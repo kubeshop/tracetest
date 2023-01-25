@@ -8,7 +8,7 @@ interface IProps {
 const useValidateTransactionDraft = ({setIsValid}: IProps) => {
   const onValidate = useCallback(
     async (changedValues: any, draft: TDraftTransaction) => {
-      const isValid = Boolean(draft.name && draft.description);
+      const isValid = !!draft.name;
 
       setIsValid(isValid);
     },

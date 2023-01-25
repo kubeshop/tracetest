@@ -13,6 +13,7 @@ import ResourceCardSummary from './ResourceCardSummary';
 import useRuns from './useRuns';
 
 interface IProps {
+  onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
   onRun(transaction: TTransaction, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
@@ -20,6 +21,7 @@ interface IProps {
 }
 
 const TransactionCard = ({
+  onEdit,
   onDelete,
   onRun,
   onViewAll,
@@ -31,6 +33,9 @@ const TransactionCard = ({
     useLazyGetTransactionRunsQuery,
     queryParams
   );
+
+  const shouldEdit = summary.hasRuns;
+  const lastRunId = summary.runs; // assume the total of runs as the last run
 
   return (
     <S.Container $type={ResourceType.Transaction}>
@@ -44,7 +49,7 @@ const TransactionCard = ({
           <S.Text>{description}</S.Text>
         </S.TitleContainer>
 
-        <ResourceCardSummary summary={summary} shouldShowResult={false} />
+        <ResourceCardSummary summary={summary} />
 
         <S.Row>
           <S.RunButton
@@ -60,7 +65,9 @@ const TransactionCard = ({
           </S.RunButton>
           <ResourceCardActions
             id={transactionId}
+            shouldEdit={shouldEdit}
             onDelete={() => onDelete(transactionId, name, ResourceType.Transaction)}
+            onEdit={() => onEdit(transactionId, lastRunId, ResourceType.Transaction)}
           />
         </S.Row>
       </S.TestContainer>

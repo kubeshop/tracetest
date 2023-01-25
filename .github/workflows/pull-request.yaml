@@ -33,6 +33,30 @@ jobs:
           cd cli/
           make test
 
+  build-cli:
+    needs:  [unit-test-cli]
+    name: Build and save CLI
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '^1.18'
+    - name: Build CLI
+      run: |
+        cd cli
+        make build
+    - name: Archive CLI binary
+      uses: actions/upload-artifact@v3
+      with:
+        retention-days: 1
+        name: cli-binary
+        path: ./cli/dist/tracetest
+        if-no-files-found: error
+
   unit-test-backend:
     name: Run backend unit tests
     runs-on: ubuntu-latest
@@ -131,7 +155,7 @@ jobs:
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   test-examples:
-    needs:  [build-docker]
+    needs:  [build-docker, build-cli]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -140,23 +164,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '^1.18'
-      - name: Build example
+      - name: Start example
         run: |
           cd examples/${{ matrix.example_dir }}
           TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
-      - name: Build CLI
-        run: |
-          cd cli
-          make build
-          ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
+      - name: Download CLI binary
+        uses: actions/download-artifact@v3
+        with:
+          name: cli-binary
       - name: Run example test
         run: |
           ./scripts/wait-for-port.sh 11633
-          ./cli/dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
+          chmod +x ./tracetest
+          ./tracetest configure -g --endpoint http://localhost:11633 --analytics=false
+          ./tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result
 
   deploy:
     needs:  [unit-test-frontend, unit-test-backend, unit-test-cli, build-docker]
@@ -248,7 +269,7 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   trace-testing:
-    needs: deploy
+    needs: [deploy]
     name: Run trace testing using tracetest
     runs-on: ubuntu-latest
 

@@ -65,6 +65,7 @@ export type TTrigger = {
 export type TRawTestSummary = TTestSchemas['TestSummary'];
 export type TSummary = {
   runs: number;
+  hasRuns: boolean;
   lastRun: {
     time: string;
     passes: number;

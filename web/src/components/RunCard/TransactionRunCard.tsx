@@ -15,17 +15,21 @@ interface IProps {
   transactionId: string;
 }
 
-function getIcon(state: TTestRun['state']) {
+function getIcon(state: TTestRun['state'], fail: number) {
   if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
     return null;
   }
-  if (state === TestStateEnum.FAILED) {
+  if (state === TestStateEnum.FAILED || fail > 0) {
     return <S.IconFail />;
   }
   return <S.IconSuccess />;
 }
 
-const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, version}, transactionId, linkTo}: IProps) => {
+const TransactionRunCard = ({
+  run: {id: runId, createdAt, state, metadata, version, pass, fail},
+  transactionId,
+  linkTo,
+}: IProps) => {
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
   const metadataBranch = metadata?.branch;
@@ -34,7 +38,7 @@ const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, versio
   return (
     <Link to={linkTo}>
       <S.Container $isWhite>
-        <S.IconContainer>{getIcon(state)}</S.IconContainer>
+        <S.IconContainer>{getIcon(state, fail)}</S.IconContainer>
 
         <S.Info>
           <div>
@@ -60,6 +64,23 @@ const TransactionRunCard = ({run: {id: runId, createdAt, state, metadata, versio
           <div>
             <TestState testState={state} />
           </div>
+        )}
+
+        {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
+          <S.Row>
+            <Tooltip title="Passed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed />
+                {pass}
+              </S.HeaderDetail>
+            </Tooltip>
+            <Tooltip title="Failed assertions">
+              <S.HeaderDetail>
+                <S.HeaderDot $passed={false} />
+                {fail}
+              </S.HeaderDetail>
+            </Tooltip>
+          </S.Row>
         )}
 
         <div>

@@ -2,7 +2,9 @@ package actions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,6 +18,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/ui"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
 )
@@ -36,11 +39,12 @@ type runTestAction struct {
 var _ Action[RunTestConfig] = &runTestAction{}
 
 type runDefParams struct {
-	DefinitionFile string
-	EnvID          string
-	WaitForResult  bool
-	JunitFile      string
-	Metadata       map[string]string
+	DefinitionFile       string
+	EnvID                string
+	WaitForResult        bool
+	JunitFile            string
+	Metadata             map[string]string
+	EnvironmentVariables map[string]string
 }
 
 func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) runTestAction {
@@ -238,6 +242,11 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		}
 	}
 
+	variables := make([]openapi.EnvironmentValue, 0)
+	for name, value := range params.EnvironmentVariables {
+		variables = append(variables, openapi.EnvironmentValue{Key: openapi.PtrString(name), Value: openapi.PtrString(value)})
+	}
+
 	body, resp, err := a.client.ApiApi.
 		ExecuteDefinition(ctx).
 		TextDefinition(openapi.TextDefinition{
@@ -245,9 +254,21 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 			RunInformation: &openapi.RunInformation{
 				Metadata:      params.Metadata,
 				EnvironmentId: &params.EnvID,
+				Variables:     variables,
 			},
 		}).
 		Execute()
+
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		filledVariables, err := a.askForMissingVariables(resp)
+		if err != nil {
+			return err
+		}
+
+		params.EnvironmentVariables = filledVariables
+
+		return a.runDefinitionFile(ctx, f, params)
+	}
 
 	if err != nil {
 		return fmt.Errorf("could not execute definition: %w", err)
@@ -288,6 +309,44 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 	}
 
 	return fmt.Errorf(`unsuported run type "%s"`, body.GetType())
+}
+
+func (a runTestAction) askForMissingVariables(resp *http.Response) (map[string]string, error) {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return map[string]string{}, fmt.Errorf("could not read response body: %w", err)
+	}
+
+	var missingVariablesError openapi.MissingVariablesError
+	err = json.Unmarshal(body, &missingVariablesError)
+	if err != nil {
+		return map[string]string{}, fmt.Errorf("could not unmarshal response: %w", err)
+	}
+
+	uniqueMissingVariables := map[string]string{}
+	for _, missingVariables := range missingVariablesError.MissingVariables {
+		for _, variable := range missingVariables.Variables {
+			defaultValue := ""
+			if variable.DefaultValue != nil {
+				defaultValue = *variable.DefaultValue
+			}
+			uniqueMissingVariables[*variable.Key] = defaultValue
+		}
+	}
+
+	if len(uniqueMissingVariables) > 0 {
+		ui.DefaultUI.Warning("Some variables are required by one or more tests")
+		ui.DefaultUI.Info("Fill the values for each variable:")
+	}
+
+	filledVariables := map[string]string{}
+
+	for variableName, variableDefaultValue := range uniqueMissingVariables {
+		value := ui.DefaultUI.TextInput(variableName, variableDefaultValue)
+		filledVariables[variableName] = value
+	}
+
+	return filledVariables, nil
 }
 
 func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.Transaction, error) {

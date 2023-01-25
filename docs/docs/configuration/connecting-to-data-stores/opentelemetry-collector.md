@@ -45,37 +45,29 @@ service:
 
 ### Configure Tracetest
 
-You also have to configure your Tracetest instance to make it aware that there's no trace data store to pull traces from. Edit your configuration file to include this configuration:
+You also have to configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector.
+
+### Web UI
+
+In the Web UI, open settings, and select OpenTelemetry Collector.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644190/Blogposts/Docs/screely-1674644186486_pahrds.png)
+
+
+### CLI
+
+Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
-# tracetest.config.yaml
+type: DataStore
+spec:
+  name: Opentelemetry Collector pipeline
+  type: otlp
+  isDefault: true
+```
 
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+Proceed to run this command in the terminal, and specify the file above.
 
-poolingConfig:
-  maxWaitTimeForTrace: 10s
-  retryDelay: 1s
-
-googleAnalytics:
-  enabled: true
-
-telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    dataStore: otlp
-    exporter: collector
-    applicationExporter: collector
-
+```bash
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```

@@ -1,5 +1,6 @@
 import {useMemo} from 'react';
 import {Button} from 'antd';
+import {useNavigate} from 'react-router-dom';
 import PaginatedList from 'components/PaginatedList';
 import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
@@ -19,6 +20,11 @@ const Content = () => {
   const params = useMemo(() => ({testId: test.id}), [test.id]);
   useDocumentTitle(`${test.name}`);
 
+  const navigate = useNavigate();
+
+  const shouldEdit = test.summary.hasRuns;
+  const onEdit = () => navigate(`/test/${test.id}/run/${test.summary.runs}`);
+
   return (
     <S.Container $isWhite>
       <TestHeader
@@ -27,6 +33,8 @@ const Content = () => {
         }`}
         id={test.id}
         onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
+        onEdit={onEdit}
+        shouldEdit={shouldEdit}
         title={`${test.name} (v${test.version})`}
         runButton={
           <Button

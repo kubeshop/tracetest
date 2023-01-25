@@ -1,4 +1,4 @@
-# OpenTelemetry Demo with Tracetest and Lightstep
+# OpenTelemetry Demo with Tracetest and New Relic
 
 This examples uses OpenTelemetry Demo `v1.2.1`.
 

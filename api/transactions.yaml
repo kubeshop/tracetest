@@ -54,3 +54,7 @@ components:
           type: object
           additionalProperties:
             type: string
+        pass:
+          type: integer
+        fail:
+          type: integer

@@ -96,41 +96,36 @@ storage:
 
 ```
 
+## Configure Tracetest to Use Tempo as a Trace Data Store
 
 You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from Tempo. 
 
-Edit your configuration file to include this configuration:
+Make sure you know what your Tempo endpoint for fetching traces is. In the screenshot below, the endpoint is `tempo:9095`.
+
+### Web UI
+
+In the Web UI, open settings, and select Tempo.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644545/Blogposts/Docs/screely-1674644541618_ly8ur3.png)
+
+### CLI
+
+Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
-# tracetest.config.yaml
+type: DataStore
+spec:
+  name: Grafana Tempo
+  type: tempo
+  isDefault: true
+  tempo:
+    endpoint: tempo:9095
+    tls:
+      insecure: true
+```
 
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+Proceed to run this command in the terminal, and specify the file above.
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
-telemetry:
-  dataStores:
-    tempo:
-      type: tempo
-      tempo:
-        endpoint: tempo:9095
-        tls:
-          insecure: true
-
-server:
-  telemetry:
-    dataStore: tempo
-    exporter: collector
-    applicationExporter: collector
-
+```bash
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```
