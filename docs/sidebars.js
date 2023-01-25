@@ -284,6 +284,28 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Tools and Integrations",
+      items: [
+        {
+          type: "doc",
+          id: "tools-and-integrations/overview",
+          label: "Overview",
+        },
+        {
+          type: "category",
+          label: "Integrations",
+          items: [
+            {
+              type: "doc",
+              id: "tools-and-integrations/integrations/keptn",
+              label: "Keptn",
+            }
+          ]
+        }
+      ]
+    },
+    {
+      type: "category",
       label: "Examples & Tutorials",
       items: [
         {
