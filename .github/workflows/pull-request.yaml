@@ -269,7 +269,7 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   trace-testing:
-    needs: [deploy, build-cli]
+    needs: [deploy]
     name: Run trace testing using tracetest
     runs-on: ubuntu-latest
 
@@ -290,11 +290,6 @@ jobs:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
-
-      - name: Download CLI binary
-        uses: actions/download-artifact@v3
-        with:
-          name: cli-binary
 
       - name: Install CLI integration version (latest main)
         run: |
@@ -317,7 +312,7 @@ jobs:
 
   cleanup:
     runs-on: ubuntu-latest
-    needs: [trace-testing, e2e]
+    needs: [trace-testing, e2e, deploy]
     if: always()
     steps:
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
