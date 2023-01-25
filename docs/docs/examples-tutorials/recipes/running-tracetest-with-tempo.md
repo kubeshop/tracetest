@@ -1,5 +1,9 @@
 # Running Tracetest with Tempo
 
+:::note
+[Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-tempo-nodejs) 
+:::
+
 ## Sample Node.js app with Tempo, OpenTelemetry and Tracetest
 
 This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces and Tracetest for enhancing your e2e and integration tests with trace-based testing. The infrastructure will use Tempo as the trace data store, and OpenTelemetry Collector to receive traces from the Node.js app and send them to Tempo.
@@ -329,5 +333,7 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
 
 Start creating tests! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+
+## Learn more
 
 Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

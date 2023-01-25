@@ -8,5 +8,6 @@ These recipes will show you the best practices of using Tracetest.
 - [Sending traces to Tempo and fetching them from Tempo with Tracetest](./recipes/running-tracetest-with-tempo)
 - [Sending traces directy to Tracetest and Lightstep](./recipes/running-tracetest-with-lightstep)
 - [Sending traces directy to Tracetest and New Relic](./recipes/running-tracetest-with-new-relic)
+- [Sending traces to Elastic APM and fetching them from Elasticsearch with Tracetest](./recipes/running-tracetest-with-elasticapm)
 
 Stay tuned! More recipes are coming soon. 🚀
