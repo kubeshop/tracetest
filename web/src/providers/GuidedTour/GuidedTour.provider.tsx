@@ -73,7 +73,7 @@ const GuidedTourProvider = ({children}: IProps) => {
 
     const btn = (
       <Space>
-        <Button ghost onClick={onSkip} type="primary">
+        <Button data-cy="guided-tour-cancel-notification" ghost onClick={onSkip} type="primary">
           No thanks
         </Button>
         <Button onClick={onStart} type="primary">
