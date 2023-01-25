@@ -241,6 +241,8 @@ const config = {
         indexName: "tracetest",
 
         contextualSearch: false,
+
+        searchPagePath: false,
       },
     }),
 };

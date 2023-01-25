@@ -1,5 +1,11 @@
 # Running Tracetest With Lightstep
 
+:::note
+[Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
+:::
+
+## OpenTelemetry Demo `v0.3.4-alpha` with Lightstep, OpenTelemetry and Tracetest
+
 This is a simple sample app on how to configure the [OpenTelemetry Demo `v0.3.4-alpha`](https://github.com/open-telemetry/opentelemetry-demo) to use [Tracetest](https://tracetest.io/) for enhancing your E2E and integration tests with trace-based testing, and [Lightstep](https://lightstep.com/) as a trace data store.
 
 ## Prerequisites
@@ -306,4 +312,4 @@ With Lightstep and Tracetest, you get the best of both worlds. You can run trace
 
 ## Learn more
 
-Feel free to check out our [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

@@ -42,45 +42,40 @@ service:
       receivers: [otlp] # your receiver
       processors: [batch] # make sure to add the batch processor
       exporters: [jaeger] # your exporter pointing to your Jaeger instance
-
 ```
 
 ## Configure Tracetest to Use Jaeger as a Trace Data Store
 
 You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from Jaeger. 
 
-Edit your configuration file to include this configuration:
+Make sure you know what your Jaeger endpoint for fetching traces is. In the screenshot below, the endpoint is `jaeger:16685`.
+
+
+### Web UI
+
+In the Web UI, open settings, and select Jaeger.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643178/Blogposts/Docs/screely-1674643170953_vazb9h.png)
+
+
+### CLI
+
+Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
-# tracetest.config.yaml
+type: DataStore
+spec:
+  name: jaeger
+  type: jaeger
+  isDefault: true
+  jaeger:
+    endpoint: jaeger:16685
+    tls:
+      insecure: true
+```
 
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+Proceed to run this command in the terminal, and specify the file above.
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
-telemetry:
-  dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
-
-server:
-  telemetry:
-    dataStore: jaeger
-    exporter: collector
-    applicationExporter: collector
-
+```bash
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```

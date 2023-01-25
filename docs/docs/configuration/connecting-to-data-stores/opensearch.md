@@ -50,40 +50,35 @@ service:
 
 ## Configure Tracetest to Use OpenSearch as a Trace Data Store
 
-You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from Jaeger. 
+You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from OpenSearch. 
 
-Edit your configuration file to include this configuration:
+Make sure you know which Index name and Address you are using. In the screenshot below, the Index name is `traces`, the Address is `http://opensearch:9200`.
+
+### Web UI
+
+In the Web UI, open settings, and select OpenSearch.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644099/Blogposts/Docs/screely-1674644094600_svcwp6.png)
+
+
+### CLI
+
+Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
-# tracetest.config.yaml
+type: DataStore
+spec:
+  name: OpenSearch Data Store
+  type: openSearch
+  isDefault: true
+  opensearch:
+    addresses:
+      - http://opensearch:9200
+    index: traces
+```
 
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+Proceed to run this command in the terminal, and specify the file above.
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
-telemetry:
-  dataStores:
-    opensearch:
-      type: opensearch
-      opensearch:
-        addresses:
-          - http://opensearch:9200 # This value is from the OpenSearch data store configuration.
-        index: traces
-
-server:
-  telemetry:
-    dataStore: opensearch
-    exporter: collector
-    applicationExporter: collector
-
+```bash
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```

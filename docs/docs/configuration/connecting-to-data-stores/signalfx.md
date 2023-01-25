@@ -51,37 +51,30 @@ service:
 
 You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from SignalFx.
 
-Edit your configuration file to include this configuration:
+### Web UI
+
+In the Web UI, open settings, and select SignalFx.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644337/Blogposts/Docs/screely-1674644332529_cks0lw.png)
+
+
+### CLI
+
+Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
-# tracetest.config.yaml
+type: DataStore
+spec:
+  name: SignalFX
+  type: signalFx
+  isDefault: true
+  signalFx:
+    realm: us1
+    token: mytoken
+```
 
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+Proceed to run this command in the terminal, and specify the file above.
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
-telemetry:
-  dataStores:
-    signalfx:
-      type: signalfx
-      signalfx:
-        token: <YOUR_TOKEN> # UPDATE WITH YOUR TOKEN
-        realm: <YOUR_REALM> # UPDATE WITH YOUR REALM
-
-server:
-  telemetry:
-    dataStore: signalfx
-    exporter: collector
-    applicationExporter: collector
-
+```bash
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```

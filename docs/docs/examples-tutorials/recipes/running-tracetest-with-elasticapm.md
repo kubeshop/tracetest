@@ -1,6 +1,8 @@
 # Running Tracetest with Elastic APM
 
-[Check out the full code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm-with-elastic-agent)
+:::note
+[Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm-with-elastic-agent) 
+:::
 
 ## Sample Node.js app with Elastic, OpenTelemetry and Tracetest
 
@@ -14,7 +16,7 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 
 * `docker-compose.yml` - docker compose file that starts the whole environment
     * Elastic stack single node cluster with Elasticsearch, Kibana and, the APM Server.
-    * OTel collector to support Tracetest (TODO - check if can be removed).
+    * OTel collector to support Tracetest.
     * Tracetest instance.
 * `collector-config.yml` - OTel collector configuration file
 * `app.js` - sample NodeJS application listening on port 8080 and instrumented with Elastic Nodejs APM agent.
@@ -168,7 +170,7 @@ tracetest datastore apply -f my/data-store/file/location.yaml
 
 ### Step-by-step guide
 
-Open http://localhost:11633/ to configure the connection to Elasticsearch:
+Open `http://localhost:11633/` to configure the connection to Elasticsearch:
 
 1. In Settings, configure Elastic APM as the Data Store.
 2. Set `traces-apm-default` as the Index name.
@@ -187,7 +189,7 @@ Create a new test:
 4. Running the test should succeed.
 
 ## Open Kibana
-Open https://localhost:5601 and login using `elastic:changeme` credentials. The credentials can be changed in the `.env` file. Navigate to APM (upper lefthand corner menu) -> Services and you should see the `tracetest` service with the rest of the details.
+Open `https://localhost:5601` and login using `elastic:changeme` credentials. The credentials can be changed in the `.env` file. Navigate to APM (upper lefthand corner menu) -> Services and you should see the `tracetest` service with the rest of the details.
 
 ## Steps to stop the environment
 ```bash
@@ -197,8 +199,6 @@ docker compose down -v
 docker rmi quick-start-nodejs:latest
 ```
 
-## Conclusion
-
-This is a short recipe on getting up and running with the Elastic Stack and Tracetest!
+## Learn more
 
 Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

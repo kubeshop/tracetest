@@ -59,39 +59,31 @@ service:
 
 ```
 
-### Configure Tracetest
+### Configure Tracetest to Use New Relic as a Trace Data Store
 
-You also have to configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. Edit your configuration file to include this configuration:
+You also have to configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector.
+
+### Web UI
+
+In the Web UI, open settings, and select New Relic.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643685/Blogposts/Docs/screely-1674643680615_de8fry.png)
+
+
+### CLI
+
+Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
-# tracetest.config.yaml
+type: DataStore
+spec:
+  name: Opentelemetry Collector pipeline
+  type: otlp
+  isDefault: true
+```
 
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+Proceed to run this command in the terminal, and specify the file above.
 
-poolingConfig:
-  maxWaitTimeForTrace: 10s
-  retryDelay: 1s
-
-googleAnalytics:
-  enabled: true
-
-telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    dataStore: otlp
-    exporter: collector
-    applicationExporter: collector
-
+```bash
+tracetest datastore apply -f my/data-store/file/location.yaml
 ```
