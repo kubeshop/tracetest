@@ -1,5 +1,6 @@
 import {Button} from 'antd';
 import {useCallback, useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 import PaginatedList from 'components/PaginatedList';
 import TransactionRunCard from 'components/RunCard/TransactionRunCard';
@@ -22,12 +23,19 @@ const Content = () => {
     if (transaction.id) runTransaction(transaction);
   }, [runTransaction, transaction]);
 
+  const navigate = useNavigate();
+
+  const shouldEdit = transaction.summary.hasRuns;
+  const onEdit = () => navigate(`/transaction/${transaction.id}/run/${transaction.summary.runs}`);
+
   return (
     <S.Container $isWhite>
       <TestHeader
         description={transaction.description}
         id={transaction.id}
         onDelete={() => onDelete(transaction.id, transaction.name)}
+        onEdit={onEdit}
+        shouldEdit={shouldEdit}
         title={`${transaction.name} (v${transaction.version})`}
         runButton={
           <Button onClick={handleRunTest} loading={isEditLoading} type="primary" ghost>

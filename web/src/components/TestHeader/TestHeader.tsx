@@ -5,12 +5,14 @@ import * as S from './TestHeader.styled';
 interface IProps {
   description: string;
   id: string;
+  shouldEdit: boolean;
+  onEdit(): void;
   onDelete(): void;
   title: string;
   runButton: React.ReactElement;
 }
 
-const TestHeader = ({description, id, onDelete, title, runButton}: IProps) => (
+const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, title, runButton}: IProps) => (
   <S.Container $isWhite>
     <S.Section>
       <Link to="/" data-cy="test-header-back-button">
@@ -23,7 +25,7 @@ const TestHeader = ({description, id, onDelete, title, runButton}: IProps) => (
     </S.Section>
     <S.Section>
       {runButton}
-      <ResourceCardActions id={id} onDelete={onDelete} />
+      <ResourceCardActions id={id} onDelete={onDelete} onEdit={onEdit} shouldEdit={shouldEdit} />
     </S.Section>
   </S.Container>
 );
