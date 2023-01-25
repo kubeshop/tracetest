@@ -45,8 +45,13 @@ func (f transactionRun) Format(output TransactionRunOutput) string {
 
 func (f transactionRun) json(output TransactionRunOutput) string {
 	type stepResult struct {
-		Name    string
-		Results openapi.AssertionResults
+		Name    string                   `json:"name"`
+		Results openapi.AssertionResults `json:"results"`
+	}
+
+	type transactionResult struct {
+		RunWebURL string       `json:"testRunWebUrl"`
+		Steps     []stepResult `json:"steps"`
 	}
 
 	stepsResults := make([]stepResult, 0, len(output.Run.Steps))
@@ -59,7 +64,12 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 		})
 	}
 
-	bytes, err := json.MarshalIndent(stepsResults, "", "  ")
+	result := transactionResult{
+		RunWebURL: output.RunWebURL,
+		Steps:     stepsResults,
+	}
+
+	bytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		panic(fmt.Errorf("could not marshal output json: %w", err))
 	}

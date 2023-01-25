@@ -61,8 +61,14 @@ func (f testRun) Format(output TestRunOutput) string {
 }
 
 func (f testRun) json(output TestRunOutput) string {
-	output.RunWebURL = f.GetRunLink(output.Test.GetId(), output.Run.GetId())
-	bytes, err := json.MarshalIndent(output.Run.Result, "", "  ")
+	result := struct {
+		RunWebURL string                   `json:"testRunWebUrl"`
+		Results   openapi.AssertionResults `json:"results"`
+	}{
+		RunWebURL: f.GetRunLink(output.Test.GetId(), output.Run.GetId()),
+		Results:   *output.Run.Result,
+	}
+	bytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		panic(fmt.Errorf("could not marshal output json: %w", err))
 	}

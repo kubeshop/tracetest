@@ -32,7 +32,7 @@ func TestJSON(t *testing.T) {
 	formatters.SetOutput(formatters.JSON)
 	actual := formatter.Format(in)
 
-	expected := `{"test":{"id":"9876543","name":"Testcase 1"},"testRun":{"id":"1", "result":{"allPassed":true},"state":"FINISHED"},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1/test"}`
+	expected := `{"results":{"allPassed":true},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1/test"}`
 
 	assert.JSONEq(t, expected, actual)
 	formatters.SetOutput(formatters.DefaultOutput)
