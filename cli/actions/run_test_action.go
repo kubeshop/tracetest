@@ -259,7 +259,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		}).
 		Execute()
 
-	if resp.StatusCode == http.StatusUnprocessableEntity {
+	if resp != nil && resp.StatusCode == http.StatusUnprocessableEntity {
 		filledVariables, err := a.askForMissingVariables(resp)
 		if err != nil {
 			return err
