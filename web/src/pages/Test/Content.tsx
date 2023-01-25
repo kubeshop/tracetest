@@ -7,11 +7,9 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import {useTest} from 'providers/Test/Test.provider';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
-import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import * as S from './Test.styled';
 
 const Content = () => {
@@ -33,7 +31,6 @@ const Content = () => {
         runButton={
           <Button
             data-cy="test-details-run-test-button"
-            data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.RunTest)}
             ghost
             loading={isLoadingRunTest}
             onClick={() => runTest(test)}
