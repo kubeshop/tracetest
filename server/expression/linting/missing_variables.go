@@ -38,7 +38,8 @@ func DetectMissingVariables(target interface{}, availableVariables []string) []s
 
 func getTokens(fieldInfo reflect.StructField, value string) []expression.Token {
 	if fieldInfo.Tag.Get("expr_enabled") == "true" {
-		exprTokens, err := expression.GetTokensFromExpression(fmt.Sprintf("\"%s\"", value))
+		value = fmt.Sprintf("'%s'", value)
+		exprTokens, err := expression.GetTokensFromExpression(value)
 		if err != nil {
 			// probably not an expression, just skip it
 			return []expression.Token{}
