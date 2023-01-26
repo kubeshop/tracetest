@@ -123,13 +123,14 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   );
 
   const onSubmit = useCallback(
-    async (values: TTestOutput, spanId?: string) => {
+    async (values: TTestOutput, matchedSpanId?: string) => {
+      const spanId = values.spanId || matchedSpanId || '';
       const props = {
         expression: values.value,
         context: {
           testId,
           runId,
-          spanId: spanId ?? '',
+          spanId,
           selector: values.selector,
           environmentId: selectedEnvironment?.id,
         },
@@ -140,10 +141,10 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       setIsOpen(false);
       if (isEditing) {
         setIsEditing(false);
-        dispatch(outputUpdated({output: {...values, valueRunDraft, id: draft?.id ?? -1}}));
+        dispatch(outputUpdated({output: {...values, spanId, valueRunDraft, id: draft?.id ?? -1}}));
         return;
       }
-      dispatch(outputAdded({...values, valueRunDraft}));
+      dispatch(outputAdded({...values, valueRunDraft, spanId}));
     },
     [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId]
   );
