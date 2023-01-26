@@ -371,23 +371,23 @@ const sidebars = {
           items: [
             {
               type: "doc",
-              id: "pokeshop/index",
+              id: "live-examples/pokeshop/overview",
               label: "Overview",
             },
             {
               type: "doc",
-              id: "pokeshop/add-pokemon",
-              label: "Add Pokemon",
+              id: "live-examples/pokeshop/add-pokemon",
+              label: "Use case: Add Pokemon",
             },
             {
               type: "doc",
-              id: "pokeshop/import-pokemon",
-              label: "Import Pokemon",
+              id: "live-examples/pokeshop/import-pokemon",
+              label: "Use case: Import Pokemon",
             },
             {
               type: "doc",
-              id: "pokeshop/list-pokemon",
-              label: "List Pokemon",
+              id: "live-examples/pokeshop/list-pokemon",
+              label: "Use case: List Pokemon",
             },
           ],
         },
@@ -397,7 +397,7 @@ const sidebars = {
         //   items: [
         //     {
         //       type: "doc",
-        //       id: "opentelemetry-store/overview",
+        //       id: "live-examples/opentelemetry-store/overview",
         //       label: "Overview",
         //     },
         //   ],
