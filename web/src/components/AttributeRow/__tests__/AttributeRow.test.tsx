@@ -21,6 +21,7 @@ describe('AttributeRow', () => {
         onCreateTestSpec={onCreateTestSpec}
         onCopy={onCopy}
         semanticConventions={{}}
+        outputs={[]}
       />
     );
 
