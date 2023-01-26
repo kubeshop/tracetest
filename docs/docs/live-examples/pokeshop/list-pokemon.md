@@ -9,7 +9,7 @@ This endpoint returns the list of Pokemon directly from the database (Postgres) 
 Route: `GET /pokemon?take=20&skip=0`
 
 Response:
-```javascript
+```json
 [
   {
     "id":  25,

@@ -9,14 +9,14 @@ This endpoint showcases a more complex scenario involving an async process. Usua
 Route: `POST /pokemon/import`
 
 Request Body:
-```javascript
+```json
 {
   "id":  1
 }
 ```
 
 Response:
-```javascript
+```json
 {
   "id":  1000,
   "name":  "meowth",

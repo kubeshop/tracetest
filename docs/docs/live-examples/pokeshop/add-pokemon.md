@@ -9,7 +9,7 @@ This endpoint showcases the different checkpoints that can be added to an applic
 Route: `POST /pokemon`
 
 Request Body:
-```javascript
+```json
 {
   "name":  "meowth",
   "type":  "normal",
@@ -19,7 +19,7 @@ Request Body:
 ```
 
 Response:
-```javascript
+```json
 {
   "id":  1000,
   "name":  "meowth",
