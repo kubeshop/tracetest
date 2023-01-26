@@ -166,6 +166,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
               {!isTestSpecFormOpen && !isTestOutputFormOpen && (
                 <S.TabsContainer>
                   <Tabs
+                    activeKey={query.get('tab') || TABS.SPECS}
                     defaultActiveKey={query.get('tab') || TABS.SPECS}
                     onChange={tab =>
                       updateQuery(

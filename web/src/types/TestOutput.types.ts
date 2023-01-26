@@ -11,11 +11,13 @@ export type TTestOutput = {
   valueRun: string;
   valueRunDraft: string;
   id: number;
+  spanId: string;
 };
 
 export type TRawTestRunOutput = {
   name?: string;
   value?: string;
+  spanId?: string;
 };
 
 export type TTestRunOutput = Model<TRawTestRunOutput, {}>;

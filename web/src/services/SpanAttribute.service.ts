@@ -8,6 +8,7 @@ import {isEmpty, remove} from 'lodash';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText, isJson} from 'utils/Common';
 import {TResultAssertions, TResultAssertionsSummary} from 'types/Assertion.types';
+import {TTestOutput} from '../types/TestOutput.types';
 
 const flatAttributes = Object.values(Attributes);
 const flatTraceTestAttributes = Object.values(TraceTestAttributes);
@@ -103,6 +104,10 @@ const SpanAttributeService = () => ({
     );
 
     return resultList;
+  },
+
+  getOutputsFromAttributeName(attributeName: string, outputs: TTestOutput[]): TTestOutput[] {
+    return outputs.filter(({value}) => value.toLowerCase().includes(attributeName.toLowerCase()));
   },
 });
 

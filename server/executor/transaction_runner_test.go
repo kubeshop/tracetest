@@ -43,7 +43,9 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 
 		r.uid++
 
-		newRun.Outputs = (model.OrderedMap[string, string]{}).MustAdd("USER_ID", strconv.Itoa(r.uid))
+		newRun.Outputs = (model.OrderedMap[string, model.RunOutput]{}).MustAdd("USER_ID", model.RunOutput{
+			Value: strconv.Itoa(r.uid),
+		})
 
 		err = r.db.UpdateRun(ctx, newRun)
 		r.subscriptionManager.PublishUpdate(subscription.Message{
@@ -66,7 +68,7 @@ func TestTransactionRunner(t *testing.T) {
 			assert.Equal(t, actual.Steps[1].State, model.RunStateFinished)
 			assert.Equal(t, "http://my-service.com", actual.Environment.Get("url"))
 
-			assert.Equal(t, "1", actual.Steps[0].Outputs.Get("USER_ID"))
+			assert.Equal(t, model.RunOutput{Name: "", Value: "1", SpanID: ""}, actual.Steps[0].Outputs.Get("USER_ID"))
 
 			// this assertom is supposed to test that the output from the previous step
 			// is injected in the env for the next. In practice, this depends
@@ -74,7 +76,7 @@ func TestTransactionRunner(t *testing.T) {
 			// to the test run, like the real test runner would.
 			// see line 27
 			assert.Equal(t, "1", actual.Steps[1].Environment.Get("USER_ID"))
-			assert.Equal(t, "2", actual.Steps[1].Outputs.Get("USER_ID"))
+			assert.Equal(t, model.RunOutput{Name: "", Value: "2", SpanID: ""}, actual.Steps[1].Outputs.Get("USER_ID"))
 
 			assert.Equal(t, "2", actual.Environment.Get("USER_ID"))
 

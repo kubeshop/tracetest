@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {ISpanState, TSpan} from 'types/Span.types';
+import {outputsSelectedOutputsChanged} from '../testOutputs/slice';
 import {setSelectedSpec} from './TestSpecs.slice';
 
 export const initialState: ISpanState = {
@@ -31,10 +32,15 @@ const testDefinitionSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(setSelectedSpec, (state, {payload: assertionResult}) => {
-      state.matchedSpans = assertionResult?.spanIds ?? [];
-      state.focusedSpan = state.matchedSpans[0] || '';
-    });
+    builder
+      .addCase(setSelectedSpec, (state, {payload: assertionResult}) => {
+        state.matchedSpans = assertionResult?.spanIds ?? [];
+        state.focusedSpan = state.matchedSpans[0] || '';
+      })
+      .addCase(outputsSelectedOutputsChanged, (state, {payload: outputs}) => {
+        state.matchedSpans = outputs.map(output => output.spanId);
+        state.focusedSpan = state.matchedSpans[0] || '';
+      });
   },
 });
 

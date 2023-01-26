@@ -16,8 +16,9 @@ import (
 
 // TestRunOutputs struct for TestRunOutputs
 type TestRunOutputs struct {
-	Name  *string `json:"name,omitempty"`
-	Value *string `json:"value,omitempty"`
+	Name   *string `json:"name,omitempty"`
+	SpanId *string `json:"spanId,omitempty"`
+	Value  *string `json:"value,omitempty"`
 }
 
 // NewTestRunOutputs instantiates a new TestRunOutputs object
@@ -69,6 +70,38 @@ func (o *TestRunOutputs) SetName(v string) {
 	o.Name = &v
 }
 
+// GetSpanId returns the SpanId field value if set, zero value otherwise.
+func (o *TestRunOutputs) GetSpanId() string {
+	if o == nil || o.SpanId == nil {
+		var ret string
+		return ret
+	}
+	return *o.SpanId
+}
+
+// GetSpanIdOk returns a tuple with the SpanId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRunOutputs) GetSpanIdOk() (*string, bool) {
+	if o == nil || o.SpanId == nil {
+		return nil, false
+	}
+	return o.SpanId, true
+}
+
+// HasSpanId returns a boolean if a field has been set.
+func (o *TestRunOutputs) HasSpanId() bool {
+	if o != nil && o.SpanId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSpanId gets a reference to the given string and assigns it to the SpanId field.
+func (o *TestRunOutputs) SetSpanId(v string) {
+	o.SpanId = &v
+}
+
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *TestRunOutputs) GetValue() string {
 	if o == nil || o.Value == nil {
@@ -105,6 +138,9 @@ func (o TestRunOutputs) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Name != nil {
 		toSerialize["name"] = o.Name
+	}
+	if o.SpanId != nil {
+		toSerialize["spanId"] = o.SpanId
 	}
 	if o.Value != nil {
 		toSerialize["value"] = o.Value

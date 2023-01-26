@@ -170,6 +170,8 @@ components:
             properties:
               name:
                 type: string
+              spanId:
+                type: string
               value:
                 type: string
 

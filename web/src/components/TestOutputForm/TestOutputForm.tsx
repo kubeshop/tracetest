@@ -48,6 +48,7 @@ const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmi
         onFinish={values => onSubmit(values, spanIdList[0])}
         onValuesChange={onValidate}
       >
+        <Form.Item name="spanId" />
         <S.FormSection>
           <S.FormSectionHeaderSelector>
             <S.FormSectionRow1>

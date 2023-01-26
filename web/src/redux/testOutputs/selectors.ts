@@ -1,31 +1,23 @@
 import {createSelector} from '@reduxjs/toolkit';
-
-import {TTestOutput} from 'types/TestOutput.types';
 import {RootState} from '../store';
-import {endpoints} from '../apis/TraceTest.api';
 
 const testOutputsStateSelector = (state: RootState) => state.testOutputs;
 
-const selectTestRunOutputs = createSelector(
-  (state: RootState) => state,
-  (state: RootState, testId: string, runId: string) => ({testId, runId}),
-  (state, {testId, runId}) => {
-    const {data} = endpoints.getRunById.select({testId, runId})(state);
+export const selectTestOutputs = createSelector(testOutputsStateSelector, ({outputs}) => outputs);
 
-    return data?.outputs ?? [];
-  }
+export const selectSelectedOutputs = createSelector(testOutputsStateSelector, ({selectedOutputs}) => selectedOutputs);
+
+export const outputIdSelector = (state: RootState, outputId: number) => outputId;
+export const selectIsSelectedOutput = createSelector(
+  selectSelectedOutputs,
+  outputIdSelector,
+  (selectedOutputs, outputId) => !!selectedOutputs.find(selectedOutput => selectedOutput.id === outputId)
 );
 
-export const selectTestOutputs = createSelector(
-  testOutputsStateSelector,
-  selectTestRunOutputs,
-  ({outputs}, testRunOutputs) => {
-    return outputs.map<TTestOutput>((output, index) => ({
-      ...output,
-      valueRun: testRunOutputs[index]?.value ?? '',
-    }));
-  }
-);
+export const spanIdSelector = (state: RootState, spanId: string) => spanId;
+export const selectOutputsBySpanId = createSelector(selectTestOutputs, spanIdSelector, (outputs, spanId) => {
+  return outputs.filter(output => output.spanId === spanId);
+});
 
 export const selectIsPending = createSelector(testOutputsStateSelector, ({outputs}) =>
   outputs.some(output => output.isDraft)

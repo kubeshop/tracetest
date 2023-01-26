@@ -4,12 +4,22 @@ import {useNavigate} from 'react-router-dom';
 
 import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {selectIsPending, selectTestOutputs} from 'redux/testOutputs/selectors';
-import {outputAdded, outputDeleted, outputsInitiated, outputsReverted, outputUpdated} from 'redux/testOutputs/slice';
+import {selectIsPending, selectSelectedOutputs, selectTestOutputs} from 'redux/testOutputs/selectors';
+import {
+  outputAdded,
+  outputDeleted,
+  outputsInitiated,
+  outputsReseted,
+  outputsReverted,
+  outputsSelectedOutputsChanged,
+  outputsTestRunOutputsMerged,
+  outputUpdated,
+} from 'redux/testOutputs/slice';
 import {TTestOutput} from 'types/TestOutput.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
+import {useTestRun} from '../TestRun/TestRun.provider';
 
 interface IContext {
   isDraftMode: boolean;
@@ -22,8 +32,10 @@ interface IContext {
   onNavigateAndOpen(draft?: TTestOutput): void;
   onOpen(draft?: TTestOutput): void;
   onSubmit(values: TTestOutput): void;
+  onSelectedOutputs(outputs: TTestOutput[]): void;
   output?: TTestOutput;
   outputs: TTestOutput[];
+  selectedOutputs: TTestOutput[];
 }
 
 export const Context = createContext<IContext>({
@@ -37,8 +49,10 @@ export const Context = createContext<IContext>({
   onNavigateAndOpen: noop,
   onOpen: noop,
   onSubmit: noop,
+  onSelectedOutputs: noop,
   output: undefined,
   outputs: [],
+  selectedOutputs: [],
 });
 
 interface IProps {
@@ -61,12 +75,24 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const {
     test: {outputs: testOutputs = []},
   } = useTest();
-  const outputs = useAppSelector(state => selectTestOutputs(state, testId, runId));
+  const {
+    run: {outputs: runOutputs = []},
+  } = useTestRun();
+  const outputs = useAppSelector(state => selectTestOutputs(state));
+  const selectedOutputs = useAppSelector(selectSelectedOutputs);
   const isDraftMode = useAppSelector(selectIsPending);
 
   useEffect(() => {
     dispatch(outputsInitiated(testOutputs));
+
+    return () => {
+      dispatch(outputsReseted());
+    };
   }, [dispatch, testOutputs]);
+
+  useEffect(() => {
+    dispatch(outputsTestRunOutputsMerged(runOutputs));
+  }, [dispatch, runOutputs]);
 
   const onOpen = useCallback((values?: TTestOutput) => {
     setDraft(values);
@@ -97,13 +123,14 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   );
 
   const onSubmit = useCallback(
-    async (values: TTestOutput, spanId?: string) => {
+    async (values: TTestOutput, matchedSpanId?: string) => {
+      const spanId = values.spanId || matchedSpanId || '';
       const props = {
         expression: values.value,
         context: {
           testId,
           runId,
-          spanId: spanId ?? '',
+          spanId,
           selector: values.selector,
           environmentId: selectedEnvironment?.id,
         },
@@ -114,10 +141,10 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       setIsOpen(false);
       if (isEditing) {
         setIsEditing(false);
-        dispatch(outputUpdated({output: {...values, valueRunDraft, id: draft?.id ?? -1}}));
+        dispatch(outputUpdated({output: {...values, spanId, valueRunDraft, id: draft?.id ?? -1}}));
         return;
       }
-      dispatch(outputAdded({...values, valueRunDraft}));
+      dispatch(outputAdded({...values, valueRunDraft, spanId}));
     },
     [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId]
   );
@@ -128,6 +155,14 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       onOpen(values);
     },
     [navigate, onOpen, runId, testId]
+  );
+
+  const onSelectedOutputs = useCallback(
+    (outputList: TTestOutput[]) => {
+      navigate(`/test/${testId}/run/${runId}/test/?tab=outputs`);
+      dispatch(outputsSelectedOutputsChanged(outputList));
+    },
+    [dispatch, navigate, runId, testId]
   );
 
   const value = useMemo<IContext>(
@@ -142,8 +177,10 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       onNavigateAndOpen,
       onOpen,
       onSubmit,
+      onSelectedOutputs,
       output: draft,
       outputs,
+      selectedOutputs,
     }),
     [
       draft,
@@ -156,8 +193,10 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       onDelete,
       onNavigateAndOpen,
       onOpen,
+      onSelectedOutputs,
       onSubmit,
       outputs,
+      selectedOutputs,
     ]
   );
 
