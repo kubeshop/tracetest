@@ -284,7 +284,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Tools and Integrations",
+      label: "Tools & Integrations",
       items: [
         {
           type: "doc",
