@@ -81,6 +81,8 @@ export const Container = styled.div<{$matched: boolean; $selected: boolean}>`
 export const Footer = styled.div`
   bottom: 12px;
   position: absolute;
+  flex-direction: column;
+  align-items: flex-end;
   right: 10px;
   display: flex;
 `;

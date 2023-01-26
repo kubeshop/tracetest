@@ -2,13 +2,15 @@ import {MoreOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
-export const Container = styled.div<{$isDeleted: boolean}>`
+export const Container = styled.div<{$isDeleted: boolean; $isSelected: boolean}>`
   background: ${({theme}) => theme.color.white};
-  border: ${({theme}) => `1px solid ${theme.color.border}`};
+  border: ${({$isSelected, theme}) =>
+    $isSelected ? `1px solid ${theme.color.interactive}` : `1px solid ${theme.color.borderLight}`};
   display: flex;
   flex-direction: column;
   padding: 7px 16px;
   transition: background-color 0.2s ease;
+  cursor: pointer;
 
   > div:nth-child(2) {
     opacity: ${({$isDeleted}) => ($isDeleted ? 0.5 : 1)};

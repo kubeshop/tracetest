@@ -96,7 +96,7 @@ type (
 		TriggerResult TriggerResult
 		Results       *RunResults
 		Trace         *Trace
-		Outputs       OrderedMap[string, string]
+		Outputs       OrderedMap[string, RunOutput]
 		LastError     error
 		Pass          int
 		Fail          int
@@ -110,6 +110,12 @@ type (
 	RunResults struct {
 		AllPassed bool
 		Results   OrderedMap[SpanQuery, []AssertionResult]
+	}
+
+	RunOutput struct {
+		Name   string
+		Value  string
+		SpanID string
 	}
 
 	AssertionResult struct {

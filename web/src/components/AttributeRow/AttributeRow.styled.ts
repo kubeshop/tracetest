@@ -1,6 +1,7 @@
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {Tag as AntdTag, Typography} from 'antd';
 import styled from 'styled-components';
+import TestOutputMark from 'components/TestOutputMark';
 
 export {default as AttributeTitle} from './AttributeTitle';
 
@@ -65,4 +66,11 @@ export const InfoIcon = styled(InfoCircleOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
   cursor: pointer;
   margin: 4px;
+`;
+
+export const OutputsMark = styled(TestOutputMark)`
+  && {
+    color: ${({theme}) => theme.color.textSecondary};
+    margin: 4px;
+  }
 `;

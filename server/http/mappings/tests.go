@@ -314,13 +314,14 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 	}
 }
 
-func (m OpenAPI) RunOutputs(in model.OrderedMap[string, string]) []openapi.TestRunOutputs {
+func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []openapi.TestRunOutputs {
 	res := make([]openapi.TestRunOutputs, 0, in.Len())
 
-	in.ForEach(func(key, val string) error {
+	in.ForEach(func(key string, val model.RunOutput) error {
 		res = append(res, openapi.TestRunOutputs{
-			Name:  key,
-			Value: val,
+			Name:   key,
+			Value:  val.Value,
+			SpanId: val.SpanID,
 		})
 		return nil
 	})
@@ -484,11 +485,15 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 	}, nil
 }
 
-func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, string] {
-	res := model.OrderedMap[string, string]{}
+func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, model.RunOutput] {
+	res := model.OrderedMap[string, model.RunOutput]{}
 
 	for _, output := range in {
-		res.Add(output.Name, output.Value)
+		res.Add(output.Name, model.RunOutput{
+			Value:  output.Value,
+			Name:   output.Name,
+			SpanID: output.SpanId,
+		})
 	}
 
 	return res

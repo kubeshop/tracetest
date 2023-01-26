@@ -8,13 +8,16 @@ import {useAppSelector} from 'redux/hooks';
 import SpanService from 'services/Span.service';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {INodeDataSpan} from 'types/DAG.types';
+import AssertionResultChecks from 'components/AssertionResultChecks/AssertionResultChecks';
+import {selectOutputsBySpanId} from 'redux/testOutputs/selectors';
+import TestOutputMark from 'components/TestOutputMark';
 import * as S from './SpanNode.styled';
-import AssertionResultChecks from '../../../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, data?.id || ''));
+  const outputs = useAppSelector(state => selectOutputsBySpanId(state, data?.id || ''));
   const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
 
   const className = data.isMatched ? 'matched' : '';
@@ -57,6 +60,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
       </S.Body>
 
       <S.Footer>
+        {!!outputs.length && <TestOutputMark outputs={outputs} />}
         <AssertionResultChecks failed={failed} passed={passed} styleType="node" />
       </S.Footer>
 

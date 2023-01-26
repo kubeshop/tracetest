@@ -10,13 +10,15 @@ function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id =
     value,
     valueRun: '',
     valueRunDraft: '',
+    spanId: '',
   };
 }
 
-export function TestRunOutput({name = '', value = ''}: TRawTestRunOutput): TTestRunOutput {
+export function TestRunOutput({name = '', value = '', spanId = ''}: TRawTestRunOutput): TTestRunOutput {
   return {
     name,
     value,
+    spanId,
   };
 }
 

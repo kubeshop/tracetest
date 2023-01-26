@@ -483,7 +483,21 @@ func readRunRow(row scanner) (model.Run, error) {
 
 		err = json.Unmarshal(jsonOutputs, &r.Outputs)
 		if err != nil {
-			return model.Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
+			// try with raw outputs
+			var rawOutputs []model.EnvironmentValue
+			err = json.Unmarshal(jsonOutputs, &rawOutputs)
+
+			for _, value := range rawOutputs {
+				r.Outputs.Add(value.Key, model.RunOutput{
+					Name:   value.Key,
+					Value:  value.Value,
+					SpanID: "",
+				})
+			}
+
+			if err != nil {
+				return model.Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
+			}
 		}
 
 		err = json.Unmarshal(jsonMetadata, &r.Metadata)

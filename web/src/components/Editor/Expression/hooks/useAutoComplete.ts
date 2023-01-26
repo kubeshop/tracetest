@@ -29,7 +29,7 @@ const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValu
   const getSelectedEnvironmentEntryList = useCallback(() => {
     const state = getState();
 
-    return EnvironmentSelectors.selectSelectedEnvironmentValues(state);
+    return EnvironmentSelectors.selectSelectedEnvironmentValues(state, true);
   }, [getState]);
 
   return useCallback(

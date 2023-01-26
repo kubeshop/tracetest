@@ -9,6 +9,7 @@ import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticCon
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import {TTestOutput} from 'types/TestOutput.types';
 import * as S from './AttributeRow.styled';
 import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
@@ -20,6 +21,7 @@ interface IProps {
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
   semanticConventions: OtelReference;
+  outputs: TTestOutput[];
 }
 
 enum Action {
@@ -37,6 +39,7 @@ const AttributeRow = ({
   searchText,
   semanticConventions,
   onCreateOutput,
+  outputs,
 }: IProps) => {
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
@@ -44,6 +47,10 @@ const AttributeRow = ({
   const {failed, passed} = useMemo(
     () => SpanAttributeService.getAttributeAssertionResults(key, assertions),
     [assertions, key]
+  );
+  const attributeOutputs = useMemo(
+    () => SpanAttributeService.getOutputsFromAttributeName(key, outputs),
+    [key, outputs]
   );
 
   const handleOnClick = ({key: option}: {key: string}) => {
@@ -106,6 +113,8 @@ const AttributeRow = ({
               <S.InfoIcon />
             </Popover>
           )}
+
+          {!!attributeOutputs.length && <S.OutputsMark outputs={attributeOutputs} />}
         </S.SectionTitle>
 
         <S.AttributeValueRow>

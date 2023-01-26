@@ -4,6 +4,10 @@ import {endpoints} from 'redux/apis/TraceTest.api';
 import UserSelectors from './User.selectors';
 
 const stateSelector = (state: RootState) => state;
+const withOutputsSelector = (state: RootState, withOutputs: boolean) => withOutputs;
+const selectOutputs = createSelector(stateSelector, ({testOutputs: {outputs}}) => {
+  return outputs;
+});
 
 const selectEnvironmentList = createSelector(stateSelector, state => {
   const {data: {items = []} = {}} = endpoints.getEnvironments.select({})(state);
@@ -17,12 +21,22 @@ const selectSelectedEnvironment = createSelector(selectEnvironmentList, stateSel
   return environmentList.find(({id}) => id === environmentId);
 });
 
+const selectSelectedEnvironmentValues = createSelector(selectSelectedEnvironment, environment => {
+  return environment?.values ?? [];
+});
+
 const EnvironmentSelectors = () => ({
   selectEnvironmentList,
   selectSelectedEnvironment,
-  selectSelectedEnvironmentValues: createSelector(selectSelectedEnvironment, environment => {
-    return environment?.values ?? [];
-  }),
+  withOutputsSelector,
+  selectSelectedEnvironmentValues: createSelector(
+    selectSelectedEnvironmentValues,
+    selectOutputs,
+    withOutputsSelector,
+    (environmentValues, outputs, withOutputs) => {
+      return environmentValues.concat(withOutputs ? outputs.map(({name, value}) => ({key: name, value})) : []);
+    }
+  ),
 });
 
 export default EnvironmentSelectors();

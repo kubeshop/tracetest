@@ -1393,6 +1393,7 @@ export interface external {
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
           outputs?: {
             name?: string;
+            spanId?: string;
             value?: string;
           }[];
           metadata?: { [key: string]: string };
