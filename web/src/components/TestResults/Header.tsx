@@ -1,9 +1,8 @@
-import {Steps} from 'components/GuidedTour/traceStepList';
+import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import SpanService from 'services/Span.service';
 import {TSpan} from 'types/Span.types';
 import {singularOrPlural} from 'utils/Common';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
 import * as S from './TestResults.styled';
 
 interface IProps {
@@ -46,11 +45,7 @@ const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => {
         </div>
       </S.Row>
 
-      <S.PrimaryButton
-        data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.AddTestSpec)}
-        data-cy="add-test-spec-button"
-        onClick={handleAddTestSpecOnClick}
-      >
+      <S.PrimaryButton data-tour={StepsID.TestSpecs} data-cy="add-test-spec-button" onClick={handleAddTestSpecOnClick}>
         Add Test Spec
       </S.PrimaryButton>
     </S.HeaderContainer>

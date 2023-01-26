@@ -1,49 +1,52 @@
 import {Button, Typography} from 'antd';
 import React from 'react';
 import {TooltipRenderProps} from 'react-joyride';
-import {Container, Divider, Header, Title, TitleContainer, TitleText} from './StepContent.styled';
+import * as S from './StepContent.styled';
 
-export const ReactJoyrideTooltip =
-  (onComplete: () => void) =>
-  ({continuous, index, step, backProps, primaryProps, tooltipProps, size, skipProps, isLastStep}: TooltipRenderProps) =>
-    (
-      <div {...tooltipProps} style={{width: 300, background: 'white'}}>
-        <Header>
-          <TitleContainer>
-            <Title>{step.title}</Title>
-            <TitleText>{` ${index + 1} of ${size}`}</TitleText>
-          </TitleContainer>
-        </Header>
-        <Container>
-          <Typography.Text>{step.content}</Typography.Text>
-        </Container>
-        <Divider />
-        <div style={{padding: 16, display: 'flex', justifyContent: 'space-between'}}>
-          <div>
-            <Button {...skipProps} type="text">
-              Skip
-            </Button>
-          </div>
-          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            {index > 0 && (
-              <Button {...backProps} type="text">
-                Back
-              </Button>
-            )}
-            {continuous && (
-              <Button
-                {...primaryProps}
-                style={{marginLeft: 8}}
-                type="text"
-                onClick={e => {
-                  primaryProps.onClick(e);
-                  if (isLastStep) onComplete();
-                }}
-              >
-                Next
-              </Button>
-            )}
-          </div>
-        </div>
+const StepContent = ({
+  continuous,
+  index,
+  step,
+  backProps,
+  primaryProps,
+  tooltipProps,
+  size,
+  skipProps,
+  isLastStep,
+}: TooltipRenderProps) => (
+  <S.Container {...tooltipProps}>
+    <S.Header>
+      <S.Title>{step.title}</S.Title>
+      <S.TitleText>{` ${index + 1} of ${size}`}</S.TitleText>
+    </S.Header>
+
+    <S.Body>
+      <Typography.Text>{step.content}</Typography.Text>
+    </S.Body>
+
+    <S.Footer>
+      <div>
+        {!isLastStep && (
+          <Button {...skipProps} type="text">
+            Skip
+          </Button>
+        )}
       </div>
-    );
+
+      <div>
+        {index > 0 && !isLastStep && (
+          <Button {...backProps} type="text">
+            Prev
+          </Button>
+        )}
+        {continuous && (
+          <Button {...primaryProps} type="link">
+            {isLastStep ? 'Done' : 'Next'}
+          </Button>
+        )}
+      </div>
+    </S.Footer>
+  </S.Container>
+);
+
+export default StepContent;

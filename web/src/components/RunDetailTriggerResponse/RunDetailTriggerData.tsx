@@ -1,5 +1,6 @@
 import {Tabs} from 'antd';
 import {useSearchParams} from 'react-router-dom';
+import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import ResponseEnvironment from './ResponseEnvironment';
@@ -26,7 +27,7 @@ const RunDetailTriggerData = ({state, triggerTime = 0}: IPropsComponent) => {
           </S.StatusText>
         </div>
       </S.TitleContainer>
-      <S.TabsContainer>
+      <S.TabsContainer data-tour={StepsID.Response}>
         <Tabs
           defaultActiveKey={query.get('tab') || TABS.Environment}
           size="small"

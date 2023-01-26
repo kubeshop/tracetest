@@ -1,7 +1,6 @@
 import {Form, Input} from 'antd';
 import {noop} from 'lodash';
-import {Steps} from 'components/GuidedTour/homeStepList';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
+import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {TDraftTest} from 'types/Test.types';
 import Env from 'utils/Env';
 import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
@@ -28,7 +27,6 @@ const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false,
         <Form.Item
           className="input-name"
           data-cy="create-test-name-input"
-          data-tour={GuidedTourService.getStep(GuidedTours.Home, Steps.Name)}
           label="Name"
           name="name"
           rules={[{required: true, message: 'Please enter a test name'}]}
@@ -39,6 +37,7 @@ const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false,
         <Form.Item
           className="input-description"
           data-cy="create-test-description-input"
+          data-tour={StepsID.Trigger}
           label="Description"
           name="description"
           style={{marginBottom: 0}}

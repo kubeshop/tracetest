@@ -1,10 +1,9 @@
 import {Tabs} from 'antd';
 import {useSearchParams} from 'react-router-dom';
-import {Steps} from 'components/GuidedTour/traceStepList';
+import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import ResponseBody from './ResponseBody';
 import ResponseEnvironment from './ResponseEnvironment';
 import ResponseHeaders from './ResponseHeaders';
@@ -30,7 +29,7 @@ const RunDetailTriggerResponse = ({
   const [query, updateQuery] = useSearchParams();
 
   return (
-    <S.Container data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Graph)}>
+    <S.Container>
       <S.TitleContainer>
         <S.Title>Response Data</S.Title>
         <div>
@@ -45,7 +44,7 @@ const RunDetailTriggerResponse = ({
           </S.StatusText>
         </div>
       </S.TitleContainer>
-      <S.TabsContainer>
+      <S.TabsContainer data-tour={StepsID.Response}>
         <Tabs
           defaultActiveKey={query.get('tab') || TabsKeys.Body}
           data-cy="run-detail-trigger-response"

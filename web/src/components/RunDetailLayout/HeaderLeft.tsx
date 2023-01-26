@@ -2,8 +2,6 @@ import {Link} from 'react-router-dom';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import Date from 'utils/Date';
-import GuidedTourService, {GuidedTours} from '../../services/GuidedTour.service';
-import {Steps} from '../GuidedTour/traceStepList';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
 
@@ -22,7 +20,7 @@ const HeaderLeft = ({name, testId, triggerType}: IProps) => {
       <Link data-cy="test-header-back-button" to={`/test/${testId}`}>
         <S.BackIcon />
       </Link>
-      <S.InfoContainer data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.MetaDetails)}>
+      <S.InfoContainer>
         <S.Row>
           <S.Title data-cy="test-details-name">
             {name} (v{run.testVersion})

@@ -8,9 +8,7 @@ import {RunDetailModes} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {TTest} from 'types/Test.types';
-import {Steps} from '../GuidedTour/traceStepList';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
@@ -20,10 +18,7 @@ interface IProps {
 }
 
 const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
-  <S.ContainerHeader
-    data-tour={GuidedTourService.getStep(GuidedTours.Trace, Steps.Switcher)}
-    data-cy="run-detail-header"
-  >
+  <S.ContainerHeader data-cy="run-detail-header">
     <DefaultTabBar {...props} className="site-custom-tab-bar" />
   </S.ContainerHeader>
 );

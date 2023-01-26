@@ -3,7 +3,7 @@ export interface IUserPreferences {
   environmentId: string;
   initConfigSetup: boolean;
   initConfigSetupFromTest: boolean;
-  isOnboardingComplete: boolean;
+  showGuidedTourNotification: boolean;
 }
 
 export type TUserPreferenceKey = keyof IUserPreferences;
