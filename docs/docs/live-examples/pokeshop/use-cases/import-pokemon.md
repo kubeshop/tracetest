@@ -1,103 +1,138 @@
-# Pokeshop API - Import Pokemon Endpoint
+# Pokeshop API - Import Pokemon
 
-This endpoint showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports, or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
+This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports, or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
-![](../../../img/516816935/518193157.png)![](../../../img/516816935/517898257.png)
+Here the process in split in two phases: 
+1. an API call that enqueue a import request to a queue
+```mermaid
+sequenceDiagram
+    participant Endpoint as POST /pokemon
+    participant API as API
+    participant Queue as RabbitMQ
+    
+    Endpoint->>API: request
 
-## **Endpoint Specification**
+    alt request is invalid
+        API-->>Endpoint: 400 Bad Request <br> <List of errors>
+    end
 
-Route: `POST /pokemon/import`
+    API->>Queue: enqueue "import" message
+    Queue-->>API: message queued
 
-Request Body:
+    API-->>Endpoint: 201 Created
+```
+
+2. a Worker that dequeue messages and do the async process
+```mermaid
+sequenceDiagram
+    participant Queue as RabbitMQ
+    participant Worker as Worker
+    participant ExternalAPI as PokeAPI
+    participant Database as Postgres
+    
+    Queue->>Worker: dequeue "import" message
+
+    Worker->>ExternalAPI: get pokemon info
+    ExternalAPI-->>Worker: pokemon info
+
+    Worker->>Database: save pokemon
+    Database-->>Worker: pokemon saved
+  
+    alt if successful
+      Worker-->>Queue: ack <br> queue can delete message
+    else is failed
+      Worker-->>Queue: nack <br> queue keep message for retries
+    end
+```
+
+You can trigger this use case by calling the endpoint `POST /pokemon/import`, with the following request body:
 ```json
 {
-  "id":  1
+  "id":  52
 }
 ```
 
-Response:
+It should return the following payload:
 ```json
 {
-  "id":  1000,
-  "name":  "meowth",
-  "type":  "normal",
-  "imageUrl":  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
-  "isFeatured":  true
+  "id":  52
 }
 ```
 
-## **Trace**
+## Building a test for this scenario
 
-![](../../../img/516816935/517406782.png)
+Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon/import` and validate the following things:
+1. If the API enqueued a import task and returned HTTP 200 Ok
+2. If the worker dequeued the import task
+3. If PokeAPI returned a valid response
+4. If the database is responding with low latency (< 200ms)
 
-## **Assertions**
+### Traces
 
-Here are some key points that are relevant to this query.
+Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, the queue messaging, the PokeAPI (external API) call and database calls. One interesting thing about this trace is that **you can observe the entire use case, end to end**:
 
-**Validate the Message Is Sent to the Queue**
+![](../images/import-pokemon-trace.png)
 
-To validate what’s being sent from the API to the worker, we can click the custom queue producer span and validate the `messaging.payload` attribute exists under the custom tab. To add an assertion targeting this attribute, we can select the **add assertion** icon that shows up while hovering over it.
+### Assertions
 
-![](../../../img/516816935/519602177.png)
+With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
 
-After that, we can tweak the assertion to match the expected value from the attribute.
+- **Validate if the API enqueued a import task and returned HTTP 200 Ok**
+![](../images/import-pokemon-message-enqueue-test-spec.png)
+![](../images/import-pokemon-api-test-spec.png)
 
-Clicking **add** should show the newly created assertion.
+- **Validate if the worker dequeued the import task**
+![](../images/import-pokemon-message-dequeue-test-spec.png)
 
-![](../../../img/516816935/519667713.png)
+- **Validate if PokeAPI returned a valid response**
+![](../images/import-pokemon-pokeapi-call-test-spec.png)
 
-**Validate the Message Is Processed by the Worker**
+- **Validate if the database is responding with low latency (< 200ms)**
+![](../images/import-pokemon-db-latency-test-spec.png)
 
-The next thing would be to add an assertion related to the worker receiving the message and starting to process the job.
+And that's all, now you can validate this entire use case.
 
-We can achieve this by validating that the custom checkpoint for the worker exists. In this case, we can click the `import pokemon` general span, then click on the **add assertion** button.
+### Test Definition
 
-After this is done, we can proceed to add checks for the `service.name` and `process.command` attributes that should match the specific worker metadata.
+If you want to replicate this entire test on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
 
-![](../../../img/516816935/519798785.png)
+```sh
+tracetest test -d test-definition.yml --wait-for-results
+```
 
-Clicking **save** should display the newly created assertion
+```yaml
+type: Test
+spec:
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-pokemon-api.demo/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"id":52}'
+  specs:
+  - selector: span[tracetest.span.type="messaging" name="queue.synchronizePokemon
+      send" messaging.system="rabbitmq" messaging.destination="queue.synchronizePokemon"]
+    assertions:
+    - attr:messaging.payload = '{"id":52}'
+  - selector: span[tracetest.span.type="http" name="POST /pokemon/import" http.method="POST"]
+    assertions:
+    - attr:http.status_code = 200
+    - attr:http.response.body = '{"id":52}'
+  - selector: span[tracetest.span.type="messaging" name="queue.synchronizePokemon
+      receive" messaging.system="rabbitmq" messaging.destination="queue.synchronizePokemon"]
+    assertions:
+    - attr:name = "queue.synchronizePokemon receive"
+  - selector: span[tracetest.span.type="http" name="HTTP GET pokeapi.pokemon" http.method="GET"]
+    assertions:
+    - attr:http.response.body  =  '{"name":"meowth"}'
+    - attr:http.status_code  =  200
+  - selector: span[tracetest.span.type="database"]
+    assertions:
+    - attr:tracetest.span.duration <= 200ms
 
-![](../../../img/516816935/519864321.png)
-
-**Validate the PokeAPI HTTP Data Information**
-
-After validating that the message has arrived at the worker, we can start adding assertions to the different steps.
-
-The first one is requesting the pokemon information from the poke API, here we can add multiple checks in regards to url, routes, response, status, etc.
-
-After having selected the worker HTTP span and clicking the **add assertion** button, we can start modifying the different checks.
-
-![](../../../img/516816935/519897089.png)
-
-Clicking **save** should show the assertion:
-
-![](../../../img/516816935/519962625.png)
-
-**Validate HTTP Spans Status Code**
-
-With Tracetest you can also add checks for not only one but multiple spans. In this case, we’ll be adding an assertion that will affect every HTTP span to validate that the `http.status_code` is equal `200`.
-
-To start this process, click on any of the HTTP spans and then the **add assertion** button.
-
-Then remove the different selector entries from the first input until the only remaining one is the `tracetest.span.type`.
-
-The last step is to add our check using the `http.status_code` and match it against the `200` value.
-
-![](../../../img/516816935/519602183.png)
-
-You’ll see the `2 affected spans` message at the top right of the form. By clicking **save**, it will be shown in the main assertions area.
-
-![](../../../img/516816935/520028161.png)
-
-**Validate the Insert Database Statement**
-
-Last but not least, we can add a validation to check if the record was saved to the database by selecting the custom Postgres span and clicking **add an assertion**.
-
-![](../../../img/516816935/520093697.png)
-
-Then we can add checks for both the `db.operation` to match `create` and the result to match the JSON expected object.
-
-Clicking **save** will display the new assertion.
-
-![](../../../img/516816935/520159233.png)
+```

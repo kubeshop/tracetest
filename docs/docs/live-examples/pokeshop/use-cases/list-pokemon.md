@@ -1,4 +1,4 @@
-# Pokeshop API - List Pokemon Use case
+# Pokeshop API - List Pokemon
 
 This use case retrieves the list of Pokemon directly from the database (Postgres) based on the provided query through the API. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to trigger a database query to get some data and return it to the client.
 
@@ -75,7 +75,6 @@ tracetest test -d test-definition.yml --wait-for-results
 ```yaml
 type: Test
 spec:
-  id: NL90DCTVR
   name: Pokeshop - List
   description: Get a Pokemon
   trigger:

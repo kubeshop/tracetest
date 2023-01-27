@@ -1,4 +1,4 @@
-# Pokeshop API - Add Pokemon Use case
+# Pokeshop API - Add Pokemon
 
 This use case showcases a simple example where a user makes an API call with some data and this data is validated and persisted into a database.
 
