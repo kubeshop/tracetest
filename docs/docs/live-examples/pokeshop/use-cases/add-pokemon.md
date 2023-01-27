@@ -1,6 +1,6 @@
 # Pokeshop API - Add Pokemon Use case
 
-This use cases showcases a simple example where an user make an API call with some data and this data is validated and persisted into a database.
+This use case showcases a simple example where a user makes an API call with some data and this data is validated and persisted into a database.
 
 ```mermaid
 sequenceDiagram
@@ -17,7 +17,7 @@ sequenceDiagram
     API->>Database: save pokemon
     Database-->>API: saved pokemon
 
-    API-->>Endpoint: 200 OK <br> <Pokemon object>
+    API-->>Endpoint: 201 Created <br> <Pokemon object>
 ```
 
 You can trigger this use case by calling the endpoint `POST /pokemon`, with the following request body:
@@ -44,12 +44,12 @@ It should return the following payload:
 ## Building a test for this scenario
 
 Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon` and validate two things:
-1. If the API is returning a proper result with HTTP 200 OK
+1. If the API is returning a proper result with HTTP 201 Created
 2. If the database is responding with low latency (< 200ms)
 
 ### Traces
 
-Running this tests for the first time will create a Observability trace like the image above, where you can see spans for the API call, validation and database operations:
+Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, validation (an API internal operation), and database calls:
 ![](../images/add-pokemon-trace.png)
 
 ### Assertions
@@ -63,6 +63,8 @@ With this trace, now we can build [assertions](../../../concepts/assertions.md) 
 ![](../images/add-pokemon-database-test-spec.png)
 
 And that's all, now you can validate this entire use case.
+
+### Test Definition
 
 If you want to replicate this entire test on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
 
