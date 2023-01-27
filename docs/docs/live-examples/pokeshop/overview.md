@@ -6,13 +6,17 @@ The idea is to have a microservice-divided system that could behave like a typic
 
 With this, users can get familiar with the Tracetest tool by focusing on creating assertions, visualizing the trace, and identifying the different data that comes from the Collector ([Jaeger](https://www.jaegertracing.io/)). Users will learn about basic instrumentation practices like what tools to use, what data to send, when, and what suggested standards need to be followed.
 
+- **Source Code**: https://github.com/kubeshop/pokeshop
+- **Running it locally**: [instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-it-locally)
+- **Running on Kubernetes**: [instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster)
+
 ## Use cases
 
 We have three use cases that use each component of this structure and that can be observed via Open Telemetry and tested with Tracetest. Each one is triggered by an API call to their respective endpoint:
 
-- [Add Pokemon](./add-pokemon.md): add a new pokemon only relying on user input into the database
-- [Import Pokemon](./import-pokemon.md): given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database
-- [List Pokemon](./list-pokemon.md): lists all Pokemons registered into Pokeshop
+- [Add Pokemon](./use-cases/add-pokemon.md): add a new pokemon only relying on user input into the database
+- [List Pokemon](./use-cases/list-pokemon.md): lists all Pokemons registered into Pokeshop
+- [Import Pokemon](./use-cases/import-pokemon.md): given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database
 
 ## System architecture
 
@@ -42,8 +46,6 @@ flowchart TD
     E --> |OpenTelemetry Node.js SDK| F
 ```
 
-In our live tests, we are deploying it into a single Kubernetes namespace, deployed via a [helm chart](https://github.com/kubeshop/pokeshop/tree/master/helm-chart).
+In our live tests, we are deploying it into a single Kubernetes namespace, deployed via a [helm chart](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster).
 
 The Pokeshop API is only accessible from within the Kubernetes cluster network as the Tracetest needs to be able to reach it.
-
-To see the details of the implementation, you can access it on our Github repository: https://github.com/kubeshop/pokeshop

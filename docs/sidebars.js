@@ -375,20 +375,26 @@ const sidebars = {
               label: "Overview",
             },
             {
-              type: "doc",
-              id: "live-examples/pokeshop/add-pokemon",
-              label: "Use case: Add Pokemon",
-            },
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/import-pokemon",
-              label: "Use case: Import Pokemon",
-            },
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/list-pokemon",
-              label: "Use case: List Pokemon",
-            },
+              type: "category",
+              label: "Use Cases",
+              items: [
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/add-pokemon",
+                  label: "Add Pokemon",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/list-pokemon",
+                  label: "List Pokemon",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/import-pokemon",
+                  label: "Import Pokemon",
+                },
+              ]
+            }
           ],
         },
         // {
