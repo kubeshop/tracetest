@@ -41,6 +41,8 @@ type TestRun struct {
 	Result                    *AssertionResults  `json:"result,omitempty"`
 	Outputs                   []TestRunOutputs   `json:"outputs,omitempty"`
 	Metadata                  *map[string]string `json:"metadata,omitempty"`
+	TransactionId             *string            `json:"transactionId,omitempty"`
+	TransactionRunId          *string            `json:"transactionRunId,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -668,6 +670,70 @@ func (o *TestRun) SetMetadata(v map[string]string) {
 	o.Metadata = &v
 }
 
+// GetTransactionId returns the TransactionId field value if set, zero value otherwise.
+func (o *TestRun) GetTransactionId() string {
+	if o == nil || o.TransactionId == nil {
+		var ret string
+		return ret
+	}
+	return *o.TransactionId
+}
+
+// GetTransactionIdOk returns a tuple with the TransactionId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetTransactionIdOk() (*string, bool) {
+	if o == nil || o.TransactionId == nil {
+		return nil, false
+	}
+	return o.TransactionId, true
+}
+
+// HasTransactionId returns a boolean if a field has been set.
+func (o *TestRun) HasTransactionId() bool {
+	if o != nil && o.TransactionId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTransactionId gets a reference to the given string and assigns it to the TransactionId field.
+func (o *TestRun) SetTransactionId(v string) {
+	o.TransactionId = &v
+}
+
+// GetTransactionRunId returns the TransactionRunId field value if set, zero value otherwise.
+func (o *TestRun) GetTransactionRunId() string {
+	if o == nil || o.TransactionRunId == nil {
+		var ret string
+		return ret
+	}
+	return *o.TransactionRunId
+}
+
+// GetTransactionRunIdOk returns a tuple with the TransactionRunId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetTransactionRunIdOk() (*string, bool) {
+	if o == nil || o.TransactionRunId == nil {
+		return nil, false
+	}
+	return o.TransactionRunId, true
+}
+
+// HasTransactionRunId returns a boolean if a field has been set.
+func (o *TestRun) HasTransactionRunId() bool {
+	if o != nil && o.TransactionRunId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTransactionRunId gets a reference to the given string and assigns it to the TransactionRunId field.
+func (o *TestRun) SetTransactionRunId(v string) {
+	o.TransactionRunId = &v
+}
+
 func (o TestRun) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -726,6 +792,12 @@ func (o TestRun) MarshalJSON() ([]byte, error) {
 	}
 	if o.Metadata != nil {
 		toSerialize["metadata"] = o.Metadata
+	}
+	if o.TransactionId != nil {
+		toSerialize["transactionId"] = o.TransactionId
+	}
+	if o.TransactionRunId != nil {
+		toSerialize["transactionRunId"] = o.TransactionRunId
 	}
 	return json.Marshal(toSerialize)
 }

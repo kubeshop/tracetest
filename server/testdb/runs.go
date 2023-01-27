@@ -327,11 +327,17 @@ SELECT
 	"test_results",
 	"trace",
 	"outputs",
-	"last_error",
-
+	"last_error",	
 	"metadata",
-	"environment"
+	"environment",
+
+	-- transaction run
+	transaction_run.transaction_run_id,
+	transaction_run.transaction_run_transaction_id
 FROM test_runs
+LEFT OUTER JOIN
+	transaction_run_steps transaction_run
+ON transaction_run.test_run_id = id
 `
 
 func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
@@ -437,6 +443,9 @@ func readRunRow(row scanner) (model.Run, error) {
 		lastError *string
 		traceID,
 		spanID string
+
+		transactionID,
+		transactionRunID sql.NullString
 	)
 
 	err := row.Scan(
@@ -458,6 +467,8 @@ func readRunRow(row scanner) (model.Run, error) {
 		&lastError,
 		&jsonMetadata,
 		&jsonEnvironment,
+		&transactionRunID,
+		&transactionID,
 	)
 
 	switch err {
@@ -526,6 +537,11 @@ func readRunRow(row scanner) (model.Run, error) {
 
 		if lastError != nil && *lastError != "" {
 			r.LastError = fmt.Errorf(*lastError)
+		}
+
+		if transactionID.Valid && transactionRunID.Valid {
+			r.TransactionID = transactionID.String
+			r.TransactionRunID = transactionRunID.String
 		}
 
 		return r, nil

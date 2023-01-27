@@ -311,6 +311,8 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
 		Environment:               m.Environment(in.Environment),
+		TransactionId:             in.TransactionID,
+		TransactionRunId:          in.TransactionRunID,
 	}
 }
 

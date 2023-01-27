@@ -50,6 +50,8 @@ const TestRun = ({
   metadata = {},
   outputs = [],
   environment = {},
+  transactionId = '',
+  transactionRunId = '',
 }: TRawTestRun): TTestRun => {
   return {
     obtainedTraceAt,
@@ -74,6 +76,8 @@ const TestRun = ({
     metadata,
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
     environment: Environment(environment),
+    transactionId,
+    transactionRunId,
   };
 };
 
