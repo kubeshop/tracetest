@@ -299,6 +299,11 @@ const sidebars = {
               type: "doc",
               id: "tools-and-integrations/integrations/keptn",
               label: "Keptn",
+            },
+            {
+              type: "doc",
+              id: "tools-and-integrations/integrations/k6",
+              label: "K6",
             }
           ]
         }

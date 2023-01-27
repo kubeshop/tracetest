@@ -1,10 +1,12 @@
 # Tracetest + K6
 
-This repository objective is to show how you can configure your tracetest to run alongside your k6 load tests against an instrumented service
+This repository objective is to show how you can configure your Tracetest to run alongside your k6 load tests against an instrumented service.
+
+For more detailed information about the K6 Tracetest Binary take a look a the [docs](https://docs.tracetest.io/tools-and-integrations/integrations/k6).
 
 ## Steps
 
-1. [Install the tracetest CLI](https://docs.tracetest.io/installing/)
+1. [Install the Tracetest CLI](https://docs.tracetest.io/installing/)
 2. Run `tracetest configure --endpoint http://localhost:11633` on a terminal
 3. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac)
 4. Test if it works by running: `tracetest test run -d tests/test.yaml`. This will create and run a test with trace id as trigger
