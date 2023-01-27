@@ -1,4 +1,15 @@
-import {SupportedDataStores, TDataStore, TRawDataStore} from 'types/Config.types';
+import {SupportedDataStores} from 'types/Config.types';
+import {Model, TDataStoreSchemas} from 'types/Common.types';
+
+export type RawDataStore = TDataStoreSchemas['DataStore'];
+type DataStore = Model<
+  RawDataStore,
+  {
+    otlp?: {};
+    newRelic?: {};
+    lightstep?: {};
+  }
+>;
 
 const DataStore = ({
   id = '',
@@ -11,7 +22,7 @@ const DataStore = ({
   jaeger = {},
   tempo = {},
   createdAt = '',
-}: TRawDataStore): TDataStore => ({
+}: RawDataStore): DataStore => ({
   id,
   name,
   type,

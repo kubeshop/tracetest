@@ -1,7 +1,8 @@
 import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
-import {TDraftDataStore, TDataStoreForm, TDataStoreConfig, SupportedDataStores, TDataStore} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreForm, TDataStoreConfig, SupportedDataStores} from 'types/Config.types';
+import DataStore from 'models/DataStore.model';
 import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
@@ -18,7 +19,7 @@ interface IProps {
   onTestConnection(): void;
   isConfigReady: boolean;
   isTestConnectionLoading: boolean;
-  onDeleteConfig(dataStore: TDataStore): void;
+  onDeleteConfig(dataStore: DataStore): void;
   isLoading: boolean;
   isFormValid: boolean;
 }

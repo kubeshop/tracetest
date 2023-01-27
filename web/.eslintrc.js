@@ -20,6 +20,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
     'no-console': 'warn',
     'no-undef': 'off',
+    'no-redeclare': 'off',
     semi: 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
