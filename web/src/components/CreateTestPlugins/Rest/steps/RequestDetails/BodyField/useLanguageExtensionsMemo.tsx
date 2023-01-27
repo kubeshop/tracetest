@@ -6,7 +6,7 @@ import {Diagnostic, linter, lintGutter} from '@codemirror/lint';
 import {EditorView} from '@codemirror/view';
 import {XMLValidator} from 'fast-xml-parser';
 import {useMemo} from 'react';
-import {jsonParseLinter} from './jsonLint';
+import EditorService from 'services/Editor.service';
 import {BodyMode} from './useBodyMode';
 
 export function useLanguageExtensionsMemo(bodyMode: BodyMode): Extension[] {
@@ -35,7 +35,7 @@ export function useLanguageExtensionsMemo(bodyMode: BodyMode): Extension[] {
       case 'json':
         return [
           json(),
-          linter((view: EditorView): Diagnostic[] => jsonParseLinter()(view)),
+          linter((view: EditorView): Diagnostic[] => EditorService.jsonParseLinter()(view)),
           new LanguageSupport(jsonLanguage),
           lintGutter({}),
         ];
