@@ -1397,6 +1397,8 @@ export interface external {
             value?: string;
           }[];
           metadata?: { [key: string]: string };
+          transactionId?: string;
+          transactionRunId?: string;
         };
         RunInformation: {
           metadata?: { [key: string]: string } | null;

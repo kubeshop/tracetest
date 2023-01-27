@@ -105,6 +105,11 @@ type (
 
 		// environment
 		Environment Environment
+
+		// transaction
+
+		TransactionID    string
+		TransactionRunID string
 	}
 
 	RunResults struct {

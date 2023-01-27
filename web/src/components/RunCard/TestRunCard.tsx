@@ -25,7 +25,18 @@ function getIcon(state: TTestRun['state'], failedAssertions: number) {
 }
 
 const TestRunCard = ({
-  run: {id: runId, executionTime, passedAssertionCount, failedAssertionCount, state, createdAt, testVersion, metadata},
+  run: {
+    id: runId,
+    executionTime,
+    passedAssertionCount,
+    failedAssertionCount,
+    state,
+    createdAt,
+    testVersion,
+    metadata,
+    transactionId,
+    transactionRunId,
+  },
   testId,
   linkTo,
 }: IProps) => {
@@ -61,6 +72,8 @@ const TestRunCard = ({
           </S.Row>
         </S.Info>
 
+        {!!transactionId && !!transactionRunId && <S.Text>Part of transaction</S.Text>}
+
         {state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED && (
           <div data-cy={`test-run-result-status-${runId}`}>
             <TestState testState={state} />
@@ -85,7 +98,13 @@ const TestRunCard = ({
         )}
 
         <div>
-          <RunActionsMenu resultId={runId} testId={testId} testVersion={testVersion} />
+          <RunActionsMenu
+            resultId={runId}
+            testId={testId}
+            testVersion={testVersion}
+            transactionRunId={transactionRunId}
+            transactionId={transactionId}
+          />
         </div>
       </S.Container>
     </Link>

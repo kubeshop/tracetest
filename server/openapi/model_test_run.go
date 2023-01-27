@@ -56,6 +56,10 @@ type TestRun struct {
 	Outputs []TestRunOutputs `json:"outputs,omitempty"`
 
 	Metadata map[string]string `json:"metadata,omitempty"`
+
+	TransactionId string `json:"transactionId,omitempty"`
+
+	TransactionRunId string `json:"transactionRunId,omitempty"`
 }
 
 // AssertTestRunRequired checks if the required fields are not zero-ed

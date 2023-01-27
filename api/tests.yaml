@@ -179,6 +179,10 @@ components:
           type: object
           additionalProperties:
             type: string
+        transactionId:
+          type: string
+        transactionRunId:
+          type: string
 
     RunInformation:
       type: object
