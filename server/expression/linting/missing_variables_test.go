@@ -130,6 +130,19 @@ func TestMissingVariableDetection(t *testing.T) {
 			},
 			expectedMissingVariables: []string{"ABC", "ABC2", "CDE"},
 		},
+		{
+			name:               "should_detect_missing_variables_in_test_http_body",
+			availableVariables: []string{},
+			object: model.Test{
+				ServiceUnderTest: model.Trigger{
+					Type: model.TriggerTypeHTTP,
+					HTTP: &model.HTTPRequest{
+						Body: `{"id": ${env:pokemonId}}`,
+					},
+				},
+			},
+			expectedMissingVariables: []string{"pokemonId"},
+		},
 	}
 
 	for _, testCase := range testCases {
