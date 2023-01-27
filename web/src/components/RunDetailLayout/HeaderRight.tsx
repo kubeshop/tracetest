@@ -36,7 +36,14 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
           Run Test
         </Button>
       )}
-      <RunActionsMenu isRunView resultId={run.id} testId={testId} testVersion={testVersion} />
+      <RunActionsMenu
+        isRunView
+        resultId={run.id}
+        testId={testId}
+        testVersion={testVersion}
+        transactionId={run.transactionId}
+        transactionRunId={run.transactionRunId}
+      />
     </S.Section>
   );
 };
