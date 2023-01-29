@@ -16,7 +16,7 @@ sequenceDiagram
     API-->>Endpoint: 200 OK <br> [<Pokemon object>, ...]
 ```
 
-You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip=0` without payloads, and should receive a payload similar to this: 
+You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip=0` without payload, and should receive a payload similar to this: 
 ```json
 [
   {
@@ -39,10 +39,10 @@ You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip
 
 ## Building a test for this scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon` and validate two things:
-1. If the API is returning results with HTTP 200 OK
-2. If the database is responding with low latency (< 200ms)
-3. If the database query uses correctly the query string parameters `take` and `skip`
+Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon` and validate three properties:
+- The API should return results with HTTP 200 OK
+- The database should respond with low latency (< 200ms)
+- The database query should use the query string parameters `take` and `skip` correctly
 
 ### Traces
 
@@ -53,13 +53,13 @@ Running these tests for the first time will create an Observability trace like t
 
 With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API response and the database responses:
 
-- **Validate if the API is returning results with HTTP 200 OK**
+- **The API should return results with HTTP 200 OK:**
 ![](../images/list-pokemons-api-test-spec.png)
 
-- **Validate if the database is responding with low latency (< 200ms)**
+- **The database should respond with low latency (< 200ms):**
 ![](../images/list-pokemons-db-latency-test-spec.png)
 
-- **Validate if the database query uses correctly the query string parameters `take` and `skip`**
+- **The database query should use the query string parameters `take` and `skip` correctly:**
 ![](../images/list-pokemons-db-query-test-spec.png)
 
 And that's all, now you can validate this entire use case.

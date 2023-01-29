@@ -43,9 +43,9 @@ It should return the following payload:
 
 ## Building a test for this scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon` and validate two things:
-1. If the API is returning a proper result with HTTP 201 Created
-2. If the database is responding with low latency (< 200ms)
+Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon` and validate two properties:
+- The API should return a proper result with HTTP 201 Created
+- The database should return with low latency (< 200ms)
 
 ### Traces
 
@@ -56,10 +56,10 @@ Running these tests for the first time will create an Observability trace like t
 
 With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API response and the database latency:
 
-- **Validate if the API is returning a proper result with HTTP 200 OK:**
+- **The API should return a proper result with HTTP 201 Created:**
 ![](../images/add-pokemon-api-test-spec.png)
 
-- **Validate if the database is responding with low latency (< 200ms):**
+- **The database should return with low latency (< 200ms):**
 ![](../images/add-pokemon-database-test-spec.png)
 
 And that's all, now you can validate this entire use case.

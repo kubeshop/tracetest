@@ -390,6 +390,11 @@ const sidebars = {
                 },
                 {
                   type: "doc",
+                  id: "live-examples/pokeshop/use-cases/get-pokemon-by-id",
+                  label: "Get Pokemon by ID",
+                },
+                {
+                  type: "doc",
                   id: "live-examples/pokeshop/use-cases/import-pokemon",
                   label: "Import Pokemon",
                 },

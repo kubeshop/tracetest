@@ -61,15 +61,15 @@ It should return the following payload:
 
 ## Building a test for this scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon/import` and validate the following things:
-1. If the API enqueued a import task and returned HTTP 200 Ok
-2. If the worker dequeued the import task
-3. If PokeAPI returned a valid response
-4. If the database is responding with low latency (< 200ms)
+Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon/import` and validate the following properties:
+- The API should enqueue an import task and return HTTP 200 OK
+- The worker should dequeue the import task
+- PokeAPI should return a valid response
+- The database should respond with low latency (< 200ms)
 
 ### Traces
 
-Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, the queue messaging, the PokeAPI (external API) call and database calls. One interesting thing about this trace is that **you can observe the entire use case, end to end**:
+Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, the queue messaging, the PokeAPI (external API) call, and database calls. One interesting thing about this trace is that **you can observe the entire use case, end to end**:
 
 ![](../images/import-pokemon-trace.png)
 
@@ -77,17 +77,17 @@ Running these tests for the first time will create an Observability trace like t
 
 With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
 
-- **Validate if the API enqueued a import task and returned HTTP 200 Ok**
+- **The API should enqueue an import task and return HTTP 200 OK:**
 ![](../images/import-pokemon-message-enqueue-test-spec.png)
 ![](../images/import-pokemon-api-test-spec.png)
 
-- **Validate if the worker dequeued the import task**
+- **The worker should dequeue the import task:**
 ![](../images/import-pokemon-message-dequeue-test-spec.png)
 
-- **Validate if PokeAPI returned a valid response**
+- **PokeAPI should return a valid response:**
 ![](../images/import-pokemon-pokeapi-call-test-spec.png)
 
-- **Validate if the database is responding with low latency (< 200ms)**
+- **The database should respond with low latency (< 200ms):**
 ![](../images/import-pokemon-db-latency-test-spec.png)
 
 And that's all, now you can validate this entire use case.
