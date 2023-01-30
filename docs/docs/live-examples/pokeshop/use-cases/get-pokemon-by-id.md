@@ -1,6 +1,6 @@
 # Pokeshop API - Get Pokemon by ID
 
-This use case retrieves a specific Pokemon from the cache if it is cached, or from the database (Postgres) also populating the cache. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to evaluate a different behavior depending of his dependencies.
+This use case retrieves a specific Pokemon from the cache if it is cached, or from the database (Postgres) also populating the cache. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to evaluate a different behavior depending of its dependencies.
 
 ```mermaid
 sequenceDiagram
@@ -27,7 +27,7 @@ sequenceDiagram
     end
 ```
 
-You can trigger this use case by calling the endpoint `GET /pokemon/25` without payload, and should receive a payload similar to this: 
+You can trigger this use case by calling the endpoint `GET /pokemon/25` without payload and should receive a payload similar to this: 
 ```json
 {
   "id":  25,
@@ -38,59 +38,59 @@ You can trigger this use case by calling the endpoint `GET /pokemon/25` without 
 }
 ```
 
-## Building a test for those scenarios
+## Building a Test for the Described Scenarios
 
 Using Tracetest, we can [create two tests](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon/25` and validate the following scenarios:
-1. **an API call with a cache hit**
-   - The API should return a valid result with HTTP 200 OK
-   - The cache should be queried
-   - The database should not be queried
-2. **an API call with a cache miss**
-   - The API should return a valid result with HTTP 200 OK
-   - The cache should be queried 
-   - The cache should be populated
-   - The database should be queried
+1. **An API call with a cache hit.**
+   - The API should return a valid result with HTTP 200 OK.
+   - The cache should be queried.
+   - The database should not be queried.
+2. **An API call with a cache miss.**
+   - The API should return a valid result with HTTP 200 OK.
+   - The cache should be queried.
+   - The cache should be populated.
+   - The database should be queried.
 
 ### Traces
 
 Running these tests for the first time will create an Observability trace with two different shapes, depending on the cache situation.
 
-1. **cache miss**, where we can see spans from the API, database, and cache:
+1. **Cache Miss** where we can see spans from the API, database, and cache:
 ![](../images/get-pokemon-by-id-trace-cachemiss.png)
 
-2. **cache hit**, where we can see spans from the API and cache:
+2. **Cache Hit** where we can see spans from the API and cache:
 ![](../images/get-pokemon-by-id-trace-cachehit.png)
 
 ### Assertions
 
-With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate API, cache, and database responses:
+With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate API, cache, and database responses:
 
-- [both cases] The API should return a valid result with HTTP 200 OK
+- [Both Cases] The API should return a valid result with HTTP 200 OK.
 ![](../images/get-pokemon-by-id-api-test-spec.png)
 
-- [both cases] The cache should be queried
+- [Both Cases] The cache should be queried.
 ![](../images/get-pokemon-by-id-redis-query-test-spec.png)
 
-- [cache hit] The database should not be queried
+- [Cache Hit] The database should not be queried.
 ![](../images/get-pokemon-by-id-db-no-query-test-spec.png)
 
-- [cache miss] The cache should be populated
+- [Cache Miss] The cache should be populated.
 ![](../images/get-pokemon-by-id-redis-set-test-spec.png)
 
-- [cache miss] The database should be queried
+- [Cache Miss] The database should be queried.
 ![](../images/get-pokemon-by-id-db-query-test-spec.png)
 
-And that's all, now you can validate this entire use case.
+Now you can validate this entire use case.
 
 ### Test Definition
 
-If you want to replicate those tests on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving one of the test definitions as the file `test-definition.yml` and running:
+If you want to replicate those tests on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving one of the test definitions as the file `test-definition.yml` and running:
 
 ```sh
 tracetest test -d test-definition.yml --wait-for-results
 ```
 
-#### Cache miss scenario
+#### Cache Miss Scenario
 
 ```yaml
 type: Test
@@ -122,7 +122,7 @@ spec:
     - attr:tracetest.selected_spans.count > 0
 ```
 
-#### Cache miss scenario
+#### Cache Miss Scenario
 
 ```yml
 type: Test

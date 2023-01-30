@@ -1,6 +1,6 @@
 # Pokeshop API - Add Pokemon
 
-This use case showcases a simple example where a user makes an API call with some data and this data is validated and persisted into a database.
+This use case showcases a simple example of an API call where call data is validated and persisted into a database.
 
 ```mermaid
 sequenceDiagram
@@ -41,11 +41,11 @@ It should return the following payload:
 }
 ```
 
-## Building a test for this scenario
+## Building a Test for This Scenario
 
 Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon` and validate two properties:
-- The API should return a proper result with HTTP 201 Created
-- The database should return with low latency (< 200ms)
+- The API should return a proper result with **HTTP 201 Created**.
+- The database should return with **low latency (< 200ms)**.
 
 ### Traces
 
@@ -62,7 +62,7 @@ With this trace, now we can build [assertions](../../../concepts/assertions.md) 
 - **The database should return with low latency (< 200ms):**
 ![](../images/add-pokemon-database-test-spec.png)
 
-And that's all, now you can validate this entire use case.
+Now you can validate this entire use case.
 
 ### Test Definition
 

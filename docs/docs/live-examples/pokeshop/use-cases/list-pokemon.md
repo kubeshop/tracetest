@@ -1,6 +1,6 @@
 # Pokeshop API - List Pokemon
 
-This use case retrieves the list of Pokemon directly from the database (Postgres) based on the provided query through the API. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to trigger a database query to get some data and return it to the client.
+This use case retrieves the list of Pokemon directly from the database (Postgres) based on the provided query through the API. The purpose of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to trigger a database query to get some data and return it to the client.
 
 ```mermaid
 sequenceDiagram
@@ -16,7 +16,7 @@ sequenceDiagram
     API-->>Endpoint: 200 OK <br> [<Pokemon object>, ...]
 ```
 
-You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip=0` without payload, and should receive a payload similar to this: 
+You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip=0` without a payload and should receive a payload similar to this: 
 ```json
 [
   {
@@ -37,12 +37,12 @@ You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip
 ]
 ```
 
-## Building a test for this scenario
+## Building a Test for This Scenario
 
 Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon` and validate three properties:
-- The API should return results with HTTP 200 OK
-- The database should respond with low latency (< 200ms)
-- The database query should use the query string parameters `take` and `skip` correctly
+- The API should return results with HTTP 200 OK.
+- The database should respond with low latency (< 200ms).
+- The database query should use the query string parameters `take` and `skip` correctly.
 
 ### Traces
 
@@ -51,7 +51,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API response and the database responses:
+With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API response and the database responses:
 
 - **The API should return results with HTTP 200 OK:**
 ![](../images/list-pokemons-api-test-spec.png)
@@ -62,11 +62,11 @@ With this trace, now we can build [assertions](../../../concepts/assertions.md) 
 - **The database query should use the query string parameters `take` and `skip` correctly:**
 ![](../images/list-pokemons-db-query-test-spec.png)
 
-And that's all, now you can validate this entire use case.
+Now you can validate this entire use case.
 
 ### Test Definition
 
-If you want to replicate this entire test on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
+If you want to replicate this entire test on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
 
 ```sh
 tracetest test -d test-definition.yml --wait-for-results

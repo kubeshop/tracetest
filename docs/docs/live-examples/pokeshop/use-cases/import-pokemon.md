@@ -2,8 +2,8 @@
 
 This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports, or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
-Here the process in split in two phases: 
-1. an API call that enqueue a import request to a queue
+Here the process is split into two phases: 
+1. An API call that enqueues an import request to a queue.
 ```mermaid
 sequenceDiagram
     participant Endpoint as POST /pokemon
@@ -22,7 +22,7 @@ sequenceDiagram
     API-->>Endpoint: 201 Created
 ```
 
-2. a Worker that dequeue messages and do the async process
+2. A Worker that dequeues messages and completes the async process.
 ```mermaid
 sequenceDiagram
     participant Queue as RabbitMQ
@@ -59,13 +59,13 @@ It should return the following payload:
 }
 ```
 
-## Building a test for this scenario
+## Building a Test for This Scenario
 
 Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon/import` and validate the following properties:
-- The API should enqueue an import task and return HTTP 200 OK
-- The worker should dequeue the import task
-- PokeAPI should return a valid response
-- The database should respond with low latency (< 200ms)
+- The API should enqueue an import task and return HTTP 200 OK.
+- The worker should dequeue the import task.
+- PokeAPI should return a valid response.
+- The database should respond with low latency (< 200ms).
 
 ### Traces
 
@@ -75,7 +75,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
+With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
 
 - **The API should enqueue an import task and return HTTP 200 OK:**
 ![](../images/import-pokemon-message-enqueue-test-spec.png)
@@ -90,11 +90,11 @@ With this trace, now we can build [assertions](../../../concepts/assertions.md) 
 - **The database should respond with low latency (< 200ms):**
 ![](../images/import-pokemon-db-latency-test-spec.png)
 
-And that's all, now you can validate this entire use case.
+Now you can validate this entire use case.
 
 ### Test Definition
 
-If you want to replicate this entire test on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
+If you want to replicate this entire test on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
 
 ```sh
 tracetest test -d test-definition.yml --wait-for-results
