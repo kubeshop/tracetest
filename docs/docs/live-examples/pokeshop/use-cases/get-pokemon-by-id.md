@@ -40,7 +40,7 @@ You can trigger this use case by calling the endpoint `GET /pokemon/25` without 
 
 ## Building a test for those scenarios
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon/25` and validate two scenarios:
+Using Tracetest, we can [create two tests](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon/25` and validate the following scenarios:
 1. **an API call with a cache hit**
    - The API should return a valid result with HTTP 200 OK
    - The cache should be queried
@@ -61,7 +61,6 @@ Running these tests for the first time will create an Observability trace with t
 2. **cache hit**, where we can see spans from the API and cache:
 ![](../images/get-pokemon-by-id-trace-cachehit.png)
 
-
 ### Assertions
 
 With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate API, cache, and database responses:
@@ -73,7 +72,7 @@ With this trace, now we can build [assertions](../../../concepts/assertions.md) 
 ![](../images/get-pokemon-by-id-redis-query-test-spec.png)
 
 - [cache hit] The database should not be queried
-TODO
+![](../images/get-pokemon-by-id-db-no-query-test-spec.png)
 
 - [cache miss] The cache should be populated
 ![](../images/get-pokemon-by-id-redis-set-test-spec.png)
@@ -85,17 +84,18 @@ And that's all, now you can validate this entire use case.
 
 ### Test Definition
 
-If you want to replicate this entire test on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
+If you want to replicate those tests on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving one of the test definitions as the file `test-definition.yml` and running:
 
 ```sh
 tracetest test -d test-definition.yml --wait-for-results
 ```
 
+#### Cache miss scenario
+
 ```yaml
 type: Test
 spec:
-  name: Pokeshop - Get Pokemon by ID [cache miss]
-  description: Get a Pokemon by ID
+  name: Pokeshop - Get Pokemon by ID [cache miss scenario]
   trigger:
     type: http
     httpRequest:
@@ -107,16 +107,47 @@ spec:
   specs:
   - selector: span[tracetest.span.type="http" http.method="GET"]
     assertions:
-    - attr:http.status_code         =         200
-    - attr:http.response.body   contains     '"id":${env:POKEMON_ID}'
+    - attr:http.status_code  =  200
+    - attr:http.response.body | json_path '$.id'  =  '${env:POKEMON_ID}'
   - selector: span[tracetest.span.type="database" db.system="redis" db.operation="get"]
     assertions:
-    - attr:name   =   "get pokemon-${env:POKEMON_ID}"
+    - attr:name  =  "get pokemon-${env:POKEMON_ID}"
   - selector: span[tracetest.span.type="database" db.system="redis" db.operation="set"]
     assertions:
-    - attr:name  =  "set pokemon-${env:POKEMON_ID}"
-  - selector: span[tracetest.span.type="database" name="findOne pokeshop.pokemon"
-      db.system="postgres" db.name="pokeshop" db.operation="findOne" db.sql.table="pokemon"]
+    - attr:name = "set pokemon-${env:POKEMON_ID}"
+  - selector: |-
+      span[tracetest.span.type="database" name="findOne pokeshop.pokemon"
+            db.system="postgres" db.name="pokeshop" db.operation="findOne" db.sql.table="pokemon"]
     assertions:
-    - attr:name  =  "findOne pokeshop.pokemon"
+    - attr:tracetest.selected_spans.count > 0
+```
+
+#### Cache miss scenario
+
+```yml
+type: Test
+spec:
+  name: Pokeshop - Get Pokemon by ID [cache hit scenario]
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-pokemon-api.demo/pokemon/${env:POKEMON_ID}
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" http.method="GET"]
+    assertions:
+    - attr:http.status_code  =  200
+    - attr:http.response.body | json_path '$.id'  =  "${env:POKEMON_ID}"
+  - selector: span[tracetest.span.type="database" db.system="redis" db.operation="get"]
+    assertions:
+    - attr:name = "get pokemon-${env:POKEMON_ID}"
+    - attr:db.result | json_path '$.id' = "${env:POKEMON_ID}"
+  - selector: |-
+      span[tracetest.span.type="database" name="findOne pokeshop.pokemon"
+            db.system="postgres" db.name="pokeshop" db.operation="findOne" db.sql.table="pokemon"]
+    assertions:
+    - attr:tracetest.selected_spans.count  =  0
 ```
