@@ -19,7 +19,6 @@ var (
 
 	// overrides
 	overrideEndpoint string
-	overrideScheme   string
 )
 
 var rootCmd = &cobra.Command{
@@ -43,5 +42,4 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
 
 	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "endpoint", "e", "", "endpoint")
-	rootCmd.PersistentFlags().StringVarP(&overrideScheme, "scheme", "s", "", "scheme")
 }

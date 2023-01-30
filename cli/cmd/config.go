@@ -53,10 +53,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 func overrideConfig() {
 	if overrideEndpoint != "" {
-		cliConfig.Endpoint = overrideEndpoint
-	}
-	if overrideScheme != "" {
-		cliConfig.Scheme = overrideScheme
+		scheme, endpoint, err := config.ParseServerURL(overrideEndpoint)
+		if err != nil {
+			msg := fmt.Sprintf("cannot parse endpoint %s", overrideEndpoint)
+			cliLogger.Error(msg, zap.Error(err))
+			os.Exit(1)
+		}
+		cliConfig.Scheme = scheme
+		cliConfig.Endpoint = endpoint
 	}
 }
 
