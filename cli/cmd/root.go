@@ -41,5 +41,5 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
 
-	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "address", "a", "", "server address")
+	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
 }
