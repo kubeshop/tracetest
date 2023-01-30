@@ -41,12 +41,22 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		setupOutputFormat()
 		setupLogger(cmd, args)
 		loadConfig(cmd, args)
+		overrideConfig()
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
 
 		analytics.Init(cliConfig)
+	}
+}
+
+func overrideConfig() {
+	if overrideEndpoint != "" {
+		cliConfig.Endpoint = overrideEndpoint
+	}
+	if overrideScheme != "" {
+		cliConfig.Scheme = overrideScheme
 	}
 }
 
