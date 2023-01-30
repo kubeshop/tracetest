@@ -3,9 +3,11 @@ import {Form, Modal as AntModal, Typography} from 'antd';
 import {InfoCircleOutlined} from '@ant-design/icons';
 
 export const Modal = styled(AntModal)`
+  top: 50px;
+
   .ant-modal-body {
     background: ${({theme}) => theme.color.background};
-    max-height: 560px;
+    max-height: calc(100vh - 250px);
     overflow-y: scroll;
   }
 `;
