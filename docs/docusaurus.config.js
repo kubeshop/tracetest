@@ -136,10 +136,6 @@ const config = {
             to: '/ci-cd-automation/github-actions-pipeline',
             from: ['/ci-cd-automation/ci-cd-best-practices' /*, '/docs/legacyDocFrom2016'*/],
           },
-          {
-            to: '/live-examples/pokeshop',
-            from: ['/pokeshop', '/pokeshop/' /*, '/docs/legacyDocFrom2016'*/],
-          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {
