@@ -66,7 +66,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
   }, [onSetFocusedSpan, setSelectedSpec]);
 
   const handleEdit = useCallback(
-    ({selector, resultList: list}: TAssertionResultEntry) => {
+    ({selector, resultList: list}: TAssertionResultEntry, name: string) => {
       AssertionAnalyticsService.onAssertionEdit();
 
       open({
@@ -75,6 +75,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
         defaultValues: {
           assertions: list.map(({assertion}) => AssertionService.getStructuredAssertion(assertion)),
           selector,
+          name,
         },
       });
     },

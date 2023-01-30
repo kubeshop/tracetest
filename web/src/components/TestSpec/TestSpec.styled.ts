@@ -53,3 +53,8 @@ export const Selector = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+export const Title = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.md};
+`;

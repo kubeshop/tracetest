@@ -6,7 +6,7 @@ interface IProps {
   isOpen: boolean;
   onClose(): void;
   onDelete(selector: string): void;
-  onEdit(assertionResult: TAssertionResultEntry): void;
+  onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onRevert(originalSelector: string): void;
   onSelectSpan(spanId: string): void;
   selectedSpan?: string;

@@ -16,6 +16,7 @@ import Reducer, {
   updateSpec,
   setSelectedSpec,
 } from '../TestSpecs.slice';
+import TestSpecs from '../../../models/TestSpecs.model';
 
 const {specs} = TestDefinitionMock.model();
 
@@ -28,6 +29,7 @@ const spec: TTestSpecEntry = {
     .fill(null)
     .map(() => `${faker.datatype.string(10)} = "${faker.datatype.string(10)}"`),
   originalSelector: specSelector,
+  name: '',
 };
 
 const state = {...initialState, specs};
@@ -40,10 +42,10 @@ describe('TestSpecs slice', () => {
   describe('initSpecs', () => {
     it('should handle triggering the action', () => {
       const assertionResults = AssertionResultsMock.model();
-      expect(Reducer(undefined, initSpecs({assertionResults}))).toEqual({
+      expect(Reducer(undefined, initSpecs({assertionResults, specs: TestSpecs({})}))).toEqual({
         ...initialState,
-        initialSpecs: assertionResultsToSpecs(assertionResults),
-        specs: assertionResultsToSpecs(assertionResults),
+        initialSpecs: assertionResultsToSpecs(assertionResults, TestSpecs({})),
+        specs: assertionResultsToSpecs(assertionResults, TestSpecs({})),
         isInitialized: true,
       });
     });
@@ -180,7 +182,7 @@ describe('TestSpecs slice', () => {
       });
 
       expect(result.assertionResults).toEqual(run.result);
-      expect(result.initialSpecs).toEqual(assertionResultsToSpecs(run.result));
+      expect(result.initialSpecs).toEqual(assertionResultsToSpecs(run.result, TestSpecs({})));
     });
   });
 

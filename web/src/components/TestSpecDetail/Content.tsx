@@ -15,7 +15,7 @@ import * as S from './TestSpecDetail.styled';
 interface IProps {
   onClose(): void;
   onDelete(selector: string): void;
-  onEdit(assertionResult: TAssertionResultEntry): void;
+  onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onRevert(originalSelector: string): void;
   onSelectSpan(spanId: string): void;
   selectedSpan?: string;
@@ -42,6 +42,7 @@ const Content = ({
     isDeleted = false,
     isDraft = false,
     originalSelector = '',
+    name = '',
   } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
   const results = useMemo(() => AssertionService.getResultsHashedBySpanId(resultList), [resultList]);
@@ -60,12 +61,13 @@ const Content = ({
           onClose();
         }}
         onEdit={() => {
-          onEdit(testSpec);
+          onEdit(testSpec, name);
         }}
         onRevert={() => {
           onRevert(originalSelector);
         }}
-        title={selector}
+        selector={selector}
+        title={!selector && !name ? 'All Spans' : name}
       />
 
       {Object.entries(results).map(([spanId, checkResults]) => {

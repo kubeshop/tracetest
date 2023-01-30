@@ -12,6 +12,7 @@ const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResult
       spanIds: AssertionService.getSpanIds(resultList),
       originalSelector: selector,
       resultList: resultList.map(assertionResult => AssertionResult(assertionResult)),
+      name: '',
     })),
   };
 };

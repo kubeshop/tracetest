@@ -12,11 +12,13 @@ export type TTestSpecEntry = {
   isDraft: boolean;
   originalSelector?: string;
   selector: string;
+  name: string;
 };
 
 export type TRawTestSpecEntry = {
   selector: {query: string};
   assertions: string[];
+  name: string;
 };
 
 export type TTestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;
@@ -41,7 +43,7 @@ export interface ITestSpecsState {
 
 export type TTestSpecsSliceActions = {
   reset: CaseReducer<ITestSpecsState>;
-  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: TAssertionResults}>>;
+  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: TAssertionResults; specs: TTestSpecs}>>;
   addSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry}>>;
   updateSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry; selector: string}>>;
   removeSpec: CaseReducer<ITestSpecsState, PayloadAction<{selector: string}>>;

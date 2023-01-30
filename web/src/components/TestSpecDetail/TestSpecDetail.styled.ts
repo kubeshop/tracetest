@@ -87,7 +87,7 @@ export const IconSuccess = styled(CheckCircleFilled)`
   color: ${({theme}) => theme.color.success};
 `;
 
-export const Row = styled.div<{$align?: string; $hasGap?: boolean, $justify?: string}>`
+export const Row = styled.div<{$align?: string; $hasGap?: boolean; $justify?: string}>`
   align-items: ${({$align}) => $align || 'center'};
   display: flex;
   justify-content: ${({$justify}) => $justify || 'flex-start'};
@@ -105,4 +105,9 @@ export const SpanHeaderContainer = styled.div`
   display: flex;
   gap: 8px;
   padding: 8px 12px;
+`;
+
+export const Title = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.md};
 `;

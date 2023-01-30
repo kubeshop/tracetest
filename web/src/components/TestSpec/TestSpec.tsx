@@ -10,7 +10,7 @@ import * as S from './TestSpec.styled';
 
 interface IProps {
   onDelete(selector: string): void;
-  onEdit(assertionResult: TAssertionResultEntry): void;
+  onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onOpen(selector: string): void;
   onRevert(originalSelector: string): void;
   testSpec: TAssertionResultEntry;
@@ -28,6 +28,7 @@ const TestSpec = ({
     isDeleted = false,
     isDraft = false,
     originalSelector = '',
+    name = '',
   } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
 
@@ -43,7 +44,8 @@ const TestSpec = ({
         affectedSpans={spanIds.length}
         assertionsFailed={totalPassedChecks?.false ?? 0}
         assertionsPassed={totalPassedChecks?.true ?? 0}
-        title={selector}
+        selector={selector}
+        title={!selector && !name ? 'All Spans' : name}
       />
       <Actions
         isDeleted={isDeleted}
@@ -52,7 +54,7 @@ const TestSpec = ({
           onDelete(selector);
         }}
         onEdit={() => {
-          onEdit(testSpec);
+          onEdit(testSpec, name);
         }}
         onRevert={() => {
           onRevert(originalSelector);

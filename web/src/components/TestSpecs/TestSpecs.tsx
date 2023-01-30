@@ -6,7 +6,7 @@ import * as S from './TestSpecs.styled';
 interface IProps {
   assertionResults: TAssertionResults;
   onDelete(selector: string): void;
-  onEdit(assertionResult: TAssertionResultEntry): void;
+  onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onOpen(selector: string): void;
   onRevert(originalSelector: string): void;
 }

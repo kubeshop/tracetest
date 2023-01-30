@@ -16,7 +16,7 @@ import {
 } from 'redux/slices/TestSpecs.slice';
 import {TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
-import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
+import {ISuggestion, TTestSpecEntry, TTestSpecs} from 'types/TestSpecs.types';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -109,8 +109,8 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   );
 
   const init = useCallback(
-    (initialAssertionResults: TAssertionResults) => {
-      dispatch(initSpecs({assertionResults: initialAssertionResults}));
+    (initialAssertionResults: TAssertionResults, specs: TTestSpecs) => {
+      dispatch(initSpecs({assertionResults: initialAssertionResults, specs}));
     },
     [dispatch]
   );

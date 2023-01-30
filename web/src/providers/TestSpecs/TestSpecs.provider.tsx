@@ -91,8 +91,8 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
   });
 
   useEffect(() => {
-    if (run.state === 'FINISHED') init(run.result);
-  }, [init, run.result, run.state]);
+    if (run.state === 'FINISHED') init(run.result, test.definition);
+  }, [init, run.result, run.state, test.definition]);
 
   useEffect(() => {
     return () => {

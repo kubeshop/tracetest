@@ -17,6 +17,7 @@ interface IProps {
   onDelete(): void;
   onEdit(): void;
   onRevert(): void;
+  selector: string;
   title: string;
 }
 
@@ -30,6 +31,7 @@ const Header = ({
   onDelete,
   onEdit,
   onRevert,
+  selector,
   title,
 }: IProps) => {
   return (
@@ -69,13 +71,17 @@ const Header = ({
 
       <Divider />
 
-      <Editor
-        type={SupportedEditors.Selector}
-        editable={false}
-        basicSetup={{lineNumbers: false}}
-        placeholder="Selecting All Spans"
-        value={title || 'All Spans'}
-      />
+      {title && <S.Title>{title}</S.Title>}
+
+      {selector && (
+        <Editor
+          type={SupportedEditors.Selector}
+          editable={false}
+          basicSetup={{lineNumbers: false}}
+          placeholder="Selecting All Spans"
+          value={selector}
+        />
+      )}
 
       <Divider />
     </>

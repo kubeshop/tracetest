@@ -1,4 +1,4 @@
-import {Button, Form, Tag} from 'antd';
+import {Button, Form, Input, Tag} from 'antd';
 import {useEffect, useState} from 'react';
 
 import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
@@ -20,6 +20,7 @@ import * as S from './TestSpecForm.styled';
 export interface IValues {
   assertions?: TStructuredAssertion[];
   selector?: string;
+  name?: string;
 }
 
 interface IProps {
@@ -43,6 +44,7 @@ const TestSpecForm = ({
       },
     ],
     selector = '',
+    name = '',
   } = {},
   isEditing = false,
   onCancel,
@@ -64,7 +66,7 @@ const TestSpecForm = ({
   const onFieldsChange = useOnFieldsChange();
 
   useEffect(() => {
-    onValuesChange(null, {assertions, selector});
+    onValuesChange(null, {assertions, selector, name});
   }, []);
 
   const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
@@ -83,6 +85,7 @@ const TestSpecForm = ({
           remember: true,
           assertions,
           selector,
+          name,
         }}
         onFinish={onSubmit}
         autoComplete="off"
@@ -149,6 +152,16 @@ const TestSpecForm = ({
               />
             )}
           </Form.List>
+        </S.FormSection>
+
+        <S.FormSection>
+          <S.FormSectionTitle>3. Give it a name</S.FormSectionTitle>
+          <S.FormSectionRow>
+            <S.FormSectionText>Give your test spec an optional name</S.FormSectionText>
+          </S.FormSectionRow>
+          <Form.Item name="name">
+            <Input />
+          </Form.Item>
         </S.FormSection>
 
         <S.AssertionFromActions>
