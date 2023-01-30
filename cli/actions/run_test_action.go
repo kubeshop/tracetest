@@ -139,7 +139,7 @@ func (a runTestAction) processEnv(ctx context.Context, envID string) (string, er
 		Environment(req).
 		Execute()
 	if err != nil {
-		if resp.StatusCode == http.StatusBadRequest {
+		if resp != nil && resp.StatusCode == http.StatusBadRequest {
 			return a.updateEnv(ctx, req)
 		}
 
