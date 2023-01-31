@@ -1,19 +1,43 @@
 import {CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
-import {Typography, Tag} from 'antd';
+import {Typography, Tag, Button} from 'antd';
 import {Link} from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  align-items: center;
   border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   border-radius: 2px;
   background: ${({theme}) => theme.color.background};
+  display: flex;
+  flex-direction: column;
+  padding: 7px 16px;
+  margin-bottom: 8px;
+`;
+
+export const Content = styled.div`
+  align-items: center;
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   gap: 16px;
-  padding: 7px 16px;
-  margin-bottom: 8px;
   height: 58px;
+  width: 100%;
+`;
+
+export const OutputsContainer = styled.div`
+  margin-left: 32px;
+`;
+
+export const OutputsButton = styled(Button)`
+  font-size: ${({theme}) => theme.size.sm};
+  font-weight: 600;
+  height: 20px;
+  padding: 0;
+`;
+
+export const OutputsGrid = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin-top: 4px;
 `;
 
 export const Info = styled.div`
@@ -23,7 +47,9 @@ export const Info = styled.div`
   height: 100%;
 `;
 
-export const ExecutionStepName = styled(Typography.Text)`
+export const ItemName = styled(Typography.Title).attrs({
+  level: 4,
+})`
   && {
     font-size: ${({theme}) => theme.size.sm};
   }
@@ -33,6 +59,14 @@ export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.lg};
     margin-bottom: 24px;
+  }
+`;
+
+export const Text = styled(Typography.Text)<{$isSecondary?: boolean}>`
+  && {
+    color: ${({theme, $isSecondary}) => ($isSecondary ? theme.color.textSecondary : theme.color.text)};
+    font-size: ${({theme}) => theme.size.sm};
+    font-weight: ${({$isSecondary}) => ($isSecondary ? 'normal' : '600')};
   }
 `;
 
