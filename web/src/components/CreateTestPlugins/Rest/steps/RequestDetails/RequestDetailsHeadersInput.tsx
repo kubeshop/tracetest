@@ -1,13 +1,13 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
-import {DEFAULT_HEADERS} from 'constants/Test.constants';
+import {DEFAULT_HEADERS, IKeyValue} from 'constants/Test.constants';
 import React from 'react';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './RequestDetails.styled';
 
 interface IProps {
-  initialValue?: Record<string, string>[];
+  initialValue?: IKeyValue[];
   name?: string[];
   unit?: string;
   label?: string;
