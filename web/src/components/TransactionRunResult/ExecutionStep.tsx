@@ -1,7 +1,7 @@
 import {LinkOutlined} from '@ant-design/icons';
 import {Tooltip} from 'antd';
 import {capitalize} from 'lodash';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {TestState} from 'constants/TestRun.constants';
 import TestRun from 'models/TestRun.model';
@@ -94,7 +94,7 @@ const ExecutionStep = ({
         {toggleOutputs && (
           <S.OutputsGrid>
             {outputs?.map(output => (
-              <>
+              <React.Fragment key={output.name}>
                 <div>
                   <S.Text $isSecondary>Key </S.Text>
                   <S.Text>{output.name}</S.Text>
@@ -103,7 +103,7 @@ const ExecutionStep = ({
                   <S.Text $isSecondary>Value </S.Text>
                   <S.Text>{output.value}</S.Text>
                 </div>
-              </>
+              </React.Fragment>
             ))}
           </S.OutputsGrid>
         )}
