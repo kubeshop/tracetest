@@ -10,14 +10,12 @@ actions:
         - data/tracetest-cli-config.yaml
       image: "kubeshop/tracetest:latest"
       cmd:
-        - sh -c 'ls /keptn/data'
-      # cmd:
-      #   - tracetest
-      # args:
-      #   - --config
-      #   - /keptn/data/tracetest-cli-config.yaml
-      #   - test
-      #   - run
-      #   - --definition
-      #   - /keptn/data/test-definition.yaml
-      #   - --wait-for-result
+        - tracetest
+      args:
+        - --config
+        - /keptn/data/tracetest-cli-config.yaml
+        - test
+        - run
+        - --definition
+        - /keptn/data/test-definition.yaml
+        - --wait-for-result
