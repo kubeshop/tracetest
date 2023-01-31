@@ -2,7 +2,7 @@ apiVersion: v2
 actions:
 - name: "Run tracetest on your service"
   events:
-    - name: "sh.keptn.event.test-services.triggered"
+    - name: "sh.keptn.event.test.triggered"
   tasks:
     - name: "Run tracetest"
       files:
@@ -10,12 +10,14 @@ actions:
         - data/tracetest-cli-config.yaml
       image: "kubeshop/tracetest:latest"
       cmd:
-        - tracetest
-      args:
-        - --config
-        - /keptn/data/tracetest-cli-config.yaml
-        - test
-        - run
-        - --definition
-        - /keptn/data/test-definition.yaml
-        - --wait-for-result
+        - sh -c 'ls /keptn/data'
+      # cmd:
+      #   - tracetest
+      # args:
+      #   - --config
+      #   - /keptn/data/tracetest-cli-config.yaml
+      #   - test
+      #   - run
+      #   - --definition
+      #   - /keptn/data/test-definition.yaml
+      #   - --wait-for-result
