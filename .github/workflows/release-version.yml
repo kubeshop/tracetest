@@ -89,8 +89,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: latest
-          args: release --rm-dist --split
+          version: v1.15.0
+          args: release --clean --split
         env:
           GOOS: ${{ matrix.GOOS }}
           VERSION: ${{ github.ref_name}}
@@ -151,7 +151,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: latest
+          version: v1.15.0
           args: continue --merge
         env:
           VERSION: ${{ github.ref_name}}
@@ -248,8 +248,8 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: latest
-          args: release --rm-dist --skip-announce -f .goreleaser.dev.yaml
+          version: v1.15.0
+          args: release --clean --skip-announce -f .goreleaser.dev.yaml
         env:
           VERSION: ${{ github.ref_name}}-demo
           TRACETEST_ENV: demo

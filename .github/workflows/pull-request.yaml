@@ -101,8 +101,8 @@ jobs:
       uses: goreleaser/goreleaser-action@v4
       with:
         distribution: goreleaser-pro
-        version: latest
-        args: build --single-target --rm-dist --snapshot
+        version: v1.15.0
+        args: build --single-target --clean --snapshot
       env:
         VERSION: pr-${{ github.event.pull_request.number }}
         TRACETEST_ENV: pr
@@ -174,8 +174,8 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: latest
-          args: release --rm-dist --skip-announce --snapshot -f .goreleaser.dev.yaml
+          version: v1.15.0
+          args: release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
         env:
           VERSION: pr-${{ github.event.pull_request.number }}
           TRACETEST_ENV: pr
@@ -266,7 +266,7 @@ jobs:
         with:
           # uncomment this once this pr is merged
           # distribution: goreleaser-pro
-          version: latest
+          version: v1.15.0
           install-only: true
       - name: Install CLI intergation version (latest main)
         run: |
