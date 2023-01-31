@@ -30,7 +30,7 @@ ARG ANALYTICS_BE_KEY
 ARG VERSION
 ARG TRACETEST_ENV
 
-RUN apk add --update make git jq
+RUN apk add --update make git jq build-base
 
 COPY ./server/go.mod ./server/go.sum ./server/
 RUN cd server && go mod download
