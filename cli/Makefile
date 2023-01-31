@@ -9,7 +9,7 @@ help: Makefile ## show list of commands
 
 build: ## build this project using goreleaser
 ifeq (, $(shell which goreleaser))
-	go install github.com/goreleaser/goreleaser@latest
+	go install github.com/goreleaser/goreleaser@v1.14.1
 endif
 	VERSION=$(VERSION) \
 	TRACETEST_ENV=$(TRACETEST_ENV) \
