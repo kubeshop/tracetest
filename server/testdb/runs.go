@@ -337,7 +337,7 @@ SELECT
 FROM test_runs
 LEFT OUTER JOIN
 	transaction_run_steps transaction_run
-ON transaction_run.test_run_id = id
+ON transaction_run.test_run_id = id AND transaction_run.test_run_test_id = test_id
 `
 
 func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
