@@ -4,8 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
-    "with-http-tracer": "node -r ./tracing.otel.http.js app.js"
+    "app-with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
+    "app-with-http-tracer": "node -r ./tracing.otel.http.js app.js",
+    "availability-with-grpc-tracer": "node -r ./tracing.otel.grpc.js availability.js",
+    "availability-with-http-tracer": "node -r ./tracing.otel.http.js availability.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,7 @@
     "@opentelemetry/sdk-trace-node": "^1.9.0",
     "@opentelemetry/semantic-conventions": "^1.9.0",
     "@opentelemetry/tracing": "^0.24.0",
+    "axios": "^1.2.5",
     "express": "^4.18.2"
   }
 }
