@@ -170,7 +170,6 @@ jobs:
         with:
           name: tracetest-web
           path: web/build/
-      # release
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
@@ -269,11 +268,9 @@ jobs:
           install-only: true
       - name: Install CLI intergation version (latest main)
         run: |
-          git clone --depth 1 https://github.com/kubeshop/tracetest /tmp/tracetest-main/
-          cd /tmp/tracetest-main/
-          goreleaser build --single-target --clean --snapshot
-          find ./dist -name 'tracetest' -exec cp {} ./dist \;
-          chmod +x ./dist/tracetest
+          cd /tmp
+          curl -L https://github.com/kubeshop/tracetest/releases/download/latest/tracetest_latest_linux_amd64.tar.gz  | tar -x
+
       - name: Forward port
         run: |
           kubectl port-forward \
@@ -285,7 +282,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd tracetesting
-          TRACETEST_CLI="/tmp/tracetest-main/dist/tracetest" \
+          TRACETEST_CLI="/tmp/tracetest" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
