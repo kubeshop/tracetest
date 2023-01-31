@@ -170,6 +170,7 @@ jobs:
         with:
           name: tracetest-web
           path: web/build/
+      # release
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
@@ -260,6 +261,12 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
+      - name: Setup GoReleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser-pro
+          version: v1.15.0
+          install-only: true
       - name: Install CLI intergation version (latest main)
         run: |
           cd /tmp
