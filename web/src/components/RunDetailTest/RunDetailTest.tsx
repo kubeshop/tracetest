@@ -37,6 +37,7 @@ interface IProps {
 }
 
 const RunDetailTest = ({run, testId}: IProps) => {
+  const [query, updateQuery] = useSearchParams();
   const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
   const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector, specs} =
     useTestSpecs();
@@ -51,14 +52,13 @@ const RunDetailTest = ({run, testId}: IProps) => {
     outputs,
   } = useTestOutput();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
-  const {
-    state: {tourActive},
-    setState,
-  } = useGuidedTour();
+  const {isGuidedTourRunning, setGuidedTourStep} = useGuidedTour();
+
   useMount(() => {
-    if (tourActive) setState(st => ({...st, run: true, stepIndex: 3}));
+    if (isGuidedTourRunning) {
+      setGuidedTourStep(3);
+    }
   });
-  const [query, updateQuery] = useSearchParams();
 
   const handleClose = useCallback(() => {
     onSetFocusedSpan('');
@@ -166,6 +166,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
               {!isTestSpecFormOpen && !isTestOutputFormOpen && (
                 <S.TabsContainer>
                   <Tabs
+                    activeKey={query.get('tab') || TABS.SPECS}
                     defaultActiveKey={query.get('tab') || TABS.SPECS}
                     onChange={tab =>
                       updateQuery(

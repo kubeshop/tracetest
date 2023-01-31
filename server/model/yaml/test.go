@@ -60,9 +60,10 @@ func (t Test) Validate() error {
 }
 
 type TestTrigger struct {
-	Type        string      `mapstructure:"type"`
-	HTTPRequest HTTPRequest `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
-	GRPC        GRPC        `mapstructure:"grpc" yaml:"grpc,omitempty"`
+	Type        string         `mapstructure:"type"`
+	HTTPRequest HTTPRequest    `mapstructure:"httpRequest" yaml:"httpRequest,omitempty" dc:"http"`
+	GRPC        GRPC           `mapstructure:"grpc" yaml:"grpc,omitempty"`
+	TRACEID     TRACEIDRequest `mapstructure:"traceid" yaml:"traceid,omitempty"`
 }
 
 func (t TestTrigger) Validate() error {
@@ -74,6 +75,10 @@ func (t TestTrigger) Validate() error {
 	case "grpc":
 		if err := t.GRPC.Validate(); err != nil {
 			return fmt.Errorf("grpc request must be valid: %w", err)
+		}
+	case "traceid":
+		if err := t.TRACEID.Validate(); err != nil {
+			return fmt.Errorf("traceid request must be valid: %w", err)
 		}
 	case "":
 		return fmt.Errorf("type cannot be empty")

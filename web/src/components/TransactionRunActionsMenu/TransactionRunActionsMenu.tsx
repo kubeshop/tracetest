@@ -1,4 +1,6 @@
 import {Dropdown, Menu} from 'antd';
+import {useNavigate} from 'react-router-dom';
+
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
 import {ResourceType} from 'types/Resource.type';
 import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
@@ -13,6 +15,9 @@ interface IProps {
 
 const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, transactionVersion}: IProps) => {
   const {loadDefinition} = useFileViewerModal();
+
+  const navigate = useNavigate();
+
   const onDelete = useDeleteResourceRun({id: transactionId, isRunView, type: ResourceType.Transaction});
 
   return (
@@ -26,6 +31,16 @@ const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, tra
               onClick={() => loadDefinition(ResourceType.Transaction, transactionId, transactionVersion)}
             >
               Transaction Definition
+            </Menu.Item>
+            <Menu.Item
+              data-cy="test-edit-button"
+              onClick={({domEvent}) => {
+                domEvent.stopPropagation();
+                navigate(`/transaction/${transactionId}/run/${runId}`);
+              }}
+              key="edit"
+            >
+              Edit
             </Menu.Item>
             <Menu.Item
               data-cy="test-delete-button"

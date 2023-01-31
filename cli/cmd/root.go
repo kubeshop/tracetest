@@ -16,6 +16,9 @@ var (
 
 	outputFormats       = formatters.OuputsStr()
 	outputFormatsString = strings.Join(outputFormats, "|")
+
+	// overrides
+	overrideEndpoint string
 )
 
 var rootCmd = &cobra.Command{
@@ -37,4 +40,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", string(formatters.DefaultOutput), fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
+
+	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
 }

@@ -6,6 +6,7 @@ import DAGModel from 'models/DAG.model';
 import {TSpan} from 'types/Span.types';
 import {clearMatchedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';
 import {setSelectedSpec} from './TestSpecs.slice';
+import {outputsSelectedOutputsChanged} from '../testOutputs/slice';
 
 export interface IDagState {
   edges: Edge[];
@@ -64,6 +65,13 @@ const dagSlice = createSlice({
         state.nodes = state.nodes.map(node => {
           const selected = span.id === node.id;
           return {...node, selected};
+        });
+      })
+      .addCase(outputsSelectedOutputsChanged, (state, {payload: outputs}) => {
+        const spanIds = outputs.map(output => output.spanId);
+        state.nodes = state.nodes.map(node => {
+          const isMatched = spanIds.includes(node.id);
+          return {...node, data: {...node.data, isMatched}};
         });
       });
   },

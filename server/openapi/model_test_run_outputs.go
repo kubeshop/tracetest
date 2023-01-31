@@ -12,6 +12,8 @@ package openapi
 type TestRunOutputs struct {
 	Name string `json:"name,omitempty"`
 
+	SpanId string `json:"spanId,omitempty"`
+
 	Value string `json:"value,omitempty"`
 }
 

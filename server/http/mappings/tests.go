@@ -8,7 +8,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -47,8 +46,8 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
 				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: 0,
-				Fails:  0,
+				Passes: int32(in.Summary.LastRun.Fails),
+				Fails:  int32(in.Summary.LastRun.Passes),
 			},
 		},
 	}
@@ -70,6 +69,8 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 		Steps:       steps,
 		Metadata:    in.Metadata,
 		Environment: m.Environment(in.Environment),
+		Pass:        int32(in.Pass),
+		Fail:        int32(in.Fail),
 	}
 }
 
@@ -130,8 +131,9 @@ func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
 	return openapi.Trigger{
 		TriggerType: string(in.Type),
 		TriggerSettings: openapi.TriggerTriggerSettings{
-			Http: m.HTTPRequest(in.HTTP),
-			Grpc: m.GRPCRequest(in.GRPC),
+			Http:    m.HTTPRequest(in.HTTP),
+			Grpc:    m.GRPCRequest(in.GRPC),
+			Traceid: m.TRACEIDRequest(in.TRACEID),
 		},
 	}
 }
@@ -141,8 +143,9 @@ func (m OpenAPI) TriggerResult(in model.TriggerResult) openapi.TriggerResult {
 	return openapi.TriggerResult{
 		TriggerType: string(in.Type),
 		TriggerResult: openapi.TriggerResultTriggerResult{
-			Http: m.HTTPResponse(in.HTTP),
-			Grpc: m.GRPCResponse(in.GRPC),
+			Http:    m.HTTPResponse(in.HTTP),
+			Grpc:    m.GRPCResponse(in.GRPC),
+			Traceid: m.TRACEIDResponse(in.TRACEID),
 		},
 	}
 }
@@ -308,16 +311,19 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
 		Environment:               m.Environment(in.Environment),
+		TransactionId:             in.TransactionID,
+		TransactionRunId:          in.TransactionRunID,
 	}
 }
 
-func (m OpenAPI) RunOutputs(in model.OrderedMap[string, string]) []openapi.TestRunOutputs {
+func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []openapi.TestRunOutputs {
 	res := make([]openapi.TestRunOutputs, 0, in.Len())
 
-	in.ForEach(func(key, val string) error {
+	in.ForEach(func(key string, val model.RunOutput) error {
 		res = append(res, openapi.TestRunOutputs{
-			Name:  key,
-			Value: val,
+			Name:   key,
+			Value:  val.Value,
+			SpanId: val.SpanID,
 		})
 		return nil
 	})
@@ -332,39 +338,6 @@ func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
 	}
 
 	return runs
-}
-
-func (m OpenAPI) TestVariables(in expression.TestVariables) openapi.TestVariables {
-	return openapi.TestVariables{
-		Test: m.Test(in.Test),
-		Variables: openapi.Variables{
-			Environment: in.Environment,
-			Variables:   in.Variables,
-			Missing:     m.MissingVariables(in.Missing),
-		},
-	}
-}
-
-func (m OpenAPI) MissingVariables(in []expression.MissingVariables) []openapi.MissingVariables {
-	missingVariables := make([]openapi.MissingVariables, len(in))
-	for i, missingVariable := range in {
-		missingVariables[i] = openapi.MissingVariables{
-			Key:          missingVariable.Key,
-			DefaultValue: missingVariable.DefaultValue,
-		}
-	}
-
-	return missingVariables
-}
-
-func (m OpenAPI) TransactionVariables(in []expression.TestVariables) []openapi.TestVariables {
-	transactionVariables := make([]openapi.TestVariables, len(in))
-
-	for i, testVariables := range in {
-		transactionVariables[i] = m.TestVariables(testVariables)
-	}
-
-	return transactionVariables
 }
 
 // in
@@ -514,11 +487,15 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 	}, nil
 }
 
-func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, string] {
-	res := model.OrderedMap[string, string]{}
+func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, model.RunOutput] {
+	res := model.OrderedMap[string, model.RunOutput]{}
 
 	for _, output := range in {
-		res.Add(output.Name, output.Value)
+		res.Add(output.Name, model.RunOutput{
+			Value:  output.Value,
+			Name:   output.Name,
+			SpanID: output.SpanId,
+		})
 	}
 
 	return res
@@ -526,18 +503,20 @@ func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, 
 
 func (m Model) Trigger(in openapi.Trigger) model.Trigger {
 	return model.Trigger{
-		Type: model.TriggerType(in.TriggerType),
-		HTTP: m.HTTPRequest(in.TriggerSettings.Http),
-		GRPC: m.GRPCRequest(in.TriggerSettings.Grpc),
+		Type:    model.TriggerType(in.TriggerType),
+		HTTP:    m.HTTPRequest(in.TriggerSettings.Http),
+		GRPC:    m.GRPCRequest(in.TriggerSettings.Grpc),
+		TRACEID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
 	}
 }
 
 func (m Model) TriggerResult(in openapi.TriggerResult) model.TriggerResult {
 
 	return model.TriggerResult{
-		Type: model.TriggerType(in.TriggerType),
-		HTTP: m.HTTPResponse(in.TriggerResult.Http),
-		GRPC: m.GRPCResponse(in.TriggerResult.Grpc),
+		Type:    model.TriggerType(in.TriggerType),
+		HTTP:    m.HTTPResponse(in.TriggerResult.Http),
+		GRPC:    m.GRPCResponse(in.TriggerResult.Grpc),
+		TRACEID: m.TRACEIDResponse(in.TriggerResult.Traceid),
 	}
 }
 

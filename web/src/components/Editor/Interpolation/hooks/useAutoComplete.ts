@@ -11,7 +11,7 @@ const useAutoComplete = () => {
   const getSelectedEnvironmentEntryList = useCallback(() => {
     const state = getState();
 
-    return EnvironmentSelectors.selectSelectedEnvironmentValues(state);
+    return EnvironmentSelectors.selectSelectedEnvironmentValues(state, false);
   }, [getState]);
 
   return useCallback(

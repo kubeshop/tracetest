@@ -1,5 +1,6 @@
 import {useMemo} from 'react';
 import {Button} from 'antd';
+import {useNavigate} from 'react-router-dom';
 import PaginatedList from 'components/PaginatedList';
 import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
@@ -7,11 +8,9 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import {useTest} from 'providers/Test/Test.provider';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import GuidedTourService, {GuidedTours} from 'services/GuidedTour.service';
 import {ResourceType} from 'types/Resource.type';
 import {TTestRun} from 'types/TestRun.types';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
-import {Steps} from 'components/GuidedTour/testDetailsStepList';
 import * as S from './Test.styled';
 
 const Content = () => {
@@ -21,6 +20,11 @@ const Content = () => {
   const params = useMemo(() => ({testId: test.id}), [test.id]);
   useDocumentTitle(`${test.name}`);
 
+  const navigate = useNavigate();
+
+  const shouldEdit = test.summary.hasRuns;
+  const onEdit = () => navigate(`/test/${test.id}/run/${test.summary.runs}`);
+
   return (
     <S.Container $isWhite>
       <TestHeader
@@ -29,11 +33,12 @@ const Content = () => {
         }`}
         id={test.id}
         onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
+        onEdit={onEdit}
+        shouldEdit={shouldEdit}
         title={`${test.name} (v${test.version})`}
         runButton={
           <Button
             data-cy="test-details-run-test-button"
-            data-tour={GuidedTourService.getStep(GuidedTours.TestDetails, Steps.RunTest)}
             ghost
             loading={isLoadingRunTest}
             onClick={() => runTest(test)}

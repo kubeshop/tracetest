@@ -178,12 +178,12 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr model
 	return tr, nil
 }
 
-func mergeOutputsIntoEnv(env model.Environment, outputs model.OrderedMap[string, string]) model.Environment {
+func mergeOutputsIntoEnv(env model.Environment, outputs model.OrderedMap[string, model.RunOutput]) model.Environment {
 	newEnv := make([]model.EnvironmentValue, 0, outputs.Len())
-	outputs.ForEach(func(key, val string) error {
+	outputs.ForEach(func(key string, val model.RunOutput) error {
 		newEnv = append(newEnv, model.EnvironmentValue{
 			Key:   key,
-			Value: val,
+			Value: val.Value,
 		})
 
 		return nil

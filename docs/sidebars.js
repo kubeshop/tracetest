@@ -75,6 +75,11 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "configuration/connecting-to-data-stores/elasticapm",
+              label: "Elastic APM",
+            },
+            {
+              type: "doc",
               id: "configuration/connecting-to-data-stores/signalfx",
               label: "SignalFX",
             },
@@ -279,6 +284,33 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Tools & Integrations",
+      items: [
+        {
+          type: "doc",
+          id: "tools-and-integrations/overview",
+          label: "Overview",
+        },
+        {
+          type: "category",
+          label: "Integrations",
+          items: [
+            {
+              type: "doc",
+              id: "tools-and-integrations/integrations/keptn",
+              label: "Keptn",
+            },
+            {
+              type: "doc",
+              id: "tools-and-integrations/integrations/k6",
+              label: "K6",
+            }
+          ]
+        }
+      ]
+    },
+    {
+      type: "category",
       label: "Examples & Tutorials",
       items: [
         {
@@ -325,6 +357,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
               label: "Running Tracetest With New Relic",
             },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
+              label: "Running Tracetest With Elastic APM",
+            },
           ],
         },
       ],
@@ -339,24 +376,35 @@ const sidebars = {
           items: [
             {
               type: "doc",
-              id: "pokeshop/index",
+              id: "live-examples/pokeshop/overview",
               label: "Overview",
             },
             {
-              type: "doc",
-              id: "pokeshop/add-pokemon",
-              label: "Add Pokemon",
-            },
-            {
-              type: "doc",
-              id: "pokeshop/import-pokemon",
-              label: "Import Pokemon",
-            },
-            {
-              type: "doc",
-              id: "pokeshop/list-pokemon",
-              label: "List Pokemon",
-            },
+              type: "category",
+              label: "Use Cases",
+              items: [
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/add-pokemon",
+                  label: "Add Pokemon",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/list-pokemon",
+                  label: "List Pokemon",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/get-pokemon-by-id",
+                  label: "Get Pokemon by ID",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/pokeshop/use-cases/import-pokemon",
+                  label: "Import Pokemon",
+                },
+              ]
+            }
           ],
         },
         // {
@@ -365,7 +413,7 @@ const sidebars = {
         //   items: [
         //     {
         //       type: "doc",
-        //       id: "opentelemetry-store/overview",
+        //       id: "live-examples/opentelemetry-store/overview",
         //       label: "Overview",
         //     },
         //   ],

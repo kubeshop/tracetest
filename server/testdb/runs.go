@@ -247,7 +247,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		lastError = &e
 	}
 
-	pass, fail := count(r)
+	pass, fail := r.ResultsCount()
 
 	_, err = stmt.ExecContext(
 		ctx,
@@ -275,27 +275,6 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 	}
 
 	return nil
-}
-
-func count(r model.Run) (pass, fail int) {
-	if r.Results == nil {
-		return
-	}
-
-	r.Results.Results.ForEach(func(_ model.SpanQuery, ars []model.AssertionResult) error {
-		for _, ar := range ars {
-			for _, rs := range ar.Results {
-				if rs.CompareErr == nil {
-					pass++
-				} else {
-					fail++
-				}
-			}
-		}
-		return nil
-	})
-
-	return
 }
 
 func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
@@ -348,11 +327,17 @@ SELECT
 	"test_results",
 	"trace",
 	"outputs",
-	"last_error",
-
+	"last_error",	
 	"metadata",
-	"environment"
+	"environment",
+
+	-- transaction run
+	transaction_run.transaction_run_id,
+	transaction_run.transaction_run_transaction_id
 FROM test_runs
+LEFT OUTER JOIN
+	transaction_run_steps transaction_run
+ON transaction_run.test_run_id = id AND transaction_run.test_run_test_id = test_id
 `
 
 func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
@@ -425,7 +410,7 @@ func (td *postgresDB) GetLatestRunByTestVersion(ctx context.Context, testID id.I
 
 	run, err := readRunRow(stmt.QueryRowContext(ctx, testID.String(), version))
 	if err != nil {
-		return model.Run{}, fmt.Errorf("cannot read row: %w", err)
+		return model.Run{}, err
 	}
 	return run, nil
 }
@@ -458,6 +443,9 @@ func readRunRow(row scanner) (model.Run, error) {
 		lastError *string
 		traceID,
 		spanID string
+
+		transactionID,
+		transactionRunID sql.NullString
 	)
 
 	err := row.Scan(
@@ -479,6 +467,8 @@ func readRunRow(row scanner) (model.Run, error) {
 		&lastError,
 		&jsonMetadata,
 		&jsonEnvironment,
+		&transactionRunID,
+		&transactionID,
 	)
 
 	switch err {
@@ -504,7 +494,21 @@ func readRunRow(row scanner) (model.Run, error) {
 
 		err = json.Unmarshal(jsonOutputs, &r.Outputs)
 		if err != nil {
-			return model.Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
+			// try with raw outputs
+			var rawOutputs []model.EnvironmentValue
+			err = json.Unmarshal(jsonOutputs, &rawOutputs)
+
+			for _, value := range rawOutputs {
+				r.Outputs.Add(value.Key, model.RunOutput{
+					Name:   value.Key,
+					Value:  value.Value,
+					SpanID: "",
+				})
+			}
+
+			if err != nil {
+				return model.Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
+			}
 		}
 
 		err = json.Unmarshal(jsonMetadata, &r.Metadata)
@@ -533,6 +537,11 @@ func readRunRow(row scanner) (model.Run, error) {
 
 		if lastError != nil && *lastError != "" {
 			r.LastError = fmt.Errorf(*lastError)
+		}
+
+		if transactionID.Valid && transactionRunID.Valid {
+			r.TransactionID = transactionID.String
+			r.TransactionRunID = transactionRunID.String
 		}
 
 		return r, nil

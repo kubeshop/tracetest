@@ -6,7 +6,7 @@ components:
       properties:
         triggerType:
           type: string
-          enum: ["http", "grpc"]
+          enum: ["http", "grpc", "traceid"]
         triggerSettings:
           type: object
           properties:
@@ -14,13 +14,15 @@ components:
               $ref: "./http.yaml#/components/schemas/HTTPRequest"
             grpc:
               $ref: "./grpc.yaml#/components/schemas/GRPCRequest"
+            traceid:
+              $ref: "./traceid.yaml#/components/schemas/TRACEIDRequest"
 
     TriggerResult:
       type: object
       properties:
         triggerType:
           type: string
-          enum: ["http", "grpc"]
+          enum: ["http", "grpc", "traceid"]
         triggerResult:
           type: object
           properties:
@@ -28,3 +30,5 @@ components:
               $ref: "./http.yaml#/components/schemas/HTTPResponse"
             grpc:
               $ref: "./grpc.yaml#/components/schemas/GRPCResponse"
+            traceid:
+              $ref: "./traceid.yaml#/components/schemas/TRACEIDResponse"

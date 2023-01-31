@@ -8,15 +8,19 @@ import {TTestRun, TTestRunState} from 'types/TestRun.types';
 import TestRun from 'models/TestRun.model';
 import * as S from './TransactionRunResult.styled';
 
-const iconBasedOnResult = (result: TTestRunState, index: number) => {
-  switch (result) {
-    case TestState.FINISHED:
-      return <S.IconSuccess />;
-    case TestState.FAILED:
-      return <S.IconFail />;
-    default:
-      return index + 1;
+const iconBasedOnResult = (state: TTestRunState, failedAssertions: number, index: number) => {
+  if (state !== TestState.FAILED && state !== TestState.FINISHED) {
+    return null;
   }
+
+  if (state === TestState.FAILED || failedAssertions > 0) {
+    return <S.IconFail />;
+  }
+  if (state === TestState.FINISHED || failedAssertions === 0) {
+    return <S.IconSuccess />;
+  }
+
+  return index + 1;
 };
 
 interface IProps {
@@ -39,13 +43,13 @@ const ExecutionStep = ({
 
   return (
     <S.Container data-cy={`transaction-execution-step-${name}`}>
-      <S.ExecutionStepStatus>{iconBasedOnResult(state, index)}</S.ExecutionStepStatus>
+      <S.ExecutionStepStatus>{iconBasedOnResult(state, failedAssertionCount, index)}</S.ExecutionStepStatus>
       <Link to={toLink} target="_blank">
         <S.Info>
           <S.ExecutionStepName>{`${name} v${testVersion}`}</S.ExecutionStepName>
           <S.TagContainer>
             <S.TextTag>{trigger.method}</S.TextTag>
-            <S.TextTag $isLight>{trigger.entryPoint}</S.TextTag>
+            <S.EntryPointTag $isLight>{trigger.entryPoint}</S.EntryPointTag>
             {!stateIsFinished && <S.TextTag>{capitalize(state)}</S.TextTag>}
           </S.TagContainer>
         </S.Info>

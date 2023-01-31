@@ -10,6 +10,7 @@ export enum ComponentNames {
   UploadCollection = 'UploadCollection',
   TestsSelection = 'TestsSelection',
   ImportCommand = 'ImportCommand',
+  TraceIdVariableName = 'TraceIdVariableName',
 }
 
 const Default: IPlugin = {
@@ -135,11 +136,30 @@ const Curl: IPlugin = {
   type: TriggerTypes.http,
 };
 
+const TraceID: IPlugin = {
+  name: SupportedPlugins.TraceID,
+  title: 'TraceID',
+  description: 'Define your test via a Trace ID',
+  isActive: true,
+  stepList: [
+    ...Default.stepList,
+    {
+      id: 'trace-id-value',
+      name: 'Variable Name',
+      title: 'Add a Variable Name',
+      component: ComponentNames.TraceIdVariableName,
+    },
+  ],
+  demoList: [],
+  type: TriggerTypes.traceid,
+};
+
 export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
   [SupportedPlugins.CURL]: Curl,
   [SupportedPlugins.Postman]: Postman,
+  [SupportedPlugins.TraceID]: TraceID,
   [SupportedPlugins.Messaging]: Messaging,
   [SupportedPlugins.OpenAPI]: OpenAPI,
 };
@@ -147,4 +167,5 @@ export const Plugins: Record<SupportedPlugins, IPlugin> = {
 export const TriggerTypeToPlugin = {
   [TriggerTypes.http]: Plugins.REST,
   [TriggerTypes.grpc]: Plugins.GRPC,
+  [TriggerTypes.traceid]: Plugins.TraceID,
 } as const;

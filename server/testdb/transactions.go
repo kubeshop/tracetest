@@ -169,7 +169,9 @@ const getTransactionSQL = `
 		t.description,
 		t.created_at,
 		(SELECT COUNT(*) FROM transaction_runs tr WHERE tr.transaction_id = t.id) as total_runs,
-		last_transaction_run.created_at as last_transaction_run_time
+		last_transaction_run.created_at as last_transaction_run_time,
+		last_transaction_run.pass as last_test_run_pass,
+		last_transaction_run.fail as last_test_run_fail
 	FROM transactions t
 	LEFT OUTER JOIN (
 		SELECT MAX(id) as id, transaction_id FROM transaction_runs GROUP BY transaction_id
@@ -315,7 +317,11 @@ func (td *postgresDB) readTransactionRows(ctx context.Context, rows *sql.Rows) (
 func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (model.Transaction, error) {
 	transaction := model.Transaction{}
 
-	var lastRunTime *time.Time
+	var (
+		lastRunTime *time.Time
+
+		pass, fail *int
+	)
 
 	err := row.Scan(
 		&transaction.ID,
@@ -325,6 +331,8 @@ func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (mode
 		&transaction.CreatedAt,
 		&transaction.Summary.Runs,
 		&lastRunTime,
+		&pass,
+		&fail,
 	)
 
 	switch err {
@@ -332,6 +340,13 @@ func (td *postgresDB) readTransactionRow(ctx context.Context, row scanner) (mode
 		if lastRunTime != nil {
 			transaction.Summary.LastRun.Time = *lastRunTime
 		}
+		if pass != nil {
+			transaction.Summary.LastRun.Passes = *pass
+		}
+		if fail != nil {
+			transaction.Summary.LastRun.Fails = *fail
+		}
+
 		return transaction, nil
 	case sql.ErrNoRows:
 		return model.Transaction{}, ErrNotFound

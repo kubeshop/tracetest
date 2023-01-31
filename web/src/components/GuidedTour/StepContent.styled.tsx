@@ -1,42 +1,42 @@
-import {Divider as AntdDivider, Typography} from 'antd';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Body = styled.div`
   min-height: 100px;
-  padding-top: 12px;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding: 13px 16px;
 `;
-export const TitleContainer = styled.div`
+
+export const Container = styled.div`
+  background-color: ${({theme}) => theme.color.white};
+  width: 300px;
+`;
+
+export const Footer = styled.div`
+  align-items: center;
+  border-top: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  padding: 8px 1px;
 `;
 
 export const Header = styled.div`
+  align-items: center;
+  background: linear-gradient(180deg, #2f1e61 -11.46%, #8b2c53 134.37%);
   display: flex;
   justify-content: space-between;
-  padding: 16px;
-  height: 48px;
-  background: linear-gradient(180deg, #2f1e61 -11.46%, #8b2c53 134.37%);
-  > div {
-    width: 100%;
-  }
-`;
-export const Divider = styled(AntdDivider)`
-  margin-top: 12px;
-  margin-bottom: 0;
+  padding: 13px 16px;
 `;
 
-export const TitleText = styled(Typography.Text).attrs({level: 3})`
-  && {
-    color: white;
-    opacity: 0.6;
-  }
-`;
 export const Title = styled(Typography.Title).attrs({level: 3})`
   && {
-    color: white;
+    color: ${({theme}) => theme.color.white};
     margin-bottom: 0;
+  }
+`;
+
+export const TitleText = styled(Typography.Text)`
+  && {
+    color: ${({theme}) => theme.color.white};
+    opacity: 0.6;
   }
 `;

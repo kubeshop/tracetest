@@ -97,6 +97,10 @@ const config = {
           //   from: ['/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
           // },
           {
+            to: '/',
+            from: ['/introduction' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
             to: '/concepts/selectors',
             from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
           },
@@ -237,6 +241,8 @@ const config = {
         indexName: "tracetest",
 
         contextualSearch: false,
+
+        searchPagePath: false,
       },
     }),
 };

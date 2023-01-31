@@ -16,8 +16,9 @@ import (
 
 // TriggerTriggerSettings struct for TriggerTriggerSettings
 type TriggerTriggerSettings struct {
-	Http *HTTPRequest `json:"http,omitempty"`
-	Grpc *GRPCRequest `json:"grpc,omitempty"`
+	Http    *HTTPRequest    `json:"http,omitempty"`
+	Grpc    *GRPCRequest    `json:"grpc,omitempty"`
+	Traceid *TRACEIDRequest `json:"traceid,omitempty"`
 }
 
 // NewTriggerTriggerSettings instantiates a new TriggerTriggerSettings object
@@ -101,6 +102,38 @@ func (o *TriggerTriggerSettings) SetGrpc(v GRPCRequest) {
 	o.Grpc = &v
 }
 
+// GetTraceid returns the Traceid field value if set, zero value otherwise.
+func (o *TriggerTriggerSettings) GetTraceid() TRACEIDRequest {
+	if o == nil || o.Traceid == nil {
+		var ret TRACEIDRequest
+		return ret
+	}
+	return *o.Traceid
+}
+
+// GetTraceidOk returns a tuple with the Traceid field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TriggerTriggerSettings) GetTraceidOk() (*TRACEIDRequest, bool) {
+	if o == nil || o.Traceid == nil {
+		return nil, false
+	}
+	return o.Traceid, true
+}
+
+// HasTraceid returns a boolean if a field has been set.
+func (o *TriggerTriggerSettings) HasTraceid() bool {
+	if o != nil && o.Traceid != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTraceid gets a reference to the given TRACEIDRequest and assigns it to the Traceid field.
+func (o *TriggerTriggerSettings) SetTraceid(v TRACEIDRequest) {
+	o.Traceid = &v
+}
+
 func (o TriggerTriggerSettings) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Http != nil {
@@ -108,6 +141,9 @@ func (o TriggerTriggerSettings) MarshalJSON() ([]byte, error) {
 	}
 	if o.Grpc != nil {
 		toSerialize["grpc"] = o.Grpc
+	}
+	if o.Traceid != nil {
+		toSerialize["traceid"] = o.Traceid
 	}
 	return json.Marshal(toSerialize)
 }

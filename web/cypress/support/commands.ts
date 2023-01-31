@@ -118,12 +118,13 @@ Cypress.Commands.add('makeSureUserIsOnTracePage', () => {
 });
 
 Cypress.Commands.add('cancelOnBoarding', () => {
-  const value = localStorage.getItem('guided_tour');
+  const value = localStorage.getItem('user_preferences');
   const parsedValue = value ? JSON.parse(value) : undefined;
 
-  if (!parsedValue || parsedValue.trace === false) {
+  if (!parsedValue || parsedValue.showGuidedTourNotification === true) {
     cy.get('body').then($body => {
-      if ($body.find('[data-cy=no-thanks]').length > 0) cy.get('[data-cy=no-thanks]').click();
+      if ($body.find('[data-cy=guided-tour-cancel-notification]').length > 0)
+        cy.get('[data-cy=guided-tour-cancel-notification]').click();
     });
   }
 });

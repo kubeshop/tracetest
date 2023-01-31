@@ -13,18 +13,22 @@ import ResourceCardSummary from './ResourceCardSummary';
 import useRuns from './useRuns';
 
 interface IProps {
+  onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
   onRun(test: TTest, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
   test: TTest;
 }
 
-const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
+const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
   const queryParams = useMemo(() => ({take: 5, testId: test.id}), [test.id]);
   const {isCollapsed, isLoading, list, onClick} = useRuns<TTestRun, {testId: string}>(
     useLazyGetRunListQuery,
     queryParams
   );
+
+  const shouldEdit = test.summary.hasRuns;
+  const lastRunId = test.summary.runs; // assume the total of runs as the last run
 
   return (
     <S.Container $type={ResourceType.Test}>
@@ -54,7 +58,12 @@ const TestCard = ({onDelete, onRun, onViewAll, test}: IProps) => {
           >
             Run
           </S.RunButton>
-          <ResourceCardActions id={test.id} onDelete={() => onDelete(test.id, test.name, ResourceType.Test)} />
+          <ResourceCardActions
+            id={test.id}
+            shouldEdit={shouldEdit}
+            onDelete={() => onDelete(test.id, test.name, ResourceType.Test)}
+            onEdit={() => onEdit(test.id, lastRunId, ResourceType.Test)}
+           />
         </S.Row>
       </S.TestContainer>
 

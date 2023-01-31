@@ -2,10 +2,12 @@ package tracedb
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"strings"
 	"time"
 
@@ -124,10 +126,21 @@ func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.
 }
 
 func newOpenSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, error) {
+	var caCert []byte
+	if cfg.Certificate != "" {
+		caCert = []byte(cfg.Certificate)
+	}
+
 	client, err := opensearch.NewClient(opensearch.Config{
 		Addresses: cfg.Addresses,
 		Username:  cfg.Username,
 		Password:  cfg.Password,
+		CACert:    caCert,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: cfg.InsecureSkipVerify,
+			},
+		},
 	})
 
 	if err != nil {

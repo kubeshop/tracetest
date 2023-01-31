@@ -86,34 +86,6 @@ func (e Executor) GetParsedStatement(statement string) (Statement, error) {
 	return parsedStatement, nil
 }
 
-func (e Executor) StatementTermsByType(statement string, termType TermType) ([]string, error) {
-	variables := []string{}
-
-	parsedStatement, err := e.GetParsedStatement(statement)
-	if err != nil {
-		return variables, err
-	}
-
-	variables = append(variables, e.ExpressionTermsByType(parsedStatement.Left, termType)...)
-
-	if parsedStatement.Right != nil {
-		variables = append(variables, e.ExpressionTermsByType(parsedStatement.Right, EnvironmentType)...)
-	}
-
-	return variables, nil
-}
-
-func (e Executor) ExpressionTermsByType(expr *Expr, termType TermType) []string {
-	terms := expr.GetTermsByType(termType)
-	termNames := []string{}
-
-	for _, term := range terms {
-		termNames = append(termNames, term.Environment.Name())
-	}
-
-	return termNames
-}
-
 func (e Executor) ResolveStatement(statement string) (string, error) {
 	parsedStatement, err := e.GetParsedStatement(statement)
 	if err != nil {
@@ -194,10 +166,6 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 		return e.resolveEnvironment(term.Environment)
 	}
 
-	if term.Variable != nil {
-		return e.resolveVariable(term.Variable)
-	}
-
 	if term.FunctionCall != nil {
 		return e.resolveFunctionCall(term.FunctionCall)
 	}
@@ -271,16 +239,6 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 	}
 
 	return value.NewFromString(attributeValue), nil
-}
-
-func (e Executor) resolveVariable(variable *Variable) (value.Value, error) {
-	variableDataStore := e.Stores["var"]
-	variableValue, err := variableDataStore.Get(variable.Name())
-	if err != nil {
-		return value.Nil, fmt.Errorf("could not resolve variable %s: %w", variable.Name(), err)
-	}
-
-	return value.NewFromString(variableValue), nil
 }
 
 func (e Executor) resolveEnvironment(environment *Environment) (value.Value, error) {

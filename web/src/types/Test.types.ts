@@ -6,7 +6,7 @@ import {VariableDefinition, Request} from 'postman-collection';
 
 import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
 import {TracetestApiTags, TriggerTypes} from 'constants/Test.constants';
-import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTriggerSchemas} from './Common.types';
+import {Model, TGrpcSchemas, THttpSchemas, TTestSchemas, TTraceIDSchemas, TTriggerSchemas} from './Common.types';
 import {ICreateTestStep, IPlugin} from './Plugins.types';
 import {TTestOutput} from './TestOutput.types';
 import {TTestSpecs} from './TestSpecs.types';
@@ -43,7 +43,16 @@ export type TGRPCRequest = Model<
   }
 >;
 
-export type TTriggerRequest = THTTPRequest | TRawGRPCRequest;
+export type TRawTRACEIDRequest = TTraceIDSchemas['TRACEIDRequest'];
+
+export type TTRACEIDRequest = Model<
+  TRawTRACEIDRequest,
+  {
+    id: string;
+  }
+>;
+
+export type TTriggerRequest = THTTPRequest | TRawGRPCRequest | TRawTRACEIDRequest;
 
 export type TRawTrigger = TTriggerSchemas['Trigger'];
 export type TTrigger = {
@@ -56,6 +65,7 @@ export type TTrigger = {
 export type TRawTestSummary = TTestSchemas['TestSummary'];
 export type TSummary = {
   runs: number;
+  hasRuns: boolean;
   lastRun: {
     time: string;
     passes: number;
@@ -117,7 +127,11 @@ export interface IBasicValues {
   testSuite: string;
 }
 
-export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues | ICurlValues;
+export interface ITraceIDValues extends IHttpValues {
+  id: string;
+}
+
+export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues | ICurlValues | ITraceIDValues;
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 

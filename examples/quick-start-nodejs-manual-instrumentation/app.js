@@ -5,7 +5,6 @@ const express = require('express')
 const app = express()
 
 const axios = require('axios')
-const http = require('http')
 
 app.get('/', (req, res) => {
   const span = tracer.startSpan('Hello World')

@@ -97,4 +97,4 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 type realTraceDB struct{}
 
 func (db *realTraceDB) ShouldRetry() bool { return true }
-func (db *realTraceDB) MinSpanCount() int { return 1 }
+func (db *realTraceDB) MinSpanCount() int { return 0 }

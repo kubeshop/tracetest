@@ -19,6 +19,7 @@ describe('AttributeList', () => {
         onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
         semanticConventions={{}}
+        outputs={[]}
       />
     );
 
@@ -32,6 +33,7 @@ describe('AttributeList', () => {
         onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
         semanticConventions={{}}
+        outputs={[]}
       />
     );
 

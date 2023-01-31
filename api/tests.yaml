@@ -170,6 +170,8 @@ components:
             properties:
               name:
                 type: string
+              spanId:
+                type: string
               value:
                 type: string
 
@@ -177,6 +179,10 @@ components:
           type: object
           additionalProperties:
             type: string
+        transactionId:
+          type: string
+        transactionRunId:
+          type: string
 
     RunInformation:
       type: object

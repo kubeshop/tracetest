@@ -1,4 +1,6 @@
 import {Dropdown, Menu} from 'antd';
+import {useNavigate} from 'react-router-dom';
+
 import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
@@ -10,10 +12,21 @@ interface IProps {
   testId: string;
   testVersion: number;
   isRunView?: boolean;
+  transactionId?: string;
+  transactionRunId: string;
 }
 
-const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IProps) => {
+const RunActionsMenu = ({
+  resultId,
+  testId,
+  testVersion,
+  transactionId,
+  transactionRunId,
+  isRunView = false,
+}: IProps) => {
   const {loadJUnit, loadDefinition} = useFileViewerModal();
+
+  const navigate = useNavigate();
 
   const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
 
@@ -22,6 +35,17 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
       <Dropdown
         overlay={
           <Menu>
+            {!!transactionId && !!transactionRunId && (
+              <Menu.Item
+                data-cy="transaction-run-button"
+                key="transaction-run"
+                onClick={() => {
+                  navigate(`/transaction/${transactionId}/run/${transactionRunId}`);
+                }}
+              >
+                Transaction Run
+              </Menu.Item>
+            )}
             <Menu.Item
               data-cy="view-junit-button"
               key="view-junit"
@@ -41,6 +65,16 @@ const RunActionsMenu = ({resultId, testId, testVersion, isRunView = false}: IPro
               }}
             >
               Test Definition
+            </Menu.Item>
+            <Menu.Item
+              data-cy="test-edit-button"
+              onClick={({domEvent}) => {
+                domEvent.stopPropagation();
+                navigate(`/test/${testId}/run/${resultId}`);
+              }}
+              key="edit"
+            >
+              Edit
             </Menu.Item>
             <Menu.Item
               data-cy="test-delete-button"

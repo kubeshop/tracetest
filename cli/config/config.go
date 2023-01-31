@@ -75,3 +75,23 @@ func loadConfig(configFile string) (Config, error) {
 
 	return config, nil
 }
+
+func ValidateServerURL(serverURL string) error {
+	if !strings.HasPrefix(serverURL, "http://") && !strings.HasPrefix(serverURL, "https://") {
+		return fmt.Errorf(`the server URL must start with the scheme, either "http://" or "https://"`)
+	}
+
+	return nil
+}
+
+func ParseServerURL(serverURL string) (scheme, endpoint string, err error) {
+	urlParts := strings.Split(serverURL, "://")
+	if len(urlParts) != 2 {
+		return "", "", fmt.Errorf("invalid server url")
+	}
+
+	scheme = urlParts[0]
+	endpoint = strings.TrimSuffix(urlParts[1], "/")
+
+	return scheme, endpoint, nil
+}

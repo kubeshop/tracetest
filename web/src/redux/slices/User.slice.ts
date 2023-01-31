@@ -17,7 +17,7 @@ export const setUserPreference = createAction('user/setUserPreference', ({key, v
   };
 });
 
-const testDefinitionSlice = createSlice({
+const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {},
@@ -29,4 +29,4 @@ const testDefinitionSlice = createSlice({
 });
 
 // export const {} = testDefinitionSlice.actions;
-export default testDefinitionSlice.reducer;
+export default userSlice.reducer;

@@ -10,6 +10,7 @@ import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
 import PostmanService from './Triggers/Postman.service';
 import CurlService from './Triggers/Curl.service';
+import TraceIDService from './Triggers/TraceID.service';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
   switch (auth?.type) {
@@ -24,8 +25,8 @@ const authValidation = ({auth}: TDraftTest): boolean => {
   }
 };
 
-const basicDetailsValidation = ({name, description}: TDraftTest): boolean => {
-  return Validator.required(name) && Validator.required(description);
+const basicDetailsValidation = ({name}: TDraftTest): boolean => {
+  return Validator.required(name);
 };
 
 const TriggerServiceMap = {
@@ -35,11 +36,13 @@ const TriggerServiceMap = {
   [SupportedPlugins.OpenAPI]: HttpService,
   [SupportedPlugins.Postman]: PostmanService,
   [SupportedPlugins.CURL]: CurlService,
+  [SupportedPlugins.TraceID]: TraceIDService,
 } as const;
 
 const TriggerServiceByTypeMap = {
   [TriggerTypes.grpc]: GrpcService,
   [TriggerTypes.http]: HttpService,
+  [TriggerTypes.traceid]: TraceIDService,
 } as const;
 
 const TestService = () => ({

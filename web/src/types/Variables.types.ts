@@ -1,31 +1,27 @@
 import {Model, TVariablesSchemas} from './Common.types';
 import {TTest} from './Test.types';
 
-export type TRawMissingVariables = TVariablesSchemas['MissingVariables'];
-export type TMissingVariables = Model<TRawMissingVariables, {}>;
+export type TRawMissingVariables = TVariablesSchemas['MissingVariablesError'];
+export type TMissingVariables = Model<TRawMissingVariables, {
+  missingVariables: TMissingVariable[];
+}>;
 
-export type TRawVariables = TVariablesSchemas['Variables'];
-export type TVariables = Model<
-  TRawVariables,
+export type TRawVariable = TVariablesSchemas['Variable'];
+export type TVariable = Model<TRawVariable, {}>;
+
+export type TRawMissingVariable = TVariablesSchemas['MissingVariable'];
+export type TMissingVariable = Model<
+  TRawMissingVariable,
   {
-    missing: TMissingVariables[];
+    variables: TVariable[];
   }
 >;
 
-export type TRawTestVariables = TVariablesSchemas['TestVariables'];
-export type TTestVariables = Model<
-  TRawTestVariables,
-  {
-    variables: TVariables;
-    test: TTest;
-  }
->;
-export type TTestVariablesMap = Record<string, TTestVariables>;
-
-export type TTransactionVariables = {
-  variables: TTestVariables[];
-  hasMissingVariables: boolean;
+export type TTestVariables = {
+  variables: TVariable[];
+  test: TTest;
 };
+export type TTestVariablesMap = Record<string, TTestVariables>;
 
 export type TDraftVariables = {
   variables: Record<string, string>;

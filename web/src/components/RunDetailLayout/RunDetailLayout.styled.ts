@@ -17,6 +17,12 @@ export const Container = styled.div`
   }
 `;
 
+export const TransactionLink = styled(Link)`
+  && {
+    color: ${({theme}) => theme.color.textSecondary};
+  }
+`;
+
 export const ContainerHeader = styled.div`
   background-color: ${({theme}) => theme.color.white};
   border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};

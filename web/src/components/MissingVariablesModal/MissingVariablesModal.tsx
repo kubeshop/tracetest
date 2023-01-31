@@ -13,20 +13,20 @@ interface IProps {
   name: string;
   onClose(): void;
   onSubmit(values: TEnvironmentValue[]): void;
-  variables: TTestVariablesMap;
+  testVariables: TTestVariablesMap;
 }
 
-const MissingVariablesModal = ({isOpen, onClose, onSubmit, variables, name}: IProps) => {
+const MissingVariablesModal = ({isOpen, onClose, onSubmit, testVariables, name}: IProps) => {
   const [form] = Form.useForm<TDraftVariables>();
   const {isValid, onValidate} = useValidateVariablesDraft();
 
   useEffect(() => {
     if (isOpen) {
-      const draft = VariablesService.getDraftVariables(variables);
+      const draft = VariablesService.getDraftVariables(testVariables);
       onValidate({}, draft);
       form.setFieldsValue(draft);
     } else form.resetFields();
-  }, [isOpen]);
+  }, [form, isOpen, testVariables, onValidate]);
 
   return (
     <S.Modal
@@ -41,14 +41,14 @@ const MissingVariablesModal = ({isOpen, onClose, onSubmit, variables, name}: IPr
         form={form}
         layout="vertical"
         name="testOutput"
-        onFinish={values => onSubmit(VariablesService.getFlatVariablesFromDraft(values))}
+        onFinish={(draft) => onSubmit(VariablesService.getSubmitValues(draft))}
         onValuesChange={onValidate}
       >
         <S.Description>
           The following variables are referenced in this test but are not defined. Please provide a value to use for
           each of these missing variables.
         </S.Description>
-        <MissingVariablesModalForm variables={variables} />
+        <MissingVariablesModalForm testVariables={testVariables} />
       </Form>
     </S.Modal>
   );

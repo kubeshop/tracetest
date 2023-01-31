@@ -11,6 +11,7 @@ import {TTest, TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawTestRun, TTestRun} from 'types/TestRun.types';
 import {TRawTestSpecs} from 'types/TestSpecs.types';
 import {TEnvironmentValue} from 'types/Environment.types';
+import RunError from 'models/RunError.model';
 
 function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);
@@ -29,8 +30,10 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: (response, error, {testId}) => [
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
       {type: TracetestApiTags.TEST, id: 'LIST'},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
+    transformErrorResponse: ({data: result}) => RunError(result),
   }),
   getRunList: builder.query<PaginationResponse<TTestRun>, {testId: string; take?: number; skip?: number}>({
     query: ({testId, take = 25, skip = 0}) => `/tests/${testId}/run?take=${take}&skip=${skip}`,
@@ -64,6 +67,7 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: (response, error, {testId, runId}) => [
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
       {type: TracetestApiTags.TEST_RUN, id: runId},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
   }),
@@ -80,6 +84,7 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     invalidatesTags: (result, error, {testId}) => [
       {type: TracetestApiTags.TEST_RUN},
       {type: TracetestApiTags.TEST, id: `${testId}-LIST`},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
   getJUnitByRunId: builder.query<string, {testId: string; runId: string}>({

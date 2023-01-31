@@ -8,8 +8,12 @@ export const Footer = styled.div`
 `;
 
 export const Modal = styled(AntModal)`
-  .ant-modal-body {
+  top: 50px;
+
+  & .ant-modal-body {
     background: ${({theme}) => theme.color.background};
+    max-height: calc(100vh - 250px);
+    overflow: scroll;
   }
 `;
 

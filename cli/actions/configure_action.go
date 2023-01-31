@@ -6,7 +6,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -52,8 +51,8 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 		serverURL = ui.TextInput("Enter your Tracetest server URL", existingConfig.URL())
 	}
 
-	if !strings.HasPrefix(serverURL, "http://") && !strings.HasPrefix(serverURL, "https://") {
-		return fmt.Errorf(`the server URL must start with the scheme, either "http://" or "https://"`)
+	if err := config.ValidateServerURL(serverURL); err != nil {
+		return err
 	}
 
 	var analyticsEnabled bool
@@ -64,13 +63,10 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 		analyticsEnabled = ui.Confirm("Enable analytics?", true)
 	}
 
-	urlParts := strings.Split(serverURL, "://")
-	if len(urlParts) != 2 {
-		return fmt.Errorf("invalid server url")
+	scheme, endpoint, err := config.ParseServerURL(serverURL)
+	if err != nil {
+		return err
 	}
-
-	scheme := urlParts[0]
-	endpoint := strings.TrimSuffix(urlParts[1], "/")
 
 	config := config.Config{
 		Scheme:           scheme,
@@ -78,7 +74,7 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 		AnalyticsEnabled: analyticsEnabled,
 	}
 
-	err := a.saveConfiguration(ctx, config, args)
+	err = a.saveConfiguration(ctx, config, args)
 	if err != nil {
 		return fmt.Errorf("could not save configuration: %w", err)
 	}

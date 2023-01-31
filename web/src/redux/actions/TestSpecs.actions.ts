@@ -10,8 +10,8 @@ import {TAssertionResults} from 'types/Assertion.types';
 import {TTest} from 'types/Test.types';
 import {TTestRun} from 'types/TestRun.types';
 import {TTestSpecEntry} from 'types/TestSpecs.types';
+import TestService from 'services/Test.service';
 import {RootState} from '../store';
-import TestService from '../../services/Test.service';
 
 export type TChange = {
   selector: string;
@@ -24,7 +24,7 @@ const TestSpecsActions = () => ({
     'testDefinition/publish',
     async ({test, testId, runId}, {dispatch, getState}) => {
       const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
-      const outputs = selectTestOutputs(getState() as RootState, testId, runId);
+      const outputs = selectTestOutputs(getState() as RootState);
       const rawTest = await TestService.getUpdatedRawTest(test, {definition: {specs}, outputs});
       await dispatch(TestGateway.edit(rawTest, testId));
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();

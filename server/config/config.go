@@ -88,11 +88,12 @@ type (
 	}
 
 	ElasticSearchDataStoreConfig struct {
-		Addresses   []string
-		Username    string
-		Password    string
-		Index       string
-		Certificate string
+		Addresses          []string
+		Username           string
+		Password           string
+		Index              string
+		Certificate        string
+		InsecureSkipVerify bool
 	}
 
 	SignalFXDataStoreConfig struct {

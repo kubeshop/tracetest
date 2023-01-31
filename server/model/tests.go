@@ -23,12 +23,12 @@ type (
 
 	Output struct {
 		Selector SpanQuery
-		Value    string
+		Value    string `expr_enabled:"true"`
 	}
 
 	NamedAssertions struct {
-		Name       string
-		Assertions []Assertion
+		Name       string      `expr_enabled:"true"`
+		Assertions []Assertion `stmt_enabled:"true"`
 	}
 
 	Summary struct {
@@ -45,15 +45,17 @@ type (
 	TriggerType string
 
 	Trigger struct {
-		Type TriggerType
-		HTTP *HTTPRequest
-		GRPC *GRPCRequest
+		Type    TriggerType
+		HTTP    *HTTPRequest
+		GRPC    *GRPCRequest
+		TRACEID *TRACEIDRequest
 	}
 
 	TriggerResult struct {
-		Type TriggerType
-		HTTP *HTTPResponse
-		GRPC *GRPCResponse
+		Type    TriggerType
+		HTTP    *HTTPResponse
+		GRPC    *GRPCResponse
+		TRACEID *TRACEIDResponse
 	}
 
 	SpanQuery string
@@ -94,7 +96,7 @@ type (
 		TriggerResult TriggerResult
 		Results       *RunResults
 		Trace         *Trace
-		Outputs       OrderedMap[string, string]
+		Outputs       OrderedMap[string, RunOutput]
 		LastError     error
 		Pass          int
 		Fail          int
@@ -103,11 +105,22 @@ type (
 
 		// environment
 		Environment Environment
+
+		// transaction
+
+		TransactionID    string
+		TransactionRunID string
 	}
 
 	RunResults struct {
 		AllPassed bool
 		Results   OrderedMap[SpanQuery, []AssertionResult]
+	}
+
+	RunOutput struct {
+		Name   string
+		Value  string
+		SpanID string
 	}
 
 	AssertionResult struct {
@@ -173,4 +186,25 @@ const (
 
 func (rs RunState) IsFinal() bool {
 	return rs == RunStateFailed || rs == RunStateFinished
+}
+
+func (r Run) ResultsCount() (pass, fail int) {
+	if r.Results == nil {
+		return
+	}
+
+	r.Results.Results.ForEach(func(_ SpanQuery, ars []AssertionResult) error {
+		for _, ar := range ars {
+			for _, rs := range ar.Results {
+				if rs.CompareErr == nil {
+					pass++
+				} else {
+					fail++
+				}
+			}
+		}
+		return nil
+	})
+
+	return
 }

@@ -28,8 +28,11 @@ const SelectorInput = ({form, runId, spanIdList, testId}: IProps) => {
         {required: true, message: 'Please enter a valid selector'},
         {
           message: 'Please select a single span',
-          validator: async () => {
-            if (spanIdList.length !== 1 && !isLoading) throw new Error('Please select a single span');
+          validator: () => {
+            if (spanIdList.length !== 1 && !isLoading) {
+              return Promise.reject(new Error('Please select a single span'));
+            }
+            return Promise.resolve();
           },
           validateTrigger: 'onSubmit',
         },

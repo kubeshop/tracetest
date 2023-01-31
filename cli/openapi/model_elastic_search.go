@@ -16,11 +16,12 @@ import (
 
 // ElasticSearch struct for ElasticSearch
 type ElasticSearch struct {
-	Addresses   []string `json:"addresses,omitempty"`
-	Username    *string  `json:"username,omitempty"`
-	Password    *string  `json:"password,omitempty"`
-	Index       *string  `json:"index,omitempty"`
-	Certificate *string  `json:"certificate,omitempty"`
+	Addresses          []string `json:"addresses,omitempty"`
+	Username           *string  `json:"username,omitempty"`
+	Password           *string  `json:"password,omitempty"`
+	Index              *string  `json:"index,omitempty"`
+	Certificate        *string  `json:"certificate,omitempty"`
+	InsecureSkipVerify *bool    `json:"insecureSkipVerify,omitempty"`
 }
 
 // NewElasticSearch instantiates a new ElasticSearch object
@@ -200,6 +201,38 @@ func (o *ElasticSearch) SetCertificate(v string) {
 	o.Certificate = &v
 }
 
+// GetInsecureSkipVerify returns the InsecureSkipVerify field value if set, zero value otherwise.
+func (o *ElasticSearch) GetInsecureSkipVerify() bool {
+	if o == nil || o.InsecureSkipVerify == nil {
+		var ret bool
+		return ret
+	}
+	return *o.InsecureSkipVerify
+}
+
+// GetInsecureSkipVerifyOk returns a tuple with the InsecureSkipVerify field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ElasticSearch) GetInsecureSkipVerifyOk() (*bool, bool) {
+	if o == nil || o.InsecureSkipVerify == nil {
+		return nil, false
+	}
+	return o.InsecureSkipVerify, true
+}
+
+// HasInsecureSkipVerify returns a boolean if a field has been set.
+func (o *ElasticSearch) HasInsecureSkipVerify() bool {
+	if o != nil && o.InsecureSkipVerify != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetInsecureSkipVerify gets a reference to the given bool and assigns it to the InsecureSkipVerify field.
+func (o *ElasticSearch) SetInsecureSkipVerify(v bool) {
+	o.InsecureSkipVerify = &v
+}
+
 func (o ElasticSearch) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Addresses != nil {
@@ -216,6 +249,9 @@ func (o ElasticSearch) MarshalJSON() ([]byte, error) {
 	}
 	if o.Certificate != nil {
 		toSerialize["certificate"] = o.Certificate
+	}
+	if o.InsecureSkipVerify != nil {
+		toSerialize["insecureSkipVerify"] = o.InsecureSkipVerify
 	}
 	return json.Marshal(toSerialize)
 }

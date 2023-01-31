@@ -355,44 +355,6 @@ paths:
         404:
           description: transaction run not found
 
-  /transactions/{transactionId}/version/{version}/variables:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: version
-          schema:
-            type: integer
-          required: true
-        - in: query
-          name: environmentId
-          schema:
-            type: string
-        - in: query
-          name: runId
-          schema:
-            type: integer
-      summary: "get transaction variables"
-      description: "get transaction variables"
-      operationId: getTransactionVariables
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "./variables.yaml#/components/schemas/TestVariables"
-        500:
-          description: "problem with getting the transaction variables"
-
   /tests:
     get:
       tags:
@@ -551,6 +513,12 @@ paths:
             application/json:
               schema:
                 $ref: "./tests.yaml#/components/schemas/TestRun"
+        422:
+          description: some variables are missing
+          content:
+            application/json:
+              schema:
+                $ref: "./variables.yaml#/components/schemas/MissingVariablesError"
     get:
       tags:
         - api
@@ -868,42 +836,6 @@ paths:
             application/yaml:
               schema:
                 type: string
-
-  /tests/{testId}/version/{version}/variables:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: version
-          schema:
-            type: integer
-          required: true
-        - in: query
-          name: environmentId
-          schema:
-            type: string
-        - in: query
-          name: runId
-          schema:
-            type: integer
-      summary: "get test variables"
-      description: "get test variables"
-      operationId: getTestVariables
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "./variables.yaml#/components/schemas/TestVariables"
-        500:
-          description: "problem with getting the test variables"
 
   # Environments
   /environments:

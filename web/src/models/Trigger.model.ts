@@ -3,31 +3,45 @@ import {get} from 'lodash';
 import {TRawTrigger, TTrigger} from 'types/Test.types';
 import GrpcRequest from './GrpcRequest.model';
 import HttpRequest from './HttpRequest.model';
+import TraceIDRequest from './TraceIDRequest.model';
 
-const entryPointMap = {
-  [TriggerTypes.http]: 'url',
-  [TriggerTypes.grpc]: 'address',
-} as const;
-
-const entryMethodMap = {
-  [TriggerTypes.http]: 'method',
-  [TriggerTypes.grpc]: 'method',
-} as const;
-
-const getEntryData = (type: TriggerTypes, request: object) => {
-  const entryPointField = entryPointMap[type];
-  const entryMethodField = entryMethodMap[type];
-
-  return {
-    entryPoint: get(request, entryPointField, ''),
-    method: get(request, entryMethodField, ''),
-  };
+const EntryData = {
+  [TriggerTypes.http](request: object) {
+    return {
+      entryPoint: get(request, 'url', ''),
+      method: get(request, 'method', ''),
+    };
+  },
+  [TriggerTypes.grpc](request: object) {
+    return {
+      entryPoint: get(request, 'address', ''),
+      method: get(request, 'method', ''),
+    };
+  },
+  [TriggerTypes.traceid](request: object) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'TraceID',
+    };
+  },
 };
 
-const Trigger = ({triggerType = 'http', triggerSettings: {http = {}, grpc = {}} = {}}: TRawTrigger): TTrigger => {
+const Trigger = ({
+  triggerType = 'http',
+  triggerSettings: {http = {}, grpc = {}, traceid = {}} = {},
+}: TRawTrigger): TTrigger => {
   const type = triggerType as TriggerTypes;
-  const request = type === TriggerTypes.http ? HttpRequest(http) : GrpcRequest(grpc);
-  const {entryPoint, method} = getEntryData(type, request);
+
+  let request = {};
+  if (type === TriggerTypes.http) {
+    request = HttpRequest(http);
+  } else if (type === TriggerTypes.grpc) {
+    request = GrpcRequest(grpc);
+  } else if (type === TriggerTypes.traceid) {
+    request = TraceIDRequest(traceid);
+  }
+
+  const {entryPoint, method} = EntryData[type](request);
 
   return {
     type,

@@ -21,6 +21,7 @@ const TransactionMock: IMockFactory<TTransaction, TTransaction> = () => ({
       },
       summary: {
         runs: 0,
+        hasRuns: false,
         lastRun: {
           time: '',
           passes: 0,

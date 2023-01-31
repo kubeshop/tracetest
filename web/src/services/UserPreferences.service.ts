@@ -10,7 +10,7 @@ const initialUserPreferences: IUserPreferences = {
   environmentId: '',
   initConfigSetup: true,
   initConfigSetupFromTest: true,
-  isOnboardingComplete: false,
+  showGuidedTourNotification: true,
 };
 
 const UserPreferencesService = () => ({

@@ -38,6 +38,8 @@ type (
 
 		// result info
 		LastError error
+		Pass      int
+		Fail      int
 
 		Metadata RunMetadata
 
@@ -75,4 +77,19 @@ func (t Transaction) NewRun() TransactionRun {
 
 func (tr TransactionRun) ResourceID() string {
 	return fmt.Sprintf("transaction/%s/run/%d", tr.TransactionID, tr.ID)
+}
+
+func (tr TransactionRun) ResultsCount() (pass, fail int) {
+	if tr.Steps == nil {
+		return
+	}
+
+	for _, step := range tr.Steps {
+		stepPass, stepFail := step.ResultsCount()
+
+		pass += stepPass
+		fail += stepFail
+	}
+
+	return
 }

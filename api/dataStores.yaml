@@ -44,6 +44,8 @@ components:
           type: string
         certificate:
           type: string
+        insecureSkipVerify:
+          type: boolean
     SignalFX:
       type: object
       properties:

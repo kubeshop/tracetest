@@ -22,6 +22,7 @@ telemetry:
         username: elastic
         password: changeme
         index: traces-apm-default
+        insecureSkipVerify: true
 
   exporters:
     collector:

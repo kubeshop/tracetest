@@ -17,6 +17,7 @@ import TestOutput from 'models/TestOutput.model';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
+import {selectOutputsBySpanId} from '../../redux/testOutputs/selectors';
 
 interface IProps {
   onCreateTestSpec?(): void;
@@ -28,6 +29,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
   const {open} = useTestSpecForm();
   const {onNavigateAndOpen} = useTestOutput();
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, span?.id || ''));
+  const outputs = useAppSelector(state => selectOutputsBySpanId(state, span?.id || ''));
   const [search, setSearch] = useState('');
   const semanticConventions = useGetOTELSemanticConventionAttributesInfo();
 
@@ -67,7 +69,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         value: `attr:${key}`,
       });
 
-      onNavigateAndOpen(output);
+      onNavigateAndOpen({...output, spanId: span!.id});
     },
     [onNavigateAndOpen, span]
   );
@@ -97,6 +99,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         onCreateOutput={handleCreateOutput}
         searchText={searchText}
         semanticConventions={semanticConventions}
+        outputs={outputs}
       />
     </>
   );

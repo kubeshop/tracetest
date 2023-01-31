@@ -149,12 +149,12 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	return run, nil
 }
 
-func createEnvironment(environment model.Environment, outputs model.OrderedMap[string, string]) model.Environment {
+func createEnvironment(environment model.Environment, outputs model.OrderedMap[string, model.RunOutput]) model.Environment {
 	outputVariables := make([]model.EnvironmentValue, 0)
-	outputs.ForEach(func(key, val string) error {
+	outputs.ForEach(func(key string, val model.RunOutput) error {
 		outputVariables = append(outputVariables, model.EnvironmentValue{
-			Key:   key,
-			Value: val,
+			Key:   val.Name,
+			Value: val.Value,
 		})
 
 		return nil
