@@ -1,9 +1,10 @@
 import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
-import {TDraftDataStore, TDataStoreForm, TDataStoreConfig, SupportedDataStores} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/Config.types';
 import DataStore from 'models/DataStore.model';
 import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
+import DataStoreConfig from 'models/DataStoreConfig.model';
 import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
@@ -13,7 +14,7 @@ export const FORM_ID = 'data-store';
 
 interface IProps {
   form: TDataStoreForm;
-  dataStoreConfig: TDataStoreConfig;
+  dataStoreConfig: DataStoreConfig;
   onSubmit(values: TDraftDataStore): Promise<void>;
   onIsFormValid(isValid: boolean): void;
   onTestConnection(): void;

@@ -1,6 +1,7 @@
 import {parse, NamespaceBase, Service} from 'protobufjs';
-import {IRpcValues, ITriggerService, TGRPCRequest} from 'types/Test.types';
+import {IRpcValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
+import GrpcRequest from 'models/GrpcRequest.model';
 
 interface IRpcTriggerService extends ITriggerService {
   getMethodList(protoFile: string): string[];
@@ -37,18 +38,18 @@ const RpcTriggerService = (): IRpcTriggerService => ({
     const protobufFile = await protoFile.text();
     const parsedMetadata = metadata.filter(({key}) => key);
 
-    return {
+    return GrpcRequest({
       address,
       request,
       auth,
       method,
       metadata: parsedMetadata,
       protobufFile,
-    };
+    });
   },
 
   getInitialValues(request) {
-    const {address: url, method, metadata, request: message, auth, protobufFile} = request as TGRPCRequest;
+    const {address: url, method, metadata, request: message, auth, protobufFile} = request as GrpcRequest;
     const protoFile = new File([protobufFile], 'file.proto');
 
     return {

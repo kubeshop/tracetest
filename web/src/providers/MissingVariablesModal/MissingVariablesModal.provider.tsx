@@ -1,16 +1,16 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import MissingVariablesModal from 'components/MissingVariablesModal';
-import {TEnvironmentValue} from 'types/Environment.types';
-import {TMissingVariable} from 'types/Variables.types';
 import VariablesService from 'services/Variables.service';
-import {TTest} from 'types/Test.types';
+import MissingVariables from 'models/MissingVariables.model';
+import {TEnvironmentValue} from 'models/Environment.model';
+import Test from 'models/Test.model';
 
 type TOnOPenProps = {
-  missingVariables: TMissingVariable[];
+  missingVariables: MissingVariables;
   name: string;
   onSubmit(draft: TEnvironmentValue[]): void;
-  testList: TTest[];
+  testList: Test[];
 };
 
 interface IContext {

@@ -1,10 +1,10 @@
-import React, {useCallback, useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import SearchInput from 'components/SearchInput';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {useDeleteEnvironmentMutation} from 'redux/apis/TraceTest.api';
 import EnvironmentsAnalytics from 'services/Analytics/EnvironmentsAnalytics.service';
-import {TEnvironment} from 'types/Environment.types';
+import Environment from 'models/Environment.model';
 import * as S from './Environment.styled';
 import EnvironmentList from './EnvironmentList';
 import {EnvironmentModal} from './EnvironmentModal';
@@ -14,7 +14,7 @@ const {onCreateEnvironmentClick} = EnvironmentsAnalytics;
 const EnvironmentContent = () => {
   const [deleteEnvironment] = useDeleteEnvironmentMutation();
   const [query, setQuery] = useState<string>('');
-  const [environment, setEnvironment] = useState<TEnvironment | undefined>(undefined);
+  const [environment, setEnvironment] = useState<Environment | undefined>(undefined);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const onSearch = useCallback((value: string) => setQuery(value), [setQuery]);
   const {onOpen} = useConfirmationModal();
@@ -29,7 +29,7 @@ const EnvironmentContent = () => {
     setIsModalOpen(false);
   };
 
-  const handleOnEdit = (values: TEnvironment) => {
+  const handleOnEdit = (values: Environment) => {
     setEnvironment(values);
     setIsModalOpen(true);
   };

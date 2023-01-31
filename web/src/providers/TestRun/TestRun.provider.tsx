@@ -1,15 +1,15 @@
 import {createContext, useContext, useMemo} from 'react';
 import {useGetRunByIdQuery} from 'redux/apis/TraceTest.api';
-import {TTestRun} from 'types/TestRun.types';
+import TestRun from 'models/TestRun.model';
 import TestProvider from '../Test';
 
 interface IContext {
-  run: TTestRun;
+  run: TestRun;
   isError: boolean;
 }
 
 export const Context = createContext<IContext>({
-  run: {} as TTestRun,
+  run: {} as TestRun,
   isError: false,
 });
 

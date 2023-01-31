@@ -1,10 +1,5 @@
-import {
-  IGRPCClientSettings,
-  SupportedDataStores,
-  TDataStore,
-  TDataStoreService,
-  TRawGRPCClientSettings,
-} from 'types/Config.types';
+import {IGRPCClientSettings, SupportedDataStores, TDataStoreService, TRawGRPCClientSettings} from 'types/Config.types';
+import DataStore from 'models/DataStore.model';
 
 const GrpcClientService = (): TDataStoreService => ({
   async getRequest({dataStore = {}}, dataStoreType = SupportedDataStores.JAEGER) {
@@ -68,7 +63,7 @@ const GrpcClientService = (): TDataStoreService => ({
     return Promise.resolve(true);
   },
   getInitialValues(
-    {defaultDataStore = {name: '', type: SupportedDataStores.JAEGER} as TDataStore},
+    {defaultDataStore = {name: '', type: SupportedDataStores.JAEGER} as DataStore},
     dataStoreType = SupportedDataStores.JAEGER
   ) {
     const values = (defaultDataStore[dataStoreType] as TRawGRPCClientSettings) ?? {};

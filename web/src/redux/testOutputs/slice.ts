@@ -1,11 +1,11 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-
-import {TTestOutput, TTestRunOutput} from 'types/TestOutput.types';
+import TestOutput from 'models/TestOutput.model';
+import TestRunOutput from 'models/TestRunOutput.model';
 
 interface ITestOutputsState {
-  initialOutputs: TTestOutput[];
-  outputs: TTestOutput[];
-  selectedOutputs: TTestOutput[];
+  initialOutputs: TestOutput[];
+  outputs: TestOutput[];
+  selectedOutputs: TestOutput[];
 }
 
 const initialState: ITestOutputsState = {
@@ -21,14 +21,14 @@ const testOutputsSlice = createSlice({
     outputsReseted() {
       return initialState;
     },
-    outputsInitiated(state, {payload: outputs}: PayloadAction<TTestOutput[]>) {
+    outputsInitiated(state, {payload: outputs}: PayloadAction<TestOutput[]>) {
       state.initialOutputs = outputs;
       state.outputs = outputs;
     },
-    outputAdded(state, {payload: outputs}: PayloadAction<TTestOutput>) {
+    outputAdded(state, {payload: outputs}: PayloadAction<TestOutput>) {
       state.outputs.push({...outputs, isDeleted: false, isDraft: true, id: state.outputs.length});
     },
-    outputUpdated(state, {payload: {output}}: PayloadAction<{output: TTestOutput}>) {
+    outputUpdated(state, {payload: {output}}: PayloadAction<{output: TestOutput}>) {
       state.outputs.splice(output.id, 1, {...output, isDeleted: false, isDraft: true});
     },
     outputDeleted(state, {payload: outputId}: PayloadAction<number>) {
@@ -40,10 +40,10 @@ const testOutputsSlice = createSlice({
     outputsReverted(state) {
       state.outputs = state.initialOutputs;
     },
-    outputsSelectedOutputsChanged(state, {payload: outputs}: PayloadAction<TTestOutput[]>) {
+    outputsSelectedOutputsChanged(state, {payload: outputs}: PayloadAction<TestOutput[]>) {
       state.selectedOutputs = outputs;
     },
-    outputsTestRunOutputsMerged(state, {payload: runOutputs}: PayloadAction<TTestRunOutput[]>) {
+    outputsTestRunOutputsMerged(state, {payload: runOutputs}: PayloadAction<TestRunOutput[]>) {
       state.outputs = state.outputs.map((output, index) => ({
         ...output,
         valueRun: runOutputs[index]?.value ?? '',

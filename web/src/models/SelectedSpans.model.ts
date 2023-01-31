@@ -1,10 +1,13 @@
 import {uniq} from 'lodash';
-import {TRawSelectedSpans, TSelectedSpans} from 'types/SelectedSpans.types';
+import {Model, TTestSchemas} from 'types/Common.types';
 
-function SelectedSpans(rawSelectedSpans: TRawSelectedSpans): TSelectedSpans {
+export type TRawSelectedSpans = TTestSchemas['SelectedSpansResult'];
+type SelectedSpans = Model<TRawSelectedSpans, {}>;
+
+function SelectedSpans(rawSelectedSpans: TRawSelectedSpans): SelectedSpans {
   return {
     selector: rawSelectedSpans?.selector ?? {},
-    spanIds: uniq(rawSelectedSpans?.spanIds ?? [])
+    spanIds: uniq(rawSelectedSpans?.spanIds ?? []),
   };
 }
 

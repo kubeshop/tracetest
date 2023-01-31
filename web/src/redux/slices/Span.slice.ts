@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ISpanState, TSpan} from 'types/Span.types';
+import {ISpanState} from 'types/Span.types';
+import Span from 'models/Span.model';
 import {outputsSelectedOutputsChanged} from '../testOutputs/slice';
 import {setSelectedSpec} from './TestSpecs.slice';
 
@@ -17,7 +18,7 @@ const testDefinitionSlice = createSlice({
       state.matchedSpans = spanIds;
       state.focusedSpan = spanIds[0] || '';
     },
-    setSelectedSpan(state, {payload: {span}}: PayloadAction<{span: TSpan}>) {
+    setSelectedSpan(state, {payload: {span}}: PayloadAction<{span: Span}>) {
       state.selectedSpan = span;
     },
     setFocusedSpan(state, {payload: {spanId}}: PayloadAction<{spanId: string}>) {

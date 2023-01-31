@@ -3,8 +3,8 @@ import {Tooltip} from 'antd';
 import {LinkOutlined} from '@ant-design/icons';
 import {Link} from 'react-router-dom';
 import {TestState} from 'constants/TestRun.constants';
-import {TTest} from 'types/Test.types';
-import {TTestRun, TTestRunState} from 'types/TestRun.types';
+import {TTestRunState} from 'types/TestRun.types';
+import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
 import * as S from './TransactionRunResult.styled';
 
@@ -25,8 +25,8 @@ const iconBasedOnResult = (state: TTestRunState, failedAssertions: number, index
 
 interface IProps {
   index: number;
-  test: TTest;
-  testRun?: TTestRun;
+  test: Test;
+  testRun?: TestRun;
   hasRunFailed: boolean;
 }
 

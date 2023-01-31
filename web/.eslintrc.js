@@ -21,6 +21,7 @@ module.exports = {
     'no-console': 'warn',
     'no-undef': 'off',
     'no-redeclare': 'off',
+    'no-shadow': 'off',
     semi: 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],

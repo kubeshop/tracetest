@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
-import {TAssertionResultEntry} from 'types/Assertion.types';
+import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Actions from './Actions';
 import Header from './Header';
 import * as S from './TestSpec.styled';

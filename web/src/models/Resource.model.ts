@@ -1,10 +1,13 @@
-import {ResourceType, TRawResource, TResource} from 'types/Resource.type';
-import {TRawTest} from 'types/Test.types';
-import {TRawTransaction} from 'types/Transaction.types';
-import Test from './Test.model';
-import Transaction from './Transaction.model';
+import {ResourceType} from 'types/Resource.type';
+import {Model, TResourceSchemas} from '../types/Common.types';
 
-function Resource({item, type}: TRawResource): TResource {
+import Test, {TRawTest} from './Test.model';
+import Transaction, {TRawTransaction} from './Transaction.model';
+
+export type TRawResource = TResourceSchemas['Resource'];
+type Resource = Model<TRawResource, {type: ResourceType; item: Test | Transaction}>;
+
+function Resource({item, type}: TRawResource): Resource {
   if (type === ResourceType.Test) {
     return {
       type: ResourceType.Test,

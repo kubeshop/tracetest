@@ -1,13 +1,12 @@
+import {noop} from 'lodash';
 import {Form, FormInstance} from 'antd';
-
 import Editor from 'components/Editor';
 import useQuerySelector from 'components/TestSpecForm/hooks/useQuerySelector';
 import {SupportedEditors} from 'constants/Editor.constants';
-import {noop} from 'lodash';
-import {TTestOutput} from '../../types/TestOutput.types';
+import TestOutput from 'models/TestOutput.model';
 
 interface IProps {
-  form: FormInstance<TTestOutput>;
+  form: FormInstance<TestOutput>;
   runId: string;
   spanIdList: string[];
   testId: string;

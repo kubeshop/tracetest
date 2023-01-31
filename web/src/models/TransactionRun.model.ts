@@ -1,8 +1,18 @@
-import {TRawTransactionRun, TTransactionRun} from 'types/TransactionRun.types';
+import { Model, TTransactionsSchemas } from '../types/Common.types';
 import Environment from './Environment.model';
 import TestRun from './TestRun.model';
 
-const TransactionRunModel = ({
+export type TRawTransactionRun = TTransactionsSchemas['TransactionRun'];
+type TransactionRun = Model<
+  TRawTransactionRun,
+  {
+    steps: TestRun[];
+    environment?: Environment;
+    metadata?: {[key: string]: string};
+  }
+>;
+
+const TransactionRun = ({
   id = '',
   createdAt = '',
   completedAt = '',
@@ -13,7 +23,7 @@ const TransactionRunModel = ({
   version = 1,
   pass = 0,
   fail = 0,
-}: TRawTransactionRun): TTransactionRun => {
+}: TRawTransactionRun): TransactionRun => {
   return {
     id,
     createdAt,
@@ -28,4 +38,4 @@ const TransactionRunModel = ({
   };
 };
 
-export default TransactionRunModel;
+export default TransactionRun;

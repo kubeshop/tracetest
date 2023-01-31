@@ -1,14 +1,14 @@
 import faker from '@faker-js/faker';
-import Transaction from 'models/Transaction.model';
+import Transaction, {TRawTransaction} from 'models/Transaction.model';
 import {IMockFactory} from 'types/Common.types';
-import {TTransaction} from 'types/Transaction.types';
 import TestMock from './Test.mock';
 
-const TransactionMock: IMockFactory<TTransaction, TTransaction> = () => ({
+const TransactionMock: IMockFactory<Transaction, TRawTransaction> = () => ({
   raw(data = {}) {
-    const test = TestMock.model();
-    const test2 = TestMock.model();
-    const test3 = TestMock.model();
+    const test = TestMock.raw();
+    const test2 = TestMock.raw();
+    const test3 = TestMock.raw();
+
     return {
       id: faker.datatype.uuid(),
       name: faker.name.firstName(),

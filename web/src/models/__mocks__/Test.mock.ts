@@ -1,10 +1,9 @@
 import faker from '@faker-js/faker';
-import {IMockFactory} from '../../types/Common.types';
-import {TRawTest, TTest} from '../../types/Test.types';
-import Test from '../Test.model';
+import {IMockFactory} from 'types/Common.types';
+import Test, {TRawTest} from '../Test.model';
 import AssertionResultMock from './AssertionResult.mock';
 
-const TestMock: IMockFactory<TTest, TRawTest> = () => ({
+const TestMock: IMockFactory<Test, TRawTest> = () => ({
   raw(data = {}) {
     return {
       id: faker.datatype.uuid(),

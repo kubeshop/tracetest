@@ -1,5 +1,7 @@
 import {PseudoSelector} from 'constants/Operator.constants';
-import {Model, TTestSchemas} from './Common.types';
+import {TAssertionResultEntry} from '../models/AssertionResults.model';
+import AssertionSpanResult from '../models/AssertionSpanResult.model';
+import {Model} from './Common.types';
 import {TCompareOperatorSymbol} from './Operator.types';
 import {TSpanFlatAttribute} from './Span.types';
 
@@ -21,36 +23,6 @@ export type TStructuredAssertion = {
   right: string;
 };
 
-export type TRawAssertionResults = TTestSchemas['AssertionResults'];
-
-export type TAssertionResultEntry = {
-  id: string;
-  selector: string;
-  originalSelector: string;
-  spanIds: string[];
-  resultList: TAssertionResult[];
-};
-
-export type TAssertionResults = Model<
-  TRawAssertionResults,
-  {
-    allPassed: boolean;
-    results?: never;
-    resultList: TAssertionResultEntry[];
-  }
->;
-
-export type TRawAssertionResult = TTestSchemas['AssertionResult'];
-export type TAssertionResult = Model<
-  TRawAssertionResult,
-  {
-    spanResults: TAssertionSpanResult[];
-  }
->;
-
-export type TRawAssertionSpanResult = TTestSchemas['AssertionSpanResult'];
-export type TAssertionSpanResult = Model<TRawAssertionSpanResult, {}>;
-
 export interface IResult {
   id: string;
   label: string;
@@ -65,6 +37,6 @@ export type TResultAssertionsSummary = {
 export type TResultAssertions = Record<string, TResultAssertionsSummary>;
 
 export interface ICheckResult {
-  result: TAssertionSpanResult;
+  result: AssertionSpanResult;
   assertion: string;
 }

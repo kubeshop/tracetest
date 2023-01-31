@@ -1,11 +1,14 @@
-import {TAssertionSpanResult, TRawAssertionSpanResult} from '../types/Assertion.types';
+import {Model, TTestSchemas} from 'types/Common.types';
+
+type AssertionSpanResult = Model<TRawAssertionSpanResult, {}>;
+export type TRawAssertionSpanResult = TTestSchemas['AssertionSpanResult'];
 
 const AssertionSpanResult = ({
   spanId = '',
   observedValue = '',
   passed = false,
   error = '',
-}: TRawAssertionSpanResult): TAssertionSpanResult => {
+}: TRawAssertionSpanResult): AssertionSpanResult => {
   return {
     spanId,
     observedValue,

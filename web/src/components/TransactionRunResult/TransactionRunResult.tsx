@@ -1,13 +1,13 @@
 import KeyValueRow from 'components/KeyValueRow';
-import {TTransaction} from 'types/Transaction.types';
-import {TTransactionRun} from 'types/TransactionRun.types';
 import {TestState} from 'constants/TestRun.constants';
+import Transaction from 'models/Transaction.model';
+import TransactionRun from 'models/TransactionRun.model';
 import ExecutionStep from './ExecutionStep';
 import * as S from './TransactionRunResult.styled';
 
 interface IProps {
-  transaction: TTransaction;
-  transactionRun: TTransactionRun;
+  transaction: Transaction;
+  transactionRun: TransactionRun;
 }
 
 const TransactionRunResult = ({transactionRun: {steps, environment, state}, transaction}: IProps) => {

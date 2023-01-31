@@ -1,11 +1,11 @@
-import {TriggerTypes} from '../constants/Test.constants';
-import {TSpanFlatAttribute} from '../types/Span.types';
-import {TTestRun} from '../types/TestRun.types';
+import {TriggerTypes} from 'constants/Test.constants';
+import TestRun from 'models/TestRun.model';
+import {TSpanFlatAttribute} from 'types/Span.types';
 
-const TestRun = () => ({
+const TestRunService = () => ({
   getResponseAttributeList({
     triggerResult: {statusCode = 0, body = '', headers = []} = {type: TriggerTypes.http, statusCode: 0},
-  }: TTestRun): TSpanFlatAttribute[] {
+  }: TestRun): TSpanFlatAttribute[] {
     const attributeList = [
       {key: 'body', value: body},
       {key: 'status_code', value: statusCode.toString()},
@@ -19,4 +19,4 @@ const TestRun = () => ({
   },
 });
 
-export default TestRun();
+export default TestRunService();

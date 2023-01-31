@@ -4,12 +4,12 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import {useGetDataStoresQuery} from 'redux/apis/TraceTest.api';
-import {ConfigMode, TDataStoreConfig} from 'types/Config.types';
+import {ConfigMode} from 'types/Config.types';
 import UserSelectors from 'selectors/User.selectors';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 
 interface IContext {
-  dataStoreConfig: TDataStoreConfig;
+  dataStoreConfig: DataStoreConfig;
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;

@@ -7,9 +7,9 @@ import TransactionRunCard from 'components/RunCard/TransactionRunCard';
 import TestHeader from 'components/TestHeader';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
-import {TTransactionRun} from 'types/TransactionRun.types';
 import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
 import useDocumentTitle from 'hooks/useDocumentTitle';
+import TransactionRun from 'models/TransactionRun.model';
 import * as S from './Transaction.styled';
 
 const Content = () => {
@@ -44,7 +44,7 @@ const Content = () => {
         }
       />
 
-      <PaginatedList<TTransactionRun, {transactionId: string}>
+      <PaginatedList<TransactionRun, {transactionId: string}>
         itemComponent={({item}) => (
           <TransactionRunCard
             linkTo={`/transaction/${transaction.id}/run/${item.id}`}

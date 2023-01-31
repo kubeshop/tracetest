@@ -6,11 +6,11 @@ import TestRunGateway from 'gateways/TestRun.gateway';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import {selectTestOutputs} from 'redux/testOutputs/selectors';
 import TestDefinitionService from 'services/TestDefinition.service';
-import {TAssertionResults} from 'types/Assertion.types';
-import {TTest} from 'types/Test.types';
-import {TTestRun} from 'types/TestRun.types';
-import {TTestSpecEntry} from 'types/TestSpecs.types';
 import TestService from 'services/Test.service';
+import TestRun from 'models/TestRun.model';
+import Test from 'models/Test.model';
+import AssertionResults from 'models/AssertionResults.model';
+import {TTestSpecEntry} from 'models/TestSpecs.model';
 import {RootState} from '../store';
 
 export type TChange = {
@@ -20,7 +20,7 @@ export type TChange = {
 };
 
 const TestSpecsActions = () => ({
-  publish: createAsyncThunk<TTestRun, {test: TTest; testId: string; runId: string}>(
+  publish: createAsyncThunk<TestRun, {test: Test; testId: string; runId: string}>(
     'testDefinition/publish',
     async ({test, testId, runId}, {dispatch, getState}) => {
       const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
@@ -30,7 +30,7 @@ const TestSpecsActions = () => ({
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }
   ),
-  dryRun: createAsyncThunk<TAssertionResults, {definitionList: TTestSpecEntry[]; testId: string; runId: string}>(
+  dryRun: createAsyncThunk<AssertionResults, {definitionList: TTestSpecEntry[]; testId: string; runId: string}>(
     'testDefinition/dryRun',
     ({definitionList, testId, runId}, {dispatch}) => {
       const specs = definitionList.map(def => TestDefinitionService.toRaw(def));

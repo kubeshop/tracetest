@@ -3,13 +3,13 @@ import FailedTrace from 'components/FailedTrace';
 import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse/RunDetailTriggerResponseFactory';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
-import {TTest} from 'types/Test.types';
-import {TTestRun} from 'types/TestRun.types';
+import Test from 'models/Test.model';
+import TestRun from 'models/TestRun.model';
 import * as S from './RunDetailTrigger.styled';
 
 interface IProps {
-  test: TTest;
-  run: TTestRun;
+  test: Test;
+  run: TestRun;
   isError: boolean;
 }
 

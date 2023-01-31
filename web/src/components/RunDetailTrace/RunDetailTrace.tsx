@@ -1,7 +1,6 @@
 import {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAppSelector} from 'redux/hooks';
-
 import Drawer from 'components/Drawer';
 import SpanDetail from 'components/SpanDetail';
 import Switch from 'components/Visualization/components/Switch';
@@ -9,14 +8,14 @@ import {TestState} from 'constants/TestRun.constants';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {TTestRun} from 'types/TestRun.types';
+import TestRun from 'models/TestRun.model';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
 import Visualization from './Visualization';
 import SetupAlert from '../SetupAlert';
 
 interface IProps {
-  run: TTestRun;
+  run: TestRun;
   testId: string;
 }
 

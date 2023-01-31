@@ -3,7 +3,7 @@ import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticCon
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {TTestOutput} from 'types/TestOutput.types';
+import TestOutput from 'models/TestOutput.model';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
 
@@ -14,7 +14,7 @@ interface IProps {
   searchText?: string;
   semanticConventions: OtelReference;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
-  outputs: TTestOutput[];
+  outputs: TestOutput[];
 }
 
 const AttributeList = ({

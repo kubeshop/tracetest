@@ -1,18 +1,19 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {useGetTestByIdQuery, useGetTestVersionByIdQuery} from 'redux/apis/TraceTest.api';
-import {TDraftTest, TTest} from 'types/Test.types';
+import {TDraftTest} from 'types/Test.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
+import TestService from 'services/Test.service';
+import Test from 'models/Test.model';
 import useTestCrud from './hooks/useTestCrud';
-import TestService from '../../services/Test.service';
 
 interface IContext {
   onEdit(values: TDraftTest): void;
   onRun(runId?: string): void;
   isLoading: boolean;
   isError: boolean;
-  test: TTest;
-  latestTest: TTest;
+  test: Test;
+  latestTest: Test;
   isLatestVersion: boolean;
   isEditLoading: boolean;
 }
@@ -20,8 +21,8 @@ interface IContext {
 export const Context = createContext<IContext>({
   onEdit: noop,
   onRun: noop,
-  test: {} as TTest,
-  latestTest: {} as TTest,
+  test: {} as Test,
+  latestTest: {} as Test,
   isLoading: false,
   isError: false,
   isLatestVersion: true,

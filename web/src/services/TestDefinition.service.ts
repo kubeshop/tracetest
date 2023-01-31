@@ -1,4 +1,4 @@
-import {TRawTestSpecEntry, TTestSpecEntry} from 'types/TestSpecs.types';
+import {TRawTestSpecEntry, TTestSpecEntry} from 'models/TestSpecs.model';
 
 const TestDefinitionService = () => ({
   toRaw({selector, assertions}: TTestSpecEntry): TRawTestSpecEntry {

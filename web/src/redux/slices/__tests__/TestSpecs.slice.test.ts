@@ -2,7 +2,6 @@ import faker from '@faker-js/faker';
 import AssertionResultsMock from '../../../models/__mocks__/AssertionResults.mock';
 import TestDefinitionMock from '../../../models/__mocks__/TestSpecs.mock';
 import TestRunMock from '../../../models/__mocks__/TestRun.mock';
-import {TTestSpecEntry} from '../../../types/TestSpecs.types';
 import Reducer, {
   addSpec,
   assertionResultsToSpecs,
@@ -16,6 +15,7 @@ import Reducer, {
   updateSpec,
   setSelectedSpec,
 } from '../TestSpecs.slice';
+import { TTestSpecEntry } from '../../../models/TestSpecs.model';
 
 const {specs} = TestDefinitionMock.model();
 

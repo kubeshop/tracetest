@@ -12,10 +12,11 @@ import {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useGetResourcesQuery} from 'redux/apis/TraceTest.api';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
-import {ResourceType, TResource} from 'types/Resource.type';
-import {TTest} from 'types/Test.types';
-import {TTransaction} from 'types/Transaction.types';
+import {ResourceType} from 'types/Resource.type';
 import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
+import Resource from 'models/Resource.model';
+import Transaction from 'models/Transaction.model';
+import Test from 'models/Test.model';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import HomeFilters from './HomeFilters';
@@ -30,16 +31,16 @@ const Resources = () => {
   const [isCreateTestOpen, setIsCreateTestOpen] = useState(false);
   const [parameters, setParameters] = useState<TParameters>(defaultSort);
 
-  const pagination = usePagination<TResource, TParameters>(useGetResourcesQuery, parameters);
+  const pagination = usePagination<Resource, TParameters>(useGetResourcesQuery, parameters);
   const onDeleteResource = useDeleteResource();
   const {runTest} = useTestCrud();
   const {runTransaction} = useTransactionCrud();
   const navigate = useNavigate();
 
   const handleOnRun = useCallback(
-    (resource: TTransaction | TTest, type: ResourceType) => {
-      if (type === ResourceType.Test) runTest(resource as TTest);
-      else if (type === ResourceType.Transaction) runTransaction(resource as TTransaction);
+    (resource: Transaction | Test, type: ResourceType) => {
+      if (type === ResourceType.Test) runTest(resource as Test);
+      else if (type === ResourceType.Transaction) runTransaction(resource as Transaction);
     },
     [runTest, runTransaction]
   );
@@ -74,7 +75,7 @@ const Resources = () => {
           />
         </S.ActionsContainer>
 
-        <Pagination<TResource>
+        <Pagination<Resource>
           emptyComponent={
             <Empty message="You have not created any tests yet. Use the Create button to create your first test" />
           }
@@ -90,7 +91,7 @@ const Resources = () => {
                   onDelete={onDeleteResource}
                   onRun={handleOnRun}
                   onViewAll={handleOnViewAll}
-                  test={resource.item as TTest}
+                  test={resource.item as Test}
                 />
               ) : (
                 <TransactionCard
@@ -99,7 +100,7 @@ const Resources = () => {
                   onDelete={onDeleteResource}
                   onRun={handleOnRun}
                   onViewAll={handleOnViewAll}
-                  transaction={resource.item as TTransaction}
+                  transaction={resource.item as Transaction}
                 />
               )
             )}

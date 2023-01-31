@@ -1,9 +1,9 @@
 import {Typography} from 'antd';
-import {TConnectionTestStep} from 'types/Config.types';
+import ConnectionTestStep from 'models/ConnectionResultStep.model';
 import * as S from './TestConnectionNotification.styled';
 
 interface IProps {
-  step: TConnectionTestStep;
+  step: ConnectionTestStep;
   title: string;
 }
 

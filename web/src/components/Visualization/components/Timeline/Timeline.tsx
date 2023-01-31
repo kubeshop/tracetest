@@ -1,6 +1,5 @@
 import {ParentSize} from '@visx/responsive';
-
-import {TSpan} from 'types/Span.types';
+import Span from 'models/Span.model';
 import * as S from './Timeline.styled';
 import Visualization from './Visualization';
 import Navigation from '../Navigation';
@@ -11,7 +10,7 @@ export interface IProps {
   onNavigateToSpan(spanId: string): void;
   onNodeClick(spanId: string): void;
   selectedSpan: string;
-  spans: TSpan[];
+  spans: Span[];
   width?: number;
 }
 

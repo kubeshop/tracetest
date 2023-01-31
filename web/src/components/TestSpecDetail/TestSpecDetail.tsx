@@ -1,4 +1,4 @@
-import {TAssertionResultEntry} from 'types/Assertion.types';
+import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import * as S from './TestSpecDetail.styled';
 import Content from './Content';
 

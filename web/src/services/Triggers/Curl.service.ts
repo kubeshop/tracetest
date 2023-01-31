@@ -2,6 +2,7 @@ import {CURLParser} from 'parse-curl-js';
 import {ICurlValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {HTTP_METHOD} from 'constants/Common.constants';
+import HttpRequest from 'models/HttpRequest.model';
 
 interface ICurlTriggerService extends ITriggerService {
   getRequestFromCommand(command: string): ICurlValues;
@@ -12,7 +13,7 @@ const CurlTriggerService = (): ICurlTriggerService => ({
   async getRequest(draft) {
     const {url, method, auth, headers, body} = draft as ICurlValues;
 
-    return {url, method, auth, headers, body};
+    return HttpRequest({url, method, auth, headers, body});
   },
 
   async validateDraft(draft) {

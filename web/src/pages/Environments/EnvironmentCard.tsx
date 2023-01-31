@@ -4,14 +4,14 @@ import {useState} from 'react';
 
 import * as T from 'components/ResourceCard/ResourceCard.styled';
 import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
-import {TEnvironment} from 'types/Environment.types';
+import {ResourceType} from 'types/Resource.type';
+import Environment from 'models/Environment.model';
 import * as E from './Environment.styled';
-import {ResourceType} from '../../types/Resource.type';
 
 interface IProps {
-  environment: TEnvironment;
+  environment: Environment;
   onDelete(id: string): void;
-  onEdit(values: TEnvironment): void;
+  onEdit(values: Environment): void;
 }
 
 export const EnvironmentCard = ({environment: {description, id, name, values}, onDelete, onEdit}: IProps) => {

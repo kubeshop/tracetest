@@ -1,10 +1,11 @@
-import {TDraftVariables, TMissingVariable, TTestVariablesMap} from 'types/Variables.types';
-import {TEnvironmentValue} from 'types/Environment.types';
-import {TTest} from 'types/Test.types';
+import {TDraftVariables, TTestVariablesMap} from 'types/Variables.types';
 import {uniqBy} from 'lodash';
+import MissingVariables from 'models/MissingVariables.model';
+import Test from 'models/Test.model';
+import {TEnvironmentValue} from 'models/Environment.model';
 
 const VariablesService = () => ({
-  getVariableEntries(missingVariables: TMissingVariable[], testList: TTest[]): TTestVariablesMap {
+  getVariableEntries(missingVariables: MissingVariables, testList: Test[]): TTestVariablesMap {
     return missingVariables.reduce((entries, {testId, variables}, index) => {
       const test = testList.find(({id}) => id === testId);
 
@@ -39,8 +40,8 @@ const VariablesService = () => ({
     }));
   },
 
-  getMatchingTests(testVariables: TTestVariablesMap, key: string): TTest[] {
-    const list = Object.values(testVariables).reduce<TTest[]>(
+  getMatchingTests(testVariables: TTestVariablesMap, key: string): Test[] {
+    const list = Object.values(testVariables).reduce<Test[]>(
       (acc, {test, variables}) =>
         variables.find(missingVariable => missingVariable.key === key) ? acc.concat(test) : acc,
       []

@@ -2,17 +2,19 @@ import {useCallback} from 'react';
 import {useMatch, useNavigate} from 'react-router-dom';
 import {useAppDispatch} from 'redux/hooks';
 import {reset} from 'redux/slices/TestSpecs.slice';
-import {TDraftTest, TTest} from 'types/Test.types';
+import {TDraftTest} from 'types/Test.types';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import TestService from 'services/Test.service';
-import {TEnvironmentValue} from 'types/Environment.types';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
-import {RunErrorTypes, TRunError} from 'types/TestRun.types';
+import {RunErrorTypes} from 'types/TestRun.types';
+import {TEnvironmentValue} from 'models/Environment.model';
+import Test from 'models/Test.model';
+import RunError from 'models/RunError.model';
 
 const useTestCrud = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +28,7 @@ const useTestCrud = () => {
   const {onOpen} = useMissingVariablesModal();
 
   const runTest = useCallback(
-    async (test: TTest, runId?: string, environmentId = selectedEnvironment?.id) => {
+    async (test: Test, runId?: string, environmentId = selectedEnvironment?.id) => {
       const run = async (variables: TEnvironmentValue[] = []) => {
         try {
           TestAnalyticsService.onRunTest();
@@ -36,7 +38,7 @@ const useTestCrud = () => {
           const mode = match?.params.mode || 'trigger';
           navigate(`/test/${test.id}/run/${id}/${mode}`);
         } catch (error) {
-          const {type, missingVariables} = error as TRunError;
+          const {type, missingVariables} = error as RunError;
           if (type === RunErrorTypes.MissingVariables)
             onOpen({
               name: test.name,
@@ -56,7 +58,7 @@ const useTestCrud = () => {
   );
 
   const edit = useCallback(
-    async (test: TTest, draft: TDraftTest) => {
+    async (test: Test, draft: TDraftTest) => {
       const {id: testId, trigger} = test;
       updateIsInitialized(false);
       const plugin = TriggerTypeToPlugin[trigger.type || TriggerTypes.http];

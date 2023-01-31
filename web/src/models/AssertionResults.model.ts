@@ -1,9 +1,26 @@
 import {uniqueId} from 'lodash';
-import AssertionService from '../services/Assertion.service';
-import {TAssertionResults, TRawAssertionResults} from '../types/Assertion.types';
+import AssertionService from 'services/Assertion.service';
+import {Model, TTestSchemas} from 'types/Common.types';
 import AssertionResult from './AssertionResult.model';
 
-const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResults): TAssertionResults => {
+export type TRawAssertionResults = TTestSchemas['AssertionResults'];
+export type TAssertionResultEntry = {
+  id: string;
+  selector: string;
+  originalSelector: string;
+  spanIds: string[];
+  resultList: AssertionResult[];
+};
+type AssertionResults = Model<
+  TRawAssertionResults,
+  {
+    allPassed: boolean;
+    results?: never;
+    resultList: TAssertionResultEntry[];
+  }
+>;
+
+const AssertionResults = ({allPassed = false, results = []}: TRawAssertionResults): AssertionResults => {
   return {
     allPassed,
     resultList: results.map(({selector: {query: selector = ''} = {}, results: resultList = []}) => ({

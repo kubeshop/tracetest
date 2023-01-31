@@ -1,10 +1,10 @@
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
-import {TTest} from 'types/Test.types';
+import Test from 'models/Test.model';
 import * as S from './TestsSelectionInput.styled';
 
 interface IProps {
-  test: TTest;
+  test: Test;
   sortableId: string;
   onDelete(sortableId: string): void;
 }

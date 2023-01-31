@@ -3,18 +3,18 @@ import Pagination from 'components/Pagination';
 import usePagination from 'hooks/usePagination';
 import Loading from 'pages/Home/Loading';
 import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
-import {TEnvironment} from 'types/Environment.types';
+import Environment from 'models/Environment.model';
 import * as S from './Environment.styled';
 import {EnvironmentCard} from './EnvironmentCard';
 
 interface IProps {
   onDelete(id: string): void;
-  onEdit(values: TEnvironment): void;
+  onEdit(values: Environment): void;
   query: string;
 }
 
 const EnvironmentList = ({onDelete, onEdit, query}: IProps) => {
-  const pagination = usePagination<TEnvironment, {query: string}>(useGetEnvironmentsQuery, {query});
+  const pagination = usePagination<Environment, {query: string}>(useGetEnvironmentsQuery, {query});
 
   return (
     <Pagination

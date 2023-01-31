@@ -1,7 +1,13 @@
-import {TRawTrace, TTrace} from '../types/Trace.types';
+import { TTraceSchemas } from 'types/Common.types';
 import Span from './Span.model';
 
-const Trace = ({traceId = '', flat = {}}: TRawTrace): TTrace => {
+export type TRawTrace = TTraceSchemas['Trace'];
+type Trace = {
+  spans: Span[];
+  traceId: string;
+};
+
+const Trace = ({traceId = '', flat = {}}: TRawTrace): Trace => {
   return {
     traceId,
     spans: Object.values(flat).map(rawSpan => Span(rawSpan)),
