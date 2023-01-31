@@ -20,6 +20,7 @@ swagger/
 .vscode/
 .idea/
 server/vendor
+dist/
 
 # .DS_Store
 .DS_Store

@@ -29,9 +29,6 @@ vet: ## run vet tool to analyze the code for suspicious, abnormal, or useless co
 run: ## run server locally
 	go run -ldflags="$(GO_LDFLAGS)" main.go
 
-build: ## build tracetest-server binary
-	go build -o tracetest-server -ldflags="$(GO_LDFLAGS)" .
-
 PROTOC_VER=0.3.1
 UNAME_P := $(shell uname -p)
 ifeq ($(UNAME_P),x86_64)
