@@ -5,8 +5,8 @@ set -e
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
 
 restart() {
+  make build-docker
   docker compose $opts kill tracetest
-  docker compose $opts build tracetest
   docker compose $opts up -d tracetest
 }
 
@@ -27,7 +27,8 @@ down() {
 }
 
 up() {
-  docker compose $opts up -d --build --remove-orphans
+  make build-docker
+  docker compose $opts up -d --remove-orphans
 }
 
 test() {
