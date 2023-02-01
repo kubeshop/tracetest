@@ -70,7 +70,7 @@ jobs:
           cache-dependency-path: go.work
       - shell: bash
         run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "sha_short=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
       - id: cache
         uses: actions/cache@v3
         with:
@@ -123,7 +123,7 @@ jobs:
 
       - shell: bash
         run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "sha_short=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
       - uses: actions/cache@v3
         with:
           path: dist/linux
@@ -179,7 +179,7 @@ jobs:
 
     - name: Deploy
       run: |
-        TAG=sha-$(git rev-parse --short HEAD) \
+        TAG=sha-$(git rev-parse --short $GITHUB_SHA) \
         NAME=tracetest-beta \
         CONFIG_FILE=./k8s/tracetest.beta.yaml \
         EXPOSE_HOST=beta.tracetest.io \
@@ -213,7 +213,11 @@ jobs:
 
     - name: Deploy
       run: |
-        TAG=sha-$(git rev-parse --short HEAD) \
+        echo "SHA: " $GITHUB_SHA
+        echo "SHA short:" $(git rev-parse --short $GITHUB_SHA)
+        echo sha-$(git rev-parse --short $GITHUB_SHA)
+
+        TAG=sha-$(git rev-parse --short $GITHUB_SHA) \
         NAME=tracetest-integration \
         CONFIG_FILE=./k8s/tracetest.integration.yaml \
         ./k8s/deploy.sh
