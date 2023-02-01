@@ -61,29 +61,21 @@ Now Tracetest is available at [http://localhost:11633]
 
 ## **Run a Development Build**
 
-Now that Tracetest is running, we can expose the dependencies in our cluster to the host machine so they are accessible to the development build.
-Tracetests needs postgres to store the tests, results, etc, and access to the trace backend (jaeger, tempo, etc) to fetch traces.
-We can use kubectl's port forwarding capabilites for this
+You can build and run Tracetest locally using docker compose. The project provides a docker compose file and a Makefile with targets to generate the required image.
 
-```
-(trap "kill 0" SIGINT; kubectl port-forward svc/tracetest-postgresql 5432:5432 & kubectl port-forward svc/jaeger-query 16685:16685)
-```
+You will need [Docker Compose](https://docs.docker.com/compose/install/) installed, as well as [GoReleaser-Pro](https://goreleaser.com/install/). 
+Note that while the `pro` version is required, no licencing is needed for local builds.
 
-### **Start Development Server**
+To build the image:
 
-When running the development version, the frontend and backend are built and run separately. You need to have both services running to access the tool.
-
-To start the backend server:
-
-```
-make server-run
+```bash
+make build-docker
 ```
 
-To start the frontend server:
-```
-cd web
-npm install -d
-npm start
+This will build a new image, tagged `kubeshop/tracetest:latest`. That is the default image used in the `docker-compose` file, so now we can start the service:
+
+```bash
+docker compose up
 ```
 
-The Tracetest development build is available at [http://localhost:3000]. Note that the port is now `3000` since we are accessing the node development server.
+Once the app is finished loading all the services, you can access your local tracetest at [http://localhost:11633]
