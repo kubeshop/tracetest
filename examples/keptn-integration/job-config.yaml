@@ -2,7 +2,7 @@ apiVersion: v2
 actions:
 - name: "Run tracetest on your service"
   events:
-    - name: "sh.keptn.event.test-services.triggered"
+    - name: "sh.keptn.event.test.triggered"
   tasks:
     - name: "Run tracetest"
       files:

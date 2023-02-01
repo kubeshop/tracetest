@@ -68,9 +68,9 @@ spec:
  stages:
    - name: "production"
      sequences:
-       - name: "test-sequence"
+       - name: "validate-pokeshop"
          tasks:
-           - name: "test-services"
+           - name: "test"
 ```
 
 2. Create a new `keptn-tracetest-integration` project using that `shipyard` file:
@@ -78,7 +78,7 @@ spec:
 keptn create project keptn-tracetest-integration -y -s shipyard.yaml
 ```
  
-**Note:** Keptn may ask you to have a Git repository for this project to enable GitOps. If so, you need to create an empty Git repository and a Git token and pass it through the flags `--git-remote-url`, `-`-git-user`, and `--`git-token`. More details about this setup can be seen on [Keptn docs/Git-based upstream](https://keptn.sh/docs/1.0.x/manage/git_upstream).
+**Note:** Keptn may ask you to have a Git repository for this project to enable GitOps. If so, you need to create an empty Git repository and a Git token and pass it through the flags `--git-remote-url`, `--git-user`, and `--git-token`. More details about this setup can be seen on [Keptn docs/Git-based upstream](https://keptn.sh/docs/1.0.x/manage/git_upstream).
  
 3. Create a `pokeshop` service:
 ```sh
@@ -130,7 +130,7 @@ apiVersion: v2
 actions:
 - name: "Run tracetest on your service"
   events:
-    - name: "sh.keptn.event.test-services.triggered"
+    - name: "sh.keptn.event.test.triggered"
   tasks:
     - name: "Run tracetest"
       files:
@@ -149,7 +149,7 @@ actions:
         - --wait-for-result
 ```
 
-This job will run Tracetest every time an event of `test-services` happens, listening to the event `sh.keptn.event.test-services.triggered` (event emitted by the `test-services` task on the `test-sequence` sequence).
+This job will run Tracetest every time a `test` event happens, listening to the event `sh.keptn.event.test.triggered` (event emitted by the `test` task on the `validate-pokeshop` sequence).
 
 5. Add this job as a resource on Keptn:
 ```sh
@@ -158,9 +158,9 @@ keptn add-resource --project keptn-tracetest-integration --service pokeshop --st
  
 ### 3. Setup Job Executor Service to see events emitted by the test step.
  
-To guarantee that our job will be called by Keptn when we execute the `deployment` sequence, we need to configure the integration `Job Executor Service` on `keptn-tracetest-integration` project to listen to `sh.keptn.event.test-services.triggered` events. We can do that only through the Keptn Bridge (their Web UI), by going to our project, choosing the `Settings` option, and later `Integrations`.
+To guarantee that our job will be called by Keptn when we execute the `deployment` sequence, we need to configure the integration `Job Executor Service` on `keptn-tracetest-integration` project to listen to `sh.keptn.event.test.triggered` events if it is not configured. We can do that only through the Keptn Bridge (their Web UI), by going to our project, choosing the `Settings` option, and later `Integrations`.
  
-Choose the `job-executor-service` integration, and add a subscription to the event `sh.keptn.event.test-services.triggered` and the project `keptn-tracetest-integration`.
+Choose the `job-executor-service` integration, and add a subscription to the event `sh.keptn.event.test.triggered` and the project `keptn-tracetest-integration`.
  
 ### 4. Run sequence when needed.
  
