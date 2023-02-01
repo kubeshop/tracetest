@@ -1,5 +1,4 @@
 PROJECT_ROOT=${PWD}
-
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
 OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
@@ -15,7 +14,7 @@ generate: generate-server generate-cli generate-web
 generate-web: ## generates OpenAPI types for WebUI
 	cd web; npm run types:generate
 
-generate-cli: ## generates OpenAPI types for CLI
+generate-cli:
 	$(eval BASE := ./cli)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
