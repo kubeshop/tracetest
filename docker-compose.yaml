@@ -5,13 +5,6 @@ services:
     image: kubeshop/tracetest:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    build:
-      context: .
-      platforms:
-        - linux/amd64
-      args:
-        VERSION: dev
-        TRACETEST_ENV: docker-compose
     volumes:
       - type: bind
         source: ./local-config/config.tests.yaml
