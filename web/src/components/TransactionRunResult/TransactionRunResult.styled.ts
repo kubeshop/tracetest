@@ -33,10 +33,7 @@ export const OutputsButton = styled(Button)`
   padding: 0;
 `;
 
-export const OutputsGrid = styled.div`
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 16px;
+export const OutputsContent = styled.div`
   margin-top: 4px;
 `;
 
@@ -59,14 +56,6 @@ export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.lg};
     margin-bottom: 24px;
-  }
-`;
-
-export const Text = styled(Typography.Text)<{$isSecondary?: boolean}>`
-  && {
-    color: ${({theme, $isSecondary}) => ($isSecondary ? theme.color.textSecondary : theme.color.text)};
-    font-size: ${({theme}) => theme.size.sm};
-    font-weight: ${({$isSecondary}) => ($isSecondary ? 'normal' : '600')};
   }
 `;
 

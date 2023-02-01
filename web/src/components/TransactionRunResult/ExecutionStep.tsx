@@ -3,6 +3,7 @@ import {Tooltip} from 'antd';
 import {capitalize} from 'lodash';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
+import KeyValueRow from 'components/KeyValueRow';
 import {TestState} from 'constants/TestRun.constants';
 import TestRun from 'models/TestRun.model';
 import {TTest} from 'types/Test.types';
@@ -92,20 +93,11 @@ const ExecutionStep = ({
         )}
 
         {toggleOutputs && (
-          <S.OutputsGrid>
-            {outputs?.map(output => (
-              <React.Fragment key={output.name}>
-                <div>
-                  <S.Text $isSecondary>Key </S.Text>
-                  <S.Text>{output.name}</S.Text>
-                </div>
-                <div>
-                  <S.Text $isSecondary>Value </S.Text>
-                  <S.Text>{output.value}</S.Text>
-                </div>
-              </React.Fragment>
+          <S.OutputsContent>
+            {outputs?.map?.(output => (
+              <KeyValueRow key={output.name} keyName={output.name} value={output.value} />
             ))}
-          </S.OutputsGrid>
+          </S.OutputsContent>
         )}
       </S.OutputsContainer>
     </S.Container>
