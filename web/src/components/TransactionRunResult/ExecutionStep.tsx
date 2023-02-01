@@ -5,9 +5,9 @@ import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import KeyValueRow from 'components/KeyValueRow';
 import {TestState} from 'constants/TestRun.constants';
+import {TTestRunState} from 'types/TestRun.types';
+import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
-import {TTest} from 'types/Test.types';
-import {TTestRun, TTestRunState} from 'types/TestRun.types';
 import * as S from './TransactionRunResult.styled';
 
 const iconBasedOnResult = (state: TTestRunState, failedAssertions: number, index: number) => {
@@ -27,8 +27,8 @@ const iconBasedOnResult = (state: TTestRunState, failedAssertions: number, index
 
 interface IProps {
   index: number;
-  test: TTest;
-  testRun?: TTestRun;
+  test: Test;
+  testRun?: TestRun;
   hasRunFailed: boolean;
 }
 

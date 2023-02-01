@@ -1,8 +1,8 @@
 import SpanSelectors from 'selectors/Span.selectors';
 import SpanMock from 'models/__mocks__/Span.mock';
 import {RootState} from 'redux/store';
-import {TAssertionResultEntry} from 'types/Assertion.types';
-import {ISpanState, TSpan} from 'types/Span.types';
+import {ISpanState} from 'types/Span.types';
+import {TAssertionResultEntry} from '../../models/AssertionResults.model';
 
 describe('SpanSelectors', () => {
   describe('selectMatchedSpans', () => {
@@ -44,7 +44,7 @@ describe('SpanSelectors', () => {
 
   describe('selectSelectedSpan', () => {
     it('should return span', () => {
-      const selectedSpan: TSpan = SpanMock.model();
+      const selectedSpan = SpanMock.model();
       const result = SpanSelectors.selectSelectedSpan({
         spans: {selectedSpan} as ISpanState,
       } as RootState);

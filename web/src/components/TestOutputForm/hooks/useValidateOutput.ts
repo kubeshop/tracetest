@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 
 import {SupportedEditors} from 'constants/Editor.constants';
 import EditorService from 'services/Editor.service';
-import {TTestOutput} from 'types/TestOutput.types';
+import TestOutput from 'models/TestOutput.model';
 
 interface IProps {
   spanIdList: string[];
@@ -12,7 +12,7 @@ const useValidateOutput = ({spanIdList}: IProps) => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   const onValidate = useCallback(
-    (changedValues: any, {name, selector, value}: TTestOutput) => {
+    (changedValues: any, {name, selector, value}: TestOutput) => {
       setIsFormValid(
         Boolean(name) &&
           Boolean(selector) &&

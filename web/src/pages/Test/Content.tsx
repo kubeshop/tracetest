@@ -9,8 +9,8 @@ import {useTest} from 'providers/Test/Test.provider';
 import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import {ResourceType} from 'types/Resource.type';
-import {TTestRun} from 'types/TestRun.types';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
+import TestRun from 'models/TestRun.model';
 import * as S from './Test.styled';
 
 const Content = () => {
@@ -49,7 +49,7 @@ const Content = () => {
         }
       />
 
-      <PaginatedList<TTestRun, {testId: string}>
+      <PaginatedList<TestRun, {testId: string}>
         dataCy="run-card-list"
         itemComponent={({item}) => (
           <TestRunCard linkTo={`/test/${test.id}/run/${item.id}`} run={item} testId={test.id} />

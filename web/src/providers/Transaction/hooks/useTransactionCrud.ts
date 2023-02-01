@@ -1,16 +1,18 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
-import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
+import {TDraftTransaction} from 'types/Transaction.types';
 import {
   useDeleteTransactionByIdMutation,
   useEditTransactionMutation,
   useLazyGetTransactionVersionByIdQuery,
   useRunTransactionMutation,
 } from 'redux/apis/TraceTest.api';
-import {TEnvironmentValue} from 'types/Environment.types';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
-import {RunErrorTypes, TRunError} from 'types/TestRun.types';
+import {RunErrorTypes} from 'types/TestRun.types';
+import Transaction from 'models/Transaction.model';
+import {TEnvironmentValue} from 'models/Environment.model';
+import RunError from 'models/RunError.model';
 
 const useTransactionCrud = () => {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const useTransactionCrud = () => {
   const {onOpen} = useMissingVariablesModal();
 
   const runTransaction = useCallback(
-    async (transaction: TTransaction, runId?: string, environmentId = selectedEnvironment?.id) => {
+    async (transaction: Transaction, runId?: string, environmentId = selectedEnvironment?.id) => {
       const {steps: testList} = await getTransaction({
         transactionId: transaction.id,
         version: transaction.version,
@@ -35,7 +37,7 @@ const useTransactionCrud = () => {
 
           navigate(`/transaction/${transaction.id}/run/${id}`);
         } catch (error) {
-          const {type, missingVariables} = error as TRunError;
+          const {type, missingVariables} = error as RunError;
           if (type === RunErrorTypes.MissingVariables)
             onOpen({
               name: transaction.name,
@@ -51,11 +53,11 @@ const useTransactionCrud = () => {
 
       run();
     },
-    [navigate, onOpen, runTransactionAction, selectedEnvironment?.id]
+    [getTransaction, navigate, onOpen, runTransactionAction, selectedEnvironment?.id]
   );
 
   const edit = useCallback(
-    async (transaction: TTransaction, draft: TDraftTransaction) => {
+    async (transaction: Transaction, draft: TDraftTransaction) => {
       await editTransaction({transactionId: transaction.id, transaction: draft}).unwrap();
 
       runTransaction(transaction);

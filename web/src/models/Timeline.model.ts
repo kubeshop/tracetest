@@ -1,8 +1,8 @@
 import TimelineService from 'services/Timeline.service';
-import {TSpan} from 'types/Span.types';
 import {INodeDataSpan} from 'types/Timeline.types';
+import Span from './Span.model';
 
-function getNodesDataFromSpans(spans: TSpan[]): INodeDataSpan[] {
+function getNodesDataFromSpans(spans: Span[]): INodeDataSpan[] {
   return spans.map(span => ({
     duration: span.duration,
     endTime: span.endTime,
@@ -17,7 +17,7 @@ function getNodesDataFromSpans(spans: TSpan[]): INodeDataSpan[] {
   }));
 }
 
-function Timeline(spans: TSpan[]) {
+function Timeline(spans: Span[]) {
   const nodesData = getNodesDataFromSpans(spans);
   return TimelineService.getNodes(nodesData);
 }

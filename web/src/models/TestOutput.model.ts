@@ -1,6 +1,19 @@
-import {TRawTestOutput, TRawTestRunOutput, TTestOutput, TTestRunOutput} from 'types/TestOutput.types';
+import {TTestSchemas} from 'types/Common.types';
 
-function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id = -1): TTestOutput {
+export type TRawTestOutput = TTestSchemas['TestOutput'];
+type TestOutput = {
+  isDeleted: boolean;
+  isDraft: boolean;
+  name: string;
+  selector: string;
+  value: string;
+  valueRun: string;
+  valueRunDraft: string;
+  id: number;
+  spanId: string;
+};
+
+function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id = -1): TestOutput {
   return {
     id,
     isDeleted: false,
@@ -14,15 +27,7 @@ function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id =
   };
 }
 
-export function TestRunOutput({name = '', value = '', spanId = ''}: TRawTestRunOutput): TTestRunOutput {
-  return {
-    name,
-    value,
-    spanId,
-  };
-}
-
-export function toRawTestOutputs(testOutputs: TTestOutput[]): TRawTestOutput[] {
+export function toRawTestOutputs(testOutputs: TestOutput[]): TRawTestOutput[] {
   return testOutputs
     .filter(output => !output.isDeleted)
     .map<TRawTestOutput>(output => ({

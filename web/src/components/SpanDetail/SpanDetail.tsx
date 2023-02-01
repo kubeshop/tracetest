@@ -11,18 +11,19 @@ import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
 import SpanService from 'services/Span.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
-import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {TSpanFlatAttribute} from 'types/Span.types';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
+import {selectOutputsBySpanId} from 'redux/testOutputs/selectors';
+import Span from 'models/Span.model';
 import TestOutput from 'models/TestOutput.model';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
-import {selectOutputsBySpanId} from '../../redux/testOutputs/selectors';
 
 interface IProps {
   onCreateTestSpec?(): void;
   searchText?: string;
-  span?: TSpan;
+  span?: Span;
 }
 
 const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {

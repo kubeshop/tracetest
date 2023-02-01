@@ -1,6 +1,11 @@
-import {TEnvironment, TRawEnvironment} from 'types/Environment.types';
+import {Model, TEnvironmentSchemas} from 'types/Common.types';
+import {IKeyValue} from '../constants/Test.constants';
 
-function Environment({id = '', name = '', description = '', values = []}: TRawEnvironment): TEnvironment {
+export type TRawEnvironment = TEnvironmentSchemas['Environment'];
+export type TEnvironmentValue = TEnvironmentSchemas['EnvironmentValue'];
+type Environment = Model<TRawEnvironment, {values: IKeyValue[]}>;
+
+function Environment({id = '', name = '', description = '', values = []}: TRawEnvironment): Environment {
   return {
     id,
     name,

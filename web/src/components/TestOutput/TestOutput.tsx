@@ -1,20 +1,19 @@
 import {Tag} from 'antd';
 import {useCallback} from 'react';
-
 import AttributeValue from 'components/AttributeValue';
-import {TTestOutput} from 'types/TestOutput.types';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useSpan} from 'providers/Span/Span.provider';
+import TestOutputModel from 'models/TestOutput.model';
+import {selectIsSelectedOutput} from 'redux/testOutputs/selectors';
+import {useAppSelector} from 'redux/hooks';
 import * as S from './TestOutput.styled';
 import Actions from './Actions';
-import {selectIsSelectedOutput} from '../../redux/testOutputs/selectors';
-import {useAppSelector} from '../../redux/hooks';
 
 interface IProps {
   index: number;
-  output: TTestOutput;
+  output: TestOutputModel;
   onDelete(index: number): void;
-  onEdit(values: TTestOutput): void;
+  onEdit(values: TestOutputModel): void;
 }
 
 const TestOutput = ({

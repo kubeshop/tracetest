@@ -6,8 +6,8 @@ import {EXPRESSIONS_DOCUMENTATION_URL, SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from '
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useAppSelector} from 'redux/hooks';
 import SpanSelectors from 'selectors/Span.selectors';
-import {TTestOutput} from 'types/TestOutput.types';
 import {singularOrPlural} from 'utils/Common';
+import TestOutput from 'models/TestOutput.model';
 import useValidateOutput from './hooks/useValidateOutput';
 import SelectorInput from './SelectorInput';
 import * as S from './TestOutputForm.styled';
@@ -16,14 +16,14 @@ interface IProps {
   isEditing?: boolean;
   isLoading?: boolean;
   onCancel(): void;
-  onSubmit(values: TTestOutput, spanId?: string): void;
-  output?: TTestOutput;
+  onSubmit(values: TestOutput, spanId?: string): void;
+  output?: TestOutput;
   runId: string;
   testId: string;
 }
 
 const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmit, output, runId, testId}: IProps) => {
-  const [form] = Form.useForm<TTestOutput>();
+  const [form] = Form.useForm<TestOutput>();
   const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
   const {isValid, onValidate} = useValidateOutput({spanIdList});
   const selector = Form.useWatch('selector', form) || '';
@@ -39,7 +39,7 @@ const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmi
     <S.Container>
       <S.Title>{isEditing ? 'Edit Test Output' : 'Add Test Output'}</S.Title>
 
-      <Form<TTestOutput>
+      <Form<TestOutput>
         autoComplete="off"
         form={form}
         initialValues={output}

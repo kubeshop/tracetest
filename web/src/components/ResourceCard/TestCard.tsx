@@ -1,11 +1,10 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
-
 import TestRunCard from 'components/RunCard/TestRunCard';
 import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
-import {TTest} from 'types/Test.types';
-import {TTestRun} from 'types/TestRun.types';
+import Test from 'models/Test.model';
+import TestRun from 'models/TestRun.model';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
@@ -15,14 +14,14 @@ import useRuns from './useRuns';
 interface IProps {
   onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
-  onRun(test: TTest, type: ResourceType): void;
+  onRun(test: Test, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
-  test: TTest;
+  test: Test;
 }
 
 const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
   const queryParams = useMemo(() => ({take: 5, testId: test.id}), [test.id]);
-  const {isCollapsed, isLoading, list, onClick} = useRuns<TTestRun, {testId: string}>(
+  const {isCollapsed, isLoading, list, onClick} = useRuns<TestRun, {testId: string}>(
     useLazyGetRunListQuery,
     queryParams
   );

@@ -3,8 +3,9 @@ import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import {toRawTestOutputs} from 'models/TestOutput.model';
 import {IPlugin} from 'types/Plugins.types';
-import {TRawTest, TTest, TDraftTest} from 'types/Test.types';
+import {TDraftTest} from 'types/Test.types';
 import Validator from 'utils/Validator';
+import Test, {TRawTest} from 'models/Test.model';
 import TestDefinitionService from './TestDefinition.service';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
@@ -46,7 +47,7 @@ const TriggerServiceByTypeMap = {
 } as const;
 
 const TestService = () => ({
-  async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: TTest): Promise<TRawTest> {
+  async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: Test): Promise<TRawTest> {
     const {name, description} = draft;
     const triggerService = TriggerServiceMap[pluginName];
     const request = await triggerService.getRequest(draft);
@@ -78,7 +79,7 @@ const TestService = () => ({
     return (isBasicDetails && basicDetailsValidation(draft)) || (isTriggerValid && authValidation(draft));
   },
 
-  getInitialValues({trigger: {request, type}, name, description}: TTest) {
+  getInitialValues({trigger: {request, type}, name, description}: Test) {
     const triggerService = TriggerServiceByTypeMap[type];
 
     return {
@@ -89,7 +90,7 @@ const TestService = () => ({
     };
   },
 
-  getUpdatedRawTest(test: TTest, partialTest: Partial<TTest>) {
+  getUpdatedRawTest(test: Test, partialTest: Partial<Test>) {
     const plugin = TriggerTypeToPlugin[test?.trigger?.type || TriggerTypes.http];
     const testTriggerData = this.getInitialValues(test);
     const updatedTest = {...test, ...partialTest};

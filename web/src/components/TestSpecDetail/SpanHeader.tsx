@@ -4,12 +4,12 @@ import * as SSpanNode from 'components/Visualization/components/DAG/SpanNode.sty
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import SpanService from 'services/Span.service';
-import {TSpan} from 'types/Span.types';
+import Span from 'models/Span.model';
 import * as S from './TestSpecDetail.styled';
 
 interface IProps {
   onSelectSpan(spanId: string): void;
-  span?: TSpan;
+  span?: Span;
 }
 
 const SpanHeader = ({onSelectSpan, span}: IProps) => {

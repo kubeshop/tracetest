@@ -1,9 +1,9 @@
 import {IMockFactory} from 'types/Common.types';
-import {TDataStoreConfig, TRawDataStore} from 'types/Config.types';
-import Config from '../DataStoreConfig.model';
+import {TRawDataStore} from '../DataStore.model';
+import DataStoreConfig from '../DataStoreConfig.model';
 
 const DataStoreConfigMock: IMockFactory<
-  TDataStoreConfig,
+  DataStoreConfig,
   {
     dataStores: TRawDataStore[];
   }
@@ -12,7 +12,7 @@ const DataStoreConfigMock: IMockFactory<
     return {dataStores};
   },
   model({dataStores = []} = {}) {
-    return Config(this.raw({dataStores}).dataStores);
+    return DataStoreConfig(this.raw({dataStores}).dataStores);
   },
 });
 

@@ -7,8 +7,8 @@ import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
-import {TSpan} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
+import Span from 'models/Span.model';
 import {useDrawer} from '../Drawer/Drawer';
 import DAG from '../Visualization/components/DAG';
 import Timeline from '../Visualization/components/Timeline';
@@ -16,7 +16,7 @@ import {VisualizationType} from './RunDetailTrace';
 
 interface IProps {
   runState: TTestRunState;
-  spans: TSpan[];
+  spans: Span[];
   type: VisualizationType;
 }
 

@@ -1,13 +1,12 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
-import Environment from 'models/Environment.model';
-import {TEnvironment, TRawEnvironment} from 'types/Environment.types';
+import Environment, {TRawEnvironment} from 'models/Environment.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {getTotalCountFromHeaders} from 'utils/Common';
 
 const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  getEnvironments: builder.query<PaginationResponse<TEnvironment>, {take?: number; skip?: number; query?: string}>({
+  getEnvironments: builder.query<PaginationResponse<Environment>, {take?: number; skip?: number; query?: string}>({
     query: ({take = 25, skip = 0, query = ''}) => `/environments?take=${take}&skip=${skip}&query=${query}`,
     providesTags: () => [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
     transformResponse: (rawEnvironments: TRawEnvironment[], meta) => ({
@@ -15,7 +14,7 @@ const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({
       total: getTotalCountFromHeaders(meta),
     }),
   }),
-  createEnvironment: builder.mutation<undefined, TEnvironment>({
+  createEnvironment: builder.mutation<undefined, Environment>({
     query: environment => ({
       url: '/environments',
       method: HTTP_METHOD.POST,

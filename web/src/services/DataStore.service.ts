@@ -1,12 +1,14 @@
-import {SupportedDataStores, TDataStore, TDataStoreConfig, TDraftDataStore, TRawDataStore} from 'types/Config.types';
+import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
+import DataStore, {TRawDataStore} from 'models/DataStore.model';
+import DataStoreConfig from 'models/DataStoreConfig.model';
 import GrpcClientService from './DataStores/GrpcClient.service';
 import ElasticSearchService from './DataStores/ElasticSearch.service';
 import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
 
 interface IDataStoreService {
-  getRequest(draft: TDraftDataStore, defaultDataStore: TDataStore): Promise<TRawDataStore>;
-  getInitialValues(config: TDataStoreConfig): TDraftDataStore;
+  getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
+  getInitialValues(config: DataStoreConfig): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
 }
 

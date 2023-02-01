@@ -1,10 +1,35 @@
-import {TRawAssertionResults} from 'types/Assertion.types';
-import {TRawTestRun, TTestRun} from 'types/TestRun.types';
-import AssertionResults from './AssertionResults.model';
+import {TTestRunState} from 'types/TestRun.types';
+import {Model, Modify, TTestSchemas, TTriggerSchemas} from '../types/Common.types';
+import AssertionResults, {TRawAssertionResults} from './AssertionResults.model';
 import Environment from './Environment.model';
-import {TestRunOutput} from './TestOutput.model';
+import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
+
+export type TRawTestRun = Modify<
+  TTestSchemas['TestRun'],
+  {
+    state?: TTestRunState;
+  }
+>;
+type TestRun = Model<
+  TRawTestRun,
+  {
+    result: AssertionResults;
+    trace?: Trace;
+    totalAssertionCount: number;
+    failedAssertionCount: number;
+    passedAssertionCount: number;
+    executionTime: number;
+    triggerTime: number;
+    lastErrorState?: string;
+    trigger?: TTriggerSchemas['Trigger'];
+    triggerResult?: TriggerResult;
+    outputs?: TestRunOutput[];
+    environment?: Environment;
+    state: TTestRunState;
+  }
+>;
 
 const getTestResultCount = (
   {results: resultList = []}: TRawAssertionResults = {},
@@ -52,7 +77,7 @@ const TestRun = ({
   environment = {},
   transactionId = '',
   transactionRunId = '',
-}: TRawTestRun): TTestRun => {
+}: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
     serviceTriggerCompletedAt,

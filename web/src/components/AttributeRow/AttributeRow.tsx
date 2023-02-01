@@ -9,7 +9,7 @@ import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticCon
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {TTestOutput} from 'types/TestOutput.types';
+import TestOutput from 'models/TestOutput.model';
 import * as S from './AttributeRow.styled';
 import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
@@ -21,7 +21,7 @@ interface IProps {
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
   semanticConventions: OtelReference;
-  outputs: TTestOutput[];
+  outputs: TestOutput[];
 }
 
 enum Action {

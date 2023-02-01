@@ -1,12 +1,12 @@
 import {TriggerTypes} from 'constants/Test.constants';
-import {TTriggerResult} from 'types/Test.types';
 import {TTestRunState} from 'types/TestRun.types';
+import TriggerResult from 'models/TriggerResult.model';
 import RunDetailTriggerData from './RunDetailTriggerData';
 import RunDetailTriggerResponse from './RunDetailTriggerResponse';
 
 export interface IPropsComponent {
   state: TTestRunState;
-  triggerResult?: TTriggerResult;
+  triggerResult?: TriggerResult;
   triggerTime?: number;
 }
 

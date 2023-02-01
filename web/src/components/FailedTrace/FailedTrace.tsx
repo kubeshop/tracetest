@@ -1,11 +1,11 @@
 import {Typography} from 'antd';
 import {DISCORD_URL, GITHUB_ISSUES_URL} from 'constants/Common.constants';
-import {TTestRun} from 'types/TestRun.types';
+import TestRun from 'models/TestRun.model';
 import * as S from './FailedTrace.styled';
 
 interface IProps {
   isDisplayingError: boolean;
-  run: TTestRun;
+  run: TestRun;
 }
 
 const FailedTrace = ({isDisplayingError, run: {lastErrorState}}: IProps) => {

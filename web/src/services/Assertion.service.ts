@@ -1,12 +1,13 @@
 import countBy from 'lodash/countBy';
 import uniq from 'lodash/uniq';
 
-import {ICheckResult, TAssertionResult, TRawAssertionResult, TStructuredAssertion} from 'types/Assertion.types';
+import {ICheckResult, TStructuredAssertion} from 'types/Assertion.types';
 import {durationRegExp} from 'constants/Common.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {CompareOperatorSymbolMap, OperatorRegexp} from 'constants/Operator.constants';
-import {TCompareOperatorSymbol} from '../types/Operator.types';
-import {isJson} from '../utils/Common';
+import {TCompareOperatorSymbol} from 'types/Operator.types';
+import {isJson} from 'utils/Common';
+import AssertionResult, {TRawAssertionResult} from 'models/AssertionResult.model';
 
 const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
 const isNumericTime = (num: string): boolean => durationRegExp.test(num);
@@ -36,12 +37,12 @@ const AssertionService = () => ({
     return uniq(spanIds);
   },
 
-  getTotalPassedChecks(resultList: TAssertionResult[]) {
+  getTotalPassedChecks(resultList: AssertionResult[]) {
     const passedResults = resultList.flatMap(({spanResults}) => spanResults.map(({passed}) => passed));
     return countBy(passedResults);
   },
 
-  getResultsHashedBySpanId(resultList: TAssertionResult[]) {
+  getResultsHashedBySpanId(resultList: AssertionResult[]) {
     return resultList
       .flatMap(({assertion, spanResults}) => spanResults.map(spanResult => ({result: spanResult, assertion})))
       .reduce((prev: Record<string, ICheckResult[]>, curr) => {

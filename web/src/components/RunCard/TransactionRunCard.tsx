@@ -1,21 +1,20 @@
 import {Tooltip} from 'antd';
 import {Link} from 'react-router-dom';
-
 import TestState from 'components/TestState';
 import TransactionRunActionsMenu from 'components/TransactionRunActionsMenu';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {TTestRun} from 'types/TestRun.types';
-import {TTransactionRun} from 'types/TransactionRun.types';
+import TransactionRun from 'models/TransactionRun.model';
+import TestRun from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 
 interface IProps {
   linkTo: string;
-  run: TTransactionRun;
+  run: TransactionRun;
   transactionId: string;
 }
 
-function getIcon(state: TTestRun['state'], fail: number) {
+function getIcon(state: TestRun['state'], fail: number) {
   if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
     return null;
   }

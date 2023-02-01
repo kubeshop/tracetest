@@ -1,20 +1,20 @@
+import {useCallback, useEffect, useState} from 'react';
 import {closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Col, Row, Select} from 'antd';
 import {noop} from 'lodash';
-import {useCallback, useEffect, useState} from 'react';
-import {TTest} from 'types/Test.types';
+import Test from 'models/Test.model';
 import TestItemList from './TestItemList';
 
 interface IProps {
   value?: string[];
-  testList: TTest[];
+  testList: Test[];
   onChange?(tests: string[]): void;
 }
 
 export interface ISortableTest {
   id: string;
-  test: TTest;
+  test: Test;
 }
 
 const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) => {

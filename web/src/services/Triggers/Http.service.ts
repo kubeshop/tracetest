@@ -1,12 +1,13 @@
-import {IHttpValues, ITriggerService, THTTPRequest, TRawHTTPRequest} from 'types/Test.types';
+import {IHttpValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {HTTP_METHOD} from 'constants/Common.constants';
+import HttpRequest from 'models/HttpRequest.model';
 
 const HttpTriggerService = (): ITriggerService => ({
-  async getRequest(values): Promise<TRawHTTPRequest> {
+  async getRequest(values) {
     const {url, method, auth, headers, body} = values as IHttpValues;
 
-    return {url, method, auth, headers, body};
+    return HttpRequest({url, method, auth, headers, body});
   },
 
   async validateDraft(draft): Promise<boolean> {
@@ -15,7 +16,7 @@ const HttpTriggerService = (): ITriggerService => ({
   },
 
   getInitialValues(request) {
-    const {url, method, headers, body, auth} = request as THTTPRequest;
+    const {url, method, headers, body, auth} = request as HttpRequest;
 
     return {
       url,

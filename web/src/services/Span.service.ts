@@ -2,15 +2,16 @@ import {differenceBy, intersectionBy} from 'lodash';
 import {CompareOperator} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {SpanKind} from 'constants/Span.constants';
-import {TSpan, TSpanFlatAttribute} from 'types/Span.types';
+import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
+import {TResultAssertions, TResultAssertionsSummary} from 'types/Assertion.types';
+import Span from 'models/Span.model';
 import OperatorService from './Operator.service';
-import {TResultAssertions, TResultAssertionsSummary} from '../types/Assertion.types';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
 
 const SpanService = () => ({
-  getSpanInfo(span?: TSpan) {
+  getSpanInfo(span?: Span) {
     const kind = span?.kind ?? SpanKind.INTERNAL;
     const name = span?.name ?? '';
     const service = span?.service ?? '';
@@ -20,7 +21,7 @@ const SpanService = () => ({
     return {kind, name, service, system, type};
   },
 
-  getSelectedSpanListAttributes({attributeList}: TSpan, selectedSpanList: TSpan[]) {
+  getSelectedSpanListAttributes({attributeList}: Span, selectedSpanList: Span[]) {
     const intersectedAttributeList = intersectionBy(...selectedSpanList.map(el => el.attributeList), 'key');
 
     const selectedSpanAttributeList = attributeList?.reduce<TSpanFlatAttribute[]>((acc, item) => {
@@ -35,7 +36,7 @@ const SpanService = () => ({
     };
   },
 
-  getSelectorInformation(span: TSpan) {
+  getSelectorInformation(span: Span) {
     return `span[${(
       span?.signature.reduce<string>(
         (selector, {value, key}) =>
@@ -45,7 +46,7 @@ const SpanService = () => ({
     ).trim()}]`;
   },
 
-  searchSpanList(spanList: TSpan[], searchText: string) {
+  searchSpanList(spanList: Span[], searchText: string) {
     if (!searchText.trim()) return [];
 
     return spanList.reduce<string[]>(

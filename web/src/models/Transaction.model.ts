@@ -1,6 +1,15 @@
-import {TRawTransaction, TTransaction} from 'types/Transaction.types';
-import TestSummary from './TestSummary.model';
+import {Model, TTransactionsSchemas} from 'types/Common.types';
+import Summary from './Summary.model';
 import Test from './Test.model';
+
+export type TRawTransaction = TTransactionsSchemas['Transaction'];
+type Transaction = Model<
+  TRawTransaction,
+  {
+    steps: Test[];
+    summary: Summary;
+  }
+>;
 
 function Transaction({
   id = '',
@@ -10,7 +19,7 @@ function Transaction({
   steps = [],
   createdAt = '',
   summary = {},
-}: TRawTransaction): TTransaction {
+}: TRawTransaction): Transaction {
   return {
     id,
     name,
@@ -18,7 +27,7 @@ function Transaction({
     version,
     steps: steps.map(step => Test(step)),
     createdAt,
-    summary: TestSummary(summary),
+    summary: Summary(summary),
   };
 }
 

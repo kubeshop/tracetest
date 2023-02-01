@@ -1,7 +1,11 @@
-import {TSpanFlatAttribute} from '../types/Span.types';
-import {TSpanAttribute} from '../types/SpanAttribute.types';
+import {TSpanFlatAttribute} from 'types/Span.types';
 
-const SpanAttribute = ({key, value}: TSpanFlatAttribute): TSpanAttribute => {
+type SpanAttribute = {
+  name: string;
+  value: string;
+};
+
+const SpanAttribute = ({key, value}: TSpanFlatAttribute): SpanAttribute => {
   return {
     name: key,
     value,

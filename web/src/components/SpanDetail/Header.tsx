@@ -4,13 +4,13 @@ import * as SSpanNode from 'components/Visualization/components/DAG/SpanNode.sty
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import SpanService from 'services/Span.service';
-import {TSpan} from 'types/Span.types';
 import {TResultAssertions} from 'types/Assertion.types';
+import Span from 'models/Span.model';
 import * as S from './SpanDetail.styled';
 import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps {
-  span?: TSpan;
+  span?: Span;
   assertions?: TResultAssertions;
 }
 

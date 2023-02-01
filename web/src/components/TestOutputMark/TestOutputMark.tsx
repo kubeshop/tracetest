@@ -1,10 +1,10 @@
-import {TTestOutput} from 'types/TestOutput.types';
-import {useTestOutput} from '../../providers/TestOutput/TestOutput.provider';
+import TestOutput from 'models/TestOutput.model';
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './TestOutputMark.styled';
 
 interface IProps {
   className?: string;
-  outputs: TTestOutput[];
+  outputs: TestOutput[];
 }
 
 const TestOutputMark = ({className, outputs}: IProps) => {

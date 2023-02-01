@@ -5,7 +5,7 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
-import {TAssertionResultEntry} from 'types/Assertion.types';
+import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import {useTest} from 'providers/Test/Test.provider';
 import Assertion from './Assertion';
 import Header from './Header';

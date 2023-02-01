@@ -1,9 +1,8 @@
 import faker from '@faker-js/faker';
-import {IMockFactory} from '../../types/Common.types';
-import {TRawSpan, TSpan} from '../../types/Span.types';
-import Span from '../Span.model';
+import {IMockFactory} from 'types/Common.types';
+import Span, {TRawSpan} from '../Span.model';
 
-const SpanMock: IMockFactory<TSpan, TRawSpan> = () => ({
+const SpanMock: IMockFactory<Span, TRawSpan> = () => ({
   raw(data = {}) {
     return {
       id: faker.datatype.uuid(),

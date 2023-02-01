@@ -1,16 +1,15 @@
-import {RunErrorTypes, TRawRunError, TRunError} from 'types/TestRun.types';
-import {TMissingVariable, TRawMissingVariables} from 'types/Variables.types';
+import {RunErrorTypes} from 'types/TestRun.types';
+import MissingVariables from './MissingVariables.model';
 
-export const MissingVariables = ({missingVariables = []}: TRawMissingVariables = {}): TMissingVariable[] => {
-  return missingVariables.map(({testId = '', variables = []}) => ({
-    testId,
-    variables: variables.map(({key = '', defaultValue = ''}) => ({key, defaultValue})),
-  }));
+export type TRawRunError = any;
+type RunError = {
+  type: RunErrorTypes;
+  missingVariables: MissingVariables;
 };
 
-const defaultError: TRunError = {type: RunErrorTypes.Unknown, missingVariables: []};
+const defaultError: RunError = {type: RunErrorTypes.Unknown, missingVariables: []};
 
-const RunError = (error: TRawRunError): TRunError => {
+const RunError = (error: TRawRunError): RunError => {
   if (!error) return defaultError;
 
   const {missingVariables} = error;

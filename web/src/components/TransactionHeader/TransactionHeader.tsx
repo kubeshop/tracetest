@@ -2,15 +2,15 @@ import {Button} from 'antd';
 import {Link} from 'react-router-dom';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
+import Transaction from 'models/Transaction.model';
+import TransactionRun from 'models/TransactionRun.model';
 import TestState from '../TestState';
 import * as S from './TransactionHeader.styled';
 import TransactionRunActionsMenu from '../TransactionRunActionsMenu';
-import {TTransaction} from '../../types/Transaction.types';
-import {TTransactionRun} from '../../types/TransactionRun.types';
 
 interface IProps {
-  transaction: TTransaction;
-  transactionRun: TTransactionRun;
+  transaction: Transaction;
+  transactionRun: TransactionRun;
 }
 
 const TransactionHeader = ({

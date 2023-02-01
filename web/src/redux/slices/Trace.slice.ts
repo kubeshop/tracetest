@@ -3,7 +3,7 @@ import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-r
 
 import {theme} from 'constants/Theme.constants';
 import DAGModel from 'models/DAG.model';
-import {TSpan} from 'types/Span.types';
+import Span from 'models/Span.model';
 
 export interface ITraceState {
   edges: Edge[];
@@ -25,7 +25,7 @@ const traceSlice = createSlice({
   name: 'trace',
   initialState,
   reducers: {
-    initNodes(state, {payload}: PayloadAction<{spans: TSpan[]}>) {
+    initNodes(state, {payload}: PayloadAction<{spans: Span[]}>) {
       const {edges, nodes} = DAGModel(payload.spans);
       state.edges = edges;
       state.nodes = nodes;

@@ -3,12 +3,12 @@ import {useEffect, useState} from 'react';
 
 import EnvironmentForm from 'components/EnvironmentForm';
 import {useCreateEnvironmentMutation, useUpdateEnvironmentMutation} from 'redux/apis/TraceTest.api';
-import {TEnvironment} from 'types/Environment.types';
+import Environment from 'models/Environment.model';
 import * as S from './EnvironmentModal.styled';
 import EnvironmentModalFooter from './EnvironmentModalFooter';
 
 interface IProps {
-  environment?: TEnvironment;
+  environment?: Environment;
   isOpen: boolean;
   onClose(): void;
 }
@@ -16,7 +16,7 @@ interface IProps {
 export const DEFAULT_VALUES = [{key: '', value: ''}];
 
 export const EnvironmentModal = ({environment, isOpen, onClose}: IProps) => {
-  const [form] = Form.useForm<TEnvironment>();
+  const [form] = Form.useForm<Environment>();
   const [createEnvironment, {isLoading}] = useCreateEnvironmentMutation();
   const [updateEnvironment, {isLoading: isLoadingUpdate}] = useUpdateEnvironmentMutation();
   const [isFormValid, setIsFormValid] = useState(false);
@@ -30,11 +30,11 @@ export const EnvironmentModal = ({environment, isOpen, onClose}: IProps) => {
     }
   }, [environment, form, isOpen]);
 
-  const handleOnValidate = (changedValues: any, {name, description, values}: TEnvironment) => {
+  const handleOnValidate = (changedValues: any, {name, description, values}: Environment) => {
     setIsFormValid(Boolean(name) && Boolean(description) && Boolean(values.length));
   };
 
-  const handleOnSubmit = async (values: TEnvironment) => {
+  const handleOnSubmit = async (values: Environment) => {
     if (isEditing) {
       await updateEnvironment({environment: values, environmentId: environment?.id ?? ''});
     } else {

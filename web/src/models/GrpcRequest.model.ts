@@ -1,4 +1,13 @@
-import {TGRPCRequest, TRawGRPCRequest} from '../types/Test.types';
+import {Model, TGrpcSchemas} from '../types/Common.types';
+import {TRawGRPCHeader} from '../types/Test.types';
+
+export type TRawGRPCRequest = TGrpcSchemas['GRPCRequest'];
+type GrpcRequest = Model<
+  TRawGRPCRequest,
+  {
+    metadata: Model<TRawGRPCHeader, {}>[];
+  }
+>;
 
 const GrpcRequest = ({
   protobufFile = '',
@@ -8,7 +17,7 @@ const GrpcRequest = ({
   metadata = [],
   auth = {},
   request = '',
-}: TRawGRPCRequest): TGRPCRequest => {
+}: TRawGRPCRequest): GrpcRequest => {
   return {
     protobufFile,
     address,

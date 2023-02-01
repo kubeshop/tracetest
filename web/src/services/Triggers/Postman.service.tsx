@@ -1,7 +1,8 @@
 import {Collection, Item, ItemGroup, Request, RequestAuthDefinition, VariableDefinition} from 'postman-collection';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {IPostmanValues, ITriggerService, TDraftTestForm, TRequestAuth} from 'types/Test.types';
-import Validator from '../../utils/Validator';
+import Validator from 'utils/Validator';
+import HttpRequest from 'models/HttpRequest.model';
 import HttpService from './Http.service';
 
 export interface RequestDefinitionExtended extends Request {
@@ -34,7 +35,7 @@ const Postman = (): IPostmanTriggerService => ({
   async getRequest(draft) {
     const {url, method, auth, headers, body} = draft as IPostmanValues;
 
-    return {url, method, auth, headers, body};
+    return HttpRequest({url, method, auth, headers, body});
   },
   async validateDraft(draft) {
     const {collectionTest} = draft as IPostmanValues;

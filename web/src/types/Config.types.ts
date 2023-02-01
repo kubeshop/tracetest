@@ -1,5 +1,8 @@
 import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
+import ConnectionTestStep from 'models/ConnectionResultStep.model';
+import {TRawDataStore} from 'models/DataStore.model';
+import DataStoreConfig from 'models/DataStoreConfig.model';
 import {THeader} from './Test.types';
 
 export enum ConfigMode {
@@ -23,21 +26,6 @@ export type TCollectorDataStores =
   | SupportedDataStores.OtelCollector
   | SupportedDataStores.Lightstep;
 
-export type TRawDataStore = TDataStoreSchemas['DataStore'];
-export type TDataStore = Model<
-  TRawDataStore,
-  {
-    otlp?: {};
-    newRelic?: {};
-    lightstep?: {};
-  }
->;
-
-export type TDataStoreConfig = {
-  defaultDataStore: TDataStore;
-  mode: ConfigMode;
-};
-
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
 
@@ -47,14 +35,12 @@ export type TConnectionResult = Model<
   TRawConnectionResult,
   {
     allPassed: boolean;
-    authentication: TConnectionTestStep;
-    connectivity: TConnectionTestStep;
-    fetchTraces: TConnectionTestStep;
+    authentication: ConnectionTestStep;
+    connectivity: ConnectionTestStep;
+    fetchTraces: ConnectionTestStep;
   }
 >;
 
-export type TRawConnectionTestStep = TConfigSchemas['ConnectionTestStep'];
-export type TConnectionTestStep = Model<TRawConnectionTestStep, {}>;
 export type TTestConnectionResponse = TConfigSchemas['ConnectionResult'];
 
 export interface IGRPCClientSettings extends TRawGRPCClientSettings {
@@ -88,7 +74,7 @@ export type TDataStoreForm = FormInstance<TDraftDataStore>;
 export type TDataStoreService = {
   getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
-  getInitialValues(draft: TDataStoreConfig, dataStoreType?: SupportedDataStores): TDraftDataStore;
+  getInitialValues(draft: DataStoreConfig, dataStoreType?: SupportedDataStores): TDraftDataStore;
 };
 
 export interface IDataStorePluginProps {}

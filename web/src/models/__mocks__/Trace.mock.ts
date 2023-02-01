@@ -1,10 +1,9 @@
 import faker from '@faker-js/faker';
 import {IMockFactory} from '../../types/Common.types';
-import {TRawTrace, TTrace} from '../../types/Trace.types';
-import Trace from '../Trace.model';
+import Trace, {TRawTrace} from '../Trace.model';
 import SpanMock from './Span.mock';
 
-const TraceMock: IMockFactory<TTrace, TRawTrace> = () => ({
+const TraceMock: IMockFactory<Trace, TRawTrace> = () => ({
   raw(data = {}) {
     return {
       traceId: faker.datatype.uuid(),

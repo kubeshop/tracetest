@@ -1,12 +1,11 @@
 import faker from '@faker-js/faker';
-import {TestState} from '../../constants/TestRun.constants';
-import {TRawAssertionResults} from '../../types/Assertion.types';
-import {IMockFactory} from '../../types/Common.types';
-import {TRawTestRun, TTestRun} from '../../types/TestRun.types';
-import TestRunResult from '../TestRun.model';
+import {TestState} from 'constants/TestRun.constants';
+import {IMockFactory} from 'types/Common.types';
+import {TRawAssertionResults} from '../AssertionResults.model';
+import TestRun, {TRawTestRun} from '../TestRun.model';
 import TraceMock from './Trace.mock';
 
-const TestRunMock: IMockFactory<TTestRun, TRawTestRun> = () => ({
+const TestRunMock: IMockFactory<TestRun, TRawTestRun> = () => ({
   raw(data = {}) {
     return {
       id: faker.datatype.uuid(),
@@ -23,7 +22,7 @@ const TestRunMock: IMockFactory<TTestRun, TRawTestRun> = () => ({
     };
   },
   model(data = {}) {
-    return TestRunResult(this.raw(data));
+    return TestRun(this.raw(data));
   },
 });
 

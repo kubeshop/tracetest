@@ -14,20 +14,21 @@ import {
   setSelectorSuggestions as setSelectorSuggestionsAction,
   setPrevSelector as setPrevSelectorAction,
 } from 'redux/slices/TestSpecs.slice';
-import {TAssertionResults} from 'types/Assertion.types';
-import {TTest} from 'types/Test.types';
-import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
+import {ISuggestion} from 'types/TestSpecs.types';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
+import Test from 'models/Test.model';
+import AssertionResults from 'models/AssertionResults.model';
+import {TTestSpecEntry} from 'models/TestSpecs.model';
 
 interface IProps {
   runId: string;
   testId: string;
-  test: TTest;
+  test: Test;
   isDraftMode: boolean;
-  assertionResults?: TAssertionResults;
+  assertionResults?: AssertionResults;
 }
 
 const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: IProps) => {
@@ -109,7 +110,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   );
 
   const init = useCallback(
-    (initialAssertionResults: TAssertionResults) => {
+    (initialAssertionResults: AssertionResults) => {
       dispatch(initSpecs({assertionResults: initialAssertionResults}));
     },
     [dispatch]

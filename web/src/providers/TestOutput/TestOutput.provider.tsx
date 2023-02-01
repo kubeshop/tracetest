@@ -15,7 +15,7 @@ import {
   outputsTestRunOutputsMerged,
   outputUpdated,
 } from 'redux/testOutputs/slice';
-import {TTestOutput} from 'types/TestOutput.types';
+import TestOutput from '../../models/TestOutput.model';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
@@ -29,13 +29,13 @@ interface IContext {
   onCancel(): void;
   onClose(): void;
   onDelete(id: number): void;
-  onNavigateAndOpen(draft?: TTestOutput): void;
-  onOpen(draft?: TTestOutput): void;
-  onSubmit(values: TTestOutput): void;
-  onSelectedOutputs(outputs: TTestOutput[]): void;
-  output?: TTestOutput;
-  outputs: TTestOutput[];
-  selectedOutputs: TTestOutput[];
+  onNavigateAndOpen(draft?: TestOutput): void;
+  onOpen(draft?: TestOutput): void;
+  onSubmit(values: TestOutput): void;
+  onSelectedOutputs(outputs: TestOutput[]): void;
+  output?: TestOutput;
+  outputs: TestOutput[];
+  selectedOutputs: TestOutput[];
 }
 
 export const Context = createContext<IContext>({
@@ -66,7 +66,7 @@ export const useTestOutput = () => useContext(Context);
 const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const dispatch = useAppDispatch();
   const [parseExpressionMutation, {isLoading}] = useParseExpressionMutation();
-  const [draft, setDraft] = useState<TTestOutput>();
+  const [draft, setDraft] = useState<TestOutput>();
   const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const {onOpen: onOpenConfirmationModal} = useConfirmationModal();
@@ -94,7 +94,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
     dispatch(outputsTestRunOutputsMerged(runOutputs));
   }, [dispatch, runOutputs]);
 
-  const onOpen = useCallback((values?: TTestOutput) => {
+  const onOpen = useCallback((values?: TestOutput) => {
     setDraft(values);
     setIsOpen(true);
     const id = values?.id ?? -1;
@@ -123,7 +123,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   );
 
   const onSubmit = useCallback(
-    async (values: TTestOutput, matchedSpanId?: string) => {
+    async (values: TestOutput, matchedSpanId?: string) => {
       const spanId = values.spanId || matchedSpanId || '';
       const props = {
         expression: values.value,
@@ -150,7 +150,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   );
 
   const onNavigateAndOpen = useCallback(
-    async (values?: TTestOutput) => {
+    async (values?: TestOutput) => {
       await navigate(`/test/${testId}/run/${runId}/test/?tab=outputs`);
       onOpen(values);
     },
@@ -158,7 +158,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   );
 
   const onSelectedOutputs = useCallback(
-    (outputList: TTestOutput[]) => {
+    (outputList: TestOutput[]) => {
       navigate(`/test/${testId}/run/${runId}/test/?tab=outputs`);
       dispatch(outputsSelectedOutputsChanged(outputList));
     },

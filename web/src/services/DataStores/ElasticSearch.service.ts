@@ -1,11 +1,6 @@
-import {
-  IElasticSearch,
-  SupportedDataStores,
-  TDataStore,
-  TDataStoreService,
-  TRawElasticSearch,
-} from 'types/Config.types';
+import {IElasticSearch, SupportedDataStores, TDataStoreService, TRawElasticSearch} from 'types/Config.types';
 import Validator from 'utils/Validator';
+import DataStore from 'models/DataStore.model';
 
 const ElasticSearchService = (): TDataStoreService => ({
   async getRequest({dataStore = {}}, dataStoreType = SupportedDataStores.OpenSearch) {
@@ -41,7 +36,7 @@ const ElasticSearchService = (): TDataStoreService => ({
     return Promise.resolve(true);
   },
   getInitialValues(
-    {defaultDataStore = {name: '', type: SupportedDataStores.OpenSearch} as TDataStore},
+    {defaultDataStore = {name: '', type: SupportedDataStores.OpenSearch} as DataStore},
     dataStoreType = SupportedDataStores.OpenSearch
   ) {
     const {
