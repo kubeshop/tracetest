@@ -71,6 +71,7 @@ snapshot:
 nightly:
   publish_release: true
   keep_single_release: true
+  name_template: 'latest'
 
 dockers:
 - image_templates:
