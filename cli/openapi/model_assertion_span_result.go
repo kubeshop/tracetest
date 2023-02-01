@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the AssertionSpanResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &AssertionSpanResult{}
+
 // AssertionSpanResult struct for AssertionSpanResult
 type AssertionSpanResult struct {
 	SpanId        *string `json:"spanId,omitempty"`
@@ -41,7 +44,7 @@ func NewAssertionSpanResultWithDefaults() *AssertionSpanResult {
 
 // GetSpanId returns the SpanId field value if set, zero value otherwise.
 func (o *AssertionSpanResult) GetSpanId() string {
-	if o == nil || o.SpanId == nil {
+	if o == nil || isNil(o.SpanId) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *AssertionSpanResult) GetSpanId() string {
 // GetSpanIdOk returns a tuple with the SpanId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionSpanResult) GetSpanIdOk() (*string, bool) {
-	if o == nil || o.SpanId == nil {
+	if o == nil || isNil(o.SpanId) {
 		return nil, false
 	}
 	return o.SpanId, true
@@ -59,7 +62,7 @@ func (o *AssertionSpanResult) GetSpanIdOk() (*string, bool) {
 
 // HasSpanId returns a boolean if a field has been set.
 func (o *AssertionSpanResult) HasSpanId() bool {
-	if o != nil && o.SpanId != nil {
+	if o != nil && !isNil(o.SpanId) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *AssertionSpanResult) SetSpanId(v string) {
 
 // GetObservedValue returns the ObservedValue field value if set, zero value otherwise.
 func (o *AssertionSpanResult) GetObservedValue() string {
-	if o == nil || o.ObservedValue == nil {
+	if o == nil || isNil(o.ObservedValue) {
 		var ret string
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *AssertionSpanResult) GetObservedValue() string {
 // GetObservedValueOk returns a tuple with the ObservedValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionSpanResult) GetObservedValueOk() (*string, bool) {
-	if o == nil || o.ObservedValue == nil {
+	if o == nil || isNil(o.ObservedValue) {
 		return nil, false
 	}
 	return o.ObservedValue, true
@@ -91,7 +94,7 @@ func (o *AssertionSpanResult) GetObservedValueOk() (*string, bool) {
 
 // HasObservedValue returns a boolean if a field has been set.
 func (o *AssertionSpanResult) HasObservedValue() bool {
-	if o != nil && o.ObservedValue != nil {
+	if o != nil && !isNil(o.ObservedValue) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *AssertionSpanResult) SetObservedValue(v string) {
 
 // GetPassed returns the Passed field value if set, zero value otherwise.
 func (o *AssertionSpanResult) GetPassed() bool {
-	if o == nil || o.Passed == nil {
+	if o == nil || isNil(o.Passed) {
 		var ret bool
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *AssertionSpanResult) GetPassed() bool {
 // GetPassedOk returns a tuple with the Passed field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionSpanResult) GetPassedOk() (*bool, bool) {
-	if o == nil || o.Passed == nil {
+	if o == nil || isNil(o.Passed) {
 		return nil, false
 	}
 	return o.Passed, true
@@ -123,7 +126,7 @@ func (o *AssertionSpanResult) GetPassedOk() (*bool, bool) {
 
 // HasPassed returns a boolean if a field has been set.
 func (o *AssertionSpanResult) HasPassed() bool {
-	if o != nil && o.Passed != nil {
+	if o != nil && !isNil(o.Passed) {
 		return true
 	}
 
@@ -137,7 +140,7 @@ func (o *AssertionSpanResult) SetPassed(v bool) {
 
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *AssertionSpanResult) GetError() string {
-	if o == nil || o.Error == nil {
+	if o == nil || isNil(o.Error) {
 		var ret string
 		return ret
 	}
@@ -147,7 +150,7 @@ func (o *AssertionSpanResult) GetError() string {
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionSpanResult) GetErrorOk() (*string, bool) {
-	if o == nil || o.Error == nil {
+	if o == nil || isNil(o.Error) {
 		return nil, false
 	}
 	return o.Error, true
@@ -155,7 +158,7 @@ func (o *AssertionSpanResult) GetErrorOk() (*string, bool) {
 
 // HasError returns a boolean if a field has been set.
 func (o *AssertionSpanResult) HasError() bool {
-	if o != nil && o.Error != nil {
+	if o != nil && !isNil(o.Error) {
 		return true
 	}
 
@@ -168,20 +171,28 @@ func (o *AssertionSpanResult) SetError(v string) {
 }
 
 func (o AssertionSpanResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.SpanId != nil {
-		toSerialize["spanId"] = o.SpanId
-	}
-	if o.ObservedValue != nil {
-		toSerialize["observedValue"] = o.ObservedValue
-	}
-	if o.Passed != nil {
-		toSerialize["passed"] = o.Passed
-	}
-	if o.Error != nil {
-		toSerialize["error"] = o.Error
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o AssertionSpanResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.SpanId) {
+		toSerialize["spanId"] = o.SpanId
+	}
+	if !isNil(o.ObservedValue) {
+		toSerialize["observedValue"] = o.ObservedValue
+	}
+	if !isNil(o.Passed) {
+		toSerialize["passed"] = o.Passed
+	}
+	if !isNil(o.Error) {
+		toSerialize["error"] = o.Error
+	}
+	return toSerialize, nil
 }
 
 type NullableAssertionSpanResult struct {

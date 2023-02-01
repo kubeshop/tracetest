@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TestSummary type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestSummary{}
+
 // TestSummary struct for TestSummary
 type TestSummary struct {
 	Runs    *int32              `json:"runs,omitempty"`
@@ -39,7 +42,7 @@ func NewTestSummaryWithDefaults() *TestSummary {
 
 // GetRuns returns the Runs field value if set, zero value otherwise.
 func (o *TestSummary) GetRuns() int32 {
-	if o == nil || o.Runs == nil {
+	if o == nil || isNil(o.Runs) {
 		var ret int32
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *TestSummary) GetRuns() int32 {
 // GetRunsOk returns a tuple with the Runs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestSummary) GetRunsOk() (*int32, bool) {
-	if o == nil || o.Runs == nil {
+	if o == nil || isNil(o.Runs) {
 		return nil, false
 	}
 	return o.Runs, true
@@ -57,7 +60,7 @@ func (o *TestSummary) GetRunsOk() (*int32, bool) {
 
 // HasRuns returns a boolean if a field has been set.
 func (o *TestSummary) HasRuns() bool {
-	if o != nil && o.Runs != nil {
+	if o != nil && !isNil(o.Runs) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *TestSummary) SetRuns(v int32) {
 
 // GetLastRun returns the LastRun field value if set, zero value otherwise.
 func (o *TestSummary) GetLastRun() TestSummaryLastRun {
-	if o == nil || o.LastRun == nil {
+	if o == nil || isNil(o.LastRun) {
 		var ret TestSummaryLastRun
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *TestSummary) GetLastRun() TestSummaryLastRun {
 // GetLastRunOk returns a tuple with the LastRun field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestSummary) GetLastRunOk() (*TestSummaryLastRun, bool) {
-	if o == nil || o.LastRun == nil {
+	if o == nil || isNil(o.LastRun) {
 		return nil, false
 	}
 	return o.LastRun, true
@@ -89,7 +92,7 @@ func (o *TestSummary) GetLastRunOk() (*TestSummaryLastRun, bool) {
 
 // HasLastRun returns a boolean if a field has been set.
 func (o *TestSummary) HasLastRun() bool {
-	if o != nil && o.LastRun != nil {
+	if o != nil && !isNil(o.LastRun) {
 		return true
 	}
 
@@ -102,14 +105,20 @@ func (o *TestSummary) SetLastRun(v TestSummaryLastRun) {
 }
 
 func (o TestSummary) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Runs != nil {
-		toSerialize["runs"] = o.Runs
-	}
-	if o.LastRun != nil {
-		toSerialize["lastRun"] = o.LastRun
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TestSummary) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	// skip: runs is readOnly
+	if !isNil(o.LastRun) {
+		toSerialize["lastRun"] = o.LastRun
+	}
+	return toSerialize, nil
 }
 
 type NullableTestSummary struct {

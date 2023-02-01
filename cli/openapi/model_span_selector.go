@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SpanSelector type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SpanSelector{}
+
 // SpanSelector struct for SpanSelector
 type SpanSelector struct {
 	Filters       []SelectorFilter            `json:"filters"`
@@ -65,7 +68,7 @@ func (o *SpanSelector) SetFilters(v []SelectorFilter) {
 
 // GetPseudoClass returns the PseudoClass field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *SpanSelector) GetPseudoClass() SelectorPseudoClass {
-	if o == nil || o.PseudoClass.Get() == nil {
+	if o == nil || isNil(o.PseudoClass.Get()) {
 		var ret SelectorPseudoClass
 		return ret
 	}
@@ -108,7 +111,7 @@ func (o *SpanSelector) UnsetPseudoClass() {
 
 // GetChildSelector returns the ChildSelector field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *SpanSelector) GetChildSelector() SpanSelector {
-	if o == nil || o.ChildSelector.Get() == nil {
+	if o == nil || isNil(o.ChildSelector.Get()) {
 		var ret SpanSelector
 		return ret
 	}
@@ -150,17 +153,23 @@ func (o *SpanSelector) UnsetChildSelector() {
 }
 
 func (o SpanSelector) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["filters"] = o.Filters
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
+	return json.Marshal(toSerialize)
+}
+
+func (o SpanSelector) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["filters"] = o.Filters
 	if o.PseudoClass.IsSet() {
 		toSerialize["pseudoClass"] = o.PseudoClass.Get()
 	}
 	if o.ChildSelector.IsSet() {
 		toSerialize["childSelector"] = o.ChildSelector.Get()
 	}
-	return json.Marshal(toSerialize)
+	return toSerialize, nil
 }
 
 type NullableSpanSelector struct {

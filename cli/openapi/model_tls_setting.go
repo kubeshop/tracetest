@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TLSSetting type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TLSSetting{}
+
 // TLSSetting struct for TLSSetting
 type TLSSetting struct {
 	CAFile     *string `json:"cAFile,omitempty"`
@@ -42,7 +45,7 @@ func NewTLSSettingWithDefaults() *TLSSetting {
 
 // GetCAFile returns the CAFile field value if set, zero value otherwise.
 func (o *TLSSetting) GetCAFile() string {
-	if o == nil || o.CAFile == nil {
+	if o == nil || isNil(o.CAFile) {
 		var ret string
 		return ret
 	}
@@ -52,7 +55,7 @@ func (o *TLSSetting) GetCAFile() string {
 // GetCAFileOk returns a tuple with the CAFile field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLSSetting) GetCAFileOk() (*string, bool) {
-	if o == nil || o.CAFile == nil {
+	if o == nil || isNil(o.CAFile) {
 		return nil, false
 	}
 	return o.CAFile, true
@@ -60,7 +63,7 @@ func (o *TLSSetting) GetCAFileOk() (*string, bool) {
 
 // HasCAFile returns a boolean if a field has been set.
 func (o *TLSSetting) HasCAFile() bool {
-	if o != nil && o.CAFile != nil {
+	if o != nil && !isNil(o.CAFile) {
 		return true
 	}
 
@@ -74,7 +77,7 @@ func (o *TLSSetting) SetCAFile(v string) {
 
 // GetCertFile returns the CertFile field value if set, zero value otherwise.
 func (o *TLSSetting) GetCertFile() string {
-	if o == nil || o.CertFile == nil {
+	if o == nil || isNil(o.CertFile) {
 		var ret string
 		return ret
 	}
@@ -84,7 +87,7 @@ func (o *TLSSetting) GetCertFile() string {
 // GetCertFileOk returns a tuple with the CertFile field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLSSetting) GetCertFileOk() (*string, bool) {
-	if o == nil || o.CertFile == nil {
+	if o == nil || isNil(o.CertFile) {
 		return nil, false
 	}
 	return o.CertFile, true
@@ -92,7 +95,7 @@ func (o *TLSSetting) GetCertFileOk() (*string, bool) {
 
 // HasCertFile returns a boolean if a field has been set.
 func (o *TLSSetting) HasCertFile() bool {
-	if o != nil && o.CertFile != nil {
+	if o != nil && !isNil(o.CertFile) {
 		return true
 	}
 
@@ -106,7 +109,7 @@ func (o *TLSSetting) SetCertFile(v string) {
 
 // GetKeyFile returns the KeyFile field value if set, zero value otherwise.
 func (o *TLSSetting) GetKeyFile() string {
-	if o == nil || o.KeyFile == nil {
+	if o == nil || isNil(o.KeyFile) {
 		var ret string
 		return ret
 	}
@@ -116,7 +119,7 @@ func (o *TLSSetting) GetKeyFile() string {
 // GetKeyFileOk returns a tuple with the KeyFile field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLSSetting) GetKeyFileOk() (*string, bool) {
-	if o == nil || o.KeyFile == nil {
+	if o == nil || isNil(o.KeyFile) {
 		return nil, false
 	}
 	return o.KeyFile, true
@@ -124,7 +127,7 @@ func (o *TLSSetting) GetKeyFileOk() (*string, bool) {
 
 // HasKeyFile returns a boolean if a field has been set.
 func (o *TLSSetting) HasKeyFile() bool {
-	if o != nil && o.KeyFile != nil {
+	if o != nil && !isNil(o.KeyFile) {
 		return true
 	}
 
@@ -138,7 +141,7 @@ func (o *TLSSetting) SetKeyFile(v string) {
 
 // GetMinVersion returns the MinVersion field value if set, zero value otherwise.
 func (o *TLSSetting) GetMinVersion() string {
-	if o == nil || o.MinVersion == nil {
+	if o == nil || isNil(o.MinVersion) {
 		var ret string
 		return ret
 	}
@@ -148,7 +151,7 @@ func (o *TLSSetting) GetMinVersion() string {
 // GetMinVersionOk returns a tuple with the MinVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLSSetting) GetMinVersionOk() (*string, bool) {
-	if o == nil || o.MinVersion == nil {
+	if o == nil || isNil(o.MinVersion) {
 		return nil, false
 	}
 	return o.MinVersion, true
@@ -156,7 +159,7 @@ func (o *TLSSetting) GetMinVersionOk() (*string, bool) {
 
 // HasMinVersion returns a boolean if a field has been set.
 func (o *TLSSetting) HasMinVersion() bool {
-	if o != nil && o.MinVersion != nil {
+	if o != nil && !isNil(o.MinVersion) {
 		return true
 	}
 
@@ -170,7 +173,7 @@ func (o *TLSSetting) SetMinVersion(v string) {
 
 // GetMaxVersion returns the MaxVersion field value if set, zero value otherwise.
 func (o *TLSSetting) GetMaxVersion() string {
-	if o == nil || o.MaxVersion == nil {
+	if o == nil || isNil(o.MaxVersion) {
 		var ret string
 		return ret
 	}
@@ -180,7 +183,7 @@ func (o *TLSSetting) GetMaxVersion() string {
 // GetMaxVersionOk returns a tuple with the MaxVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLSSetting) GetMaxVersionOk() (*string, bool) {
-	if o == nil || o.MaxVersion == nil {
+	if o == nil || isNil(o.MaxVersion) {
 		return nil, false
 	}
 	return o.MaxVersion, true
@@ -188,7 +191,7 @@ func (o *TLSSetting) GetMaxVersionOk() (*string, bool) {
 
 // HasMaxVersion returns a boolean if a field has been set.
 func (o *TLSSetting) HasMaxVersion() bool {
-	if o != nil && o.MaxVersion != nil {
+	if o != nil && !isNil(o.MaxVersion) {
 		return true
 	}
 
@@ -201,23 +204,31 @@ func (o *TLSSetting) SetMaxVersion(v string) {
 }
 
 func (o TLSSetting) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.CAFile != nil {
-		toSerialize["cAFile"] = o.CAFile
-	}
-	if o.CertFile != nil {
-		toSerialize["certFile"] = o.CertFile
-	}
-	if o.KeyFile != nil {
-		toSerialize["keyFile"] = o.KeyFile
-	}
-	if o.MinVersion != nil {
-		toSerialize["minVersion"] = o.MinVersion
-	}
-	if o.MaxVersion != nil {
-		toSerialize["maxVersion"] = o.MaxVersion
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TLSSetting) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.CAFile) {
+		toSerialize["cAFile"] = o.CAFile
+	}
+	if !isNil(o.CertFile) {
+		toSerialize["certFile"] = o.CertFile
+	}
+	if !isNil(o.KeyFile) {
+		toSerialize["keyFile"] = o.KeyFile
+	}
+	if !isNil(o.MinVersion) {
+		toSerialize["minVersion"] = o.MinVersion
+	}
+	if !isNil(o.MaxVersion) {
+		toSerialize["maxVersion"] = o.MaxVersion
+	}
+	return toSerialize, nil
 }
 
 type NullableTLSSetting struct {

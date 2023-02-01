@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TriggerTriggerSettings type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TriggerTriggerSettings{}
+
 // TriggerTriggerSettings struct for TriggerTriggerSettings
 type TriggerTriggerSettings struct {
 	Http    *HTTPRequest    `json:"http,omitempty"`
@@ -40,7 +43,7 @@ func NewTriggerTriggerSettingsWithDefaults() *TriggerTriggerSettings {
 
 // GetHttp returns the Http field value if set, zero value otherwise.
 func (o *TriggerTriggerSettings) GetHttp() HTTPRequest {
-	if o == nil || o.Http == nil {
+	if o == nil || isNil(o.Http) {
 		var ret HTTPRequest
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *TriggerTriggerSettings) GetHttp() HTTPRequest {
 // GetHttpOk returns a tuple with the Http field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TriggerTriggerSettings) GetHttpOk() (*HTTPRequest, bool) {
-	if o == nil || o.Http == nil {
+	if o == nil || isNil(o.Http) {
 		return nil, false
 	}
 	return o.Http, true
@@ -58,7 +61,7 @@ func (o *TriggerTriggerSettings) GetHttpOk() (*HTTPRequest, bool) {
 
 // HasHttp returns a boolean if a field has been set.
 func (o *TriggerTriggerSettings) HasHttp() bool {
-	if o != nil && o.Http != nil {
+	if o != nil && !isNil(o.Http) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *TriggerTriggerSettings) SetHttp(v HTTPRequest) {
 
 // GetGrpc returns the Grpc field value if set, zero value otherwise.
 func (o *TriggerTriggerSettings) GetGrpc() GRPCRequest {
-	if o == nil || o.Grpc == nil {
+	if o == nil || isNil(o.Grpc) {
 		var ret GRPCRequest
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *TriggerTriggerSettings) GetGrpc() GRPCRequest {
 // GetGrpcOk returns a tuple with the Grpc field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TriggerTriggerSettings) GetGrpcOk() (*GRPCRequest, bool) {
-	if o == nil || o.Grpc == nil {
+	if o == nil || isNil(o.Grpc) {
 		return nil, false
 	}
 	return o.Grpc, true
@@ -90,7 +93,7 @@ func (o *TriggerTriggerSettings) GetGrpcOk() (*GRPCRequest, bool) {
 
 // HasGrpc returns a boolean if a field has been set.
 func (o *TriggerTriggerSettings) HasGrpc() bool {
-	if o != nil && o.Grpc != nil {
+	if o != nil && !isNil(o.Grpc) {
 		return true
 	}
 
@@ -104,7 +107,7 @@ func (o *TriggerTriggerSettings) SetGrpc(v GRPCRequest) {
 
 // GetTraceid returns the Traceid field value if set, zero value otherwise.
 func (o *TriggerTriggerSettings) GetTraceid() TRACEIDRequest {
-	if o == nil || o.Traceid == nil {
+	if o == nil || isNil(o.Traceid) {
 		var ret TRACEIDRequest
 		return ret
 	}
@@ -114,7 +117,7 @@ func (o *TriggerTriggerSettings) GetTraceid() TRACEIDRequest {
 // GetTraceidOk returns a tuple with the Traceid field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TriggerTriggerSettings) GetTraceidOk() (*TRACEIDRequest, bool) {
-	if o == nil || o.Traceid == nil {
+	if o == nil || isNil(o.Traceid) {
 		return nil, false
 	}
 	return o.Traceid, true
@@ -122,7 +125,7 @@ func (o *TriggerTriggerSettings) GetTraceidOk() (*TRACEIDRequest, bool) {
 
 // HasTraceid returns a boolean if a field has been set.
 func (o *TriggerTriggerSettings) HasTraceid() bool {
-	if o != nil && o.Traceid != nil {
+	if o != nil && !isNil(o.Traceid) {
 		return true
 	}
 
@@ -135,17 +138,25 @@ func (o *TriggerTriggerSettings) SetTraceid(v TRACEIDRequest) {
 }
 
 func (o TriggerTriggerSettings) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Http != nil {
-		toSerialize["http"] = o.Http
-	}
-	if o.Grpc != nil {
-		toSerialize["grpc"] = o.Grpc
-	}
-	if o.Traceid != nil {
-		toSerialize["traceid"] = o.Traceid
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TriggerTriggerSettings) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Http) {
+		toSerialize["http"] = o.Http
+	}
+	if !isNil(o.Grpc) {
+		toSerialize["grpc"] = o.Grpc
+	}
+	if !isNil(o.Traceid) {
+		toSerialize["traceid"] = o.Traceid
+	}
+	return toSerialize, nil
 }
 
 type NullableTriggerTriggerSettings struct {

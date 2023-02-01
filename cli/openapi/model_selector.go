@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Selector type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Selector{}
+
 // Selector struct for Selector
 type Selector struct {
 	Query     *string        `json:"query,omitempty"`
@@ -39,7 +42,7 @@ func NewSelectorWithDefaults() *Selector {
 
 // GetQuery returns the Query field value if set, zero value otherwise.
 func (o *Selector) GetQuery() string {
-	if o == nil || o.Query == nil {
+	if o == nil || isNil(o.Query) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *Selector) GetQuery() string {
 // GetQueryOk returns a tuple with the Query field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Selector) GetQueryOk() (*string, bool) {
-	if o == nil || o.Query == nil {
+	if o == nil || isNil(o.Query) {
 		return nil, false
 	}
 	return o.Query, true
@@ -57,7 +60,7 @@ func (o *Selector) GetQueryOk() (*string, bool) {
 
 // HasQuery returns a boolean if a field has been set.
 func (o *Selector) HasQuery() bool {
-	if o != nil && o.Query != nil {
+	if o != nil && !isNil(o.Query) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *Selector) SetQuery(v string) {
 
 // GetStructure returns the Structure field value if set, zero value otherwise.
 func (o *Selector) GetStructure() []SpanSelector {
-	if o == nil || o.Structure == nil {
+	if o == nil || isNil(o.Structure) {
 		var ret []SpanSelector
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *Selector) GetStructure() []SpanSelector {
 // GetStructureOk returns a tuple with the Structure field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Selector) GetStructureOk() ([]SpanSelector, bool) {
-	if o == nil || o.Structure == nil {
+	if o == nil || isNil(o.Structure) {
 		return nil, false
 	}
 	return o.Structure, true
@@ -89,7 +92,7 @@ func (o *Selector) GetStructureOk() ([]SpanSelector, bool) {
 
 // HasStructure returns a boolean if a field has been set.
 func (o *Selector) HasStructure() bool {
-	if o != nil && o.Structure != nil {
+	if o != nil && !isNil(o.Structure) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *Selector) SetStructure(v []SpanSelector) {
 }
 
 func (o Selector) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Query != nil {
-		toSerialize["query"] = o.Query
-	}
-	if o.Structure != nil {
-		toSerialize["structure"] = o.Structure
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Selector) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Query) {
+		toSerialize["query"] = o.Query
+	}
+	if !isNil(o.Structure) {
+		toSerialize["structure"] = o.Structure
+	}
+	return toSerialize, nil
 }
 
 type NullableSelector struct {

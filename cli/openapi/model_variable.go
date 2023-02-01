@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Variable type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Variable{}
+
 // Variable struct for Variable
 type Variable struct {
 	Key          *string `json:"key,omitempty"`
@@ -39,7 +42,7 @@ func NewVariableWithDefaults() *Variable {
 
 // GetKey returns the Key field value if set, zero value otherwise.
 func (o *Variable) GetKey() string {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *Variable) GetKey() string {
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Variable) GetKeyOk() (*string, bool) {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		return nil, false
 	}
 	return o.Key, true
@@ -57,7 +60,7 @@ func (o *Variable) GetKeyOk() (*string, bool) {
 
 // HasKey returns a boolean if a field has been set.
 func (o *Variable) HasKey() bool {
-	if o != nil && o.Key != nil {
+	if o != nil && !isNil(o.Key) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *Variable) SetKey(v string) {
 
 // GetDefaultValue returns the DefaultValue field value if set, zero value otherwise.
 func (o *Variable) GetDefaultValue() string {
-	if o == nil || o.DefaultValue == nil {
+	if o == nil || isNil(o.DefaultValue) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *Variable) GetDefaultValue() string {
 // GetDefaultValueOk returns a tuple with the DefaultValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Variable) GetDefaultValueOk() (*string, bool) {
-	if o == nil || o.DefaultValue == nil {
+	if o == nil || isNil(o.DefaultValue) {
 		return nil, false
 	}
 	return o.DefaultValue, true
@@ -89,7 +92,7 @@ func (o *Variable) GetDefaultValueOk() (*string, bool) {
 
 // HasDefaultValue returns a boolean if a field has been set.
 func (o *Variable) HasDefaultValue() bool {
-	if o != nil && o.DefaultValue != nil {
+	if o != nil && !isNil(o.DefaultValue) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *Variable) SetDefaultValue(v string) {
 }
 
 func (o Variable) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Key != nil {
-		toSerialize["key"] = o.Key
-	}
-	if o.DefaultValue != nil {
-		toSerialize["defaultValue"] = o.DefaultValue
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Variable) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Key) {
+		toSerialize["key"] = o.Key
+	}
+	if !isNil(o.DefaultValue) {
+		toSerialize["defaultValue"] = o.DefaultValue
+	}
+	return toSerialize, nil
 }
 
 type NullableVariable struct {

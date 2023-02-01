@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the Transaction type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Transaction{}
+
 // Transaction struct for Transaction
 type Transaction struct {
 	Id          *string `json:"id,omitempty"`
@@ -46,7 +49,7 @@ func NewTransactionWithDefaults() *Transaction {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *Transaction) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -56,7 +59,7 @@ func (o *Transaction) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -64,7 +67,7 @@ func (o *Transaction) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *Transaction) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -78,7 +81,7 @@ func (o *Transaction) SetId(v string) {
 
 // GetName returns the Name field value if set, zero value otherwise.
 func (o *Transaction) GetName() string {
-	if o == nil || o.Name == nil {
+	if o == nil || isNil(o.Name) {
 		var ret string
 		return ret
 	}
@@ -88,7 +91,7 @@ func (o *Transaction) GetName() string {
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetNameOk() (*string, bool) {
-	if o == nil || o.Name == nil {
+	if o == nil || isNil(o.Name) {
 		return nil, false
 	}
 	return o.Name, true
@@ -96,7 +99,7 @@ func (o *Transaction) GetNameOk() (*string, bool) {
 
 // HasName returns a boolean if a field has been set.
 func (o *Transaction) HasName() bool {
-	if o != nil && o.Name != nil {
+	if o != nil && !isNil(o.Name) {
 		return true
 	}
 
@@ -110,7 +113,7 @@ func (o *Transaction) SetName(v string) {
 
 // GetDescription returns the Description field value if set, zero value otherwise.
 func (o *Transaction) GetDescription() string {
-	if o == nil || o.Description == nil {
+	if o == nil || isNil(o.Description) {
 		var ret string
 		return ret
 	}
@@ -120,7 +123,7 @@ func (o *Transaction) GetDescription() string {
 // GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetDescriptionOk() (*string, bool) {
-	if o == nil || o.Description == nil {
+	if o == nil || isNil(o.Description) {
 		return nil, false
 	}
 	return o.Description, true
@@ -128,7 +131,7 @@ func (o *Transaction) GetDescriptionOk() (*string, bool) {
 
 // HasDescription returns a boolean if a field has been set.
 func (o *Transaction) HasDescription() bool {
-	if o != nil && o.Description != nil {
+	if o != nil && !isNil(o.Description) {
 		return true
 	}
 
@@ -142,7 +145,7 @@ func (o *Transaction) SetDescription(v string) {
 
 // GetVersion returns the Version field value if set, zero value otherwise.
 func (o *Transaction) GetVersion() int32 {
-	if o == nil || o.Version == nil {
+	if o == nil || isNil(o.Version) {
 		var ret int32
 		return ret
 	}
@@ -152,7 +155,7 @@ func (o *Transaction) GetVersion() int32 {
 // GetVersionOk returns a tuple with the Version field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetVersionOk() (*int32, bool) {
-	if o == nil || o.Version == nil {
+	if o == nil || isNil(o.Version) {
 		return nil, false
 	}
 	return o.Version, true
@@ -160,7 +163,7 @@ func (o *Transaction) GetVersionOk() (*int32, bool) {
 
 // HasVersion returns a boolean if a field has been set.
 func (o *Transaction) HasVersion() bool {
-	if o != nil && o.Version != nil {
+	if o != nil && !isNil(o.Version) {
 		return true
 	}
 
@@ -174,7 +177,7 @@ func (o *Transaction) SetVersion(v int32) {
 
 // GetSteps returns the Steps field value if set, zero value otherwise.
 func (o *Transaction) GetSteps() []Test {
-	if o == nil || o.Steps == nil {
+	if o == nil || isNil(o.Steps) {
 		var ret []Test
 		return ret
 	}
@@ -184,7 +187,7 @@ func (o *Transaction) GetSteps() []Test {
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetStepsOk() ([]Test, bool) {
-	if o == nil || o.Steps == nil {
+	if o == nil || isNil(o.Steps) {
 		return nil, false
 	}
 	return o.Steps, true
@@ -192,7 +195,7 @@ func (o *Transaction) GetStepsOk() ([]Test, bool) {
 
 // HasSteps returns a boolean if a field has been set.
 func (o *Transaction) HasSteps() bool {
-	if o != nil && o.Steps != nil {
+	if o != nil && !isNil(o.Steps) {
 		return true
 	}
 
@@ -206,7 +209,7 @@ func (o *Transaction) SetSteps(v []Test) {
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *Transaction) GetCreatedAt() time.Time {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -216,7 +219,7 @@ func (o *Transaction) GetCreatedAt() time.Time {
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		return nil, false
 	}
 	return o.CreatedAt, true
@@ -224,7 +227,7 @@ func (o *Transaction) GetCreatedAtOk() (*time.Time, bool) {
 
 // HasCreatedAt returns a boolean if a field has been set.
 func (o *Transaction) HasCreatedAt() bool {
-	if o != nil && o.CreatedAt != nil {
+	if o != nil && !isNil(o.CreatedAt) {
 		return true
 	}
 
@@ -238,7 +241,7 @@ func (o *Transaction) SetCreatedAt(v time.Time) {
 
 // GetSummary returns the Summary field value if set, zero value otherwise.
 func (o *Transaction) GetSummary() TestSummary {
-	if o == nil || o.Summary == nil {
+	if o == nil || isNil(o.Summary) {
 		var ret TestSummary
 		return ret
 	}
@@ -248,7 +251,7 @@ func (o *Transaction) GetSummary() TestSummary {
 // GetSummaryOk returns a tuple with the Summary field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Transaction) GetSummaryOk() (*TestSummary, bool) {
-	if o == nil || o.Summary == nil {
+	if o == nil || isNil(o.Summary) {
 		return nil, false
 	}
 	return o.Summary, true
@@ -256,7 +259,7 @@ func (o *Transaction) GetSummaryOk() (*TestSummary, bool) {
 
 // HasSummary returns a boolean if a field has been set.
 func (o *Transaction) HasSummary() bool {
-	if o != nil && o.Summary != nil {
+	if o != nil && !isNil(o.Summary) {
 		return true
 	}
 
@@ -269,29 +272,35 @@ func (o *Transaction) SetSummary(v TestSummary) {
 }
 
 func (o Transaction) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.Name != nil {
-		toSerialize["name"] = o.Name
-	}
-	if o.Description != nil {
-		toSerialize["description"] = o.Description
-	}
-	if o.Version != nil {
-		toSerialize["version"] = o.Version
-	}
-	if o.Steps != nil {
-		toSerialize["steps"] = o.Steps
-	}
-	if o.CreatedAt != nil {
-		toSerialize["createdAt"] = o.CreatedAt
-	}
-	if o.Summary != nil {
-		toSerialize["summary"] = o.Summary
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Transaction) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	// skip: id is readOnly
+	if !isNil(o.Name) {
+		toSerialize["name"] = o.Name
+	}
+	if !isNil(o.Description) {
+		toSerialize["description"] = o.Description
+	}
+	if !isNil(o.Version) {
+		toSerialize["version"] = o.Version
+	}
+	if !isNil(o.Steps) {
+		toSerialize["steps"] = o.Steps
+	}
+	if !isNil(o.CreatedAt) {
+		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if !isNil(o.Summary) {
+		toSerialize["summary"] = o.Summary
+	}
+	return toSerialize, nil
 }
 
 type NullableTransaction struct {

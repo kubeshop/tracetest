@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SelectedSpansResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SelectedSpansResult{}
+
 // SelectedSpansResult struct for SelectedSpansResult
 type SelectedSpansResult struct {
 	Selector *Selector `json:"selector,omitempty"`
@@ -39,7 +42,7 @@ func NewSelectedSpansResultWithDefaults() *SelectedSpansResult {
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
 func (o *SelectedSpansResult) GetSelector() Selector {
-	if o == nil || o.Selector == nil {
+	if o == nil || isNil(o.Selector) {
 		var ret Selector
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *SelectedSpansResult) GetSelector() Selector {
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SelectedSpansResult) GetSelectorOk() (*Selector, bool) {
-	if o == nil || o.Selector == nil {
+	if o == nil || isNil(o.Selector) {
 		return nil, false
 	}
 	return o.Selector, true
@@ -57,7 +60,7 @@ func (o *SelectedSpansResult) GetSelectorOk() (*Selector, bool) {
 
 // HasSelector returns a boolean if a field has been set.
 func (o *SelectedSpansResult) HasSelector() bool {
-	if o != nil && o.Selector != nil {
+	if o != nil && !isNil(o.Selector) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *SelectedSpansResult) SetSelector(v Selector) {
 
 // GetSpanIds returns the SpanIds field value if set, zero value otherwise.
 func (o *SelectedSpansResult) GetSpanIds() []string {
-	if o == nil || o.SpanIds == nil {
+	if o == nil || isNil(o.SpanIds) {
 		var ret []string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *SelectedSpansResult) GetSpanIds() []string {
 // GetSpanIdsOk returns a tuple with the SpanIds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SelectedSpansResult) GetSpanIdsOk() ([]string, bool) {
-	if o == nil || o.SpanIds == nil {
+	if o == nil || isNil(o.SpanIds) {
 		return nil, false
 	}
 	return o.SpanIds, true
@@ -89,7 +92,7 @@ func (o *SelectedSpansResult) GetSpanIdsOk() ([]string, bool) {
 
 // HasSpanIds returns a boolean if a field has been set.
 func (o *SelectedSpansResult) HasSpanIds() bool {
-	if o != nil && o.SpanIds != nil {
+	if o != nil && !isNil(o.SpanIds) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *SelectedSpansResult) SetSpanIds(v []string) {
 }
 
 func (o SelectedSpansResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Selector != nil {
-		toSerialize["selector"] = o.Selector
-	}
-	if o.SpanIds != nil {
-		toSerialize["spanIds"] = o.SpanIds
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o SelectedSpansResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Selector) {
+		toSerialize["selector"] = o.Selector
+	}
+	if !isNil(o.SpanIds) {
+		toSerialize["spanIds"] = o.SpanIds
+	}
+	return toSerialize, nil
 }
 
 type NullableSelectedSpansResult struct {

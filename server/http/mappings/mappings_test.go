@@ -17,7 +17,7 @@ func strp(in string) *string {
 
 func TestSpecOrder(t *testing.T) {
 	input := openapi.TestSpecs{
-		Specs: []openapi.TestSpecsSpecs{
+		Specs: []openapi.TestSpecsSpecsInner{
 			{
 				Name: strp("name 1"),
 				Selector: openapi.Selector{
@@ -78,7 +78,7 @@ func TestSpecOrder(t *testing.T) {
 
 func TestResultsOrder(t *testing.T) {
 	input := openapi.AssertionResults{
-		Results: []openapi.AssertionResultsResults{
+		Results: []openapi.AssertionResultsResultsInner{
 			{
 				Selector: openapi.Selector{
 					Query: "selector 1",

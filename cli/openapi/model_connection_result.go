@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ConnectionResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ConnectionResult{}
+
 // ConnectionResult struct for ConnectionResult
 type ConnectionResult struct {
 	Connectivity   *ConnectionTestStep `json:"connectivity,omitempty"`
@@ -40,7 +43,7 @@ func NewConnectionResultWithDefaults() *ConnectionResult {
 
 // GetConnectivity returns the Connectivity field value if set, zero value otherwise.
 func (o *ConnectionResult) GetConnectivity() ConnectionTestStep {
-	if o == nil || o.Connectivity == nil {
+	if o == nil || isNil(o.Connectivity) {
 		var ret ConnectionTestStep
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *ConnectionResult) GetConnectivity() ConnectionTestStep {
 // GetConnectivityOk returns a tuple with the Connectivity field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ConnectionResult) GetConnectivityOk() (*ConnectionTestStep, bool) {
-	if o == nil || o.Connectivity == nil {
+	if o == nil || isNil(o.Connectivity) {
 		return nil, false
 	}
 	return o.Connectivity, true
@@ -58,7 +61,7 @@ func (o *ConnectionResult) GetConnectivityOk() (*ConnectionTestStep, bool) {
 
 // HasConnectivity returns a boolean if a field has been set.
 func (o *ConnectionResult) HasConnectivity() bool {
-	if o != nil && o.Connectivity != nil {
+	if o != nil && !isNil(o.Connectivity) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *ConnectionResult) SetConnectivity(v ConnectionTestStep) {
 
 // GetAuthentication returns the Authentication field value if set, zero value otherwise.
 func (o *ConnectionResult) GetAuthentication() ConnectionTestStep {
-	if o == nil || o.Authentication == nil {
+	if o == nil || isNil(o.Authentication) {
 		var ret ConnectionTestStep
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *ConnectionResult) GetAuthentication() ConnectionTestStep {
 // GetAuthenticationOk returns a tuple with the Authentication field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ConnectionResult) GetAuthenticationOk() (*ConnectionTestStep, bool) {
-	if o == nil || o.Authentication == nil {
+	if o == nil || isNil(o.Authentication) {
 		return nil, false
 	}
 	return o.Authentication, true
@@ -90,7 +93,7 @@ func (o *ConnectionResult) GetAuthenticationOk() (*ConnectionTestStep, bool) {
 
 // HasAuthentication returns a boolean if a field has been set.
 func (o *ConnectionResult) HasAuthentication() bool {
-	if o != nil && o.Authentication != nil {
+	if o != nil && !isNil(o.Authentication) {
 		return true
 	}
 
@@ -104,7 +107,7 @@ func (o *ConnectionResult) SetAuthentication(v ConnectionTestStep) {
 
 // GetFetchTraces returns the FetchTraces field value if set, zero value otherwise.
 func (o *ConnectionResult) GetFetchTraces() ConnectionTestStep {
-	if o == nil || o.FetchTraces == nil {
+	if o == nil || isNil(o.FetchTraces) {
 		var ret ConnectionTestStep
 		return ret
 	}
@@ -114,7 +117,7 @@ func (o *ConnectionResult) GetFetchTraces() ConnectionTestStep {
 // GetFetchTracesOk returns a tuple with the FetchTraces field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ConnectionResult) GetFetchTracesOk() (*ConnectionTestStep, bool) {
-	if o == nil || o.FetchTraces == nil {
+	if o == nil || isNil(o.FetchTraces) {
 		return nil, false
 	}
 	return o.FetchTraces, true
@@ -122,7 +125,7 @@ func (o *ConnectionResult) GetFetchTracesOk() (*ConnectionTestStep, bool) {
 
 // HasFetchTraces returns a boolean if a field has been set.
 func (o *ConnectionResult) HasFetchTraces() bool {
-	if o != nil && o.FetchTraces != nil {
+	if o != nil && !isNil(o.FetchTraces) {
 		return true
 	}
 
@@ -135,17 +138,25 @@ func (o *ConnectionResult) SetFetchTraces(v ConnectionTestStep) {
 }
 
 func (o ConnectionResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Connectivity != nil {
-		toSerialize["connectivity"] = o.Connectivity
-	}
-	if o.Authentication != nil {
-		toSerialize["authentication"] = o.Authentication
-	}
-	if o.FetchTraces != nil {
-		toSerialize["fetchTraces"] = o.FetchTraces
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ConnectionResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Connectivity) {
+		toSerialize["connectivity"] = o.Connectivity
+	}
+	if !isNil(o.Authentication) {
+		toSerialize["authentication"] = o.Authentication
+	}
+	if !isNil(o.FetchTraces) {
+		toSerialize["fetchTraces"] = o.FetchTraces
+	}
+	return toSerialize, nil
 }
 
 type NullableConnectionResult struct {

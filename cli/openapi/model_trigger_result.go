@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TriggerResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TriggerResult{}
+
 // TriggerResult struct for TriggerResult
 type TriggerResult struct {
 	TriggerType   *string                     `json:"triggerType,omitempty"`
@@ -39,7 +42,7 @@ func NewTriggerResultWithDefaults() *TriggerResult {
 
 // GetTriggerType returns the TriggerType field value if set, zero value otherwise.
 func (o *TriggerResult) GetTriggerType() string {
-	if o == nil || o.TriggerType == nil {
+	if o == nil || isNil(o.TriggerType) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *TriggerResult) GetTriggerType() string {
 // GetTriggerTypeOk returns a tuple with the TriggerType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TriggerResult) GetTriggerTypeOk() (*string, bool) {
-	if o == nil || o.TriggerType == nil {
+	if o == nil || isNil(o.TriggerType) {
 		return nil, false
 	}
 	return o.TriggerType, true
@@ -57,7 +60,7 @@ func (o *TriggerResult) GetTriggerTypeOk() (*string, bool) {
 
 // HasTriggerType returns a boolean if a field has been set.
 func (o *TriggerResult) HasTriggerType() bool {
-	if o != nil && o.TriggerType != nil {
+	if o != nil && !isNil(o.TriggerType) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *TriggerResult) SetTriggerType(v string) {
 
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
 func (o *TriggerResult) GetTriggerResult() TriggerResultTriggerResult {
-	if o == nil || o.TriggerResult == nil {
+	if o == nil || isNil(o.TriggerResult) {
 		var ret TriggerResultTriggerResult
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *TriggerResult) GetTriggerResult() TriggerResultTriggerResult {
 // GetTriggerResultOk returns a tuple with the TriggerResult field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TriggerResult) GetTriggerResultOk() (*TriggerResultTriggerResult, bool) {
-	if o == nil || o.TriggerResult == nil {
+	if o == nil || isNil(o.TriggerResult) {
 		return nil, false
 	}
 	return o.TriggerResult, true
@@ -89,7 +92,7 @@ func (o *TriggerResult) GetTriggerResultOk() (*TriggerResultTriggerResult, bool)
 
 // HasTriggerResult returns a boolean if a field has been set.
 func (o *TriggerResult) HasTriggerResult() bool {
-	if o != nil && o.TriggerResult != nil {
+	if o != nil && !isNil(o.TriggerResult) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *TriggerResult) SetTriggerResult(v TriggerResultTriggerResult) {
 }
 
 func (o TriggerResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.TriggerType != nil {
-		toSerialize["triggerType"] = o.TriggerType
-	}
-	if o.TriggerResult != nil {
-		toSerialize["triggerResult"] = o.TriggerResult
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TriggerResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.TriggerType) {
+		toSerialize["triggerType"] = o.TriggerType
+	}
+	if !isNil(o.TriggerResult) {
+		toSerialize["triggerResult"] = o.TriggerResult
+	}
+	return toSerialize, nil
 }
 
 type NullableTriggerResult struct {

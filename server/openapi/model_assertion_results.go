@@ -12,13 +12,13 @@ package openapi
 type AssertionResults struct {
 	AllPassed bool `json:"allPassed,omitempty"`
 
-	Results []AssertionResultsResults `json:"results,omitempty"`
+	Results []AssertionResultsResultsInner `json:"results,omitempty"`
 }
 
 // AssertAssertionResultsRequired checks if the required fields are not zero-ed
 func AssertAssertionResultsRequired(obj AssertionResults) error {
 	for _, el := range obj.Results {
-		if err := AssertAssertionResultsResultsRequired(el); err != nil {
+		if err := AssertAssertionResultsResultsInnerRequired(el); err != nil {
 			return err
 		}
 	}

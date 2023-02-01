@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the UpsertDefinitionResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &UpsertDefinitionResponse{}
+
 // UpsertDefinitionResponse struct for UpsertDefinitionResponse
 type UpsertDefinitionResponse struct {
 	// resource ID
@@ -41,7 +44,7 @@ func NewUpsertDefinitionResponseWithDefaults() *UpsertDefinitionResponse {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *UpsertDefinitionResponse) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *UpsertDefinitionResponse) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *UpsertDefinitionResponse) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -59,7 +62,7 @@ func (o *UpsertDefinitionResponse) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *UpsertDefinitionResponse) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *UpsertDefinitionResponse) SetId(v string) {
 
 // GetType returns the Type field value if set, zero value otherwise.
 func (o *UpsertDefinitionResponse) GetType() string {
-	if o == nil || o.Type == nil {
+	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *UpsertDefinitionResponse) GetType() string {
 // GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *UpsertDefinitionResponse) GetTypeOk() (*string, bool) {
-	if o == nil || o.Type == nil {
+	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
 	return o.Type, true
@@ -91,7 +94,7 @@ func (o *UpsertDefinitionResponse) GetTypeOk() (*string, bool) {
 
 // HasType returns a boolean if a field has been set.
 func (o *UpsertDefinitionResponse) HasType() bool {
-	if o != nil && o.Type != nil {
+	if o != nil && !isNil(o.Type) {
 		return true
 	}
 
@@ -104,14 +107,22 @@ func (o *UpsertDefinitionResponse) SetType(v string) {
 }
 
 func (o UpsertDefinitionResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.Type != nil {
-		toSerialize["type"] = o.Type
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o UpsertDefinitionResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
+	}
+	return toSerialize, nil
 }
 
 type NullableUpsertDefinitionResponse struct {

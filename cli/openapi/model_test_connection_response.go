@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TestConnectionResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestConnectionResponse{}
+
 // TestConnectionResponse struct for TestConnectionResponse
 type TestConnectionResponse struct {
 	Successful *bool              `json:"successful,omitempty"`
@@ -39,7 +42,7 @@ func NewTestConnectionResponseWithDefaults() *TestConnectionResponse {
 
 // GetSuccessful returns the Successful field value if set, zero value otherwise.
 func (o *TestConnectionResponse) GetSuccessful() bool {
-	if o == nil || o.Successful == nil {
+	if o == nil || isNil(o.Successful) {
 		var ret bool
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *TestConnectionResponse) GetSuccessful() bool {
 // GetSuccessfulOk returns a tuple with the Successful field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestConnectionResponse) GetSuccessfulOk() (*bool, bool) {
-	if o == nil || o.Successful == nil {
+	if o == nil || isNil(o.Successful) {
 		return nil, false
 	}
 	return o.Successful, true
@@ -57,7 +60,7 @@ func (o *TestConnectionResponse) GetSuccessfulOk() (*bool, bool) {
 
 // HasSuccessful returns a boolean if a field has been set.
 func (o *TestConnectionResponse) HasSuccessful() bool {
-	if o != nil && o.Successful != nil {
+	if o != nil && !isNil(o.Successful) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *TestConnectionResponse) SetSuccessful(v bool) {
 
 // GetSteps returns the Steps field value if set, zero value otherwise.
 func (o *TestConnectionResponse) GetSteps() []ConnectionResult {
-	if o == nil || o.Steps == nil {
+	if o == nil || isNil(o.Steps) {
 		var ret []ConnectionResult
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *TestConnectionResponse) GetSteps() []ConnectionResult {
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestConnectionResponse) GetStepsOk() ([]ConnectionResult, bool) {
-	if o == nil || o.Steps == nil {
+	if o == nil || isNil(o.Steps) {
 		return nil, false
 	}
 	return o.Steps, true
@@ -89,7 +92,7 @@ func (o *TestConnectionResponse) GetStepsOk() ([]ConnectionResult, bool) {
 
 // HasSteps returns a boolean if a field has been set.
 func (o *TestConnectionResponse) HasSteps() bool {
-	if o != nil && o.Steps != nil {
+	if o != nil && !isNil(o.Steps) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *TestConnectionResponse) SetSteps(v []ConnectionResult) {
 }
 
 func (o TestConnectionResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Successful != nil {
-		toSerialize["successful"] = o.Successful
-	}
-	if o.Steps != nil {
-		toSerialize["steps"] = o.Steps
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TestConnectionResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Successful) {
+		toSerialize["successful"] = o.Successful
+	}
+	if !isNil(o.Steps) {
+		toSerialize["steps"] = o.Steps
+	}
+	return toSerialize, nil
 }
 
 type NullableTestConnectionResponse struct {

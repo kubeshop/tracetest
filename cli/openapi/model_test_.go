@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the Test type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Test{}
+
 // Test struct for Test
 type Test struct {
 	Id          *string `json:"id,omitempty"`
@@ -49,7 +52,7 @@ func NewTestWithDefaults() *Test {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *Test) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -59,7 +62,7 @@ func (o *Test) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -67,7 +70,7 @@ func (o *Test) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *Test) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -81,7 +84,7 @@ func (o *Test) SetId(v string) {
 
 // GetName returns the Name field value if set, zero value otherwise.
 func (o *Test) GetName() string {
-	if o == nil || o.Name == nil {
+	if o == nil || isNil(o.Name) {
 		var ret string
 		return ret
 	}
@@ -91,7 +94,7 @@ func (o *Test) GetName() string {
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetNameOk() (*string, bool) {
-	if o == nil || o.Name == nil {
+	if o == nil || isNil(o.Name) {
 		return nil, false
 	}
 	return o.Name, true
@@ -99,7 +102,7 @@ func (o *Test) GetNameOk() (*string, bool) {
 
 // HasName returns a boolean if a field has been set.
 func (o *Test) HasName() bool {
-	if o != nil && o.Name != nil {
+	if o != nil && !isNil(o.Name) {
 		return true
 	}
 
@@ -113,7 +116,7 @@ func (o *Test) SetName(v string) {
 
 // GetDescription returns the Description field value if set, zero value otherwise.
 func (o *Test) GetDescription() string {
-	if o == nil || o.Description == nil {
+	if o == nil || isNil(o.Description) {
 		var ret string
 		return ret
 	}
@@ -123,7 +126,7 @@ func (o *Test) GetDescription() string {
 // GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetDescriptionOk() (*string, bool) {
-	if o == nil || o.Description == nil {
+	if o == nil || isNil(o.Description) {
 		return nil, false
 	}
 	return o.Description, true
@@ -131,7 +134,7 @@ func (o *Test) GetDescriptionOk() (*string, bool) {
 
 // HasDescription returns a boolean if a field has been set.
 func (o *Test) HasDescription() bool {
-	if o != nil && o.Description != nil {
+	if o != nil && !isNil(o.Description) {
 		return true
 	}
 
@@ -145,7 +148,7 @@ func (o *Test) SetDescription(v string) {
 
 // GetVersion returns the Version field value if set, zero value otherwise.
 func (o *Test) GetVersion() int32 {
-	if o == nil || o.Version == nil {
+	if o == nil || isNil(o.Version) {
 		var ret int32
 		return ret
 	}
@@ -155,7 +158,7 @@ func (o *Test) GetVersion() int32 {
 // GetVersionOk returns a tuple with the Version field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetVersionOk() (*int32, bool) {
-	if o == nil || o.Version == nil {
+	if o == nil || isNil(o.Version) {
 		return nil, false
 	}
 	return o.Version, true
@@ -163,7 +166,7 @@ func (o *Test) GetVersionOk() (*int32, bool) {
 
 // HasVersion returns a boolean if a field has been set.
 func (o *Test) HasVersion() bool {
-	if o != nil && o.Version != nil {
+	if o != nil && !isNil(o.Version) {
 		return true
 	}
 
@@ -177,7 +180,7 @@ func (o *Test) SetVersion(v int32) {
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *Test) GetCreatedAt() time.Time {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -187,7 +190,7 @@ func (o *Test) GetCreatedAt() time.Time {
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		return nil, false
 	}
 	return o.CreatedAt, true
@@ -195,7 +198,7 @@ func (o *Test) GetCreatedAtOk() (*time.Time, bool) {
 
 // HasCreatedAt returns a boolean if a field has been set.
 func (o *Test) HasCreatedAt() bool {
-	if o != nil && o.CreatedAt != nil {
+	if o != nil && !isNil(o.CreatedAt) {
 		return true
 	}
 
@@ -209,7 +212,7 @@ func (o *Test) SetCreatedAt(v time.Time) {
 
 // GetServiceUnderTest returns the ServiceUnderTest field value if set, zero value otherwise.
 func (o *Test) GetServiceUnderTest() Trigger {
-	if o == nil || o.ServiceUnderTest == nil {
+	if o == nil || isNil(o.ServiceUnderTest) {
 		var ret Trigger
 		return ret
 	}
@@ -219,7 +222,7 @@ func (o *Test) GetServiceUnderTest() Trigger {
 // GetServiceUnderTestOk returns a tuple with the ServiceUnderTest field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetServiceUnderTestOk() (*Trigger, bool) {
-	if o == nil || o.ServiceUnderTest == nil {
+	if o == nil || isNil(o.ServiceUnderTest) {
 		return nil, false
 	}
 	return o.ServiceUnderTest, true
@@ -227,7 +230,7 @@ func (o *Test) GetServiceUnderTestOk() (*Trigger, bool) {
 
 // HasServiceUnderTest returns a boolean if a field has been set.
 func (o *Test) HasServiceUnderTest() bool {
-	if o != nil && o.ServiceUnderTest != nil {
+	if o != nil && !isNil(o.ServiceUnderTest) {
 		return true
 	}
 
@@ -241,7 +244,7 @@ func (o *Test) SetServiceUnderTest(v Trigger) {
 
 // GetSpecs returns the Specs field value if set, zero value otherwise.
 func (o *Test) GetSpecs() TestSpecs {
-	if o == nil || o.Specs == nil {
+	if o == nil || isNil(o.Specs) {
 		var ret TestSpecs
 		return ret
 	}
@@ -251,7 +254,7 @@ func (o *Test) GetSpecs() TestSpecs {
 // GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetSpecsOk() (*TestSpecs, bool) {
-	if o == nil || o.Specs == nil {
+	if o == nil || isNil(o.Specs) {
 		return nil, false
 	}
 	return o.Specs, true
@@ -259,7 +262,7 @@ func (o *Test) GetSpecsOk() (*TestSpecs, bool) {
 
 // HasSpecs returns a boolean if a field has been set.
 func (o *Test) HasSpecs() bool {
-	if o != nil && o.Specs != nil {
+	if o != nil && !isNil(o.Specs) {
 		return true
 	}
 
@@ -273,7 +276,7 @@ func (o *Test) SetSpecs(v TestSpecs) {
 
 // GetOutputs returns the Outputs field value if set, zero value otherwise.
 func (o *Test) GetOutputs() []TestOutput {
-	if o == nil || o.Outputs == nil {
+	if o == nil || isNil(o.Outputs) {
 		var ret []TestOutput
 		return ret
 	}
@@ -283,7 +286,7 @@ func (o *Test) GetOutputs() []TestOutput {
 // GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetOutputsOk() ([]TestOutput, bool) {
-	if o == nil || o.Outputs == nil {
+	if o == nil || isNil(o.Outputs) {
 		return nil, false
 	}
 	return o.Outputs, true
@@ -291,7 +294,7 @@ func (o *Test) GetOutputsOk() ([]TestOutput, bool) {
 
 // HasOutputs returns a boolean if a field has been set.
 func (o *Test) HasOutputs() bool {
-	if o != nil && o.Outputs != nil {
+	if o != nil && !isNil(o.Outputs) {
 		return true
 	}
 
@@ -305,7 +308,7 @@ func (o *Test) SetOutputs(v []TestOutput) {
 
 // GetSummary returns the Summary field value if set, zero value otherwise.
 func (o *Test) GetSummary() TestSummary {
-	if o == nil || o.Summary == nil {
+	if o == nil || isNil(o.Summary) {
 		var ret TestSummary
 		return ret
 	}
@@ -315,7 +318,7 @@ func (o *Test) GetSummary() TestSummary {
 // GetSummaryOk returns a tuple with the Summary field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Test) GetSummaryOk() (*TestSummary, bool) {
-	if o == nil || o.Summary == nil {
+	if o == nil || isNil(o.Summary) {
 		return nil, false
 	}
 	return o.Summary, true
@@ -323,7 +326,7 @@ func (o *Test) GetSummaryOk() (*TestSummary, bool) {
 
 // HasSummary returns a boolean if a field has been set.
 func (o *Test) HasSummary() bool {
-	if o != nil && o.Summary != nil {
+	if o != nil && !isNil(o.Summary) {
 		return true
 	}
 
@@ -336,35 +339,41 @@ func (o *Test) SetSummary(v TestSummary) {
 }
 
 func (o Test) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.Name != nil {
-		toSerialize["name"] = o.Name
-	}
-	if o.Description != nil {
-		toSerialize["description"] = o.Description
-	}
-	if o.Version != nil {
-		toSerialize["version"] = o.Version
-	}
-	if o.CreatedAt != nil {
-		toSerialize["createdAt"] = o.CreatedAt
-	}
-	if o.ServiceUnderTest != nil {
-		toSerialize["serviceUnderTest"] = o.ServiceUnderTest
-	}
-	if o.Specs != nil {
-		toSerialize["specs"] = o.Specs
-	}
-	if o.Outputs != nil {
-		toSerialize["outputs"] = o.Outputs
-	}
-	if o.Summary != nil {
-		toSerialize["summary"] = o.Summary
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Test) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	// skip: id is readOnly
+	if !isNil(o.Name) {
+		toSerialize["name"] = o.Name
+	}
+	if !isNil(o.Description) {
+		toSerialize["description"] = o.Description
+	}
+	if !isNil(o.Version) {
+		toSerialize["version"] = o.Version
+	}
+	if !isNil(o.CreatedAt) {
+		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if !isNil(o.ServiceUnderTest) {
+		toSerialize["serviceUnderTest"] = o.ServiceUnderTest
+	}
+	if !isNil(o.Specs) {
+		toSerialize["specs"] = o.Specs
+	}
+	if !isNil(o.Outputs) {
+		toSerialize["outputs"] = o.Outputs
+	}
+	if !isNil(o.Summary) {
+		toSerialize["summary"] = o.Summary
+	}
+	return toSerialize, nil
 }
 
 type NullableTest struct {

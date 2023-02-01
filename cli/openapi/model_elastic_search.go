@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ElasticSearch type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ElasticSearch{}
+
 // ElasticSearch struct for ElasticSearch
 type ElasticSearch struct {
 	Addresses          []string `json:"addresses,omitempty"`
@@ -43,7 +46,7 @@ func NewElasticSearchWithDefaults() *ElasticSearch {
 
 // GetAddresses returns the Addresses field value if set, zero value otherwise.
 func (o *ElasticSearch) GetAddresses() []string {
-	if o == nil || o.Addresses == nil {
+	if o == nil || isNil(o.Addresses) {
 		var ret []string
 		return ret
 	}
@@ -53,7 +56,7 @@ func (o *ElasticSearch) GetAddresses() []string {
 // GetAddressesOk returns a tuple with the Addresses field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ElasticSearch) GetAddressesOk() ([]string, bool) {
-	if o == nil || o.Addresses == nil {
+	if o == nil || isNil(o.Addresses) {
 		return nil, false
 	}
 	return o.Addresses, true
@@ -61,7 +64,7 @@ func (o *ElasticSearch) GetAddressesOk() ([]string, bool) {
 
 // HasAddresses returns a boolean if a field has been set.
 func (o *ElasticSearch) HasAddresses() bool {
-	if o != nil && o.Addresses != nil {
+	if o != nil && !isNil(o.Addresses) {
 		return true
 	}
 
@@ -75,7 +78,7 @@ func (o *ElasticSearch) SetAddresses(v []string) {
 
 // GetUsername returns the Username field value if set, zero value otherwise.
 func (o *ElasticSearch) GetUsername() string {
-	if o == nil || o.Username == nil {
+	if o == nil || isNil(o.Username) {
 		var ret string
 		return ret
 	}
@@ -85,7 +88,7 @@ func (o *ElasticSearch) GetUsername() string {
 // GetUsernameOk returns a tuple with the Username field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ElasticSearch) GetUsernameOk() (*string, bool) {
-	if o == nil || o.Username == nil {
+	if o == nil || isNil(o.Username) {
 		return nil, false
 	}
 	return o.Username, true
@@ -93,7 +96,7 @@ func (o *ElasticSearch) GetUsernameOk() (*string, bool) {
 
 // HasUsername returns a boolean if a field has been set.
 func (o *ElasticSearch) HasUsername() bool {
-	if o != nil && o.Username != nil {
+	if o != nil && !isNil(o.Username) {
 		return true
 	}
 
@@ -107,7 +110,7 @@ func (o *ElasticSearch) SetUsername(v string) {
 
 // GetPassword returns the Password field value if set, zero value otherwise.
 func (o *ElasticSearch) GetPassword() string {
-	if o == nil || o.Password == nil {
+	if o == nil || isNil(o.Password) {
 		var ret string
 		return ret
 	}
@@ -117,7 +120,7 @@ func (o *ElasticSearch) GetPassword() string {
 // GetPasswordOk returns a tuple with the Password field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ElasticSearch) GetPasswordOk() (*string, bool) {
-	if o == nil || o.Password == nil {
+	if o == nil || isNil(o.Password) {
 		return nil, false
 	}
 	return o.Password, true
@@ -125,7 +128,7 @@ func (o *ElasticSearch) GetPasswordOk() (*string, bool) {
 
 // HasPassword returns a boolean if a field has been set.
 func (o *ElasticSearch) HasPassword() bool {
-	if o != nil && o.Password != nil {
+	if o != nil && !isNil(o.Password) {
 		return true
 	}
 
@@ -139,7 +142,7 @@ func (o *ElasticSearch) SetPassword(v string) {
 
 // GetIndex returns the Index field value if set, zero value otherwise.
 func (o *ElasticSearch) GetIndex() string {
-	if o == nil || o.Index == nil {
+	if o == nil || isNil(o.Index) {
 		var ret string
 		return ret
 	}
@@ -149,7 +152,7 @@ func (o *ElasticSearch) GetIndex() string {
 // GetIndexOk returns a tuple with the Index field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ElasticSearch) GetIndexOk() (*string, bool) {
-	if o == nil || o.Index == nil {
+	if o == nil || isNil(o.Index) {
 		return nil, false
 	}
 	return o.Index, true
@@ -157,7 +160,7 @@ func (o *ElasticSearch) GetIndexOk() (*string, bool) {
 
 // HasIndex returns a boolean if a field has been set.
 func (o *ElasticSearch) HasIndex() bool {
-	if o != nil && o.Index != nil {
+	if o != nil && !isNil(o.Index) {
 		return true
 	}
 
@@ -171,7 +174,7 @@ func (o *ElasticSearch) SetIndex(v string) {
 
 // GetCertificate returns the Certificate field value if set, zero value otherwise.
 func (o *ElasticSearch) GetCertificate() string {
-	if o == nil || o.Certificate == nil {
+	if o == nil || isNil(o.Certificate) {
 		var ret string
 		return ret
 	}
@@ -181,7 +184,7 @@ func (o *ElasticSearch) GetCertificate() string {
 // GetCertificateOk returns a tuple with the Certificate field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ElasticSearch) GetCertificateOk() (*string, bool) {
-	if o == nil || o.Certificate == nil {
+	if o == nil || isNil(o.Certificate) {
 		return nil, false
 	}
 	return o.Certificate, true
@@ -189,7 +192,7 @@ func (o *ElasticSearch) GetCertificateOk() (*string, bool) {
 
 // HasCertificate returns a boolean if a field has been set.
 func (o *ElasticSearch) HasCertificate() bool {
-	if o != nil && o.Certificate != nil {
+	if o != nil && !isNil(o.Certificate) {
 		return true
 	}
 
@@ -203,7 +206,7 @@ func (o *ElasticSearch) SetCertificate(v string) {
 
 // GetInsecureSkipVerify returns the InsecureSkipVerify field value if set, zero value otherwise.
 func (o *ElasticSearch) GetInsecureSkipVerify() bool {
-	if o == nil || o.InsecureSkipVerify == nil {
+	if o == nil || isNil(o.InsecureSkipVerify) {
 		var ret bool
 		return ret
 	}
@@ -213,7 +216,7 @@ func (o *ElasticSearch) GetInsecureSkipVerify() bool {
 // GetInsecureSkipVerifyOk returns a tuple with the InsecureSkipVerify field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ElasticSearch) GetInsecureSkipVerifyOk() (*bool, bool) {
-	if o == nil || o.InsecureSkipVerify == nil {
+	if o == nil || isNil(o.InsecureSkipVerify) {
 		return nil, false
 	}
 	return o.InsecureSkipVerify, true
@@ -221,7 +224,7 @@ func (o *ElasticSearch) GetInsecureSkipVerifyOk() (*bool, bool) {
 
 // HasInsecureSkipVerify returns a boolean if a field has been set.
 func (o *ElasticSearch) HasInsecureSkipVerify() bool {
-	if o != nil && o.InsecureSkipVerify != nil {
+	if o != nil && !isNil(o.InsecureSkipVerify) {
 		return true
 	}
 
@@ -234,26 +237,34 @@ func (o *ElasticSearch) SetInsecureSkipVerify(v bool) {
 }
 
 func (o ElasticSearch) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Addresses != nil {
-		toSerialize["addresses"] = o.Addresses
-	}
-	if o.Username != nil {
-		toSerialize["username"] = o.Username
-	}
-	if o.Password != nil {
-		toSerialize["password"] = o.Password
-	}
-	if o.Index != nil {
-		toSerialize["index"] = o.Index
-	}
-	if o.Certificate != nil {
-		toSerialize["certificate"] = o.Certificate
-	}
-	if o.InsecureSkipVerify != nil {
-		toSerialize["insecureSkipVerify"] = o.InsecureSkipVerify
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ElasticSearch) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Addresses) {
+		toSerialize["addresses"] = o.Addresses
+	}
+	if !isNil(o.Username) {
+		toSerialize["username"] = o.Username
+	}
+	if !isNil(o.Password) {
+		toSerialize["password"] = o.Password
+	}
+	if !isNil(o.Index) {
+		toSerialize["index"] = o.Index
+	}
+	if !isNil(o.Certificate) {
+		toSerialize["certificate"] = o.Certificate
+	}
+	if !isNil(o.InsecureSkipVerify) {
+		toSerialize["insecureSkipVerify"] = o.InsecureSkipVerify
+	}
+	return toSerialize, nil
 }
 
 type NullableElasticSearch struct {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the HTTPResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &HTTPResponse{}
+
 // HTTPResponse struct for HTTPResponse
 type HTTPResponse struct {
 	Status     *string      `json:"status,omitempty"`
@@ -41,7 +44,7 @@ func NewHTTPResponseWithDefaults() *HTTPResponse {
 
 // GetStatus returns the Status field value if set, zero value otherwise.
 func (o *HTTPResponse) GetStatus() string {
-	if o == nil || o.Status == nil {
+	if o == nil || isNil(o.Status) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *HTTPResponse) GetStatus() string {
 // GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPResponse) GetStatusOk() (*string, bool) {
-	if o == nil || o.Status == nil {
+	if o == nil || isNil(o.Status) {
 		return nil, false
 	}
 	return o.Status, true
@@ -59,7 +62,7 @@ func (o *HTTPResponse) GetStatusOk() (*string, bool) {
 
 // HasStatus returns a boolean if a field has been set.
 func (o *HTTPResponse) HasStatus() bool {
-	if o != nil && o.Status != nil {
+	if o != nil && !isNil(o.Status) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *HTTPResponse) SetStatus(v string) {
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
 func (o *HTTPResponse) GetStatusCode() int32 {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || isNil(o.StatusCode) {
 		var ret int32
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *HTTPResponse) GetStatusCode() int32 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPResponse) GetStatusCodeOk() (*int32, bool) {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || isNil(o.StatusCode) {
 		return nil, false
 	}
 	return o.StatusCode, true
@@ -91,7 +94,7 @@ func (o *HTTPResponse) GetStatusCodeOk() (*int32, bool) {
 
 // HasStatusCode returns a boolean if a field has been set.
 func (o *HTTPResponse) HasStatusCode() bool {
-	if o != nil && o.StatusCode != nil {
+	if o != nil && !isNil(o.StatusCode) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *HTTPResponse) SetStatusCode(v int32) {
 
 // GetHeaders returns the Headers field value if set, zero value otherwise.
 func (o *HTTPResponse) GetHeaders() []HTTPHeader {
-	if o == nil || o.Headers == nil {
+	if o == nil || isNil(o.Headers) {
 		var ret []HTTPHeader
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *HTTPResponse) GetHeaders() []HTTPHeader {
 // GetHeadersOk returns a tuple with the Headers field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPResponse) GetHeadersOk() ([]HTTPHeader, bool) {
-	if o == nil || o.Headers == nil {
+	if o == nil || isNil(o.Headers) {
 		return nil, false
 	}
 	return o.Headers, true
@@ -123,7 +126,7 @@ func (o *HTTPResponse) GetHeadersOk() ([]HTTPHeader, bool) {
 
 // HasHeaders returns a boolean if a field has been set.
 func (o *HTTPResponse) HasHeaders() bool {
-	if o != nil && o.Headers != nil {
+	if o != nil && !isNil(o.Headers) {
 		return true
 	}
 
@@ -137,7 +140,7 @@ func (o *HTTPResponse) SetHeaders(v []HTTPHeader) {
 
 // GetBody returns the Body field value if set, zero value otherwise.
 func (o *HTTPResponse) GetBody() string {
-	if o == nil || o.Body == nil {
+	if o == nil || isNil(o.Body) {
 		var ret string
 		return ret
 	}
@@ -147,7 +150,7 @@ func (o *HTTPResponse) GetBody() string {
 // GetBodyOk returns a tuple with the Body field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPResponse) GetBodyOk() (*string, bool) {
-	if o == nil || o.Body == nil {
+	if o == nil || isNil(o.Body) {
 		return nil, false
 	}
 	return o.Body, true
@@ -155,7 +158,7 @@ func (o *HTTPResponse) GetBodyOk() (*string, bool) {
 
 // HasBody returns a boolean if a field has been set.
 func (o *HTTPResponse) HasBody() bool {
-	if o != nil && o.Body != nil {
+	if o != nil && !isNil(o.Body) {
 		return true
 	}
 
@@ -168,20 +171,28 @@ func (o *HTTPResponse) SetBody(v string) {
 }
 
 func (o HTTPResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Status != nil {
-		toSerialize["status"] = o.Status
-	}
-	if o.StatusCode != nil {
-		toSerialize["statusCode"] = o.StatusCode
-	}
-	if o.Headers != nil {
-		toSerialize["headers"] = o.Headers
-	}
-	if o.Body != nil {
-		toSerialize["body"] = o.Body
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o HTTPResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Status) {
+		toSerialize["status"] = o.Status
+	}
+	if !isNil(o.StatusCode) {
+		toSerialize["statusCode"] = o.StatusCode
+	}
+	if !isNil(o.Headers) {
+		toSerialize["headers"] = o.Headers
+	}
+	if !isNil(o.Body) {
+		toSerialize["body"] = o.Body
+	}
+	return toSerialize, nil
 }
 
 type NullableHTTPResponse struct {

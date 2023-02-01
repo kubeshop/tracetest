@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TLS type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TLS{}
+
 // TLS struct for TLS
 type TLS struct {
 	Insecure           *bool       `json:"insecure,omitempty"`
@@ -41,7 +44,7 @@ func NewTLSWithDefaults() *TLS {
 
 // GetInsecure returns the Insecure field value if set, zero value otherwise.
 func (o *TLS) GetInsecure() bool {
-	if o == nil || o.Insecure == nil {
+	if o == nil || isNil(o.Insecure) {
 		var ret bool
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *TLS) GetInsecure() bool {
 // GetInsecureOk returns a tuple with the Insecure field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLS) GetInsecureOk() (*bool, bool) {
-	if o == nil || o.Insecure == nil {
+	if o == nil || isNil(o.Insecure) {
 		return nil, false
 	}
 	return o.Insecure, true
@@ -59,7 +62,7 @@ func (o *TLS) GetInsecureOk() (*bool, bool) {
 
 // HasInsecure returns a boolean if a field has been set.
 func (o *TLS) HasInsecure() bool {
-	if o != nil && o.Insecure != nil {
+	if o != nil && !isNil(o.Insecure) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *TLS) SetInsecure(v bool) {
 
 // GetInsecureSkipVerify returns the InsecureSkipVerify field value if set, zero value otherwise.
 func (o *TLS) GetInsecureSkipVerify() bool {
-	if o == nil || o.InsecureSkipVerify == nil {
+	if o == nil || isNil(o.InsecureSkipVerify) {
 		var ret bool
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *TLS) GetInsecureSkipVerify() bool {
 // GetInsecureSkipVerifyOk returns a tuple with the InsecureSkipVerify field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLS) GetInsecureSkipVerifyOk() (*bool, bool) {
-	if o == nil || o.InsecureSkipVerify == nil {
+	if o == nil || isNil(o.InsecureSkipVerify) {
 		return nil, false
 	}
 	return o.InsecureSkipVerify, true
@@ -91,7 +94,7 @@ func (o *TLS) GetInsecureSkipVerifyOk() (*bool, bool) {
 
 // HasInsecureSkipVerify returns a boolean if a field has been set.
 func (o *TLS) HasInsecureSkipVerify() bool {
-	if o != nil && o.InsecureSkipVerify != nil {
+	if o != nil && !isNil(o.InsecureSkipVerify) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *TLS) SetInsecureSkipVerify(v bool) {
 
 // GetServerName returns the ServerName field value if set, zero value otherwise.
 func (o *TLS) GetServerName() string {
-	if o == nil || o.ServerName == nil {
+	if o == nil || isNil(o.ServerName) {
 		var ret string
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *TLS) GetServerName() string {
 // GetServerNameOk returns a tuple with the ServerName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLS) GetServerNameOk() (*string, bool) {
-	if o == nil || o.ServerName == nil {
+	if o == nil || isNil(o.ServerName) {
 		return nil, false
 	}
 	return o.ServerName, true
@@ -123,7 +126,7 @@ func (o *TLS) GetServerNameOk() (*string, bool) {
 
 // HasServerName returns a boolean if a field has been set.
 func (o *TLS) HasServerName() bool {
-	if o != nil && o.ServerName != nil {
+	if o != nil && !isNil(o.ServerName) {
 		return true
 	}
 
@@ -137,7 +140,7 @@ func (o *TLS) SetServerName(v string) {
 
 // GetSettings returns the Settings field value if set, zero value otherwise.
 func (o *TLS) GetSettings() TLSSetting {
-	if o == nil || o.Settings == nil {
+	if o == nil || isNil(o.Settings) {
 		var ret TLSSetting
 		return ret
 	}
@@ -147,7 +150,7 @@ func (o *TLS) GetSettings() TLSSetting {
 // GetSettingsOk returns a tuple with the Settings field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TLS) GetSettingsOk() (*TLSSetting, bool) {
-	if o == nil || o.Settings == nil {
+	if o == nil || isNil(o.Settings) {
 		return nil, false
 	}
 	return o.Settings, true
@@ -155,7 +158,7 @@ func (o *TLS) GetSettingsOk() (*TLSSetting, bool) {
 
 // HasSettings returns a boolean if a field has been set.
 func (o *TLS) HasSettings() bool {
-	if o != nil && o.Settings != nil {
+	if o != nil && !isNil(o.Settings) {
 		return true
 	}
 
@@ -168,20 +171,28 @@ func (o *TLS) SetSettings(v TLSSetting) {
 }
 
 func (o TLS) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Insecure != nil {
-		toSerialize["insecure"] = o.Insecure
-	}
-	if o.InsecureSkipVerify != nil {
-		toSerialize["insecureSkipVerify"] = o.InsecureSkipVerify
-	}
-	if o.ServerName != nil {
-		toSerialize["serverName"] = o.ServerName
-	}
-	if o.Settings != nil {
-		toSerialize["settings"] = o.Settings
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TLS) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Insecure) {
+		toSerialize["insecure"] = o.Insecure
+	}
+	if !isNil(o.InsecureSkipVerify) {
+		toSerialize["insecureSkipVerify"] = o.InsecureSkipVerify
+	}
+	if !isNil(o.ServerName) {
+		toSerialize["serverName"] = o.ServerName
+	}
+	if !isNil(o.Settings) {
+		toSerialize["settings"] = o.Settings
+	}
+	return toSerialize, nil
 }
 
 type NullableTLS struct {

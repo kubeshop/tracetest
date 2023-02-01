@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the MissingVariablesError type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &MissingVariablesError{}
+
 // MissingVariablesError struct for MissingVariablesError
 type MissingVariablesError struct {
 	MissingVariables []MissingVariable `json:"missingVariables,omitempty"`
@@ -38,7 +41,7 @@ func NewMissingVariablesErrorWithDefaults() *MissingVariablesError {
 
 // GetMissingVariables returns the MissingVariables field value if set, zero value otherwise.
 func (o *MissingVariablesError) GetMissingVariables() []MissingVariable {
-	if o == nil || o.MissingVariables == nil {
+	if o == nil || isNil(o.MissingVariables) {
 		var ret []MissingVariable
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *MissingVariablesError) GetMissingVariables() []MissingVariable {
 // GetMissingVariablesOk returns a tuple with the MissingVariables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *MissingVariablesError) GetMissingVariablesOk() ([]MissingVariable, bool) {
-	if o == nil || o.MissingVariables == nil {
+	if o == nil || isNil(o.MissingVariables) {
 		return nil, false
 	}
 	return o.MissingVariables, true
@@ -56,7 +59,7 @@ func (o *MissingVariablesError) GetMissingVariablesOk() ([]MissingVariable, bool
 
 // HasMissingVariables returns a boolean if a field has been set.
 func (o *MissingVariablesError) HasMissingVariables() bool {
-	if o != nil && o.MissingVariables != nil {
+	if o != nil && !isNil(o.MissingVariables) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *MissingVariablesError) SetMissingVariables(v []MissingVariable) {
 }
 
 func (o MissingVariablesError) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.MissingVariables != nil {
-		toSerialize["missingVariables"] = o.MissingVariables
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o MissingVariablesError) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.MissingVariables) {
+		toSerialize["missingVariables"] = o.MissingVariables
+	}
+	return toSerialize, nil
 }
 
 type NullableMissingVariablesError struct {

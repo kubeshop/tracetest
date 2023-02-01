@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the TestSummaryLastRun type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestSummaryLastRun{}
+
 // TestSummaryLastRun struct for TestSummaryLastRun
 type TestSummaryLastRun struct {
 	Time   NullableTime `json:"time,omitempty"`
@@ -41,7 +44,7 @@ func NewTestSummaryLastRunWithDefaults() *TestSummaryLastRun {
 
 // GetTime returns the Time field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *TestSummaryLastRun) GetTime() time.Time {
-	if o == nil || o.Time.Get() == nil {
+	if o == nil || isNil(o.Time.Get()) {
 		var ret time.Time
 		return ret
 	}
@@ -84,7 +87,7 @@ func (o *TestSummaryLastRun) UnsetTime() {
 
 // GetPasses returns the Passes field value if set, zero value otherwise.
 func (o *TestSummaryLastRun) GetPasses() int32 {
-	if o == nil || o.Passes == nil {
+	if o == nil || isNil(o.Passes) {
 		var ret int32
 		return ret
 	}
@@ -94,7 +97,7 @@ func (o *TestSummaryLastRun) GetPasses() int32 {
 // GetPassesOk returns a tuple with the Passes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestSummaryLastRun) GetPassesOk() (*int32, bool) {
-	if o == nil || o.Passes == nil {
+	if o == nil || isNil(o.Passes) {
 		return nil, false
 	}
 	return o.Passes, true
@@ -102,7 +105,7 @@ func (o *TestSummaryLastRun) GetPassesOk() (*int32, bool) {
 
 // HasPasses returns a boolean if a field has been set.
 func (o *TestSummaryLastRun) HasPasses() bool {
-	if o != nil && o.Passes != nil {
+	if o != nil && !isNil(o.Passes) {
 		return true
 	}
 
@@ -116,7 +119,7 @@ func (o *TestSummaryLastRun) SetPasses(v int32) {
 
 // GetFails returns the Fails field value if set, zero value otherwise.
 func (o *TestSummaryLastRun) GetFails() int32 {
-	if o == nil || o.Fails == nil {
+	if o == nil || isNil(o.Fails) {
 		var ret int32
 		return ret
 	}
@@ -126,7 +129,7 @@ func (o *TestSummaryLastRun) GetFails() int32 {
 // GetFailsOk returns a tuple with the Fails field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestSummaryLastRun) GetFailsOk() (*int32, bool) {
-	if o == nil || o.Fails == nil {
+	if o == nil || isNil(o.Fails) {
 		return nil, false
 	}
 	return o.Fails, true
@@ -134,7 +137,7 @@ func (o *TestSummaryLastRun) GetFailsOk() (*int32, bool) {
 
 // HasFails returns a boolean if a field has been set.
 func (o *TestSummaryLastRun) HasFails() bool {
-	if o != nil && o.Fails != nil {
+	if o != nil && !isNil(o.Fails) {
 		return true
 	}
 
@@ -147,17 +150,21 @@ func (o *TestSummaryLastRun) SetFails(v int32) {
 }
 
 func (o TestSummaryLastRun) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
+func (o TestSummaryLastRun) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Time.IsSet() {
 		toSerialize["time"] = o.Time.Get()
 	}
-	if o.Passes != nil {
-		toSerialize["passes"] = o.Passes
-	}
-	if o.Fails != nil {
-		toSerialize["fails"] = o.Fails
-	}
-	return json.Marshal(toSerialize)
+	// skip: passes is readOnly
+	// skip: fails is readOnly
+	return toSerialize, nil
 }
 
 type NullableTestSummaryLastRun struct {

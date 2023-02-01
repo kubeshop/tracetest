@@ -42,7 +42,7 @@ var (
 func TestContains_Issue617(t *testing.T) {
 
 	spec := openapi.TestSpecs{
-		Specs: []openapi.TestSpecsSpecs{
+		Specs: []openapi.TestSpecsSpecsInner{
 			{
 				Selector: openapi.Selector{
 					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
@@ -56,7 +56,7 @@ func TestContains_Issue617(t *testing.T) {
 
 	expected := openapi.AssertionResults{
 		AllPassed: true,
-		Results: []openapi.AssertionResultsResults{
+		Results: []openapi.AssertionResultsResultsInner{
 			{
 				Selector: openapi.Selector{
 					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,

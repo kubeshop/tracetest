@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the MissingVariable type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &MissingVariable{}
+
 // MissingVariable struct for MissingVariable
 type MissingVariable struct {
 	TestId    *string    `json:"testId,omitempty"`
@@ -39,7 +42,7 @@ func NewMissingVariableWithDefaults() *MissingVariable {
 
 // GetTestId returns the TestId field value if set, zero value otherwise.
 func (o *MissingVariable) GetTestId() string {
-	if o == nil || o.TestId == nil {
+	if o == nil || isNil(o.TestId) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *MissingVariable) GetTestId() string {
 // GetTestIdOk returns a tuple with the TestId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *MissingVariable) GetTestIdOk() (*string, bool) {
-	if o == nil || o.TestId == nil {
+	if o == nil || isNil(o.TestId) {
 		return nil, false
 	}
 	return o.TestId, true
@@ -57,7 +60,7 @@ func (o *MissingVariable) GetTestIdOk() (*string, bool) {
 
 // HasTestId returns a boolean if a field has been set.
 func (o *MissingVariable) HasTestId() bool {
-	if o != nil && o.TestId != nil {
+	if o != nil && !isNil(o.TestId) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *MissingVariable) SetTestId(v string) {
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
 func (o *MissingVariable) GetVariables() []Variable {
-	if o == nil || o.Variables == nil {
+	if o == nil || isNil(o.Variables) {
 		var ret []Variable
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *MissingVariable) GetVariables() []Variable {
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *MissingVariable) GetVariablesOk() ([]Variable, bool) {
-	if o == nil || o.Variables == nil {
+	if o == nil || isNil(o.Variables) {
 		return nil, false
 	}
 	return o.Variables, true
@@ -89,7 +92,7 @@ func (o *MissingVariable) GetVariablesOk() ([]Variable, bool) {
 
 // HasVariables returns a boolean if a field has been set.
 func (o *MissingVariable) HasVariables() bool {
-	if o != nil && o.Variables != nil {
+	if o != nil && !isNil(o.Variables) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *MissingVariable) SetVariables(v []Variable) {
 }
 
 func (o MissingVariable) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.TestId != nil {
-		toSerialize["testId"] = o.TestId
-	}
-	if o.Variables != nil {
-		toSerialize["variables"] = o.Variables
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o MissingVariable) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.TestId) {
+		toSerialize["testId"] = o.TestId
+	}
+	if !isNil(o.Variables) {
+		toSerialize["variables"] = o.Variables
+	}
+	return toSerialize, nil
 }
 
 type NullableMissingVariable struct {

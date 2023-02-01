@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ConnectionTestStep type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ConnectionTestStep{}
+
 // ConnectionTestStep struct for ConnectionTestStep
 type ConnectionTestStep struct {
 	Passed  *bool   `json:"passed,omitempty"`
@@ -40,7 +43,7 @@ func NewConnectionTestStepWithDefaults() *ConnectionTestStep {
 
 // GetPassed returns the Passed field value if set, zero value otherwise.
 func (o *ConnectionTestStep) GetPassed() bool {
-	if o == nil || o.Passed == nil {
+	if o == nil || isNil(o.Passed) {
 		var ret bool
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *ConnectionTestStep) GetPassed() bool {
 // GetPassedOk returns a tuple with the Passed field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ConnectionTestStep) GetPassedOk() (*bool, bool) {
-	if o == nil || o.Passed == nil {
+	if o == nil || isNil(o.Passed) {
 		return nil, false
 	}
 	return o.Passed, true
@@ -58,7 +61,7 @@ func (o *ConnectionTestStep) GetPassedOk() (*bool, bool) {
 
 // HasPassed returns a boolean if a field has been set.
 func (o *ConnectionTestStep) HasPassed() bool {
-	if o != nil && o.Passed != nil {
+	if o != nil && !isNil(o.Passed) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *ConnectionTestStep) SetPassed(v bool) {
 
 // GetMessage returns the Message field value if set, zero value otherwise.
 func (o *ConnectionTestStep) GetMessage() string {
-	if o == nil || o.Message == nil {
+	if o == nil || isNil(o.Message) {
 		var ret string
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *ConnectionTestStep) GetMessage() string {
 // GetMessageOk returns a tuple with the Message field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ConnectionTestStep) GetMessageOk() (*string, bool) {
-	if o == nil || o.Message == nil {
+	if o == nil || isNil(o.Message) {
 		return nil, false
 	}
 	return o.Message, true
@@ -90,7 +93,7 @@ func (o *ConnectionTestStep) GetMessageOk() (*string, bool) {
 
 // HasMessage returns a boolean if a field has been set.
 func (o *ConnectionTestStep) HasMessage() bool {
-	if o != nil && o.Message != nil {
+	if o != nil && !isNil(o.Message) {
 		return true
 	}
 
@@ -104,7 +107,7 @@ func (o *ConnectionTestStep) SetMessage(v string) {
 
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *ConnectionTestStep) GetError() string {
-	if o == nil || o.Error == nil {
+	if o == nil || isNil(o.Error) {
 		var ret string
 		return ret
 	}
@@ -114,7 +117,7 @@ func (o *ConnectionTestStep) GetError() string {
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ConnectionTestStep) GetErrorOk() (*string, bool) {
-	if o == nil || o.Error == nil {
+	if o == nil || isNil(o.Error) {
 		return nil, false
 	}
 	return o.Error, true
@@ -122,7 +125,7 @@ func (o *ConnectionTestStep) GetErrorOk() (*string, bool) {
 
 // HasError returns a boolean if a field has been set.
 func (o *ConnectionTestStep) HasError() bool {
-	if o != nil && o.Error != nil {
+	if o != nil && !isNil(o.Error) {
 		return true
 	}
 
@@ -135,17 +138,25 @@ func (o *ConnectionTestStep) SetError(v string) {
 }
 
 func (o ConnectionTestStep) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Passed != nil {
-		toSerialize["passed"] = o.Passed
-	}
-	if o.Message != nil {
-		toSerialize["message"] = o.Message
-	}
-	if o.Error != nil {
-		toSerialize["error"] = o.Error
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ConnectionTestStep) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Passed) {
+		toSerialize["passed"] = o.Passed
+	}
+	if !isNil(o.Message) {
+		toSerialize["message"] = o.Message
+	}
+	if !isNil(o.Error) {
+		toSerialize["error"] = o.Error
+	}
+	return toSerialize, nil
 }
 
 type NullableConnectionTestStep struct {

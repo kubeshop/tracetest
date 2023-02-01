@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the HTTPHeader type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &HTTPHeader{}
+
 // HTTPHeader struct for HTTPHeader
 type HTTPHeader struct {
 	Key   *string `json:"key,omitempty"`
@@ -39,7 +42,7 @@ func NewHTTPHeaderWithDefaults() *HTTPHeader {
 
 // GetKey returns the Key field value if set, zero value otherwise.
 func (o *HTTPHeader) GetKey() string {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *HTTPHeader) GetKey() string {
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPHeader) GetKeyOk() (*string, bool) {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		return nil, false
 	}
 	return o.Key, true
@@ -57,7 +60,7 @@ func (o *HTTPHeader) GetKeyOk() (*string, bool) {
 
 // HasKey returns a boolean if a field has been set.
 func (o *HTTPHeader) HasKey() bool {
-	if o != nil && o.Key != nil {
+	if o != nil && !isNil(o.Key) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *HTTPHeader) SetKey(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *HTTPHeader) GetValue() string {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *HTTPHeader) GetValue() string {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPHeader) GetValueOk() (*string, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -89,7 +92,7 @@ func (o *HTTPHeader) GetValueOk() (*string, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *HTTPHeader) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !isNil(o.Value) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *HTTPHeader) SetValue(v string) {
 }
 
 func (o HTTPHeader) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Key != nil {
-		toSerialize["key"] = o.Key
-	}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o HTTPHeader) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Key) {
+		toSerialize["key"] = o.Key
+	}
+	if !isNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	return toSerialize, nil
 }
 
 type NullableHTTPHeader struct {

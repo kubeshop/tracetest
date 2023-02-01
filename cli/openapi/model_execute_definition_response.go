@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ExecuteDefinitionResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ExecuteDefinitionResponse{}
+
 // ExecuteDefinitionResponse struct for ExecuteDefinitionResponse
 type ExecuteDefinitionResponse struct {
 	// resource ID
@@ -45,7 +48,7 @@ func NewExecuteDefinitionResponseWithDefaults() *ExecuteDefinitionResponse {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *ExecuteDefinitionResponse) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -55,7 +58,7 @@ func (o *ExecuteDefinitionResponse) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ExecuteDefinitionResponse) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -63,7 +66,7 @@ func (o *ExecuteDefinitionResponse) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *ExecuteDefinitionResponse) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -77,7 +80,7 @@ func (o *ExecuteDefinitionResponse) SetId(v string) {
 
 // GetRunId returns the RunId field value if set, zero value otherwise.
 func (o *ExecuteDefinitionResponse) GetRunId() string {
-	if o == nil || o.RunId == nil {
+	if o == nil || isNil(o.RunId) {
 		var ret string
 		return ret
 	}
@@ -87,7 +90,7 @@ func (o *ExecuteDefinitionResponse) GetRunId() string {
 // GetRunIdOk returns a tuple with the RunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ExecuteDefinitionResponse) GetRunIdOk() (*string, bool) {
-	if o == nil || o.RunId == nil {
+	if o == nil || isNil(o.RunId) {
 		return nil, false
 	}
 	return o.RunId, true
@@ -95,7 +98,7 @@ func (o *ExecuteDefinitionResponse) GetRunIdOk() (*string, bool) {
 
 // HasRunId returns a boolean if a field has been set.
 func (o *ExecuteDefinitionResponse) HasRunId() bool {
-	if o != nil && o.RunId != nil {
+	if o != nil && !isNil(o.RunId) {
 		return true
 	}
 
@@ -109,7 +112,7 @@ func (o *ExecuteDefinitionResponse) SetRunId(v string) {
 
 // GetType returns the Type field value if set, zero value otherwise.
 func (o *ExecuteDefinitionResponse) GetType() string {
-	if o == nil || o.Type == nil {
+	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
 	}
@@ -119,7 +122,7 @@ func (o *ExecuteDefinitionResponse) GetType() string {
 // GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ExecuteDefinitionResponse) GetTypeOk() (*string, bool) {
-	if o == nil || o.Type == nil {
+	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
 	return o.Type, true
@@ -127,7 +130,7 @@ func (o *ExecuteDefinitionResponse) GetTypeOk() (*string, bool) {
 
 // HasType returns a boolean if a field has been set.
 func (o *ExecuteDefinitionResponse) HasType() bool {
-	if o != nil && o.Type != nil {
+	if o != nil && !isNil(o.Type) {
 		return true
 	}
 
@@ -141,7 +144,7 @@ func (o *ExecuteDefinitionResponse) SetType(v string) {
 
 // GetUrl returns the Url field value if set, zero value otherwise.
 func (o *ExecuteDefinitionResponse) GetUrl() string {
-	if o == nil || o.Url == nil {
+	if o == nil || isNil(o.Url) {
 		var ret string
 		return ret
 	}
@@ -151,7 +154,7 @@ func (o *ExecuteDefinitionResponse) GetUrl() string {
 // GetUrlOk returns a tuple with the Url field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ExecuteDefinitionResponse) GetUrlOk() (*string, bool) {
-	if o == nil || o.Url == nil {
+	if o == nil || isNil(o.Url) {
 		return nil, false
 	}
 	return o.Url, true
@@ -159,7 +162,7 @@ func (o *ExecuteDefinitionResponse) GetUrlOk() (*string, bool) {
 
 // HasUrl returns a boolean if a field has been set.
 func (o *ExecuteDefinitionResponse) HasUrl() bool {
-	if o != nil && o.Url != nil {
+	if o != nil && !isNil(o.Url) {
 		return true
 	}
 
@@ -172,20 +175,28 @@ func (o *ExecuteDefinitionResponse) SetUrl(v string) {
 }
 
 func (o ExecuteDefinitionResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.RunId != nil {
-		toSerialize["runId"] = o.RunId
-	}
-	if o.Type != nil {
-		toSerialize["type"] = o.Type
-	}
-	if o.Url != nil {
-		toSerialize["url"] = o.Url
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ExecuteDefinitionResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !isNil(o.RunId) {
+		toSerialize["runId"] = o.RunId
+	}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
+	}
+	if !isNil(o.Url) {
+		toSerialize["url"] = o.Url
+	}
+	return toSerialize, nil
 }
 
 type NullableExecuteDefinitionResponse struct {

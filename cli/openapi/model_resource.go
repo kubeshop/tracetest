@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Resource type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Resource{}
+
 // Resource struct for Resource
 type Resource struct {
 	Type string      `json:"type"`
@@ -78,7 +81,7 @@ func (o *Resource) GetItem() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *Resource) GetItemOk() (*interface{}, bool) {
-	if o == nil || o.Item == nil {
+	if o == nil || isNil(o.Item) {
 		return nil, false
 	}
 	return &o.Item, true
@@ -90,14 +93,20 @@ func (o *Resource) SetItem(v interface{}) {
 }
 
 func (o Resource) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["type"] = o.Type
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
+	return json.Marshal(toSerialize)
+}
+
+func (o Resource) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	// skip: type is readOnly
 	if o.Item != nil {
 		toSerialize["item"] = o.Item
 	}
-	return json.Marshal(toSerialize)
+	return toSerialize, nil
 }
 
 type NullableResource struct {

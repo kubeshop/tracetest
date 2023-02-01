@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TRACEIDRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TRACEIDRequest{}
+
 // TRACEIDRequest struct for TRACEIDRequest
 type TRACEIDRequest struct {
 	Id *string `json:"id,omitempty"`
@@ -38,7 +41,7 @@ func NewTRACEIDRequestWithDefaults() *TRACEIDRequest {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *TRACEIDRequest) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *TRACEIDRequest) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TRACEIDRequest) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -56,7 +59,7 @@ func (o *TRACEIDRequest) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *TRACEIDRequest) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *TRACEIDRequest) SetId(v string) {
 }
 
 func (o TRACEIDRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TRACEIDRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	return toSerialize, nil
 }
 
 type NullableTRACEIDRequest struct {

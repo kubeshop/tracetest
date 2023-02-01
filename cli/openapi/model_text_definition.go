@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TextDefinition type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TextDefinition{}
+
 // TextDefinition struct for TextDefinition
 type TextDefinition struct {
 	RunInformation *RunInformation `json:"runInformation,omitempty"`
@@ -39,7 +42,7 @@ func NewTextDefinitionWithDefaults() *TextDefinition {
 
 // GetRunInformation returns the RunInformation field value if set, zero value otherwise.
 func (o *TextDefinition) GetRunInformation() RunInformation {
-	if o == nil || o.RunInformation == nil {
+	if o == nil || isNil(o.RunInformation) {
 		var ret RunInformation
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *TextDefinition) GetRunInformation() RunInformation {
 // GetRunInformationOk returns a tuple with the RunInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TextDefinition) GetRunInformationOk() (*RunInformation, bool) {
-	if o == nil || o.RunInformation == nil {
+	if o == nil || isNil(o.RunInformation) {
 		return nil, false
 	}
 	return o.RunInformation, true
@@ -57,7 +60,7 @@ func (o *TextDefinition) GetRunInformationOk() (*RunInformation, bool) {
 
 // HasRunInformation returns a boolean if a field has been set.
 func (o *TextDefinition) HasRunInformation() bool {
-	if o != nil && o.RunInformation != nil {
+	if o != nil && !isNil(o.RunInformation) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *TextDefinition) SetRunInformation(v RunInformation) {
 
 // GetContent returns the Content field value if set, zero value otherwise.
 func (o *TextDefinition) GetContent() string {
-	if o == nil || o.Content == nil {
+	if o == nil || isNil(o.Content) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *TextDefinition) GetContent() string {
 // GetContentOk returns a tuple with the Content field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TextDefinition) GetContentOk() (*string, bool) {
-	if o == nil || o.Content == nil {
+	if o == nil || isNil(o.Content) {
 		return nil, false
 	}
 	return o.Content, true
@@ -89,7 +92,7 @@ func (o *TextDefinition) GetContentOk() (*string, bool) {
 
 // HasContent returns a boolean if a field has been set.
 func (o *TextDefinition) HasContent() bool {
-	if o != nil && o.Content != nil {
+	if o != nil && !isNil(o.Content) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *TextDefinition) SetContent(v string) {
 }
 
 func (o TextDefinition) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.RunInformation != nil {
-		toSerialize["runInformation"] = o.RunInformation
-	}
-	if o.Content != nil {
-		toSerialize["content"] = o.Content
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TextDefinition) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.RunInformation) {
+		toSerialize["runInformation"] = o.RunInformation
+	}
+	if !isNil(o.Content) {
+		toSerialize["content"] = o.Content
+	}
+	return toSerialize, nil
 }
 
 type NullableTextDefinition struct {

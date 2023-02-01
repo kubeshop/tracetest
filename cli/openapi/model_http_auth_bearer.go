@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the HTTPAuthBearer type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &HTTPAuthBearer{}
+
 // HTTPAuthBearer struct for HTTPAuthBearer
 type HTTPAuthBearer struct {
 	Token *string `json:"token,omitempty"`
@@ -38,7 +41,7 @@ func NewHTTPAuthBearerWithDefaults() *HTTPAuthBearer {
 
 // GetToken returns the Token field value if set, zero value otherwise.
 func (o *HTTPAuthBearer) GetToken() string {
-	if o == nil || o.Token == nil {
+	if o == nil || isNil(o.Token) {
 		var ret string
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *HTTPAuthBearer) GetToken() string {
 // GetTokenOk returns a tuple with the Token field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuthBearer) GetTokenOk() (*string, bool) {
-	if o == nil || o.Token == nil {
+	if o == nil || isNil(o.Token) {
 		return nil, false
 	}
 	return o.Token, true
@@ -56,7 +59,7 @@ func (o *HTTPAuthBearer) GetTokenOk() (*string, bool) {
 
 // HasToken returns a boolean if a field has been set.
 func (o *HTTPAuthBearer) HasToken() bool {
-	if o != nil && o.Token != nil {
+	if o != nil && !isNil(o.Token) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *HTTPAuthBearer) SetToken(v string) {
 }
 
 func (o HTTPAuthBearer) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Token != nil {
-		toSerialize["token"] = o.Token
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o HTTPAuthBearer) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Token) {
+		toSerialize["token"] = o.Token
+	}
+	return toSerialize, nil
 }
 
 type NullableHTTPAuthBearer struct {

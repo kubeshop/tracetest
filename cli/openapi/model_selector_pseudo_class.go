@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SelectorPseudoClass type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SelectorPseudoClass{}
+
 // SelectorPseudoClass struct for SelectorPseudoClass
 type SelectorPseudoClass struct {
 	Name     string `json:"name"`
@@ -64,7 +67,7 @@ func (o *SelectorPseudoClass) SetName(v string) {
 
 // GetArgument returns the Argument field value if set, zero value otherwise.
 func (o *SelectorPseudoClass) GetArgument() int32 {
-	if o == nil || o.Argument == nil {
+	if o == nil || isNil(o.Argument) {
 		var ret int32
 		return ret
 	}
@@ -74,7 +77,7 @@ func (o *SelectorPseudoClass) GetArgument() int32 {
 // GetArgumentOk returns a tuple with the Argument field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SelectorPseudoClass) GetArgumentOk() (*int32, bool) {
-	if o == nil || o.Argument == nil {
+	if o == nil || isNil(o.Argument) {
 		return nil, false
 	}
 	return o.Argument, true
@@ -82,7 +85,7 @@ func (o *SelectorPseudoClass) GetArgumentOk() (*int32, bool) {
 
 // HasArgument returns a boolean if a field has been set.
 func (o *SelectorPseudoClass) HasArgument() bool {
-	if o != nil && o.Argument != nil {
+	if o != nil && !isNil(o.Argument) {
 		return true
 	}
 
@@ -95,14 +98,20 @@ func (o *SelectorPseudoClass) SetArgument(v int32) {
 }
 
 func (o SelectorPseudoClass) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["name"] = o.Name
-	}
-	if o.Argument != nil {
-		toSerialize["argument"] = o.Argument
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o SelectorPseudoClass) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["name"] = o.Name
+	if !isNil(o.Argument) {
+		toSerialize["argument"] = o.Argument
+	}
+	return toSerialize, nil
 }
 
 type NullableSelectorPseudoClass struct {

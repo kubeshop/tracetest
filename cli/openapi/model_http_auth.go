@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the HTTPAuth type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &HTTPAuth{}
+
 // HTTPAuth struct for HTTPAuth
 type HTTPAuth struct {
 	Type   *string         `json:"type,omitempty"`
@@ -41,7 +44,7 @@ func NewHTTPAuthWithDefaults() *HTTPAuth {
 
 // GetType returns the Type field value if set, zero value otherwise.
 func (o *HTTPAuth) GetType() string {
-	if o == nil || o.Type == nil {
+	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *HTTPAuth) GetType() string {
 // GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuth) GetTypeOk() (*string, bool) {
-	if o == nil || o.Type == nil {
+	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
 	return o.Type, true
@@ -59,7 +62,7 @@ func (o *HTTPAuth) GetTypeOk() (*string, bool) {
 
 // HasType returns a boolean if a field has been set.
 func (o *HTTPAuth) HasType() bool {
-	if o != nil && o.Type != nil {
+	if o != nil && !isNil(o.Type) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *HTTPAuth) SetType(v string) {
 
 // GetApiKey returns the ApiKey field value if set, zero value otherwise.
 func (o *HTTPAuth) GetApiKey() HTTPAuthApiKey {
-	if o == nil || o.ApiKey == nil {
+	if o == nil || isNil(o.ApiKey) {
 		var ret HTTPAuthApiKey
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *HTTPAuth) GetApiKey() HTTPAuthApiKey {
 // GetApiKeyOk returns a tuple with the ApiKey field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuth) GetApiKeyOk() (*HTTPAuthApiKey, bool) {
-	if o == nil || o.ApiKey == nil {
+	if o == nil || isNil(o.ApiKey) {
 		return nil, false
 	}
 	return o.ApiKey, true
@@ -91,7 +94,7 @@ func (o *HTTPAuth) GetApiKeyOk() (*HTTPAuthApiKey, bool) {
 
 // HasApiKey returns a boolean if a field has been set.
 func (o *HTTPAuth) HasApiKey() bool {
-	if o != nil && o.ApiKey != nil {
+	if o != nil && !isNil(o.ApiKey) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *HTTPAuth) SetApiKey(v HTTPAuthApiKey) {
 
 // GetBasic returns the Basic field value if set, zero value otherwise.
 func (o *HTTPAuth) GetBasic() HTTPAuthBasic {
-	if o == nil || o.Basic == nil {
+	if o == nil || isNil(o.Basic) {
 		var ret HTTPAuthBasic
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *HTTPAuth) GetBasic() HTTPAuthBasic {
 // GetBasicOk returns a tuple with the Basic field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuth) GetBasicOk() (*HTTPAuthBasic, bool) {
-	if o == nil || o.Basic == nil {
+	if o == nil || isNil(o.Basic) {
 		return nil, false
 	}
 	return o.Basic, true
@@ -123,7 +126,7 @@ func (o *HTTPAuth) GetBasicOk() (*HTTPAuthBasic, bool) {
 
 // HasBasic returns a boolean if a field has been set.
 func (o *HTTPAuth) HasBasic() bool {
-	if o != nil && o.Basic != nil {
+	if o != nil && !isNil(o.Basic) {
 		return true
 	}
 
@@ -137,7 +140,7 @@ func (o *HTTPAuth) SetBasic(v HTTPAuthBasic) {
 
 // GetBearer returns the Bearer field value if set, zero value otherwise.
 func (o *HTTPAuth) GetBearer() HTTPAuthBearer {
-	if o == nil || o.Bearer == nil {
+	if o == nil || isNil(o.Bearer) {
 		var ret HTTPAuthBearer
 		return ret
 	}
@@ -147,7 +150,7 @@ func (o *HTTPAuth) GetBearer() HTTPAuthBearer {
 // GetBearerOk returns a tuple with the Bearer field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuth) GetBearerOk() (*HTTPAuthBearer, bool) {
-	if o == nil || o.Bearer == nil {
+	if o == nil || isNil(o.Bearer) {
 		return nil, false
 	}
 	return o.Bearer, true
@@ -155,7 +158,7 @@ func (o *HTTPAuth) GetBearerOk() (*HTTPAuthBearer, bool) {
 
 // HasBearer returns a boolean if a field has been set.
 func (o *HTTPAuth) HasBearer() bool {
-	if o != nil && o.Bearer != nil {
+	if o != nil && !isNil(o.Bearer) {
 		return true
 	}
 
@@ -168,20 +171,28 @@ func (o *HTTPAuth) SetBearer(v HTTPAuthBearer) {
 }
 
 func (o HTTPAuth) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Type != nil {
-		toSerialize["type"] = o.Type
-	}
-	if o.ApiKey != nil {
-		toSerialize["apiKey"] = o.ApiKey
-	}
-	if o.Basic != nil {
-		toSerialize["basic"] = o.Basic
-	}
-	if o.Bearer != nil {
-		toSerialize["bearer"] = o.Bearer
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o HTTPAuth) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
+	}
+	if !isNil(o.ApiKey) {
+		toSerialize["apiKey"] = o.ApiKey
+	}
+	if !isNil(o.Basic) {
+		toSerialize["basic"] = o.Basic
+	}
+	if !isNil(o.Bearer) {
+		toSerialize["bearer"] = o.Bearer
+	}
+	return toSerialize, nil
 }
 
 type NullableHTTPAuth struct {

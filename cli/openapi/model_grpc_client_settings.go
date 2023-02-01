@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the GRPCClientSettings type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &GRPCClientSettings{}
+
 // GRPCClientSettings struct for GRPCClientSettings
 type GRPCClientSettings struct {
 	Endpoint        *string            `json:"endpoint,omitempty"`
@@ -46,7 +49,7 @@ func NewGRPCClientSettingsWithDefaults() *GRPCClientSettings {
 
 // GetEndpoint returns the Endpoint field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetEndpoint() string {
-	if o == nil || o.Endpoint == nil {
+	if o == nil || isNil(o.Endpoint) {
 		var ret string
 		return ret
 	}
@@ -56,7 +59,7 @@ func (o *GRPCClientSettings) GetEndpoint() string {
 // GetEndpointOk returns a tuple with the Endpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetEndpointOk() (*string, bool) {
-	if o == nil || o.Endpoint == nil {
+	if o == nil || isNil(o.Endpoint) {
 		return nil, false
 	}
 	return o.Endpoint, true
@@ -64,7 +67,7 @@ func (o *GRPCClientSettings) GetEndpointOk() (*string, bool) {
 
 // HasEndpoint returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasEndpoint() bool {
-	if o != nil && o.Endpoint != nil {
+	if o != nil && !isNil(o.Endpoint) {
 		return true
 	}
 
@@ -78,7 +81,7 @@ func (o *GRPCClientSettings) SetEndpoint(v string) {
 
 // GetReadBufferSize returns the ReadBufferSize field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetReadBufferSize() float32 {
-	if o == nil || o.ReadBufferSize == nil {
+	if o == nil || isNil(o.ReadBufferSize) {
 		var ret float32
 		return ret
 	}
@@ -88,7 +91,7 @@ func (o *GRPCClientSettings) GetReadBufferSize() float32 {
 // GetReadBufferSizeOk returns a tuple with the ReadBufferSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetReadBufferSizeOk() (*float32, bool) {
-	if o == nil || o.ReadBufferSize == nil {
+	if o == nil || isNil(o.ReadBufferSize) {
 		return nil, false
 	}
 	return o.ReadBufferSize, true
@@ -96,7 +99,7 @@ func (o *GRPCClientSettings) GetReadBufferSizeOk() (*float32, bool) {
 
 // HasReadBufferSize returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasReadBufferSize() bool {
-	if o != nil && o.ReadBufferSize != nil {
+	if o != nil && !isNil(o.ReadBufferSize) {
 		return true
 	}
 
@@ -110,7 +113,7 @@ func (o *GRPCClientSettings) SetReadBufferSize(v float32) {
 
 // GetWriteBufferSize returns the WriteBufferSize field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetWriteBufferSize() float32 {
-	if o == nil || o.WriteBufferSize == nil {
+	if o == nil || isNil(o.WriteBufferSize) {
 		var ret float32
 		return ret
 	}
@@ -120,7 +123,7 @@ func (o *GRPCClientSettings) GetWriteBufferSize() float32 {
 // GetWriteBufferSizeOk returns a tuple with the WriteBufferSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetWriteBufferSizeOk() (*float32, bool) {
-	if o == nil || o.WriteBufferSize == nil {
+	if o == nil || isNil(o.WriteBufferSize) {
 		return nil, false
 	}
 	return o.WriteBufferSize, true
@@ -128,7 +131,7 @@ func (o *GRPCClientSettings) GetWriteBufferSizeOk() (*float32, bool) {
 
 // HasWriteBufferSize returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasWriteBufferSize() bool {
-	if o != nil && o.WriteBufferSize != nil {
+	if o != nil && !isNil(o.WriteBufferSize) {
 		return true
 	}
 
@@ -142,7 +145,7 @@ func (o *GRPCClientSettings) SetWriteBufferSize(v float32) {
 
 // GetWaitForReady returns the WaitForReady field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetWaitForReady() bool {
-	if o == nil || o.WaitForReady == nil {
+	if o == nil || isNil(o.WaitForReady) {
 		var ret bool
 		return ret
 	}
@@ -152,7 +155,7 @@ func (o *GRPCClientSettings) GetWaitForReady() bool {
 // GetWaitForReadyOk returns a tuple with the WaitForReady field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetWaitForReadyOk() (*bool, bool) {
-	if o == nil || o.WaitForReady == nil {
+	if o == nil || isNil(o.WaitForReady) {
 		return nil, false
 	}
 	return o.WaitForReady, true
@@ -160,7 +163,7 @@ func (o *GRPCClientSettings) GetWaitForReadyOk() (*bool, bool) {
 
 // HasWaitForReady returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasWaitForReady() bool {
-	if o != nil && o.WaitForReady != nil {
+	if o != nil && !isNil(o.WaitForReady) {
 		return true
 	}
 
@@ -174,7 +177,7 @@ func (o *GRPCClientSettings) SetWaitForReady(v bool) {
 
 // GetHeaders returns the Headers field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetHeaders() map[string]string {
-	if o == nil || o.Headers == nil {
+	if o == nil || isNil(o.Headers) {
 		var ret map[string]string
 		return ret
 	}
@@ -184,7 +187,7 @@ func (o *GRPCClientSettings) GetHeaders() map[string]string {
 // GetHeadersOk returns a tuple with the Headers field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetHeadersOk() (*map[string]string, bool) {
-	if o == nil || o.Headers == nil {
+	if o == nil || isNil(o.Headers) {
 		return nil, false
 	}
 	return o.Headers, true
@@ -192,7 +195,7 @@ func (o *GRPCClientSettings) GetHeadersOk() (*map[string]string, bool) {
 
 // HasHeaders returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasHeaders() bool {
-	if o != nil && o.Headers != nil {
+	if o != nil && !isNil(o.Headers) {
 		return true
 	}
 
@@ -206,7 +209,7 @@ func (o *GRPCClientSettings) SetHeaders(v map[string]string) {
 
 // GetBalancerName returns the BalancerName field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetBalancerName() string {
-	if o == nil || o.BalancerName == nil {
+	if o == nil || isNil(o.BalancerName) {
 		var ret string
 		return ret
 	}
@@ -216,7 +219,7 @@ func (o *GRPCClientSettings) GetBalancerName() string {
 // GetBalancerNameOk returns a tuple with the BalancerName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetBalancerNameOk() (*string, bool) {
-	if o == nil || o.BalancerName == nil {
+	if o == nil || isNil(o.BalancerName) {
 		return nil, false
 	}
 	return o.BalancerName, true
@@ -224,7 +227,7 @@ func (o *GRPCClientSettings) GetBalancerNameOk() (*string, bool) {
 
 // HasBalancerName returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasBalancerName() bool {
-	if o != nil && o.BalancerName != nil {
+	if o != nil && !isNil(o.BalancerName) {
 		return true
 	}
 
@@ -238,7 +241,7 @@ func (o *GRPCClientSettings) SetBalancerName(v string) {
 
 // GetCompression returns the Compression field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetCompression() string {
-	if o == nil || o.Compression == nil {
+	if o == nil || isNil(o.Compression) {
 		var ret string
 		return ret
 	}
@@ -248,7 +251,7 @@ func (o *GRPCClientSettings) GetCompression() string {
 // GetCompressionOk returns a tuple with the Compression field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetCompressionOk() (*string, bool) {
-	if o == nil || o.Compression == nil {
+	if o == nil || isNil(o.Compression) {
 		return nil, false
 	}
 	return o.Compression, true
@@ -256,7 +259,7 @@ func (o *GRPCClientSettings) GetCompressionOk() (*string, bool) {
 
 // HasCompression returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasCompression() bool {
-	if o != nil && o.Compression != nil {
+	if o != nil && !isNil(o.Compression) {
 		return true
 	}
 
@@ -270,7 +273,7 @@ func (o *GRPCClientSettings) SetCompression(v string) {
 
 // GetTls returns the Tls field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetTls() TLS {
-	if o == nil || o.Tls == nil {
+	if o == nil || isNil(o.Tls) {
 		var ret TLS
 		return ret
 	}
@@ -280,7 +283,7 @@ func (o *GRPCClientSettings) GetTls() TLS {
 // GetTlsOk returns a tuple with the Tls field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetTlsOk() (*TLS, bool) {
-	if o == nil || o.Tls == nil {
+	if o == nil || isNil(o.Tls) {
 		return nil, false
 	}
 	return o.Tls, true
@@ -288,7 +291,7 @@ func (o *GRPCClientSettings) GetTlsOk() (*TLS, bool) {
 
 // HasTls returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasTls() bool {
-	if o != nil && o.Tls != nil {
+	if o != nil && !isNil(o.Tls) {
 		return true
 	}
 
@@ -302,7 +305,7 @@ func (o *GRPCClientSettings) SetTls(v TLS) {
 
 // GetAuth returns the Auth field value if set, zero value otherwise.
 func (o *GRPCClientSettings) GetAuth() HTTPAuth {
-	if o == nil || o.Auth == nil {
+	if o == nil || isNil(o.Auth) {
 		var ret HTTPAuth
 		return ret
 	}
@@ -312,7 +315,7 @@ func (o *GRPCClientSettings) GetAuth() HTTPAuth {
 // GetAuthOk returns a tuple with the Auth field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCClientSettings) GetAuthOk() (*HTTPAuth, bool) {
-	if o == nil || o.Auth == nil {
+	if o == nil || isNil(o.Auth) {
 		return nil, false
 	}
 	return o.Auth, true
@@ -320,7 +323,7 @@ func (o *GRPCClientSettings) GetAuthOk() (*HTTPAuth, bool) {
 
 // HasAuth returns a boolean if a field has been set.
 func (o *GRPCClientSettings) HasAuth() bool {
-	if o != nil && o.Auth != nil {
+	if o != nil && !isNil(o.Auth) {
 		return true
 	}
 
@@ -333,35 +336,43 @@ func (o *GRPCClientSettings) SetAuth(v HTTPAuth) {
 }
 
 func (o GRPCClientSettings) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Endpoint != nil {
-		toSerialize["endpoint"] = o.Endpoint
-	}
-	if o.ReadBufferSize != nil {
-		toSerialize["readBufferSize"] = o.ReadBufferSize
-	}
-	if o.WriteBufferSize != nil {
-		toSerialize["writeBufferSize"] = o.WriteBufferSize
-	}
-	if o.WaitForReady != nil {
-		toSerialize["waitForReady"] = o.WaitForReady
-	}
-	if o.Headers != nil {
-		toSerialize["headers"] = o.Headers
-	}
-	if o.BalancerName != nil {
-		toSerialize["balancerName"] = o.BalancerName
-	}
-	if o.Compression != nil {
-		toSerialize["compression"] = o.Compression
-	}
-	if o.Tls != nil {
-		toSerialize["tls"] = o.Tls
-	}
-	if o.Auth != nil {
-		toSerialize["auth"] = o.Auth
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o GRPCClientSettings) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Endpoint) {
+		toSerialize["endpoint"] = o.Endpoint
+	}
+	if !isNil(o.ReadBufferSize) {
+		toSerialize["readBufferSize"] = o.ReadBufferSize
+	}
+	if !isNil(o.WriteBufferSize) {
+		toSerialize["writeBufferSize"] = o.WriteBufferSize
+	}
+	if !isNil(o.WaitForReady) {
+		toSerialize["waitForReady"] = o.WaitForReady
+	}
+	if !isNil(o.Headers) {
+		toSerialize["headers"] = o.Headers
+	}
+	if !isNil(o.BalancerName) {
+		toSerialize["balancerName"] = o.BalancerName
+	}
+	if !isNil(o.Compression) {
+		toSerialize["compression"] = o.Compression
+	}
+	if !isNil(o.Tls) {
+		toSerialize["tls"] = o.Tls
+	}
+	if !isNil(o.Auth) {
+		toSerialize["auth"] = o.Auth
+	}
+	return toSerialize, nil
 }
 
 type NullableGRPCClientSettings struct {

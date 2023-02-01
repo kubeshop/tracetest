@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the HTTPAuthBasic type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &HTTPAuthBasic{}
+
 // HTTPAuthBasic struct for HTTPAuthBasic
 type HTTPAuthBasic struct {
 	Username *string `json:"username,omitempty"`
@@ -39,7 +42,7 @@ func NewHTTPAuthBasicWithDefaults() *HTTPAuthBasic {
 
 // GetUsername returns the Username field value if set, zero value otherwise.
 func (o *HTTPAuthBasic) GetUsername() string {
-	if o == nil || o.Username == nil {
+	if o == nil || isNil(o.Username) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *HTTPAuthBasic) GetUsername() string {
 // GetUsernameOk returns a tuple with the Username field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuthBasic) GetUsernameOk() (*string, bool) {
-	if o == nil || o.Username == nil {
+	if o == nil || isNil(o.Username) {
 		return nil, false
 	}
 	return o.Username, true
@@ -57,7 +60,7 @@ func (o *HTTPAuthBasic) GetUsernameOk() (*string, bool) {
 
 // HasUsername returns a boolean if a field has been set.
 func (o *HTTPAuthBasic) HasUsername() bool {
-	if o != nil && o.Username != nil {
+	if o != nil && !isNil(o.Username) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *HTTPAuthBasic) SetUsername(v string) {
 
 // GetPassword returns the Password field value if set, zero value otherwise.
 func (o *HTTPAuthBasic) GetPassword() string {
-	if o == nil || o.Password == nil {
+	if o == nil || isNil(o.Password) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *HTTPAuthBasic) GetPassword() string {
 // GetPasswordOk returns a tuple with the Password field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuthBasic) GetPasswordOk() (*string, bool) {
-	if o == nil || o.Password == nil {
+	if o == nil || isNil(o.Password) {
 		return nil, false
 	}
 	return o.Password, true
@@ -89,7 +92,7 @@ func (o *HTTPAuthBasic) GetPasswordOk() (*string, bool) {
 
 // HasPassword returns a boolean if a field has been set.
 func (o *HTTPAuthBasic) HasPassword() bool {
-	if o != nil && o.Password != nil {
+	if o != nil && !isNil(o.Password) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *HTTPAuthBasic) SetPassword(v string) {
 }
 
 func (o HTTPAuthBasic) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Username != nil {
-		toSerialize["username"] = o.Username
-	}
-	if o.Password != nil {
-		toSerialize["password"] = o.Password
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o HTTPAuthBasic) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Username) {
+		toSerialize["username"] = o.Username
+	}
+	if !isNil(o.Password) {
+		toSerialize["password"] = o.Password
+	}
+	return toSerialize, nil
 }
 
 type NullableHTTPAuthBasic struct {
