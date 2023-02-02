@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/pterm/pterm"
@@ -93,9 +92,21 @@ func (f testRun) pretty(output TestRunOutput) string {
 }
 
 func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) string {
+	var buffer bytes.Buffer
+
 	link := f.GetRunLink(test.GetId(), run.GetId())
 	message := f.formatMessage("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
-	return f.getColoredText(true, message)
+	message = f.getColoredText(true, message)
+	buffer.WriteString(message)
+
+	for i, specResult := range run.Result.Results {
+		title := f.getTestSpecTitle(test.Specs.Specs[i].GetName(), specResult)
+		message := f.formatMessage("\t%s %s\n", PASSED_TEST_ICON, title)
+		message = f.getColoredText(true, message)
+		buffer.WriteString(message)
+	}
+
+	return buffer.String()
 }
 
 type spanAssertionResult struct {
@@ -125,7 +136,7 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		for _, result := range specResult.Results {
 
 			for _, spanResult := range result.SpanResults {
-				// meta assertions such as tracetest.selected_spasn.count don't have a spanID
+				// meta assertions such as tracetest.selected_spans.count don't have a spanID,
 				// so they will be treated differently. To overcome them, we will place all
 				// meta assertions under the "spanID = "meta"
 				spanID := "meta"
@@ -160,8 +171,9 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 			}
 		}
 
+		title := f.getTestSpecTitle(test.Specs.Specs[i].GetName(), specResult)
 		icon := f.getStateIcon(allPassed)
-		message := f.formatMessage("\t%s %s\n", icon, *specResult.Selector.Query)
+		message := f.formatMessage("\t%s %s\n", icon, title)
 		message = f.getColoredText(allPassed, message)
 		buffer.WriteString(message)
 
@@ -256,4 +268,21 @@ func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {
 	}
 
 	return link
+}
+
+func (f testRun) getSelectorQuery(specResult openapi.AssertionResultsResults) string {
+	if hasQuery := specResult.Selector.HasQuery(); hasQuery {
+		return *specResult.Selector.Query
+	}
+
+	return "All Spans"
+}
+
+func (f testRun) getTestSpecTitle(specName string, specResult openapi.AssertionResultsResults) string {
+	if specName != "" {
+		return specName
+	}
+
+	return f.getSelectorQuery(specResult)
+
 }
