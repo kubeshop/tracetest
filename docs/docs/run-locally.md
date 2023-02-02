@@ -61,7 +61,7 @@ Now Tracetest is available at [http://localhost:11633]
 
 ## **Run a Development Build**
 
-You can build and run Tracetest locally using docker compose. The project provides a docker compose file and a Makefile with targets to generate the required image.
+You can build and run Tracetest locally using Docker compose. The project provides a Docker compose file and a Makefile with targets to generate the required image.
 
 You will need [Docker Compose](https://docs.docker.com/compose/install/) installed, as well as [GoReleaser-Pro](https://goreleaser.com/install/). 
 Note that while the `pro` version is required, no licencing is needed for local builds.
