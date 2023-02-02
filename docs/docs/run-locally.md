@@ -78,4 +78,4 @@ This will build a new image, tagged `kubeshop/tracetest:latest`. That is the def
 docker compose up
 ```
 
-Once the app is finished loading all the services, you can access your local tracetest at [http://localhost:11633]
+Once the app is finished loading all the services, you can access your local tracetest at [http://localhost:11633].
