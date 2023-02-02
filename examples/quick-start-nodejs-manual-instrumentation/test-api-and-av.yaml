@@ -1,8 +1,8 @@
 type: Test
 spec:
-  id: phAZcrT4W
-  name: Books list
-  description: Testing the books list
+  id: phAZcrT4B
+  name: Books list with availability
+  description: Testing the books list and availability check
   trigger:
     type: http
     httpRequest:
@@ -18,4 +18,10 @@ spec:
     - attr:tracetest.span.duration  < 500ms
   - selector: span[tracetest.span.type="general" name="Books List"]
     assertions:
-    - attr:books.list.count = 4
+    - attr:books.list.count = 3
+  - selector: span[tracetest.span.type="http" name="GET /availability/:bookId" http.method="GET"]
+    assertions:
+    - attr:http.host = "availability:8080"
+  - selector: span[tracetest.span.type="general" name="Availablity check"]
+    assertions:
+    - attr:isAvailable = "true"
