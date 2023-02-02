@@ -412,17 +412,43 @@ const sidebars = {
             }
           ],
         },
-        // {
-        //   type: "category",
-        //   label: "OpenTelemetry Store Demo",
-        //   items: [
-        //     {
-        //       type: "doc",
-        //       id: "live-examples/opentelemetry-store/overview",
-        //       label: "Overview",
-        //     },
-        //   ],
-        // },
+        {
+          type: "category",
+          label: "OpenTelemetry Store Demo",
+          items: [
+            {
+              type: "doc",
+              id: "live-examples/opentelemetry-store/overview",
+              label: "Overview",
+            },
+            {
+              type: "category",
+              label: "Use Cases",
+              items: [
+                {
+                  type: "doc",
+                  id: "live-examples/opentelemetry-store/use-cases/add-item-into-shopping-cart",
+                  label: "Add item into shopping cart",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/opentelemetry-store/use-cases/check-shopping-cart-contents",
+                  label: "Check shopping cart contents",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/opentelemetry-store/use-cases/checkout",
+                  label: "Checkout",
+                },
+                {
+                  type: "doc",
+                  id: "live-examples/opentelemetry-store/use-cases/get-recommended-products",
+                  label: "Get recommended products",
+                },
+              ]
+            }
+          ],
+        },
       ],
     },
     {
