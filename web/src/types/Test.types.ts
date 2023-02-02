@@ -67,7 +67,6 @@ export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValue
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 
-
 export type TTriggerRequest = HttpRequest | GRPCRequest | TraceIDRequest;
 export interface ITriggerService {
   getRequest(values: TDraftTest): Promise<TTriggerRequest>;
