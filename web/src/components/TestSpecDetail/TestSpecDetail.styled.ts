@@ -106,8 +106,3 @@ export const SpanHeaderContainer = styled.div`
   gap: 8px;
   padding: 8px 12px;
 `;
-
-export const Title = styled(Typography.Text)`
-  color: ${({theme}) => theme.color.text};
-  font-size: ${({theme}) => theme.size.md};
-`;

@@ -71,7 +71,7 @@ const Header = ({
 
       <Divider />
 
-      {title && <S.Title>{title}</S.Title>}
+      {title && <S.HeaderTitle level={3}>{title}</S.HeaderTitle>}
 
       {selector && (
         <Editor
