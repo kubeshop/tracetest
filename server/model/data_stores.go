@@ -68,6 +68,7 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 		Type:   cType,
 		Values: DataStoreValues{},
 	}
+
 	switch dsc.Type {
 	case jaeger:
 		ds.Type = openapi.JAEGER

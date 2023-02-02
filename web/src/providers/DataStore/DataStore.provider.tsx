@@ -10,7 +10,8 @@ import {
   useDeleteDataStoreMutation,
 } from 'redux/apis/TraceTest.api';
 import DataStoreService from 'services/DataStore.service';
-import {SupportedDataStores, TConnectionResult, TDataStore, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/Config.types';
+import DataStore from 'models/DataStore.model';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useDataStoreConfig} from '../DataStoreConfig/DataStoreConfig.provider';
@@ -19,9 +20,9 @@ interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
-  onDeleteConfig(defaultDataStore: TDataStore): void;
-  onSaveConfig(draft: TDraftDataStore, defaultDataStore: TDataStore): void;
-  onTestConnection(draft: TDraftDataStore, defaultDataStore: TDataStore): void;
+  onDeleteConfig(defaultDataStore: DataStore): void;
+  onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore): void;
+  onTestConnection(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onIsFormValid(isValid: boolean): void;
 }
 
@@ -52,7 +53,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const {onOpen} = useConfirmationModal();
 
   const onSaveConfig = useCallback(
-    async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
+    async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
       const warningMessage =
         !!defaultDataStore.id && draft.dataStoreType !== defaultDataStore.type
           ? `Saving will delete your previous configuration of the ${
@@ -84,7 +85,7 @@ const DataStoreProvider = ({children}: IProps) => {
   );
 
   const onDeleteConfig = useCallback(
-    async (defaultDataStore: TDataStore) => {
+    async (defaultDataStore: DataStore) => {
       onOpen({
         title:
           "Tracetest will remove the trace data store configuration information and enter the 'No-Tracing Mode'. You can still run tests against the responses until you configure a new trace data store.",
@@ -103,7 +104,7 @@ const DataStoreProvider = ({children}: IProps) => {
   }, []);
 
   const onTestConnection = useCallback(
-    async (draft: TDraftDataStore, defaultDataStore: TDataStore) => {
+    async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
 
       if (NoTestConnectionDataStoreList.includes(draft.dataStoreType!)) {

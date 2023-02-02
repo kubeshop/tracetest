@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState} from 'react';
-
 import AttributeList from 'components/AttributeList';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import { TTestOutput } from 'types/TestOutput.types';
+import TestOutput from 'models/TestOutput.model';
 import * as S from './SpanDetail.styled';
 
 interface IProps {
@@ -14,7 +13,7 @@ interface IProps {
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
   semanticConventions: OtelReference;
-  outputs: TTestOutput[];
+  outputs: TestOutput[];
 }
 
 const Attributes = ({assertions, attributeList, outputs, onCreateTestSpec, onCreateOutput, searchText, semanticConventions}: IProps) => {

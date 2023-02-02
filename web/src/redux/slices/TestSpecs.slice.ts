@@ -1,7 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
-import TestSpecs from 'models/TestSpecs.model';
-import {TAssertionResults} from 'types/Assertion.types';
-import {TTestSpecEntry, TTestSpecsSliceActions, ITestSpecsState, TTestSpecs} from 'types/TestSpecs.types';
+
+import AssertionResults from 'models/AssertionResults.model';
+import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
+import {TTestSpecsSliceActions, ITestSpecsState} from 'types/TestSpecs.types';
 import TestSpecsActions from '../actions/TestSpecs.actions';
 
 export const initialState: ITestSpecsState = {
@@ -16,7 +17,7 @@ export const initialState: ITestSpecsState = {
   prevSelector: '',
 };
 
-export const assertionResultsToSpecs = (assertionResults: TAssertionResults, specs: TTestSpecs): TTestSpecEntry[] => {
+export const assertionResultsToSpecs = (assertionResults: AssertionResults, specs: TestSpecs): TTestSpecEntry[] => {
   return assertionResults.resultList.map(({selector, resultList}, index) => ({
     isDraft: false,
     isDeleted: false,

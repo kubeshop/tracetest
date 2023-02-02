@@ -2,9 +2,9 @@ import {NodeTypesEnum} from 'constants/DAG.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import DAGService from 'services/DAG.service';
 import {INodeDataSpan, INodeDatum} from 'types/DAG.types';
-import {TSpan} from 'types/Span.types';
+import Span from './Span.model';
 
-function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
+function getNodesDatumFromSpans(spans: Span[]): INodeDatum<INodeDataSpan>[] {
   return spans.map(span => ({
     data: {
       duration: span.duration,
@@ -25,7 +25,7 @@ function getNodesDatumFromSpans(spans: TSpan[]): INodeDatum<INodeDataSpan>[] {
   }));
 }
 
-function DAG(spans: TSpan[]) {
+function DAG(spans: Span[]) {
   const nodesDatum = getNodesDatumFromSpans(spans).sort((a, b) => {
     if (b.data.startTime !== a.data.startTime) return b.data.startTime - a.data.startTime;
     if (b.id < a.id) return -1;

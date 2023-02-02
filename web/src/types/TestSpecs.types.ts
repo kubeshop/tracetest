@@ -1,27 +1,8 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 
 import {TChange} from 'redux/actions/TestSpecs.actions';
-import {TAssertionResultEntry, TAssertionResults} from './Assertion.types';
-import {Model, TTestSchemas} from './Common.types';
-
-export type TRawTestSpecs = TTestSchemas['TestSpecs'];
-
-export type TTestSpecEntry = {
-  assertions: string[];
-  isDeleted?: boolean;
-  isDraft: boolean;
-  originalSelector?: string;
-  selector: string;
-  name: string;
-};
-
-export type TRawTestSpecEntry = {
-  selector: {query: string};
-  assertions: string[];
-  name: string;
-};
-
-export type TTestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;
+import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
+import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
 
 export interface ISuggestion {
   query: string;
@@ -31,7 +12,7 @@ export interface ISuggestion {
 export interface ITestSpecsState {
   initialSpecs: TTestSpecEntry[];
   specs: TTestSpecEntry[];
-  assertionResults?: TAssertionResults;
+  assertionResults?: AssertionResults;
   changeList: TChange[];
   isLoading: boolean;
   isInitialized: boolean;
@@ -43,13 +24,13 @@ export interface ITestSpecsState {
 
 export type TTestSpecsSliceActions = {
   reset: CaseReducer<ITestSpecsState>;
-  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: TAssertionResults; specs: TTestSpecs}>>;
+  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: AssertionResults; specs: TestSpecs}>>;
   addSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry}>>;
   updateSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry; selector: string}>>;
   removeSpec: CaseReducer<ITestSpecsState, PayloadAction<{selector: string}>>;
   revertSpec: CaseReducer<ITestSpecsState, PayloadAction<{originalSelector: string}>>;
   resetSpecs: CaseReducer<ITestSpecsState>;
-  setAssertionResults: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResults>>;
+  setAssertionResults: CaseReducer<ITestSpecsState, PayloadAction<AssertionResults>>;
   setSelectedSpec: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResultEntry | undefined>>;
   setIsInitialized: CaseReducer<ITestSpecsState, PayloadAction<{isInitialized: boolean}>>;
   setSelectorSuggestions: CaseReducer<ITestSpecsState, PayloadAction<ISuggestion[]>>;

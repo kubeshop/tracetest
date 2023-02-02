@@ -1,20 +1,19 @@
 import {Tooltip} from 'antd';
 import {Link} from 'react-router-dom';
-
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {TTestRun} from 'types/TestRun.types';
+import TestRun from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 
 interface IProps {
-  run: TTestRun;
+  run: TestRun;
   testId: string;
   linkTo: string;
 }
 
-function getIcon(state: TTestRun['state'], failedAssertions: number) {
+function getIcon(state: TestRun['state'], failedAssertions: number) {
   if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
     return null;
   }

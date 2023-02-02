@@ -4,12 +4,12 @@ import {useSelector} from 'react-redux';
 import {useAppDispatch} from 'redux/hooks';
 import {setMatchedSpans, setFocusedSpan, clearMatchedSpans, clearSelectedSpan} from 'redux/slices/Span.slice';
 import SpanSelectors from 'selectors/Span.selectors';
-import {TSpan} from 'types/Span.types';
-import {RouterSearchFields} from '../../constants/Common.constants';
-import RouterActions from '../../redux/actions/Router.actions';
+import {RouterSearchFields} from 'constants/Common.constants';
+import Span from 'models/Span.model';
+import RouterActions from 'redux/actions/Router.actions';
 
 interface IContext {
-  selectedSpan?: TSpan;
+  selectedSpan?: Span;
   matchedSpans: string[];
   focusedSpan: string;
   onSelectSpan(spanId: string): void;

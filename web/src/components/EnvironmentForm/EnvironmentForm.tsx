@@ -2,18 +2,18 @@ import {Form, FormInstance, Input} from 'antd';
 
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import {DEFAULT_VALUES} from 'pages/Environments/EnvironmentModal';
-import {TEnvironment} from 'types/Environment.types';
+import Environment from 'models/Environment.model';
 
 interface IProps {
-  form: FormInstance<TEnvironment>;
-  initialValues?: TEnvironment;
-  onSubmit(values: TEnvironment): void;
-  onValidate(changedValues: any, values: TEnvironment): void;
+  form: FormInstance<Environment>;
+  initialValues?: Environment;
+  onSubmit(values: Environment): void;
+  onValidate(changedValues: any, values: Environment): void;
 }
 
 const EnvironmentForm = ({form, initialValues, onSubmit, onValidate}: IProps) => {
   return (
-    <Form<TEnvironment>
+    <Form<Environment>
       initialValues={{...initialValues}}
       form={form}
       layout="vertical"

@@ -4,8 +4,8 @@ import {useMemo} from 'react';
 import TransactionRunCard from 'components/RunCard/TransactionRunCard';
 import {useLazyGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
-import {TTransactionRun} from 'types/TransactionRun.types';
-import {TTransaction} from 'types/Transaction.types';
+import Transaction from 'models/Transaction.model';
+import TransactionRun from 'models/TransactionRun.model';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
@@ -15,9 +15,9 @@ import useRuns from './useRuns';
 interface IProps {
   onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
-  onRun(transaction: TTransaction, type: ResourceType): void;
+  onRun(transaction: Transaction, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
-  transaction: TTransaction;
+  transaction: Transaction;
 }
 
 const TransactionCard = ({
@@ -29,7 +29,7 @@ const TransactionCard = ({
   transaction,
 }: IProps) => {
   const queryParams = useMemo(() => ({take: 5, transactionId}), [transactionId]);
-  const {isCollapsed, isLoading, list, onClick} = useRuns<TTransactionRun, {transactionId: string}>(
+  const {isCollapsed, isLoading, list, onClick} = useRuns<TransactionRun, {transactionId: string}>(
     useLazyGetTransactionRunsQuery,
     queryParams
   );

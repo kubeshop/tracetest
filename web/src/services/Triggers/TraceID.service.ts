@@ -1,14 +1,15 @@
-import {ITraceIDValues, ITriggerService, TRawTRACEIDRequest} from 'types/Test.types';
+import {ITraceIDValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
+import TraceIDRequest from 'models/TraceIDRequest.model';
 
 const TraceIDTriggerService = (): ITriggerService => ({
-  async getRequest(values): Promise<TRawTRACEIDRequest> {
+  async getRequest(values) {
     const {id} = values as ITraceIDValues;
 
-    return {id: id.includes('env:') ? id : `\${env:${id}}`};
+    return TraceIDRequest({id: id.includes('env:') ? id : `\${env:${id}}`});
   },
 
-  async validateDraft(draft): Promise<boolean> {
+  async validateDraft(draft) {
     const {id} = draft as ITraceIDValues;
     return Validator.required(id);
   },

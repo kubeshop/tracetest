@@ -3,9 +3,10 @@ import {createContext, ReactNode, useCallback, useContext, useMemo, useState} fr
 import {useNavigate} from 'react-router-dom';
 
 import {useGetTransactionByIdQuery, useGetTransactionVersionByIdQuery} from 'redux/apis/TraceTest.api';
-import {TDraftTransaction, TTransaction} from 'types/Transaction.types';
+import {TDraftTransaction} from 'types/Transaction.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import TransactionService from 'services/Transaction.service';
+import Transaction from 'models/Transaction.model';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import useTransactionCrud from './hooks/useTransactionCrud';
 
@@ -17,8 +18,8 @@ interface IContext {
   onDelete(id: string, name: string): void;
   onEdit(draft: TDraftTransaction): void;
   onRun(runId?: string): void;
-  transaction: TTransaction;
-  latestTransaction: TTransaction;
+  transaction: Transaction;
+  latestTransaction: Transaction;
 }
 
 export const Context = createContext<IContext>({
@@ -29,8 +30,8 @@ export const Context = createContext<IContext>({
   onDelete: noop,
   onRun: noop,
   onEdit: noop,
-  transaction: {} as TTransaction,
-  latestTransaction: {} as TTransaction,
+  transaction: {} as Transaction,
+  latestTransaction: {} as Transaction,
 });
 
 interface IProps {

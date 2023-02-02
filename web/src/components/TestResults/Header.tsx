@@ -1,12 +1,12 @@
 import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import SpanService from 'services/Span.service';
-import {TSpan} from 'types/Span.types';
 import {singularOrPlural} from 'utils/Common';
+import Span from 'models/Span.model';
 import * as S from './TestResults.styled';
 
 interface IProps {
-  selectedSpan: TSpan;
+  selectedSpan: Span;
   totalFailedSpecs: number;
   totalPassedSpecs: number;
 }

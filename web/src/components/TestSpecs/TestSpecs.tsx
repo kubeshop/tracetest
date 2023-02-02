@@ -1,10 +1,10 @@
 import TestSpec from 'components/TestSpec';
-import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
+import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Empty from './Empty';
 import * as S from './TestSpecs.styled';
 
 interface IProps {
-  assertionResults: TAssertionResults;
+  assertionResults: AssertionResults;
   onDelete(selector: string): void;
   onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onOpen(selector: string): void;

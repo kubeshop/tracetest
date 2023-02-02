@@ -1,6 +1,16 @@
 import {TriggerTypes} from 'constants/Test.constants';
 import {get} from 'lodash';
-import {THeader, TRawTriggerResult, TTriggerResult} from 'types/Test.types';
+import {THeader} from 'types/Test.types';
+import {TTriggerSchemas} from 'types/Common.types';
+
+export type TRawTriggerResult = TTriggerSchemas['TriggerResult'];
+type TriggerResult = {
+  type: TriggerTypes;
+  headers?: THeader[];
+  body?: string;
+  statusCode: number;
+  bodyMimeType?: string;
+};
 
 const ResponseData = {
   [TriggerTypes.http](response: object) {
@@ -29,7 +39,7 @@ const ResponseData = {
 const TriggerResult = ({
   triggerType = 'http',
   triggerResult: {http = {}, grpc = {}, traceid = {}} = {},
-}: TRawTriggerResult): TTriggerResult => {
+}: TRawTriggerResult): TriggerResult => {
   const type = triggerType as TriggerTypes;
 
   let request = {};

@@ -1,7 +1,8 @@
 import {Form} from 'antd';
 import {useMemo} from 'react';
-import {TDraftTest, TDraftTestForm, TTest} from 'types/Test.types';
-import TestService from '../../services/Test.service';
+import {TDraftTest, TDraftTestForm} from 'types/Test.types';
+import Test from 'models/Test.model';
+import TestService from 'services/Test.service';
 import BasicDetailsForm from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
 import EditRequestDetails from './EditRequestDetails/EditRequestDetails';
 import * as S from './EditTestForm.styled';
@@ -10,7 +11,7 @@ export const FORM_ID = 'edit-test';
 
 interface IProps {
   form: TDraftTestForm;
-  test: TTest;
+  test: Test;
   onSubmit(values: TDraftTest): Promise<void>;
   onValidation(allValues: any, values: TDraftTest): void;
 }

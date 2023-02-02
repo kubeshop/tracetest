@@ -5,12 +5,12 @@ import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import EnvironmentSelectors from 'selectors/Environment.selectors';
-import {TEnvironment} from 'types/Environment.types';
+import Environment from 'models/Environment.model';
 
 interface IContext {
-  environmentList: TEnvironment[];
-  selectedEnvironment?: TEnvironment;
-  setSelectedEnvironment(environment?: TEnvironment): void;
+  environmentList: Environment[];
+  selectedEnvironment?: Environment;
+  setSelectedEnvironment(environment?: Environment): void;
   isLoading: boolean;
 }
 
@@ -30,10 +30,10 @@ export const useEnvironment = () => useContext(Context);
 const EnvironmentProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
   const {data: {items: environmentList = []} = {}, isLoading} = useGetEnvironmentsQuery({});
-  const selectedEnvironment: TEnvironment | undefined = useAppSelector(EnvironmentSelectors.selectSelectedEnvironment);
+  const selectedEnvironment: Environment | undefined = useAppSelector(EnvironmentSelectors.selectSelectedEnvironment);
 
   const setSelectedEnvironment = useCallback(
-    (environment?: TEnvironment) => {
+    (environment?: Environment) => {
       dispatch(
         setUserPreference({
           key: 'environmentId',

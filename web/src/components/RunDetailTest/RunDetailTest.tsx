@@ -2,7 +2,6 @@ import {Tabs} from 'antd';
 import {useCallback, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useMount} from 'react-use';
-
 import Drawer from 'components/Drawer';
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import SetupAlert from 'components/SetupAlert';
@@ -21,8 +20,8 @@ import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
-import {TAssertionResultEntry} from 'types/Assertion.types';
-import {TTestRun} from 'types/TestRun.types';
+import TestRun from 'models/TestRun.model';
+import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
 
@@ -32,7 +31,7 @@ const TABS = {
 } as const;
 
 interface IProps {
-  run: TTestRun;
+  run: TestRun;
   testId: string;
 }
 

@@ -1,18 +1,17 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
-import TransactionRun from 'models/TransactionRun.model';
+import TransactionRun, {TRawTransactionRun} from 'models/TransactionRun.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {TRawTransactionRun, TTransactionRun} from 'types/TransactionRun.types';
 import {IListenerFunction} from 'gateways/WebSocket.gateway';
 import WebSocketService from 'services/WebSocket.service';
-import {TEnvironmentValue} from 'types/Environment.types';
 import {getTotalCountFromHeaders} from 'utils/Common';
 import RunError from 'models/RunError.model';
+import {TEnvironmentValue} from 'models/Environment.model';
 
 const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
   runTransaction: builder.mutation<
-    TTransactionRun,
+    TransactionRun,
     {transactionId: string; environmentId?: string; variables?: TEnvironmentValue[]}
   >({
     query: ({transactionId, environmentId, variables = []}) => ({
@@ -29,7 +28,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
 
   getTransactionRuns: builder.query<
-    PaginationResponse<TTransactionRun>,
+    PaginationResponse<TransactionRun>,
     {transactionId: string; take?: number; skip?: number}
   >({
     query: ({transactionId, take = 25, skip = 0}) => `/transactions/${transactionId}/run?take=${take}&skip=${skip}`,
@@ -43,7 +42,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
   }),
 
-  getTransactionRunById: builder.query<TTransactionRun, {transactionId: string; runId: string}>({
+  getTransactionRunById: builder.query<TransactionRun, {transactionId: string; runId: string}>({
     query: ({transactionId, runId}) => `/transactions/${transactionId}/run/${runId}`,
     providesTags: result => [{type: TracetestApiTags.TRANSACTION_RUN, id: result?.id}],
     transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun),
@@ -61,7 +60,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     },
   }),
 
-  deleteTransactionRunById: builder.mutation<TTransactionRun, {transactionId: string; runId: string}>({
+  deleteTransactionRunById: builder.mutation<TransactionRun, {transactionId: string; runId: string}>({
     query: ({transactionId, runId}) => ({
       url: `/transactions/${transactionId}/run/${runId}`,
       method: HTTP_METHOD.DELETE,

@@ -1,9 +1,8 @@
 import faker from '@faker-js/faker';
-import {TAssertionSpanResult, TRawAssertionSpanResult} from '../../types/Assertion.types';
 import {IMockFactory} from '../../types/Common.types';
-import AssertionSpanResult from '../AssertionSpanResult.model';
+import AssertionSpanResult, {TRawAssertionSpanResult} from '../AssertionSpanResult.model';
 
-const AssertionSpanResultMock: IMockFactory<TAssertionSpanResult, TRawAssertionSpanResult> = () => ({
+const AssertionSpanResultMock: IMockFactory<AssertionSpanResult, TRawAssertionSpanResult> = () => ({
   raw(data = {}) {
     return {
       spanId: faker.datatype.uuid(),

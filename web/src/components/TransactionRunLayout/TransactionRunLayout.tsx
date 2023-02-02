@@ -1,16 +1,16 @@
 import {useMemo} from 'react';
 import TransactionHeader from 'components/TransactionHeader';
-import {TTransaction} from 'types/Transaction.types';
-import {TTransactionRun} from 'types/TransactionRun.types';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import TransactionService from 'services/Transaction.service';
+import Transaction from 'models/Transaction.model';
+import TransactionRun from 'models/TransactionRun.model';
 import * as S from './TransactionRunLayout.styled';
 import EditTransaction from '../EditTransaction';
 import TransactionRunResult from '../TransactionRunResult/TransactionRunResult';
 
 interface IProps {
-  transaction: TTransaction;
-  transactionRun: TTransactionRun;
+  transaction: Transaction;
+  transactionRun: TransactionRun;
 }
 
 const TransactionRunDetailLayout = ({transaction, transactionRun}: IProps) => {
@@ -19,10 +19,7 @@ const TransactionRunDetailLayout = ({transaction, transactionRun}: IProps) => {
 
   return (
     <>
-      <TransactionHeader
-        transactionRun={transactionRun}
-        transaction={transaction}
-      />
+      <TransactionHeader transactionRun={transactionRun} transaction={transaction} />
       <S.Wrapper>
         <S.Container>
           <S.SectionLeft>

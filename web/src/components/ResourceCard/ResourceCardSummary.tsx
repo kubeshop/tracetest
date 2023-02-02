@@ -1,10 +1,10 @@
 import {Tooltip} from 'antd';
-import {TSummary} from 'types/Test.types';
 import Date from 'utils/Date';
+import Summary from 'models/Summary.model';
 import * as S from './ResourceCard.styled';
 
 interface IProps {
-  summary: TSummary;
+  summary: Summary;
 }
 
 const ResourceCardSummary = ({

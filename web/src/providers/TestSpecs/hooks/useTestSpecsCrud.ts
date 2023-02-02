@@ -1,5 +1,9 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
+
+import AssertionResults from 'models/AssertionResults.model';
+import Test from 'models/Test.model';
+import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
 import TestSpecsActions from 'redux/actions/TestSpecs.actions';
 import {useAppDispatch} from 'redux/hooks';
 import {
@@ -14,9 +18,7 @@ import {
   setSelectorSuggestions as setSelectorSuggestionsAction,
   setPrevSelector as setPrevSelectorAction,
 } from 'redux/slices/TestSpecs.slice';
-import {TAssertionResults} from 'types/Assertion.types';
-import {TTest} from 'types/Test.types';
-import {ISuggestion, TTestSpecEntry, TTestSpecs} from 'types/TestSpecs.types';
+import {ISuggestion} from 'types/TestSpecs.types';
 import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -25,9 +27,9 @@ import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModa
 interface IProps {
   runId: string;
   testId: string;
-  test: TTest;
+  test: Test;
   isDraftMode: boolean;
-  assertionResults?: TAssertionResults;
+  assertionResults?: AssertionResults;
 }
 
 const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: IProps) => {
@@ -109,7 +111,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   );
 
   const init = useCallback(
-    (initialAssertionResults: TAssertionResults, specs: TTestSpecs) => {
+    (initialAssertionResults: AssertionResults, specs: TestSpecs) => {
       dispatch(initSpecs({assertionResults: initialAssertionResults, specs}));
     },
     [dispatch]

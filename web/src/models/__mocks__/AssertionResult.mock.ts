@@ -1,10 +1,9 @@
 import faker from '@faker-js/faker';
-import {TAssertionResult, TRawAssertionResult} from '../../types/Assertion.types';
 import {IMockFactory} from '../../types/Common.types';
-import AssertionResult from '../AssertionResult.model';
+import AssertionResult, {TRawAssertionResult} from '../AssertionResult.model';
 import AssertionSpanResultMock from './AssertionSpanResult.mock';
 
-const AssertionResultMock: IMockFactory<TAssertionResult, TRawAssertionResult> = () => ({
+const AssertionResultMock: IMockFactory<AssertionResult, TRawAssertionResult> = () => ({
   raw(data = {}) {
     return {
       allPassed: faker.datatype.boolean(),

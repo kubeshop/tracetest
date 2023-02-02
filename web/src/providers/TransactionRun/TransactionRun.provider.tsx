@@ -1,10 +1,10 @@
 import {createContext, useContext, useMemo} from 'react';
 import {useGetTransactionRunByIdQuery} from 'redux/apis/TraceTest.api';
-import {TTransactionRun} from 'types/TransactionRun.types';
+import TransactionRun from 'models/TransactionRun.model';
 import TransactionProvider from '../Transaction/Transaction.provider';
 
 interface IContext {
-  transactionRun?: TTransactionRun;
+  transactionRun?: TransactionRun;
 }
 
 export const Context = createContext<IContext>({

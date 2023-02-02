@@ -7,7 +7,7 @@ import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
-import {TAssertionResultEntry} from 'types/Assertion.types';
+import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Header from './Header';
 import * as S from './TestResults.styled';
 

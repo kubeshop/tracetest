@@ -1,5 +1,4 @@
 PROJECT_ROOT=${PWD}
-
 OPENAPI_GENERATOR_VER=v5.4.0
 OPENAPI_GENERATOR_IMAGE=openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VER)
 OPENAPI_GENERATOR_CLI=docker run --rm -u ${shell id -u}  -v "$(PROJECT_ROOT):/local" -w "/local" ${OPENAPI_GENERATOR_IMAGE}
@@ -10,12 +9,25 @@ help: Makefile ## show list of commands
 	@echo ""
 	@awk 'BEGIN {FS = ":.*?## "} /[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
+.PHONY: build-docker build-go build-web
+build-docker: build-go build-web
+	VERSION=latest \
+		goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+
+build-web:
+	cd web; npm install
+	cd web; npm run build
+
+build-go:
+	goreleaser build --single-target --clean --snapshot
+	find ./dist -name 'tracetest*' -exec cp {} ./dist \;
+
 generate: generate-server generate-cli generate-web
 
 generate-web: ## generates OpenAPI types for WebUI
 	cd web; npm run types:generate
 
-generate-cli: ## generates OpenAPI types for CLI
+generate-cli:
 	$(eval BASE := ./cli)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)

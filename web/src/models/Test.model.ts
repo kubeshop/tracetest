@@ -1,8 +1,22 @@
-import {TRawTest, TTest} from 'types/Test.types';
+import {Model, TTestSchemas} from 'types/Common.types';
 import TestOutput from './TestOutput.model';
 import TestSpecs from './TestSpecs.model';
-import TestSummary from './TestSummary.model';
+import Summary from './Summary.model';
 import Trigger from './Trigger.model';
+
+export type TRawTest = TTestSchemas['Test'];
+type Test = Model<
+  TRawTest,
+  {
+    definition: TestSpecs;
+    serviceUnderTest?: undefined;
+    trigger: Trigger;
+    specs?: TestSpecs;
+    summary: Summary;
+    outputs?: TestOutput[];
+    createdAt?: string;
+  }
+>;
 
 const Test = ({
   id = '',
@@ -14,7 +28,7 @@ const Test = ({
   summary = {},
   outputs = [],
   createdAt = '',
-}: TRawTest): TTest => ({
+}: TRawTest): Test => ({
   id,
   name,
   version,
@@ -22,8 +36,8 @@ const Test = ({
   createdAt,
   definition: TestSpecs(specs || {}),
   trigger: Trigger(rawTrigger || {}),
-  summary: TestSummary(summary),
-  outputs: outputs?.map((rawOutput, index) => TestOutput(rawOutput, index)),
+  summary: Summary(summary),
+  outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
 });
 
 export default Test;

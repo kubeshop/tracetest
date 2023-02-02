@@ -5,12 +5,11 @@ import TestOutputModel from 'models/TestOutput.model';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import SpanService from 'services/Span.service';
-import {TTestOutput} from 'types/TestOutput.types';
 import Empty from './Empty';
 import * as S from './TestOutputs.styled';
 
 interface IProps {
-  outputs: TTestOutput[];
+  outputs: TestOutputModel[];
 }
 
 const TestOutputs = ({outputs}: IProps) => {

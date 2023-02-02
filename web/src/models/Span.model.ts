@@ -5,15 +5,31 @@ import {
 } from 'constants/SemanticGroupNames.constants';
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {SpanKind} from 'constants/Span.constants';
-import {TRawSpan, TSpan, TSpanFlatAttribute} from 'types/Span.types';
-import {TSpanAttribute} from 'types/SpanAttribute.types';
+import {TSpanFlatAttribute} from 'types/Span.types';
 import SpanAttribute from './SpanAttribute.model';
+import {Model, TTraceSchemas} from '../types/Common.types';
 
 const SemanticGroupNamesList = Object.values(SemanticGroupNames);
 const SpanKindList = Object.values(SpanKind);
 
+export type TRawSpan = TTraceSchemas['Span'];
+type Span = Model<
+  TRawSpan,
+  {
+    attributes: Record<string, SpanAttribute>;
+    type: SemanticGroupNames;
+    duration: string;
+    signature: TSpanFlatAttribute[];
+    attributeList: TSpanFlatAttribute[];
+    children?: Span[];
+    kind: SpanKind;
+    service: string;
+    system: string;
+  }
+>;
+
 const getSpanSignature = (
-  attributes: Record<string, TSpanAttribute>,
+  attributes: Record<string, SpanAttribute>,
   type: SemanticGroupNames
 ): TSpanFlatAttribute[] => {
   const attributeNameList = SemanticGroupsSignature[type];
@@ -32,13 +48,13 @@ const getSpanSignature = (
   }, []);
 };
 
-const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = ''}: TRawSpan): TSpan => {
+const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = ''}: TRawSpan): Span => {
   const attributeList = Object.entries(attributes).map<TSpanFlatAttribute>(([key, value]) => ({
     value: String(value),
     key,
   }));
 
-  const attributesMap = attributeList.reduce<Record<string, TSpanAttribute>>((map, rawSpanAttribute) => {
+  const attributesMap = attributeList.reduce<Record<string, SpanAttribute>>((map, rawSpanAttribute) => {
     const spanAttribute = SpanAttribute(rawSpanAttribute);
 
     return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};

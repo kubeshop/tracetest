@@ -23,7 +23,7 @@ All `services` in the `docker-compose.yaml` are on the same network and will be 
 
 ## Node.js app
 
-The Node.js app is a simple Express app, contained in the `app.js` file.
+The Node.js app is a simple Express app with two microservices, contained in the `app.js` and `availability.js` files.
 
 The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively.
 Traces will be sent to the OpenTelemetry Collector.
@@ -73,45 +73,65 @@ Enabling the tracer is done by preloading the trace file.
 node -r ./tracing.otel.grpc.js app.js
 ```
 
-In the `package.json` you will see two npm script for running the respective tracers alongside the `app.js`.
+In the `package.json` you will see two npm script for running the respective tracers alongside the `app.js` or `availability.js`.
 
 ```json
 "scripts": {
-  "with-grpc-tracer":"node -r ./tracing.otel.grpc.js app.js",
-  "with-http-tracer":"node -r ./tracing.otel.http.js app.js"
+  "app-with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
+  "app-with-http-tracer": "node -r ./tracing.otel.http.js app.js",
+  "availability-with-grpc-tracer": "node -r ./tracing.otel.grpc.js availability.js",
+  "availability-with-http-tracer": "node -r ./tracing.otel.http.js availability.js"
 },
 ```
 
-To start the server you run this command.
+To start the `app.js` Express server you run this command.
 
 ```bash
-npm run with-grpc-tracer
+npm run app-with-grpc-tracer
 # or
-npm run with-http-tracer
+npm run app-with-http-tracer
 ```
 
-As you can see the `Dockerfile` uses the command above.
+To start the `availability.js` Express server you run this command.
+
+```bash
+npm run availability-with-grpc-tracer
+# or
+npm run availability-with-http-tracer
+```
+
+As you can see the `Dockerfile` does not have a `CMD` section.
 
 ```Dockerfile
 FROM node:slim
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/
 COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 8080
-CMD [ "npm", "run", "with-grpc-tracer" ]
 ```
 
-And, the `docker-compose.yaml` contains just one service for the Node.js app.
+Instead, the `docker-compose.yaml` contains the `CMD` section for both services.
 
 ```yaml
 version: '3'
 services:
   app:
     image: quick-start-nodejs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build: .
+    command: npm run app-with-grpc-tracer
     ports:
       - "8080:8080"
+  availability:
+    image: quick-start-nodejs-availability
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build: .
+    command: npm run availability-with-grpc-tracer
+    ports:
+      - "8080"
 ```
 
 To start it, run this command:
@@ -121,7 +141,7 @@ docker compose build # optional if you haven't already built the image
 docker compose up
 ```
 
-This will start the Node.js app. But, you're not sending the traces anywhere.
+This will start the Node.js services. But, you're not sending the traces anywhere.
 
 Let's fix this by configuring Tracetest and OpenTelemetry Collector.
 
@@ -138,7 +158,7 @@ version: '3'
 services:
 
   tracetest:
-    image: kubeshop/tracetest
+    image: kubeshop/tracetest:v0.9.3
     platform: linux/amd64
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
@@ -173,12 +193,11 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
 
-**Why?** To start both the Node.js app and Tracetest we will run this command:
+**Why?** To start both the Node.js services and Tracetest we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
@@ -253,7 +272,7 @@ service:
 
 ## Run both the Node.js app and Tracetest
 
-To start both the Node.js app and Tracetest we will run this command:
+To start both the Node.js services and Tracetest we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already

@@ -1,9 +1,18 @@
 import {TriggerTypes} from 'constants/Test.constants';
 import {get} from 'lodash';
-import {TRawTrigger, TTrigger} from 'types/Test.types';
+import {TTriggerSchemas} from 'types/Common.types';
+import {TTriggerRequest} from 'types/Test.types';
 import GrpcRequest from './GrpcRequest.model';
 import HttpRequest from './HttpRequest.model';
 import TraceIDRequest from './TraceIDRequest.model';
+
+export type TRawTrigger = TTriggerSchemas['Trigger'];
+type Trigger = {
+  type: TriggerTypes;
+  entryPoint: string;
+  method: string;
+  request: TTriggerRequest;
+};
 
 const EntryData = {
   [TriggerTypes.http](request: object) {
@@ -29,10 +38,10 @@ const EntryData = {
 const Trigger = ({
   triggerType = 'http',
   triggerSettings: {http = {}, grpc = {}, traceid = {}} = {},
-}: TRawTrigger): TTrigger => {
+}: TRawTrigger): Trigger => {
   const type = triggerType as TriggerTypes;
 
-  let request = {};
+  let request = {} as TTriggerRequest;
   if (type === TriggerTypes.http) {
     request = HttpRequest(http);
   } else if (type === TriggerTypes.grpc) {

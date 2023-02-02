@@ -4,8 +4,9 @@ import {useAppSelector} from 'redux/hooks';
 
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
-import {TAssertionResultEntry, TAssertionResults} from 'types/Assertion.types';
-import {ISuggestion, TTestSpecEntry} from 'types/TestSpecs.types';
+import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
+import {TTestSpecEntry} from 'models/TestSpecs.model';
+import {ISuggestion} from 'types/TestSpecs.types';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 import {useTest} from '../Test/Test.provider';
 
@@ -19,7 +20,7 @@ interface IContext {
   dryRun(definitionList: TTestSpecEntry[]): void;
   updateIsInitialized(isInitialized: boolean): void;
   selectedTestSpec?: TAssertionResultEntry;
-  assertionResults?: TAssertionResults;
+  assertionResults?: AssertionResults;
   specs: TTestSpecEntry[];
   isLoading: boolean;
   isError: boolean;

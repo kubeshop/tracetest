@@ -1,6 +1,15 @@
-import {THTTPRequest, TRawHTTPRequest} from '../types/Test.types';
+import {Model, THttpSchemas} from 'types/Common.types';
+import {THeader} from 'types/Test.types';
 
-const HttpRequest = ({method = 'GET', url = '', headers = [], body = '', auth = {}}: TRawHTTPRequest): THTTPRequest => {
+export type TRawHTTPRequest = THttpSchemas['HTTPRequest'];
+type HttpRequest = Model<
+  TRawHTTPRequest,
+  {
+    headers: THeader[];
+  }
+>;
+
+const HttpRequest = ({method = 'GET', url = '', headers = [], body = '', auth = {}}: TRawHTTPRequest): HttpRequest => {
   return {
     method,
     url,

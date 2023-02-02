@@ -2,17 +2,12 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import ConnectionResult from 'models/ConnectionResult.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
-import {
-  TConnectionResult,
-  TDataStoreConfig,
-  TRawConnectionResult,
-  TRawDataStore,
-  TTestConnectionRequest,
-} from 'types/Config.types';
+import {TConnectionResult, TRawConnectionResult, TTestConnectionRequest} from 'types/Config.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
+import {TRawDataStore} from 'models/DataStore.model';
 
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  getDataStores: builder.query<TDataStoreConfig, unknown>({
+  getDataStores: builder.query<DataStoreConfig, unknown>({
     query: () => '/datastores?take=50',
     providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
     transformResponse: (rawDataStores: TRawDataStore[]) => DataStoreConfig(rawDataStores),

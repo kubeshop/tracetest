@@ -1,6 +1,14 @@
-import {TRawTRACEIDRequest, TTRACEIDRequest} from '../types/Test.types';
+import {Model, TTraceIDSchemas} from 'types/Common.types';
 
-const TraceIDRequest = ({id = ''}: TRawTRACEIDRequest): TTRACEIDRequest => {
+export type TRawTRACEIDRequest = TTraceIDSchemas['TRACEIDRequest'];
+type TraceIDRequest = Model<
+  TRawTRACEIDRequest,
+  {
+    id: string;
+  }
+>;
+
+const TraceIDRequest = ({id = ''}: TRawTRACEIDRequest): TraceIDRequest => {
   return {id};
 };
 

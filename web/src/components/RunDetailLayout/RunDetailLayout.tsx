@@ -8,13 +8,13 @@ import {RunDetailModes} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import {TTest} from 'types/Test.types';
+import Test from 'models/Test.model';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
 
 interface IProps {
-  test: TTest;
+  test: Test;
 }
 
 const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
