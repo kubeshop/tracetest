@@ -18,7 +18,7 @@ tracetest test run [flags]
   -e, --environment string   --environment <id>
   -h, --help                 help for run
   -j, --junit string         --junit <junit-output.xml>
-  -w, --wait-for-result      
+  -w, --wait-for-result
 ```
 
 ### Options inherited from parent commands
