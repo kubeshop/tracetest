@@ -170,7 +170,7 @@ func (m OpenAPI) Environments(in []model.Environment) []openapi.Environment {
 
 func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
 
-	specs := make([]openapi.TestSpecsSpecs, in.Len())
+	specs := make([]openapi.TestSpecsSpecsInner, in.Len())
 
 	i := 0
 	in.ForEach(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) error {
@@ -179,7 +179,7 @@ func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertion
 			assertions[j] = string(a)
 		}
 
-		specs[i] = openapi.TestSpecsSpecs{
+		specs[i] = openapi.TestSpecsSpecsInner{
 			Name:       &namedAssertions.Name,
 			Selector:   m.Selector(spanQuery),
 			Assertions: assertions,
@@ -246,7 +246,7 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 		return openapi.AssertionResults{}
 	}
 
-	results := make([]openapi.AssertionResultsResults, in.Results.Len())
+	results := make([]openapi.AssertionResultsResultsInner, in.Results.Len())
 
 	i := 0
 	in.Results.ForEach(func(query model.SpanQuery, inRes []model.AssertionResult) error {
@@ -272,7 +272,7 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 				SpanResults: sres,
 			}
 		}
-		results[i] = openapi.AssertionResultsResults{
+		results[i] = openapi.AssertionResultsResultsInner{
 			Selector: m.Selector(query),
 			Results:  res,
 		}
@@ -316,11 +316,11 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 	}
 }
 
-func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []openapi.TestRunOutputs {
-	res := make([]openapi.TestRunOutputs, 0, in.Len())
+func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []openapi.TestRunOutputsInner {
+	res := make([]openapi.TestRunOutputsInner, 0, in.Len())
 
 	in.ForEach(func(key string, val model.RunOutput) error {
-		res = append(res, openapi.TestRunOutputs{
+		res = append(res, openapi.TestRunOutputsInner{
 			Name:   key,
 			Value:  val.Value,
 			SpanId: val.SpanID,
@@ -487,7 +487,7 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 	}, nil
 }
 
-func (m Model) RunOutputs(in []openapi.TestRunOutputs) model.OrderedMap[string, model.RunOutput] {
+func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) model.OrderedMap[string, model.RunOutput] {
 	res := model.OrderedMap[string, model.RunOutput]{}
 
 	for _, output := range in {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ExportedTestInformation type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ExportedTestInformation{}
+
 // ExportedTestInformation struct for ExportedTestInformation
 type ExportedTestInformation struct {
 	Test Test    `json:"test"`
@@ -88,14 +91,18 @@ func (o *ExportedTestInformation) SetRun(v TestRun) {
 }
 
 func (o ExportedTestInformation) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["test"] = o.Test
-	}
-	if true {
-		toSerialize["run"] = o.Run
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ExportedTestInformation) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["test"] = o.Test
+	toSerialize["run"] = o.Run
+	return toSerialize, nil
 }
 
 type NullableExportedTestInformation struct {

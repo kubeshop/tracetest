@@ -14,10 +14,13 @@ import (
 	"encoding/json"
 )
 
+// checks if the AssertionResults type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &AssertionResults{}
+
 // AssertionResults struct for AssertionResults
 type AssertionResults struct {
-	AllPassed *bool                     `json:"allPassed,omitempty"`
-	Results   []AssertionResultsResults `json:"results,omitempty"`
+	AllPassed *bool                          `json:"allPassed,omitempty"`
+	Results   []AssertionResultsResultsInner `json:"results,omitempty"`
 }
 
 // NewAssertionResults instantiates a new AssertionResults object
@@ -39,7 +42,7 @@ func NewAssertionResultsWithDefaults() *AssertionResults {
 
 // GetAllPassed returns the AllPassed field value if set, zero value otherwise.
 func (o *AssertionResults) GetAllPassed() bool {
-	if o == nil || o.AllPassed == nil {
+	if o == nil || isNil(o.AllPassed) {
 		var ret bool
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *AssertionResults) GetAllPassed() bool {
 // GetAllPassedOk returns a tuple with the AllPassed field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionResults) GetAllPassedOk() (*bool, bool) {
-	if o == nil || o.AllPassed == nil {
+	if o == nil || isNil(o.AllPassed) {
 		return nil, false
 	}
 	return o.AllPassed, true
@@ -57,7 +60,7 @@ func (o *AssertionResults) GetAllPassedOk() (*bool, bool) {
 
 // HasAllPassed returns a boolean if a field has been set.
 func (o *AssertionResults) HasAllPassed() bool {
-	if o != nil && o.AllPassed != nil {
+	if o != nil && !isNil(o.AllPassed) {
 		return true
 	}
 
@@ -70,9 +73,9 @@ func (o *AssertionResults) SetAllPassed(v bool) {
 }
 
 // GetResults returns the Results field value if set, zero value otherwise.
-func (o *AssertionResults) GetResults() []AssertionResultsResults {
-	if o == nil || o.Results == nil {
-		var ret []AssertionResultsResults
+func (o *AssertionResults) GetResults() []AssertionResultsResultsInner {
+	if o == nil || isNil(o.Results) {
+		var ret []AssertionResultsResultsInner
 		return ret
 	}
 	return o.Results
@@ -80,8 +83,8 @@ func (o *AssertionResults) GetResults() []AssertionResultsResults {
 
 // GetResultsOk returns a tuple with the Results field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AssertionResults) GetResultsOk() ([]AssertionResultsResults, bool) {
-	if o == nil || o.Results == nil {
+func (o *AssertionResults) GetResultsOk() ([]AssertionResultsResultsInner, bool) {
+	if o == nil || isNil(o.Results) {
 		return nil, false
 	}
 	return o.Results, true
@@ -89,27 +92,35 @@ func (o *AssertionResults) GetResultsOk() ([]AssertionResultsResults, bool) {
 
 // HasResults returns a boolean if a field has been set.
 func (o *AssertionResults) HasResults() bool {
-	if o != nil && o.Results != nil {
+	if o != nil && !isNil(o.Results) {
 		return true
 	}
 
 	return false
 }
 
-// SetResults gets a reference to the given []AssertionResultsResults and assigns it to the Results field.
-func (o *AssertionResults) SetResults(v []AssertionResultsResults) {
+// SetResults gets a reference to the given []AssertionResultsResultsInner and assigns it to the Results field.
+func (o *AssertionResults) SetResults(v []AssertionResultsResultsInner) {
 	o.Results = v
 }
 
 func (o AssertionResults) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.AllPassed != nil {
-		toSerialize["allPassed"] = o.AllPassed
-	}
-	if o.Results != nil {
-		toSerialize["results"] = o.Results
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o AssertionResults) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.AllPassed) {
+		toSerialize["allPassed"] = o.AllPassed
+	}
+	if !isNil(o.Results) {
+		toSerialize["results"] = o.Results
+	}
+	return toSerialize, nil
 }
 
 type NullableAssertionResults struct {

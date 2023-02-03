@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the TransactionRun type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TransactionRun{}
+
 // TransactionRun struct for TransactionRun
 type TransactionRun struct {
 	Id          *string            `json:"id,omitempty"`
@@ -48,7 +51,7 @@ func NewTransactionRunWithDefaults() *TransactionRun {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *TransactionRun) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -58,7 +61,7 @@ func (o *TransactionRun) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -66,7 +69,7 @@ func (o *TransactionRun) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *TransactionRun) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -80,7 +83,7 @@ func (o *TransactionRun) SetId(v string) {
 
 // GetVersion returns the Version field value if set, zero value otherwise.
 func (o *TransactionRun) GetVersion() int32 {
-	if o == nil || o.Version == nil {
+	if o == nil || isNil(o.Version) {
 		var ret int32
 		return ret
 	}
@@ -90,7 +93,7 @@ func (o *TransactionRun) GetVersion() int32 {
 // GetVersionOk returns a tuple with the Version field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetVersionOk() (*int32, bool) {
-	if o == nil || o.Version == nil {
+	if o == nil || isNil(o.Version) {
 		return nil, false
 	}
 	return o.Version, true
@@ -98,7 +101,7 @@ func (o *TransactionRun) GetVersionOk() (*int32, bool) {
 
 // HasVersion returns a boolean if a field has been set.
 func (o *TransactionRun) HasVersion() bool {
-	if o != nil && o.Version != nil {
+	if o != nil && !isNil(o.Version) {
 		return true
 	}
 
@@ -112,7 +115,7 @@ func (o *TransactionRun) SetVersion(v int32) {
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *TransactionRun) GetCreatedAt() time.Time {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -122,7 +125,7 @@ func (o *TransactionRun) GetCreatedAt() time.Time {
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		return nil, false
 	}
 	return o.CreatedAt, true
@@ -130,7 +133,7 @@ func (o *TransactionRun) GetCreatedAtOk() (*time.Time, bool) {
 
 // HasCreatedAt returns a boolean if a field has been set.
 func (o *TransactionRun) HasCreatedAt() bool {
-	if o != nil && o.CreatedAt != nil {
+	if o != nil && !isNil(o.CreatedAt) {
 		return true
 	}
 
@@ -144,7 +147,7 @@ func (o *TransactionRun) SetCreatedAt(v time.Time) {
 
 // GetCompletedAt returns the CompletedAt field value if set, zero value otherwise.
 func (o *TransactionRun) GetCompletedAt() time.Time {
-	if o == nil || o.CompletedAt == nil {
+	if o == nil || isNil(o.CompletedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -154,7 +157,7 @@ func (o *TransactionRun) GetCompletedAt() time.Time {
 // GetCompletedAtOk returns a tuple with the CompletedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetCompletedAtOk() (*time.Time, bool) {
-	if o == nil || o.CompletedAt == nil {
+	if o == nil || isNil(o.CompletedAt) {
 		return nil, false
 	}
 	return o.CompletedAt, true
@@ -162,7 +165,7 @@ func (o *TransactionRun) GetCompletedAtOk() (*time.Time, bool) {
 
 // HasCompletedAt returns a boolean if a field has been set.
 func (o *TransactionRun) HasCompletedAt() bool {
-	if o != nil && o.CompletedAt != nil {
+	if o != nil && !isNil(o.CompletedAt) {
 		return true
 	}
 
@@ -176,7 +179,7 @@ func (o *TransactionRun) SetCompletedAt(v time.Time) {
 
 // GetState returns the State field value if set, zero value otherwise.
 func (o *TransactionRun) GetState() string {
-	if o == nil || o.State == nil {
+	if o == nil || isNil(o.State) {
 		var ret string
 		return ret
 	}
@@ -186,7 +189,7 @@ func (o *TransactionRun) GetState() string {
 // GetStateOk returns a tuple with the State field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetStateOk() (*string, bool) {
-	if o == nil || o.State == nil {
+	if o == nil || isNil(o.State) {
 		return nil, false
 	}
 	return o.State, true
@@ -194,7 +197,7 @@ func (o *TransactionRun) GetStateOk() (*string, bool) {
 
 // HasState returns a boolean if a field has been set.
 func (o *TransactionRun) HasState() bool {
-	if o != nil && o.State != nil {
+	if o != nil && !isNil(o.State) {
 		return true
 	}
 
@@ -208,7 +211,7 @@ func (o *TransactionRun) SetState(v string) {
 
 // GetSteps returns the Steps field value if set, zero value otherwise.
 func (o *TransactionRun) GetSteps() []TestRun {
-	if o == nil || o.Steps == nil {
+	if o == nil || isNil(o.Steps) {
 		var ret []TestRun
 		return ret
 	}
@@ -218,7 +221,7 @@ func (o *TransactionRun) GetSteps() []TestRun {
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetStepsOk() ([]TestRun, bool) {
-	if o == nil || o.Steps == nil {
+	if o == nil || isNil(o.Steps) {
 		return nil, false
 	}
 	return o.Steps, true
@@ -226,7 +229,7 @@ func (o *TransactionRun) GetStepsOk() ([]TestRun, bool) {
 
 // HasSteps returns a boolean if a field has been set.
 func (o *TransactionRun) HasSteps() bool {
-	if o != nil && o.Steps != nil {
+	if o != nil && !isNil(o.Steps) {
 		return true
 	}
 
@@ -240,7 +243,7 @@ func (o *TransactionRun) SetSteps(v []TestRun) {
 
 // GetEnvironment returns the Environment field value if set, zero value otherwise.
 func (o *TransactionRun) GetEnvironment() Environment {
-	if o == nil || o.Environment == nil {
+	if o == nil || isNil(o.Environment) {
 		var ret Environment
 		return ret
 	}
@@ -250,7 +253,7 @@ func (o *TransactionRun) GetEnvironment() Environment {
 // GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetEnvironmentOk() (*Environment, bool) {
-	if o == nil || o.Environment == nil {
+	if o == nil || isNil(o.Environment) {
 		return nil, false
 	}
 	return o.Environment, true
@@ -258,7 +261,7 @@ func (o *TransactionRun) GetEnvironmentOk() (*Environment, bool) {
 
 // HasEnvironment returns a boolean if a field has been set.
 func (o *TransactionRun) HasEnvironment() bool {
-	if o != nil && o.Environment != nil {
+	if o != nil && !isNil(o.Environment) {
 		return true
 	}
 
@@ -272,7 +275,7 @@ func (o *TransactionRun) SetEnvironment(v Environment) {
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
 func (o *TransactionRun) GetMetadata() map[string]string {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		var ret map[string]string
 		return ret
 	}
@@ -282,7 +285,7 @@ func (o *TransactionRun) GetMetadata() map[string]string {
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetMetadataOk() (*map[string]string, bool) {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		return nil, false
 	}
 	return o.Metadata, true
@@ -290,7 +293,7 @@ func (o *TransactionRun) GetMetadataOk() (*map[string]string, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *TransactionRun) HasMetadata() bool {
-	if o != nil && o.Metadata != nil {
+	if o != nil && !isNil(o.Metadata) {
 		return true
 	}
 
@@ -304,7 +307,7 @@ func (o *TransactionRun) SetMetadata(v map[string]string) {
 
 // GetPass returns the Pass field value if set, zero value otherwise.
 func (o *TransactionRun) GetPass() int32 {
-	if o == nil || o.Pass == nil {
+	if o == nil || isNil(o.Pass) {
 		var ret int32
 		return ret
 	}
@@ -314,7 +317,7 @@ func (o *TransactionRun) GetPass() int32 {
 // GetPassOk returns a tuple with the Pass field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetPassOk() (*int32, bool) {
-	if o == nil || o.Pass == nil {
+	if o == nil || isNil(o.Pass) {
 		return nil, false
 	}
 	return o.Pass, true
@@ -322,7 +325,7 @@ func (o *TransactionRun) GetPassOk() (*int32, bool) {
 
 // HasPass returns a boolean if a field has been set.
 func (o *TransactionRun) HasPass() bool {
-	if o != nil && o.Pass != nil {
+	if o != nil && !isNil(o.Pass) {
 		return true
 	}
 
@@ -336,7 +339,7 @@ func (o *TransactionRun) SetPass(v int32) {
 
 // GetFail returns the Fail field value if set, zero value otherwise.
 func (o *TransactionRun) GetFail() int32 {
-	if o == nil || o.Fail == nil {
+	if o == nil || isNil(o.Fail) {
 		var ret int32
 		return ret
 	}
@@ -346,7 +349,7 @@ func (o *TransactionRun) GetFail() int32 {
 // GetFailOk returns a tuple with the Fail field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TransactionRun) GetFailOk() (*int32, bool) {
-	if o == nil || o.Fail == nil {
+	if o == nil || isNil(o.Fail) {
 		return nil, false
 	}
 	return o.Fail, true
@@ -354,7 +357,7 @@ func (o *TransactionRun) GetFailOk() (*int32, bool) {
 
 // HasFail returns a boolean if a field has been set.
 func (o *TransactionRun) HasFail() bool {
-	if o != nil && o.Fail != nil {
+	if o != nil && !isNil(o.Fail) {
 		return true
 	}
 
@@ -367,38 +370,42 @@ func (o *TransactionRun) SetFail(v int32) {
 }
 
 func (o TransactionRun) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.Version != nil {
-		toSerialize["version"] = o.Version
-	}
-	if o.CreatedAt != nil {
-		toSerialize["createdAt"] = o.CreatedAt
-	}
-	if o.CompletedAt != nil {
-		toSerialize["completedAt"] = o.CompletedAt
-	}
-	if o.State != nil {
-		toSerialize["state"] = o.State
-	}
-	if o.Steps != nil {
-		toSerialize["steps"] = o.Steps
-	}
-	if o.Environment != nil {
-		toSerialize["environment"] = o.Environment
-	}
-	if o.Metadata != nil {
-		toSerialize["metadata"] = o.Metadata
-	}
-	if o.Pass != nil {
-		toSerialize["pass"] = o.Pass
-	}
-	if o.Fail != nil {
-		toSerialize["fail"] = o.Fail
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TransactionRun) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	// skip: id is readOnly
+	// skip: version is readOnly
+	if !isNil(o.CreatedAt) {
+		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if !isNil(o.CompletedAt) {
+		toSerialize["completedAt"] = o.CompletedAt
+	}
+	if !isNil(o.State) {
+		toSerialize["state"] = o.State
+	}
+	if !isNil(o.Steps) {
+		toSerialize["steps"] = o.Steps
+	}
+	if !isNil(o.Environment) {
+		toSerialize["environment"] = o.Environment
+	}
+	if !isNil(o.Metadata) {
+		toSerialize["metadata"] = o.Metadata
+	}
+	if !isNil(o.Pass) {
+		toSerialize["pass"] = o.Pass
+	}
+	if !isNil(o.Fail) {
+		toSerialize["fail"] = o.Fail
+	}
+	return toSerialize, nil
 }
 
 type NullableTransactionRun struct {

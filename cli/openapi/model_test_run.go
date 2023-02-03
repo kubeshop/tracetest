@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// checks if the TestRun type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestRun{}
+
 // TestRun struct for TestRun
 type TestRun struct {
 	Id      *string `json:"id,omitempty"`
@@ -29,20 +32,20 @@ type TestRun struct {
 	// time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	ExecutionTime *int32 `json:"executionTime,omitempty"`
 	// time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
-	TriggerTime               *int32             `json:"triggerTime,omitempty"`
-	CreatedAt                 *time.Time         `json:"createdAt,omitempty"`
-	ServiceTriggeredAt        *time.Time         `json:"serviceTriggeredAt,omitempty"`
-	ServiceTriggerCompletedAt *time.Time         `json:"serviceTriggerCompletedAt,omitempty"`
-	ObtainedTraceAt           *time.Time         `json:"obtainedTraceAt,omitempty"`
-	CompletedAt               *time.Time         `json:"completedAt,omitempty"`
-	Environment               *Environment       `json:"environment,omitempty"`
-	TriggerResult             *TriggerResult     `json:"triggerResult,omitempty"`
-	Trace                     *Trace             `json:"trace,omitempty"`
-	Result                    *AssertionResults  `json:"result,omitempty"`
-	Outputs                   []TestRunOutputs   `json:"outputs,omitempty"`
-	Metadata                  *map[string]string `json:"metadata,omitempty"`
-	TransactionId             *string            `json:"transactionId,omitempty"`
-	TransactionRunId          *string            `json:"transactionRunId,omitempty"`
+	TriggerTime               *int32                `json:"triggerTime,omitempty"`
+	CreatedAt                 *time.Time            `json:"createdAt,omitempty"`
+	ServiceTriggeredAt        *time.Time            `json:"serviceTriggeredAt,omitempty"`
+	ServiceTriggerCompletedAt *time.Time            `json:"serviceTriggerCompletedAt,omitempty"`
+	ObtainedTraceAt           *time.Time            `json:"obtainedTraceAt,omitempty"`
+	CompletedAt               *time.Time            `json:"completedAt,omitempty"`
+	Environment               *Environment          `json:"environment,omitempty"`
+	TriggerResult             *TriggerResult        `json:"triggerResult,omitempty"`
+	Trace                     *Trace                `json:"trace,omitempty"`
+	Result                    *AssertionResults     `json:"result,omitempty"`
+	Outputs                   []TestRunOutputsInner `json:"outputs,omitempty"`
+	Metadata                  *map[string]string    `json:"metadata,omitempty"`
+	TransactionId             *string               `json:"transactionId,omitempty"`
+	TransactionRunId          *string               `json:"transactionRunId,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -64,7 +67,7 @@ func NewTestRunWithDefaults() *TestRun {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *TestRun) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -74,7 +77,7 @@ func (o *TestRun) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -82,7 +85,7 @@ func (o *TestRun) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *TestRun) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !isNil(o.Id) {
 		return true
 	}
 
@@ -96,7 +99,7 @@ func (o *TestRun) SetId(v string) {
 
 // GetTraceId returns the TraceId field value if set, zero value otherwise.
 func (o *TestRun) GetTraceId() string {
-	if o == nil || o.TraceId == nil {
+	if o == nil || isNil(o.TraceId) {
 		var ret string
 		return ret
 	}
@@ -106,7 +109,7 @@ func (o *TestRun) GetTraceId() string {
 // GetTraceIdOk returns a tuple with the TraceId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTraceIdOk() (*string, bool) {
-	if o == nil || o.TraceId == nil {
+	if o == nil || isNil(o.TraceId) {
 		return nil, false
 	}
 	return o.TraceId, true
@@ -114,7 +117,7 @@ func (o *TestRun) GetTraceIdOk() (*string, bool) {
 
 // HasTraceId returns a boolean if a field has been set.
 func (o *TestRun) HasTraceId() bool {
-	if o != nil && o.TraceId != nil {
+	if o != nil && !isNil(o.TraceId) {
 		return true
 	}
 
@@ -128,7 +131,7 @@ func (o *TestRun) SetTraceId(v string) {
 
 // GetSpanId returns the SpanId field value if set, zero value otherwise.
 func (o *TestRun) GetSpanId() string {
-	if o == nil || o.SpanId == nil {
+	if o == nil || isNil(o.SpanId) {
 		var ret string
 		return ret
 	}
@@ -138,7 +141,7 @@ func (o *TestRun) GetSpanId() string {
 // GetSpanIdOk returns a tuple with the SpanId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetSpanIdOk() (*string, bool) {
-	if o == nil || o.SpanId == nil {
+	if o == nil || isNil(o.SpanId) {
 		return nil, false
 	}
 	return o.SpanId, true
@@ -146,7 +149,7 @@ func (o *TestRun) GetSpanIdOk() (*string, bool) {
 
 // HasSpanId returns a boolean if a field has been set.
 func (o *TestRun) HasSpanId() bool {
-	if o != nil && o.SpanId != nil {
+	if o != nil && !isNil(o.SpanId) {
 		return true
 	}
 
@@ -160,7 +163,7 @@ func (o *TestRun) SetSpanId(v string) {
 
 // GetTestVersion returns the TestVersion field value if set, zero value otherwise.
 func (o *TestRun) GetTestVersion() int32 {
-	if o == nil || o.TestVersion == nil {
+	if o == nil || isNil(o.TestVersion) {
 		var ret int32
 		return ret
 	}
@@ -170,7 +173,7 @@ func (o *TestRun) GetTestVersion() int32 {
 // GetTestVersionOk returns a tuple with the TestVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTestVersionOk() (*int32, bool) {
-	if o == nil || o.TestVersion == nil {
+	if o == nil || isNil(o.TestVersion) {
 		return nil, false
 	}
 	return o.TestVersion, true
@@ -178,7 +181,7 @@ func (o *TestRun) GetTestVersionOk() (*int32, bool) {
 
 // HasTestVersion returns a boolean if a field has been set.
 func (o *TestRun) HasTestVersion() bool {
-	if o != nil && o.TestVersion != nil {
+	if o != nil && !isNil(o.TestVersion) {
 		return true
 	}
 
@@ -192,7 +195,7 @@ func (o *TestRun) SetTestVersion(v int32) {
 
 // GetState returns the State field value if set, zero value otherwise.
 func (o *TestRun) GetState() string {
-	if o == nil || o.State == nil {
+	if o == nil || isNil(o.State) {
 		var ret string
 		return ret
 	}
@@ -202,7 +205,7 @@ func (o *TestRun) GetState() string {
 // GetStateOk returns a tuple with the State field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetStateOk() (*string, bool) {
-	if o == nil || o.State == nil {
+	if o == nil || isNil(o.State) {
 		return nil, false
 	}
 	return o.State, true
@@ -210,7 +213,7 @@ func (o *TestRun) GetStateOk() (*string, bool) {
 
 // HasState returns a boolean if a field has been set.
 func (o *TestRun) HasState() bool {
-	if o != nil && o.State != nil {
+	if o != nil && !isNil(o.State) {
 		return true
 	}
 
@@ -224,7 +227,7 @@ func (o *TestRun) SetState(v string) {
 
 // GetLastErrorState returns the LastErrorState field value if set, zero value otherwise.
 func (o *TestRun) GetLastErrorState() string {
-	if o == nil || o.LastErrorState == nil {
+	if o == nil || isNil(o.LastErrorState) {
 		var ret string
 		return ret
 	}
@@ -234,7 +237,7 @@ func (o *TestRun) GetLastErrorState() string {
 // GetLastErrorStateOk returns a tuple with the LastErrorState field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetLastErrorStateOk() (*string, bool) {
-	if o == nil || o.LastErrorState == nil {
+	if o == nil || isNil(o.LastErrorState) {
 		return nil, false
 	}
 	return o.LastErrorState, true
@@ -242,7 +245,7 @@ func (o *TestRun) GetLastErrorStateOk() (*string, bool) {
 
 // HasLastErrorState returns a boolean if a field has been set.
 func (o *TestRun) HasLastErrorState() bool {
-	if o != nil && o.LastErrorState != nil {
+	if o != nil && !isNil(o.LastErrorState) {
 		return true
 	}
 
@@ -256,7 +259,7 @@ func (o *TestRun) SetLastErrorState(v string) {
 
 // GetExecutionTime returns the ExecutionTime field value if set, zero value otherwise.
 func (o *TestRun) GetExecutionTime() int32 {
-	if o == nil || o.ExecutionTime == nil {
+	if o == nil || isNil(o.ExecutionTime) {
 		var ret int32
 		return ret
 	}
@@ -266,7 +269,7 @@ func (o *TestRun) GetExecutionTime() int32 {
 // GetExecutionTimeOk returns a tuple with the ExecutionTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetExecutionTimeOk() (*int32, bool) {
-	if o == nil || o.ExecutionTime == nil {
+	if o == nil || isNil(o.ExecutionTime) {
 		return nil, false
 	}
 	return o.ExecutionTime, true
@@ -274,7 +277,7 @@ func (o *TestRun) GetExecutionTimeOk() (*int32, bool) {
 
 // HasExecutionTime returns a boolean if a field has been set.
 func (o *TestRun) HasExecutionTime() bool {
-	if o != nil && o.ExecutionTime != nil {
+	if o != nil && !isNil(o.ExecutionTime) {
 		return true
 	}
 
@@ -288,7 +291,7 @@ func (o *TestRun) SetExecutionTime(v int32) {
 
 // GetTriggerTime returns the TriggerTime field value if set, zero value otherwise.
 func (o *TestRun) GetTriggerTime() int32 {
-	if o == nil || o.TriggerTime == nil {
+	if o == nil || isNil(o.TriggerTime) {
 		var ret int32
 		return ret
 	}
@@ -298,7 +301,7 @@ func (o *TestRun) GetTriggerTime() int32 {
 // GetTriggerTimeOk returns a tuple with the TriggerTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTriggerTimeOk() (*int32, bool) {
-	if o == nil || o.TriggerTime == nil {
+	if o == nil || isNil(o.TriggerTime) {
 		return nil, false
 	}
 	return o.TriggerTime, true
@@ -306,7 +309,7 @@ func (o *TestRun) GetTriggerTimeOk() (*int32, bool) {
 
 // HasTriggerTime returns a boolean if a field has been set.
 func (o *TestRun) HasTriggerTime() bool {
-	if o != nil && o.TriggerTime != nil {
+	if o != nil && !isNil(o.TriggerTime) {
 		return true
 	}
 
@@ -320,7 +323,7 @@ func (o *TestRun) SetTriggerTime(v int32) {
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *TestRun) GetCreatedAt() time.Time {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -330,7 +333,7 @@ func (o *TestRun) GetCreatedAt() time.Time {
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || isNil(o.CreatedAt) {
 		return nil, false
 	}
 	return o.CreatedAt, true
@@ -338,7 +341,7 @@ func (o *TestRun) GetCreatedAtOk() (*time.Time, bool) {
 
 // HasCreatedAt returns a boolean if a field has been set.
 func (o *TestRun) HasCreatedAt() bool {
-	if o != nil && o.CreatedAt != nil {
+	if o != nil && !isNil(o.CreatedAt) {
 		return true
 	}
 
@@ -352,7 +355,7 @@ func (o *TestRun) SetCreatedAt(v time.Time) {
 
 // GetServiceTriggeredAt returns the ServiceTriggeredAt field value if set, zero value otherwise.
 func (o *TestRun) GetServiceTriggeredAt() time.Time {
-	if o == nil || o.ServiceTriggeredAt == nil {
+	if o == nil || isNil(o.ServiceTriggeredAt) {
 		var ret time.Time
 		return ret
 	}
@@ -362,7 +365,7 @@ func (o *TestRun) GetServiceTriggeredAt() time.Time {
 // GetServiceTriggeredAtOk returns a tuple with the ServiceTriggeredAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetServiceTriggeredAtOk() (*time.Time, bool) {
-	if o == nil || o.ServiceTriggeredAt == nil {
+	if o == nil || isNil(o.ServiceTriggeredAt) {
 		return nil, false
 	}
 	return o.ServiceTriggeredAt, true
@@ -370,7 +373,7 @@ func (o *TestRun) GetServiceTriggeredAtOk() (*time.Time, bool) {
 
 // HasServiceTriggeredAt returns a boolean if a field has been set.
 func (o *TestRun) HasServiceTriggeredAt() bool {
-	if o != nil && o.ServiceTriggeredAt != nil {
+	if o != nil && !isNil(o.ServiceTriggeredAt) {
 		return true
 	}
 
@@ -384,7 +387,7 @@ func (o *TestRun) SetServiceTriggeredAt(v time.Time) {
 
 // GetServiceTriggerCompletedAt returns the ServiceTriggerCompletedAt field value if set, zero value otherwise.
 func (o *TestRun) GetServiceTriggerCompletedAt() time.Time {
-	if o == nil || o.ServiceTriggerCompletedAt == nil {
+	if o == nil || isNil(o.ServiceTriggerCompletedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -394,7 +397,7 @@ func (o *TestRun) GetServiceTriggerCompletedAt() time.Time {
 // GetServiceTriggerCompletedAtOk returns a tuple with the ServiceTriggerCompletedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetServiceTriggerCompletedAtOk() (*time.Time, bool) {
-	if o == nil || o.ServiceTriggerCompletedAt == nil {
+	if o == nil || isNil(o.ServiceTriggerCompletedAt) {
 		return nil, false
 	}
 	return o.ServiceTriggerCompletedAt, true
@@ -402,7 +405,7 @@ func (o *TestRun) GetServiceTriggerCompletedAtOk() (*time.Time, bool) {
 
 // HasServiceTriggerCompletedAt returns a boolean if a field has been set.
 func (o *TestRun) HasServiceTriggerCompletedAt() bool {
-	if o != nil && o.ServiceTriggerCompletedAt != nil {
+	if o != nil && !isNil(o.ServiceTriggerCompletedAt) {
 		return true
 	}
 
@@ -416,7 +419,7 @@ func (o *TestRun) SetServiceTriggerCompletedAt(v time.Time) {
 
 // GetObtainedTraceAt returns the ObtainedTraceAt field value if set, zero value otherwise.
 func (o *TestRun) GetObtainedTraceAt() time.Time {
-	if o == nil || o.ObtainedTraceAt == nil {
+	if o == nil || isNil(o.ObtainedTraceAt) {
 		var ret time.Time
 		return ret
 	}
@@ -426,7 +429,7 @@ func (o *TestRun) GetObtainedTraceAt() time.Time {
 // GetObtainedTraceAtOk returns a tuple with the ObtainedTraceAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetObtainedTraceAtOk() (*time.Time, bool) {
-	if o == nil || o.ObtainedTraceAt == nil {
+	if o == nil || isNil(o.ObtainedTraceAt) {
 		return nil, false
 	}
 	return o.ObtainedTraceAt, true
@@ -434,7 +437,7 @@ func (o *TestRun) GetObtainedTraceAtOk() (*time.Time, bool) {
 
 // HasObtainedTraceAt returns a boolean if a field has been set.
 func (o *TestRun) HasObtainedTraceAt() bool {
-	if o != nil && o.ObtainedTraceAt != nil {
+	if o != nil && !isNil(o.ObtainedTraceAt) {
 		return true
 	}
 
@@ -448,7 +451,7 @@ func (o *TestRun) SetObtainedTraceAt(v time.Time) {
 
 // GetCompletedAt returns the CompletedAt field value if set, zero value otherwise.
 func (o *TestRun) GetCompletedAt() time.Time {
-	if o == nil || o.CompletedAt == nil {
+	if o == nil || isNil(o.CompletedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -458,7 +461,7 @@ func (o *TestRun) GetCompletedAt() time.Time {
 // GetCompletedAtOk returns a tuple with the CompletedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetCompletedAtOk() (*time.Time, bool) {
-	if o == nil || o.CompletedAt == nil {
+	if o == nil || isNil(o.CompletedAt) {
 		return nil, false
 	}
 	return o.CompletedAt, true
@@ -466,7 +469,7 @@ func (o *TestRun) GetCompletedAtOk() (*time.Time, bool) {
 
 // HasCompletedAt returns a boolean if a field has been set.
 func (o *TestRun) HasCompletedAt() bool {
-	if o != nil && o.CompletedAt != nil {
+	if o != nil && !isNil(o.CompletedAt) {
 		return true
 	}
 
@@ -480,7 +483,7 @@ func (o *TestRun) SetCompletedAt(v time.Time) {
 
 // GetEnvironment returns the Environment field value if set, zero value otherwise.
 func (o *TestRun) GetEnvironment() Environment {
-	if o == nil || o.Environment == nil {
+	if o == nil || isNil(o.Environment) {
 		var ret Environment
 		return ret
 	}
@@ -490,7 +493,7 @@ func (o *TestRun) GetEnvironment() Environment {
 // GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetEnvironmentOk() (*Environment, bool) {
-	if o == nil || o.Environment == nil {
+	if o == nil || isNil(o.Environment) {
 		return nil, false
 	}
 	return o.Environment, true
@@ -498,7 +501,7 @@ func (o *TestRun) GetEnvironmentOk() (*Environment, bool) {
 
 // HasEnvironment returns a boolean if a field has been set.
 func (o *TestRun) HasEnvironment() bool {
-	if o != nil && o.Environment != nil {
+	if o != nil && !isNil(o.Environment) {
 		return true
 	}
 
@@ -512,7 +515,7 @@ func (o *TestRun) SetEnvironment(v Environment) {
 
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
 func (o *TestRun) GetTriggerResult() TriggerResult {
-	if o == nil || o.TriggerResult == nil {
+	if o == nil || isNil(o.TriggerResult) {
 		var ret TriggerResult
 		return ret
 	}
@@ -522,7 +525,7 @@ func (o *TestRun) GetTriggerResult() TriggerResult {
 // GetTriggerResultOk returns a tuple with the TriggerResult field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTriggerResultOk() (*TriggerResult, bool) {
-	if o == nil || o.TriggerResult == nil {
+	if o == nil || isNil(o.TriggerResult) {
 		return nil, false
 	}
 	return o.TriggerResult, true
@@ -530,7 +533,7 @@ func (o *TestRun) GetTriggerResultOk() (*TriggerResult, bool) {
 
 // HasTriggerResult returns a boolean if a field has been set.
 func (o *TestRun) HasTriggerResult() bool {
-	if o != nil && o.TriggerResult != nil {
+	if o != nil && !isNil(o.TriggerResult) {
 		return true
 	}
 
@@ -544,7 +547,7 @@ func (o *TestRun) SetTriggerResult(v TriggerResult) {
 
 // GetTrace returns the Trace field value if set, zero value otherwise.
 func (o *TestRun) GetTrace() Trace {
-	if o == nil || o.Trace == nil {
+	if o == nil || isNil(o.Trace) {
 		var ret Trace
 		return ret
 	}
@@ -554,7 +557,7 @@ func (o *TestRun) GetTrace() Trace {
 // GetTraceOk returns a tuple with the Trace field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTraceOk() (*Trace, bool) {
-	if o == nil || o.Trace == nil {
+	if o == nil || isNil(o.Trace) {
 		return nil, false
 	}
 	return o.Trace, true
@@ -562,7 +565,7 @@ func (o *TestRun) GetTraceOk() (*Trace, bool) {
 
 // HasTrace returns a boolean if a field has been set.
 func (o *TestRun) HasTrace() bool {
-	if o != nil && o.Trace != nil {
+	if o != nil && !isNil(o.Trace) {
 		return true
 	}
 
@@ -576,7 +579,7 @@ func (o *TestRun) SetTrace(v Trace) {
 
 // GetResult returns the Result field value if set, zero value otherwise.
 func (o *TestRun) GetResult() AssertionResults {
-	if o == nil || o.Result == nil {
+	if o == nil || isNil(o.Result) {
 		var ret AssertionResults
 		return ret
 	}
@@ -586,7 +589,7 @@ func (o *TestRun) GetResult() AssertionResults {
 // GetResultOk returns a tuple with the Result field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetResultOk() (*AssertionResults, bool) {
-	if o == nil || o.Result == nil {
+	if o == nil || isNil(o.Result) {
 		return nil, false
 	}
 	return o.Result, true
@@ -594,7 +597,7 @@ func (o *TestRun) GetResultOk() (*AssertionResults, bool) {
 
 // HasResult returns a boolean if a field has been set.
 func (o *TestRun) HasResult() bool {
-	if o != nil && o.Result != nil {
+	if o != nil && !isNil(o.Result) {
 		return true
 	}
 
@@ -607,9 +610,9 @@ func (o *TestRun) SetResult(v AssertionResults) {
 }
 
 // GetOutputs returns the Outputs field value if set, zero value otherwise.
-func (o *TestRun) GetOutputs() []TestRunOutputs {
-	if o == nil || o.Outputs == nil {
-		var ret []TestRunOutputs
+func (o *TestRun) GetOutputs() []TestRunOutputsInner {
+	if o == nil || isNil(o.Outputs) {
+		var ret []TestRunOutputsInner
 		return ret
 	}
 	return o.Outputs
@@ -617,8 +620,8 @@ func (o *TestRun) GetOutputs() []TestRunOutputs {
 
 // GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetOutputsOk() ([]TestRunOutputs, bool) {
-	if o == nil || o.Outputs == nil {
+func (o *TestRun) GetOutputsOk() ([]TestRunOutputsInner, bool) {
+	if o == nil || isNil(o.Outputs) {
 		return nil, false
 	}
 	return o.Outputs, true
@@ -626,21 +629,21 @@ func (o *TestRun) GetOutputsOk() ([]TestRunOutputs, bool) {
 
 // HasOutputs returns a boolean if a field has been set.
 func (o *TestRun) HasOutputs() bool {
-	if o != nil && o.Outputs != nil {
+	if o != nil && !isNil(o.Outputs) {
 		return true
 	}
 
 	return false
 }
 
-// SetOutputs gets a reference to the given []TestRunOutputs and assigns it to the Outputs field.
-func (o *TestRun) SetOutputs(v []TestRunOutputs) {
+// SetOutputs gets a reference to the given []TestRunOutputsInner and assigns it to the Outputs field.
+func (o *TestRun) SetOutputs(v []TestRunOutputsInner) {
 	o.Outputs = v
 }
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
 func (o *TestRun) GetMetadata() map[string]string {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		var ret map[string]string
 		return ret
 	}
@@ -650,7 +653,7 @@ func (o *TestRun) GetMetadata() map[string]string {
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetMetadataOk() (*map[string]string, bool) {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		return nil, false
 	}
 	return o.Metadata, true
@@ -658,7 +661,7 @@ func (o *TestRun) GetMetadataOk() (*map[string]string, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *TestRun) HasMetadata() bool {
-	if o != nil && o.Metadata != nil {
+	if o != nil && !isNil(o.Metadata) {
 		return true
 	}
 
@@ -672,7 +675,7 @@ func (o *TestRun) SetMetadata(v map[string]string) {
 
 // GetTransactionId returns the TransactionId field value if set, zero value otherwise.
 func (o *TestRun) GetTransactionId() string {
-	if o == nil || o.TransactionId == nil {
+	if o == nil || isNil(o.TransactionId) {
 		var ret string
 		return ret
 	}
@@ -682,7 +685,7 @@ func (o *TestRun) GetTransactionId() string {
 // GetTransactionIdOk returns a tuple with the TransactionId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTransactionIdOk() (*string, bool) {
-	if o == nil || o.TransactionId == nil {
+	if o == nil || isNil(o.TransactionId) {
 		return nil, false
 	}
 	return o.TransactionId, true
@@ -690,7 +693,7 @@ func (o *TestRun) GetTransactionIdOk() (*string, bool) {
 
 // HasTransactionId returns a boolean if a field has been set.
 func (o *TestRun) HasTransactionId() bool {
-	if o != nil && o.TransactionId != nil {
+	if o != nil && !isNil(o.TransactionId) {
 		return true
 	}
 
@@ -704,7 +707,7 @@ func (o *TestRun) SetTransactionId(v string) {
 
 // GetTransactionRunId returns the TransactionRunId field value if set, zero value otherwise.
 func (o *TestRun) GetTransactionRunId() string {
-	if o == nil || o.TransactionRunId == nil {
+	if o == nil || isNil(o.TransactionRunId) {
 		var ret string
 		return ret
 	}
@@ -714,7 +717,7 @@ func (o *TestRun) GetTransactionRunId() string {
 // GetTransactionRunIdOk returns a tuple with the TransactionRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TestRun) GetTransactionRunIdOk() (*string, bool) {
-	if o == nil || o.TransactionRunId == nil {
+	if o == nil || isNil(o.TransactionRunId) {
 		return nil, false
 	}
 	return o.TransactionRunId, true
@@ -722,7 +725,7 @@ func (o *TestRun) GetTransactionRunIdOk() (*string, bool) {
 
 // HasTransactionRunId returns a boolean if a field has been set.
 func (o *TestRun) HasTransactionRunId() bool {
-	if o != nil && o.TransactionRunId != nil {
+	if o != nil && !isNil(o.TransactionRunId) {
 		return true
 	}
 
@@ -735,71 +738,73 @@ func (o *TestRun) SetTransactionRunId(v string) {
 }
 
 func (o TestRun) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.TraceId != nil {
-		toSerialize["traceId"] = o.TraceId
-	}
-	if o.SpanId != nil {
-		toSerialize["spanId"] = o.SpanId
-	}
-	if o.TestVersion != nil {
-		toSerialize["testVersion"] = o.TestVersion
-	}
-	if o.State != nil {
-		toSerialize["state"] = o.State
-	}
-	if o.LastErrorState != nil {
-		toSerialize["lastErrorState"] = o.LastErrorState
-	}
-	if o.ExecutionTime != nil {
-		toSerialize["executionTime"] = o.ExecutionTime
-	}
-	if o.TriggerTime != nil {
-		toSerialize["triggerTime"] = o.TriggerTime
-	}
-	if o.CreatedAt != nil {
-		toSerialize["createdAt"] = o.CreatedAt
-	}
-	if o.ServiceTriggeredAt != nil {
-		toSerialize["serviceTriggeredAt"] = o.ServiceTriggeredAt
-	}
-	if o.ServiceTriggerCompletedAt != nil {
-		toSerialize["serviceTriggerCompletedAt"] = o.ServiceTriggerCompletedAt
-	}
-	if o.ObtainedTraceAt != nil {
-		toSerialize["obtainedTraceAt"] = o.ObtainedTraceAt
-	}
-	if o.CompletedAt != nil {
-		toSerialize["completedAt"] = o.CompletedAt
-	}
-	if o.Environment != nil {
-		toSerialize["environment"] = o.Environment
-	}
-	if o.TriggerResult != nil {
-		toSerialize["triggerResult"] = o.TriggerResult
-	}
-	if o.Trace != nil {
-		toSerialize["trace"] = o.Trace
-	}
-	if o.Result != nil {
-		toSerialize["result"] = o.Result
-	}
-	if o.Outputs != nil {
-		toSerialize["outputs"] = o.Outputs
-	}
-	if o.Metadata != nil {
-		toSerialize["metadata"] = o.Metadata
-	}
-	if o.TransactionId != nil {
-		toSerialize["transactionId"] = o.TransactionId
-	}
-	if o.TransactionRunId != nil {
-		toSerialize["transactionRunId"] = o.TransactionRunId
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TestRun) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	// skip: id is readOnly
+	// skip: traceId is readOnly
+	// skip: spanId is readOnly
+	if !isNil(o.TestVersion) {
+		toSerialize["testVersion"] = o.TestVersion
+	}
+	if !isNil(o.State) {
+		toSerialize["state"] = o.State
+	}
+	if !isNil(o.LastErrorState) {
+		toSerialize["lastErrorState"] = o.LastErrorState
+	}
+	if !isNil(o.ExecutionTime) {
+		toSerialize["executionTime"] = o.ExecutionTime
+	}
+	if !isNil(o.TriggerTime) {
+		toSerialize["triggerTime"] = o.TriggerTime
+	}
+	if !isNil(o.CreatedAt) {
+		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if !isNil(o.ServiceTriggeredAt) {
+		toSerialize["serviceTriggeredAt"] = o.ServiceTriggeredAt
+	}
+	if !isNil(o.ServiceTriggerCompletedAt) {
+		toSerialize["serviceTriggerCompletedAt"] = o.ServiceTriggerCompletedAt
+	}
+	if !isNil(o.ObtainedTraceAt) {
+		toSerialize["obtainedTraceAt"] = o.ObtainedTraceAt
+	}
+	if !isNil(o.CompletedAt) {
+		toSerialize["completedAt"] = o.CompletedAt
+	}
+	if !isNil(o.Environment) {
+		toSerialize["environment"] = o.Environment
+	}
+	if !isNil(o.TriggerResult) {
+		toSerialize["triggerResult"] = o.TriggerResult
+	}
+	if !isNil(o.Trace) {
+		toSerialize["trace"] = o.Trace
+	}
+	if !isNil(o.Result) {
+		toSerialize["result"] = o.Result
+	}
+	if !isNil(o.Outputs) {
+		toSerialize["outputs"] = o.Outputs
+	}
+	if !isNil(o.Metadata) {
+		toSerialize["metadata"] = o.Metadata
+	}
+	if !isNil(o.TransactionId) {
+		toSerialize["transactionId"] = o.TransactionId
+	}
+	if !isNil(o.TransactionRunId) {
+		toSerialize["transactionRunId"] = o.TransactionRunId
+	}
+	return toSerialize, nil
 }
 
 type NullableTestRun struct {

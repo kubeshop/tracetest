@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the EnvironmentValue type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &EnvironmentValue{}
+
 // EnvironmentValue struct for EnvironmentValue
 type EnvironmentValue struct {
 	Key   *string `json:"key,omitempty"`
@@ -39,7 +42,7 @@ func NewEnvironmentValueWithDefaults() *EnvironmentValue {
 
 // GetKey returns the Key field value if set, zero value otherwise.
 func (o *EnvironmentValue) GetKey() string {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *EnvironmentValue) GetKey() string {
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EnvironmentValue) GetKeyOk() (*string, bool) {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		return nil, false
 	}
 	return o.Key, true
@@ -57,7 +60,7 @@ func (o *EnvironmentValue) GetKeyOk() (*string, bool) {
 
 // HasKey returns a boolean if a field has been set.
 func (o *EnvironmentValue) HasKey() bool {
-	if o != nil && o.Key != nil {
+	if o != nil && !isNil(o.Key) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *EnvironmentValue) SetKey(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *EnvironmentValue) GetValue() string {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *EnvironmentValue) GetValue() string {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EnvironmentValue) GetValueOk() (*string, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -89,7 +92,7 @@ func (o *EnvironmentValue) GetValueOk() (*string, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *EnvironmentValue) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !isNil(o.Value) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *EnvironmentValue) SetValue(v string) {
 }
 
 func (o EnvironmentValue) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Key != nil {
-		toSerialize["key"] = o.Key
-	}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o EnvironmentValue) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Key) {
+		toSerialize["key"] = o.Key
+	}
+	if !isNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	return toSerialize, nil
 }
 
 type NullableEnvironmentValue struct {

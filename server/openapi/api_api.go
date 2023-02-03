@@ -47,7 +47,7 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 	return controller
 }
 
-// Routes returns all of the api route for the ApiApiController
+// Routes returns all the api routes for the ApiApiController
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{

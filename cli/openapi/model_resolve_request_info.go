@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ResolveRequestInfo type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ResolveRequestInfo{}
+
 // ResolveRequestInfo struct for ResolveRequestInfo
 type ResolveRequestInfo struct {
 	Expression *string         `json:"expression,omitempty"`
@@ -39,7 +42,7 @@ func NewResolveRequestInfoWithDefaults() *ResolveRequestInfo {
 
 // GetExpression returns the Expression field value if set, zero value otherwise.
 func (o *ResolveRequestInfo) GetExpression() string {
-	if o == nil || o.Expression == nil {
+	if o == nil || isNil(o.Expression) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *ResolveRequestInfo) GetExpression() string {
 // GetExpressionOk returns a tuple with the Expression field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ResolveRequestInfo) GetExpressionOk() (*string, bool) {
-	if o == nil || o.Expression == nil {
+	if o == nil || isNil(o.Expression) {
 		return nil, false
 	}
 	return o.Expression, true
@@ -57,7 +60,7 @@ func (o *ResolveRequestInfo) GetExpressionOk() (*string, bool) {
 
 // HasExpression returns a boolean if a field has been set.
 func (o *ResolveRequestInfo) HasExpression() bool {
-	if o != nil && o.Expression != nil {
+	if o != nil && !isNil(o.Expression) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *ResolveRequestInfo) SetExpression(v string) {
 
 // GetContext returns the Context field value if set, zero value otherwise.
 func (o *ResolveRequestInfo) GetContext() ResolveContext {
-	if o == nil || o.Context == nil {
+	if o == nil || isNil(o.Context) {
 		var ret ResolveContext
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *ResolveRequestInfo) GetContext() ResolveContext {
 // GetContextOk returns a tuple with the Context field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ResolveRequestInfo) GetContextOk() (*ResolveContext, bool) {
-	if o == nil || o.Context == nil {
+	if o == nil || isNil(o.Context) {
 		return nil, false
 	}
 	return o.Context, true
@@ -89,7 +92,7 @@ func (o *ResolveRequestInfo) GetContextOk() (*ResolveContext, bool) {
 
 // HasContext returns a boolean if a field has been set.
 func (o *ResolveRequestInfo) HasContext() bool {
-	if o != nil && o.Context != nil {
+	if o != nil && !isNil(o.Context) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *ResolveRequestInfo) SetContext(v ResolveContext) {
 }
 
 func (o ResolveRequestInfo) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Expression != nil {
-		toSerialize["expression"] = o.Expression
-	}
-	if o.Context != nil {
-		toSerialize["context"] = o.Context
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ResolveRequestInfo) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Expression) {
+		toSerialize["expression"] = o.Expression
+	}
+	if !isNil(o.Context) {
+		toSerialize["context"] = o.Context
+	}
+	return toSerialize, nil
 }
 
 type NullableResolveRequestInfo struct {

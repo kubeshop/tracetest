@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the GRPCRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &GRPCRequest{}
+
 // GRPCRequest struct for GRPCRequest
 type GRPCRequest struct {
 	ProtobufFile *string      `json:"protobufFile,omitempty"`
@@ -44,7 +47,7 @@ func NewGRPCRequestWithDefaults() *GRPCRequest {
 
 // GetProtobufFile returns the ProtobufFile field value if set, zero value otherwise.
 func (o *GRPCRequest) GetProtobufFile() string {
-	if o == nil || o.ProtobufFile == nil {
+	if o == nil || isNil(o.ProtobufFile) {
 		var ret string
 		return ret
 	}
@@ -54,7 +57,7 @@ func (o *GRPCRequest) GetProtobufFile() string {
 // GetProtobufFileOk returns a tuple with the ProtobufFile field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetProtobufFileOk() (*string, bool) {
-	if o == nil || o.ProtobufFile == nil {
+	if o == nil || isNil(o.ProtobufFile) {
 		return nil, false
 	}
 	return o.ProtobufFile, true
@@ -62,7 +65,7 @@ func (o *GRPCRequest) GetProtobufFileOk() (*string, bool) {
 
 // HasProtobufFile returns a boolean if a field has been set.
 func (o *GRPCRequest) HasProtobufFile() bool {
-	if o != nil && o.ProtobufFile != nil {
+	if o != nil && !isNil(o.ProtobufFile) {
 		return true
 	}
 
@@ -76,7 +79,7 @@ func (o *GRPCRequest) SetProtobufFile(v string) {
 
 // GetAddress returns the Address field value if set, zero value otherwise.
 func (o *GRPCRequest) GetAddress() string {
-	if o == nil || o.Address == nil {
+	if o == nil || isNil(o.Address) {
 		var ret string
 		return ret
 	}
@@ -86,7 +89,7 @@ func (o *GRPCRequest) GetAddress() string {
 // GetAddressOk returns a tuple with the Address field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetAddressOk() (*string, bool) {
-	if o == nil || o.Address == nil {
+	if o == nil || isNil(o.Address) {
 		return nil, false
 	}
 	return o.Address, true
@@ -94,7 +97,7 @@ func (o *GRPCRequest) GetAddressOk() (*string, bool) {
 
 // HasAddress returns a boolean if a field has been set.
 func (o *GRPCRequest) HasAddress() bool {
-	if o != nil && o.Address != nil {
+	if o != nil && !isNil(o.Address) {
 		return true
 	}
 
@@ -108,7 +111,7 @@ func (o *GRPCRequest) SetAddress(v string) {
 
 // GetService returns the Service field value if set, zero value otherwise.
 func (o *GRPCRequest) GetService() string {
-	if o == nil || o.Service == nil {
+	if o == nil || isNil(o.Service) {
 		var ret string
 		return ret
 	}
@@ -118,7 +121,7 @@ func (o *GRPCRequest) GetService() string {
 // GetServiceOk returns a tuple with the Service field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetServiceOk() (*string, bool) {
-	if o == nil || o.Service == nil {
+	if o == nil || isNil(o.Service) {
 		return nil, false
 	}
 	return o.Service, true
@@ -126,7 +129,7 @@ func (o *GRPCRequest) GetServiceOk() (*string, bool) {
 
 // HasService returns a boolean if a field has been set.
 func (o *GRPCRequest) HasService() bool {
-	if o != nil && o.Service != nil {
+	if o != nil && !isNil(o.Service) {
 		return true
 	}
 
@@ -140,7 +143,7 @@ func (o *GRPCRequest) SetService(v string) {
 
 // GetMethod returns the Method field value if set, zero value otherwise.
 func (o *GRPCRequest) GetMethod() string {
-	if o == nil || o.Method == nil {
+	if o == nil || isNil(o.Method) {
 		var ret string
 		return ret
 	}
@@ -150,7 +153,7 @@ func (o *GRPCRequest) GetMethod() string {
 // GetMethodOk returns a tuple with the Method field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetMethodOk() (*string, bool) {
-	if o == nil || o.Method == nil {
+	if o == nil || isNil(o.Method) {
 		return nil, false
 	}
 	return o.Method, true
@@ -158,7 +161,7 @@ func (o *GRPCRequest) GetMethodOk() (*string, bool) {
 
 // HasMethod returns a boolean if a field has been set.
 func (o *GRPCRequest) HasMethod() bool {
-	if o != nil && o.Method != nil {
+	if o != nil && !isNil(o.Method) {
 		return true
 	}
 
@@ -172,7 +175,7 @@ func (o *GRPCRequest) SetMethod(v string) {
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
 func (o *GRPCRequest) GetMetadata() []GRPCHeader {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		var ret []GRPCHeader
 		return ret
 	}
@@ -182,7 +185,7 @@ func (o *GRPCRequest) GetMetadata() []GRPCHeader {
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetMetadataOk() ([]GRPCHeader, bool) {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		return nil, false
 	}
 	return o.Metadata, true
@@ -190,7 +193,7 @@ func (o *GRPCRequest) GetMetadataOk() ([]GRPCHeader, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *GRPCRequest) HasMetadata() bool {
-	if o != nil && o.Metadata != nil {
+	if o != nil && !isNil(o.Metadata) {
 		return true
 	}
 
@@ -204,7 +207,7 @@ func (o *GRPCRequest) SetMetadata(v []GRPCHeader) {
 
 // GetAuth returns the Auth field value if set, zero value otherwise.
 func (o *GRPCRequest) GetAuth() HTTPAuth {
-	if o == nil || o.Auth == nil {
+	if o == nil || isNil(o.Auth) {
 		var ret HTTPAuth
 		return ret
 	}
@@ -214,7 +217,7 @@ func (o *GRPCRequest) GetAuth() HTTPAuth {
 // GetAuthOk returns a tuple with the Auth field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetAuthOk() (*HTTPAuth, bool) {
-	if o == nil || o.Auth == nil {
+	if o == nil || isNil(o.Auth) {
 		return nil, false
 	}
 	return o.Auth, true
@@ -222,7 +225,7 @@ func (o *GRPCRequest) GetAuthOk() (*HTTPAuth, bool) {
 
 // HasAuth returns a boolean if a field has been set.
 func (o *GRPCRequest) HasAuth() bool {
-	if o != nil && o.Auth != nil {
+	if o != nil && !isNil(o.Auth) {
 		return true
 	}
 
@@ -236,7 +239,7 @@ func (o *GRPCRequest) SetAuth(v HTTPAuth) {
 
 // GetRequest returns the Request field value if set, zero value otherwise.
 func (o *GRPCRequest) GetRequest() string {
-	if o == nil || o.Request == nil {
+	if o == nil || isNil(o.Request) {
 		var ret string
 		return ret
 	}
@@ -246,7 +249,7 @@ func (o *GRPCRequest) GetRequest() string {
 // GetRequestOk returns a tuple with the Request field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCRequest) GetRequestOk() (*string, bool) {
-	if o == nil || o.Request == nil {
+	if o == nil || isNil(o.Request) {
 		return nil, false
 	}
 	return o.Request, true
@@ -254,7 +257,7 @@ func (o *GRPCRequest) GetRequestOk() (*string, bool) {
 
 // HasRequest returns a boolean if a field has been set.
 func (o *GRPCRequest) HasRequest() bool {
-	if o != nil && o.Request != nil {
+	if o != nil && !isNil(o.Request) {
 		return true
 	}
 
@@ -267,29 +270,37 @@ func (o *GRPCRequest) SetRequest(v string) {
 }
 
 func (o GRPCRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.ProtobufFile != nil {
-		toSerialize["protobufFile"] = o.ProtobufFile
-	}
-	if o.Address != nil {
-		toSerialize["address"] = o.Address
-	}
-	if o.Service != nil {
-		toSerialize["service"] = o.Service
-	}
-	if o.Method != nil {
-		toSerialize["method"] = o.Method
-	}
-	if o.Metadata != nil {
-		toSerialize["metadata"] = o.Metadata
-	}
-	if o.Auth != nil {
-		toSerialize["auth"] = o.Auth
-	}
-	if o.Request != nil {
-		toSerialize["request"] = o.Request
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o GRPCRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.ProtobufFile) {
+		toSerialize["protobufFile"] = o.ProtobufFile
+	}
+	if !isNil(o.Address) {
+		toSerialize["address"] = o.Address
+	}
+	if !isNil(o.Service) {
+		toSerialize["service"] = o.Service
+	}
+	if !isNil(o.Method) {
+		toSerialize["method"] = o.Method
+	}
+	if !isNil(o.Metadata) {
+		toSerialize["metadata"] = o.Metadata
+	}
+	if !isNil(o.Auth) {
+		toSerialize["auth"] = o.Auth
+	}
+	if !isNil(o.Request) {
+		toSerialize["request"] = o.Request
+	}
+	return toSerialize, nil
 }
 
 type NullableGRPCRequest struct {

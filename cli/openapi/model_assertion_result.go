@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the AssertionResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &AssertionResult{}
+
 // AssertionResult struct for AssertionResult
 type AssertionResult struct {
 	Assertion   *string               `json:"assertion,omitempty"`
@@ -40,7 +43,7 @@ func NewAssertionResultWithDefaults() *AssertionResult {
 
 // GetAssertion returns the Assertion field value if set, zero value otherwise.
 func (o *AssertionResult) GetAssertion() string {
-	if o == nil || o.Assertion == nil {
+	if o == nil || isNil(o.Assertion) {
 		var ret string
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *AssertionResult) GetAssertion() string {
 // GetAssertionOk returns a tuple with the Assertion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionResult) GetAssertionOk() (*string, bool) {
-	if o == nil || o.Assertion == nil {
+	if o == nil || isNil(o.Assertion) {
 		return nil, false
 	}
 	return o.Assertion, true
@@ -58,7 +61,7 @@ func (o *AssertionResult) GetAssertionOk() (*string, bool) {
 
 // HasAssertion returns a boolean if a field has been set.
 func (o *AssertionResult) HasAssertion() bool {
-	if o != nil && o.Assertion != nil {
+	if o != nil && !isNil(o.Assertion) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *AssertionResult) SetAssertion(v string) {
 
 // GetAllPassed returns the AllPassed field value if set, zero value otherwise.
 func (o *AssertionResult) GetAllPassed() bool {
-	if o == nil || o.AllPassed == nil {
+	if o == nil || isNil(o.AllPassed) {
 		var ret bool
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *AssertionResult) GetAllPassed() bool {
 // GetAllPassedOk returns a tuple with the AllPassed field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionResult) GetAllPassedOk() (*bool, bool) {
-	if o == nil || o.AllPassed == nil {
+	if o == nil || isNil(o.AllPassed) {
 		return nil, false
 	}
 	return o.AllPassed, true
@@ -90,7 +93,7 @@ func (o *AssertionResult) GetAllPassedOk() (*bool, bool) {
 
 // HasAllPassed returns a boolean if a field has been set.
 func (o *AssertionResult) HasAllPassed() bool {
-	if o != nil && o.AllPassed != nil {
+	if o != nil && !isNil(o.AllPassed) {
 		return true
 	}
 
@@ -104,7 +107,7 @@ func (o *AssertionResult) SetAllPassed(v bool) {
 
 // GetSpanResults returns the SpanResults field value if set, zero value otherwise.
 func (o *AssertionResult) GetSpanResults() []AssertionSpanResult {
-	if o == nil || o.SpanResults == nil {
+	if o == nil || isNil(o.SpanResults) {
 		var ret []AssertionSpanResult
 		return ret
 	}
@@ -114,7 +117,7 @@ func (o *AssertionResult) GetSpanResults() []AssertionSpanResult {
 // GetSpanResultsOk returns a tuple with the SpanResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AssertionResult) GetSpanResultsOk() ([]AssertionSpanResult, bool) {
-	if o == nil || o.SpanResults == nil {
+	if o == nil || isNil(o.SpanResults) {
 		return nil, false
 	}
 	return o.SpanResults, true
@@ -122,7 +125,7 @@ func (o *AssertionResult) GetSpanResultsOk() ([]AssertionSpanResult, bool) {
 
 // HasSpanResults returns a boolean if a field has been set.
 func (o *AssertionResult) HasSpanResults() bool {
-	if o != nil && o.SpanResults != nil {
+	if o != nil && !isNil(o.SpanResults) {
 		return true
 	}
 
@@ -135,17 +138,25 @@ func (o *AssertionResult) SetSpanResults(v []AssertionSpanResult) {
 }
 
 func (o AssertionResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Assertion != nil {
-		toSerialize["assertion"] = o.Assertion
-	}
-	if o.AllPassed != nil {
-		toSerialize["allPassed"] = o.AllPassed
-	}
-	if o.SpanResults != nil {
-		toSerialize["spanResults"] = o.SpanResults
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o AssertionResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Assertion) {
+		toSerialize["assertion"] = o.Assertion
+	}
+	if !isNil(o.AllPassed) {
+		toSerialize["allPassed"] = o.AllPassed
+	}
+	if !isNil(o.SpanResults) {
+		toSerialize["spanResults"] = o.SpanResults
+	}
+	return toSerialize, nil
 }
 
 type NullableAssertionResult struct {

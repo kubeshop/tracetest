@@ -14,9 +14,12 @@ import (
 	"encoding/json"
 )
 
+// checks if the TestSpecs type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestSpecs{}
+
 // TestSpecs struct for TestSpecs
 type TestSpecs struct {
-	Specs []TestSpecsSpecs `json:"specs,omitempty"`
+	Specs []TestSpecsSpecsInner `json:"specs,omitempty"`
 }
 
 // NewTestSpecs instantiates a new TestSpecs object
@@ -37,9 +40,9 @@ func NewTestSpecsWithDefaults() *TestSpecs {
 }
 
 // GetSpecs returns the Specs field value if set, zero value otherwise.
-func (o *TestSpecs) GetSpecs() []TestSpecsSpecs {
-	if o == nil || o.Specs == nil {
-		var ret []TestSpecsSpecs
+func (o *TestSpecs) GetSpecs() []TestSpecsSpecsInner {
+	if o == nil || isNil(o.Specs) {
+		var ret []TestSpecsSpecsInner
 		return ret
 	}
 	return o.Specs
@@ -47,8 +50,8 @@ func (o *TestSpecs) GetSpecs() []TestSpecsSpecs {
 
 // GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSpecs) GetSpecsOk() ([]TestSpecsSpecs, bool) {
-	if o == nil || o.Specs == nil {
+func (o *TestSpecs) GetSpecsOk() ([]TestSpecsSpecsInner, bool) {
+	if o == nil || isNil(o.Specs) {
 		return nil, false
 	}
 	return o.Specs, true
@@ -56,24 +59,32 @@ func (o *TestSpecs) GetSpecsOk() ([]TestSpecsSpecs, bool) {
 
 // HasSpecs returns a boolean if a field has been set.
 func (o *TestSpecs) HasSpecs() bool {
-	if o != nil && o.Specs != nil {
+	if o != nil && !isNil(o.Specs) {
 		return true
 	}
 
 	return false
 }
 
-// SetSpecs gets a reference to the given []TestSpecsSpecs and assigns it to the Specs field.
-func (o *TestSpecs) SetSpecs(v []TestSpecsSpecs) {
+// SetSpecs gets a reference to the given []TestSpecsSpecsInner and assigns it to the Specs field.
+func (o *TestSpecs) SetSpecs(v []TestSpecsSpecsInner) {
 	o.Specs = v
 }
 
 func (o TestSpecs) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Specs != nil {
-		toSerialize["specs"] = o.Specs
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TestSpecs) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Specs) {
+		toSerialize["specs"] = o.Specs
+	}
+	return toSerialize, nil
 }
 
 type NullableTestSpecs struct {

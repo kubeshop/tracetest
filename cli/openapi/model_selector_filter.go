@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SelectorFilter type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SelectorFilter{}
+
 // SelectorFilter struct for SelectorFilter
 type SelectorFilter struct {
 	Property string `json:"property"`
@@ -114,17 +117,19 @@ func (o *SelectorFilter) SetValue(v string) {
 }
 
 func (o SelectorFilter) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["property"] = o.Property
-	}
-	if true {
-		toSerialize["operator"] = o.Operator
-	}
-	if true {
-		toSerialize["value"] = o.Value
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o SelectorFilter) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["property"] = o.Property
+	toSerialize["operator"] = o.Operator
+	toSerialize["value"] = o.Value
+	return toSerialize, nil
 }
 
 type NullableSelectorFilter struct {

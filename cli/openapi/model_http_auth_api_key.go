@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the HTTPAuthApiKey type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &HTTPAuthApiKey{}
+
 // HTTPAuthApiKey struct for HTTPAuthApiKey
 type HTTPAuthApiKey struct {
 	Key   *string `json:"key,omitempty"`
@@ -40,7 +43,7 @@ func NewHTTPAuthApiKeyWithDefaults() *HTTPAuthApiKey {
 
 // GetKey returns the Key field value if set, zero value otherwise.
 func (o *HTTPAuthApiKey) GetKey() string {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		var ret string
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *HTTPAuthApiKey) GetKey() string {
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuthApiKey) GetKeyOk() (*string, bool) {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		return nil, false
 	}
 	return o.Key, true
@@ -58,7 +61,7 @@ func (o *HTTPAuthApiKey) GetKeyOk() (*string, bool) {
 
 // HasKey returns a boolean if a field has been set.
 func (o *HTTPAuthApiKey) HasKey() bool {
-	if o != nil && o.Key != nil {
+	if o != nil && !isNil(o.Key) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *HTTPAuthApiKey) SetKey(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *HTTPAuthApiKey) GetValue() string {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		var ret string
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *HTTPAuthApiKey) GetValue() string {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuthApiKey) GetValueOk() (*string, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -90,7 +93,7 @@ func (o *HTTPAuthApiKey) GetValueOk() (*string, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *HTTPAuthApiKey) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !isNil(o.Value) {
 		return true
 	}
 
@@ -104,7 +107,7 @@ func (o *HTTPAuthApiKey) SetValue(v string) {
 
 // GetIn returns the In field value if set, zero value otherwise.
 func (o *HTTPAuthApiKey) GetIn() string {
-	if o == nil || o.In == nil {
+	if o == nil || isNil(o.In) {
 		var ret string
 		return ret
 	}
@@ -114,7 +117,7 @@ func (o *HTTPAuthApiKey) GetIn() string {
 // GetInOk returns a tuple with the In field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *HTTPAuthApiKey) GetInOk() (*string, bool) {
-	if o == nil || o.In == nil {
+	if o == nil || isNil(o.In) {
 		return nil, false
 	}
 	return o.In, true
@@ -122,7 +125,7 @@ func (o *HTTPAuthApiKey) GetInOk() (*string, bool) {
 
 // HasIn returns a boolean if a field has been set.
 func (o *HTTPAuthApiKey) HasIn() bool {
-	if o != nil && o.In != nil {
+	if o != nil && !isNil(o.In) {
 		return true
 	}
 
@@ -135,17 +138,25 @@ func (o *HTTPAuthApiKey) SetIn(v string) {
 }
 
 func (o HTTPAuthApiKey) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Key != nil {
-		toSerialize["key"] = o.Key
-	}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
-	}
-	if o.In != nil {
-		toSerialize["in"] = o.In
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o HTTPAuthApiKey) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Key) {
+		toSerialize["key"] = o.Key
+	}
+	if !isNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	if !isNil(o.In) {
+		toSerialize["in"] = o.In
+	}
+	return toSerialize, nil
 }
 
 type NullableHTTPAuthApiKey struct {

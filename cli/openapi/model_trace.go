@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Trace type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Trace{}
+
 // Trace struct for Trace
 type Trace struct {
 	TraceId *string `json:"traceId,omitempty"`
@@ -41,7 +44,7 @@ func NewTraceWithDefaults() *Trace {
 
 // GetTraceId returns the TraceId field value if set, zero value otherwise.
 func (o *Trace) GetTraceId() string {
-	if o == nil || o.TraceId == nil {
+	if o == nil || isNil(o.TraceId) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *Trace) GetTraceId() string {
 // GetTraceIdOk returns a tuple with the TraceId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Trace) GetTraceIdOk() (*string, bool) {
-	if o == nil || o.TraceId == nil {
+	if o == nil || isNil(o.TraceId) {
 		return nil, false
 	}
 	return o.TraceId, true
@@ -59,7 +62,7 @@ func (o *Trace) GetTraceIdOk() (*string, bool) {
 
 // HasTraceId returns a boolean if a field has been set.
 func (o *Trace) HasTraceId() bool {
-	if o != nil && o.TraceId != nil {
+	if o != nil && !isNil(o.TraceId) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *Trace) SetTraceId(v string) {
 
 // GetTree returns the Tree field value if set, zero value otherwise.
 func (o *Trace) GetTree() Span {
-	if o == nil || o.Tree == nil {
+	if o == nil || isNil(o.Tree) {
 		var ret Span
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *Trace) GetTree() Span {
 // GetTreeOk returns a tuple with the Tree field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Trace) GetTreeOk() (*Span, bool) {
-	if o == nil || o.Tree == nil {
+	if o == nil || isNil(o.Tree) {
 		return nil, false
 	}
 	return o.Tree, true
@@ -91,7 +94,7 @@ func (o *Trace) GetTreeOk() (*Span, bool) {
 
 // HasTree returns a boolean if a field has been set.
 func (o *Trace) HasTree() bool {
-	if o != nil && o.Tree != nil {
+	if o != nil && !isNil(o.Tree) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *Trace) SetTree(v Span) {
 
 // GetFlat returns the Flat field value if set, zero value otherwise.
 func (o *Trace) GetFlat() map[string]Span {
-	if o == nil || o.Flat == nil {
+	if o == nil || isNil(o.Flat) {
 		var ret map[string]Span
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *Trace) GetFlat() map[string]Span {
 // GetFlatOk returns a tuple with the Flat field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Trace) GetFlatOk() (*map[string]Span, bool) {
-	if o == nil || o.Flat == nil {
+	if o == nil || isNil(o.Flat) {
 		return nil, false
 	}
 	return o.Flat, true
@@ -123,7 +126,7 @@ func (o *Trace) GetFlatOk() (*map[string]Span, bool) {
 
 // HasFlat returns a boolean if a field has been set.
 func (o *Trace) HasFlat() bool {
-	if o != nil && o.Flat != nil {
+	if o != nil && !isNil(o.Flat) {
 		return true
 	}
 
@@ -136,17 +139,25 @@ func (o *Trace) SetFlat(v map[string]Span) {
 }
 
 func (o Trace) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.TraceId != nil {
-		toSerialize["traceId"] = o.TraceId
-	}
-	if o.Tree != nil {
-		toSerialize["tree"] = o.Tree
-	}
-	if o.Flat != nil {
-		toSerialize["flat"] = o.Flat
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Trace) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.TraceId) {
+		toSerialize["traceId"] = o.TraceId
+	}
+	if !isNil(o.Tree) {
+		toSerialize["tree"] = o.Tree
+	}
+	if !isNil(o.Flat) {
+		toSerialize["flat"] = o.Flat
+	}
+	return toSerialize, nil
 }
 
 type NullableTrace struct {

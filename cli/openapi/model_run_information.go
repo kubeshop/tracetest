@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the RunInformation type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &RunInformation{}
+
 // RunInformation struct for RunInformation
 type RunInformation struct {
 	Metadata      map[string]string  `json:"metadata,omitempty"`
@@ -51,7 +54,7 @@ func (o *RunInformation) GetMetadata() map[string]string {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *RunInformation) GetMetadataOk() (*map[string]string, bool) {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		return nil, false
 	}
 	return &o.Metadata, true
@@ -59,7 +62,7 @@ func (o *RunInformation) GetMetadataOk() (*map[string]string, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *RunInformation) HasMetadata() bool {
-	if o != nil && o.Metadata != nil {
+	if o != nil && isNil(o.Metadata) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *RunInformation) SetMetadata(v map[string]string) {
 
 // GetEnvironmentId returns the EnvironmentId field value if set, zero value otherwise.
 func (o *RunInformation) GetEnvironmentId() string {
-	if o == nil || o.EnvironmentId == nil {
+	if o == nil || isNil(o.EnvironmentId) {
 		var ret string
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *RunInformation) GetEnvironmentId() string {
 // GetEnvironmentIdOk returns a tuple with the EnvironmentId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RunInformation) GetEnvironmentIdOk() (*string, bool) {
-	if o == nil || o.EnvironmentId == nil {
+	if o == nil || isNil(o.EnvironmentId) {
 		return nil, false
 	}
 	return o.EnvironmentId, true
@@ -91,7 +94,7 @@ func (o *RunInformation) GetEnvironmentIdOk() (*string, bool) {
 
 // HasEnvironmentId returns a boolean if a field has been set.
 func (o *RunInformation) HasEnvironmentId() bool {
-	if o != nil && o.EnvironmentId != nil {
+	if o != nil && !isNil(o.EnvironmentId) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *RunInformation) SetEnvironmentId(v string) {
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
 func (o *RunInformation) GetVariables() []EnvironmentValue {
-	if o == nil || o.Variables == nil {
+	if o == nil || isNil(o.Variables) {
 		var ret []EnvironmentValue
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *RunInformation) GetVariables() []EnvironmentValue {
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RunInformation) GetVariablesOk() ([]EnvironmentValue, bool) {
-	if o == nil || o.Variables == nil {
+	if o == nil || isNil(o.Variables) {
 		return nil, false
 	}
 	return o.Variables, true
@@ -123,7 +126,7 @@ func (o *RunInformation) GetVariablesOk() ([]EnvironmentValue, bool) {
 
 // HasVariables returns a boolean if a field has been set.
 func (o *RunInformation) HasVariables() bool {
-	if o != nil && o.Variables != nil {
+	if o != nil && !isNil(o.Variables) {
 		return true
 	}
 
@@ -136,17 +139,25 @@ func (o *RunInformation) SetVariables(v []EnvironmentValue) {
 }
 
 func (o RunInformation) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
+func (o RunInformation) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Metadata != nil {
 		toSerialize["metadata"] = o.Metadata
 	}
-	if o.EnvironmentId != nil {
+	if !isNil(o.EnvironmentId) {
 		toSerialize["environmentId"] = o.EnvironmentId
 	}
-	if o.Variables != nil {
+	if !isNil(o.Variables) {
 		toSerialize["variables"] = o.Variables
 	}
-	return json.Marshal(toSerialize)
+	return toSerialize, nil
 }
 
 type NullableRunInformation struct {

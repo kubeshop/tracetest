@@ -92,7 +92,7 @@ func TestFailingTestOutput(t *testing.T) {
 			Id: openapi.PtrString("1"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(false),
-				Results: []openapi.AssertionResultsResults{
+				Results: []openapi.AssertionResultsResultsInner{
 					{
 						Selector: &openapi.Selector{
 							Query: openapi.PtrString(`span[name = "my span"]`),
@@ -176,7 +176,7 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 			Id: openapi.PtrString("1"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(false),
-				Results: []openapi.AssertionResultsResults{
+				Results: []openapi.AssertionResultsResultsInner{
 					{
 						Selector: &openapi.Selector{
 							Query: openapi.PtrString(`span[name = "my span"]`),

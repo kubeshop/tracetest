@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SignalFX type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SignalFX{}
+
 // SignalFX struct for SignalFX
 type SignalFX struct {
 	Realm *string `json:"realm,omitempty"`
@@ -39,7 +42,7 @@ func NewSignalFXWithDefaults() *SignalFX {
 
 // GetRealm returns the Realm field value if set, zero value otherwise.
 func (o *SignalFX) GetRealm() string {
-	if o == nil || o.Realm == nil {
+	if o == nil || isNil(o.Realm) {
 		var ret string
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *SignalFX) GetRealm() string {
 // GetRealmOk returns a tuple with the Realm field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SignalFX) GetRealmOk() (*string, bool) {
-	if o == nil || o.Realm == nil {
+	if o == nil || isNil(o.Realm) {
 		return nil, false
 	}
 	return o.Realm, true
@@ -57,7 +60,7 @@ func (o *SignalFX) GetRealmOk() (*string, bool) {
 
 // HasRealm returns a boolean if a field has been set.
 func (o *SignalFX) HasRealm() bool {
-	if o != nil && o.Realm != nil {
+	if o != nil && !isNil(o.Realm) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *SignalFX) SetRealm(v string) {
 
 // GetToken returns the Token field value if set, zero value otherwise.
 func (o *SignalFX) GetToken() string {
-	if o == nil || o.Token == nil {
+	if o == nil || isNil(o.Token) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *SignalFX) GetToken() string {
 // GetTokenOk returns a tuple with the Token field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SignalFX) GetTokenOk() (*string, bool) {
-	if o == nil || o.Token == nil {
+	if o == nil || isNil(o.Token) {
 		return nil, false
 	}
 	return o.Token, true
@@ -89,7 +92,7 @@ func (o *SignalFX) GetTokenOk() (*string, bool) {
 
 // HasToken returns a boolean if a field has been set.
 func (o *SignalFX) HasToken() bool {
-	if o != nil && o.Token != nil {
+	if o != nil && !isNil(o.Token) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *SignalFX) SetToken(v string) {
 }
 
 func (o SignalFX) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Realm != nil {
-		toSerialize["realm"] = o.Realm
-	}
-	if o.Token != nil {
-		toSerialize["token"] = o.Token
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o SignalFX) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.Realm) {
+		toSerialize["realm"] = o.Realm
+	}
+	if !isNil(o.Token) {
+		toSerialize["token"] = o.Token
+	}
+	return toSerialize, nil
 }
 
 type NullableSignalFX struct {

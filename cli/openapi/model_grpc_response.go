@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the GRPCResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &GRPCResponse{}
+
 // GRPCResponse struct for GRPCResponse
 type GRPCResponse struct {
 	StatusCode *int32       `json:"statusCode,omitempty"`
@@ -40,7 +43,7 @@ func NewGRPCResponseWithDefaults() *GRPCResponse {
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
 func (o *GRPCResponse) GetStatusCode() int32 {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || isNil(o.StatusCode) {
 		var ret int32
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *GRPCResponse) GetStatusCode() int32 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCResponse) GetStatusCodeOk() (*int32, bool) {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || isNil(o.StatusCode) {
 		return nil, false
 	}
 	return o.StatusCode, true
@@ -58,7 +61,7 @@ func (o *GRPCResponse) GetStatusCodeOk() (*int32, bool) {
 
 // HasStatusCode returns a boolean if a field has been set.
 func (o *GRPCResponse) HasStatusCode() bool {
-	if o != nil && o.StatusCode != nil {
+	if o != nil && !isNil(o.StatusCode) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *GRPCResponse) SetStatusCode(v int32) {
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
 func (o *GRPCResponse) GetMetadata() []GRPCHeader {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		var ret []GRPCHeader
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *GRPCResponse) GetMetadata() []GRPCHeader {
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCResponse) GetMetadataOk() ([]GRPCHeader, bool) {
-	if o == nil || o.Metadata == nil {
+	if o == nil || isNil(o.Metadata) {
 		return nil, false
 	}
 	return o.Metadata, true
@@ -90,7 +93,7 @@ func (o *GRPCResponse) GetMetadataOk() ([]GRPCHeader, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *GRPCResponse) HasMetadata() bool {
-	if o != nil && o.Metadata != nil {
+	if o != nil && !isNil(o.Metadata) {
 		return true
 	}
 
@@ -104,7 +107,7 @@ func (o *GRPCResponse) SetMetadata(v []GRPCHeader) {
 
 // GetBody returns the Body field value if set, zero value otherwise.
 func (o *GRPCResponse) GetBody() string {
-	if o == nil || o.Body == nil {
+	if o == nil || isNil(o.Body) {
 		var ret string
 		return ret
 	}
@@ -114,7 +117,7 @@ func (o *GRPCResponse) GetBody() string {
 // GetBodyOk returns a tuple with the Body field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *GRPCResponse) GetBodyOk() (*string, bool) {
-	if o == nil || o.Body == nil {
+	if o == nil || isNil(o.Body) {
 		return nil, false
 	}
 	return o.Body, true
@@ -122,7 +125,7 @@ func (o *GRPCResponse) GetBodyOk() (*string, bool) {
 
 // HasBody returns a boolean if a field has been set.
 func (o *GRPCResponse) HasBody() bool {
-	if o != nil && o.Body != nil {
+	if o != nil && !isNil(o.Body) {
 		return true
 	}
 
@@ -135,17 +138,25 @@ func (o *GRPCResponse) SetBody(v string) {
 }
 
 func (o GRPCResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.StatusCode != nil {
-		toSerialize["statusCode"] = o.StatusCode
-	}
-	if o.Metadata != nil {
-		toSerialize["metadata"] = o.Metadata
-	}
-	if o.Body != nil {
-		toSerialize["body"] = o.Body
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o GRPCResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.StatusCode) {
+		toSerialize["statusCode"] = o.StatusCode
+	}
+	if !isNil(o.Metadata) {
+		toSerialize["metadata"] = o.Metadata
+	}
+	if !isNil(o.Body) {
+		toSerialize["body"] = o.Body
+	}
+	return toSerialize, nil
 }
 
 type NullableGRPCResponse struct {

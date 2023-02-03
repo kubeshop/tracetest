@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ResolveResponseInfo type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ResolveResponseInfo{}
+
 // ResolveResponseInfo struct for ResolveResponseInfo
 type ResolveResponseInfo struct {
 	ResolvedValues []string `json:"resolvedValues,omitempty"`
@@ -38,7 +41,7 @@ func NewResolveResponseInfoWithDefaults() *ResolveResponseInfo {
 
 // GetResolvedValues returns the ResolvedValues field value if set, zero value otherwise.
 func (o *ResolveResponseInfo) GetResolvedValues() []string {
-	if o == nil || o.ResolvedValues == nil {
+	if o == nil || isNil(o.ResolvedValues) {
 		var ret []string
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *ResolveResponseInfo) GetResolvedValues() []string {
 // GetResolvedValuesOk returns a tuple with the ResolvedValues field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ResolveResponseInfo) GetResolvedValuesOk() ([]string, bool) {
-	if o == nil || o.ResolvedValues == nil {
+	if o == nil || isNil(o.ResolvedValues) {
 		return nil, false
 	}
 	return o.ResolvedValues, true
@@ -56,7 +59,7 @@ func (o *ResolveResponseInfo) GetResolvedValuesOk() ([]string, bool) {
 
 // HasResolvedValues returns a boolean if a field has been set.
 func (o *ResolveResponseInfo) HasResolvedValues() bool {
-	if o != nil && o.ResolvedValues != nil {
+	if o != nil && !isNil(o.ResolvedValues) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *ResolveResponseInfo) SetResolvedValues(v []string) {
 }
 
 func (o ResolveResponseInfo) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.ResolvedValues != nil {
-		toSerialize["resolvedValues"] = o.ResolvedValues
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ResolveResponseInfo) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !isNil(o.ResolvedValues) {
+		toSerialize["resolvedValues"] = o.ResolvedValues
+	}
+	return toSerialize, nil
 }
 
 type NullableResolveResponseInfo struct {
