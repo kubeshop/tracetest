@@ -73,7 +73,7 @@ Start Docker Compose from the directory where you ran `tracetest server install`
   language="bash"
   title="Terminal"
 >
-{`docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up -d`}
+{`docker compose -f tracetest/docker-compose.yaml up -d`}
 </CodeBlock>
 <CodeBlock
   language="bash"
