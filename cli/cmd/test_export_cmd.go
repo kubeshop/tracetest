@@ -17,8 +17,8 @@ var (
 
 var testExportCmd = &cobra.Command{
 	Use:    "export",
-	Short:  "export a test",
-	Long:   "export a test",
+	Short:  "exports a test into a file",
+	Long:   "exports a test into a file",
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Test Export", "cmd", map[string]string{})
