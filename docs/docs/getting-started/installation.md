@@ -62,7 +62,7 @@ tracetest server install
 
 :::note
 Follow the prompts and continue with all the default settings.
-This will generate an empty `docker-compose.yaml` file and a `./tracetest/` directory that contains another `docker-compose.yaml` and two more config files. One for Tracetest and one for OpenTelemetry collector.
+This will generate a `./tracetest/` directory that contains a `docker-compose.yaml` and two more config files. One for Tracetest and one for OpenTelemetry collector.
 
 To see the output of this command, view [this sample setup](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-jaeger) from our GitHub examples.
 :::
