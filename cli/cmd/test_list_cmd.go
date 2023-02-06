@@ -11,8 +11,8 @@ import (
 
 var testListCmd = &cobra.Command{
 	Use:    "list",
-	Short:  "list all test",
-	Long:   "list all test",
+	Short:  "List all tests",
+	Long:   "List all tests",
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Test List", "cmd", map[string]string{})

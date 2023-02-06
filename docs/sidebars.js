@@ -241,6 +241,11 @@ const sidebars = {
       items: [
         {
           type: "doc",
+          id: "cli/generated/tracetest",
+          label: "Reference"
+        },
+        {
+          type: "doc",
           id: "cli/configuring-your-cli",
           label: "Configuring your CLI",
         },

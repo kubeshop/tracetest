@@ -17,8 +17,8 @@ var (
 
 var dataStoreExportCmd = &cobra.Command{
 	Use:    "export",
-	Short:  "Export data store configuration into a file",
-	Long:   "Export data store configuration into a file",
+	Short:  "Exports a data store configuration into a file",
+	Long:   "Exports a data store configuration into a file",
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Datastore Export", "cmd", map[string]string{})
