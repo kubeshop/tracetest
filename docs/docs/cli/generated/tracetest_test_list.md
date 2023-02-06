@@ -1,11 +1,11 @@
 # CLI Reference
 ## tracetest test list
 
-list all test
+List all tests
 
 ### Synopsis
 
-list all test
+List all tests
 
 ```
 tracetest test list [flags]
