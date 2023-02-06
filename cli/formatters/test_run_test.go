@@ -69,7 +69,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 1"),
 			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecs{
+				Specs: []openapi.TestSpecsSpecsInner{
 					{
 						Selector: &openapi.Selector{
 							Query: openapi.PtrString(`span[name = "my span"]`),
@@ -84,7 +84,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			State: openapi.PtrString("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(true),
-				Results: []openapi.AssertionResultsResults{
+				Results: []openapi.AssertionResultsResultsInner{
 					{
 						Selector: &openapi.Selector{
 							Query: openapi.PtrString(`span[name = "my span"]`),
@@ -128,7 +128,7 @@ func TestFailingTestOutput(t *testing.T) {
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 2"),
 			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecs{
+				Specs: []openapi.TestSpecsSpecsInner{
 					{
 						Selector: &openapi.Selector{
 							Query: openapi.PtrString(`span[name = "my span"]`),
@@ -228,7 +228,7 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 2"),
 			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecs{
+				Specs: []openapi.TestSpecsSpecsInner{
 					{
 						Selector: &openapi.Selector{
 							Query: openapi.PtrString(`span[name = "my span"]`),
