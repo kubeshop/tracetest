@@ -612,23 +612,24 @@ func (c *controller) upsertTest(ctx context.Context, test model.Test) (openapi.I
 
 func (c *controller) CreateEnvironment(ctx context.Context, in openapi.Environment) (openapi.ImplResponse, error) {
 	environment := c.mappers.In.Environment(in)
-
-	if environment.ID != "" {
-		exists, err := c.testDB.EnvironmentIDExists(ctx, environment.ID)
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		if exists {
-			err := fmt.Errorf(`cannot create environment with ID "%s: %w`, environment.ID, errTestExists)
-			r := map[string]string{
-				"error": err.Error(),
-			}
-			return openapi.Response(http.StatusBadRequest, r), err
-		}
+	if environment.ID == "" {
+		environment.ID = environment.Slug()
 	}
 
-	environment, err := c.testDB.CreateEnvironment(ctx, environment)
+	exists, err := c.testDB.EnvironmentIDExists(ctx, environment.ID)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	if exists {
+		err := fmt.Errorf(`cannot create environment with ID "%s: %w`, environment.ID, errTestExists)
+		r := map[string]string{
+			"error": err.Error(),
+		}
+		return openapi.Response(http.StatusBadRequest, r), err
+	}
+
+	environment, err = c.testDB.CreateEnvironment(ctx, environment)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
