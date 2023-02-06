@@ -87,7 +87,7 @@ export const IconSuccess = styled(CheckCircleFilled)`
   color: ${({theme}) => theme.color.success};
 `;
 
-export const Row = styled.div<{$align?: string; $hasGap?: boolean, $justify?: string}>`
+export const Row = styled.div<{$align?: string; $hasGap?: boolean; $justify?: string}>`
   align-items: ${({$align}) => $align || 'center'};
   display: flex;
   justify-content: ${({$justify}) => $justify || 'flex-start'};

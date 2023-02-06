@@ -13,7 +13,7 @@ import * as S from './TestResults.styled';
 
 interface IProps {
   onDelete(selector: string): void;
-  onEdit(assertionResult: TAssertionResultEntry): void;
+  onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onRevert(originalSelector: string): void;
 }
 

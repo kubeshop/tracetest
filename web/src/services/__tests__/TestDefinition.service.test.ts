@@ -9,12 +9,14 @@ describe('TestDefinitionService', () => {
         isDraft: false,
         originalSelector: '',
         selector: '',
+        name: '',
       });
       expect(testResultCount).toEqual({
         assertions: [],
         selector: {
           query: '',
         },
+        name: '',
       });
     });
   });

@@ -1,7 +1,7 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 
 import {TChange} from 'redux/actions/TestSpecs.actions';
-import {TTestSpecEntry} from 'models/TestSpecs.model';
+import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
 import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
 
 export interface ISuggestion {
@@ -24,7 +24,7 @@ export interface ITestSpecsState {
 
 export type TTestSpecsSliceActions = {
   reset: CaseReducer<ITestSpecsState>;
-  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: AssertionResults}>>;
+  initSpecs: CaseReducer<ITestSpecsState, PayloadAction<{assertionResults: AssertionResults; specs: TestSpecs}>>;
   addSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry}>>;
   updateSpec: CaseReducer<ITestSpecsState, PayloadAction<{spec: TTestSpecEntry; selector: string}>>;
   removeSpec: CaseReducer<ITestSpecsState, PayloadAction<{selector: string}>>;

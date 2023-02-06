@@ -7,19 +7,24 @@ interface IProps {
   affectedSpans: number;
   assertionsFailed: number;
   assertionsPassed: number;
+  selector: string;
   title: string;
 }
 
-const Header = ({affectedSpans, assertionsFailed, assertionsPassed, title}: IProps) => {
+const Header = ({affectedSpans, assertionsFailed, assertionsPassed, selector, title}: IProps) => {
   return (
     <S.Column>
-      <Editor
-        type={SupportedEditors.Selector}
-        editable={false}
-        basicSetup={{lineNumbers: false}}
-        placeholder="Selecting All Spans"
-        value={title || 'All Spans'}
-      />
+      {title ? (
+        <S.Title>{title}</S.Title>
+      ) : (
+        <Editor
+          type={SupportedEditors.Selector}
+          editable={false}
+          basicSetup={{lineNumbers: false}}
+          placeholder="Selecting All Spans"
+          value={selector}
+        />
+      )}
 
       <div>
         {Boolean(assertionsPassed) && (

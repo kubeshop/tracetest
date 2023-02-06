@@ -1,7 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {TTestSpecsSliceActions, ITestSpecsState} from 'types/TestSpecs.types';
+
 import AssertionResults from 'models/AssertionResults.model';
-import {TTestSpecEntry} from 'models/TestSpecs.model';
+import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
+import {TTestSpecsSliceActions, ITestSpecsState} from 'types/TestSpecs.types';
 import TestSpecsActions from '../actions/TestSpecs.actions';
 
 export const initialState: ITestSpecsState = {
@@ -16,13 +17,14 @@ export const initialState: ITestSpecsState = {
   prevSelector: '',
 };
 
-export const assertionResultsToSpecs = (assertionResults: AssertionResults): TTestSpecEntry[] => {
-  return assertionResults.resultList.map(({selector, resultList}) => ({
+export const assertionResultsToSpecs = (assertionResults: AssertionResults, specs: TestSpecs): TTestSpecEntry[] => {
+  return assertionResults.resultList.map(({selector, resultList}, index) => ({
     isDraft: false,
     isDeleted: false,
     selector,
     originalSelector: selector,
     assertions: resultList.flatMap(({assertion}) => [assertion]),
+    name: specs?.specs?.[index]?.name ?? '',
   }));
 };
 
@@ -33,11 +35,11 @@ const testSpecsSlice = createSlice<ITestSpecsState, TTestSpecsSliceActions, 'tes
     reset() {
       return initialState;
     },
-    initSpecs(state, {payload: {assertionResults}}) {
-      const specs = assertionResultsToSpecs(assertionResults);
+    initSpecs(state, {payload: {assertionResults, specs}}) {
+      const specsFromResults = assertionResultsToSpecs(assertionResults, specs);
 
-      state.initialSpecs = specs;
-      state.specs = specs;
+      state.initialSpecs = specsFromResults;
+      state.specs = specsFromResults;
       state.isInitialized = true;
       state.isDraftMode = false;
     },
@@ -104,7 +106,7 @@ const testSpecsSlice = createSlice<ITestSpecsState, TTestSpecsSliceActions, 'tes
         state.isDraftMode = false;
       })
       .addCase(TestSpecsActions.publish.fulfilled, (state, {payload: {result}}) => {
-        const specs = assertionResultsToSpecs(result);
+        const specs = assertionResultsToSpecs(result, TestSpecs({}));
 
         state.assertionResults = result;
         state.initialSpecs = specs;

@@ -1,5 +1,9 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
+
+import AssertionResults from 'models/AssertionResults.model';
+import Test from 'models/Test.model';
+import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
 import TestSpecsActions from 'redux/actions/TestSpecs.actions';
 import {useAppDispatch} from 'redux/hooks';
 import {
@@ -19,9 +23,6 @@ import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import Test from 'models/Test.model';
-import AssertionResults from 'models/AssertionResults.model';
-import {TTestSpecEntry} from 'models/TestSpecs.model';
 
 interface IProps {
   runId: string;
@@ -110,8 +111,8 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   );
 
   const init = useCallback(
-    (initialAssertionResults: AssertionResults) => {
-      dispatch(initSpecs({assertionResults: initialAssertionResults}));
+    (initialAssertionResults: AssertionResults, specs: TestSpecs) => {
+      dispatch(initSpecs({assertionResults: initialAssertionResults, specs}));
     },
     [dispatch]
   );

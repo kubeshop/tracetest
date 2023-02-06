@@ -22,7 +22,7 @@ const RouterActions = () => ({
       const {[RouterSearchFields.SelectedAssertion]: positionIndex} = search;
       const selectedSpec = TestSpecsSelectors.selectSelectedSpec(getState() as RootState);
 
-      if (typeof positionIndex === 'undefined' && selectedSpec) {
+      if (typeof positionIndex === 'undefined' && typeof selectedSpec !== 'undefined') {
         dispatch(setSelectedSpec());
         return;
       }

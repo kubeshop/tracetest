@@ -56,7 +56,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
 
   const open = useCallback(
     (props: IFormProps = {}) => {
-      const {isEditing, defaultValues: {assertions = [], selector: defaultSelector} = {}} = props;
+      const {isEditing, defaultValues: {assertions = [], selector: defaultSelector, name = ''} = {}} = props;
       const spec = specs.find(({selector}) => defaultSelector === selector);
 
       if (spec)
@@ -66,6 +66,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
           selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
+            name,
             assertions: isEditing
               ? assertions
               : [
@@ -103,7 +104,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   }, []);
 
   const onSubmit = useCallback(
-    async ({assertions = [], selector: newSelectorString = ''}: IValues) => {
+    async ({assertions = [], selector: newSelectorString = '', name = ''}: IValues) => {
       const {isEditing, selector = ''} = formProps;
 
       const definition: TTestSpecEntry = {
@@ -111,6 +112,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
         assertions: assertions.map(assertion => AssertionService.getStringAssertion(assertion)),
         originalSelector: newSelectorString,
         isDraft: true,
+        name,
       };
 
       if (isEditing) {
