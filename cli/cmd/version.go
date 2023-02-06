@@ -10,7 +10,7 @@ import (
 
 var versionCmd = &cobra.Command{
 	Use:    "version",
-	Short:  "cli versions",
+	Short:  "Display this CLI tool version",
 	Long:   "Display this CLI tool version",
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {

@@ -14,8 +14,8 @@ var environmentApplyFile string
 
 var environmentApplyCmd = &cobra.Command{
 	Use:    "apply",
-	Short:  "Apply environment to tracetest",
-	Long:   "Apply environment to tracetest",
+	Short:  "Create or update an environment to Tracetest",
+	Long:   "Create or update an environment to Tracetest",
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Environment apply", "cmd", map[string]string{})

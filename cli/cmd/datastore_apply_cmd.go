@@ -14,8 +14,8 @@ var dataStoreApplyFile string
 
 var dataStoreApplyCmd = &cobra.Command{
 	Use:    "apply",
-	Short:  "Apply data store configuration to your tracetest server",
-	Long:   "Apply data store configuration to your tracetest server",
+	Short:  "Apply (create/update) data store configuration to your Tracetest server",
+	Long:   "Apply (create/update) data store configuration to your Tracetest server",
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Datastore Apply", "cmd", map[string]string{})

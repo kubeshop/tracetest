@@ -12,8 +12,8 @@ var (
 
 var serverInstallCmd = &cobra.Command{
 	Use:    "install",
-	Short:  "install a new server",
-	Long:   "install a new server",
+	Short:  "Install a new Tracetest server",
+	Long:   "Install a new Tracetest server",
 	PreRun: setupCommand(SkipConfigValidation()),
 	Run: func(cmd *cobra.Command, args []string) {
 		installer.Force = force
