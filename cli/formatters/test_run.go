@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/pterm/pterm"
@@ -270,7 +271,7 @@ func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {
 	return link
 }
 
-func (f testRun) getSelectorQuery(specResult openapi.AssertionResultsResults) string {
+func (f testRun) getSelectorQuery(specResult openapi.AssertionResultsResultsInner) string {
 	if hasQuery := specResult.Selector.HasQuery(); hasQuery {
 		return *specResult.Selector.Query
 	}
@@ -278,7 +279,7 @@ func (f testRun) getSelectorQuery(specResult openapi.AssertionResultsResults) st
 	return "All Spans"
 }
 
-func (f testRun) getTestSpecTitle(specName string, specResult openapi.AssertionResultsResults) string {
+func (f testRun) getTestSpecTitle(specName string, specResult openapi.AssertionResultsResultsInner) string {
 	if specName != "" {
 		return specName
 	}
