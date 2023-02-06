@@ -21,7 +21,7 @@ var docGenCmd = &cobra.Command{
 		}
 
 		err = doc.GenMarkdownTreeCustom(rootCmd, docsOutputDir, func(s string) string {
-			return "# CLI Referece\n"
+			return "# CLI Reference\n"
 		}, func(s string) string { return s })
 		if err != nil {
 			panic(err)
