@@ -14,7 +14,7 @@ tracetest environment apply [flags]
 ### Options
 
 ```
-  -f, --file string   --file environment.yaml
+  -f, --file string   file containing the environment configuration
   -h, --help          help for apply
 ```
 

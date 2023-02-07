@@ -14,7 +14,7 @@ tracetest datastore apply [flags]
 ### Options
 
 ```
-  -f, --file string   --file my-datastore.yaml
+  -f, --file string   file containing the data store configuration
   -h, --help          help for apply
 ```
 

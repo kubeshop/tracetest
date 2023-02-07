@@ -15,7 +15,7 @@ tracetest datastore export [flags]
 
 ```
   -h, --help        help for export
-      --id string   --id my-data-store
+      --id string   id of the data store that will be exported
 ```
 
 ### Options inherited from parent commands

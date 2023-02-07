@@ -14,11 +14,11 @@ tracetest test run [flags]
 ### Options
 
 ```
-  -d, --definition string    --definition <definition-file.yml>
-  -e, --environment string   --environment <id>
+  -d, --definition string    path to the definition file to be run
+  -e, --environment string   id of the environment to be used
   -h, --help                 help for run
-  -j, --junit string         --junit <junit-output.xml>
-  -w, --wait-for-result
+  -j, --junit string         path to the junit file that will be generated
+  -w, --wait-for-result      wait for the test result to print it's result
 ```
 
 ### Options inherited from parent commands

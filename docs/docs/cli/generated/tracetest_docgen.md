@@ -14,7 +14,7 @@ tracetest docgen [flags]
 ### Options
 
 ```
-  -d, --docusaurus string   tracetest docgen -o my/doc/dir --docusaurus
+  -d, --docusaurus string   folder containing your docusaurus documentation content
   -h, --help                help for docgen
 ```
 
