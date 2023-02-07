@@ -6,3 +6,8 @@ help: Makefile ## show list of commands
 
 test: ## execute unit tests
 	@go test -coverprofile=coverage.out ./...
+
+docgen: ## generate CLI documentation
+	@go build main.go
+	@./main docgen -o ../docs/docs/cli/generated/ -d ../docs/docs
+	@rm main
