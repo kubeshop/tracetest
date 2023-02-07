@@ -11,6 +11,10 @@
 
 // @ts-check
 
+// generated docs pages
+/** @type {import('@docusaurus/plugin-content-docs/lib/sidebars/types').SidebarItem[]} */
+const cliGeneratedPages = require('./docs/cli/generated/cli-sidebar');
+
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
@@ -240,9 +244,9 @@ const sidebars = {
       label: "CLI",
       items: [
         {
-          type: "doc",
-          id: "cli/generated/tracetest",
-          label: "Reference"
+          type: "category",
+          label: "Reference",
+          items: cliGeneratedPages,
         },
         {
           type: "doc",

@@ -47,9 +47,9 @@ var testRunCmd = &cobra.Command{
 }
 
 func init() {
-	testRunCmd.PersistentFlags().StringVarP(&runTestEnvID, "environment", "e", "", "--environment <id>")
-	testRunCmd.PersistentFlags().StringVarP(&runTestFileDefinition, "definition", "d", "", "--definition <definition-file.yml>")
-	testRunCmd.PersistentFlags().BoolVarP(&runTestWaitForResult, "wait-for-result", "w", false, "")
-	testRunCmd.PersistentFlags().StringVarP(&runTestJUnit, "junit", "j", "", "--junit <junit-output.xml>")
+	testRunCmd.PersistentFlags().StringVarP(&runTestEnvID, "environment", "e", "", "id of the environment to be used")
+	testRunCmd.PersistentFlags().StringVarP(&runTestFileDefinition, "definition", "d", "", "path to the definition file to be run")
+	testRunCmd.PersistentFlags().BoolVarP(&runTestWaitForResult, "wait-for-result", "w", false, "wait for the test result to print it's result")
+	testRunCmd.PersistentFlags().StringVarP(&runTestJUnit, "junit", "j", "", "path to the junit file that will be generated")
 	testCmd.AddCommand(testRunCmd)
 }
