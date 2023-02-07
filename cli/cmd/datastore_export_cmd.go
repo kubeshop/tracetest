@@ -44,8 +44,8 @@ var dataStoreExportCmd = &cobra.Command{
 }
 
 func init() {
-	dataStoreExportCmd.PersistentFlags().StringVarP(&exportOutputFile, "output", "o", "", "--output output.yaml")
-	dataStoreExportCmd.PersistentFlags().StringVarP(&dataStoreID, "id", "", "", "--id my-data-store")
+	dataStoreExportCmd.PersistentFlags().StringVarP(&exportOutputFile, "output", "o", "", "file where data store configuration will be saved")
+	dataStoreExportCmd.PersistentFlags().StringVarP(&dataStoreID, "id", "", "", "id of the data store that will be exported")
 
 	dataStoreCmd.AddCommand(dataStoreExportCmd)
 }

@@ -100,7 +100,7 @@ func generateContentItems(inputDir string, docusaurusRootFolder string) (string,
 }
 
 func init() {
-	docGenCmd.Flags().StringVarP(&docsOutputDir, "output", "o", "", "tracetest docgen -o my/docs/dir")
-	docGenCmd.Flags().StringVarP(&docusaurusFolder, "docusaurus", "d", "", "tracetest docgen -o my/doc/dir --docusaurus")
+	docGenCmd.Flags().StringVarP(&docsOutputDir, "output", "o", "", "folder where all files will be generated")
+	docGenCmd.Flags().StringVarP(&docusaurusFolder, "docusaurus", "d", "", "folder containing your docusaurus documentation content")
 	rootCmd.AddCommand(docGenCmd)
 }

@@ -33,6 +33,6 @@ var environmentApplyCmd = &cobra.Command{
 }
 
 func init() {
-	environmentApplyCmd.PersistentFlags().StringVarP(&environmentApplyFile, "file", "f", "", "--file environment.yaml")
+	environmentApplyCmd.PersistentFlags().StringVarP(&environmentApplyFile, "file", "f", "", "file containing the environment configuration")
 	environmentCmd.AddCommand(environmentApplyCmd)
 }

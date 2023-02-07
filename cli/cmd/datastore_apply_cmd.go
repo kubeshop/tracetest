@@ -40,6 +40,6 @@ var dataStoreApplyCmd = &cobra.Command{
 }
 
 func init() {
-	dataStoreApplyCmd.PersistentFlags().StringVarP(&dataStoreApplyFile, "file", "f", "", "--file my-datastore.yaml")
+	dataStoreApplyCmd.PersistentFlags().StringVarP(&dataStoreApplyFile, "file", "f", "", "file containing the data store configuration")
 	dataStoreCmd.AddCommand(dataStoreApplyCmd)
 }
