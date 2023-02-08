@@ -1,3 +1,4 @@
+import posthog from 'posthog-js';
 import {Categories} from 'constants/Analytics.constants';
 import Env from 'utils/Env';
 
@@ -32,6 +33,8 @@ const AnalyticsService = (): TAnalyticsService => ({
       appVersion,
       env,
     });
+
+    posthog.capture('$pageview');
   },
   identify() {
     if (!analyticsEnabled) return;
@@ -39,6 +42,13 @@ const AnalyticsService = (): TAnalyticsService => ({
       serverID,
       appVersion,
       env,
+    });
+
+    posthog.init('phc_Rg59ClPckoqa5p4onheukqHKJFPbTJkiNzECjIG4lMj', {
+      api_host: 'https://app.posthog.com',
+      loaded: ph => {
+        ph.identify(serverID, {appVersion, env});
+      },
     });
   },
 });
