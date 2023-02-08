@@ -1,4 +1,4 @@
-# OpenTelemetry Store - User purchasing products
+# OpenTelemetry Store - User Purchasing Products
 
 In this use case, we want to validate the following story:
 
@@ -22,9 +22,9 @@ Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-te
  
 We can do that by creating the tests and transactions through the Web UI or using the CLI. In this example, we will use the CLI to create an environment and then create the transaction with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
 
-### Mapping environment variables 
+### Mapping Environment Variables 
 
-The first thing that we need to think about is to map what variables are needed in this process. At first glance, we can think of vars to the API address and the user ID:
+The first thing that we need to think about is to map the variables are needed in this process. At first glance, we can identify the vars to the API address and the user ID:
 With these variables, we can create the following definition file as saving as `user-buying-products.env`:
 
 ```sh
@@ -32,9 +32,9 @@ OTEL_API_URL=http://otel-shop-demo-frontend:8080/api
 USER_ID=2491f868-88f1-4345-8836-d5d8511a9f83
 ```
 
-### Creating tests
+### Creating Tests
 
-After having the environment file, we will create a test for each step, starting with [Get Recommended Products](./get-recommended-products.md), which will be saved as `get-recommended-products.yaml`:
+After creating the environment file, we will create a test for each step, starting with [Get Recommended Products](./get-recommended-products.md), which will be saved as `get-recommended-products.yaml`:
 
 ```yaml
 type: Test
@@ -61,9 +61,9 @@ spec:
     value: attr:tracetest.response.body | json_path '$[0].id'
 ```
 
-Note that we have one important changes here: we are now using environment variables on the definition, like `${env:OTEL_API_URL}` and `${env:USER_ID}` on trigger section and an output to fetch the first `${env:PRODUCT_ID}` that the user chose. This new environment variable will be used on the next tests.
+Note that we have one important changes here: we are now using environment variables on the definition, like `${env:OTEL_API_URL}` and `${env:USER_ID}` on the trigger section and an output to fetch the first `${env:PRODUCT_ID}` that the user chose. This new environment variable will be used in the next tests.
 
-The next step is to define [Add Item into Shopping Cart](./add-item-into-shopping-cart.md) test, which will be saved as `add-product-into-shopping-cart.yaml`:
+The next step is to define the [Add Item into Shopping Cart](./add-item-into-shopping-cart.md) test, which will be saved as `add-product-into-shopping-cart.yaml`:
 
 ```yaml
 type: Test
@@ -156,9 +156,9 @@ spec:
     - attr:tracetest.selected_spans.count >= 1
 ```
 
-### Creating transaction
+### Creating the Transaction
 
-Now we wrap these files and create a transaction that will run these tests in sequence and will fail in case of any test failing. We will call it `transaction.yaml`:
+Now we wrap these files and create a transaction that will run these tests in sequence and will fail if any of the tests fail. We will call it `transaction.yaml`:
 
 ```yml
 type: Transaction
@@ -172,7 +172,7 @@ spec:
   - ./checkout.yaml
 ```
 
-By having test, transaction and environment files in the same directory, now we can call the CLI and execute this transaction:
+By having the test, transaction and environment files in the same directory, we can call the CLI and execute this transaction:
 
 ```sh
 tracetest test run -d transaction.yaml -e user-buying-products.env --wait-for-result
