@@ -12,21 +12,19 @@ import (
 )
 
 func TestBasicConfiguration(t *testing.T) {
-	expectedConfig := config.Config{
-		PoolingConfig: config.PoolingConfig{
-			MaxWaitTimeForTrace: "1m",
-			RetryDelay:          "3s",
-		},
-		PostgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
-		Server: config.ServerConfig{
-			PathPrefix: "/tracetest",
-			HttpPort:   9999,
-		},
-	}
-
 	actual, err := config.FromFile("./testdata/basic_config.yaml")
 	require.NoError(t, err)
-	assert.Equal(t, expectedConfig, actual)
+
+	assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 sslmode=disable", actual.PostgresConnString())
+
+	assert.Equal(t, "/tracetest", actual.ServerPathPrefix())
+	assert.Equal(t, 9999, actual.ServerPort())
+
+	expectedPoolingConfig := config.PoolingConfig{
+		MaxWaitTimeForTrace: "1m",
+		RetryDelay:          "3s",
+	}
+	assert.Equal(t, expectedPoolingConfig, actual.PoolingConfig())
 }
 
 func TestFromFileError(t *testing.T) {

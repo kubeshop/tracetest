@@ -27,11 +27,15 @@ func ShutdownTracer(ctx context.Context) error {
 	return nil
 }
 
-func NewTracer(ctx context.Context, config config.Config) (trace.Tracer, error) {
+type exporterConfig interface {
+	Exporter() (*config.TelemetryExporterOption, error)
+}
+
+func NewTracer(ctx context.Context, cfg exporterConfig) (trace.Tracer, error) {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
 	otel.SetTextMapPropagator(propagator)
 
-	exporterConfig, err := config.Exporter()
+	exporterConfig, err := cfg.Exporter()
 	if err != nil {
 		return nil, fmt.Errorf("could not get exporter config: %w", err)
 	}
