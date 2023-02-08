@@ -100,7 +100,7 @@ func (a *App) Start() error {
 	}
 
 	if os.Getenv("TRACETEST_DEV") != "" {
-		// non-empty TRACETEST_DEV variable means it's running by a dev
+		// non-empty TRACETEST_DEV variable means it's running by a dev,
 		// and we should totally ignore analytics
 		a.config.GA.Enabled = false
 	}
