@@ -4,6 +4,7 @@ import (
 	"github.com/denisbrodbeck/machineid"
 	"github.com/kubeshop/tracetest/cli/config"
 	segment "github.com/segmentio/analytics-go/v3"
+	"os"
 )
 
 var (
@@ -17,7 +18,9 @@ func ClientID() string {
 }
 
 func Init(conf config.Config) {
-	if !conf.AnalyticsEnabled {
+	if !conf.AnalyticsEnabled || os.Getenv("TRACETEST_DEV") != "" {
+		// non-empty TRACETEST_DEV variable means it's running by a dev,
+		// and we should totally ignore analytics
 		return
 	}
 
