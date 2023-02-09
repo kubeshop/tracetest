@@ -24,26 +24,26 @@ import (
 
 type tempoTraceDB struct {
 	realTraceDB
-	client *client.Client
+	dataSource *client.DataSource
 }
 
 func newTempoDB(config *config.BaseClientConfig) (TraceDB, error) {
-	client := client.NewClient("Tempo", config, client.Callbacks{
+	dataSource := client.NewDataSource("Tempo", config, client.Callbacks{
 		HTTP: httpGetTraceByID,
 		GRPC: grpcGetTraceByID,
 	})
 
 	return &tempoTraceDB{
-		client: client,
+		dataSource: dataSource,
 	}, nil
 }
 
 func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
-	return tdb.client.Connect(ctx)
+	return tdb.dataSource.Connect(ctx)
 }
 
 func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	connectionTestResult, err := ttd.client.TestConnection(ctx)
+	connectionTestResult, err := ttd.dataSource.TestConnection(ctx)
 	if err != nil {
 		return connectionTestResult
 	}
@@ -80,16 +80,16 @@ func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.Connecti
 }
 
 func (ttd *tempoTraceDB) Ready() bool {
-	return ttd.client.Ready()
+	return ttd.dataSource.Ready()
 }
 
 func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
-	trace, err := ttd.client.GetTraceByID(ctx, traceID)
+	trace, err := ttd.dataSource.GetTraceByID(ctx, traceID)
 	return trace, err
 }
 
 func (ttd *tempoTraceDB) Close() error {
-	return ttd.client.Close()
+	return ttd.dataSource.Close()
 }
 
 func grpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (model.Trace, error) {

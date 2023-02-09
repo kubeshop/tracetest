@@ -22,7 +22,7 @@ import (
 
 type jaegerTraceDB struct {
 	realTraceDB
-	client *client.Client
+	dataSource *client.DataSource
 }
 
 func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
@@ -31,21 +31,21 @@ func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
 		Grpc: *grpcConfig,
 	}
 
-	client := client.NewClient("Jaeger", baseConfig, client.Callbacks{
+	dataSource := client.NewDataSource("Jaeger", baseConfig, client.Callbacks{
 		GRPC: jaegerGrpcGetTraceByID,
 	})
 
 	return &jaegerTraceDB{
-		client: client,
+		dataSource: dataSource,
 	}, nil
 }
 
 func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
-	return jtd.client.Connect(ctx)
+	return jtd.dataSource.Connect(ctx)
 }
 
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	connectionTestResult, err := jtd.client.TestConnection(ctx)
+	connectionTestResult, err := jtd.dataSource.TestConnection(ctx)
 	if err != nil {
 		return connectionTestResult
 	}
@@ -82,16 +82,16 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) connection.Connect
 }
 
 func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
-	trace, err := jtd.client.GetTraceByID(ctx, traceID)
+	trace, err := jtd.dataSource.GetTraceByID(ctx, traceID)
 	return trace, err
 }
 
 func (jtd *jaegerTraceDB) Ready() bool {
-	return jtd.client.Ready()
+	return jtd.dataSource.Ready()
 }
 
 func (jtd *jaegerTraceDB) Close() error {
-	return jtd.client.Close()
+	return jtd.dataSource.Close()
 }
 
 func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (model.Trace, error) {

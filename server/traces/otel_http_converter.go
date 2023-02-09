@@ -93,8 +93,8 @@ func getHttpAttributeValue(value map[string]interface{}) string {
 	}
 
 	if value["doubleValue"] != nil {
-		val := value["doubleValue"].(float64)
-		if val != 0.0 {
+		val, ok := value["doubleValue"].(float64)
+		if ok {
 			isFloatingPoint := math.Abs(val-math.Abs(val)) > 0.0
 			if isFloatingPoint {
 				return fmt.Sprintf("%f", val)
