@@ -10,7 +10,6 @@ import (
 	"text/template"
 
 	"github.com/kubeshop/tracetest/server/analytics"
-	"github.com/kubeshop/tracetest/server/config"
 )
 
 func jsonEscape(text any) string {
@@ -51,21 +50,30 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 	return http.StripPrefix(prefix, http.HandlerFunc(handler)).ServeHTTP
 }
 
-func SPAHandler(conf config.Config, serverID, version, env string) http.HandlerFunc {
+type spaConfig interface {
+	ServerPathPrefix() string
+	AnalyticsEnabled() bool
+	DemoEnabled() []string
+	DemoEndpoints() map[string]string
+	ExperimentalFeatures() []string
+}
+
+func SPAHandler(conf spaConfig, serverID, version, env string) http.HandlerFunc {
+	pathPrefix := conf.ServerPathPrefix()
 	return spaHandler(
-		conf.Server.PathPrefix,
+		pathPrefix,
 		"./html",
 		"index.html",
 		map[string]string{
 			"AnalyticsKey":         analytics.FrontendKey,
-			"AnalyticsEnabled":     fmt.Sprintf("%t", conf.GA.Enabled),
-			"ServerPathPrefix":     fmt.Sprintf("%s/", conf.Server.PathPrefix),
+			"AnalyticsEnabled":     fmt.Sprintf("%t", conf.AnalyticsEnabled()),
+			"ServerPathPrefix":     fmt.Sprintf("%s/", pathPrefix),
 			"ServerID":             serverID,
 			"AppVersion":           version,
 			"Env":                  env,
-			"DemoEnabled":          jsonEscape(conf.Demo.Enabled),
-			"DemoEndpoints":        jsonEscape(conf.Demo.Endpoints),
-			"ExperimentalFeatures": jsonEscape(conf.ExperimentalFeatures),
+			"DemoEnabled":          jsonEscape(conf.DemoEnabled()),
+			"DemoEndpoints":        jsonEscape(conf.DemoEndpoints()),
+			"ExperimentalFeatures": jsonEscape(conf.ExperimentalFeatures()),
 		},
 	)
 }

@@ -1,14 +1,14 @@
 package installer
 
 import (
+	"bytes"
+	_ "embed"
+	"html/template"
+
 	"fmt"
 	"strings"
 
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
-	serverConfig "github.com/kubeshop/tracetest/server/config"
-	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/collector/config/configtls"
-	"gopkg.in/yaml.v3"
 )
 
 func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
@@ -72,28 +72,10 @@ func configureBackend(conf configuration, ui cliUI.UI) configuration {
 	return conf
 }
 
+//go:embed config.yaml.tpl
+var configTemplate string
+
 func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configuration) []byte {
-	sc := serverConfig.Config{
-		PostgresConnString: psql,
-		PoolingConfig: serverConfig.PoolingConfig{
-			MaxWaitTimeForTrace: "2m",
-			RetryDelay:          "3s",
-		},
-		GA: serverConfig.GoogleAnalytics{
-			Enabled: config.Bool("tracetest.analytics"),
-		},
-	}
-
-	sc.Telemetry = telemetryConfig(ui, config)
-
-	if config.Bool("tracetest.backend.install") {
-		sc.Server = serverConfig.ServerConfig{
-			Telemetry: serverConfig.ServerTelemetryConfig{
-				DataStore: config.String("tracetest.backend.type"),
-			},
-		}
-	}
-
 	enabledDemos := []string{}
 	if config.Bool("demo.enable.pokeshop") {
 		enabledDemos = append(enabledDemos, "pokeshop")
@@ -102,131 +84,35 @@ func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configurati
 		enabledDemos = append(enabledDemos, "otel")
 	}
 
-	sc.Demo = serverConfig.Demo{
-		Enabled: enabledDemos,
-		Endpoints: serverConfig.DemoEndpoints{
-			PokeshopHttp:       config.String("demo.endpoint.pokeshop.http"),
-			PokeshopGrpc:       config.String("demo.endpoint.pokeshop.grpc"),
-			OtelFrontend:       config.String("demo.endpoint.otel.frontend"),
-			OtelProductCatalog: config.String("demo.endpoint.otel.product_catalog"),
-			OtelCart:           config.String("demo.endpoint.otel.cart"),
-			OtelCheckout:       config.String("demo.endpoint.otel.checkout"),
-		},
+	vals := map[string]string{
+		"installBackend":   fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
+		"psql":             psql,
+		"analyticsEnabled": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
+
+		"enabledDemos":       strings.Join(enabledDemos, ", "),
+		"pokeshopHttp":       config.String("demo.endpoint.pokeshop.http"),
+		"pokeshopGrpc":       config.String("demo.endpoint.pokeshop.grpc"),
+		"otelFrontend":       config.String("demo.endpoint.otel.frontend"),
+		"otelProductCatalog": config.String("demo.endpoint.otel.product_catalog"),
+		"otelCart":           config.String("demo.endpoint.otel.cart"),
+		"otelCheckout":       config.String("demo.endpoint.otel.checkout"),
+
+		"backendType":      config.String("tracetest.backend.type"),
+		"backendEndpoint":  config.String("tracetest.backend.endpoint.query"),
+		"backendInsecure":  config.String("tracetest.backend.tls.insecure"),
+		"backendAddresses": config.String("tracetest.backend.addresses"),
+		"backendIndex":     config.String("tracetest.backend.index"),
+		"backendToken":     config.String("tracetest.backend.token"),
+		"backendRealm":     config.String("tracetest.backend.realm"),
 	}
 
-	out, err := yaml.Marshal(sc)
+	tpl, err := template.New("page").Parse(configTemplate)
 	if err != nil {
-		ui.Exit(fmt.Errorf("cannot marshal tracetest config file: %w", err).Error())
+		ui.Panic(fmt.Errorf("cannot parse config template: %w", err))
 	}
 
-	if config.Bool("tracetest.backend.install") {
-		out, err = fixConfigs(out)
-		if err != nil {
-			ui.Exit(fmt.Errorf("cannot fix tracertest config: %w", err).Error())
-		}
-	}
+	out := &bytes.Buffer{}
+	tpl.Execute(out, vals)
 
-	return out
-}
-
-func fixConfigs(conf []byte) ([]byte, error) {
-	encoded := msa{}
-
-	err := yaml.Unmarshal(conf, &encoded)
-	if err != nil {
-		return nil, fmt.Errorf("cannot decode mapstructure: %w", err)
-	}
-
-	ds := encoded["telemetry"].(msa)["datastores"].(msa)
-
-	var (
-		target msa
-		key    string
-	)
-
-	if d, ok := ds["jaeger"]; ok {
-		target = d.(msa)["jaeger"].(msa)
-		key = "jaeger"
-	} else if d, ok := ds["tempo"]; ok {
-		target = d.(msa)["tempo"].(msa)
-		key = "tempo"
-	} else {
-		// we only need to fix tempo/jaeger
-		return yaml.Marshal(encoded)
-	}
-
-	target["tls"] = target["tlssetting"]
-	delete(target, "tlssetting")
-
-	encoded["telemetry"].(msa)["datastores"].(msa)[key].(msa)[key] = target
-
-	return yaml.Marshal(encoded)
-}
-
-func telemetryConfig(ui cliUI.UI, conf configuration) serverConfig.Telemetry {
-	if conf.Bool("tracetest.backend.install") {
-		return serverConfig.Telemetry{
-			DataStores: dataStoreConfig(ui, conf),
-			Exporters:  map[string]serverConfig.TelemetryExporterOption{},
-		}
-	}
-
-	return serverConfig.Telemetry{
-		DataStores: map[string]serverConfig.TracingBackendDataStoreConfig{},
-		Exporters:  map[string]serverConfig.TelemetryExporterOption{},
-	}
-}
-
-func dataStoreConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.TracingBackendDataStoreConfig {
-	dstype := conf.String("tracetest.backend.type")
-	var c serverConfig.TracingBackendDataStoreConfig
-	switch dstype {
-	case "jaeger":
-		c = serverConfig.TracingBackendDataStoreConfig{
-			Type: dstype,
-			Jaeger: configgrpc.GRPCClientSettings{
-				Endpoint: conf.String("tracetest.backend.endpoint.query"),
-				TLSSetting: configtls.TLSClientSetting{
-					Insecure: conf.Bool("tracetest.backend.tls.insecure"),
-				},
-			},
-		}
-	case "tempo":
-		c = serverConfig.TracingBackendDataStoreConfig{
-			Type: dstype,
-			Tempo: configgrpc.GRPCClientSettings{
-				Endpoint: conf.String("tracetest.backend.endpoint"),
-				TLSSetting: configtls.TLSClientSetting{
-					Insecure: conf.Bool("tracetest.backend.tls.insecure"),
-				},
-			},
-		}
-	case "opensearch":
-		c = serverConfig.TracingBackendDataStoreConfig{
-			Type: dstype,
-			OpenSearch: serverConfig.ElasticSearchDataStoreConfig{
-				Addresses: strings.Split(conf.String("tracetest.backend.addresses"), ","),
-				Index:     conf.String("tracetest.backend.index"),
-			},
-		}
-	case "signalfx":
-		c = serverConfig.TracingBackendDataStoreConfig{
-			Type: dstype,
-			SignalFX: serverConfig.SignalFXDataStoreConfig{
-				Token: conf.String("tracetest.backend.token"),
-				Realm: conf.String("tracetest.backend.realm"),
-			},
-		}
-	case "otlp":
-		c = serverConfig.TracingBackendDataStoreConfig{
-			Type: dstype,
-		}
-	default:
-		ui.Panic(fmt.Errorf("unsupported dataStore type %s", dstype))
-	}
-
-	return map[string]serverConfig.TracingBackendDataStoreConfig{
-		dstype: c,
-	}
-
+	return out.Bytes()
 }
