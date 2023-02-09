@@ -449,6 +449,11 @@ const sidebars = {
                   id: "live-examples/opentelemetry-store/use-cases/get-recommended-products",
                   label: "Get recommended products",
                 },
+                {
+                  type: "doc",
+                  id: "live-examples/opentelemetry-store/use-cases/user-purchasing-products",
+                  label: "User purchasing products"
+                }
               ]
             }
           ],
