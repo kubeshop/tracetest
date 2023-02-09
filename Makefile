@@ -1,12 +1,19 @@
 PROJECT_ROOT=${PWD}
 
+GORELEASER_VERSION=1.15.0-pro
+CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 1 | cut -d' ' -f3-)
+goreleaser-version:
+ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
+	$(error Bad goreleaser version $(CURRENT_GORELEASER_VERSION), please install $(GORELEASER_VERSION))
+endif
+
 CLI_SRC_FILES := $(shell find cli -type f)
-dist/tracetest: generate-cli $(CLI_SRC_FILES)
+dist/tracetest: goreleaser-version generate-cli $(CLI_SRC_FILES)
 	goreleaser build --single-target --clean --snapshot --id cli
 	find ./dist -name 'tracetest' -exec cp {} ./dist \;
 
 SERVER_SRC_FILES := $(shell find server -type f)
-dist/tracetest-server: generate-server $(SERVER_SRC_FILES)
+dist/tracetest-server: goreleaser-version generate-server $(SERVER_SRC_FILES)
 	goreleaser build --single-target --clean --snapshot --id server
 	find ./dist -name 'tracetest-server' -exec cp {} ./dist \;
 
@@ -27,7 +34,7 @@ run: build-docker ## build and run tracetest using docker compose
 	docker compose up
 build-go: dist/tracetest dist/tracetest-server ## build all go code
 build-web: web/build ## build web
-build-docker: build-go build-web .goreleaser.dev.yaml ## build and tag docker image as defined in .goreleaser.dev.yaml
+build-docker: goreleaser-version build-go build-web .goreleaser.dev.yaml ## build and tag docker image as defined in .goreleaser.dev.yaml
 	VERSION=latest goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
 
 .PHONY: generate generate-server generate-cli generate-web
