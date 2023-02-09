@@ -66,16 +66,27 @@ You can build and run Tracetest locally using Docker compose. The project provid
 You will need [Docker Compose](https://docs.docker.com/compose/install/) installed, as well as [GoReleaser-Pro](https://goreleaser.com/install/). 
 Note that while the `pro` version is required, no licencing is needed for local builds.
 
-To build the image:
+You can build each part of the system separatedly:
+
+```bash
+make build-web
+make build-cli
+make build-server
+```
+
+You can build and tag the docker image, implicitly building web, cli and server:
 
 ```bash
 make build-docker
 ```
 
-This will build a new image, tagged `kubeshop/tracetest:latest`. That is the default image used in the `docker-compose` file, so now we can start the service:
+This will build a new image, tagged `kubeshop/tracetest:latest`
+
+
+To build and run tracetest locally:
 
 ```bash
-docker compose up
+make run
 ```
 
 Once the app is finished loading all the services, you can access your local tracetest at [http://localhost:11633].
