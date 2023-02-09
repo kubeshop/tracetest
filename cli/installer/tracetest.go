@@ -194,11 +194,14 @@ func dataStoreConfig(ui cliUI.UI, conf configuration) map[string]serverConfig.Tr
 	case "tempo":
 		c = serverConfig.TracingBackendDataStoreConfig{
 			Type: dstype,
-			Tempo: configgrpc.GRPCClientSettings{
-				Endpoint: conf.String("tracetest.backend.endpoint"),
-				TLSSetting: configtls.TLSClientSetting{
-					Insecure: conf.Bool("tracetest.backend.tls.insecure"),
+			Tempo: serverConfig.BaseClientConfig{
+				Grpc: configgrpc.GRPCClientSettings{
+					Endpoint: conf.String("tracetest.backend.endpoint"),
+					TLSSetting: configtls.TLSClientSetting{
+						Insecure: conf.Bool("tracetest.backend.tls.insecure"),
+					},
 				},
+				Type: "grpc",
 			},
 		}
 	case "opensearch":
