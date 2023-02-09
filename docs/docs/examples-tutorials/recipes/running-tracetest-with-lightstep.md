@@ -304,7 +304,7 @@ To access a historical overview of all the trace spans the OpenTelemetry Demo ge
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998664/Blogposts/tracetest-lightstep-partnership/screely-1672998658856_lae7ml.png)
 
-You can also drill down into a partucular trace as well.
+You can also drill down into a particular trace as well.
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998974/Blogposts/tracetest-lightstep-partnership/screely-1672998969770_iwmjy5.png)
 
