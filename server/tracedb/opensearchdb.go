@@ -13,6 +13,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/opensearch-project/opensearch-go"
 	"github.com/opensearch-project/opensearch-go/opensearchapi"
 	"go.opentelemetry.io/otel/trace"
@@ -33,26 +34,26 @@ func (db opensearchDB) Close() error {
 	return nil
 }
 
-func (db opensearchDB) TestConnection(ctx context.Context) ConnectionTestResult {
+func (db opensearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	addressesString := strings.Join(db.config.Addresses, ",")
-	connectionTestResult := ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
+	connectionTestResult := connection.ConnectionTestResult{
+		ConnectivityTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, addressesString),
 		},
-		AuthenticationTestResult: ConnectionTestStepResult{
+		AuthenticationTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: `Tracetest managed to authenticate with OpenSearch`,
 		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
+		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: `Tracetest was able to search for a trace using the OpenSearch API`,
 		},
 	}
 
 	for _, address := range db.config.Addresses {
-		reachable, err := isReachable(address)
+		reachable, err := connection.IsReachable(address)
 
 		if !reachable {
-			return ConnectionTestResult{
-				ConnectivityTestResult: ConnectionTestStepResult{
+			return connection.ConnectionTestResult{
+				ConnectivityTestResult: connection.ConnectionTestStepResult{
 					OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, address),
 					Error:                err,
 				},
@@ -62,20 +63,20 @@ func (db opensearchDB) TestConnection(ctx context.Context) ConnectionTestResult 
 
 	_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
 	if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
-		return ConnectionTestResult{
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: ConnectionTestStepResult{
+			AuthenticationTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: `Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues`,
 				Error:                err,
 			},
 		}
 	}
 
-	if !errors.Is(err, ErrTraceNotFound) {
-		return ConnectionTestResult{
+	if !errors.Is(err, connection.ErrTraceNotFound) {
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrivalTestResult: ConnectionTestStepResult{
+			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the OpenSearch endpoint "%s" and got an error`, addressesString),
 				Error:                err,
 			},
@@ -119,7 +120,7 @@ func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.
 	}
 
 	if len(searchResponse.Hits.Results) == 0 {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil

@@ -25,7 +25,7 @@ type DataStore struct {
 	Type       SupportedDataStores `json:"type"`
 	IsDefault  *bool               `json:"isDefault,omitempty"`
 	Jaeger     *GRPCClientSettings `json:"jaeger,omitempty"`
-	Tempo      *GRPCClientSettings `json:"tempo,omitempty"`
+	Tempo      *BaseClient         `json:"tempo,omitempty"`
 	OpenSearch *ElasticSearch      `json:"openSearch,omitempty"`
 	ElasticApm *ElasticSearch      `json:"elasticApm,omitempty"`
 	SignalFx   *SignalFX           `json:"signalFx,omitempty"`
@@ -196,9 +196,9 @@ func (o *DataStore) SetJaeger(v GRPCClientSettings) {
 }
 
 // GetTempo returns the Tempo field value if set, zero value otherwise.
-func (o *DataStore) GetTempo() GRPCClientSettings {
+func (o *DataStore) GetTempo() BaseClient {
 	if o == nil || isNil(o.Tempo) {
-		var ret GRPCClientSettings
+		var ret BaseClient
 		return ret
 	}
 	return *o.Tempo
@@ -206,7 +206,7 @@ func (o *DataStore) GetTempo() GRPCClientSettings {
 
 // GetTempoOk returns a tuple with the Tempo field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DataStore) GetTempoOk() (*GRPCClientSettings, bool) {
+func (o *DataStore) GetTempoOk() (*BaseClient, bool) {
 	if o == nil || isNil(o.Tempo) {
 		return nil, false
 	}
@@ -222,8 +222,8 @@ func (o *DataStore) HasTempo() bool {
 	return false
 }
 
-// SetTempo gets a reference to the given GRPCClientSettings and assigns it to the Tempo field.
-func (o *DataStore) SetTempo(v GRPCClientSettings) {
+// SetTempo gets a reference to the given BaseClient and assigns it to the Tempo field.
+func (o *DataStore) SetTempo(v BaseClient) {
 	o.Tempo = &v
 }
 

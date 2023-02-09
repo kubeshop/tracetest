@@ -13,6 +13,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -47,25 +48,25 @@ func (db signalfxDB) Close() error {
 	return nil
 }
 
-func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
+func (db signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
-	connectionTestResult := ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
+	connectionTestResult := connection.ConnectionTestResult{
+		ConnectivityTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
 		},
-		AuthenticationTestResult: ConnectionTestStepResult{
+		AuthenticationTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: `Tracetest managed to authenticate with signalFX`,
 		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
+		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: `Tracetest was able to search for a trace using the signalFX API`,
 		},
 	}
 
-	reachable, err := isReachable(url)
+	reachable, err := connection.IsReachable(url)
 
 	if !reachable {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
+		return connection.ConnectionTestResult{
+			ConnectivityTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, url),
 				Error:                err,
 			},
@@ -75,20 +76,20 @@ func (db signalfxDB) TestConnection(ctx context.Context) ConnectionTestResult {
 	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
 
 	if strings.Contains(strings.ToLower(err.Error()), "401") {
-		return ConnectionTestResult{
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: ConnectionTestStepResult{
+			AuthenticationTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: `Tracetest tried to execute an signalFX API request but it failed due to authentication issues`,
 				Error:                err,
 			},
 		}
 	}
 
-	if !errors.Is(err, ErrTraceNotFound) {
-		return ConnectionTestResult{
+	if !errors.Is(err, connection.ErrTraceNotFound) {
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrivalTestResult: ConnectionTestStepResult{
+			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the signalFX endpoint "%s" and got an error`, url),
 				Error:                err,
 			},
@@ -105,7 +106,7 @@ func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Tr
 	}
 
 	if len(timestamps) == 0 {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	traceSpans := make([]model.Span, 0)
@@ -123,7 +124,7 @@ func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Tr
 	}
 
 	if len(traceSpans) == 0 {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return model.NewTrace(traceID, traceSpans), nil

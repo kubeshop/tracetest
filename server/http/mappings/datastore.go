@@ -2,10 +2,10 @@ package mappings
 
 import (
 	"github.com/kubeshop/tracetest/server/openapi"
-	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 )
 
-func (m *OpenAPI) ConnectionTestResult(in tracedb.ConnectionTestResult) openapi.ConnectionResult {
+func (m *OpenAPI) ConnectionTestResult(in connection.ConnectionTestResult) openapi.ConnectionResult {
 	result := openapi.ConnectionResult{}
 
 	if in.ConnectivityTestResult.IsSet() {
@@ -16,14 +16,14 @@ func (m *OpenAPI) ConnectionTestResult(in tracedb.ConnectionTestResult) openapi.
 		result.Authentication = m.ConnectionTestStep(in.AuthenticationTestResult)
 	}
 
-	if in.TraceRetrivalTestResult.IsSet() {
-		result.FetchTraces = m.ConnectionTestStep(in.TraceRetrivalTestResult)
+	if in.TraceRetrievalTestResult.IsSet() {
+		result.FetchTraces = m.ConnectionTestStep(in.TraceRetrievalTestResult)
 	}
 
 	return result
 }
 
-func (m *OpenAPI) ConnectionTestStep(in tracedb.ConnectionTestStepResult) openapi.ConnectionTestStep {
+func (m *OpenAPI) ConnectionTestStep(in connection.ConnectionTestStepResult) openapi.ConnectionTestStep {
 	errMessage := ""
 	if in.Error != nil {
 		errMessage = in.Error.Error()

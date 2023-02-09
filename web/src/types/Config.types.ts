@@ -21,6 +21,11 @@ export enum SupportedDataStores {
   SignalFX = 'signalFx',
 }
 
+export enum SupportedClientTypes {
+  GRPC = 'grpc',
+  HTTP = 'http',
+}
+
 export type TCollectorDataStores =
   | SupportedDataStores.NewRelic
   | SupportedDataStores.OtelCollector
@@ -28,6 +33,8 @@ export type TCollectorDataStores =
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
+export type TRawBaseClientSettings = TDataStoreSchemas['BaseClient'];
+export type TRawHttpClientSettings = TDataStoreSchemas['HTTPClientSettings'];
 
 export type TTestConnectionRequest = TRawDataStore;
 export type TRawConnectionResult = TConfigSchemas['ConnectionResult'];
@@ -44,9 +51,20 @@ export type TConnectionResult = Model<
 export type TTestConnectionResponse = TConfigSchemas['ConnectionResult'];
 
 export interface IGRPCClientSettings extends TRawGRPCClientSettings {
-  fileCA: File;
-  fileCert: File;
-  fileKey: File;
+  fileCA?: File;
+  fileCert?: File;
+  fileKey?: File;
+  rawHeaders?: THeader[];
+}
+
+export interface IBaseClientSettings extends TRawBaseClientSettings {
+  type: SupportedClientTypes;
+}
+
+export interface IHttpClientSettings extends TRawHttpClientSettings {
+  fileCA?: File;
+  fileCert?: File;
+  fileKey?: File;
   rawHeaders?: THeader[];
 }
 
@@ -54,15 +72,15 @@ export interface IElasticSearch extends TRawElasticSearch {
   certificateFile?: File;
 }
 
-interface IDataStore extends TRawDataStore {
-  jaeger?: IGRPCClientSettings;
-  tempo?: IGRPCClientSettings;
+type IDataStore = TRawDataStore & {
+  jaeger?: IBaseClientSettings;
+  tempo?: IBaseClientSettings;
   openSearch?: IElasticSearch;
   elasticApm?: IElasticSearch;
   otlp?: {};
   lightstep?: {};
   newRelic?: {};
-}
+};
 
 export type TDraftDataStore = {
   dataStore?: IDataStore;

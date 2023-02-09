@@ -19,7 +19,7 @@ components:
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
         tempo:
-          $ref: "#/components/schemas/GRPCClientSettings"
+          $ref: "#/components/schemas/BaseClient"
         openSearch:
           $ref: "#/components/schemas/ElasticSearch"
         elasticApm:
@@ -29,6 +29,15 @@ components:
         createdAt:
           type: string
           format: date-time
+    BaseClient:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/SupportedClients"
+        http:
+          $ref: "#/components/schemas/HTTPClientSettings"
+        grpc:
+          $ref: "#/components/schemas/GRPCClientSettings"
     ElasticSearch:
       type: object
       properties:
@@ -53,6 +62,19 @@ components:
           type: string
         token:
           type: string
+    HTTPClientSettings:
+      type: object
+      properties:
+        url:
+          type: string
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        tls:
+          $ref: "#/components/schemas/TLS"
+        auth:
+          $ref: "./http.yaml#/components/schemas/HTTPAuth"
     GRPCClientSettings:
       type: object
       properties:
@@ -121,3 +143,6 @@ components:
           newRelic,
           lightstep,
         ]
+    SupportedClients:
+      type: string
+      enum: [http, grpc]

@@ -7,6 +7,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configtls"
 	"gopkg.in/yaml.v2"
 )
 
@@ -66,7 +67,7 @@ type (
 	TracingBackendDataStoreConfig struct {
 		Type       string                        `yaml:",omitempty" mapstructure:"type"`
 		Jaeger     configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"jaeger"`
-		Tempo      configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"tempo"`
+		Tempo      BaseClientConfig              `yaml:",omitempty" mapstructure:"tempo"`
 		OpenSearch ElasticSearchDataStoreConfig  `yaml:",omitempty" mapstructure:"opensearch"`
 		SignalFX   SignalFXDataStoreConfig       `yaml:",omitempty" mapstructure:"signalfx"`
 		ElasticApm ElasticSearchDataStoreConfig  `yaml:",omitempty" mapstructure:"elasticapm"`
@@ -94,6 +95,18 @@ type (
 		Index              string
 		Certificate        string
 		InsecureSkipVerify bool
+	}
+
+	BaseClientConfig struct {
+		Type string                        `yaml:",omitempty" mapstructure:"type"`
+		Grpc configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"grpc"`
+		Http HttpClientConfig              `yaml:",omitempty" mapstructure:"http"`
+	}
+
+	HttpClientConfig struct {
+		Url        string                     `yaml:",omitempty" mapstructure:"url"`
+		Headers    map[string]string          `yaml:",omitempty" mapstructure:"headers"`
+		TLSSetting configtls.TLSClientSetting `yaml:",omitempty" mapstructure:"tls"`
 	}
 
 	SignalFXDataStoreConfig struct {

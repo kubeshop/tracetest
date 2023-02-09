@@ -1080,12 +1080,17 @@ export interface external {
           type: external["dataStores.yaml"]["components"]["schemas"]["SupportedDataStores"];
           isDefault?: boolean;
           jaeger?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
-          tempo?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
+          tempo?: external["dataStores.yaml"]["components"]["schemas"]["BaseClient"];
           openSearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
           elasticApm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
           signalFx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
           /** Format: date-time */
           createdAt?: string;
+        };
+        BaseClient: {
+          type?: external["dataStores.yaml"]["components"]["schemas"]["SupportedClients"];
+          http?: external["dataStores.yaml"]["components"]["schemas"]["HTTPClientSettings"];
+          grpc?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
         };
         ElasticSearch: {
           addresses?: string[];
@@ -1098,6 +1103,12 @@ export interface external {
         SignalFX: {
           realm?: string;
           token?: string;
+        };
+        HTTPClientSettings: {
+          url?: string;
+          headers?: { [key: string]: string };
+          tls?: external["dataStores.yaml"]["components"]["schemas"]["TLS"];
+          auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
         };
         GRPCClientSettings: {
           endpoint?: string;
@@ -1141,6 +1152,8 @@ export interface external {
           | "elasticApm"
           | "newRelic"
           | "lightstep";
+        /** @enum {string} */
+        SupportedClients: "http" | "grpc";
       };
     };
     operations: {};

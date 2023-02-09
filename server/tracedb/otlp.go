@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
@@ -32,19 +33,19 @@ func (tdb *OTLPTraceDB) Close() error {
 	return nil
 }
 
-func (jtd *OTLPTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
-	return ConnectionTestResult{}
+func (jtd *OTLPTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+	return connection.ConnectionTestResult{}
 }
 
 // GetTraceByID implements TraceDB
 func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (model.Trace, error) {
 	run, err := tdb.db.GetRunByTraceID(ctx, traces.DecodeTraceID(id))
 	if err != nil && strings.Contains(err.Error(), "record not found") {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	if run.Trace == nil {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return *run.Trace, nil

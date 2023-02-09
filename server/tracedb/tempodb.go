@@ -2,15 +2,20 @@ package tracedb
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/id"
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/client"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/collector/component/componenttest"
-	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
@@ -19,136 +24,95 @@ import (
 
 type tempoTraceDB struct {
 	realTraceDB
-
-	config *configgrpc.GRPCClientSettings
-	conn   *grpc.ClientConn
-	query  tempopb.QuerierClient
+	client *client.Client
 }
 
-func newTempoDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
+func newTempoDB(config *config.BaseClientConfig) (TraceDB, error) {
+	client := client.NewClient("Tempo", config, client.Callbacks{
+		HTTP: httpGetTraceByID,
+		GRPC: grpcGetTraceByID,
+	})
+
 	return &tempoTraceDB{
-		config: config,
+		client: client,
 	}, nil
 }
 
 func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
-	opts, err := tdb.config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
-	if err != nil {
-		return errors.Wrap(ErrInvalidConfiguration, err.Error())
-	}
-
-	conn, err := grpc.DialContext(ctx, tdb.config.Endpoint, opts...)
-	if err != nil {
-		return errors.Wrap(ErrConnectionFailed, err.Error())
-	}
-
-	tdb.conn = conn
-	tdb.query = tempopb.NewQuerierClient(conn)
-
-	return nil
+	return tdb.client.Connect(ctx)
 }
 
-func (ttd *tempoTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
-	connectionTestResult := ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, ttd.config.Endpoint),
-		},
-		AuthenticationTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with Tempo`,
-		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using Tempo API`,
-		},
+func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+	connectionTestResult, err := ttd.client.TestConnection(ctx)
+	if err != nil {
+		return connectionTestResult
 	}
 
-	reachable, err := isReachable(ttd.config.Endpoint)
-	if !reachable {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, ttd.config.Endpoint),
-				Error:                err,
-			},
-		}
-	}
-
-	err = ttd.Connect(ctx)
-	wrappedErr := errors.Unwrap(err)
-	if errors.Is(wrappedErr, ErrConnectionFailed) {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, ttd.config.Endpoint),
-				Error:                err,
-			},
-		}
-	}
-
-	_, err = ttd.GetTraceByID(ctx, trace.TraceID{}.String())
-	if strings.Contains(err.Error(), "connection error") && !strings.Contains(err.Error(), "authentication handshake failed") {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, ttd.config.Endpoint),
-				Error:                err,
-			},
-		}
-	}
-
+	_, err = ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
 	if strings.Contains(err.Error(), "authentication handshake failed") {
-		return ConnectionTestResult{
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute a gRPC request but it failed due to authentication issues`,
+			AuthenticationTestResult: connection.ConnectionTestStepResult{
+				OperationDescription: "Tracetest tried to execute a request but it failed due to authentication issues",
 				Error:                err,
 			},
 		}
 	}
 
-	if !errors.Is(err, ErrTraceNotFound) {
-		return ConnectionTestResult{
+	if !errors.Is(err, connection.ErrTraceNotFound) {
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrivalTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from Tempo endpoint "%s" and got an error`, ttd.config.Endpoint),
+			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
+				OperationDescription: "Tracetest tried to fetch a trace from Tempo",
 				Error:                err,
 			},
 		}
 	}
 
+	connectionTestResult.AuthenticationTestResult = connection.ConnectionTestStepResult{
+		OperationDescription: `Tracetest managed to authenticate with Tempo`,
+	}
+	connectionTestResult.TraceRetrievalTestResult = connection.ConnectionTestStepResult{
+		OperationDescription: `Tracetest was able to search for a trace using Tempo API`,
+	}
 	return connectionTestResult
 }
 
 func (ttd *tempoTraceDB) Ready() bool {
-	return ttd.query != nil
+	return ttd.client.Ready()
 }
 
 func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
-	if !ttd.Ready() {
-		return model.Trace{}, fmt.Errorf("Tempo dataStore not ready")
-	}
+	trace, err := ttd.client.GetTraceByID(ctx, traceID)
+	return trace, err
+}
+
+func (ttd *tempoTraceDB) Close() error {
+	return ttd.client.Close()
+}
+
+func grpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (model.Trace, error) {
+	query := tempopb.NewQuerierClient(conn)
 
 	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
 		return model.Trace{}, err
 	}
-	resp, err := ttd.query.FindTraceByID(ctx, &tempopb.TraceByIDRequest{
+
+	resp, err := query.FindTraceByID(ctx, &tempopb.TraceByIDRequest{
 		TraceID: []byte(trID[:]),
 	})
 	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			return model.Trace{}, fmt.Errorf("tempo FindTraceByID %w", err)
-		}
-		if st.Message() == "trace not found" {
-			return model.Trace{}, ErrTraceNotFound
-		}
-		return model.Trace{}, fmt.Errorf("tempo err: %w", err)
+		return model.Trace{}, handleError(err)
 	}
 
 	if resp.Trace == nil {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	if len(resp.Trace.Batches) == 0 {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	trace := &v1.TracesData{
@@ -158,10 +122,52 @@ func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (mode
 	return traces.FromOtel(trace), nil
 }
 
-func (ttd *tempoTraceDB) Close() error {
-	err := ttd.conn.Close()
+type HttpTempoTraceByIDResponse struct {
+	Batches []*traces.HttpResourceSpans `json:"batches"`
+}
+
+func httpGetTraceByID(ctx context.Context, traceID string, client client.HttpClient) (model.Trace, error) {
+	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
-		return fmt.Errorf("GRPC close: %w", err)
+		return model.Trace{}, err
 	}
+	resp, err := client.Request(ctx, fmt.Sprintf("/api/traces/%s", trID), http.MethodGet, "")
+
+	if err != nil {
+		return model.Trace{}, handleError(err)
+	}
+
+	if resp.StatusCode >= 300 {
+		return model.Trace{}, connection.ErrTraceNotFound
+	}
+
+	var body []byte
+	if b, err := io.ReadAll(resp.Body); err == nil {
+		body = b
+	} else {
+		fmt.Println(err)
+	}
+
+	var trace HttpTempoTraceByIDResponse
+	err = json.Unmarshal(body, &trace)
+	if err != nil {
+		return model.Trace{}, err
+	}
+
+	return traces.FromHttpOtelResourceSpans(trace.Batches), nil
+}
+
+func handleError(err error) error {
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			return fmt.Errorf("tempo FindTraceByID %w", err)
+		}
+		if st.Message() == "trace not found" {
+			return connection.ErrTraceNotFound
+		}
+		return fmt.Errorf("tempo err: %w", err)
+	}
+
 	return nil
 }

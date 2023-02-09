@@ -6,17 +6,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
-	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/otel/trace"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type elasticsearchDB struct {
@@ -34,26 +36,26 @@ func (db elasticsearchDB) Close() error {
 	return nil
 }
 
-func (db elasticsearchDB) TestConnection(ctx context.Context) ConnectionTestResult {
+func (db elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	addressesString := strings.Join(db.config.Addresses, ",")
-	connectionTestResult := ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
+	connectionTestResult := connection.ConnectionTestResult{
+		ConnectivityTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, addressesString),
 		},
-		AuthenticationTestResult: ConnectionTestStepResult{
+		AuthenticationTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: `Tracetest managed to authenticate with ElasticSearch`,
 		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
+		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
 			OperationDescription: `Tracetest was able to search for a trace using the ElasticSearch API`,
 		},
 	}
 
 	for _, address := range db.config.Addresses {
-		reachable, err := isReachable(address)
+		reachable, err := connection.IsReachable(address)
 
 		if !reachable {
-			return ConnectionTestResult{
-				ConnectivityTestResult: ConnectionTestStepResult{
+			return connection.ConnectionTestResult{
+				ConnectivityTestResult: connection.ConnectionTestStepResult{
 					OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, address),
 					Error:                err,
 				},
@@ -63,9 +65,9 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) ConnectionTestResu
 
 	_, err := getClusterInfo(db.client)
 	if err != nil {
-		return ConnectionTestResult{
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: ConnectionTestStepResult{
+			AuthenticationTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: `Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues`,
 				Error:                err,
 			},
@@ -74,20 +76,20 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) ConnectionTestResu
 
 	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
 	if err != nil && strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
-		return ConnectionTestResult{
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: ConnectionTestStepResult{
+			AuthenticationTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: `Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues`,
 				Error:                err,
 			},
 		}
 	}
 
-	if !errors.Is(err, ErrTraceNotFound) {
-		return ConnectionTestResult{
+	if !errors.Is(err, connection.ErrTraceNotFound) {
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrivalTestResult: ConnectionTestStepResult{
+			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
 				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the ElasticSearch endpoint "%s" and got an error`, addressesString),
 				Error:                err,
 			},
@@ -133,7 +135,7 @@ func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mod
 	}
 
 	if len(searchResponse.Hits.Results) == 0 {
-		return model.Trace{}, ErrTraceNotFound
+		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return convertElasticSearchFormatIntoTrace(traceID, searchResponse), nil

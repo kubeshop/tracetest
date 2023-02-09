@@ -10,7 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
-	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -153,7 +153,7 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	run := job.run
-	if errors.Is(err, tracedb.ErrTraceNotFound) {
+	if errors.Is(err, connection.ErrTraceNotFound) {
 		if time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
 			tp.requeue(job)
 			return
