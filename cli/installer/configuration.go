@@ -27,12 +27,7 @@ func (c configuration) set(key string, value interface{}) {
 }
 
 func (c configuration) get(key string) interface{} {
-	v, exists := c.db[key]
-	if !exists {
-		c.ui.Panic(fmt.Errorf("config key %s not exists", key))
-	}
-
-	return v
+	return c.db[key]
 }
 
 func (c configuration) Bool(key string) bool {
@@ -47,7 +42,7 @@ func (c configuration) Bool(key string) bool {
 func (c configuration) String(key string) string {
 	s, ok := c.get(key).(string)
 	if !ok {
-		c.ui.Panic(fmt.Errorf("config key %s is not a string", key))
+		return ""
 	}
 
 	return s

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/handlers"
@@ -44,7 +44,7 @@ type App struct {
 }
 
 type Config struct {
-	config.Config
+	*config.Config
 	Migrations string
 }
 
@@ -99,13 +99,7 @@ func (a *App) Start() error {
 		return err
 	}
 
-	if os.Getenv("TRACETEST_DEV") != "" {
-		// non-empty TRACETEST_DEV variable means it's running by a dev,
-		// and we should totally ignore analytics
-		a.config.GA.Enabled = false
-	}
-
-	err = analytics.Init(a.config.GA.Enabled, serverID, Version, Env)
+	err = analytics.Init(a.config.AnalyticsEnabled(), serverID, Version, Env)
 	if err != nil {
 		return err
 	}
@@ -193,8 +187,12 @@ func (a *App) Start() error {
 	return nil
 }
 
-func ensureFirstTimeDataSources(conf config.Config, repo model.DataStoreRepository) {
-	dsc, err := conf.DataStore()
+type dataStoreConfig interface {
+	DataStore() (*config.TracingBackendDataStoreConfig, error)
+}
+
+func ensureFirstTimeDataSources(cfg dataStoreConfig, repo model.DataStoreRepository) {
+	dsc, err := cfg.DataStore()
 	if err != nil {
 		panic(fmt.Errorf("cannot parse DataStore from config file: %w", err))
 	}
@@ -220,8 +218,13 @@ func ensureFirstTimeDataSources(conf config.Config, repo model.DataStoreReposito
 
 }
 
+type facadeConfig interface {
+	PoolingRetryDelay() time.Duration
+	MaxWaitTimeForTraceDuration() time.Duration
+}
+
 func newRunnerFacades(
-	conf config.Config,
+	cfg facadeConfig,
 	testDB model.Repository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
@@ -240,9 +243,12 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
+	retryDelay := cfg.PoolingRetryDelay()
+	maxWaitTime := cfg.MaxWaitTimeForTraceDuration()
+
 	pollerExecutor := executor.NewPollerExecutor(
-		conf.PoolingRetryDelay(),
-		conf.MaxWaitTimeForTraceDuration(),
+		retryDelay,
+		maxWaitTime,
 		tracer,
 		execTestUpdater,
 		tracedb.Factory(testDB),
@@ -253,8 +259,8 @@ func newRunnerFacades(
 		pollerExecutor,
 		execTestUpdater,
 		assertionRunner,
-		conf.PoolingRetryDelay(),
-		conf.MaxWaitTimeForTraceDuration(),
+		retryDelay,
+		maxWaitTime,
 		subscriptionManager,
 	)
 
@@ -286,9 +292,18 @@ func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
 	return triggerReg
 }
 
+type httpServerConfig interface {
+	ServerPathPrefix() string
+	ServerPort() int
+	AnalyticsEnabled() bool
+	DemoEnabled() []string
+	DemoEndpoints() map[string]string
+	ExperimentalFeatures() []string
+}
+
 func newHttpServer(
 	serverID string,
-	conf config.Config,
+	cfg httpServerConfig,
 	testDB model.Repository,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
@@ -297,7 +312,7 @@ func newHttpServer(
 ) *http.Server {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
 
-	router := openapi.NewRouter(httpRouter(conf, testDB, tracer, rf, mappers, triggerRegistry))
+	router := openapi.NewRouter(httpRouter(cfg, testDB, tracer, rf, mappers, triggerRegistry))
 
 	wsRouter := websocket.NewRouter()
 	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
@@ -306,23 +321,18 @@ func newHttpServer(
 	router.Handle("/ws", wsRouter.Handler())
 
 	router.
-		PathPrefix(conf.Server.PathPrefix).
+		PathPrefix(cfg.ServerPathPrefix()).
 		Handler(
 			httpServer.SPAHandler(
-				conf,
+				cfg,
 				serverID,
 				Version,
 				Env,
 			),
 		)
 
-	port := 11633
-	if conf.Server.HttpPort != 0 {
-		port = conf.Server.HttpPort
-	}
-
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
+		Addr:    fmt.Sprintf(":%d", cfg.ServerPort()),
 		Handler: handlers.CompressHandler(router),
 	}
 
@@ -330,7 +340,7 @@ func newHttpServer(
 }
 
 func httpRouter(
-	conf config.Config,
+	cfg httpServerConfig,
 	testDB model.Repository,
 	tracer trace.Tracer,
 	rf *runnerFacade,
@@ -342,8 +352,8 @@ func httpRouter(
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController
 
-	if conf.Server.PathPrefix != "" {
-		httpRouter = httpServer.NewPrefixedRouter(httpRouter, conf.Server.PathPrefix)
+	if prefix := cfg.ServerPathPrefix(); prefix != "" {
+		httpRouter = httpServer.NewPrefixedRouter(httpRouter, prefix)
 	}
 
 	return httpRouter

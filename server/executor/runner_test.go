@@ -125,7 +125,7 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	tr, _ := tracing.NewTracer(context.TODO(), config.Config{})
+	tr, _ := tracing.NewTracer(context.TODO(), config.New())
 	reg := trigger.NewRegsitry(tr, tr)
 
 	me := new(mockTriggerer)
@@ -140,7 +140,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	tracer, _ := tracing.NewTracer(context.Background(), config.Config{})
+	tracer, _ := tracing.NewTracer(context.Background(), config.New())
 
 	mtp.Test(t)
 	return runnerFixture{

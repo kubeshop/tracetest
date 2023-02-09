@@ -8,8 +8,12 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func GetApplicationTracer(ctx context.Context, config config.Config) (trace.Tracer, error) {
-	applicationSpanExporter, err := config.ApplicationExporter()
+type appExporterConfig interface {
+	ApplicationExporter() (*config.TelemetryExporterOption, error)
+}
+
+func GetApplicationTracer(ctx context.Context, cfg appExporterConfig) (trace.Tracer, error) {
+	applicationSpanExporter, err := cfg.ApplicationExporter()
 	if err != nil {
 		return nil, fmt.Errorf("could not get application exporter config: %w", err)
 	}

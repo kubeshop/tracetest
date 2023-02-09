@@ -23,13 +23,13 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 )
 
-var cfg = flag.String("config", "config.yaml", "path to the config file")
+var configFile = flag.String("config", "config.yaml", "path to the config file")
 
 func main() {
 
 	flag.Parse()
 	cfg := loadConfig()
-	db, err := testdb.Connect(cfg.PostgresConnString)
+	db, err := testdb.Connect(cfg.PostgresConnString())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,8 +69,8 @@ func main() {
 	wg.Wait()
 }
 
-func loadConfig() config.Config {
-	cfg, err := config.FromFile(*cfg)
+func loadConfig() *config.Config {
+	cfg, err := config.FromFile(*configFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func watchChanges(updateFn func()) {
 	}()
 
 	// Add a path.
-	err = watcher.Add(*cfg)
+	err = watcher.Add(*configFile)
 	if err != nil {
 		log.Fatal(err)
 	}

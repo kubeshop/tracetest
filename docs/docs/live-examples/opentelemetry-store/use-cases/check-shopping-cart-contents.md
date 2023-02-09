@@ -90,5 +90,5 @@ spec:
     - attr:app.product.id = "66VCHSJNUP"
   - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
     assertions:
-    - attr:tracetest.response.body | json_path '$.items.lenght' > 0
+    - attr:tracetest.response.body | json_path '$.items.length' = 1
 ```
