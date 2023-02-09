@@ -19,7 +19,7 @@ const HttpClientService = () => ({
 
     const filesToText = [fileCA, fileCert, fileKey].map(file => (file ? file.text() : Promise.resolve(undefined)));
     const [cAFile, certFile, keyFile] = await Promise.all(filesToText);
-    const headers = rawHeaders.reduce((acc, curr) => ({...acc, [curr.key]: curr.value}), {});
+    const headers = rawHeaders.reduce((acc, {key, value}) => (key && value ? {...acc, [key]: value} : acc), {});
 
     return {
       url,

@@ -137,7 +137,7 @@ func httpGetTraceByID(ctx context.Context, traceID string, client client.HttpCli
 		return model.Trace{}, handleError(err)
 	}
 
-	if resp.StatusCode >= 300 {
+	if resp.StatusCode == 404 {
 		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
@@ -146,6 +146,10 @@ func httpGetTraceByID(ctx context.Context, traceID string, client client.HttpCli
 		body = b
 	} else {
 		fmt.Println(err)
+	}
+
+	if resp.StatusCode == 401 {
+		return model.Trace{}, fmt.Errorf("tempo err: %w %s", errors.New("authentication handshake failed"), string(body))
 	}
 
 	var trace HttpTempoTraceByIDResponse
