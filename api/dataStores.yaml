@@ -142,6 +142,7 @@ components:
           elasticApm,
           newRelic,
           lightstep,
+          datadog
         ]
     SupportedClients:
       type: string

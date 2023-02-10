@@ -22,7 +22,7 @@ exporters:
   otlp/ls:
     endpoint: ingest.lightstep.com:443
     headers:
-      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start 
+      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start
 
 service:
   pipelines:
@@ -98,7 +98,42 @@ service:
       exporters: [logging, otlp/nr]
 `;
 
+export const Datadog = `receivers:
+  otlp:
+    protocols:
+      http:
+      grpc:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  # OTLP for Tracetest
+  otlp/tt:
+    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true
+  # Datadog exporter
+  datadog:
+    api:
+      site: datadoghq.com
+      key: <datadog_API_key> # Add here you API key for Datadog
+      # Read more in docs here: https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter
+service:
+  pipelines:
+    traces/tt:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tt]
+    traces/dd:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [datadog]
+`;
+
 export const CollectorConfigMap = {
+  [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.OtelCollector]: OtelCollector,

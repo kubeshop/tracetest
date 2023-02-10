@@ -1151,9 +1151,8 @@ export interface external {
           | "otlp"
           | "elasticApm"
           | "newRelic"
-          | "lightstep";
-        /** @enum {string} */
-        SupportedClients: "http" | "grpc";
+          | "lightstep"
+          | "datadog";
       };
     };
     operations: {};

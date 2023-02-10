@@ -13,6 +13,7 @@ export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.ElasticApm]: ElasticSearch,
   [SupportedDataStores.OtelCollector]: OpenTelemetryCollector,
   [SupportedDataStores.Lightstep]: OpenTelemetryCollector,
+  [SupportedDataStores.Datadog]: OpenTelemetryCollector,
   [SupportedDataStores.NewRelic]: OpenTelemetryCollector,
 };
 

@@ -1,6 +1,3 @@
-# One example on how to set up a collector configuration for Datadog can be seen here:
-# https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=onahost
-
 receivers:
   otlp:
     protocols:
@@ -9,9 +6,7 @@ receivers:
 
 processors:
   batch:
-    send_batch_max_size: 100
-    send_batch_size: 10
-    timeout: 10s
+    timeout: 100ms
 
 exporters:
   # OTLP for Tracetest
@@ -23,7 +18,8 @@ exporters:
   datadog:
     api:
       site: datadoghq.com
-      key: ${DATADOG_API_KEY} # Add here you API key for Datadog
+      key: <datadog_API_key> # Add here you API key for Datadog
+      # Read more in docs here: https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter
 
 service:
   pipelines:
