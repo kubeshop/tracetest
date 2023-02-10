@@ -13,7 +13,7 @@
 
 // generated docs pages
 /** @type {import('@docusaurus/plugin-content-docs/lib/sidebars/types').SidebarItem[]} */
-const cliGeneratedPages = require('./docs/cli/generated/cli-sidebar');
+const cliGeneratedPages = require('./docs/cli/reference/cli-sidebar');
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
@@ -244,11 +244,6 @@ const sidebars = {
       label: "CLI",
       items: [
         {
-          type: "category",
-          label: "Reference",
-          items: cliGeneratedPages,
-        },
-        {
           type: "doc",
           id: "cli/configuring-your-cli",
           label: "Configuring your CLI",
@@ -278,6 +273,11 @@ const sidebars = {
         //   id: "cli/exporting-tests",
         //   label: "Exporting tests",
         // },
+        {
+          type: "category",
+          label: "Reference",
+          items: cliGeneratedPages,
+        },
       ],
     },
     {
