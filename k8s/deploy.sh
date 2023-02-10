@@ -59,6 +59,7 @@ kubectl patch deployment \
   "--config",
   "/app/config/config.yaml"
 ]}]'
+sleep 30 # let k8s finish doing things
 ## END TMP FIX
 
 sleep 10 # let k8s finish doing things
