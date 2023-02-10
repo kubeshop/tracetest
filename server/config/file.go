@@ -1,13 +1,8 @@
 package config
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
-	"gopkg.in/yaml.v2"
 )
 
 type (
@@ -102,27 +97,3 @@ type (
 		Token string
 	}
 )
-
-func FromFile(file string) (*Config, error) {
-	yamlFile, err := os.ReadFile(file)
-	if err != nil {
-		return &Config{}, fmt.Errorf("read file: %w", err)
-	}
-
-	var m map[string]interface{}
-	err = yaml.Unmarshal(yamlFile, &m)
-	if err != nil {
-		return &Config{}, fmt.Errorf("yaml unmarshal : %w", err)
-	}
-
-	var c config
-	err = mapstructure.Decode(m, &c)
-	if err != nil {
-		return &Config{}, fmt.Errorf("yaml unmarshal : %w", err)
-	}
-
-	cfg := New()
-	cfg.config = &c
-
-	return cfg, nil
-}

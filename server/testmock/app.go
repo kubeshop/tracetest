@@ -26,7 +26,7 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 		return nil, err
 	}
 
-	cfg := config.New()
+	cfg, _ := config.New(nil)
 	for _, option := range options {
 		option(cfg)
 	}

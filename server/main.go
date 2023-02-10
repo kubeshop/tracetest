@@ -10,7 +10,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -21,13 +20,14 @@ import (
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/spf13/pflag"
 )
-
-var configFile = flag.String("config", "config.yaml", "path to the config file")
 
 func main() {
 
-	flag.Parse()
+	config.SetupFlags(pflag.CommandLine)
+	pflag.Parse()
+
 	cfg := loadConfig()
 	db, err := testdb.Connect(cfg.PostgresConnString())
 	if err != nil {
@@ -70,7 +70,7 @@ func main() {
 }
 
 func loadConfig() *config.Config {
-	cfg, err := config.FromFile(*configFile)
+	cfg, err := config.New(pflag.CommandLine)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,10 +107,10 @@ func watchChanges(updateFn func()) {
 	}()
 
 	// Add a path.
-	err = watcher.Add(*configFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = watcher.Add(*configFile)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	<-make(chan struct{})
 

@@ -32,7 +32,6 @@ import (
 var (
 	Version = "dev"
 	Env     = "dev"
-	PokeAPI = "dev"
 )
 
 var EmptyDemoEnabled []string
