@@ -18,7 +18,7 @@ func serverDefaultSetter(vp *viper.Viper) {
 	vp.SetDefault("postgres.port", 5432)
 	vp.SetDefault("postgres.params", "")
 
-	vp.SetDefault("server.port", 11633)
+	vp.SetDefault("server.httpPort", 11633)
 	vp.SetDefault("server.pathPrefix", "/")
 
 	vp.SetDefault("experimentalFeatures", []string{})
@@ -65,14 +65,14 @@ func (c *Config) ServerPort() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	return c.vp.GetInt("server.port")
+	return c.vp.GetInt("server.httpPort")
 }
 
 func (c *Config) SetServerPort(port int) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.vp.Set("server.port", port)
+	c.vp.Set("server.httpPort", port)
 }
 
 func (c *Config) ExperimentalFeatures() []string {
