@@ -7,13 +7,10 @@ import (
 
 type (
 	config struct {
-		Server               serverConfig    `yaml:",omitempty" mapstructure:"server"`
-		PostgresConnString   string          `yaml:",omitempty" mapstructure:"postgresConnString"`
-		PoolingConfig        PoolingConfig   `yaml:",omitempty" mapstructure:"poolingConfig"`
-		GA                   googleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
-		Telemetry            telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
-		Demo                 demo            `yaml:",omitempty" mapstructure:"demo"`
-		ExperimentalFeatures []string        `yaml:",omitempty" mapstructure:"experimentalFeatures"`
+		Server    serverConfig    `yaml:",omitempty" mapstructure:"server"`
+		GA        googleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
+		Telemetry telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
+		Demo      demo            `yaml:",omitempty" mapstructure:"demo"`
 	}
 
 	demo struct {
@@ -25,15 +22,8 @@ type (
 		Enabled bool `yaml:",omitempty" mapstructure:"enabled"`
 	}
 
-	PoolingConfig struct {
-		MaxWaitTimeForTrace string `yaml:",omitempty" mapstructure:"maxWaitTimeForTrace"`
-		RetryDelay          string `yaml:",omitempty" mapstructure:"retryDelay"`
-	}
-
 	serverConfig struct {
-		PathPrefix string                `yaml:",omitempty" mapstructure:"pathPrefix"`
-		HttpPort   int                   `yaml:",omitempty" mapstructure:"httpPort"`
-		Telemetry  serverTelemetryConfig `yaml:",omitempty" mapstructure:"telemetry"`
+		Telemetry serverTelemetryConfig `yaml:",omitempty" mapstructure:"telemetry"`
 	}
 
 	serverTelemetryConfig struct {
