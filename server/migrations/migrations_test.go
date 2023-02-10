@@ -3,10 +3,13 @@ package migrations_test
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/kubeshop/tracetest/server/migrations"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +21,7 @@ func TestMigrations(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("applying migrations", func(t *testing.T) {
-		_, err = testdb.Postgres(testdb.WithMigrations("file://../migrations"), testdb.WithDB(db))
+		_, err = testdb.Postgres(testdb.WithDB(db))
 		require.NoError(t, err, "postgres migrations up should not fail")
 	})
 
@@ -33,8 +36,12 @@ func rollback(db *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("could not get driver from postgres connection: %w", err)
 	}
+	sourceDriver, err := iofs.New(migrations.Migrations, ".")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	migrateClient, err := migrate.NewWithDatabaseInstance("file://../migrations/", "tracetest", driver)
+	migrateClient, err := migrate.NewWithInstance("iofs", sourceDriver, "tracetest", driver)
 	if err != nil {
 		return fmt.Errorf("could not get migration client: %w", err)
 	}
