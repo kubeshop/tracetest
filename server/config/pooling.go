@@ -14,11 +14,8 @@ func init() {
 }
 
 func (c *Config) SetPoolingConfig(pc PoolingConfig) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.vp.Set("poolingConfig.maxWaitTimeForTrace", pc.MaxWaitTimeForTrace)
-	c.vp.Set("poolingConfig.retryDelay", pc.RetryDelay)
+	c.Set("poolingConfig.maxWaitTimeForTrace", pc.MaxWaitTimeForTrace)
+	c.Set("poolingConfig.retryDelay", pc.RetryDelay)
 
 }
 

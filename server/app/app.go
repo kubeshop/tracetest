@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -37,20 +36,13 @@ var (
 var EmptyDemoEnabled []string
 
 type App struct {
-	config  Config
-	db      *sql.DB
+	cfg     *config.Config
 	stopFns []func()
 }
 
-type Config struct {
-	*config.Config
-	Migrations string
-}
-
-func New(config Config, db *sql.DB) (*App, error) {
+func New(config *config.Config) (*App, error) {
 	app := &App{
-		config: config,
-		db:     db,
+		cfg: config,
 	}
 
 	return app, nil
@@ -70,8 +62,8 @@ func (a *App) registerStopFn(fn func()) {
 	a.stopFns = append(a.stopFns, fn)
 }
 
-func (a *App) HotReload(c Config) {
-	a.config = c
+func (a *App) HotReload(cfg *config.Config) {
+	a.cfg = cfg
 	a.Stop()
 	a.Start()
 }
@@ -81,15 +73,19 @@ func (a *App) Start() error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
+	db, err := testdb.Connect(a.cfg.PostgresConnString())
+	if err != nil {
+		return err
+	}
+
 	testDB, err := testdb.Postgres(
-		testdb.WithDB(a.db),
-		testdb.WithMigrations(a.config.Migrations),
+		testdb.WithDB(db),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tracer, err := tracing.NewTracer(ctx, a.config.Config)
+	tracer, err := tracing.NewTracer(ctx, a.cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,7 +99,7 @@ func (a *App) Start() error {
 		return err
 	}
 
-	err = analytics.Init(a.config.AnalyticsEnabled(), serverID, Version, Env)
+	err = analytics.Init(a.cfg.AnalyticsEnabled(), serverID, Version, Env)
 	if err != nil {
 		return err
 	}
@@ -115,10 +111,10 @@ func (a *App) Start() error {
 			return err
 		}
 
-		ensureFirstTimeDataSources(a.config.Config, testDB)
+		ensureFirstTimeDataSources(a.cfg, testDB)
 	}
 
-	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config.Config)
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.cfg)
 	if err != nil {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
@@ -127,7 +123,7 @@ func (a *App) Start() error {
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(
-		a.config.Config,
+		a.cfg,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -173,7 +169,7 @@ func (a *App) Start() error {
 
 	httpServer := newHttpServer(
 		serverID,
-		a.config.Config,
+		a.cfg,
 		testDB,
 		tracer,
 		subscriptionManager,

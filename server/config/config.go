@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -118,6 +119,21 @@ func Must(c *Config, err error) *Config {
 	}
 
 	return c
+}
+
+func (c *Config) Watch(updateFn func(c *Config)) {
+	c.vp.OnConfigChange(func(e fsnotify.Event) {
+		fmt.Println("Config file changed:", e.Name)
+		updateFn(c)
+	})
+	c.vp.WatchConfig()
+}
+
+func (c *Config) Set(key string, value any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.vp.Set(key, value)
 }
 
 func (c *Config) AnalyticsEnabled() bool {

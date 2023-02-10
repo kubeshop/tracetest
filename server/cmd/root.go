@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/spf13/cobra"
 )
 
@@ -15,16 +14,8 @@ var (
 		Use:   "tracetest-server",
 		Short: "tracetest server",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			db, err := testdb.Connect(cfg.PostgresConnString())
-			if err != nil {
-				return err
-			}
-
-			appCfg := app.Config{
-				Config: cfg,
-			}
-
-			appInstance, err = app.New(appCfg, db)
+			var err error
+			appInstance, err = app.New(cfg)
 			if err != nil {
 				return err
 			}
