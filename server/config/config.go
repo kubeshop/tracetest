@@ -68,7 +68,9 @@ func SetupFlags(flagset *pflag.FlagSet) {
 
 func New(flagset *pflag.FlagSet) (*Config, error) {
 	vp := viper.New()
-	vp.BindPFlags(flagset)
+	if flagset != nil {
+		vp.BindPFlags(flagset)
+	}
 
 	configureConfigFile(vp)
 	err := readConfigFile(vp)
