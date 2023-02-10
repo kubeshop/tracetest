@@ -6,6 +6,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,10 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start tracete server",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg.Watch(func(c *config.Config) {
+			// appInstance.HotReload()
+		})
+
 		var wg sync.WaitGroup
 		c := make(chan os.Signal)
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
