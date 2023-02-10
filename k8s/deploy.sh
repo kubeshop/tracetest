@@ -50,10 +50,6 @@ kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yam
 
 kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
 
-sleep 10 # let k8s finish doing things
-
-kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 30m
-
 ## TMP FIX FOR NEW CONFIG
 kubectl patch deployment \
   $NAME \
@@ -63,3 +59,8 @@ kubectl patch deployment \
   "--config",
   "/app/config/config.yaml"
 ]}]'
+## END TMP FIX
+
+sleep 10 # let k8s finish doing things
+
+kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 30m
