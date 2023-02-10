@@ -2,29 +2,27 @@ package config
 
 import (
 	"fmt"
-
-	"github.com/spf13/viper"
 )
 
-func init() {
-	defaultSetters = append(defaultSetters, serverDefaultSetter)
+var serverOptions = options{
+	{"postgres.host", "postgres", "postgres DB host"},
+	{"postgres.user", "postgres", "postgres DB user"},
+	{"postgres.password", "postgres", "postgres DB password"},
+	{"postgres.dbname", "tracetest", "postgres DB dbname"},
+	{"postgres.port", 5432, "postgres DB port"},
+	{"postgres.params", "", "postgres DB connection params"},
+
+	{"server.httpPort", 11633, "tracetest HTTP Port"},
+	{"server.pathPrefix", "/", "tracetest HTTP Path prefix"},
+
+	{"experimentalFeatures", []string{}, "enabled experimental features"},
+
+	{"internalTelemetry.enabled", false, "enable internal telemetry (used for internal testing)"},
+	{"internalTelemetry.otelCollectorEndpoint", "", "internal telemetry  otel collector (used for internal testing)"},
 }
 
-func serverDefaultSetter(vp *viper.Viper) {
-	vp.SetDefault("postgres.host", "postgres")
-	vp.SetDefault("postgres.username", "postgres")
-	vp.SetDefault("postgres.password", "postgres")
-	vp.SetDefault("postgres.dbname", "tracetest")
-	vp.SetDefault("postgres.port", 5432)
-	vp.SetDefault("postgres.params", "")
-
-	vp.SetDefault("server.httpPort", 11633)
-	vp.SetDefault("server.pathPrefix", "/")
-
-	vp.SetDefault("experimentalFeatures", []string{})
-
-	vp.SetDefault("internalTelemetry.enabled", false)
-	vp.SetDefault("internalTelemetry.otelCollectorAddress", "")
+func init() {
+	configOptions = append(configOptions, serverOptions...)
 }
 
 func (c *Config) PostgresConnString() string {
@@ -34,7 +32,7 @@ func (c *Config) PostgresConnString() string {
 	str := fmt.Sprintf(
 		"host=%s user=%s password=%s port=%d dbname=%s",
 		c.vp.GetString("postgres.host"),
-		c.vp.GetString("postgres.username"),
+		c.vp.GetString("postgres.user"),
 		c.vp.GetString("postgres.password"),
 		c.vp.GetInt("postgres.port"),
 		c.vp.GetString("postgres.dbname"),
@@ -93,5 +91,5 @@ func (c *Config) InternalTelemetryOtelCollectorAddress() string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	return c.vp.GetString("internalTelemetry.otelCollectorAddress")
+	return c.vp.GetString("internalTelemetry.otelCollectorEndpoint")
 }

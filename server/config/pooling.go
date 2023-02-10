@@ -2,17 +2,15 @@ package config
 
 import (
 	"time"
-
-	"github.com/spf13/viper"
 )
 
-func init() {
-	defaultSetters = append(defaultSetters, poolingDefaultSetter)
+var poolingOptions = options{
+	{"poolingConfig.maxWaitTimeForTrace", "30s", "pooling config: max wait time for trace"},
+	{"poolingConfig.retryDelay", "1s", "pooling config: interval between poll retries"},
 }
 
-func poolingDefaultSetter(vp *viper.Viper) {
-	vp.SetDefault("poolingConfig.maxWaitTimeForTrace", "30s")
-	vp.SetDefault("poolingConfig.retryDelay", "1s")
+func init() {
+	configOptions = append(configOptions, poolingOptions...)
 }
 
 func (c *Config) SetPoolingConfig(pc PoolingConfig) {

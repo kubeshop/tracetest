@@ -11,6 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
+	flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
+	config.SetupFlags(flags)
+
+	err := flags.Parse(inputFlags)
+	require.NoError(t, err)
+
+	cfg, err := config.New(flags)
+	require.NoError(t, err)
+
+	return cfg
+}
+
 func TestFlags(t *testing.T) {
 
 	t.Run("config", func(t *testing.T) {
@@ -28,16 +41,7 @@ func TestFlags(t *testing.T) {
 	})
 
 	configFromFile := func(t *testing.T, path string) *config.Config {
-		flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
-		config.SetupFlags(flags)
-
-		err := flags.Parse([]string{"--config", path})
-		require.NoError(t, err)
-
-		cfg, err := config.New(flags)
-		require.NoError(t, err)
-
-		return cfg
+		return configWithFlags(t, []string{"--config", path})
 	}
 
 	t.Run("BasicConfig", func(t *testing.T) {

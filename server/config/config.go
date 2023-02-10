@@ -16,16 +16,42 @@ type Config struct {
 	mu     sync.Mutex
 }
 
-var (
-	defaultSetters []func(*viper.Viper)
-	flagSetters    = []func(*pflag.FlagSet){
-		configFileFlag,
-	}
-)
-
-func configFileFlag(flags *pflag.FlagSet) {
-	flags.StringP("config", "c", "", "path to a config file")
+type option struct {
+	key          string
+	defaultValue any
+	description  string
 }
+
+type options []option
+
+func (opts options) registerDefaults(vp *viper.Viper) {
+	for _, opt := range opts {
+		vp.SetDefault(opt.key, opt.defaultValue)
+	}
+}
+
+func (opts options) registerFlags(flags *pflag.FlagSet) {
+	for _, opt := range opts {
+		switch defVal := opt.defaultValue.(type) {
+		case int:
+			flags.Int(opt.key, defVal, opt.description)
+		case string:
+			flags.String(opt.key, defVal, opt.description)
+		case []string:
+			flags.StringSlice(opt.key, defVal, opt.description)
+		case bool:
+			flags.Bool(opt.key, defVal, opt.description)
+		default:
+			panic(fmt.Errorf(
+				"unexpected type %T in default value for config option %s",
+				defVal, opt.key,
+			))
+		}
+
+	}
+}
+
+var configOptions options
 
 func configureConfigFile(vp *viper.Viper) {
 	vp.SetConfigName("tracetest")
@@ -60,16 +86,18 @@ func readConfigFile(vp *viper.Viper) error {
 	return fmt.Errorf("cannot read config file: %w", err)
 }
 
-func SetupFlags(flagset *pflag.FlagSet) {
-	for _, fs := range flagSetters {
-		fs(flagset)
-	}
+func SetupFlags(flags *pflag.FlagSet) {
+	flags.StringP("config", "c", "", "path to a config file")
+	configOptions.registerFlags(flags)
 }
 
-func New(flagset *pflag.FlagSet) (*Config, error) {
+func New(flags *pflag.FlagSet) (*Config, error) {
 	vp := viper.New()
-	if flagset != nil {
-		vp.BindPFlags(flagset)
+
+	configOptions.registerDefaults(vp)
+
+	if flags != nil {
+		vp.BindPFlags(flags)
 	}
 
 	configureConfigFile(vp)
@@ -78,9 +106,6 @@ func New(flagset *pflag.FlagSet) (*Config, error) {
 		return nil, err
 	}
 
-	for _, ds := range defaultSetters {
-		ds(vp)
-	}
 	return &Config{
 		config: &config{},
 		vp:     vp,
