@@ -24,6 +24,17 @@ func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
 	return cfg
 }
 
+func configWithEnv(t *testing.T, env map[string]string) *config.Config {
+	for k, v := range env {
+		os.Setenv(k, v)
+	}
+
+	cfg, err := config.New(nil)
+	require.NoError(t, err)
+
+	return cfg
+}
+
 func TestFlags(t *testing.T) {
 
 	t.Run("ConfigFileOverrideNotExists", func(t *testing.T) {

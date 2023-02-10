@@ -1,11 +1,9 @@
 package config_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/assert"
 )
 
@@ -68,12 +66,7 @@ func TestServerConfig(t *testing.T) {
 			"TRACETEST_INTERNALTELEMETRY_OTELCOLLECTORENDPOINT": "otel-collector.tracetest",
 		}
 
-		for k, v := range env {
-			os.Setenv(k, v)
-		}
-
-		cfg, err := config.New(nil)
-		require.NoError(t, err)
+		cfg := configWithEnv(t, env)
 
 		assert.Equal(t, "host=localhost user=user password=passwd port=1234 dbname=other_dbname custom=params", cfg.PostgresConnString())
 
