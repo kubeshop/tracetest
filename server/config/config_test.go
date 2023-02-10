@@ -26,7 +26,7 @@ func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
 
 func TestFlags(t *testing.T) {
 
-	t.Run("config", func(t *testing.T) {
+	t.Run("ConfigFileOverrideNotExists", func(t *testing.T) {
 		t.Parallel()
 
 		flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
@@ -44,7 +44,7 @@ func TestFlags(t *testing.T) {
 		return configWithFlags(t, []string{"--config", path})
 	}
 
-	t.Run("BasicConfig", func(t *testing.T) {
+	t.Run("ConfigFileOK", func(t *testing.T) {
 		t.Parallel()
 
 		cfg := configFromFile(t, "./testdata/basic_config.yaml")

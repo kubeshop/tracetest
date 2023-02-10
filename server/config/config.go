@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
@@ -94,6 +95,10 @@ func SetupFlags(flags *pflag.FlagSet) {
 
 func New(flags *pflag.FlagSet) (*Config, error) {
 	vp := viper.New()
+
+	vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	vp.SetEnvPrefix("TRACETEST")
+	vp.AutomaticEnv()
 
 	configOptions.registerDefaults(vp)
 

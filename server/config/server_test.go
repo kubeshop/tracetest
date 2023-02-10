@@ -1,15 +1,16 @@
 package config_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/assert"
 )
 
 func TestServerConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		t.Parallel()
 		cfg, _ := config.New(nil)
 
 		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
@@ -24,8 +25,6 @@ func TestServerConfig(t *testing.T) {
 	})
 
 	t.Run("Flags", func(t *testing.T) {
-		t.Parallel()
-
 		flags := []string{
 			"--postgres.dbname", "other_dbname",
 			"--postgres.host", "localhost",
@@ -42,6 +41,39 @@ func TestServerConfig(t *testing.T) {
 		}
 
 		cfg := configWithFlags(t, flags)
+
+		assert.Equal(t, "host=localhost user=user password=passwd port=1234 dbname=other_dbname custom=params", cfg.PostgresConnString())
+
+		assert.Equal(t, 4321, cfg.ServerPort())
+		assert.Equal(t, "/prefix", cfg.ServerPathPrefix())
+
+		assert.DeepEqual(t, []string{"a", "b"}, cfg.ExperimentalFeatures())
+
+		assert.Equal(t, true, cfg.InternalTelemetryEnabled())
+		assert.Equal(t, "otel-collector.tracetest", cfg.InternalTelemetryOtelCollectorAddress())
+	})
+
+	t.Run("EnvVars", func(t *testing.T) {
+		env := map[string]string{
+			"TRACETEST_POSTGRES_DBNAME":                         "other_dbname",
+			"TRACETEST_POSTGRES_HOST":                           "localhost",
+			"TRACETEST_POSTGRES_USER":                           "user",
+			"TRACETEST_POSTGRES_PASSWORD":                       "passwd",
+			"TRACETEST_POSTGRES_PORT":                           "1234",
+			"TRACETEST_POSTGRES_PARAMS":                         "custom=params",
+			"TRACETEST_SERVER_HTTPPORT":                         "4321",
+			"TRACETEST_SERVER_PATHPREFIX":                       "/prefix",
+			"TRACETEST_EXPERIMENTALFEATURES":                    "a b",
+			"TRACETEST_INTERNALTELEMETRY_ENABLED":               "true",
+			"TRACETEST_INTERNALTELEMETRY_OTELCOLLECTORENDPOINT": "otel-collector.tracetest",
+		}
+
+		for k, v := range env {
+			os.Setenv(k, v)
+		}
+
+		cfg, err := config.New(nil)
+		require.NoError(t, err)
 
 		assert.Equal(t, "host=localhost user=user password=passwd port=1234 dbname=other_dbname custom=params", cfg.PostgresConnString())
 
