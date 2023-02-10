@@ -19,7 +19,7 @@ var serveCmd = &cobra.Command{
 	Short: "Start tracete server",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg.Watch(func(updated *config.Config) {
-			appInstance.HotReload(updated)
+			appInstance.HotReload()
 		})
 
 		var wg sync.WaitGroup

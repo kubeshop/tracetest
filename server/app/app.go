@@ -62,8 +62,7 @@ func (a *App) registerStopFn(fn func()) {
 	a.stopFns = append(a.stopFns, fn)
 }
 
-func (a *App) HotReload(cfg *config.Config) {
-	a.cfg = cfg
+func (a *App) HotReload() {
 	a.Stop()
 	a.Start()
 }
@@ -182,7 +181,7 @@ func (a *App) Start() error {
 	})
 
 	go httpServer.ListenAndServe()
-	log.Printf("HTTP Server started")
+	log.Printf("HTTP Server started on %s", httpServer.Addr)
 
 	return nil
 }
