@@ -2,7 +2,7 @@ type: Test
 spec:
   id: W656Q0c4g
   name: http://app:8080
-  description: akadlkasjdf
+  description: Calling Hello World API
   trigger:
     type: http
     httpRequest:

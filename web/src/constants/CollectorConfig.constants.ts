@@ -106,7 +106,9 @@ export const Datadog = `receivers:
 
 processors:
   batch:
-    timeout: 100ms
+    send_batch_max_size: 100
+    send_batch_size: 10
+    timeout: 10s
 
 exporters:
   # OTLP for Tracetest
