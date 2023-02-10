@@ -3,7 +3,7 @@ postgres:
   user: tracetest
   password: not-secure-database-password
   port: 5432
-  dbname: tracetest
+  dbname: postgres
   params: sslmode=disable
 
 poolingConfig:

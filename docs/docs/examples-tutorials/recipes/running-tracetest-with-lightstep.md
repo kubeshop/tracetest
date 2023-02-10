@@ -68,7 +68,7 @@ services:
     volumes:
       - type: bind
         source: ./tracetest/tracetest.config.yaml
-        target: /app/config.yaml
+        target: /app/tracetest.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
@@ -120,7 +120,7 @@ postgres:
   user: postgres
   password: postgres
   port: 5432
-  dbname: tracetest
+  dbname: postgres
   params: sslmode=disable
 
 poolingConfig:
