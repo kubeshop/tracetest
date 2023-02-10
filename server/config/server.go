@@ -10,7 +10,7 @@ var serverOptions = options{
 	{"postgres.password", "postgres", "postgres DB password"},
 	{"postgres.dbname", "tracetest", "postgres DB dbname"},
 	{"postgres.port", 5432, "postgres DB port"},
-	{"postgres.params", "", "postgres DB connection params"},
+	{"postgres.params", "sslmode=disable", "postgres DB connection params"},
 
 	{"server.httpPort", 11633, "tracetest HTTP Port"},
 	{"server.pathPrefix", "/", "tracetest HTTP Path prefix"},
@@ -52,25 +52,11 @@ func (c *Config) ServerPathPrefix() string {
 	return c.vp.GetString("server.pathPrefix")
 }
 
-func (c *Config) SetServerPathPrefix(prefix string) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.vp.Set("server.pathPrefix", prefix)
-}
-
 func (c *Config) ServerPort() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.vp.GetInt("server.httpPort")
-}
-
-func (c *Config) SetServerPort(port int) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.vp.Set("server.httpPort", port)
 }
 
 func (c *Config) ExperimentalFeatures() []string {
