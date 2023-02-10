@@ -219,7 +219,7 @@ func ensureFirstTimeDataSources(cfg dataStoreConfig, repo model.DataStoreReposit
 
 type facadeConfig interface {
 	PoolingRetryDelay() time.Duration
-	MaxWaitTimeForTraceDuration() time.Duration
+	PoolingMaxWaitTimeForTraceDuration() time.Duration
 }
 
 func newRunnerFacades(
@@ -243,7 +243,7 @@ func newRunnerFacades(
 	)
 
 	retryDelay := cfg.PoolingRetryDelay()
-	maxWaitTime := cfg.MaxWaitTimeForTraceDuration()
+	maxWaitTime := cfg.PoolingMaxWaitTimeForTraceDuration()
 
 	pollerExecutor := executor.NewPollerExecutor(
 		retryDelay,
