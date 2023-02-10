@@ -1,4 +1,4 @@
-package client
+package datasource
 
 import (
 	"bytes"
@@ -13,16 +13,18 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 )
 
 type HttpClient struct {
-	name   string
-	config *http.Request
-	client *http.Client
+	name     string
+	config   *http.Request
+	client   *http.Client
+	callback HttpCallback
 }
 
-func NewHttpClient(name string, config *config.HttpClientConfig) *HttpClient {
+func NewHttpClient(name string, config *config.HttpClientConfig, callback HttpCallback) DataSource {
 	endpoint, _ := url.Parse(config.Url)
 	client := &http.Client{
 		Transport: &http.Transport{
@@ -41,10 +43,23 @@ func NewHttpClient(name string, config *config.HttpClientConfig) *HttpClient {
 	}
 
 	return &HttpClient{
-		name:   name,
-		config: request,
-		client: client,
+		name:     name,
+		config:   request,
+		client:   client,
+		callback: callback,
 	}
+}
+
+func (client *HttpClient) Ready() bool {
+	return client.callback != nil
+}
+
+func (client *HttpClient) Close() error {
+	return nil
+}
+
+func (client *HttpClient) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	return client.callback(ctx, traceID, client)
 }
 
 func (client *HttpClient) Connect(ctx context.Context) error {

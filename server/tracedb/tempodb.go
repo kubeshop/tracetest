@@ -12,8 +12,8 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/client"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/trace"
@@ -24,11 +24,11 @@ import (
 
 type tempoTraceDB struct {
 	realTraceDB
-	dataSource *client.DataSource
+	dataSource datasource.DataSource
 }
 
 func newTempoDB(config *config.BaseClientConfig) (TraceDB, error) {
-	dataSource := client.NewDataSource("Tempo", config, client.Callbacks{
+	dataSource := datasource.New("Tempo", config, datasource.Callbacks{
 		HTTP: httpGetTraceByID,
 		GRPC: grpcGetTraceByID,
 	})
@@ -126,7 +126,7 @@ type HttpTempoTraceByIDResponse struct {
 	Batches []*traces.HttpResourceSpans `json:"batches"`
 }
 
-func httpGetTraceByID(ctx context.Context, traceID string, client client.HttpClient) (model.Trace, error) {
+func httpGetTraceByID(ctx context.Context, traceID string, client *datasource.HttpClient) (model.Trace, error) {
 	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
 		return model.Trace{}, err

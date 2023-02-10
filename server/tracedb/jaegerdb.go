@@ -10,8 +10,8 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/client"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -22,16 +22,16 @@ import (
 
 type jaegerTraceDB struct {
 	realTraceDB
-	dataSource *client.DataSource
+	dataSource datasource.DataSource
 }
 
 func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
 	baseConfig := &config.BaseClientConfig{
-		Type: string(client.GRPC),
+		Type: string(datasource.GRPC),
 		Grpc: *grpcConfig,
 	}
 
-	dataSource := client.NewDataSource("Jaeger", baseConfig, client.Callbacks{
+	dataSource := datasource.New("Jaeger", baseConfig, datasource.Callbacks{
 		GRPC: jaegerGrpcGetTraceByID,
 	})
 

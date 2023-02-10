@@ -1,9 +1,10 @@
-package client
+package datasource
 
 import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
@@ -12,16 +13,26 @@ import (
 )
 
 type GrpcClient struct {
-	name   string
-	config *configgrpc.GRPCClientSettings
-	conn   *grpc.ClientConn
+	name     string
+	config   *configgrpc.GRPCClientSettings
+	conn     *grpc.ClientConn
+	callback GrpcCallback
 }
 
-func NewGrpcClient(name string, config *configgrpc.GRPCClientSettings) *GrpcClient {
+func NewGrpcClient(name string, config *configgrpc.GRPCClientSettings, callback GrpcCallback) DataSource {
 	return &GrpcClient{
-		name:   name,
-		config: config,
+		name:     name,
+		config:   config,
+		callback: callback,
 	}
+}
+
+func (client *GrpcClient) Ready() bool {
+	return client.conn != nil
+}
+
+func (client *GrpcClient) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	return client.callback(ctx, traceID, client.conn)
 }
 
 func (client *GrpcClient) Connect(ctx context.Context) error {
