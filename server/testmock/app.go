@@ -5,34 +5,29 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 )
 
-type TestingAppOption func(config *config.Config)
+type TestingAppOption func(*config.Config)
 
 func WithServerPrefix(prefix string) TestingAppOption {
-	return func(config *config.Config) {
-		config.SetServerPathPrefix(prefix)
+	return func(cfg *config.Config) {
+		cfg.Set("server.pathPrefix", prefix)
 	}
 }
 
 func WithHttpPort(port int) TestingAppOption {
-	return func(config *config.Config) {
-		config.SetServerPort(port)
+	return func(cfg *config.Config) {
+		cfg.Set("server.httpPort", port)
 	}
 }
 
 func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
-	db, err := GetRawTestingDatabase()
-
-	if err != nil {
-		return nil, err
-	}
-
 	cfg, _ := config.New(nil)
 	for _, option := range options {
 		option(cfg)
 	}
+	err := ConfigureDB(cfg)
+	if err != nil {
+		panic(err)
+	}
 
-	return app.New(app.Config{
-		Config:     cfg,
-		Migrations: "file://../migrations",
-	}, db)
+	return app.New(cfg)
 }
