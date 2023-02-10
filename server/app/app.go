@@ -56,6 +56,10 @@ func New(config Config, db *sql.DB) (*App, error) {
 	return app, nil
 }
 
+func (a *App) Version() string {
+	return fmt.Sprintf("tracetest-server %s (%s)", Version, Env)
+}
+
 func (a *App) Stop() {
 	for _, fn := range a.stopFns {
 		fn()
@@ -73,7 +77,8 @@ func (a *App) HotReload(c Config) {
 }
 
 func (a *App) Start() error {
-	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
+	fmt.Println(a.Version())
+	fmt.Println("Starting")
 	ctx := context.Background()
 
 	testDB, err := testdb.Postgres(
