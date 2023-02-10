@@ -9,5 +9,5 @@ test: ## execute unit tests
 
 docgen: ## generate CLI documentation
 	@go build main.go
-	@./main docgen -o ../docs/docs/cli/generated/ -d ../docs/docs
+	@./main docgen -o ../docs/docs/cli/reference/ -d ../docs/docs
 	@rm main
