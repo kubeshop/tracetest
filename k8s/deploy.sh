@@ -53,3 +53,13 @@ kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
 sleep 10 # let k8s finish doing things
 
 kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 30m
+
+## TMP FIX FOR NEW CONFIG
+kubectl patch deployment \
+  $NAME \
+  --namespace $NAME \
+  --type='json' \
+  -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": [
+  "--config",
+  "/app/config/config.yaml"
+]}]'
