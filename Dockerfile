@@ -11,4 +11,4 @@ COPY ./server/migrations/ /app/migrations/
 
 EXPOSE 11633/tcp
 
-ENTRYPOINT ["/app/tracetest-server"]
+ENTRYPOINT ["/app/tracetest-server", "serve"]

@@ -40,15 +40,14 @@ func Execute() error {
 }
 
 func init() {
+	config.SetupFlags(rootCmd.PersistentFlags())
+
 	cobra.OnInitialize(func() {
-		config.SetupFlags(rootCmd.PersistentFlags())
-		c, err := config.New(rootCmd.PersistentFlags())
+		var err error
+		cfg, err = config.New(rootCmd.PersistentFlags())
 		if err != nil {
 			panic(err)
 		}
-
-		cfg = c
-
 	})
 
 }
