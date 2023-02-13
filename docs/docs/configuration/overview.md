@@ -13,9 +13,10 @@ Tracetest is designed to work with different trace data stores. To enable Tracet
 Currently, Tracetest supports the following data stores. Click on the respective data store to view configuration examples:
 
 - [Jaeger](./connecting-to-data-stores/jaeger)
-- [Grafana Tempo](./connecting-to-data-stores/tempo)
 - [OpenSearch](./connecting-to-data-stores/opensearch)
+- [Elastic](./connecting-to-data-stores/elasticapm)
 - [SignalFX](./connecting-to-data-stores/signalfx)
+- [Grafana Tempo](./connecting-to-data-stores/tempo)
 - [Lightstep](./connecting-to-data-stores/lightstep)
 - [New Relic](./connecting-to-data-stores/new-relic)
 
@@ -27,6 +28,6 @@ View the [configuration for OpenTelemetry Collector](./connecting-to-data-stores
 
 ## Trace Data Store Configuration Examples
 
-Examples of configuring Tracetest to access different data stores can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest to access different data stores can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). Check out the [**Recipes**](../examples-tutorials/recipes.md) for guided walkthroughs of sample use cases.
 
 We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) any additional data stores you would like to see us support.

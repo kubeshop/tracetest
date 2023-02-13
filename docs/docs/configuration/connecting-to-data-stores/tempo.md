@@ -1,53 +1,14 @@
 # Tempo
 
-If you want to use Tempo as the trace data store, you can configure Tracetest to fetch trace data from Tempo.
-
-You'll configure the OpenTelemetry Collector to receive traces from your system and then send them to Tempo. And, you don't have to change your existing pipelines to do so.
+Tracetest fetches traces from [Tempo on the default gRPC port](https://grafana.com/docs/tempo/latest/configuration/#server) `9095`.
 
 :::tip
 Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 :::
 
-## Configure OpenTelemetry Collector to Send Traces to Tempo
+## Configure Tempo
 
-In your OpenTelemetry Collector config file, make sure to set the `exporter` to `tempo`, with the `endpoint` pointing to your Tempo's instance on port `4317`. If you are running Tracetest with Docker, the endpoint might look like this `http://tempo:4317`.
-
-```yaml
-# collector.config.yaml
-
-# If you already have receivers declared, you can just ignore
-# this one and still use yours instead.
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-
-processors:
-  batch:
-    timeout: 100ms
-
-exporters:
-  otlp/2:
-    endpoint: tempo:4317
-    tls:
-      insecure: true
-
-service:
-  pipelines:
-    # your probably already have a traces pipeline, you don't have to change it.
-    # just add this one to your configuration. Just make sure to not have two
-    # pipelines with the same name
-    traces/1:
-      receivers: [otlp] # your receiver
-      processors: [batch] # make sure to have the probabilistic_sampler before your batch processor
-      exporters: [otlp/2] # your exporter pointing to your Tempo instance
-
-```
-
-## Configure Tracetest to Use Tempo as a Trace Data Store
-
-First, configure Tempo to run on port `9095`. Here is an example config file:
+Tempo uses port `9095` as the default `grpc_listen_port`. Here is an example config file:
 
 ```yaml
 # tempo.config.yaml
@@ -98,17 +59,25 @@ storage:
 
 ## Configure Tracetest to Use Tempo as a Trace Data Store
 
-You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from Tempo. 
+Configure Tracetest to be aware that it has to fetch trace data from Tempo. 
 
-Make sure you know what your Tempo endpoint for fetching traces is. In the screenshot below, the endpoint is `tempo:9095`.
+Tracetest uses [Tempo's gRPC	endpoint](https://grafana.com/docs/tempo/latest/configuration/#server) on port `9095` to fetch trace data.
 
-### Web UI
+:::tip
+Need help configuring the OpenTelemetry Collector so send trace data from your application to Jaeger? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)). 
+:::
 
-In the Web UI, open settings, and select Tempo.
+## Connect Tracetest to Tempo with the Web UI
+
+In the Web UI, open settings, and select Tempo. If you are using Docker like in the screenshot below, use the service name as the hostname with port `9095` like this:
+
+```
+tempo:9095
+```
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644545/Blogposts/Docs/screely-1674644541618_ly8ur3.png)
 
-### CLI
+## Connect Tracetest to Tempo with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
 
@@ -129,3 +98,7 @@ Proceed to run this command in the terminal, and specify the file above.
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml
 ```
+
+:::tip
+To learn more, [read the recipe on running a sample app with Tempo and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-tempo.md).
+:::

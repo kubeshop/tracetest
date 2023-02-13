@@ -104,6 +104,11 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "doc",
+          id: "configuration/opentelemetry-collector-configuration-file-reference",
+          label: "OpenTelemetry Collector Configuration File Reference",
+        },
       ],
     },
     {
