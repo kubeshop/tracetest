@@ -136,6 +136,14 @@ const config = {
             to: '/ci-cd-automation/github-actions-pipeline',
             from: ['/ci-cd-automation/ci-cd-best-practices' /*, '/docs/legacyDocFrom2016'*/],
           },
+          {
+            to: '/tools-and-integrations/k6',
+            from: ['/tools-and-integrations/integrations/k6' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/tools-and-integrations/keptn',
+            from: ['/tools-and-integrations/integrations/keptn' /*, '/docs/legacyDocFrom2016'*/],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {

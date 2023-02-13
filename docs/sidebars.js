@@ -301,21 +301,15 @@ const sidebars = {
           label: "Overview",
         },
         {
-          type: "category",
-          label: "Integrations",
-          items: [
-            {
-              type: "doc",
-              id: "tools-and-integrations/integrations/keptn",
-              label: "Keptn",
-            },
-            {
-              type: "doc",
-              id: "tools-and-integrations/integrations/k6",
-              label: "K6",
-            }
-          ]
-        }
+          type: "doc",
+          id: "tools-and-integrations/keptn",
+          label: "Keptn",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/k6",
+          label: "K6",
+        },
       ]
     },
     {
