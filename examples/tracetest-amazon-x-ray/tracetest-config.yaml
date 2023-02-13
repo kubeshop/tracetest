@@ -14,9 +14,9 @@ experimentalFeatures: []
 
 telemetry:
   dataStores:
-    otlp:
-      type: otlp
+    awsxray:
+      type: awsxray
 
 server:
   telemetry:
-    dataStore: otlp
+    dataStore: awsxray

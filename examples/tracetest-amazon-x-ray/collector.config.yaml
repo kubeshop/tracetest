@@ -6,8 +6,6 @@ processors:
   batch:
 
 exporters:
-  logging:
-    loglevel: debug
   awsxray:
     region: ${AWS_REGION}
   otlp/tt:

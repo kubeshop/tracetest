@@ -138,12 +138,10 @@ export const AWSXRay = `receivers:
   awsxray:
     transport: udp
 
-  processors:
+processors:
   batch:
 
 exporters:
-  logging:
-    loglevel: debug
   awsxray:
     region: <aws-region>
   otlp/tt:
