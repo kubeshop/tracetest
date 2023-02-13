@@ -13,7 +13,7 @@ var serverOptions = options{
 	{"postgres.params", "sslmode=disable", "postgres DB connection params"},
 
 	{"server.httpPort", 11633, "tracetest HTTP Port"},
-	{"server.pathPrefix", "/", "tracetest HTTP Path prefix"},
+	{"server.pathPrefix", "", "tracetest HTTP Path prefix"},
 
 	{"experimentalFeatures", []string{}, "enabled experimental features"},
 
