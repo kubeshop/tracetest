@@ -13,7 +13,7 @@
 
 // generated docs pages
 /** @type {import('@docusaurus/plugin-content-docs/lib/sidebars/types').SidebarItem[]} */
-const cliGeneratedPages = require('./docs/cli/reference/cli-sidebar');
+const cliGeneratedPages = require("./docs/cli/reference/cli-sidebar");
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
@@ -313,10 +313,15 @@ const sidebars = {
               type: "doc",
               id: "tools-and-integrations/integrations/k6",
               label: "K6",
-            }
-          ]
-        }
-      ]
+            },
+            {
+              type: "doc",
+              id: "tools-and-integrations/integrations/testkube",
+              label: "Testkube",
+            },
+          ],
+        },
+      ],
     },
     {
       type: "category",
@@ -412,8 +417,8 @@ const sidebars = {
                   id: "live-examples/pokeshop/use-cases/import-pokemon",
                   label: "Import Pokemon",
                 },
-              ]
-            }
+              ],
+            },
           ],
         },
         {
@@ -452,10 +457,10 @@ const sidebars = {
                 {
                   type: "doc",
                   id: "live-examples/opentelemetry-store/use-cases/user-purchasing-products",
-                  label: "User purchasing products"
-                }
-              ]
-            }
+                  label: "User purchasing products",
+                },
+              ],
+            },
           ],
         },
       ],
