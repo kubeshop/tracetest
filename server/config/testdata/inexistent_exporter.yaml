@@ -1,0 +1,4 @@
+server:
+  telemetry:
+    exporter: nonExistent
+    applicationExporter: anotherOneThatDoesntExist

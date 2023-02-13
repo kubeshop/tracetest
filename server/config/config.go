@@ -12,8 +12,21 @@ import (
 	"github.com/spf13/viper"
 )
 
+type (
+	googleAnalytics struct {
+		Enabled bool `yaml:",omitempty" mapstructure:"enabled"`
+	}
+
+	oldConfig struct {
+		Server    serverConfig    `yaml:",omitempty" mapstructure:"server"`
+		GA        googleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
+		Telemetry telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
+		Demo      demo            `yaml:",omitempty" mapstructure:"demo"`
+	}
+)
+
 type Config struct {
-	config *config
+	config *oldConfig
 	vp     *viper.Viper
 	mu     sync.Mutex
 }
@@ -112,7 +125,7 @@ func New(flags *pflag.FlagSet) (*Config, error) {
 		return nil, err
 	}
 
-	oldConfig := config{}
+	oldConfig := oldConfig{}
 	err = vp.Unmarshal(&oldConfig)
 	if err != nil {
 		return nil, err

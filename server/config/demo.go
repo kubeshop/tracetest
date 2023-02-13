@@ -2,6 +2,11 @@ package config
 
 import "strings"
 
+type demo struct {
+	Enabled   []string          `yaml:",omitempty" mapstructure:"enabled"`
+	Endpoints map[string]string `yaml:",omitempty" mapstructure:"endpoints"`
+}
+
 func (c *Config) DemoEnabled() []string {
 	c.mu.Lock()
 	defer c.mu.Unlock()

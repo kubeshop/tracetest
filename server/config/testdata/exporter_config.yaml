@@ -1,0 +1,14 @@
+telemetry:
+  exporters:
+    otelcollector:
+      serviceName: tracetest
+      sampling: 100
+      exporter:
+        type: collector
+        collector:
+          endpoint: collector:8888
+
+server:
+  telemetry:
+    exporter: otelcollector
+    applicationExporter: otelcollector
