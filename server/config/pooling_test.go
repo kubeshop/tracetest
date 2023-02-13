@@ -16,6 +16,18 @@ func TestPoolingConfig(t *testing.T) {
 		assert.Equal(t, 1*time.Second, cfg.PoolingRetryDelay())
 	})
 
+	t.Run("InvalidFormat", func(t *testing.T) {
+		flags := []string{
+			"--poolingConfig.maxWaitTimeForTrace", "not-valid",
+			"--poolingConfig.retryDelay", "not-valid",
+		}
+
+		cfg := configWithFlags(t, flags)
+
+		assert.Equal(t, 30*time.Second, cfg.PoolingMaxWaitTimeForTraceDuration())
+		assert.Equal(t, 1*time.Second, cfg.PoolingRetryDelay())
+	})
+
 	t.Run("Flags", func(t *testing.T) {
 		flags := []string{
 			"--poolingConfig.maxWaitTimeForTrace", "2m",
