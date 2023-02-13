@@ -24,6 +24,10 @@ func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
 	return cfg
 }
 
+func configFromFile(t *testing.T, path string) *config.Config {
+	return configWithFlags(t, []string{"--config", path})
+}
+
 func configWithEnv(t *testing.T, env map[string]string) *config.Config {
 	for k, v := range env {
 		os.Setenv(k, v)
@@ -51,14 +55,10 @@ func TestFlags(t *testing.T) {
 		assert.ErrorIs(t, err, os.ErrNotExist)
 	})
 
-	configFromFile := func(t *testing.T, path string) *config.Config {
-		return configWithFlags(t, []string{"--config", path})
-	}
-
 	t.Run("ConfigFileOK", func(t *testing.T) {
 		t.Parallel()
 
-		cfg := configFromFile(t, "./testdata/basic_config.yaml")
+		cfg := configFromFile(t, "./testdata/basic.yaml")
 
 		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
 

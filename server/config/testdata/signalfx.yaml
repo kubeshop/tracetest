@@ -1,0 +1,11 @@
+telemetry:
+  dataStores:
+    signalfx:
+      type: signalfx
+      signalfx:
+        token: thetoken
+        realm: us1
+
+server:
+  telemetry:
+    dataStore: signalfx

@@ -112,8 +112,14 @@ func New(flags *pflag.FlagSet) (*Config, error) {
 		return nil, err
 	}
 
+	oldConfig := config{}
+	err = vp.Unmarshal(&oldConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
-		config: &config{},
+		config: &oldConfig,
 		vp:     vp,
 	}, nil
 }
