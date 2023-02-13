@@ -8,11 +8,6 @@ processors:
   batch:
     timeout: 100ms
 
-  # Data sources: traces
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 100
-
 exporters:
   jaeger:
     endpoint: jaeger:14250
@@ -23,5 +18,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [probabilistic_sampler, batch]
+      processors: [batch]
       exporters: [jaeger]
