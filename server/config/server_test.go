@@ -14,7 +14,7 @@ func TestServerConfig(t *testing.T) {
 		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
 
 		assert.Equal(t, 11633, cfg.ServerPort())
-		assert.Equal(t, "/", cfg.ServerPathPrefix())
+		assert.Equal(t, "", cfg.ServerPathPrefix())
 
 		assert.DeepEqual(t, []string{}, cfg.ExperimentalFeatures())
 
