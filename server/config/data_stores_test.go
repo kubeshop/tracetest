@@ -9,10 +9,32 @@ import (
 	"go.opentelemetry.io/collector/config/configtls"
 )
 
-func TestDataStore(t *testing.T) {
-	t.Parallel()
+func TestDataStoreExceptions(t *testing.T) {
+	t.Run("Inexistent", func(t *testing.T) {
+		t.Parallel()
 
+		cfg := configFromFile(t, "./testdata/inexistent_datastore.yaml")
+
+		dataStore, err := cfg.DataStore()
+		assert.Error(t, err)
+		assert.Nil(t, dataStore)
+	})
+
+	t.Run("Empty", func(t *testing.T) {
+		t.Parallel()
+
+		cfg := configFromFile(t, "./testdata/empty_datastore.yaml")
+
+		dataStore, err := cfg.DataStore()
+		assert.NoError(t, err)
+		assert.Nil(t, dataStore)
+	})
+}
+
+func TestDataStore(t *testing.T) {
 	t.Run("JaegerGRPC", func(t *testing.T) {
+		t.Parallel()
+
 		expectedDataStore := &config.TracingBackendDataStoreConfig{
 			Type: "jaeger",
 			Jaeger: configgrpc.GRPCClientSettings{
@@ -29,6 +51,8 @@ func TestDataStore(t *testing.T) {
 	})
 
 	t.Run("TempoGRPC", func(t *testing.T) {
+		t.Parallel()
+
 		expectedDataStore := &config.TracingBackendDataStoreConfig{
 			Type: "tempo",
 			Tempo: config.BaseClientConfig{
@@ -47,6 +71,8 @@ func TestDataStore(t *testing.T) {
 	})
 
 	t.Run("TempoHTTP", func(t *testing.T) {
+		t.Parallel()
+
 		expectedDataStore := &config.TracingBackendDataStoreConfig{
 			Type: "tempo",
 			Tempo: config.BaseClientConfig{
@@ -65,6 +91,8 @@ func TestDataStore(t *testing.T) {
 	})
 
 	t.Run("OpenSearch", func(t *testing.T) {
+		t.Parallel()
+
 		expectedDataStore := &config.TracingBackendDataStoreConfig{
 			Type: "opensearch",
 			OpenSearch: config.ElasticSearchDataStoreConfig{
@@ -81,6 +109,8 @@ func TestDataStore(t *testing.T) {
 	})
 
 	t.Run("SignalFX", func(t *testing.T) {
+		t.Parallel()
+
 		expectedDataStore := &config.TracingBackendDataStoreConfig{
 			Type: "signalfx",
 			SignalFX: config.SignalFXDataStoreConfig{
@@ -97,6 +127,8 @@ func TestDataStore(t *testing.T) {
 	})
 
 	t.Run("ElasitcAPM", func(t *testing.T) {
+		t.Parallel()
+
 		expectedDataStore := &config.TracingBackendDataStoreConfig{
 			Type: "elasticapm",
 			ElasticApm: config.ElasticSearchDataStoreConfig{
