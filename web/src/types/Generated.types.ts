@@ -1153,6 +1153,8 @@ export interface external {
           | "newRelic"
           | "lightstep"
           | "datadog";
+        /** @enum {string} */
+        SupportedClients: "http" | "grpc";
       };
     };
     operations: {};
