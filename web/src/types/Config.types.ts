@@ -20,6 +20,7 @@ export enum SupportedDataStores {
   ElasticApm = 'elasticApm',
   SignalFX = 'signalFx',
   Datadog = 'datadog',
+  AWSXRay = 'awsxray',
 }
 
 export enum SupportedClientTypes {
@@ -83,6 +84,7 @@ type IDataStore = TRawDataStore & {
   lightstep?: {};
   newRelic?: {};
   datadog?: {};
+  awsxray?: {};
 }
 
 export type TDraftDataStore = {

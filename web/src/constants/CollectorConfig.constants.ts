@@ -134,9 +134,38 @@ service:
       exporters: [datadog]
 `;
 
+export const AWSXRay = `receivers:
+  awsxray:
+    transport: udp
+
+  processors:
+  batch:
+
+exporters:
+  logging:
+    loglevel: debug
+  awsxray:
+    region: <aws-region>
+  otlp/tt:
+    endpoint: tracetest:21321
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces/tt:
+      receivers: [awsxray]
+      processors: [batch]
+      exporters: [otlp/tt]
+    traces/xr:
+      receivers: [awsxray]
+      exporters: [awsxray]
+`;
+
 export const CollectorConfigMap = {
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.OtelCollector]: OtelCollector,
+  [SupportedDataStores.AWSXRay]: AWSXRay,
 } as const;

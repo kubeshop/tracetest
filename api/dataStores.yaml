@@ -142,7 +142,8 @@ components:
           elasticApm,
           newRelic,
           lightstep,
-          datadog
+          datadog,
+          awsxray
         ]
     SupportedClients:
       type: string

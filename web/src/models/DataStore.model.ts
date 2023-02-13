@@ -9,6 +9,7 @@ type DataStore = Model<
     newRelic?: {};
     lightstep?: {};
     datadog?: {};
+    awsxray?: {};
   }
 >;
 

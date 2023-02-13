@@ -40,6 +40,7 @@ var validTypes = []openapi.SupportedDataStores{
 	openapi.SIGNAL_FX,
 	openapi.OTLP,
 	openapi.ELASTIC_APM,
+	openapi.AWSXRAY,
 }
 
 func (ds DataStore) Validate() error {
@@ -60,6 +61,7 @@ const (
 	lighstep   string = "lighstep"
 	elasticapm string = "elasticapm"
 	datadog    string = "datadog"
+	awsxray    string = "awsxray"
 )
 
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
@@ -87,6 +89,8 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 		ds.Type = openapi.LIGHTSTEP
 	case datadog:
 		ds.Type = openapi.DATADOG
+	case awsxray:
+		ds.Type = openapi.AWSXRAY
 	case otlp:
 		ds.Type = openapi.OTLP
 	}

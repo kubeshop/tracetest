@@ -20,6 +20,7 @@ const iconMap = {
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.Datadog]: Datadog,
+  [SupportedDataStores.AWSXRay]: Datadog,
 } as const;
 
 interface IProps {

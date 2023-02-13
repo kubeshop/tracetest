@@ -15,6 +15,7 @@ export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.Lightstep]: OpenTelemetryCollector,
   [SupportedDataStores.Datadog]: OpenTelemetryCollector,
   [SupportedDataStores.NewRelic]: OpenTelemetryCollector,
+  [SupportedDataStores.AWSXRay]: OpenTelemetryCollector,
 };
 
 export default DataStoreComponentMap;

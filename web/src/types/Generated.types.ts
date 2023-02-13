@@ -1152,7 +1152,8 @@ export interface external {
           | "elasticApm"
           | "newRelic"
           | "lightstep"
-          | "datadog";
+          | "datadog"
+          | "awsxray";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
       };
