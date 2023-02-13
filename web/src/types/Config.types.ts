@@ -19,6 +19,7 @@ export enum SupportedDataStores {
   OpenSearch = 'openSearch',
   ElasticApm = 'elasticApm',
   SignalFX = 'signalFx',
+  Datadog = 'datadog',
 }
 
 export enum SupportedClientTypes {
@@ -29,7 +30,8 @@ export enum SupportedClientTypes {
 export type TCollectorDataStores =
   | SupportedDataStores.NewRelic
   | SupportedDataStores.OtelCollector
-  | SupportedDataStores.Lightstep;
+  | SupportedDataStores.Lightstep
+  | SupportedDataStores.Datadog;
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
@@ -80,7 +82,8 @@ type IDataStore = TRawDataStore & {
   otlp?: {};
   lightstep?: {};
   newRelic?: {};
-};
+  datadog?: {};
+}
 
 export type TDraftDataStore = {
   dataStore?: IDataStore;

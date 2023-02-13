@@ -3,7 +3,8 @@ import {SupportedDataStores} from 'types/Config.types';
 import Elastic from './Icons/Elastic';
 import Jaeger from './Icons/Jaeger';
 import Lightstep from './Icons/Lightstep';
-import NewRelic from './Icons/NewrRelic';
+import Datadog from './Icons/Datadog';
+import NewRelic from './Icons/NewRelic';
 import OpenSearch from './Icons/OpenSearch';
 import Otlp from './Icons/Otlp';
 import SignalFx from './Icons/SignalFx';
@@ -18,6 +19,7 @@ const iconMap = {
   [SupportedDataStores.OpenSearch]: OpenSearch,
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.Lightstep]: Lightstep,
+  [SupportedDataStores.Datadog]: Datadog,
 } as const;
 
 interface IProps {

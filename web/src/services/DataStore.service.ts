@@ -22,6 +22,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.OtelCollector]: OtelCollectorService,
   [SupportedDataStores.NewRelic]: OtelCollectorService,
   [SupportedDataStores.Lightstep]: OtelCollectorService,
+  [SupportedDataStores.Datadog]: OtelCollectorService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({
