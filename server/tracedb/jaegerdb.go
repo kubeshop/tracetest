@@ -6,13 +6,15 @@ import (
 	"io"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/id"
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
@@ -20,112 +22,82 @@ import (
 
 type jaegerTraceDB struct {
 	realTraceDB
-	config *configgrpc.GRPCClientSettings
-	conn   *grpc.ClientConn
-	query  pb.QueryServiceClient
+	dataSource datasource.DataSource
 }
 
-func newJaegerDB(config *configgrpc.GRPCClientSettings) (TraceDB, error) {
+func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
+	baseConfig := &config.BaseClientConfig{
+		Type: string(datasource.GRPC),
+		Grpc: *grpcConfig,
+	}
+
+	dataSource := datasource.New("Jaeger", baseConfig, datasource.Callbacks{
+		GRPC: jaegerGrpcGetTraceByID,
+	})
+
 	return &jaegerTraceDB{
-		config: config,
+		dataSource: dataSource,
 	}, nil
 }
 
 func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
-	opts, err := jtd.config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
-	if err != nil {
-		return errors.Wrap(ErrInvalidConfiguration, err.Error())
-	}
-
-	conn, err := grpc.DialContext(ctx, jtd.config.Endpoint, opts...)
-	if err != nil {
-		return errors.Wrap(ErrConnectionFailed, err.Error())
-	}
-
-	jtd.conn = conn
-	jtd.query = pb.NewQueryServiceClient(conn)
-
-	return nil
+	return jtd.dataSource.Connect(ctx)
 }
 
-func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
-	connectionTestResult := ConnectionTestResult{
-		ConnectivityTestResult: ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, jtd.config.Endpoint),
-		},
-		AuthenticationTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with Jaeger`,
-		},
-		TraceRetrivalTestResult: ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using Jaeger API`,
-		},
+func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+	connectionTestResult, err := jtd.dataSource.TestConnection(ctx)
+	if err != nil {
+		return connectionTestResult
 	}
 
-	reachable, err := isReachable(jtd.config.Endpoint)
-	if !reachable {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, jtd.config.Endpoint),
-				Error:                err,
-			},
-		}
-	}
-
-	err = jtd.Connect(ctx)
-	wrappedErr := errors.Unwrap(err)
-	if errors.Is(wrappedErr, ErrConnectionFailed) {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, jtd.config.Endpoint),
-				Error:                err,
-			},
-		}
-	}
-
-	_, err = jtd.GetTraceByID(ctx, trace.TraceID{}.String())
-	if strings.Contains(err.Error(), "connection error") && !strings.Contains(err.Error(), "authentication handshake failed") {
-		return ConnectionTestResult{
-			ConnectivityTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, jtd.config.Endpoint),
-				Error:                err,
-			},
-		}
-	}
-
+	_, err = jtd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
 	if strings.Contains(err.Error(), "authentication handshake failed") {
-		return ConnectionTestResult{
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute a gRPC request but it failed due to authentication issues`,
+			AuthenticationTestResult: connection.ConnectionTestStepResult{
+				OperationDescription: "Tracetest tried to execute a gRPC request but it failed due to authentication issues",
 				Error:                err,
 			},
 		}
 	}
 
-	if !errors.Is(err, ErrTraceNotFound) {
-		return ConnectionTestResult{
+	if !errors.Is(err, connection.ErrTraceNotFound) {
+		return connection.ConnectionTestResult{
 			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrivalTestResult: ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from Jaeger endpoint "%s" and got an error`, jtd.config.Endpoint),
+			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
+				OperationDescription: "Tracetest tried to fetch a trace from Jaeger",
 				Error:                err,
 			},
 		}
 	}
 
+	connectionTestResult.AuthenticationTestResult = connection.ConnectionTestStepResult{
+		OperationDescription: `Tracetest managed to authenticate with Jaeger`,
+	}
+	connectionTestResult.TraceRetrievalTestResult = connection.ConnectionTestStepResult{
+		OperationDescription: `Tracetest was able to search for a trace using Jaeger API`,
+	}
 	return connectionTestResult
 }
 
-func (jtd *jaegerTraceDB) Ready() bool {
-	return jtd.query != nil
+func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+	trace, err := jtd.dataSource.GetTraceByID(ctx, traceID)
+	return trace, err
 }
 
-func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
-	if !jtd.Ready() {
-		return model.Trace{}, fmt.Errorf("Jaeger dataStore not ready")
-	}
+func (jtd *jaegerTraceDB) Ready() bool {
+	return jtd.dataSource.Ready()
+}
 
-	stream, err := jtd.query.GetTrace(ctx, &pb.GetTraceRequest{
+func (jtd *jaegerTraceDB) Close() error {
+	return jtd.dataSource.Close()
+}
+
+func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (model.Trace, error) {
+	query := pb.NewQueryServiceClient(conn)
+
+	stream, err := query.GetTrace(ctx, &pb.GetTraceRequest{
 		TraceId: traceID,
 	})
 	if err != nil {
@@ -146,7 +118,7 @@ func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (mod
 				return model.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
 			}
 			if st.Message() == "trace not found" {
-				return model.Trace{}, ErrTraceNotFound
+				return model.Trace{}, connection.ErrTraceNotFound
 			}
 			return model.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)
 		}
@@ -159,12 +131,4 @@ func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (mod
 	}
 
 	return traces.FromOtel(trace), nil
-}
-
-func (jtd *jaegerTraceDB) Close() error {
-	err := jtd.conn.Close()
-	if err != nil {
-		return fmt.Errorf("GRPC close: %w", err)
-	}
-	return nil
 }

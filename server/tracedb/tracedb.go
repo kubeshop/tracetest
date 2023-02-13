@@ -2,17 +2,11 @@ package tracedb
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
-)
-
-var (
-	ErrTraceNotFound        = errors.New("trace not found")
-	ErrInvalidConfiguration = errors.New("invalid data store configuration")
-	ErrConnectionFailed     = errors.New("could not connect to data store")
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 )
 
 type TraceDB interface {
@@ -21,7 +15,7 @@ type TraceDB interface {
 	ShouldRetry() bool
 	MinSpanCount() int
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
-	TestConnection(ctx context.Context) ConnectionTestResult
+	TestConnection(ctx context.Context) connection.ConnectionTestResult
 	Close() error
 }
 
@@ -36,8 +30,8 @@ func (db *noopTraceDB) Close() error                      { return nil }
 func (db *noopTraceDB) ShouldRetry() bool                 { return false }
 func (db *noopTraceDB) Ready() bool                       { return true }
 func (db *noopTraceDB) MinSpanCount() int                 { return 0 }
-func (db *noopTraceDB) TestConnection(ctx context.Context) ConnectionTestResult {
-	return ConnectionTestResult{}
+func (db *noopTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+	return connection.ConnectionTestResult{}
 }
 
 func WithFallback(fn func(ds model.DataStore) (TraceDB, error), fallbackDS model.DataStore) func(ds model.DataStore) (TraceDB, error) {

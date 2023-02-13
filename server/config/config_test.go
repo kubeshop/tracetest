@@ -52,9 +52,11 @@ func TestJaegerDataStore(t *testing.T) {
 func TestTempoDataStore(t *testing.T) {
 	expectedDataStore := config.TracingBackendDataStoreConfig{
 		Type: "tempo",
-		Tempo: configgrpc.GRPCClientSettings{
-			Endpoint:   "tempo:9095",
-			TLSSetting: configtls.TLSClientSetting{Insecure: true},
+		Tempo: config.BaseClientConfig{
+			Grpc: configgrpc.GRPCClientSettings{
+				Endpoint:   "tempo:9095",
+				TLSSetting: configtls.TLSClientSetting{Insecure: true},
+			},
 		},
 	}
 

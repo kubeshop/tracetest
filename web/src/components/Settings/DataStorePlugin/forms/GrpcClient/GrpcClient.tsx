@@ -19,7 +19,7 @@ const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 const GrpcClient = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
   const dataStoreType = form.getFieldValue('dataStoreType');
-  const baseName = ['dataStore', dataStoreType];
+  const baseName = ['dataStore', dataStoreType, 'grpc'];
   const insecureValue = Form.useWatch([...baseName, 'tls', 'insecure'], form) ?? true;
 
   return (
@@ -85,7 +85,11 @@ const GrpcClient = () => {
         <Switch
           onChange={checked => {
             form.setFieldsValue({
-              dataStore: {name: dataStoreType, type: dataStoreType, [dataStoreType]: {tls: {insecure: !checked}}},
+              dataStore: {
+                name: dataStoreType,
+                type: dataStoreType,
+                [dataStoreType]: {grpc: {tls: {insecure: !checked}}},
+              },
             });
           }}
           checked={!insecureValue}

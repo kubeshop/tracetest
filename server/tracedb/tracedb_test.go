@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -34,7 +35,7 @@ func TestCreateClient(t *testing.T) {
 			ds: model.DataStore{
 				Type: openapi.TEMPO,
 				Values: model.DataStoreValues{
-					Tempo: &configgrpc.GRPCClientSettings{},
+					Tempo: &config.BaseClientConfig{},
 				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",

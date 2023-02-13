@@ -22,7 +22,7 @@ type (
 
 	DataStoreValues struct {
 		Jaeger     *configgrpc.GRPCClientSettings
-		Tempo      *configgrpc.GRPCClientSettings
+		Tempo      *config.BaseClientConfig
 		OpenSearch *config.ElasticSearchDataStoreConfig
 		ElasticApm *config.ElasticSearchDataStoreConfig
 		SignalFx   *config.SignalFXDataStoreConfig

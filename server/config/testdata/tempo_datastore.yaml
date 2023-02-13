@@ -10,9 +10,10 @@ telemetry:
     tempo:
       type: tempo
       tempo:
-        endpoint: tempo:9095
-        tls:
-          insecure: true
+        grpc:
+          endpoint: tempo:9095
+          tls:
+            insecure: true
 
 server:
   telemetry:

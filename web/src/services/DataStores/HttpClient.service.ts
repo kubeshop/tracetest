@@ -1,15 +1,10 @@
-import {IGRPCClientSettings, TRawGRPCClientSettings} from 'types/Config.types';
+import {IHttpClientSettings, TRawHttpClientSettings} from 'types/Config.types';
 
-const GrpcClientService = () => ({
-  async getRequest(values: IGRPCClientSettings): Promise<TRawGRPCClientSettings> {
+const HttpClientService = () => ({
+  async getRequest(values: IHttpClientSettings): Promise<TRawHttpClientSettings> {
     const {
-      endpoint = '',
-      readBufferSize,
-      writeBufferSize,
-      waitForReady = false,
+      url = '',
       rawHeaders = [],
-      balancerName = '',
-      compression = '',
       tls: {
         insecure = true,
         insecureSkipVerify = false,
@@ -24,16 +19,11 @@ const GrpcClientService = () => ({
 
     const filesToText = [fileCA, fileCert, fileKey].map(file => (file ? file.text() : Promise.resolve(undefined)));
     const [cAFile, certFile, keyFile] = await Promise.all(filesToText);
-    const headers = rawHeaders.reduce((acc, curr) => ({...acc, [curr.key]: curr.value}), {});
+    const headers = rawHeaders.reduce((acc, {key, value}) => (key && value ? {...acc, [key]: value} : acc), {});
 
-    return Promise.resolve({
-      endpoint,
-      readBufferSize: parseInt(String(readBufferSize), 10),
-      writeBufferSize: parseInt(String(writeBufferSize), 10),
-      waitForReady,
+    return {
+      url,
       headers,
-      balancerName,
-      compression,
       tls: {
         insecure,
         insecureSkipVerify,
@@ -47,23 +37,18 @@ const GrpcClientService = () => ({
         },
       },
       auth,
-    });
+    };
   },
-  validateDraft(values: IGRPCClientSettings): Promise<boolean> {
-    const {endpoint = ''} = values;
-    if (!endpoint) return Promise.resolve(false);
+  validateDraft(values: IHttpClientSettings) {
+    const {url = ''} = values;
+    if (!url) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
-  getInitialValues(values: TRawGRPCClientSettings): IGRPCClientSettings {
+  getInitialValues(values: TRawHttpClientSettings): IHttpClientSettings {
     const {
-      endpoint = '',
-      readBufferSize,
-      writeBufferSize,
-      waitForReady = false,
+      url = '',
       headers = {},
-      balancerName = '',
-      compression = '',
       tls: {
         insecure,
         insecureSkipVerify = false,
@@ -76,16 +61,11 @@ const GrpcClientService = () => ({
     const rawHeaders = Object.entries(headers).map(([key, value]) => ({key, value}));
 
     return {
-      endpoint,
-      readBufferSize,
-      writeBufferSize,
-      waitForReady,
+      url,
       headers,
       rawHeaders,
-      balancerName,
-      compression,
       tls: {
-        insecure: endpoint ? !!insecure : true,
+        insecure: url ? !!insecure : true,
         insecureSkipVerify,
         serverName,
         settings: {
@@ -104,4 +84,4 @@ const GrpcClientService = () => ({
   },
 });
 
-export default GrpcClientService();
+export default HttpClientService();
