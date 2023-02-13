@@ -59,6 +59,7 @@ const (
 	newrelic   string = "newrelic"
 	lighstep   string = "lighstep"
 	elasticapm string = "elasticapm"
+	datadog    string = "datadog"
 )
 
 func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
@@ -84,6 +85,8 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 		ds.Type = openapi.NEW_RELIC
 	case lighstep:
 		ds.Type = openapi.LIGHTSTEP
+	case datadog:
+		ds.Type = openapi.DATADOG
 	case otlp:
 		ds.Type = openapi.OTLP
 	}

@@ -69,6 +69,7 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case openapi.NEW_RELIC:
 	case openapi.LIGHTSTEP:
+	case openapi.DATADOG:
 	case openapi.OTLP:
 		tdb, err = newCollectorDB(f.repo)
 	default:
