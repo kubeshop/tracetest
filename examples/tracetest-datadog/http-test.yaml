@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: JBYAfKJ4R
   name: OpenTelemetry Shop - List Products
   description: List Products available on OTel shop
   trigger:
@@ -14,7 +15,7 @@ spec:
   - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
     assertions:
     - attr:tracetest.response.status   =   200
-    - attr:tracetest.span.duration  <  50ms
+    - attr:tracetest.span.duration  <  10ms
   - selector: span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
     assertions:
     - attr:rpc.grpc.status_code = 0

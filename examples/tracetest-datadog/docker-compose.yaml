@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This file was adapted to not build the images, ignore Load Generator and Envoy services and
+# to disable the metrics and rely on OTel collector container
+# defined on ./tracetest/docker-compose.yaml
+
 version: '3.9'
 x-default-logging: &logging
   driver: "json-file"

@@ -1,4 +1,11 @@
 ---
+# postgres:
+#   host: tt-postgres
+#   user: postgres
+#   password: postgres
+#   port: 5432
+#   dbname: postgres
+#   params: sslmode=disable
 postgresConnString: "host=tt-postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
@@ -8,10 +15,10 @@ poolingConfig:
 demo:
   enabled: [otel]
   endpoints:
-    otelFrontend: http://otel-frontend:8084
-    otelProductCatalog: otel-productcatalogservice:3550
-    otelCart: otel-cartservice:7070
-    otelCheckout: otel-checkoutservice:5050
+    otelFrontend: http://frontend:8084
+    otelProductCatalog: productcatalogservice:3550
+    otelCart: cartservice:7070
+    otelCheckout: checkoutservice:5050
 
 experimentalFeatures: []
 

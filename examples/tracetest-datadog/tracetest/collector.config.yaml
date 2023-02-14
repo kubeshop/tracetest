@@ -3,9 +3,38 @@ receivers:
     protocols:
       http:
       grpc:
+  # The hostmetrics receiver is required to get correct infrastructure metrics in Datadog.
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      paging:
+        metrics:
+          system.paging.utilization:
+            enabled: true
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+      disk:
+      filesystem:
+        metrics:
+          system.filesystem.utilization:
+            enabled: true
+      load:
+      memory:
+      network:
+      processes:
+  # The prometheus receiver scrapes metrics needed for the OpenTelemetry Collector Dashboard.
+  prometheus:
+    config:
+      scrape_configs:
+      - job_name: 'otelcol'
+        scrape_interval: 10s
+        static_configs:
+        - targets: ['0.0.0.0:8888']
 
 processors:
-  batch:
+  batch: # this configuration is needed to guarantee that the data is sent correctly to Datadog
     send_batch_max_size: 100
     send_batch_size: 10
     timeout: 10s
@@ -13,7 +42,8 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:21321 # Send traces to Tracetest.
+                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # Datadog exporter
@@ -32,5 +62,9 @@ service:
       exporters: [otlp/tt]
     traces/dd:
       receivers: [otlp]
+      processors: [batch]
+      exporters: [datadog]
+    metrics:
+      receivers: [hostmetrics, otlp]
       processors: [batch]
       exporters: [datadog]
