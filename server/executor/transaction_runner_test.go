@@ -94,7 +94,7 @@ func TestTransactionRunner(t *testing.T) {
 }
 
 func getDB() (model.Repository, func()) {
-	db, err := testmock.GetTestingDatabase("file://../migrations")
+	db, err := testmock.GetTestingDatabase()
 	if err != nil {
 		panic(err)
 	}
