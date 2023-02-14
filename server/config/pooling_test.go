@@ -22,10 +22,10 @@ func TestPoolingConfig(t *testing.T) {
 			"--poolingConfig.retryDelay", "not-valid",
 		}
 
-		cfg := configWithFlags(t, flags)
+		_, err := configWithFlagsE(t, flags)
 
-		assert.Equal(t, 30*time.Second, cfg.PoolingMaxWaitTimeForTraceDuration())
-		assert.Equal(t, 1*time.Second, cfg.PoolingRetryDelay())
+		assert.ErrorContains(t, err, "invalid config value for 'poolingConfig.maxWaitTimeForTrace': invalid duration format 'not-valid'")
+		assert.ErrorContains(t, err, "invalid config value for 'poolingConfig.retryDelay': invalid duration format 'not-valid'")
 	})
 
 	t.Run("Flags", func(t *testing.T) {

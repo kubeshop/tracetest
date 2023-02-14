@@ -35,6 +35,7 @@ type option struct {
 	key          string
 	defaultValue any
 	description  string
+	validate     func(*Config) error
 }
 
 type options []option
@@ -131,10 +132,16 @@ func New(flags *pflag.FlagSet) (*Config, error) {
 		return nil, err
 	}
 
-	return &Config{
+	cfg := &Config{
 		config: &oldConfig,
 		vp:     vp,
-	}, nil
+	}
+
+	if err := cfg.Validate(); err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	return cfg, nil
 }
 
 func Must(c *Config, err error) *Config {

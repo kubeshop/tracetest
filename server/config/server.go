@@ -5,20 +5,20 @@ import (
 )
 
 var serverOptions = options{
-	{"postgres.host", "postgres", "Postgres DB host"},
-	{"postgres.user", "postgres", "Postgres DB user"},
-	{"postgres.password", "postgres", "Postgres DB password"},
-	{"postgres.dbname", "tracetest", "Postgres DB database name"},
-	{"postgres.port", 5432, "Postgres DB port"},
-	{"postgres.params", "sslmode=disable", "Postgres DB connection parameters"},
+	{"postgres.host", "postgres", "Postgres DB host", nil},
+	{"postgres.user", "postgres", "Postgres DB user", nil},
+	{"postgres.password", "postgres", "Postgres DB password", nil},
+	{"postgres.dbname", "tracetest", "Postgres DB database name", nil},
+	{"postgres.port", 5432, "Postgres DB port", nil},
+	{"postgres.params", "sslmode=disable", "Postgres DB connection parameters", nil},
 
-	{"server.httpPort", 11633, "Tracetest server HTTP Port"},
-	{"server.pathPrefix", "", "Tracetest server HTTP Path prefix"},
+	{"server.httpPort", 11633, "Tracetest server HTTP Port", nil},
+	{"server.pathPrefix", "", "Tracetest server HTTP Path prefix", nil},
 
-	{"experimentalFeatures", []string{}, "enabled experimental features"},
+	{"experimentalFeatures", []string{}, "enabled experimental features", nil},
 
-	{"internalTelemetry.enabled", false, "enable internal telemetry (used for internal testing)"},
-	{"internalTelemetry.otelCollectorEndpoint", "", "internal telemetry  otel collector (used for internal testing)"},
+	{"internalTelemetry.enabled", false, "enable internal telemetry (used for internal testing)", nil},
+	{"internalTelemetry.otelCollectorEndpoint", "", "internal telemetry  otel collector (used for internal testing)", nil},
 }
 
 func init() {

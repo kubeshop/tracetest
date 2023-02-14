@@ -11,14 +11,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
+func configWithFlagsE(t *testing.T, inputFlags []string) (*config.Config, error) {
 	flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
 	config.SetupFlags(flags)
 
 	err := flags.Parse(inputFlags)
 	require.NoError(t, err)
 
-	cfg, err := config.New(flags)
+	return config.New(flags)
+}
+
+func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
+	cfg, err := configWithFlagsE(t, inputFlags)
 	require.NoError(t, err)
 
 	return cfg

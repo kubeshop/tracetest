@@ -5,8 +5,8 @@ import (
 )
 
 var poolingOptions = options{
-	{"poolingConfig.maxWaitTimeForTrace", "30s", "pooling config: max wait time for trace"},
-	{"poolingConfig.retryDelay", "1s", "pooling config: interval between poll retries"},
+	{"poolingConfig.maxWaitTimeForTrace", "30s", "pooling config: max wait time for trace", validateDuration("poolingConfig.maxWaitTimeForTrace")},
+	{"poolingConfig.retryDelay", "1s", "pooling config: interval between poll retries", validateDuration("poolingConfig.retryDelay")},
 }
 
 func init() {
