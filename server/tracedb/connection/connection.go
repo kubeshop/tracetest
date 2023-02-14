@@ -39,23 +39,25 @@ func (r ConnectionTestStepResult) IsSet() bool {
 }
 
 func IsReachable(endpoint string) (bool, error) {
-	address, err := url.Parse(endpoint)
-	if err != nil {
-		return false, err
+	if strings.HasPrefix(endpoint, "http://") || strings.HasPrefix(endpoint, "https://") {
+		address, err := url.Parse(endpoint)
+		if err != nil {
+			return false, err
+		}
+
+		endpoint = strings.TrimPrefix(endpoint, "http://")
+		endpoint = strings.TrimPrefix(endpoint, "https://")
+
+		if address.Scheme == "https" && address.Port() == "" {
+			endpoint = fmt.Sprintf("%s:443", address.Hostname())
+		}
+
+		if address.Scheme == "http" && address.Port() == "" {
+			endpoint = fmt.Sprintf("%s:80", address.Hostname())
+		}
 	}
 
-	endpoint = strings.TrimPrefix(endpoint, "http://")
-	endpoint = strings.TrimPrefix(endpoint, "https://")
-
-	if address.Scheme == "https" && address.Port() == "" {
-		endpoint = fmt.Sprintf("%s:443", address.Hostname())
-	}
-
-	if address.Scheme == "http" && address.Port() == "" {
-		endpoint = fmt.Sprintf("%s:80", address.Hostname())
-	}
-
-	_, err = net.DialTimeout("tcp", endpoint, 5*time.Second)
+	_, err := net.DialTimeout("tcp", endpoint, 5*time.Second)
 	if err != nil {
 		return false, err
 	}

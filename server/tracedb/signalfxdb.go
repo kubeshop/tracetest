@@ -3,7 +3,6 @@ package tracedb
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -50,53 +49,19 @@ func (db signalfxDB) Close() error {
 
 func (db signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
-	connectionTestResult := connection.ConnectionTestResult{
-		ConnectivityTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
-		},
-		AuthenticationTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with signalFX`,
-		},
-		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using the signalFX API`,
-		},
-	}
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(connection.ConnectivityStep(url)),
+		connection.WithPollingTest(connection.TracePollingTestStep(db)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
+			if strings.Contains(strings.ToLower(err.Error()), "401") {
+				return "Tracetest tried to execute an signalFX API request but it failed due to authentication issues", err
+			}
 
-	reachable, err := connection.IsReachable(url)
-
-	if !reachable {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, url),
-				Error:                err,
-			},
-		}
-	}
-
-	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
-
-	if strings.Contains(strings.ToLower(err.Error()), "401") {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute an signalFX API request but it failed due to authentication issues`,
-				Error:                err,
-			},
-		}
-	}
-
-	if !errors.Is(err, connection.ErrTraceNotFound) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the signalFX endpoint "%s" and got an error`, url),
-				Error:                err,
-			},
-		}
-	}
-
-	return connectionTestResult
+			return "Tracetest managed to authenticate with signalFX", nil
+		})),
+	)
+	return tester.TestConnection(ctx)
 }
 
 func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
