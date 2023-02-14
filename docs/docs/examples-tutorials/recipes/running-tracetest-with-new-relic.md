@@ -68,7 +68,7 @@ services:
     volumes:
       - type: bind
         source: ./tracetest/tracetest.config.yaml
-        target: /app/config.yaml
+        target: /app/tracetest.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
@@ -115,7 +115,13 @@ The `tracetest.config.yaml` file contains the basic setup of connecting Tracetes
 # tracetest.config.yaml
 
 ---
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 30s

@@ -174,7 +174,13 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to OTLP meaning the traces will be stored in Tracetest itself. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10s

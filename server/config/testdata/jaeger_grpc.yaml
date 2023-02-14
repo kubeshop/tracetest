@@ -7,13 +7,6 @@ telemetry:
         tls:
           insecure: true
 
-    tempo:
-      type: tempo
-      tempo:
-        endpoint: tempo:9095
-        tls:
-          insecure: true
-
 server:
   telemetry:
     dataStore: jaeger

@@ -72,7 +72,7 @@ services:
         volumes:
             - type: bind
               source: tracetest/tracetest.yaml
-              target: /app/config.yaml
+              target: /app/tracetest.yaml
 networks:
     default:
         name: _default
