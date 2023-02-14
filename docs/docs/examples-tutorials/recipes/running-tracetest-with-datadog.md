@@ -70,6 +70,7 @@ services:
   tracetest:
     restart: unless-stopped
     image: kubeshop/tracetest:${TAG:-latest}
+    container_name: tracetest
     platform: linux/amd64
     ports:
       - 11633:11633
@@ -94,6 +95,7 @@ services:
 
   tt-postgres:
     image: postgres
+    container_name: tt-postgres
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -105,12 +107,14 @@ services:
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.68.0
+    container_name: otel-collector
     restart: unless-stopped
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
