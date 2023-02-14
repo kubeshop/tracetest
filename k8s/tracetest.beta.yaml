@@ -1,4 +1,10 @@
-postgresConnString: "host=${NAME}-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
+postgres:
+  host: ${NAME}-postgresql
+  user: tracetest
+  password: not-secure-database-password
+  port: 5432
+  dbname: tracetest
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10s

@@ -1,0 +1,12 @@
+telemetry:
+  dataStores:
+    opensearch:
+      type: opensearch
+      opensearch:
+        addresses:
+          - http://opensearch:9200
+        index: traces
+
+server:
+  telemetry:
+    dataStore: opensearch

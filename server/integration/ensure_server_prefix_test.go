@@ -6,17 +6,32 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
+	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/openapi"
-	"github.com/kubeshop/tracetest/server/testfixtures"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func getTracetestApp(options ...testmock.TestingAppOption) (*app.App, error) {
+	tracetestApp, err := testmock.GetTestingApp(options...)
+	if err != nil {
+		return nil, err
+	}
+
+	go tracetestApp.Start()
+
+	time.Sleep(1 * time.Second)
+
+	return tracetestApp, nil
+}
+
 func TestServerPrefix(t *testing.T) {
-	_, err := testfixtures.GetTracetestApp(
-		testfixtures.WithServerPrefix("/tracetest"),
-		testfixtures.WithHttpPort(8000),
+	_, err := getTracetestApp(
+		testmock.WithServerPrefix("/tracetest"),
+		testmock.WithHttpPort(8000),
 	)
 	require.NoError(t, err)
 
