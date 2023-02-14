@@ -17,22 +17,12 @@ func (c *Config) PoolingMaxWaitTimeForTraceDuration() time.Duration {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	maxWaitTimeForTrace := c.vp.GetDuration("poolingConfig.maxWaitTimeForTrace")
-	if maxWaitTimeForTrace == 0 {
-		return 30 * time.Second
-	}
-
-	return maxWaitTimeForTrace
+	return c.vp.GetDuration("poolingConfig.maxWaitTimeForTrace")
 }
 
 func (c *Config) PoolingRetryDelay() time.Duration {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	delay := c.vp.GetDuration("poolingConfig.retryDelay")
-	if delay == 0 {
-		return 1 * time.Second
-	}
-
-	return delay
+	return c.vp.GetDuration("poolingConfig.retryDelay")
 }

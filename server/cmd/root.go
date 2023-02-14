@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/spf13/cobra"
@@ -37,7 +40,8 @@ func init() {
 		var err error
 		cfg, err = config.New(rootCmd.PersistentFlags())
 		if err != nil {
-			panic(err)
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 	})
 
