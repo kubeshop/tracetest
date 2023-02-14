@@ -5,15 +5,15 @@ import (
 )
 
 var serverOptions = options{
-	{"postgres.host", "postgres", "postgres DB host"},
-	{"postgres.user", "postgres", "postgres DB user"},
-	{"postgres.password", "postgres", "postgres DB password"},
-	{"postgres.dbname", "tracetest", "postgres DB dbname"},
-	{"postgres.port", 5432, "postgres DB port"},
-	{"postgres.params", "sslmode=disable", "postgres DB connection params"},
+	{"postgres.host", "postgres", "Postgres DB host"},
+	{"postgres.user", "postgres", "Postgres DB user"},
+	{"postgres.password", "postgres", "Postgres DB password"},
+	{"postgres.dbname", "tracetest", "Postgres DB database name"},
+	{"postgres.port", 5432, "Postgres DB port"},
+	{"postgres.params", "sslmode=disable", "Postgres DB connection parameters"},
 
-	{"server.httpPort", 11633, "tracetest HTTP Port"},
-	{"server.pathPrefix", "", "tracetest HTTP Path prefix"},
+	{"server.httpPort", 11633, "Tracetest server HTTP Port"},
+	{"server.pathPrefix", "", "Tracetest server HTTP Path prefix"},
 
 	{"experimentalFeatures", []string{}, "enabled experimental features"},
 
