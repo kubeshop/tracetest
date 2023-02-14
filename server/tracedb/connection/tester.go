@@ -25,6 +25,21 @@ func NewTester(opts ...TesterOption) Tester {
 }
 
 func (t *Tester) TestConnection(ctx context.Context) ConnectionTestResult {
+	connectivityTestResult := t.connectivityTestStep.TestConnection(ctx)
+	if connectivityTestResult.Error != nil {
+		return ConnectionTestResult{
+			ConnectivityTestResult: connectivityTestResult,
+		}
+	}
+
+	authTestResult := t.authenticationTestStep.TestConnection(ctx)
+	if authTestResult.Error != nil {
+		return ConnectionTestResult{
+			ConnectivityTestResult:   connectivityTestResult,
+			AuthenticationTestResult: authTestResult,
+		}
+	}
+
 	return ConnectionTestResult{
 		ConnectivityTestResult:   t.connectivityTestStep.TestConnection(ctx),
 		AuthenticationTestResult: t.authenticationTestStep.TestConnection(ctx),
