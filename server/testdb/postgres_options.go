@@ -54,14 +54,3 @@ func WithDB(db *sql.DB) PostgresOption {
 		return nil
 	}
 }
-
-func WithMigrations(migrationFolder string) PostgresOption {
-	return func(pd *postgresDB) error {
-		if migrationFolder == "" {
-			return nil
-		}
-		pd.migrationsFolder = migrationFolder
-
-		return nil
-	}
-}

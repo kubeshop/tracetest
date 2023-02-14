@@ -9,7 +9,13 @@ demo:
 poolingconfig:
     maxwaittimefortrace: 2m
     retrydelay: 3s
-postgresconnstring: host=postgres user=postgres password=postgres port=5432 sslmode=disable
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 server:
     telemetry:
         applicationexporter: collector

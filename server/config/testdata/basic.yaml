@@ -1,0 +1,13 @@
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: tracetest
+  params: sslmode=disable
+server:
+  pathPrefix: /tracetest
+  httpPort: 9999
+poolingConfig:
+  maxWaitTimeForTrace: 1m
+  retryDelay: 3s

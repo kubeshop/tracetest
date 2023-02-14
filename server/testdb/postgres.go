@@ -4,16 +4,17 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/migrations"
 )
 
 type postgresDB struct {
-	db               *sql.DB
-	migrationsFolder string
+	db *sql.DB
 }
 
 var (
@@ -26,9 +27,7 @@ type scanner interface {
 }
 
 func Postgres(options ...PostgresOption) (*postgresDB, error) {
-	ps := &postgresDB{
-		migrationsFolder: "file://./migrations",
-	}
+	ps := &postgresDB{}
 	for _, option := range options {
 		err := option(ps)
 		if err != nil {
@@ -49,7 +48,12 @@ func (p *postgresDB) ensureLatestMigration() error {
 	if err != nil {
 		return fmt.Errorf("could not get driver from postgres connection: %w", err)
 	}
-	migrateClient, err := migrate.NewWithDatabaseInstance(p.migrationsFolder, "tracetest", driver)
+	sourceDriver, err := iofs.New(migrations.Migrations, ".")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	migrateClient, err := migrate.NewWithInstance("iofs", sourceDriver, "tracetest", driver)
 	if err != nil {
 		return fmt.Errorf("could not get migration client: %w", err)
 	}

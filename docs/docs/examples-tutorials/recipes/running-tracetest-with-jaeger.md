@@ -200,7 +200,13 @@ But how does Tracetest fetch traces?
 Tracetest uses `jaeger.endpoint:jaeger:16685` to connect to Jaeger and fetch trace data.
 
 ```yaml
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10m
