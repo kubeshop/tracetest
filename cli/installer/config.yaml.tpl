@@ -1,4 +1,7 @@
-postgresConnString: "{{ .psql }}"
+postgres:
+  host: {{ .pHost }}
+  user: {{ .pUser }}
+  password: {{ .pPasswd }}
 
 poolingConfig:
   maxWaitTimeForTrace: 2m

@@ -141,8 +141,7 @@ func installOtelCollector(conf configuration, ui cliUI.UI) {
 }
 
 func fixTracetestConfiguration(conf configuration, ui cliUI.UI) {
-	psql := "host=tracetest-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
-	c := getTracetestConfigFileContents(psql, ui, conf)
+	c := getTracetestConfigFileContents("tracetest-postgresql", "tracetest", "not-secure-database-password", ui, conf)
 	ttc := createTmpFile("tracetest-config", string(c), ui)
 	defer os.Remove(ttc.Name())
 	execCmd(

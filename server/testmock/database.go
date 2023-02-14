@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/orlangure/gnomock"
@@ -13,16 +14,29 @@ import (
 
 var pgContainer *gnomock.Container
 
-func GetTestingDatabase(migrationFolder string) (model.Repository, error) {
+func GetTestingDatabase() (model.Repository, error) {
 	db, err := GetRawTestingDatabase()
 	if err != nil {
 		return nil, err
 	}
 
-	return testdb.Postgres(
-		testdb.WithDB(db),
-		testdb.WithMigrations(migrationFolder),
-	)
+	return testdb.Postgres(testdb.WithDB(db))
+}
+
+func ConfigureDB(cfg *config.Config) error {
+	pgContainer, err := getPostgresContainer()
+	if err != nil {
+		return err
+	}
+
+	cfg.Set("postgres.host", pgContainer.Host)
+	cfg.Set("postgres.user", "tracetest")
+	cfg.Set("postgres.password", "tracetest")
+	cfg.Set("postgres.dbname", "postgres")
+	cfg.Set("postgres.port", pgContainer.DefaultPort())
+
+	return nil
+
 }
 
 func GetRawTestingDatabase() (*sql.DB, error) {
