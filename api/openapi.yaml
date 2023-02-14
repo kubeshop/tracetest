@@ -3,6 +3,8 @@ info:
   version: 0.2.1
   title: TraceTest
   description: OpenAPI definition for TraceTest endpoint and resources
+
+
 servers:
   - url: /api
 paths:

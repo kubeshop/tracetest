@@ -52,8 +52,7 @@ dockers:
 - image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}'
   extra_files:
-    - web/build
-    - server/migrations
+    - dist/html
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"

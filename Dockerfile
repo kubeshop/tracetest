@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ./tracetest-server /app/tracetest-server
 COPY ./tracetest /app/tracetest
 
-COPY ./web/build ./html
+COPY ./html ./html
 
 EXPOSE 11633/tcp
 

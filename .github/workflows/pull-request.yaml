@@ -131,7 +131,7 @@ jobs:
         id: cache-build
         uses: actions/cache@v3
         with:
-          path: web/build/
+          path: dist/html/
           key: web-build-${{ hashFiles('web/*') }}
       - run: cd web; npm ci
         if: steps.cache-build.outputs.cache-hit != 'true'
@@ -141,7 +141,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: tracetest-web
-          path: web/build/
+          path: dist/html/
 
   build-docker:
     runs-on: ubuntu-latest
@@ -169,7 +169,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
-          path: web/build/
+          path: dist/html/
       # release
       - uses: goreleaser/goreleaser-action@v4
         with:

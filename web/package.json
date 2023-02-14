@@ -68,7 +68,7 @@
     "start": "craco start",
     "dev": "concurrently 'npm run start' 'npm run port-forward'",
     "port-forward": "while true; do kubectl -n tracetest-beta port-forward svc/tracetest-beta 11633; done",
-    "build": "craco build",
+    "build": "BUILD_PATH='../dist/html' craco build",
     "test": "npm run test:unit",
     "test:integration": "npm run cy:run",
     "test:unit": "craco test --watchAll=false --coverage",

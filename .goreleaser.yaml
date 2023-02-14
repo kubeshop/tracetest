@@ -77,8 +77,7 @@ dockers:
 - image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}-amd64'
   extra_files:
-    - web/build
-    - server/migrations
+    - dist/html
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"
@@ -94,8 +93,7 @@ dockers:
 - image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
   extra_files:
-    - web/build
-    - server/migrations
+    - dist/html
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"
