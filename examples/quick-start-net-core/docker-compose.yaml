@@ -10,7 +10,7 @@ services:
 
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
-    # platform: linux/amd64
+    platform: linux/amd64
     volumes:
       - type: bind
         source: ./tracetest-config.yaml
@@ -29,8 +29,6 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres:14
@@ -56,6 +54,7 @@ services:
       - jaeger
     ports:
       - 4317:4317
+      - 4318:4318
 
   jaeger:
     image: jaegertracing/all-in-one:latest
