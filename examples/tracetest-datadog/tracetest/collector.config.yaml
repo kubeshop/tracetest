@@ -22,8 +22,7 @@ exporters:
   datadog:
     api:
       site: datadoghq.com
-      key: <datadog_API_key> # Add here you API key for Datadog
-      # Read more in docs here: https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter
+      key: ${DATADOG_API_KEY} # Add here you API key for Datadog
 
 service:
   pipelines:
