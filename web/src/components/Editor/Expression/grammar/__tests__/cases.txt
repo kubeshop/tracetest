@@ -55,6 +55,14 @@ Program(Expression(ComposedValue(OutsideInput(Source,Identifier))))
 
 Program(Expression(ComposedValue(Duration)))
 
+# Duration With Space
+
+120 ms
+
+==>
+
+Program(Expression(ComposedValue(Duration)))
+
 # Complete Expression
 
 attr:http.response.body | json_path '$.name' = env:IMPORTED_POKEMON_NAME
