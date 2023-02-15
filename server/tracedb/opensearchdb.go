@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/opensearch-project/opensearch-go"
@@ -20,7 +19,7 @@ import (
 
 type opensearchDB struct {
 	realTraceDB
-	config *config.ElasticSearchDataStoreConfig
+	config *model.ElasticSearchDataStoreConfig
 	client *opensearch.Client
 }
 
@@ -90,7 +89,7 @@ func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newOpenSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, error) {
+func newOpenSearchDB(cfg *model.ElasticSearchDataStoreConfig) (TraceDB, error) {
 	var caCert []byte
 	if cfg.Certificate != "" {
 		caCert = []byte(cfg.Certificate)
