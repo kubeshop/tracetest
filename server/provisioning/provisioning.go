@@ -3,6 +3,7 @@ package provisioning
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 
@@ -19,10 +20,14 @@ type provisioner struct {
 	db model.Repository
 }
 
+var (
+	ErrEnvEmpty = errors.New("cannot read provisioning from env variable TRACETEST_PROVISIONING: variable is empty")
+)
+
 func (p provisioner) FromEnv() error {
 	envVar := os.Getenv("TRACETEST_PROVISIONING")
 	if envVar == "" {
-		return fmt.Errorf("cannot read provisioning from env variable TRACETEST_PROVISIONING: variable is empty")
+		return ErrEnvEmpty
 	}
 
 	data, err := base64.StdEncoding.DecodeString(envVar)
@@ -32,9 +37,14 @@ func (p provisioner) FromEnv() error {
 	return p.do(data)
 }
 
+var ErrFileNotExists = errors.New("provisioning file does not exists")
+
 func (p provisioner) FromFile(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return ErrFileNotExists
+		}
 		return fmt.Errorf("cannot read provisioning file '%s'", path)
 	}
 

@@ -1,0 +1,2 @@
+dataStore:
+  type: otlp

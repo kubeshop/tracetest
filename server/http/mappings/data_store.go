@@ -10,7 +10,7 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 	dataStore := openapi.DataStore{
 		Id:         in.ID,
 		Name:       in.Name,
-		Type:       in.Type,
+		Type:       openapi.SupportedDataStores(in.Type),
 		IsDefault:  in.IsDefault,
 		Jaeger:     openapi.GrpcClientSettings{},
 		Tempo:      openapi.BaseClient{},
@@ -50,7 +50,7 @@ func (m Model) DataStore(in openapi.DataStore) model.DataStore {
 	dataStore := model.DataStore{
 		ID:        in.Id,
 		Name:      in.Name,
-		Type:      in.Type,
+		Type:      model.DataStoreType(in.Type),
 		IsDefault: in.IsDefault,
 		CreatedAt: in.CreatedAt,
 	}

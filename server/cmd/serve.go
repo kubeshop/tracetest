@@ -6,13 +6,17 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+	serveCmd.Flags().StringVar(&provisioningFile, "provisioning-file", "", "path to a provisioning file")
 }
+
+var provisioningFile string
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -33,7 +37,7 @@ var serveCmd = &cobra.Command{
 		}()
 
 		wg.Add(1)
-		err := appInstance.Start()
+		err := appInstance.Start(app.WithProvisioningFile(provisioningFile))
 		if err != nil {
 			return err
 		}

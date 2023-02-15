@@ -18,7 +18,7 @@ func TestFromFile(t *testing.T) {
 		provisioner := provisioning.New(&testdb.MockRepository{})
 
 		err := provisioner.FromFile("notexists.yaml")
-		assert.ErrorContains(t, err, "cannot read provisioning file 'notexists.yaml'")
+		assert.ErrorIs(t, err, provisioning.ErrFileNotExists)
 	})
 }
 
@@ -27,7 +27,7 @@ func TestFromEnv(t *testing.T) {
 		provisioner := provisioning.New(&testdb.MockRepository{})
 
 		err := provisioner.FromEnv()
-		assert.ErrorContains(t, err, "cannot read provisioning from env variable TRACETEST_PROVISIONING: variable is empty")
+		assert.ErrorIs(t, err, provisioning.ErrEnvEmpty)
 	})
 
 	t.Run("InvalidData", func(t *testing.T) {
