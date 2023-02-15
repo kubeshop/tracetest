@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
+	"github.com/hashicorp/go-multierror"
 )
 
 type connectivityTestStep struct {
@@ -20,11 +22,14 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 		err := IsReachable(endpoint, s.protocol)
 		if err != nil {
 			unreachableEndpoints = append(unreachableEndpoints, fmt.Sprintf(`"%s"`, endpoint))
-			connectionErr = err
+			connectionErr = multierror.Append(
+				connectionErr,
+				fmt.Errorf("cannot connect to endpoint '%s': %w", endpoint, err),
+			)
 		}
 	}
 
-	if len(unreachableEndpoints) > 0 {
+	if connectionErr != nil {
 		endpoints := strings.Join(unreachableEndpoints, ", ")
 		return ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf("Tracetest tried to connect to the following endpoints and failed: %s", endpoints),
@@ -34,7 +39,7 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 
 	endpoints := strings.Join(s.endpoints, ", ")
 	return ConnectionTestStepResult{
-		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, endpoints),
+		OperationDescription: fmt.Sprintf(`Tracetest connected to %s`, endpoints),
 	}
 }
 
