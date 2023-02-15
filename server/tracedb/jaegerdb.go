@@ -6,7 +6,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/id"
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
 	"github.com/kubeshop/tracetest/server/model"
@@ -25,7 +24,7 @@ type jaegerTraceDB struct {
 }
 
 func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
-	baseConfig := &config.BaseClientConfig{
+	baseConfig := &model.BaseClientConfig{
 		Type: string(datasource.GRPC),
 		Grpc: *grpcConfig,
 	}

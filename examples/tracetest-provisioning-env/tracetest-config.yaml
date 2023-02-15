@@ -7,25 +7,18 @@ postgres:
   params: sslmode=disable
 
 poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
 
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 demo:
-  enabled: [pokeshop]
-  endpoints:
-    pokeshopHttp: http://demo-api:8081
-    pokeshopGrpc: demo-rpc:8082
+  enabled: []
 
 experimentalFeatures: []
 
 telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-
   exporters:
     collector:
       serviceName: tracetest
@@ -37,6 +30,4 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: otlp
     exporter: collector
-    applicationExporter: collector
