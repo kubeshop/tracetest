@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const timeoutIsReachable = 5 * time.Second
+const reachabilityTimeout = 5 * time.Second
 
 type Protocol string
 
@@ -47,7 +47,7 @@ func (r ConnectionTestStepResult) IsSet() bool {
 	return r.OperationDescription != ""
 }
 
-func IsReachable(endpoint string, protocol Protocol) error {
+func CheckReachability(endpoint string, protocol Protocol) error {
 	if protocol == ProtocolHTTP {
 		address, err := url.Parse(endpoint)
 		if err != nil {
@@ -66,7 +66,7 @@ func IsReachable(endpoint string, protocol Protocol) error {
 		}
 	}
 
-	_, err := net.DialTimeout("tcp", endpoint, timeoutIsReachable)
+	_, err := net.DialTimeout("tcp", endpoint, reachabilityTimeout)
 	if err != nil {
 		return err
 	}

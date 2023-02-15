@@ -19,7 +19,7 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 	unreachableEndpoints := make([]string, 0)
 	var connectionErr error
 	for _, endpoint := range s.endpoints {
-		err := IsReachable(endpoint, s.protocol)
+		err := CheckReachability(endpoint, s.protocol)
 		if err != nil {
 			unreachableEndpoints = append(unreachableEndpoints, fmt.Sprintf(`"%s"`, endpoint))
 			connectionErr = multierror.Append(
