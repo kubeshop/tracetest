@@ -24,7 +24,7 @@ type OpTerm struct {
 type Term struct {
 	FunctionCall *FunctionCall `( @@`
 	Array        *Array        `| @@`
-	Duration     *string       `| @Duration `
+	Duration     *Duration     `| @Duration `
 	Number       *string       `| @Number `
 	Attribute    *Attribute    `| @Attribute `
 	Environment  *Environment  `| @Environment `
@@ -53,7 +53,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "Comparator", Pattern: `!=|<=|>=|=|<|>|contains|not-contains`},
 		{Name: "Operator", Pattern: `(\+|\-|\*|\/)`, Action: nil},
 
-		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)(ns|us|ms|s|m|h)`},
+		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)( )?(ns|us|ms|s|m|h)`},
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
 		{Name: "Attribute", Pattern: `attr:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
 		{Name: "Environment", Pattern: `env:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
@@ -106,26 +106,4 @@ func (term *Term) Type() TermType {
 	}
 
 	return ""
-}
-
-func (expr *Expr) GetTermsByType(termType TermType) []*Term {
-	terms := []*Term{}
-
-	if expr.Left.Type() == StrType {
-		for _, arg := range expr.Left.Str.Args {
-			terms = append(terms, arg.GetTermsByType(termType)...)
-		}
-	}
-
-	if expr.Left.Type() == termType {
-		terms = append(terms, expr.Left)
-	}
-
-	for _, optTerm := range expr.Right {
-		if optTerm.Term.Type() == termType {
-			terms = append(terms, optTerm.Term)
-		}
-	}
-
-	return terms
 }
