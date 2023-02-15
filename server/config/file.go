@@ -59,6 +59,7 @@ type (
 		OpenSearch ElasticSearchDataStoreConfig  `yaml:",omitempty" mapstructure:"opensearch"`
 		SignalFX   SignalFXDataStoreConfig       `yaml:",omitempty" mapstructure:"signalfx"`
 		ElasticApm ElasticSearchDataStoreConfig  `yaml:",omitempty" mapstructure:"elasticapm"`
+		AwsXRay    AWSXRayDataStoreConfig        `yaml:",omitempty" mapstructure:"awsxray"`
 	}
 
 	TelemetryExporterOption struct {
@@ -100,6 +101,12 @@ type (
 	SignalFXDataStoreConfig struct {
 		Realm string
 		Token string
+	}
+
+	AWSXRayDataStoreConfig struct {
+		Region          string `yaml:",omitempty" mapstructure:"region"`
+		AccessKeyID     string `yaml:",omitempty" mapstructure:"accessKeyId"`
+		SecretAccessKey string `yaml:",omitempty" mapstructure:"secretAccessKey"`
 	}
 )
 

@@ -9,6 +9,7 @@ type DataStore struct {
 	Tempo      BaseClientConfig   `mapstructure:"tempo"`
 	OpenSearch OpenSearch         `mapstructure:"openSearch"`
 	SignalFx   SignalFX           `mapstructure:"signalFx"`
+	AwsXRay    AwsXRay            `mapstructure:"awsxray"`
 }
 
 type GRPCClientSettings struct {
@@ -53,6 +54,12 @@ type TLSSetting struct {
 type SignalFX struct {
 	Realm string `mapstructure:"realm"`
 	Token string `mapstructure:"token"`
+}
+
+type AwsXRay struct {
+	Region          string `mapstructure:"region"`
+	AccessKeyId     string `mapstructure:"accessKeyId"`
+	SecretAccessKey string `mapstructure:"secretAccessKey"`
 }
 
 type OpenSearch struct {

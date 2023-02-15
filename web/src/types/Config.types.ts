@@ -84,7 +84,6 @@ type IDataStore = TRawDataStore & {
   lightstep?: {};
   newRelic?: {};
   datadog?: {};
-  awsxray?: {};
 }
 
 export type TDraftDataStore = {

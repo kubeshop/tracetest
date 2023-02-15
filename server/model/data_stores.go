@@ -26,6 +26,7 @@ type (
 		OpenSearch *config.ElasticSearchDataStoreConfig
 		ElasticApm *config.ElasticSearchDataStoreConfig
 		SignalFx   *config.SignalFXDataStoreConfig
+		AwsXRay    *config.AWSXRayDataStoreConfig
 	}
 )
 
@@ -99,6 +100,7 @@ func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
 	ds.Values.OpenSearch = &dsc.OpenSearch
 	ds.Values.SignalFx = &dsc.SignalFX
 	ds.Values.ElasticApm = &dsc.ElasticApm
+	ds.Values.AwsXRay = &dsc.AwsXRay
 
 	return ds
 }

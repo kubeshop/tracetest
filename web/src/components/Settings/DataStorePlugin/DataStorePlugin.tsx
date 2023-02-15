@@ -4,6 +4,7 @@ import ElasticSearch from './forms/ElasticSearch';
 import OpenTelemetryCollector from './forms/OpenTelemetryCollector';
 import SignalFx from './forms/SignalFx/SignalFx';
 import BaseClient from './forms/BaseClient';
+import AwsXRay from './forms/AwsXRay';
 
 export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.JAEGER]: GrpcClient,
@@ -15,7 +16,7 @@ export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.Lightstep]: OpenTelemetryCollector,
   [SupportedDataStores.Datadog]: OpenTelemetryCollector,
   [SupportedDataStores.NewRelic]: OpenTelemetryCollector,
-  [SupportedDataStores.AWSXRay]: OpenTelemetryCollector,
+  [SupportedDataStores.AWSXRay]: AwsXRay,
 };
 
 export default DataStoreComponentMap;

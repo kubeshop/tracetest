@@ -17,9 +17,9 @@ telemetry:
     awsxray:
       type: awsxray
       awsxray:
-        accessKeyId: ${AWS_ACCESS_KEY_ID}
-        secretAccessKey: ${AWS_SECRET_ACCESS_KEY}
-        region: ${AWS_REGION}
+        accessKeyId: <your-access-key-id>
+        secretAccessKey: <your-secret-access-key>
+        region: <your-aws-region>
 
 server:
   telemetry:

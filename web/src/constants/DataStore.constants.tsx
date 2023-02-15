@@ -38,23 +38,11 @@ const collectorExplanation = (
   </>
 );
 
-const aDotCollectorExplanation = (
-  <>
-    Tracetest can work with any AWS distributed tracing solution that is utilizing the{' '}
-    <a href="https://aws-otel.github.io/docs/getting-started/collector" target="_blank">
-      AWS OpenTelemetry Collector
-    </a>{' '}
-    via a second pipeline. The second pipeline enables your current tracing system to send only Tracetest spans to
-    Tracetest, while all other spans continue to go to the backend of your choice.
-  </>
-);
-
 export const SupportedDataStoresToExplanation: Record<string, React.ReactElement> = {
   [SupportedDataStores.OtelCollector]: collectorExplanation,
   [SupportedDataStores.NewRelic]: collectorExplanation,
   [SupportedDataStores.Lightstep]: collectorExplanation,
   [SupportedDataStores.Datadog]: collectorExplanation,
-  [SupportedDataStores.AWSXRay]: aDotCollectorExplanation,
 };
 
 export const NoTestConnectionDataStoreList = [
@@ -62,5 +50,4 @@ export const NoTestConnectionDataStoreList = [
   SupportedDataStores.Lightstep,
   SupportedDataStores.Datadog,
   SupportedDataStores.NewRelic,
-  SupportedDataStores.AWSXRay,
 ];

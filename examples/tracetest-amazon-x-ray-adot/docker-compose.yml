@@ -21,7 +21,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      xray-daemon:
+      adot-collector:
         condition: service_started
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
@@ -42,11 +42,17 @@ services:
     ports:
       - 5432:5432
 
-  xray-daemon:
-    image: amazon/aws-xray-daemon:latest
+  adot-collector:
+    image: amazon/aws-otel-collector:latest
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
     ports:
+      - 4317:4317
       - 2000:2000

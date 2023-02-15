@@ -252,6 +252,10 @@ func patchDataStoreValues(dataStore model.DataStore) model.DataStore {
 		dataStore.Values.SignalFx = &config.SignalFXDataStoreConfig{}
 	}
 
+	if dataStore.Values.AwsXRay == nil {
+		dataStore.Values.AwsXRay = &config.AWSXRayDataStoreConfig{}
+	}
+
 	return dataStore
 }
 

@@ -75,7 +75,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTe
 
 	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
 
-	if strings.Contains(strings.ToLower(err.Error()), "401") {
+	if err != nil && strings.Contains(strings.ToLower(err.Error()), "401") {
 		return connection.ConnectionTestResult{
 			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
 			AuthenticationTestResult: connection.ConnectionTestStepResult{

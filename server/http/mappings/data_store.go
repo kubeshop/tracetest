@@ -17,6 +17,7 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 		OpenSearch: openapi.ElasticSearch{},
 		ElasticApm: openapi.ElasticSearch{},
 		SignalFx:   openapi.SignalFx{},
+		Awsxray:    openapi.AwsXRay{},
 		CreatedAt:  in.CreatedAt,
 	}
 
@@ -33,6 +34,7 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 	deepcopy.DeepCopy(in.Values.OpenSearch, &dataStore.OpenSearch)
 	deepcopy.DeepCopy(in.Values.ElasticApm, &dataStore.ElasticApm)
 	deepcopy.DeepCopy(in.Values.SignalFx, &dataStore.SignalFx)
+	deepcopy.DeepCopy(in.Values.AwsXRay, &dataStore.Awsxray)
 
 	return dataStore
 }
@@ -68,6 +70,7 @@ func (m Model) DataStore(in openapi.DataStore) model.DataStore {
 	deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.OpenSearch)
 	deepcopy.DeepCopy(in.ElasticApm, &dataStore.Values.ElasticApm)
 	deepcopy.DeepCopy(in.SignalFx, &dataStore.Values.SignalFx)
+	deepcopy.DeepCopy(in.Awsxray, &dataStore.Values.AwsXRay)
 
 	return dataStore
 }

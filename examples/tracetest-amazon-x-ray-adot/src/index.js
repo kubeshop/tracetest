@@ -2,7 +2,7 @@ const AWSXRay = require("aws-xray-sdk");
 const XRayExpress = AWSXRay.express;
 const express = require("express");
 
-AWSXRay.setDaemonAddress("xray-daemon:2000");
+AWSXRay.setDaemonAddress("adot-collector:2000");
 
 // Capture all AWS clients we create
 const AWS = AWSXRay.captureAWS(require("aws-sdk"));

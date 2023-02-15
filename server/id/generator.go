@@ -1,6 +1,7 @@
 package id
 
 import (
+	"encoding/binary"
 	"math/rand"
 	"time"
 
@@ -41,9 +42,15 @@ func (g randGenerator) ID() ID {
 }
 
 func (g randGenerator) TraceID() trace.TraceID {
-	tid := trace.TraceID{}
-	g.rand.Read(tid[:])
-	return tid
+	var r [16]byte
+	epoch := time.Now().Unix()
+	binary.BigEndian.PutUint32(r[0:4], uint32(epoch))
+	_, err := rand.Read(r[4:])
+	if err != nil {
+		panic(err)
+	}
+
+	return trace.TraceID(r)
 }
 func (g randGenerator) SpanID() trace.SpanID {
 	sid := trace.SpanID{}

@@ -1084,6 +1084,7 @@ export interface external {
           openSearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
           elasticApm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
           signalFx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
+          awsxray?: external["dataStores.yaml"]["components"]["schemas"]["AwsXRay"];
           /** Format: date-time */
           createdAt?: string;
         };
@@ -1103,6 +1104,11 @@ export interface external {
         SignalFX: {
           realm?: string;
           token?: string;
+        };
+        AwsXRay: {
+          region?: string;
+          accessKeyId?: string;
+          secretAccessKey?: string;
         };
         HTTPClientSettings: {
           url?: string;

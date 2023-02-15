@@ -14,13 +14,9 @@ experimentalFeatures: []
 
 telemetry:
   dataStores:
-    awsxray:
-      type: awsxray
-      awsxray:
-        accessKeyId: ${AWS_ACCESS_KEY_ID}
-        secretAccessKey: ${AWS_SECRET_ACCESS_KEY}
-        region: ${AWS_REGION}
+    otlp:
+      type: otlp
 
 server:
   telemetry:
-    dataStore: awsxray
+    dataStore: otlp

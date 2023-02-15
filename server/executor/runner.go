@@ -3,6 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
+
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"

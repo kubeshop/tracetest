@@ -9,7 +9,6 @@ type DataStore = Model<
     newRelic?: {};
     lightstep?: {};
     datadog?: {};
-    awsxray?: {};
   }
 >;
 
@@ -23,6 +22,7 @@ const DataStore = ({
   signalFx = {},
   jaeger = {},
   tempo = {},
+  awsxray = {},
   createdAt = '',
 }: TRawDataStore): DataStore => ({
   id,
@@ -34,6 +34,7 @@ const DataStore = ({
   elasticApm,
   jaeger,
   tempo,
+  awsxray,
   createdAt,
 });
 
