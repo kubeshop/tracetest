@@ -8,9 +8,21 @@ Examples of configuring Tracetest with Datadog can be found in the [`examples` f
 
 ## Configuring OpenTelemetry Collector to Send Traces to both Datadog and Tracetest
 
-In your OpenTelemetry Collector config file, make sure to set the `exporter` to `otlp/tt`, with the `endpoint` pointing to your Tracetest instance on port `21321`. If you are running Tracetest with Docker, the endpoint might look like this `http://tracetest:21321`.
+In your OpenTelemetry Collector config file:
 
-Additionally, set another `exporter` to `datadog`, with the `endpoint` pointing to your Datadog account. Set the site to the Datadog API `datadoghq.com` and add your API key.
+- Set the `exporter` to `otlp/tt`
+- Set the `endpoint` to your Tracetest instance on port `21321`
+
+:::tip
+If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
+:::
+
+Additionally, add another config:
+
+- Set the `exporter` to `datadog`
+- Set the `api` pointing to your Datadog account
+- Set the `site` to Datadog API `datadoghq.com`
+- Set the `key` to your Datadog API key
 
 ```yaml
 # collector.config.yaml
@@ -53,17 +65,17 @@ service:
       exporters: [datadog] # exporter sending traces to directly to Datadog
 ```
 
-### Configure Tracetest to Use Lightstep as a Trace Data Store
+## Configure Tracetest to Use Lightstep as a Trace Data Store
 
-You also have to configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector.
+Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
 
-### Web UI
+## Connect Tracetest to Datadog with the Web UI
 
 In the Web UI, open settings, and select Datadog.
 
 ![](../img/configure-datadog.png)
 
-### CLI
+## Connect Tracetest to Datadog with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
 
@@ -80,3 +92,9 @@ Proceed to run this command in the terminal, and specify the file above.
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml
 ```
+
+<!--
+:::tip
+To learn more, [read the recipe on running a sample app with Datadog and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-datadog.md).
+::: 
+-->
