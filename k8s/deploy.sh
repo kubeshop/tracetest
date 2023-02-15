@@ -43,12 +43,14 @@ helm upgrade --install $NAME kubeshop/tracetest \
   --set server.httpPort=11633 \
   ${extraParams[@]}
 
-kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yaml --dry-run=client \
+PROVISION_FILE=$(cd $(dirname "${BASH_SOURCE:-$0}") && pwd)/provisioning.yaml
+kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE --from-file=$PROVISION_FILE -o yaml --dry-run=client \
   | envsubst \
   | sed 's#'$(basename $CONFIG_FILE)'#config.yaml#' \
   | kubectl --namespace $NAME replace -f -
 
 kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
+
 
 ## TMP FIX FOR NEW CONFIG
 kubectl patch deployment \
@@ -57,7 +59,9 @@ kubectl patch deployment \
   --type='json' \
   -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": [
   "--config",
-  "/app/config/config.yaml"
+  "/app/config/config.yaml",
+  "--provisioning-file",
+  "/app/config/provisioning.yaml"
 ]}]'
 
 TIME_OUT=30m

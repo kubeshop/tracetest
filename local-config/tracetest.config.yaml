@@ -1,0 +1,22 @@
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
+
+poolingConfig:
+  maxWaitTimeForTrace: 30s
+  retryDelay: 500ms
+
+googleAnalytics:
+  enabled: false
+
+demo:
+  enabled: [pokeshop]
+  endpoints:
+    pokeshopHttp: http://demo-api:8081
+    pokeshopGrpc: demo-rpc:8082
+
+experimentalFeatures: []
