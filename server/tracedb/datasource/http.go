@@ -73,7 +73,7 @@ func (client *HttpClient) TestConnection(ctx context.Context) connection.Connect
 		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.URL.String()),
 	}
 
-	reachable, err := connection.IsReachable(client.config.URL.String())
+	reachable, err := connection.IsReachable(client.config.URL.String(), connection.ProtocolHTTP)
 	if !reachable {
 		return connection.ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.URL.String()),

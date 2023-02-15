@@ -55,7 +55,7 @@ func (client *GrpcClient) TestConnection(ctx context.Context) connection.Connect
 		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.Endpoint),
 	}
 
-	reachable, err := connection.IsReachable(client.config.Endpoint)
+	reachable, err := connection.IsReachable(client.config.Endpoint, connection.ProtocolGRPC)
 	if !reachable {
 		return connection.ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.Endpoint),

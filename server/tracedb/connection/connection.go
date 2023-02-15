@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+type Protocol string
+
+var (
+	ProtocolHTTP Protocol = "http"
+	ProtocolGRPC Protocol = "grpc"
+)
+
 type ConnectionTestResult struct {
 	ConnectivityTestResult   ConnectionTestStepResult
 	AuthenticationTestResult ConnectionTestStepResult
@@ -38,8 +45,8 @@ func (r ConnectionTestStepResult) IsSet() bool {
 	return r.OperationDescription != ""
 }
 
-func IsReachable(endpoint string) (bool, error) {
-	if strings.HasPrefix(endpoint, "http://") || strings.HasPrefix(endpoint, "https://") {
+func IsReachable(endpoint string, protocol Protocol) (bool, error) {
+	if protocol == ProtocolHTTP {
 		address, err := url.Parse(endpoint)
 		if err != nil {
 			return false, err

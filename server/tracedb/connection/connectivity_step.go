@@ -8,6 +8,7 @@ import (
 
 type connectivityTestStep struct {
 	endpoints []string
+	protocol  Protocol
 }
 
 var _ TestStep = &connectivityTestStep{}
@@ -16,7 +17,7 @@ func (s *connectivityTestStep) TestConnection(ctx context.Context) ConnectionTes
 	unreachableEndpoints := make([]string, 0)
 	var connectionErr error
 	for _, endpoint := range s.endpoints {
-		reachable, err := IsReachable(endpoint)
+		reachable, err := IsReachable(endpoint, s.protocol)
 		if !reachable {
 			unreachableEndpoints = append(unreachableEndpoints, fmt.Sprintf(`"%s"`, endpoint))
 			connectionErr = err
@@ -37,7 +38,7 @@ func (s *connectivityTestStep) TestConnection(ctx context.Context) ConnectionTes
 	}
 }
 
-func ConnectivityStep(endpoints ...string) TestStep {
+func ConnectivityStep(protocol Protocol, endpoints ...string) TestStep {
 	return &connectivityTestStep{
 		endpoints: endpoints,
 	}
