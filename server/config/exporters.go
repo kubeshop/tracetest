@@ -1,6 +1,8 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type (
 	serverConfig struct {
@@ -14,8 +16,7 @@ type (
 	}
 
 	telemetry struct {
-		DataStores map[string]TracingBackendDataStoreConfig `yaml:",omitempty" mapstructure:"dataStores"`
-		Exporters  map[string]TelemetryExporterOption       `yaml:",omitempty" mapstructure:"exporters"`
+		Exporters map[string]TelemetryExporterOption `yaml:",omitempty" mapstructure:"exporters"`
 	}
 
 	TelemetryExporterOption struct {
@@ -27,6 +28,10 @@ type (
 	ExporterConfig struct {
 		Type                   string              `yaml:",omitempty" mapstructure:"type"`
 		CollectorConfiguration OTELCollectorConfig `yaml:"collector,omitempty" mapstructure:"collector"`
+	}
+
+	OTELCollectorConfig struct {
+		Endpoint string `yaml:",omitempty" mapstructure:"endpoint"`
 	}
 )
 
@@ -52,7 +57,7 @@ func (c *Config) getExporter(name string) (*TelemetryExporterOption, error) {
 
 	exporterConfig, found := c.config.Telemetry.Exporters[name]
 	if !found {
-		availableOptions := mapKeys(c.config.Telemetry.DataStores)
+		availableOptions := mapKeys(c.config.Telemetry.Exporters)
 		return nil, fmt.Errorf(`invalid exporter option: "%s". Available options: %v`, name, availableOptions)
 	}
 

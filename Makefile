@@ -24,7 +24,7 @@ web/node_modules: web/package.json web/package-lock.json
 	cd web; npm ci
 
 WEB_SRC_FILES := $(shell find web -type f -not -path "*node_modules*" -not -path "*build*" -not -path "*cypress/videos*" -not -path "*cypress/screenshots*")
-web/build: generate-web web/node_modules $(WEB_SRC_FILES)
+web/build: web/node_modules $(WEB_SRC_FILES)
 	cd web; npm run build
 
 help: Makefile ## show list of commands

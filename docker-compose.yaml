@@ -7,10 +7,14 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - type: bind
-        source: ./local-config/config.tests.yaml
+        source: ./local-config/tracetest.config.yaml
         target: /app/tracetest.yaml
+      - type: bind
+        source: ./local-config/tracetest.provision.yaml
+        target: /app/provisioning.yaml
     ports:
       - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
