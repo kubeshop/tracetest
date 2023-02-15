@@ -24,19 +24,18 @@ func NewTester(opts ...TesterOption) Tester {
 	return tester
 }
 
-func (t *Tester) TestConnection(ctx context.Context) res ConnectionTestResult {
+func (t *Tester) TestConnection(ctx context.Context) (res ConnectionTestResult) {
 	res.ConnectivityTestResult = t.connectivityTestStep.TestConnection(ctx)
 	if res.ConnectivityTestResult.Error != nil {
-		return 
+		return
 	}
 
 	res.AuthenticationTestResult = t.authenticationTestStep.TestConnection(ctx)
 	if res.ConnectivityTestResult.Error != nil {
-		return 
+		return
 	}
 
 	res.TraceRetrievalTestResult = t.pollingTestStep.TestConnection(ctx)
 
 	return
-}
 }
