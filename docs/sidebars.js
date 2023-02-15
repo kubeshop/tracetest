@@ -376,6 +376,11 @@ const sidebars = {
           id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
           label: "Node.js and Elastic APM",
         },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+          label: "OpenTelemetry Demo and Datadog",
+        },
       ],
     },
     {
