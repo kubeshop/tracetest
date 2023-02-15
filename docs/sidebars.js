@@ -381,6 +381,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
               label: "Running Tracetest With Elastic APM",
             },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+              label: "Running Tracetest With Datadog",
+            },
           ],
         },
       ],
