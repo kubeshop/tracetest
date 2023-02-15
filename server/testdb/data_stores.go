@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 var _ model.DataStoreRepository = &postgresDB{}
@@ -235,11 +236,11 @@ func patchDataStoreValues(dataStore model.DataStore) model.DataStore {
 	}
 
 	if dataStore.Values.Jaeger == nil {
-		dataStore.Values.Jaeger = &model.GRPCClientSettings{}
+		dataStore.Values.Jaeger = &configgrpc.GRPCClientSettings{}
 	}
 
 	if dataStore.Values.Tempo == nil {
-		dataStore.Values.Jaeger = &model.GRPCClientSettings{}
+		dataStore.Values.Jaeger = &configgrpc.GRPCClientSettings{}
 	}
 
 	if dataStore.Values.OpenSearch == nil {

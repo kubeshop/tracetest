@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/openapi"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
 	"golang.org/x/exp/slices"
@@ -14,36 +13,23 @@ type (
 	DataStore struct {
 		ID        string
 		Name      string
-		Type      openapi.SupportedDataStores
+		Type      DataStoreType
 		IsDefault bool
 		Values    DataStoreValues
 		CreatedAt time.Time
 	}
 
-	GRPCClientSettings struct {
-		configgrpc.GRPCClientSettings
-	}
-
 	DataStoreValues struct {
-		Jaeger     *GRPCClientSettings
+		Jaeger     *configgrpc.GRPCClientSettings
 		Tempo      *BaseClientConfig
 		OpenSearch *ElasticSearchDataStoreConfig
 		ElasticApm *ElasticSearchDataStoreConfig
 		SignalFx   *SignalFXDataStoreConfig
 	}
 
-	TracingBackendDataStoreConfig struct {
-		Type       string
-		Jaeger     GRPCClientSettings
-		Tempo      BaseClientConfig
-		OpenSearch ElasticSearchDataStoreConfig
-		SignalFX   SignalFXDataStoreConfig
-		ElasticApm ElasticSearchDataStoreConfig
-	}
-
 	BaseClientConfig struct {
 		Type string
-		Grpc GRPCClientSettings
+		Grpc configgrpc.GRPCClientSettings
 		Http HttpClientConfig
 	}
 
@@ -76,13 +62,30 @@ func (ds DataStore) IsZero() bool {
 	return ds.Type == ""
 }
 
-var validTypes = []openapi.SupportedDataStores{
-	openapi.JAEGER,
-	openapi.OPEN_SEARCH,
-	openapi.TEMPO,
-	openapi.SIGNAL_FX,
-	openapi.OTLP,
-	openapi.ELASTIC_APM,
+type DataStoreType string
+
+const (
+	DataStoreTypeJaeger     DataStoreType = "jaeger"
+	DataStoreTypeTempo      DataStoreType = "tempo"
+	DataStoreTypeOpenSearch DataStoreType = "opensearch"
+	DataStoreTypeSignalFX   DataStoreType = "signalfx"
+	DataStoreTypeOTLP       DataStoreType = "otlp"
+	DataStoreTypeNewRelic   DataStoreType = "newrelic"
+	DataStoreTypeLighStep   DataStoreType = "lighstep"
+	DataStoreTypeElasticAPM DataStoreType = "elasticapm"
+	DataStoreTypeDataDog    DataStoreType = "datadog"
+)
+
+var validTypes = []DataStoreType{
+	DataStoreTypeJaeger,
+	DataStoreTypeTempo,
+	DataStoreTypeOpenSearch,
+	DataStoreTypeSignalFX,
+	DataStoreTypeOTLP,
+	DataStoreTypeNewRelic,
+	DataStoreTypeLighStep,
+	DataStoreTypeElasticAPM,
+	DataStoreTypeDataDog,
 }
 
 func (ds DataStore) Validate() error {
@@ -91,53 +94,4 @@ func (ds DataStore) Validate() error {
 	}
 
 	return nil
-}
-
-const (
-	jaeger     string = "jaeger"
-	tempo      string = "tempo"
-	opensearch string = "opensearch"
-	signalfx   string = "signalfx"
-	otlp       string = "otlp"
-	newrelic   string = "newrelic"
-	lighstep   string = "lighstep"
-	elasticapm string = "elasticapm"
-	datadog    string = "datadog"
-)
-
-func DataStoreFromConfig(dsc TracingBackendDataStoreConfig) DataStore {
-	var cType openapi.SupportedDataStores
-	ds := DataStore{
-		Name:   dsc.Type,
-		Type:   cType,
-		Values: DataStoreValues{},
-	}
-
-	switch dsc.Type {
-	case jaeger:
-		ds.Type = openapi.JAEGER
-	case tempo:
-		ds.Type = openapi.TEMPO
-	case elasticapm:
-		ds.Type = openapi.ELASTIC_APM
-	case opensearch:
-		ds.Type = openapi.OPEN_SEARCH
-	case signalfx:
-		ds.Type = openapi.SIGNAL_FX
-	case newrelic:
-		ds.Type = openapi.NEW_RELIC
-	case lighstep:
-		ds.Type = openapi.LIGHTSTEP
-	case datadog:
-		ds.Type = openapi.DATADOG
-	case otlp:
-		ds.Type = openapi.OTLP
-	}
-	ds.Values.Jaeger = &dsc.Jaeger
-	ds.Values.Tempo = &dsc.Tempo
-	ds.Values.OpenSearch = &dsc.OpenSearch
-	ds.Values.SignalFx = &dsc.SignalFX
-	ds.Values.ElasticApm = &dsc.ElasticApm
-
-	return ds
 }

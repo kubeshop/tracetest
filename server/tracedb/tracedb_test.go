@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 func TestCreateClient(t *testing.T) {
@@ -23,7 +24,7 @@ func TestCreateClient(t *testing.T) {
 			ds: model.DataStore{
 				Type: openapi.JAEGER,
 				Values: model.DataStoreValues{
-					Jaeger: &model.GRPCClientSettings{},
+					Jaeger: &configgrpc.GRPCClientSettings{},
 				},
 			},
 			expectedType: "*tracedb.jaegerTraceDB",

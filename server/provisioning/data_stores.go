@@ -3,6 +3,8 @@ package provisioning
 import (
 	"fmt"
 
+	"github.com/fluidtruck/deepcopy"
+	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
 )
@@ -10,32 +12,28 @@ import (
 var ErrInvalidTraceDBProvider = fmt.Errorf("invalid traceDB provider")
 
 type (
-	TracingBackendDataStoreConfig struct {
-		Type       string                        `yaml:",omitempty" mapstructure:"type"`
-		Jaeger     configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"jaeger"`
-		Tempo      BaseClientConfig              `yaml:",omitempty" mapstructure:"tempo"`
-		OpenSearch ElasticSearchDataStoreConfig  `yaml:",omitempty" mapstructure:"opensearch"`
-		SignalFX   SignalFXDataStoreConfig       `yaml:",omitempty" mapstructure:"signalfx"`
-		ElasticApm ElasticSearchDataStoreConfig  `yaml:",omitempty" mapstructure:"elasticapm"`
+	dataStore struct {
+		Type       string                         `mapstructure:"type"`
+		Jaeger     *configgrpc.GRPCClientSettings `mapstructure:"jaeger"`
+		Tempo      *baseClientConfig              `mapstructure:"tempo"`
+		OpenSearch *elasticSearch                 `mapstructure:"opensearch"`
+		SignalFX   *signalFX                      `mapstructure:"signalfx"`
+		ElasticApm *elasticSearch                 `mapstructure:"elasticapm"`
 	}
 
-	BaseClientConfig struct {
-		Type string                        `yaml:",omitempty" mapstructure:"type"`
-		Grpc configgrpc.GRPCClientSettings `yaml:",omitempty" mapstructure:"grpc"`
-		Http HttpClientConfig              `yaml:",omitempty" mapstructure:"http"`
+	baseClientConfig struct {
+		Type string                        `mapstructure:"type"`
+		Grpc configgrpc.GRPCClientSettings `mapstructure:"grpc"`
+		Http httpClientConfig              `mapstructure:"http"`
 	}
 
-	HttpClientConfig struct {
-		Url        string                     `yaml:",omitempty" mapstructure:"url"`
-		Headers    map[string]string          `yaml:",omitempty" mapstructure:"headers"`
-		TLSSetting configtls.TLSClientSetting `yaml:",omitempty" mapstructure:"tls"`
+	httpClientConfig struct {
+		Url        string                     `mapstructure:"url"`
+		Headers    map[string]string          `mapstructure:"headers"`
+		TLSSetting configtls.TLSClientSetting `mapstructure:"tls"`
 	}
 
-	OTELCollectorConfig struct {
-		Endpoint string `yaml:",omitempty" mapstructure:"endpoint"`
-	}
-
-	ElasticSearchDataStoreConfig struct {
+	elasticSearch struct {
 		Addresses          []string
 		Username           string
 		Password           string
@@ -44,26 +42,33 @@ type (
 		InsecureSkipVerify bool
 	}
 
-	SignalFXDataStoreConfig struct {
+	signalFX struct {
 		Realm string
 		Token string
 	}
 )
 
-// func (c *Config) DataStore() (*TracingBackendDataStoreConfig, error) {
-// 	c.mu.Lock()
-// 	defer c.mu.Unlock()
+func (ds dataStore) model() model.DataStore {
+	m := model.DataStore{
+		Name: ds.Type,
+		Type: model.DataStoreType(ds.Type),
+	}
 
-// 	selectedStore := c.config.Server.Telemetry.DataStore
-// 	dataStoreConfig, found := c.config.Telemetry.DataStores[selectedStore]
+	if ds.Jaeger != nil {
+		deepcopy.DeepCopy(ds.Jaeger, &m.Values.Jaeger)
+	}
+	if ds.Tempo != nil {
+		deepcopy.DeepCopy(ds.Tempo, &m.Values.Tempo)
+	}
+	if ds.OpenSearch != nil {
+		deepcopy.DeepCopy(ds.OpenSearch, &m.Values.OpenSearch)
+	}
+	if ds.ElasticApm != nil {
+		deepcopy.DeepCopy(ds.ElasticApm, &m.Values.ElasticApm)
+	}
+	if ds.SignalFX != nil {
+		deepcopy.DeepCopy(ds.SignalFX, &m.Values.SignalFx)
+	}
 
-// 	if selectedStore != "" && !found {
-// 		return nil, ErrInvalidTraceDBProvider
-// 	}
-
-// 	if !found {
-// 		return nil, nil
-// 	}
-
-// 	return &dataStoreConfig, nil
-// }
+	return m
+}

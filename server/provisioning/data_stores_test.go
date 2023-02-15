@@ -1,140 +1,120 @@
-package provisioning
+package provisioning_test
 
-// func TestDataStoreExceptions(t *testing.T) {
-// 	t.Run("Inexistent", func(t *testing.T) {
-// 		t.Parallel()
+import (
+	"testing"
 
-// 		cfg := configFromFile(t, "./testdata/inexistent_datastore.yaml")
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/provisioning"
+	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configtls"
+)
 
-// 		dataStore, err := cfg.DataStore()
-// 		assert.Error(t, err)
-// 		assert.Nil(t, dataStore)
-// 	})
+func TestDataStore(t *testing.T) {
+	cases := []struct {
+		name   string
+		dsType model.DataStoreType
+		file   string
+		values model.DataStoreValues
+	}{
+		{
+			name:   "JaegerGRPC",
+			file:   "./testdata/jaeger_grpc.yaml",
+			dsType: model.DataStoreTypeJaeger,
+			values: model.DataStoreValues{
+				Jaeger: &configgrpc.GRPCClientSettings{
+					Endpoint:   "jaeger-query:16685",
+					TLSSetting: configtls.TLSClientSetting{Insecure: true},
+				},
+			},
+		},
+		{
+			name:   "TempoGRPC",
+			file:   "./testdata/tempo_grpc.yaml",
+			dsType: model.DataStoreTypeTempo,
+			values: model.DataStoreValues{
+				Tempo: &model.BaseClientConfig{
+					Grpc: configgrpc.GRPCClientSettings{
+						Endpoint:   "tempo:9095",
+						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+					},
+				},
+			},
+		},
+		{
+			name:   "TempoHTTP",
+			file:   "./testdata/tempo_http.yaml",
+			dsType: model.DataStoreTypeTempo,
+			values: model.DataStoreValues{
+				Tempo: &model.BaseClientConfig{
+					Http: model.HttpClientConfig{
+						Url:        "tempo:80",
+						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+					},
+				},
+			},
+		},
+		{
+			name:   "OpenSearch",
+			file:   "./testdata/opensearch.yaml",
+			dsType: model.DataStoreTypeOpenSearch,
+			values: model.DataStoreValues{
+				OpenSearch: &model.ElasticSearchDataStoreConfig{
+					Addresses: []string{"http://opensearch:9200"},
+					Index:     "traces",
+				},
+			},
+		},
+		{
+			name:   "SignalFX",
+			file:   "./testdata/signalfx.yaml",
+			dsType: model.DataStoreTypeSignalFX,
+			values: model.DataStoreValues{
+				SignalFx: &model.SignalFXDataStoreConfig{
+					Token: "thetoken",
+					Realm: "us1",
+				},
+			},
+		},
+		{
+			name:   "ElasitcAPM",
+			file:   "./testdata/elastic_apm.yaml",
+			dsType: model.DataStoreTypeElasticAPM,
+			values: model.DataStoreValues{
+				ElasticApm: &model.ElasticSearchDataStoreConfig{
+					Addresses:          []string{"https://es01:9200"},
+					Username:           "elastic",
+					Password:           "changeme",
+					Index:              "traces-apm-default",
+					InsecureSkipVerify: true,
+				},
+			},
+		},
+	}
 
-// 	t.Run("Empty", func(t *testing.T) {
-// 		t.Parallel()
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			c := c
+			t.Parallel()
 
-// 		cfg := configFromFile(t, "./testdata/empty_datastore.yaml")
+			expectedDataStore := model.DataStore{
+				IsDefault: true,
+				Name:      string(c.dsType),
+				Type:      c.dsType,
+				Values:    c.values,
+			}
 
-// 		dataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Nil(t, dataStore)
-// 	})
-// }
+			mockRepo := &testdb.MockRepository{}
+			provisioner := provisioning.New(mockRepo)
 
-// func TestDataStore(t *testing.T) {
-// 	t.Run("JaegerGRPC", func(t *testing.T) {
-// 		t.Parallel()
+			mockRepo.
+				On("CreateDataStore", expectedDataStore).
+				Return(expectedDataStore, nil)
 
-// 		expectedDataStore := &config.TracingBackendDataStoreConfig{
-// 			Type: "jaeger",
-// 			Jaeger: configgrpc.GRPCClientSettings{
-// 				Endpoint:   "jaeger-query:16685",
-// 				TLSSetting: configtls.TLSClientSetting{Insecure: true},
-// 			},
-// 		}
-
-// 		cfg := configFromFile(t, "./testdata/jaeger_grpc.yaml")
-
-// 		selectedDataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, expectedDataStore, selectedDataStore)
-// 	})
-
-// 	t.Run("TempoGRPC", func(t *testing.T) {
-// 		t.Parallel()
-
-// 		expectedDataStore := &config.TracingBackendDataStoreConfig{
-// 			Type: "tempo",
-// 			Tempo: config.BaseClientConfig{
-// 				Grpc: configgrpc.GRPCClientSettings{
-// 					Endpoint:   "tempo:9095",
-// 					TLSSetting: configtls.TLSClientSetting{Insecure: true},
-// 				},
-// 			},
-// 		}
-
-// 		cfg := configFromFile(t, "./testdata/tempo_grpc.yaml")
-
-// 		selectedDataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, expectedDataStore, selectedDataStore)
-// 	})
-
-// 	t.Run("TempoHTTP", func(t *testing.T) {
-// 		t.Parallel()
-
-// 		expectedDataStore := &config.TracingBackendDataStoreConfig{
-// 			Type: "tempo",
-// 			Tempo: config.BaseClientConfig{
-// 				Http: config.HttpClientConfig{
-// 					Url:        "tempo:80",
-// 					TLSSetting: configtls.TLSClientSetting{Insecure: true},
-// 				},
-// 			},
-// 		}
-
-// 		cfg := configFromFile(t, "./testdata/tempo_http.yaml")
-
-// 		selectedDataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, expectedDataStore, selectedDataStore)
-// 	})
-
-// 	t.Run("OpenSearch", func(t *testing.T) {
-// 		t.Parallel()
-
-// 		expectedDataStore := &config.TracingBackendDataStoreConfig{
-// 			Type: "opensearch",
-// 			OpenSearch: config.ElasticSearchDataStoreConfig{
-// 				Addresses: []string{"http://opensearch:9200"},
-// 				Index:     "traces",
-// 			},
-// 		}
-
-// 		cfg := configFromFile(t, "./testdata/opensearch.yaml")
-
-// 		selectedDataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, expectedDataStore, selectedDataStore)
-// 	})
-
-// 	t.Run("SignalFX", func(t *testing.T) {
-// 		t.Parallel()
-
-// 		expectedDataStore := &config.TracingBackendDataStoreConfig{
-// 			Type: "signalfx",
-// 			SignalFX: config.SignalFXDataStoreConfig{
-// 				Token: "thetoken",
-// 				Realm: "us1",
-// 			},
-// 		}
-
-// 		cfg := configFromFile(t, "./testdata/signalfx.yaml")
-
-// 		selectedDataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, expectedDataStore, selectedDataStore)
-// 	})
-
-// 	t.Run("ElasitcAPM", func(t *testing.T) {
-// 		t.Parallel()
-
-// 		expectedDataStore := &config.TracingBackendDataStoreConfig{
-// 			Type: "elasticapm",
-// 			ElasticApm: config.ElasticSearchDataStoreConfig{
-// 				Addresses:          []string{"https://es01:9200"},
-// 				Username:           "elastic",
-// 				Password:           "changeme",
-// 				Index:              "traces-apm-default",
-// 				InsecureSkipVerify: true,
-// 			},
-// 		}
-
-// 		cfg := configFromFile(t, "./testdata/elastic_apm.yaml")
-
-// 		selectedDataStore, err := cfg.DataStore()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, expectedDataStore, selectedDataStore)
-// 	})
-// }
+			err := provisioner.FromFile(c.file)
+			assert.NoError(t, err)
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}

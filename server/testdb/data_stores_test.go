@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 func TestCreateDataStore(t *testing.T) {
@@ -19,7 +20,7 @@ func TestCreateDataStore(t *testing.T) {
 		Type:      "jaeger",
 		IsDefault: true,
 		Values: model.DataStoreValues{
-			Jaeger:     &model.GRPCClientSettings{},
+			Jaeger:     &configgrpc.GRPCClientSettings{},
 			Tempo:      &model.BaseClientConfig{},
 			SignalFx:   &model.SignalFXDataStoreConfig{},
 			OpenSearch: &model.ElasticSearchDataStoreConfig{},
