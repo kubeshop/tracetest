@@ -68,35 +68,29 @@ func (client *HttpClient) Connect(ctx context.Context) error {
 	return err
 }
 
-func (client *HttpClient) TestConnection(ctx context.Context) (connection.ConnectionTestResult, error) {
-	connectionTestResult := connection.ConnectionTestResult{
-		ConnectivityTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.URL.String()),
-		},
+func (client *HttpClient) TestConnection(ctx context.Context) connection.ConnectionTestStepResult {
+	connectionTestResult := connection.ConnectionTestStepResult{
+		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.URL.String()),
 	}
 
-	reachable, err := connection.IsReachable(client.config.URL.String())
-	if !reachable {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.URL.String()),
-				Error:                err,
-			},
-		}, err
+	err := connection.CheckReachability(client.config.URL.String(), connection.ProtocolHTTP)
+	if err != nil {
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.URL.String()),
+			Error:                err,
+		}
 	}
 
 	err = client.Connect(ctx)
 	wrappedErr := errors.Unwrap(err)
 	if errors.Is(wrappedErr, connection.ErrConnectionFailed) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to open a connection against "%s" and failed`, client.config.URL.String()),
-				Error:                err,
-			},
-		}, err
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to open a connection against "%s" and failed`, client.config.URL.String()),
+			Error:                err,
+		}
 	}
 
-	return connectionTestResult, nil
+	return connectionTestResult
 }
 
 func (client *HttpClient) Request(ctx context.Context, path, method, body string) (*http.Response, error) {

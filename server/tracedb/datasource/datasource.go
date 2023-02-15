@@ -28,7 +28,7 @@ type DataSource interface {
 	Connect(ctx context.Context) error
 	Ready() bool
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
-	TestConnection(ctx context.Context) (connection.ConnectionTestResult, error)
+	TestConnection(ctx context.Context) connection.ConnectionTestStepResult
 	Close() error
 }
 
@@ -40,8 +40,8 @@ func (dataSource *noopDataSource) GetTraceByID(ctx context.Context, traceID stri
 func (db *noopDataSource) Connect(ctx context.Context) error { return nil }
 func (db *noopDataSource) Close() error                      { return nil }
 func (db *noopDataSource) Ready() bool                       { return true }
-func (db *noopDataSource) TestConnection(ctx context.Context) (connection.ConnectionTestResult, error) {
-	return connection.ConnectionTestResult{}, nil
+func (db *noopDataSource) TestConnection(ctx context.Context) connection.ConnectionTestStepResult {
+	return connection.ConnectionTestStepResult{}
 }
 
 func New(name string, config *config.BaseClientConfig, callbacks Callbacks) DataSource {

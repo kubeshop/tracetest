@@ -43,40 +43,20 @@ func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
 }
 
 func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	connectionTestResult, err := ttd.dataSource.TestConnection(ctx)
-	if err != nil {
-		return connectionTestResult
-	}
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(ttd.dataSource),
+		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			if strings.Contains(err.Error(), "authentication handshake failed") {
+				return "Tracetest tried to execute a request but it failed due to authentication issues", err
+			}
 
-	_, err = ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
-	if strings.Contains(err.Error(), "authentication handshake failed") {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: "Tracetest tried to execute a request but it failed due to authentication issues",
-				Error:                err,
-			},
-		}
-	}
+			return "Tracetest managed to authenticate with Tempo", nil
+		})),
+	)
 
-	if !errors.Is(err, connection.ErrTraceNotFound) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: "Tracetest tried to fetch a trace from Tempo",
-				Error:                err,
-			},
-		}
-	}
-
-	connectionTestResult.AuthenticationTestResult = connection.ConnectionTestStepResult{
-		OperationDescription: `Tracetest managed to authenticate with Tempo`,
-	}
-	connectionTestResult.TraceRetrievalTestResult = connection.ConnectionTestStepResult{
-		OperationDescription: `Tracetest was able to search for a trace using Tempo API`,
-	}
-	return connectionTestResult
+	return tester.TestConnection(ctx)
 }
 
 func (ttd *tempoTraceDB) Ready() bool {
