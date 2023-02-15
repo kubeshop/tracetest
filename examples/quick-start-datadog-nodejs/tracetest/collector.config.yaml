@@ -17,6 +17,8 @@ exporters:
     tls:
       insecure: true
   # Datadog exporter
+  # One example on how to set up a collector configuration for Datadog can be seen here:
+  # https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=onahost
   datadog:
     api:
       site: datadoghq.com
