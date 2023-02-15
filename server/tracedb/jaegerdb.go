@@ -13,7 +13,6 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
-	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
@@ -45,40 +44,20 @@ func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
 }
 
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	connectionTestResult, err := jtd.dataSource.TestConnection(ctx)
-	if err != nil {
-		return connectionTestResult
-	}
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(jtd.dataSource),
+		connection.WithPollingTest(connection.TracePollingTestStep(jtd)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := jtd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			if strings.Contains(err.Error(), "authentication handshake failed") {
+				return "Tracetest tried to execute a gRPC request but it failed due to authentication issues", err
+			}
 
-	_, err = jtd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
-	if strings.Contains(err.Error(), "authentication handshake failed") {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: "Tracetest tried to execute a gRPC request but it failed due to authentication issues",
-				Error:                err,
-			},
-		}
-	}
+			return "Tracetest managed to authenticate with Jaeger", nil
+		})),
+	)
 
-	if !errors.Is(err, connection.ErrTraceNotFound) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: "Tracetest tried to fetch a trace from Jaeger",
-				Error:                err,
-			},
-		}
-	}
-
-	connectionTestResult.AuthenticationTestResult = connection.ConnectionTestStepResult{
-		OperationDescription: `Tracetest managed to authenticate with Jaeger`,
-	}
-	connectionTestResult.TraceRetrievalTestResult = connection.ConnectionTestStepResult{
-		OperationDescription: `Tracetest was able to search for a trace using Jaeger API`,
-	}
-	return connectionTestResult
+	return tester.TestConnection(ctx)
 }
 
 func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {

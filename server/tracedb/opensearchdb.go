@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -35,55 +34,20 @@ func (db opensearchDB) Close() error {
 }
 
 func (db opensearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	addressesString := strings.Join(db.config.Addresses, ",")
-	connectionTestResult := connection.ConnectionTestResult{
-		ConnectivityTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, addressesString),
-		},
-		AuthenticationTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with OpenSearch`,
-		},
-		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using the OpenSearch API`,
-		},
-	}
-
-	for _, address := range db.config.Addresses {
-		reachable, err := connection.IsReachable(address)
-
-		if !reachable {
-			return connection.ConnectionTestResult{
-				ConnectivityTestResult: connection.ConnectionTestStepResult{
-					OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, address),
-					Error:                err,
-				},
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
+		connection.WithPollingTest(connection.TracePollingTestStep(db)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
+			if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
+				return "Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues", err
 			}
-		}
-	}
 
-	_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
-	if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues`,
-				Error:                err,
-			},
-		}
-	}
+			return "Tracetest managed to authenticate with OpenSearch", nil
+		})),
+	)
 
-	if !errors.Is(err, connection.ErrTraceNotFound) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the OpenSearch endpoint "%s" and got an error`, addressesString),
-				Error:                err,
-			},
-		}
-	}
-
-	return connectionTestResult
+	return tester.TestConnection(ctx)
 }
 
 func (db opensearchDB) Ready() bool {

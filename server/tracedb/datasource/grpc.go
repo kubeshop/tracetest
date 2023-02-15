@@ -50,35 +50,29 @@ func (client *GrpcClient) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (client *GrpcClient) TestConnection(ctx context.Context) (connection.ConnectionTestResult, error) {
-	connectionTestResult := connection.ConnectionTestResult{
-		ConnectivityTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.Endpoint),
-		},
+func (client *GrpcClient) TestConnection(ctx context.Context) connection.ConnectionTestStepResult {
+	connectionTestResult := connection.ConnectionTestStepResult{
+		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.Endpoint),
 	}
 
-	reachable, err := connection.IsReachable(client.config.Endpoint)
-	if !reachable {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.Endpoint),
-				Error:                err,
-			},
-		}, err
+	err := connection.CheckReachability(client.config.Endpoint, connection.ProtocolGRPC)
+	if err != nil {
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.Endpoint),
+			Error:                err,
+		}
 	}
 
 	err = client.Connect(ctx)
 	wrappedErr := errors.Unwrap(err)
 	if errors.Is(wrappedErr, connection.ErrConnectionFailed) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, client.config.Endpoint),
-				Error:                err,
-			},
-		}, err
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, client.config.Endpoint),
+			Error:                err,
+		}
 	}
 
-	return connectionTestResult, nil
+	return connectionTestResult
 }
 
 func (client *GrpcClient) Close() error {
