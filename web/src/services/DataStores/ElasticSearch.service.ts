@@ -1,4 +1,4 @@
-import {IElasticSearch, SupportedDataStores, TDataStoreService, TRawElasticSearch} from 'types/Config.types';
+import {IElasticSearch, SupportedDataStores, TDataStoreService, TRawElasticSearch} from 'types/DataStore.types';
 import Validator from 'utils/Validator';
 import DataStore from 'models/DataStore.model';
 

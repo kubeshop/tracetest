@@ -2,7 +2,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import ConnectionResult from 'models/ConnectionResult.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
-import {TConnectionResult, TRawConnectionResult, TTestConnectionRequest} from 'types/Config.types';
+import {TConnectionResult, TRawConnectionResult, TTestConnectionRequest} from 'types/DataStore.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawDataStore} from 'models/DataStore.model';
 

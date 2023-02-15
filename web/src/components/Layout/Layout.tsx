@@ -11,7 +11,7 @@ import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import EnvironmentProvider from 'providers/Environment';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
-import {ConfigMode} from 'types/Config.types';
+import {ConfigMode} from 'types/DataStore.types';
 import * as S from './Layout.styled';
 
 interface IProps {

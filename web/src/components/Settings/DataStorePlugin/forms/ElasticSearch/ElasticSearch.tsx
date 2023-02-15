@@ -1,5 +1,5 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
-import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import RequestDetailsFileInput from '../../../../CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
 import * as S from '../../DataStorePluginForm.styled';
 import AddressesList from './AddressesList';

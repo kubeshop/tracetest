@@ -1,7 +1,7 @@
 import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import SetupConfigService from 'services/DataStore.service';
-import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/Config.types';
+import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
 import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreConfig from 'models/DataStoreConfig.model';

@@ -2,7 +2,7 @@ import {Form} from 'antd';
 import {useDataStore} from 'providers/DataStore/DataStore.provider';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 import {useCallback} from 'react';
-import {TDraftDataStore, ConfigMode} from 'types/Config.types';
+import {TDraftDataStore, ConfigMode} from 'types/DataStore.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 

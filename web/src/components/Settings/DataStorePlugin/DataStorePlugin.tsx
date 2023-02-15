@@ -1,4 +1,4 @@
-import {IDataStorePluginMap, SupportedDataStores} from 'types/Config.types';
+import {IDataStorePluginMap, SupportedDataStores} from 'types/DataStore.types';
 import GrpcClient from './forms/GrpcClient';
 import ElasticSearch from './forms/ElasticSearch';
 import OpenTelemetryCollector from './forms/OpenTelemetryCollector';

@@ -1,4 +1,4 @@
-import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import DataStore, {TRawDataStore} from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import ElasticSearchService from './DataStores/ElasticSearch.service';

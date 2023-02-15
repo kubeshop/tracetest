@@ -1,7 +1,7 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
 
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import {TDraftDataStore} from 'types/Config.types';
+import {TDraftDataStore} from 'types/DataStore.types';
 import * as S from './GrcpClient.styled';
 import GrpcClientSecure from './GrpcClientSecure';
 

@@ -1,5 +1,5 @@
 import {Col, Form, Input, Row} from 'antd';
-import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStores} from 'types/DataStore.types';
 
 const SignalFx = () => {
   const baseName = ['dataStore', SupportedDataStores.SignalFX];

@@ -1,5 +1,5 @@
-import {ConfigMode, SupportedDataStores} from 'types/Config.types';
-import DataStore, { TRawDataStore } from './DataStore.model';
+import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
+import DataStore, {TRawDataStore} from './DataStore.model';
 
 type DataStoreConfig = {
   defaultDataStore: DataStore;
