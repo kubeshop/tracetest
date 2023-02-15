@@ -1,6 +1,6 @@
 telemetry:
   exporters:
-    otelCollector:
+    otelcollector:
       serviceName: tracetest
       sampling: 100
       exporter:
@@ -10,5 +10,5 @@ telemetry:
 
 server:
   telemetry:
-    exporter: otelCollector
-    applicationExporter: otelCollector
+    exporter: otelcollector
+    applicationExporter: otelcollector

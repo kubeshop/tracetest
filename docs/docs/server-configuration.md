@@ -5,7 +5,10 @@ Tracetest can be configured using a config.yaml file placed on the same director
 ## Configuration file example
 ```yaml
 # Connection string to the postgres instance
-postgresConnString: "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
+postgres:
+  host: localhost
+  user: postgres
+  password: postgres
 
 # Instance of jaeger that will be used to retrieve the trace of the service under test
 tracingBackend:

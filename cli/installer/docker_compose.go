@@ -64,8 +64,7 @@ func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 		ui.Exit(err.Error())
 	}
 
-	psql := "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
-	tracetestConfigFile := getTracetestConfigFileContents(psql, ui, config)
+	tracetestConfigFile := getTracetestConfigFileContents("postgres", "postgres", "postgres", ui, config)
 
 	dockerComposeFile := getDockerComposeFileContents(ui, config)
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
