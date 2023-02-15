@@ -2,8 +2,9 @@ package provisioning
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/mitchellh/mapstructure"
@@ -18,8 +19,21 @@ type provisioner struct {
 	db model.Repository
 }
 
+func (p provisioner) FromEnv() error {
+	envVar := os.Getenv("TRACETEST_PROVISIONING")
+	if envVar == "" {
+		return fmt.Errorf("cannot read provisioning from env variable TRACETEST_PROVISIONING: variable is empty")
+	}
+
+	data, err := base64.StdEncoding.DecodeString(envVar)
+	if err != nil {
+		return fmt.Errorf("cannot decode env variable TRACETEST_PROVISIONING: %w", err)
+	}
+	return p.do(data)
+}
+
 func (p provisioner) FromFile(path string) error {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("cannot read provisioning file '%s'", path)
 	}
