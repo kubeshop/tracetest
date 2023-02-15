@@ -24,7 +24,7 @@ type DataStore struct {
 
 	Jaeger GrpcClientSettings `json:"jaeger,omitempty"`
 
-	Tempo GrpcClientSettings `json:"tempo,omitempty"`
+	Tempo BaseClient `json:"tempo,omitempty"`
 
 	OpenSearch ElasticSearch `json:"openSearch,omitempty"`
 
@@ -50,7 +50,7 @@ func AssertDataStoreRequired(obj DataStore) error {
 	if err := AssertGrpcClientSettingsRequired(obj.Jaeger); err != nil {
 		return err
 	}
-	if err := AssertGrpcClientSettingsRequired(obj.Tempo); err != nil {
+	if err := AssertBaseClientRequired(obj.Tempo); err != nil {
 		return err
 	}
 	if err := AssertElasticSearchRequired(obj.OpenSearch); err != nil {

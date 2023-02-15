@@ -39,7 +39,6 @@ module.exports = {
     'react/jsx-max-props-per-line': [1, {maximum: 1, when: 'multiline'}],
     // Disabled old no-shadow rule as seems to be communicated by ESLint while working with TS.
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-shadow.md
-    'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
     'import/prefer-default-export': 'off', // cannot control what we import from standard libs
     'import/no-unresolved': 'off', // typescript

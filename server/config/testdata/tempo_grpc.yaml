@@ -1,0 +1,13 @@
+telemetry:
+  dataStores:
+    tempo:
+      type: tempo
+      tempo:
+        grpc:
+          endpoint: tempo:9095
+          tls:
+            insecure: true
+
+server:
+  telemetry:
+    dataStore: tempo

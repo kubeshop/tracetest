@@ -6,7 +6,7 @@ type DataStore struct {
 	Type       string             `mapstructure:"type"`
 	IsDefault  bool               `mapstructure:"isDefault"`
 	Jaeger     GRPCClientSettings `mapstructure:"jaeger"`
-	Tempo      GRPCClientSettings `mapstructure:"tempo"`
+	Tempo      BaseClientConfig   `mapstructure:"tempo"`
 	OpenSearch OpenSearch         `mapstructure:"openSearch"`
 	SignalFx   SignalFX           `mapstructure:"signalFx"`
 }
@@ -21,6 +21,18 @@ type GRPCClientSettings struct {
 	Compression     string             `mapstructure:"compression"`
 	Tls             TLS                `mapstructure:"tls"`
 	Auth            HTTPAuthentication `mapstructure:"auth"`
+}
+
+type BaseClientConfig struct {
+	Type string             `mapstructure:"type"`
+	Grpc GRPCClientSettings `mapstructure:"grpc"`
+	Http HttpClientConfig   `mapstructure:"http"`
+}
+
+type HttpClientConfig struct {
+	Url     string            `yaml:",omitempty" mapstructure:"url"`
+	Headers map[string]string `yaml:",omitempty" mapstructure:"headers"`
+	Tls     TLS               `yaml:",omitempty" mapstructure:"tls"`
 }
 
 type TLS struct {

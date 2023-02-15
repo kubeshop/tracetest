@@ -9,6 +9,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.ElasticApm]: 'Elastic APM',
   [SupportedDataStores.NewRelic]: 'New Relic',
   [SupportedDataStores.Lightstep]: 'Lightstep',
+  [SupportedDataStores.Datadog]: 'Datadog',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -17,6 +18,7 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.ElasticApm]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/elasticapm',
   [SupportedDataStores.NewRelic]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/new-relic',
   [SupportedDataStores.Lightstep]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/lightstep',
+  [SupportedDataStores.Datadog]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/datadog',
   [SupportedDataStores.SignalFX]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/signalfx',
   [SupportedDataStores.TEMPO]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/tempo',
   [SupportedDataStores.OtelCollector]:
@@ -38,10 +40,12 @@ export const SupportedDataStoresToExplanation: Record<string, React.ReactElement
   [SupportedDataStores.OtelCollector]: collectorExplanation,
   [SupportedDataStores.NewRelic]: collectorExplanation,
   [SupportedDataStores.Lightstep]: collectorExplanation,
+  [SupportedDataStores.Datadog]: collectorExplanation,
 };
 
 export const NoTestConnectionDataStoreList = [
   SupportedDataStores.OtelCollector,
   SupportedDataStores.Lightstep,
+  SupportedDataStores.Datadog,
   SupportedDataStores.NewRelic,
 ];

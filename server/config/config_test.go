@@ -1,136 +1,76 @@
 package config_test
 
 import (
-	"strings"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/collector/config/configtls"
 )
 
-func TestBasicConfiguration(t *testing.T) {
-	actual, err := config.FromFile("./testdata/basic_config.yaml")
+func configWithFlagsE(t *testing.T, inputFlags []string) (*config.Config, error) {
+	flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
+	config.SetupFlags(flags)
+
+	err := flags.Parse(inputFlags)
 	require.NoError(t, err)
 
-	assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 sslmode=disable", actual.PostgresConnString())
-
-	assert.Equal(t, "/tracetest", actual.ServerPathPrefix())
-	assert.Equal(t, 9999, actual.ServerPort())
-
-	expectedPoolingConfig := config.PoolingConfig{
-		MaxWaitTimeForTrace: "1m",
-		RetryDelay:          "3s",
-	}
-	assert.Equal(t, expectedPoolingConfig, actual.PoolingConfig())
+	return config.New(flags)
 }
 
-func TestFromFileError(t *testing.T) {
-	_, err := config.FromFile("./testdata/notexists.yaml")
-	assert.True(t, strings.HasPrefix(err.Error(), "read file: "))
+func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
+	cfg, err := configWithFlagsE(t, inputFlags)
+	require.NoError(t, err)
+
+	return cfg
 }
 
-func TestJaegerDataStore(t *testing.T) {
-	expectedDataStore := config.TracingBackendDataStoreConfig{
-		Type: "jaeger",
-		Jaeger: configgrpc.GRPCClientSettings{
-			Endpoint:   "jaeger-query:16685",
-			TLSSetting: configtls.TLSClientSetting{Insecure: true},
-		},
+func configFromFile(t *testing.T, path string) *config.Config {
+	return configWithFlags(t, []string{"--config", path})
+}
+
+func configWithEnv(t *testing.T, env map[string]string) *config.Config {
+	for k, v := range env {
+		os.Setenv(k, v)
 	}
 
-	config, err := config.FromFile("./testdata/jaeger_datastore.yaml")
+	cfg, err := config.New(nil)
 	require.NoError(t, err)
 
-	selectedDataStore, err := config.DataStore()
-	assert.NoError(t, err)
-	assert.Equal(t, expectedDataStore, *selectedDataStore)
+	return cfg
 }
 
-func TestTempoDataStore(t *testing.T) {
-	expectedDataStore := config.TracingBackendDataStoreConfig{
-		Type: "tempo",
-		Tempo: configgrpc.GRPCClientSettings{
-			Endpoint:   "tempo:9095",
-			TLSSetting: configtls.TLSClientSetting{Insecure: true},
-		},
-	}
+func TestFlags(t *testing.T) {
 
-	config, err := config.FromFile("./testdata/tempo_datastore.yaml")
-	require.NoError(t, err)
+	t.Run("ConfigFileOverrideNotExists", func(t *testing.T) {
+		t.Parallel()
 
-	selectedDataStore, err := config.DataStore()
-	assert.NoError(t, err)
-	assert.Equal(t, expectedDataStore, *selectedDataStore)
-}
+		flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
+		config.SetupFlags(flags)
 
-func TestInexistentDataStore(t *testing.T) {
-	config, err := config.FromFile("./testdata/inexistent_datastore.yaml")
-	assert.NoError(t, err)
+		err := flags.Parse([]string{"--config", "notexists.yaml"})
+		require.NoError(t, err)
 
-	dataStore, err := config.DataStore()
-	assert.Error(t, err)
-	assert.Nil(t, dataStore)
-}
+		cfg, err := config.New(flags)
+		assert.Nil(t, cfg)
+		assert.ErrorIs(t, err, os.ErrNotExist)
+	})
 
-func TestEmptyDataStore(t *testing.T) {
-	config, err := config.FromFile("./testdata/empty_datastore.yaml")
-	assert.NoError(t, err)
+	t.Run("ConfigFileOK", func(t *testing.T) {
+		t.Parallel()
 
-	dataStore, err := config.DataStore()
+		cfg := configFromFile(t, "./testdata/basic.yaml")
 
-	assert.NoError(t, err)
-	assert.Nil(t, dataStore)
-}
+		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
 
-func TestExporterConfig(t *testing.T) {
-	expectedExporter := config.TelemetryExporterOption{
-		ServiceName: "tracetest",
-		Sampling:    100,
-		Exporter: config.ExporterConfig{
-			Type: "collector",
-			CollectorConfiguration: config.OTELCollectorConfig{
-				Endpoint: "collector:8888",
-			},
-		},
-	}
+		assert.Equal(t, "/tracetest", cfg.ServerPathPrefix())
+		assert.Equal(t, 9999, cfg.ServerPort())
 
-	config, err := config.FromFile("./testdata/exporter_config.yaml")
-	require.NoError(t, err)
+		assert.Equal(t, 1*time.Minute, cfg.PoolingMaxWaitTimeForTraceDuration())
+		assert.Equal(t, 3*time.Second, cfg.PoolingRetryDelay())
+	})
 
-	selectedExporter, err := config.Exporter()
-	assert.NoError(t, err)
-	assert.Equal(t, expectedExporter, *selectedExporter)
-
-	selectedAppExporter, err := config.ApplicationExporter()
-	assert.NoError(t, err)
-	assert.Equal(t, *selectedExporter, *selectedAppExporter)
-}
-
-func TestInexistentExporter(t *testing.T) {
-	config, err := config.FromFile("./testdata/inexistent_exporter.yaml")
-	require.NoError(t, err)
-
-	exporter, err := config.Exporter()
-	assert.Error(t, err)
-	assert.Nil(t, exporter)
-
-	appExporter, err := config.ApplicationExporter()
-	assert.Error(t, err)
-	assert.Nil(t, appExporter)
-}
-
-func TestEmptyExporter(t *testing.T) {
-	config, err := config.FromFile("./testdata/empty_exporter.yaml")
-	require.NoError(t, err)
-
-	exporter, err := config.Exporter()
-	assert.NoError(t, err)
-	assert.Nil(t, exporter)
-
-	appExporter, err := config.ApplicationExporter()
-	assert.NoError(t, err)
-	assert.Nil(t, appExporter)
 }

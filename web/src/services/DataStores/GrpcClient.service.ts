@@ -1,9 +1,7 @@
-import {IGRPCClientSettings, SupportedDataStores, TDataStoreService, TRawGRPCClientSettings} from 'types/Config.types';
-import DataStore from 'models/DataStore.model';
+import {IGRPCClientSettings, TRawGRPCClientSettings} from 'types/Config.types';
 
-const GrpcClientService = (): TDataStoreService => ({
-  async getRequest({dataStore = {}}, dataStoreType = SupportedDataStores.JAEGER) {
-    const values = dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings;
+const GrpcClientService = () => ({
+  async getRequest(values: IGRPCClientSettings): Promise<TRawGRPCClientSettings> {
     const {
       endpoint = '',
       readBufferSize,
@@ -29,44 +27,35 @@ const GrpcClientService = (): TDataStoreService => ({
     const headers = rawHeaders.reduce((acc, curr) => ({...acc, [curr.key]: curr.value}), {});
 
     return Promise.resolve({
-      type: dataStoreType,
-      name: dataStoreType,
-      [dataStoreType]: {
-        endpoint,
-        readBufferSize: parseInt(String(readBufferSize), 10),
-        writeBufferSize: parseInt(String(writeBufferSize), 10),
-        waitForReady,
-        headers,
-        balancerName,
-        compression,
-        tls: {
-          insecure,
-          insecureSkipVerify,
-          serverName,
-          settings: {
-            cAFile,
-            certFile,
-            keyFile,
-            minVersion,
-            maxVersion,
-          },
+      endpoint,
+      readBufferSize: parseInt(String(readBufferSize), 10),
+      writeBufferSize: parseInt(String(writeBufferSize), 10),
+      waitForReady,
+      headers,
+      balancerName,
+      compression,
+      tls: {
+        insecure,
+        insecureSkipVerify,
+        serverName,
+        settings: {
+          cAFile,
+          certFile,
+          keyFile,
+          minVersion,
+          maxVersion,
         },
-        auth,
       },
+      auth,
     });
   },
-  validateDraft({dataStore = {name: '', type: SupportedDataStores.JAEGER}, dataStoreType}) {
-    const values = (dataStore[dataStoreType || SupportedDataStores.JAEGER] as IGRPCClientSettings) ?? {};
+  validateDraft(values: IGRPCClientSettings): Promise<boolean> {
     const {endpoint = ''} = values;
     if (!endpoint) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
-  getInitialValues(
-    {defaultDataStore = {name: '', type: SupportedDataStores.JAEGER} as DataStore},
-    dataStoreType = SupportedDataStores.JAEGER
-  ) {
-    const values = (defaultDataStore[dataStoreType] as TRawGRPCClientSettings) ?? {};
+  getInitialValues(values: TRawGRPCClientSettings): IGRPCClientSettings {
     const {
       endpoint = '',
       readBufferSize,
@@ -87,37 +76,30 @@ const GrpcClientService = (): TDataStoreService => ({
     const rawHeaders = Object.entries(headers).map(([key, value]) => ({key, value}));
 
     return {
-      dataStore: {
-        [dataStoreType]: {
-          endpoint,
-          readBufferSize,
-          writeBufferSize,
-          waitForReady,
-          headers,
-          rawHeaders,
-          balancerName,
-          compression,
-          tls: {
-            insecure: endpoint ? !!insecure : true,
-            insecureSkipVerify,
-            serverName,
-            settings: {
-              cAFile,
-              certFile,
-              keyFile,
-              minVersion,
-              maxVersion,
-            },
-          },
-          auth,
-          fileCA: cAFile ? new File([cAFile], 'fileCA') : undefined,
-          fileCert: certFile ? new File([certFile], 'fileCert') : undefined,
-          fileKey: keyFile ? new File([keyFile], 'fileKey') : undefined,
+      endpoint,
+      readBufferSize,
+      writeBufferSize,
+      waitForReady,
+      headers,
+      rawHeaders,
+      balancerName,
+      compression,
+      tls: {
+        insecure: endpoint ? !!insecure : true,
+        insecureSkipVerify,
+        serverName,
+        settings: {
+          cAFile,
+          certFile,
+          keyFile,
+          minVersion,
+          maxVersion,
         },
-        name: dataStoreType,
-        type: dataStoreType,
       },
-      dataStoreType,
+      auth,
+      fileCA: cAFile ? new File([cAFile], 'fileCA') : undefined,
+      fileCert: certFile ? new File([certFile], 'fileCert') : undefined,
+      fileKey: keyFile ? new File([keyFile], 'fileKey') : undefined,
     };
   },
 });

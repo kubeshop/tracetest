@@ -22,7 +22,7 @@ func TestCreateDataStore(t *testing.T) {
 		IsDefault: true,
 		Values: model.DataStoreValues{
 			Jaeger:     &configgrpc.GRPCClientSettings{},
-			Tempo:      &configgrpc.GRPCClientSettings{},
+			Tempo:      &config.BaseClientConfig{},
 			SignalFx:   &config.SignalFXDataStoreConfig{},
 			OpenSearch: &config.ElasticSearchDataStoreConfig{},
 			ElasticApm: &config.ElasticSearchDataStoreConfig{},

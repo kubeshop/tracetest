@@ -8,6 +8,7 @@ type DataStore = Model<
     otlp?: {};
     newRelic?: {};
     lightstep?: {};
+    datadog?: {};
   }
 >;
 

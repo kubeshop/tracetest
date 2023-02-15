@@ -50,6 +50,20 @@ kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yam
 
 kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
 
-sleep 10 # let k8s finish doing things
+## TMP FIX FOR NEW CONFIG
+kubectl patch deployment \
+  $NAME \
+  --namespace $NAME \
+  --type='json' \
+  -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": [
+  "--config",
+  "/app/config/config.yaml"
+]}]'
 
-kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 30m
+TIME_OUT=30m
+CONDITION='[[ $(kubectl get pods  --namespace '$NAME' -lapp.kubernetes.io/name=tracetest -o jsonpath="{.items[*].status.phase}") = "Running" ]]'
+IF_TRUE='echo "pods ready"'
+IF_FALSE='echo "pods not ready. retrying"'
+
+ROOT_DIR=$(cd $(dirname "${BASH_SOURCE:-$0}")/.. && pwd)
+$ROOT_DIR/scripts/wait.sh "$TIME_OUT" "$CONDITION" "$IF_TRUE" "$IF_FALSE"

@@ -18,10 +18,14 @@ exporters:
     endpoint: jaeger:14250
     tls:
       insecure: true
+  otlp/2:
+    endpoint: tempo-us-central1.grafana.net:443
+    headers:
+      Authorization: Basic <your-auth-token>
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      exporters: [jaeger]
+      exporters: [otlp/2, jaeger]

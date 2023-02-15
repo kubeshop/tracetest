@@ -1,0 +1,13 @@
+telemetry:
+  dataStores:
+    tempo:
+      type: tempo
+      tempo:
+        http:
+          url: tempo:80
+          tls:
+            insecure: true
+
+server:
+  telemetry:
+    dataStore: tempo

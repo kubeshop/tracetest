@@ -21,6 +21,7 @@ const (
 	ELASTIC_APM SupportedDataStores = "elasticApm"
 	NEW_RELIC   SupportedDataStores = "newRelic"
 	LIGHTSTEP   SupportedDataStores = "lightstep"
+	DATADOG     SupportedDataStores = "datadog"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

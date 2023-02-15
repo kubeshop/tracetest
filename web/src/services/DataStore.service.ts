@@ -1,10 +1,11 @@
 import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
 import DataStore, {TRawDataStore} from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
-import GrpcClientService from './DataStores/GrpcClient.service';
 import ElasticSearchService from './DataStores/ElasticSearch.service';
 import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
+import BaseClientService from './DataStores/BaseClient.service';
+import JaegerService from './DataStores/Jaeger.service';
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
@@ -13,14 +14,15 @@ interface IDataStoreService {
 }
 
 const dataStoreServiceMap = {
-  [SupportedDataStores.JAEGER]: GrpcClientService,
-  [SupportedDataStores.TEMPO]: GrpcClientService,
+  [SupportedDataStores.JAEGER]: JaegerService,
+  [SupportedDataStores.TEMPO]: BaseClientService,
   [SupportedDataStores.OpenSearch]: ElasticSearchService,
   [SupportedDataStores.ElasticApm]: ElasticSearchService,
   [SupportedDataStores.SignalFX]: SignalFxService,
   [SupportedDataStores.OtelCollector]: OtelCollectorService,
   [SupportedDataStores.NewRelic]: OtelCollectorService,
   [SupportedDataStores.Lightstep]: OtelCollectorService,
+  [SupportedDataStores.Datadog]: OtelCollectorService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({
