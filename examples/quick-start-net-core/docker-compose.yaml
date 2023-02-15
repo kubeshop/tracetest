@@ -1,0 +1,69 @@
+version: "3"
+services:
+  app:
+    image: quick-start-dot-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build: .
+    ports:
+      - "80:80"
+
+  tracetest:
+    image: kubeshop/tracetest:${TAG:-latest}
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./tracetest-config.yaml
+        target: /app/config.yaml
+    ports:
+      - 11633:11633
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    ports:
+      - 5432:5432
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.54.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+    depends_on:
+      - jaeger
+    ports:
+      - 4317:4317
+      - 4318:4318
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    ports:
+      - 16685:16685
+      - 16686:16686

@@ -1,0 +1,21 @@
+type: Test
+spec:
+  id: ghgJpzJ4R
+  name: Weather Test
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app/weatherforecast
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[tracetest.span.type="http"]
+      assertions:
+        - attr:http.status_code = 200
+    - selector:
+        span[tracetest.span.type="http" name="WeatherForecast" http.target="/weatherforecast"
+        http.method="GET"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
