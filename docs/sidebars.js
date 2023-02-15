@@ -109,6 +109,11 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "doc",
+          id: "configuration/opentelemetry-collector-configuration-file-reference",
+          label: "OpenTelemetry Collector Configuration File Reference",
+        },
       ],
     },
     {
@@ -306,27 +311,21 @@ const sidebars = {
           label: "Overview",
         },
         {
-          type: "category",
-          label: "Integrations",
-          items: [
-            {
-              type: "doc",
-              id: "tools-and-integrations/integrations/keptn",
-              label: "Keptn",
-            },
-            {
-              type: "doc",
-              id: "tools-and-integrations/integrations/k6",
-              label: "K6",
-            },
-            {
-              type: "doc",
-              id: "tools-and-integrations/integrations/testkube",
-              label: "Testkube",
-            },
-          ],
+          type: "doc",
+          id: "tools-and-integrations/keptn",
+          label: "Keptn",
         },
-      ],
+        {
+          type: "doc",
+          id: "tools-and-integrations/k6",
+          label: "K6",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/testkube",
+          label: "Testkube",
+        },
+      ]
     },
     {
       type: "category",
@@ -338,55 +337,49 @@ const sidebars = {
           label: "Overview",
         },
         {
-          type: "category",
+          type: "doc",
+          id: "examples-tutorials/recipes",
           label: "Recipes",
-          items: [
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes",
-              label: "Overview",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
-              label: "Running Tracetest Without a Trace Data Store",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
-              label: "Running Tracetest With Jaeger",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
-              label: "Running Tracetest With OpenSearch",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-tempo",
-              label: "Running Tracetest With Tempo",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
-              label: "Running Tracetest With Lightstep",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
-              label: "Running Tracetest With New Relic",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
-              label: "Running Tracetest With Elastic APM",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-datadog",
-              label: "Running Tracetest With Datadog",
-            },
-          ],
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
+          label: "Node.js and OpenTelemetry Collector",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
+          label: "Node.js and Jaeger",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
+          label: "Node.js and OpenSearch",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-tempo",
+          label: "Node.js and Tempo",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
+          label: "OpenTelemetry Demo and Lightstep",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
+          label: "OpenTelemetry Demo and New Relic",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
+          label: "Node.js and Elastic APM",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+          label: "OpenTelemetry Demo and Datadog",
         },
       ],
     },

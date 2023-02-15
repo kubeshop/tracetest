@@ -10,18 +10,19 @@ Examples of configuring Tracetest with Datadog can be found in the [`examples` f
 
 In your OpenTelemetry Collector config file:
 
-- Set the `exporter` to `otlp/tt`.
-- Set the `endpoint` to your Tracetest instance on port `21321`.
+- Set the `exporter` to `otlp/tt`
+- Set the `endpoint` to your Tracetest instance on port `21321`
 
 :::tip
-If you are running Tracetest with Docker, the endpoint might look like this `http://tracetest:21321`.
+If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
 :::
 
 Additionally, add another config:
 
-- Set the `exporter` to `datadog`.
-- Set the `endpoint` pointing to your Datadog account.
-- Set the site to the Datadog API `datadoghq.com` and add your API key.
+- Set the `exporter` to `datadog`
+- Set the `api` pointing to your Datadog account
+- Set the `site` to Datadog API `datadoghq.com`
+- Set the `key` to your Datadog API key
 
 ```yaml
 # collector.config.yaml
@@ -35,18 +36,21 @@ receivers:
       grpc:
 
 processors:
-  batch: # this configuration is needed to guarantee that the data is sent correctly to Datadog
+  # This configuration is needed to guarantee that the data is sent correctly to Datadog
+  batch: 
     send_batch_max_size: 100
     send_batch_size: 10
     timeout: 10s
 
 exporters:
   # OTLP for Tracetest
+  # Send traces to Tracetest.
+  # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest.
-                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:21321
     tls:
       insecure: true
+  
   # Datadog exporter
   # One example on how to set up a collector configuration for Datadog can be seen here:
   # https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=onahost
@@ -67,17 +71,17 @@ service:
       exporters: [datadog] # exporter sending traces to directly to Datadog
 ```
 
-### Configure Tracetest to Use Lightstep as a Trace Data Store
+## Configure Tracetest to Use Datadog as a Trace Data Store
 
 Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
 
-## Connect Tracetest to Lightstep with the Web UI
+## Connect Tracetest to Datadog with the Web UI
 
 In the Web UI, open settings, and select Datadog.
 
 ![](../img/configure-datadog.png)
 
-## Connect Tracetest to Lightstep with the CLI
+## Connect Tracetest to Datadog with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
 

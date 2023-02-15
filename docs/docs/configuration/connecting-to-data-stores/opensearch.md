@@ -1,67 +1,40 @@
 # OpenSearch
 
-If you want to use OpenSearch as the trace data store, you can configure Tracetest to fetch trace data from OpenSearch.
-
-You'll configure the OpenTelemetry Collector to receive traces from your system and then send them to OpenSearch via Data Prepper. And, you don't have to change your existing pipelines to do so.
+Tracetest fetches traces from [OpenSearch's default port](https://logz.io/blog/opensearch-tutorial-installation-configuration/#:~:text=This%20is%20because%20OpenSearch%20runs,use%20port%205601%20by%20default.) `9200`.
 
 :::tip
 Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 :::
 
-## Configure OpenTelemetry Collector to Send Traces to OpenSearch
-
-In your OpenTelemetry Collector config file, make sure to set the `exporter` to `otlp`, with the `endpoint` pointing to the Data Prepper on port `21890`. If you are running Tracetest with Docker, the endpoint might look like this `data-prepper:21890`.
-
-```yaml
-# collector.config.yaml
-
-# If you already have receivers declared, you can just ignore
-# this one and use yours instead.
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-
-processors:
-  batch:
-    timeout: 100ms
-
-exporters:
-  logging:
-    loglevel: debug
-  otlp/2:
-    endpoint: data-prepper:21890
-    tls:
-      insecure: true
-      insecure_skip_verify: true
-
-service:
-  pipelines:
-    # You probably already have a traces pipeline, you don't have to change it.
-    # Just add this one to your configuration. Just make sure to not have two
-    # pipelines with the same name.
-    traces/1:
-      receivers: [otlp] # your receiver
-      processors: [batch] # make sure to add the batch processor
-      exporters: [otlp/2] # your exporter pointing to your Data Prepper instance
-
-```
-
 ## Configure Tracetest to Use OpenSearch as a Trace Data Store
 
-You also have to configure your Tracetest instance to make it aware that it has to fetch trace data from OpenSearch. 
+Configure Tracetest to fetch trace data from OpenSearch. 
 
-Make sure you know which Index name and Address you are using. In the screenshot below, the Index name is `traces`, the Address is `http://opensearch:9200`.
+Tracetest uses OpenSearch's **default port** `9200` to fetch trace data.
 
-### Web UI
+You need to know which **Index name** and **Address** you are using.
 
-In the Web UI, open settings, and select OpenSearch.
+The defaults can be:
+
+- **Index name**: `traces`
+- **Address**: `http://opensearch:9200`
+
+:::tip
+Need help configuring the OpenTelemetry Collector so send trace data from your application to OpenSearch? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)).
+:::
+
+## Connect Tracetest to OpenSearch with the Web UI
+
+In the Web UI, open settings, and select OpenSearch. If you are using Docker like in the screenshot below, use the service name as the hostname with port `9200`. Use `http`, or `https` if TLS is enabled.
+
+```
+http://opensearch:9200
+```
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644099/Blogposts/Docs/screely-1674644094600_svcwp6.png)
 
 
-### CLI
+## Connect Tracetest to OpenSearch with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
 
@@ -82,3 +55,7 @@ Proceed to run this command in the terminal, and specify the file above.
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml
 ```
+
+:::tip
+To learn more, [read the recipe on running a sample app with OpenSearch and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-opensearch.md).
+:::
