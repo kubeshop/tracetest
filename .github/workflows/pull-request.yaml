@@ -195,6 +195,7 @@ jobs:
           - tracetest-opensearch
           - tracetest-tempo
           - tracetest-no-tracing
+          - tracetest-provisioning-env
     steps:
       - name: Checkout
         uses: actions/checkout@v3

@@ -1,0 +1,7 @@
+dataStore:
+  type: tempo
+  tempo:
+    http:
+      url: tempo:80
+      tls:
+        insecure: true
