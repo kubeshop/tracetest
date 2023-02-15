@@ -74,53 +74,20 @@ func (db *awsxrayDB) Close() error {
 
 func (db *awsxrayDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	url := fmt.Sprintf("xray.%s.amazonaws.com:443", db.region)
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, url)),
+		connection.WithPollingTest(connection.TracePollingTestStep(db)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := db.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			if err != nil && strings.Contains(strings.ToLower(err.Error()), "403") {
+				return `Tracetest tried to execute an AWS XRay API request but it failed due to authentication issues`, err
+			}
 
-	connectionTestResult := connection.ConnectionTestResult{
-		ConnectivityTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, url),
-		},
-		AuthenticationTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with the AWS Services`,
-		},
-		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using the AWS X-Ray API`,
-		},
-	}
+			return "Tracetest managed to authenticate with the AWS Services", nil
+		})),
+	)
 
-	reachable, err := connection.IsReachable(url)
-
-	if !reachable {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, url),
-				Error:                err,
-			},
-		}
-	}
-
-	_, err = db.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
-	if err != nil && strings.Contains(strings.ToLower(err.Error()), "403") {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute an AWS XRay API request but it failed due to authentication issues`,
-				Error:                err,
-			},
-		}
-	}
-
-	if err != nil && !errors.Is(err, connection.ErrTraceNotFound) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the AWS XRay endpoint "%s" and got an error`, url),
-				Error:                err,
-			},
-		}
-	}
-
-	return connectionTestResult
+	return tester.TestConnection(ctx)
 }
 
 func (db *awsxrayDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
