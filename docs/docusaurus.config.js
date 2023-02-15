@@ -144,6 +144,10 @@ const config = {
             to: '/tools-and-integrations/keptn',
             from: ['/tools-and-integrations/integrations/keptn' /*, '/docs/legacyDocFrom2016'*/],
           },
+          {
+            to: '/tools-and-integrations/testkube',
+            from: ['/tools-and-integrations/integrations/testkube' /*, '/docs/legacyDocFrom2016'*/],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {
