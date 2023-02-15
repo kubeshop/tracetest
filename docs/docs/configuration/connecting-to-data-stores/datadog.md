@@ -10,18 +10,18 @@ Examples of configuring Tracetest with Datadog can be found in the [`examples` f
 
 In your OpenTelemetry Collector config file:
 
-- Set the `exporter` to `otlp/tt`
-- Set the `endpoint` to your Tracetest instance on port `21321`
+- Set the `exporter` to `otlp/tt`.
+- Set the `endpoint` to your Tracetest instance on port `21321`.
 
 :::tip
-If you are running Tracetest with Docker, the endpoint might look like this `http://tracetest:21321`
+If you are running Tracetest with Docker, the endpoint might look like this `http://tracetest:21321`.
 :::
 
 Additionally, add another config:
 
-- Set the `exporter` to `datadog`
-- Set the `endpoint` pointing to your Datadog account
-- Set the site to the Datadog API `datadoghq.com` and add your API key
+- Set the `exporter` to `datadog`.
+- Set the `endpoint` pointing to your Datadog account.
+- Set the site to the Datadog API `datadoghq.com` and add your API key.
 
 ```yaml
 # collector.config.yaml
