@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const timeoutIsReachable = 5 * time.Second
+
 type Protocol string
 
 var (
@@ -64,7 +66,7 @@ func IsReachable(endpoint string, protocol Protocol) error {
 		}
 	}
 
-	_, err := net.DialTimeout("tcp", endpoint, 5*time.Second)
+	_, err := net.DialTimeout("tcp", endpoint, timeoutIsReachable)
 	if err != nil {
 		return err
 	}
