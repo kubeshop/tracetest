@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/trace"
@@ -225,7 +224,7 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 	}
 }
 
-func newSignalFXDB(cfg *config.SignalFXDataStoreConfig) (TraceDB, error) {
+func newSignalFXDB(cfg *model.SignalFXDataStoreConfig) (TraceDB, error) {
 	return &signalfxDB{
 		Realm:      cfg.Realm,
 		Token:      cfg.Token,

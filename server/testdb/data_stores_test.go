@@ -4,12 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 func TestCreateDataStore(t *testing.T) {
@@ -21,11 +19,11 @@ func TestCreateDataStore(t *testing.T) {
 		Type:      "jaeger",
 		IsDefault: true,
 		Values: model.DataStoreValues{
-			Jaeger:     &configgrpc.GRPCClientSettings{},
-			Tempo:      &config.BaseClientConfig{},
-			SignalFx:   &config.SignalFXDataStoreConfig{},
-			OpenSearch: &config.ElasticSearchDataStoreConfig{},
-			ElasticApm: &config.ElasticSearchDataStoreConfig{},
+			Jaeger:     &model.GRPCClientSettings{},
+			Tempo:      &model.BaseClientConfig{},
+			SignalFx:   &model.SignalFXDataStoreConfig{},
+			OpenSearch: &model.ElasticSearchDataStoreConfig{},
+			ElasticApm: &model.ElasticSearchDataStoreConfig{},
 		},
 	}
 

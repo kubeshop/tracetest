@@ -1,4 +1,4 @@
-package config
+package provisioning
 
 import (
 	"fmt"
@@ -50,20 +50,20 @@ type (
 	}
 )
 
-func (c *Config) DataStore() (*TracingBackendDataStoreConfig, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+// func (c *Config) DataStore() (*TracingBackendDataStoreConfig, error) {
+// 	c.mu.Lock()
+// 	defer c.mu.Unlock()
 
-	selectedStore := c.config.Server.Telemetry.DataStore
-	dataStoreConfig, found := c.config.Telemetry.DataStores[selectedStore]
+// 	selectedStore := c.config.Server.Telemetry.DataStore
+// 	dataStoreConfig, found := c.config.Telemetry.DataStores[selectedStore]
 
-	if selectedStore != "" && !found {
-		return nil, ErrInvalidTraceDBProvider
-	}
+// 	if selectedStore != "" && !found {
+// 		return nil, ErrInvalidTraceDBProvider
+// 	}
 
-	if !found {
-		return nil, nil
-	}
+// 	if !found {
+// 		return nil, nil
+// 	}
 
-	return &dataStoreConfig, nil
-}
+// 	return &dataStoreConfig, nil
+// }

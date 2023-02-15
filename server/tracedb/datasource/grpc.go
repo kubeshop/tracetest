@@ -8,18 +8,17 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
-	"go.opentelemetry.io/collector/config/configgrpc"
 	"google.golang.org/grpc"
 )
 
 type GrpcClient struct {
 	name     string
-	config   *configgrpc.GRPCClientSettings
+	config   *model.GRPCClientSettings
 	conn     *grpc.ClientConn
 	callback GrpcCallback
 }
 
-func NewGrpcClient(name string, config *configgrpc.GRPCClientSettings, callback GrpcCallback) DataSource {
+func NewGrpcClient(name string, config *model.GRPCClientSettings, callback GrpcCallback) DataSource {
 	return &GrpcClient{
 		name:     name,
 		config:   config,

@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 func TestCreateClient(t *testing.T) {
@@ -25,7 +23,7 @@ func TestCreateClient(t *testing.T) {
 			ds: model.DataStore{
 				Type: openapi.JAEGER,
 				Values: model.DataStoreValues{
-					Jaeger: &configgrpc.GRPCClientSettings{},
+					Jaeger: &model.GRPCClientSettings{},
 				},
 			},
 			expectedType: "*tracedb.jaegerTraceDB",
@@ -35,7 +33,7 @@ func TestCreateClient(t *testing.T) {
 			ds: model.DataStore{
 				Type: openapi.TEMPO,
 				Values: model.DataStoreValues{
-					Tempo: &config.BaseClientConfig{},
+					Tempo: &model.BaseClientConfig{},
 				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",

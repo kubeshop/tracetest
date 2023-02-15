@@ -8,9 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 var _ model.DataStoreRepository = &postgresDB{}
@@ -233,23 +231,23 @@ func (td *postgresDB) readDataStoreRow(ctx context.Context, row scanner) (model.
 
 func patchDataStoreValues(dataStore model.DataStore) model.DataStore {
 	if dataStore.Values.ElasticApm == nil {
-		dataStore.Values.ElasticApm = &config.ElasticSearchDataStoreConfig{}
+		dataStore.Values.ElasticApm = &model.ElasticSearchDataStoreConfig{}
 	}
 
 	if dataStore.Values.Jaeger == nil {
-		dataStore.Values.Jaeger = &configgrpc.GRPCClientSettings{}
+		dataStore.Values.Jaeger = &model.GRPCClientSettings{}
 	}
 
 	if dataStore.Values.Tempo == nil {
-		dataStore.Values.Jaeger = &configgrpc.GRPCClientSettings{}
+		dataStore.Values.Jaeger = &model.GRPCClientSettings{}
 	}
 
 	if dataStore.Values.OpenSearch == nil {
-		dataStore.Values.OpenSearch = &config.ElasticSearchDataStoreConfig{}
+		dataStore.Values.OpenSearch = &model.ElasticSearchDataStoreConfig{}
 	}
 
 	if dataStore.Values.SignalFx == nil {
-		dataStore.Values.SignalFx = &config.SignalFXDataStoreConfig{}
+		dataStore.Values.SignalFx = &model.SignalFXDataStoreConfig{}
 	}
 
 	return dataStore

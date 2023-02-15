@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configtls"
 	"golang.org/x/exp/slices"
 )
 
@@ -20,12 +20,55 @@ type (
 		CreatedAt time.Time
 	}
 
+	GRPCClientSettings struct {
+		configgrpc.GRPCClientSettings
+	}
+
 	DataStoreValues struct {
-		Jaeger     *configgrpc.GRPCClientSettings
-		Tempo      *config.BaseClientConfig
-		OpenSearch *config.ElasticSearchDataStoreConfig
-		ElasticApm *config.ElasticSearchDataStoreConfig
-		SignalFx   *config.SignalFXDataStoreConfig
+		Jaeger     *GRPCClientSettings
+		Tempo      *BaseClientConfig
+		OpenSearch *ElasticSearchDataStoreConfig
+		ElasticApm *ElasticSearchDataStoreConfig
+		SignalFx   *SignalFXDataStoreConfig
+	}
+
+	TracingBackendDataStoreConfig struct {
+		Type       string
+		Jaeger     GRPCClientSettings
+		Tempo      BaseClientConfig
+		OpenSearch ElasticSearchDataStoreConfig
+		SignalFX   SignalFXDataStoreConfig
+		ElasticApm ElasticSearchDataStoreConfig
+	}
+
+	BaseClientConfig struct {
+		Type string
+		Grpc GRPCClientSettings
+		Http HttpClientConfig
+	}
+
+	HttpClientConfig struct {
+		Url        string
+		Headers    map[string]string
+		TLSSetting configtls.TLSClientSetting
+	}
+
+	OTELCollectorConfig struct {
+		Endpoint string
+	}
+
+	ElasticSearchDataStoreConfig struct {
+		Addresses          []string
+		Username           string
+		Password           string
+		Index              string
+		Certificate        string
+		InsecureSkipVerify bool
+	}
+
+	SignalFXDataStoreConfig struct {
+		Realm string
+		Token string
 	}
 )
 
@@ -62,7 +105,7 @@ const (
 	datadog    string = "datadog"
 )
 
-func DataStoreFromConfig(dsc config.TracingBackendDataStoreConfig) DataStore {
+func DataStoreFromConfig(dsc TracingBackendDataStoreConfig) DataStore {
 	var cType openapi.SupportedDataStores
 	ds := DataStore{
 		Name:   dsc.Type,

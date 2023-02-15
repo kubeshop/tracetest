@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/handlers"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
@@ -110,7 +109,7 @@ func (a *App) Start() error {
 			return err
 		}
 
-		ensureFirstTimeDataSources(a.cfg, testDB)
+		// ensureFirstTimeDataSources(a.cfg, testDB)
 	}
 
 	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.cfg)
@@ -186,36 +185,36 @@ func (a *App) Start() error {
 	return nil
 }
 
-type dataStoreConfig interface {
-	DataStore() (*config.TracingBackendDataStoreConfig, error)
-}
+// type dataStoreConfig interface {
+// 	DataStore() (*config.TracingBackendDataStoreConfig, error)
+// }
 
-func ensureFirstTimeDataSources(cfg dataStoreConfig, repo model.DataStoreRepository) {
-	dsc, err := cfg.DataStore()
-	if err != nil {
-		panic(fmt.Errorf("cannot parse DataStore from config file: %w", err))
-	}
+// func ensureFirstTimeDataSources(cfg dataStoreConfig, repo model.DataStoreRepository) {
+// 	dsc, err := cfg.DataStore()
+// 	if err != nil {
+// 		panic(fmt.Errorf("cannot parse DataStore from config file: %w", err))
+// 	}
 
-	if dsc == nil {
-		return
-	}
+// 	if dsc == nil {
+// 		return
+// 	}
 
-	ds := model.DataStoreFromConfig(*dsc)
-	ds.IsDefault = true
+// 	ds := model.DataStoreFromConfig(*dsc)
+// 	ds.IsDefault = true
 
-	if err := ds.Validate(); err != nil {
-		panic(fmt.Errorf("invalid DataStore config from config file: %w", err))
-	}
+// 	if err := ds.Validate(); err != nil {
+// 		panic(fmt.Errorf("invalid DataStore config from config file: %w", err))
+// 	}
 
-	ds, err = repo.CreateDataStore(context.Background(), ds)
-	if err != nil {
-		panic(fmt.Errorf("cannot persist DataStore from config file: %w", err))
-	}
+// 	ds, err = repo.CreateDataStore(context.Background(), ds)
+// 	if err != nil {
+// 		panic(fmt.Errorf("cannot persist DataStore from config file: %w", err))
+// 	}
 
-	fmt.Println("persisted initial DataStore from config file:")
-	spew.Dump(ds)
+// 	fmt.Println("persisted initial DataStore from config file:")
+// 	spew.Dump(ds)
 
-}
+// }
 
 type facadeConfig interface {
 	PoolingRetryDelay() time.Duration

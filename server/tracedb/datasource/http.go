@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 )
@@ -24,7 +23,7 @@ type HttpClient struct {
 	callback HttpCallback
 }
 
-func NewHttpClient(name string, config *config.HttpClientConfig, callback HttpCallback) DataSource {
+func NewHttpClient(name string, config *model.HttpClientConfig, callback HttpCallback) DataSource {
 	endpoint, _ := url.Parse(config.Url)
 	client := &http.Client{
 		Transport: &http.Transport{

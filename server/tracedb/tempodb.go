@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/id"
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/model"
@@ -27,7 +26,7 @@ type tempoTraceDB struct {
 	dataSource datasource.DataSource
 }
 
-func newTempoDB(config *config.BaseClientConfig) (TraceDB, error) {
+func newTempoDB(config *model.BaseClientConfig) (TraceDB, error) {
 	dataSource := datasource.New("Tempo", config, datasource.Callbacks{
 		HTTP: httpGetTraceByID,
 		GRPC: grpcGetTraceByID,
