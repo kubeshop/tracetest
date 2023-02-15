@@ -45,11 +45,11 @@ func (r ConnectionTestStepResult) IsSet() bool {
 	return r.OperationDescription != ""
 }
 
-func IsReachable(endpoint string, protocol Protocol) (bool, error) {
+func IsReachable(endpoint string, protocol Protocol) error {
 	if protocol == ProtocolHTTP {
 		address, err := url.Parse(endpoint)
 		if err != nil {
-			return false, err
+			return err
 		}
 
 		endpoint = strings.TrimPrefix(endpoint, "http://")
@@ -66,8 +66,8 @@ func IsReachable(endpoint string, protocol Protocol) (bool, error) {
 
 	_, err := net.DialTimeout("tcp", endpoint, 5*time.Second)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }
