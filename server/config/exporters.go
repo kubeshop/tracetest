@@ -2,9 +2,6 @@ package config
 
 import (
 	"fmt"
-
-	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/collector/config/configtls"
 )
 
 type (
@@ -19,8 +16,7 @@ type (
 	}
 
 	telemetry struct {
-		DataStores map[string]TracingBackendDataStoreConfig `yaml:",omitempty" mapstructure:"dataStores"`
-		Exporters  map[string]TelemetryExporterOption       `yaml:",omitempty" mapstructure:"exporters"`
+		Exporters map[string]TelemetryExporterOption `yaml:",omitempty" mapstructure:"exporters"`
 	}
 
 	TelemetryExporterOption struct {
@@ -34,43 +30,8 @@ type (
 		CollectorConfiguration OTELCollectorConfig `yaml:"collector,omitempty" mapstructure:"collector"`
 	}
 
-	TracingBackendDataStoreConfig struct {
-		Type       string                       `yaml:",omitempty" mapstructure:"type"`
-		Jaeger     model.GRPCClientSettings     `yaml:",omitempty" mapstructure:"jaeger"`
-		Tempo      BaseClientConfig             `yaml:",omitempty" mapstructure:"tempo"`
-		OpenSearch ElasticSearchDataStoreConfig `yaml:",omitempty" mapstructure:"opensearch"`
-		SignalFX   SignalFXDataStoreConfig      `yaml:",omitempty" mapstructure:"signalfx"`
-		ElasticApm ElasticSearchDataStoreConfig `yaml:",omitempty" mapstructure:"elasticapm"`
-	}
-
-	BaseClientConfig struct {
-		Type string                   `yaml:",omitempty" mapstructure:"type"`
-		Grpc model.GRPCClientSettings `yaml:",omitempty" mapstructure:"grpc"`
-		Http HttpClientConfig         `yaml:",omitempty" mapstructure:"http"`
-	}
-
-	HttpClientConfig struct {
-		Url        string                     `yaml:",omitempty" mapstructure:"url"`
-		Headers    map[string]string          `yaml:",omitempty" mapstructure:"headers"`
-		TLSSetting configtls.TLSClientSetting `yaml:",omitempty" mapstructure:"tls"`
-	}
-
 	OTELCollectorConfig struct {
 		Endpoint string `yaml:",omitempty" mapstructure:"endpoint"`
-	}
-
-	ElasticSearchDataStoreConfig struct {
-		Addresses          []string
-		Username           string
-		Password           string
-		Index              string
-		Certificate        string
-		InsecureSkipVerify bool
-	}
-
-	SignalFXDataStoreConfig struct {
-		Realm string
-		Token string
 	}
 )
 
@@ -96,7 +57,7 @@ func (c *Config) getExporter(name string) (*TelemetryExporterOption, error) {
 
 	exporterConfig, found := c.config.Telemetry.Exporters[name]
 	if !found {
-		availableOptions := mapKeys(c.config.Telemetry.DataStores)
+		availableOptions := mapKeys(c.config.Telemetry.Exporters)
 		return nil, fmt.Errorf(`invalid exporter option: "%s". Available options: %v`, name, availableOptions)
 	}
 
