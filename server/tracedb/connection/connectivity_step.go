@@ -13,7 +13,7 @@ type connectivityTestStep struct {
 
 var _ TestStep = &connectivityTestStep{}
 
-func (s *connectivityTestStep) TestConnection(ctx context.Context) ConnectionTestStepResult {
+func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestStepResult {
 	unreachableEndpoints := make([]string, 0)
 	var connectionErr error
 	for _, endpoint := range s.endpoints {
