@@ -13,11 +13,6 @@ poolingConfig:
 googleAnalytics:
   enabled: true
 
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
 telemetry:
   dataStores:
     tempo:
@@ -30,5 +25,3 @@ telemetry:
 server:
   telemetry:
     dataStore: tempo
-    exporter: collector
-    applicationExporter: collector
