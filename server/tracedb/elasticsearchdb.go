@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -37,66 +36,20 @@ func (db elasticsearchDB) Close() error {
 }
 
 func (db elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	addressesString := strings.Join(db.config.Addresses, ",")
-	connectionTestResult := connection.ConnectionTestResult{
-		ConnectivityTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, addressesString),
-		},
-		AuthenticationTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest managed to authenticate with ElasticSearch`,
-		},
-		TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-			OperationDescription: `Tracetest was able to search for a trace using the ElasticSearch API`,
-		},
-	}
-
-	for _, address := range db.config.Addresses {
-		reachable, err := connection.IsReachable(address)
-
-		if !reachable {
-			return connection.ConnectionTestResult{
-				ConnectivityTestResult: connection.ConnectionTestStepResult{
-					OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, address),
-					Error:                err,
-				},
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
+		connection.WithPollingTest(connection.TracePollingTestStep(db)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := getClusterInfo(db.client)
+			if err != nil {
+				return "Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues", err
 			}
-		}
-	}
 
-	_, err := getClusterInfo(db.client)
-	if err != nil {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues`,
-				Error:                err,
-			},
-		}
-	}
+			return "Tracetest managed to authenticate with OpenSearch", nil
+		})),
+	)
 
-	_, err = db.GetTraceByID(ctx, trace.TraceID{}.String())
-	if err != nil && strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult: connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: `Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues`,
-				Error:                err,
-			},
-		}
-	}
-
-	if !errors.Is(err, connection.ErrTraceNotFound) {
-		return connection.ConnectionTestResult{
-			ConnectivityTestResult:   connectionTestResult.ConnectivityTestResult,
-			AuthenticationTestResult: connectionTestResult.AuthenticationTestResult,
-			TraceRetrievalTestResult: connection.ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`Tracetest tried to fetch a trace from the ElasticSearch endpoint "%s" and got an error`, addressesString),
-				Error:                err,
-			},
-		}
-	}
-
-	return connectionTestResult
+	return tester.TestConnection(ctx)
 }
 
 func (db elasticsearchDB) Ready() bool {
