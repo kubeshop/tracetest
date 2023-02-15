@@ -4,12 +4,7 @@ receivers:
       grpc:
       http:
 
-processors:
-  batch:
-
 exporters:
-  logging:
-    logLevel: debug
   awsxray:
     region: ${AWS_REGION}
 
@@ -17,4 +12,4 @@ service:
   pipelines:
     traces/xr:
       receivers: [otlp]
-      exporters: [logging, awsxray]
+      exporters: [awsxray]

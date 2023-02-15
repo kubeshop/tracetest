@@ -9,11 +9,11 @@ services:
 
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
-    # platform: linux/amd64
+    platform: linux/amd64
     volumes:
       - type: bind
         source: ./tracetest-config.yaml
-        target: /app/config.yaml
+        target: /app/tracetest.yaml
     ports:
       - 11633:11633
     extra_hosts:

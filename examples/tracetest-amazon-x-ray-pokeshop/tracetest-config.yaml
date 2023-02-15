@@ -1,4 +1,11 @@
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+---
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10m
@@ -17,9 +24,9 @@ telemetry:
     awsxray:
       type: awsxray
       awsxray:
-        accessKeyId: <your-access-key-id>
-        secretAccessKey: <your-secret-access-key>
-        region: <your-aws-region>
+        accessKeyId: <your-accessKeyId>
+        secretAccessKey: <your-secretAccessKey>
+        region: "us-west-2"
 
 server:
   telemetry:
