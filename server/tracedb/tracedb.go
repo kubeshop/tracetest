@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 )
 
@@ -57,22 +56,22 @@ func Factory(repo model.Repository) func(ds model.DataStore) (TraceDB, error) {
 
 func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 	switch ds.Type {
-	case openapi.JAEGER:
+	case model.DataStoreTypeJaeger:
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
-	case openapi.TEMPO:
+	case model.DataStoreTypeTempo:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	case openapi.ELASTIC_APM:
+	case model.DataStoreTypeElasticAPM:
 		tdb, err = newElasticSearchDB(ds.Values.ElasticApm)
-	case openapi.OPEN_SEARCH:
+	case model.DataStoreTypeOpenSearch:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
-	case openapi.SIGNAL_FX:
+	case model.DataStoreTypeSignalFX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
-	case openapi.AWSXRAY:
+	case model.DataStoreTypeAwsXRay:
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
-	case openapi.NEW_RELIC:
-	case openapi.LIGHTSTEP:
-	case openapi.DATADOG:
-	case openapi.OTLP:
+	case model.DataStoreTypeNewRelic:
+	case model.DataStoreTypeLighStep:
+	case model.DataStoreTypeDataDog:
+	case model.DataStoreTypeOTLP:
 		tdb, err = newCollectorDB(f.repo)
 	default:
 		return &noopTraceDB{}, nil

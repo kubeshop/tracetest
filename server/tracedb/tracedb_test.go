@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,7 +21,7 @@ func TestCreateClient(t *testing.T) {
 		{
 			name: "Jaeger",
 			ds: model.DataStore{
-				Type: openapi.JAEGER,
+				Type: model.DataStoreTypeJaeger,
 				Values: model.DataStoreValues{
 					Jaeger: &configgrpc.GRPCClientSettings{},
 				},
@@ -33,9 +31,9 @@ func TestCreateClient(t *testing.T) {
 		{
 			name: "Tempo",
 			ds: model.DataStore{
-				Type: openapi.TEMPO,
+				Type: model.DataStoreTypeTempo,
 				Values: model.DataStoreValues{
-					Tempo: &config.BaseClientConfig{},
+					Tempo: &model.BaseClientConfig{},
 				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",

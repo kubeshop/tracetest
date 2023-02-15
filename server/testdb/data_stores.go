@@ -8,9 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
-	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 var _ model.DataStoreRepository = &postgresDB{}
@@ -225,38 +223,10 @@ func (td *postgresDB) readDataStoreRow(ctx context.Context, row scanner) (model.
 			return model.DataStore{}, fmt.Errorf("cannot parse data store: %w", err)
 		}
 
-		return patchDataStoreValues(dataStore), nil
+		return dataStore, nil
 	default:
 		return model.DataStore{}, err
 	}
-}
-
-func patchDataStoreValues(dataStore model.DataStore) model.DataStore {
-	if dataStore.Values.ElasticApm == nil {
-		dataStore.Values.ElasticApm = &config.ElasticSearchDataStoreConfig{}
-	}
-
-	if dataStore.Values.Jaeger == nil {
-		dataStore.Values.Jaeger = &configgrpc.GRPCClientSettings{}
-	}
-
-	if dataStore.Values.Tempo == nil {
-		dataStore.Values.Jaeger = &configgrpc.GRPCClientSettings{}
-	}
-
-	if dataStore.Values.OpenSearch == nil {
-		dataStore.Values.OpenSearch = &config.ElasticSearchDataStoreConfig{}
-	}
-
-	if dataStore.Values.SignalFx == nil {
-		dataStore.Values.SignalFx = &config.SignalFXDataStoreConfig{}
-	}
-
-	if dataStore.Values.AwsXRay == nil {
-		dataStore.Values.AwsXRay = &config.AWSXRayDataStoreConfig{}
-	}
-
-	return dataStore
 }
 
 func (td *postgresDB) countDataStores(ctx context.Context, condition, cleanSearchQuery string) (int, error) {

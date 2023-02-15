@@ -16,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/xray"
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
@@ -38,7 +37,7 @@ type awsxrayDB struct {
 	service     *xray.XRay
 }
 
-func NewAwsXRayDB(cfg *config.AWSXRayDataStoreConfig) (TraceDB, error) {
+func NewAwsXRayDB(cfg *model.AWSXRayDataStoreConfig) (TraceDB, error) {
 	sessionCredentials := credentials.NewStaticCredentials(cfg.AccessKeyID, cfg.SecretAccessKey, "")
 
 	return &awsxrayDB{

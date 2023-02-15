@@ -10,7 +10,7 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 	dataStore := openapi.DataStore{
 		Id:         in.ID,
 		Name:       in.Name,
-		Type:       in.Type,
+		Type:       openapi.SupportedDataStores(in.Type),
 		IsDefault:  in.IsDefault,
 		Jaeger:     openapi.GrpcClientSettings{},
 		Tempo:      openapi.BaseClient{},
@@ -21,20 +21,33 @@ func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 		CreatedAt:  in.CreatedAt,
 	}
 
-	deepcopy.DeepCopy(in.Values.Jaeger, &dataStore.Jaeger)
-	deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting, &dataStore.Jaeger.Tls)
-	deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting.TLSSetting, &dataStore.Jaeger.Tls.Settings)
+	if in.Values.Jaeger != nil {
+		deepcopy.DeepCopy(in.Values.Jaeger, &dataStore.Jaeger)
+		deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting, &dataStore.Jaeger.Tls)
+		deepcopy.DeepCopy(in.Values.Jaeger.TLSSetting.TLSSetting, &dataStore.Jaeger.Tls.Settings)
+	}
 
-	deepcopy.DeepCopy(in.Values.Tempo, &dataStore.Tempo)
-	deepcopy.DeepCopy(in.Values.Tempo.Grpc.TLSSetting, &dataStore.Tempo.Grpc.Tls)
-	deepcopy.DeepCopy(in.Values.Tempo.Grpc.TLSSetting.TLSSetting, &dataStore.Tempo.Grpc.Tls.Settings)
-	deepcopy.DeepCopy(in.Values.Tempo.Http.TLSSetting, &dataStore.Tempo.Http.Tls)
-	deepcopy.DeepCopy(in.Values.Tempo.Http.TLSSetting, &dataStore.Tempo.Http.Tls.Settings)
+	if in.Values.Tempo != nil {
+		deepcopy.DeepCopy(in.Values.Tempo, &dataStore.Tempo)
+		deepcopy.DeepCopy(in.Values.Tempo.Grpc.TLSSetting, &dataStore.Tempo.Grpc.Tls)
+		deepcopy.DeepCopy(in.Values.Tempo.Grpc.TLSSetting.TLSSetting, &dataStore.Tempo.Grpc.Tls.Settings)
+		deepcopy.DeepCopy(in.Values.Tempo.Http.TLSSetting, &dataStore.Tempo.Http.Tls)
+		deepcopy.DeepCopy(in.Values.Tempo.Http.TLSSetting, &dataStore.Tempo.Http.Tls.Settings)
+	}
 
-	deepcopy.DeepCopy(in.Values.OpenSearch, &dataStore.OpenSearch)
-	deepcopy.DeepCopy(in.Values.ElasticApm, &dataStore.ElasticApm)
-	deepcopy.DeepCopy(in.Values.SignalFx, &dataStore.SignalFx)
-	deepcopy.DeepCopy(in.Values.AwsXRay, &dataStore.Awsxray)
+	if in.Values.OpenSearch != nil {
+		deepcopy.DeepCopy(in.Values.OpenSearch, &dataStore.OpenSearch)
+	}
+	if in.Values.ElasticApm != nil {
+		deepcopy.DeepCopy(in.Values.ElasticApm, &dataStore.ElasticApm)
+	}
+	if in.Values.SignalFx != nil {
+		deepcopy.DeepCopy(in.Values.SignalFx, &dataStore.SignalFx)
+	}
+
+	if in.Values.AwsXRay != nil {
+		deepcopy.DeepCopy(in.Values.AwsXRay, &dataStore.Awsxray)
+	}
 
 	return dataStore
 }
@@ -52,7 +65,7 @@ func (m Model) DataStore(in openapi.DataStore) model.DataStore {
 	dataStore := model.DataStore{
 		ID:        in.Id,
 		Name:      in.Name,
-		Type:      in.Type,
+		Type:      model.DataStoreType(in.Type),
 		IsDefault: in.IsDefault,
 		CreatedAt: in.CreatedAt,
 	}

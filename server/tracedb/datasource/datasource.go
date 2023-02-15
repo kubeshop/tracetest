@@ -3,7 +3,6 @@ package datasource
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"google.golang.org/grpc"
@@ -44,15 +43,15 @@ func (db *noopDataSource) TestConnection(ctx context.Context) connection.Connect
 	return connection.ConnectionTestStepResult{}
 }
 
-func New(name string, config *config.BaseClientConfig, callbacks Callbacks) DataSource {
-	sourceType := SupportedDataSource(config.Type)
+func New(name string, cfg *model.BaseClientConfig, callbacks Callbacks) DataSource {
+	sourceType := SupportedDataSource(cfg.Type)
 
 	switch sourceType {
 	default:
 	case GRPC:
-		return NewGrpcClient(name, &config.Grpc, callbacks.GRPC)
+		return NewGrpcClient(name, &cfg.Grpc, callbacks.GRPC)
 	case HTTP:
-		return NewHttpClient(name, &config.Http, callbacks.HTTP)
+		return NewHttpClient(name, &cfg.Http, callbacks.HTTP)
 	}
 
 	return &noopDataSource{}
