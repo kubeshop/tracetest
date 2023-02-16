@@ -45,6 +45,11 @@ func TestBasicExpressionExecution(t *testing.T) {
 			Query:      `13 > 12`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "should_enable_spaces_in_durations",
+			Query:      `100ms < 200 ms`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
