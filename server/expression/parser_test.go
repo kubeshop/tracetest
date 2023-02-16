@@ -36,6 +36,15 @@ func TestSimpleParsingRules(t *testing.T) {
 			},
 		},
 		{
+			Name:  "should_parse_100_ms=100_ms",
+			Query: `100 ms = 100 ms`,
+			ExpectedOutput: expression.Statement{
+				Left:       durationExpr("100ms"),
+				Comparator: "=",
+				Right:      durationExpr("100ms"),
+			},
+		},
+		{
 			Name:  "should_parse_attr:abc=attr:abc",
 			Query: `attr:abc = attr:abc`,
 			ExpectedOutput: expression.Statement{
@@ -528,7 +537,7 @@ func TestArrays(t *testing.T) {
 						Array: &expression.Array{
 							Items: []*expression.Term{
 								{Number: strp("1")},
-								{Duration: strp("2s")},
+								{Duration: durationp("2s")},
 								{Str: &expression.Str{Text: "3", Args: []expression.Expr{}}},
 							},
 						},
@@ -540,7 +549,7 @@ func TestArrays(t *testing.T) {
 						Array: &expression.Array{
 							Items: []*expression.Term{
 								{Str: &expression.Str{Text: "3", Args: []expression.Expr{}}},
-								{Duration: strp("2s")},
+								{Duration: durationp("2s")},
 								{Number: strp("1")},
 							},
 						},
@@ -567,6 +576,11 @@ func strp(in string) *string {
 	return &in
 }
 
+func durationp(in string) *expression.Duration {
+	duration := expression.Duration(in)
+	return &duration
+}
+
 func numberExpr(number int) *expression.Expr {
 	return &expression.Expr{
 		Left: &expression.Term{
@@ -578,7 +592,7 @@ func numberExpr(number int) *expression.Expr {
 func durationExpr(duration string) *expression.Expr {
 	return &expression.Expr{
 		Left: &expression.Term{
-			Duration: &duration,
+			Duration: durationp(duration),
 		},
 	}
 }
