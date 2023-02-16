@@ -102,11 +102,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/new-relic",
               label: "New Relic",
             },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/datadog",
-              label: "Datadog",
-            },
+//             {
+//               type: "doc",
+//               id: "configuration/connecting-to-data-stores/datadog",
+//               label: "Datadog",
+//             },
           ],
         },
         {
@@ -376,11 +376,11 @@ const sidebars = {
           id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
           label: "Node.js and Elastic APM",
         },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-datadog",
-          label: "OpenTelemetry Demo and Datadog",
-        },
+        // {
+        //   type: "doc",
+        //   id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+        //   label: "OpenTelemetry Demo and Datadog",
+        // },
       ],
     },
     {
