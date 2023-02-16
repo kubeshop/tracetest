@@ -18,22 +18,30 @@ const AwsXRay = () => {
         </Col>
         <Col span={12}>
           <Form.Item
-            label="Region"
-            name={[...baseName, 'region']}
-            rules={[{required: true, message: 'Region is required'}]}
+            label="Secret Access Key"
+            name={[...baseName, 'secretAccessKey']}
+            rules={[{required: true, message: 'Secret Access Key is required'}]}
           >
-            <Input placeholder="Region" />
+            <Input placeholder="Secret Access Key" type="password" />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
-            label="Secret Access Key"
-            name={[...baseName, 'secretAccessKey']}
-            rules={[{required: true, message: 'Secret Access Key is required'}]}
+            label="Session Token"
+            name={[...baseName, 'sessionToken']}
           >
-            <Input placeholder="Secret Access Key" type="password" />
+            <Input placeholder="Session Token" type="password" />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="Region"
+            name={[...baseName, 'region']}
+            rules={[{required: true, message: 'Region is required'}]}
+          >
+            <Input placeholder="Region" />
           </Form.Item>
         </Col>
       </Row>

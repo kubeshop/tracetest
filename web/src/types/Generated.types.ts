@@ -1109,6 +1109,7 @@ export interface external {
           region?: string;
           accessKeyId?: string;
           secretAccessKey?: string;
+          sessionToken?: string;
         };
         HTTPClientSettings: {
           url?: string;

@@ -60,6 +60,7 @@ type AwsXRay struct {
 	Region          string `mapstructure:"region"`
 	AccessKeyId     string `mapstructure:"accessKeyId"`
 	SecretAccessKey string `mapstructure:"secretAccessKey"`
+	SessionToken    string `mapstructure:"sessionToken"`
 }
 
 type OpenSearch struct {

@@ -23,11 +23,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type AwsCredentials struct {
-	SecretAccessKey string
-	AccessKey       string
-}
-
 type awsxrayDB struct {
 	realTraceDB
 
@@ -38,7 +33,7 @@ type awsxrayDB struct {
 }
 
 func NewAwsXRayDB(cfg *model.AWSXRayDataStoreConfig) (TraceDB, error) {
-	sessionCredentials := credentials.NewStaticCredentials(cfg.AccessKeyID, cfg.SecretAccessKey, "")
+	sessionCredentials := credentials.NewStaticCredentials(cfg.AccessKeyID, cfg.SecretAccessKey, cfg.SessionToken)
 
 	return &awsxrayDB{
 		credentials: sessionCredentials,
@@ -133,7 +128,7 @@ func parseXRayTrace(traceID string, rawTrace *xray.Trace) (model.Trace, error) {
 }
 
 func parseSegmentToSpans(rawSeg []byte, traceID string) ([]model.Span, error) {
-	var seg Segment
+	var seg segment
 	err := json.Unmarshal(rawSeg, &seg)
 	if err != nil {
 		return []model.Span{}, err
@@ -148,7 +143,7 @@ func parseSegmentToSpans(rawSeg []byte, traceID string) ([]model.Span, error) {
 	return spans, err
 }
 
-func segToSpans(seg Segment, traceID string, parent *model.Span) ([]model.Span, error) {
+func segToSpans(seg segment, traceID string, parent *model.Span) ([]model.Span, error) {
 	span, err := generateSpan(&seg, traceID, parent)
 	if err != nil {
 		return []model.Span{}, err
@@ -164,26 +159,12 @@ func segToSpans(seg Segment, traceID string, parent *model.Span) ([]model.Span, 
 		}
 
 		spans = append(spans, nestedSpans...)
-
-		// if seg.Cause != nil &&
-		// 	populatedChildSpan.Status().Code() != ptrace.StatusCodeUnset {
-		// 	// if seg.Cause is not nil, then one of the subsegments must contain a
-		// 	// HTTP error code. Also, span.Status().Code() is already
-		// 	// set to `StatusCodeUnknownError` by `addCause()` in
-		// 	// `populateSpan()` above, so here we are just trying to figure out
-		// 	// whether we can get an even more specific error code.
-
-		// 	if span.Status().Code() == ptrace.StatusCodeError {
-		// 		// update the error code to a possibly more specific code
-		// 		span.Status().SetCode(populatedChildSpan.Status().Code())
-		// 	}
-		// }
 	}
 
 	return spans, nil
 }
 
-func generateSpan(seg *Segment, traceID string, parent *model.Span) (model.Span, error) {
+func generateSpan(seg *segment, traceID string, parent *model.Span) (model.Span, error) {
 	attributes := make(model.Attributes, 0)
 	span := model.Span{
 		Parent: parent,
@@ -242,7 +223,7 @@ const (
 	validRemoteNamespace = "remote"
 )
 
-func addNamespace(seg *Segment, attributes model.Attributes) error {
+func addNamespace(seg *segment, attributes model.Attributes) error {
 	if seg.Namespace != nil {
 		switch *seg.Namespace {
 		case validAWSNamespace:
@@ -259,7 +240,7 @@ func addNamespace(seg *Segment, attributes model.Attributes) error {
 	return nil
 }
 
-func addHTTP(seg *Segment, attributes model.Attributes) {
+func addHTTP(seg *segment, attributes model.Attributes) {
 	if seg.HTTP == nil {
 		return
 	}
@@ -276,11 +257,11 @@ func addHTTP(seg *Segment, attributes model.Attributes) {
 	}
 
 	if resp := seg.HTTP.Response; resp != nil {
-		if resp.Status != nil {
-			attributes[conventions.AttributeHTTPStatusCode] = fmt.Sprintf("%v", *resp.Status)
+		if resp.status != nil {
+			attributes[conventions.AttributeHTTPStatusCode] = fmt.Sprintf("%v", *resp.status)
 		}
 
-		switch val := resp.ContentLength.(type) {
+		switch val := resp.contentLength.(type) {
 		case string:
 			attributes[conventions.AttributeHTTPResponseContentLength] = val
 		case float64:
@@ -290,7 +271,7 @@ func addHTTP(seg *Segment, attributes model.Attributes) {
 	}
 }
 
-func addAWSToSpan(aws *AWSData, attrs model.Attributes) {
+func addAWSToSpan(aws *aWSData, attrs model.Attributes) {
 	if aws != nil {
 		attrs.SetPointer(AWSAccountAttribute, aws.AccountID)
 		attrs.SetPointer(AWSOperationAttribute, aws.Operation)
@@ -305,7 +286,7 @@ func addAWSToSpan(aws *AWSData, attrs model.Attributes) {
 	}
 }
 
-func addSQLToSpan(sql *SQLData, attrs model.Attributes) error {
+func addSQLToSpan(sql *sQLData, attrs model.Attributes) error {
 	if sql == nil {
 		return nil
 	}
@@ -393,11 +374,7 @@ const (
 
 func convertToAmazonTraceID(traceID trace.TraceID) (string, error) {
 	const (
-		// maxAge of 28 days.  AWS has a 30 day limit, let's be conservative rather than
-		// hit the limit
-		maxAge = 60 * 60 * 24 * 28
-
-		// maxSkew allows for 5m of clock skew
+		maxAge  = 60 * 60 * 24 * 28
 		maxSkew = 60 * 5
 	)
 
@@ -408,12 +385,6 @@ func convertToAmazonTraceID(traceID trace.TraceID) (string, error) {
 		epoch        = int64(binary.BigEndian.Uint32(traceIDBytes[0:4]))
 		b            = [4]byte{}
 	)
-
-	// If AWS traceID originally came from AWS, no problem.  However, if oc generated
-	// the traceID, then the epoch may be outside the accepted AWS range of within the
-	// past 30 days.
-	//
-	// In that case, we return invalid traceid error
 
 	delta := epochNow - epoch
 	if delta > maxAge || delta < -maxSkew {
@@ -429,18 +400,6 @@ func convertToAmazonTraceID(traceID trace.TraceID) (string, error) {
 	hex.Encode(content[identifierOffset:], traceIDBytes[4:16]) // overwrite with identifier
 
 	return string(content[0:traceIDLength]), nil
-}
-
-func decodeXRayTraceID(traceID string) (trace.TraceID, error) {
-	tid := [16]byte{}
-
-	if len(traceID) < 35 {
-		return tid, errors.New("traceID length is wrong")
-	}
-	traceIDtoBeDecoded := (traceID)[2:10] + (traceID)[11:]
-
-	_, err := hex.Decode(tid[:], []byte(traceIDtoBeDecoded))
-	return tid, err
 }
 
 func decodeXRaySpanID(spanID *string) (trace.SpanID, error) {
@@ -463,24 +422,18 @@ const (
 type CauseType int
 
 const (
-	// CauseTypeExceptionID indicates that the type of the `cause`
-	// field is a string
 	CauseTypeExceptionID CauseType = iota + 1
-	// CauseTypeObject indicates that the type of the `cause`
-	// field is an object
 	CauseTypeObject
 )
 
-// Segment schema is documented in xray-segmentdocument-schema-v1.0.0 listed
-// on https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html
-type Segment struct {
+type segment struct {
 	// Required fields for both segment and subsegments
 	Name      *string  `json:"name"`
 	ID        *string  `json:"id"`
 	StartTime *float64 `json:"start_time"`
 
 	// Segment-only optional fields
-	Service     *ServiceData `json:"service,omitempty"`
+	Service     *serviceData `json:"service,omitempty"`
 	Origin      *string      `json:"origin,omitempty"`
 	User        *string      `json:"user,omitempty"`
 	ResourceARN *string      `json:"resource_arn,omitempty"`
@@ -489,15 +442,15 @@ type Segment struct {
 	TraceID     *string                           `json:"trace_id,omitempty"`
 	EndTime     *float64                          `json:"end_time,omitempty"`
 	InProgress  *bool                             `json:"in_progress,omitempty"`
-	HTTP        *HTTPData                         `json:"http,omitempty"`
+	HTTP        *hTTPData                         `json:"http,omitempty"`
 	Fault       *bool                             `json:"fault,omitempty"`
 	Error       *bool                             `json:"error,omitempty"`
 	Throttle    *bool                             `json:"throttle,omitempty"`
-	Cause       *CauseData                        `json:"cause,omitempty"`
-	AWS         *AWSData                          `json:"aws,omitempty"`
+	Cause       *causeData                        `json:"cause,omitempty"`
+	AWS         *aWSData                          `json:"aws,omitempty"`
 	Annotations map[string]interface{}            `json:"annotations,omitempty"`
 	Metadata    map[string]map[string]interface{} `json:"metadata,omitempty"`
-	Subsegments []Segment                         `json:"subsegments,omitempty"`
+	Subsegments []segment                         `json:"subsegments,omitempty"`
 
 	// (for both embedded and independent) subsegment-only (optional) fields.
 	// Please refer to https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html#api-segmentdocuments-subsegments
@@ -507,11 +460,11 @@ type Segment struct {
 	Type         *string  `json:"type,omitempty"`
 	PrecursorIDs []string `json:"precursor_ids,omitempty"`
 	Traced       *bool    `json:"traced,omitempty"`
-	SQL          *SQLData `json:"sql,omitempty"`
+	SQL          *sQLData `json:"sql,omitempty"`
 }
 
 // Validate checks whether the segment is valid or not
-func (s *Segment) Validate() error {
+func (s *segment) Validate() error {
 	if s.Name == nil {
 		return errors.New(`segment "name" can not be nil`)
 	}
@@ -534,16 +487,14 @@ func (s *Segment) Validate() error {
 	return nil
 }
 
-// AWSData represents the aws resource that this segment
-// originates from
-type AWSData struct {
+type aWSData struct {
 	// Segment-only
-	Beanstalk *BeanstalkMetadata `json:"elastic_beanstalk,omitempty"`
-	CWLogs    []LogGroupMetadata `json:"cloudwatch_logs,omitempty"`
-	ECS       *ECSMetadata       `json:"ecs,omitempty"`
-	EC2       *EC2Metadata       `json:"ec2,omitempty"`
-	EKS       *EKSMetadata       `json:"eks,omitempty"`
-	XRay      *XRayMetaData      `json:"xray,omitempty"`
+	Beanstalk *beanstalkMetadata `json:"elastic_beanstalk,omitempty"`
+	CWLogs    []logGroupMetadata `json:"cloudwatch_logs,omitempty"`
+	ECS       *eCSMetadata       `json:"ecs,omitempty"`
+	EC2       *eC2Metadata       `json:"ec2,omitempty"`
+	EKS       *eKSMetadata       `json:"eks,omitempty"`
+	XRay      *xRayMetaData      `json:"xray,omitempty"`
 
 	// For both segment and subsegments
 	AccountID    *string `json:"account_id,omitempty"`
@@ -555,17 +506,14 @@ type AWSData struct {
 	Retries      *int64  `json:"retries,omitempty"`
 }
 
-// EC2Metadata represents the EC2 metadata field
-type EC2Metadata struct {
+type eC2Metadata struct {
 	InstanceID       *string `json:"instance_id"`
 	AvailabilityZone *string `json:"availability_zone"`
 	InstanceSize     *string `json:"instance_size"`
 	AmiID            *string `json:"ami_id"`
 }
 
-// ECSMetadata represents the ECS metadata field. All must be omitempty b/c they come from two different detectors:
-// Docker and ECS, so it's possible one is present and not the other
-type ECSMetadata struct {
+type eCSMetadata struct {
 	ContainerName    *string `json:"container,omitempty"`
 	ContainerID      *string `json:"container_id,omitempty"`
 	TaskArn          *string `json:"task_arn,omitempty"`
@@ -577,43 +525,43 @@ type ECSMetadata struct {
 }
 
 // BeanstalkMetadata represents the Elastic Beanstalk environment metadata field
-type BeanstalkMetadata struct {
+type beanstalkMetadata struct {
 	Environment  *string `json:"environment_name"`
 	VersionLabel *string `json:"version_label"`
 	DeploymentID *int64  `json:"deployment_id"`
 }
 
 // EKSMetadata represents the EKS metadata field
-type EKSMetadata struct {
+type eKSMetadata struct {
 	ClusterName *string `json:"cluster_name"`
 	Pod         *string `json:"pod"`
 	ContainerID *string `json:"container_id"`
 }
 
 // LogGroupMetadata represents a single CloudWatch Log Group
-type LogGroupMetadata struct {
+type logGroupMetadata struct {
 	LogGroup *string `json:"log_group"`
 	Arn      *string `json:"arn,omitempty"`
 }
 
 // CauseData is the container that contains the `cause` field
-type CauseData struct {
+type causeData struct {
 	Type CauseType `json:"-"`
 	// it will contain one of ExceptionID or (WorkingDirectory, Paths, Exceptions)
 	ExceptionID *string `json:"-"`
 
-	CauseObject
+	causeObject
 }
 
-type CauseObject struct {
+type causeObject struct {
 	WorkingDirectory *string     `json:"working_directory,omitempty"`
 	Paths            []string    `json:"paths,omitempty"`
-	Exceptions       []Exception `json:"exceptions,omitempty"`
+	Exceptions       []exception `json:"exceptions,omitempty"`
 }
 
 // UnmarshalJSON is the custom unmarshaller for the cause field
-func (c *CauseData) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &c.CauseObject)
+func (c *causeData) UnmarshalJSON(data []byte) error {
+	err := json.Unmarshal(data, &c.causeObject)
 	if err == nil {
 		c.Type = CauseTypeObject
 		return nil
@@ -630,7 +578,7 @@ func (c *CauseData) UnmarshalJSON(data []byte) error {
 }
 
 // Exception represents an exception occurred
-type Exception struct {
+type exception struct {
 	ID        *string      `json:"id,omitempty"`
 	Message   *string      `json:"message,omitempty"`
 	Type      *string      `json:"type,omitempty"`
@@ -638,24 +586,24 @@ type Exception struct {
 	Truncated *int64       `json:"truncated,omitempty"`
 	Skipped   *int64       `json:"skipped,omitempty"`
 	Cause     *string      `json:"cause,omitempty"`
-	Stack     []StackFrame `json:"stack,omitempty"`
+	Stack     []stackFrame `json:"stack,omitempty"`
 }
 
 // StackFrame represents a frame in the stack when an exception occurred
-type StackFrame struct {
+type stackFrame struct {
 	Path  *string `json:"path,omitempty"`
 	Line  *int    `json:"line,omitempty"`
 	Label *string `json:"label,omitempty"`
 }
 
 // HTTPData provides the shape for unmarshalling request and response fields.
-type HTTPData struct {
-	Request  *RequestData  `json:"request,omitempty"`
-	Response *ResponseData `json:"response,omitempty"`
+type hTTPData struct {
+	Request  *requestData  `json:"request,omitempty"`
+	Response *responseData `json:"response,omitempty"`
 }
 
 // RequestData provides the shape for unmarshalling the request field.
-type RequestData struct {
+type requestData struct {
 	// Available in segment
 	XForwardedFor *bool `json:"x_forwarded_for,omitempty"`
 
@@ -667,38 +615,38 @@ type RequestData struct {
 }
 
 // ResponseData provides the shape for unmarshalling the response field.
-type ResponseData struct {
-	Status        *int64      `json:"status,omitempty"`
-	ContentLength interface{} `json:"content_length,omitempty"`
+type responseData struct {
+	status        *int64      `json:"status,omitempty"`
+	contentLength interface{} `json:"content_length,omitempty"`
 }
 
 // ECSData provides the shape for unmarshalling the ecs field.
-type ECSData struct {
+type eCSData struct {
 	Container *string `json:"container"`
 }
 
 // EC2Data provides the shape for unmarshalling the ec2 field.
-type EC2Data struct {
+type eC2Data struct {
 	InstanceID       *string `json:"instance_id"`
 	AvailabilityZone *string `json:"availability_zone"`
 }
 
 // ElasticBeanstalkData provides the shape for unmarshalling the elastic_beanstalk field.
-type ElasticBeanstalkData struct {
+type elasticBeanstalkData struct {
 	EnvironmentName *string `json:"environment_name"`
 	VersionLabel    *string `json:"version_label"`
 	DeploymentID    *int    `json:"deployment_id"`
 }
 
 // XRayMetaData provides the shape for unmarshalling the xray field
-type XRayMetaData struct {
+type xRayMetaData struct {
 	SDK                 *string `json:"sdk,omitempty"`
 	SDKVersion          *string `json:"sdk_version,omitempty"`
 	AutoInstrumentation *bool   `json:"auto_instrumentation"`
 }
 
 // SQLData provides the shape for unmarshalling the sql field.
-type SQLData struct {
+type sQLData struct {
 	ConnectionString *string `json:"connection_string,omitempty"`
 	URL              *string `json:"url,omitempty"` // protocol://host[:port]/database
 	SanitizedQuery   *string `json:"sanitized_query,omitempty"`
@@ -710,7 +658,7 @@ type SQLData struct {
 }
 
 // ServiceData provides the shape for unmarshalling the service field.
-type ServiceData struct {
+type serviceData struct {
 	Version         *string `json:"version,omitempty"`
 	CompilerVersion *string `json:"compiler_version,omitempty"`
 	Compiler        *string `json:"compiler,omitempty"`

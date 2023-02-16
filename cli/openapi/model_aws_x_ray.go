@@ -22,6 +22,7 @@ type AwsXRay struct {
 	Region          *string `json:"region,omitempty"`
 	AccessKeyId     *string `json:"accessKeyId,omitempty"`
 	SecretAccessKey *string `json:"secretAccessKey,omitempty"`
+	SessionToken    *string `json:"sessionToken,omitempty"`
 }
 
 // NewAwsXRay instantiates a new AwsXRay object
@@ -137,6 +138,38 @@ func (o *AwsXRay) SetSecretAccessKey(v string) {
 	o.SecretAccessKey = &v
 }
 
+// GetSessionToken returns the SessionToken field value if set, zero value otherwise.
+func (o *AwsXRay) GetSessionToken() string {
+	if o == nil || isNil(o.SessionToken) {
+		var ret string
+		return ret
+	}
+	return *o.SessionToken
+}
+
+// GetSessionTokenOk returns a tuple with the SessionToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AwsXRay) GetSessionTokenOk() (*string, bool) {
+	if o == nil || isNil(o.SessionToken) {
+		return nil, false
+	}
+	return o.SessionToken, true
+}
+
+// HasSessionToken returns a boolean if a field has been set.
+func (o *AwsXRay) HasSessionToken() bool {
+	if o != nil && !isNil(o.SessionToken) {
+		return true
+	}
+
+	return false
+}
+
+// SetSessionToken gets a reference to the given string and assigns it to the SessionToken field.
+func (o *AwsXRay) SetSessionToken(v string) {
+	o.SessionToken = &v
+}
+
 func (o AwsXRay) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o AwsXRay) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.SecretAccessKey) {
 		toSerialize["secretAccessKey"] = o.SecretAccessKey
+	}
+	if !isNil(o.SessionToken) {
+		toSerialize["sessionToken"] = o.SessionToken
 	}
 	return toSerialize, nil
 }

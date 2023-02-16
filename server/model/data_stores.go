@@ -62,6 +62,7 @@ type (
 		Region          string
 		AccessKeyID     string
 		SecretAccessKey string
+		SessionToken    string
 	}
 )
 

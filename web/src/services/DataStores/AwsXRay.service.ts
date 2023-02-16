@@ -1,7 +1,9 @@
 import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
 
 const AwsXRayService = (): TDataStoreService => ({
-  getRequest({dataStore: {awsxray: {region = '', accessKeyId = '', secretAccessKey = ''} = {}} = {}}) {
+  getRequest({
+    dataStore: {awsxray: {region = '', accessKeyId = '', secretAccessKey = '', sessionToken = ''} = {}} = {},
+  }) {
     return Promise.resolve({
       type: SupportedDataStores.AWSXRay,
       name: SupportedDataStores.AWSXRay,
@@ -9,6 +11,7 @@ const AwsXRayService = (): TDataStoreService => ({
         region,
         accessKeyId,
         secretAccessKey,
+        sessionToken,
       },
     });
   },
@@ -18,13 +21,13 @@ const AwsXRayService = (): TDataStoreService => ({
     return Promise.resolve(true);
   },
   getInitialValues({defaultDataStore: {awsxray = {}} = {}}) {
-    const {region = '', secretAccessKey = '', accessKeyId = ''} = awsxray;
+    const {region = '', secretAccessKey = '', accessKeyId = '', sessionToken = ''} = awsxray;
 
     return {
       dataStore: {
         name: SupportedDataStores.AWSXRay,
         type: SupportedDataStores.AWSXRay,
-        awsxray: {region, secretAccessKey, accessKeyId},
+        awsxray: {region, secretAccessKey, accessKeyId, sessionToken},
       },
       dataStoreType: SupportedDataStores.AWSXRay,
     };
