@@ -20,6 +20,7 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/j2gg0s/otsql v0.14.0
 	github.com/jhump/protoreflect v1.12.0
 	github.com/lib/pq v1.10.5
@@ -52,7 +53,7 @@ require (
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
-	github.com/containerd/containerd v1.6.12 // indirect
+	github.com/containerd/containerd v1.6.18 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.14+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -65,7 +66,6 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/knadh/koanf v1.4.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
