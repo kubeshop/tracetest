@@ -46,14 +46,6 @@ type options []option
 func (opts options) registerDefaults(vp *viper.Viper) {
 	for _, opt := range opts {
 		vp.SetDefault(opt.key, opt.defaultValue)
-
-		if opt.deprecated {
-			if opt.deprecationMessage != "" {
-				log.L.Warnf(`config "%s" is deprecated: %s`, opt.key, opt.deprecationMessage)
-			} else {
-				log.L.Warnf(`config "%s" is deprecated.`, opt.key)
-			}
-		}
 	}
 }
 
@@ -125,13 +117,15 @@ func New(flags *pflag.FlagSet) (*Config, error) {
 	vp.SetEnvPrefix("TRACETEST")
 	vp.AutomaticEnv()
 
+	configureConfigFile(vp)
+	warnAboutDeprecatedFields(vp)
+
 	configOptions.registerDefaults(vp)
 
 	if flags != nil {
 		vp.BindPFlags(flags)
 	}
 
-	configureConfigFile(vp)
 	err := readConfigFile(vp)
 	if err != nil {
 		return nil, err
@@ -187,4 +181,32 @@ func (c *Config) AnalyticsEnabled() bool {
 	defer c.mu.Unlock()
 
 	return c.config.GA.Enabled
+}
+
+func warnAboutDeprecatedFields(vp *viper.Viper) error {
+	err := readConfigFile(vp)
+	if err != nil {
+		return err
+	}
+
+	for _, opt := range configOptions {
+		if !opt.deprecated {
+			continue
+		}
+
+		if vp.IsSet(opt.key) {
+			value := vp.Get(opt.key)
+			if value == opt.defaultValue {
+				continue
+			}
+
+			if opt.deprecationMessage != "" {
+				log.L.Warnf(`config "%s" is deprecated: %s`, opt.key, opt.deprecationMessage)
+			} else {
+				log.L.Warnf(`config "%s" is deprecated.`, opt.key)
+			}
+		}
+	}
+
+	return nil
 }
