@@ -2,6 +2,7 @@ package tracedb
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
@@ -39,6 +40,18 @@ func NewAwsXRayDB(cfg *model.AWSXRayDataStoreConfig) (TraceDB, error) {
 		credentials: sessionCredentials,
 		region:      cfg.Region,
 	}, nil
+}
+
+func (db *awsxrayDB) GetTraceID() trace.TraceID {
+	var r [16]byte
+	epoch := time.Now().Unix()
+	binary.BigEndian.PutUint32(r[0:4], uint32(epoch))
+	_, err := rand.Read(r[4:])
+	if err != nil {
+		panic(err)
+	}
+
+	return trace.TraceID(r)
 }
 
 func (db *awsxrayDB) Connect(ctx context.Context) error {

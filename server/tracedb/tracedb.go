@@ -4,15 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var IDGen = id.NewRandGenerator()
 
 type TraceDB interface {
 	Connect(ctx context.Context) error
 	Ready() bool
 	ShouldRetry() bool
 	MinSpanCount() int
+	GetTraceID() trace.TraceID
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
 	TestConnection(ctx context.Context) connection.ConnectionTestResult
 	Close() error
@@ -24,6 +29,9 @@ func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t mode
 	return model.Trace{}, nil
 }
 
+func (db *noopTraceDB) GetTraceID() trace.TraceID {
+	return IDGen.TraceID()
+}
 func (db *noopTraceDB) Connect(ctx context.Context) error { return nil }
 func (db *noopTraceDB) Close() error                      { return nil }
 func (db *noopTraceDB) ShouldRetry() bool                 { return false }
@@ -94,3 +102,6 @@ type realTraceDB struct{}
 
 func (db *realTraceDB) ShouldRetry() bool { return true }
 func (db *realTraceDB) MinSpanCount() int { return 0 }
+func (db *realTraceDB) GetTraceID() trace.TraceID {
+	return IDGen.TraceID()
+}

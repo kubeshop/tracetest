@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -34,6 +35,8 @@ func NewPersistentRunner(
 	tp TracePoller,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
+	newTraceDBFn traceDBFactoryFn,
+	dsRepo model.DataStoreRepository,
 ) PersistentRunner {
 	return persistentRunner{
 		triggers:            triggers,
@@ -41,6 +44,8 @@ func NewPersistentRunner(
 		updater:             updater,
 		tp:                  tp,
 		tracer:              tracer,
+		newTraceDBFn:        newTraceDBFn,
+		dsRepo:              dsRepo,
 		subscriptionManager: subscriptionManager,
 		executeQueue:        make(chan execReq, 5),
 		exit:                make(chan bool, 1),
@@ -54,6 +59,8 @@ type persistentRunner struct {
 	updater             RunUpdater
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
+	newTraceDBFn        traceDBFactoryFn
+	dsRepo              model.DataStoreRepository
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -135,6 +142,20 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 	return run
 }
 
+func (r persistentRunner) traceDB(ctx context.Context) (tracedb.TraceDB, error) {
+	ds, err := r.dsRepo.DefaultDataStore(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get default datastore: %w", err)
+	}
+
+	tdb, err := r.newTraceDBFn(ds)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot get tracedb from DataStore config with ID "%s": %w`, ds.ID, err)
+	}
+
+	return tdb, nil
+}
+
 func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(run, r.updater.Update(job.ctx, run))
@@ -145,7 +166,12 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		panic(err)
 	}
 
-	traceID := model.IDGen.TraceID()
+	tdb, err := r.traceDB(job.ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	traceID := tdb.GetTraceID()
 	run.TraceID = traceID
 	r.handleDBError(run, r.updater.Update(job.ctx, run))
 
