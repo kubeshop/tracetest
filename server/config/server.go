@@ -13,66 +13,55 @@ var serverOptions = options{
 		deprecated:         true,
 		deprecationMessage: "Use the new postgres config structure instead.",
 	},
-
 	{
 		key:          "postgres.host",
 		defaultValue: "postgres",
 		description:  "Postgres DB host",
-		validate:     nil,
 	},
 	{
 		key:          "postgres.user",
 		defaultValue: "postgres",
 		description:  "Postgres DB user",
-		validate:     nil,
 	},
 	{
 		key:          "postgres.password",
 		defaultValue: "postgres",
 		description:  "Postgres DB password",
-		validate:     nil,
 	},
 	{
 		key:          "postgres.dbname",
 		defaultValue: "tracetest",
 		description:  "Postgres DB database name",
-		validate:     nil,
 	},
 	{
 		key:          "postgres.port",
 		defaultValue: 5432,
 		description:  "Postgres DB port",
-		validate:     nil,
 	},
 	{
 		key:          "postgres.params",
 		defaultValue: "sslmode=disable",
 		description:  "Postgres DB connection parameters",
-		validate:     nil,
 	},
 	{
 		key:          "server.httpPort",
 		defaultValue: 11633,
 		description:  "Tracetest server HTTP Port",
-		validate:     nil,
 	},
 	{
 		key:          "server.pathPrefix",
 		defaultValue: "",
 		description:  "Tracetest server HTTP Path prefix",
-		validate:     nil,
 	},
 	{
 		key:          "experimentalFeatures",
 		defaultValue: []string{},
 		description:  "enabled experimental features",
-		validate:     nil,
 	},
 	{
 		key:          "internalTelemetry.enabled",
 		defaultValue: false,
 		description:  "enable internal telemetry (used for internal testing)",
-		validate:     nil,
 	},
 	{
 		key:          "internalTelemetry.otelCollectorEndpoint",
