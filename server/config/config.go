@@ -35,7 +35,7 @@ type option struct {
 	key          string
 	defaultValue any
 	description  string
-	validate     func(*Config) error
+	validate     validator
 }
 
 type options []option

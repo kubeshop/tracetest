@@ -7,6 +7,12 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
+type validator func(*Config) error
+
+var (
+	noValidation validator = nil
+)
+
 func validateDuration(key string) func(c *Config) error {
 	return func(c *Config) error {
 		input := c.vp.GetString(key)
