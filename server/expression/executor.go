@@ -175,7 +175,7 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 	}
 
 	if term.Duration != nil {
-		nanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(*term.Duration)
+		nanoSeconds := traces.ConvertTimeFieldIntoNanoSeconds(string(*term.Duration))
 		typedValue := types.TypedValue{
 			Value: fmt.Sprintf("%d", nanoSeconds),
 			Type:  types.TypeDuration,

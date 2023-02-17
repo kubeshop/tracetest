@@ -25,7 +25,7 @@ JsonPath {"json_path '$" Word "'"}
   Pipe {"|"}
   Number { @digit+ }
   Comparator {"=" | "contains" | "!=" | "<" | ">" | "<=" | ">=" | "not-contains" }
-  Duration { Number ("." Number)? ("ns" | "us" | "ms"| "s"| "m" | "h") }
+  Duration { Number ("." Number)?(" ")?("ns" | "us" | "ms"| "s"| "m" | "h") }
   Operator {"+" | "-" | "*" | "/" | "%" | "^" }
   String {(![${}"])+}
   Quotes {'"'}
