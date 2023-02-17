@@ -6,6 +6,15 @@ import (
 
 var serverOptions = options{
 	{
+		key:                "postgresConnString",
+		defaultValue:       "",
+		description:        "Postgres connection string",
+		validate:           nil,
+		deprecated:         true,
+		deprecationMessage: "Use the new postgres config structure instead.",
+	},
+
+	{
 		key:          "postgres.host",
 		defaultValue: "postgres",
 		description:  "Postgres DB host",
