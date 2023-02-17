@@ -5,20 +5,72 @@ import (
 )
 
 var serverOptions = options{
-	{"postgres.host", "postgres", "Postgres DB host", nil},
-	{"postgres.user", "postgres", "Postgres DB user", nil},
-	{"postgres.password", "postgres", "Postgres DB password", nil},
-	{"postgres.dbname", "tracetest", "Postgres DB database name", nil},
-	{"postgres.port", 5432, "Postgres DB port", nil},
-	{"postgres.params", "sslmode=disable", "Postgres DB connection parameters", nil},
-
-	{"server.httpPort", 11633, "Tracetest server HTTP Port", nil},
-	{"server.pathPrefix", "", "Tracetest server HTTP Path prefix", nil},
-
-	{"experimentalFeatures", []string{}, "enabled experimental features", nil},
-
-	{"internalTelemetry.enabled", false, "enable internal telemetry (used for internal testing)", nil},
-	{"internalTelemetry.otelCollectorEndpoint", "", "internal telemetry  otel collector (used for internal testing)", nil},
+	{
+		key:          "postgres.host",
+		defaultValue: "postgres",
+		description:  "Postgres DB host",
+		validate:     nil,
+	},
+	{
+		key:          "postgres.user",
+		defaultValue: "postgres",
+		description:  "Postgres DB user",
+		validate:     nil,
+	},
+	{
+		key:          "postgres.password",
+		defaultValue: "postgres",
+		description:  "Postgres DB password",
+		validate:     nil,
+	},
+	{
+		key:          "postgres.dbname",
+		defaultValue: "tracetest",
+		description:  "Postgres DB database name",
+		validate:     nil,
+	},
+	{
+		key:          "postgres.port",
+		defaultValue: 5432,
+		description:  "Postgres DB port",
+		validate:     nil,
+	},
+	{
+		key:          "postgres.params",
+		defaultValue: "sslmode=disable",
+		description:  "Postgres DB connection parameters",
+		validate:     nil,
+	},
+	{
+		key:          "server.httpPort",
+		defaultValue: 11633,
+		description:  "Tracetest server HTTP Port",
+		validate:     nil,
+	},
+	{
+		key:          "server.pathPrefix",
+		defaultValue: "",
+		description:  "Tracetest server HTTP Path prefix",
+		validate:     nil,
+	},
+	{
+		key:          "experimentalFeatures",
+		defaultValue: []string{},
+		description:  "enabled experimental features",
+		validate:     nil,
+	},
+	{
+		key:          "internalTelemetry.enabled",
+		defaultValue: false,
+		description:  "enable internal telemetry (used for internal testing)",
+		validate:     nil,
+	},
+	{
+		key:          "internalTelemetry.otelCollectorEndpoint",
+		defaultValue: "",
+		description:  "internal telemetry  otel collector (used for internal testing)",
+		validate:     nil,
+	},
 }
 
 func init() {

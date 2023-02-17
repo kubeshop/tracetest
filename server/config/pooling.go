@@ -5,8 +5,18 @@ import (
 )
 
 var poolingOptions = options{
-	{"poolingConfig.maxWaitTimeForTrace", "30s", "pooling config: max wait time for trace", validateDuration("poolingConfig.maxWaitTimeForTrace")},
-	{"poolingConfig.retryDelay", "1s", "pooling config: interval between poll retries", validateDuration("poolingConfig.retryDelay")},
+	{
+		key:          "poolingConfig.maxWaitTimeForTrace",
+		defaultValue: "30s",
+		description:  "pooling config: max wait time for trace",
+		validate:     validateDuration("poolingConfig.maxWaitTimeForTrace"),
+	},
+	{
+		key:          "poolingConfig.retryDelay",
+		defaultValue: "1s",
+		description:  "pooling config: interval between poll retries",
+		validate:     validateDuration("poolingConfig.retryDelay"),
+	},
 }
 
 func init() {

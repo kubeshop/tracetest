@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/containerd/containerd/log"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -32,10 +33,12 @@ type Config struct {
 }
 
 type option struct {
-	key          string
-	defaultValue any
-	description  string
-	validate     func(*Config) error
+	key                string
+	defaultValue       any
+	description        string
+	validate           func(*Config) error
+	deprecated         bool
+	deprecationMessage string
 }
 
 type options []option
@@ -43,6 +46,14 @@ type options []option
 func (opts options) registerDefaults(vp *viper.Viper) {
 	for _, opt := range opts {
 		vp.SetDefault(opt.key, opt.defaultValue)
+
+		if opt.deprecated {
+			if opt.deprecationMessage != "" {
+				log.L.Warnf(`config "%s" is deprecated: %s`, opt.key, opt.deprecationMessage)
+			} else {
+				log.L.Warnf(`config "%s" is deprecated.`, opt.key)
+			}
+		}
 	}
 }
 
