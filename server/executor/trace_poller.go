@@ -75,6 +75,15 @@ type PollingRequest struct {
 	count int
 }
 
+func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
+	return &PollingRequest{
+		ctx:   ctx,
+		test:  test,
+		run:   run,
+		count: count,
+	}
+}
+
 func (tp tracePoller) handleDBError(err error) {
 	if err != nil {
 		fmt.Printf("DB error when polling traces: %s\n", err.Error())

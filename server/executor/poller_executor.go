@@ -159,7 +159,12 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 		return false
 	}
 
-	if len(trace.Flat) > traceDB.MinSpanCount() && len(trace.Flat) == len(job.run.Trace.Flat) {
+	haveNotCollectedSpansSinceLastPoll := len(trace.Flat) == len(job.run.Trace.Flat)
+
+	// Today we consider that we finished collecting traces
+	// if we haven't collected any new spans since our last poll
+
+	if haveNotCollectedSpansSinceLastPoll {
 		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Condition met\n", job.test.ID, job.run.ID)
 		return true
 	}
