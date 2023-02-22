@@ -1,0 +1,59 @@
+version: "3"
+services:
+  app:
+    build: .
+    environment:
+      AWS_REGION: ${AWS_REGION}
+    ports:
+      - "3000:3000"
+
+  tracetest:
+    image: kubeshop/tracetest:${TAG:-latest}
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./tracetest-config.yaml
+        target: /app/tracetest.yaml
+    ports:
+      - 11633:11633
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      adot-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    ports:
+      - 5432:5432
+
+  adot-collector:
+    image: amazon/aws-otel-collector:latest
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      AWS_REGION: ${AWS_REGION}
+    ports:
+      - 4317:4317
+      - 2000:2000

@@ -1,0 +1,15 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  awsxray:
+    region: ${AWS_REGION}
+
+service:
+  pipelines:
+    traces/xr:
+      receivers: [otlp]
+      exporters: [awsxray]

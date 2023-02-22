@@ -1,0 +1,16 @@
+receivers:
+  awsxray:
+    transport: udp
+
+processors:
+  batch:
+
+exporters:
+  awsxray:
+    region: ${AWS_REGION}
+
+service:
+  pipelines:
+    traces/xr:
+      receivers: [awsxray]
+      exporters: [awsxray]
