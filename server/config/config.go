@@ -10,7 +10,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 )
 
 type (
@@ -30,6 +29,10 @@ type Config struct {
 	config *oldConfig
 	vp     *viper.Viper
 	mu     sync.Mutex
+}
+
+type Logger interface {
+	Println(...any)
 }
 
 type option struct {
@@ -110,7 +113,7 @@ func SetupFlags(flags *pflag.FlagSet) {
 	configOptions.registerFlags(flags)
 }
 
-func New(flags *pflag.FlagSet, logger *zap.Logger) (*Config, error) {
+func New(flags *pflag.FlagSet, logger Logger) (*Config, error) {
 	vp := viper.New()
 
 	vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -183,7 +186,7 @@ func (c *Config) AnalyticsEnabled() bool {
 	return c.config.GA.Enabled
 }
 
-func warnAboutDeprecatedFields(vp *viper.Viper, logger *zap.Logger) error {
+func warnAboutDeprecatedFields(vp *viper.Viper, logger Logger) error {
 	err := readConfigFile(vp)
 	if err != nil {
 		return err
@@ -201,9 +204,9 @@ func warnAboutDeprecatedFields(vp *viper.Viper, logger *zap.Logger) error {
 			}
 
 			if opt.deprecationMessage != "" {
-				logger.Warn(fmt.Sprintf(`config "%s" is deprecated: %s`, opt.key, opt.deprecationMessage))
+				logger.Println(fmt.Sprintf(`config "%s" is deprecated: %s`, opt.key, opt.deprecationMessage))
 			} else {
-				logger.Warn(fmt.Sprintf(`config "%s" is deprecated.`, opt.key))
+				logger.Println(fmt.Sprintf(`config "%s" is deprecated.`, opt.key))
 			}
 		}
 	}

@@ -10,14 +10,25 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zaptest/observer"
 )
 
 type deprecatedOptionTest struct {
 	name                   string
 	fileContent            string
 	expectedDeprecatedKeys []string
+}
+
+type logger struct {
+	messages []string
+}
+
+func (l *logger) Println(in ...any) {
+	message := fmt.Sprintf("%s", in...)
+	l.messages = append(l.messages, message)
+}
+
+func (l *logger) GetMessages() []string {
+	return l.messages
 }
 
 func TestDeprecatedOptions(t *testing.T) {
@@ -55,18 +66,19 @@ func executeDeprecationTestCase(t *testing.T, testCases []deprecatedOptionTest) 
 		require.NoError(t, err)
 		defer os.Remove(fileName)
 
-		observedZapCore, observedLogs := observer.New(zap.InfoLevel)
-		observedLogger := zap.New(observedZapCore)
+		logger := logger{
+			messages: []string{},
+		}
 
-		config.New(nil, observedLogger)
+		config.New(nil, &logger)
 
 		warnings := make([]string, 0)
-		for _, line := range observedLogs.All() {
-			if line.Message == "" {
+		for _, line := range logger.GetMessages() {
+			if line == "" {
 				continue
 			}
 
-			warnings = append(warnings, line.Message)
+			warnings = append(warnings, line)
 		}
 
 		assert.Len(t, warnings, len(testCase.expectedDeprecatedKeys))

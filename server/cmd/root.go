@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +39,7 @@ func init() {
 
 	cobra.OnInitialize(func() {
 		var err error
-		cfg, err = config.New(rootCmd.PersistentFlags(), logger.Default())
+		cfg, err = config.New(rootCmd.PersistentFlags(), log.Default())
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)

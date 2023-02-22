@@ -1,12 +1,12 @@
 package config_test
 
 import (
+	"log"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/logger"
 	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,7 +19,7 @@ func configWithFlagsE(t *testing.T, inputFlags []string) (*config.Config, error)
 	err := flags.Parse(inputFlags)
 	require.NoError(t, err)
 
-	return config.New(flags, logger.Default())
+	return config.New(flags, log.Default())
 }
 
 func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
@@ -38,7 +38,7 @@ func configWithEnv(t *testing.T, env map[string]string) *config.Config {
 		os.Setenv(k, v)
 	}
 
-	cfg, err := config.New(nil, logger.Default())
+	cfg, err := config.New(nil, log.Default())
 	require.NoError(t, err)
 
 	return cfg
@@ -55,7 +55,7 @@ func TestFlags(t *testing.T) {
 		err := flags.Parse([]string{"--config", "notexists.yaml"})
 		require.NoError(t, err)
 
-		cfg, err := config.New(flags, logger.Default())
+		cfg, err := config.New(flags, log.Default())
 		assert.Nil(t, cfg)
 		assert.ErrorIs(t, err, os.ErrNotExist)
 	})
