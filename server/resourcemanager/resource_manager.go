@@ -1,7 +1,6 @@
 package resourcemanager
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mitchellh/mapstructure"
-	"gopkg.in/yaml.v2"
 )
 
 type validator interface {
@@ -47,7 +45,13 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
-	values, err := readValues(r)
+	encoder, err := encoderFromRequest(r)
+	if err != nil {
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		return
+	}
+
+	values, err := readValues(r, encoder)
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot parse body: %s", err.Error()))
 		return
@@ -73,7 +77,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 		Spec: created,
 	}
 
-	bytes, err := encodeValues(newResource, r)
+	bytes, err := encodeValues(newResource, encoder)
 	if err != nil {
 		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("cannot marshal entity: %s", err.Error()))
 		return
@@ -88,8 +92,7 @@ func writeResponse(w http.ResponseWriter, code int, msg string) {
 	w.Write([]byte(msg))
 }
 
-func encodeValues(resource any, r *http.Request) ([]byte, error) {
-
+func encodeValues(resource any, enc encoder) ([]byte, error) {
 	// mapstructure doesn't have a `Decode`, but encoding with reversed provides this func.
 	// See https://github.com/mitchellh/mapstructure/issues/53#issuecomment-273342420
 	var values map[string]any
@@ -98,64 +101,22 @@ func encodeValues(resource any, r *http.Request) ([]byte, error) {
 		return nil, fmt.Errorf("cannot encode values: %w", err)
 	}
 
-	var (
-		bytes []byte
-	)
-
-	switch r.Header.Get("Content-Type") {
-	case "text/yaml":
-		bytes, err = yaml.Marshal(values)
-	case "application/json":
-		bytes, err = json.Marshal(values)
-	}
-
-	return bytes, err
+	return enc.Marshal(values)
 }
 
-func readValues(r *http.Request) (map[string]any, error) {
-	var (
-		values map[string]any
-		err    error
-	)
-
-	switch r.Header.Get("Content-Type") {
-	case "text/yaml":
-		values, err = readYaml(r)
-	case "application/json":
-		values, err = readJSON(r)
-	}
-
-	return values, err
-}
-
-func readYaml(r *http.Request) (map[string]any, error) {
+func readValues(r *http.Request, enc encoder) (map[string]any, error) {
 	body, err := readBody(r)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read yaml body: %w", err)
 	}
 
-	out := make(map[string]any)
-	err = yaml.Unmarshal(body, &out)
+	var out map[string]any
+	err = enc.Unmarshal(body, &out)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal yaml: %w", err)
+		return nil, fmt.Errorf("cannot unmarshal request: %w", err)
 	}
 
-	return out, nil
-}
-
-func readJSON(r *http.Request) (map[string]any, error) {
-	body, err := readBody(r)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read json body: %w", err)
-	}
-
-	out := make(map[string]any)
-	err = json.Unmarshal(body, &out)
-	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal json: %w", err)
-	}
-
-	return out, nil
+	return out, err
 }
 
 func readBody(r *http.Request) ([]byte, error) {
