@@ -8,6 +8,7 @@ COPY ./tracetest /app/tracetest
 COPY ./web/build ./html
 COPY ./server/migrations/ /app/migrations/
 
+ENV PATH="$PATH:/app"
 
 EXPOSE 11633/tcp
 
