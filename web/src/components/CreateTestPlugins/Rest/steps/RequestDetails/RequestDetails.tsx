@@ -25,13 +25,8 @@ const RequestDetails = () => {
     const {url = '', body = '', method = HTTP_METHOD.GET, headers = DEFAULT_HEADERS} = draftTest as IHttpValues;
     form.setFieldsValue({url, body, method: method as HTTP_METHOD, headers});
 
-    try {
-      form.validateFields();
-      onIsFormValid(true);
-    } catch (err) {
-      onIsFormValid(false);
-    }
-  }, [draftTest, form, onIsFormValid]);
+    onValidate(null, form.getFieldsValue());
+  }, [draftTest, form, onValidate]);
 
   useEffect(() => {
     onRefreshData();
