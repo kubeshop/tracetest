@@ -1,6 +1,8 @@
 package resourcemanager_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
 type sampleResource struct {
@@ -34,64 +37,134 @@ func (m *sampleResourceManager) Create(s sampleResource) (sampleResource, error)
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
-var (
-	sampleResourceNew_json = `{
-		"type": "SampleResource",
-		"spec": {
-			"name": "test",
-			"some_value": "the value"
-		}
-	}`
-	sampleResourceNew = sampleResource{
-		Name:      "test",
-		SomeValue: "the value",
-	}
-
-	sampleResourceCreated_json = `{
-		"type": "SampleResource",
-		"spec": {
-			"id": "1",
-
-			"name": "test",
-			"some_value": "the value"
-		}
-	}`
-	sampleResourceCreated = sampleResource{
-		ID:        "1",
-		Name:      "test",
-		SomeValue: "the value",
-	}
-)
-
 func TestSampleResource(t *testing.T) {
-	router := mux.NewRouter()
-	testServer := httptest.NewServer(router)
 
-	mockManager := new(sampleResourceManager)
-	manager := resourcemanager.New[sampleResource]("SampleResource", mockManager)
-	manager.RegisterRoutes(router)
+	resourceTest := struct {
+		resourceType      string
+		registerManagerFn func(*mux.Router) *mock.Mock
 
-	mockManager.
-		On("Create", sampleResourceNew).
-		Return(sampleResourceCreated, nil)
+		sampleNew     any
+		sampleNewJSON string
 
-	req, err := http.NewRequest(http.MethodPost, testServer.URL+"/sampleresource/", strings.NewReader(sampleResourceNew_json))
-	req.Header.Set("Content-Type", "application/json")
-	require.NoError(t, err)
+		sampleCreated     any
+		sampleCreatedJSON string
+	}{
+		resourceType: "SampleResource",
+		registerManagerFn: func(router *mux.Router) *mock.Mock {
+			mockManager := new(sampleResourceManager)
+			manager := resourcemanager.New[sampleResource]("SampleResource", mockManager)
+			manager.RegisterRoutes(router)
 
-	resp, err := testServer.Client().Do(req)
-	require.NoError(t, err)
+			return &mockManager.Mock
+		},
 
-	assert.Equal(t, resp.StatusCode, 201)
+		sampleNew: sampleResource{
+			Name:      "test",
+			SomeValue: "the value",
+		},
+		sampleNewJSON: `{
+			"type": "SampleResource",
+			"spec": {
+				"name": "test",
+				"some_value": "the value"
+			}
+		}`,
 
-	body := ""
-	if resp.Body != nil {
-		b, err := io.ReadAll(resp.Body)
-		require.NoError(t, err)
-		body = string(b)
+		sampleCreated: sampleResource{
+			ID:        "1",
+			Name:      "test",
+			SomeValue: "the value",
+		},
+		sampleCreatedJSON: `{
+			"type": "SampleResource",
+			"spec": {
+				"id": "1",
+
+				"name": "test",
+				"some_value": "the value"
+			}
+		}`,
 	}
 
-	assert.Equal(t, 201, resp.StatusCode)
-	assert.JSONEq(t, sampleResourceCreated_json, body)
+	t.Run(resourceTest.resourceType, func(t *testing.T) {
+
+		rt := resourceTest
+		t.Parallel()
+
+		contentTypes := []struct {
+			name     string
+			fromJSON func(input string) string
+			toJSON   func(input string) string
+		}{
+			{
+				name:     "application/json",
+				fromJSON: func(jsonSring string) string { return jsonSring },
+				toJSON:   func(jsonSring string) string { return jsonSring },
+			},
+
+			{
+				name: "text/yaml",
+				fromJSON: func(jsonString string) string {
+					var parsed map[string]any
+					err := json.Unmarshal([]byte(jsonString), &parsed)
+					if err != nil {
+						panic(err)
+					}
+					out, err := yaml.Marshal(parsed)
+					if err != nil {
+						panic(err)
+					}
+					return string(out)
+				},
+				toJSON: func(yamlString string) string {
+					var parsed map[string]any
+					err := yaml.Unmarshal([]byte(yamlString), &parsed)
+					if err != nil {
+						panic(err)
+					}
+					out, err := json.Marshal(parsed)
+					if err != nil {
+						panic(err)
+					}
+					return string(out)
+				},
+			},
+		}
+
+		for _, ct := range contentTypes {
+			t.Run(ct.name, func(t *testing.T) {
+				ct := ct
+				t.Parallel()
+
+				router := mux.NewRouter()
+				testServer := httptest.NewServer(router)
+				mockManager := rt.registerManagerFn(router)
+
+				mockManager.
+					On("Create", rt.sampleNew).
+					Return(rt.sampleCreated, nil)
+
+				input := ct.fromJSON(rt.sampleNewJSON)
+				url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.resourceType))
+				req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(input))
+				require.NoError(t, err)
+
+				req.Header.Set("Content-Type", ct.name)
+
+				resp, err := testServer.Client().Do(req)
+				require.NoError(t, err)
+
+				assert.Equal(t, resp.StatusCode, 201)
+
+				require.NotNil(t, resp.Body)
+				body, err := io.ReadAll(resp.Body)
+				require.NoError(t, err)
+
+				assert.Equal(t, 201, resp.StatusCode)
+				assert.JSONEq(t, rt.sampleCreatedJSON, ct.toJSON(string(body)))
+			})
+		}
+
+	})
 
 }
