@@ -18,16 +18,3 @@ demo:
   enabled: []
 
 experimentalFeatures: []
-
-telemetry:
-  dataStores:
-    awsxray:
-      type: awsxray
-      awsxray:
-        accessKeyId: <your-accessKeyId>
-        secretAccessKey: <your-secretAccessKey>
-        region: "us-west-2"
-
-server:
-  telemetry:
-    dataStore: awsxray

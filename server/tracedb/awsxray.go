@@ -17,7 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/xray"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	conventions "go.opentelemetry.io/collector/semconv/v1.6.1"
@@ -85,7 +84,7 @@ func (db *awsxrayDB) TestConnection(ctx context.Context) connection.ConnectionTe
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, url)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
-			_, err := db.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			_, err := db.GetTraceByID(ctx, db.GetTraceID().String())
 			if err != nil && strings.Contains(strings.ToLower(err.Error()), "403") {
 				return `Tracetest tried to execute an AWS XRay API request but it failed due to authentication issues`, err
 			}
