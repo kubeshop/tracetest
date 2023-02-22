@@ -80,7 +80,8 @@ func configureConfigFile(vp *viper.Viper) {
 var ErrConfigFileNotFound = errors.New("config file not found")
 
 func readConfigFile(vp *viper.Viper) error {
-	if confFile := vp.GetString("config"); confFile != "" {
+	confFile := vp.GetString("config")
+	if confFile != "" {
 		// if --config is passed, and the file does not exists
 		// it will trigger a "no such file or directory" error
 		// which is NOT an instance of `viper.ConfigFileNotFoundError` checked later in this func
@@ -89,7 +90,7 @@ func readConfigFile(vp *viper.Viper) error {
 	}
 
 	err := vp.ReadInConfig()
-	if err == nil {
+	if err == nil || confFile == "" {
 		return nil
 	}
 

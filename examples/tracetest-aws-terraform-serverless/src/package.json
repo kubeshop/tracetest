@@ -1,0 +1,19 @@
+{
+  "name": "tracetest-aws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hello.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.36.3",
+    "@opentelemetry/instrumentation": "^0.35.1",
+    "@opentelemetry/resources": "^1.9.1",
+    "@opentelemetry/sdk-node": "^0.35.1",
+    "@opentelemetry/sdk-trace-node": "^1.9.1",
+    "@opentelemetry/semantic-conventions": "^1.9.1"
+  }
+}

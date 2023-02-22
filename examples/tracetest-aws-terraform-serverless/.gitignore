@@ -1,0 +1,4 @@
+.terraform
+terraform.tfstate*
+src.zip
+node_modules
