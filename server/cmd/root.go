@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +39,7 @@ func init() {
 
 	cobra.OnInitialize(func() {
 		var err error
-		cfg, err = config.New(rootCmd.PersistentFlags())
+		cfg, err = config.New(rootCmd.PersistentFlags(), logger.Default())
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)

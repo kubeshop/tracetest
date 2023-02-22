@@ -1,17 +1,17 @@
 package config_test
 
 import (
-	"bytes"
-	"io"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/containerd/containerd/log"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 type deprecatedOptionTest struct {
@@ -43,10 +43,10 @@ func TestDeprecatedOptions(t *testing.T) {
 		},
 	}
 
-	newFunction(t, testCases)
+	executeDeprecationTestCase(t, testCases)
 }
 
-func newFunction(t *testing.T, testCases []deprecatedOptionTest) {
+func executeDeprecationTestCase(t *testing.T, testCases []deprecatedOptionTest) {
 	for _, testCase := range testCases {
 		testCase.fileContent = strings.ReplaceAll(testCase.fileContent, "\t", "")
 
@@ -55,40 +55,33 @@ func newFunction(t *testing.T, testCases []deprecatedOptionTest) {
 		require.NoError(t, err)
 		defer os.Remove(fileName)
 
-		r, w, err := os.Pipe()
-		require.NoError(t, err)
+		observedZapCore, observedLogs := observer.New(zap.InfoLevel)
+		observedLogger := zap.New(observedZapCore)
 
-		old := log.L.Logger.Out
-		log.L.Logger.Out = w
-		defer func() {
-			log.L.Logger.Out = old
-		}()
-
-		outC := make(chan string)
-
-		go func() {
-			var buf bytes.Buffer
-			io.Copy(&buf, r)
-			outC <- buf.String()
-		}()
-
-		config.New(nil)
-
-		w.Close()
-		output := <-outC
+		config.New(nil, observedLogger)
 
 		warnings := make([]string, 0)
-		for _, line := range strings.Split(output, "\n") {
-			if line == "" {
+		for _, line := range observedLogs.All() {
+			if line.Message == "" {
 				continue
 			}
 
-			warnings = append(warnings, line)
+			warnings = append(warnings, line.Message)
 		}
 
 		assert.Len(t, warnings, len(testCase.expectedDeprecatedKeys))
 		for _, message := range testCase.expectedDeprecatedKeys {
-			assert.Contains(t, output, message)
+			assertSlicesContainsString(t, warnings, message)
 		}
 	}
+}
+
+func assertSlicesContainsString(t *testing.T, slice []string, str string) {
+	for _, item := range slice {
+		if strings.Contains(item, str) {
+			return
+		}
+	}
+
+	assert.Fail(t, fmt.Sprintf("%s was not found", str))
 }

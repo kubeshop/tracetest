@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/logger"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -125,7 +126,7 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New(nil)))
+	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New(nil, logger.Default())))
 	reg := trigger.NewRegsitry(tr, tr)
 
 	me := new(mockTriggerer)
@@ -140,7 +141,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New(nil)))
+	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New(nil, logger.Default())))
 
 	mtp.Test(t)
 	return runnerFixture{
