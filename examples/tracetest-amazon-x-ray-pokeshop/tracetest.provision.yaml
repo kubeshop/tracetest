@@ -1,7 +1,0 @@
-dataStore:
-  type: awsxray
-  awsxray:
-    accessKeyId: <your-accessKeyId>
-    secretAccessKey: <your-secretAccessKey>
-    sessionToken: <your-session-token>
-    region: "us-west-2"
