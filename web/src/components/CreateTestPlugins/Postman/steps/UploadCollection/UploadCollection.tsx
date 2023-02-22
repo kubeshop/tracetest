@@ -37,18 +37,9 @@ const UploadCollection = () => {
     onRefreshData();
   }, [onRefreshData]);
 
-  const onValidateUrlChange = useCallback(async () => {
-    try {
-      await form.validateFields();
-      onIsFormValid(true);
-    } catch (err) {
-      onIsFormValid(false);
-    }
-  }, [form, onIsFormValid]);
-
   useEffect(() => {
-    onValidateUrlChange();
-  }, [currentUrl, onValidateUrlChange]);
+    onValidate(null, form.getFieldsValue());
+  }, [currentUrl, form, onValidate]);
 
   return (
     <Step.Step>

@@ -10,7 +10,7 @@ interface IProps {
 
 export const CollectionFileField = ({form}: IProps): React.ReactElement => (
   <Form.Item
-    rules={[{required: true, message: 'Please enter a request url'}]}
+    rules={[{required: true, message: 'No file selected yet'}]}
     name="collectionFile"
     label="Upload Postman Collection"
   >
