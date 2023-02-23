@@ -197,18 +197,21 @@ func warnAboutDeprecatedFields(vp *viper.Viper, logger Logger) error {
 			continue
 		}
 
-		if vp.IsSet(opt.key) {
-			value := vp.Get(opt.key)
-			if value == opt.defaultValue {
-				continue
-			}
-
-			if opt.deprecationMessage != "" {
-				logger.Println(fmt.Sprintf(`config "%s" is deprecated: %s`, opt.key, opt.deprecationMessage))
-			} else {
-				logger.Println(fmt.Sprintf(`config "%s" is deprecated.`, opt.key))
-			}
+		if !vp.IsSet(opt.key) {
+			continue
 		}
+		if vp.Get(opt.key) == opt.defaultValue {
+			continue
+		}
+
+		msg := fmt.Sprintf(`config "%s" is deprecated. `, opt.key)
+
+
+		if opt.deprecationMessage != "" {
+			msg += opt.deprecationMessage
+		}
+		
+		logger.Println(msg)
 	}
 
 	return nil
