@@ -1,11 +1,9 @@
 package testutil
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -15,10 +13,6 @@ import (
 )
 
 type Operation string
-
-const (
-	OperationCreateSuccess Operation = "CreateSuccess"
-)
 
 type ResourceTypeTest struct {
 	ResourceType      string
@@ -32,12 +26,19 @@ type ResourceTypeTest struct {
 	SampleCreatedJSON string
 }
 
-var contentTypes = []struct {
+type contentType struct {
 	name        string
 	contentType string
 	fromJSON    func(input string) string
 	toJSON      func(input string) string
-}{
+}
+
+type operationTester interface {
+	buildRequest(*testing.T, *httptest.Server, contentType, *ResourceTypeTest) *http.Request
+	name() Operation
+}
+
+var contentTypes = []contentType{
 	{
 		name:        "json",
 		contentType: "application/json",
@@ -69,43 +70,57 @@ func TestResourceType(t *testing.T, rt *ResourceTypeTest) {
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
-
 		rt := rt
 		t.Parallel()
 
-		for _, ct := range contentTypes {
-			t.Run(ct.name, func(t *testing.T) {
-				ct := ct
+		for _, op := range operations {
+			t.Run(string(op.name()), func(t *testing.T) {
+				op := op
 				t.Parallel()
 
-				router := mux.NewRouter()
-				testServer := httptest.NewServer(router)
-				testBridge := rt.RegisterManagerFn(router)
-
-				if rt.Prepare != nil {
-					rt.Prepare(OperationCreateSuccess, testBridge)
-				}
-
-				input := ct.fromJSON(rt.SampleNewJSON)
-				url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.ResourceType))
-				req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(input))
-				require.NoError(t, err)
-
-				req.Header.Set("Content-Type", ct.contentType)
-
-				resp, err := testServer.Client().Do(req)
-				require.NoError(t, err)
-
-				assert.Equal(t, resp.StatusCode, 201)
-
-				require.NotNil(t, resp.Body)
-				body, err := io.ReadAll(resp.Body)
-				require.NoError(t, err)
-
-				assert.Equal(t, 201, resp.StatusCode)
-				assert.JSONEq(t, rt.SampleCreatedJSON, ct.toJSON(string(body)))
+				testOperation(t, op, rt)
 			})
 		}
 
 	})
+}
+
+func testOperation(t *testing.T, op operationTester, rt *ResourceTypeTest) {
+	t.Helper()
+
+	for _, ct := range contentTypes {
+		t.Run(ct.name, func(t *testing.T) {
+			ct := ct
+			t.Parallel()
+
+			testContentType(t, op, ct, rt)
+		})
+	}
+}
+
+func testContentType(t *testing.T, op operationTester, ct contentType, rt *ResourceTypeTest) {
+	t.Helper()
+
+	router := mux.NewRouter()
+	testServer := httptest.NewServer(router)
+	testBridge := rt.RegisterManagerFn(router)
+
+	if rt.Prepare != nil {
+		rt.Prepare(op.name(), testBridge)
+	}
+
+	req := op.buildRequest(t, testServer, ct, rt)
+	req.Header.Set("Content-Type", ct.contentType)
+
+	resp, err := testServer.Client().Do(req)
+	require.NoError(t, err)
+
+	assert.Equal(t, resp.StatusCode, 201)
+
+	require.NotNil(t, resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, 201, resp.StatusCode)
+	assert.JSONEq(t, rt.SampleCreatedJSON, ct.toJSON(string(body)))
 }
