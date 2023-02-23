@@ -17,11 +17,7 @@ type ResourceTypeTest struct {
 	RegisterManagerFn func(*mux.Router) any
 	Prepare           func(operation Operation, bridge any)
 
-	SampleNew     any
-	SampleNewJSON string
-
-	SampleCreated     any
-	SampleCreatedJSON string
+	SampleJSON string
 }
 
 type contentType struct {
@@ -32,8 +28,8 @@ type contentType struct {
 }
 
 type operationTester interface {
-	buildRequest(*testing.T, *httptest.Server, contentType, *ResourceTypeTest) *http.Request
-	assertResponse(*testing.T, *http.Response, contentType, *ResourceTypeTest)
+	buildRequest(*testing.T, *httptest.Server, contentType, ResourceTypeTest) *http.Request
+	assertResponse(*testing.T, *http.Response, contentType, ResourceTypeTest)
 	name() Operation
 }
 
@@ -65,7 +61,7 @@ var contentTypes = []contentType{
 	},
 }
 
-func TestResourceType(t *testing.T, rt *ResourceTypeTest) {
+func TestResourceType(t *testing.T, rt ResourceTypeTest) {
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
@@ -84,7 +80,7 @@ func TestResourceType(t *testing.T, rt *ResourceTypeTest) {
 	})
 }
 
-func testOperation(t *testing.T, op operationTester, rt *ResourceTypeTest) {
+func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	t.Helper()
 
 	for _, ct := range contentTypes {
@@ -97,7 +93,7 @@ func testOperation(t *testing.T, op operationTester, rt *ResourceTypeTest) {
 	}
 }
 
-func testContentType(t *testing.T, op operationTester, ct contentType, rt *ResourceTypeTest) {
+func testContentType(t *testing.T, op operationTester, ct contentType, rt ResourceTypeTest) {
 	t.Helper()
 
 	router := mux.NewRouter()
