@@ -237,16 +237,10 @@ jobs:
         run:
           cd examples/collector
           TAG=latest docker-compose up -d
-          docker compose logs -f > /tmp/docker-log &
+          ./scripts/wait-for-port.sh 11633
       - name: Run tests
         run:
-          find ./dist -name 'tracetest' -exec cp {} ./dist \;
-          chmod +x ./dist/tracetest
-
-          ./scripts/wait-for-port.sh 11633
-
           cd ./cli/testscripts
-
           TRACETEST_CLI="./dist/tracetest" \
           TAG=pr-${{ github.event.pull_request.number }} \
            ./${{ matrix.test_dir }}/run.bash

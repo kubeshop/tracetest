@@ -28,8 +28,6 @@ echo ""
 
 echo "Setting up test helpers..."
 
-mkdir -p results/responses
-
 run_test() {
   test_definition_file=$1
 
