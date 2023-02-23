@@ -2,20 +2,17 @@
 
 set -e
 
-export TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
-if ! command -v "$TRACETEST_CLI" &> /dev/null; then
-  echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
-  exit 2
-fi
-
-export TRACETEST_ENDPOINT="localhost:11633"
+export TAG=${TAG:-"latest"}
+export TRACETEST_ENDPOINT="host.docker.internal:11633"
+export TRACETEST_CLI="tracetest"
 
 echo "Preparing to run CLI tests..."
 echo ""
 
 echo "Environment variables considered on this run:"
-echo "TRACETEST_CLI:      $TRACETEST_CLI"
+echo "TAG:                $TAG"
 echo "TRACETEST_ENDPOINT: $TRACETEST_ENDPOINT"
+echo "TRACETEST_CLI:      $TRACETEST_CLI"
 
 echo "Setting up tracetest CLI configuration..."
 cat << EOF > config.yml
@@ -31,9 +28,9 @@ echo "Setting up test helpers..."
 mkdir -p results/responses
 
 run_test() {
-  test_definition_file=$1
+  test_definition_file=./files/$1
 
-  $TRACETEST_CLI --config ./config.yml test run --definition $test_definition_file --wait-for-result
+  docker run --volume $(PWD):/app/files --entrypoint $TRACETEST_CLI kubeshop/tracetest:$TAG --config ./files/config.yml test run --definition $test_definition_file --wait-for-result
   return $?
 }
 

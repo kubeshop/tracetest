@@ -17,7 +17,7 @@ on:
       - k8s/**
 
 jobs:
-  test-cli:
+  unit-test-cli:
     name: CLI unit tests
     runs-on: ubuntu-latest
 
@@ -217,7 +217,7 @@ jobs:
           ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
           ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
-  test-cli:
+  integration-test-cli:
     needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
@@ -245,10 +245,14 @@ jobs:
 
           ./scripts/wait-for-port.sh 11633
 
-          TAG=pr-${{ github.event.pull_request.number }} ./cli/testscripts/${{ matrix.test_dir }}/run.bash
+          cd ./cli/testscripts
+
+          TRACETEST_CLI="./dist/tracetest" \
+          TAG=pr-${{ github.event.pull_request.number }} \
+           ./${{ matrix.test_dir }}/run.bash
 
   deploy:
-    needs: [build-docker, test-cli, test-server, test-web]
+    needs: [build-docker, unit-test-cli, test-server, test-web]
     runs-on: ubuntu-latest
 
     steps:
