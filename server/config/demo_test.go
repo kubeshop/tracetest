@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"log"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -9,7 +10,7 @@ import (
 
 func TestDemoConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, _ := config.New(nil)
+		cfg, _ := config.New(nil, log.Default())
 
 		defaultEndponts := map[string]string{
 			"PokeshopHttp":       "",
