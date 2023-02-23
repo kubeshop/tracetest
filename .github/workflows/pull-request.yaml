@@ -234,12 +234,12 @@ jobs:
           name: tracetest-go
           path: dist/
       - name: Build latest server
-        run:
+        run: |
           cd examples/collector
           TAG=latest docker-compose up -d
-      - name: Run tests
-        run:
           ./scripts/wait-for-port.sh 11633
+      - name: Run tests
+        run: |
           cd ./cli/testscripts
           TRACETEST_CLI="./dist/tracetest" \
           TAG=pr-${{ github.event.pull_request.number }} \
