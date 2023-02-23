@@ -236,7 +236,7 @@ jobs:
       - name: Build latest server
         run:
           cd examples/collector
-          TAG=latest docker-compose up -d
+          TAG=latest docker-compose up -d &
           ./scripts/wait-for-port.sh 11633
       - name: Run tests
         run:
