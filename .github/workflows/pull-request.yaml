@@ -36,7 +36,7 @@ jobs:
         run: cd cli; make test
 
   test-server:
-    name: server unit tests
+    name: API Server unit tests
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +54,7 @@ jobs:
         run: cd server; make test
 
   test-web:
-    name: web unit tests
+    name: WebUI unit tests
     runs-on: ubuntu-latest
 
     strategy:
@@ -87,7 +87,7 @@ jobs:
       - run: cd web; ${{ matrix.cmd }}
 
   build-go:
-    name: build go binaries
+    name: Build go binaries (API Server and CLI)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -116,7 +116,7 @@ jobs:
         path: dist/
 
   build-web:
-    name: build web
+    name: Build WebUI resources
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -144,6 +144,7 @@ jobs:
           path: web/build/
 
   build-docker:
+    name: Build docker image
     runs-on: ubuntu-latest
     needs: [build-web, build-go]
     env:
@@ -184,6 +185,7 @@ jobs:
       - run: docker push kubeshop/tracetest:pr-${{ github.event.pull_request.number }}
 
   test-examples:
+    name: Test examples
     needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
@@ -217,7 +219,8 @@ jobs:
           ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
           ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
-  integration-test-cli:
+  smoke-test-cli:
+    name: CLI smoke test
     needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
@@ -240,12 +243,17 @@ jobs:
           ../../scripts/wait-for-port.sh 11633
       - name: Run tests
         run: |
+          chmod +x ./dist/tracetest
+          chmod +x ./${{ matrix.test_dir }}/run.bash
+
           cd ./cli/testscripts
+
           TRACETEST_CLI="./dist/tracetest" \
           TAG=pr-${{ github.event.pull_request.number }} \
            ./${{ matrix.test_dir }}/run.bash
 
   deploy:
+    name: Deploy test infra
     needs: [build-docker, unit-test-cli, test-server, test-web]
     runs-on: ubuntu-latest
 
@@ -273,7 +281,7 @@ jobs:
 
   trace-testing:
     needs: [deploy]
-    name: tracetesting server
+    name: Tracetesting API Server
     runs-on: ubuntu-latest
 
     steps:
@@ -311,7 +319,7 @@ jobs:
 
   e2e:
     needs: [deploy, trace-testing]
-    name: e2e test web
+    name: WebUI End-to-end tests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -369,6 +377,7 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   cleanup:
+    name: Cleanup test infra
     runs-on: ubuntu-latest
     needs: [trace-testing, e2e]
     if: always()
