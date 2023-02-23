@@ -237,7 +237,7 @@ jobs:
         run: |
           cd examples/collector
           TAG=latest docker-compose up -d
-          ./scripts/wait-for-port.sh 11633
+          ../../scripts/wait-for-port.sh 11633
       - name: Run tests
         run: |
           cd ./cli/testscripts
