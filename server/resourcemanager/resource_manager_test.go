@@ -32,8 +32,27 @@ func (m *sampleResourceManager) Create(s sampleResource) (sampleResource, error)
 
 func TestSampleResource(t *testing.T) {
 
-	var resourceTest *rmtests.ResourceTypeTest
-	resourceTest = &rmtests.ResourceTypeTest{
+	sample := sampleResource{
+		Name:      "test",
+		SomeValue: "the value",
+	}
+
+	sampleWithID := sampleResource{
+		ID:        "1",
+		Name:      "test",
+		SomeValue: "the value",
+	}
+
+	sampleJSON := `{
+		"type": "SampleResource",
+		"spec": {
+			"id": "1",
+			"name": "test",
+			"some_value": "the value"
+		}
+	}`
+
+	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceType: "SampleResource",
 		RegisterManagerFn: func(router *mux.Router) any {
 			mockManager := new(sampleResourceManager)
@@ -47,42 +66,14 @@ func TestSampleResource(t *testing.T) {
 			switch op {
 			case rmtests.OperationCreateSuccess:
 				mockManager.
-					On("Create", resourceTest.SampleNew).
-					Return(resourceTest.SampleCreated, nil)
+					On("Create", sample).
+					Return(sampleWithID, nil)
 			case rmtests.OperationCreateInteralError:
 				mockManager.
-					On("Create", resourceTest.SampleNew).
+					On("Create", sample).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 			}
 		},
-
-		SampleNew: sampleResource{
-			Name:      "test",
-			SomeValue: "the value",
-		},
-		SampleNewJSON: `{
-			"type": "SampleResource",
-			"spec": {
-				"name": "test",
-				"some_value": "the value"
-			}
-		}`,
-
-		SampleCreated: sampleResource{
-			ID:        "1",
-			Name:      "test",
-			SomeValue: "the value",
-		},
-		SampleCreatedJSON: `{
-			"type": "SampleResource",
-			"spec": {
-				"id": "1",
-
-				"name": "test",
-				"some_value": "the value"
-			}
-		}`,
-	}
-
-	rmtests.TestResourceType(t, resourceTest)
+		SampleJSON: sampleJSON,
+	})
 }
