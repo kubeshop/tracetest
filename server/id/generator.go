@@ -15,6 +15,12 @@ func (id ID) String() string {
 	return string(id)
 }
 
+type GeneratorFunc func() ID
+
+func GenerateID() ID {
+	return ID(shortid.MustGenerate())
+}
+
 type Generator interface {
 	UUID() uuid.UUID
 	ID() ID
@@ -37,7 +43,7 @@ func (g randGenerator) UUID() uuid.UUID {
 }
 
 func (g randGenerator) ID() ID {
-	return ID(shortid.MustGenerate())
+	return GenerateID()
 }
 
 func (g randGenerator) TraceID() trace.TraceID {
