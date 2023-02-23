@@ -79,6 +79,10 @@ func (c *Config) PostgresConnString() string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if postgresConnString := c.vp.GetString("postgresConnString"); postgresConnString != "" {
+		return postgresConnString
+	}
+
 	str := fmt.Sprintf(
 		"host=%s user=%s password=%s port=%d dbname=%s",
 		c.vp.GetString("postgres.host"),
