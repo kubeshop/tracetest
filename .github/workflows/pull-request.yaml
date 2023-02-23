@@ -243,7 +243,9 @@ jobs:
           ../../scripts/wait-for-port.sh 11633
       - name: Run tests
         run: |
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
+
           chmod +x ./${{ matrix.test_dir }}/run.bash
 
           cd ./cli/testscripts
