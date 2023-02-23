@@ -2,98 +2,62 @@ package config_test
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-type deprecatedOptionTest struct {
-	name                   string
-	fileContent            string
-	expectedDeprecatedKeys []string
-}
 
 type logger struct {
 	messages []string
 }
 
-func (l *logger) Println(in ...any) {
-	message := fmt.Sprintf("%s", in...)
-	l.messages = append(l.messages, message)
+func newLogger() *logger {
+	return &logger{
+		messages: []string{},
+	}
 }
 
-func (l *logger) GetMessages() []string {
-	return l.messages
+func (l *logger) Println(in ...any) {
+	l.messages = append(l.messages, fmt.Sprintf("%s", in...))
 }
 
 func TestDeprecatedOptions(t *testing.T) {
-	testCases := []deprecatedOptionTest{
+	testCases := []struct {
+		name             string
+		flags            []string
+		expectedMessages []string
+	}{
 		{
-			name:                   "shouldNotDetectAnyDeprecatedConfig",
-			expectedDeprecatedKeys: []string{},
-			fileContent: `
-				postgres:
-				  host: localhost
-				  port: 5432
-			`,
+			name:             "NoDeprecations",
+			flags:            []string{"--config", "./testdata/basic.yaml"},
+			expectedMessages: []string{},
 		},
 		{
-			name:                   "shouldDetectAnyDeprecatedConfig",
-			expectedDeprecatedKeys: []string{"postgresConnString"},
-			fileContent: `
-				postgresConnString: "this is deprecated"
-				postgres:
-				  host: localhost
-				  port: 5432
-			`,
+			name:             "Deprecated/postgresConnString",
+			flags:            []string{"--postgresConnString", "some conn string"},
+			expectedMessages: []string{`config "postgresConnString" is deprecated. Use the new postgres config structure instead.`},
 		},
 	}
 
-	executeDeprecationTestCase(t, testCases)
-}
-
-func executeDeprecationTestCase(t *testing.T, testCases []deprecatedOptionTest) {
-	for _, testCase := range testCases {
-		testCase.fileContent = strings.ReplaceAll(testCase.fileContent, "\t", "")
-
-		fileName := "tracetest.yaml"
-		err := ioutil.WriteFile(fileName, []byte(testCase.fileContent), 0644)
+	configFromFlagsWithLogger := func(logger *logger, inputFlags []string) *config.Config {
+		flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
+		config.SetupFlags(flags)
+		err := flags.Parse(inputFlags)
 		require.NoError(t, err)
-		defer os.Remove(fileName)
-
-		logger := logger{
-			messages: []string{},
-		}
-
-		config.New(nil, &logger)
-
-		warnings := make([]string, 0)
-		for _, line := range logger.GetMessages() {
-			if line == "" {
-				continue
-			}
-
-			warnings = append(warnings, line)
-		}
-
-		assert.Len(t, warnings, len(testCase.expectedDeprecatedKeys))
-		for _, message := range testCase.expectedDeprecatedKeys {
-			assertSlicesContainsString(t, warnings, message)
-		}
-	}
-}
-
-func assertSlicesContainsString(t *testing.T, slice []string, str string) {
-	for _, item := range slice {
-		if strings.Contains(item, str) {
-			return
-		}
+		cfg, err := config.New(flags, logger)
+		require.NoError(t, err)
+		return cfg
 	}
 
-	assert.Fail(t, fmt.Sprintf("%s was not found", str))
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			testCase := testCase
+			logger := newLogger()
+			configFromFlagsWithLogger(logger, testCase.flags)
+			assert.Equal(t, testCase.expectedMessages, logger.messages)
+		})
+	}
 }

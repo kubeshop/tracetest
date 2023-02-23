@@ -121,13 +121,14 @@ func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 	vp.AutomaticEnv()
 
 	configureConfigFile(vp)
-	warnAboutDeprecatedFields(vp, logger)
-
-	configOptions.registerDefaults(vp)
 
 	if flags != nil {
 		vp.BindPFlags(flags)
 	}
+
+	configOptions.registerDefaults(vp)
+
+	warnAboutDeprecatedFields(vp, logger)
 
 	err := readConfigFile(vp)
 	if err != nil {
@@ -197,20 +198,17 @@ func warnAboutDeprecatedFields(vp *viper.Viper, logger logger) error {
 			continue
 		}
 
-		if !vp.IsSet(opt.key) {
-			continue
-		}
-		if vp.Get(opt.key) == opt.defaultValue {
+		optionValue := vp.Get(opt.key)
+		if optionValue == nil || optionValue == opt.defaultValue {
 			continue
 		}
 
 		msg := fmt.Sprintf(`config "%s" is deprecated. `, opt.key)
 
-
 		if opt.deprecationMessage != "" {
 			msg += opt.deprecationMessage
 		}
-		
+
 		logger.Println(msg)
 	}
 
