@@ -10,25 +10,25 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type validator interface {
+type Validator interface {
 	Validate() error
 }
 
-type Resource[T validator] struct {
+type Resource[T Validator] struct {
 	Type string `mapstructure:"type"`
 	Spec T      `mapstructure:"spec"`
 }
 
-type ResourceHandler[T validator] interface {
+type ResourceHandler[T Validator] interface {
 	Create(T) (T, error)
 }
 
-type manager[T validator] struct {
+type manager[T Validator] struct {
 	resourceType string
 	handler      ResourceHandler[T]
 }
 
-func New[T validator](resourceType string, handler ResourceHandler[T]) *manager[T] {
+func New[T Validator](resourceType string, handler ResourceHandler[T]) *manager[T] {
 	return &manager[T]{
 		resourceType: resourceType,
 		handler:      handler,

@@ -39,6 +39,31 @@ func ConfigureDB(cfg *config.Config) error {
 
 }
 
+func MustGetRawTestingDatabase() *sql.DB {
+	db, err := GetRawTestingDatabase()
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
+
+func MustCreateRandomMigratedDatabase(db *sql.DB) *sql.DB {
+	newConn, err := createRandomDatabaseForTest(db, "tracetest")
+	if err != nil {
+		panic(err)
+	}
+
+	// migrate DB
+	_, err = testdb.Postgres(testdb.WithDB(newConn))
+	if err != nil {
+		panic(err)
+	}
+
+	return newConn
+
+}
+
 func GetRawTestingDatabase() (*sql.DB, error) {
 	pgContainer, err := getPostgresContainer()
 	if err != nil {

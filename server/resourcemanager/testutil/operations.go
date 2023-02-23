@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -85,7 +84,7 @@ func (createSuccessOperation) name() Operation {
 }
 
 func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	assert.Equal(t, resp.StatusCode, 201)
+	require.Equal(t, 201, resp.StatusCode)
 
 	require.NotNil(t, resp.Body)
 	body, err := io.ReadAll(resp.Body)
@@ -95,8 +94,8 @@ func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, 
 	clean := removeIDFromJSON(rt.SampleJSON)
 	expected := ct.toJSON(clean)
 
-	assert.JSONEq(t, expected, removeIDFromJSON(jsonBody))
-	assert.NotEmpty(t, extractID(jsonBody))
+	require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
+	require.NotEmpty(t, extractID(jsonBody))
 }
 
 const OperationCreateInteralError Operation = "CreateInteralError"
@@ -119,11 +118,11 @@ func (createInteralErrorOperation) name() Operation {
 }
 
 func (createInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	assert.Equal(t, 500, resp.StatusCode)
+	require.Equal(t, 500, resp.StatusCode)
 
 	require.NotNil(t, resp.Body)
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 
-	assert.Contains(t, string(body), "error creating resource "+rt.ResourceType)
+	require.Contains(t, string(body), "error creating resource "+rt.ResourceType)
 }
