@@ -1,6 +1,7 @@
 package resourcemanager_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -48,6 +49,10 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Create", resourceTest.SampleNew).
 					Return(resourceTest.SampleCreated, nil)
+			case rmtests.OperationCreateInteralError:
+				mockManager.
+					On("Create", resourceTest.SampleNew).
+					Return(sampleResource{}, fmt.Errorf("some error"))
 			}
 		},
 
