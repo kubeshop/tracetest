@@ -217,6 +217,36 @@ jobs:
           ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
           ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
+  test-cli:
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_dir:
+          - local
+          - docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-go
+          path: dist/
+      - name: Build latest server
+        run:
+          cd examples/collector
+          TAG=latest docker-compose up -d
+          docker compose logs -f > /tmp/docker-log &
+      - name: Run tests
+        run:
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
+          chmod +x ./dist/tracetest
+
+          ./scripts/wait-for-port.sh 11633
+
+          TAG=pr-${{ github.event.pull_request.number }} ./cli/testscripts/${{ matrix.test_dir }}/run.bash
+
   deploy:
     needs: [build-docker, test-cli, test-server, test-web]
     runs-on: ubuntu-latest
@@ -261,12 +291,12 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Install CLI intergation version (latest main)
+      - name: Install CLI integration version (latest main)
         run: |
           cd /tmp
           curl -L https://github.com/kubeshop/tracetest/releases/download/nightly/tracetest_latest_linux_amd64.tar.gz  | tar -xz
 
-      - name: Forward port
+      - name: Connecting with integration env (port-forwarding)
         run: |
           kubectl port-forward \
             --namespace tracetest-integration \
