@@ -68,7 +68,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 	created, err := m.handler.Create(targetResource.Spec)
 	if err != nil {
-		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("cannot persist entity: %s", err.Error()))
+		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("error creating resource %s: %s", m.resourceType, err.Error()))
 		return
 	}
 
