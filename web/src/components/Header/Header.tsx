@@ -8,12 +8,11 @@ import * as S from './Header.styled';
 import Menu from './Menu';
 
 interface IProps {
-  hasEnvironments?: boolean;
   hasLogo?: boolean;
   isNoTracingMode: boolean;
 }
 
-const Header = ({hasEnvironments = false, hasLogo = false, isNoTracingMode}: IProps) => (
+const Header = ({hasLogo = false, isNoTracingMode}: IProps) => (
   <S.Header>
     <div>
       {hasLogo && (
@@ -25,7 +24,7 @@ const Header = ({hasEnvironments = false, hasLogo = false, isNoTracingMode}: IPr
 
     <Space>
       {isNoTracingMode && <NoTracingPopover />}
-      {hasEnvironments && <EnvironmentSelector />}
+      <EnvironmentSelector />
       <Menu />
     </Space>
   </S.Header>
