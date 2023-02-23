@@ -34,7 +34,7 @@ func (l *logger) GetMessages() []string {
 func TestDeprecatedOptions(t *testing.T) {
 	testCases := []deprecatedOptionTest{
 		{
-			name:                   "should_not_detect_any_deprecated_config",
+			name:                   "shouldNotDetectAnyDeprecatedConfig",
 			expectedDeprecatedKeys: []string{},
 			fileContent: `
 				postgres:
@@ -43,7 +43,7 @@ func TestDeprecatedOptions(t *testing.T) {
 			`,
 		},
 		{
-			name:                   "should_detect_any_deprecated_config",
+			name:                   "shouldDetectAnyDeprecatedConfig",
 			expectedDeprecatedKeys: []string{"postgresConnString"},
 			fileContent: `
 				postgresConnString: "this is deprecated"
