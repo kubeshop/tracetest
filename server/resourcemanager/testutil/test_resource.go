@@ -1,13 +1,11 @@
 package testutil
 
 import (
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 )
@@ -35,6 +33,7 @@ type contentType struct {
 
 type operationTester interface {
 	buildRequest(*testing.T, *httptest.Server, contentType, *ResourceTypeTest) *http.Request
+	assertResponse(*testing.T, *http.Response, contentType, *ResourceTypeTest)
 	name() Operation
 }
 
@@ -115,12 +114,5 @@ func testContentType(t *testing.T, op operationTester, ct contentType, rt *Resou
 	resp, err := testServer.Client().Do(req)
 	require.NoError(t, err)
 
-	assert.Equal(t, resp.StatusCode, 201)
-
-	require.NotNil(t, resp.Body)
-	body, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	assert.Equal(t, 201, resp.StatusCode)
-	assert.JSONEq(t, rt.SampleCreatedJSON, ct.toJSON(string(body)))
+	op.assertResponse(t, resp, ct, rt)
 }
