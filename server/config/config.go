@@ -31,7 +31,7 @@ type Config struct {
 	mu     sync.Mutex
 }
 
-type Logger interface {
+type logger interface {
 	Println(...any)
 }
 
@@ -113,7 +113,7 @@ func SetupFlags(flags *pflag.FlagSet) {
 	configOptions.registerFlags(flags)
 }
 
-func New(flags *pflag.FlagSet, logger Logger) (*Config, error) {
+func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 	vp := viper.New()
 
 	vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -186,7 +186,7 @@ func (c *Config) AnalyticsEnabled() bool {
 	return c.config.GA.Enabled
 }
 
-func warnAboutDeprecatedFields(vp *viper.Viper, logger Logger) error {
+func warnAboutDeprecatedFields(vp *viper.Viper, logger logger) error {
 	err := readConfigFile(vp)
 	if err != nil {
 		return err
