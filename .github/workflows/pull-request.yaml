@@ -246,9 +246,8 @@ jobs:
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
-          chmod +x ./${{ matrix.test_dir }}/run.bash
-
           cd ./cli/testscripts
+          chmod +x ./${{ matrix.test_dir }}/run.bash
 
           TRACETEST_CLI="./dist/tracetest" \
           TAG=pr-${{ github.event.pull_request.number }} \
