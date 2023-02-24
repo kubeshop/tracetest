@@ -123,6 +123,15 @@ func (createInteralErrorOperation) assertResponse(t *testing.T, resp *http.Respo
 	require.NotNil(t, resp.Body)
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
+	jsonBody := ct.toJSON(string(body))
 
-	require.Contains(t, string(body), "error creating resource "+rt.ResourceType)
+	// hacky way to get the types we want
+	bodyValues := struct {
+		Code  int    `json:"code"`
+		Error string `json:"error"`
+	}{}
+	json.Unmarshal([]byte(jsonBody), &bodyValues)
+
+	require.Equal(t, 500, bodyValues.Code)
+	require.Contains(t, bodyValues.Error, "error creating resource "+rt.ResourceType)
 }
