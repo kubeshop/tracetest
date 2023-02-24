@@ -64,7 +64,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: if resoruceType != values.resourceType return error
+	// TODO: if resourceType != values.resourceType return error
 
 	created, err := m.handler.Create(targetResource.Spec)
 	if err != nil {
