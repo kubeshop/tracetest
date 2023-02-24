@@ -3,16 +3,7 @@
 set -e
 
 export TAG=${TAG:-"latest"}
-if ! command -v "$TAG" &> /dev/null; then
-  echo "\$TAG not set. stopping script";
-  exit 2
-fi
-
 export TEST_ENV=${TEST_ENV:-"local"}
-if ! command -v "$TEST_ENV" &> /dev/null; then
-  echo "\$TEST_ENV not set. stopping script";
-  exit 2
-fi
 
 if [ $TEST_ENV = "local" ]; then
   export TRACETEST_ENDPOINT="localhost:11633"
@@ -43,7 +34,7 @@ echo ""
 echo "Setting up test helpers..."
 
 run_cli_command() {
-  test_definition_file=$args
+  args=$1
 
   $TRACETEST_CLI_COMMAND --config ./config.yml $args
   return $?
