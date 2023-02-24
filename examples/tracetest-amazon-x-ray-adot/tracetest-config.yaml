@@ -17,12 +17,3 @@ demo:
   enabled: []
 
 experimentalFeatures: []
-
-telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-
-server:
-  telemetry:
-    dataStore: otlp

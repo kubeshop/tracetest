@@ -1,4 +1,4 @@
-# Tracetest + Amazon X-Ray
+# Tracetest + Amazon X-Ray (using ADOT Collector)
 
 This repository objective is to show how you can configure your Tracetest instance to connect to AWS X-Ray plus the ADOT collector and use it as its tracing backend.
 
