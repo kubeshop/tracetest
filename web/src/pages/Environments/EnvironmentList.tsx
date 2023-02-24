@@ -4,6 +4,7 @@ import usePagination from 'hooks/usePagination';
 import Loading from 'pages/Home/Loading';
 import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
 import Environment from 'models/Environment.model';
+import {ENVIRONMENTS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import * as S from './Environment.styled';
 import {EnvironmentCard} from './EnvironmentCard';
 
@@ -19,7 +20,15 @@ const EnvironmentList = ({onDelete, onEdit, query}: IProps) => {
   return (
     <Pagination
       emptyComponent={
-        <Empty message="You have not created any environments yet. Use the Create button to create your first environment" />
+        <Empty
+          title="You have not created any environments yet"
+          message={
+            <>
+              Use the Create button to create your first environment. Learn more about test or transactions{' '}
+              <a href={ENVIRONMENTS_DOCUMENTATION_URL}>here.</a>
+            </>
+          }
+        />
       }
       loadingComponent={<Loading />}
       {...pagination}

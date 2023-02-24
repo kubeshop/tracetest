@@ -7,9 +7,10 @@ import * as S from './Home.styled';
 interface IProps {
   onSearch(search: string): void;
   onSortBy(sortBy: SortBy, sortDirection: SortDirection): void;
+  isEmpty: boolean;
 }
 
-const HomeFilters = ({onSearch, onSortBy}: IProps) => {
+const HomeFilters = ({onSearch, onSortBy, isEmpty}: IProps) => {
   const handleSort = useCallback(
     (newSortBy: string) => {
       const {
@@ -25,7 +26,7 @@ const HomeFilters = ({onSearch, onSortBy}: IProps) => {
     <S.FiltersContainer>
       <SearchInput onSearch={onSearch} placeholder="Search test" />
       <Typography.Text>Sort by:</Typography.Text>
-      <Select defaultValue={sortOptions[0].value} onChange={handleSort} style={{width: 160}}>
+      <Select disabled={isEmpty} defaultValue={sortOptions[0].value} onChange={handleSort} style={{width: 160}}>
         {sortOptions.map(({value, label}) => (
           <Select.Option key={value} value={value}>
             {label}
