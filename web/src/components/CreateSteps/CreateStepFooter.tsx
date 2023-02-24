@@ -53,7 +53,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
             type="primary"
             loading={isLoading}
           >
-            Create
+            Create & Run
           </Button>
         )}
       </span>
