@@ -220,13 +220,13 @@ jobs:
           ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || cat /tmp/docker-log
 
   smoke-test-cli:
-    name: CLI smoke test
+    name: CLI smoke tests
     needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        test_dir:
+        test_env:
           - local
           - docker
     steps:
@@ -250,8 +250,8 @@ jobs:
           chmod +x ./run.bash
 
           TRACETEST_CLI="../../dist/tracetest" \
-          TAG=pr-${{ github.event.pull_request.number }} \
-          TEST_ENV=${{ matrix.test_dir }} \
+          TAG="pr-${{ github.event.pull_request.number }}" \
+          TEST_ENV="${{ matrix.test_env }}" \
           ./run.bash
 
   deploy:
