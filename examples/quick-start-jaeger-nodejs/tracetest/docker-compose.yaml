@@ -1,8 +1,7 @@
-version: '3'
+version: "3"
 services:
-
   tracetest:
-    image: kubeshop/tracetest
+    image: kubeshop/tracetest:${TAG:-latest}
     platform: linux/amd64
     volumes:
       - ./tracetest/tracetest.config.yaml:/app/config.yaml
@@ -45,6 +44,8 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: unless-stopped
+    ports:
+      - "16686:16686"
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s
