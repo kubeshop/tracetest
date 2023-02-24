@@ -10,7 +10,7 @@ if [ $TEST_ENV = "local" ]; then
   export TRACETEST_CLI_COMMAND=$TRACETEST_CLI
 else
   export TRACETEST_ENDPOINT="host.docker.internal:11633"
-  export TRACETEST_CLI_COMMAND="docker run --volume $PWD/tests:/app/tests --entrypoint tracetest kubeshop/tracetest:$TAG"
+  export TRACETEST_CLI_COMMAND="docker run --volume $PWD/tests:/app/tests --entrypoint tracetest --add-host=host.docker.internal:host-gateway kubeshop/tracetest:$TAG"
 fi
 
 echo "Preparing to run CLI tests..."
