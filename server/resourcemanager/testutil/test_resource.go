@@ -65,7 +65,6 @@ func TestResourceType(t *testing.T, rt ResourceTypeTest) {
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
-		rt := rt
 		t.Parallel()
 
 		for _, op := range operations {
