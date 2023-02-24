@@ -44,23 +44,38 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	return subrouter
 }
 
+func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
+	body, err := enc.Marshal(map[string]any{
+		"code":  code,
+		"error": err.Error(),
+	})
+	if err != nil {
+		// this panic is intentional. Since we have a hardcoded map to encode
+		// any errors means there's something very very wrong
+		panic(fmt.Errorf("cannot marshal error: %w", err))
+	}
+
+	writeResponse(w, code, string(body))
+}
+
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 	encoder, err := encoderFromRequest(r)
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
 		return
 	}
+	w.Header().Set("Content-Type", encoder.ResponseContentType())
 
 	values, err := readValues(r, encoder)
 	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot parse body: %s", err.Error()))
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
 		return
 	}
 
 	targetResource := Resource[T]{}
 	err = mapstructure.Decode(values, &targetResource)
 	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot unmarshal body values: %s", err.Error()))
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot unmarshal body values: %w", err))
 		return
 	}
 
@@ -68,7 +83,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 	created, err := m.handler.Create(targetResource.Spec)
 	if err != nil {
-		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("error creating resource %s: %s", m.resourceType, err.Error()))
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error creating resource %s: %w", m.resourceType, err))
 		return
 	}
 
@@ -79,7 +94,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 	bytes, err := encodeValues(newResource, encoder)
 	if err != nil {
-		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("cannot marshal entity: %s", err.Error()))
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 		return
 	}
 
