@@ -236,7 +236,7 @@ jobs:
         with:
           name: tracetest-go
           path: dist/
-      - name: Build latest server
+      - name: Start server
         run: |
           cd examples/collector
           TAG=latest docker-compose up -d
