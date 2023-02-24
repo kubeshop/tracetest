@@ -23,7 +23,7 @@ echo "TRACETEST_ENDPOINT:    $TRACETEST_ENDPOINT"
 echo "TRACETEST_CLI_COMMAND: $TRACETEST_CLI_COMMAND"
 
 echo "Setting up tracetest CLI configuration..."
-cat << EOF > config.yml
+cat << EOF > tests/config.yml
 scheme: http
 endpoint: $TRACETEST_ENDPOINT
 analyticsEnabled: false
@@ -36,7 +36,7 @@ echo "Setting up test helpers..."
 run_cli_command() {
   args=$1
 
-  $TRACETEST_CLI_COMMAND --config ./config.yml $args
+  $TRACETEST_CLI_COMMAND --config ./tests/config.yml $args
   return $?
 }
 
