@@ -251,7 +251,7 @@ jobs:
 
           TRACETEST_CLI="../../dist/tracetest" \
           TAG=pr-${{ github.event.pull_request.number }} \
-          TEST_ENV=${{ matrix.test_dir }}
+          TEST_ENV=${{ matrix.test_dir }} \
           ./run.bash
 
   deploy:
