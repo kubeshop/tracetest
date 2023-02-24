@@ -2,8 +2,10 @@
 
 set -e
 
-export TAG=${TAG:-"latest"}
-export TEST_ENV=${TEST_ENV:-"local"}
+if ! command -v "$TAG" &> /dev/null; then
+  echo "\$TAG not set. stopping script";
+  exit 2
+fi
 
 if ! command -v "$TEST_ENV" &> /dev/null; then
   echo "\$TEST_ENV not set. stopping script";
@@ -12,7 +14,7 @@ fi
 
 if [ $TEST_ENV = "local" ]; then
   export TRACETEST_ENDPOINT="localhost:11633"
-  export TRACETEST_CLI_COMMAND="tracetest"
+  export TRACETEST_CLI_COMMAND=$TRACETEST_CLI
 else
   export TRACETEST_ENDPOINT="host.docker.internal:11633"
   export TRACETEST_CLI_COMMAND="docker run --volume $PWD/tests:/app/tests --entrypoint tracetest kubeshop/tracetest:$TAG"
