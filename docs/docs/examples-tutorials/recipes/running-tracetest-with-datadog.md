@@ -130,17 +130,11 @@ The `tracetest.config.yaml` file contains the basic setup of connecting Tracetes
 ```yaml
 # tracetest.config.yaml
 ---
-postgres:
-  host: postgres
-  user: postgres
-  password: postgres
-  port: 5432
-  dbname: postgres
-  params: sslmode=disable
+postgresConnString: "host=tt-postgres user=postgres password=postgres port=5432 sslmode=disable"
 
 poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
+  maxWaitTimeForTrace: 180s
+  retryDelay: 5s
 
 demo:
   enabled: [otel]
