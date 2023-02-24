@@ -33,6 +33,6 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: datadog
+    dataStore: otlp
     exporter: collector
     applicationExporter: collector
