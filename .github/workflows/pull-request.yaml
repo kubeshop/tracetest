@@ -249,7 +249,10 @@ jobs:
           cd ./cli/smoketest
           chmod +x ./run.bash
 
-          TRACETEST_CLI="../../dist/tracetest" TAG="pr-${{ github.event.pull_request.number }}" TEST_ENV="${{ matrix.test_env }}" ./run.bash
+          TRACETEST_CLI="../../dist/tracetest" \
+          TAG="pr-${{ github.event.pull_request.number }}" \
+          TEST_ENV="${{ matrix.test_env }}" \
+          ./run.bash
 
   deploy:
     name: Deploy test infra
