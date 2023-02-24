@@ -21,6 +21,7 @@ echo "TAG:                   $TAG"
 echo "TEST_ENV:              $TEST_ENV"
 echo "TRACETEST_ENDPOINT:    $TRACETEST_ENDPOINT"
 echo "TRACETEST_CLI_COMMAND: $TRACETEST_CLI_COMMAND"
+echo ""
 
 echo "Setting up tracetest CLI configuration..."
 cat << EOF > tests/config.yml
