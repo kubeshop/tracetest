@@ -1,4 +1,4 @@
-# OpenTelemetry Demo with Tracetest and Lightstep
+# OpenTelemetry Demo with Tracetest and Datadog
 
 > [Read the detailed recipe for setting up Datadog with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-with-datadog)
 
