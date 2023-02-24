@@ -13,35 +13,45 @@ type encoder interface {
 	Marshal(in interface{}) (out []byte, err error)
 	Unmarshal(in []byte, out interface{}) (err error)
 	Accepts(contentType string) bool
+	ResponseContentType() string
 }
 
 var encoders = []encoder{
-	jsonEncoder{},
-	yamlEncoder{},
+	jsonEncoder,
+	yamlEncoder,
 }
 
-type yamlEncoder struct{}
-
-func (e yamlEncoder) Accepts(contentType string) bool {
-	return contentType == "text/yaml"
-}
-func (e yamlEncoder) Marshal(in interface{}) (out []byte, err error) {
-	return yaml.Marshal(in)
-}
-func (e yamlEncoder) Unmarshal(in []byte, out interface{}) (err error) {
-	return yaml.Unmarshal(in, out)
+var jsonEncoder = basicEncoder{
+	contentType: "application/json",
+	marshalFn:   json.Marshal,
+	unmarshalFn: json.Unmarshal,
 }
 
-type jsonEncoder struct{}
+var yamlEncoder = basicEncoder{
+	contentType: "text/yaml",
+	marshalFn:   yaml.Marshal,
+	unmarshalFn: yaml.Unmarshal,
+}
 
-func (e jsonEncoder) Accepts(contentType string) bool {
-	return contentType == "application/json"
+type basicEncoder struct {
+	contentType string
+	marshalFn   func(interface{}) ([]byte, error)
+	unmarshalFn func([]byte, interface{}) error
 }
-func (e jsonEncoder) Marshal(in interface{}) (out []byte, err error) {
-	return json.Marshal(in)
+
+func (e basicEncoder) ResponseContentType() string {
+	return e.contentType
 }
-func (e jsonEncoder) Unmarshal(in []byte, out interface{}) (err error) {
-	return json.Unmarshal(in, out)
+
+func (e basicEncoder) Accepts(contentType string) bool {
+	return contentType == e.contentType
+}
+
+func (e basicEncoder) Marshal(in interface{}) (out []byte, err error) {
+	return e.marshalFn(in)
+}
+func (e basicEncoder) Unmarshal(in []byte, out interface{}) (err error) {
+	return e.unmarshalFn(in, out)
 }
 
 var errUnacceptableContentType = errors.New("unacceptable content type")
