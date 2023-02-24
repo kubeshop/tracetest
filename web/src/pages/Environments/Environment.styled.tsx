@@ -1,3 +1,4 @@
+import {CheckCircleOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -105,8 +106,23 @@ export const TextContainer = styled.div`
   overflow: hidden;
 `;
 
+export const NameContainer = styled(TextContainer)`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
 export const MainHeaderContainer = styled.div`
   border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   padding: 23px 0;
   width: 100%;
+`;
+
+export const InfoIcon = styled(CheckCircleOutlined)`
+  color: ${({theme}) => theme.color.text};
+  cursor: pointer;
+  margin: 4px;
 `;

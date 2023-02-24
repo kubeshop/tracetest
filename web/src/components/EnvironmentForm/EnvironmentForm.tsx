@@ -1,7 +1,7 @@
 import {Form, FormInstance, Input} from 'antd';
 
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import {DEFAULT_VALUES} from 'pages/Environments/EnvironmentModal';
+import {DEFAULT_VALUES} from 'components/EnvironmentModal/EnvironmentModal';
 import Environment from 'models/Environment.model';
 
 interface IProps {
