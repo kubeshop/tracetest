@@ -149,6 +149,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 
 	resourceList := ResourceList[T]{
 		Count: count,
+		Items: []map[string]any{},
 	}
 
 	for _, item := range items {

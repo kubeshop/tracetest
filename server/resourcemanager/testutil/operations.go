@@ -23,6 +23,7 @@ var (
 		deleteNotFoundOperation{},
 		deleteSuccessOperation{},
 
+		listNoResultsOperation{},
 		listSuccessOperation{},
 		// TODO: add tests for pagination etc
 	}

@@ -164,6 +164,13 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{sample}, nil)
+			case rmtests.OperationListNoResults:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(0, nil)
+				mockManager.
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{}, nil)
 			case rmtests.OperationListInteralError:
 				mockManager.
 					On("Count", mock.Anything).
