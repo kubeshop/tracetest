@@ -139,6 +139,9 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Delete", sample.ID).
 					Return(nil)
+				mockManager.
+					On("Get", sample.ID).
+					Return(sampleResource{}, sql.ErrNoRows)
 			case rmtests.OperationDeleteInteralError:
 				mockManager.
 					On("Delete", sample.ID).

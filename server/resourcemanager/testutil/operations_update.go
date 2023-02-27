@@ -23,6 +23,9 @@ const OperationUpdateSuccess Operation = "UpdateSuccess"
 
 type updateSuccessOperation struct{}
 
+func (op updateSuccessOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
+
 func (op updateSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildUpdateRequest(rt, ct, testServer, t)
 }
@@ -46,6 +49,9 @@ const OperationUpdateNotFound Operation = "UpdateNotFound"
 
 type updateNotFoundOperation struct{}
 
+func (op updateNotFoundOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
+
 func (op updateNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildUpdateRequest(rt, ct, testServer, t)
 }
@@ -62,6 +68,9 @@ func (updateNotFoundOperation) assertResponse(t *testing.T, resp *http.Response,
 const OperationUpdateInteralError Operation = "UpdateInteralError"
 
 type updateInteralErrorOperation struct{}
+
+func (op updateInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
 
 func (op updateInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildUpdateRequest(rt, ct, testServer, t)
