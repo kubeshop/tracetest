@@ -37,7 +37,8 @@ func TestConfigResource(t *testing.T) {
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
-				rmtests.OperationDeleteSuccess:
+				rmtests.OperationDeleteSuccess,
+				rmtests.OperationListSuccess:
 				configRepo.Create(context.TODO(), sampleConfig)
 			}
 		},

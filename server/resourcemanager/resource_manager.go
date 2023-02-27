@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -19,6 +20,11 @@ type ResourceSpec interface {
 	Validate() error
 }
 
+type ResourceList[T ResourceSpec] struct {
+	Count int              `mapstructure:"count"`
+	Items []map[string]any `mapstructure:"items"`
+}
+
 type Resource[T ResourceSpec] struct {
 	Type string `mapstructure:"type"`
 	Spec T      `mapstructure:"spec"`
@@ -26,6 +32,8 @@ type Resource[T ResourceSpec] struct {
 
 type ResourceHandler[T ResourceSpec] interface {
 	SetID(T, id.ID) T
+	List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
+	Count(_ context.Context, query string) (int, error)
 	Create(context.Context, T) (T, error)
 	Update(context.Context, T) (T, error)
 	Get(context.Context, id.ID) (T, error)
@@ -50,6 +58,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
 
+	subrouter.HandleFunc("/", m.list).Methods(http.MethodGet)
 	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost)
 	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut)
 
@@ -65,6 +74,106 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 	m.operationWithBody(w, r, http.StatusOK, "updating", m.handler.Update)
+}
+
+func getIntFromQuery(r *http.Request, key string) (int, error) {
+	str := r.URL.Query().Get(key)
+	if str == "" {
+		return 0, nil
+	}
+
+	val, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, fmt.Errorf("'%s' is not a number", str)
+	}
+
+	return val, nil
+}
+
+func paginationParams(r *http.Request) (take, skip int, query, sortBy, sortDirection string, err error) {
+	take, err = getIntFromQuery(r, "take")
+	if err != nil {
+		err = fmt.Errorf("error reading take param: %w", err)
+		return
+	}
+
+	skip, err = getIntFromQuery(r, "skip")
+	if err != nil {
+		err = fmt.Errorf("error reading skip param: %w", err)
+		return
+	}
+
+	sortBy = r.URL.Query().Get("sortBy")
+	sortDirection = r.URL.Query().Get("sortDirection")
+
+	query = r.URL.Query().Get("query")
+
+	return
+}
+
+func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
+	encoder, err := encoderFromRequest(r)
+	if err != nil {
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", encoder.ResponseContentType())
+
+	ctx := r.Context()
+	take, skip,
+		query, sortBy,
+		sortDirection, err := paginationParams(r)
+	if err != nil {
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		return
+	}
+
+	count, err := m.handler.Count(ctx, query)
+	if err != nil {
+		m.handleResourceHandlerError(w, "listing", err, encoder)
+		return
+	}
+
+	items, err := m.handler.List(
+		ctx,
+		take,
+		skip,
+		query,
+		sortBy,
+		sortDirection,
+	)
+	if err != nil {
+		m.handleResourceHandlerError(w, "listing", err, encoder)
+		return
+	}
+
+	resourceList := ResourceList[T]{
+		Count: count,
+	}
+
+	for _, item := range items {
+		resource := Resource[T]{
+			Type: m.resourceType,
+			Spec: item,
+		}
+
+		var values map[string]any
+		err := mapstructure.Decode(resource, &values)
+		if err != nil {
+			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
+			return
+		}
+
+		resourceList.Items = append(resourceList.Items, values)
+	}
+
+	bytes, err := encodeValues(resourceList, encoder)
+	if err != nil {
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
+		return
+	}
+
+	writeResponse(w, 200, string(bytes))
 }
 
 func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {

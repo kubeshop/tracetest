@@ -57,6 +57,15 @@ func (m *sampleResourceManager) Delete(_ context.Context, id id.ID) error {
 	return args.Error(0)
 }
 
+func (m *sampleResourceManager) List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]sampleResource, error) {
+	args := m.Called(take, skip, query, sortBy, sortDirection)
+	return args.Get(0).([]sampleResource), args.Error(1)
+}
+func (m *sampleResourceManager) Count(_ context.Context, query string) (int, error) {
+	args := m.Called(query)
+	return args.Int(0), args.Error(1)
+}
+
 func TestSampleResource(t *testing.T) {
 
 	sample := sampleResource{
@@ -146,6 +155,19 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Delete", sample.ID).
 					Return(fmt.Errorf("some error"))
+
+				// List
+			case rmtests.OperationListSuccess:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(1, nil)
+				mockManager.
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{sample}, nil)
+			case rmtests.OperationListInteralError:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(0, fmt.Errorf("some error"))
 			}
 		},
 		SampleJSON: `{
