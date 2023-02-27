@@ -18,37 +18,38 @@ func buildListRequest(rt string, ct contentType, testServer *httptest.Server, t 
 	return req
 }
 
-// const OperationListNoResults Operation = "ListNoResults"
+const OperationListNoResults Operation = "ListNoResults"
 
-// type listNoResultsOperation struct{}
+type listNoResultsOperation struct{}
 
-// func (op listNoResultsOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-// }
+func (op listNoResultsOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
 
-// func (op listNoResultsOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-// 	return buildListRequest(
-// 		rt.ResourceType,
-// 		ct,
-// 		testServer,
-// 		t,
-// 	)
-// }
+func (op listNoResultsOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+	return buildListRequest(
+		rt.ResourceType,
+		ct,
+		testServer,
+		t,
+	)
+}
 
-// func (listNoResultsOperation) name() Operation {
-// 	return OperationListNoResults
-// }
+func (listNoResultsOperation) name() Operation {
+	return OperationListNoResults
+}
 
-// func (listNoResultsOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-// 	require.Equal(t, 201, resp.StatusCode)
+func (listNoResultsOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+	require.Equal(t, 200, resp.StatusCode)
 
-// 	jsonBody := responseBodyJSON(t, resp, ct)
+	jsonBody := responseBodyJSON(t, resp, ct)
 
-// 	clean := removeIDFromJSON(rt.SampleJSON)
-// 	expected := ct.toJSON(clean)
+	expected := `{
+		"count": 0,
+		"items": []
+	}`
 
-// 	require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
-// 	require.NotEmpty(t, extractID(jsonBody))
-// }
+	require.JSONEq(t, expected, jsonBody)
+}
 
 const OperationListSuccess Operation = "ListSuccess"
 
