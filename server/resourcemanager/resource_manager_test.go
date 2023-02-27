@@ -52,7 +52,7 @@ func TestSampleResource(t *testing.T) {
 		}
 	}`
 
-	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
+	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceType: "SampleResource",
 		RegisterManagerFn: func(router *mux.Router) any {
 			mockManager := new(sampleResourceManager)

@@ -65,6 +65,18 @@ var contentTypes = []contentType{
 func TestResourceType(t *testing.T, rt ResourceTypeTest) {
 	t.Helper()
 
+	TestResourceTypeOperations(t, rt, defaultOperations)
+}
+
+func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
+	t.Helper()
+
+	TestResourceTypeOperations(t, rt, append(defaultOperations, errorOperations...))
+}
+
+func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []operationTester) {
+	t.Helper()
+
 	t.Run(rt.ResourceType, func(t *testing.T) {
 		t.Parallel()
 
