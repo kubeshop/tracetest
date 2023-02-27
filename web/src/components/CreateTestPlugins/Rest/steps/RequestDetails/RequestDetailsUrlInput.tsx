@@ -35,10 +35,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => {
           </div>
         )}
 
-        <Form.Item
-          name="url"
-          data-cy="url"
-        >
+        <Form.Item data-cy="url" name="url" rules={[{required: true, message: 'Please enter a request url'}]}>
           <Editor type={SupportedEditors.Interpolation} placeholder="Enter request url" />
         </Form.Item>
       </S.URLInputContainer>

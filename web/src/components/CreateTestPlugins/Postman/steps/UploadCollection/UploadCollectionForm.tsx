@@ -13,52 +13,50 @@ interface IProps {
   form: TDraftTestForm<IPostmanValues>;
 }
 
-const UploadCollectionForm = ({form}: IProps) => {
-  return (
-    <S.FieldsContainer>
-      <Row gutter={12}>
-        <Col span={18}>
-          <Form.Item name="requests" hidden>
-            <Input type="hidden" />
-          </Form.Item>
-          <Form.Item name="variables" hidden>
-            <Input type="hidden" />
-          </Form.Item>
-          <CollectionFileField form={form} />
-        </Col>
-      </Row>
-      <Row gutter={12}>
-        <Col span={18}>
-          <EnvFileField form={form} />
-        </Col>
-      </Row>
-      <Row gutter={12}>
-        <Col span={18}>
-          <SelectTestFromCollection form={form} />
-        </Col>
-      </Row>
-      <Row gutter={12}>
-        <Col span={18}>
-          <RequestDetailsUrlInput />
-        </Col>
-      </Row>
-      <Row gutter={12}>
-        <Col span={18}>
-          <RequestDetailsHeadersInput />
-        </Col>
-      </Row>
-      <Row gutter={12}>
-        <Col span={18}>
-          <RequestDetailsAuthInput />
-        </Col>
-      </Row>
-      <Row gutter={12}>
-        <Col span={18}>
-          <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
-        </Col>
-      </Row>
-    </S.FieldsContainer>
-  );
-};
+const UploadCollectionForm = ({form}: IProps) => (
+  <S.FieldsContainer>
+    <Row gutter={12}>
+      <Col span={18}>
+        <Form.Item name="requests" hidden>
+          <Input type="hidden" />
+        </Form.Item>
+        <Form.Item name="variables" hidden>
+          <Input type="hidden" />
+        </Form.Item>
+        <CollectionFileField form={form} />
+      </Col>
+    </Row>
+    <Row gutter={12}>
+      <Col span={18}>
+        <EnvFileField form={form} />
+      </Col>
+    </Row>
+    <Row gutter={12}>
+      <Col span={18}>
+        <SelectTestFromCollection form={form} />
+      </Col>
+    </Row>
+    <Row gutter={12}>
+      <Col span={18}>
+        <RequestDetailsUrlInput />
+      </Col>
+    </Row>
+    <Row gutter={12}>
+      <Col span={18}>
+        <RequestDetailsHeadersInput />
+      </Col>
+    </Row>
+    <Row gutter={12}>
+      <Col span={18}>
+        <RequestDetailsAuthInput />
+      </Col>
+    </Row>
+    <Row gutter={12}>
+      <Col span={18}>
+        <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
+      </Col>
+    </Row>
+  </S.FieldsContainer>
+);
 
 export default UploadCollectionForm;

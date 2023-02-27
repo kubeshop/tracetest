@@ -25,6 +25,7 @@ type (
 		OpenSearch *ElasticSearchDataStoreConfig
 		ElasticApm *ElasticSearchDataStoreConfig
 		SignalFx   *SignalFXDataStoreConfig
+		AwsXRay    *AWSXRayDataStoreConfig
 	}
 
 	BaseClientConfig struct {
@@ -56,6 +57,13 @@ type (
 		Realm string
 		Token string
 	}
+
+	AWSXRayDataStoreConfig struct {
+		Region          string
+		AccessKeyID     string
+		SecretAccessKey string
+		SessionToken    string
+	}
 )
 
 func (ds DataStore) IsZero() bool {
@@ -74,6 +82,7 @@ const (
 	DataStoreTypeLighStep   DataStoreType = "lighstep"
 	DataStoreTypeElasticAPM DataStoreType = "elasticapm"
 	DataStoreTypeDataDog    DataStoreType = "datadog"
+	DataStoreTypeAwsXRay    DataStoreType = "awsxray"
 )
 
 var validTypes = []DataStoreType{
@@ -86,6 +95,7 @@ var validTypes = []DataStoreType{
 	DataStoreTypeLighStep,
 	DataStoreTypeElasticAPM,
 	DataStoreTypeDataDog,
+	DataStoreTypeAwsXRay,
 }
 
 func (ds DataStore) Validate() error {

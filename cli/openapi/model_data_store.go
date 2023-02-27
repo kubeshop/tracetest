@@ -29,6 +29,7 @@ type DataStore struct {
 	OpenSearch *ElasticSearch      `json:"openSearch,omitempty"`
 	ElasticApm *ElasticSearch      `json:"elasticApm,omitempty"`
 	SignalFx   *SignalFX           `json:"signalFx,omitempty"`
+	Awsxray    *AwsXRay            `json:"awsxray,omitempty"`
 	CreatedAt  *time.Time          `json:"createdAt,omitempty"`
 }
 
@@ -323,6 +324,38 @@ func (o *DataStore) SetSignalFx(v SignalFX) {
 	o.SignalFx = &v
 }
 
+// GetAwsxray returns the Awsxray field value if set, zero value otherwise.
+func (o *DataStore) GetAwsxray() AwsXRay {
+	if o == nil || isNil(o.Awsxray) {
+		var ret AwsXRay
+		return ret
+	}
+	return *o.Awsxray
+}
+
+// GetAwsxrayOk returns a tuple with the Awsxray field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetAwsxrayOk() (*AwsXRay, bool) {
+	if o == nil || isNil(o.Awsxray) {
+		return nil, false
+	}
+	return o.Awsxray, true
+}
+
+// HasAwsxray returns a boolean if a field has been set.
+func (o *DataStore) HasAwsxray() bool {
+	if o != nil && !isNil(o.Awsxray) {
+		return true
+	}
+
+	return false
+}
+
+// SetAwsxray gets a reference to the given AwsXRay and assigns it to the Awsxray field.
+func (o *DataStore) SetAwsxray(v AwsXRay) {
+	o.Awsxray = &v
+}
+
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *DataStore) GetCreatedAt() time.Time {
 	if o == nil || isNil(o.CreatedAt) {
@@ -385,6 +418,9 @@ func (o DataStore) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.SignalFx) {
 		toSerialize["signalFx"] = o.SignalFx
+	}
+	if !isNil(o.Awsxray) {
+		toSerialize["awsxray"] = o.Awsxray
 	}
 	if !isNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt

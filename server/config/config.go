@@ -31,11 +31,17 @@ type Config struct {
 	mu     sync.Mutex
 }
 
+type logger interface {
+	Println(...any)
+}
+
 type option struct {
-	key          string
-	defaultValue any
-	description  string
-	validate     func(*Config) error
+	key                string
+	defaultValue       any
+	description        string
+	validate           func(*Config) error
+	deprecated         bool
+	deprecationMessage string
 }
 
 type options []option
@@ -80,8 +86,7 @@ func configureConfigFile(vp *viper.Viper) {
 var ErrConfigFileNotFound = errors.New("config file not found")
 
 func readConfigFile(vp *viper.Viper) error {
-	confFile := vp.GetString("config")
-	if confFile != "" {
+	if confFile := vp.GetString("config"); confFile != "" {
 		// if --config is passed, and the file does not exists
 		// it will trigger a "no such file or directory" error
 		// which is NOT an instance of `viper.ConfigFileNotFoundError` checked later in this func
@@ -90,7 +95,7 @@ func readConfigFile(vp *viper.Viper) error {
 	}
 
 	err := vp.ReadInConfig()
-	if err == nil || confFile == "" {
+	if err == nil {
 		return nil
 	}
 
@@ -108,20 +113,23 @@ func SetupFlags(flags *pflag.FlagSet) {
 	configOptions.registerFlags(flags)
 }
 
-func New(flags *pflag.FlagSet) (*Config, error) {
+func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 	vp := viper.New()
 
 	vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	vp.SetEnvPrefix("TRACETEST")
 	vp.AutomaticEnv()
 
-	configOptions.registerDefaults(vp)
+	configureConfigFile(vp)
 
 	if flags != nil {
 		vp.BindPFlags(flags)
 	}
 
-	configureConfigFile(vp)
+	configOptions.registerDefaults(vp)
+
+	warnAboutDeprecatedFields(vp, logger)
+
 	err := readConfigFile(vp)
 	if err != nil {
 		return nil, err
@@ -177,4 +185,32 @@ func (c *Config) AnalyticsEnabled() bool {
 	defer c.mu.Unlock()
 
 	return c.config.GA.Enabled
+}
+
+func warnAboutDeprecatedFields(vp *viper.Viper, logger logger) error {
+	err := readConfigFile(vp)
+	if err != nil {
+		return err
+	}
+
+	for _, opt := range configOptions {
+		if !opt.deprecated {
+			continue
+		}
+
+		optionValue := vp.Get(opt.key)
+		if optionValue == nil || optionValue == opt.defaultValue {
+			continue
+		}
+
+		msg := fmt.Sprintf(`config "%s" is deprecated. `, opt.key)
+
+		if opt.deprecationMessage != "" {
+			msg += opt.deprecationMessage
+		}
+
+		logger.Println(msg)
+	}
+
+	return nil
 }

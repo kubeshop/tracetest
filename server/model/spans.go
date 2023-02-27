@@ -19,6 +19,12 @@ func (a Attributes) Get(key string) string {
 	return ""
 }
 
+func (a Attributes) SetPointerValue(key string, value *string) {
+	if value != nil {
+		a[key] = *value
+	}
+}
+
 type Spans []Span
 
 func (s Spans) ForEach(fn func(ix int, _ Span) bool) Spans {

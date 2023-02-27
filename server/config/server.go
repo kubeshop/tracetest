@@ -5,20 +5,70 @@ import (
 )
 
 var serverOptions = options{
-	{"postgres.host", "postgres", "Postgres DB host", nil},
-	{"postgres.user", "postgres", "Postgres DB user", nil},
-	{"postgres.password", "postgres", "Postgres DB password", nil},
-	{"postgres.dbname", "tracetest", "Postgres DB database name", nil},
-	{"postgres.port", 5432, "Postgres DB port", nil},
-	{"postgres.params", "sslmode=disable", "Postgres DB connection parameters", nil},
-
-	{"server.httpPort", 11633, "Tracetest server HTTP Port", nil},
-	{"server.pathPrefix", "", "Tracetest server HTTP Path prefix", nil},
-
-	{"experimentalFeatures", []string{}, "enabled experimental features", nil},
-
-	{"internalTelemetry.enabled", false, "enable internal telemetry (used for internal testing)", nil},
-	{"internalTelemetry.otelCollectorEndpoint", "", "internal telemetry  otel collector (used for internal testing)", nil},
+	{
+		key:                "postgresConnString",
+		defaultValue:       "",
+		description:        "Postgres connection string",
+		validate:           nil,
+		deprecated:         true,
+		deprecationMessage: "Use the new postgres config structure instead.",
+	},
+	{
+		key:          "postgres.host",
+		defaultValue: "postgres",
+		description:  "Postgres DB host",
+	},
+	{
+		key:          "postgres.user",
+		defaultValue: "postgres",
+		description:  "Postgres DB user",
+	},
+	{
+		key:          "postgres.password",
+		defaultValue: "postgres",
+		description:  "Postgres DB password",
+	},
+	{
+		key:          "postgres.dbname",
+		defaultValue: "tracetest",
+		description:  "Postgres DB database name",
+	},
+	{
+		key:          "postgres.port",
+		defaultValue: 5432,
+		description:  "Postgres DB port",
+	},
+	{
+		key:          "postgres.params",
+		defaultValue: "sslmode=disable",
+		description:  "Postgres DB connection parameters",
+	},
+	{
+		key:          "server.httpPort",
+		defaultValue: 11633,
+		description:  "Tracetest server HTTP Port",
+	},
+	{
+		key:          "server.pathPrefix",
+		defaultValue: "",
+		description:  "Tracetest server HTTP Path prefix",
+	},
+	{
+		key:          "experimentalFeatures",
+		defaultValue: []string{},
+		description:  "enabled experimental features",
+	},
+	{
+		key:          "internalTelemetry.enabled",
+		defaultValue: false,
+		description:  "enable internal telemetry (used for internal testing)",
+	},
+	{
+		key:          "internalTelemetry.otelCollectorEndpoint",
+		defaultValue: "",
+		description:  "internal telemetry  otel collector (used for internal testing)",
+		validate:     nil,
+	},
 }
 
 func init() {
@@ -28,6 +78,10 @@ func init() {
 func (c *Config) PostgresConnString() string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	if postgresConnString := c.vp.GetString("postgresConnString"); postgresConnString != "" {
+		return postgresConnString
+	}
 
 	str := fmt.Sprintf(
 		"host=%s user=%s password=%s port=%d dbname=%s",

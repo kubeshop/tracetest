@@ -13,7 +13,7 @@ export const SelectTestFromCollection = ({form}: IProps) => {
   const variables = useWatch<any[]>('variables');
   return (
     <Form.Item
-      rules={[{required: true, message: 'Please enter a request url'}]}
+      rules={[{required: true, message: 'No test selected yet'}]}
       name="collectionTest"
       label="Select test from Postman Collection"
     >

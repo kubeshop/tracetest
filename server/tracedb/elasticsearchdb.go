@@ -25,16 +25,16 @@ type elasticsearchDB struct {
 	client *elasticsearch.Client
 }
 
-func (db elasticsearchDB) Connect(ctx context.Context) error {
+func (db *elasticsearchDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (db elasticsearchDB) Close() error {
+func (db *elasticsearchDB) Close() error {
 	// No need to close this db
 	return nil
 }
 
-func (db elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+func (db *elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
@@ -51,11 +51,11 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) connection.Connect
 	return tester.TestConnection(ctx)
 }
 
-func (db elasticsearchDB) Ready() bool {
+func (db *elasticsearchDB) Ready() bool {
 	return db.client != nil
 }
 
-func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	if !db.Ready() {
 		return model.Trace{}, fmt.Errorf("ElasticSearch dataStore not ready")
 	}

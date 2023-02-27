@@ -10,6 +10,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.NewRelic]: 'New Relic',
   [SupportedDataStores.Lightstep]: 'Lightstep',
   [SupportedDataStores.Datadog]: 'Datadog',
+  [SupportedDataStores.AWSXRay]: 'AWS X-Ray',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -21,6 +22,7 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.Datadog]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/datadog',
   [SupportedDataStores.SignalFX]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/signalfx',
   [SupportedDataStores.TEMPO]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/tempo',
+  [SupportedDataStores.AWSXRay]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/aws-x-ray',
   [SupportedDataStores.OtelCollector]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector',
 } as const;
