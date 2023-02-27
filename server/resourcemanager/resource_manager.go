@@ -23,6 +23,7 @@ type Resource[T Validator] struct {
 type ResourceHandler[T Validator] interface {
 	Create(context.Context, T) (T, error)
 	Update(context.Context, T) (T, error)
+	Get(_ context.Context, id string) (T, error)
 }
 
 type manager[T Validator] struct {
@@ -44,21 +45,9 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost)
 	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut)
 
+	subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet)
+
 	return subrouter
-}
-
-func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
-	body, err := enc.Marshal(map[string]any{
-		"code":  code,
-		"error": err.Error(),
-	})
-	if err != nil {
-		// this panic is intentional. Since we have a hardcoded map to encode
-		// any errors means there's something very very wrong
-		panic(fmt.Errorf("cannot marshal error: %w", err))
-	}
-
-	writeResponse(w, code, string(body))
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +56,37 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 	m.operationWithBody(w, r, http.StatusOK, "updating", m.handler.Update)
+}
+
+func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
+	encoder, err := encoderFromRequest(r)
+	if err != nil {
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", encoder.ResponseContentType())
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	item, err := m.handler.Get(r.Context(), id)
+	if err != nil {
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error getting resource %s: %w", m.resourceType, err))
+		return
+	}
+
+	newResource := Resource[T]{
+		Type: m.resourceType,
+		Spec: item,
+	}
+
+	bytes, err := encodeValues(newResource, encoder)
+	if err != nil {
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
+		return
+	}
+
+	writeResponse(w, 200, string(bytes))
 }
 
 func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
@@ -115,6 +135,20 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 func writeResponse(w http.ResponseWriter, code int, msg string) {
 	w.WriteHeader(code)
 	w.Write([]byte(msg))
+}
+
+func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
+	body, err := enc.Marshal(map[string]any{
+		"code":  code,
+		"error": err.Error(),
+	})
+	if err != nil {
+		// this panic is intentional. Since we have a hardcoded map to encode
+		// any errors means there's something very very wrong
+		panic(fmt.Errorf("cannot marshal error: %w", err))
+	}
+
+	writeResponse(w, code, string(body))
 }
 
 func encodeValues(resource any, enc encoder) ([]byte, error) {

@@ -36,6 +36,11 @@ func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sam
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
+func (m *sampleResourceManager) Get(_ context.Context, id string) (sampleResource, error) {
+	args := m.Called(id)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
 func TestSampleResource(t *testing.T) {
 
 	sample := sampleResource{
@@ -85,6 +90,16 @@ func TestSampleResource(t *testing.T) {
 			case rmtests.OperationUpdateInteralError:
 				mockManager.
 					On("Update", sampleUpdated).
+					Return(sampleResource{}, fmt.Errorf("some error"))
+
+			// Get
+			case rmtests.OperationGetSuccess:
+				mockManager.
+					On("Get", sampleWithID.ID).
+					Return(sampleWithID, nil)
+			case rmtests.OperationGetInteralError:
+				mockManager.
+					On("Get", sampleWithID.ID).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 			}
 		},

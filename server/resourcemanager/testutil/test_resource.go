@@ -123,6 +123,6 @@ func testContentType(t *testing.T, op operationTester, ct contentType, rt Resour
 	resp, err := testServer.Client().Do(req)
 	require.NoError(t, err)
 
-	assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
 	op.assertResponse(t, resp, ct, rt)
+	assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
 }
