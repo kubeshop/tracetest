@@ -12,10 +12,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var operations = []operationTester{
-	createSuccessOperation{},
-	createInteralErrorOperation{},
-}
+var (
+	defaultOperations = []operationTester{
+		createSuccessOperation{},
+	}
+
+	errorOperations = []operationTester{
+		createInteralErrorOperation{},
+	}
+)
 
 func removeID(input map[string]any) map[string]any {
 	out := map[string]any{}
