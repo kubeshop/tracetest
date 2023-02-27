@@ -1,6 +1,7 @@
 package resourcemanager_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -25,12 +26,12 @@ type sampleResourceManager struct {
 	mock.Mock
 }
 
-func (m *sampleResourceManager) Create(s sampleResource) (sampleResource, error) {
+func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {
 	args := m.Called(s)
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
-func (m *sampleResourceManager) Update(s sampleResource) (sampleResource, error) {
+func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
 	args := m.Called(s)
 	return args.Get(0).(sampleResource), args.Error(1)
 }

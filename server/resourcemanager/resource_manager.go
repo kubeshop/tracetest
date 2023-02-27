@@ -1,6 +1,7 @@
 package resourcemanager
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,8 +21,8 @@ type Resource[T Validator] struct {
 }
 
 type ResourceHandler[T Validator] interface {
-	Create(T) (T, error)
-	Update(T) (T, error)
+	Create(context.Context, T) (T, error)
+	Update(context.Context, T) (T, error)
 }
 
 type manager[T Validator] struct {
@@ -68,7 +69,7 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 	m.operationWithBody(w, r, http.StatusOK, "updating", m.handler.Update)
 }
 
-func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(T) (T, error)) {
+func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
 	encoder, err := encoderFromRequest(r)
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
@@ -91,7 +92,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 
 	// TODO: if resourceType != values.resourceType return error
 
-	created, err := fn(targetResource.Spec)
+	created, err := fn(r.Context(), targetResource.Spec)
 	if err != nil {
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error %s resource %s: %w", operationVerb, m.resourceType, err))
 		return

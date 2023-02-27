@@ -35,10 +35,7 @@ const insertQuery = `
 			"analytics_enabled"
 		) VALUES ($1, $2, $3)`
 
-// TODO: add context.Context
-func (r *repository) Create(cfg Config) (Config, error) {
-	ctx := context.TODO()
-
+func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
 	cfg.ID = r.idgen().String()
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -71,10 +68,7 @@ const updateQuery = `
 			"analytics_enabled" = $3
 		WHERE "id" = $1`
 
-// TODO: add context.Context
-func (r *repository) Update(cfg Config) (Config, error) {
-	ctx := context.TODO()
-
+func (r *repository) Update(ctx context.Context, cfg Config) (Config, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Config{}, err
