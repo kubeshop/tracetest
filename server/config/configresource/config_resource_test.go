@@ -1,6 +1,7 @@
 package configresource_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -14,6 +15,11 @@ import (
 func TestConfigResource(t *testing.T) {
 
 	db := testmock.MustGetRawTestingDatabase()
+	sampleConfig := configresource.Config{
+		ID:               "1",
+		Name:             "test",
+		AnalyticsEnabled: true,
+	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceType: "Config",
@@ -21,10 +27,18 @@ func TestConfigResource(t *testing.T) {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			configRepo := configresource.Repository(db, id.GenerateID)
 
-			manager := resourcemanager.New[configresource.Config]("Config", configRepo)
+			manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
 			manager.RegisterRoutes(router)
 
-			return nil
+			return configRepo
+		},
+		Prepare: func(t *testing.T, op rmtests.Operation, bridge any) {
+			configRepo := bridge.(resourcemanager.ResourceHandler[configresource.Config])
+			switch op {
+			case rmtests.OperationGetSuccess,
+				rmtests.OperationUpdateSuccess:
+				configRepo.Create(context.TODO(), sampleConfig)
+			}
 		},
 		SampleJSON: `{
 			"type": "Config",

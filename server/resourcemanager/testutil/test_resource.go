@@ -83,6 +83,9 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 
 		for _, op := range operations {
 			t.Run(string(op.name()), func(t *testing.T) {
+				op := op
+				t.Parallel()
+
 				testOperation(t, op, rt)
 			})
 		}
@@ -95,6 +98,9 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 
 	for _, ct := range contentTypes {
 		t.Run(ct.name, func(t *testing.T) {
+			ct := ct
+			t.Parallel()
+
 			testContentType(t, op, ct, rt)
 		})
 	}
