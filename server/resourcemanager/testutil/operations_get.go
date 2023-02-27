@@ -28,6 +28,9 @@ const OperationGetSuccess Operation = "GetSuccess"
 
 type getSuccessOperation struct{}
 
+func (op getSuccessOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
+
 func (op getSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)
 }
@@ -51,6 +54,9 @@ const OperationGetNotFound Operation = "GetNotFound"
 
 type getNotFoundOperation struct{}
 
+func (op getNotFoundOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
+
 func (op getNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)
 }
@@ -67,6 +73,9 @@ func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct
 const OperationGetInteralError Operation = "GetInteralError"
 
 type getInteralErrorOperation struct{}
+
+func (op getInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
 
 func (op getInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)

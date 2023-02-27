@@ -131,3 +131,33 @@ func (r *repository) Get(ctx context.Context, id id.ID) (Config, error) {
 	return cfg, nil
 
 }
+
+const deleteQuery = `
+		DELETE FROM configs
+		WHERE "id" = $1`
+
+func (r *repository) Delete(ctx context.Context, id id.ID) error {
+	cfg, err := r.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, deleteQuery, cfg.ID)
+
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("commit: %w", err)
+	}
+
+	return nil
+}

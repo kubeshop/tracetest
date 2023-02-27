@@ -36,7 +36,8 @@ func TestConfigResource(t *testing.T) {
 			configRepo := bridge.(resourcemanager.ResourceHandler[configresource.Config])
 			switch op {
 			case rmtests.OperationGetSuccess,
-				rmtests.OperationUpdateSuccess:
+				rmtests.OperationUpdateSuccess,
+				rmtests.OperationDeleteSuccess:
 				configRepo.Create(context.TODO(), sampleConfig)
 			}
 		},

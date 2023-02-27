@@ -23,6 +23,9 @@ const OperationCreateNoID Operation = "CreateNoID"
 
 type createNoIDOperation struct{}
 
+func (op createNoIDOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
+
 func (op createNoIDOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(
 		removeIDFromJSON(rt.SampleJSON),
@@ -53,6 +56,9 @@ const OperationCreateSuccess Operation = "CreateSuccess"
 
 type createSuccessOperation struct{}
 
+func (op createSuccessOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
+
 func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(
 		rt.SampleJSON,
@@ -79,6 +85,9 @@ func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, 
 const OperationCreateInteralError Operation = "CreateInteralError"
 
 type createInteralErrorOperation struct{}
+
+func (op createInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+}
 
 func (op createInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(

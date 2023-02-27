@@ -33,6 +33,7 @@ type operationTester interface {
 	buildRequest(*testing.T, *httptest.Server, contentType, ResourceTypeTest) *http.Request
 	assertResponse(*testing.T, *http.Response, contentType, ResourceTypeTest)
 	name() Operation
+	postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server)
 }
 
 var contentTypes = []contentType{
@@ -118,11 +119,17 @@ func testContentType(t *testing.T, op operationTester, ct contentType, rt Resour
 	}
 
 	req := op.buildRequest(t, testServer, ct, rt)
-	req.Header.Set("Content-Type", ct.contentType)
-
-	resp, err := testServer.Client().Do(req)
-	require.NoError(t, err)
+	resp := doRequest(t, req, ct, testServer)
 
 	op.assertResponse(t, resp, ct, rt)
 	assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
+	op.postAssert(t, ct, rt, testServer)
+}
+
+func doRequest(t *testing.T, req *http.Request, ct contentType, testServer *httptest.Server) *http.Response {
+	req.Header.Set("Content-Type", ct.contentType)
+	resp, err := testServer.Client().Do(req)
+	require.NoError(t, err)
+
+	return resp
 }
