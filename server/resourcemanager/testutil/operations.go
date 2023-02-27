@@ -17,7 +17,7 @@ var (
 
 	errorOperations = []operationTester{
 		createInteralErrorOperation{},
-		// updateInteralErrorOperation{},
+		updateInteralErrorOperation{},
 	}
 )
 
@@ -76,7 +76,7 @@ func responseBodyJSON(t *testing.T, resp *http.Response, ct contentType) string 
 	return jsonBody
 }
 
-func assertInternalError(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func assertInternalError(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest, verb string) {
 	require.Equal(t, 500, resp.StatusCode)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
@@ -89,5 +89,5 @@ func assertInternalError(t *testing.T, resp *http.Response, ct contentType, rt R
 	json.Unmarshal([]byte(jsonBody), &bodyValues)
 
 	require.Equal(t, 500, bodyValues.Code)
-	require.Contains(t, bodyValues.Error, "error creating resource "+rt.ResourceType)
+	require.Contains(t, bodyValues.Error, "error "+verb+" resource "+rt.ResourceType)
 }

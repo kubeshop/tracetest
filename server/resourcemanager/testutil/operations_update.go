@@ -55,5 +55,5 @@ func (updateInteralErrorOperation) name() Operation {
 }
 
 func (updateInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt)
+	assertInternalError(t, resp, ct, rt, "updating")
 }
