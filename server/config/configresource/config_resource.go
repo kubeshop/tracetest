@@ -9,10 +9,14 @@ import (
 )
 
 type Config struct {
-	ID   string `mapstructure:"id"`
+	ID   id.ID  `mapstructure:"id"`
 	Name string `mapstructure:"name"`
 
 	AnalyticsEnabled bool `mapstructure:"analyticsEnabled"`
+}
+
+func (c Config) HasID() bool {
+	return c.ID.String() != ""
 }
 
 func (c Config) Validate() error {
@@ -35,8 +39,12 @@ const insertQuery = `
 			"analytics_enabled"
 		) VALUES ($1, $2, $3)`
 
+func (r *repository) SetID(cfg Config, id id.ID) Config {
+	cfg.ID = id
+	return cfg
+}
+
 func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
-	cfg.ID = r.idgen().String()
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Config{}, err
@@ -59,7 +67,6 @@ func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
 	}
 
 	return cfg, nil
-
 }
 
 const updateQuery = `
@@ -68,7 +75,12 @@ const updateQuery = `
 			"analytics_enabled" = $3
 		WHERE "id" = $1`
 
-func (r *repository) Update(ctx context.Context, cfg Config) (Config, error) {
+func (r *repository) Update(ctx context.Context, updated Config) (Config, error) {
+	cfg, err := r.Get(ctx, updated.ID)
+	if err != nil {
+		return Config{}, err
+	}
+
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Config{}, err
@@ -76,8 +88,8 @@ func (r *repository) Update(ctx context.Context, cfg Config) (Config, error) {
 
 	_, err = tx.ExecContext(ctx, updateQuery,
 		cfg.ID,
-		cfg.Name,
-		cfg.AnalyticsEnabled,
+		updated.Name,
+		updated.AnalyticsEnabled,
 	)
 
 	if err != nil {
@@ -88,6 +100,32 @@ func (r *repository) Update(ctx context.Context, cfg Config) (Config, error) {
 	err = tx.Commit()
 	if err != nil {
 		return Config{}, fmt.Errorf("commit: %w", err)
+	}
+
+	return updated, nil
+}
+
+const getQuery = `
+		SELECT
+			"name",
+			"analytics_enabled"
+		FROM configs
+		WHERE "id" = $1`
+
+func (r *repository) Get(ctx context.Context, id id.ID) (Config, error) {
+	cfg := Config{
+		ID: id,
+	}
+
+	err := r.db.
+		QueryRowContext(ctx, getQuery, id).
+		Scan(
+			&cfg.Name,
+			&cfg.AnalyticsEnabled,
+		)
+
+	if err != nil {
+		return Config{}, fmt.Errorf("sql query: %w", err)
 	}
 
 	return cfg, nil

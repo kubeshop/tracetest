@@ -11,13 +11,14 @@ import (
 
 var (
 	defaultOperations = []operationTester{
-		getNotFoundOperation{},
-		updateNotFoundOperation{},
-
 		createNoIDOperation{},
 		createSuccessOperation{},
+
+		updateNotFoundOperation{},
 		updateSuccessOperation{},
-		// getSuccessOperation{},
+
+		getNotFoundOperation{},
+		getSuccessOperation{},
 	}
 
 	errorOperations = []operationTester{
