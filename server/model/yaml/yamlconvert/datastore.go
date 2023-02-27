@@ -16,6 +16,7 @@ func DataStore(in model.DataStore) yaml.File {
 	deepcopy.DeepCopy(in.Values.Tempo.Http.TLSSetting, &out.Tempo.Http.Tls)
 	deepcopy.DeepCopy(in.Values.OpenSearch, &out.OpenSearch)
 	deepcopy.DeepCopy(in.Values.SignalFx, &out.SignalFx)
+	deepcopy.DeepCopy(in.Values.AwsXRay, &out.AwsXRay)
 
 	return yaml.File{
 		Type: yaml.FileTypeDataStore,

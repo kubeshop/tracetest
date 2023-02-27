@@ -25,7 +25,7 @@ type signalfxDB struct {
 	httpClient *http.Client
 }
 
-func (db signalfxDB) getURL() string {
+func (db *signalfxDB) getURL() string {
 	if db.URL != "" {
 		return db.URL
 	}
@@ -33,20 +33,20 @@ func (db signalfxDB) getURL() string {
 	return fmt.Sprintf("https://api.%s.signalfx.com", db.Realm)
 }
 
-func (tdb signalfxDB) Connect(ctx context.Context) error {
+func (tdb *signalfxDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (tdb signalfxDB) Ready() bool {
+func (tdb *signalfxDB) Ready() bool {
 	return true
 }
 
-func (db signalfxDB) Close() error {
+func (db *signalfxDB) Close() error {
 	// Doesn't need to be closed
 	return nil
 }
 
-func (db signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+func (db *signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
 	tester := connection.NewTester(
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, url)),
@@ -63,7 +63,7 @@ func (db signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTe
 	return tester.TestConnection(ctx)
 }
 
-func (db signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	timestamps, err := db.getSegmentsTimestamps(ctx, traceID)
 	if err != nil {
 		return model.Trace{}, fmt.Errorf("coult not get trace segment timestamps: %w", err)

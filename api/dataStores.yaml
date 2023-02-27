@@ -26,6 +26,8 @@ components:
           $ref: "#/components/schemas/ElasticSearch"
         signalFx:
           $ref: "#/components/schemas/SignalFX"
+        awsxray:
+          $ref: "#/components/schemas/AwsXRay"
         createdAt:
           type: string
           format: date-time
@@ -61,6 +63,17 @@ components:
         realm:
           type: string
         token:
+          type: string
+    AwsXRay:
+      type: object
+      properties:
+        region:
+          type: string
+        accessKeyId:
+          type: string
+        secretAccessKey:
+          type: string
+        sessionToken:
           type: string
     HTTPClientSettings:
       type: object
@@ -142,7 +155,8 @@ components:
           elasticApm,
           newRelic,
           lightstep,
-          datadog
+          datadog,
+          awsxray,
         ]
     SupportedClients:
       type: string

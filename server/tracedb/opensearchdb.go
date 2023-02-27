@@ -23,16 +23,16 @@ type opensearchDB struct {
 	client *opensearch.Client
 }
 
-func (db opensearchDB) Connect(ctx context.Context) error {
+func (db *opensearchDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (db opensearchDB) Close() error {
+func (db *opensearchDB) Close() error {
 	// No need to close this db
 	return nil
 }
 
-func (db opensearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+func (db *opensearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
@@ -49,11 +49,11 @@ func (db opensearchDB) TestConnection(ctx context.Context) connection.Connection
 	return tester.TestConnection(ctx)
 }
 
-func (db opensearchDB) Ready() bool {
+func (db *opensearchDB) Ready() bool {
 	return db.client != nil
 }
 
-func (db opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	if !db.Ready() {
 		return model.Trace{}, fmt.Errorf("OpenSearch dataStore not ready")
 	}
