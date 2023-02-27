@@ -40,9 +40,7 @@ const Postman = (): IPostmanTriggerService => ({
   async validateDraft(draft) {
     const {collectionTest} = draft as IPostmanValues;
 
-    const isValid = Validator.required(collectionTest) && Validator.required(collectionTest);
-
-    return isValid && HttpService.validateDraft(draft);
+    return Validator.required(collectionTest) && HttpService.validateDraft(draft);
   },
   valuesFromRequest(requests, variables, identifier) {
     const request = requests.find(({id}) => identifier === id);

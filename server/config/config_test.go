@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -18,7 +19,7 @@ func configWithFlagsE(t *testing.T, inputFlags []string) (*config.Config, error)
 	err := flags.Parse(inputFlags)
 	require.NoError(t, err)
 
-	return config.New(flags)
+	return config.New(flags, log.Default())
 }
 
 func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
@@ -37,7 +38,7 @@ func configWithEnv(t *testing.T, env map[string]string) *config.Config {
 		os.Setenv(k, v)
 	}
 
-	cfg, err := config.New(nil)
+	cfg, err := config.New(nil, log.Default())
 	require.NoError(t, err)
 
 	return cfg
@@ -54,7 +55,7 @@ func TestFlags(t *testing.T) {
 		err := flags.Parse([]string{"--config", "notexists.yaml"})
 		require.NoError(t, err)
 
-		cfg, err := config.New(flags)
+		cfg, err := config.New(flags, log.Default())
 		assert.Nil(t, cfg)
 		assert.ErrorIs(t, err, os.ErrNotExist)
 	})

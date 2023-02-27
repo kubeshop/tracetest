@@ -1,6 +1,6 @@
 import {useLocation} from 'react-router-dom';
 
-import {DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
+import {DISCORD_URL, DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import Env from 'utils/Env';
 import * as S from './Header.styled';
@@ -33,6 +33,14 @@ const Menu = () => {
               label: (
                 <a data-cy="documentation-link" href={DOCUMENTATION_URL} target="_blank">
                   Documentation
+                </a>
+              ),
+            },
+            {
+              key: 'discord',
+              label: (
+                <a data-cy="discord-link" href={DISCORD_URL} target="_blank">
+                  Discord
                 </a>
               ),
             },

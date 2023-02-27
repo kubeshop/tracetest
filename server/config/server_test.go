@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"log"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -9,7 +10,7 @@ import (
 
 func TestServerConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, _ := config.New(nil)
+		cfg, _ := config.New(nil, log.Default())
 
 		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
 
@@ -77,5 +78,21 @@ func TestServerConfig(t *testing.T) {
 
 		assert.Equal(t, true, cfg.InternalTelemetryEnabled())
 		assert.Equal(t, "otel-collector.tracetest", cfg.InternalTelemetryOtelCollectorAddress())
+	})
+
+	t.Run("postgresConnStringCompatibility", func(t *testing.T) {
+		flags := []string{
+			"--postgres.dbname", "other_dbname",
+			"--postgres.host", "localhost",
+			"--postgres.user", "user",
+			"--postgres.password", "passwd",
+			"--postgres.port", "1234",
+			"--postgres.params", "custom=params",
+			"--postgresConnString", "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
+		}
+
+		cfg := configWithFlags(t, flags)
+
+		assert.Equal(t, cfg.PostgresConnString(), "host=postgres user=postgres password=postgres port=5432 sslmode=disable")
 	})
 }
