@@ -25,6 +25,18 @@ export const SupportedDataStoresToDocsLink = {
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector',
 } as const;
 
+export const SupportedDataStoresToDefaultEndpoint = {
+  [SupportedDataStores.JAEGER]: 'jaeger:16685',
+  [SupportedDataStores.OpenSearch]: 'http://opensearch:9200',
+  [SupportedDataStores.SignalFX]: '',
+  [SupportedDataStores.TEMPO]: 'tempo:9095',
+  [SupportedDataStores.OtelCollector]: '',
+  [SupportedDataStores.ElasticApm]: 'http://elasticsearch:9200',
+  [SupportedDataStores.NewRelic]: '',
+  [SupportedDataStores.Lightstep]: '',
+  [SupportedDataStores.Datadog]: '',
+} as const;
+
 const collectorExplanation = (
   <>
     Tracetest can work with any distributed tracing solution that is utilizing the{' '}
