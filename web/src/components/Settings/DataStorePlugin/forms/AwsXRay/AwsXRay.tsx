@@ -1,5 +1,5 @@
 import {Col, Form, Input, Row} from 'antd';
-import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStores} from 'types/DataStore.types';
 
 const AwsXRay = () => {
   const baseName = ['dataStore', SupportedDataStores.AWSXRay];
@@ -28,10 +28,7 @@ const AwsXRay = () => {
       </Row>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Form.Item
-            label="Session Token"
-            name={[...baseName, 'sessionToken']}
-          >
+          <Form.Item label="Session Token" name={[...baseName, 'sessionToken']}>
             <Input placeholder="Session Token" type="password" />
           </Form.Item>
         </Col>

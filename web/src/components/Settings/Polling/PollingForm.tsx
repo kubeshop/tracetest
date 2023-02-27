@@ -32,6 +32,7 @@ const PollingForm = () => {
           </Form.Item>
         </Col>
       </Row>
+
       <S.FooterContainer>
         <Button htmlType="submit" type="primary">
           Save

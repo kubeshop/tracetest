@@ -12,9 +12,13 @@ const AnalyticsForm = () => {
 
   return (
     <Form<IDraftSettings> autoComplete="off" form={form} layout="horizontal" name={FORM_ID} onFinish={onSubmit}>
-      <Form.Item label="Enable analytics" name="analytics" valuePropName="checked">
-        <Switch />
-      </Form.Item>
+      <S.SwitchContainer>
+        <label htmlFor={`${FORM_ID}_analytics`}>Enable analytics</label>
+        <Form.Item name="analytics" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+      </S.SwitchContainer>
+
       <S.FooterContainer>
         <Button htmlType="submit" type="primary">
           Save

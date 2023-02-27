@@ -26,3 +26,13 @@ export const Description = styled(Typography.Text)`
     color: ${({theme}) => theme.color.textSecondary};
   }
 `;
+
+export const SwitchContainer = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 8px;
+
+  label {
+    margin-bottom: 24px;
+  }
+`;
