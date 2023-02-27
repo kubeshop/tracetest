@@ -19,7 +19,7 @@ func (a Attributes) Get(key string) string {
 	return ""
 }
 
-func (a Attributes) SetPointer(key string, value *string) {
+func (a Attributes) SetPointerValue(key string, value *string) {
 	if value != nil {
 		a[key] = *value
 	}

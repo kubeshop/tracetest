@@ -208,7 +208,7 @@ func generateSpan(seg *segment, traceID string, parent *model.Span) (model.Span,
 		attributes[AWSXRayInProgressAttribute] = strconv.FormatBool(*seg.InProgress)
 	}
 
-	attributes.SetPointer(conventions.AttributeEnduserID, seg.User)
+	attributes.SetPointerValue(conventions.AttributeEnduserID, seg.User)
 	addHTTP(seg, attributes)
 	addAWSToSpan(seg.AWS, attributes)
 	err = addSQLToSpan(seg.SQL, attributes)
@@ -239,7 +239,7 @@ func addNamespace(seg *segment, attributes model.Attributes) error {
 	if seg.Namespace != nil {
 		switch *seg.Namespace {
 		case validAWSNamespace:
-			attributes.SetPointer(AWSServiceAttribute, seg.Name)
+			attributes.SetPointerValue(AWSServiceAttribute, seg.Name)
 
 		case validRemoteNamespace:
 			// no op
@@ -258,10 +258,10 @@ func addHTTP(seg *segment, attributes model.Attributes) {
 	}
 
 	if req := seg.HTTP.Request; req != nil {
-		attributes.SetPointer(conventions.AttributeHTTPMethod, req.Method)
-		attributes.SetPointer(conventions.AttributeHTTPClientIP, req.ClientIP)
-		attributes.SetPointer(conventions.AttributeHTTPUserAgent, req.UserAgent)
-		attributes.SetPointer(conventions.AttributeHTTPURL, req.URL)
+		attributes.SetPointerValue(conventions.AttributeHTTPMethod, req.Method)
+		attributes.SetPointerValue(conventions.AttributeHTTPClientIP, req.ClientIP)
+		attributes.SetPointerValue(conventions.AttributeHTTPUserAgent, req.UserAgent)
+		attributes.SetPointerValue(conventions.AttributeHTTPURL, req.URL)
 
 		if req.XForwardedFor != nil {
 			attributes[AWSXRayXForwardedForAttribute] = strconv.FormatBool(*req.XForwardedFor)
@@ -285,12 +285,12 @@ func addHTTP(seg *segment, attributes model.Attributes) {
 
 func addAWSToSpan(aws *aWSData, attrs model.Attributes) {
 	if aws != nil {
-		attrs.SetPointer(AWSAccountAttribute, aws.AccountID)
-		attrs.SetPointer(AWSOperationAttribute, aws.Operation)
-		attrs.SetPointer(AWSRegionAttribute, aws.RemoteRegion)
-		attrs.SetPointer(AWSRequestIDAttribute, aws.RequestID)
-		attrs.SetPointer(AWSQueueURLAttribute, aws.QueueURL)
-		attrs.SetPointer(AWSTableNameAttribute, aws.TableName)
+		attrs.SetPointerValue(AWSAccountAttribute, aws.AccountID)
+		attrs.SetPointerValue(AWSOperationAttribute, aws.Operation)
+		attrs.SetPointerValue(AWSRegionAttribute, aws.RemoteRegion)
+		attrs.SetPointerValue(AWSRequestIDAttribute, aws.RequestID)
+		attrs.SetPointerValue(AWSQueueURLAttribute, aws.QueueURL)
+		attrs.SetPointerValue(AWSTableNameAttribute, aws.TableName)
 
 		if aws.Retries != nil {
 			attrs[AWSXrayRetriesAttribute] = fmt.Sprintf("%v", *aws.Retries)
@@ -314,9 +314,9 @@ func addSQLToSpan(sql *sQLData, attrs model.Attributes) error {
 	}
 	// not handling sql.ConnectionString for now because the X-Ray exporter
 	// does not support it
-	attrs.SetPointer(conventions.AttributeDBSystem, sql.DatabaseType)
-	attrs.SetPointer(conventions.AttributeDBStatement, sql.SanitizedQuery)
-	attrs.SetPointer(conventions.AttributeDBUser, sql.User)
+	attrs.SetPointerValue(conventions.AttributeDBSystem, sql.DatabaseType)
+	attrs.SetPointerValue(conventions.AttributeDBStatement, sql.SanitizedQuery)
+	attrs.SetPointerValue(conventions.AttributeDBUser, sql.User)
 	return nil
 }
 
