@@ -21,6 +21,7 @@ type Resource[T Validator] struct {
 
 type ResourceHandler[T Validator] interface {
 	Create(T) (T, error)
+	Update(T) (T, error)
 }
 
 type manager[T Validator] struct {
@@ -40,6 +41,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
 
 	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost)
+	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut)
 
 	return subrouter
 }
@@ -59,6 +61,14 @@ func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
+	m.operationWithBody(w, r, http.StatusCreated, "creating", m.handler.Create)
+}
+
+func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
+	m.operationWithBody(w, r, http.StatusOK, "updating", m.handler.Update)
+}
+
+func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(T) (T, error)) {
 	encoder, err := encoderFromRequest(r)
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
@@ -81,9 +91,9 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: if resourceType != values.resourceType return error
 
-	created, err := m.handler.Create(targetResource.Spec)
+	created, err := fn(targetResource.Spec)
 	if err != nil {
-		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error creating resource %s: %w", m.resourceType, err))
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error %s resource %s: %w", operationVerb, m.resourceType, err))
 		return
 	}
 
@@ -98,8 +108,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeResponse(w, http.StatusCreated, string(bytes))
-
+	writeResponse(w, statusCode, string(bytes))
 }
 
 func writeResponse(w http.ResponseWriter, code int, msg string) {
