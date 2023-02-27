@@ -2,11 +2,8 @@ package testutil
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
-	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -69,66 +66,18 @@ func extractID(input string) string {
 	return id.(string)
 }
 
-const OperationCreateSuccess Operation = "CreateSuccess"
-
-type createSuccessOperation struct{}
-
-func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	clean := removeIDFromJSON(rt.SampleJSON)
-	input := ct.fromJSON(clean)
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.ResourceType))
-
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(input))
-	require.NoError(t, err)
-
-	return req
-}
-
-func (createSuccessOperation) name() Operation {
-	return OperationCreateSuccess
-}
-
-func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	require.Equal(t, 201, resp.StatusCode)
-
+func responseBodyJSON(t *testing.T, resp *http.Response, ct contentType) string {
 	require.NotNil(t, resp.Body)
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 	jsonBody := ct.toJSON(string(body))
-
-	clean := removeIDFromJSON(rt.SampleJSON)
-	expected := ct.toJSON(clean)
-
-	require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
-	require.NotEmpty(t, extractID(jsonBody))
+	return jsonBody
 }
 
-const OperationCreateInteralError Operation = "CreateInteralError"
-
-type createInteralErrorOperation struct{}
-
-func (op createInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	clean := removeIDFromJSON(rt.SampleJSON)
-	input := ct.fromJSON(clean)
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.ResourceType))
-
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(input))
-	require.NoError(t, err)
-
-	return req
-}
-
-func (createInteralErrorOperation) name() Operation {
-	return OperationCreateInteralError
-}
-
-func (createInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func assertInternalError(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	require.Equal(t, 500, resp.StatusCode)
 
-	require.NotNil(t, resp.Body)
-	body, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
-	jsonBody := ct.toJSON(string(body))
+	jsonBody := responseBodyJSON(t, resp, ct)
 
 	// hacky way to get the types we want
 	bodyValues := struct {
