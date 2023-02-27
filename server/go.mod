@@ -8,7 +8,6 @@ require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/aws/aws-sdk-go v1.44.196
 	github.com/brianvoe/gofakeit/v6 v6.17.0
-	github.com/containerd/containerd v1.6.12
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/elastic/go-elasticsearch/v8 v8.4.0-alpha.1.0.20221227164349-c40d762a40ad
 	github.com/fluidtruck/deepcopy v1.0.0
