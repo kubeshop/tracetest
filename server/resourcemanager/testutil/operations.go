@@ -13,11 +13,13 @@ var (
 	defaultOperations = []operationTester{
 		createSuccessOperation{},
 		updateSuccessOperation{},
+		getSuccessOperation{},
 	}
 
 	errorOperations = []operationTester{
 		createInteralErrorOperation{},
 		updateInteralErrorOperation{},
+		getInteralErrorOperation{},
 	}
 )
 
