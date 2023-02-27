@@ -30,27 +30,29 @@ func (m *sampleResourceManager) Create(s sampleResource) (sampleResource, error)
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
+func (m *sampleResourceManager) Update(s sampleResource) (sampleResource, error) {
+	args := m.Called(s)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
 func TestSampleResource(t *testing.T) {
 
 	sample := sampleResource{
-		Name:      "test",
+		Name:      "the name",
 		SomeValue: "the value",
 	}
 
 	sampleWithID := sampleResource{
 		ID:        "1",
-		Name:      "test",
+		Name:      "the name",
 		SomeValue: "the value",
 	}
 
-	sampleJSON := `{
-		"type": "SampleResource",
-		"spec": {
-			"id": "1",
-			"name": "test",
-			"some_value": "the value"
-		}
-	}`
+	sampleUpdated := sampleResource{
+		ID:        "1",
+		Name:      "the name updated",
+		SomeValue: "the value updated",
+	}
 
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceType: "SampleResource",
@@ -72,8 +74,28 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Create", sample).
 					Return(sampleResource{}, fmt.Errorf("some error"))
+			case rmtests.OperationUpdateSuccess:
+				mockManager.
+					On("Update", sampleUpdated).
+					Return(sampleUpdated, nil)
 			}
 		},
-		SampleJSON: sampleJSON,
+		SampleJSON: `{
+			"type": "SampleResource",
+			"spec": {
+				"id": "1",
+				"name": "the name",
+				"some_value": "the value"
+			}
+		}`,
+
+		SampleJSONUpdated: `{
+			"type": "SampleResource",
+			"spec": {
+				"id": "1",
+				"name": "the name updated",
+				"some_value": "the value updated"
+			}
+		}`,
 	})
 }

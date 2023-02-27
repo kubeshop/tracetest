@@ -12,10 +12,12 @@ import (
 var (
 	defaultOperations = []operationTester{
 		createSuccessOperation{},
+		updateSuccessOperation{},
 	}
 
 	errorOperations = []operationTester{
 		createInteralErrorOperation{},
+		// updateInteralErrorOperation{},
 	}
 )
 

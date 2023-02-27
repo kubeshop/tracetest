@@ -18,7 +18,8 @@ type ResourceTypeTest struct {
 	RegisterManagerFn func(*mux.Router) any
 	Prepare           func(operation Operation, bridge any)
 
-	SampleJSON string
+	SampleJSON        string
+	SampleJSONUpdated string
 }
 
 type contentType struct {
