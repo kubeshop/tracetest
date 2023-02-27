@@ -7,16 +7,21 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/stretchr/testify/mock"
 )
 
 type sampleResource struct {
-	ID   string `mapstructure:"id"`
+	ID   id.ID  `mapstructure:"id"`
 	Name string `mapstructure:"name"`
 
 	SomeValue string `mapstructure:"some_value"`
+}
+
+func (sr sampleResource) HasID() bool {
+	return sr.ID.String() != ""
 }
 
 func (sr sampleResource) Validate() error {
@@ -25,6 +30,11 @@ func (sr sampleResource) Validate() error {
 
 type sampleResourceManager struct {
 	mock.Mock
+}
+
+func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
+	sr.ID = id
+	return sr
 }
 
 func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {
@@ -37,7 +47,7 @@ func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sam
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
-func (m *sampleResourceManager) Get(_ context.Context, id string) (sampleResource, error) {
+func (m *sampleResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
 	args := m.Called(id)
 	return args.Get(0).(sampleResource), args.Error(1)
 }
@@ -45,11 +55,6 @@ func (m *sampleResourceManager) Get(_ context.Context, id string) (sampleResourc
 func TestSampleResource(t *testing.T) {
 
 	sample := sampleResource{
-		Name:      "the name",
-		SomeValue: "the value",
-	}
-
-	sampleWithID := sampleResource{
 		ID:        "1",
 		Name:      "the name",
 		SomeValue: "the value",
@@ -65,25 +70,38 @@ func TestSampleResource(t *testing.T) {
 		ResourceType: "SampleResource",
 		RegisterManagerFn: func(router *mux.Router) any {
 			mockManager := new(sampleResourceManager)
-			manager := resourcemanager.New[sampleResource]("SampleResource", mockManager)
+			manager := resourcemanager.New[sampleResource]("SampleResource", mockManager, func() id.ID {
+				return id.ID("3")
+			})
 			manager.RegisterRoutes(router)
 
 			return mockManager
 		},
-		Prepare: func(op rmtests.Operation, bridge any) {
+		Prepare: func(t *testing.T, op rmtests.Operation, bridge any) {
 			mockManager := bridge.(*sampleResourceManager)
+			mockManager.Test(t)
 			switch op {
 			// Create
+			case rmtests.OperationCreateNoID:
+				withGenID := sample
+				withGenID.ID = id.ID("3")
+				mockManager.
+					On("Create", withGenID).
+					Return(sample, nil)
 			case rmtests.OperationCreateSuccess:
 				mockManager.
 					On("Create", sample).
-					Return(sampleWithID, nil)
+					Return(sample, nil)
 			case rmtests.OperationCreateInteralError:
 				mockManager.
 					On("Create", sample).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
-			// Update
+				// Update
+			case rmtests.OperationUpdateNotFound:
+				mockManager.
+					On("Update", sampleUpdated).
+					Return(sampleResource{}, sql.ErrNoRows)
 			case rmtests.OperationUpdateSuccess:
 				mockManager.
 					On("Update", sampleUpdated).
@@ -93,18 +111,18 @@ func TestSampleResource(t *testing.T) {
 					On("Update", sampleUpdated).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
-				// Get
+			// Get
 			case rmtests.OperationGetNotFound:
 				mockManager.
-					On("Get", sampleWithID.ID).
+					On("Get", sample.ID).
 					Return(sampleResource{}, sql.ErrNoRows)
 			case rmtests.OperationGetSuccess:
 				mockManager.
-					On("Get", sampleWithID.ID).
-					Return(sampleWithID, nil)
+					On("Get", sample.ID).
+					Return(sample, nil)
 			case rmtests.OperationGetInteralError:
 				mockManager.
-					On("Get", sampleWithID.ID).
+					On("Get", sample.ID).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 			}
 		},
@@ -116,7 +134,6 @@ func TestSampleResource(t *testing.T) {
 				"some_value": "the value"
 			}
 		}`,
-
 		SampleJSONUpdated: `{
 			"type": "SampleResource",
 			"spec": {

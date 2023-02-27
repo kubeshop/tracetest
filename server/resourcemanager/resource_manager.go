@@ -10,33 +10,38 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/mitchellh/mapstructure"
 )
 
-type Validator interface {
+type ResourceSpec interface {
+	HasID() bool
 	Validate() error
 }
 
-type Resource[T Validator] struct {
+type Resource[T ResourceSpec] struct {
 	Type string `mapstructure:"type"`
 	Spec T      `mapstructure:"spec"`
 }
 
-type ResourceHandler[T Validator] interface {
+type ResourceHandler[T ResourceSpec] interface {
+	SetID(T, id.ID) T
 	Create(context.Context, T) (T, error)
 	Update(context.Context, T) (T, error)
-	Get(_ context.Context, id string) (T, error)
+	Get(context.Context, id.ID) (T, error)
 }
 
-type manager[T Validator] struct {
+type manager[T ResourceSpec] struct {
 	resourceType string
 	handler      ResourceHandler[T]
+	idgen        func() id.ID
 }
 
-func New[T Validator](resourceType string, handler ResourceHandler[T]) *manager[T] {
+func New[T ResourceSpec](resourceType string, handler ResourceHandler[T], idgenFn func() id.ID) *manager[T] {
 	return &manager[T]{
 		resourceType: resourceType,
 		handler:      handler,
+		idgen:        idgenFn,
 	}
 }
 
@@ -69,15 +74,11 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", encoder.ResponseContentType())
 
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id := id.ID(vars["id"])
 
 	item, err := m.handler.Get(r.Context(), id)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error getting resource %s: %w", m.resourceType, err))
+		m.handleResourceHandlerError(w, "getting", err, encoder)
 		return
 	}
 
@@ -93,6 +94,18 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, 200, string(bytes))
+}
+
+func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb string, err error, encoder encoder) {
+	// 404 - not found
+	if errors.Is(err, sql.ErrNoRows) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// 500 - internal server error
+	err = fmt.Errorf("error %s resource %s: %w", verb, m.resourceType, err)
+	writeError(w, encoder, http.StatusInternalServerError, err)
 }
 
 func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
@@ -118,9 +131,14 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 
 	// TODO: if resourceType != values.resourceType return error
 
+	// TODO: check if this needs to be done per operation
+	if !targetResource.Spec.HasID() {
+		targetResource.Spec = m.handler.SetID(targetResource.Spec, m.idgen())
+	}
+
 	created, err := fn(r.Context(), targetResource.Spec)
 	if err != nil {
-		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error %s resource %s: %w", operationVerb, m.resourceType, err))
+		m.handleResourceHandlerError(w, operationVerb, err, encoder)
 		return
 	}
 

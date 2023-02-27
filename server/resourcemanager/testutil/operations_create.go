@@ -10,29 +10,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildCreateRequest(rt ResourceTypeTest, ct contentType, testServer *httptest.Server, t *testing.T) *http.Request {
-	clean := removeIDFromJSON(rt.SampleJSON)
-	input := ct.fromJSON(clean)
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.ResourceType))
+func buildCreateRequest(body, rt string, ct contentType, testServer *httptest.Server, t *testing.T) *http.Request {
+	input := ct.fromJSON(body)
+	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt))
 
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(input))
 	require.NoError(t, err)
 	return req
 }
 
-const OperationCreateSuccess Operation = "CreateSuccess"
+const OperationCreateNoID Operation = "CreateNoID"
 
-type createSuccessOperation struct{}
+type createNoIDOperation struct{}
 
-func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildCreateRequest(rt, ct, testServer, t)
+func (op createNoIDOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+	return buildCreateRequest(
+		removeIDFromJSON(rt.SampleJSON),
+		rt.ResourceType,
+		ct,
+		testServer,
+		t,
+	)
 }
 
-func (createSuccessOperation) name() Operation {
-	return OperationCreateSuccess
+func (createNoIDOperation) name() Operation {
+	return OperationCreateNoID
 }
 
-func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func (createNoIDOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	require.Equal(t, 201, resp.StatusCode)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
@@ -44,12 +49,45 @@ func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, 
 	require.NotEmpty(t, extractID(jsonBody))
 }
 
+const OperationCreateSuccess Operation = "CreateSuccess"
+
+type createSuccessOperation struct{}
+
+func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+	return buildCreateRequest(
+		rt.SampleJSON,
+		rt.ResourceType,
+		ct,
+		testServer,
+		t,
+	)
+}
+
+func (createSuccessOperation) name() Operation {
+	return OperationCreateSuccess
+}
+
+func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+	require.Equal(t, 201, resp.StatusCode)
+
+	jsonBody := responseBodyJSON(t, resp, ct)
+	expected := ct.toJSON(rt.SampleJSON)
+
+	require.JSONEq(t, expected, jsonBody)
+}
+
 const OperationCreateInteralError Operation = "CreateInteralError"
 
 type createInteralErrorOperation struct{}
 
 func (op createInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildCreateRequest(rt, ct, testServer, t)
+	return buildCreateRequest(
+		rt.SampleJSON,
+		rt.ResourceType,
+		ct,
+		testServer,
+		t,
+	)
 }
 
 func (createInteralErrorOperation) name() Operation {
