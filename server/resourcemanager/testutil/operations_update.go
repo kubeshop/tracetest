@@ -42,6 +42,23 @@ func (updateSuccessOperation) assertResponse(t *testing.T, resp *http.Response, 
 	require.JSONEq(t, expected, jsonBody)
 }
 
+const OperationUpdateNotFound Operation = "UpdateNotFound"
+
+type updateNotFoundOperation struct{}
+
+func (op updateNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+	return buildUpdateRequest(rt, ct, testServer, t)
+}
+
+func (updateNotFoundOperation) name() Operation {
+	return OperationUpdateNotFound
+}
+
+func (updateNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+	t.Helper()
+	require.Equal(t, 404, resp.StatusCode)
+}
+
 const OperationUpdateInteralError Operation = "UpdateInteralError"
 
 type updateInteralErrorOperation struct{}

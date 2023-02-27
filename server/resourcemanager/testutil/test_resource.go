@@ -16,7 +16,7 @@ type Operation string
 type ResourceTypeTest struct {
 	ResourceType      string
 	RegisterManagerFn func(*mux.Router) any
-	Prepare           func(operation Operation, bridge any)
+	Prepare           func(t *testing.T, operation Operation, bridge any)
 
 	SampleJSON        string
 	SampleJSONUpdated string
@@ -76,6 +76,7 @@ func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
 }
 
 func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []operationTester) {
+	t.Parallel()
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
@@ -107,7 +108,7 @@ func testContentType(t *testing.T, op operationTester, ct contentType, rt Resour
 	testBridge := rt.RegisterManagerFn(router)
 
 	if rt.Prepare != nil {
-		rt.Prepare(op.name(), testBridge)
+		rt.Prepare(t, op.name(), testBridge)
 	}
 
 	req := op.buildRequest(t, testServer, ct, rt)
