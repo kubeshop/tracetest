@@ -2,6 +2,8 @@ package resourcemanager
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -71,6 +73,10 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 
 	item, err := m.handler.Get(r.Context(), id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("error getting resource %s: %w", m.resourceType, err))
 		return
 	}

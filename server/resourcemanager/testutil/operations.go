@@ -11,6 +11,9 @@ import (
 
 var (
 	defaultOperations = []operationTester{
+		getNotFoundOperation{},
+		// updateNotFoundOperation{},
+
 		createSuccessOperation{},
 		updateSuccessOperation{},
 		getSuccessOperation{},
