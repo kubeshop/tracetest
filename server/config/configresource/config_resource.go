@@ -64,3 +64,38 @@ func (r *repository) Create(cfg Config) (Config, error) {
 	return cfg, nil
 
 }
+
+const updateQuery = `
+		UPDATE configs SET
+			"name" = $2,
+			"analytics_enabled" = $3
+		WHERE "id" = $1`
+
+// TODO: add context.Context
+func (r *repository) Update(cfg Config) (Config, error) {
+	ctx := context.TODO()
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return Config{}, err
+	}
+
+	_, err = tx.ExecContext(ctx, updateQuery,
+		cfg.ID,
+		cfg.Name,
+		cfg.AnalyticsEnabled,
+	)
+
+	if err != nil {
+		tx.Rollback()
+		return Config{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return Config{}, fmt.Errorf("commit: %w", err)
+	}
+
+	return cfg, nil
+
+}
