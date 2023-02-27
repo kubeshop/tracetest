@@ -47,6 +47,23 @@ func (getSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct 
 	require.JSONEq(t, expected, jsonBody)
 }
 
+const OperationGetNotFound Operation = "GetNotFound"
+
+type getNotFoundOperation struct{}
+
+func (op getNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+	return buildGetRequest(rt, ct, testServer, t)
+}
+
+func (getNotFoundOperation) name() Operation {
+	return OperationGetNotFound
+}
+
+func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+	t.Helper()
+	require.Equal(t, 404, resp.StatusCode)
+}
+
 const OperationGetInteralError Operation = "GetInteralError"
 
 type getInteralErrorOperation struct{}

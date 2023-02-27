@@ -2,6 +2,7 @@ package resourcemanager_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"testing"
 
@@ -92,7 +93,11 @@ func TestSampleResource(t *testing.T) {
 					On("Update", sampleUpdated).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
-			// Get
+				// Get
+			case rmtests.OperationGetNotFound:
+				mockManager.
+					On("Get", sampleWithID.ID).
+					Return(sampleResource{}, sql.ErrNoRows)
 			case rmtests.OperationGetSuccess:
 				mockManager.
 					On("Get", sampleWithID.ID).
