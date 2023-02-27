@@ -29,6 +29,7 @@ type ResourceHandler[T ResourceSpec] interface {
 	Create(context.Context, T) (T, error)
 	Update(context.Context, T) (T, error)
 	Get(context.Context, id.ID) (T, error)
+	Delete(context.Context, id.ID) error
 }
 
 type manager[T ResourceSpec] struct {
@@ -53,6 +54,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut)
 
 	subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet)
+	subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete)
 
 	return subrouter
 }
@@ -94,6 +96,26 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, 200, string(bytes))
+}
+
+func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
+	encoder, err := encoderFromRequest(r)
+	if err != nil {
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", encoder.ResponseContentType())
+
+	vars := mux.Vars(r)
+	id := id.ID(vars["id"])
+
+	err = m.handler.Delete(r.Context(), id)
+	if err != nil {
+		m.handleResourceHandlerError(w, "deleting", err, encoder)
+		return
+	}
+
+	w.WriteHeader(204)
 }
 
 func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb string, err error, encoder encoder) {

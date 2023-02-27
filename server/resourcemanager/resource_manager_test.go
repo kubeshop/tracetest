@@ -52,6 +52,11 @@ func (m *sampleResourceManager) Get(_ context.Context, id id.ID) (sampleResource
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
+func (m *sampleResourceManager) Delete(_ context.Context, id id.ID) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
 func TestSampleResource(t *testing.T) {
 
 	sample := sampleResource{
@@ -111,7 +116,7 @@ func TestSampleResource(t *testing.T) {
 					On("Update", sampleUpdated).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
-			// Get
+				// Get
 			case rmtests.OperationGetNotFound:
 				mockManager.
 					On("Get", sample.ID).
@@ -124,6 +129,20 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Get", sample.ID).
 					Return(sampleResource{}, fmt.Errorf("some error"))
+
+			// Delete
+			case rmtests.OperationDeleteNotFound:
+				mockManager.
+					On("Delete", sample.ID).
+					Return(sql.ErrNoRows)
+			case rmtests.OperationDeleteSuccess:
+				mockManager.
+					On("Delete", sample.ID).
+					Return(nil)
+			case rmtests.OperationDeleteInteralError:
+				mockManager.
+					On("Delete", sample.ID).
+					Return(fmt.Errorf("some error"))
 			}
 		},
 		SampleJSON: `{
