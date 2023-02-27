@@ -1,6 +1,7 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
+import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
+import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
 import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
-import RequestDetailsFileInput from '../../../../CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
 import * as S from '../../DataStorePluginForm.styled';
 import AddressesList from './AddressesList';
 
@@ -8,6 +9,7 @@ const OpenSearch = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
   const dataStoreType = Form.useWatch('dataStoreType', form) || SupportedDataStores.OpenSearch;
   const baseName = ['dataStore', dataStoreType];
+  const endpointPlaceholder = SupportedDataStoresToDefaultEndpoint[dataStoreType];
 
   return (
     <>
@@ -24,7 +26,9 @@ const OpenSearch = () => {
         <Col span={12}>
           <S.ItemListLabel>Addresses</S.ItemListLabel>
           <Form.List name={[...baseName, 'addresses']}>
-            {(fields, {add, remove}) => <AddressesList fields={fields} add={add} remove={remove} />}
+            {(fields, {add, remove}) => (
+              <AddressesList fields={fields} add={add} remove={remove} placeholder={endpointPlaceholder} />
+            )}
           </Form.List>
         </Col>
       </Row>
