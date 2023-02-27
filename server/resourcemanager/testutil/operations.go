@@ -19,12 +19,16 @@ var (
 
 		getNotFoundOperation{},
 		getSuccessOperation{},
+
+		deleteNotFoundOperation{},
+		deleteSuccessOperation{},
 	}
 
 	errorOperations = []operationTester{
 		createInteralErrorOperation{},
 		updateInteralErrorOperation{},
 		getInteralErrorOperation{},
+		deleteInteralErrorOperation{},
 	}
 )
 
@@ -75,10 +79,16 @@ func extractID(input string) string {
 	return id.(string)
 }
 
-func responseBodyJSON(t *testing.T, resp *http.Response, ct contentType) string {
+func responseBody(t *testing.T, resp *http.Response) string {
 	require.NotNil(t, resp.Body)
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
+
+	return string(body)
+}
+
+func responseBodyJSON(t *testing.T, resp *http.Response, ct contentType) string {
+	body := responseBody(t, resp)
 	jsonBody := ct.toJSON(string(body))
 	return jsonBody
 }
