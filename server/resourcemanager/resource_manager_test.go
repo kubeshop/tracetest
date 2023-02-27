@@ -66,6 +66,7 @@ func TestSampleResource(t *testing.T) {
 		Prepare: func(op rmtests.Operation, bridge any) {
 			mockManager := bridge.(*sampleResourceManager)
 			switch op {
+			// Create
 			case rmtests.OperationCreateSuccess:
 				mockManager.
 					On("Create", sample).
@@ -74,10 +75,16 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Create", sample).
 					Return(sampleResource{}, fmt.Errorf("some error"))
+
+			// Update
 			case rmtests.OperationUpdateSuccess:
 				mockManager.
 					On("Update", sampleUpdated).
 					Return(sampleUpdated, nil)
+			case rmtests.OperationUpdateInteralError:
+				mockManager.
+					On("Update", sampleUpdated).
+					Return(sampleResource{}, fmt.Errorf("some error"))
 			}
 		},
 		SampleJSON: `{
