@@ -22,6 +22,9 @@ var (
 
 		deleteNotFoundOperation{},
 		deleteSuccessOperation{},
+
+		listSuccessOperation{},
+		// TODO: add tests for pagination etc
 	}
 
 	errorOperations = []operationTester{
@@ -29,6 +32,7 @@ var (
 		updateInteralErrorOperation{},
 		getInteralErrorOperation{},
 		deleteInteralErrorOperation{},
+		listInteralErrorOperation{},
 	}
 )
 
