@@ -13,14 +13,6 @@ import (
 
 func TestConfigResource(t *testing.T) {
 
-	sampleJSON := `{
-		"type": "Config",
-		"spec": {
-			"id": "1",
-			"name": "test",
-			"analyticsEnabled": true
-		}
-	}`
 	db := testmock.MustGetRawTestingDatabase()
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
@@ -34,6 +26,22 @@ func TestConfigResource(t *testing.T) {
 
 			return nil
 		},
-		SampleJSON: sampleJSON,
+		SampleJSON: `{
+			"type": "Config",
+			"spec": {
+				"id": "1",
+				"name": "test",
+				"analyticsEnabled": true
+			}
+		}`,
+
+		SampleJSONUpdated: `{
+			"type": "Config",
+			"spec": {
+				"id": "1",
+				"name": "test updated",
+				"analyticsEnabled": true
+			}
+		}`,
 	})
 }
