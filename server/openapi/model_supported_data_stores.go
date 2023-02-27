@@ -22,6 +22,7 @@ const (
 	NEW_RELIC   SupportedDataStores = "newRelic"
 	LIGHTSTEP   SupportedDataStores = "lightstep"
 	DATADOG     SupportedDataStores = "datadog"
+	AWSXRAY     SupportedDataStores = "awsxray"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

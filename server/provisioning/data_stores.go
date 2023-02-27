@@ -19,6 +19,7 @@ type (
 		OpenSearch *elasticSearch                 `mapstructure:"opensearch"`
 		SignalFX   *signalFX                      `mapstructure:"signalfx"`
 		ElasticApm *elasticSearch                 `mapstructure:"elasticapm"`
+		AwsXRay    *aWSXRayDataStoreConfig        `mapstructure:"awsxray"`
 	}
 
 	baseClientConfig struct {
@@ -46,6 +47,13 @@ type (
 		Realm string
 		Token string
 	}
+
+	aWSXRayDataStoreConfig struct {
+		Region          string
+		AccessKeyID     string
+		SecretAccessKey string
+		SessionToken    string
+	}
 )
 
 func (ds dataStore) model() model.DataStore {
@@ -68,6 +76,10 @@ func (ds dataStore) model() model.DataStore {
 	}
 	if ds.SignalFX != nil {
 		deepcopy.DeepCopy(ds.SignalFX, &m.Values.SignalFx)
+	}
+
+	if ds.AwsXRay != nil {
+		deepcopy.DeepCopy(ds.AwsXRay, &m.Values.AwsXRay)
 	}
 
 	return m

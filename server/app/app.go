@@ -279,6 +279,8 @@ func newRunnerFacades(
 		tracePoller,
 		tracer,
 		subscriptionManager,
+		tracedb.Factory(testDB),
+		testDB,
 	)
 
 	transactionRunner := executor.NewTransactionRunner(runner, testDB, subscriptionManager)

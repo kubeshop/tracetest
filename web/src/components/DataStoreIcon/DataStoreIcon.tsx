@@ -9,6 +9,7 @@ import OpenSearch from './Icons/OpenSearch';
 import Otlp from './Icons/Otlp';
 import SignalFx from './Icons/SignalFx';
 import Tempo from './Icons/Tempo';
+import AWSXRay from './Icons/AwsXRay';
 
 const iconMap = {
   [SupportedDataStores.JAEGER]: Jaeger,
@@ -20,6 +21,7 @@ const iconMap = {
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.Datadog]: Datadog,
+  [SupportedDataStores.AWSXRay]: AWSXRay,
 } as const;
 
 interface IProps {

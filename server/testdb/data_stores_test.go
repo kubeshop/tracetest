@@ -25,6 +25,7 @@ func TestCreateDataStore(t *testing.T) {
 			SignalFx:   &model.SignalFXDataStoreConfig{},
 			OpenSearch: &model.ElasticSearchDataStoreConfig{},
 			ElasticApm: &model.ElasticSearchDataStoreConfig{},
+			AwsXRay:    &model.AWSXRayDataStoreConfig{},
 		},
 	}
 

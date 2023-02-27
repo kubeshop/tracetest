@@ -45,6 +45,7 @@ func (g randGenerator) TraceID() trace.TraceID {
 	g.rand.Read(tid[:])
 	return tid
 }
+
 func (g randGenerator) SpanID() trace.SpanID {
 	sid := trace.SpanID{}
 	g.rand.Read(sid[:])
