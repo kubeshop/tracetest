@@ -106,6 +106,22 @@ func (s Server) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, sp
 		return fmt.Errorf("could not find test run with traceID %s: %w", traceID.String(), err)
 	}
 
+	if run.State != model.RunStateAwaitingTrace {
+		// test is not waiting for trace, so we can completely ignore those as they might
+		// mess up with the test integrity.
+		//
+		// For example:
+		// Imagine that a test failed because Span A wasn't available in the trace and one minute
+		// later, the span is received and added to the span. When investigating the issue,
+		// one might be confused and maybe think it's a bug in our assertion engine
+		// because the assertion failed, but the span is there. However, it wasn't at
+		// the moment the assertion ran.
+		//
+		// So, to reduce friction and prevent long debugging hours, we can just disable this.
+
+		return nil
+	}
+
 	existingSpans := run.Trace.Spans()
 	newSpans := append(existingSpans, spans...)
 	newTrace := model.NewTrace(traceID.String(), newSpans)
