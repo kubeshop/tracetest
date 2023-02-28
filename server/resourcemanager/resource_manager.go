@@ -58,12 +58,12 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
 
-	subrouter.HandleFunc("/", m.list).Methods(http.MethodGet)
-	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost)
-	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut)
+	subrouter.HandleFunc("/", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceType))
+	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
+	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
 
-	subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet)
-	subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete)
+	subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
+	subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
 
 	return subrouter
 }
