@@ -42,10 +42,10 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) connection.Connect
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := getClusterInfo(db.client)
 			if err != nil {
-				return "Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues", err
+				return "Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues", err
 			}
 
-			return "Tracetest managed to authenticate with OpenSearch", nil
+			return "Tracetest managed to authenticate with ElasticSearch", nil
 		})),
 	)
 
