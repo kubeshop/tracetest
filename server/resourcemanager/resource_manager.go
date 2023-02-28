@@ -205,7 +205,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeResponse(w, 200, string(bytes))
+	writeResponse(w, http.StatusOK, string(bytes))
 }
 
 func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
