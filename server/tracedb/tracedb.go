@@ -16,11 +16,7 @@ type TraceDB interface {
 	Connect(ctx context.Context) error
 	Ready() bool
 	ShouldRetry() bool
-<<<<<<< HEAD
-	MinSpanCount() int
 	GetTraceID() trace.TraceID
-=======
->>>>>>> 87144066 (fix(server): update polling logic to remove MinSpanCount logic)
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
 	TestConnection(ctx context.Context) connection.ConnectionTestResult
 	Close() error

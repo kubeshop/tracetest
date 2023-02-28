@@ -2,6 +2,7 @@ package executor_test
 
 import (
 	"context"
+	"log"
 	"testing"
 	"time"
 
@@ -25,13 +26,12 @@ var (
 func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	t.Parallel()
 
-	// Scenario: Trace without spans
+	// Scenario: Trace without any spans, even root span
 	// Given the trigger execution returns 0 spans
 	// And tracetest does not send the root span
 	// When the server do the polling process
-	// Then it should stop at the second iteration
-	// And it should have no error on the process
-	// And a root span should be added to it
+	// Then it will not send a finished flag
+	// And it will return a connection error on every call
 
 	// Given conditions
 
@@ -39,71 +39,35 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	retryDelay := 1 * time.Second
 	maxWaitTimeForTrace := 30 * time.Second
 
-	tracePerIteration := map[int]model.Trace{
-		0: model.Trace{},
-		1: model.Trace{},
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		model.Trace{},
 	}
 
 	// mock external dependencies
-	updater := getRunUpdaterMock(t)
-	tracer := getTracerMock(t)
-	testDB := getDataStoreRepositoryMock(t)
-	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
-
-	pollerExecutor := executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTimeForTrace,
-		tracer,
-		updater,
-		traceDBFactory,
-		testDB,
-	)
-
-	ctx := context.Background()
-	test := model.Test{
-		ID: id.ID("some-test"),
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-		},
-	}
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectConnectionError: true},
+		{finished: false, expectConnectionError: true},
+	})
 
-	var finished bool
-	var run model.Run
-	var err error
-
-	// first iteration
-	firstRun := model.NewRun()
-	requestForFirstIteration := executor.NewPollingRequest(ctx, test, firstRun, 0)
-
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForFirstIteration)
-	require.False(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.False(t, run.Trace.HasRootSpan())
-
-	// second iteration
-	secondRun := run
-	requestForSecondIteration := executor.NewPollingRequest(ctx, test, secondRun, 1)
-
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForSecondIteration)
-	require.True(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.True(t, run.Trace.HasRootSpan())
+	// it will return errors on repeated calls.
+	// on this case, the trace polling process will be finished by TracePoller itself
 }
 
 func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	t.Parallel()
 
-	// Scenario: Trace with only 1 span
-	// Given the trigger execution returns 1 span on first iteration
+	// Scenario: Trace with only 1 span, without root span
+	// Given the trigger execution returns 1 span on the second iteration
+	// And find no trace on the first iteration
 	// And tracetest does not send the root span
 	// When the server do the polling process
-	// Then it should stop at the second iteration
-	// And it should have no error on the process
+	// Then it should stop at the third iteration
+	// And it should handle the trace error on first iteration
 	// And a root span should be added to it
 
 	// Given conditions
@@ -126,71 +90,34 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	})
 
 	// test
-	tracePerIteration := map[int]model.Trace{
-		0: trace,
-		1: trace,
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		trace,
+		trace,
 	}
 
 	// mock external dependencies
-	updater := getRunUpdaterMock(t)
-	tracer := getTracerMock(t)
-	testDB := getDataStoreRepositoryMock(t)
-	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
-
-	pollerExecutor := executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTimeForTrace,
-		tracer,
-		updater,
-		traceDBFactory,
-		testDB,
-	)
-
-	ctx := context.Background()
-	test := model.Test{
-		ID: id.ID("some-test"),
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-		},
-	}
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-
-	var finished bool
-	var run model.Run
-	var err error
-
-	// first iteration
-	firstRun := model.NewRun()
-	requestForFirstIteration := executor.NewPollingRequest(ctx, test, firstRun, 0)
-
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForFirstIteration)
-	require.False(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.False(t, run.Trace.HasRootSpan())
-
-	// second iteration
-	secondRun := run
-	requestForSecondIteration := executor.NewPollingRequest(ctx, test, secondRun, 1)
-
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForSecondIteration)
-	require.True(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.True(t, run.Trace.HasRootSpan())
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectConnectionError: true},
+		{finished: false, expectConnectionError: false, expectRootSpan: false},
+		{finished: true, expectConnectionError: false, expectRootSpan: true},
+	})
 }
 
 func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 	t.Parallel()
 
-	// Scenario: Trace with 2 span
-	// Given the trigger execution returns 1 span on first iteration and another one on second iteration
+	// Scenario: Trace with 2 span, without root span
+	// Given the trigger execution returns 1 span on second iteration and another one on third iteration
+	// And find no trace on the first iteration
 	// And tracetest does not send the root span
 	// When the server do the polling process
-	// Then it should stop at the third iteration
-	// And it should have no error on the process
+	// Then it should stop at the fourth iteration
+	// And it should handle the trace error on first iteration
 	// And a root span should be added to it
 
 	// Given conditions
@@ -224,33 +151,231 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		Children: []*model.Span{},
 	}
 
-	firstIterationTrace := model.NewTrace(traceID, []model.Span{firstSpan})
-	secondIterationTrace := model.NewTrace(traceID, []model.Span{firstSpan, secondSpan})
-	thirdIterationTrace := model.NewTrace(traceID, []model.Span{firstSpan, secondSpan})
+	traceWithOneSpan := model.NewTrace(traceID, []model.Span{firstSpan})
+	traceWithTwoSpans := model.NewTrace(traceID, []model.Span{firstSpan, secondSpan})
 
 	// test
-	tracePerIteration := map[int]model.Trace{
-		0: firstIterationTrace,
-		1: secondIterationTrace,
-		2: thirdIterationTrace,
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		traceWithOneSpan,
+		traceWithTwoSpans,
+		traceWithTwoSpans,
 	}
 
 	// mock external dependencies
-	updater := getRunUpdaterMock(t)
-	tracer := getTracerMock(t)
-	testDB := getDataStoreRepositoryMock(t)
-	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
 
-	pollerExecutor := executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTimeForTrace,
-		tracer,
-		updater,
-		traceDBFactory,
-		testDB,
-	)
+	// When doing polling process
+	// Then validate outputs
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectConnectionError: true},
+		{finished: false, expectConnectionError: false, expectRootSpan: false},
+		{finished: false, expectConnectionError: false, expectRootSpan: false},
+		{finished: true, expectConnectionError: false, expectRootSpan: true},
+	})
+}
 
+func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
+	t.Parallel()
+
+	// Scenario: Trace without any spans, only root span
+	// Given the trigger execution returns 0 spans
+	// And tracetest sent the root span
+	// When the server do the polling process
+	// Then it should stop on third iteration
+	// And it should handle the trace error on first iteration
+
+	// Given conditions
+
+	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
+	retryDelay := 1 * time.Second
+	maxWaitTimeForTrace := 30 * time.Second
+
+	rootSpan := model.Span{
+		ID:        randomIDGenerator.SpanID(),
+		Name:      model.TriggerSpanName,
+		StartTime: time.Now(),
+		EndTime:   time.Now().Add(retryDelay),
+		Attributes: map[string]string{
+			"testSpan": "true",
+		},
+		Children: []*model.Span{},
+	}
+
+	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan})
+
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		trace,
+		trace,
+	}
+
+	// mock external dependencies
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+
+	// When doing polling process
+	// Then validate outputs
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectConnectionError: true},
+		{finished: false, expectConnectionError: false, expectRootSpan: true},
+		{finished: true, expectConnectionError: false, expectRootSpan: true},
+	})
+}
+
+func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
+	t.Parallel()
+
+	// Scenario: Trace with only 1 span, plus a root span
+	// Given the trigger execution returns 1 span on second iteration
+	// And find no trace on the first iteration
+	// And tracetest sent the root span
+	// When the server do the polling process
+	// Then it should stop at the second iteration
+	// And it should handle the trace error on first iteration
+	// And a root span should be added to it
+
+	// Given conditions
+
+	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
+	retryDelay := 1 * time.Second
+	maxWaitTimeForTrace := 30 * time.Second
+
+	rootSpanID := randomIDGenerator.SpanID()
+
+	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
+		model.Span{
+			ID:        rootSpanID,
+			Name:      model.TriggerSpanName,
+			StartTime: time.Now(),
+			EndTime:   time.Now().Add(retryDelay),
+			Attributes: map[string]string{
+				"testSpan": "true",
+			},
+			Children: []*model.Span{},
+		},
+		{
+			ID:        randomIDGenerator.SpanID(),
+			Name:      "HTTP API",
+			StartTime: time.Now(),
+			EndTime:   time.Now().Add(retryDelay),
+			Attributes: map[string]string{
+				"testSpan":  "true",
+				"parent_id": rootSpanID.String(),
+			},
+			Children: []*model.Span{},
+		},
+	})
+
+	// test
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		trace,
+		trace,
+	}
+
+	// mock external dependencies
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+
+	// When doing polling process
+	// Then validate outputs
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectConnectionError: true},
+		{finished: false, expectConnectionError: false, expectRootSpan: true},
+		{finished: true, expectConnectionError: false, expectRootSpan: true},
+	})
+}
+
+func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) {
+	t.Parallel()
+
+	// Scenario: Trace with 2 span, plus a root span
+	// Given the trigger execution returns 1 span on second iteration and another one on third iteration
+	// And find no trace on the first iteration
+	// And tracetest sent the root span
+	// When the server do the polling process
+	// Then it should stop at the third iteration
+	// And it should handle the trace error on first iteration
+	// And a root span should be added to it
+
+	// Given conditions
+
+	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
+	retryDelay := 1 * time.Second
+	maxWaitTimeForTrace := 30 * time.Second
+
+	traceID := randomIDGenerator.TraceID().String()
+
+	rootSpan := model.Span{
+		ID:        randomIDGenerator.SpanID(),
+		Name:      model.TriggerSpanName,
+		StartTime: time.Now(),
+		EndTime:   time.Now().Add(retryDelay),
+		Attributes: map[string]string{
+			"testSpan": "true",
+		},
+		Children: []*model.Span{},
+	}
+
+	firstSpan := model.Span{
+		ID:        randomIDGenerator.SpanID(),
+		Name:      "HTTP API",
+		StartTime: time.Now(),
+		EndTime:   time.Now().Add(retryDelay),
+		Attributes: map[string]string{
+			"testSpan":  "true",
+			"parent_id": rootSpan.ID.String(),
+		},
+		Children: []*model.Span{},
+	}
+
+	secondSpan := model.Span{
+		ID:        randomIDGenerator.SpanID(),
+		Name:      "Database query",
+		StartTime: firstSpan.EndTime,
+		EndTime:   firstSpan.EndTime.Add(retryDelay),
+		Attributes: map[string]string{
+			"testSpan":  "true",
+			"parent_id": firstSpan.ID.String(),
+		},
+		Children: []*model.Span{},
+	}
+
+	traceWithOneSpan := model.NewTrace(traceID, []model.Span{rootSpan, firstSpan})
+	traceWithTwoSpans := model.NewTrace(traceID, []model.Span{rootSpan, firstSpan, secondSpan})
+
+	// test
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		traceWithOneSpan,
+		traceWithTwoSpans,
+		traceWithTwoSpans,
+	}
+
+	// mock external dependencies
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+
+	// When doing polling process
+	// Then validate outputs
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectConnectionError: true},
+		{finished: false, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectConnectionError: false, expectRootSpan: true},
+		{finished: true, expectConnectionError: false, expectRootSpan: true},
+	})
+}
+
+// Helper structs / functions
+
+type iterationExpectedValues struct {
+	finished              bool
+	expectConnectionError bool
+	expectRootSpan        bool
+}
+
+func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
 	ctx := context.Background()
+	run := model.NewRun()
+
 	test := model.Test{
 		ID: id.ID("some-test"),
 		ServiceUnderTest: model.Trigger{
@@ -258,45 +383,51 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		},
 	}
 
-	// When doing polling process
-	// Then validate outputs
+	for i, value := range expectedValues {
+		request := executor.NewPollingRequest(ctx, test, run, i)
 
-	var finished bool
-	var run model.Run
-	var err error
+		finished, anotherRun, err := pollerExecutor.ExecuteRequest(request)
+		run = anotherRun // should store a run to use in another iteration
 
-	// first iteration
-	firstRun := model.NewRun()
-	requestForFirstIteration := executor.NewPollingRequest(ctx, test, firstRun, 0)
+		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
 
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForFirstIteration)
-	require.False(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.False(t, run.Trace.HasRootSpan())
+		if value.finished {
+			require.Truef(t, finished, "The poller should have finished on iteration %d", i)
+		} else {
+			require.Falsef(t, finished, "The poller should have not finished on iteration %d", i)
+		}
 
-	// second iteration
-	secondRun := run
-	requestForSecondIteration := executor.NewPollingRequest(ctx, test, secondRun, 1)
+		if value.expectConnectionError {
+			require.Errorf(t, err, "An error should have happened on iteration %d", i)
+			require.ErrorIsf(t, err, connection.ErrTraceNotFound, "An connection error should have happened on iteration %d", i)
+		} else {
+			require.NoErrorf(t, err, "An error should not have happened on iteration %d", i)
 
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForSecondIteration)
-	require.False(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.False(t, run.Trace.HasRootSpan())
-
-	// third iteration
-	thirdRun := run
-	requestForThirdIteration := executor.NewPollingRequest(ctx, test, thirdRun, 1)
-
-	finished, run, err = pollerExecutor.ExecuteRequest(requestForThirdIteration)
-	require.True(t, finished)
-	require.NoError(t, err)
-	require.NotNil(t, run)
-	require.True(t, run.Trace.HasRootSpan())
+			// only validate root span if we have a root span
+			if value.expectRootSpan {
+				require.Truef(t, run.Trace.HasRootSpan(), "The trace associated with the run on iteration %d should have a root span", i)
+			} else {
+				require.Falsef(t, run.Trace.HasRootSpan(), "The trace associated with the run on iteration %d should not have a root span", i)
+			}
+		}
+	}
 }
 
-// TODO: add cases where Tracetest root came along
+func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
+	updater := getRunUpdaterMock(t)
+	tracer := getTracerMock(t)
+	testDB := getDataStoreRepositoryMock(t)
+	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+
+	return executor.NewPollerExecutor(
+		retryDelay,
+		maxWaitTimeForTrace,
+		tracer,
+		updater,
+		traceDBFactory,
+		testDB,
+	)
+}
 
 // Mocks
 
@@ -333,7 +464,7 @@ func getDataStoreRepositoryMock(t *testing.T) model.Repository {
 func getTracerMock(t *testing.T) trace.Tracer {
 	t.Helper()
 
-	tracer, err := tracing.NewTracer(context.TODO(), config.New())
+	tracer, err := tracing.NewTracer(context.TODO(), config.Must(config.New(nil, log.Default())))
 	require.NoError(t, err)
 
 	return tracer
@@ -341,7 +472,7 @@ func getTracerMock(t *testing.T) trace.Tracer {
 
 // TraceDB
 type traceDBMock struct {
-	tracePerIteration map[int]model.Trace
+	tracePerIteration []model.Trace
 	state             *traceDBState
 }
 
@@ -349,11 +480,19 @@ func (db *traceDBMock) GetTraceByID(ctx context.Context, traceID string) (t mode
 	trace := db.tracePerIteration[db.state.currentIteration]
 	db.state.currentIteration += 1
 
+	if len(trace.Flat) == 0 {
+		return trace, connection.ErrTraceNotFound
+	}
+
 	return trace, nil
 }
 
 func (db *traceDBMock) ShouldRetry() bool {
 	return true // this provider should retry
+}
+
+func (db *traceDBMock) GetTraceID() trace.TraceID {
+	return randomIDGenerator.TraceID()
 }
 
 // empty methods to respect TraceDB interface
@@ -368,7 +507,7 @@ type traceDBState struct {
 	currentIteration int
 }
 
-func getTraceDBMockFactory(t *testing.T, tracePerIteration map[int]model.Trace, state *traceDBState) func(model.DataStore) (tracedb.TraceDB, error) {
+func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(model.DataStore) (tracedb.TraceDB, error) {
 	t.Helper()
 
 	return func(ds model.DataStore) (tracedb.TraceDB, error) {
