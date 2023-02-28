@@ -43,13 +43,31 @@ helm upgrade --install $NAME kubeshop/tracetest \
   --set server.httpPort=11633 \
   ${extraParams[@]}
 
-kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE -o yaml --dry-run=client \
+PROVISION_FILE=$(cd $(dirname "${BASH_SOURCE:-$0}") && pwd)/provisioning.yaml
+kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE --from-file=$PROVISION_FILE -o yaml --dry-run=client \
   | envsubst \
   | sed 's#'$(basename $CONFIG_FILE)'#config.yaml#' \
   | kubectl --namespace $NAME replace -f -
 
 kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
 
-sleep 10 # let k8s finish doing things
 
-kubectl --namespace $NAME wait --for=condition=ready pod -l app.kubernetes.io/name=tracetest --timeout 30m
+## TMP FIX FOR NEW CONFIG
+kubectl patch deployment \
+  $NAME \
+  --namespace $NAME \
+  --type='json' \
+  -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": [
+  "--config",
+  "/app/config/config.yaml",
+  "--provisioning-file",
+  "/app/config/provisioning.yaml"
+]}]'
+
+TIME_OUT=30m
+CONDITION='[[ $(kubectl get pods  --namespace '$NAME' -lapp.kubernetes.io/name=tracetest -o jsonpath="{.items[*].status.phase}") = "Running" ]]'
+IF_TRUE='echo "pods ready"'
+IF_FALSE='echo "pods not ready. retrying"'
+
+ROOT_DIR=$(cd $(dirname "${BASH_SOURCE:-$0}")/.. && pwd)
+$ROOT_DIR/scripts/wait.sh "$TIME_OUT" "$CONDITION" "$IF_TRUE" "$IF_FALSE"

@@ -2,13 +2,12 @@ package app
 
 import (
 	"context"
-	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/handlers"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
@@ -21,6 +20,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
+	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -32,64 +32,102 @@ import (
 var (
 	Version = "dev"
 	Env     = "dev"
-	PokeAPI = "dev"
 )
 
 var EmptyDemoEnabled []string
 
 type App struct {
-	config  Config
-	db      *sql.DB
-	stopFns []func()
+	cfg              *config.Config
+	provisioningFile string
+	stopFns          []func()
 }
 
-type Config struct {
-	*config.Config
-	Migrations string
-}
-
-func New(config Config, db *sql.DB) (*App, error) {
+func New(config *config.Config) (*App, error) {
 	app := &App{
-		config: config,
-		db:     db,
+		cfg: config,
 	}
 
 	return app, nil
 }
 
-func (a *App) Stop() {
-	for _, fn := range a.stopFns {
+func (app *App) Version() string {
+	return fmt.Sprintf("tracetest-server %s (%s)", Version, Env)
+}
+
+func (app *App) Stop() {
+	for _, fn := range app.stopFns {
 		fn()
 	}
 }
 
-func (a *App) registerStopFn(fn func()) {
-	a.stopFns = append(a.stopFns, fn)
+func (app *App) registerStopFn(fn func()) {
+	app.stopFns = append(app.stopFns, fn)
 }
 
-func (a *App) HotReload(c Config) {
-	a.config = c
-	a.Stop()
-	a.Start()
+func (app *App) HotReload() {
+	app.Stop()
+	app.Start()
 }
 
-func (a *App) Start() error {
-	fmt.Printf("Starting tracetest (version %s, env %s)\n", Version, Env)
+type appOption func(app *App)
+
+func WithProvisioningFile(path string) appOption {
+	return func(app *App) {
+		app.provisioningFile = path
+	}
+}
+
+func (app *App) provision(db model.Repository) {
+	p := provisioning.New(db)
+
+	var err error
+
+	if app.provisioningFile != "" {
+		log.Println("[provisioning] attempting file: ", app.provisioningFile)
+		err = p.FromFile(app.provisioningFile)
+		if err != nil {
+			log.Fatalf("[provisioning] error: %s", err.Error())
+		}
+		fmt.Println("[Provisioning]: success")
+		return
+	}
+
+	err = p.FromEnv()
+	log.Println("[provisioning] attempting env var")
+	if err != nil {
+		if !errors.Is(err, provisioning.ErrEnvEmpty) {
+			log.Fatalf("[provisioning] error: %s", err.Error())
+		}
+		log.Println("[provisioning] TRACETEST_PROVISIONING env var is empty")
+	}
+	fmt.Println("[Provisioning]: success")
+}
+
+func (app *App) Start(opts ...appOption) error {
+	for _, opt := range opts {
+		opt(app)
+	}
+	fmt.Println(app.Version())
+	fmt.Println("Starting")
 	ctx := context.Background()
 
+	db, err := testdb.Connect(app.cfg.PostgresConnString())
+	if err != nil {
+		return err
+	}
+
 	testDB, err := testdb.Postgres(
-		testdb.WithDB(a.db),
-		testdb.WithMigrations(a.config.Migrations),
+		testdb.WithDB(db),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tracer, err := tracing.NewTracer(ctx, a.config.Config)
+	tracer, err := tracing.NewTracer(ctx, app.cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping tracer")
 		tracing.ShutdownTracer(ctx)
 	})
@@ -99,7 +137,7 @@ func (a *App) Start() error {
 		return err
 	}
 
-	err = analytics.Init(a.config.AnalyticsEnabled(), serverID, Version, Env)
+	err = analytics.Init(app.cfg.AnalyticsEnabled(), serverID, Version, Env)
 	if err != nil {
 		return err
 	}
@@ -111,10 +149,11 @@ func (a *App) Start() error {
 			return err
 		}
 
-		ensureFirstTimeDataSources(a.config.Config, testDB)
+		app.provision(testDB)
+
 	}
 
-	applicationTracer, err := tracing.GetApplicationTracer(ctx, a.config.Config)
+	applicationTracer, err := tracing.GetApplicationTracer(ctx, app.cfg)
 	if err != nil {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
@@ -123,7 +162,7 @@ func (a *App) Start() error {
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(
-		a.config.Config,
+		app.cfg,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -138,19 +177,19 @@ func (a *App) Start() error {
 	rf.transactionRunner.Start(5)
 	rf.assertionRunner.Start(5)
 
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping tracePoller")
 		rf.tracePoller.Stop()
 	})
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping runner")
 		rf.runner.Stop()
 	})
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping transactionRunner")
 		rf.transactionRunner.Stop()
 	})
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping assertionRunner")
 		rf.assertionRunner.Stop()
 	})
@@ -162,65 +201,34 @@ func (a *App) Start() error {
 
 	otlpServer := otlp.NewServer(":21321", testDB)
 	go otlpServer.Start()
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping otlp server")
 		otlpServer.Stop()
 	})
 
 	httpServer := newHttpServer(
 		serverID,
-		a.config.Config,
+		app.cfg,
 		testDB,
 		tracer,
 		subscriptionManager,
 		rf,
 		triggerRegistry,
 	)
-	a.registerStopFn(func() {
+	app.registerStopFn(func() {
 		fmt.Println("stopping http server")
 		httpServer.Shutdown(ctx)
 	})
 
 	go httpServer.ListenAndServe()
-	log.Printf("HTTP Server started")
+	log.Printf("HTTP Server started on %s", httpServer.Addr)
 
 	return nil
 }
 
-type dataStoreConfig interface {
-	DataStore() (*config.TracingBackendDataStoreConfig, error)
-}
-
-func ensureFirstTimeDataSources(cfg dataStoreConfig, repo model.DataStoreRepository) {
-	dsc, err := cfg.DataStore()
-	if err != nil {
-		panic(fmt.Errorf("cannot parse DataStore from config file: %w", err))
-	}
-
-	if dsc == nil {
-		return
-	}
-
-	ds := model.DataStoreFromConfig(*dsc)
-	ds.IsDefault = true
-
-	if err := ds.Validate(); err != nil {
-		panic(fmt.Errorf("invalid DataStore config from config file: %w", err))
-	}
-
-	ds, err = repo.CreateDataStore(context.Background(), ds)
-	if err != nil {
-		panic(fmt.Errorf("cannot persist DataStore from config file: %w", err))
-	}
-
-	fmt.Println("persisted initial DataStore from config file:")
-	spew.Dump(ds)
-
-}
-
 type facadeConfig interface {
 	PoolingRetryDelay() time.Duration
-	MaxWaitTimeForTraceDuration() time.Duration
+	PoolingMaxWaitTimeForTraceDuration() time.Duration
 }
 
 func newRunnerFacades(
@@ -244,7 +252,7 @@ func newRunnerFacades(
 	)
 
 	retryDelay := cfg.PoolingRetryDelay()
-	maxWaitTime := cfg.MaxWaitTimeForTraceDuration()
+	maxWaitTime := cfg.PoolingMaxWaitTimeForTraceDuration()
 
 	pollerExecutor := executor.NewPollerExecutor(
 		retryDelay,
@@ -271,6 +279,8 @@ func newRunnerFacades(
 		tracePoller,
 		tracer,
 		subscriptionManager,
+		tracedb.Factory(testDB),
+		testDB,
 	)
 
 	transactionRunner := executor.NewTransactionRunner(runner, testDB, subscriptionManager)

@@ -1,3 +1,10 @@
 #!/bin/bash
 PORT=$1
-timeout 30s bash -c 'until nc -z -w 1 localhost '$PORT' > /dev/null 2>&1; do echo "port '$PORT' not available, retry"; sleep 1; done; echo "port '$PORT' ready"'
+
+TIME_OUT=30s
+CONDITION='nc -z -w 1 localhost '$PORT' > /dev/null 2>&1'
+IF_TRUE='echo "port '$PORT' ready"'
+IF_FALSE='echo "port '$PORT' not available, retry"'
+
+ROOT_DIR=$(cd $(dirname "${BASH_SOURCE:-$0}")/.. && pwd)
+$ROOT_DIR/scripts/wait.sh "$TIME_OUT" "$CONDITION" "$IF_TRUE" "$IF_FALSE"

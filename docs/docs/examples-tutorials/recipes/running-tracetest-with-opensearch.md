@@ -241,7 +241,13 @@ opensearch:
 Here's the full `tracetest.config.yaml`:
 
 ```yaml
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10m

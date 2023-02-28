@@ -4,16 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"go.opentelemetry.io/otel/trace"
 )
+
+var IDGen = id.NewRandGenerator()
 
 type TraceDB interface {
 	Connect(ctx context.Context) error
 	Ready() bool
 	ShouldRetry() bool
 	MinSpanCount() int
+	GetTraceID() trace.TraceID
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
 	TestConnection(ctx context.Context) connection.ConnectionTestResult
 	Close() error
@@ -25,6 +29,9 @@ func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t mode
 	return model.Trace{}, nil
 }
 
+func (db *noopTraceDB) GetTraceID() trace.TraceID {
+	return IDGen.TraceID()
+}
 func (db *noopTraceDB) Connect(ctx context.Context) error { return nil }
 func (db *noopTraceDB) Close() error                      { return nil }
 func (db *noopTraceDB) ShouldRetry() bool                 { return false }
@@ -57,20 +64,22 @@ func Factory(repo model.Repository) func(ds model.DataStore) (TraceDB, error) {
 
 func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 	switch ds.Type {
-	case openapi.JAEGER:
+	case model.DataStoreTypeJaeger:
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
-	case openapi.TEMPO:
+	case model.DataStoreTypeTempo:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	case openapi.ELASTIC_APM:
+	case model.DataStoreTypeElasticAPM:
 		tdb, err = newElasticSearchDB(ds.Values.ElasticApm)
-	case openapi.OPEN_SEARCH:
+	case model.DataStoreTypeOpenSearch:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
-	case openapi.SIGNAL_FX:
+	case model.DataStoreTypeSignalFX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
-	case openapi.NEW_RELIC:
-	case openapi.LIGHTSTEP:
-	case openapi.DATADOG:
-	case openapi.OTLP:
+	case model.DataStoreTypeAwsXRay:
+		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
+	case model.DataStoreTypeNewRelic:
+	case model.DataStoreTypeLighStep:
+	case model.DataStoreTypeDataDog:
+	case model.DataStoreTypeOTLP:
 		tdb, err = newCollectorDB(f.repo)
 	default:
 		return &noopTraceDB{}, nil
@@ -93,3 +102,6 @@ type realTraceDB struct{}
 
 func (db *realTraceDB) ShouldRetry() bool { return true }
 func (db *realTraceDB) MinSpanCount() int { return 0 }
+func (db *realTraceDB) GetTraceID() trace.TraceID {
+	return IDGen.TraceID()
+}

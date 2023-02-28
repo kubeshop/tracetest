@@ -6,6 +6,7 @@ import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
 import BaseClientService from './DataStores/BaseClient.service';
 import JaegerService from './DataStores/Jaeger.service';
+import AwsXRayService from './DataStores/AwsXRay.service';
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
@@ -23,6 +24,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.NewRelic]: OtelCollectorService,
   [SupportedDataStores.Lightstep]: OtelCollectorService,
   [SupportedDataStores.Datadog]: OtelCollectorService,
+  [SupportedDataStores.AWSXRay]: AwsXRayService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({

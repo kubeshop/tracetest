@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
@@ -22,10 +21,11 @@ func TestCreateDataStore(t *testing.T) {
 		IsDefault: true,
 		Values: model.DataStoreValues{
 			Jaeger:     &configgrpc.GRPCClientSettings{},
-			Tempo:      &config.BaseClientConfig{},
-			SignalFx:   &config.SignalFXDataStoreConfig{},
-			OpenSearch: &config.ElasticSearchDataStoreConfig{},
-			ElasticApm: &config.ElasticSearchDataStoreConfig{},
+			Tempo:      &model.BaseClientConfig{},
+			SignalFx:   &model.SignalFXDataStoreConfig{},
+			OpenSearch: &model.ElasticSearchDataStoreConfig{},
+			ElasticApm: &model.ElasticSearchDataStoreConfig{},
+			AwsXRay:    &model.AWSXRayDataStoreConfig{},
 		},
 	}
 

@@ -75,7 +75,7 @@ func configureBackend(conf configuration, ui cliUI.UI) configuration {
 //go:embed config.yaml.tpl
 var configTemplate string
 
-func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configuration) []byte {
+func getTracetestConfigFileContents(pHost, pUser, pPasswd string, ui cliUI.UI, config configuration) []byte {
 	enabledDemos := []string{}
 	if config.Bool("demo.enable.pokeshop") {
 		enabledDemos = append(enabledDemos, "pokeshop")
@@ -86,7 +86,9 @@ func getTracetestConfigFileContents(psql string, ui cliUI.UI, config configurati
 
 	vals := map[string]string{
 		"installBackend":   fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
-		"psql":             psql,
+		"pHost":            pHost,
+		"pUser":            pUser,
+		"pPasswd":          pPasswd,
 		"analyticsEnabled": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
 
 		"enabledDemos":       strings.Join(enabledDemos, ", "),

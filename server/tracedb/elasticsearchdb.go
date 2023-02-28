@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/trace"
@@ -22,20 +21,20 @@ import (
 
 type elasticsearchDB struct {
 	realTraceDB
-	config *config.ElasticSearchDataStoreConfig
+	config *model.ElasticSearchDataStoreConfig
 	client *elasticsearch.Client
 }
 
-func (db elasticsearchDB) Connect(ctx context.Context) error {
+func (db *elasticsearchDB) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (db elasticsearchDB) Close() error {
+func (db *elasticsearchDB) Close() error {
 	// No need to close this db
 	return nil
 }
 
-func (db elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+func (db *elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
@@ -52,11 +51,11 @@ func (db elasticsearchDB) TestConnection(ctx context.Context) connection.Connect
 	return tester.TestConnection(ctx)
 }
 
-func (db elasticsearchDB) Ready() bool {
+func (db *elasticsearchDB) Ready() bool {
 	return db.client != nil
 }
 
-func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
 	if !db.Ready() {
 		return model.Trace{}, fmt.Errorf("ElasticSearch dataStore not ready")
 	}
@@ -94,7 +93,7 @@ func (db elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mod
 	return convertElasticSearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newElasticSearchDB(cfg *config.ElasticSearchDataStoreConfig) (TraceDB, error) {
+func newElasticSearchDB(cfg *model.ElasticSearchDataStoreConfig) (TraceDB, error) {
 	var caCert []byte
 	if cfg.Certificate != "" {
 		caCert = []byte(cfg.Certificate)

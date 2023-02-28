@@ -29,6 +29,7 @@ const (
 	NEW_RELIC   SupportedDataStores = "newRelic"
 	LIGHTSTEP   SupportedDataStores = "lightstep"
 	DATADOG     SupportedDataStores = "datadog"
+	AWSXRAY     SupportedDataStores = "awsxray"
 )
 
 // All allowed values of SupportedDataStores enum
@@ -42,6 +43,7 @@ var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"newRelic",
 	"lightstep",
 	"datadog",
+	"awsxray",
 }
 
 func (v *SupportedDataStores) UnmarshalJSON(src []byte) error {

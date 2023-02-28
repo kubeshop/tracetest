@@ -1,4 +1,10 @@
-postgresConnString: "host=${NAME}-postgresql user=tracetest password=not-secure-database-password  port=5432 sslmode=disable"
+postgres:
+  host: ${NAME}-postgresql
+  user: tracetest
+  password: not-secure-database-password
+  port: 5432
+  dbname: tracetest
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10s
@@ -20,14 +26,6 @@ demo:
 experimentalFeatures: []
 
 telemetry:
-  dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger-query.tracetest:16685
-        tls:
-          insecure: true
-
   exporters:
     collector:
       serviceName: tracetest

@@ -197,6 +197,7 @@ jobs:
           - tracetest-opensearch
           - tracetest-tempo
           - tracetest-no-tracing
+          - tracetest-provisioning-env
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -239,7 +240,7 @@ jobs:
       - name: Start server
         run: |
           cd examples/collector
-          TAG=latest docker-compose up -d
+          TAG="pr-${{ github.event.pull_request.number }}" docker-compose up -d
           docker compose logs -f > /tmp/docker-log &
       - name: Run tests
         run: |
