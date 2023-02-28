@@ -19,9 +19,10 @@ var _ MappedNullable = &ConnectionResult{}
 
 // ConnectionResult struct for ConnectionResult
 type ConnectionResult struct {
-	Connectivity   *ConnectionTestStep `json:"connectivity,omitempty"`
-	Authentication *ConnectionTestStep `json:"authentication,omitempty"`
-	FetchTraces    *ConnectionTestStep `json:"fetchTraces,omitempty"`
+	EndpointLinting *ConnectionTestStep `json:"endpointLinting,omitempty"`
+	Connectivity    *ConnectionTestStep `json:"connectivity,omitempty"`
+	Authentication  *ConnectionTestStep `json:"authentication,omitempty"`
+	FetchTraces     *ConnectionTestStep `json:"fetchTraces,omitempty"`
 }
 
 // NewConnectionResult instantiates a new ConnectionResult object
@@ -39,6 +40,38 @@ func NewConnectionResult() *ConnectionResult {
 func NewConnectionResultWithDefaults() *ConnectionResult {
 	this := ConnectionResult{}
 	return &this
+}
+
+// GetEndpointLinting returns the EndpointLinting field value if set, zero value otherwise.
+func (o *ConnectionResult) GetEndpointLinting() ConnectionTestStep {
+	if o == nil || isNil(o.EndpointLinting) {
+		var ret ConnectionTestStep
+		return ret
+	}
+	return *o.EndpointLinting
+}
+
+// GetEndpointLintingOk returns a tuple with the EndpointLinting field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ConnectionResult) GetEndpointLintingOk() (*ConnectionTestStep, bool) {
+	if o == nil || isNil(o.EndpointLinting) {
+		return nil, false
+	}
+	return o.EndpointLinting, true
+}
+
+// HasEndpointLinting returns a boolean if a field has been set.
+func (o *ConnectionResult) HasEndpointLinting() bool {
+	if o != nil && !isNil(o.EndpointLinting) {
+		return true
+	}
+
+	return false
+}
+
+// SetEndpointLinting gets a reference to the given ConnectionTestStep and assigns it to the EndpointLinting field.
+func (o *ConnectionResult) SetEndpointLinting(v ConnectionTestStep) {
+	o.EndpointLinting = &v
 }
 
 // GetConnectivity returns the Connectivity field value if set, zero value otherwise.
@@ -147,6 +180,9 @@ func (o ConnectionResult) MarshalJSON() ([]byte, error) {
 
 func (o ConnectionResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.EndpointLinting) {
+		toSerialize["endpointLinting"] = o.EndpointLinting
+	}
 	if !isNil(o.Connectivity) {
 		toSerialize["connectivity"] = o.Connectivity
 	}

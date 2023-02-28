@@ -10,6 +10,8 @@
 package openapi
 
 type ConnectionResult struct {
+	EndpointLinting ConnectionTestStep `json:"endpointLinting,omitempty"`
+
 	Connectivity ConnectionTestStep `json:"connectivity,omitempty"`
 
 	Authentication ConnectionTestStep `json:"authentication,omitempty"`
@@ -19,6 +21,9 @@ type ConnectionResult struct {
 
 // AssertConnectionResultRequired checks if the required fields are not zero-ed
 func AssertConnectionResultRequired(obj ConnectionResult) error {
+	if err := AssertConnectionTestStepRequired(obj.EndpointLinting); err != nil {
+		return err
+	}
 	if err := AssertConnectionTestStepRequired(obj.Connectivity); err != nil {
 		return err
 	}

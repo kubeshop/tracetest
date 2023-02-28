@@ -1,4 +1,4 @@
-import {CheckCircleFilled, MinusCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, MinusCircleFilled, WarningFilled} from '@ant-design/icons';
 import styled from 'styled-components';
 import {Typography} from 'antd';
 
@@ -9,6 +9,11 @@ export const SuccessCheckIcon = styled(CheckCircleFilled)`
 
 export const FailedCheckIcon = styled(MinusCircleFilled)`
   color: ${({theme}) => theme.color.error};
+  margin-top: 3px;
+`;
+
+export const WarningCheckICon = styled(WarningFilled)`
+  color: ${({theme}) => theme.color.warningYellow};
   margin-top: 3px;
 `;
 

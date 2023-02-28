@@ -11,14 +11,24 @@ import (
 
 const reachabilityTimeout = 5 * time.Second
 
-type Protocol string
+type (
+	Protocol string
+	Status   string
+)
 
 var (
 	ProtocolHTTP Protocol = "http"
 	ProtocolGRPC Protocol = "grpc"
 )
 
+var (
+	StatusPassed  Status = "passed"
+	StatusWarning Status = "passed_with_warning"
+	StatusFailed  Status = "failed"
+)
+
 type ConnectionTestResult struct {
+	EndpointLintTestResult   ConnectionTestStepResult
 	ConnectivityTestResult   ConnectionTestStepResult
 	AuthenticationTestResult ConnectionTestStepResult
 	TraceRetrievalTestResult ConnectionTestStepResult
@@ -36,6 +46,7 @@ func (c ConnectionTestResult) HasSucceed() bool {
 
 type ConnectionTestStepResult struct {
 	OperationDescription string
+	Status               Status
 	Error                error
 }
 

@@ -7,10 +7,18 @@ interface IProps {
   title: string;
 }
 
-const TestConnectionStep = ({step: {message, error: err, passed}, title}: IProps) => {
+const TestConnectionStep = ({step: {message, error: err, status}, title}: IProps) => {
+  const iconMap = {
+    'passed': <S.SuccessCheckIcon />,
+    'failed': <S.FailedCheckIcon />,
+    'passed_with_warning': <S.WarningCheckICon />,
+  };
+
+  const icon = iconMap[status];
+
   return message || err ? (
     <S.StepContainer>
-      {passed ? <S.SuccessCheckIcon /> : <S.FailedCheckIcon />}
+      {icon}
       <div>
         <S.Title level={3}>{title}</S.Title>
         <Typography.Text>{message}</Typography.Text>

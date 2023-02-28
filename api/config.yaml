@@ -13,6 +13,8 @@ components:
     ConnectionResult:
       type: object
       properties:
+        endpointLinting:
+          $ref: "#/components/schemas/ConnectionTestStep"
         connectivity:
           $ref: "#/components/schemas/ConnectionTestStep"
         authentication:
@@ -24,6 +26,12 @@ components:
       properties:
         passed:
           type: boolean
+        status:
+          type: string
+          enum:
+            - passed
+            - passed_with_warning
+            - failed
         message:
           type: string
         error:
