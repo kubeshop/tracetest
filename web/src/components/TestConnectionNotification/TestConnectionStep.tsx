@@ -7,12 +7,14 @@ interface IProps {
   title: string;
 }
 
+const iconMap = {
+  passed: <S.SuccessCheckIcon />,
+  failed: <S.FailedCheckIcon />,
+  warning: <S.WarningCheckICon />,
+};
+
 const TestConnectionStep = ({step: {message, error: err, status}, title}: IProps) => {
-  const iconMap = {
-    'passed': <S.SuccessCheckIcon />,
-    'failed': <S.FailedCheckIcon />,
-    'passed_with_warning': <S.WarningCheckICon />,
-  };
+
 
   const icon = iconMap[status];
 

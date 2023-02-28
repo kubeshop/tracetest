@@ -9,7 +9,7 @@ func (m *OpenAPI) ConnectionTestResult(in connection.ConnectionTestResult) opena
 	result := openapi.ConnectionResult{}
 
 	if in.EndpointLintTestResult.IsSet() {
-		result.EndpointLinting = m.ConnectionTestStep(in.EndpointLintTestResult)
+		result.PortCheck = m.ConnectionTestStep(in.EndpointLintTestResult)
 	}
 
 	if in.ConnectivityTestResult.IsSet() {

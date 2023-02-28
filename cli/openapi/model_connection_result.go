@@ -19,10 +19,10 @@ var _ MappedNullable = &ConnectionResult{}
 
 // ConnectionResult struct for ConnectionResult
 type ConnectionResult struct {
-	EndpointLinting *ConnectionTestStep `json:"endpointLinting,omitempty"`
-	Connectivity    *ConnectionTestStep `json:"connectivity,omitempty"`
-	Authentication  *ConnectionTestStep `json:"authentication,omitempty"`
-	FetchTraces     *ConnectionTestStep `json:"fetchTraces,omitempty"`
+	PortCheck      *ConnectionTestStep `json:"portCheck,omitempty"`
+	Connectivity   *ConnectionTestStep `json:"connectivity,omitempty"`
+	Authentication *ConnectionTestStep `json:"authentication,omitempty"`
+	FetchTraces    *ConnectionTestStep `json:"fetchTraces,omitempty"`
 }
 
 // NewConnectionResult instantiates a new ConnectionResult object
@@ -42,36 +42,36 @@ func NewConnectionResultWithDefaults() *ConnectionResult {
 	return &this
 }
 
-// GetEndpointLinting returns the EndpointLinting field value if set, zero value otherwise.
-func (o *ConnectionResult) GetEndpointLinting() ConnectionTestStep {
-	if o == nil || isNil(o.EndpointLinting) {
+// GetPortCheck returns the PortCheck field value if set, zero value otherwise.
+func (o *ConnectionResult) GetPortCheck() ConnectionTestStep {
+	if o == nil || isNil(o.PortCheck) {
 		var ret ConnectionTestStep
 		return ret
 	}
-	return *o.EndpointLinting
+	return *o.PortCheck
 }
 
-// GetEndpointLintingOk returns a tuple with the EndpointLinting field value if set, nil otherwise
+// GetPortCheckOk returns a tuple with the PortCheck field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ConnectionResult) GetEndpointLintingOk() (*ConnectionTestStep, bool) {
-	if o == nil || isNil(o.EndpointLinting) {
+func (o *ConnectionResult) GetPortCheckOk() (*ConnectionTestStep, bool) {
+	if o == nil || isNil(o.PortCheck) {
 		return nil, false
 	}
-	return o.EndpointLinting, true
+	return o.PortCheck, true
 }
 
-// HasEndpointLinting returns a boolean if a field has been set.
-func (o *ConnectionResult) HasEndpointLinting() bool {
-	if o != nil && !isNil(o.EndpointLinting) {
+// HasPortCheck returns a boolean if a field has been set.
+func (o *ConnectionResult) HasPortCheck() bool {
+	if o != nil && !isNil(o.PortCheck) {
 		return true
 	}
 
 	return false
 }
 
-// SetEndpointLinting gets a reference to the given ConnectionTestStep and assigns it to the EndpointLinting field.
-func (o *ConnectionResult) SetEndpointLinting(v ConnectionTestStep) {
-	o.EndpointLinting = &v
+// SetPortCheck gets a reference to the given ConnectionTestStep and assigns it to the PortCheck field.
+func (o *ConnectionResult) SetPortCheck(v ConnectionTestStep) {
+	o.PortCheck = &v
 }
 
 // GetConnectivity returns the Connectivity field value if set, zero value otherwise.
@@ -180,8 +180,8 @@ func (o ConnectionResult) MarshalJSON() ([]byte, error) {
 
 func (o ConnectionResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.EndpointLinting) {
-		toSerialize["endpointLinting"] = o.EndpointLinting
+	if !isNil(o.PortCheck) {
+		toSerialize["portCheck"] = o.PortCheck
 	}
 	if !isNil(o.Connectivity) {
 		toSerialize["connectivity"] = o.Connectivity

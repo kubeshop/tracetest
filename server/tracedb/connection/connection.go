@@ -23,7 +23,7 @@ var (
 
 var (
 	StatusPassed  Status = "passed"
-	StatusWarning Status = "passed_with_warning"
+	StatusWarning Status = "warning"
 	StatusFailed  Status = "failed"
 )
 

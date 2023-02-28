@@ -13,7 +13,7 @@ components:
     ConnectionResult:
       type: object
       properties:
-        endpointLinting:
+        portCheck:
           $ref: "#/components/schemas/ConnectionTestStep"
         connectivity:
           $ref: "#/components/schemas/ConnectionTestStep"
@@ -30,7 +30,7 @@ components:
           type: string
           enum:
             - passed
-            - passed_with_warning
+            - warning
             - failed
         message:
           type: string

@@ -21,6 +21,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func tempoDefaultPorts() []string {
+	return []string{"9095"}
+}
+
 type tempoTraceDB struct {
 	realTraceDB
 	dataSource datasource.DataSource
@@ -43,7 +47,7 @@ func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
 
 func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
-		connection.WithPortLintingTest(connection.PortLinter([]string{"9095"}, ttd.dataSource.Endpoint())),
+		connection.WithPortLintingTest(connection.PortLinter(tempoDefaultPorts(), ttd.dataSource.Endpoint())),
 		connection.WithConnectivityTest(ttd.dataSource),
 		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {

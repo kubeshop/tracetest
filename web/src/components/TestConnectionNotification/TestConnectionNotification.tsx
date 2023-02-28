@@ -6,10 +6,10 @@ interface IProps {
   result: TConnectionResult;
 }
 
-const TestConnectionNotification = ({result: {endpointLinting, authentication, connectivity, fetchTraces}}: IProps) => {
+const TestConnectionNotification = ({result: {portCheck, authentication, connectivity, fetchTraces}}: IProps) => {
   return (
     <S.Container>
-      <TestConnectionStep step={endpointLinting} title="Port checking" />
+      <TestConnectionStep step={portCheck} title="Port checking" />
       <TestConnectionStep step={connectivity} title="Connectivity" />
       <TestConnectionStep step={authentication} title="Authentication" />
       <TestConnectionStep step={fetchTraces} title="Fetch traces" />
