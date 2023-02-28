@@ -12,7 +12,7 @@ export const FailedCheckIcon = styled(MinusCircleFilled)`
   margin-top: 3px;
 `;
 
-export const WarningCheckICon = styled(WarningFilled)`
+export const WarningCheckIcon = styled(WarningFilled)`
   color: ${({theme}) => theme.color.warningYellow};
   margin-top: 3px;
 `;
