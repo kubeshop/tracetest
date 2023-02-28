@@ -240,7 +240,7 @@ jobs:
       - name: Start server
         run: |
           cd examples/collector
-          TAG=latest docker-compose up -d
+          TAG="pr-${{ github.event.pull_request.number }}" docker-compose up -d
           docker compose logs -f > /tmp/docker-log &
       - name: Run tests
         run: |
