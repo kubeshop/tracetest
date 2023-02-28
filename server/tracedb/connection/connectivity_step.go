@@ -33,6 +33,7 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 		endpoints := strings.Join(unreachableEndpoints, ", ")
 		return ConnectionTestStepResult{
 			OperationDescription: fmt.Sprintf("Tracetest tried to connect to the following endpoints and failed: %s", endpoints),
+			Status:               StatusFailed,
 			Error:                connectionErr,
 		}
 	}
@@ -40,6 +41,7 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 	endpoints := strings.Join(s.endpoints, ", ")
 	return ConnectionTestStepResult{
 		OperationDescription: fmt.Sprintf(`Tracetest connected to %s`, endpoints),
+		Status:               StatusPassed,
 	}
 }
 

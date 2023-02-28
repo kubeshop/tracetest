@@ -20,6 +20,7 @@ var _ MappedNullable = &ConnectionTestStep{}
 // ConnectionTestStep struct for ConnectionTestStep
 type ConnectionTestStep struct {
 	Passed  *bool   `json:"passed,omitempty"`
+	Status  *string `json:"status,omitempty"`
 	Message *string `json:"message,omitempty"`
 	Error   *string `json:"error,omitempty"`
 }
@@ -71,6 +72,38 @@ func (o *ConnectionTestStep) HasPassed() bool {
 // SetPassed gets a reference to the given bool and assigns it to the Passed field.
 func (o *ConnectionTestStep) SetPassed(v bool) {
 	o.Passed = &v
+}
+
+// GetStatus returns the Status field value if set, zero value otherwise.
+func (o *ConnectionTestStep) GetStatus() string {
+	if o == nil || isNil(o.Status) {
+		var ret string
+		return ret
+	}
+	return *o.Status
+}
+
+// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ConnectionTestStep) GetStatusOk() (*string, bool) {
+	if o == nil || isNil(o.Status) {
+		return nil, false
+	}
+	return o.Status, true
+}
+
+// HasStatus returns a boolean if a field has been set.
+func (o *ConnectionTestStep) HasStatus() bool {
+	if o != nil && !isNil(o.Status) {
+		return true
+	}
+
+	return false
+}
+
+// SetStatus gets a reference to the given string and assigns it to the Status field.
+func (o *ConnectionTestStep) SetStatus(v string) {
+	o.Status = &v
 }
 
 // GetMessage returns the Message field value if set, zero value otherwise.
@@ -149,6 +182,9 @@ func (o ConnectionTestStep) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Passed) {
 		toSerialize["passed"] = o.Passed
+	}
+	if !isNil(o.Status) {
+		toSerialize["status"] = o.Status
 	}
 	if !isNil(o.Message) {
 		toSerialize["message"] = o.Message

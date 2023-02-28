@@ -61,6 +61,10 @@ func (client *HttpClient) GetTraceByID(ctx context.Context, traceID string) (mod
 	return client.callback(ctx, traceID, client)
 }
 
+func (client *HttpClient) Endpoint() string {
+	return client.config.Host
+}
+
 func (client *HttpClient) Connect(ctx context.Context) error {
 	_, err := client.client.Transport.RoundTrip(client.config)
 

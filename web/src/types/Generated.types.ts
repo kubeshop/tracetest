@@ -1057,12 +1057,15 @@ export interface external {
           steps?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"][];
         };
         ConnectionResult: {
+          portCheck?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
           connectivity?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
           authentication?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
           fetchTraces?: external["config.yaml"]["components"]["schemas"]["ConnectionTestStep"];
         };
         ConnectionTestStep: {
           passed?: boolean;
+          /** @enum {string} */
+          status?: "passed" | "warning" | "failed";
           message?: string;
           error?: string;
         };

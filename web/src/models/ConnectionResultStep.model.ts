@@ -5,10 +5,12 @@ type ConnectionTestStep = Model<TRawConnectionTestStep, {}>;
 
 const ConnectionTestStep = ({
   passed = false,
+  status = 'passed',
   error = '',
   message = '',
 }: TRawConnectionTestStep): ConnectionTestStep => ({
   passed,
+  status,
   error,
   message,
 });

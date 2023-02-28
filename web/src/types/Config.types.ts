@@ -45,6 +45,7 @@ export type TConnectionResult = Model<
   TRawConnectionResult,
   {
     allPassed: boolean;
+    portCheck: ConnectionTestStep;
     authentication: ConnectionTestStep;
     connectivity: ConnectionTestStep;
     fetchTraces: ConnectionTestStep;

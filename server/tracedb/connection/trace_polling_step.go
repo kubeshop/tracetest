@@ -23,12 +23,14 @@ func (s *tracePollingTestStep) TestConnection(ctx context.Context) ConnectionTes
 		return ConnectionTestStepResult{
 			OperationDescription: "Tracetest could not get traces back from the data store",
 			Error:                err,
+			Status:               StatusFailed,
 		}
 	}
 
 	return ConnectionTestStepResult{
 		OperationDescription: "Traces were obtained successfully",
 		Error:                nil,
+		Status:               StatusPassed,
 	}
 }
 
