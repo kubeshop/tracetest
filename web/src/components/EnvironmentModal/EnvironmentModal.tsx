@@ -2,7 +2,6 @@ import {Form} from 'antd';
 import {useEffect, useState} from 'react';
 
 import EnvironmentForm from 'components/EnvironmentForm';
-import {useCreateEnvironmentMutation, useUpdateEnvironmentMutation} from 'redux/apis/TraceTest.api';
 import Environment from 'models/Environment.model';
 import * as S from './EnvironmentModal.styled';
 import EnvironmentModalFooter from './EnvironmentModalFooter';
@@ -10,15 +9,15 @@ import EnvironmentModalFooter from './EnvironmentModalFooter';
 interface IProps {
   environment?: Environment;
   isOpen: boolean;
+  isLoading: boolean;
   onClose(): void;
+  onSubmit(environment: Environment): void;
 }
 
 export const DEFAULT_VALUES = [{key: '', value: ''}];
 
-export const EnvironmentModal = ({environment, isOpen, onClose}: IProps) => {
+const EnvironmentModal = ({environment, isOpen, onClose, onSubmit, isLoading}: IProps) => {
   const [form] = Form.useForm<Environment>();
-  const [createEnvironment, {isLoading}] = useCreateEnvironmentMutation();
-  const [updateEnvironment, {isLoading: isLoadingUpdate}] = useUpdateEnvironmentMutation();
   const [isFormValid, setIsFormValid] = useState(false);
   const isEditing = Boolean(environment);
 
@@ -35,11 +34,7 @@ export const EnvironmentModal = ({environment, isOpen, onClose}: IProps) => {
   };
 
   const handleOnSubmit = async (values: Environment) => {
-    if (isEditing) {
-      await updateEnvironment({environment: values, environmentId: environment?.id ?? ''});
-    } else {
-      await createEnvironment(values);
-    }
+    onSubmit(values);
     onClose();
   };
 
@@ -49,7 +44,7 @@ export const EnvironmentModal = ({environment, isOpen, onClose}: IProps) => {
       footer={
         <EnvironmentModalFooter
           isEditing={isEditing}
-          isLoading={isLoading || isLoadingUpdate}
+          isLoading={isLoading}
           isValid={isFormValid}
           onCancel={onClose}
           onSave={() => form.submit()}
@@ -68,3 +63,5 @@ export const EnvironmentModal = ({environment, isOpen, onClose}: IProps) => {
     </S.Modal>
   );
 };
+
+export default EnvironmentModal;

@@ -1,7 +1,8 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
 
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import {TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
+import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
 import * as S from './GrcpClient.styled';
 import GrpcClientSecure from './GrpcClientSecure';
 
@@ -18,7 +19,7 @@ const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 
 const GrpcClient = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
-  const dataStoreType = form.getFieldValue('dataStoreType');
+  const dataStoreType = form.getFieldValue('dataStoreType') as SupportedDataStores;
   const baseName = ['dataStore', dataStoreType, 'grpc'];
   const insecureValue = Form.useWatch([...baseName, 'tls', 'insecure'], form) ?? true;
 
@@ -31,7 +32,7 @@ const GrpcClient = () => {
             name={[...baseName, 'endpoint']}
             rules={[{required: true, message: 'Endpoint is required'}]}
           >
-            <Input placeholder="Enter an endpoint" />
+            <Input placeholder={SupportedDataStoresToDefaultEndpoint[dataStoreType]} />
           </Form.Item>
         </Col>
         <Col span={12}>

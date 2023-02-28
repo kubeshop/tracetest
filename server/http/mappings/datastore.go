@@ -8,6 +8,10 @@ import (
 func (m *OpenAPI) ConnectionTestResult(in connection.ConnectionTestResult) openapi.ConnectionResult {
 	result := openapi.ConnectionResult{}
 
+	if in.EndpointLintTestResult.IsSet() {
+		result.PortCheck = m.ConnectionTestStep(in.EndpointLintTestResult)
+	}
+
 	if in.ConnectivityTestResult.IsSet() {
 		result.Connectivity = m.ConnectionTestStep(in.ConnectivityTestResult)
 	}
@@ -30,8 +34,9 @@ func (m *OpenAPI) ConnectionTestStep(in connection.ConnectionTestStepResult) ope
 	}
 
 	return openapi.ConnectionTestStep{
-		Passed:  in.Error == nil,
+		Passed:  in.Status != connection.StatusFailed,
 		Message: in.OperationDescription,
+		Status:  string(in.Status),
 		Error:   errMessage,
 	}
 }
