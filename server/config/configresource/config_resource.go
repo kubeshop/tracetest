@@ -24,13 +24,12 @@ func (c Config) Validate() error {
 	return nil
 }
 
-func Repository(db *sql.DB, idgen id.GeneratorFunc) *repository {
-	return &repository{db, idgen}
+func Repository(db *sql.DB) *repository {
+	return &repository{db}
 }
 
 type repository struct {
-	db    *sql.DB
-	idgen id.GeneratorFunc
+	db *sql.DB
 }
 
 const insertQuery = `

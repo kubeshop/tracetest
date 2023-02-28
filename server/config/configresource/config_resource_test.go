@@ -25,7 +25,7 @@ func TestConfigResource(t *testing.T) {
 		ResourceType: "Config",
 		RegisterManagerFn: func(router *mux.Router) any {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
-			configRepo := configresource.Repository(db, id.GenerateID)
+			configRepo := configresource.Repository(db)
 
 			manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
 			manager.RegisterRoutes(router)
