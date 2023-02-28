@@ -29,6 +29,13 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 		}
 	}
 
+	if len(s.endpoints) == 0 {
+		return ConnectionTestStepResult{
+			OperationDescription: "Tracetest tried to connect but no endpoints were provided",
+			Error:                fmt.Errorf("no endpoints provided"),
+		}
+	}
+
 	if connectionErr != nil {
 		endpoints := strings.Join(unreachableEndpoints, ", ")
 		return ConnectionTestStepResult{
