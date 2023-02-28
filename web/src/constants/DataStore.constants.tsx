@@ -37,6 +37,7 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.NewRelic]: '',
   [SupportedDataStores.Lightstep]: '',
   [SupportedDataStores.Datadog]: '',
+  [SupportedDataStores.AWSXRay]: '',
 } as const;
 
 const collectorExplanation = (
