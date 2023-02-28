@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -9,18 +10,22 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/provisioning"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -206,15 +211,19 @@ func (app *App) Start(opts ...appOption) error {
 		otlpServer.Stop()
 	})
 
-	httpServer := newHttpServer(
-		serverID,
-		app.cfg,
-		testDB,
-		tracer,
-		subscriptionManager,
-		rf,
-		triggerRegistry,
-	)
+	router, mappers := controller(app.cfg, testDB, tracer, rf, triggerRegistry)
+	registerWSHandler(router, mappers, subscriptionManager)
+
+	apiRouter := router.PathPrefix("/api").Subrouter()
+	registerConfigResource(apiRouter, db)
+
+	registerSPAHandler(router, app.cfg, serverID)
+
+	httpServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", app.cfg.ServerPort()),
+		Handler: handlers.CompressHandler(router),
+	}
+
 	app.registerStopFn(func() {
 		fmt.Println("stopping http server")
 		httpServer.Shutdown(ctx)
@@ -224,6 +233,26 @@ func (app *App) Start(opts ...appOption) error {
 	log.Printf("HTTP Server started on %s", httpServer.Addr)
 
 	return nil
+}
+
+func registerSPAHandler(router *mux.Router, cfg httpServerConfig, serverID string) {
+	router.
+		PathPrefix(cfg.ServerPathPrefix()).
+		Handler(
+			httpServer.SPAHandler(
+				cfg,
+				serverID,
+				Version,
+				Env,
+			),
+		)
+
+}
+
+func registerConfigResource(router *mux.Router, db *sql.DB) {
+	configRepo := configresource.Repository(db)
+	manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
+	manager.RegisterRoutes(router)
 }
 
 type facadeConfig interface {
@@ -311,42 +340,26 @@ type httpServerConfig interface {
 	ExperimentalFeatures() []string
 }
 
-func newHttpServer(
-	serverID string,
-	cfg httpServerConfig,
-	testDB model.Repository,
-	tracer trace.Tracer,
-	subscriptionManager *subscription.Manager,
-	rf *runnerFacade,
-	triggerRegistry *trigger.Registry,
-) *http.Server {
-	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
-
-	router := openapi.NewRouter(httpRouter(cfg, testDB, tracer, rf, mappers, triggerRegistry))
-
+func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscriptionManager *subscription.Manager) {
 	wsRouter := websocket.NewRouter()
 	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
 	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))
 
 	router.Handle("/ws", wsRouter.Handler())
+}
 
-	router.
-		PathPrefix(cfg.ServerPathPrefix()).
-		Handler(
-			httpServer.SPAHandler(
-				cfg,
-				serverID,
-				Version,
-				Env,
-			),
-		)
+func controller(
+	cfg httpServerConfig,
+	testDB model.Repository,
+	tracer trace.Tracer,
+	rf *runnerFacade,
+	triggerRegistry *trigger.Registry,
+) (*mux.Router, mappings.Mappings) {
+	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
 
-	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.ServerPort()),
-		Handler: handlers.CompressHandler(router),
-	}
+	router := openapi.NewRouter(httpRouter(cfg, testDB, tracer, rf, mappers, triggerRegistry))
 
-	return httpServer
+	return router, mappers
 }
 
 func httpRouter(
