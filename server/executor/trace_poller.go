@@ -75,6 +75,15 @@ type PollingRequest struct {
 	count int
 }
 
+func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
+	return &PollingRequest{
+		ctx:   ctx,
+		test:  test,
+		run:   run,
+		count: count,
+	}
+}
+
 func (tp tracePoller) handleDBError(err error) {
 	if err != nil {
 		fmt.Printf("DB error when polling traces: %s\n", err.Error())
@@ -107,13 +116,9 @@ func (tp tracePoller) Stop() {
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 
-	job := PollingRequest{
-		ctx:  ctx,
-		test: test,
-		run:  run,
-	}
+	job := NewPollingRequest(ctx, test, run, 0)
 
-	tp.enqueueJob(job)
+	tp.enqueueJob(*job)
 }
 
 func (tp tracePoller) enqueueJob(job PollingRequest) {
