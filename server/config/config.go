@@ -94,7 +94,9 @@ func loadConfig(vp *viper.Viper, logger logger) error {
 	}
 
 	err := vp.ReadInConfig()
-	logger.Println("Config file used: ", vp.ConfigFileUsed())
+	if path := vp.ConfigFileUsed(); path != "" {
+		logger.Println("Config file used: ", path)
+	}
 	if err == nil {
 		return nil
 	}
