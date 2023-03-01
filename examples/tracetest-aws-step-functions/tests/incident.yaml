@@ -1,0 +1,47 @@
+type: Test
+spec:
+  id: 2007r5bVg
+  name: "Incident - Step Functions"
+  trigger:
+    type: http
+    httpRequest:
+      url: <your_api_endpoint>/incident
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |-
+        {
+            "StudentId": "tracetest"
+        }
+  specs:
+    - selector: span[tracetest.span.type="general" name="RegisterIncident"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[tracetest.span.type="general" name="ScheduleExam"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[tracetest.span.type="general" name="SendNotification"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[tracetest.span.type="general" name="NotificationData"]
+      assertions:
+        - attr:aws.xray.metadata.default contains "ExamId"
+    - selector: span[tracetest.span.type="general" name="DynamoDB" aws.operation = "UpdateItem"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 4
+    - selector:
+        span[tracetest.span.type="http" name="DevelopingWithStepFunctionsApi/v2"
+        http.method="POST"]
+      assertions:
+        - attr:tracetest.span.duration < 2s
+  outputs:
+    - name: TASK_TOKEN
+      selector: span[tracetest.span.type="general" name="NotificationData"]
+      value: attr:aws.xray.metadata.default | json_path '.TaskToken'
+    - name: EXAM_ID
+      selector: span[tracetest.span.type="general" name="NotificationData"]
+      value: attr:aws.xray.metadata.default | json_path '.ExamId'
+    - name: INCIDENT_ID
+      selector: span[tracetest.span.type="general" name="NotificationData"]
+      value: attr:aws.xray.metadata.default | json_path '.IncidentId'

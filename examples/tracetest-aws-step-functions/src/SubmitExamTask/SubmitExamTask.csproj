@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <AWSProjectType>Lambda</AWSProjectType>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="2.5.0" />
+        <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0" />
+        <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.3.0" />
+        <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.207" />
+        <PackageReference Include="AWSXRayRecorder.Core" Version="2.11.1" />
+        <PackageReference Include="AWSXRayRecorder.Handlers.AwsSdk" Version="2.9.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\PlagiarismRepository\PlagiarismRepository.csproj" />
+    </ItemGroup>
+</Project>

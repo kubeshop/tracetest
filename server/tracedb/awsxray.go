@@ -55,7 +55,7 @@ func (db *awsxrayDB) GetTraceID() trace.TraceID {
 
 func (db *awsxrayDB) Connect(ctx context.Context) error {
 	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String("us-west-2"),
+		Region:      &db.region,
 		Credentials: db.credentials,
 	})
 
@@ -129,11 +129,16 @@ func parseXRayTrace(traceID string, rawTrace *xray.Trace) (model.Trace, error) {
 		return model.Trace{}, nil
 	}
 
-	segment := rawTrace.Segments[0]
-	spans, err := parseSegmentToSpans([]byte(*segment.Document), traceID)
+	spans := []model.Span{}
 
-	if err != nil {
-		return model.Trace{}, err
+	for _, segment := range rawTrace.Segments {
+		newSpans, err := parseSegmentToSpans([]byte(*segment.Document), traceID)
+
+		if err != nil {
+			return model.Trace{}, err
+		}
+
+		spans = append(spans, newSpans...)
 	}
 
 	return model.NewTrace(traceID, spans), nil
@@ -151,12 +156,11 @@ func parseSegmentToSpans(rawSeg []byte, traceID string) ([]model.Span, error) {
 		return []model.Span{}, err
 	}
 
-	spans, err := segToSpans(seg, traceID, nil)
-	return spans, err
+	return segToSpans(seg, traceID, nil)
 }
 
 func segToSpans(seg segment, traceID string, parent *model.Span) ([]model.Span, error) {
-	span, err := generateSpan(&seg, traceID, parent)
+	span, err := generateSpan(&seg, parent)
 	if err != nil {
 		return []model.Span{}, err
 	}
@@ -176,14 +180,21 @@ func segToSpans(seg segment, traceID string, parent *model.Span) ([]model.Span, 
 	return spans, nil
 }
 
-func generateSpan(seg *segment, traceID string, parent *model.Span) (model.Span, error) {
+func generateSpan(seg *segment, parent *model.Span) (model.Span, error) {
 	attributes := make(model.Attributes, 0)
 	span := model.Span{
 		Parent: parent,
 		Name:   *seg.Name,
 	}
 
-	if parent != nil {
+	if seg.ParentID != nil {
+		parentID, err := decodeXRaySpanID(seg.ParentID)
+		if err != nil {
+			return span, err
+		}
+
+		attributes["parent_id"] = parentID.String()
+	} else if parent != nil {
 		attributes["parent_id"] = parent.ID.String()
 	}
 

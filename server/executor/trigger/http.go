@@ -32,7 +32,7 @@ func httpClient() http.Client {
 
 	return http.Client{
 		Transport: transport,
-		Timeout:   5 * time.Second,
+		Timeout:   30 * time.Second,
 	}
 }
 
@@ -73,7 +73,7 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 	client := httpClient()
 
 	ctx = trace.ContextWithSpanContext(ctx, newSpanContext(ctx))
-	ctx, cncl := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cncl := context.WithTimeout(ctx, 30*time.Second)
 	defer cncl()
 
 	tReq := trigger.HTTP
