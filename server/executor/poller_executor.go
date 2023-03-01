@@ -111,12 +111,16 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 
 	trace.ID = run.TraceID
 
-	if !pe.donePollingTraces(request, traceDB, trace) {
-		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling\n", request.test.ID, request.run.ID)
+	done, reason := pe.donePollingTraces(request, traceDB, trace)
+
+	if !done {
+		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)\n", request.test.ID, request.run.ID, reason)
 		run.Trace = &trace
 		request.run = run
 		return false, run, nil
 	}
+
+	log.Printf("[PollerExecutor] Test %s Run %d: Done polling. (%s)\n", request.test.ID, request.run.ID, reason)
 
 	log.Printf("[PollerExecutor] Test %s Run %d: Start Sorting\n", request.test.ID, request.run.ID)
 	trace = trace.Sort()
@@ -132,7 +136,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	}
 	run = run.SuccessfullyPolledTraces(run.Trace)
 
-	fmt.Printf("completed polling result %d after %d times, number of spans: %d \n", run.ID, request.count, len(run.Trace.Flat))
+	fmt.Printf("[PollerExecutor] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d \n", run.ID, request.count+1, len(run.Trace.Flat))
 
 	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", request.test.ID, request.run.ID)
 	err = pe.updater.Update(request.ctx, run)
@@ -144,32 +148,31 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 	return true, run, nil
 }
 
-func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB tracedb.TraceDB, trace model.Trace) bool {
+func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB tracedb.TraceDB, trace model.Trace) (bool, string) {
 	if !traceDB.ShouldRetry() {
-		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. TraceDB is not retryable\n", job.test.ID, job.run.ID)
-		return true
+		return true, "TraceDB is not retryable"
 	}
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == pe.maxTracePollRetry {
-		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Hit MaxRetry of %d\n", job.test.ID, job.run.ID, pe.maxTracePollRetry)
-		return true
+		return true, fmt.Sprintf("Hit MaxRetry of %d", pe.maxTracePollRetry)
 	}
 
 	if job.run.Trace == nil {
-		return false
+		return false, "First iteration"
 	}
 
 	haveNotCollectedSpansSinceLastPoll := len(trace.Flat) == len(job.run.Trace.Flat)
 	haveCollectedSpansInTestRun := len(trace.Flat) > 0
+	haveCollectedOnlyRootNode := len(trace.Flat) == 1 && trace.HasRootSpan()
 
 	// Today we consider that we finished collecting traces
 	// if we haven't collected any new spans since our last poll
 	// and we have collected at least one span for this test run
+	// and we have not collected only the root span
 
-	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun {
-		log.Printf("[PollerExecutor] Test %s Run %d: Done polling. Condition met\n", job.test.ID, job.run.ID)
-		return true
+	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun && !haveCollectedOnlyRootNode {
+		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
 	}
 
-	return false
+	return false, fmt.Sprintf("New spans found. Before: %d After: %d", len(job.run.Trace.Flat), len(trace.Flat))
 }

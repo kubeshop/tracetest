@@ -187,9 +187,9 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 
 	// Given conditions
 
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
+	// maxRetries=3 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
 	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
+	maxWaitTimeForTrace := 3 * time.Second
 
 	rootSpan := model.Span{
 		ID:        randomIDGenerator.SpanID(),
@@ -208,6 +208,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 		model.Trace{},
 		trace,
 		trace,
+		trace,
 	}
 
 	// mock external dependencies
@@ -217,6 +218,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
@@ -280,6 +282,73 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
+	})
+}
+
+func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testing.T) {
+	t.Parallel()
+
+	// Scenario: Trace with only 1 delayed span, plus a root span
+	// Given the trigger execution returns 1 span on fourth iteration
+	// And find no trace on the first iteration
+	// And tracetest sent the root span
+	// When the server do the polling process
+	// Then it should stop at the fifth iteration
+	// And it should handle the trace error on first iteration
+	// And a root span should be added to it
+
+	// Given conditions
+
+	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
+	retryDelay := 1 * time.Second
+	maxWaitTimeForTrace := 30 * time.Second
+
+	rootSpan := model.Span{
+		ID:        randomIDGenerator.SpanID(),
+		Name:      model.TriggerSpanName,
+		StartTime: time.Now(),
+		EndTime:   time.Now().Add(retryDelay),
+		Attributes: map[string]string{
+			"testSpan": "true",
+		},
+		Children: []*model.Span{},
+	}
+
+	apiSpan := model.Span{
+		ID:        randomIDGenerator.SpanID(),
+		Name:      "HTTP API",
+		StartTime: time.Now(),
+		EndTime:   time.Now().Add(retryDelay),
+		Attributes: map[string]string{
+			"testSpan":  "true",
+			"parent_id": rootSpan.ID.String(),
+		},
+		Children: []*model.Span{},
+	}
+
+	traceWithOnlyRoot := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan})
+	completeTrace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan, apiSpan})
+
+	// test
+	tracePerIteration := []model.Trace{
+		model.Trace{},
+		traceWithOnlyRoot,
+		traceWithOnlyRoot,
+		completeTrace,
+		completeTrace,
+	}
+
+	// mock external dependencies
+	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+
+	// When doing polling process
+	// Then validate outputs
+	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})

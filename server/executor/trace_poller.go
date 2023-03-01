@@ -100,7 +100,7 @@ func (tp tracePoller) Start(workers int) {
 					fmt.Println("tracePoller exit goroutine")
 					return
 				case job := <-tp.executeQueue:
-					log.Printf("[TracePoller] Test %s Run %d: recieved job\n", job.test.ID, job.run.ID)
+					log.Printf("[TracePoller] Test %s Run %d: Received job\n", job.test.ID, job.run.ID)
 					tp.processJob(job)
 				}
 			}
@@ -139,7 +139,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		return
 	}
 
-	log.Printf("[TracePoller] Test %s Run %d: Done polling. completed polling after %d times, number of spans %d\n", job.test.ID, job.run.ID, job.count, len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling. Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, job.count+1, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
 
@@ -158,16 +158,20 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	run := job.run
+
+	// Edge case: the trace still not avaiable on Data Store during polling
+	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
+		log.Println("[TracePoller] Trace not found on Data Store yet. Requeuing...")
+		tp.requeue(job)
+		return
+	}
+
 	if errors.Is(err, connection.ErrTraceNotFound) {
-		if time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
-			tp.requeue(job)
-			return
-		}
 		err = fmt.Errorf("timed out waiting for traces after %s", tp.maxWaitTimeForTrace.String())
-		fmt.Println("timedout", err)
+		fmt.Println("[TracePoller] Timed-out", err)
 	} else {
 		err = fmt.Errorf("cannot fetch trace: %w", err)
-		fmt.Println("other", err)
+		fmt.Println("[TracePoller] Unknown error", err)
 	}
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
@@ -177,12 +181,11 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 		Type:       "update_run",
 		Content:    RunResult{Run: run, Err: err},
 	})
-
 }
 
 func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
-		fmt.Printf("requeuing result %d for %d time\n", job.run.ID, job.count)
+		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
 		time.Sleep(tp.retryDelay)
 		tp.enqueueJob(job)
 	}()
