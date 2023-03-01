@@ -49,6 +49,7 @@ func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, insertQuery,
 		cfg.ID,
@@ -57,7 +58,6 @@ func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
 	)
 
 	if err != nil {
-		tx.Rollback()
 		return Config{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -85,6 +85,7 @@ func (r *repository) Update(ctx context.Context, updated Config) (Config, error)
 	if err != nil {
 		return Config{}, err
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, updateQuery,
 		cfg.ID,
@@ -93,7 +94,6 @@ func (r *repository) Update(ctx context.Context, updated Config) (Config, error)
 	)
 
 	if err != nil {
-		tx.Rollback()
 		return Config{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -139,11 +139,11 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, deleteQuery, cfg.ID)
 
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
