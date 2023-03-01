@@ -33,11 +33,23 @@ func TestPortLinter(t *testing.T) {
 			ExpectedPorts:  []string{"9200"},
 			ExpectedStatus: connection.StatusPassed,
 		},
+		{
+			Name:           "shouldSupportTwoPorts",
+			Endpoints:      []string{"https://us2.endpoint:9100"},
+			ExpectedPorts:  []string{"9200", "9250"},
+			ExpectedStatus: connection.StatusWarning,
+		},
+		{
+			Name:           "shouldSupportTwoPorts",
+			Endpoints:      []string{"https://us2.endpoint:9100"},
+			ExpectedPorts:  []string{"9200", "9250", "9300"},
+			ExpectedStatus: connection.StatusWarning,
+		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
-			linter := connection.PortLinter(testCase.ExpectedPorts, testCase.Endpoints...)
+			linter := connection.PortLinter("Jaeger", testCase.ExpectedPorts, testCase.Endpoints...)
 			result := linter.TestConnection(context.Background())
 			assert.Equal(t, testCase.ExpectedStatus, result.Status)
 		})
