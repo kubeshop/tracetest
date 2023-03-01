@@ -163,12 +163,14 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 
 	haveNotCollectedSpansSinceLastPoll := len(trace.Flat) == len(job.run.Trace.Flat)
 	haveCollectedSpansInTestRun := len(trace.Flat) > 0
+	haveCollectedOnlyRootNode := len(trace.Flat) == 1 && trace.HasRootSpan()
 
 	// Today we consider that we finished collecting traces
 	// if we haven't collected any new spans since our last poll
 	// and we have collected at least one span for this test run
+	// and we have not collected only the root span
 
-	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun {
+	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun && !haveCollectedOnlyRootNode {
 		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
 	}
 
