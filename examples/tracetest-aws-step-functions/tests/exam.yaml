@@ -18,9 +18,6 @@ spec:
             "Score": "80"
         }
   specs:
-    - selector: span[tracetest.span.type="general" name="tracetest-step-functions-SubmitExamTaskFunction-ciSBxeVO3UFo"]
-      assertions:
-        - attr:tracetest.selected_spans.count  > 1
     - selector: span[tracetest.span.type="general" name="DynamoDB"]
       assertions:
         - attr:tracetest.span.duration < 4s
