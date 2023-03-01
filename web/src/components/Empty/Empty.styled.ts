@@ -11,4 +11,6 @@ export const Content = styled.div`
 
 export const Icon = styled.img`
   margin-bottom: 25px;
+  height: 115px;
+  width: 115px;
 `;

@@ -88,7 +88,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
               )}
 
               <S.Layout>
-                <Header hasEnvironments hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
+                <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
                 <S.Content $hasMenu={hasMenu}>{children}</S.Content>
               </S.Layout>
             </S.Layout>

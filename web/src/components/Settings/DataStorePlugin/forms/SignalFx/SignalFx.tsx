@@ -8,12 +8,12 @@ const SignalFx = () => {
     <Row gutter={[16, 16]}>
       <Col span={12}>
         <Form.Item label="Realm" name={[...baseName, 'realm']} rules={[{required: true, message: 'Realm is required'}]}>
-          <Input placeholder="Realm" />
+          <Input placeholder="us1" />
         </Form.Item>
       </Col>
       <Col span={12}>
         <Form.Item label="Token" name={[...baseName, 'token']} rules={[{required: true, message: 'Token is required'}]}>
-          <Input placeholder="Token" type="password" />
+          <Input placeholder="Your token" type="password" />
         </Form.Item>
       </Col>
     </Row>

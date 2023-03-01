@@ -110,26 +110,24 @@ const TestSpecForm = ({
           <SelectorInput form={form} testId={testId} runId={runId} onValidSelector={setIsValid} />
 
           <S.SuggestionsContainer>
-            {!isEditing && (
-              <SelectorSuggestions
-                onClick={query => {
-                  onClickPrevSelector(form.getFieldValue('selector'));
-                  onClearSelectorSuggestions();
-                  form.setFieldsValue({
-                    selector: query,
-                  });
-                }}
-                onClickPrevSelector={query => {
-                  onClickPrevSelector('');
-                  onClearSelectorSuggestions();
-                  form.setFieldsValue({
-                    selector: query,
-                  });
-                }}
-                prevSelector={prevSelector}
-                selectorSuggestions={selectorSuggestions}
-              />
-            )}
+            <SelectorSuggestions
+              onClick={query => {
+                onClickPrevSelector(form.getFieldValue('selector'));
+                onClearSelectorSuggestions();
+                form.setFieldsValue({
+                  selector: query,
+                });
+              }}
+              onClickPrevSelector={query => {
+                onClickPrevSelector('');
+                onClearSelectorSuggestions();
+                form.setFieldsValue({
+                  selector: query,
+                });
+              }}
+              prevSelector={prevSelector}
+              selectorSuggestions={selectorSuggestions}
+            />
           </S.SuggestionsContainer>
         </S.FormSection>
 

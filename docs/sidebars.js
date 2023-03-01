@@ -102,11 +102,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/new-relic",
               label: "New Relic",
             },
-//             {
-//               type: "doc",
-//               id: "configuration/connecting-to-data-stores/datadog",
-//               label: "Datadog",
-//             },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/datadog",
+              label: "Datadog",
+            },
           ],
         },
         {

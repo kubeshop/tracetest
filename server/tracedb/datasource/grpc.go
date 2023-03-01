@@ -35,6 +35,10 @@ func (client *GrpcClient) GetTraceByID(ctx context.Context, traceID string) (mod
 	return client.callback(ctx, traceID, client.conn)
 }
 
+func (client *GrpcClient) Endpoint() string {
+	return client.config.Endpoint
+}
+
 func (client *GrpcClient) Connect(ctx context.Context) error {
 	opts, err := client.config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
 	if err != nil {

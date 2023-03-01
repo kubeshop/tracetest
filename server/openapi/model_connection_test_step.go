@@ -12,6 +12,8 @@ package openapi
 type ConnectionTestStep struct {
 	Passed bool `json:"passed,omitempty"`
 
+	Status string `json:"status,omitempty"`
+
 	Message string `json:"message,omitempty"`
 
 	Error string `json:"error,omitempty"`

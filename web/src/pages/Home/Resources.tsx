@@ -11,6 +11,7 @@ import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useGetResourcesQuery} from 'redux/apis/TraceTest.api';
+import {ADD_TEST_SPECS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
@@ -68,6 +69,7 @@ const Resources = () => {
           <HomeFilters
             onSearch={pagination.search}
             onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})}
+            isEmpty={pagination.list?.length === 0}
           />
           <HomeActions
             onCreateTransaction={() => setIsCreateTransactionOpen(true)}
@@ -77,7 +79,17 @@ const Resources = () => {
 
         <Pagination<Resource>
           emptyComponent={
-            <Empty message="You have not created any tests yet. Use the Create button to create your first test" />
+            <Empty
+              title="You have not created any tests yet"
+              message={
+                <>
+                  Use the Create button to create your first test. Learn more about test or transactions{' '}
+                  <a href={ADD_TEST_SPECS_DOCUMENTATION_URL} target="_blank">
+                    here.
+                  </a>
+                </>
+              }
+            />
           }
           loadingComponent={<Loading />}
           {...pagination}
