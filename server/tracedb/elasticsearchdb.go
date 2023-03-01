@@ -40,7 +40,7 @@ func (db *elasticsearchDB) Close() error {
 
 func (db *elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
-		connection.WithPortLintingTest(connection.PortLinter(elasticSearchDefaultPorts(), db.config.Addresses...)),
+		connection.WithPortLintingTest(connection.PortLinter("ElasticSearch", elasticSearchDefaultPorts(), db.config.Addresses...)),
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
