@@ -6,6 +6,7 @@ type ConnectionResult = Model<
   TRawConnectionResult,
   {
     allPassed: boolean;
+    portCheck: ConnectionTestStep;
     authentication: ConnectionTestStep;
     connectivity: ConnectionTestStep;
     fetchTraces: ConnectionTestStep;
@@ -13,16 +14,19 @@ type ConnectionResult = Model<
 >;
 
 const ConnectionResult = ({
+  portCheck: rawPortCheck = {},
   authentication: rawAuthentication = {},
   connectivity: rawConnectivity = {},
   fetchTraces: rawFetchTraces = {},
 }: TRawConnectionResult): ConnectionResult => {
+  const portCheck = ConnectionTestStep(rawPortCheck);
   const authentication = ConnectionTestStep(rawAuthentication);
   const connectivity = ConnectionTestStep(rawConnectivity);
   const fetchTraces = ConnectionTestStep(rawFetchTraces);
 
   return {
-    allPassed: authentication.passed && connectivity.passed && fetchTraces.passed,
+    allPassed: portCheck.status && authentication.passed && connectivity.passed && fetchTraces.passed,
+    portCheck,
     authentication,
     connectivity,
     fetchTraces,

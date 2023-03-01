@@ -2,6 +2,12 @@ package connection
 
 import "context"
 
+func WithPortLintingTest(step TestStep) TesterOption {
+	return func(t *Tester) {
+		t.portLinterStep = step
+	}
+}
+
 func WithConnectivityTest(step TestStep) TesterOption {
 	return func(t *Tester) {
 		t.connectivityTestStep = step

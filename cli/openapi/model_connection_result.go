@@ -19,6 +19,7 @@ var _ MappedNullable = &ConnectionResult{}
 
 // ConnectionResult struct for ConnectionResult
 type ConnectionResult struct {
+	PortCheck      *ConnectionTestStep `json:"portCheck,omitempty"`
 	Connectivity   *ConnectionTestStep `json:"connectivity,omitempty"`
 	Authentication *ConnectionTestStep `json:"authentication,omitempty"`
 	FetchTraces    *ConnectionTestStep `json:"fetchTraces,omitempty"`
@@ -39,6 +40,38 @@ func NewConnectionResult() *ConnectionResult {
 func NewConnectionResultWithDefaults() *ConnectionResult {
 	this := ConnectionResult{}
 	return &this
+}
+
+// GetPortCheck returns the PortCheck field value if set, zero value otherwise.
+func (o *ConnectionResult) GetPortCheck() ConnectionTestStep {
+	if o == nil || isNil(o.PortCheck) {
+		var ret ConnectionTestStep
+		return ret
+	}
+	return *o.PortCheck
+}
+
+// GetPortCheckOk returns a tuple with the PortCheck field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ConnectionResult) GetPortCheckOk() (*ConnectionTestStep, bool) {
+	if o == nil || isNil(o.PortCheck) {
+		return nil, false
+	}
+	return o.PortCheck, true
+}
+
+// HasPortCheck returns a boolean if a field has been set.
+func (o *ConnectionResult) HasPortCheck() bool {
+	if o != nil && !isNil(o.PortCheck) {
+		return true
+	}
+
+	return false
+}
+
+// SetPortCheck gets a reference to the given ConnectionTestStep and assigns it to the PortCheck field.
+func (o *ConnectionResult) SetPortCheck(v ConnectionTestStep) {
+	o.PortCheck = &v
 }
 
 // GetConnectivity returns the Connectivity field value if set, zero value otherwise.
@@ -147,6 +180,9 @@ func (o ConnectionResult) MarshalJSON() ([]byte, error) {
 
 func (o ConnectionResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.PortCheck) {
+		toSerialize["portCheck"] = o.PortCheck
+	}
 	if !isNil(o.Connectivity) {
 		toSerialize["connectivity"] = o.Connectivity
 	}

@@ -19,6 +19,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+func elasticSearchDefaultPorts() []string {
+	return []string{"9200"}
+}
+
 type elasticsearchDB struct {
 	realTraceDB
 	config *model.ElasticSearchDataStoreConfig
@@ -36,15 +40,16 @@ func (db *elasticsearchDB) Close() error {
 
 func (db *elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
+		connection.WithPortLintingTest(connection.PortLinter(elasticSearchDefaultPorts(), db.config.Addresses...)),
 		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := getClusterInfo(db.client)
 			if err != nil {
-				return "Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues", err
+				return "Tracetest tried to execute an ElasticSearch API request but it failed due to authentication issues", err
 			}
 
-			return "Tracetest managed to authenticate with OpenSearch", nil
+			return "Tracetest managed to authenticate with ElasticSearch", nil
 		})),
 	)
 

@@ -96,13 +96,7 @@ const DataStoreForm = ({
               <div />
             )}
             <S.SaveContainer>
-              <Button
-                loading={isTestConnectionLoading}
-                disabled={!isFormValid}
-                type="primary"
-                ghost
-                onClick={onTestConnection}
-              >
+              <Button loading={isTestConnectionLoading} type="primary" ghost onClick={onTestConnection}>
                 Test Connection
               </Button>
               <Button disabled={!isFormValid} loading={isLoading} type="primary" onClick={() => form.submit()}>

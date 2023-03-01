@@ -24,6 +24,7 @@ type Callbacks struct {
 }
 
 type DataSource interface {
+	Endpoint() string
 	Connect(ctx context.Context) error
 	Ready() bool
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
@@ -36,6 +37,7 @@ type noopDataSource struct{}
 func (dataSource *noopDataSource) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
 	return model.Trace{}, nil
 }
+func (db *noopDataSource) Endpoint() string                  { return "" }
 func (db *noopDataSource) Connect(ctx context.Context) error { return nil }
 func (db *noopDataSource) Close() error                      { return nil }
 func (db *noopDataSource) Ready() bool                       { return true }

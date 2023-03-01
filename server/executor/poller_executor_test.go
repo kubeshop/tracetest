@@ -50,8 +50,8 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: true},
 	})
 
 	// it will return errors on repeated calls.
@@ -102,9 +102,9 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: false},
-		{finished: true, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: false},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
 }
 
@@ -168,10 +168,10 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: false},
-		{finished: false, expectConnectionError: false, expectRootSpan: false},
-		{finished: true, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: false},
+		{finished: false, expectNoTraceError: false, expectRootSpan: false},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
 }
 
@@ -182,7 +182,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	// Given the trigger execution returns 0 spans
 	// And tracetest sent the root span
 	// When the server do the polling process
-	// Then it should stop on timeout
+	// Then it should stop on third iteration
 	// And it should handle the trace error on first iteration
 
 	// Given conditions
@@ -217,10 +217,10 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: true, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
 }
 
@@ -281,9 +281,9 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: true, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
 }
 
@@ -346,11 +346,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: true, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
 }
 
@@ -426,19 +426,19 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 	// When doing polling process
 	// Then validate outputs
 	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
-		{finished: false, expectConnectionError: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: false, expectConnectionError: false, expectRootSpan: true},
-		{finished: true, expectConnectionError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: false, expectNoTraceError: false, expectRootSpan: true},
+		{finished: true, expectNoTraceError: false, expectRootSpan: true},
 	})
 }
 
 // Helper structs / functions
 
 type iterationExpectedValues struct {
-	finished              bool
-	expectConnectionError bool
-	expectRootSpan        bool
+	finished           bool
+	expectNoTraceError bool
+	expectRootSpan     bool
 }
 
 func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
@@ -466,7 +466,7 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 			require.Falsef(t, finished, "The poller should have not finished on iteration %d", i)
 		}
 
-		if value.expectConnectionError {
+		if value.expectNoTraceError {
 			require.Errorf(t, err, "An error should have happened on iteration %d", i)
 			require.ErrorIsf(t, err, connection.ErrTraceNotFound, "An connection error should have happened on iteration %d", i)
 		} else {
