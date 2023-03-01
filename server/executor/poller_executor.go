@@ -162,11 +162,13 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	}
 
 	haveNotCollectedSpansSinceLastPoll := len(trace.Flat) == len(job.run.Trace.Flat)
+	haveCollectedSpansInTestRun := len(trace.Flat) > 0
 
 	// Today we consider that we finished collecting traces
 	// if we haven't collected any new spans since our last poll
+	// and we have collected at least one span for this test run
 
-	if haveNotCollectedSpansSinceLastPoll {
+	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun {
 		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
 	}
 
