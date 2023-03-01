@@ -76,8 +76,7 @@ func (opts options) registerFlags(flags *pflag.FlagSet) {
 var configOptions options
 
 func configureConfigFile(vp *viper.Viper) {
-	vp.SetConfigName("tracetest")
-	vp.SetConfigType("yaml")
+	vp.SetConfigName("tracetest.yaml")
 	vp.AddConfigPath("/etc/tracetest")
 	vp.AddConfigPath("$HOME/.tracetest")
 	vp.AddConfigPath(".")
@@ -85,7 +84,7 @@ func configureConfigFile(vp *viper.Viper) {
 
 var ErrConfigFileNotFound = errors.New("config file not found")
 
-func readConfigFile(vp *viper.Viper) error {
+func loadConfig(vp *viper.Viper, logger logger) error {
 	if confFile := vp.GetString("config"); confFile != "" {
 		// if --config is passed, and the file does not exists
 		// it will trigger a "no such file or directory" error
@@ -95,6 +94,7 @@ func readConfigFile(vp *viper.Viper) error {
 	}
 
 	err := vp.ReadInConfig()
+	logger.Println("Config file used: ", vp.ConfigFileUsed())
 	if err == nil {
 		return nil
 	}
@@ -128,7 +128,7 @@ func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 
 	configOptions.registerDefaults(vp)
 
-	err := readConfigFile(vp)
+	err := loadConfig(vp, logger)
 	if err != nil {
 		return nil, err
 	}
