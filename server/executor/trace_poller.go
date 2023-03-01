@@ -139,7 +139,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		return
 	}
 
-	log.Printf("[TracePoller] Test %s Run %d: Done polling. Completed polling after %d iteractions, number of spans collected %d\n", job.test.ID, job.run.ID, job.count+1, len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling. Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, job.count+1, len(run.Trace.Flat))
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
 
@@ -168,7 +168,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 
 	if errors.Is(err, connection.ErrTraceNotFound) {
 		err = fmt.Errorf("timed out waiting for traces after %s", tp.maxWaitTimeForTrace.String())
-		fmt.Println("[TracePoller] Timedout", err)
+		fmt.Println("[TracePoller] Timed-out", err)
 	} else {
 		err = fmt.Errorf("cannot fetch trace: %w", err)
 		fmt.Println("[TracePoller] Unknown error", err)
