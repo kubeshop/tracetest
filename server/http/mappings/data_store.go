@@ -1,16 +1,41 @@
 package mappings
 
 import (
+	"fmt"
+
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 )
 
+var dataStoreTypesMapping = map[model.DataStoreType]openapi.SupportedDataStores{
+	model.DataStoreTypeJaeger:     openapi.JAEGER,
+	model.DataStoreTypeTempo:      openapi.TEMPO,
+	model.DataStoreTypeOpenSearch: openapi.OPEN_SEARCH,
+	model.DataStoreTypeSignalFX:   openapi.SIGNAL_FX,
+	model.DataStoreTypeOTLP:       openapi.OTLP,
+	model.DataStoreTypeNewRelic:   openapi.NEW_RELIC,
+	model.DataStoreTypeLighStep:   openapi.LIGHTSTEP,
+	model.DataStoreTypeElasticAPM: openapi.ELASTIC_APM,
+	model.DataStoreTypeDataDog:    openapi.DATADOG,
+	model.DataStoreTypeAwsXRay:    openapi.AWSXRAY,
+}
+
+func (m OpenAPI) DataStoreType(in model.DataStoreType) openapi.SupportedDataStores {
+	dsd, exists := dataStoreTypesMapping[in]
+	if !exists {
+		// this should only happen during development,
+		// so it's more an alert for devs than actual error handling``
+		panic(fmt.Errorf("trying to convert an undefined model.DataStoreType '%s'", in))
+	}
+	return dsd
+}
+
 func (m OpenAPI) DataStore(in model.DataStore) openapi.DataStore {
 	dataStore := openapi.DataStore{
 		Id:         in.ID,
 		Name:       in.Name,
-		Type:       openapi.SupportedDataStores(in.Type),
+		Type:       m.DataStoreType(in.Type),
 		IsDefault:  in.IsDefault,
 		Jaeger:     openapi.GrpcClientSettings{},
 		Tempo:      openapi.BaseClient{},
@@ -61,11 +86,24 @@ func (m OpenAPI) DataStores(in []model.DataStore) []openapi.DataStore {
 	return dataStores
 }
 
+func (m Model) DataStoreType(in openapi.SupportedDataStores) model.DataStoreType {
+	for k, v := range dataStoreTypesMapping {
+		if v == in {
+			return k
+		}
+	}
+
+	// this should only happen during development,
+	// so it's more an alert for devs than actual error handling``
+	panic(fmt.Errorf("trying to convert an undefined model.DataStoreType '%s'", in))
+
+}
+
 func (m Model) DataStore(in openapi.DataStore) model.DataStore {
 	dataStore := model.DataStore{
 		ID:        in.Id,
 		Name:      in.Name,
-		Type:      model.DataStoreType(in.Type),
+		Type:      m.DataStoreType(in.Type),
 		IsDefault: in.IsDefault,
 		CreatedAt: in.CreatedAt,
 	}
