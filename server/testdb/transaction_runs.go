@@ -81,10 +81,10 @@ func (td *postgresDB) CreateTransactionRun(ctx context.Context, tr model.Transac
 	if err != nil {
 		return model.TransactionRun{}, fmt.Errorf("sql beginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, replaceTransactionRunSequenceName(createSequeceQuery, tr.TransactionID))
 	if err != nil {
-		tx.Rollback()
 		return model.TransactionRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -143,6 +143,7 @@ func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.Transac
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(updateTransactionRunQuery)
 	if err != nil {
@@ -182,7 +183,6 @@ func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.Transac
 	)
 
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -190,16 +190,16 @@ func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.Transac
 }
 
 func (td *postgresDB) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr model.TransactionRun) error {
+	defer tx.Rollback()
+
 	// delete existing steps
 	stmt, err := tx.Prepare("DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2")
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
 	_, err = stmt.ExecContext(ctx, tr.ID, tr.TransactionID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -222,9 +222,9 @@ func (td *postgresDB) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr
 	sql := "INSERT INTO transaction_run_steps VALUES " + strings.Join(values, ", ")
 	_, err = tx.ExecContext(ctx, sql)
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("cannot save transaction run steps: %w", err)
 	}
+
 	return tx.Commit()
 }
 
@@ -233,6 +233,7 @@ func (td *postgresDB) DeleteTransactionRun(ctx context.Context, tr model.Transac
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(
 		ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2",
@@ -248,7 +249,6 @@ func (td *postgresDB) DeleteTransactionRun(ctx context.Context, tr model.Transac
 		tr.ID, tr.TransactionID,
 	)
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("delete transaction runs: %w", err)
 	}
 

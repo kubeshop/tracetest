@@ -86,11 +86,11 @@ func (td *postgresDB) DeleteDataStore(ctx context.Context, dataStore model.DataS
 	if err != nil {
 		return fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, deleteFromDataStoresQuery, dataStore.ID)
 
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql error: %w", err)
 	}
 
@@ -256,12 +256,12 @@ func (td *postgresDB) insertIntoDataStores(ctx context.Context, dataStore model.
 	if err != nil {
 		return model.DataStore{}, fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	if dataStore.IsDefault {
 		_, err = tx.ExecContext(ctx, updateAllDefaultDataStoresQuery)
 
 		if err != nil {
-			tx.Rollback()
 			return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
 		}
 	}
@@ -280,7 +280,6 @@ func (td *postgresDB) insertIntoDataStores(ctx context.Context, dataStore model.
 		dataStore.CreatedAt)
 
 	if err != nil {
-		tx.Rollback()
 		return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -297,12 +296,12 @@ func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.
 	if err != nil {
 		return model.DataStore{}, fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	if dataStore.IsDefault {
 		_, err = tx.ExecContext(ctx, updateAllDefaultDataStoresQuery)
 
 		if err != nil {
-			tx.Rollback()
 			return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
 		}
 	}
@@ -322,7 +321,6 @@ func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.
 		dataStore.CreatedAt)
 
 	if err != nil {
-		tx.Rollback()
 		return model.DataStore{}, fmt.Errorf("sql exec: %w", err)
 	}
 

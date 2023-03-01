@@ -79,11 +79,11 @@ func (td *postgresDB) DeleteEnvironment(ctx context.Context, environment model.E
 	if err != nil {
 		return fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, deleteQuery, environment.ID)
 
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql error: %w", err)
 	}
 

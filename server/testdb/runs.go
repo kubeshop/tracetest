@@ -140,10 +140,10 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 	if err != nil {
 		return model.Run{}, fmt.Errorf("sql beginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequeceQuery, test.ID))
 	if err != nil {
-		tx.Rollback()
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -166,7 +166,6 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		jsonEnvironment,
 	).Scan(&runID)
 	if err != nil {
-		tx.Rollback()
 		return model.Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -287,11 +286,11 @@ func (td *postgresDB) DeleteRun(ctx context.Context, r model.Run) error {
 	if err != nil {
 		return fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	for _, sql := range queries {
 		_, err := tx.ExecContext(ctx, sql, r.ID, r.TestID)
 		if err != nil {
-			tx.Rollback()
 			return fmt.Errorf("sql error: %w", err)
 		}
 	}
@@ -327,7 +326,7 @@ SELECT
 	"test_results",
 	"trace",
 	"outputs",
-	"last_error",	
+	"last_error",
 	"metadata",
 	"environment",
 

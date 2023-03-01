@@ -129,11 +129,11 @@ func (td *postgresDB) DeleteTest(ctx context.Context, test model.Test) error {
 	if err != nil {
 		return fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	for _, sql := range queries {
 		_, err := tx.ExecContext(ctx, sql, test.ID)
 		if err != nil {
-			tx.Rollback()
 			return fmt.Errorf("sql error: %w", err)
 		}
 	}

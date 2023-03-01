@@ -52,10 +52,10 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 	if err != nil {
 		return model.Transaction{}, fmt.Errorf("sql begin: %w", err)
 	}
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(insertIntoTransactionsQuery)
 	if err != nil {
-		tx.Rollback()
 		return model.Transaction{}, fmt.Errorf("sql prepare: %w", err)
 	}
 	defer stmt.Close()
@@ -69,7 +69,6 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 		transaction.CreatedAt,
 	)
 	if err != nil {
-		tx.Rollback()
 		return model.Transaction{}, fmt.Errorf("sql exec: %w", err)
 	}
 
@@ -77,16 +76,16 @@ func (td *postgresDB) insertIntoTransactions(ctx context.Context, transaction mo
 }
 
 func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction model.Transaction) (model.Transaction, error) {
+	defer tx.Rollback()
+
 	// delete existing steps
 	stmt, err := tx.Prepare("DELETE FROM transaction_runs WHERE transaction_id = $1 AND transaction_version = $2")
 	if err != nil {
-		tx.Rollback()
 		return model.Transaction{}, err
 	}
 
 	_, err = stmt.ExecContext(ctx, transaction.ID, transaction.Version)
 	if err != nil {
-		tx.Rollback()
 		return model.Transaction{}, err
 	}
 
@@ -106,9 +105,9 @@ func (td *postgresDB) setTransactionSteps(ctx context.Context, tx *sql.Tx, trans
 	sql := "INSERT INTO transaction_steps VALUES " + strings.Join(values, ", ")
 	_, err = tx.ExecContext(ctx, sql)
 	if err != nil {
-		tx.Rollback()
 		return model.Transaction{}, fmt.Errorf("cannot save transaction steps: %w", err)
 	}
+
 	return transaction, tx.Commit()
 }
 
@@ -139,22 +138,20 @@ func (td *postgresDB) DeleteTransaction(ctx context.Context, transaction model.T
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_steps WHERE transaction_id = $1", transaction.ID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", transaction.ID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
 	_, err = tx.ExecContext(ctx, "DELETE FROM transactions WHERE id = $1", transaction.ID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
