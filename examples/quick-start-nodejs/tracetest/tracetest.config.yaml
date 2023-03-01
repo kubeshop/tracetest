@@ -25,7 +25,7 @@ telemetry:
       exporter:
         type: collector
         collector:
-          endpoint: localhost:4317
+          endpoint: otel-collector:4317
 
 server:
   telemetry:
