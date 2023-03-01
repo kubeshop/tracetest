@@ -16,7 +16,7 @@ variable "environment" {
 locals {
   name            = "tracetest-step-functions"
   region          = var.aws_region
-  tracetest_image = "public.ecr.aws/s5b8u2m9/tracetest:${var.tracetest_version}"
+  tracetest_image = "kubeshop/tracetest:${var.tracetest_version}"
   environment     = var.environment
 
   db_name     = "postgres"
