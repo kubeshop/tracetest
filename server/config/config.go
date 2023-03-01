@@ -128,6 +128,8 @@ func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 
 	configOptions.registerDefaults(vp)
 
+	warnAboutDeprecatedFields(vp, logger)
+
 	err := loadConfig(vp, logger)
 	if err != nil {
 		return nil, err
