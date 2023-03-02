@@ -55,5 +55,6 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 func ConnectivityStep(protocol Protocol, endpoints ...string) TestStep {
 	return &connectivityTestStep{
 		endpoints: endpoints,
+		protocol:  protocol,
 	}
 }
