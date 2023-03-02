@@ -1,3 +1,4 @@
+---
 type: Test
 spec:
   id: K68RahA4g
@@ -8,5 +9,5 @@ spec:
       url: http://app:8080/
       method: GET
       headers:
-      - key: Content-Type
-        value: application/json
+        - key: Content-Type
+          value: application/json

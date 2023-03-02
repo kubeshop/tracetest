@@ -7,13 +7,8 @@ postgres:
   params: sslmode=disable
 
 poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
+  maxWaitTimeForTrace: 10s
+  retryDelay: 1s
 
 googleAnalytics:
   enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
