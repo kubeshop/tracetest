@@ -1,0 +1,7 @@
+---
+dataStore:
+  type: jaeger
+  jaeger:
+    endpoint: jaeger:16685
+    tls:
+      insecure: true
