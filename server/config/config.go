@@ -76,7 +76,9 @@ func (opts options) registerFlags(flags *pflag.FlagSet) {
 var configOptions options
 
 func configureConfigFile(vp *viper.Viper) {
-	vp.SetConfigName("tracetest.yaml")
+	vp.SetConfigName("tracetest")
+	// intentionally removed this line, because it allows to have config files without extensions
+	// vp.SetConfigType("yaml")
 	vp.AddConfigPath("/etc/tracetest")
 	vp.AddConfigPath("$HOME/.tracetest")
 	vp.AddConfigPath(".")

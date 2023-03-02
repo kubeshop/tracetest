@@ -74,4 +74,46 @@ func TestFlags(t *testing.T) {
 		assert.Equal(t, 3*time.Second, cfg.PoolingRetryDelay())
 	})
 
+	t.Run("ConfigFileDefault", func(t *testing.T) {
+		t.Parallel()
+
+		t.Run("OK", func(t *testing.T) {
+			// copy an example config file to the default location
+			err := copyFile("./testdata/basic.yaml", "./tracetest.yaml")
+			defer os.Remove("./tracetest.yaml")
+
+			require.NoError(t, err)
+
+			cfg, err := config.New(nil, log.Default())
+			require.NoError(t, err)
+
+			// this one assertion is enough to guarantee we're not using the defaults
+			assert.Equal(t, 9999, cfg.ServerPort())
+		})
+
+		t.Run("MustHaveExtension", func(t *testing.T) {
+			// copy an example config file to the default location
+			err := copyFile("./testdata/basic.yaml", "./tracetest")
+			defer os.Remove("./tracetest")
+
+			require.NoError(t, err)
+
+			cfg, err := config.New(nil, log.Default())
+			require.NoError(t, err)
+
+			// the config file would change this value to 9999, but we want to make sure
+			// the file is NOT being read, since it doesn't have the .yaml extension
+			assert.Equal(t, 11633, cfg.ServerPort())
+		})
+	})
+
+}
+
+func copyFile(in, out string) error {
+	b, err := os.ReadFile(in)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(out, b, 0644)
 }
