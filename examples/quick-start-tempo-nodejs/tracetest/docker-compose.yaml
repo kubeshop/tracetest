@@ -1,13 +1,18 @@
-version: '3'
+version: "3"
 services:
-
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
     platform: linux/amd64
     volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
+      - type: bind
+        source: ./tracetest/tracetest.config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest/tracetest.provision.yaml
+        target: /app/provisioning.yaml
     ports:
       - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,4 +53,4 @@ services:
     image: grafana/tempo:1.5.0
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
-    - ./tracetest/tempo.config.yaml:/etc/tempo.yaml
+      - ./tracetest/tempo.config.yaml:/etc/tempo.yaml

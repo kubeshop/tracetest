@@ -1,3 +1,4 @@
+---
 postgres:
   host: postgres
   user: postgres
@@ -7,27 +8,13 @@ postgres:
   params: sslmode=disable
 
 poolingConfig:
-  maxWaitTimeForTrace: 10s
-  retryDelay: 1s
+  maxWaitTimeForTrace: 10m
+  retryDelay: 5s
 
 googleAnalytics:
   enabled: true
 
-telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
+demo:
+  enabled: []
 
-server:
-  telemetry:
-    dataStore: otlp
-    exporter: collector
-    applicationExporter: collector
+experimentalFeatures: []
