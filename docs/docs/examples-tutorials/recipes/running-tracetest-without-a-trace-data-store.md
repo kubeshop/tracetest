@@ -192,9 +192,6 @@ googleAnalytics:
   enabled: true
 
 telemetry:
-  dataStores:
-    otlp:
-      type: otlp
   exporters:
     collector:
       serviceName: tracetest
@@ -206,7 +203,6 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: otlp
     exporter: collector
     applicationExporter: collector
 

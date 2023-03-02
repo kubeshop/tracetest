@@ -19,14 +19,6 @@ demo:
 experimentalFeatures: []
 
 telemetry:
-  dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
-
   exporters:
     collector:
       serviceName: tracetest
