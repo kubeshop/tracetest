@@ -5,10 +5,10 @@ services:
     platform: linux/amd64
     volumes:
       - type: bind
-        source: ./tracetest/tracetest.config.yaml
+        source: ./tracetest/tracetest-config.yaml
         target: /app/tracetest.yaml
       - type: bind
-        source: ./tracetest/tracetest.provision.yaml
+        source: ./tracetest/tracetest-provision.yaml
         target: /app/provisioning.yaml
     ports:
       - 11633:11633
