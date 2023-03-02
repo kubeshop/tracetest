@@ -24,8 +24,6 @@ postgres:
 
 server:
     telemetry:
-        applicationexporter: collector
-        datastore: jaeger
         exporter: collector
 
 telemetry:
