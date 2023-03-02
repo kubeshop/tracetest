@@ -47,7 +47,7 @@ func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
 
 func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
-		connection.WithPortLintingTest(connection.PortLinter(tempoDefaultPorts(), ttd.dataSource.Endpoint())),
+		connection.WithPortLintingTest(connection.PortLinter("Tempo", tempoDefaultPorts(), ttd.dataSource.Endpoint())),
 		connection.WithConnectivityTest(ttd.dataSource),
 		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {

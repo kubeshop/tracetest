@@ -48,7 +48,7 @@ func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
 
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
-		connection.WithPortLintingTest(connection.PortLinter(jaegerDefaultPorts(), jtd.dataSource.Endpoint())),
+		connection.WithPortLintingTest(connection.PortLinter("Jaeger", jaegerDefaultPorts(), jtd.dataSource.Endpoint())),
 		connection.WithConnectivityTest(jtd.dataSource),
 		connection.WithPollingTest(connection.TracePollingTestStep(jtd)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {

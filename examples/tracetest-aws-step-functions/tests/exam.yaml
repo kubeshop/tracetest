@@ -1,0 +1,26 @@
+type: Test
+spec:
+  id: BhEkooxVR
+  name: "Exam - Step Functions"
+  trigger:
+    type: http
+    httpRequest:
+      url: <your_api_endpoint>/exam
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |-
+        {
+            "TaskToken": "${env:TASK_TOKEN}",
+            "ExamId": "${env:EXAM_ID}",
+            "IncidentId": "${env:INCIDENT_ID}",
+            "Score": "80"
+        }
+  specs:
+    - selector: span[tracetest.span.type="general" name="DynamoDB"]
+      assertions:
+        - attr:tracetest.span.duration < 4s
+    - selector: span[tracetest.span.type="general" name="StepFunctions"]
+      assertions:
+        - attr:aws.operation = "SendTaskSuccess"
