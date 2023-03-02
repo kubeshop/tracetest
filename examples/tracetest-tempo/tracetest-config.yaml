@@ -19,14 +19,6 @@ demo:
 experimentalFeatures: []
 
 telemetry:
-  dataStores:
-    tempo:
-      type: tempo
-      tempo:
-        endpoint: tempo:9095
-        tls:
-          insecure: true
-
   exporters:
     collector:
       serviceName: tracetest
@@ -38,5 +30,4 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: tempo
     exporter: collector
