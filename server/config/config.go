@@ -77,7 +77,8 @@ var configOptions options
 
 func configureConfigFile(vp *viper.Viper) {
 	vp.SetConfigName("tracetest")
-	vp.SetConfigType("yaml")
+	// intentionally removed this line, because it allows to have config files without extensions
+	// vp.SetConfigType("yaml")
 	vp.AddConfigPath("/etc/tracetest")
 	vp.AddConfigPath("$HOME/.tracetest")
 	vp.AddConfigPath(".")
@@ -85,7 +86,7 @@ func configureConfigFile(vp *viper.Viper) {
 
 var ErrConfigFileNotFound = errors.New("config file not found")
 
-func readConfigFile(vp *viper.Viper) error {
+func loadConfig(vp *viper.Viper, logger logger) error {
 	if confFile := vp.GetString("config"); confFile != "" {
 		// if --config is passed, and the file does not exists
 		// it will trigger a "no such file or directory" error
@@ -95,6 +96,9 @@ func readConfigFile(vp *viper.Viper) error {
 	}
 
 	err := vp.ReadInConfig()
+	if path := vp.ConfigFileUsed(); path != "" {
+		logger.Println("Config file used: ", path)
+	}
 	if err == nil {
 		return nil
 	}
@@ -128,7 +132,7 @@ func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 
 	configOptions.registerDefaults(vp)
 
-	err := readConfigFile(vp)
+	err := loadConfig(vp, logger)
 	if err != nil {
 		return nil, err
 	}

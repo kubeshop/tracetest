@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -21,7 +22,13 @@ func newLogger() *logger {
 }
 
 func (l *logger) Println(in ...any) {
-	l.messages = append(l.messages, fmt.Sprintf("%s", in...))
+	str := fmt.Sprint(in...)
+
+	// ignore config file messages
+	if strings.HasPrefix(str, "Config file used:") {
+		return
+	}
+	l.messages = append(l.messages, str)
 }
 
 func TestDeprecatedOptions(t *testing.T) {
