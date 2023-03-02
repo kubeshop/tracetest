@@ -19,13 +19,6 @@ demo:
 experimentalFeatures: []
 
 telemetry:
-  dataStores:
-    signalfx:
-      type: signalfx
-      signalfx:
-        token: <YOUR_TOKEN> # UPDATE THIS
-        realm: us1 # UPDATE THIS IF NEEDED
-
   exporters:
     collector:
       serviceName: tracetest
@@ -37,5 +30,4 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: signalfx
     exporter: collector
