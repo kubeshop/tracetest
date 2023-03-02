@@ -1,10 +1,8 @@
 VERSION ?= "dev"
 TRACETEST_ENV ?= "dev"
-POKE_API?= "http://demo-api:8081"
 GO_LDFLAGS := $(shell echo \
 		-X "'github.com/kubeshop/tracetest/server/app.Version=$(VERSION)'" \
 		-X "'github.com/kubeshop/tracetest/server/app.Env=$(TRACETEST_ENV)'" \
-		-X "'github.com/kubeshop/tracetest/server/app.PokeAPI=$(POKE_API)'" \
 		-X "'github.com/kubeshop/tracetest/server/analytics.SecretKey=$(ANALYTICS_BE_KEY)'" \
 		-X "'github.com/kubeshop/tracetest/server/analytics.FrontendKey=$(ANALYTICS_FE_KEY)'" \
 	| sed 's/ / /g')
@@ -27,7 +25,7 @@ vet: ## run vet tool to analyze the code for suspicious, abnormal, or useless co
 	go vet -structtag=false ./...
 
 run: ## run server locally
-	go run -ldflags="$(GO_LDFLAGS)" main.go
+	go run -ldflags="$(GO_LDFLAGS)" main.go serve
 
 PROTOC_VER=0.3.1
 UNAME_P := $(shell uname -p)
