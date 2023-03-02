@@ -19,7 +19,7 @@ const PollingForm = () => {
             name="maxWaitTimeForTrace"
             rules={[{required: true, message: 'Max wait time for trace is required'}]}
           >
-            <Input placeholder="Enter a time value" />
+            <Input placeholder="10s" />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -28,7 +28,7 @@ const PollingForm = () => {
             name="retryDelay"
             rules={[{required: true, message: 'Retry delay is required'}]}
           >
-            <Input placeholder="Enter a time value" />
+            <Input placeholder="500ms" />
           </Form.Item>
         </Col>
       </Row>
