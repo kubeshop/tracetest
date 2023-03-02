@@ -12,6 +12,7 @@ jobs:
           token: '${{ secrets.GITHUB_TOKEN }}'
           # Ignore the job we're running on lest we create an infinite loop
           ignored_checks: 'wait-for-green'
+          check_interval: 20
       - name: Fail if checks have failed
         if: steps.wait-for-green.outputs.success != 'true'
         run: echo "Status checks failed with status ${{ steps.wait-for-green.outputs.success }}!" && exit 1
