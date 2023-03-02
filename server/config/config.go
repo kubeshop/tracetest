@@ -100,7 +100,7 @@ func readConfigFile(vp *viper.Viper) error {
 	}
 
 	_, fileNotFound := err.(viper.ConfigFileNotFoundError)
-	if fileNotFound || vp.GetString("config") == "" {
+	if fileNotFound {
 		// config file is optional, can rely on defaults
 		return nil
 	}
