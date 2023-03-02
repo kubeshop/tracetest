@@ -1,4 +1,11 @@
-postgresConnString: "host=postgres user=postgres password=postgres port=5432 sslmode=disable"
+---
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 poolingConfig:
   maxWaitTimeForTrace: 10s
@@ -8,9 +15,6 @@ googleAnalytics:
   enabled: true
 
 telemetry:
-  dataStores:
-    otlp:
-      type: otlp
   exporters:
     collector:
       serviceName: tracetest
@@ -22,6 +26,4 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: otlp
     exporter: collector
-    applicationExporter: collector
