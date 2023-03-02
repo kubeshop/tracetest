@@ -1,0 +1,73 @@
+{
+  "StartAt": "RegisterIncident",
+  "Comment": "Developing with AWS Step Functions Demo",
+  "States": {
+    "RegisterIncident": {
+      "Type": "Task",
+      "Comment": "Register the plagiarism incident in the system and begin workflow execution.",
+      "Resource": "${RegisterIncidentFunctionArn}",
+      "Next": "ScheduleExam"
+    },
+    "ScheduleExam": {
+      "Type": "Task",
+      "Comment": "Set the next exam deadline for the student to complete the exam.",
+      "Resource": "${ScheduleExamFunctionArn}",
+      "Next": "SendNotification",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "StudentExceededAllowableExamRetries"
+          ],
+          "ResultPath": "$.Error",
+          "Next": "TakeAdministrativeAction"
+        }
+      ]
+    },
+    "SendNotification": {
+      "Type": "Task",
+      "Comment": "Send email confirming exam details and exam deadline. Wait for callback.",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters":{
+        "FunctionName":"${SendExamNotificationFunctionName}",
+        "Payload":{
+          "input.$":"$",
+          "TaskToken.$":"$$.Task.Token"
+        }
+      },
+      "Next": "HasStudentPassedExam"
+    },
+    "HasStudentPassedExam": {
+      "Type": "Choice",
+      "Comment": "If the student has a score less than 67, they need to reschedule",
+      "Choices": [
+        {
+          "Variable": "$.Exams[0].Result",
+          "NumericEquals": 0,
+          "Next": "ResolveIncident"
+        },
+        {
+          "Variable": "$.Exams[0].Result",
+          "NumericEquals": 1,
+          "Next": "ScheduleExam"
+        },
+        {
+          "Variable": "$.Exams[0].Result",
+          "NumericEquals": 2,
+          "Next": "TakeAdministrativeAction"
+        }
+      ]
+    },
+    "TakeAdministrativeAction": {
+      "Type": "Task",
+      "Resource": "${TakeAdministrativeActionFunctionArn}",
+      "Comment": "Take administrative action if student does not sit exam or fails all three attempts.",
+      "End": true
+    },
+    "ResolveIncident": {
+      "Type": "Task",
+      "Comment": "Resolves the incident for the student.",
+      "End": true,
+      "Resource": "${ResolveIncidentFunctionArn}"
+    }
+  }
+}
