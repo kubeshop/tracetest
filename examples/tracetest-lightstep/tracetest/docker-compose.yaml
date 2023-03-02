@@ -12,6 +12,10 @@ services:
       - type: bind
         source: ./tracetest/tracetest.config.yaml
         target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest/tracetest-provision.yaml
+        target: /app/provision.yaml
+    command: --provisioning-file /app/provision.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s

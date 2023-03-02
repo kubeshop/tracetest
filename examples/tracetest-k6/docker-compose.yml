@@ -7,8 +7,12 @@ services:
       - type: bind
         source: ./tracetest-config.yaml
         target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest-provision.yaml
+        target: /app/provision.yaml
     ports:
       - 11633:11633
+    command: --provisioning-file /app/provision.yaml
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
