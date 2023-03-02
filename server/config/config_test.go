@@ -77,6 +77,9 @@ func TestFlags(t *testing.T) {
 	t.Run("ConfigFileDefault", func(t *testing.T) {
 		t.Parallel()
 
+		// These tests are not great, since they rely on file writing and removing.
+		// Becase of this, the tests cannot be run in parallel because they might interfer with each other.
+
 		t.Run("OK", func(t *testing.T) {
 			// copy an example config file to the default location
 			err := copyFile("./testdata/basic.yaml", "./tracetest.yaml")
