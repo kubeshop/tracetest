@@ -5,7 +5,13 @@ services:
     image: kubeshop/tracetest:latest
     platform: linux/amd64
     volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
+      - type: bind
+        source: ./tracetest/tracetest.config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: tracetest/tracetest-provision.yaml
+        target: /app/provision.yaml
+    command: --provisioning-file /app/provision.yaml
     ports:
       - 11633:11633
     depends_on:

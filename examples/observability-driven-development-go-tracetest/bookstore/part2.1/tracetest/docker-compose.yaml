@@ -61,7 +61,7 @@ services:
             interval: 1s
             retries: 60
         image: kubeshop/tracetest:latest
-    platform: linux/amd64
+        platform: linux/amd64
         networks:
             default: null
         ports:
@@ -73,6 +73,10 @@ services:
             - type: bind
               source: tracetest/tracetest.yaml
               target: /app/tracetest.yaml
+            - type: bind
+              source: tracetest/tracetest-provision.yaml
+              target: /app/provision.yaml
+        command: --provisioning-file /app/provision.yaml
 networks:
     default:
         name: _default
