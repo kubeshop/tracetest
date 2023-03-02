@@ -8,14 +8,16 @@ import (
 )
 
 type portLinter struct {
+	dataStoreName string
 	endpoints     []string
 	expectedPorts []string
 }
 
 var _ TestStep = &portLinter{}
 
-func PortLinter(expectedPorts []string, endpoints ...string) TestStep {
+func PortLinter(dataStoreName string, expectedPorts []string, endpoints ...string) TestStep {
 	return &portLinter{
+		dataStoreName: dataStoreName,
 		endpoints:     endpoints,
 		expectedPorts: expectedPorts,
 	}
@@ -26,9 +28,9 @@ func (s *portLinter) TestConnection(ctx context.Context) ConnectionTestStepResul
 		port := parsePort(endpoint)
 
 		if !sliceContains(s.expectedPorts, port) {
-			suggestedPorts := strings.Join(s.expectedPorts, ", ")
+			suggestedPorts := formatAvailablePortsMessage(s.expectedPorts)
 			return ConnectionTestStepResult{
-				OperationDescription: fmt.Sprintf(`port "%s" is not used frequently for connecting to this data store. Consider using %s instead if you experience problems connecting to it`, port, suggestedPorts),
+				OperationDescription: fmt.Sprintf(`For %s, port "%s" is not the default port for accessing traces programmatically. Typically, %s uses port %s. If you continue experiencing issues, you may want to verify the correct port to specify.`, s.dataStoreName, port, s.dataStoreName, suggestedPorts),
 				Status:               StatusWarning,
 			}
 		}
@@ -48,6 +50,26 @@ func sliceContains(slice []string, value string) bool {
 	}
 
 	return false
+}
+
+// Generates the ports separated by commas and "or"
+// ["123"] => 123
+// ["123", "345"] => 123 or 345
+// ["123", "345", "567"] => 123, 345, or 567
+func formatAvailablePortsMessage(ports []string) string {
+	if len(ports) == 1 {
+		return ports[0]
+	}
+
+	allPortsExceptLast := ports[0 : len(ports)-1]
+	portsSeparatedByComma := strings.Join(allPortsExceptLast, ", ")
+	lastPort := ports[len(ports)-1]
+
+	if len(ports) == 2 {
+		return fmt.Sprintf("%s or %s", portsSeparatedByComma, lastPort)
+	}
+
+	return fmt.Sprintf("%s, or %s", portsSeparatedByComma, lastPort)
 }
 
 var extractPortRegex = regexp.MustCompile("([0-9]+).*")

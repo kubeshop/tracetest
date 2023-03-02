@@ -128,12 +128,12 @@ func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
 
 	configOptions.registerDefaults(vp)
 
-	warnAboutDeprecatedFields(vp, logger)
-
 	err := readConfigFile(vp)
 	if err != nil {
 		return nil, err
 	}
+
+	warnAboutDeprecatedFields(vp, logger)
 
 	oldConfig := oldConfig{}
 	err = vp.Unmarshal(&oldConfig)
@@ -188,11 +188,6 @@ func (c *Config) AnalyticsEnabled() bool {
 }
 
 func warnAboutDeprecatedFields(vp *viper.Viper, logger logger) error {
-	err := readConfigFile(vp)
-	if err != nil {
-		return err
-	}
-
 	for _, opt := range configOptions {
 		if !opt.deprecated {
 			continue
