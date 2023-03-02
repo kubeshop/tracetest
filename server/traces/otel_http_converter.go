@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
@@ -23,10 +24,17 @@ type httpScopeSpans struct {
 
 type httpSpan struct {
 	v1.Span
-	SpanId       string               `json:"spanId"`
-	ParentSpanId string               `json:"parentSpanId"`
-	Kind         string               `json:"kind"`
-	Attributes   []*httpSpanAttribute `json:"attributes"`
+	SpanId            string               `json:"spanId"`
+	ParentSpanId      string               `json:"parentSpanId"`
+	Kind              string               `json:"kind"`
+	StartTimeUnixNano string               `json:"startTimeUnixNano"`
+	EndTimeUnixNano   string               `json:"endTimeUnixNano"`
+	Attributes        []*httpSpanAttribute `json:"attributes"`
+	Status            *httpSpanStatus      `json:"status"`
+}
+
+type httpSpanStatus struct {
+	Code string `json:"code"`
 }
 
 type httpSpanAttribute struct {
@@ -61,12 +69,14 @@ func convertHttpOtelSpanIntoSpan(span *httpSpan) *model.Span {
 
 	var startTime, endTime time.Time
 
-	if span.GetStartTimeUnixNano() != 0 {
-		startTime = time.Unix(0, int64(span.GetStartTimeUnixNano()))
+	if span.StartTimeUnixNano != "" {
+		startTimeNs, _ := strconv.ParseInt(span.StartTimeUnixNano, 10, 64)
+		startTime = time.Unix(0, startTimeNs)
 	}
 
-	if span.GetEndTimeUnixNano() != 0 {
-		endTime = time.Unix(0, int64(span.GetEndTimeUnixNano()))
+	if span.EndTimeUnixNano != "" {
+		endTimeNs, _ := strconv.ParseInt(span.EndTimeUnixNano, 10, 64)
+		endTime = time.Unix(0, endTimeNs)
 	}
 
 	spanID := createSpanID([]byte(span.SpanId))
