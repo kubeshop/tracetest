@@ -39,7 +39,10 @@ func init() {
 
 	cobra.OnInitialize(func() {
 		var err error
-		cfg, err = config.New(rootCmd.PersistentFlags(), config.WithLogger(log.Default()))
+		cfg, err = config.New(
+			config.WithFlagSet(rootCmd.PersistentFlags()),
+			config.WithLogger(log.Default()),
+		)
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)

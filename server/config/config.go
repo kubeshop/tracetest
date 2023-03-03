@@ -119,15 +119,21 @@ func SetupFlags(flags *pflag.FlagSet) {
 	configOptions.registerFlags(flags)
 }
 
-type configOption func(*Config)
+type Option func(*Config)
 
-func WithLogger(l logger) configOption {
-	return func(c *Config) {
-		c.logger = l
+func WithFlagSet(flags *pflag.FlagSet) Option {
+	return func(cfg *Config) {
+		cfg.vp.BindPFlags(flags)
 	}
 }
 
-func New(flags *pflag.FlagSet, confOpts ...configOption) (*Config, error) {
+func WithLogger(l logger) Option {
+	return func(cfg *Config) {
+		cfg.logger = l
+	}
+}
+
+func New(confOpts ...Option) (*Config, error) {
 	cfg := Config{
 		vp: viper.New(),
 	}
@@ -143,10 +149,6 @@ func New(flags *pflag.FlagSet, confOpts ...configOption) (*Config, error) {
 	cfg.vp.AutomaticEnv()
 
 	configureConfigFile(cfg.vp)
-
-	if flags != nil {
-		cfg.vp.BindPFlags(flags)
-	}
 
 	configOptions.registerDefaults(cfg.vp)
 

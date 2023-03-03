@@ -11,18 +11,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func configWithFlagsE(t *testing.T, inputFlags []string) (*config.Config, error) {
+func configWithFlagsE(t *testing.T, inputFlags []string, opts ...config.Option) (*config.Config, error) {
 	flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
 	config.SetupFlags(flags)
 
 	err := flags.Parse(inputFlags)
 	require.NoError(t, err)
 
-	return config.New(flags)
+	return config.New(append(opts, config.WithFlagSet(flags))...)
 }
 
-func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
-	cfg, err := configWithFlagsE(t, inputFlags)
+func configWithFlags(t *testing.T, inputFlags []string, opts ...config.Option) *config.Config {
+	cfg, err := configWithFlagsE(t, inputFlags, opts...)
 	require.NoError(t, err)
 
 	return cfg
@@ -37,7 +37,7 @@ func configWithEnv(t *testing.T, env map[string]string) *config.Config {
 		os.Setenv(k, v)
 	}
 
-	cfg, err := config.New(nil)
+	cfg, err := config.New()
 	require.NoError(t, err)
 
 	return cfg
@@ -54,7 +54,7 @@ func TestFlags(t *testing.T) {
 		err := flags.Parse([]string{"--config", "notexists.yaml"})
 		require.NoError(t, err)
 
-		cfg, err := config.New(flags)
+		cfg, err := config.New(config.WithFlagSet(flags))
 		assert.Nil(t, cfg)
 		assert.ErrorIs(t, err, os.ErrNotExist)
 	})
@@ -86,7 +86,7 @@ func TestFlags(t *testing.T) {
 
 			require.NoError(t, err)
 
-			cfg, err := config.New(nil)
+			cfg, err := config.New()
 			require.NoError(t, err)
 
 			// this one assertion is enough to guarantee we're not using the defaults
@@ -100,7 +100,7 @@ func TestFlags(t *testing.T) {
 
 			require.NoError(t, err)
 
-			cfg, err := config.New(nil)
+			cfg, err := config.New()
 			require.NoError(t, err)
 
 			// the config file would change this value to 9999, but we want to make sure
