@@ -65,21 +65,21 @@ func (updateNotFoundOperation) assertResponse(t *testing.T, resp *http.Response,
 	require.Equal(t, 404, resp.StatusCode)
 }
 
-const OperationUpdateInteralError Operation = "UpdateInteralError"
+const OperationUpdateInternalError Operation = "UpdateInternalError"
 
-type updateInteralErrorOperation struct{}
+type updateInternalErrorOperation struct{}
 
-func (op updateInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op updateInternalErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op updateInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+func (op updateInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildUpdateRequest(rt, ct, testServer, t)
 }
 
-func (updateInteralErrorOperation) name() Operation {
-	return OperationUpdateInteralError
+func (updateInternalErrorOperation) name() Operation {
+	return OperationUpdateInternalError
 }
 
-func (updateInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func (updateInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "updating")
 }

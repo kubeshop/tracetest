@@ -70,21 +70,21 @@ func (deleteNotFoundOperation) assertResponse(t *testing.T, resp *http.Response,
 	require.Equal(t, 404, resp.StatusCode)
 }
 
-const OperationDeleteInteralError Operation = "DeleteInteralError"
+const OperationDeleteInternalError Operation = "DeleteInternalError"
 
-type deleteInteralErrorOperation struct{}
+type deleteInternalErrorOperation struct{}
 
-func (op deleteInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op deleteInternalErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op deleteInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+func (op deleteInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildDeleteRequest(rt, ct, testServer, t)
 }
 
-func (deleteInteralErrorOperation) name() Operation {
-	return OperationDeleteInteralError
+func (deleteInternalErrorOperation) name() Operation {
+	return OperationDeleteInternalError
 }
 
-func (deleteInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func (deleteInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "deleting")
 }

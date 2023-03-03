@@ -70,21 +70,21 @@ func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct
 	require.Equal(t, 404, resp.StatusCode)
 }
 
-const OperationGetInteralError Operation = "GetInteralError"
+const OperationGetInternalError Operation = "GetInternalError"
 
-type getInteralErrorOperation struct{}
+type getInternalErrorOperation struct{}
 
-func (op getInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op getInternalErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op getInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+func (op getInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)
 }
 
-func (getInteralErrorOperation) name() Operation {
-	return OperationGetInteralError
+func (getInternalErrorOperation) name() Operation {
+	return OperationGetInternalError
 }
 
-func (getInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func (getInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "getting")
 }

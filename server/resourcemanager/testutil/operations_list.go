@@ -84,14 +84,14 @@ func (listSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct
 	require.JSONEq(t, expected, jsonBody)
 }
 
-const OperationListInteralError Operation = "ListInteralError"
+const OperationListInternalError Operation = "ListInternalError"
 
-type listInteralErrorOperation struct{}
+type listInternalErrorOperation struct{}
 
-func (op listInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op listInternalErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op listInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+func (op listInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildListRequest(
 		rt.ResourceType,
 		ct,
@@ -100,10 +100,10 @@ func (op listInteralErrorOperation) buildRequest(t *testing.T, testServer *httpt
 	)
 }
 
-func (listInteralErrorOperation) name() Operation {
-	return OperationListInteralError
+func (listInternalErrorOperation) name() Operation {
+	return OperationListInternalError
 }
 
-func (listInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func (listInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "listing")
 }

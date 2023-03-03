@@ -29,11 +29,11 @@ var (
 	}
 
 	errorOperations = []operationTester{
-		createInteralErrorOperation{},
-		updateInteralErrorOperation{},
-		getInteralErrorOperation{},
-		deleteInteralErrorOperation{},
-		listInteralErrorOperation{},
+		createInternalErrorOperation{},
+		updateInternalErrorOperation{},
+		getInternalErrorOperation{},
+		deleteInternalErrorOperation{},
+		listInternalErrorOperation{},
 	}
 )
 

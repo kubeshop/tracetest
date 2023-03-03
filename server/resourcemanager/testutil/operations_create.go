@@ -82,14 +82,14 @@ func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, 
 	require.JSONEq(t, expected, jsonBody)
 }
 
-const OperationCreateInteralError Operation = "CreateInteralError"
+const OperationCreateInternalError Operation = "CreateInternalError"
 
-type createInteralErrorOperation struct{}
+type createInternalErrorOperation struct{}
 
-func (op createInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op createInternalErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op createInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
+func (op createInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(
 		rt.SampleJSON,
 		rt.ResourceType,
@@ -99,10 +99,10 @@ func (op createInteralErrorOperation) buildRequest(t *testing.T, testServer *htt
 	)
 }
 
-func (createInteralErrorOperation) name() Operation {
-	return OperationCreateInteralError
+func (createInternalErrorOperation) name() Operation {
+	return OperationCreateInternalError
 }
 
-func (createInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
+func (createInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "creating")
 }
