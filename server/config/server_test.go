@@ -9,7 +9,7 @@ import (
 
 func TestServerConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, _ := config.New(nil)
+		cfg, _ := config.New()
 
 		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
 

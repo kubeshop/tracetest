@@ -20,7 +20,7 @@ func WithHttpPort(port int) TestingAppOption {
 }
 
 func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
-	cfg, _ := config.New(nil)
+	cfg, _ := config.New()
 	for _, option := range options {
 		option(cfg)
 	}

@@ -10,7 +10,7 @@ import (
 
 func TestDemoConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, err := config.New(nil)
+		cfg, err := config.New()
 		require.NoError(t, err)
 
 		defaultEndponts := map[string]string{

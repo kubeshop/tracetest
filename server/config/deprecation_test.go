@@ -6,9 +6,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type logger struct {
@@ -49,21 +47,11 @@ func TestDeprecatedOptions(t *testing.T) {
 		},
 	}
 
-	configFromFlagsWithLogger := func(logger *logger, inputFlags []string) *config.Config {
-		flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
-		config.SetupFlags(flags)
-		err := flags.Parse(inputFlags)
-		require.NoError(t, err)
-		cfg, err := config.New(flags, config.WithLogger(logger))
-		require.NoError(t, err)
-		return cfg
-	}
-
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			testCase := testCase
 			logger := newLogger()
-			configFromFlagsWithLogger(logger, testCase.flags)
+			configWithFlags(t, testCase.flags, config.WithLogger(logger))
 			assert.Equal(t, testCase.expectedMessages, logger.messages)
 		})
 	}

@@ -126,7 +126,7 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New(nil)))
+	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New()))
 	reg := trigger.NewRegsitry(tr, tr)
 
 	me := new(mockTriggerer)
@@ -141,7 +141,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New(nil)))
+	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New()))
 	testDB := testdb.MockRepository{}
 
 	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)

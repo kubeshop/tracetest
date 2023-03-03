@@ -532,7 +532,7 @@ func getDataStoreRepositoryMock(t *testing.T) model.Repository {
 func getTracerMock(t *testing.T) trace.Tracer {
 	t.Helper()
 
-	tracer, err := tracing.NewTracer(context.TODO(), config.Must(config.New(nil)))
+	tracer, err := tracing.NewTracer(context.TODO(), config.Must(config.New()))
 	require.NoError(t, err)
 
 	return tracer
