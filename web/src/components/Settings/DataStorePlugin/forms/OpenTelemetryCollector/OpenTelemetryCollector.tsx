@@ -1,7 +1,7 @@
 import {Form, message} from 'antd';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-import {TCollectorDataStores, TDraftDataStore} from 'types/Config.types';
+import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
 import {CollectorConfigMap} from 'constants/CollectorConfig.constants';
 import * as S from '../../DataStorePluginForm.styled';
 import * as OtelCollectorStyles from './OpenTelemetryCollector.styled';

@@ -1,4 +1,4 @@
-import {TConnectionResult} from 'types/Config.types';
+import {TConnectionResult} from 'types/DataStore.types';
 import TestConnectionStep from './TestConnectionStep';
 import * as S from './TestConnectionNotification.styled';
 

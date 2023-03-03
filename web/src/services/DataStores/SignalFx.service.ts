@@ -1,4 +1,4 @@
-import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
+import {SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
 
 const SignalFxService = (): TDataStoreService => ({
   getRequest({dataStore: {signalFx: {realm = '', token = ''} = {}} = {}}) {

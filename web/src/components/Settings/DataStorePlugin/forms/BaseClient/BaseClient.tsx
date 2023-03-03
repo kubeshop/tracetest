@@ -1,5 +1,5 @@
 import {Col, Form, Radio, Row} from 'antd';
-import {SupportedClientTypes, TDraftDataStore} from 'types/Config.types';
+import {SupportedClientTypes, TDraftDataStore} from 'types/DataStore.types';
 import GrpcClient from '../GrpcClient';
 import HttpClient from '../HttpClient';
 

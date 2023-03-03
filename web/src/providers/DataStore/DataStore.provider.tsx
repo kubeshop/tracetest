@@ -10,7 +10,7 @@ import {
   useDeleteDataStoreMutation,
 } from 'redux/apis/TraceTest.api';
 import DataStoreService from 'services/DataStore.service';
-import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';

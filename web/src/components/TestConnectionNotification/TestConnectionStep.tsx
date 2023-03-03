@@ -14,8 +14,6 @@ const iconMap = {
 };
 
 const TestConnectionStep = ({step: {message, error: err, status}, title}: IProps) => {
-
-
   const icon = iconMap[status];
 
   return message || err ? (

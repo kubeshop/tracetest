@@ -1,4 +1,4 @@
-import {IGRPCClientSettings, TRawGRPCClientSettings} from 'types/Config.types';
+import {IGRPCClientSettings, TRawGRPCClientSettings} from 'types/DataStore.types';
 
 const GrpcClientService = () => ({
   async getRequest(values: IGRPCClientSettings): Promise<TRawGRPCClientSettings> {

@@ -1,5 +1,5 @@
 import {useTheme} from 'styled-components';
-import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStores} from 'types/DataStore.types';
 import Elastic from './Icons/Elastic';
 import Jaeger from './Icons/Jaeger';
 import Lightstep from './Icons/Lightstep';

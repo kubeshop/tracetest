@@ -1,7 +1,7 @@
 import {Popover} from 'antd';
 import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
-import {ConfigMode, SupportedDataStores} from 'types/Config.types';
+import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
 

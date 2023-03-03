@@ -22,6 +22,9 @@ export const ENVIRONMENTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concept
 
 export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 
+export const POKESHOP_GITHUB = 'https://github.com/kubeshop/pokeshop';
+export const OTEL_DEMO_GITHUB = 'https://github.com/open-telemetry/opentelemetry-demo';
+
 export enum HTTP_METHOD {
   GET = 'GET',
   PUT = 'PUT',

@@ -1,6 +1,6 @@
 import {ReadOutlined} from '@ant-design/icons';
 import {SupportedDataStoresToDocsLink, SupportedDataStoresToName} from 'constants/DataStore.constants';
-import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStores} from 'types/DataStore.types';
 import * as S from './DataStoreDocsBanner.styled';
 
 interface IProps {

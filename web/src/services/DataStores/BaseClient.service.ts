@@ -8,7 +8,7 @@ import {
   TRawBaseClientSettings,
   TRawGRPCClientSettings,
   TRawHttpClientSettings,
-} from 'types/Config.types';
+} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
 import HttpClientService from './HttpClient.service';
 import GrpcClientService from './GrpcClient.service';
