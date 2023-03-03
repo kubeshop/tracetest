@@ -2,11 +2,7 @@ package config
 
 import "os"
 
-type googleAnalytics struct {
-	Enabled bool `yaml:",omitempty" mapstructure:"enabled"`
-}
-
-func (c *Config) Analyticsnabled() bool {
+func (c *Config) AnalyticsEnabled() bool {
 	if os.Getenv("TRACETEST_DEV") != "" {
 		return false
 	}
