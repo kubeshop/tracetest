@@ -1,10 +1,8 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 	"sync"
 
@@ -13,124 +11,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-type (
-	googleAnalytics struct {
-		Enabled bool `yaml:",omitempty" mapstructure:"enabled"`
-	}
-
-	oldConfig struct {
-		Server    serverConfig    `yaml:",omitempty" mapstructure:"server"`
-		GA        googleAnalytics `yaml:"googleAnalytics,omitempty" mapstructure:"googleAnalytics"`
-		Telemetry telemetry       `yaml:",omitempty" mapstructure:"telemetry"`
-		Demo      demo            `yaml:",omitempty" mapstructure:"demo"`
-	}
-)
-
-type Config struct {
-	config *oldConfig
-	vp     *viper.Viper
-	mu     sync.Mutex
-	logger logger
-}
-
-type logger interface {
-	Println(...any)
-}
-
-type option struct {
-	key                string
-	defaultValue       any
-	description        string
-	validate           func(*Config) error
-	deprecated         bool
-	deprecationMessage string
-}
-
-type options []option
-
-func (opts options) registerDefaults(vp *viper.Viper) {
-	for _, opt := range opts {
-		vp.SetDefault(opt.key, opt.defaultValue)
-	}
-}
-
-func (opts options) registerFlags(flags *pflag.FlagSet) {
-	for _, opt := range opts {
-		switch defVal := opt.defaultValue.(type) {
-		case int:
-			flags.Int(opt.key, defVal, opt.description)
-		case string:
-			flags.String(opt.key, defVal, opt.description)
-		case []string:
-			flags.StringSlice(opt.key, defVal, opt.description)
-		case bool:
-			flags.Bool(opt.key, defVal, opt.description)
-		default:
-			panic(fmt.Errorf(
-				"unexpected type %T in default value for config option %s",
-				defVal, opt.key,
-			))
-		}
-
-	}
-}
-
-var configOptions options
-
-func configureConfigFile(vp *viper.Viper) {
-	vp.SetConfigName("tracetest")
-	// intentionally removed this line, because it allows to have config files without extensions
-	// vp.SetConfigType("yaml")
-	vp.AddConfigPath("/etc/tracetest")
-	vp.AddConfigPath("$HOME/.tracetest")
-	vp.AddConfigPath(".")
-}
-
-var ErrConfigFileNotFound = errors.New("config file not found")
-
-func loadConfig(vp *viper.Viper, logger logger) error {
-	if confFile := vp.GetString("config"); confFile != "" {
-		// if --config is passed, and the file does not exists
-		// it will trigger a "no such file or directory" error
-		// which is NOT an instance of `viper.ConfigFileNotFoundError` checked later in this func
-		// so this func WILL return an error
-		vp.SetConfigFile(confFile)
-	}
-
-	err := vp.ReadInConfig()
-	if path := vp.ConfigFileUsed(); path != "" {
-		logger.Println("Config file used: ", path)
-	}
-	if err == nil {
-		return nil
-	}
-
-	_, fileNotFound := err.(viper.ConfigFileNotFoundError)
-	if fileNotFound {
-		// config file is optional, can rely on defaults
-		return nil
-	}
-
-	return fmt.Errorf("cannot read config file: %w", err)
-}
-
 func SetupFlags(flags *pflag.FlagSet) {
 	flags.StringP("config", "c", "", "path to a config file")
 	configOptions.registerFlags(flags)
-}
-
-type Option func(*Config)
-
-func WithFlagSet(flags *pflag.FlagSet) Option {
-	return func(cfg *Config) {
-		cfg.vp.BindPFlags(flags)
-	}
-}
-
-func WithLogger(l logger) Option {
-	return func(cfg *Config) {
-		cfg.logger = l
-	}
 }
 
 func New(confOpts ...Option) (*Config, error) {
@@ -148,16 +31,16 @@ func New(confOpts ...Option) (*Config, error) {
 	cfg.vp.SetEnvPrefix("TRACETEST")
 	cfg.vp.AutomaticEnv()
 
-	configureConfigFile(cfg.vp)
+	cfg.configureConfigFile()
 
 	configOptions.registerDefaults(cfg.vp)
 
-	err := loadConfig(cfg.vp, cfg.logger)
+	err := cfg.loadConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	warnAboutDeprecatedFields(cfg.vp, cfg.logger)
+	cfg.warnAboutDeprecatedFields()
 
 	err = cfg.vp.Unmarshal(&cfg.config)
 	if err != nil {
@@ -171,18 +54,15 @@ func New(confOpts ...Option) (*Config, error) {
 	return &cfg, nil
 }
 
-func (c *Config) defaults() {
-	if c.logger == nil {
-		c.logger = log.Default()
-	}
+type logger interface {
+	Println(...any)
 }
 
-func Must(c *Config, err error) *Config {
-	if err != nil {
-		panic(err)
-	}
-
-	return c
+type Config struct {
+	config *oldConfig
+	vp     *viper.Viper
+	mu     sync.Mutex
+	logger logger
 }
 
 func (c *Config) Watch(updateFn func(c *Config)) {
@@ -200,24 +80,54 @@ func (c *Config) Set(key string, value any) {
 	c.vp.Set(key, value)
 }
 
-func (c *Config) AnalyticsEnabled() bool {
-	if os.Getenv("TRACETEST_DEV") != "" {
-		return false
+func (cfg *Config) loadConfig() error {
+	if confFile := cfg.vp.GetString("config"); confFile != "" {
+		// if --config is passed, and the file does not exists
+		// it will trigger a "no such file or directory" error
+		// which is NOT an instance of `viper.ConfigFileNotFoundError` checked later in this func
+		// so this func WILL return an error
+		cfg.vp.SetConfigFile(confFile)
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	err := cfg.vp.ReadInConfig()
+	if path := cfg.vp.ConfigFileUsed(); path != "" {
+		cfg.logger.Println("Config file used: ", path)
+	}
+	if err == nil {
+		return nil
+	}
 
-	return c.config.GA.Enabled
+	_, fileNotFound := err.(viper.ConfigFileNotFoundError)
+	if fileNotFound {
+		// config file is optional, can rely on defaults
+		return nil
+	}
+
+	return fmt.Errorf("cannot read config file: %w", err)
 }
 
-func warnAboutDeprecatedFields(vp *viper.Viper, logger logger) error {
+func (cfg *Config) configureConfigFile() {
+	cfg.vp.SetConfigName("tracetest")
+	// intentionally removed this line, because it allows to have config files without extensions
+	// cfg.vp.SetConfigType("yaml")
+	cfg.vp.AddConfigPath("/etc/tracetest")
+	cfg.vp.AddConfigPath("$HOME/.tracetest")
+	cfg.vp.AddConfigPath(".")
+}
+
+func (c *Config) defaults() {
+	if c.logger == nil {
+		c.logger = log.Default()
+	}
+}
+
+func (cfg *Config) warnAboutDeprecatedFields() error {
 	for _, opt := range configOptions {
 		if !opt.deprecated {
 			continue
 		}
 
-		optionValue := vp.Get(opt.key)
+		optionValue := cfg.vp.Get(opt.key)
 		if optionValue == nil || optionValue == opt.defaultValue {
 			continue
 		}
@@ -228,7 +138,7 @@ func warnAboutDeprecatedFields(vp *viper.Viper, logger logger) error {
 			msg += opt.deprecationMessage
 		}
 
-		logger.Println(msg)
+		cfg.logger.Println(msg)
 	}
 
 	return nil
