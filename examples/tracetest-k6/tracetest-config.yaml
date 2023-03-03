@@ -12,16 +12,3 @@ poolingConfig:
 
 googleAnalytics:
   enabled: true
-
-telemetry:
-  dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
-
-server:
-  telemetry:
-    dataStore: jaeger

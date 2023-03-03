@@ -1,0 +1,8 @@
+dataStore:
+  type: tempo
+  tempo:
+    type: grpc
+    grpc:
+      endpoint: tempo:9095
+      tls:
+        insecure: true

@@ -13,14 +13,17 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 The project is built with Docker Compose. It contains a `docker-compose.yaml` file with 25 services.
 
 ### 1. OpenTelemetry Demo
+
 The `docker-compose.yaml` file and `.env` file in the root directory are for the OpenTelemetry Demo.
 
 ### 2. Tracetest & New Relic
+
 At the bottom of the `docker-compose.yaml` file you'll see the Tracetest service. In the `./otelcollector/otelcol-config-extras.yml` you'll see the config for forwarding traces to both Tracetest and New Relic. The `./tracetest/tracetest.config.yaml` is for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory also contains an `e2e` directory with a `http-test.yaml` file which is a Tracetest test definition for running a test via the Tracetest CLI.
 
 ### Docker Compose Network
+
 All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `otelcol-config-extras.yml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
 
 ## OpenTelemetry Demo
@@ -60,7 +63,13 @@ The `TRACETEST_SERVICE_PORT` is configured in the `.env` file
     ports:
       - "${TRACETEST_SERVICE_PORT}:${TRACETEST_SERVICE_PORT}"
     volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
+      - type: bind
+        source: ./tracetest/tracetest.config.yaml
+        target: /app/config.yaml
+      - type: bind
+        source: ./tracetest/tracetest-provision.yaml
+        target: /app/provision.yaml
+    command: --provisioning-file /app/provision.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
@@ -89,11 +98,10 @@ The `TRACETEST_SERVICE_PORT` is configured in the `.env` file
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Tracetest requires a config file to be loaded via a volume. The volume is mapped from the root directory into the `tracetest` directory and the respective config file.
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to OTLP meaning the traces will be stored in Tracetest itself. The exporter is set to the OpenTelemetry Collector.
+The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the exporter. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
 # tracetest.config.yaml
-
 ---
 postgres:
   host: tt_postgres
@@ -122,10 +130,6 @@ googleAnalytics:
   enabled: true
 
 telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-
   exporters:
     collector:
       serviceName: tracetest
@@ -137,9 +141,17 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: otlp
     exporter: collector
     applicationExporter: collector
+```
+
+The `tracetest-provision.yaml` file contains the data store setup. The data store is set to OTLP meaning the traces will be stored in Tracetest itself.
+
+```yaml
+# tracetest-provision.yaml
+---
+dataStore:
+  type: otlp
 ```
 
 **How to send traces to Tracetest and New Relic?**
@@ -238,21 +250,23 @@ spec:
       url: http://otel-frontend:8084/api/products
       method: GET
       headers:
-      - key: Content-Type
-        value: application/json
+        - key: Content-Type
+          value: application/json
   specs:
-  - selector: span[tracetest.span.type="http" name="API HTTP GET" http.target="/api/products"
-      http.method="GET"]
-    assertions:
-    - attr:http.status_code   =   200
-    - attr:tracetest.span.duration  <  50ms
-  - selector: span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
-    assertions:
-    - attr:rpc.grpc.status_code = 0
-  - selector: span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts"
-      rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
-    assertions:
-    - attr:rpc.grpc.status_code = 0
+    - selector:
+        span[tracetest.span.type="http" name="API HTTP GET" http.target="/api/products"
+        http.method="GET"]
+      assertions:
+        - attr:http.status_code   =   200
+        - attr:tracetest.span.duration  <  50ms
+    - selector: span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
+      assertions:
+        - attr:rpc.grpc.status_code = 0
+    - selector:
+        span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts"
+        rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
+      assertions:
+        - attr:rpc.grpc.status_code = 0
 ```
 
 This file defines the a test the same way you would through the Web UI.

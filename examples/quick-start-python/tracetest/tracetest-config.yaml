@@ -1,0 +1,14 @@
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
+
+poolingConfig:
+  maxWaitTimeForTrace: 10s
+  retryDelay: 1s
+
+googleAnalytics:
+  enabled: true

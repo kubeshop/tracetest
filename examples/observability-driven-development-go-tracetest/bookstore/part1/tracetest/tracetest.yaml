@@ -6,9 +6,11 @@ demo:
         otelproductcatalog: otel-productcatalogservice:3550
         pokeshopgrpc: demo-api:8082
         pokeshophttp: http://demo-api:8081
+
 poolingconfig:
     maxwaittimefortrace: 2m
     retrydelay: 3s
+
 postgres:
   host: postgres
   user: postgres
@@ -16,36 +18,12 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
+
 server:
     telemetry:
-        applicationexporter: collector
-        datastore: jaeger
         exporter: collector
+
 telemetry:
-    datastores:
-        jaeger:
-            jaeger:
-                auth: null
-                balancername: ""
-                compression: ""
-                endpoint: jaeger:16685
-                headers: {}
-                keepalive: null
-                readbuffersize: 0
-                tls:
-                    insecure: true
-                    insecureskipverify: false
-                    servername: ""
-                    tlssetting:
-                        cafile: ""
-                        certfile: ""
-                        keyfile: ""
-                        maxversion: ""
-                        minversion: ""
-                        reloadinterval: 0s
-                waitforready: false
-                writebuffersize: 0
-            type: jaeger
     exporters:
         collector:
             exporter:

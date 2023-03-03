@@ -47,7 +47,7 @@ func (s *Server) Stop() {
 func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := s.db.DefaultDataStore(ctx)
 
-	if err != nil || ds.Type != "otlp" {
+	if err != nil || !ds.IsOTLPBasedProvider() {
 		fmt.Println("OTLP server is not enabled. Ignoring request")
 		return &pb.ExportTraceServiceResponse{}, nil
 	}

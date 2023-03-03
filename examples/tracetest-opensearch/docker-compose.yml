@@ -7,6 +7,10 @@ services:
       - type: bind
         source: ./tracetest-config.yaml
         target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest-provision.yaml
+        target: /app/provision.yaml
+    command: --provisioning-file /app/provision.yaml
     ports:
       - 11633:11633
     extra_hosts:
@@ -49,7 +53,8 @@ services:
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
     depends_on:
-      - data-prepper
+      data-prepper:
+        condition: service_healthy
 
   data-prepper:
     restart: unless-stopped
@@ -57,6 +62,11 @@ services:
     volumes:
       - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
       - ./opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
+    healthcheck:
+      test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/21890"]
+      interval: 1s
+      timeout: 30s
+      retries: 60
     depends_on:
       opensearch:
         condition: service_healthy

@@ -325,7 +325,7 @@ const sidebars = {
           id: "tools-and-integrations/testkube",
           label: "Testkube",
         },
-      ]
+      ],
     },
     {
       type: "category",
@@ -381,11 +381,11 @@ const sidebars = {
           id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
           label: "AWS Fargate and Terraform",
         },
-        // {
-        //   type: "doc",
-        //   id: "examples-tutorials/recipes/running-tracetest-with-datadog",
-        //   label: "OpenTelemetry Demo and Datadog",
-        // },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+          label: "OpenTelemetry Demo and Datadog",
+        },
       ],
     },
     {
