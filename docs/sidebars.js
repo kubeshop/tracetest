@@ -383,6 +383,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
+          label: "AWS Step Functions, AWS X-Ray and Terraform",
+        },
+        {
+          type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-datadog",
           label: "OpenTelemetry Demo and Datadog",
         },
