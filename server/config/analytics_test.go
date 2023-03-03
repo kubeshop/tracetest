@@ -1,10 +1,13 @@
 package config_test
 
 import (
+	"context"
 	"os"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/config/configresource"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,25 +16,46 @@ func TestAnalyticsEnabledConfig(t *testing.T) {
 		// make sure this env is empty
 		os.Setenv("TRACETEST_DEV", "")
 	}
+
+	db := testmock.MustGetRawTestingDatabase()
+
+	setup := func(existingConfigs ...configresource.Config) config.Option {
+		repo := configresource.Repository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+		for _, ec := range existingConfigs {
+			_, err := repo.Create(context.TODO(), ec)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		return config.WithConfigResource(repo)
+	}
 	t.Run("DefaultValues", func(t *testing.T) {
 		cleanEnv()
-
-		cfg, _ := config.New()
-
-		assert.False(t, cfg.AnalyticsEnabled())
-	})
-
-	t.Run("File", func(t *testing.T) {
-		cleanEnv()
-
-		cfg := configFromFile(t, "./testdata/analytics.yaml")
+		opt := setup()
+		cfg, _ := config.New(opt)
 
 		assert.True(t, cfg.AnalyticsEnabled())
 	})
 
-	t.Run("EnvOverride", func(t *testing.T) {
+	t.Run("FromRepoi", func(t *testing.T) {
+		cleanEnv()
+		opt := setup(configresource.Config{
+			AnalyticsEnabled: false,
+		})
 
-		cfg := configFromFile(t, "./testdata/analytics.yaml")
+		cfg := configFromFile(t, "./testdata/analytics.yaml", opt)
+
+		assert.False(t, cfg.AnalyticsEnabled())
+	})
+
+	t.Run("EnvOverride", func(t *testing.T) {
+		opt := setup(configresource.Config{
+			AnalyticsEnabled: true,
+		})
+		cfg := configFromFile(t, "./testdata/analytics.yaml", opt)
 
 		os.Setenv("TRACETEST_DEV", "yes")
 		assert.False(t, cfg.AnalyticsEnabled())

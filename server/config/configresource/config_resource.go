@@ -92,6 +92,25 @@ func (r *repository) SetID(cfg Config, id id.ID) Config {
 	return cfg
 }
 
+func (r *repository) Current(ctx context.Context) Config {
+	defaultConfig := Config{
+		AnalyticsEnabled: true,
+	}
+	list, err := r.List(ctx, 1, 0, "", "", "")
+	if err != nil || len(list) != 1 {
+		// TODO: log error
+		return defaultConfig
+	}
+
+	return list[0]
+
+}
+
+func (r *repository) SetID(cfg Config, id id.ID) Config {
+	cfg.ID = id
+	return cfg
+}
+
 const insertQuery = `
 		INSERT INTO configs (
 			"id",
