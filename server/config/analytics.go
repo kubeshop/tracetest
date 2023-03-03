@@ -1,14 +1,16 @@
 package config
 
-import "os"
+import (
+	"context"
+	"os"
+)
 
-func (c *Config) AnalyticsEnabled() bool {
+func (cfg *Config) AnalyticsEnabled() bool {
 	if os.Getenv("TRACETEST_DEV") != "" {
 		return false
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	cr := cfg.resources.config.Current(context.TODO())
 
-	return c.config.GA.Enabled
+	return cr.AnalyticsEnabled
 }
