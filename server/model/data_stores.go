@@ -98,10 +98,21 @@ var validTypes = []DataStoreType{
 	DataStoreTypeAwsXRay,
 }
 
+var otlpBasedDataStores = []DataStoreType{
+	DataStoreTypeOTLP,
+	DataStoreTypeNewRelic,
+	DataStoreTypeLighStep,
+	DataStoreTypeDataDog,
+}
+
 func (ds DataStore) Validate() error {
 	if !slices.Contains(validTypes, ds.Type) {
 		return fmt.Errorf("unsupported data store")
 	}
 
 	return nil
+}
+
+func (ds DataStore) IsOTLPBasedProvider() bool {
+	return slices.Contains(otlpBasedDataStores, ds.Type)
 }
