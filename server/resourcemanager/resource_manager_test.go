@@ -106,7 +106,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Create", sample).
 					Return(sample, nil)
-			case rmtests.OperationCreateInteralError:
+			case rmtests.OperationCreateInternalError:
 				mockManager.
 					On("Create", sample).
 					Return(sampleResource{}, fmt.Errorf("some error"))
@@ -120,7 +120,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Update", sampleUpdated).
 					Return(sampleUpdated, nil)
-			case rmtests.OperationUpdateInteralError:
+			case rmtests.OperationUpdateInternalError:
 				mockManager.
 					On("Update", sampleUpdated).
 					Return(sampleResource{}, fmt.Errorf("some error"))
@@ -134,7 +134,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Get", sample.ID).
 					Return(sample, nil)
-			case rmtests.OperationGetInteralError:
+			case rmtests.OperationGetInternalError:
 				mockManager.
 					On("Get", sample.ID).
 					Return(sampleResource{}, fmt.Errorf("some error"))
@@ -151,7 +151,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Get", sample.ID).
 					Return(sampleResource{}, sql.ErrNoRows)
-			case rmtests.OperationDeleteInteralError:
+			case rmtests.OperationDeleteInternalError:
 				mockManager.
 					On("Delete", sample.ID).
 					Return(fmt.Errorf("some error"))
@@ -171,7 +171,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
-			case rmtests.OperationListInteralError:
+			case rmtests.OperationListInternalError:
 				mockManager.
 					On("Count", mock.Anything).
 					Return(0, fmt.Errorf("some error"))
