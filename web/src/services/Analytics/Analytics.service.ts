@@ -2,7 +2,7 @@ import posthog from 'posthog-js';
 import {Categories} from 'constants/Analytics.constants';
 import Env from 'utils/Env';
 
-const analyticsEnabled = Env.get('analyticsEnabled');
+const isAnalyticsEnabled = () => Env.get('analyticsEnabled');
 const appVersion = Env.get('appVersion');
 const env = Env.get('env');
 const serverID = Env.get('serverID');
@@ -17,7 +17,7 @@ type TAnalyticsService = {
 
 const AnalyticsService = (): TAnalyticsService => ({
   event<A>(category: Categories, action: A, label: string) {
-    if (!analyticsEnabled) return;
+    if (!isAnalyticsEnabled()) return;
     analytics.track(String(action), {
       serverID,
       appVersion,
@@ -27,7 +27,7 @@ const AnalyticsService = (): TAnalyticsService => ({
     });
   },
   page(name: string) {
-    if (!analyticsEnabled) return;
+    if (!isAnalyticsEnabled()) return;
     analytics.page(name, {
       serverID,
       appVersion,
@@ -37,7 +37,7 @@ const AnalyticsService = (): TAnalyticsService => ({
     posthog.capture('$pageview');
   },
   identify() {
-    if (!analyticsEnabled) return;
+    if (!isAnalyticsEnabled()) return;
     analytics.identify({
       serverID,
       appVersion,

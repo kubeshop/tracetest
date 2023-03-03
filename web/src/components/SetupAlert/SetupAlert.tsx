@@ -1,10 +1,10 @@
 import {Button} from 'antd';
-import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {Link} from 'react-router-dom';
 import * as S from './SetupAlert.styled';
 
 const SetupAlert = () => {
-  const {shouldDisplayConfigSetupFromTest, skipConfigSetupFromTest} = useDataStoreConfig();
+  const {shouldDisplayConfigSetupFromTest, skipConfigSetupFromTest} = useSettingsValues();
 
   return shouldDisplayConfigSetupFromTest ? (
     <S.Container

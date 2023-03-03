@@ -1,6 +1,6 @@
 import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
-import SetupConfigService from 'services/DataStore.service';
+import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
 import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
@@ -37,7 +37,7 @@ const DataStoreForm = ({
   isLoading,
   isFormValid,
 }: IProps) => {
-  const initialValues = useMemo(() => SetupConfigService.getInitialValues(dataStoreConfig), [dataStoreConfig]);
+  const initialValues = useMemo(() => DataStoreService.getInitialValues(dataStoreConfig), [dataStoreConfig]);
   const dataStoreType = Form.useWatch('dataStoreType', form);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const DataStoreForm = ({
 
   const onValidation = useCallback(
     async (_: any, draft: TDraftDataStore) => {
-      const isValid = await SetupConfigService.validateDraft(draft);
+      const isValid = await DataStoreService.validateDraft(draft);
       onIsFormValid(isValid);
     },
     [onIsFormValid]

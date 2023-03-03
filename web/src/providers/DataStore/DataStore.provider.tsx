@@ -14,7 +14,7 @@ import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/Dat
 import DataStore from 'models/DataStore.model';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
-import {useDataStoreConfig} from '../DataStoreConfig/DataStoreConfig.provider';
+import {useSettingsValues} from '../SettingsValues/SettingsValues.provider';
 
 interface IContext {
   isFormValid: boolean;
@@ -43,7 +43,7 @@ interface IProps {
 export const useDataStore = () => useContext(Context);
 
 const DataStoreProvider = ({children}: IProps) => {
-  const {isFetching} = useDataStoreConfig();
+  const {isFetching} = useSettingsValues();
   const [createDataStore, {isLoading: isLoadingCreate}] = useCreateDataStoreMutation();
   const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
   const [deleteDataStore] = useDeleteDataStoreMutation();

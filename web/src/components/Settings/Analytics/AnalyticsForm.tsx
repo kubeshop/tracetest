@@ -1,26 +1,41 @@
 import {Button, Form, Switch} from 'antd';
 
+import {rawToResource, TRawConfig} from 'models/Config.model';
 import {useSettings} from 'providers/Settings/Settings.provider';
-import {IDraftSettings} from 'types/Settings.types';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import * as S from '../common/Settings.styled';
 
 const FORM_ID = 'analytics';
 
 const AnalyticsForm = () => {
-  const [form] = Form.useForm<IDraftSettings>();
-  const {onSubmit} = useSettings();
+  const [form] = Form.useForm<TRawConfig>();
+  const {isLoading, onSubmit} = useSettings();
+  const {config} = useSettingsValues();
+
+  const handleOnSubmit = (values: TRawConfig) => {
+    onSubmit(rawToResource(values));
+  };
 
   return (
-    <Form<IDraftSettings> autoComplete="off" form={form} layout="horizontal" name={FORM_ID} onFinish={onSubmit}>
+    <Form<TRawConfig>
+      autoComplete="off"
+      form={form}
+      initialValues={config}
+      layout="horizontal"
+      name={FORM_ID}
+      onFinish={handleOnSubmit}
+    >
+      <Form.Item hidden name="id" />
+
       <S.SwitchContainer>
-        <label htmlFor={`${FORM_ID}_analytics`}>Enable analytics</label>
-        <Form.Item name="analytics" valuePropName="checked">
+        <label htmlFor={`${FORM_ID}_analyticsEnabled`}>Enable analytics</label>
+        <Form.Item name="analyticsEnabled" valuePropName="checked">
           <Switch />
         </Form.Item>
       </S.SwitchContainer>
 
       <S.FooterContainer>
-        <Button htmlType="submit" type="primary">
+        <Button htmlType="submit" loading={isLoading} type="primary">
           Save
         </Button>
       </S.FooterContainer>

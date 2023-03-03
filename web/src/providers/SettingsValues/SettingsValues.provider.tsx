@@ -1,12 +1,16 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 
+import {useGetDataStoresQuery, useGetConfigQuery, useGetPollingQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
-import {useGetDataStoresQuery} from 'redux/apis/TraceTest.api';
-import {ConfigMode} from 'types/DataStore.types';
-import UserSelectors from 'selectors/User.selectors';
 import DataStoreConfig from 'models/DataStoreConfig.model';
+import Config from 'models/Config.model';
+import UserSelectors from 'selectors/User.selectors';
+import AnalyticsService from 'services/Analytics/Analytics.service';
+import {ConfigMode} from 'types/DataStore.types';
+import Env from 'utils/Env';
+import Polling from 'models/Polling.model';
 
 interface IContext {
   dataStoreConfig: DataStoreConfig;
@@ -17,6 +21,8 @@ interface IContext {
   skipConfigSetupFromTest(): void;
   shouldDisplayConfigSetup: boolean;
   shouldDisplayConfigSetupFromTest: boolean;
+  config: Config;
+  polling: Polling;
 }
 
 const Context = createContext<IContext>({
@@ -28,15 +34,18 @@ const Context = createContext<IContext>({
   isError: false,
   shouldDisplayConfigSetup: false,
   shouldDisplayConfigSetupFromTest: false,
+  config: Config(),
+  polling: Polling(),
 });
 
 interface IProps {
   children: React.ReactNode;
 }
 
-export const useDataStoreConfig = () => useContext(Context);
+export const useSettingsValues = () => useContext(Context);
 
-const DataStoreConfigProvider = ({children}: IProps) => {
+const SettingsValuesProvider = ({children}: IProps) => {
+  // DataStore
   const dispatch = useAppDispatch();
   const {data: dataStoreConfig = DataStoreConfig([]), isLoading, isError, isFetching} = useGetDataStoresQuery({});
   const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
@@ -66,6 +75,17 @@ const DataStoreConfigProvider = ({children}: IProps) => {
     );
   }, [dispatch]);
 
+  // Config
+  const {data: config = Config()} = useGetConfigQuery({});
+
+  useEffect(() => {
+    Env.set('analyticsEnabled', config.analyticsEnabled);
+    AnalyticsService.identify();
+  }, [config]);
+
+  // Polling
+  const {data: polling = Polling()} = useGetPollingQuery({});
+
   const value = useMemo<IContext>(
     () => ({
       dataStoreConfig,
@@ -76,6 +96,8 @@ const DataStoreConfigProvider = ({children}: IProps) => {
       skipConfigSetupFromTest,
       shouldDisplayConfigSetup,
       shouldDisplayConfigSetupFromTest,
+      config,
+      polling,
     }),
     [
       dataStoreConfig,
@@ -86,10 +108,12 @@ const DataStoreConfigProvider = ({children}: IProps) => {
       shouldDisplayConfigSetupFromTest,
       skipConfigSetup,
       skipConfigSetupFromTest,
+      config,
+      polling,
     ]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
-export default DataStoreConfigProvider;
+export default SettingsValuesProvider;

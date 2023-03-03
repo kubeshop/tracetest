@@ -14,11 +14,13 @@ const emptyValues: IEnv = {
   serverPathPrefix: '/',
 };
 
-const initialEnv = window.ENV || {};
-
 const Env = {
   get<Key extends TEnv>(key: Key) {
+    const initialEnv = window.ENV || {};
     return initialEnv[key] ?? emptyValues[key];
+  },
+  set<Key extends TEnv>(key: Key, value: any) {
+    window.ENV = {...window.ENV, [key]: value};
   },
 };
 

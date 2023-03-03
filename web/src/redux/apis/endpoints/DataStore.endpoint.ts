@@ -6,10 +6,10 @@ import {TConnectionResult, TRawConnectionResult, TTestConnectionRequest} from 't
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TRawDataStore} from 'models/DataStore.model';
 
-const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
+const DataStoreEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getDataStores: builder.query<DataStoreConfig, unknown>({
     query: () => '/datastores?take=50',
-    providesTags: () => [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
+    providesTags: () => [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
     transformResponse: (rawDataStores: TRawDataStore[]) => DataStoreConfig(rawDataStores),
   }),
   createDataStore: builder.mutation<undefined, TRawDataStore>({
@@ -18,7 +18,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
       method: HTTP_METHOD.POST,
       body: dataStore,
     }),
-    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
+    invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
   }),
   updateDataStore: builder.mutation<undefined, {dataStore: TRawDataStore; dataStoreId: string}>({
     query: ({dataStore, dataStoreId}) => ({
@@ -26,14 +26,14 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
       method: HTTP_METHOD.PUT,
       body: dataStore,
     }),
-    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
+    invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
   }),
   deleteDataStore: builder.mutation<undefined, {dataStoreId: string}>({
     query: ({dataStoreId}) => ({
       url: `/datastores/${dataStoreId}`,
       method: HTTP_METHOD.DELETE,
     }),
-    invalidatesTags: [{type: TracetestApiTags.CONFIG, id: 'datastore'}],
+    invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
   }),
   testConnection: builder.mutation<TConnectionResult, TTestConnectionRequest>({
     query: connectionTest => ({
@@ -46,4 +46,4 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
 });
 
-export default ConfigEndpoint;
+export default DataStoreEndpoint;

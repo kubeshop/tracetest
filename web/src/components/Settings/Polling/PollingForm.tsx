@@ -1,17 +1,30 @@
 import {Button, Col, Form, Input, Row} from 'antd';
 
+import {rawToResource, TRawPolling} from 'models/Polling.model';
 import {useSettings} from 'providers/Settings/Settings.provider';
-import {IDraftSettings} from 'types/Settings.types';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import * as S from '../common/Settings.styled';
 
 const FORM_ID = 'polling';
 
 const PollingForm = () => {
-  const [form] = Form.useForm<IDraftSettings>();
-  const {onSubmit} = useSettings();
+  const [form] = Form.useForm<TRawPolling>();
+  const {isLoading, onSubmit} = useSettings();
+  const {polling} = useSettingsValues();
+
+  const handleOnSubmit = (values: TRawPolling) => {
+    onSubmit(rawToResource(values));
+  };
 
   return (
-    <Form<IDraftSettings> autoComplete="off" form={form} layout="vertical" name={FORM_ID} onFinish={onSubmit}>
+    <Form<TRawPolling>
+      autoComplete="off"
+      form={form}
+      initialValues={polling}
+      layout="vertical"
+      name={FORM_ID}
+      onFinish={handleOnSubmit}
+    >
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
@@ -34,7 +47,7 @@ const PollingForm = () => {
       </Row>
 
       <S.FooterContainer>
-        <Button htmlType="submit" type="primary">
+        <Button htmlType="submit" loading={isLoading} type="primary">
           Save
         </Button>
       </S.FooterContainer>
