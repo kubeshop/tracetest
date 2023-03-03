@@ -35,12 +35,10 @@ fi
 
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
-helm upgrade --install $NAME kubeshop/tracetest \
-  --namespace $NAME --create-namespace \
+helm upgrade --install tracetest . \
+  --namespace tracetest --create-namespace \
   --set image.tag=$TAG \
-  --set image.pullPolicy=Always \
-  --set service.port=11633 \
-  --set server.httpPort=11633 \
+  --set image.pullPolicy=Always
   ${extraParams[@]}
 
 PROVISION_FILE=$(cd $(dirname "${BASH_SOURCE:-$0}") && pwd)/provisioning.yaml
@@ -50,19 +48,6 @@ kubectl --namespace $NAME create configmap $NAME --from-file=$CONFIG_FILE --from
   | kubectl --namespace $NAME replace -f -
 
 kubectl --namespace $NAME delete pods -l app.kubernetes.io/name=tracetest
-
-
-## TMP FIX FOR NEW CONFIG
-kubectl patch deployment \
-  $NAME \
-  --namespace $NAME \
-  --type='json' \
-  -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": [
-  "--config",
-  "/app/config/config.yaml",
-  "--provisioning-file",
-  "/app/config/provisioning.yaml"
-]}]'
 
 TIME_OUT=30m
 CONDITION='[[ $(kubectl get pods  --namespace '$NAME' -lapp.kubernetes.io/name=tracetest -o jsonpath="{.items[*].status.phase}") = "Running" ]]'

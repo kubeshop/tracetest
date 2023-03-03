@@ -25,7 +25,7 @@ func (m OpenAPI) DataStoreType(in model.DataStoreType) openapi.SupportedDataStor
 	dsd, exists := dataStoreTypesMapping[in]
 	if !exists {
 		// this should only happen during development,
-		// so it's more an alert for devs than actual error handling``
+		// so it's more an alert for devs than actual error handling
 		panic(fmt.Errorf("trying to convert an undefined model.DataStoreType '%s'", in))
 	}
 	return dsd
@@ -94,7 +94,7 @@ func (m Model) DataStoreType(in openapi.SupportedDataStores) model.DataStoreType
 	}
 
 	// this should only happen during development,
-	// so it's more an alert for devs than actual error handling``
+	// so it's more an alert for devs than actual error handling
 	panic(fmt.Errorf("trying to convert an undefined model.DataStoreType '%s'", in))
 
 }
