@@ -325,7 +325,7 @@ const sidebars = {
           id: "tools-and-integrations/testkube",
           label: "Testkube",
         },
-      ]
+      ],
     },
     {
       type: "category",
@@ -375,6 +375,11 @@ const sidebars = {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
           label: "Node.js and Elastic APM",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
+          label: "AWS Fargate and Terraform",
         },
         {
           type: "doc",

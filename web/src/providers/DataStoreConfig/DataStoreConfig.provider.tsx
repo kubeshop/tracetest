@@ -4,7 +4,7 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import {useGetDataStoresQuery} from 'redux/apis/TraceTest.api';
-import {ConfigMode} from 'types/Config.types';
+import {ConfigMode} from 'types/DataStore.types';
 import UserSelectors from 'selectors/User.selectors';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 

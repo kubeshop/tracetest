@@ -1,6 +1,6 @@
 import {Checkbox, Col, Form, Input, Row, Space, Switch} from 'antd';
 import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import {TDraftDataStore} from 'types/Config.types';
+import {TDraftDataStore} from 'types/DataStore.types';
 import GrpcClientSecure from '../GrpcClient/GrpcClientSecure';
 
 const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
@@ -15,11 +15,7 @@ const HttpClient = () => {
     <>
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Form.Item
-            label="URL"
-            name={[...baseName, 'url']}
-            rules={[{required: true, message: 'URL is required'}]}
-          >
+          <Form.Item label="URL" name={[...baseName, 'url']} rules={[{required: true, message: 'URL is required'}]}>
             <Input placeholder="Enter a URL" />
           </Form.Item>
         </Col>

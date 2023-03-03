@@ -1,4 +1,4 @@
-import {IHttpClientSettings, TRawHttpClientSettings} from 'types/Config.types';
+import {IHttpClientSettings, TRawHttpClientSettings} from 'types/DataStore.types';
 
 const HttpClientService = () => ({
   async getRequest(values: IHttpClientSettings): Promise<TRawHttpClientSettings> {

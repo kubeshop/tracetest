@@ -1,7 +1,8 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
+
 import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
 import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
-import {SupportedDataStores, TDraftDataStore} from 'types/Config.types';
+import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from '../../DataStorePluginForm.styled';
 import AddressesList from './AddressesList';
 

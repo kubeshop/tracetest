@@ -1,4 +1,4 @@
-import {SupportedDataStores, TDataStoreService} from 'types/Config.types';
+import {SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
 
 const OtelCollectorService = (): TDataStoreService => ({
   getRequest(draft, dataStoreType = SupportedDataStores.OtelCollector) {

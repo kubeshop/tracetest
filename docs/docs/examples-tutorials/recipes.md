@@ -10,5 +10,6 @@ These recipes will show you the best practices for using Tracetest.
 - [Sending traces to New Relic and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-new-relic)
 - [Sending traces to Datadog and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-datadog)
 - [Sending traces to Elastic APM from a Node.js app and fetching them from Elasticsearch with Tracetest](./recipes/running-tracetest-with-elasticapm)
+- [Running Tracetest on AWS Fargate with Terraform](./recipes/running-tracetest-with-aws-terraform.md)
 
 Stay tuned! More recipes are coming soon. 🚀

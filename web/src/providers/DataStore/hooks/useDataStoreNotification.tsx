@@ -1,7 +1,7 @@
 import {notification, Typography} from 'antd';
 import {useCallback} from 'react';
 import {useTheme} from 'styled-components';
-import {SupportedDataStores, TConnectionResult} from 'types/Config.types';
+import {SupportedDataStores, TConnectionResult} from 'types/DataStore.types';
 import TestConnectionNotification from 'components/TestConnectionNotification/TestConnectionNotification';
 import {NoTestConnectionDataStoreList} from '../../../constants/DataStore.constants';
 

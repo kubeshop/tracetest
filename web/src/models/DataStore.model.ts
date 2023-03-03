@@ -1,4 +1,4 @@
-import {SupportedDataStores} from 'types/Config.types';
+import {SupportedDataStores} from 'types/DataStore.types';
 import {Model, TDataStoreSchemas} from 'types/Common.types';
 
 export type TRawDataStore = TDataStoreSchemas['DataStore'];

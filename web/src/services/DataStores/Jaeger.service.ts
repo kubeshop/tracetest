@@ -5,7 +5,7 @@ import {
   SupportedDataStores,
   TDataStoreService,
   TRawGRPCClientSettings,
-} from 'types/Config.types';
+} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
 import GrpcClientService from './GrpcClient.service';
 
