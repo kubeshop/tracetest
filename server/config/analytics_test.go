@@ -40,13 +40,13 @@ func TestAnalyticsEnabledConfig(t *testing.T) {
 		assert.True(t, cfg.AnalyticsEnabled())
 	})
 
-	t.Run("FromRepoi", func(t *testing.T) {
+	t.Run("FromRepo", func(t *testing.T) {
 		cleanEnv()
 		opt := setup(configresource.Config{
 			AnalyticsEnabled: false,
 		})
 
-		cfg := configFromFile(t, "./testdata/analytics.yaml", opt)
+		cfg, _ := config.New(opt)
 
 		assert.False(t, cfg.AnalyticsEnabled())
 	})
@@ -55,7 +55,7 @@ func TestAnalyticsEnabledConfig(t *testing.T) {
 		opt := setup(configresource.Config{
 			AnalyticsEnabled: true,
 		})
-		cfg := configFromFile(t, "./testdata/analytics.yaml", opt)
+		cfg, _ := config.New(opt)
 
 		os.Setenv("TRACETEST_DEV", "yes")
 		assert.False(t, cfg.AnalyticsEnabled())
