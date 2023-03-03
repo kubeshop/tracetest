@@ -35,7 +35,7 @@ fi
 
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
-helm upgrade --install tracetest kubeshop/tracetest \
+helm upgrade --install $NAME kubeshop/tracetest \
   --namespace $NAME --create-namespace \
   --set image.tag=$TAG \
   --set image.pullPolicy=Always
