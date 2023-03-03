@@ -2,6 +2,7 @@ package configresource_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -10,7 +11,55 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestIsAnalyticsEnabled(t *testing.T) {
+	cleanEnv := func() {
+		// make sure this env is empty
+		os.Setenv("TRACETEST_DEV", "")
+	}
+
+	db := testmock.MustGetRawTestingDatabase()
+	t.Run("DefaultValues", func(t *testing.T) {
+		cleanEnv()
+		repo := configresource.Repository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+
+		cfg := repo.Current(context.TODO())
+		assert.True(t, cfg.IsAnalyticsEnabled())
+
+	})
+
+	t.Run("FromRepo", func(t *testing.T) {
+		cleanEnv()
+		repo := configresource.Repository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+		repo.Create(context.TODO(), configresource.Config{
+			AnalyticsEnabled: false,
+		})
+
+		cfg := repo.Current(context.TODO())
+		assert.False(t, cfg.IsAnalyticsEnabled())
+	})
+
+	t.Run("EnvOverride", func(t *testing.T) {
+		repo := configresource.Repository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+		repo.Create(context.TODO(), configresource.Config{
+			AnalyticsEnabled: true,
+		})
+
+		cfg := repo.Current(context.TODO())
+
+		os.Setenv("TRACETEST_DEV", "yes")
+		assert.False(t, cfg.IsAnalyticsEnabled())
+
+	})
+}
 
 func TestConfigResource(t *testing.T) {
 

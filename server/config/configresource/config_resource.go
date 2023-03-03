@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/kubeshop/tracetest/server/id"
 )
@@ -24,6 +25,14 @@ func (c Config) Validate() error {
 	return nil
 }
 
+func (c Config) IsAnalyticsEnabled() bool {
+	if os.Getenv("TRACETEST_DEV") != "" {
+		return false
+	}
+
+	return c.AnalyticsEnabled
+}
+
 func Repository(db *sql.DB) *repository {
 	return &repository{db}
 }
@@ -36,6 +45,7 @@ func (r *repository) Current(ctx context.Context) Config {
 	defaultConfig := Config{
 		AnalyticsEnabled: true,
 	}
+
 	list, err := r.List(ctx, 1, 0, "", "", "")
 	if err != nil || len(list) != 1 {
 		// TODO: log error
@@ -43,7 +53,6 @@ func (r *repository) Current(ctx context.Context) Config {
 	}
 
 	return list[0]
-
 }
 
 func (r *repository) SetID(cfg Config, id id.ID) Config {
