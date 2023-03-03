@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "jaeger" {
-  family                   = "jaeger"
+  family                   = "${local.name}_jaeger"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = 1024
