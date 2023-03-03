@@ -3,6 +3,7 @@ package testmock
 import (
 	"database/sql"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -39,6 +40,31 @@ func ConfigureDB(cfg *config.Config) error {
 
 }
 
+func MustGetRawTestingDatabase() *sql.DB {
+	db, err := GetRawTestingDatabase()
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
+
+func MustCreateRandomMigratedDatabase(db *sql.DB) *sql.DB {
+	newConn, err := createRandomDatabaseForTest(db, "tracetest")
+	if err != nil {
+		panic(err)
+	}
+
+	// migrate DB
+	_, err = testdb.Postgres(testdb.WithDB(newConn))
+	if err != nil {
+		panic(err)
+	}
+
+	return newConn
+
+}
+
 func GetRawTestingDatabase() (*sql.DB, error) {
 	pgContainer, err := getPostgresContainer()
 	if err != nil {
@@ -67,8 +93,9 @@ func getMainDatabaseConnection(container *gnomock.Container) (*sql.DB, error) {
 }
 
 func createRandomDatabaseForTest(db *sql.DB, baseDatabase string) (*sql.DB, error) {
-	epoch := time.Now().UnixNano()
-	newDatabaseName := fmt.Sprintf("%s_%d", baseDatabase, epoch)
+	rand.Seed(time.Now().UnixNano())
+	randomInt := rand.Int()
+	newDatabaseName := fmt.Sprintf("%s_%d", baseDatabase, randomInt)
 	_, err := db.Exec(fmt.Sprintf("CREATE DATABASE %s WITH TEMPLATE %s", newDatabaseName, baseDatabase))
 	if err != nil {
 		return nil, fmt.Errorf("could not create database %s: %w", newDatabaseName, err)
