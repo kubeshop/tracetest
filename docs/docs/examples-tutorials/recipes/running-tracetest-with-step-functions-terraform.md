@@ -12,7 +12,7 @@
 
 ## .NET Step Functions Serverless API with AWS X-Ray, AWS Fargate and Tracetest
 
-The use case you'll see in this recipe is based on [this .NET demo repository](https://github.com/aws-samples/aws-step-functions-plagiarism-demo-dotnetcore) that illustrates how to create a basic State Machine based using Step Functions, Lambda and DynamoDB.
+The use case you'll see in this recipe is based on [this .NET demo repository](https://github.com/aws-samples/aws-step-functions-plagiarism-demo-dotnetcore) that illustrates how to create a Basic State Machine using Step Functions, Lambda and DynamoDB.
 
 The infrastructure will use X-Ray as the trace data store to receive traces from the NET core lambda functions, SAM as deployment framework for the Step Functions and Terraform to provision the required AWS services to run Tracetest in the cloud.
 
@@ -26,7 +26,7 @@ You will need [Terraform](https://www.terraform.io/), a configured instance of t
 
 ## Project Structure
 
-The project is divided into two main sections. The `infra` folder includes the basic services and resources that are required to run Tracetest iin your AWS account using Terraform as deployment framework. Meanwhile, the `src` folder includes the code and configuration to create and provision the Step Functions using the SAM framework.
+The project is divided into two main sections. The `infra` folder includes the basic services and resources that are required to run Tracetest in your AWS account using Terraform as the deployment framework. Meanwhile, the `src` folder includes the code and configuration to create and provision the Step Functions using the SAM framework.
 
 ### 1. NET Core Lambda Functions
 
@@ -40,7 +40,7 @@ Under the `infra` folder you'll find the `tracetest.tf` file which includes the 
 
 ### AWS Network
 
-To connect all of the services, the example generates a VPC network which includes private and public subnets. Internal service like the Postgres RDS instance are protected behind the VPC and only accessible through a node within the internal network.
+To connect all of the services, the example generates a VPC network which includes private and public subnets. Internal services like the Postgres RDS instance are protected behind the VPC and only accessible through a node within the internal network.
 
 There is one [Public Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/) which provides access to the Tracetest task instance through port `11633`.
 
@@ -55,7 +55,7 @@ The `infra/tracetest.tf` file contains the required services for the Tracetest s
 
 ### Configuring the Tracetest Container
 
-The Tracetest docker image supports environment variables as entry point for the bootstrap configuration, in this case the task definition incliudes the following:
+The Tracetest docker image supports environment variables as the entry point for the bootstrap configuration. In this case the task definition includes the following:
 
 ```json
 {
@@ -87,11 +87,11 @@ The Tracetest docker image supports environment variables as entry point for the
 
 ## AWS X-Ray
 
-This recipe uses AWS X-Ray as Data Source for the telemetry data, it doesn't require any predefined configuration to start using this service only having the right access for applications to been able to send and fetch information from it.
+This recipe uses AWS X-Ray as the Data Source for the telemetry data. It doesn't require any predefined configuration to start using this service, only needing the correct access for applications to be able to send and fetch information from it.
 
-## How do Tracetest reach AWS X-Ray?
+## How does Tracetest reach AWS X-Ray?
 
-Tracetest supports the native AWS SDK library to connect to X-Ray to find traces. Today the only authentication method it supports is by manually adding a set of AWS credentials that have access to the X-Ray service from your account.
+Tracetest supports the native AWS SDK library to connect to X-Ray to find traces. Today the only authentication method supported is manually adding a set of AWS credentials that have access to the X-Ray service from your account.
 This can be done by either providing them from the initial bootstrap using:
 
 ```yaml
@@ -109,49 +109,49 @@ Or from the the Tracetest settings page:
 
 ## How do traces reach AWS X-Ray?
 
-This recipe uses the auto-instrumentation [library for .NET](https://docs.aws.amazon.com/xray-sdk-for-dotnet/latest/reference/html/N_Amazon_XRay_Recorder_Handlers_AwsSdk.htm) which automatically listens to any aws sdk request and sends the telemetry data to X-Ray.
+This recipe uses the auto-instrumentation [library for .NET](https://docs.aws.amazon.com/xray-sdk-for-dotnet/latest/reference/html/N_Amazon_XRay_Recorder_Handlers_AwsSdk.htm) which automatically listens to any AWS SDK request and sends the telemetry data to X-Ray.
 
 To provide the lambda functions access to X-Ray the `arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess` AWS managed policy is also added.
 
-## Running the example
+## Running the Example
 
-The first thing you need to do is to provision the Tracetest infrastructure by running the following commands from the `infra` folder.
+The first thing you need to do is to provision the Tracetest infrastructure by running the following commands from the `infra` folder:
 
 ```bash
 terraform init \
 terraform apply
 ```
 
-After accepting the changes after running the `terraform apply` command and finalizing the infra creation you can find the set of output with the required endpoints to continue with some tests.
+After accepting the changes after running the `terraform apply` command and finalizing the infra creation, you can find the output with the required endpoints to continue with tests.
 The final output from the Terraform command should be a list of endpoints that similar to the following:
 
 ![Terraform Step Functions Output](../img/terraform-step-functions.png)
 
 You can follow the `tracetest_url` to find the Tracetest UI.
 
-Second step is adding the AWS credentials for Tracetest to reach to X-Ray by following this url `tracetest_url/settings`. Selecting the X-Ray as data store and updating the settings.
+The second step is adding the AWS credentials for Tracetest to reach to X-Ray by following this url `tracetest_url/settings`. Select the X-Ray as data store and updating the settings.
 
-**Tip.** After you add the credentials, you can test the connection by clicking the Test Connection button.
+**Tip.** After you add the credentials, you can test the connection by clicking the **Test Connection** button.
 
-Third step is to create the Lambda functions and the rest of the services to run the Step Functions, running the following command from the `src` folder:
+The third step is to create the Lambda functions and the rest of the services to run the Step Functions by running the following command from the `src` folder:
 
 ```bash
 sam build \
 sam deploy --guided
 ```
 
-You'll be asked to fill some details like the app name, email settings and a Sendgrid API key.
+You'll be asked to fill in some details like the app name, email settings and a Sendgrid API key.
 The output from the previous command should look similar ot this:
 
 ![SAM Step Functions](../img/sam-step-functions.png)
 
-## Running Trace Based Tests
+## Running Trace-based Tests
 
-Now that all of the required services and infra has been created, you can start running some Trace based testing by doing the following:
+Now that all of the required services and infra has been created, you can start running trace-based testing by doing the following:
 
-1. Run this `sam list stack-outputs --stack-name <your_app_name>` sam command where you can copy the `StepFunctionsAPIUrl` value and add replace the `<your_api_endpoint>` placeholder from the `tests/incident.yaml` and `tests/exam.yaml` files
-2. From the Terraform output configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --endpoint <tracetest_url>`
-3. Run the tests YAML file using the CLI
+1. Run this `sam list stack-outputs --stack-name <your_app_name>` sam command where you can copy the `StepFunctionsAPIUrl` value and add the `<your_api_endpoint>` placeholder from the `tests/incident.yaml` and `tests/exam.yaml` files.
+2. From the Terraform output configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --endpoint <tracetest_url>`.
+3. Run the tests YAML file using the CLI.
 
 ```bash
   tracetest test run -d tests/incident.yaml \
@@ -159,8 +159,8 @@ Now that all of the required services and infra has been created, you can start 
   tracetest test run -d tests/transaction.yaml
 ```
 
-4. Follow the link to find the results
+4. Follow the link to find the results.
 
-## Learn more
+## Learn More
 
-Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Please visit our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
