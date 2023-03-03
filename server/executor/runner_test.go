@@ -2,7 +2,6 @@ package executor_test
 
 import (
 	"context"
-	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -127,7 +126,7 @@ func (f runnerFixture) assert(t *testing.T) {
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New(nil, log.Default())))
+	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New(nil)))
 	reg := trigger.NewRegsitry(tr, tr)
 
 	me := new(mockTriggerer)
@@ -142,7 +141,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	mtp := new(mockTracePoller)
 	mtp.t = t
 
-	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New(nil, log.Default())))
+	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New(nil)))
 	testDB := testdb.MockRepository{}
 
 	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)

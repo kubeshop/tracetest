@@ -54,7 +54,7 @@ func TestDeprecatedOptions(t *testing.T) {
 		config.SetupFlags(flags)
 		err := flags.Parse(inputFlags)
 		require.NoError(t, err)
-		cfg, err := config.New(flags, logger)
+		cfg, err := config.New(flags, config.WithLogger(logger))
 		require.NoError(t, err)
 		return cfg
 	}

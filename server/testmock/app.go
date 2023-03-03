@@ -1,8 +1,6 @@
 package testmock
 
 import (
-	"log"
-
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
 )
@@ -22,7 +20,7 @@ func WithHttpPort(port int) TestingAppOption {
 }
 
 func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
-	cfg, _ := config.New(nil, log.Default())
+	cfg, _ := config.New(nil)
 	for _, option := range options {
 		option(cfg)
 	}

@@ -1,16 +1,17 @@
 package config_test
 
 import (
-	"log"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/assert"
 )
 
 func TestDemoConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, _ := config.New(nil, log.Default())
+		cfg, err := config.New(nil)
+		require.NoError(t, err)
 
 		defaultEndponts := map[string]string{
 			"PokeshopHttp":       "",

@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -29,6 +30,7 @@ type Config struct {
 	config *oldConfig
 	vp     *viper.Viper
 	mu     sync.Mutex
+	logger logger
 }
 
 type logger interface {
@@ -117,44 +119,60 @@ func SetupFlags(flags *pflag.FlagSet) {
 	configOptions.registerFlags(flags)
 }
 
-func New(flags *pflag.FlagSet, logger logger) (*Config, error) {
-	vp := viper.New()
+type configOption func(*Config)
 
-	vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	vp.SetEnvPrefix("TRACETEST")
-	vp.AutomaticEnv()
+func WithLogger(l logger) configOption {
+	return func(c *Config) {
+		c.logger = l
+	}
+}
 
-	configureConfigFile(vp)
+func New(flags *pflag.FlagSet, confOpts ...configOption) (*Config, error) {
+	cfg := Config{
+		vp: viper.New(),
+	}
+
+	for _, coFn := range confOpts {
+		coFn(&cfg)
+	}
+
+	cfg.defaults()
+
+	cfg.vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	cfg.vp.SetEnvPrefix("TRACETEST")
+	cfg.vp.AutomaticEnv()
+
+	configureConfigFile(cfg.vp)
 
 	if flags != nil {
-		vp.BindPFlags(flags)
+		cfg.vp.BindPFlags(flags)
 	}
 
-	configOptions.registerDefaults(vp)
+	configOptions.registerDefaults(cfg.vp)
 
-	err := loadConfig(vp, logger)
+	err := loadConfig(cfg.vp, cfg.logger)
 	if err != nil {
 		return nil, err
 	}
 
-	warnAboutDeprecatedFields(vp, logger)
+	warnAboutDeprecatedFields(cfg.vp, cfg.logger)
 
-	oldConfig := oldConfig{}
-	err = vp.Unmarshal(&oldConfig)
+	err = cfg.vp.Unmarshal(&cfg.config)
 	if err != nil {
 		return nil, err
-	}
-
-	cfg := &Config{
-		config: &oldConfig,
-		vp:     vp,
 	}
 
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid configuration: %w", err)
 	}
 
-	return cfg, nil
+	return &cfg, nil
+}
+
+func (c *Config) defaults() {
+	if c.logger == nil {
+		c.logger = log.Default()
+	}
 }
 
 func Must(c *Config, err error) *Config {

@@ -2,7 +2,6 @@ package executor_test
 
 import (
 	"context"
-	"log"
 	"testing"
 	"time"
 
@@ -533,7 +532,7 @@ func getDataStoreRepositoryMock(t *testing.T) model.Repository {
 func getTracerMock(t *testing.T) trace.Tracer {
 	t.Helper()
 
-	tracer, err := tracing.NewTracer(context.TODO(), config.Must(config.New(nil, log.Default())))
+	tracer, err := tracing.NewTracer(context.TODO(), config.Must(config.New(nil)))
 	require.NoError(t, err)
 
 	return tracer
