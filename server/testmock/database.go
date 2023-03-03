@@ -92,10 +92,15 @@ func getMainDatabaseConnection(container *gnomock.Container) (*sql.DB, error) {
 	return sql.Open("postgres", connStr)
 }
 
-func createRandomDatabaseForTest(db *sql.DB, baseDatabase string) (*sql.DB, error) {
+func randomInt() int {
 	rand.Seed(time.Now().UnixNano())
-	randomInt := rand.Int()
-	newDatabaseName := fmt.Sprintf("%s_%d", baseDatabase, randomInt)
+	min := 1
+	max := 1000000
+	return rand.Intn(max-min) + min
+}
+
+func createRandomDatabaseForTest(db *sql.DB, baseDatabase string) (*sql.DB, error) {
+	newDatabaseName := fmt.Sprintf("%s_%d%d%d", baseDatabase, randomInt(), randomInt(), randomInt())
 	_, err := db.Exec(fmt.Sprintf("CREATE DATABASE %s WITH TEMPLATE %s", newDatabaseName, baseDatabase))
 	if err != nil {
 		return nil, fmt.Errorf("could not create database %s: %w", newDatabaseName, err)

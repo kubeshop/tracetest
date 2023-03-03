@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"log"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
@@ -10,7 +9,7 @@ import (
 
 func TestServerConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, _ := config.New(nil, log.Default())
+		cfg, _ := config.New(nil)
 
 		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
 

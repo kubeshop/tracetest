@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"log"
 	"testing"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 
 func TestPoolingConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
-		cfg, _ := config.New(nil, log.Default())
+		cfg, _ := config.New(nil)
 
 		assert.Equal(t, 30*time.Second, cfg.PoolingMaxWaitTimeForTraceDuration())
 		assert.Equal(t, 1*time.Second, cfg.PoolingRetryDelay())

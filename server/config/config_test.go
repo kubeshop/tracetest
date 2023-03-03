@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -19,7 +18,7 @@ func configWithFlagsE(t *testing.T, inputFlags []string) (*config.Config, error)
 	err := flags.Parse(inputFlags)
 	require.NoError(t, err)
 
-	return config.New(flags, log.Default())
+	return config.New(flags)
 }
 
 func configWithFlags(t *testing.T, inputFlags []string) *config.Config {
@@ -38,7 +37,7 @@ func configWithEnv(t *testing.T, env map[string]string) *config.Config {
 		os.Setenv(k, v)
 	}
 
-	cfg, err := config.New(nil, log.Default())
+	cfg, err := config.New(nil)
 	require.NoError(t, err)
 
 	return cfg
@@ -55,7 +54,7 @@ func TestFlags(t *testing.T) {
 		err := flags.Parse([]string{"--config", "notexists.yaml"})
 		require.NoError(t, err)
 
-		cfg, err := config.New(flags, log.Default())
+		cfg, err := config.New(flags)
 		assert.Nil(t, cfg)
 		assert.ErrorIs(t, err, os.ErrNotExist)
 	})
@@ -87,7 +86,7 @@ func TestFlags(t *testing.T) {
 
 			require.NoError(t, err)
 
-			cfg, err := config.New(nil, log.Default())
+			cfg, err := config.New(nil)
 			require.NoError(t, err)
 
 			// this one assertion is enough to guarantee we're not using the defaults
@@ -101,7 +100,7 @@ func TestFlags(t *testing.T) {
 
 			require.NoError(t, err)
 
-			cfg, err := config.New(nil, log.Default())
+			cfg, err := config.New(nil)
 			require.NoError(t, err)
 
 			// the config file would change this value to 9999, but we want to make sure
