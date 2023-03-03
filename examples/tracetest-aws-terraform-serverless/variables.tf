@@ -25,7 +25,7 @@ locals {
   vpc_cidr = "192.168.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  privisioning = <<EOF
+  provisioning = <<EOF
 dataStore:
   type: jaeger
   jaeger:

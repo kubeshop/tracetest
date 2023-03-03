@@ -42,7 +42,7 @@ resource "aws_ecs_task_definition" "tracetest" {
         },
         {
           "name" : "TRACETEST_PROVISIONING",
-          "value" : base64encode(local.privisioning),
+          "value" : base64encode(local.provisioning),
         }
       ],
       "logConfiguration" : {
