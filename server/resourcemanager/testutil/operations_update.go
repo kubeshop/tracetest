@@ -21,65 +21,44 @@ func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 
 const OperationUpdateSuccess Operation = "UpdateSuccess"
 
-type updateSuccessOperation struct{}
+var updateSuccessOperation = operationTester{
+	name: OperationUpdateSuccess,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildUpdateRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 200, resp.StatusCode)
 
-func (op updateSuccessOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
 
-func (op updateSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildUpdateRequest(rt, ct, testServer, t)
-}
+		expected := ct.toJSON(rt.SampleJSONUpdated)
 
-func (updateSuccessOperation) name() Operation {
-	return OperationUpdateSuccess
-}
-
-func (updateSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 200, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-
-	expected := ct.toJSON(rt.SampleJSONUpdated)
-
-	require.JSONEq(t, expected, jsonBody)
+		require.JSONEq(t, expected, jsonBody)
+	},
 }
 
 const OperationUpdateNotFound Operation = "UpdateNotFound"
 
-type updateNotFoundOperation struct{}
-
-func (op updateNotFoundOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op updateNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildUpdateRequest(rt, ct, testServer, t)
-}
-
-func (updateNotFoundOperation) name() Operation {
-	return OperationUpdateNotFound
-}
-
-func (updateNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 404, resp.StatusCode)
+var updateNotFoundOperation = operationTester{
+	name: OperationUpdateNotFound,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildUpdateRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 404, resp.StatusCode)
+	},
 }
 
 const OperationUpdateInternalError Operation = "UpdateInternalError"
 
-type updateInternalErrorOperation struct{}
-
-func (op updateInternalErrorOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op updateInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildUpdateRequest(rt, ct, testServer, t)
-}
-
-func (updateInternalErrorOperation) name() Operation {
-	return OperationUpdateInternalError
-}
-
-func (updateInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt, "updating")
+var updateInternalErrorOperation = operationTester{
+	name: OperationUpdateInternalError,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildUpdateRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		assertInternalError(t, resp, ct, rt, "updating")
+	},
 }

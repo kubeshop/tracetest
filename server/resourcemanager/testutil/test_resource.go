@@ -31,13 +31,13 @@ func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
 	TestResourceTypeOperations(t, rt, append(defaultOperations, errorOperations...))
 }
 
-func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []OperationTester) {
+func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []operationTester) {
 	t.Parallel()
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
 		for _, op := range operations {
-			t.Run(string(op.name()), func(t *testing.T) {
+			t.Run(string(op.name), func(t *testing.T) {
 				op := op
 				t.Parallel()
 
@@ -47,7 +47,7 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 	})
 }
 
-func testOperation(t *testing.T, op OperationTester, rt ResourceTypeTest) {
+func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	t.Helper()
 
 	for _, ct := range contentTypeConverters {
@@ -60,7 +60,7 @@ func testOperation(t *testing.T, op OperationTester, rt ResourceTypeTest) {
 	}
 }
 
-func testOperationForContentType(t *testing.T, op OperationTester, ct contentTypeConverter, rt ResourceTypeTest) {
+func testOperationForContentType(t *testing.T, op operationTester, ct contentTypeConverter, rt ResourceTypeTest) {
 	t.Helper()
 
 	router := mux.NewRouter()
@@ -68,7 +68,7 @@ func testOperationForContentType(t *testing.T, op OperationTester, ct contentTyp
 	testBridge := rt.RegisterManagerFn(router)
 
 	if rt.Prepare != nil {
-		rt.Prepare(t, op.name(), testBridge)
+		rt.Prepare(t, op.name, testBridge)
 	}
 
 	req := op.buildRequest(t, testServer, ct, rt)
@@ -76,7 +76,9 @@ func testOperationForContentType(t *testing.T, op OperationTester, ct contentTyp
 
 	op.assertResponse(t, resp, ct, rt)
 	assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
-	op.postAssert(t, ct, rt, testServer)
+	if op.postAssert != nil {
+		op.postAssert(t, ct, rt, testServer)
+	}
 }
 
 func doRequest(t *testing.T, req *http.Request, ct contentTypeConverter, testServer *httptest.Server) *http.Response {

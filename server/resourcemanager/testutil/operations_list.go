@@ -20,90 +20,69 @@ func buildListRequest(rt string, ct contentTypeConverter, testServer *httptest.S
 
 const OperationListNoResults Operation = "ListNoResults"
 
-type listNoResultsOperation struct{}
+var listNoResultsOperation = operationTester{
+	name: OperationListNoResults,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildListRequest(
+			rt.ResourceType,
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 200, resp.StatusCode)
 
-func (op listNoResultsOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
 
-func (op listNoResultsOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildListRequest(
-		rt.ResourceType,
-		ct,
-		testServer,
-		t,
-	)
-}
+		expected := `{
+			"count": 0,
+			"items": []
+		}`
 
-func (listNoResultsOperation) name() Operation {
-	return OperationListNoResults
-}
-
-func (listNoResultsOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	require.Equal(t, 200, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-
-	expected := `{
-		"count": 0,
-		"items": []
-	}`
-
-	require.JSONEq(t, expected, jsonBody)
+		require.JSONEq(t, expected, jsonBody)
+	},
 }
 
 const OperationListSuccess Operation = "ListSuccess"
 
-type listSuccessOperation struct{}
+var listSuccessOperation = operationTester{
+	name: OperationListSuccess,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildListRequest(
+			rt.ResourceType,
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 200, resp.StatusCode)
 
-func (op listSuccessOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
 
-func (op listSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildListRequest(
-		rt.ResourceType,
-		ct,
-		testServer,
-		t,
-	)
-}
+		expected := `{
+			"count": 1,
+			"items": [` + ct.toJSON(rt.SampleJSON) + `]
+		}`
 
-func (listSuccessOperation) name() Operation {
-	return OperationListSuccess
-}
-
-func (listSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	require.Equal(t, 200, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-
-	expected := `{
-		"count": 1,
-		"items": [` + ct.toJSON(rt.SampleJSON) + `]
-	}`
-
-	require.JSONEq(t, expected, jsonBody)
+		require.JSONEq(t, expected, jsonBody)
+	},
 }
 
 const OperationListInternalError Operation = "ListInternalError"
 
-type listInternalErrorOperation struct{}
-
-func (op listInternalErrorOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op listInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildListRequest(
-		rt.ResourceType,
-		ct,
-		testServer,
-		t,
-	)
-}
-
-func (listInternalErrorOperation) name() Operation {
-	return OperationListInternalError
-}
-
-func (listInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt, "listing")
+var listInternalErrorOperation = operationTester{
+	name: OperationListInternalError,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildListRequest(
+			rt.ResourceType,
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		assertInternalError(t, resp, ct, rt, "listing")
+	},
 }

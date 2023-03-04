@@ -26,65 +26,44 @@ func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 
 const OperationDeleteSuccess Operation = "DeleteSuccess"
 
-type deleteSuccessOperation struct{}
-
-func (op deleteSuccessOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-	req := buildGetRequest(rt, ct, testServer, t)
-
-	resp := doRequest(t, req, ct, testServer)
-
-	(getNotFoundOperation{}).assertResponse(t, resp, ct, rt)
-}
-
-func (op deleteSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildDeleteRequest(rt, ct, testServer, t)
-}
-
-func (deleteSuccessOperation) name() Operation {
-	return OperationDeleteSuccess
-}
-
-func (deleteSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 204, resp.StatusCode)
-	require.Empty(t, responseBody(t, resp))
+var deleteSuccessOperation = operationTester{
+	name: OperationDeleteSuccess,
+	postAssert: func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+		req := buildGetRequest(rt, ct, testServer, t)
+		resp := doRequest(t, req, ct, testServer)
+		getNotFoundOperation.assertResponse(t, resp, ct, rt)
+	},
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildDeleteRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 204, resp.StatusCode)
+		require.Empty(t, responseBody(t, resp))
+	},
 }
 
 const OperationDeleteNotFound Operation = "DeleteNotFound"
 
-type deleteNotFoundOperation struct{}
-
-func (op deleteNotFoundOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op deleteNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildDeleteRequest(rt, ct, testServer, t)
-}
-
-func (deleteNotFoundOperation) name() Operation {
-	return OperationDeleteNotFound
-}
-
-func (deleteNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 404, resp.StatusCode)
+var deleteNotFoundOperation = operationTester{
+	name: OperationDeleteNotFound,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildDeleteRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 404, resp.StatusCode)
+	},
 }
 
 const OperationDeleteInternalError Operation = "DeleteInternalError"
 
-type deleteInternalErrorOperation struct{}
-
-func (op deleteInternalErrorOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op deleteInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildDeleteRequest(rt, ct, testServer, t)
-}
-
-func (deleteInternalErrorOperation) name() Operation {
-	return OperationDeleteInternalError
-}
-
-func (deleteInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt, "deleting")
+var deleteInternalErrorOperation = operationTester{
+	name: OperationDeleteInternalError,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildDeleteRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		assertInternalError(t, resp, ct, rt, "deleting")
+	},
 }

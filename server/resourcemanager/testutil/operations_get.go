@@ -26,65 +26,44 @@ func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *h
 
 const OperationGetSuccess Operation = "GetSuccess"
 
-type getSuccessOperation struct{}
+var getSuccessOperation = operationTester{
+	name: OperationGetSuccess,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildGetRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 200, resp.StatusCode)
 
-func (op getSuccessOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
 
-func (op getSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildGetRequest(rt, ct, testServer, t)
-}
+		expected := ct.toJSON(rt.SampleJSON)
 
-func (getSuccessOperation) name() Operation {
-	return OperationGetSuccess
-}
-
-func (getSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 200, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-
-	expected := ct.toJSON(rt.SampleJSON)
-
-	require.JSONEq(t, expected, jsonBody)
+		require.JSONEq(t, expected, jsonBody)
+	},
 }
 
 const OperationGetNotFound Operation = "GetNotFound"
 
-type getNotFoundOperation struct{}
-
-func (op getNotFoundOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op getNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildGetRequest(rt, ct, testServer, t)
-}
-
-func (getNotFoundOperation) name() Operation {
-	return OperationGetNotFound
-}
-
-func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 404, resp.StatusCode)
+var getNotFoundOperation = operationTester{
+	name: OperationGetNotFound,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildGetRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 404, resp.StatusCode)
+	},
 }
 
 const OperationGetInternalError Operation = "GetInternalError"
 
-type getInternalErrorOperation struct{}
-
-func (op getInternalErrorOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op getInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-	return buildGetRequest(rt, ct, testServer, t)
-}
-
-func (getInternalErrorOperation) name() Operation {
-	return OperationGetInternalError
-}
-
-func (getInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt, "getting")
+var getInternalErrorOperation = operationTester{
+	name: OperationGetInternalError,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildGetRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		assertInternalError(t, resp, ct, rt, "getting")
+	},
 }

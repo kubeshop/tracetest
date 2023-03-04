@@ -8,37 +8,37 @@ import (
 
 type Operation string
 
-type OperationTester interface {
-	buildRequest(*testing.T, *httptest.Server, contentTypeConverter, ResourceTypeTest) *http.Request
-	assertResponse(*testing.T, *http.Response, contentTypeConverter, ResourceTypeTest)
-	name() Operation
-	postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server)
+type operationTester struct {
+	buildRequest   func(*testing.T, *httptest.Server, contentTypeConverter, ResourceTypeTest) *http.Request
+	assertResponse func(*testing.T, *http.Response, contentTypeConverter, ResourceTypeTest)
+	name           Operation
+	postAssert     func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server)
 }
 
 var (
-	defaultOperations = []OperationTester{
-		createNoIDOperation{},
-		createSuccessOperation{},
+	defaultOperations = []operationTester{
+		createNoIDOperation,
+		createSuccessOperation,
 
-		updateNotFoundOperation{},
-		updateSuccessOperation{},
+		updateNotFoundOperation,
+		updateSuccessOperation,
 
-		getNotFoundOperation{},
-		getSuccessOperation{},
+		getNotFoundOperation,
+		getSuccessOperation,
 
-		deleteNotFoundOperation{},
-		deleteSuccessOperation{},
+		deleteNotFoundOperation,
+		deleteSuccessOperation,
 
-		listNoResultsOperation{},
-		listSuccessOperation{},
+		listNoResultsOperation,
+		listSuccessOperation,
 		// TODO: add tests for pagination etc
 	}
 
-	errorOperations = []OperationTester{
-		createInternalErrorOperation{},
-		updateInternalErrorOperation{},
-		getInternalErrorOperation{},
-		deleteInternalErrorOperation{},
-		listInternalErrorOperation{},
+	errorOperations = []operationTester{
+		createInternalErrorOperation,
+		updateInternalErrorOperation,
+		getInternalErrorOperation,
+		deleteInternalErrorOperation,
+		listInternalErrorOperation,
 	}
 )
