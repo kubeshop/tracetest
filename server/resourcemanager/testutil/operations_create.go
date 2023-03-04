@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildCreateRequest(body, rt string, ct ContentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
+func buildCreateRequest(body, rt string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
 	input := ct.fromJSON(body)
 	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt))
 
@@ -23,10 +23,10 @@ const OperationCreateNoID Operation = "CreateNoID"
 
 type createNoIDOperation struct{}
 
-func (op createNoIDOperation) postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op createNoIDOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op createNoIDOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct ContentTypeConverter, rt ResourceTypeTest) *http.Request {
+func (op createNoIDOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(
 		removeIDFromJSON(rt.SampleJSON),
 		rt.ResourceType,
@@ -40,7 +40,7 @@ func (createNoIDOperation) name() Operation {
 	return OperationCreateNoID
 }
 
-func (createNoIDOperation) assertResponse(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest) {
+func (createNoIDOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 	require.Equal(t, 201, resp.StatusCode)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
@@ -56,10 +56,10 @@ const OperationCreateSuccess Operation = "CreateSuccess"
 
 type createSuccessOperation struct{}
 
-func (op createSuccessOperation) postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op createSuccessOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct ContentTypeConverter, rt ResourceTypeTest) *http.Request {
+func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(
 		rt.SampleJSON,
 		rt.ResourceType,
@@ -73,7 +73,7 @@ func (createSuccessOperation) name() Operation {
 	return OperationCreateSuccess
 }
 
-func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest) {
+func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 	require.Equal(t, 201, resp.StatusCode)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
@@ -86,10 +86,10 @@ const OperationCreateInternalError Operation = "CreateInternalError"
 
 type createInternalErrorOperation struct{}
 
-func (op createInternalErrorOperation) postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op createInternalErrorOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op createInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct ContentTypeConverter, rt ResourceTypeTest) *http.Request {
+func (op createInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 	return buildCreateRequest(
 		rt.SampleJSON,
 		rt.ResourceType,
@@ -103,6 +103,6 @@ func (createInternalErrorOperation) name() Operation {
 	return OperationCreateInternalError
 }
 
-func (createInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest) {
+func (createInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "creating")
 }

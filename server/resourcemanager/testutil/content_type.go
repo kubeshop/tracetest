@@ -4,21 +4,21 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-type ContentTypeConverter struct {
+type contentTypeConverter struct {
 	name        string
 	contentType string
 	fromJSON    func(input string) string
 	toJSON      func(input string) string
 }
 
-var contentTypeJSON = ContentTypeConverter{
+var contentTypeJSON = contentTypeConverter{
 	name:        "json",
 	contentType: "application/json",
 	fromJSON:    func(jsonString string) string { return jsonString },
 	toJSON:      func(jsonString string) string { return jsonString },
 }
 
-var contentTypeYAML = ContentTypeConverter{
+var contentTypeYAML = contentTypeConverter{
 	name:        "yaml",
 	contentType: "text/yaml",
 	fromJSON: func(jsonString string) string {
@@ -37,4 +37,4 @@ var contentTypeYAML = ContentTypeConverter{
 	},
 }
 
-var contentTypeConverters = []ContentTypeConverter{contentTypeJSON, contentTypeYAML}
+var contentTypeConverters = []contentTypeConverter{contentTypeJSON, contentTypeYAML}

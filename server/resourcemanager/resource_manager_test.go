@@ -13,61 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type sampleResource struct {
-	ID   id.ID  `mapstructure:"id"`
-	Name string `mapstructure:"name"`
-
-	SomeValue string `mapstructure:"some_value"`
-}
-
-func (sr sampleResource) HasID() bool {
-	return sr.ID.String() != ""
-}
-
-func (sr sampleResource) Validate() error {
-	return nil
-}
-
-type sampleResourceManager struct {
-	mock.Mock
-}
-
-func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
-	sr.ID = id
-	return sr
-}
-
-func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {
-	args := m.Called(s)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
-	args := m.Called(s)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
-	args := m.Called(id)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Delete(_ context.Context, id id.ID) error {
-	args := m.Called(id)
-	return args.Error(0)
-}
-
-func (m *sampleResourceManager) List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]sampleResource, error) {
-	args := m.Called(take, skip, query, sortBy, sortDirection)
-	return args.Get(0).([]sampleResource), args.Error(1)
-}
-func (m *sampleResourceManager) Count(_ context.Context, query string) (int, error) {
-	args := m.Called(query)
-	return args.Int(0), args.Error(1)
-}
-
 func TestSampleResource(t *testing.T) {
-
 	sample := sampleResource{
 		ID:        "1",
 		Name:      "the name",
@@ -194,4 +140,59 @@ func TestSampleResource(t *testing.T) {
 			}
 		}`,
 	})
+}
+
+// test structures and mocks
+
+type sampleResource struct {
+	ID   id.ID  `mapstructure:"id"`
+	Name string `mapstructure:"name"`
+
+	SomeValue string `mapstructure:"some_value"`
+}
+
+func (sr sampleResource) HasID() bool {
+	return sr.ID.String() != ""
+}
+
+func (sr sampleResource) Validate() error {
+	return nil
+}
+
+type sampleResourceManager struct {
+	mock.Mock
+}
+
+func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
+	sr.ID = id
+	return sr
+}
+
+func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {
+	args := m.Called(s)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
+	args := m.Called(s)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+func (m *sampleResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
+	args := m.Called(id)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+func (m *sampleResourceManager) Delete(_ context.Context, id id.ID) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
+func (m *sampleResourceManager) List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]sampleResource, error) {
+	args := m.Called(take, skip, query, sortBy, sortDirection)
+	return args.Get(0).([]sampleResource), args.Error(1)
+}
+func (m *sampleResourceManager) Count(_ context.Context, query string) (int, error) {
+	args := m.Called(query)
+	return args.Int(0), args.Error(1)
 }

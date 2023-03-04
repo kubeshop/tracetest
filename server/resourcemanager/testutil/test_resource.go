@@ -10,8 +10,6 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-type Operation string
-
 type ResourceTypeTest struct {
 	ResourceType      string
 	RegisterManagerFn func(*mux.Router) any
@@ -19,12 +17,6 @@ type ResourceTypeTest struct {
 
 	SampleJSON        string
 	SampleJSONUpdated string
-}
-type operationTester interface {
-	buildRequest(*testing.T, *httptest.Server, ContentTypeConverter, ResourceTypeTest) *http.Request
-	assertResponse(*testing.T, *http.Response, ContentTypeConverter, ResourceTypeTest)
-	name() Operation
-	postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server)
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest) {
@@ -39,12 +31,11 @@ func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
 	TestResourceTypeOperations(t, rt, append(defaultOperations, errorOperations...))
 }
 
-func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []operationTester) {
+func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []OperationTester) {
 	t.Parallel()
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
-
 		for _, op := range operations {
 			t.Run(string(op.name()), func(t *testing.T) {
 				op := op
@@ -53,11 +44,10 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 				testOperation(t, op, rt)
 			})
 		}
-
 	})
 }
 
-func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
+func testOperation(t *testing.T, op OperationTester, rt ResourceTypeTest) {
 	t.Helper()
 
 	for _, ct := range contentTypeConverters {
@@ -65,12 +55,12 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 			ct := ct
 			t.Parallel()
 
-			testContentType(t, op, ct, rt)
+			testOperationForContentType(t, op, ct, rt)
 		})
 	}
 }
 
-func testContentType(t *testing.T, op operationTester, ct ContentTypeConverter, rt ResourceTypeTest) {
+func testOperationForContentType(t *testing.T, op OperationTester, ct contentTypeConverter, rt ResourceTypeTest) {
 	t.Helper()
 
 	router := mux.NewRouter()
@@ -89,7 +79,7 @@ func testContentType(t *testing.T, op operationTester, ct ContentTypeConverter, 
 	op.postAssert(t, ct, rt, testServer)
 }
 
-func doRequest(t *testing.T, req *http.Request, ct ContentTypeConverter, testServer *httptest.Server) *http.Response {
+func doRequest(t *testing.T, req *http.Request, ct contentTypeConverter, testServer *httptest.Server) *http.Response {
 	req.Header.Set("Content-Type", ct.contentType)
 	resp, err := testServer.Client().Do(req)
 	require.NoError(t, err)

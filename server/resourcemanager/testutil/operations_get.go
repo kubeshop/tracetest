@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildGetRequest(rt ResourceTypeTest, ct ContentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
+func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
 	id := extractID(rt.SampleJSON)
 	url := fmt.Sprintf(
 		"%s/%s/%s",
@@ -28,10 +28,10 @@ const OperationGetSuccess Operation = "GetSuccess"
 
 type getSuccessOperation struct{}
 
-func (op getSuccessOperation) postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op getSuccessOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op getSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct ContentTypeConverter, rt ResourceTypeTest) *http.Request {
+func (op getSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)
 }
 
@@ -39,7 +39,7 @@ func (getSuccessOperation) name() Operation {
 	return OperationGetSuccess
 }
 
-func (getSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest) {
+func (getSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 	t.Helper()
 	require.Equal(t, 200, resp.StatusCode)
 
@@ -54,10 +54,10 @@ const OperationGetNotFound Operation = "GetNotFound"
 
 type getNotFoundOperation struct{}
 
-func (op getNotFoundOperation) postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op getNotFoundOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op getNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct ContentTypeConverter, rt ResourceTypeTest) *http.Request {
+func (op getNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)
 }
 
@@ -65,7 +65,7 @@ func (getNotFoundOperation) name() Operation {
 	return OperationGetNotFound
 }
 
-func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest) {
+func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 	t.Helper()
 	require.Equal(t, 404, resp.StatusCode)
 }
@@ -74,10 +74,10 @@ const OperationGetInternalError Operation = "GetInternalError"
 
 type getInternalErrorOperation struct{}
 
-func (op getInternalErrorOperation) postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+func (op getInternalErrorOperation) postAssert(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 }
 
-func (op getInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct ContentTypeConverter, rt ResourceTypeTest) *http.Request {
+func (op getInternalErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 	return buildGetRequest(rt, ct, testServer, t)
 }
 
@@ -85,6 +85,6 @@ func (getInternalErrorOperation) name() Operation {
 	return OperationGetInternalError
 }
 
-func (getInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest) {
+func (getInternalErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 	assertInternalError(t, resp, ct, rt, "getting")
 }
