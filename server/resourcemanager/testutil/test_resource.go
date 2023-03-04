@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/assert"
-	"sigs.k8s.io/yaml"
 )
 
 type Operation string
@@ -21,47 +20,11 @@ type ResourceTypeTest struct {
 	SampleJSON        string
 	SampleJSONUpdated string
 }
-
-type contentType struct {
-	name        string
-	contentType string
-	fromJSON    func(input string) string
-	toJSON      func(input string) string
-}
-
 type operationTester interface {
-	buildRequest(*testing.T, *httptest.Server, contentType, ResourceTypeTest) *http.Request
-	assertResponse(*testing.T, *http.Response, contentType, ResourceTypeTest)
+	buildRequest(*testing.T, *httptest.Server, ContentTypeConverter, ResourceTypeTest) *http.Request
+	assertResponse(*testing.T, *http.Response, ContentTypeConverter, ResourceTypeTest)
 	name() Operation
-	postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server)
-}
-
-var contentTypes = []contentType{
-	{
-		name:        "json",
-		contentType: "application/json",
-		fromJSON:    func(jsonSring string) string { return jsonSring },
-		toJSON:      func(jsonSring string) string { return jsonSring },
-	},
-
-	{
-		name:        "yaml",
-		contentType: "text/yaml",
-		fromJSON: func(jsonString string) string {
-			y, err := yaml.JSONToYAML([]byte(jsonString))
-			if err != nil {
-				panic(err)
-			}
-			return string(y)
-		},
-		toJSON: func(yamlString string) string {
-			j, err := yaml.YAMLToJSON([]byte(yamlString))
-			if err != nil {
-				panic(err)
-			}
-			return string(j)
-		},
-	},
+	postAssert(t *testing.T, ct ContentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server)
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest) {
@@ -97,7 +60,7 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	t.Helper()
 
-	for _, ct := range contentTypes {
+	for _, ct := range contentTypeConverters {
 		t.Run(ct.name, func(t *testing.T) {
 			ct := ct
 			t.Parallel()
@@ -107,7 +70,7 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	}
 }
 
-func testContentType(t *testing.T, op operationTester, ct contentType, rt ResourceTypeTest) {
+func testContentType(t *testing.T, op operationTester, ct ContentTypeConverter, rt ResourceTypeTest) {
 	t.Helper()
 
 	router := mux.NewRouter()
@@ -126,7 +89,7 @@ func testContentType(t *testing.T, op operationTester, ct contentType, rt Resour
 	op.postAssert(t, ct, rt, testServer)
 }
 
-func doRequest(t *testing.T, req *http.Request, ct contentType, testServer *httptest.Server) *http.Response {
+func doRequest(t *testing.T, req *http.Request, ct ContentTypeConverter, testServer *httptest.Server) *http.Response {
 	req.Header.Set("Content-Type", ct.contentType)
 	resp, err := testServer.Client().Do(req)
 	require.NoError(t, err)

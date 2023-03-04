@@ -92,13 +92,13 @@ func responseBody(t *testing.T, resp *http.Response) string {
 	return string(body)
 }
 
-func responseBodyJSON(t *testing.T, resp *http.Response, ct contentType) string {
+func responseBodyJSON(t *testing.T, resp *http.Response, ct ContentTypeConverter) string {
 	body := responseBody(t, resp)
 	jsonBody := ct.toJSON(string(body))
 	return jsonBody
 }
 
-func assertInternalError(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest, verb string) {
+func assertInternalError(t *testing.T, resp *http.Response, ct ContentTypeConverter, rt ResourceTypeTest, verb string) {
 	require.Equal(t, 500, resp.StatusCode)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
