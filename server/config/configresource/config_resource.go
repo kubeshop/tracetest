@@ -165,7 +165,17 @@ const (
 )
 
 func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Config, error) {
-	rows, err := r.db.QueryContext(ctx, baseSelect)
+	listQuery := baseSelect
+
+	if take > 0 {
+		listQuery = fmt.Sprintf("%s LIMIT %d", listQuery, take)
+	}
+
+	if skip > 0 {
+		listQuery = fmt.Sprintf("%s OFFSET %d", listQuery, skip)
+	}
+
+	rows, err := r.db.QueryContext(ctx, listQuery)
 	if err != nil {
 		return nil, fmt.Errorf("sql query: %w", err)
 	}
