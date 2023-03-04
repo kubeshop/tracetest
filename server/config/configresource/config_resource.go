@@ -167,6 +167,14 @@ const (
 func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Config, error) {
 	listQuery := baseSelect
 
+	if sortDirection == "" {
+		sortDirection = "ASC"
+	}
+
+	if sortBy != "" {
+		listQuery = fmt.Sprintf("%s SORT BY %s %s", listQuery, sortBy, sortDirection)
+	}
+
 	if take > 0 {
 		listQuery = fmt.Sprintf("%s LIMIT %d", listQuery, take)
 	}
