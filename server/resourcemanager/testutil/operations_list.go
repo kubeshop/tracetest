@@ -10,8 +10,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildListRequest(rt string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt))
+func buildQueryString(params map[string]string) string {
+	queryString := ""
+
+	if len(params) == 0 {
+		return queryString
+	}
+
+	formattedParams := []string{}
+
+	for key, value := range params {
+		formattedParams = append(formattedParams, fmt.Sprintf("%s=%s", key, value))
+	}
+
+	return "?" + strings.Join(formattedParams, "&")
+}
+
+func buildListRequest(resourceType string, paginationParams map[string]string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
+	queryString := buildQueryString(paginationParams)
+
+	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(resourceType), queryString)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	require.NoError(t, err)
@@ -25,6 +43,7 @@ var listNoResultsOperation = operationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
+			map[string]string{},
 			ct,
 			testServer,
 			t,
@@ -51,6 +70,7 @@ var listSuccessOperation = operationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
+			map[string]string{},
 			ct,
 			testServer,
 			t,
@@ -70,6 +90,72 @@ var listSuccessOperation = operationTester{
 	},
 }
 
+const OperationListPaginatedAscendingSuccess Operation = "ListPaginatedAscendingSuccess"
+
+var listPaginatedAscendingSuccessOperation = operationTester{
+	name: OperationListPaginatedAscendingSuccess,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildListRequest(
+			rt.ResourceType,
+			map[string]string{
+				"take":          "2",
+				"skip":          "1",
+				"sortBy":        "id",
+				"sortDirection": "asc",
+				// TODO: think how to use "query" param
+			},
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 200, resp.StatusCode)
+
+		jsonBody := responseBodyJSON(t, resp, ct)
+
+		expected := `{
+			"count": 2,
+			"items": ` + ct.toJSON(rt.SamplePaginatedAscJSON) + `
+		}`
+
+		require.JSONEq(t, expected, jsonBody)
+	},
+}
+
+const OperationListPaginatedDescendingSuccess Operation = "ListPaginatedDescendingSuccess"
+
+var listPaginatedDescendingSuccessOperation = operationTester{
+	name: OperationListPaginatedDescendingSuccess,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildListRequest(
+			rt.ResourceType,
+			map[string]string{
+				"take":          "2",
+				"skip":          "1",
+				"sortBy":        "id",
+				"sortDirection": "desc",
+				// TODO: think how to use "query" param
+			},
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 200, resp.StatusCode)
+
+		jsonBody := responseBodyJSON(t, resp, ct)
+
+		expected := `{
+			"count": 2,
+			"items": ` + ct.toJSON(rt.SamplePaginatedDescJSON) + `
+		}`
+
+		require.JSONEq(t, expected, jsonBody)
+	},
+}
+
 const OperationListInternalError Operation = "ListInternalError"
 
 var listInternalErrorOperation = operationTester{
@@ -77,6 +163,7 @@ var listInternalErrorOperation = operationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
+			map[string]string{},
 			ct,
 			testServer,
 			t,

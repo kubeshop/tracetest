@@ -31,6 +31,8 @@ var (
 
 		listNoResultsOperation,
 		listSuccessOperation,
+		listPaginatedAscendingSuccessOperation,
+		listPaginatedDescendingSuccessOperation,
 		// TODO: add tests for pagination etc
 	}
 

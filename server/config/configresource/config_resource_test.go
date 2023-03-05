@@ -17,8 +17,18 @@ func TestConfigResource(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
 	sampleConfig := configresource.Config{
 		ID:               "1",
-		Name:             "test",
+		Name:             "test 1",
+		AnalyticsEnabled: false,
+	}
+	secondSampleConfig := configresource.Config{
+		ID:               "2",
+		Name:             "test 2",
 		AnalyticsEnabled: true,
+	}
+	thirdSampleConfig := configresource.Config{
+		ID:               "3",
+		Name:             "test 3",
+		AnalyticsEnabled: false,
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
@@ -40,14 +50,19 @@ func TestConfigResource(t *testing.T) {
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				configRepo.Create(context.TODO(), sampleConfig)
+			case rmtests.OperationListPaginatedAscendingSuccess,
+				rmtests.OperationListPaginatedDescendingSuccess:
+				configRepo.Create(context.TODO(), sampleConfig)
+				configRepo.Create(context.TODO(), secondSampleConfig)
+				configRepo.Create(context.TODO(), thirdSampleConfig)
 			}
 		},
 		SampleJSON: `{
 			"type": "Config",
 			"spec": {
 				"id": "1",
-				"name": "test",
-				"analyticsEnabled": true
+				"name": "test 1",
+				"analyticsEnabled": false
 			}
 		}`,
 
@@ -56,8 +71,46 @@ func TestConfigResource(t *testing.T) {
 			"spec": {
 				"id": "1",
 				"name": "test updated",
-				"analyticsEnabled": true
+				"analyticsEnabled": false
 			}
 		}`,
+
+		SamplePaginatedAscJSON: `[
+			{
+				"type": "Config",
+				"spec": {
+					"id": "2",
+					"name": "test 2",
+					"analyticsEnabled": true
+				}
+			},
+			{
+				"type": "Config",
+				"spec": {
+					"id": "3",
+					"name": "test 3",
+					"analyticsEnabled": false
+				}
+			},
+		]`,
+
+		SamplePaginatedDescJSON: `[
+			{
+				"type": "Config",
+				"spec": {
+					"id": "1",
+					"name": "test 1",
+					"analyticsEnabled": false
+				}
+			},
+			{
+				"type": "Config",
+				"spec": {
+					"id": "2",
+					"name": "test 2",
+					"analyticsEnabled": true
+				}
+			},
+		]`,
 	})
 }
