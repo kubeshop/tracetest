@@ -1,5 +1,10 @@
 // import original module declarations
+import {CSSProperties} from 'react';
 import 'styled-components';
+
+type TNotification = {
+  style: CSSProperties;
+};
 
 // Extend them
 declare module 'styled-components' {
@@ -37,20 +42,11 @@ declare module 'styled-components' {
     };
 
     notification: {
-      success: {
-        style: {
-          border: string;
-          background: string;
-          minWidth: string;
-        };
-      };
-      error: {
-        style: {
-          border: string;
-          background: string;
-          minWidth: string;
-        };
-      };
+      success: TNotification;
+      error: TNotification;
+      info: TNotification;
+      warning: TNotification;
+      open: TNotification;
     };
   }
 }

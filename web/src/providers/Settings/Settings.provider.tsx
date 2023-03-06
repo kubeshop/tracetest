@@ -1,10 +1,9 @@
-import {notification} from 'antd';
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
-import {useTheme} from 'styled-components';
 
 import {IDraftSettings} from 'types/Settings.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useNotification} from '../Notification/Notification.provider';
 
 interface IContext {
   onSubmit(values: IDraftSettings): void;
@@ -19,11 +18,8 @@ interface IProps {
 export const useSettings = () => useContext(Context);
 
 const SettingsProvider = ({children}: IProps) => {
-  const [notificationApi, notificationComponent] = notification.useNotification();
+  const {showNotification} = useNotification();
   const {onOpen: onOpenConfirmation} = useConfirmationModal();
-  const {
-    notification: {success},
-  } = useTheme();
 
   const onSubmit = useCallback(
     (values: IDraftSettings) => {
@@ -32,25 +28,16 @@ const SettingsProvider = ({children}: IProps) => {
         heading: 'Save Confirmation',
         okText: 'Save',
         onConfirm: () => {
-          notificationApi.success({
-            message: 'Settings saved',
-            description: 'Your settings were saved',
-            ...success,
-          });
+          showNotification({type: 'success', title: 'Settings saved', description: 'Your settings were saved'});
         },
       });
     },
-    [notificationApi, onOpenConfirmation, success]
+    [onOpenConfirmation, showNotification]
   );
 
   const value = useMemo<IContext>(() => ({onSubmit}), [onSubmit]);
 
-  return (
-    <>
-      {notificationComponent}
-      <Context.Provider value={value}>{children}</Context.Provider>
-    </>
-  );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default SettingsProvider;
