@@ -122,6 +122,29 @@ var listSuccessOperation = operationTester{
 	},
 }
 
+const OperationListWithInvalidSortField Operation = "ListWithInvalidSortField"
+
+var listWithInvalidSortFieldOperation = operationTester{
+	name: OperationListWithInvalidSortField,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildListRequest(
+			rt.ResourceType,
+			map[string]string{
+				"take":          "2",
+				"skip":          "1",
+				"sortBy":        rt.InvalidSortField,
+				"sortDirection": "asc",
+			},
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 400, resp.StatusCode)
+	},
+}
+
 const OperationListPaginatedAscendingSuccess Operation = "ListPaginatedAscendingSuccess"
 
 var listPaginatedAscendingSuccessOperation = operationTester{
@@ -132,7 +155,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        rt.PaginationSortField,
+				"sortBy":        rt.SortField,
 				"sortDirection": "asc",
 			},
 			ct,
@@ -154,7 +177,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 		require.Equal(t, 3, parsedJsonBody.Count)
 
 		var prevVal any
-		field := rt.PaginationSortField
+		field := rt.SortField
 
 		for _, item := range parsedJsonBody.Items {
 			if prevVal == nil {
@@ -178,7 +201,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        rt.PaginationSortField,
+				"sortBy":        rt.SortField,
 				"sortDirection": "desc",
 			},
 			ct,
@@ -200,7 +223,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 		require.Equal(t, 3, parsedJsonBody.Count)
 
 		var prevVal any
-		field := rt.PaginationSortField
+		field := rt.SortField
 
 		for _, item := range parsedJsonBody.Items {
 			if prevVal == nil {

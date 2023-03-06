@@ -164,6 +164,10 @@ const (
 		FROM configs `
 )
 
+func (r *repository) SortingFields() []string {
+	return []string{"id", "name", "analytics_enabled"}
+}
+
 func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Config, error) {
 	listQuery := baseSelect
 

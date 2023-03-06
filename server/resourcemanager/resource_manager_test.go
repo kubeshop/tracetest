@@ -165,7 +165,8 @@ func TestSampleResource(t *testing.T) {
 				"some_value": "the value updated"
 			}
 		}`,
-		PaginationSortField: "id",
+		SortField:        "id",
+		InvalidSortField: "invalid_field",
 	})
 }
 
@@ -215,10 +216,15 @@ func (m *sampleResourceManager) Delete(_ context.Context, id id.ID) error {
 	return args.Error(0)
 }
 
+func (m *sampleResourceManager) SortingFields() []string {
+	return []string{"id", "name", "some_value"}
+}
+
 func (m *sampleResourceManager) List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]sampleResource, error) {
 	args := m.Called(take, skip, query, sortBy, sortDirection)
 	return args.Get(0).([]sampleResource), args.Error(1)
 }
+
 func (m *sampleResourceManager) Count(_ context.Context, query string) (int, error) {
 	args := m.Called(query)
 	return args.Int(0), args.Error(1)

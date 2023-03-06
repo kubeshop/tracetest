@@ -15,9 +15,10 @@ type ResourceTypeTest struct {
 	RegisterManagerFn func(*mux.Router) any
 	Prepare           func(t *testing.T, operation Operation, bridge any)
 
-	SampleJSON          string
-	SampleJSONUpdated   string
-	PaginationSortField string
+	SampleJSON        string
+	SampleJSONUpdated string
+	SortField         string
+	InvalidSortField  string
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest) {

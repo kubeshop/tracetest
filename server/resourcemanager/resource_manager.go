@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/mitchellh/mapstructure"
@@ -32,6 +34,7 @@ type Resource[T ResourceSpec] struct {
 
 type ResourceHandler[T ResourceSpec] interface {
 	SetID(T, id.ID) T
+	SortingFields() []string
 	List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
 	Count(_ context.Context, query string) (int, error)
 	Create(context.Context, T) (T, error)
@@ -90,7 +93,7 @@ func getIntFromQuery(r *http.Request, key string) (int, error) {
 	return val, nil
 }
 
-func paginationParams(r *http.Request) (take, skip int, query, sortBy, sortDirection string, err error) {
+func paginationParams(r *http.Request, sortingFields []string) (take, skip int, query, sortBy, sortDirection string, err error) {
 	take, err = getIntFromQuery(r, "take")
 	if err != nil {
 		err = fmt.Errorf("error reading take param: %w", err)
@@ -104,6 +107,11 @@ func paginationParams(r *http.Request) (take, skip int, query, sortBy, sortDirec
 	}
 
 	sortBy = r.URL.Query().Get("sortBy")
+	if sortBy != "" && !slices.Contains(sortingFields, sortBy) {
+		err = fmt.Errorf("invalid sort field: %s", sortBy)
+		return
+	}
+
 	sortDirection = r.URL.Query().Get("sortDirection")
 
 	query = r.URL.Query().Get("query")
@@ -122,7 +130,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	take, skip,
 		query, sortBy,
-		sortDirection, err := paginationParams(r)
+		sortDirection, err := paginationParams(r, m.handler.SortingFields())
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
 		return
