@@ -14,13 +14,13 @@
 
 ## Pokeshop API with AWS X-Ray and Tracetest
 
-This is a simple quick start on how to configure a fully instrumented API to be used with Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use AWS X-Ray as the trace data store, the ADOT as a middleware and the Pokeshop API to generate the telemetry data.
+This is a simple quick start guide on how to configure a fully instrumented API to be used with Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use AWS X-Ray as the trace data store, the ADOT as a middleware and the Pokeshop API to generate the telemetry data.
 
 ## Prerequisites
 
 You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
 
-A set of AWS credentials to connect Tracetest to the cloud API.
+And a set of AWS credentials to connect Tracetest to the cloud API.
 
 ## Project Structure
 
@@ -38,7 +38,7 @@ All `services` in the `docker-compose.yaml` are on the same network and will be 
 
 The Pokeshop API is a fully instrumented REST API that makes use of different services to mimic a real life scenario.
 
-It is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/) sending the data to the ADOT collector that will be pushing the telemetry information to both the AWS X-Ray service.
+It is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/), sending the data to the ADOT collector that will be pushing the telemetry information to both the AWS X-Ray service.
 
 This is a fragment from the main tracing file from the [Pokeshop API repo.](https://github.com/kubeshop/pokeshop)
 
@@ -205,7 +205,7 @@ services:
 
 ## Tracetest
 
-The `docker-compose.yaml`  includes three other services.
+The `docker-compose.yaml` includes three other services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
 - [**AWS Distro for OpenTelemetry (ADOT**)](https://aws-otel.github.io/docs/getting-started/collector) - is a software application that listens for traffic on UDP port 2000, gathers raw segment data, and relays it to the AWS X-Ray API. The daemon works in conjunction with the AWS X-Ray SDKs and must be running so that data sent by the SDKs can reach the X-Ray service.
@@ -295,7 +295,7 @@ The `tracetest.provision.yaml` file definines the trace data store, set to AWS X
 
 But how does Tracetest fetch traces?
 
-Tracetest uses the golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
+Tracetest uses the Golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
 
 ```yaml
 dataStore:
@@ -313,15 +313,15 @@ The Pokeshop API code uses the native Node.js OpenTelemetry modules which sends 
 
 ## Run Both the Pokeshop API and Tracetest
 
-To start both the Pokeshop API and Tracetest, we will run this command:
+To start both the Pokeshop API and Tracetest, run this command:
 
 ```bash
 docker-compose up
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
-Start creating tests! Make sure to use the `http://demo-api:8081/` url in your test creation, because your Pokeshop API and Tracetest are in the same network.
+This will start your Tracetest instance on `http://localhost:11633/`. Open it and start creating tests!
+Make sure to use the `http://demo-api:8081/` url in your test creation, because your Pokeshop API and Tracetest are in the same network.
 
 ## Learn More
 
-Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Please visit our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples) and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

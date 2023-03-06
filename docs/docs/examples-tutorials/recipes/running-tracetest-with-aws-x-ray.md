@@ -8,15 +8,15 @@
 
 [AWS X-Ray](https://aws.amazon.com/xray/) provides a complete view of requests as they travel through your application and filters visual data across payloads, functions, traces, services, APIs, and more with no-code and low-code motions.
 
-## Sample Node.js app with AWS X-Ray and Tracetest
+## Sample Node.js App with AWS X-Ray and Tracetest
 
-This is a simple quick start on how to configure a Node.js app to use instrumentation with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use AWS X-Ray as the trace data store and a Node.js app to generate the telemetry data.
+This is a simple quick start guide on how to configure a Node.js app to use instrumentation with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use AWS X-Ray as the trace data store and a Node.js app to generate the telemetry data.
 
 ## Prerequisites
 
 You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
 
-A set of AWS credentials to connect Tracetest to the cloud API.
+And a set of AWS credentials to connect Tracetest to the cloud API.
 
 ## Project Structure
 
@@ -32,15 +32,15 @@ The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest-confi
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `xray-daemon:2000` in the `src/index.js` will map to the `xray-daemon` service, where the port `2000` is the port where the X-Ray Daemon accepts telemetry data
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `xray-daemon:2000` in the `src/index.js` will map to the `xray-daemon` service, where the port `2000` is the port where the X-Ray Daemon accepts telemetry data.
 
-## Node.js app
+## Node.js App
 
 The Node.js app is a simple Express app, contained in the `src/index.js` file.
 
 It is instrumented using [AWS X-Ray SDK](https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-nodejs.html) sending the initial data to the Daemon that will be pushing the telemetry data to the AWS service.
 
-The key instrumentation section from the `src/index.js` file.
+The key following is the instrumentation section from the `src/index.js` file.
 
 ```js
 const AWSXRay = require("aws-xray-sdk");
@@ -88,7 +88,7 @@ CMD [ "npm", "start" ]
 
 ## Tracetest
 
-The `docker-compose.yaml`  includes three other services.
+The `docker-compose.yaml` includes three other services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
 - [**AWS X-Ray Daemon**](https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon.html) - is a software application that listens for traffic on UDP port 2000, gathers raw segment data, and relays it to the AWS X-Ray API. The daemon works in conjunction with the AWS X-Ray SDKs and must be running so that data sent by the SDKs can reach the X-Ray service.
@@ -173,7 +173,7 @@ The `tracetest.provision.yaml` file definines the trace data store, set to AWS X
 
 But how does Tracetest fetch traces?
 
-Tracetest uses the golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
+Tracetest uses the Golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
 
 ```yaml
 dataStore:
@@ -190,7 +190,7 @@ How do traces reach AWX X-Ray?
 
 The application code in the `src/index.js` file uses the native AWS SDK X-Ray library which sends telemetry data to the X-Ray Daemon to be processed and then sent to the configured AWS X-Ray SaaS.
 
-## Run Both the Node.js app and Tracetest
+## Run Both the Node.js App and Tracetest
 
 To start both the Node.js app and Tracetest, we will run this command:
 
@@ -198,9 +198,9 @@ To start both the Node.js app and Tracetest, we will run this command:
 docker-compose up
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
-Start creating tests! Make sure to use the `http://app:3000/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+This will start your Tracetest instance on `http://localhost:11633/`. Open it and start creating tests!
+Make sure to use the `http://app:3000/` url in your test creation, because your Node.js app and Tracetest are in the same network.
 
 ## Learn More
 
-Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Please visit our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

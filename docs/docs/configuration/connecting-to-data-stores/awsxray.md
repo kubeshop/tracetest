@@ -10,7 +10,7 @@ Examples of configuring Tracetest with X-Ray can be found in the [`examples` fol
 
 Configure Tracetest to be aware that it has to fetch trace data from X-Ray.
 
-Tracetest uses the golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
+Tracetest uses the Golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
 
 :::tip
 Need help configuring the OpenTelemetry Collector so send trace data from your application to AWS X-Ray? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
@@ -22,7 +22,7 @@ In the Web UI, open settings, and select AWS X-Ray.
 
 ![AWS X-Ray Settings](../img/configure-awsxray.png)
 
-From the configuration page, add your AWS credentials, you can use temporary credentials by running `aws sts get-session-token`.
+From the configuration page, add your AWS credentials. You can use temporary credentials by running `aws sts get-session-token`.
 Lastly, you can ensure the connection is working as expected by pressing the `Test Connection` button.
 
 ## Connect Tracetest to AWS X-Ray with the CLI
@@ -40,7 +40,7 @@ spec:
     region: "us-west-2"
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Run this command in the terminal and specify the file above.
 
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml

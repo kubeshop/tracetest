@@ -22,7 +22,7 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
-### 1. Node.js app
+### 1. Node.js App
 
 The `Dockerfile` in the root directory are for the Node.js app.
 
@@ -32,13 +32,13 @@ The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest-confi
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `adot-collector:2000` in the `src/index.js` will map to the `adot-collector` service, where the port `2000` is the port where the X-Ray Daemon accepts telemetry data
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `adot-collector:2000` in the `src/index.js` will map to the `adot-collector` service, where the port `2000` is the port where the X-Ray Daemon accepts telemetry data.
 
-## Node.js app
+## Node.js App
 
 The Node.js app is a simple Express app, contained in the `src/index.js` file.
 
-It is instrumented using [AWS X-Ray SDK](https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-nodejs.html) sending the data to the ADOT collector that will be pushing the telemetry information to both the AWS service and the Tracetest otlp endpoint.
+It is instrumented using [AWS X-Ray SDK](https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-nodejs.html), sending the data to the ADOT collector that will push the telemetry information to both the AWS service and the Tracetest OLTP endpoint.
 
 The key instrumentation section from the `src/index.js` file.
 
@@ -65,7 +65,7 @@ const port = 3000;
 app.use(XRayExpress.openSegment("Tracetest"));
 ```
 
-To start the server you run this command.
+To start the server run this command.
 
 ```bash
 npm start
@@ -88,7 +88,7 @@ CMD [ "npm", "start" ]
 
 ## Tracetest
 
-The `docker-compose.yaml`  includes three other services.
+The `docker-compose.yaml` includes three other services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
 - [**AWS Distro for OpenTelemetry (ADOT)**](https://aws-otel.github.io/docs/getting-started/collector) - is a software application that listens for traffic on UDP port 2000, gathers raw segment data, and relays it to the AWS X-Ray API. The daemon works in conjunction with the AWS X-Ray SDKs and must be running so that data sent by the SDKs can reach the X-Ray service.
@@ -212,17 +212,17 @@ How do traces reach AWS X-Ray?
 
 The application code in the `src/index.js` file uses the native AWS SDK X-Ray library which sends telemetry data to the ADOT Collector to be processed and then sent to the configured AWS X-Ray SaaS and Tracetest.
 
-## Run Both the Node.js app and Tracetest
+## Run Both the Node.js App and Tracetest
 
-To start both the Node.js app and Tracetest, we will run this command:
+To start both the Node.js app and Tracetest, run this command:
 
 ```bash
 docker-compose up
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
-Start creating tests! Make sure to use the `http://app:3000/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+This will start your Tracetest instance on `http://localhost:11633/`. Open the instance and start creating tests!
+Make sure to use the `http://app:3000/` url in your test creation, because your Node.js app and Tracetest are in the same network.
 
 ## Learn More
 
-Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Please visit our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
