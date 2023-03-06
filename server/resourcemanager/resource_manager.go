@@ -147,6 +147,9 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: the name "count" can be misleading when using pagination.
+	//       an user can paginate the request and see a different number
+	//       of records inside "item"
 	resourceList := ResourceList[T]{
 		Count: count,
 		Items: []map[string]any{},

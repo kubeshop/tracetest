@@ -115,7 +115,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 		jsonBody := responseBodyJSON(t, resp, ct)
 
 		expected := `{
-			"count": 2,
+			"count": 3,
 			"items": ` + ct.toJSON(rt.SamplePaginatedAscJSON) + `
 		}`
 
@@ -148,7 +148,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 		jsonBody := responseBodyJSON(t, resp, ct)
 
 		expected := `{
-			"count": 2,
+			"count": 3,
 			"items": ` + ct.toJSON(rt.SamplePaginatedDescJSON) + `
 		}`
 

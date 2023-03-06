@@ -20,6 +20,18 @@ func TestSampleResource(t *testing.T) {
 		SomeValue: "the value",
 	}
 
+	secondSample := sampleResource{
+		ID:        "2",
+		Name:      "the name 2",
+		SomeValue: "the value 2",
+	}
+
+	thirdSample := sampleResource{
+		ID:        "3",
+		Name:      "the name 3",
+		SomeValue: "the value 3",
+	}
+
 	sampleUpdated := sampleResource{
 		ID:        "1",
 		Name:      "the name updated",
@@ -117,6 +129,20 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
+			case rmtests.OperationListPaginatedAscendingSuccess:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(3, nil)
+				mockManager.
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{secondSample, thirdSample}, nil)
+			case rmtests.OperationListPaginatedDescendingSuccess:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(3, nil)
+				mockManager.
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{secondSample, sample}, nil)
 			case rmtests.OperationListInternalError:
 				mockManager.
 					On("Count", mock.Anything).
@@ -139,6 +165,42 @@ func TestSampleResource(t *testing.T) {
 				"some_value": "the value updated"
 			}
 		}`,
+		SamplePaginatedAscJSON: `[
+			{
+				"type": "SampleResource",
+				"spec": {
+					"id": "2",
+					"name": "the name 2",
+					"some_value": "the value 2"
+				}
+			},
+			{
+				"type": "SampleResource",
+				"spec": {
+					"id": "3",
+					"name": "the name 3",
+					"some_value": "the value 3"
+				}
+			}
+		]`,
+		SamplePaginatedDescJSON: `[
+			{
+				"type": "SampleResource",
+				"spec": {
+					"id": "2",
+					"name": "the name 2",
+					"some_value": "the value 2"
+				}
+			},
+			{
+				"type": "SampleResource",
+				"spec": {
+					"id": "1",
+					"name": "the name",
+					"some_value": "the value"
+				}
+			}
+		]`,
 	})
 }
 
