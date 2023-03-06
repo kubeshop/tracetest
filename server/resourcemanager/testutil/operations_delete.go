@@ -30,7 +30,7 @@ var deleteSuccessOperation = operationTester{
 	name: OperationDeleteSuccess,
 	postAssert: func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 		req := buildGetRequest(rt, ct, testServer, t)
-		resp := doRequest(t, req, ct, testServer)
+		resp := doRequest(t, req, ct.contentType, testServer)
 		getNotFoundOperation.assertResponse(t, resp, ct, rt)
 	},
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {

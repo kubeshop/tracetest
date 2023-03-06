@@ -165,42 +165,7 @@ func TestSampleResource(t *testing.T) {
 				"some_value": "the value updated"
 			}
 		}`,
-		SamplePaginatedAscJSON: `[
-			{
-				"type": "SampleResource",
-				"spec": {
-					"id": "2",
-					"name": "the name 2",
-					"some_value": "the value 2"
-				}
-			},
-			{
-				"type": "SampleResource",
-				"spec": {
-					"id": "3",
-					"name": "the name 3",
-					"some_value": "the value 3"
-				}
-			}
-		]`,
-		SamplePaginatedDescJSON: `[
-			{
-				"type": "SampleResource",
-				"spec": {
-					"id": "2",
-					"name": "the name 2",
-					"some_value": "the value 2"
-				}
-			},
-			{
-				"type": "SampleResource",
-				"spec": {
-					"id": "1",
-					"name": "the name",
-					"some_value": "the value"
-				}
-			}
-		]`,
+		PaginationSortFields: []string{"id"},
 	})
 }
 

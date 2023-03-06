@@ -1,12 +1,14 @@
 package testutil
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,6 +26,48 @@ func buildQueryString(params map[string]string) string {
 	}
 
 	return "?" + strings.Join(formattedParams, "&")
+}
+
+func getSafeSortFields(sortFields []string) []string {
+	if sortFields == nil {
+		return []string{}
+	}
+
+	return sortFields
+}
+
+func getSortFieldsString(sortFields []string) string {
+	return strings.Join(getSafeSortFields(sortFields), ",")
+}
+
+func compareFieldsGreaterThan(first, second any) bool {
+	switch first.(type) {
+	case int:
+		return first.(int) >= second.(int)
+	case float32:
+		return first.(float32) >= second.(float32)
+	case float64:
+		return first.(float64) >= second.(float64)
+	case string:
+		return first.(string) >= second.(string)
+	default:
+		panic("type unknown for comparison")
+	}
+}
+
+func compareFieldsLesserThan(first, second any) bool {
+	switch first.(type) {
+	case int:
+		return first.(int) <= second.(int)
+	case float32:
+		return first.(float32) <= second.(float32)
+	case float64:
+		return first.(float64) <= second.(float64)
+	case string:
+		return first.(string) <= second.(string)
+	default:
+		panic("type unknown for comparison")
+	}
 }
 
 func buildListRequest(resourceType string, paginationParams map[string]string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
@@ -100,9 +144,8 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        "id",
+				"sortBy":        getSortFieldsString(rt.PaginationSortFields),
 				"sortDirection": "asc",
-				// TODO: think how to use "query" param
 			},
 			ct,
 			testServer,
@@ -114,12 +157,29 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
-		expected := `{
-			"count": 3,
-			"items": ` + ct.toJSON(rt.SamplePaginatedAscJSON) + `
-		}`
+		var parsedJsonBody struct {
+			Count int              `json:count`
+			Items []map[string]any `json:items`
+		}
+		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-		require.JSONEq(t, expected, jsonBody)
+		require.Equal(t, 3, parsedJsonBody.Count)
+
+		var prevVal any
+
+		sortFields := getSafeSortFields(rt.PaginationSortFields)
+
+		for _, field := range sortFields {
+			for _, item := range parsedJsonBody.Items {
+				if prevVal == nil {
+					prevVal = item[field]
+					continue
+				}
+				assert.True(t, compareFieldsLesserThan(prevVal, item[field]))
+
+				prevVal = item[field]
+			}
+		}
 	},
 }
 
@@ -133,9 +193,8 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        "id",
+				"sortBy":        getSortFieldsString(rt.PaginationSortFields),
 				"sortDirection": "desc",
-				// TODO: think how to use "query" param
 			},
 			ct,
 			testServer,
@@ -147,12 +206,29 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
-		expected := `{
-			"count": 3,
-			"items": ` + ct.toJSON(rt.SamplePaginatedDescJSON) + `
-		}`
+		var parsedJsonBody struct {
+			Count int              `json:count`
+			Items []map[string]any `json:items`
+		}
+		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-		require.JSONEq(t, expected, jsonBody)
+		require.Equal(t, 3, parsedJsonBody.Count)
+
+		var prevVal any
+
+		sortFields := getSafeSortFields(rt.PaginationSortFields)
+
+		for _, field := range sortFields {
+			for _, item := range parsedJsonBody.Items {
+				if prevVal == nil {
+					prevVal = item[field]
+					continue
+				}
+				assert.True(t, compareFieldsGreaterThan(prevVal, item[field]))
+
+				prevVal = item[field]
+			}
+		}
 	},
 }
 

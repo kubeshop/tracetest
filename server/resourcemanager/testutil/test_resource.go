@@ -15,10 +15,9 @@ type ResourceTypeTest struct {
 	RegisterManagerFn func(*mux.Router) any
 	Prepare           func(t *testing.T, operation Operation, bridge any)
 
-	SampleJSON              string
-	SampleJSONUpdated       string
-	SamplePaginatedAscJSON  string
-	SamplePaginatedDescJSON string
+	SampleJSON           string
+	SampleJSONUpdated    string
+	PaginationSortFields []string
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest) {
@@ -74,7 +73,7 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 	}
 
 	req := op.buildRequest(t, testServer, ct, rt)
-	resp := doRequest(t, req, ct, testServer)
+	resp := doRequest(t, req, ct.contentType, testServer)
 
 	op.assertResponse(t, resp, ct, rt)
 	assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
@@ -83,8 +82,8 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 	}
 }
 
-func doRequest(t *testing.T, req *http.Request, ct contentTypeConverter, testServer *httptest.Server) *http.Response {
-	req.Header.Set("Content-Type", ct.contentType)
+func doRequest(t *testing.T, req *http.Request, contentType string, testServer *httptest.Server) *http.Response {
+	req.Header.Set("Content-Type", contentType)
 	resp, err := testServer.Client().Do(req)
 	require.NoError(t, err)
 

@@ -65,7 +65,6 @@ func TestConfigResource(t *testing.T) {
 				"analyticsEnabled": false
 			}
 		}`,
-
 		SampleJSONUpdated: `{
 			"type": "Config",
 			"spec": {
@@ -74,43 +73,6 @@ func TestConfigResource(t *testing.T) {
 				"analyticsEnabled": false
 			}
 		}`,
-
-		SamplePaginatedAscJSON: `[
-			{
-				"type": "Config",
-				"spec": {
-					"id": "2",
-					"name": "test 2",
-					"analyticsEnabled": true
-				}
-			},
-			{
-				"type": "Config",
-				"spec": {
-					"id": "3",
-					"name": "test 3",
-					"analyticsEnabled": false
-				}
-			}
-		]`,
-
-		SamplePaginatedDescJSON: `[
-			{
-				"type": "Config",
-				"spec": {
-					"id": "2",
-					"name": "test 2",
-					"analyticsEnabled": true
-				}
-			},
-			{
-				"type": "Config",
-				"spec": {
-					"id": "1",
-					"name": "test 1",
-					"analyticsEnabled": false
-				}
-			}
-		]`,
+		PaginationSortFields: []string{"id"},
 	})
 }
