@@ -143,9 +143,6 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		sortDirection,
 	)
 	if err != nil {
-		fmt.Println("---------------------------------------------------------------------------------------------------")
-		fmt.Println(err)
-		fmt.Println("---------------------------------------------------------------------------------------------------")
 		m.handleResourceHandlerError(w, "listing", err, encoder)
 		return
 	}
