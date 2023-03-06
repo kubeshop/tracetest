@@ -20,11 +20,11 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 
 ## Project Structure
 
-The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
+The project is built with Docker Compose.
 
 ### 1. Node.js App
 
-The `Dockerfile` in the root directory are for the Node.js app.
+The `Dockerfile` in the root directory is for the Node.js app.
 
 ### 2. Tracetest
 

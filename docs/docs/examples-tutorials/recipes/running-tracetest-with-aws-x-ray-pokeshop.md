@@ -24,7 +24,7 @@ And a set of AWS credentials to connect Tracetest to the cloud API.
 
 ## Project Structure
 
-The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
+The project is built with Docker Compose.
 
 ### 1. Tracetest
 
