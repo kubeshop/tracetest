@@ -91,18 +91,10 @@ func TestConfigResource(t *testing.T) {
 					"name": "test 3",
 					"analyticsEnabled": false
 				}
-			},
+			}
 		]`,
 
 		SamplePaginatedDescJSON: `[
-			{
-				"type": "Config",
-				"spec": {
-					"id": "1",
-					"name": "test 1",
-					"analyticsEnabled": false
-				}
-			},
 			{
 				"type": "Config",
 				"spec": {
@@ -111,6 +103,14 @@ func TestConfigResource(t *testing.T) {
 					"analyticsEnabled": true
 				}
 			},
+			{
+				"type": "Config",
+				"spec": {
+					"id": "1",
+					"name": "test 1",
+					"analyticsEnabled": false
+				}
+			}
 		]`,
 	})
 }

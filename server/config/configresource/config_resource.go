@@ -171,8 +171,12 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 		sortDirection = "ASC"
 	}
 
+	if query != "" {
+		listQuery = fmt.Sprintf("%s WHERE %s", listQuery, query)
+	}
+
 	if sortBy != "" {
-		listQuery = fmt.Sprintf("%s SORT BY %s %s", listQuery, sortBy, sortDirection)
+		listQuery = fmt.Sprintf("%s ORDER BY %s %s", listQuery, sortBy, sortDirection)
 	}
 
 	if take > 0 {
@@ -210,9 +214,15 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	return configs, nil
 }
 
-const countQuery = `SELECT COUNT(*) FROM configs`
+const baseCountQuery = `SELECT COUNT(*) FROM configs`
 
 func (r *repository) Count(ctx context.Context, query string) (int, error) {
+	countQuery := baseCountQuery
+
+	if query != "" {
+		countQuery = fmt.Sprintf("%s WHERE %s", countQuery, query)
+	}
+
 	count := 0
 
 	err := r.db.
