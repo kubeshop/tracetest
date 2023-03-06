@@ -165,7 +165,7 @@ func TestSampleResource(t *testing.T) {
 				"some_value": "the value updated"
 			}
 		}`,
-		PaginationSortFields: []string{"id"},
+		PaginationSortField: "id",
 	})
 }
 

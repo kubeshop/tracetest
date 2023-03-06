@@ -28,18 +28,6 @@ func buildQueryString(params map[string]string) string {
 	return "?" + strings.Join(formattedParams, "&")
 }
 
-func getSafeSortFields(sortFields []string) []string {
-	if sortFields == nil {
-		return []string{}
-	}
-
-	return sortFields
-}
-
-func getSortFieldsString(sortFields []string) string {
-	return strings.Join(getSafeSortFields(sortFields), ",")
-}
-
 func compareFieldsGreaterThan(first, second any) bool {
 	switch first.(type) {
 	case int:
@@ -144,7 +132,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        getSortFieldsString(rt.PaginationSortFields),
+				"sortBy":        rt.PaginationSortField,
 				"sortDirection": "asc",
 			},
 			ct,
@@ -166,19 +154,16 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 		require.Equal(t, 3, parsedJsonBody.Count)
 
 		var prevVal any
+		field := rt.PaginationSortField
 
-		sortFields := getSafeSortFields(rt.PaginationSortFields)
-
-		for _, field := range sortFields {
-			for _, item := range parsedJsonBody.Items {
-				if prevVal == nil {
-					prevVal = item[field]
-					continue
-				}
-				assert.True(t, compareFieldsLesserThan(prevVal, item[field]))
-
+		for _, item := range parsedJsonBody.Items {
+			if prevVal == nil {
 				prevVal = item[field]
+				continue
 			}
+			assert.True(t, compareFieldsLesserThan(prevVal, item[field]))
+
+			prevVal = item[field]
 		}
 	},
 }
@@ -193,7 +178,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        getSortFieldsString(rt.PaginationSortFields),
+				"sortBy":        rt.PaginationSortField,
 				"sortDirection": "desc",
 			},
 			ct,
@@ -215,19 +200,16 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 		require.Equal(t, 3, parsedJsonBody.Count)
 
 		var prevVal any
+		field := rt.PaginationSortField
 
-		sortFields := getSafeSortFields(rt.PaginationSortFields)
-
-		for _, field := range sortFields {
-			for _, item := range parsedJsonBody.Items {
-				if prevVal == nil {
-					prevVal = item[field]
-					continue
-				}
-				assert.True(t, compareFieldsGreaterThan(prevVal, item[field]))
-
+		for _, item := range parsedJsonBody.Items {
+			if prevVal == nil {
 				prevVal = item[field]
+				continue
 			}
+			assert.True(t, compareFieldsGreaterThan(prevVal, item[field]))
+
+			prevVal = item[field]
 		}
 	},
 }

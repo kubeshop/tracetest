@@ -73,6 +73,6 @@ func TestConfigResource(t *testing.T) {
 				"analyticsEnabled": false
 			}
 		}`,
-		PaginationSortFields: []string{"id"},
+		PaginationSortField: "id",
 	})
 }
