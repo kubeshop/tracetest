@@ -19,6 +19,8 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [Grafana Tempo](./connecting-to-data-stores/tempo)
 - [Lightstep](./connecting-to-data-stores/lightstep)
 - [New Relic](./connecting-to-data-stores/new-relic)
+- [AWS X-Ray](./connecting-to-data-stores/awsxray)
+- [Datadog](./connecting-to-data-stores/datadog)
 
 ## Using Tracetest without a Trace Data Store
 
