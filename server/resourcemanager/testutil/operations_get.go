@@ -64,6 +64,6 @@ var getInternalErrorOperation = operationTester{
 		return buildGetRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt, "getting")
+		assertInternalError(t, resp, ct, rt.ResourceType, "getting")
 	},
 }

@@ -59,6 +59,6 @@ var updateInternalErrorOperation = operationTester{
 		return buildUpdateRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt, "updating")
+		assertInternalError(t, resp, ct, rt.ResourceType, "updating")
 	},
 }

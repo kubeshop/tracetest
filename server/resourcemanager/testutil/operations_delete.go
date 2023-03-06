@@ -64,6 +64,6 @@ var deleteInternalErrorOperation = operationTester{
 		return buildDeleteRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt, "deleting")
+		assertInternalError(t, resp, ct, rt.ResourceType, "deleting")
 	},
 }

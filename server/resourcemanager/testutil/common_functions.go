@@ -70,7 +70,7 @@ func responseBodyJSON(t *testing.T, resp *http.Response, ct contentTypeConverter
 	return jsonBody
 }
 
-func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest, verb string) {
+func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConverter, resourceType, verb string) {
 	require.Equal(t, 500, resp.StatusCode)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
@@ -83,5 +83,5 @@ func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConver
 	json.Unmarshal([]byte(jsonBody), &bodyValues)
 
 	require.Equal(t, 500, bodyValues.Code)
-	require.Contains(t, bodyValues.Error, "error "+verb+" resource "+rt.ResourceType)
+	require.Contains(t, bodyValues.Error, "error "+verb+" resource "+resourceType)
 }

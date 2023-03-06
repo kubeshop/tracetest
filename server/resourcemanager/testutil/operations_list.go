@@ -170,6 +170,6 @@ var listInternalErrorOperation = operationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt, "listing")
+		assertInternalError(t, resp, ct, rt.ResourceType, "listing")
 	},
 }
