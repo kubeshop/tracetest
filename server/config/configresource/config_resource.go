@@ -33,12 +33,37 @@ func (c Config) IsAnalyticsEnabled() bool {
 	return c.AnalyticsEnabled
 }
 
-func Repository(db *sql.DB) *repository {
-	return &repository{db}
+type option func(*repository)
+
+func WithPublisher(p publisher) option {
+	return func(r *repository) {
+		r.publisher = p
+	}
+}
+
+func Repository(db *sql.DB, opts ...option) *repository {
+	return &repository{
+		db: db,
+	}
+}
+
+const ResourceID = "/app/config/update"
+
+type publisher interface {
+	Publish(resourceID string, message any)
 }
 
 type repository struct {
-	db *sql.DB
+	db        *sql.DB
+	publisher publisher
+}
+
+func (r *repository) publish(config Config) {
+	if r.publisher == nil {
+		return
+	}
+
+	r.publisher.Publish(ResourceID, config)
 }
 
 func (r *repository) Current(ctx context.Context) Config {
@@ -124,6 +149,8 @@ func (r *repository) Update(ctx context.Context, updated Config) (Config, error)
 	if err != nil {
 		return Config{}, fmt.Errorf("commit: %w", err)
 	}
+
+	r.publish(updated)
 
 	return updated, nil
 }

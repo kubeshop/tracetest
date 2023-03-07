@@ -12,7 +12,19 @@ import (
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
+
+type mockPublisher struct {
+	mock.Mock
+}
+
+func TestPublishing(t *testing.T) {
+	updated := configresource.Config{
+		AnalyticsEnabled: true,
+	}
+
+}
 
 func TestIsAnalyticsEnabled(t *testing.T) {
 	cleanEnv := func() {

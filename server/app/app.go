@@ -45,6 +45,8 @@ type App struct {
 	cfg              *config.Config
 	provisioningFile string
 	stopFns          []func()
+
+	serverID string
 }
 
 func New(config *config.Config) (*App, error) {
@@ -108,6 +110,23 @@ func (app *App) provision(db model.Repository) {
 	fmt.Println("[Provisioning]: success")
 }
 
+func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
+	sm.Subscribe(configresource.ResourceID, subscription.NewSubscriberFunction(
+		func(m subscription.Message) error {
+			configFromDB, ok := m.Content.(configresource.Config)
+			if !ok {
+				return fmt.Errorf("cannot read update to configFromDB. unexpected type %T", m.Content)
+			}
+
+			return app.initAnalytics(configFromDB)
+		}),
+	)
+}
+
+func (app *App) initAnalytics(configFromDB configresource.Config) error {
+	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env)
+}
+
 func (app *App) Start(opts ...appOption) error {
 	for _, opt := range opts {
 		opt(app)
@@ -115,6 +134,9 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println(app.Version())
 	fmt.Println("Starting")
 	ctx := context.Background()
+
+	subscriptionManager := subscription.NewManager()
+	app.subscribeToConfigChanges(subscriptionManager)
 
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
@@ -144,8 +166,9 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
+	app.serverID = serverID
 
-	err = analytics.Init(configFromDB.IsAnalyticsEnabled(), serverID, Version, Env)
+	err = app.initAnalytics(configFromDB)
 	if err != nil {
 		return err
 	}
@@ -166,7 +189,6 @@ func (app *App) Start(opts ...appOption) error {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
 
-	subscriptionManager := subscription.NewManager()
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(

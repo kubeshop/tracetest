@@ -54,3 +54,14 @@ func (m *Manager) PublishUpdate(message Message) {
 		}
 	}
 }
+
+func (m *Manager) Publish(resourceID string, message any) {
+	if subscribers, ok := m.subscriptions[resourceID]; ok {
+		for _, subscriber := range subscribers {
+			subscriber.Notify(Message{
+				ResourceID: resourceID,
+				Content:    message,
+			})
+		}
+	}
+}
