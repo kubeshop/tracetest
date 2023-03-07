@@ -17,6 +17,7 @@ const (
 	FileTypeTransaction FileType = "Transaction"
 	FileTypeEnvironment FileType = "Environment"
 	FileTypeDataStore   FileType = "DataStore"
+	FileTypeConfig      FileType = "Config"
 )
 
 type File struct {

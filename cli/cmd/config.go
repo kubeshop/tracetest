@@ -2,8 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
@@ -139,4 +143,28 @@ func getAPIClient() *openapi.APIClient {
 		}
 	}
 	return openapi.NewAPIClient(config)
+}
+
+func getResourceClient(resourceType string) (http.Client, http.Request) {
+	transport := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout: time.Second,
+		}).DialContext,
+	}
+
+	url, _ := url.Parse(fmt.Sprintf("%s://%s/api/%s/", cliConfig.Scheme, strings.TrimSuffix(cliConfig.Endpoint, "/"), resourceType))
+	request := http.Request{
+		URL: url,
+		Header: http.Header{
+			"X-Client-Id":  []string{analytics.ClientID()},
+			"content-type": []string{"text/yaml"},
+		},
+	}
+
+	client := http.Client{
+		Transport: transport,
+		Timeout:   30 * time.Second,
+	}
+
+	return client, request
 }
