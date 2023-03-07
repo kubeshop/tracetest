@@ -113,9 +113,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: tracetest-go
-        path: |
-          dist/*/tracetest
-          dist/*/tracetest-server
+        path: dist/
 
   build-web:
     name: Build WebUI resources
