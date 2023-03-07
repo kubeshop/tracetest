@@ -103,8 +103,18 @@ func TestConfigResource(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
 	sampleConfig := configresource.Config{
 		ID:               "1",
-		Name:             "test",
+		Name:             "test 1",
+		AnalyticsEnabled: false,
+	}
+	secondSampleConfig := configresource.Config{
+		ID:               "2",
+		Name:             "test 2",
 		AnalyticsEnabled: true,
+	}
+	thirdSampleConfig := configresource.Config{
+		ID:               "3",
+		Name:             "test 3",
+		AnalyticsEnabled: false,
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
@@ -126,23 +136,26 @@ func TestConfigResource(t *testing.T) {
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				configRepo.Create(context.TODO(), sampleConfig)
+			case rmtests.OperationListPaginatedSuccess:
+				configRepo.Create(context.TODO(), sampleConfig)
+				configRepo.Create(context.TODO(), secondSampleConfig)
+				configRepo.Create(context.TODO(), thirdSampleConfig)
 			}
 		},
 		SampleJSON: `{
 			"type": "Config",
 			"spec": {
 				"id": "1",
-				"name": "test",
-				"analyticsEnabled": true
+				"name": "test 1",
+				"analyticsEnabled": false
 			}
 		}`,
-
 		SampleJSONUpdated: `{
 			"type": "Config",
 			"spec": {
 				"id": "1",
 				"name": "test updated",
-				"analyticsEnabled": true
+				"analyticsEnabled": false
 			}
 		}`,
 	})

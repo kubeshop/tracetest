@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildCreateRequest(body, rt string, ct contentType, testServer *httptest.Server, t *testing.T) *http.Request {
+func buildCreateRequest(body, rt string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
 	input := ct.fromJSON(body)
 	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt))
 
@@ -21,88 +21,67 @@ func buildCreateRequest(body, rt string, ct contentType, testServer *httptest.Se
 
 const OperationCreateNoID Operation = "CreateNoID"
 
-type createNoIDOperation struct{}
+var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
+	name: OperationCreateNoID,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildCreateRequest(
+			removeIDFromJSON(rt.SampleJSON),
+			rt.ResourceType,
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 201, resp.StatusCode)
 
-func (op createNoIDOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
 
-func (op createNoIDOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildCreateRequest(
-		removeIDFromJSON(rt.SampleJSON),
-		rt.ResourceType,
-		ct,
-		testServer,
-		t,
-	)
-}
+		clean := removeIDFromJSON(rt.SampleJSON)
+		expected := ct.toJSON(clean)
 
-func (createNoIDOperation) name() Operation {
-	return OperationCreateNoID
-}
-
-func (createNoIDOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	require.Equal(t, 201, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-
-	clean := removeIDFromJSON(rt.SampleJSON)
-	expected := ct.toJSON(clean)
-
-	require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
-	require.NotEmpty(t, extractID(jsonBody))
-}
+		require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
+		require.NotEmpty(t, extractID(jsonBody))
+	},
+})
 
 const OperationCreateSuccess Operation = "CreateSuccess"
 
-type createSuccessOperation struct{}
+var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
+	name: OperationCreateSuccess,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildCreateRequest(
+			rt.SampleJSON,
+			rt.ResourceType,
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		require.Equal(t, 201, resp.StatusCode)
 
-func (op createSuccessOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
+		expected := ct.toJSON(rt.SampleJSON)
 
-func (op createSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildCreateRequest(
-		rt.SampleJSON,
-		rt.ResourceType,
-		ct,
-		testServer,
-		t,
-	)
-}
+		require.JSONEq(t, expected, jsonBody)
+	},
+})
 
-func (createSuccessOperation) name() Operation {
-	return OperationCreateSuccess
-}
+const OperationCreateInternalError Operation = "CreateInternalError"
 
-func (createSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	require.Equal(t, 201, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-	expected := ct.toJSON(rt.SampleJSON)
-
-	require.JSONEq(t, expected, jsonBody)
-}
-
-const OperationCreateInteralError Operation = "CreateInteralError"
-
-type createInteralErrorOperation struct{}
-
-func (op createInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op createInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildCreateRequest(
-		rt.SampleJSON,
-		rt.ResourceType,
-		ct,
-		testServer,
-		t,
-	)
-}
-
-func (createInteralErrorOperation) name() Operation {
-	return OperationCreateInteralError
-}
-
-func (createInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt, "creating")
-}
+var createInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
+	name: OperationCreateInternalError,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildCreateRequest(
+			rt.SampleJSON,
+			rt.ResourceType,
+			ct,
+			testServer,
+			t,
+		)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		assertInternalError(t, resp, ct, rt.ResourceType, "creating")
+	},
+})
