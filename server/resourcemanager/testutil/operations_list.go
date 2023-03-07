@@ -158,6 +158,7 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			)
 		},
 		assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+			sortField := sortField
 			require.Equal(t, 200, resp.StatusCode)
 
 			jsonBody := responseBodyJSON(t, resp, ct)
@@ -171,6 +172,9 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			require.Equal(t, 3, parsedJsonBody.Count)
 			require.Greater(t, len(parsedJsonBody.Items), 1)
 
+			// we skip the 1st item, so starting in 1 instead of 0
+			// makes things match later when comparing to len(parsedJsonBody.Items)
+			asserted := 1
 			var prevVal any
 			for _, item := range parsedJsonBody.Items {
 				itemSpec := item["spec"].(map[string]any)
@@ -181,11 +185,13 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 
 				if sortDirection == "asc" {
 					assert.LessOrEqual(t, prevVal, itemSpec[sortField])
+					asserted++
 				} else {
 					assert.GreaterOrEqual(t, prevVal, itemSpec[sortField])
+					asserted++
 				}
-
 			}
+			assert.Equal(t, len(parsedJsonBody.Items), asserted)
 		},
 	}
 }
