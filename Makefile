@@ -89,9 +89,3 @@ server/openapi: $(OPENAPI_SRC_FILES)
 	rm -rf $(BASE)/tmp
 
 	cd $(BASE); go fmt ./...
-
-serve-docs: ## serve documentation for Tracetest
-	docker build -t tracetest-docs -f docs-Dockerfile .
-	docker run --network host tracetest-docs
-	sleep 1
-	open http://localhost:8000
