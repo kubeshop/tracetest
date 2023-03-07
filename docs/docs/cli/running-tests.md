@@ -189,7 +189,7 @@ The JUnit output file would then contain the JUnit result, for example:
 
 There are two ways of referencing an environment when running a test. 
 
-You can reference an existing environment using it's id by running. For example, given this defined environment with an id of 'testenv':
+You can reference an existing environment using its id. For example, given this defined environment with an id of 'testenv':
 
 ![testenv](../img/show-environment-definition.png)
 
