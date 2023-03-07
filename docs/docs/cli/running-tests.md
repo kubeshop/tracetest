@@ -198,7 +198,7 @@ We can run a test and specify that environment with this command:
 tracetest test run -d path/to/test.yaml -e testenv -w
 ```
 
-You can also reference an .env file which will be used to create a new environment or updating an existing one. For example, if you have a .env file named local.env with this content:
+You can also reference an .env file which will be used to create a new environment or update an existing one. For example, if you have a .env file named local.env with this content:
 ```
 POKEID=45
 POKENAME=vileplume
