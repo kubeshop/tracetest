@@ -83,10 +83,6 @@ func (r *Repository) publish(config Config) {
 }
 
 func (r *Repository) Current(ctx context.Context) Config {
-	defaultConfig := Config{
-		AnalyticsEnabled: true,
-	}
-
 	cfg, err := r.Get(ctx, id.ID("current"))
 	if err != nil {
 		// TODO: log error
