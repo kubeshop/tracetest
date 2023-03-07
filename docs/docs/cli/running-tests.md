@@ -206,6 +206,6 @@ POKENAME=vileplume
 
 tracetest test run -d path/to/test.yaml -e path/to/local.env -w
 
-If you use the .env approach, a new environment will be created in Tracetest if it does not exist where the environment name and id will be the file name without the suffix .env. So, local.env becomes local.
+If you use the .env approach, a new environment will be created in Tracetest. If it does not exist, the environment name and id will be the file name without the suffix .env. So, local.env becomes local.
 
 The second approach is very useful if you are running tests from a CI pipeline
