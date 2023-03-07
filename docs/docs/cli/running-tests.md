@@ -162,7 +162,7 @@ output:
 }
 ```
 
-You can also opt to output the result as junit to a file. You would run the command with a -j option and a file name, ie:
+You can also opt to output the result as JUnit to a file. You would run the command with a -j option and a file name, ie:
 ```
 tracetest test run -d path/to/test.yaml -w -j junit.out
 ```
