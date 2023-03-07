@@ -102,7 +102,7 @@ jobs:
       with:
         distribution: goreleaser-pro
         version: v1.15.2
-        args: build --clean --snapshot
+        args: build --single-target --clean --snapshot
       env:
         VERSION: pr-${{ github.event.pull_request.number }}
         TRACETEST_ENV: pr
