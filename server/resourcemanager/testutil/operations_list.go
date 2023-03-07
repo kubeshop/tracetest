@@ -169,21 +169,22 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
 			require.Equal(t, 3, parsedJsonBody.Count)
+			require.Greater(t, len(parsedJsonBody.Items), 1)
 
 			var prevVal any
 			for _, item := range parsedJsonBody.Items {
+				itemSpec := item["spec"].(map[string]any)
 				if prevVal == nil {
-					prevVal = item[sortField]
+					prevVal = itemSpec[sortField]
 					continue
 				}
 
 				if sortDirection == "asc" {
-					assert.LessOrEqual(t, prevVal, item[sortField])
+					assert.LessOrEqual(t, prevVal, itemSpec[sortField])
 				} else {
-					assert.GreaterOrEqual(t, prevVal, item[sortField])
+					assert.GreaterOrEqual(t, prevVal, itemSpec[sortField])
 				}
 
-				prevVal = item[sortField]
 			}
 		},
 	}

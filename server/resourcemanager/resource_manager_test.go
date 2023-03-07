@@ -20,22 +20,55 @@ func TestSampleResource(t *testing.T) {
 		SomeValue: "the value",
 	}
 
-	secondSample := sampleResource{
-		ID:        "2",
-		Name:      "the name 2",
-		SomeValue: "the value 2",
-	}
-
-	thirdSample := sampleResource{
-		ID:        "3",
-		Name:      "the name 3",
-		SomeValue: "the value 3",
-	}
-
 	sampleUpdated := sampleResource{
 		ID:        "1",
 		Name:      "the name updated",
 		SomeValue: "the value updated",
+	}
+
+	prepareSortByID := func(m *sampleResourceManager) {
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "asc").
+			Return([]sampleResource{
+				{ID: "1", Name: "3", SomeValue: "3"},
+				{ID: "2", Name: "1", SomeValue: "1"},
+				{ID: "3", Name: "2", SomeValue: "2"},
+			}, nil)
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "desc").
+			Return([]sampleResource{
+				{ID: "3", Name: "2", SomeValue: "2"},
+				{ID: "2", Name: "1", SomeValue: "1"},
+				{ID: "1", Name: "3", SomeValue: "3"},
+			}, nil)
+	}
+
+	prepareSortByName := func(m *sampleResourceManager) {
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "asc").
+			Return([]sampleResource{
+				{Name: "1", ID: "3", SomeValue: "3"},
+				{Name: "2", ID: "1", SomeValue: "1"},
+				{Name: "3", ID: "2", SomeValue: "2"},
+			}, nil)
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "desc").
+			Return([]sampleResource{
+				{Name: "3", ID: "2", SomeValue: "2"},
+				{Name: "2", ID: "1", SomeValue: "1"},
+				{Name: "1", ID: "3", SomeValue: "3"},
+			}, nil)
+	}
+
+	prepareSortBySomeValue := func(m *sampleResourceManager) {
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "asc").
+			Return([]sampleResource{
+				{SomeValue: "1", ID: "3", Name: "3"},
+				{SomeValue: "2", ID: "1", Name: "1"},
+				{SomeValue: "3", ID: "2", Name: "2"},
+			}, nil)
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "desc").
+			Return([]sampleResource{
+				{SomeValue: "3", ID: "2", Name: "2"},
+				{SomeValue: "2", ID: "1", Name: "1"},
+				{SomeValue: "1", ID: "3", Name: "3"},
+			}, nil)
 	}
 
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
@@ -138,12 +171,10 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
-				mockManager.
-					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "asc").
-					Return([]sampleResource{secondSample, thirdSample}, nil)
-				mockManager.
-					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "desc").
-					Return([]sampleResource{secondSample, sample}, nil)
+
+				prepareSortByID(mockManager)
+				prepareSortByName(mockManager)
+				prepareSortBySomeValue(mockManager)
 			case rmtests.OperationListInternalError:
 				mockManager.
 					On("Count", mock.Anything).
