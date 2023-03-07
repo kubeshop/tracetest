@@ -143,7 +143,7 @@ func (app *App) Start(opts ...appOption) error {
 		return err
 	}
 
-	configRepo := configresource.Repository(db)
+	configRepo := configresource.Repository(db, configresource.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
 
 	testDB, err := testdb.Postgres(
