@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/assert"
+
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type ResourceTypeTest struct {
@@ -17,8 +19,9 @@ type ResourceTypeTest struct {
 
 	SampleJSON        string
 	SampleJSONUpdated string
-	SortField         string
-	InvalidSortField  string
+
+	// private files
+	sortFields []string
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest) {
@@ -72,6 +75,9 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 	if rt.Prepare != nil {
 		rt.Prepare(t, op.name, testBridge)
 	}
+
+	sortableHandler := testBridge.(rm.SortableHandler)
+	rt.sortFields = sortableHandler.SortingFields()
 
 	req := op.buildRequest(t, testServer, ct, rt)
 	resp := doRequest(t, req, ct.contentType, testServer)

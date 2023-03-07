@@ -7,7 +7,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/kubeshop/tracetest/server/id"
 )
+
+func generateRandomString() string {
+	generator := id.NewRandGenerator()
+	return generator.TraceID().String()
+}
 
 func removeID(input map[string]any) map[string]any {
 	out := map[string]any{}

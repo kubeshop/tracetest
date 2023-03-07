@@ -32,9 +32,13 @@ type Resource[T ResourceSpec] struct {
 	Spec T      `mapstructure:"spec"`
 }
 
-type ResourceHandler[T ResourceSpec] interface {
-	SetID(T, id.ID) T
+type SortableHandler interface {
 	SortingFields() []string
+}
+
+type ResourceHandler[T ResourceSpec] interface {
+	SortableHandler
+	SetID(T, id.ID) T
 	List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
 	Count(_ context.Context, query string) (int, error)
 	Create(context.Context, T) (T, error)

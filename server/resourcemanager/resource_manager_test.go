@@ -161,8 +161,6 @@ func TestSampleResource(t *testing.T) {
 				"some_value": "the value updated"
 			}
 		}`,
-		SortField:        "id",
-		InvalidSortField: "invalid_field",
 	})
 }
 

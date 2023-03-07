@@ -72,7 +72,5 @@ func TestConfigResource(t *testing.T) {
 				"analyticsEnabled": false
 			}
 		}`,
-		SortField:        "id",
-		InvalidSortField: "invalid_field",
 	})
 }

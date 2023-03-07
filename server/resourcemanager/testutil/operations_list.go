@@ -95,12 +95,14 @@ const OperationListWithInvalidSortField Operation = "ListWithInvalidSortField"
 var listWithInvalidSortFieldOperation = operationTester{
 	name: OperationListWithInvalidSortField,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		invalidSortField := generateRandomString()
+
 		return buildListRequest(
 			rt.ResourceType,
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        rt.InvalidSortField,
+				"sortBy":        invalidSortField,
 				"sortDirection": "asc",
 			},
 			ct,
@@ -126,7 +128,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        rt.SortField,
+				"sortBy":        rt.sortFields[0],
 				"sortDirection": "asc",
 			},
 			ct,
@@ -148,7 +150,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 		require.Equal(t, 3, parsedJsonBody.Count)
 
 		var prevVal any
-		field := rt.SortField
+		field := rt.sortFields[0]
 
 		for _, item := range parsedJsonBody.Items {
 			if prevVal == nil {
@@ -170,7 +172,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
-				"sortBy":        rt.SortField,
+				"sortBy":        rt.sortFields[0],
 				"sortDirection": "desc",
 			},
 			ct,
@@ -192,7 +194,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 		require.Equal(t, 3, parsedJsonBody.Count)
 
 		var prevVal any
-		field := rt.SortField
+		field := rt.sortFields[0]
 
 		for _, item := range parsedJsonBody.Items {
 			if prevVal == nil {

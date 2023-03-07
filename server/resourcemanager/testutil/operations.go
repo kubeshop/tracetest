@@ -31,10 +31,9 @@ var (
 
 		listNoResultsOperation,
 		listSuccessOperation,
-		listWithInvalidSortFieldOperation,
 		listPaginatedAscendingSuccessOperation,
 		listPaginatedDescendingSuccessOperation,
-		// TODO: add tests for pagination etc
+		// TODO: add tests for other operations
 	}
 
 	errorOperations = []operationTester{
@@ -43,5 +42,6 @@ var (
 		getInternalErrorOperation,
 		deleteInternalErrorOperation,
 		listInternalErrorOperation,
+		listWithInvalidSortFieldOperation,
 	}
 )
