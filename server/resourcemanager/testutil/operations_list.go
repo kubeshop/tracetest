@@ -115,98 +115,73 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 	},
 })
 
-// Tech debt: Even being one operation, we will split ASC and DESC in two just to keep
-// "one request per operation". In the future we can change this structure to support both tests
-// in one operationTester instance
 const OperationListPaginatedSuccess Operation = "ListPaginatedSuccess"
 
-var listPaginatedAscendingSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
+var listPaginatedSuccessOperation = operationTester{
 	name: OperationListPaginatedSuccess,
-	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-		return buildListRequest(
-			rt.ResourceType,
-			map[string]string{
-				"take":          "2",
-				"skip":          "1",
-				"sortBy":        rt.sortFields[0],
-				"sortDirection": "asc",
-			},
-			ct,
-			testServer,
-			t,
-		)
-	},
-	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 200, resp.StatusCode)
+	getSteps: func(t *testing.T, rt ResourceTypeTest) []operationTesterStep {
+		steps := []operationTesterStep{}
 
-		jsonBody := responseBodyJSON(t, resp, ct)
-
-		var parsedJsonBody struct {
-			Count int              `json:count`
-			Items []map[string]any `json:items`
+		for _, sortField := range rt.sortFields {
+			steps = append(steps,
+				buildPaginationOperationStep("asc", sortField),
+				buildPaginationOperationStep("desc", sortField),
+			)
 		}
-		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-		require.Equal(t, 3, parsedJsonBody.Count)
+		return steps
+	},
+}
 
-		var prevVal any
-		field := rt.sortFields[0]
+func buildPaginationOperationStep(sortDirection, sortField string) operationTesterStep {
+	return operationTesterStep{
+		buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+			return buildListRequest(
+				rt.ResourceType,
+				map[string]string{
+					"take":          "2",
+					"skip":          "1",
+					"sortBy":        sortField,
+					"sortDirection": sortDirection,
+				},
+				ct,
+				testServer,
+				t,
+			)
+		},
+		assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+			require.Equal(t, 200, resp.StatusCode)
 
-		for _, item := range parsedJsonBody.Items {
-			if prevVal == nil {
-				prevVal = item[field]
-				continue
+			jsonBody := responseBodyJSON(t, resp, ct)
+
+			var parsedJsonBody struct {
+				Count int              `json:count`
+				Items []map[string]any `json:items`
 			}
-			assert.LessOrEqual(t, prevVal, item[field])
+			json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-			prevVal = item[field]
-		}
-	},
-})
+			require.Equal(t, 3, parsedJsonBody.Count)
 
-var listPaginatedDescendingSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationListPaginatedSuccess,
-	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
-		return buildListRequest(
-			rt.ResourceType,
-			map[string]string{
-				"take":          "2",
-				"skip":          "1",
-				"sortBy":        rt.sortFields[0],
-				"sortDirection": "desc",
-			},
-			ct,
-			testServer,
-			t,
-		)
-	},
-	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 200, resp.StatusCode)
+			var prevVal any
+			field := rt.sortFields[0]
 
-		jsonBody := responseBodyJSON(t, resp, ct)
+			for _, item := range parsedJsonBody.Items {
+				if prevVal == nil {
+					prevVal = item[field]
+					continue
+				}
 
-		var parsedJsonBody struct {
-			Count int              `json:count`
-			Items []map[string]any `json:items`
-		}
-		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
+				if sortDirection == "asc" {
+					assert.LessOrEqual(t, prevVal, item[field])
+				} else {
+					assert.GreaterOrEqual(t, prevVal, item[field])
+				}
 
-		require.Equal(t, 3, parsedJsonBody.Count)
-
-		var prevVal any
-		field := rt.sortFields[0]
-
-		for _, item := range parsedJsonBody.Items {
-			if prevVal == nil {
 				prevVal = item[field]
-				continue
 			}
-			assert.GreaterOrEqual(t, prevVal, item[field])
-
-			prevVal = item[field]
-		}
-	},
-})
+		},
+	}
+}
 
 const OperationListInternalError Operation = "ListInternalError"
 

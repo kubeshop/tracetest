@@ -57,8 +57,7 @@ var (
 
 		listNoResultsOperation,
 		listSuccessOperation,
-		listPaginatedAscendingSuccessOperation,
-		listPaginatedDescendingSuccessOperation,
+		listPaginatedSuccessOperation,
 		// TODO: add tests for other operations
 	}
 
