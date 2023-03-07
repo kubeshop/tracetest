@@ -13,28 +13,52 @@ import (
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 type mockPublisher struct {
 	mock.Mock
 }
 
+func (m *mockPublisher) Publish(resourceID string, message any) {
+	m.Called(resourceID, message)
+}
+
 func TestPublishing(t *testing.T) {
+	restore := cleanEnv()
+	defer restore()
+
 	updated := configresource.Config{
+		ID:               "123",
 		AnalyticsEnabled: true,
 	}
+
+	publisher := new(mockPublisher)
+	publisher.Test(t)
+
+	publisher.On("Publish", configresource.ResourceID, updated)
+
+	db := testmock.MustGetRawTestingDatabase()
+	repo := configresource.Repository(
+		testmock.MustCreateRandomMigratedDatabase(db),
+		configresource.WithPublisher(publisher),
+	)
+
+	repo.Create(context.TODO(), configresource.Config{ID: "123"})
+
+	_, err := repo.Update(context.TODO(), updated)
+	require.NoError(t, err)
+
+	publisher.AssertExpectations(t)
 
 }
 
 func TestIsAnalyticsEnabled(t *testing.T) {
-	cleanEnv := func() {
-		// make sure this env is empty
-		os.Setenv("TRACETEST_DEV", "")
-	}
-
 	db := testmock.MustGetRawTestingDatabase()
 	t.Run("DefaultValues", func(t *testing.T) {
-		cleanEnv()
+		restore := cleanEnv()
+		defer restore()
+
 		repo := configresource.Repository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
@@ -45,7 +69,8 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 	})
 
 	t.Run("FromRepo", func(t *testing.T) {
-		cleanEnv()
+		restore := cleanEnv()
+		defer restore()
 		repo := configresource.Repository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
@@ -121,4 +146,13 @@ func TestConfigResource(t *testing.T) {
 			}
 		}`,
 	})
+}
+
+func cleanEnv() func() {
+	val := os.Getenv("TRACETEST_DEV")
+	// make sure this env is empty
+	os.Setenv("TRACETEST_DEV", "")
+	return func() {
+		os.Setenv("TRACETEST_DEV", val)
+	}
 }

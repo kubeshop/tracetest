@@ -42,9 +42,16 @@ func WithPublisher(p publisher) option {
 }
 
 func Repository(db *sql.DB, opts ...option) *repository {
-	return &repository{
+	repo := &repository{
 		db: db,
 	}
+
+	for _, opt := range opts {
+		opt(repo)
+	}
+
+	return repo
+
 }
 
 const ResourceID = "/app/config/update"
