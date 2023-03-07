@@ -166,7 +166,7 @@ You can also opt to output the result as JUnit to a file. You would run the comm
 ```
 tracetest test run -d path/to/test.yaml -w -j junit.out
 ```
-The junit output file would then contain the junit result, for example:
+The JUnit output file would then contain the JUnit result, for example:
 ```
 <testsuites name="Pokeshop - Import" tests="5" failures="1" errors="0" skipped="0" time="10">
         <testsuite name="span[tracetest.span.type=&#34;general&#34; name=&#34;Tracetest trigger&#34;]" tests="1" failures="0" errors="0" skipped="0">
