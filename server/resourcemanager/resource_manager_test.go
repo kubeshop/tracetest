@@ -129,19 +129,15 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
-			case rmtests.OperationListPaginatedAscendingSuccess:
+			case rmtests.OperationListPaginatedSuccess:
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
 				mockManager.
-					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "asc").
 					Return([]sampleResource{secondSample, thirdSample}, nil)
-			case rmtests.OperationListPaginatedDescendingSuccess:
 				mockManager.
-					On("Count", mock.Anything).
-					Return(3, nil)
-				mockManager.
-					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "desc").
 					Return([]sampleResource{secondSample, sample}, nil)
 			case rmtests.OperationListInternalError:
 				mockManager.

@@ -113,10 +113,13 @@ var listWithInvalidSortFieldOperation = operationTester{
 	},
 }
 
-const OperationListPaginatedAscendingSuccess Operation = "ListPaginatedAscendingSuccess"
+// Tech debt: Even being one operation, we will split ASC and DESC in two just to keep
+// "one request per operation". In the future we can change this structure to support both tests
+// in one operationTester instance
+const OperationListPaginatedSuccess Operation = "ListPaginatedSuccess"
 
 var listPaginatedAscendingSuccessOperation = operationTester{
-	name: OperationListPaginatedAscendingSuccess,
+	name: OperationListPaginatedSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
@@ -159,10 +162,8 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 	},
 }
 
-const OperationListPaginatedDescendingSuccess Operation = "ListPaginatedDescendingSuccess"
-
 var listPaginatedDescendingSuccessOperation = operationTester{
-	name: OperationListPaginatedDescendingSuccess,
+	name: OperationListPaginatedSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,

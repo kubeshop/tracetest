@@ -50,8 +50,7 @@ func TestConfigResource(t *testing.T) {
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				configRepo.Create(context.TODO(), sampleConfig)
-			case rmtests.OperationListPaginatedAscendingSuccess,
-				rmtests.OperationListPaginatedDescendingSuccess:
+			case rmtests.OperationListPaginatedSuccess:
 				configRepo.Create(context.TODO(), sampleConfig)
 				configRepo.Create(context.TODO(), secondSampleConfig)
 				configRepo.Create(context.TODO(), thirdSampleConfig)
