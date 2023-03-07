@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -12,59 +13,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildQueryString(params map[string]string) string {
-	queryString := ""
+func buildQueryString(params map[string]string) url.Values {
+	vals := url.Values{}
 
-	if len(params) == 0 {
-		return queryString
+	for k, v := range params {
+		vals.Add(k, v)
 	}
 
-	formattedParams := []string{}
-
-	for key, value := range params {
-		formattedParams = append(formattedParams, fmt.Sprintf("%s=%s", key, value))
-	}
-
-	return "?" + strings.Join(formattedParams, "&")
-}
-
-func compareFieldsGreaterThan(first, second any) bool {
-	switch first.(type) {
-	case int:
-		return first.(int) >= second.(int)
-	case float32:
-		return first.(float32) >= second.(float32)
-	case float64:
-		return first.(float64) >= second.(float64)
-	case string:
-		return first.(string) >= second.(string)
-	default:
-		panic("type unknown for comparison")
-	}
-}
-
-func compareFieldsLesserThan(first, second any) bool {
-	switch first.(type) {
-	case int:
-		return first.(int) <= second.(int)
-	case float32:
-		return first.(float32) <= second.(float32)
-	case float64:
-		return first.(float64) <= second.(float64)
-	case string:
-		return first.(string) <= second.(string)
-	default:
-		panic("type unknown for comparison")
-	}
+	return vals
 }
 
 func buildListRequest(resourceType string, paginationParams map[string]string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
-	queryString := buildQueryString(paginationParams)
+	qs := buildQueryString(paginationParams)
 
-	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(resourceType), queryString)
+	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(resourceType))
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	require.NoError(t, err)
+
+	req.URL.RawQuery = qs.Encode()
+
 	return req
 }
 
@@ -184,7 +152,7 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 				prevVal = item[field]
 				continue
 			}
-			assert.True(t, compareFieldsLesserThan(prevVal, item[field]))
+			assert.LessOrEqual(t, prevVal, item[field])
 
 			prevVal = item[field]
 		}
@@ -230,7 +198,7 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 				prevVal = item[field]
 				continue
 			}
-			assert.True(t, compareFieldsGreaterThan(prevVal, item[field]))
+			assert.GreaterOrEqual(t, prevVal, item[field])
 
 			prevVal = item[field]
 		}
