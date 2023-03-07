@@ -33,16 +33,16 @@ func (c Config) IsAnalyticsEnabled() bool {
 	return c.AnalyticsEnabled
 }
 
-type option func(*repository)
+type option func(*Repository)
 
 func WithPublisher(p publisher) option {
-	return func(r *repository) {
+	return func(r *Repository) {
 		r.publisher = p
 	}
 }
 
-func Repository(db *sql.DB, opts ...option) *repository {
-	repo := &repository{
+func NewRepository(db *sql.DB, opts ...option) *Repository {
+	repo := &Repository{
 		db: db,
 	}
 
@@ -60,12 +60,12 @@ type publisher interface {
 	Publish(resourceID string, message any)
 }
 
-type repository struct {
+type Repository struct {
 	db        *sql.DB
 	publisher publisher
 }
 
-func (r *repository) publish(config Config) {
+func (r *Repository) publish(config Config) {
 	if r.publisher == nil {
 		return
 	}
@@ -73,7 +73,7 @@ func (r *repository) publish(config Config) {
 	r.publisher.Publish(ResourceID, config)
 }
 
-func (r *repository) Current(ctx context.Context) Config {
+func (r *Repository) Current(ctx context.Context) Config {
 	defaultConfig := Config{
 		AnalyticsEnabled: true,
 	}
@@ -87,7 +87,7 @@ func (r *repository) Current(ctx context.Context) Config {
 	return list[0]
 }
 
-func (r *repository) SetID(cfg Config, id id.ID) Config {
+func (r *Repository) SetID(cfg Config, id id.ID) Config {
 	cfg.ID = id
 	return cfg
 }
@@ -99,7 +99,7 @@ const insertQuery = `
 			"analytics_enabled"
 		) VALUES ($1, $2, $3)`
 
-func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
+func (r *Repository) Create(ctx context.Context, cfg Config) (Config, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Config{}, err
@@ -130,7 +130,7 @@ const updateQuery = `
 			"analytics_enabled" = $3
 		WHERE "id" = $1`
 
-func (r *repository) Update(ctx context.Context, updated Config) (Config, error) {
+func (r *Repository) Update(ctx context.Context, updated Config) (Config, error) {
 	cfg, err := r.Get(ctx, updated.ID)
 	if err != nil {
 		return Config{}, err
@@ -164,7 +164,7 @@ func (r *repository) Update(ctx context.Context, updated Config) (Config, error)
 
 const getQuery = baseSelect + `WHERE "id" = $1`
 
-func (r *repository) Get(ctx context.Context, id id.ID) (Config, error) {
+func (r *Repository) Get(ctx context.Context, id id.ID) (Config, error) {
 	cfg := Config{}
 
 	err := r.db.
@@ -186,7 +186,7 @@ const deleteQuery = `
 		DELETE FROM configs
 		WHERE "id" = $1`
 
-func (r *repository) Delete(ctx context.Context, id id.ID) error {
+func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	cfg, err := r.Get(ctx, id)
 	if err != nil {
 		return err
@@ -221,11 +221,11 @@ const (
 		FROM configs `
 )
 
-func (r *repository) SortingFields() []string {
+func (r *Repository) SortingFields() []string {
 	return []string{"id", "name", "analytics_enabled"}
 }
 
-func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Config, error) {
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Config, error) {
 	listQuery := baseSelect
 
 	if sortDirection == "" {
@@ -277,7 +277,7 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 
 const baseCountQuery = `SELECT COUNT(*) FROM configs`
 
-func (r *repository) Count(ctx context.Context, query string) (int, error) {
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	countQuery := baseCountQuery
 
 	if query != "" {

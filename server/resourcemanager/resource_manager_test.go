@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/stretchr/testify/mock"
 )
@@ -40,18 +40,19 @@ func TestSampleResource(t *testing.T) {
 
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceType: "SampleResource",
-		RegisterManagerFn: func(router *mux.Router) any {
+		RegisterManagerFn: func(router *mux.Router) rm.Manager {
 			mockManager := new(sampleResourceManager)
-			manager := resourcemanager.New[sampleResource]("SampleResource", mockManager, func() id.ID {
+			manager := rm.New[sampleResource]("SampleResource", mockManager, func() id.ID {
 				return id.ID("3")
 			})
 			manager.RegisterRoutes(router)
 
-			return mockManager
+			return manager
 		},
-		Prepare: func(t *testing.T, op rmtests.Operation, bridge any) {
-			mockManager := bridge.(*sampleResourceManager)
+		Prepare: func(t *testing.T, op rmtests.Operation, manager rm.Manager) {
+			mockManager := manager.Handler().(*sampleResourceManager)
 			mockManager.Test(t)
+
 			switch op {
 			// Create
 			case rmtests.OperationCreateNoID:
@@ -181,8 +182,22 @@ func (sr sampleResource) Validate() error {
 	return nil
 }
 
-type sampleResourceManager struct {
+type basicResourceManager struct {
 	mock.Mock
+}
+
+func (m *basicResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
+	args := m.Called(id)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+func (m *basicResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
+	args := m.Called(s)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+type sampleResourceManager struct {
+	basicResourceManager
 }
 
 func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
@@ -192,16 +207,6 @@ func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResourc
 
 func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {
 	args := m.Called(s)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
-	args := m.Called(s)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
-	args := m.Called(id)
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 

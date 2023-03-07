@@ -39,7 +39,7 @@ func TestPublishing(t *testing.T) {
 	publisher.On("Publish", configresource.ResourceID, updated)
 
 	db := testmock.MustGetRawTestingDatabase()
-	repo := configresource.Repository(
+	repo := configresource.NewRepository(
 		testmock.MustCreateRandomMigratedDatabase(db),
 		configresource.WithPublisher(publisher),
 	)
@@ -59,7 +59,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
 
-		repo := configresource.Repository(
+		repo := configresource.NewRepository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
 
@@ -71,7 +71,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 	t.Run("FromRepo", func(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
-		repo := configresource.Repository(
+		repo := configresource.NewRepository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
 		repo.Create(context.TODO(), configresource.Config{
@@ -83,7 +83,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 	})
 
 	t.Run("EnvOverride", func(t *testing.T) {
-		repo := configresource.Repository(
+		repo := configresource.NewRepository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
 		repo.Create(context.TODO(), configresource.Config{
@@ -119,17 +119,17 @@ func TestConfigResource(t *testing.T) {
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceType: "Config",
-		RegisterManagerFn: func(router *mux.Router) any {
+		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
-			configRepo := configresource.Repository(db)
+			configRepo := configresource.NewRepository(db)
 
 			manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
 			manager.RegisterRoutes(router)
 
-			return configRepo
+			return manager
 		},
-		Prepare: func(t *testing.T, op rmtests.Operation, bridge any) {
-			configRepo := bridge.(resourcemanager.ResourceHandler[configresource.Config])
+		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
+			configRepo := manager.Handler().(configresource.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,

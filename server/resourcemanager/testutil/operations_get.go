@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +28,8 @@ func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *h
 const OperationGetSuccess Operation = "GetSuccess"
 
 var getSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationGetSuccess,
+	name:               OperationGetSuccess,
+	neededForOperation: rm.OperationGet,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildGetRequest(rt, ct, testServer, t)
 	},
@@ -46,7 +48,8 @@ var getSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationGetNotFound Operation = "GetNotFound"
 
 var getNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationGetNotFound,
+	name:               OperationGetNotFound,
+	neededForOperation: rm.OperationGet,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildGetRequest(rt, ct, testServer, t)
 	},
@@ -59,7 +62,8 @@ var getNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationGetInternalError Operation = "GetInternalError"
 
 var getInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationGetInternalError,
+	name:               OperationGetInternalError,
+	neededForOperation: rm.OperationGet,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildGetRequest(rt, ct, testServer, t)
 	},

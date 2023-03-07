@@ -32,55 +32,85 @@ type Resource[T ResourceSpec] struct {
 	Spec T      `mapstructure:"spec"`
 }
 
-type SortableHandler interface {
-	SortingFields() []string
-}
-
-type ResourceHandler[T ResourceSpec] interface {
-	SortableHandler
-	SetID(T, id.ID) T
-	List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
-	Count(_ context.Context, query string) (int, error)
-	Create(context.Context, T) (T, error)
-	Update(context.Context, T) (T, error)
-	Get(context.Context, id.ID) (T, error)
-	Delete(context.Context, id.ID) error
+type Manager interface {
+	EnabledOperations() []Operation
+	Handler() any
+	RegisterRoutes(*mux.Router) *mux.Router
 }
 
 type manager[T ResourceSpec] struct {
-	resourceType string
-	handler      ResourceHandler[T]
-	idgen        func() id.ID
+	resourceType      string
+	handler           any
+	enabledOperations []Operation
+	rh                resourceHandler[T]
+	idgen             func() id.ID
 }
 
-func New[T ResourceSpec](resourceType string, handler ResourceHandler[T], idgenFn func() id.ID) *manager[T] {
-	return &manager[T]{
-		resourceType: resourceType,
-		handler:      handler,
-		idgen:        idgenFn,
+func New[T ResourceSpec](resourceType string, handler any, idgenFn func() id.ID) Manager {
+	rh := &resourceHandler[T]{}
+
+	// enable all available by default
+	enabledOperations := availableOperations
+	if casted, ok := handler.(Operationer); ok {
+		enabledOperations = casted.Operations()
 	}
+
+	err := rh.bindOperations(enabledOperations, handler)
+
+	if err != nil {
+		err := fmt.Errorf(
+			"cannot create Resourcemanager '%s': %w",
+			resourceType,
+			err,
+		)
+		panic(err)
+	}
+
+	return &manager[T]{
+		resourceType:      resourceType,
+		handler:           handler,
+		rh:                *rh,
+		enabledOperations: enabledOperations,
+		idgen:             idgenFn,
+	}
+}
+func (m *manager[T]) EnabledOperations() []Operation {
+	return m.enabledOperations
+}
+func (m *manager[T]) Handler() any {
+	return m.handler
 }
 
 func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
 
-	subrouter.HandleFunc("/", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceType))
-	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
-	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
+	if slices.Contains(m.enabledOperations, "list") {
+		subrouter.HandleFunc("/", m.list).Methods(http.MethodGet).Name("list")
+	}
+	if slices.Contains(m.enabledOperations, "create") {
+		subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
+	}
+	if slices.Contains(m.enabledOperations, "update") {
+		subrouter.HandleFunc("/", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
+	}
 
-	subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
-	subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
+	if slices.Contains(m.enabledOperations, "get") {
+		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
+	}
+	if slices.Contains(m.enabledOperations, "delete") {
+		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
+	}
 
 	return subrouter
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
-	m.operationWithBody(w, r, http.StatusCreated, "creating", m.handler.Create)
+	m.operationWithBody(w, r, http.StatusCreated, "creating", m.rh.Create)
 }
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
-	m.operationWithBody(w, r, http.StatusOK, "updating", m.handler.Update)
+	m.operationWithBody(w, r, http.StatusOK, "updating", m.rh.Update)
 }
 
 func getIntFromQuery(r *http.Request, key string) (int, error) {
@@ -134,19 +164,19 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	take, skip,
 		query, sortBy,
-		sortDirection, err := paginationParams(r, m.handler.SortingFields())
+		sortDirection, err := paginationParams(r, m.rh.SortingFields())
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
 		return
 	}
 
-	count, err := m.handler.Count(ctx, query)
+	count, err := m.rh.Count(ctx, query)
 	if err != nil {
 		m.handleResourceHandlerError(w, "listing", err, encoder)
 		return
 	}
 
-	items, err := m.handler.List(
+	items, err := m.rh.List(
 		ctx,
 		take,
 		skip,
@@ -203,7 +233,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	item, err := m.handler.Get(r.Context(), id)
+	item, err := m.rh.Get(r.Context(), id)
 	if err != nil {
 		m.handleResourceHandlerError(w, "getting", err, encoder)
 		return
@@ -234,7 +264,7 @@ func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	err = m.handler.Delete(r.Context(), id)
+	err = m.rh.Delete(r.Context(), id)
 	if err != nil {
 		m.handleResourceHandlerError(w, "deleting", err, encoder)
 		return
@@ -280,7 +310,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 
 	// TODO: check if this needs to be done per operation
 	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.handler.SetID(targetResource.Spec, m.idgen())
+		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.idgen())
 	}
 
 	created, err := fn(r.Context(), targetResource.Spec)

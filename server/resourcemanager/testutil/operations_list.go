@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -39,7 +40,8 @@ func buildListRequest(resourceType string, paginationParams map[string]string, c
 const OperationListNoResults Operation = "ListNoResults"
 
 var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationListNoResults,
+	name:               OperationListNoResults,
+	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
@@ -66,7 +68,8 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationListSuccess Operation = "ListSuccess"
 
 var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationListSuccess,
+	name:               OperationListSuccess,
+	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
@@ -93,7 +96,8 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationListWithInvalidSortField Operation = "ListWithInvalidSortField"
 
 var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationListWithInvalidSortField,
+	name:               OperationListWithInvalidSortField,
+	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		invalidSortField := generateRandomString()
 
@@ -118,7 +122,8 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 const OperationListPaginatedSuccess Operation = "ListPaginatedSuccess"
 
 var listPaginatedSuccessOperation = operationTester{
-	name: OperationListPaginatedSuccess,
+	name:               OperationListPaginatedSuccess,
+	neededForOperation: rm.OperationList,
 	getSteps: func(t *testing.T, rt ResourceTypeTest) []operationTesterStep {
 		steps := []operationTesterStep{}
 
@@ -155,8 +160,8 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			jsonBody := responseBodyJSON(t, resp, ct)
 
 			var parsedJsonBody struct {
-				Count int              `json:count`
-				Items []map[string]any `json:items`
+				Count int              `json:"count"`
+				Items []map[string]any `json:"items"`
 			}
 			json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
@@ -186,7 +191,8 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 const OperationListInternalError Operation = "ListInternalError"
 
 var listInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationListInternalError,
+	name:               OperationListInternalError,
+	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
 			rt.ResourceType,
