@@ -122,7 +122,7 @@ func TestConfigResource(t *testing.T) {
 			"spec": {
 				"id": "current",
 				"name": "Config",
-				"analyticsEnabled": true
+				"analyticsEnabled": false
 			}
 		}`,
 		SampleJSONUpdated: `{
@@ -130,7 +130,7 @@ func TestConfigResource(t *testing.T) {
 			"spec": {
 				"id": "current",
 				"name": "Config",
-				"analyticsEnabled": false
+				"analyticsEnabled": true
 			}
 		}`,
 	},
