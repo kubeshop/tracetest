@@ -102,7 +102,7 @@ jobs:
       with:
         distribution: goreleaser-pro
         version: v1.15.2
-        args: build --single-target --clean --snapshot
+        args: build --clean --snapshot
       env:
         VERSION: pr-${{ github.event.pull_request.number }}
         TRACETEST_ENV: pr
@@ -113,7 +113,9 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: tracetest-go
-        path: dist/
+        path: |
+          dist/*/tracetest
+          dist/*/tracetest-server
 
   build-web:
     name: Build WebUI resources
