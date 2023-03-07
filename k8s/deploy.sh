@@ -38,7 +38,7 @@ helm repo update
 helm upgrade --install $NAME kubeshop/tracetest \
   --namespace $NAME --create-namespace \
   --set image.tag=$TAG \
-  --set image.pullPolicy=Always
+  --set image.pullPolicy=Always \
   ${extraParams[@]}
 
 PROVISION_FILE=$(cd $(dirname "${BASH_SOURCE:-$0}") && pwd)/provisioning.yaml
