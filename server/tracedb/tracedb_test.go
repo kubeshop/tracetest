@@ -79,6 +79,38 @@ func TestCreateClient(t *testing.T) {
 			expectedType: "*tracedb.awsxrayDB",
 		},
 		{
+			name: "OTLP",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeOTLP,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "NewRelic",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeNewRelic,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "Lightstep",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeLighStep,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "DataDog",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeDataDog,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
 			name:         "EmptyConfig",
 			ds:           model.DataStore{},
 			expectedType: "*tracedb.noopTraceDB",
