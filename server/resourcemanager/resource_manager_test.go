@@ -42,9 +42,13 @@ func TestSampleResource(t *testing.T) {
 		ResourceType: "SampleResource",
 		RegisterManagerFn: func(router *mux.Router) rm.Manager {
 			mockManager := new(sampleResourceManager)
-			manager := rm.New[sampleResource]("SampleResource", mockManager, func() id.ID {
-				return id.ID("3")
-			})
+			manager := rm.New[sampleResource](
+				"SampleResource",
+				mockManager,
+				rm.WithIDGen(func() id.ID {
+					return id.ID("3")
+				}),
+			)
 			manager.RegisterRoutes(router)
 
 			return manager
@@ -182,9 +186,14 @@ func TestRestrictedResource(t *testing.T) {
 		ResourceType: "RestrictedResource",
 		RegisterManagerFn: func(router *mux.Router) rm.Manager {
 			mockManager := new(restrictedResourceManager)
-			manager := rm.New[sampleResource]("RestrictedResource", mockManager, func() id.ID {
-				return id.ID("3")
-			})
+			manager := rm.New[sampleResource](
+				"RestrictedResource",
+				mockManager,
+				rm.WithIDGen(func() id.ID {
+					return id.ID("3")
+				}),
+				rm.WithOperations(rm.OperationGet, rm.OperationUpdate),
+			)
 			manager.RegisterRoutes(router)
 
 			return manager

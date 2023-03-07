@@ -26,10 +26,6 @@ var availableOperations = []Operation{
 	OperationDelete,
 }
 
-type Operationer interface {
-	Operations() []Operation
-}
-
 type SortableHandler interface {
 	SortingFields() []string
 }

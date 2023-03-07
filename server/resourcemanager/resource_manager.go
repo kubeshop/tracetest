@@ -39,23 +39,43 @@ type Manager interface {
 }
 
 type manager[T ResourceSpec] struct {
-	resourceType      string
-	handler           any
+	resourceType string
+	handler      any
+	rh           resourceHandler[T]
+	config       config
+}
+
+type config struct {
 	enabledOperations []Operation
-	rh                resourceHandler[T]
 	idgen             func() id.ID
 }
 
-func New[T ResourceSpec](resourceType string, handler any, idgenFn func() id.ID) Manager {
+type managerOption func(*config)
+
+func WithIDGen(fn func() id.ID) managerOption {
+	return func(c *config) {
+		c.idgen = fn
+	}
+}
+
+func WithOperations(ops ...Operation) managerOption {
+	return func(c *config) {
+		c.enabledOperations = ops
+	}
+}
+
+func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption) Manager {
 	rh := &resourceHandler[T]{}
 
-	// enable all available by default
-	enabledOperations := availableOperations
-	if casted, ok := handler.(Operationer); ok {
-		enabledOperations = casted.Operations()
+	cfg := config{
+		enabledOperations: availableOperations,
 	}
 
-	err := rh.bindOperations(enabledOperations, handler)
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	err := rh.bindOperations(cfg.enabledOperations, handler)
 
 	if err != nil {
 		err := fmt.Errorf(
@@ -67,16 +87,17 @@ func New[T ResourceSpec](resourceType string, handler any, idgenFn func() id.ID)
 	}
 
 	return &manager[T]{
-		resourceType:      resourceType,
-		handler:           handler,
-		rh:                *rh,
-		enabledOperations: enabledOperations,
-		idgen:             idgenFn,
+		resourceType: resourceType,
+		handler:      handler,
+		rh:           *rh,
+		config:       cfg,
 	}
 }
+
 func (m *manager[T]) EnabledOperations() []Operation {
-	return m.enabledOperations
+	return m.config.enabledOperations
 }
+
 func (m *manager[T]) Handler() any {
 	return m.handler
 }
@@ -85,20 +106,22 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
 
-	if slices.Contains(m.enabledOperations, "list") {
+	enabledOps := m.EnabledOperations()
+
+	if slices.Contains(enabledOps, OperationList) {
 		subrouter.HandleFunc("/", m.list).Methods(http.MethodGet).Name("list")
 	}
-	if slices.Contains(m.enabledOperations, "create") {
+	if slices.Contains(enabledOps, OperationCreate) {
 		subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
 	}
-	if slices.Contains(m.enabledOperations, "update") {
+	if slices.Contains(enabledOps, OperationUpdate) {
 		subrouter.HandleFunc("/", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
 	}
 
-	if slices.Contains(m.enabledOperations, "get") {
+	if slices.Contains(enabledOps, OperationGet) {
 		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
 	}
-	if slices.Contains(m.enabledOperations, "delete") {
+	if slices.Contains(enabledOps, OperationDelete) {
 		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
 	}
 
@@ -310,7 +333,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 
 	// TODO: check if this needs to be done per operation
 	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.idgen())
+		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
 	}
 
 	created, err := fn(r.Context(), targetResource.Spec)
