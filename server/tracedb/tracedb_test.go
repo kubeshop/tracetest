@@ -39,6 +39,46 @@ func TestCreateClient(t *testing.T) {
 			expectedType: "*tracedb.tempoTraceDB",
 		},
 		{
+			name: "ElasticSearch",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeElasticAPM,
+				Values: model.DataStoreValues{
+					ElasticApm: &model.ElasticSearchDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.elasticsearchDB",
+		},
+		{
+			name: "OpenSearch",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeOpenSearch,
+				Values: model.DataStoreValues{
+					OpenSearch: &model.ElasticSearchDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.opensearchDB",
+		},
+		{
+			name: "SignalFX",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeSignalFX,
+				Values: model.DataStoreValues{
+					SignalFx: &model.SignalFXDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.signalfxDB",
+		},
+		{
+			name: "AWSXRay",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeAwsXRay,
+				Values: model.DataStoreValues{
+					AwsXRay: &model.AWSXRayDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.awsxrayDB",
+		},
+		{
 			name:         "EmptyConfig",
 			ds:           model.DataStore{},
 			expectedType: "*tracedb.noopTraceDB",

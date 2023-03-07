@@ -60,7 +60,15 @@ func Factory(repo model.Repository) func(ds model.DataStore) (TraceDB, error) {
 	return f.New
 }
 
-func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
+func (f *traceDBFactory) getTraceDBInstance(ds model.DataStore) (TraceDB, error) {
+	var tdb TraceDB
+	var err error
+
+	if ds.IsOTLPBasedProvider() {
+		tdb, err = newCollectorDB(f.repo)
+		return tdb, err
+	}
+
 	switch ds.Type {
 	case model.DataStoreTypeJaeger:
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
@@ -74,14 +82,23 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case model.DataStoreTypeAwsXRay:
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
-	case model.DataStoreTypeNewRelic:
-	case model.DataStoreTypeLighStep:
-	case model.DataStoreTypeDataDog:
-	case model.DataStoreTypeOTLP:
-		tdb, err = newCollectorDB(f.repo)
 	default:
 		return &noopTraceDB{}, nil
 	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if tdb == nil {
+		return nil, fmt.Errorf("data store unknown: %s", ds.Type)
+	}
+
+	return tdb, err
+}
+
+func (f *traceDBFactory) New(ds model.DataStore) (TraceDB, error) {
+	tdb, err := f.getTraceDBInstance(ds)
 
 	if err != nil {
 		return nil, err
@@ -93,7 +110,6 @@ func (f *traceDBFactory) New(ds model.DataStore) (tdb TraceDB, err error) {
 	}
 
 	return tdb, nil
-
 }
 
 type realTraceDB struct{}
