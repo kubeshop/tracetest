@@ -29,7 +29,8 @@ func TestPublishing(t *testing.T) {
 	defer restore()
 
 	updated := configresource.Config{
-		ID:               "123",
+		ID:               "current",
+		Name:             "Config",
 		AnalyticsEnabled: true,
 	}
 
@@ -43,8 +44,6 @@ func TestPublishing(t *testing.T) {
 		testmock.MustCreateRandomMigratedDatabase(db),
 		configresource.WithPublisher(publisher),
 	)
-
-	repo.Create(context.TODO(), configresource.Config{ID: "123"})
 
 	_, err := repo.Update(context.TODO(), updated)
 	require.NoError(t, err)
@@ -74,7 +73,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		repo := configresource.NewRepository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
-		repo.Create(context.TODO(), configresource.Config{
+		repo.Update(context.TODO(), configresource.Config{
 			AnalyticsEnabled: false,
 		})
 
@@ -86,7 +85,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		repo := configresource.NewRepository(
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
-		repo.Create(context.TODO(), configresource.Config{
+		repo.Update(context.TODO(), configresource.Config{
 			AnalyticsEnabled: true,
 		})
 
@@ -101,21 +100,6 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 func TestConfigResource(t *testing.T) {
 
 	db := testmock.MustGetRawTestingDatabase()
-	sampleConfig := configresource.Config{
-		ID:               "1",
-		Name:             "test 1",
-		AnalyticsEnabled: false,
-	}
-	secondSampleConfig := configresource.Config{
-		ID:               "2",
-		Name:             "test 2",
-		AnalyticsEnabled: true,
-	}
-	thirdSampleConfig := configresource.Config{
-		ID:               "3",
-		Name:             "test 3",
-		AnalyticsEnabled: false,
-	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceType: "Config",
@@ -128,33 +112,19 @@ func TestConfigResource(t *testing.T) {
 
 			return manager
 		},
-		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			configRepo := manager.Handler().(configresource.Repository)
-			switch op {
-			case rmtests.OperationGetSuccess,
-				rmtests.OperationUpdateSuccess,
-				rmtests.OperationDeleteSuccess,
-				rmtests.OperationListSuccess:
-				configRepo.Create(context.TODO(), sampleConfig)
-			case rmtests.OperationListPaginatedSuccess:
-				configRepo.Create(context.TODO(), sampleConfig)
-				configRepo.Create(context.TODO(), secondSampleConfig)
-				configRepo.Create(context.TODO(), thirdSampleConfig)
-			}
-		},
 		SampleJSON: `{
 			"type": "Config",
 			"spec": {
-				"id": "1",
-				"name": "test 1",
+				"id": "current",
+				"name": "config",
 				"analyticsEnabled": false
 			}
 		}`,
 		SampleJSONUpdated: `{
 			"type": "Config",
 			"spec": {
-				"id": "1",
-				"name": "test updated",
+				"id": "current",
+				"name": "config",
 				"analyticsEnabled": false
 			}
 		}`,
