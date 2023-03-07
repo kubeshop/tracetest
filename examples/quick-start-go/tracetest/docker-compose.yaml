@@ -2,7 +2,7 @@ version: '3'
 services:
 
   tracetest:
-    image: kubeshop/tracetest:latest
+    image: kubeshop/tracetest:${TAG:-latest}
     platform: linux/amd64
     volumes:
       - type: bind
