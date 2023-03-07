@@ -10,7 +10,7 @@ require (
 	github.com/fluidtruck/deepcopy v1.0.0
 	github.com/joho/godotenv v1.3.0
 	github.com/kubeshop/tracetest/server v0.0.0-20230208220354-63c9594b2160
-	github.com/pterm/pterm v0.12.46
+	github.com/pterm/pterm v0.12.55
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.13.0
@@ -22,7 +22,7 @@ require (
 
 require (
 	atomicgo.dev/cursor v0.1.1 // indirect
-	atomicgo.dev/keyboard v0.2.8 // indirect
+	atomicgo.dev/keyboard v0.2.9 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -60,7 +60,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rivo/uniseg v0.4.2 // indirect
+	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/segmentio/backo-go v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
@@ -85,9 +85,9 @@ require (
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1 // indirect
 	golang.org/x/sync v0.0.0-20220907140024-f12130a52804 // indirect
-	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20220919141832-68c03719ef51 // indirect
 	google.golang.org/grpc v1.49.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
