@@ -98,12 +98,14 @@ func (r *Repository) Current(ctx context.Context) Config {
 
 const selectQuery = `SELECT "analytics_enabled" FROM config`
 
+var defaultConfig = Config{
+	ID:               id.ID("current"),
+	Name:             "Config",
+	AnalyticsEnabled: true,
+}
+
 func (r *Repository) Get(ctx context.Context, i id.ID) (Config, error) {
-	cfg := Config{
-		ID:               id.ID("current"),
-		Name:             "Config",
-		AnalyticsEnabled: true,
-	}
+	cfg := defaultConfig
 
 	err := r.db.
 		QueryRowContext(ctx, selectQuery).
