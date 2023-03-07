@@ -3,11 +3,18 @@ package configresource
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
+
+var Operations = []resourcemanager.Operation{
+	resourcemanager.OperationGet,
+	resourcemanager.OperationUpdate,
+}
 
 type Config struct {
 	ID   id.ID  `mapstructure:"id"`
@@ -53,7 +60,10 @@ func NewRepository(db *sql.DB, opts ...option) *Repository {
 
 }
 
-const ResourceID = "/app/config/update"
+const (
+	ResourceID   = "/app/config/update"
+	ResourceName = "Config"
+)
 
 type publisher interface {
 	Publish(resourceID string, message any)
@@ -88,10 +98,11 @@ func (r *Repository) Current(ctx context.Context) Config {
 
 const selectQuery = `SELECT "analytics_enabled" FROM config`
 
-func (r *Repository) Get(ctx context.Context, _ id.ID) (Config, error) {
+func (r *Repository) Get(ctx context.Context, i id.ID) (Config, error) {
 	cfg := Config{
-		ID:   id.ID("current"),
-		Name: "Config",
+		ID:               id.ID("current"),
+		Name:             "Config",
+		AnalyticsEnabled: true,
 	}
 
 	err := r.db.
@@ -101,6 +112,9 @@ func (r *Repository) Get(ctx context.Context, _ id.ID) (Config, error) {
 		)
 
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return cfg, nil
+		}
 		return Config{}, fmt.Errorf("sql query: %w", err)
 	}
 

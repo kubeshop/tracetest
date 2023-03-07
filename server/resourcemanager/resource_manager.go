@@ -69,6 +69,7 @@ func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption
 
 	cfg := config{
 		enabledOperations: availableOperations,
+		idgen:             func() id.ID { return id.ID("") },
 	}
 
 	for _, opt := range opts {

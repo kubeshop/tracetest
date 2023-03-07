@@ -56,7 +56,7 @@ func buildSingleStepOperation(operation singleStepOperationTester) operationTest
 }
 
 var (
-	defaultOperations = []operationTester{
+	defaultOperations = operationTesters{
 		createNoIDOperation,
 		createSuccessOperation,
 
@@ -75,7 +75,7 @@ var (
 		// TODO: add tests for other operations
 	}
 
-	errorOperations = []operationTester{
+	errorOperations = operationTesters{
 		createInternalErrorOperation,
 		updateInternalErrorOperation,
 		getInternalErrorOperation,
@@ -84,3 +84,17 @@ var (
 		listWithInvalidSortFieldOperation,
 	}
 )
+
+type operationTesters []operationTester
+
+func (ops operationTesters) exclude(exclude ...Operation) operationTesters {
+	include := operationTesters{}
+	for _, op := range ops {
+		if slices.Contains(exclude, op.name) {
+			continue
+		}
+		include = append(include, op)
+	}
+
+	return include
+}

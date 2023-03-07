@@ -7,7 +7,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/config/configresource"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testmock"
@@ -102,12 +101,16 @@ func TestConfigResource(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: "Config",
+		ResourceType: configresource.ResourceName,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			configRepo := configresource.NewRepository(db)
 
-			manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
+			manager := resourcemanager.New[configresource.Config](
+				configresource.ResourceName,
+				configRepo,
+				resourcemanager.WithOperations(configresource.Operations...),
+			)
 			manager.RegisterRoutes(router)
 
 			return manager
@@ -116,19 +119,24 @@ func TestConfigResource(t *testing.T) {
 			"type": "Config",
 			"spec": {
 				"id": "current",
-				"name": "config",
-				"analyticsEnabled": false
+				"name": "Config",
+				"analyticsEnabled": true
 			}
 		}`,
 		SampleJSONUpdated: `{
 			"type": "Config",
 			"spec": {
 				"id": "current",
-				"name": "config",
+				"name": "Config",
 				"analyticsEnabled": false
 			}
 		}`,
-	})
+	},
+		rmtests.ExcludeOperations(
+			rmtests.OperationGetNotFound,
+			rmtests.OperationUpdateNotFound,
+		),
+	)
 }
 
 func cleanEnv() func() {

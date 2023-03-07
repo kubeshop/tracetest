@@ -24,10 +24,30 @@ type ResourceTypeTest struct {
 	sortFields []string
 }
 
-func TestResourceType(t *testing.T, rt ResourceTypeTest) {
+type config struct {
+	operations operationTesters
+}
+
+type testOption func(*config)
+
+func ExcludeOperations(ops ...Operation) testOption {
+	return func(c *config) {
+		c.operations = c.operations.exclude(ops...)
+	}
+}
+
+func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
 	t.Helper()
 
-	TestResourceTypeOperations(t, rt, defaultOperations)
+	cfg := config{
+		operations: defaultOperations,
+	}
+
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	TestResourceTypeOperations(t, rt, cfg.operations)
 }
 
 func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {

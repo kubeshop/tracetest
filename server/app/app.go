@@ -20,7 +20,6 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -276,7 +275,11 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 }
 
 func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB) {
-	manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
+	manager := resourcemanager.New[configresource.Config](
+		configresource.ResourceName,
+		configRepo,
+		resourcemanager.WithOperations(configresource.Operations...),
+	)
 	manager.RegisterRoutes(router)
 }
 
