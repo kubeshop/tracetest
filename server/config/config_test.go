@@ -28,8 +28,8 @@ func configWithFlags(t *testing.T, inputFlags []string, opts ...config.Option) *
 	return cfg
 }
 
-func configFromFile(t *testing.T, path string) *config.Config {
-	return configWithFlags(t, []string{"--config", path})
+func configFromFile(t *testing.T, path string, opts ...config.Option) *config.Config {
+	return configWithFlags(t, []string{"--config", path}, opts...)
 }
 
 func configWithEnv(t *testing.T, env map[string]string) *config.Config {

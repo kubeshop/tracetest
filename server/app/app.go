@@ -45,6 +45,8 @@ type App struct {
 	cfg              *config.Config
 	provisioningFile string
 	stopFns          []func()
+
+	serverID string
 }
 
 func New(config *config.Config) (*App, error) {
@@ -108,6 +110,23 @@ func (app *App) provision(db model.Repository) {
 	fmt.Println("[Provisioning]: success")
 }
 
+func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
+	sm.Subscribe(configresource.ResourceID, subscription.NewSubscriberFunction(
+		func(m subscription.Message) error {
+			configFromDB, ok := m.Content.(configresource.Config)
+			if !ok {
+				return fmt.Errorf("cannot read update to configFromDB. unexpected type %T", m.Content)
+			}
+
+			return app.initAnalytics(configFromDB)
+		}),
+	)
+}
+
+func (app *App) initAnalytics(configFromDB configresource.Config) error {
+	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env)
+}
+
 func (app *App) Start(opts ...appOption) error {
 	for _, opt := range opts {
 		opt(app)
@@ -116,10 +135,16 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
+	subscriptionManager := subscription.NewManager()
+	app.subscribeToConfigChanges(subscriptionManager)
+
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
 		return err
 	}
+
+	configRepo := configresource.Repository(db, configresource.WithPublisher(subscriptionManager))
+	configFromDB := configRepo.Current(ctx)
 
 	testDB, err := testdb.Postgres(
 		testdb.WithDB(db),
@@ -141,8 +166,9 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
+	app.serverID = serverID
 
-	err = analytics.Init(app.cfg.AnalyticsEnabled(), serverID, Version, Env)
+	err = app.initAnalytics(configFromDB)
 	if err != nil {
 		return err
 	}
@@ -163,7 +189,6 @@ func (app *App) Start(opts ...appOption) error {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
 
-	subscriptionManager := subscription.NewManager()
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(
@@ -215,9 +240,9 @@ func (app *App) Start(opts ...appOption) error {
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	registerConfigResource(apiRouter, db)
+	registerConfigResource(configRepo, apiRouter, db)
 
-	registerSPAHandler(router, app.cfg, serverID)
+	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", app.cfg.ServerPort()),
@@ -235,12 +260,13 @@ func (app *App) Start(opts ...appOption) error {
 	return nil
 }
 
-func registerSPAHandler(router *mux.Router, cfg httpServerConfig, serverID string) {
+func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabled bool, serverID string) {
 	router.
 		PathPrefix(cfg.ServerPathPrefix()).
 		Handler(
 			httpServer.SPAHandler(
 				cfg,
+				analyticsEnabled,
 				serverID,
 				Version,
 				Env,
@@ -249,9 +275,8 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, serverID strin
 
 }
 
-func registerConfigResource(router *mux.Router, db *sql.DB) {
-	configRepo := configresource.Repository(db)
-	manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
+func registerConfigResource(configRepo resourcemanager.ResourceHandler[configresource.Config], router *mux.Router, db *sql.DB) {
+	manager := resourcemanager.New("Config", configRepo, id.GenerateID)
 	manager.RegisterRoutes(router)
 }
 
@@ -334,7 +359,6 @@ func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
 type httpServerConfig interface {
 	ServerPathPrefix() string
 	ServerPort() int
-	AnalyticsEnabled() bool
 	DemoEnabled() []string
 	DemoEndpoints() map[string]string
 	ExperimentalFeatures() []string

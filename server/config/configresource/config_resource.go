@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/kubeshop/tracetest/server/id"
 )
@@ -24,12 +25,71 @@ func (c Config) Validate() error {
 	return nil
 }
 
-func Repository(db *sql.DB) *repository {
-	return &repository{db}
+func (c Config) IsAnalyticsEnabled() bool {
+	if os.Getenv("TRACETEST_DEV") != "" {
+		return false
+	}
+
+	return c.AnalyticsEnabled
+}
+
+type option func(*repository)
+
+func WithPublisher(p publisher) option {
+	return func(r *repository) {
+		r.publisher = p
+	}
+}
+
+func Repository(db *sql.DB, opts ...option) *repository {
+	repo := &repository{
+		db: db,
+	}
+
+	for _, opt := range opts {
+		opt(repo)
+	}
+
+	return repo
+
+}
+
+const ResourceID = "/app/config/update"
+
+type publisher interface {
+	Publish(resourceID string, message any)
 }
 
 type repository struct {
-	db *sql.DB
+	db        *sql.DB
+	publisher publisher
+}
+
+func (r *repository) publish(config Config) {
+	if r.publisher == nil {
+		return
+	}
+
+	r.publisher.Publish(ResourceID, config)
+}
+
+func (r *repository) Current(ctx context.Context) Config {
+	defaultConfig := Config{
+		AnalyticsEnabled: true,
+	}
+
+	list, err := r.List(ctx, 1, 0, "", "", "")
+	if err != nil || len(list) != 1 {
+		// TODO: log error
+		return defaultConfig
+	}
+
+	return list[0]
+}
+
+func (r *repository) SetID(cfg Config, id id.ID) Config {
+	cfg.ID = id
+	return cfg
 }
 
 const insertQuery = `
@@ -38,11 +98,6 @@ const insertQuery = `
 			"name",
 			"analytics_enabled"
 		) VALUES ($1, $2, $3)`
-
-func (r *repository) SetID(cfg Config, id id.ID) Config {
-	cfg.ID = id
-	return cfg
-}
 
 func (r *repository) Create(ctx context.Context, cfg Config) (Config, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -101,6 +156,8 @@ func (r *repository) Update(ctx context.Context, updated Config) (Config, error)
 	if err != nil {
 		return Config{}, fmt.Errorf("commit: %w", err)
 	}
+
+	r.publish(updated)
 
 	return updated, nil
 }

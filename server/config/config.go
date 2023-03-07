@@ -59,10 +59,11 @@ type logger interface {
 }
 
 type Config struct {
-	config *oldConfig
-	vp     *viper.Viper
-	mu     sync.Mutex
-	logger logger
+	config    *oldConfig
+	vp        *viper.Viper
+	mu        sync.Mutex
+	logger    logger
+	resources resources
 }
 
 func (c *Config) Watch(updateFn func(c *Config)) {
