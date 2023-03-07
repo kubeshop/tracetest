@@ -92,6 +92,11 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 	testServer := httptest.NewServer(router)
 	manager := rt.RegisterManagerFn(router)
 
+	sortable, ok := manager.Handler().(rm.SortableHandler)
+	if ok {
+		rt.sortFields = sortable.SortingFields()
+	}
+
 	if rt.Prepare != nil {
 		rt.Prepare(t, op.name, manager)
 	}

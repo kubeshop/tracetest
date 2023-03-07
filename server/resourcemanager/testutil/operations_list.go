@@ -127,6 +127,9 @@ var listPaginatedSuccessOperation = operationTester{
 	getSteps: func(t *testing.T, rt ResourceTypeTest) []operationTesterStep {
 		steps := []operationTesterStep{}
 
+		if len(rt.sortFields) < 1 {
+			panic(fmt.Errorf("trying to test list pagination but no sort field was provided"))
+		}
 		for _, sortField := range rt.sortFields {
 			steps = append(steps,
 				buildPaginationOperationStep("asc", sortField),
@@ -168,21 +171,19 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			require.Equal(t, 3, parsedJsonBody.Count)
 
 			var prevVal any
-			field := rt.sortFields[0]
-
 			for _, item := range parsedJsonBody.Items {
 				if prevVal == nil {
-					prevVal = item[field]
+					prevVal = item[sortField]
 					continue
 				}
 
 				if sortDirection == "asc" {
-					assert.LessOrEqual(t, prevVal, item[field])
+					assert.LessOrEqual(t, prevVal, item[sortField])
 				} else {
-					assert.GreaterOrEqual(t, prevVal, item[field])
+					assert.GreaterOrEqual(t, prevVal, item[sortField])
 				}
 
-				prevVal = item[field]
+				prevVal = item[sortField]
 			}
 		},
 	}
