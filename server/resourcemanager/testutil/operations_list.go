@@ -38,7 +38,7 @@ func buildListRequest(resourceType string, paginationParams map[string]string, c
 
 const OperationListNoResults Operation = "ListNoResults"
 
-var listNoResultsOperation = operationTester{
+var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationListNoResults,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
@@ -61,11 +61,11 @@ var listNoResultsOperation = operationTester{
 
 		require.JSONEq(t, expected, jsonBody)
 	},
-}
+})
 
 const OperationListSuccess Operation = "ListSuccess"
 
-var listSuccessOperation = operationTester{
+var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationListSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
@@ -88,11 +88,11 @@ var listSuccessOperation = operationTester{
 
 		require.JSONEq(t, expected, jsonBody)
 	},
-}
+})
 
 const OperationListWithInvalidSortField Operation = "ListWithInvalidSortField"
 
-var listWithInvalidSortFieldOperation = operationTester{
+var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationListWithInvalidSortField,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		invalidSortField := generateRandomString()
@@ -113,14 +113,14 @@ var listWithInvalidSortFieldOperation = operationTester{
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		require.Equal(t, 400, resp.StatusCode)
 	},
-}
+})
 
 // Tech debt: Even being one operation, we will split ASC and DESC in two just to keep
 // "one request per operation". In the future we can change this structure to support both tests
 // in one operationTester instance
 const OperationListPaginatedSuccess Operation = "ListPaginatedSuccess"
 
-var listPaginatedAscendingSuccessOperation = operationTester{
+var listPaginatedAscendingSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationListPaginatedSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
@@ -162,9 +162,9 @@ var listPaginatedAscendingSuccessOperation = operationTester{
 			prevVal = item[field]
 		}
 	},
-}
+})
 
-var listPaginatedDescendingSuccessOperation = operationTester{
+var listPaginatedDescendingSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationListPaginatedSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
@@ -206,11 +206,11 @@ var listPaginatedDescendingSuccessOperation = operationTester{
 			prevVal = item[field]
 		}
 	},
-}
+})
 
 const OperationListInternalError Operation = "ListInternalError"
 
-var listInternalErrorOperation = operationTester{
+var listInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationListInternalError,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
@@ -224,4 +224,4 @@ var listInternalErrorOperation = operationTester{
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		assertInternalError(t, resp, ct, rt.ResourceType, "listing")
 	},
-}
+})

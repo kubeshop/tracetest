@@ -76,16 +76,22 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 		rt.Prepare(t, op.name, testBridge)
 	}
 
+	// minor hack to pass "sortFields" to each operation
+	// without needing to propagate sortableHandler for each one
 	sortableHandler := testBridge.(rm.SortableHandler)
 	rt.sortFields = sortableHandler.SortingFields()
 
-	req := op.buildRequest(t, testServer, ct, rt)
-	resp := doRequest(t, req, ct.contentType, testServer)
+	operationSteps := op.getSteps(t, rt)
 
-	op.assertResponse(t, resp, ct, rt)
-	assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
-	if op.postAssert != nil {
-		op.postAssert(t, ct, rt, testServer)
+	for _, step := range operationSteps {
+		req := step.buildRequest(t, testServer, ct, rt)
+		resp := doRequest(t, req, ct.contentType, testServer)
+
+		step.assertResponse(t, resp, ct, rt)
+		assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))
+		if step.postAssert != nil {
+			step.postAssert(t, ct, rt, testServer)
+		}
 	}
 }
 

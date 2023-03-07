@@ -26,7 +26,7 @@ func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *h
 
 const OperationGetSuccess Operation = "GetSuccess"
 
-var getSuccessOperation = operationTester{
+var getSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationGetSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildGetRequest(rt, ct, testServer, t)
@@ -41,11 +41,11 @@ var getSuccessOperation = operationTester{
 
 		require.JSONEq(t, expected, jsonBody)
 	},
-}
+})
 
 const OperationGetNotFound Operation = "GetNotFound"
 
-var getNotFoundOperation = operationTester{
+var getNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationGetNotFound,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildGetRequest(rt, ct, testServer, t)
@@ -54,11 +54,11 @@ var getNotFoundOperation = operationTester{
 		t.Helper()
 		require.Equal(t, 404, resp.StatusCode)
 	},
-}
+})
 
 const OperationGetInternalError Operation = "GetInternalError"
 
-var getInternalErrorOperation = operationTester{
+var getInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationGetInternalError,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildGetRequest(rt, ct, testServer, t)
@@ -66,4 +66,4 @@ var getInternalErrorOperation = operationTester{
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		assertInternalError(t, resp, ct, rt.ResourceType, "getting")
 	},
-}
+})

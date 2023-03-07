@@ -21,7 +21,7 @@ func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 
 const OperationUpdateSuccess Operation = "UpdateSuccess"
 
-var updateSuccessOperation = operationTester{
+var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationUpdateSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildUpdateRequest(rt, ct, testServer, t)
@@ -36,11 +36,11 @@ var updateSuccessOperation = operationTester{
 
 		require.JSONEq(t, expected, jsonBody)
 	},
-}
+})
 
 const OperationUpdateNotFound Operation = "UpdateNotFound"
 
-var updateNotFoundOperation = operationTester{
+var updateNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationUpdateNotFound,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildUpdateRequest(rt, ct, testServer, t)
@@ -49,11 +49,11 @@ var updateNotFoundOperation = operationTester{
 		t.Helper()
 		require.Equal(t, 404, resp.StatusCode)
 	},
-}
+})
 
 const OperationUpdateInternalError Operation = "UpdateInternalError"
 
-var updateInternalErrorOperation = operationTester{
+var updateInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationUpdateInternalError,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildUpdateRequest(rt, ct, testServer, t)
@@ -61,4 +61,4 @@ var updateInternalErrorOperation = operationTester{
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		assertInternalError(t, resp, ct, rt.ResourceType, "updating")
 	},
-}
+})

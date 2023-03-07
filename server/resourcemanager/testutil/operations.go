@@ -9,10 +9,36 @@ import (
 type Operation string
 
 type operationTester struct {
+	name     Operation
+	getSteps func(*testing.T, ResourceTypeTest) []operationTesterStep
+}
+
+type operationTesterStep struct {
 	buildRequest   func(*testing.T, *httptest.Server, contentTypeConverter, ResourceTypeTest) *http.Request
 	assertResponse func(*testing.T, *http.Response, contentTypeConverter, ResourceTypeTest)
+	postAssert     func(*testing.T, contentTypeConverter, ResourceTypeTest, *httptest.Server)
+}
+
+type singleStepOperationTester struct {
 	name           Operation
-	postAssert     func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server)
+	buildRequest   func(*testing.T, *httptest.Server, contentTypeConverter, ResourceTypeTest) *http.Request
+	assertResponse func(*testing.T, *http.Response, contentTypeConverter, ResourceTypeTest)
+	postAssert     func(*testing.T, contentTypeConverter, ResourceTypeTest, *httptest.Server)
+}
+
+func buildSingleStepOperation(operation singleStepOperationTester) operationTester {
+	return operationTester{
+		name: operation.name,
+		getSteps: func(t *testing.T, rt ResourceTypeTest) []operationTesterStep {
+			return []operationTesterStep{
+				{
+					buildRequest:   operation.buildRequest,
+					assertResponse: operation.assertResponse,
+					postAssert:     operation.postAssert,
+				},
+			}
+		},
+	}
 }
 
 var (

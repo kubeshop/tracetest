@@ -21,7 +21,7 @@ func buildCreateRequest(body, rt string, ct contentTypeConverter, testServer *ht
 
 const OperationCreateNoID Operation = "CreateNoID"
 
-var createNoIDOperation = operationTester{
+var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationCreateNoID,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
@@ -43,11 +43,11 @@ var createNoIDOperation = operationTester{
 		require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
 		require.NotEmpty(t, extractID(jsonBody))
 	},
-}
+})
 
 const OperationCreateSuccess Operation = "CreateSuccess"
 
-var createSuccessOperation = operationTester{
+var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationCreateSuccess,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
@@ -66,11 +66,11 @@ var createSuccessOperation = operationTester{
 
 		require.JSONEq(t, expected, jsonBody)
 	},
-}
+})
 
 const OperationCreateInternalError Operation = "CreateInternalError"
 
-var createInternalErrorOperation = operationTester{
+var createInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationCreateInternalError,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
@@ -84,4 +84,4 @@ var createInternalErrorOperation = operationTester{
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		assertInternalError(t, resp, ct, rt.ResourceType, "creating")
 	},
-}
+})

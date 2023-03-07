@@ -26,12 +26,12 @@ func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 
 const OperationDeleteSuccess Operation = "DeleteSuccess"
 
-var deleteSuccessOperation = operationTester{
+var deleteSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationDeleteSuccess,
 	postAssert: func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 		req := buildGetRequest(rt, ct, testServer, t)
 		resp := doRequest(t, req, ct.contentType, testServer)
-		getNotFoundOperation.assertResponse(t, resp, ct, rt)
+		require.Equal(t, 404, resp.StatusCode)
 	},
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildDeleteRequest(rt, ct, testServer, t)
@@ -41,11 +41,11 @@ var deleteSuccessOperation = operationTester{
 		require.Equal(t, 204, resp.StatusCode)
 		require.Empty(t, responseBody(t, resp))
 	},
-}
+})
 
 const OperationDeleteNotFound Operation = "DeleteNotFound"
 
-var deleteNotFoundOperation = operationTester{
+var deleteNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationDeleteNotFound,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildDeleteRequest(rt, ct, testServer, t)
@@ -54,11 +54,11 @@ var deleteNotFoundOperation = operationTester{
 		t.Helper()
 		require.Equal(t, 404, resp.StatusCode)
 	},
-}
+})
 
 const OperationDeleteInternalError Operation = "DeleteInternalError"
 
-var deleteInternalErrorOperation = operationTester{
+var deleteInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
 	name: OperationDeleteInternalError,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildDeleteRequest(rt, ct, testServer, t)
@@ -66,4 +66,4 @@ var deleteInternalErrorOperation = operationTester{
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		assertInternalError(t, resp, ct, rt.ResourceType, "deleting")
 	},
-}
+})
