@@ -278,6 +278,11 @@ const sidebars = {
           id: "cli/creating-tests",
           label: "Creating Tests",
         },
+        {
+          type: "doc",
+          id: "cli/running-tests",
+          label: "Running Tests",
+        },        
         // {
         //   type: "doc",
         //   id: "cli/creating-transactions",
