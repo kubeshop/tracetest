@@ -14,13 +14,33 @@ import (
 
 func TestPollingProfileResource(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
-	sampleConfig := pollingprofile.PollingProfile{
+	sampleProfile := pollingprofile.PollingProfile{
 		ID:       "1",
 		Name:     "test",
 		Strategy: pollingprofile.Periodic,
 		Periodic: &pollingprofile.PeriodicPollingConfig{
 			RetryDelay: "10s",
 			Timeout:    "30m",
+		},
+	}
+
+	secondSampleProfile := pollingprofile.PollingProfile{
+		ID:       "2",
+		Name:     "fast test",
+		Strategy: pollingprofile.Periodic,
+		Periodic: &pollingprofile.PeriodicPollingConfig{
+			RetryDelay: "1s",
+			Timeout:    "1m",
+		},
+	}
+
+	thirdSampleProfile := pollingprofile.PollingProfile{
+		ID:       "3",
+		Name:     "long running test",
+		Strategy: pollingprofile.Periodic,
+		Periodic: &pollingprofile.PeriodicPollingConfig{
+			RetryDelay: "2m",
+			Timeout:    "45m",
 		},
 	}
 
@@ -42,7 +62,11 @@ func TestPollingProfileResource(t *testing.T) {
 				rmtests.OperationUpdateSuccess,
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
-				pollingProfileRepo.Create(context.TODO(), sampleConfig)
+				pollingProfileRepo.Create(context.TODO(), sampleProfile)
+			case rmtests.OperationListPaginatedSuccess:
+				pollingProfileRepo.Create(context.TODO(), sampleProfile)
+				pollingProfileRepo.Create(context.TODO(), secondSampleProfile)
+				pollingProfileRepo.Create(context.TODO(), thirdSampleProfile)
 			}
 		},
 		SampleJSON: `{

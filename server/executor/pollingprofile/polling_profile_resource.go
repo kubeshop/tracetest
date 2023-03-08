@@ -219,8 +219,34 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	return nil
 }
 
-func (r *repository) List(ctx context.Context, take, skip int, query, sortedBy, sortDirection string) ([]PollingProfile, error) {
-	rows, err := r.db.QueryContext(ctx, baseSelect)
+func (r repository) SortingFields() []string {
+	return []string{"id", "name", "strategy"}
+}
+
+func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
+	listQuery := baseSelect
+
+	if sortDirection == "" {
+		sortDirection = "ASC"
+	}
+
+	if query != "" {
+		listQuery = fmt.Sprintf("%s WHERE %s", listQuery, query)
+	}
+
+	if sortBy != "" {
+		listQuery = fmt.Sprintf("%s ORDER BY %s %s", listQuery, sortBy, sortDirection)
+	}
+
+	if take > 0 {
+		listQuery = fmt.Sprintf("%s LIMIT %d", listQuery, take)
+	}
+
+	if skip > 0 {
+		listQuery = fmt.Sprintf("%s OFFSET %d", listQuery, skip)
+	}
+
+	rows, err := r.db.QueryContext(ctx, listQuery)
 	if err != nil {
 		return nil, fmt.Errorf("sql query: %w", err)
 	}
@@ -259,9 +285,15 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortedBy, 
 	return profiles, nil
 }
 
-const countQuery = `SELECT COUNT(*) FROM polling_profiles`
+const baseCountQuery = `SELECT COUNT(*) FROM polling_profiles`
 
 func (r *repository) Count(ctx context.Context, query string) (int, error) {
+	countQuery := baseCountQuery
+
+	if query != "" {
+		countQuery = fmt.Sprintf("%s WHERE %s", countQuery, query)
+	}
+
 	count := 0
 
 	err := r.db.
