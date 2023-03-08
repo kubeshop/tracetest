@@ -36,3 +36,28 @@ components:
           type: string
         error:
           type: string
+    Configuration:
+      type: object
+      description: "Represents the set of configuration common options for Tracetest."
+      properties:
+        id:
+          type: string
+          description: "ID of the configuration resource. It should always be set as 'current'."
+        name:
+          type: string
+          description: "Name given for this configuration set. It should always be set as 'Config'."
+        analyticsEnabled:
+          type: boolean
+          description: "Flag telling if a user allow Tracetest to send analytics about its usage."
+      required:
+        - analyticsEnabled
+    ConfigurationResource:
+      type: object
+      description: "Represents a coonfiguration into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Config'."
+        spec:
+          $ref: "#/components/schemas/Configuration"
+

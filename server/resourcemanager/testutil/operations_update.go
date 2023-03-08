@@ -12,8 +12,10 @@ import (
 )
 
 func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
+	id := extractID(rt.SampleJSON)
 	input := ct.fromJSON(rt.SampleJSONUpdated)
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.ResourceType))
+
+	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(rt.ResourceType), id)
 
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(input))
 	require.NoError(t, err)
