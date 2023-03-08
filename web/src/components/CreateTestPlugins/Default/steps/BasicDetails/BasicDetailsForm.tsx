@@ -2,22 +2,26 @@ import {Form, Input} from 'antd';
 import {noop} from 'lodash';
 import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {TDraftTest} from 'types/Test.types';
-import Env from 'utils/Env';
 import BasicDetailsDemoHelper from './BasicDetailsDemoHelper';
 import * as S from './BasicDetails.styled';
 
 export const FORM_ID = 'create-test';
-const demoEnabled = Env.get('demoEnabled');
-const isDemoEnabled = demoEnabled.length > 0;
 
 interface IProps {
   onSelectDemo?(demo: TDraftTest): void;
   demoList?: TDraftTest[];
   selectedDemo?: TDraftTest;
   isEditing?: boolean;
+  isDemoEnabled?: boolean;
 }
 
-const BasicDetailsForm = ({onSelectDemo = noop, selectedDemo, isEditing = false, demoList = []}: IProps) => {
+const BasicDetailsForm = ({
+  onSelectDemo = noop,
+  selectedDemo,
+  isEditing = false,
+  demoList = [],
+  isDemoEnabled = false,
+}: IProps) => {
   return (
     <>
       {!isEditing && Boolean(demoList.length) && isDemoEnabled && (

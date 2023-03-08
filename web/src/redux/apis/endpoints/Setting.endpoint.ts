@@ -1,6 +1,7 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import Config, {TRawConfig} from 'models/Config.model';
+import Demo, {TRawDemo} from 'models/Demo.model';
 import Polling, {TRawPolling} from 'models/Polling.model';
 import {EResourceType, TListResponse, TResource, TSpec} from 'types/Settings.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
@@ -27,6 +28,17 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     providesTags: () => [{type: TracetestApiTags.SETTING, id: EResourceType.Polling}],
     transformResponse: (rawPollings: TListResponse<TRawPolling>) => Polling(rawPollings),
+  }),
+  getDemo: builder.query<Demo, unknown>({
+    query: () => ({
+      url: '/demo/',
+      method: HTTP_METHOD.GET,
+      headers: {
+        'content-type': 'application/json',
+      },
+    }),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: EResourceType.Demo}],
+    transformResponse: (rawDemos: TListResponse<TRawDemo>) => Demo(rawDemos),
   }),
   createSetting: builder.mutation<undefined, {resource: TResource<TSpec>}>({
     query: ({resource}) => ({

@@ -1,16 +1,17 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo} from 'react';
 
-import {useGetDataStoresQuery, useGetConfigQuery, useGetPollingQuery} from 'redux/apis/TraceTest.api';
+import Config from 'models/Config.model';
+import DataStoreConfig from 'models/DataStoreConfig.model';
+import Demo from 'models/Demo.model';
+import Polling from 'models/Polling.model';
+import {useGetDataStoresQuery, useGetConfigQuery, useGetDemoQuery, useGetPollingQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
-import DataStoreConfig from 'models/DataStoreConfig.model';
-import Config from 'models/Config.model';
 import UserSelectors from 'selectors/User.selectors';
 import AnalyticsService from 'services/Analytics/Analytics.service';
 import {ConfigMode} from 'types/DataStore.types';
 import Env from 'utils/Env';
-import Polling from 'models/Polling.model';
 
 interface IContext {
   dataStoreConfig: DataStoreConfig;
@@ -23,6 +24,7 @@ interface IContext {
   shouldDisplayConfigSetupFromTest: boolean;
   config: Config;
   polling: Polling;
+  demo: Demo;
 }
 
 const Context = createContext<IContext>({
@@ -36,6 +38,7 @@ const Context = createContext<IContext>({
   shouldDisplayConfigSetupFromTest: false,
   config: Config(),
   polling: Polling(),
+  demo: Demo(),
 });
 
 interface IProps {
@@ -86,6 +89,9 @@ const SettingsValuesProvider = ({children}: IProps) => {
   // Polling
   const {data: polling = Polling()} = useGetPollingQuery({});
 
+  // Demo
+  const {data: demo = Demo()} = useGetDemoQuery({});
+
   const value = useMemo<IContext>(
     () => ({
       dataStoreConfig,
@@ -98,6 +104,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       shouldDisplayConfigSetupFromTest,
       config,
       polling,
+      demo,
     }),
     [
       dataStoreConfig,
@@ -110,6 +117,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       skipConfigSetupFromTest,
       config,
       polling,
+      demo,
     ]
   );
 

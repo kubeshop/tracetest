@@ -1,4 +1,4 @@
-import {PokeshopDemo} from '../../../src/constants/Demo.constants';
+import {PokeshopDemo} from '../constants/Test';
 import {getResultId, getTestId} from '../utils/Common';
 
 describe('Show test details', () => {
@@ -14,7 +14,7 @@ describe('Show test details', () => {
       cy.get('[data-cy=test-details-link]', {timeout: 10000}).first().click();
 
       cy.location('pathname').should('match', /\/test\/.*/i);
-      cy.get('[data-cy=test-details-name]').should('have.text', `${PokeshopDemo.REST[0].name} (v1)`);
+      cy.get('[data-cy=test-details-name]').should('have.text', `${PokeshopDemo[0].name} (v1)`);
       cy.get('[data-cy=run-card-list]').should('be.visible');
       cy.get('[data-cy^=run-card-]').should('have.length.above', 0);
 

@@ -1,4 +1,4 @@
-import {TRawTest} from '../../../src/types/Test.types';
+import {TRawTest} from '../../../src/models/Test.model';
 
 export const transactionTestList: TRawTest[] = [
   {

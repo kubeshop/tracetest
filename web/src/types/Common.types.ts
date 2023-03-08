@@ -3,8 +3,6 @@ import {external} from './Generated.types';
 export interface IEnv {
   analyticsEnabled: boolean;
   appVersion: string;
-  demoEnabled: string[];
-  demoEndpoints: {[key: string]: string};
   env: string;
   experimentalFeatures: string[];
   measurementId: string;

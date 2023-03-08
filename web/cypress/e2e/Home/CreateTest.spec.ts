@@ -1,6 +1,4 @@
-import {PokeshopDemo} from '../../../src/constants/Demo.constants';
-
-const DemoTestExampleList = PokeshopDemo.REST;
+import {PokeshopDemo} from '../constants/Test';
 
 describe('Create test', () => {
   beforeEach(() => {
@@ -39,12 +37,12 @@ describe('Create test', () => {
   });
 
   it('should create a GET test from an example', () => {
-    const [{name}] = DemoTestExampleList;
+    const [{name}] = PokeshopDemo;
     cy.createTestByName(name);
   });
 
   it('should create a POST test from an example', () => {
-    const [, {name}] = DemoTestExampleList;
+    const [, {name}] = PokeshopDemo;
     cy.createTestByName(name);
   });
 });

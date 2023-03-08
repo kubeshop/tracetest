@@ -1,4 +1,5 @@
 import {TRawConfig} from 'models/Config.model';
+import {TRawDemo} from 'models/Demo.model';
 import {TRawPolling} from 'models/Polling.model';
 
 export type TListResponse<T> = {
@@ -14,24 +15,7 @@ export type TResource<T> = {
 export enum EResourceType {
   Config = 'Config',
   Polling = 'Polling',
+  Demo = 'Demo',
 }
 
-export type TSpec = TRawConfig | TRawPolling;
-
-export interface IDraftSettings {
-  analytics: boolean;
-  maxWaitTimeForTrace: string;
-  retryDelay: string;
-  demo: IDemoSettings;
-}
-
-interface IDemoSettings {
-  pokeshopEnabled: boolean;
-  pokeshopHttp: string;
-  pokeshopGrpc: string;
-  otelEnabled: boolean;
-  otelFrontend: string;
-  otelProductCatalog: string;
-  otelCart: string;
-  otelCheckout: string;
-}
+export type TSpec = TRawConfig | TRawPolling | TRawDemo;

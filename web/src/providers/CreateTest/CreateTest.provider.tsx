@@ -1,5 +1,6 @@
 import {createContext, useCallback, useContext, useMemo} from 'react';
 import {noop} from 'lodash';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {IPlugin} from 'types/Plugins.types';
 import {
   initialState,
@@ -56,11 +57,12 @@ const CreateTestProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
   const {runTest, isEditLoading} = useTestCrud();
+  const {demo} = useSettingsValues();
 
   const stepList = useAppSelector(CreateTestSelectors.selectStepList);
   const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
-  const plugin = useAppSelector(CreateTestSelectors.selectPlugin);
+  const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demo));
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
   const isFormValid = useAppSelector(CreateTestSelectors.selectIsFormValid);
   const isFinalStep = stepNumber === stepList.length - 1;
