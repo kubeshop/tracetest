@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type Strategy string
@@ -15,6 +16,16 @@ type Strategy string
 const (
 	Periodic Strategy = "periodic"
 )
+
+const ResourceName = "PollingProfile"
+
+var Operations = []resourcemanager.Operation{
+	resourcemanager.OperationCreate,
+	resourcemanager.OperationDelete,
+	resourcemanager.OperationGet,
+	resourcemanager.OperationList,
+	resourcemanager.OperationUpdate,
+}
 
 type PollingProfile struct {
 	ID       id.ID                  `mapstructure:"id"`
@@ -40,15 +51,15 @@ func (pp PollingProfile) Validate() error {
 	return nil
 }
 
-func Repository(db *sql.DB) *repository {
-	return &repository{db}
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{db}
 }
 
-type repository struct {
+type Repository struct {
 	db *sql.DB
 }
 
-func (r *repository) SetID(profile PollingProfile, id id.ID) PollingProfile {
+func (r *Repository) SetID(profile PollingProfile, id id.ID) PollingProfile {
 	profile.ID = id
 	return profile
 }
@@ -61,7 +72,7 @@ const insertQuery = `INSERT INTO polling_profiles (
 	)
 	VALUES ($1, $2, $3, $4)`
 
-func (r *repository) Create(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
+func (r *Repository) Create(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
 	var (
 		periodicJSON []byte
 		err          error
@@ -106,7 +117,7 @@ const updateQuery = `
 		"periodic" = $4
 	WHERE "id" = $1`
 
-func (r *repository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
+func (r *Repository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
 	var (
 		periodicJSON []byte
 		err          error
@@ -161,7 +172,7 @@ const (
 	getQuery = baseSelect + `WHERE "id" = $1`
 )
 
-func (r *repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
+func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
 	profile := PollingProfile{}
 
 	var periodicJSON []byte
@@ -193,7 +204,7 @@ func (r *repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) 
 
 const deleteQuery = `DELETE FROM polling_profiles WHERE "id" = $1`
 
-func (r *repository) Delete(ctx context.Context, id id.ID) error {
+func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	profile, err := r.Get(ctx, id)
 	if err != nil {
 		return err
@@ -219,11 +230,11 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	return nil
 }
 
-func (r repository) SortingFields() []string {
+func (r Repository) SortingFields() []string {
 	return []string{"id", "name", "strategy"}
 }
 
-func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
 	listQuery := baseSelect
 
 	if sortDirection == "" {
@@ -287,7 +298,7 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 
 const baseCountQuery = `SELECT COUNT(*) FROM polling_profiles`
 
-func (r *repository) Count(ctx context.Context, query string) (int, error) {
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	countQuery := baseCountQuery
 
 	if query != "" {

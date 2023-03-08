@@ -48,7 +48,7 @@ func TestPollingProfileResource(t *testing.T) {
 		ResourceType: "PollingProfile",
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
-			pollingProfileRepo := pollingprofile.Repository(db)
+			pollingProfileRepo := pollingprofile.NewRepository(db)
 
 			manager := resourcemanager.New[pollingprofile.PollingProfile]("PollingProfile", pollingProfileRepo, resourcemanager.WithIDGen(id.GenerateID))
 			manager.RegisterRoutes(router)
