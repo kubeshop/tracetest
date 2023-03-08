@@ -1074,13 +1074,13 @@ paths:
             application/json:
               schema:
                 $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
-  /config/{id}:
+  /config/{configId}:
     get:
       tags:
         - api
       parameters:
         - in: path
-          name: id
+          name: configId
           schema:
             type: string
           required: true
@@ -1099,13 +1099,13 @@ paths:
               schema:
                 $ref: "./config.yaml#/components/schemas/Configuration"
         500:
-          description: "problem with getting a configuration"
+          description: "problem getting a configuration"
     put:
       tags:
         - api
       parameters:
         - in: path
-          name: id
+          name: configId
           schema:
             type: string
           required: true
@@ -1132,7 +1132,178 @@ paths:
               schema:
                 $ref: "./config.yaml#/components/schemas/Configuration"
         500:
-          description: "problem with updating configuration"
+          description: "problem updating configuration"
+
+  # Polling Profile
+  /pollingprofile:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: configId
+          schema:
+            type: string
+          description: "ID of the configuration resource used on Tracetest. It should be set as 'current'."
+      summary: "List Polling Profiles"
+      description: "List polling profiles used on Tracetest to configure how to fetch traces in a test."
+      operationId: listPollingProfiles
+      parameters:
+        - in: query
+          name: take
+          description: "Indicates the maximum number of polling profiles that can be returned on this call."
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: skip
+          description: "Indicates how many polling profiles will be skipped when paginating."
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: sortBy
+          description: "Indicates the sort field for on which all polling profiles will be sorted."
+          schema:
+            type: string
+            enum: [id, name, strategy]
+        - in: query
+          name: sortDirection
+          description: "Indicates the sort direction for the polling profiles (ascending or descending)."
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./config.yaml#/components/schemas/PollingProfile"
+            text/yaml:
+              schema:
+                type: array
+                items:
+                  $ref: "./config.yaml#/components/schemas/PollingProfile"
+        400:
+          description: "invalid query for polling profiles, some data was sent in incorrect format."
+        500:
+          description: "problem listing polling profile"
+    post:
+      tags:
+        - api
+      summary: "Create a Polling Profile"
+      description: "Create a polling profile used on Tracetest to configure how to fetch traces in a test."
+      operationId: createPollingProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+          text/yaml:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+        500:
+          description: "problem creating a polling profile"
+  /pollingprofile/{pollingProfileId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: pollingProfileId
+          schema:
+            type: string
+          required: true
+          description: "ID of a polling profile used on Tracetest to configure how to fetch traces in a test."
+      summary: "Get Polling Profile"
+      description: "Get a polling profile used on Tracetest to configure how to fetch traces in a test."
+      operationId: getPollingProfile
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+        404:
+          description: "polling profile not found"
+        500:
+          description: "problem getting a polling profile"
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: pollingProfileId
+          schema:
+            type: string
+          required: true
+          description: "ID of a polling profile used on Tracetest to configure how to fetch traces in a test."
+      summary: "Update a Polling Profile"
+      description: "Update a polling profile used on Tracetest to configure how to fetch traces in a test."
+      operationId: updatePollingProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+          text/yaml:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+        400:
+          description: "invalid polling profile, some data was sent in incorrect format."
+        404:
+          description: "polling profile not found"
+        500:
+          description: "problem updating a polling profile"
+    delete:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: pollingProfileId
+          schema:
+            type: string
+          required: true
+          description: "ID of a polling profile used on Tracetest to configure how to fetch traces in a test."
+      summary: "Delete a Polling Profile"
+      description: "Delete a polling profile used on Tracetest to configure how to fetch traces in a test."
+      operationId: deletePollingProfile
+      responses:
+        204:
+          description: successful operation
+        400:
+          description: "invalid polling profile, some data was sent in incorrect format."
+        404:
+          description: "polling profile not found"
+        500:
+          description: "problem deleting a polling profile"
 
   # Data Stores
   /datastores:
