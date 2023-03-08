@@ -20,7 +20,6 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -143,7 +142,7 @@ func (app *App) Start(opts ...appOption) error {
 		return err
 	}
 
-	configRepo := configresource.Repository(db, configresource.WithPublisher(subscriptionManager))
+	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
 
 	testDB, err := testdb.Postgres(
@@ -275,8 +274,12 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 
 }
 
-func registerConfigResource(configRepo resourcemanager.ResourceHandler[configresource.Config], router *mux.Router, db *sql.DB) {
-	manager := resourcemanager.New("Config", configRepo, id.GenerateID)
+func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB) {
+	manager := resourcemanager.New[configresource.Config](
+		configresource.ResourceName,
+		configRepo,
+		resourcemanager.WithOperations(configresource.Operations...),
+	)
 	manager.RegisterRoutes(router)
 }
 

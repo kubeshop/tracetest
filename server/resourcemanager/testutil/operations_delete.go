@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +28,8 @@ func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 const OperationDeleteSuccess Operation = "DeleteSuccess"
 
 var deleteSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationDeleteSuccess,
+	name:               OperationDeleteSuccess,
+	neededForOperation: rm.OperationDelete,
 	postAssert: func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
 		req := buildGetRequest(rt, ct, testServer, t)
 		resp := doRequest(t, req, ct.contentType, testServer)
@@ -46,7 +48,8 @@ var deleteSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationDeleteNotFound Operation = "DeleteNotFound"
 
 var deleteNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationDeleteNotFound,
+	name:               OperationDeleteNotFound,
+	neededForOperation: rm.OperationDelete,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildDeleteRequest(rt, ct, testServer, t)
 	},
@@ -59,7 +62,8 @@ var deleteNotFoundOperation = buildSingleStepOperation(singleStepOperationTester
 const OperationDeleteInternalError Operation = "DeleteInternalError"
 
 var deleteInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationDeleteInternalError,
+	name:               OperationDeleteInternalError,
+	neededForOperation: rm.OperationDelete,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildDeleteRequest(rt, ct, testServer, t)
 	},

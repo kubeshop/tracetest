@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,7 +23,8 @@ func buildCreateRequest(body, rt string, ct contentTypeConverter, testServer *ht
 const OperationCreateNoID Operation = "CreateNoID"
 
 var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationCreateNoID,
+	name:               OperationCreateNoID,
+	neededForOperation: rm.OperationCreate,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			removeIDFromJSON(rt.SampleJSON),
@@ -48,7 +50,8 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationCreateSuccess Operation = "CreateSuccess"
 
 var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationCreateSuccess,
+	name:               OperationCreateSuccess,
+	neededForOperation: rm.OperationCreate,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
@@ -71,7 +74,8 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationCreateInternalError Operation = "CreateInternalError"
 
 var createInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationCreateInternalError,
+	name:               OperationCreateInternalError,
+	neededForOperation: rm.OperationCreate,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
