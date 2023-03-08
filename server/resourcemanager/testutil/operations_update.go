@@ -7,12 +7,15 @@ import (
 	"strings"
 	"testing"
 
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/require"
 )
 
 func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
+	id := extractID(rt.SampleJSON)
 	input := ct.fromJSON(rt.SampleJSONUpdated)
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt.ResourceType))
+
+	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(rt.ResourceType), id)
 
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(input))
 	require.NoError(t, err)
@@ -22,7 +25,8 @@ func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 const OperationUpdateSuccess Operation = "UpdateSuccess"
 
 var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationUpdateSuccess,
+	name:               OperationUpdateSuccess,
+	neededForOperation: rm.OperationUpdate,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildUpdateRequest(rt, ct, testServer, t)
 	},
@@ -41,7 +45,8 @@ var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 const OperationUpdateNotFound Operation = "UpdateNotFound"
 
 var updateNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationUpdateNotFound,
+	name:               OperationUpdateNotFound,
+	neededForOperation: rm.OperationUpdate,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildUpdateRequest(rt, ct, testServer, t)
 	},
@@ -54,7 +59,8 @@ var updateNotFoundOperation = buildSingleStepOperation(singleStepOperationTester
 const OperationUpdateInternalError Operation = "UpdateInternalError"
 
 var updateInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
-	name: OperationUpdateInternalError,
+	name:               OperationUpdateInternalError,
+	neededForOperation: rm.OperationUpdate,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildUpdateRequest(rt, ct, testServer, t)
 	},

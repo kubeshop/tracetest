@@ -14,8 +14,8 @@ import (
 
 type ResourceTypeTest struct {
 	ResourceType      string
-	RegisterManagerFn func(*mux.Router) any
-	Prepare           func(t *testing.T, operation Operation, bridge any)
+	RegisterManagerFn func(*mux.Router) rm.Manager
+	Prepare           func(t *testing.T, operation Operation, manager rm.Manager)
 
 	SampleJSON        string
 	SampleJSONUpdated string
@@ -24,10 +24,30 @@ type ResourceTypeTest struct {
 	sortFields []string
 }
 
-func TestResourceType(t *testing.T, rt ResourceTypeTest) {
+type config struct {
+	operations operationTesters
+}
+
+type testOption func(*config)
+
+func ExcludeOperations(ops ...Operation) testOption {
+	return func(c *config) {
+		c.operations = c.operations.exclude(ops...)
+	}
+}
+
+func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
 	t.Helper()
 
-	TestResourceTypeOperations(t, rt, defaultOperations)
+	cfg := config{
+		operations: defaultOperations,
+	}
+
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	TestResourceTypeOperations(t, rt, cfg.operations)
 }
 
 func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
@@ -70,16 +90,20 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 
 	router := mux.NewRouter()
 	testServer := httptest.NewServer(router)
-	testBridge := rt.RegisterManagerFn(router)
+	manager := rt.RegisterManagerFn(router)
 
-	if rt.Prepare != nil {
-		rt.Prepare(t, op.name, testBridge)
+	sortable, ok := manager.Handler().(rm.SortableHandler)
+	if ok {
+		rt.sortFields = sortable.SortingFields()
 	}
 
-	// minor hack to pass "sortFields" to each operation
-	// without needing to propagate sortableHandler for each one
-	sortableHandler := testBridge.(rm.SortableHandler)
-	rt.sortFields = sortableHandler.SortingFields()
+	if rt.Prepare != nil {
+		rt.Prepare(t, op.name, manager)
+	}
+
+	if !op.needsToRun(manager.EnabledOperations()) {
+		t.Skipf("operation '%s' not enabled", op.name)
+	}
 
 	operationSteps := op.getSteps(t, rt)
 

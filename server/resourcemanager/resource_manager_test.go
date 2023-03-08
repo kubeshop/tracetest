@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/stretchr/testify/mock"
 )
@@ -20,38 +20,76 @@ func TestSampleResource(t *testing.T) {
 		SomeValue: "the value",
 	}
 
-	secondSample := sampleResource{
-		ID:        "2",
-		Name:      "the name 2",
-		SomeValue: "the value 2",
-	}
-
-	thirdSample := sampleResource{
-		ID:        "3",
-		Name:      "the name 3",
-		SomeValue: "the value 3",
-	}
-
 	sampleUpdated := sampleResource{
 		ID:        "1",
 		Name:      "the name updated",
 		SomeValue: "the value updated",
 	}
 
+	prepareSortByID := func(m *sampleResourceManager) {
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "asc").
+			Return([]sampleResource{
+				{ID: "1", Name: "3", SomeValue: "3"},
+				{ID: "2", Name: "1", SomeValue: "1"},
+				{ID: "3", Name: "2", SomeValue: "2"},
+			}, nil)
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "desc").
+			Return([]sampleResource{
+				{ID: "3", Name: "2", SomeValue: "2"},
+				{ID: "2", Name: "1", SomeValue: "1"},
+				{ID: "1", Name: "3", SomeValue: "3"},
+			}, nil)
+	}
+
+	prepareSortByName := func(m *sampleResourceManager) {
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "asc").
+			Return([]sampleResource{
+				{Name: "1", ID: "3", SomeValue: "3"},
+				{Name: "2", ID: "1", SomeValue: "1"},
+				{Name: "3", ID: "2", SomeValue: "2"},
+			}, nil)
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "desc").
+			Return([]sampleResource{
+				{Name: "3", ID: "2", SomeValue: "2"},
+				{Name: "2", ID: "1", SomeValue: "1"},
+				{Name: "1", ID: "3", SomeValue: "3"},
+			}, nil)
+	}
+
+	prepareSortBySomeValue := func(m *sampleResourceManager) {
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "asc").
+			Return([]sampleResource{
+				{SomeValue: "1", ID: "3", Name: "3"},
+				{SomeValue: "2", ID: "1", Name: "1"},
+				{SomeValue: "3", ID: "2", Name: "2"},
+			}, nil)
+		m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "desc").
+			Return([]sampleResource{
+				{SomeValue: "3", ID: "2", Name: "2"},
+				{SomeValue: "2", ID: "1", Name: "1"},
+				{SomeValue: "1", ID: "3", Name: "3"},
+			}, nil)
+	}
+
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceType: "SampleResource",
-		RegisterManagerFn: func(router *mux.Router) any {
+		RegisterManagerFn: func(router *mux.Router) rm.Manager {
 			mockManager := new(sampleResourceManager)
-			manager := resourcemanager.New[sampleResource]("SampleResource", mockManager, func() id.ID {
-				return id.ID("3")
-			})
+			manager := rm.New[sampleResource](
+				"SampleResource",
+				mockManager,
+				rm.WithIDGen(func() id.ID {
+					return id.ID("3")
+				}),
+			)
 			manager.RegisterRoutes(router)
 
-			return mockManager
+			return manager
 		},
-		Prepare: func(t *testing.T, op rmtests.Operation, bridge any) {
-			mockManager := bridge.(*sampleResourceManager)
+		Prepare: func(t *testing.T, op rmtests.Operation, manager rm.Manager) {
+			mockManager := manager.Handler().(*sampleResourceManager)
 			mockManager.Test(t)
+
 			switch op {
 			// Create
 			case rmtests.OperationCreateNoID:
@@ -133,12 +171,10 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
-				mockManager.
-					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "asc").
-					Return([]sampleResource{secondSample, thirdSample}, nil)
-				mockManager.
-					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "desc").
-					Return([]sampleResource{secondSample, sample}, nil)
+
+				prepareSortByID(mockManager)
+				prepareSortByName(mockManager)
+				prepareSortBySomeValue(mockManager)
 			case rmtests.OperationListInternalError:
 				mockManager.
 					On("Count", mock.Anything).
@@ -155,6 +191,89 @@ func TestSampleResource(t *testing.T) {
 		}`,
 		SampleJSONUpdated: `{
 			"type": "SampleResource",
+			"spec": {
+				"id": "1",
+				"name": "the name updated",
+				"some_value": "the value updated"
+			}
+		}`,
+	})
+}
+
+func TestRestrictedResource(t *testing.T) {
+	sample := sampleResource{
+		ID:        "1",
+		Name:      "the name",
+		SomeValue: "the value",
+	}
+
+	sampleUpdated := sampleResource{
+		ID:        "1",
+		Name:      "the name updated",
+		SomeValue: "the value updated",
+	}
+
+	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
+		ResourceType: "RestrictedResource",
+		RegisterManagerFn: func(router *mux.Router) rm.Manager {
+			mockManager := new(restrictedResourceManager)
+			manager := rm.New[sampleResource](
+				"RestrictedResource",
+				mockManager,
+				rm.WithIDGen(func() id.ID {
+					return id.ID("3")
+				}),
+				rm.WithOperations(rm.OperationGet, rm.OperationUpdate),
+			)
+			manager.RegisterRoutes(router)
+
+			return manager
+		},
+		Prepare: func(t *testing.T, op rmtests.Operation, manager rm.Manager) {
+			mockManager := manager.Handler().(*restrictedResourceManager)
+			mockManager.Test(t)
+
+			switch op {
+
+			// Update
+			case rmtests.OperationUpdateNotFound:
+				mockManager.
+					On("Update", sampleUpdated).
+					Return(sampleResource{}, sql.ErrNoRows)
+			case rmtests.OperationUpdateSuccess:
+				mockManager.
+					On("Update", sampleUpdated).
+					Return(sampleUpdated, nil)
+			case rmtests.OperationUpdateInternalError:
+				mockManager.
+					On("Update", sampleUpdated).
+					Return(sampleResource{}, fmt.Errorf("some error"))
+
+				// Get
+			case rmtests.OperationGetNotFound:
+				mockManager.
+					On("Get", sample.ID).
+					Return(sampleResource{}, sql.ErrNoRows)
+			case rmtests.OperationGetSuccess:
+				mockManager.
+					On("Get", sample.ID).
+					Return(sample, nil)
+			case rmtests.OperationGetInternalError:
+				mockManager.
+					On("Get", sample.ID).
+					Return(sampleResource{}, fmt.Errorf("some error"))
+			}
+		},
+		SampleJSON: `{
+			"type": "RestrictedResource",
+			"spec": {
+				"id": "1",
+				"name": "the name",
+				"some_value": "the value"
+			}
+		}`,
+		SampleJSONUpdated: `{
+			"type": "RestrictedResource",
 			"spec": {
 				"id": "1",
 				"name": "the name updated",
@@ -181,8 +300,33 @@ func (sr sampleResource) Validate() error {
 	return nil
 }
 
-type sampleResourceManager struct {
+type baseResourceManager struct {
 	mock.Mock
+}
+
+func (m *baseResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
+	args := m.Called(id)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+func (m *baseResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
+	args := m.Called(s)
+	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+type restrictedResourceManager struct {
+	baseResourceManager
+}
+
+func (m *restrictedResourceManager) Operations() []rm.Operation {
+	return []rm.Operation{
+		rm.OperationGet,
+		rm.OperationUpdate,
+	}
+}
+
+type sampleResourceManager struct {
+	baseResourceManager
 }
 
 func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
@@ -192,16 +336,6 @@ func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResourc
 
 func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {
 	args := m.Called(s)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Update(_ context.Context, s sampleResource) (sampleResource, error) {
-	args := m.Called(s)
-	return args.Get(0).(sampleResource), args.Error(1)
-}
-
-func (m *sampleResourceManager) Get(_ context.Context, id id.ID) (sampleResource, error) {
-	args := m.Called(id)
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
