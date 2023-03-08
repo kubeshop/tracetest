@@ -42,12 +42,22 @@ components:
       properties:
         id:
           type: string
-          description: "ID of the configuration resource. It will be set as 'current'."
+          description: "ID of the configuration resource. It should always be set as 'current'."
         name:
           type: string
-          description: "Name given for this configuration set. It will be set as 'Config'."
+          description: "Name given for this configuration set. It should always be set as 'Config'."
         analyticsEnabled:
           type: boolean
           description: "Flag telling if a user allow Tracetest to send analytics about its usage."
       required:
         - analyticsEnabled
+    ConfigurationResource:
+      type: object
+      description: "Represents a coonfiguration into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Config'."
+        spec:
+          $ref: "#/components/schemas/Configuration"
+
