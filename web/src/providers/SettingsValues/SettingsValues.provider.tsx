@@ -80,6 +80,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
 
   useEffect(() => {
     Env.set('analyticsEnabled', config.analyticsEnabled);
+    AnalyticsService.load();
     AnalyticsService.identify();
   }, [config]);
 

@@ -12,6 +12,7 @@ const emptyValues: IEnv = {
   measurementId: '',
   serverID: '',
   serverPathPrefix: '/',
+  segmentLoaded: false,
 };
 
 const Env = {
