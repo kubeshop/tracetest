@@ -46,17 +46,17 @@ func TestPollingProfileResource(t *testing.T) {
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceType: "PollingProfile",
-		RegisterManagerFn: func(router *mux.Router) any {
+		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			pollingProfileRepo := pollingprofile.Repository(db)
 
-			manager := resourcemanager.New[pollingprofile.PollingProfile]("PollingProfile", pollingProfileRepo, id.GenerateID)
+			manager := resourcemanager.New[pollingprofile.PollingProfile]("PollingProfile", pollingProfileRepo, resourcemanager.WithIDGen(id.GenerateID))
 			manager.RegisterRoutes(router)
 
-			return pollingProfileRepo
+			return manager
 		},
-		Prepare: func(t *testing.T, op rmtests.Operation, bridge any) {
-			pollingProfileRepo := bridge.(resourcemanager.ResourceHandler[pollingprofile.PollingProfile])
+		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
+			pollingProfileRepo := manager.Handler().(resourcemanager.Create[pollingprofile.PollingProfile])
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
