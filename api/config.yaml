@@ -38,11 +38,13 @@ components:
           type: string
     ConfigurationResource:
       type: object
-      description: "Represents a configuration into the Resources format."
+      description: "Represents a configuration structured into the Resources format."
       properties:
         type:
           type: string
           description: "Represents the type of this resource. It should always be set as 'Config'."
+          enum:
+            - Config
         spec:
           type: object
           description: "Represents the set of configuration common options for Tracetest."
@@ -50,9 +52,13 @@ components:
             id:
               type: string
               description: "ID of the configuration resource. It should always be set as 'current'."
+              enum:
+                - current
             name:
               type: string
               description: "Name given for this configuration set. It should always be set as 'Config'."
+              enum:
+                - Config
             analyticsEnabled:
               type: boolean
               description: "Flag telling if a user allow Tracetest to send analytics about its usage."
@@ -60,11 +66,13 @@ components:
             - analyticsEnabled
     PollingProfile:
       type: object
-      description: "Represents a polling profile into the Resources format."
+      description: "Represents a polling profile structured into the Resources format."
       properties:
         type:
           type: string
           description: "Represents the type of this resource. It should always be set as 'PollingProfile'."
+          enum:
+            - PollingProfile
         spec:
           type: object
           description: "Represents the attributes of a Polling Profile."
@@ -94,3 +102,63 @@ components:
             - id
             - name
             - strategy
+    DemoPokeshop:
+      type: object
+      description: "Represents the settings of the Pokeshop API demonstration."
+      properties:
+        type:
+          type: string
+          description: "String defining that this demo is a Pokeshop demo."
+          enum:
+            - pokeshop
+        enabled:
+          type: boolean
+          description: "Flag telling if this API is enabled on Tracetest."
+        httpEndpoint:
+          type: string
+          description: "HTTP endpoint for Pokeshop API"
+        grpcEndpoint:
+          type: string
+          description: "gRPC endpoint for Pokeshop API"
+      required:
+        - enabled
+    DemoOpenTelemetryStore:
+      type: object
+      description: "Represents the settings of the Open Telemetry Store demonstration."
+      properties:
+        type:
+          type: string
+          description: "String defining that this demo is a Open Telemetry Store demo."
+          enum:
+            - otelstore
+        enabled:
+          type: boolean
+          description: "Flag telling if this API is enabled on Tracetest."
+        frontendEndpoint:
+          type: string
+          description: "Address of the root URL for the Frontend microservice on Open Telemetry Store."
+        productCatalogEndpoint:
+          type: string
+          description: "Address of the root URL for the Product Catalog microservice on Open Telemetry Store."
+        cartEndpoint:
+          type: string
+          description: "Address of the root URL for the Cart microservice on Open Telemetry Store."
+        checkoutEndpoint:
+          type: string
+          description: "Address of the root URL for the Checkout microservice on Open Telemetry Store."
+      required:
+        - enabled
+    Demo:
+      type: object
+      description: "Represents a demonstration API structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Demo'."
+          enum:
+            - Demo
+        spec:
+          description: "Represents the attributes of a Demonstration API."
+          oneOf:
+            - $ref: "#/components/schemas/DemoPokeshop"
+            - $ref: "#/components/schemas/DemoOpenTelemetryStore"
