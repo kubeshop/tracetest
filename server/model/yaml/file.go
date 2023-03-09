@@ -3,6 +3,7 @@ package yaml
 import (
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/config/configresource"
 	"gopkg.in/yaml.v3"
 )
 
@@ -58,6 +59,19 @@ func (f File) Test() (Test, error) {
 	}
 
 	return test, nil
+}
+
+func (f File) Config() (configresource.Config, error) {
+	if f.Type != FileTypeConfig {
+		return configresource.Config{}, fmt.Errorf("file is not a test")
+	}
+
+	config, ok := f.Spec.(configresource.Config)
+	if !ok {
+		return configresource.Config{}, fmt.Errorf("file spec cannot be casted to a test")
+	}
+
+	return config, nil
 }
 
 func (f File) Transaction() (Transaction, error) {
