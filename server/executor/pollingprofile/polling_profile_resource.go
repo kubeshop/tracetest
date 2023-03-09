@@ -78,6 +78,10 @@ func (r *Repository) Create(ctx context.Context, profile PollingProfile) (Pollin
 		err          error
 	)
 
+	if profile.ID == "" {
+		profile.ID = id.SlugFromString(profile.Name)
+	}
+
 	if profile.Periodic != nil {
 		periodicJSON, err = json.Marshal(profile.Periodic)
 		if err != nil {
