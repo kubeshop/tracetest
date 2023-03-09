@@ -287,10 +287,10 @@ func registerConfigResource(configRepo *configresource.Repository, router *mux.R
 	manager.RegisterRoutes(router)
 }
 
-func registerPollingProfilesResource(configRepo *pollingprofile.Repository, router *mux.Router, db *sql.DB) {
+func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB) {
 	manager := resourcemanager.New[pollingprofile.PollingProfile](
 		pollingprofile.ResourceName,
-		configRepo,
+		repository,
 		resourcemanager.WithOperations(pollingprofile.Operations...),
 	)
 	manager.RegisterRoutes(router)
