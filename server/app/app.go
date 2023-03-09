@@ -16,6 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -241,6 +242,9 @@ func (app *App) Start(opts ...appOption) error {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	registerConfigResource(configRepo, apiRouter, db)
 
+	pollingProfileRepo := pollingprofile.NewRepository(db)
+	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db)
+
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
 
 	httpServer := &http.Server{
@@ -279,6 +283,15 @@ func registerConfigResource(configRepo *configresource.Repository, router *mux.R
 		configresource.ResourceName,
 		configRepo,
 		resourcemanager.WithOperations(configresource.Operations...),
+	)
+	manager.RegisterRoutes(router)
+}
+
+func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB) {
+	manager := resourcemanager.New[pollingprofile.PollingProfile](
+		pollingprofile.ResourceName,
+		repository,
+		resourcemanager.WithOperations(pollingprofile.Operations...),
 	)
 	manager.RegisterRoutes(router)
 }

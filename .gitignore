@@ -26,3 +26,4 @@ dist/
 .DS_Store
 config.yml
 server/tracetest.yaml
+server/html
