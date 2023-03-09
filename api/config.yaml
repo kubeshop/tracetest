@@ -58,7 +58,7 @@ components:
               description: "Flag telling if a user allow Tracetest to send analytics about its usage."
           required:
             - analyticsEnabled
-    PollingProfileResource:
+    PollingProfile:
       type: object
       description: "Represents a polling profile into the Resources format."
       properties:

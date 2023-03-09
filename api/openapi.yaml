@@ -1077,7 +1077,7 @@ paths:
   /config/{configId}:
     get:
       tags:
-        - api
+        - resource-manager-api
       parameters:
         - in: path
           name: configId
@@ -1094,15 +1094,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./config.yaml#/components/schemas/Configuration"
+                $ref: "./config.yaml#/components/schemas/ConfigurationResource"
             text/yaml:
               schema:
-                $ref: "./config.yaml#/components/schemas/Configuration"
+                $ref: "./config.yaml#/components/schemas/ConfigurationResource"
         500:
           description: "problem getting a configuration"
     put:
       tags:
-        - api
+        - resource-manager-api
       parameters:
         - in: path
           name: configId
@@ -1117,20 +1117,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./config.yaml#/components/schemas/Configuration"
+              $ref: "./config.yaml#/components/schemas/ConfigurationResource"
           text/yaml:
             schema:
-              $ref: "./config.yaml#/components/schemas/Configuration"
+              $ref: "./config.yaml#/components/schemas/ConfigurationResource"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./config.yaml#/components/schemas/Configuration"
+                $ref: "./config.yaml#/components/schemas/ConfigurationResource"
             text/yaml:
               schema:
-                $ref: "./config.yaml#/components/schemas/Configuration"
+                $ref: "./config.yaml#/components/schemas/ConfigurationResource"
         500:
           description: "problem updating configuration"
 
@@ -1138,7 +1138,7 @@ paths:
   /pollingprofile:
     get:
       tags:
-        - api
+        - resource-manager-api
       summary: "List Polling Profiles"
       description: "List polling profiles used on Tracetest to configure how to fetch traces in a test."
       operationId: listPollingProfiles
@@ -1214,7 +1214,7 @@ paths:
   /pollingprofile/{pollingProfileId}:
     get:
       tags:
-        - api
+        - resource-manager-api
       parameters:
         - in: path
           name: pollingProfileId
