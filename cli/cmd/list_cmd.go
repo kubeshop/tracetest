@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -21,7 +20,7 @@ var listCmd = &cobra.Command{
 		resourceType := args[0]
 		ctx := context.Background()
 
-		analytics.Track("Resource Apply", "cmd", map[string]string{
+		analytics.Track("Resource List", "cmd", map[string]string{
 			resourceType: resourceType,
 		})
 
@@ -40,8 +39,6 @@ var listCmd = &cobra.Command{
 			os.Exit(1)
 			return
 		}
-
-		cmd.Println(pterm.FgGreen.Sprintf(fmt.Sprintf("✔  Definition applied successfully for resource type: %s", resourceType)))
 	},
 	PostRun: teardownCommand,
 }
