@@ -1325,7 +1325,7 @@ paths:
           description: "Indicates the sort field for on which all demos will be sorted."
           schema:
             type: string
-            enum: [id, name, strategy]
+            enum: [type, enabled]
         - in: query
           name: sortDirection
           description: "Indicates the sort direction for the demos (ascending or descending)."
