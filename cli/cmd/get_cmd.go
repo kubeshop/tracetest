@@ -11,17 +11,19 @@ import (
 	"go.uber.org/zap"
 )
 
-var listCmd = &cobra.Command{
-	Use:    "list [resource type]",
-	Long:   "List resources from your Tracetest server",
-	Short:  "List resources",
+var resourceID string
+
+var getCmd = &cobra.Command{
+	Use:    "get [resource type]",
+	Long:   "Get a resource from your Tracetest server",
+	Short:  "Get resource",
 	PreRun: setupCommand(),
 	Args:   cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()
 
-		analytics.Track("Resource List", "cmd", map[string]string{
+		analytics.Track("Resource Get", "cmd", map[string]string{
 			resourceType: resourceType,
 		})
 
@@ -33,10 +35,10 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		err = resourceActions.List(ctx)
+		err = resourceActions.Get(ctx, resourceID)
 
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to apply definition for type: %s", resourceType), zap.Error(err))
+			cliLogger.Error(fmt.Sprintf("failed to get resource for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
@@ -45,5 +47,6 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(listCmd)
+	getCmd.PersistentFlags().StringVarP(&resourceID, "identifier", "i", "", "id of the resource to get")
+	rootCmd.AddCommand(getCmd)
 }

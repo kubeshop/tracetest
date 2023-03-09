@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
 )
@@ -15,6 +16,7 @@ type ApplyArgs struct {
 type ResourceActions interface {
 	Apply(ctx context.Context, args ApplyArgs) error
 	List(ctx context.Context) error
+	Get(ctx context.Context, ID string) error
 	Export(ctx context.Context, ID string) error
 	Delete(ctx context.Context, ID string) error
 }
@@ -22,29 +24,30 @@ type ResourceActions interface {
 type resourceArgs struct {
 	logger *zap.Logger
 	client *openapi.APIClient
+	config config.Config
 }
 
-type resourceArgsOption = func(*resourceArgs)
-
-type ResourceRegistry map[string]ResourceActions
-type supportedResources string
+type ResourceArgsOption = func(any)
+type ResourceRegistry map[SupportedResources]ResourceActions
+type SupportedResources string
 
 var (
-	SupportedResourceConfig supportedResources = "config"
+	SupportedResourceConfig         SupportedResources = "config"
+	SupportedResourcePollingProfile SupportedResources = "pollingprofile"
 
 	ErrResourceNotRegistered      = errors.New("resource not registered")
 	ErrNotSupportedResourceAction = errors.New("the specified resource type doesn't support the action")
 )
 
 func NewResourceRegistry() ResourceRegistry {
-	return map[string]ResourceActions{}
+	return map[SupportedResources]ResourceActions{}
 }
 
-func (r ResourceRegistry) Register(resource string, actions ResourceActions) {
+func (r ResourceRegistry) Register(resource SupportedResources, actions ResourceActions) {
 	r[resource] = actions
 }
 
-func (r ResourceRegistry) Get(resource string) (ResourceActions, error) {
+func (r ResourceRegistry) Get(resource SupportedResources) (ResourceActions, error) {
 	resourceActions, found := r[resource]
 
 	if !found {
@@ -54,14 +57,23 @@ func (r ResourceRegistry) Get(resource string) (ResourceActions, error) {
 	return resourceActions, nil
 }
 
-func WithClient(client *openapi.APIClient) resourceArgsOption {
-	return func(args *resourceArgs) {
-		args.client = client
+func WithClient(client *openapi.APIClient) ResourceArgsOption {
+	return func(args any) {
+		typedArgs := args.(*resourceArgs)
+		typedArgs.client = client
 	}
 }
 
-func WithLogger(logger *zap.Logger) resourceArgsOption {
-	return func(args *resourceArgs) {
-		args.logger = logger
+func WithLogger(logger *zap.Logger) ResourceArgsOption {
+	return func(args any) {
+		typedArgs := args.(*resourceArgs)
+		typedArgs.logger = logger
+	}
+}
+
+func WithConfig(config config.Config) ResourceArgsOption {
+	return func(args any) {
+		typedArgs := args.(*resourceArgs)
+		typedArgs.config = config
 	}
 }
