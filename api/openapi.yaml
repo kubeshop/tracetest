@@ -1187,7 +1187,7 @@ paths:
           description: "problem listing polling profile"
     post:
       tags:
-        - api
+        - resource-api
       summary: "Create a Polling Profile"
       description: "Create a polling profile used on Tracetest to configure how to fetch traces in a test."
       operationId: createPollingProfile
@@ -1241,7 +1241,7 @@ paths:
           description: "problem getting a polling profile"
     put:
       tags:
-        - api
+        - resource-api
       parameters:
         - in: path
           name: pollingProfileId
@@ -1278,7 +1278,7 @@ paths:
           description: "problem updating a polling profile"
     delete:
       tags:
-        - api
+        - resource-api
       parameters:
         - in: path
           name: pollingProfileId
