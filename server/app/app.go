@@ -84,8 +84,8 @@ func WithProvisioningFile(path string) appOption {
 	}
 }
 
-func (app *App) provision(db model.Repository) {
-	p := provisioning.New(db)
+func (app *App) provision(db model.Repository, configDB *configresource.Repository) {
+	p := provisioning.New(db, configDB)
 
 	var err error
 
@@ -180,7 +180,7 @@ func (app *App) Start(opts ...appOption) error {
 			return err
 		}
 
-		app.provision(testDB)
+		app.provision(testDB, configRepo)
 
 	}
 

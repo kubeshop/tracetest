@@ -3,9 +3,11 @@ package provisioning_test
 import (
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/config/configgrpc"
 	"go.opentelemetry.io/collector/config/configtls"
@@ -93,8 +95,14 @@ var cases = []struct {
 }
 
 func TestDataStore(t *testing.T) {
+	db := testmock.MustGetRawTestingDatabase()
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			configDB := configresource.NewRepository(
+				testmock.MustCreateRandomMigratedDatabase(db),
+			)
+
 			t.Run("FromFile", func(t *testing.T) {
 				c := c
 				t.Parallel()
@@ -107,7 +115,7 @@ func TestDataStore(t *testing.T) {
 				}
 
 				mockRepo := &testdb.MockRepository{}
-				provisioner := provisioning.New(mockRepo)
+				provisioner := provisioning.New(mockRepo, configDB)
 
 				mockRepo.
 					On("CreateDataStore", expectedDataStore).
