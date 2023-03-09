@@ -36,9 +36,9 @@ components:
           type: string
         error:
           type: string
-    Configuration:
+    ConfigurationResource:
       type: object
-      description: "Represents a coonfiguration into the Resources format."
+      description: "Represents a configuration into the Resources format."
       properties:
         type:
           type: string
@@ -58,3 +58,39 @@ components:
               description: "Flag telling if a user allow Tracetest to send analytics about its usage."
           required:
             - analyticsEnabled
+    PollingProfile:
+      type: object
+      description: "Represents a polling profile into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'PollingProfile'."
+        spec:
+          type: object
+          description: "Represents the attributes of a Polling Profile."
+          properties:
+            id:
+              type: string
+              description: "ID of this Polling Profile."
+            name:
+              type: string
+              description: "Name given for this profile."
+            strategy:
+              type: string
+              description: "Name of the strategy that will be used on this profile."
+              enum:
+                - periodic
+            periodic:
+              type: object
+              description: "Configuration for the strategy 'periodic'. It only should be filled if the field strategy is equals to 'periodic'."
+              properties:
+                retryDelay:
+                  description: "Time that the poller should wait until try to fetch more traces. It should be written in duration format (example: 1s, 30s, 1m)."
+                  type: string
+                timeout:
+                  description: "Total time that the poller should try to continue to fetch traces. It should be written in duration format (example: 1s, 30s, 1m)."
+                  type: string
+          required:
+            - id
+            - name
+            - strategy
