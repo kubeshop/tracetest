@@ -80,7 +80,7 @@ func TestDecode(t *testing.T) {
 		},
 		{
 			name: "FileTypeConfig",
-			yaml: readFile("./testdata/config.yaml"),
+			yaml: readFile("./testdata/config_resource.yaml"),
 			file: yaml.File{
 				Type: yaml.FileTypeConfig,
 				Spec: configresource.Config{
