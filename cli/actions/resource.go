@@ -2,9 +2,10 @@ package actions
 
 import (
 	"context"
-	"fmt"
-	"net/http"
+	"errors"
 
+	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
 )
 
@@ -20,28 +21,47 @@ type ResourceActions interface {
 }
 
 type resourceArgs struct {
-	logger  *zap.Logger
-	client  http.Client
-	request http.Request
+	logger    *zap.Logger
+	client    *openapi.APIClient
+	cliConfig config.Config
 }
+type resourceArgsOption = func(*resourceArgs)
 
+type ResourceRegistry map[string]ResourceActions
 type supportedResources string
 
 var (
-	Config supportedResources = "config"
+	SupportedResourceConfig supportedResources = "config"
+
+	ErrResourceNotRegistered = errors.New("resource not registered")
 )
 
-func NewResourceActions(resourceType string, logger *zap.Logger, client http.Client, request http.Request) (ResourceActions, error) {
-	args := resourceArgs{
-		logger:  logger,
-		client:  client,
-		request: request,
+func NewResourceRegistry() ResourceRegistry {
+	return map[string]ResourceActions{}
+}
+
+func (r ResourceRegistry) Register(resource string, actions ResourceActions) {
+	r[resource] = actions
+}
+
+func (r ResourceRegistry) Get(resource string) (ResourceActions, error) {
+	resourceActions, found := r[resource]
+
+	if !found {
+		return nil, ErrResourceNotRegistered
 	}
 
-	switch resourceType {
-	case string(Config):
-		return NewConfigActions(args), nil
-	default:
-		return nil, fmt.Errorf("unsupported resource type: %s", resourceType)
+	return resourceActions, nil
+}
+
+func WithClient(client *openapi.APIClient) resourceArgsOption {
+	return func(args *resourceArgs) {
+		args.client = client
+	}
+}
+
+func WithLogger(logger *zap.Logger) resourceArgsOption {
+	return func(args *resourceArgs) {
+		args.logger = logger
 	}
 }

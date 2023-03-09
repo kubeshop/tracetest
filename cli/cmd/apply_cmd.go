@@ -22,14 +22,13 @@ var applyCmd = &cobra.Command{
 	Args:   cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
-		client, request := getResourceClient(resourceType)
 		ctx := context.Background()
 
 		analytics.Track("Resource Apply", "cmd", map[string]string{
 			resourceType: resourceType,
 		})
 
-		resourceActions, err := actions.NewResourceActions(resourceType, cliLogger, client, request)
+		resourceActions, err := resourceRegistry.Get(resourceType)
 
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))

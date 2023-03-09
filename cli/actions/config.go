@@ -1,30 +1,28 @@
 package actions
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 
+	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/cli/file"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
 )
 
-type configActions struct {
-	logger  *zap.Logger
-	client  http.Client
-	request http.Request
-}
+type configActions = resourceArgs
 
 var _ ResourceActions = &configActions{}
 
-func NewConfigActions(resourceArgs resourceArgs) configActions {
-	return configActions{
-		logger:  resourceArgs.logger,
-		client:  resourceArgs.client,
-		request: resourceArgs.request,
+func NewConfigActions(options ...resourceArgsOption) configActions {
+	cfgActions := configActions{}
+
+	for _, option := range options {
+		option(&cfgActions)
 	}
+
+	return cfgActions
 }
 
 func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
@@ -46,12 +44,17 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf(`file must be of type "Config"`)
 	}
 
-	body := bytes.NewBufferString(fileContent.Contents())
+	var configurationResource openapi.ConfigurationResource
+	deepcopy.DeepCopy(fileContent.Definition().Spec, &configurationResource)
 
-	config.request.Body = io.NopCloser(body)
-	config.request.Method = http.MethodPost
+	request := config.client.ResourceApiApi.UpdateConfiguration(ctx, "current")
+	request = request.ConfigurationResource(configurationResource)
 
-	res, err := config.client.Do(&config.request)
+	_, res, err := config.client.ResourceApiApi.UpdateConfigurationExecute(request)
+
+	if err != nil {
+		return fmt.Errorf("could not send request: %w", err)
+	}
 
 	if res.StatusCode != http.StatusCreated {
 		return fmt.Errorf("could not create config: %s", res.Status)
