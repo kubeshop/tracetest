@@ -110,11 +110,13 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	enabledOps := m.EnabledOperations()
 
 	if slices.Contains(enabledOps, OperationList) {
-		subrouter.HandleFunc("/", m.list).Methods(http.MethodGet).Name("list")
+		subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list")
 	}
+
 	if slices.Contains(enabledOps, OperationCreate) {
-		subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
+		subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
 	}
+
 	if slices.Contains(enabledOps, OperationUpdate) {
 		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
 	}
@@ -122,6 +124,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	if slices.Contains(enabledOps, OperationGet) {
 		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
 	}
+
 	if slices.Contains(enabledOps, OperationDelete) {
 		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
 	}
