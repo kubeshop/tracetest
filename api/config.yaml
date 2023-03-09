@@ -38,7 +38,7 @@ components:
           type: string
     ConfigurationResource:
       type: object
-      description: "Represents a configuration into the Resources format."
+      description: "Represents a configuration structured into the Resources format."
       properties:
         type:
           type: string
@@ -60,7 +60,7 @@ components:
             - analyticsEnabled
     PollingProfile:
       type: object
-      description: "Represents a polling profile into the Resources format."
+      description: "Represents a polling profile structured into the Resources format."
       properties:
         type:
           type: string
@@ -94,3 +94,14 @@ components:
             - id
             - name
             - strategy
+    Demo:
+      type: object
+      description: "Represents a demonstration API structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Demo'."
+        spec:
+          type: object
+          description: "Represents the attributes of a Demonstration API."
+          # ...
