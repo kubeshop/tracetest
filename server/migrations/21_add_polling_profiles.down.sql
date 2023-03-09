@@ -1,5 +1,5 @@
 BEGIN;
 
-DROP TABLE "configs";
+DROP TABLE "polling_profiles";
 
 COMMIT;
