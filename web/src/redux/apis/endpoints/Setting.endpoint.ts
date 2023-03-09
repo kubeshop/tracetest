@@ -38,7 +38,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   updateSetting: builder.mutation<undefined, {resource: TResource<TSpec>}>({
     query: ({resource}) => ({
-      url: `/${resource.type.toLowerCase()}/`,
+      url: `/${resource.type.toLowerCase()}/${resource.spec.id}`,
       method: HTTP_METHOD.PUT,
       body: resource,
     }),
