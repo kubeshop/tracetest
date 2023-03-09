@@ -116,7 +116,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 		subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
 	}
 	if slices.Contains(enabledOps, OperationUpdate) {
-		subrouter.HandleFunc("/", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
+		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
 	}
 
 	if slices.Contains(enabledOps, OperationGet) {

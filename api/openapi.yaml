@@ -57,6 +57,7 @@ paths:
               schema:
                 $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
 
+  # Transactions
   /transactions:
     get:
       tags:
@@ -130,7 +131,6 @@ paths:
                 $ref: "./transactions.yaml#/components/schemas/Transaction"
         400:
           description: "trying to create a transaction with an already existing ID"
-
   /transactions/{transactionId}:
     get:
       tags:
@@ -190,7 +190,6 @@ paths:
       responses:
         "204":
           description: OK
-
   /transactions/{transactionId}/version/{version}:
     get:
       tags:
@@ -218,7 +217,6 @@ paths:
                 $ref: "./transactions.yaml#/components/schemas/Transaction"
         500:
           description: "problem with getting a test"
-
   /transactions/{transactionId}/version/{version}/definition.yaml:
     get:
       tags:
@@ -244,7 +242,6 @@ paths:
             application/yaml:
               schema:
                 type: string
-
   /transactions/{transactionId}/run:
     post:
       tags:
@@ -303,7 +300,6 @@ paths:
                 type: array
                 items:
                   $ref: "./transactions.yaml#/components/schemas/TransactionRun"
-
   /transactions/{transactionId}/run/{runId}:
     get:
       tags:
@@ -355,6 +351,7 @@ paths:
         404:
           description: transaction run not found
 
+  # Tests
   /tests:
     get:
       tags:
@@ -428,7 +425,6 @@ paths:
                 $ref: "./tests.yaml#/components/schemas/Test"
         400:
           description: "trying to create a test with an already existing ID"
-
   /tests/{testId}:
     get:
       tags:
@@ -586,7 +582,6 @@ paths:
             application/json:
               schema:
                 $ref: "./tests.yaml#/components/schemas/SelectedSpansResult"
-
   /tests/{testId}/run/{runId}/dry-run:
     put:
       tags:
@@ -642,7 +637,6 @@ paths:
             application/json:
               schema:
                 $ref: "./tests.yaml#/components/schemas/TestRun"
-
   /tests/{testId}/run/{runId}/junit.xml:
     get:
       tags:
@@ -668,7 +662,6 @@ paths:
             application/xml:
               schema:
                 type: string
-
   /tests/{testId}/run/{runId}/export:
     get:
       tags:
@@ -694,7 +687,6 @@ paths:
             application/json:
               schema:
                 $ref: "tests.yaml#/components/schemas/ExportedTestInformation"
-
   /tests/import:
     post:
       tags:
@@ -714,7 +706,6 @@ paths:
             application/json:
               schema:
                 $ref: "tests.yaml#/components/schemas/ExportedTestInformation"
-
   /tests/{testId}/run/{runId}:
     get:
       tags:
@@ -782,7 +773,6 @@ paths:
                 type: array
                 items:
                   $ref: "./tests.yaml#/components/schemas/TestSpecs"
-
   /tests/{testId}/version/{version}:
     get:
       tags:
@@ -810,7 +800,6 @@ paths:
                 $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting a test"
-
   /tests/{testId}/version/{version}/definition.yaml:
     get:
       tags:
@@ -911,7 +900,6 @@ paths:
                 $ref: "./environments.yaml#/components/schemas/Environment"
         400:
           description: "trying to create a environment with an already existing ID"
-
   /environments/{environmentId}:
     get:
       tags:
@@ -971,7 +959,6 @@ paths:
       responses:
         "204":
           description: OK
-
   /environments/{environmentId}/definition.yaml:
     get:
       tags:
@@ -993,7 +980,7 @@ paths:
               schema:
                 type: string
 
-  # expressions
+  # Expressions
   /expressions/resolve:
     post:
       tags:
@@ -1014,6 +1001,7 @@ paths:
               schema:
                 $ref: "./expressions.yaml#/components/schemas/ResolveResponseInfo"
 
+  # Resources (Tests, Transactions)
   /resources:
     get:
       tags:
@@ -1066,6 +1054,7 @@ paths:
                 items:
                   $ref: "./resources.yaml#/components/schemas/Resource"
 
+  # Configuration
   /config/connection:
     post:
       tags:
@@ -1085,6 +1074,65 @@ paths:
             application/json:
               schema:
                 $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
+  /config/{id}:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: "ID of the configuration resource used on Tracetest. It should be set as 'current'."
+      summary: "Get Tracetest configuration"
+      description: "Get Tracetest configuration"
+      operationId: getConfiguration
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/Configuration"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/Configuration"
+        500:
+          description: "problem with getting a configuration"
+    put:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: "ID of the configuration resource used on Tracetest. It should be set as 'current'."
+      summary: "Update Tracetest configuration"
+      description: "Update Tracetest configuration"
+      operationId: updateConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/Configuration"
+          text/yaml:
+            schema:
+              $ref: "./config.yaml#/components/schemas/Configuration"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/Configuration"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/Configuration"
+        500:
+          description: "problem with updating configuration"
 
   # Data Stores
   /datastores:
@@ -1160,7 +1208,6 @@ paths:
                 $ref: "./dataStores.yaml#/components/schemas/DataStore"
         400:
           description: "trying to create a data store with an already existing ID"
-
   /datastores/{dataStoreId}:
     get:
       tags:
@@ -1220,7 +1267,6 @@ paths:
       responses:
         "204":
           description: OK
-
   /datastores/{dataStoreId}/definition.yaml:
     get:
       tags:
