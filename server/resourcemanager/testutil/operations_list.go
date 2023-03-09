@@ -27,7 +27,7 @@ func buildQueryString(params map[string]string) url.Values {
 func buildListRequest(resourceType string, paginationParams map[string]string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
 	qs := buildQueryString(paginationParams)
 
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(resourceType))
+	url := fmt.Sprintf("%s/%s", testServer.URL, strings.ToLower(resourceType))
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	require.NoError(t, err)

@@ -17,6 +17,7 @@ func TestPollingProfileResource(t *testing.T) {
 	sampleProfile := pollingprofile.PollingProfile{
 		ID:       "1",
 		Name:     "test",
+		Default:  true,
 		Strategy: pollingprofile.Periodic,
 		Periodic: &pollingprofile.PeriodicPollingConfig{
 			RetryDelay: "10s",
@@ -27,6 +28,7 @@ func TestPollingProfileResource(t *testing.T) {
 	secondSampleProfile := pollingprofile.PollingProfile{
 		ID:       "2",
 		Name:     "fast test",
+		Default:  false,
 		Strategy: pollingprofile.Periodic,
 		Periodic: &pollingprofile.PeriodicPollingConfig{
 			RetryDelay: "1s",
@@ -37,6 +39,7 @@ func TestPollingProfileResource(t *testing.T) {
 	thirdSampleProfile := pollingprofile.PollingProfile{
 		ID:       "3",
 		Name:     "long running test",
+		Default:  false,
 		Strategy: pollingprofile.Periodic,
 		Periodic: &pollingprofile.PeriodicPollingConfig{
 			RetryDelay: "2m",
@@ -74,6 +77,7 @@ func TestPollingProfileResource(t *testing.T) {
 			"spec": {
 				"id": "1",
 				"name": "test",
+				"default": true,
 				"strategy": "periodic",
 				"periodic": {
 					"retryDelay": "10s",
@@ -86,6 +90,7 @@ func TestPollingProfileResource(t *testing.T) {
 			"spec": {
 				"id": "1",
 				"name": "long test",
+				"default": true,
 				"strategy": "periodic",
 				"periodic": {
 					"retryDelay": "25s",
