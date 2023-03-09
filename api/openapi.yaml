@@ -1077,7 +1077,7 @@ paths:
   /config/{configId}:
     get:
       tags:
-        - resource-manager-api
+        - resource-api
       parameters:
         - in: path
           name: configId
@@ -1102,7 +1102,7 @@ paths:
           description: "problem getting a configuration"
     put:
       tags:
-        - resource-manager-api
+        - resource-api
       parameters:
         - in: path
           name: configId
@@ -1138,7 +1138,7 @@ paths:
   /pollingprofile:
     get:
       tags:
-        - resource-manager-api
+        - resource-api
       summary: "List Polling Profiles"
       description: "List polling profiles used on Tracetest to configure how to fetch traces in a test."
       operationId: listPollingProfiles
@@ -1214,7 +1214,7 @@ paths:
   /pollingprofile/{pollingProfileId}:
     get:
       tags:
-        - resource-manager-api
+        - resource-api
       parameters:
         - in: path
           name: pollingProfileId
