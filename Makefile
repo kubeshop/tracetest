@@ -80,6 +80,7 @@ $(wildcard server/openapi/*.go): $(OPENAPI_SRC_FILES)
 	$(OPENAPI_GENERATOR_CLI) generate \
 		-i api/openapi.yaml \
 		-g go-server \
+		--global-property apis="api" \
 		-o $(BASE)/tmp \
 		--generate-alias-as-model
 	cp $(BASE)/tmp/go/*.go $(BASE)/$(OPENAPI_TARGET_DIR)
