@@ -64,7 +64,18 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 }
 
 func (config configActions) List(ctx context.Context) error {
-	return nil
+	request := config.client.ResourceApiApi.GetConfiguration(ctx, "current")
+	_, res, err := config.client.ResourceApiApi.GetConfigurationExecute(request)
+
+	if err != nil {
+		return fmt.Errorf("could not send request: %w", err)
+	}
+
+	if res.StatusCode != http.StatusCreated {
+		return fmt.Errorf("could not create config: %s", res.Status)
+	}
+
+	return err
 }
 
 func (config configActions) Export(ctx context.Context, ID string) error {

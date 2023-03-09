@@ -16,8 +16,8 @@ var definitionFile string
 
 var applyCmd = &cobra.Command{
 	Use:    "apply [resource type]",
-	Short:  "Apply (create/update) resources to your Tracetest server",
-	Long:   "Apply resources",
+	Short:  "Apply resources",
+	Long:   "Apply (create/update) resources to your Tracetest server",
 	PreRun: setupCommand(),
 	Args:   cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

@@ -6,8 +6,8 @@ import (
 
 var deleteCmd = &cobra.Command{
 	Use:    "delete [resource type]",
-	Short:  "Delete resources from your Tracetest server",
-	Long:   "Delete resources",
+	Long:   "Delete resources from your Tracetest server",
+	Short:  "Delete resources",
 	PreRun: setupCommand(),
 	Args:   cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
