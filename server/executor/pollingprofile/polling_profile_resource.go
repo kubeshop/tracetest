@@ -30,6 +30,7 @@ var Operations = []resourcemanager.Operation{
 type PollingProfile struct {
 	ID       id.ID                  `mapstructure:"id"`
 	Name     string                 `mapstructure:"name"`
+	Default  bool                   `mapstructure:"default"`
 	Strategy Strategy               `mapstructure:"strategy"`
 	Periodic *PeriodicPollingConfig `mapstructure:"periodic"`
 }
@@ -67,10 +68,11 @@ func (r *Repository) SetID(profile PollingProfile, id id.ID) PollingProfile {
 const insertQuery = `INSERT INTO polling_profiles (
 		"id",
 		"name",
+		"default",
 		"strategy",
 		"periodic"
 	)
-	VALUES ($1, $2, $3, $4)`
+	VALUES ($1, $2, $3, $4, $5)`
 
 func (r *Repository) Create(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
 	var (
@@ -80,6 +82,13 @@ func (r *Repository) Create(ctx context.Context, profile PollingProfile) (Pollin
 
 	if profile.ID == "" {
 		profile.ID = id.SlugFromString(profile.Name)
+	}
+
+	if profile.Default {
+		err := r.clearDefaultFlag(ctx)
+		if err != nil {
+			return PollingProfile{}, fmt.Errorf("could not update old default profile: %w", err)
+		}
 	}
 
 	if profile.Periodic != nil {
@@ -97,6 +106,7 @@ func (r *Repository) Create(ctx context.Context, profile PollingProfile) (Pollin
 	_, err = tx.ExecContext(ctx, insertQuery,
 		profile.ID,
 		profile.Name,
+		profile.Default,
 		profile.Strategy,
 		periodicJSON,
 	)
@@ -114,11 +124,28 @@ func (r *Repository) Create(ctx context.Context, profile PollingProfile) (Pollin
 	return profile, nil
 }
 
+func (r *Repository) clearDefaultFlag(ctx context.Context) error {
+	defaultProfile, err := r.GetDefault(ctx)
+	if err != nil {
+		wrappedError := errors.Unwrap(err)
+		if errors.Is(wrappedError, sql.ErrNoRows) {
+			return nil
+		}
+
+		return fmt.Errorf("could not get default profile: %w", err)
+	}
+
+	defaultProfile.Default = false
+	_, err = r.Update(ctx, defaultProfile)
+	return err
+}
+
 const updateQuery = `
 	UPDATE polling_profiles SET
 		"name" = $2,
-		"strategy" = $3,
-		"periodic" = $4
+		"default" = $3,
+		"strategy" = $4,
+		"periodic" = $5
 	WHERE "id" = $1`
 
 func (r *Repository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
@@ -126,6 +153,13 @@ func (r *Repository) Update(ctx context.Context, profile PollingProfile) (Pollin
 		periodicJSON []byte
 		err          error
 	)
+
+	if profile.Default {
+		err := r.clearDefaultFlag(ctx)
+		if err != nil {
+			return PollingProfile{}, fmt.Errorf("could not update old default profile: %w", err)
+		}
+	}
 
 	if profile.Periodic != nil {
 		periodicJSON, err = json.Marshal(profile.Periodic)
@@ -147,6 +181,7 @@ func (r *Repository) Update(ctx context.Context, profile PollingProfile) (Pollin
 	_, err = tx.ExecContext(ctx, updateQuery,
 		oldProfile.ID,
 		profile.Name,
+		profile.Default,
 		profile.Strategy,
 		periodicJSON,
 	)
@@ -169,22 +204,33 @@ const (
 		SELECT
 			"id",
 			"name",
+			"default",
 			"strategy",
 			"periodic"
 		FROM polling_profiles `
 
-	getQuery = baseSelect + `WHERE "id" = $1`
+	getQuery        = baseSelect + `WHERE "id" = $1`
+	getDefaultQuery = baseSelect + `WHERE "default" = true`
 )
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
+	return r.get(ctx, getQuery, id)
+}
+
+func (r *Repository) GetDefault(ctx context.Context) (PollingProfile, error) {
+	return r.get(ctx, getDefaultQuery)
+}
+
+func (r *Repository) get(ctx context.Context, query string, args ...any) (PollingProfile, error) {
 	profile := PollingProfile{}
 
 	var periodicJSON []byte
 	err := r.db.
-		QueryRowContext(ctx, getQuery, id).
+		QueryRowContext(ctx, query, args...).
 		Scan(
 			&profile.ID,
 			&profile.Name,
+			&profile.Default,
 			&profile.Strategy,
 			&periodicJSON,
 		)
@@ -273,6 +319,7 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 		err := rows.Scan(
 			&profile.ID,
 			&profile.Name,
+			&profile.Default,
 			&profile.Strategy,
 			&periodicJSON,
 		)
