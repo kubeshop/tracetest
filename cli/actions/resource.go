@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
 )
@@ -21,10 +20,10 @@ type ResourceActions interface {
 }
 
 type resourceArgs struct {
-	logger    *zap.Logger
-	client    *openapi.APIClient
-	cliConfig config.Config
+	logger *zap.Logger
+	client *openapi.APIClient
 }
+
 type resourceArgsOption = func(*resourceArgs)
 
 type ResourceRegistry map[string]ResourceActions
@@ -33,7 +32,8 @@ type supportedResources string
 var (
 	SupportedResourceConfig supportedResources = "config"
 
-	ErrResourceNotRegistered = errors.New("resource not registered")
+	ErrResourceNotRegistered      = errors.New("resource not registered")
+	ErrNotSupportedResourceAction = errors.New("the specified resource type doesn't support the action")
 )
 
 func NewResourceRegistry() ResourceRegistry {

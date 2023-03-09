@@ -79,9 +79,9 @@ func (config configActions) List(ctx context.Context) error {
 }
 
 func (config configActions) Export(ctx context.Context, ID string) error {
-	return nil
+	return ErrNotSupportedResourceAction
 }
 
 func (config configActions) Delete(ctx context.Context, ID string) error {
-	return nil
+	return ErrNotSupportedResourceAction
 }
