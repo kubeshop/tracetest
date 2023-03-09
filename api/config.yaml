@@ -94,6 +94,38 @@ components:
             - id
             - name
             - strategy
+    DemoPokeshop:
+      type: object
+      description: "Represents the settings of the Pokeshop API demonstration."
+      properties:
+        enabled:
+          type: boolean
+          description: "Flag telling if this API is enabled on Tracetest."
+        httpEndpoint:
+          type: string
+          description: "HTTP endpoint for Pokeshop API"
+        grpcEndpoint:
+          type: string
+          description: "gRPC endpoint for Pokeshop API"
+    DemoOpenTelemetryStore:
+      type: object
+      description: "Represents the settings of the Open Telemetry Store demonstration."
+      properties:
+        enabled:
+          type: boolean
+          description: "Flag telling if this API is enabled on Tracetest."
+        frontendEndpoint:
+          type: string
+          description: "Address of the root URL for the Frontend microservice on Open Telemetry Store."
+        productCatalogEndpoint:
+          type: string
+          description: "Address of the root URL for the Product Catalog microservice on Open Telemetry Store."
+        cartEndpoint:
+          type: string
+          description: "Address of the root URL for the Cart microservice on Open Telemetry Store."
+        checkoutEndpoint:
+          type: string
+          description: "Address of the root URL for the Checkout microservice on Open Telemetry Store."
     Demo:
       type: object
       description: "Represents a demonstration API structured into the Resources format."
@@ -102,6 +134,7 @@ components:
           type: string
           description: "Represents the type of this resource. It should always be set as 'Demo'."
         spec:
-          type: object
           description: "Represents the attributes of a Demonstration API."
-          # ...
+          oneOf:
+            - $ref: "#/components/schemas/DemoPokeshop"
+            - $ref: "#/components/schemas/DemoOpenTelemetryStore"
