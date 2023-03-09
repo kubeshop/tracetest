@@ -107,6 +107,8 @@ components:
         grpcEndpoint:
           type: string
           description: "gRPC endpoint for Pokeshop API"
+      required:
+        - enabled
     DemoOpenTelemetryStore:
       type: object
       description: "Represents the settings of the Open Telemetry Store demonstration."
@@ -126,6 +128,8 @@ components:
         checkoutEndpoint:
           type: string
           description: "Address of the root URL for the Checkout microservice on Open Telemetry Store."
+      required:
+        - enabled
     Demo:
       type: object
       description: "Represents a demonstration API structured into the Resources format."
