@@ -26,10 +26,10 @@ const Content = () => (
         <Tabs.TabPane key={TabsKeys.Analytics} tab="Analytics">
           <Analytics />
         </Tabs.TabPane>
-        {/* <Tabs.TabPane key={TabsKeys.Polling} tab="Trace Polling">
+        <Tabs.TabPane key={TabsKeys.Polling} tab="Trace Polling">
           <Polling />
         </Tabs.TabPane>
-         <Tabs.TabPane key={TabsKeys.Demo} tab="Demo">
+        <Tabs.TabPane key={TabsKeys.Demo} tab="Demo">
           <Demo />
         </Tabs.TabPane>
       </Tabs>
