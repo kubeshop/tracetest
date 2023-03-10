@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -21,7 +22,7 @@ var dataStoreApplyCmd = &cobra.Command{
 		analytics.Track("Datastore Apply", "cmd", map[string]string{})
 
 		ctx := context.Background()
-		client := getAPIClient()
+		client := utils.GetAPIClient(cliConfig)
 
 		applyDataStoreAction := actions.NewApplyDataStoreAction(cliLogger, client)
 		actionArgs := actions.ApplyDataStoreConfig{

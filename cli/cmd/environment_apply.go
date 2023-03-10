@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,8 @@ var environmentApplyCmd = &cobra.Command{
 	PreRun: setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Environment apply", "cmd", map[string]string{})
-		action := actions.NewApplyEnvironmentAction(cliLogger, getAPIClient())
+		client := utils.GetAPIClient(cliConfig)
+		action := actions.NewApplyEnvironmentAction(cliLogger, client)
 
 		err := action.Run(context.Background(), actions.ApplyEnvironmentConfig{
 			File: environmentApplyFile,
