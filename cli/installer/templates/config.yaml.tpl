@@ -24,9 +24,3 @@ demo:
     otelCheckout: {{ .otelCheckout }}
 
 experimentalFeatures: []
-
-{{ if eq .installBackend "true" }}
-server:
-  telemetry:
-    dataStore: {{ .backendType }}
-{{end}}
