@@ -27,7 +27,7 @@ type resourceArgs struct {
 	config config.Config
 }
 
-type ResourceArgsOption = func(any)
+type ResourceArgsOption = func(args *resourceArgs)
 type ResourceRegistry map[SupportedResources]ResourceActions
 type SupportedResources string
 
@@ -58,22 +58,19 @@ func (r ResourceRegistry) Get(resource SupportedResources) (ResourceActions, err
 }
 
 func WithClient(client *openapi.APIClient) ResourceArgsOption {
-	return func(args any) {
-		typedArgs := args.(*resourceArgs)
-		typedArgs.client = client
+	return func(args *resourceArgs) {
+		args.client = client
 	}
 }
 
 func WithLogger(logger *zap.Logger) ResourceArgsOption {
-	return func(args any) {
-		typedArgs := args.(*resourceArgs)
-		typedArgs.logger = logger
+	return func(args *resourceArgs) {
+		args.logger = logger
 	}
 }
 
 func WithConfig(config config.Config) ResourceArgsOption {
-	return func(args any) {
-		typedArgs := args.(*resourceArgs)
-		typedArgs.config = config
+	return func(args *resourceArgs) {
+		args.config = config
 	}
 }

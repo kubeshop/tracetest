@@ -36,7 +36,7 @@ var listCmd = &cobra.Command{
 		err = resourceActions.List(ctx)
 
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to apply definition for type: %s", resourceType), zap.Error(err))
+			cliLogger.Error(fmt.Sprintf("failed to list for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}

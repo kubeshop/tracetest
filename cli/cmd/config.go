@@ -48,7 +48,10 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 		options := []actions.ResourceArgsOption{actions.WithClient(apiClient), actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 		configActions := actions.NewConfigActions(options...)
+		pollingActions := actions.NewPollingActions(options...)
 		resourceRegistry.Register(actions.SupportedResourceConfig, configActions)
+
+		resourceRegistry.Register(actions.SupportedResourcePollingProfile, pollingActions)
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)

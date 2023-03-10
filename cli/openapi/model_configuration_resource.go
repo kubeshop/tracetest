@@ -17,7 +17,7 @@ import (
 // checks if the ConfigurationResource type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &ConfigurationResource{}
 
-// ConfigurationResource Represents a configuration into the Resources format.
+// ConfigurationResource Represents a configuration structured into the Resources format.
 type ConfigurationResource struct {
 	// Represents the type of this resource. It should always be set as 'Config'.
 	Type *string                    `json:"type,omitempty"`

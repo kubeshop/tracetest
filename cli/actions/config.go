@@ -12,18 +12,22 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
-type configActions = resourceArgs
+type configActions struct {
+	resourceArgs
+}
 
 var _ ResourceActions = &configActions{}
 
 func NewConfigActions(options ...ResourceArgsOption) configActions {
-	cfgActions := configActions{}
+	args := resourceArgs{}
 
 	for _, option := range options {
-		option(&cfgActions)
+		option(&args)
 	}
 
-	return cfgActions
+	return configActions{
+		resourceArgs: args,
+	}
 }
 
 func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
