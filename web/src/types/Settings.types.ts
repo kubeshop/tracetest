@@ -13,7 +13,7 @@ export type TResource<T> = {
 
 export enum EResourceType {
   Config = 'Config',
-  Polling = 'Polling',
+  Polling = 'PollingProfile',
 }
 
 export type TSpec = TRawConfig | TRawPolling;
