@@ -13,7 +13,7 @@ import (
 
 func buildCreateRequest(body, rt string, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
 	input := ct.fromJSON(body)
-	url := fmt.Sprintf("%s/%s/", testServer.URL, strings.ToLower(rt))
+	url := fmt.Sprintf("%s/%s", testServer.URL, strings.ToLower(rt))
 
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(input))
 	require.NoError(t, err)

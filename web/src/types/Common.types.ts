@@ -8,6 +8,7 @@ export interface IEnv {
   measurementId: string;
   serverID: string;
   serverPathPrefix: string;
+  segmentLoaded: boolean;
 }
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
@@ -36,9 +37,3 @@ export type TVariablesSchemas = external['variables.yaml']['components']['schema
 export type TSelector = TTestSchemas['Selector'];
 
 export type Model<T, R> = Modify<Required<T>, R>;
-
-export interface IAnalytics {
-  identify(traits: Record<string, any>): void;
-  track(event: string, traits: Record<string, any>): void;
-  page(pageName: string, traits: Record<string, any>): void;
-}

@@ -2,6 +2,7 @@ package id
 
 import (
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,6 +20,13 @@ type GeneratorFunc func() ID
 
 func GenerateID() ID {
 	return ID(shortid.MustGenerate())
+}
+
+func SlugFromString(input string) ID {
+	id := strings.ReplaceAll(input, " ", "-")
+	id = strings.ToLower(id)
+
+	return ID(id)
 }
 
 type Generator interface {

@@ -5,7 +5,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: http://app:8080/api
+      url: http://app:8080/
       method: GET
       headers:
       - key: Content-Type
