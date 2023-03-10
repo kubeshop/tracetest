@@ -14,8 +14,8 @@ export type TResource<T> = {
 
 export enum EResourceType {
   Config = 'Config',
-  Polling = 'Polling',
   Demo = 'Demo',
+  Polling = 'PollingProfile',
 }
 
 export type TSpec = TRawConfig | TRawPolling | TRawDemo;
