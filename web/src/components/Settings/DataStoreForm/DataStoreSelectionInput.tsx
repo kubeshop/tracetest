@@ -3,7 +3,7 @@ import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
 import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
-import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 
 import DataStoreIcon from '../../DataStoreIcon/DataStoreIcon';
 import * as S from './DataStoreForm.styled';
@@ -19,7 +19,7 @@ const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.J
   const {
     color: {text, primary},
   } = useTheme();
-  const {dataStoreConfig} = useDataStoreConfig();
+  const {dataStoreConfig} = useSettingsValues();
   const configuredDataStoreType = dataStoreConfig.defaultDataStore.type;
 
   return (
