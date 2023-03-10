@@ -19,7 +19,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   getPolling: builder.query<Polling, unknown>({
     query: () => ({
-      url: '/polling/',
+      url: '/pollingprofile',
       method: HTTP_METHOD.GET,
       headers: {
         'content-type': 'application/json',
@@ -30,7 +30,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   createSetting: builder.mutation<undefined, {resource: TResource<TSpec>}>({
     query: ({resource}) => ({
-      url: `/${resource.type.toLowerCase()}/`,
+      url: `/${resource.type.toLowerCase()}`,
       method: HTTP_METHOD.POST,
       body: resource,
     }),
