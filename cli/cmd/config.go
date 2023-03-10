@@ -3,12 +3,12 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
+	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -16,6 +16,7 @@ import (
 
 var cliConfig config.Config
 var cliLogger *zap.Logger
+var resourceRegistry = actions.NewResourceRegistry()
 
 type setupConfig struct {
 	shouldValidateConfig bool
@@ -42,6 +43,12 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		setupLogger(cmd, args)
 		loadConfig(cmd, args)
 		overrideConfig()
+
+		apiClient := utils.GetAPIClient(cliConfig)
+
+		options := []actions.ResourceArgsOption{actions.WithClient(apiClient), actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
+		configActions := actions.NewConfigActions(options...)
+		resourceRegistry.Register(actions.SupportedResourceConfig, configActions)
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
@@ -124,19 +131,4 @@ func setupLogger(cmd *cobra.Command, args []string) {
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
 	analytics.Close()
-}
-
-func getAPIClient() *openapi.APIClient {
-	config := openapi.NewConfiguration()
-	config.AddDefaultHeader("x-client-id", analytics.ClientID())
-	config.Scheme = cliConfig.Scheme
-	config.Host = strings.TrimSuffix(cliConfig.Endpoint, "/")
-	if cliConfig.ServerPath != nil {
-		config.Servers = []openapi.ServerConfiguration{
-			{
-				URL: *cliConfig.ServerPath,
-			},
-		}
-	}
-	return openapi.NewAPIClient(config)
 }

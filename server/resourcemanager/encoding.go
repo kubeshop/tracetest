@@ -58,8 +58,9 @@ var errUnacceptableContentType = errors.New("unacceptable content type")
 
 func encoderFromRequest(r *http.Request) (encoder, error) {
 	contentType := r.Header.Get("Content-Type")
+	accept := r.Header.Get("Accept")
 	for _, enc := range encoders {
-		if enc.Accepts(contentType) {
+		if enc.Accepts(contentType) || enc.Accepts(accept) {
 			return enc, nil
 		}
 	}

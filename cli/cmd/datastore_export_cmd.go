@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -24,7 +25,7 @@ var dataStoreExportCmd = &cobra.Command{
 		analytics.Track("Datastore Export", "cmd", map[string]string{})
 
 		ctx := context.Background()
-		client := getAPIClient()
+		client := utils.GetAPIClient(cliConfig)
 
 		exportDataStoreAction := actions.NewExportDataStoreAction(cliLogger, client)
 		actionArgs := actions.ExportDataStoreConfig{
