@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 )
 
 type pollingActions struct {
@@ -20,11 +21,7 @@ type pollingActions struct {
 var _ ResourceActions = &pollingActions{}
 
 func NewPollingActions(options ...ResourceArgsOption) pollingActions {
-	args := resourceArgs{}
-
-	for _, option := range options {
-		option(&args)
-	}
+	args := NewResourceArgs(options...)
 
 	return pollingActions{
 		resourceArgs: args,
@@ -55,15 +52,15 @@ func (polling pollingActions) Apply(ctx context.Context, args ApplyArgs) error {
 	deepcopy.DeepCopy(fileContent.Definition().Spec, &pollingProfile.Spec)
 
 	if pollingProfile.Spec.Id == "" {
-		err := polling.createPollingProfile(ctx, fileContent, pollingProfile)
+		err := polling.create(ctx, fileContent, pollingProfile)
 		return err
 	} else {
-		err := polling.updatePollingProfile(ctx, fileContent, pollingProfile)
+		err := polling.update(ctx, fileContent, pollingProfile)
 		return err
 	}
 }
 
-func (polling pollingActions) createPollingProfile(ctx context.Context, file file.File, pollingProfile openapi.PollingProfile) error {
+func (polling pollingActions) create(ctx context.Context, file file.File, pollingProfile openapi.PollingProfile) error {
 	request := polling.client.ResourceApiApi.CreatePollingProfile(ctx)
 	request = request.PollingProfile(pollingProfile)
 	createdPollingProfile, resp, err := polling.client.ResourceApiApi.CreatePollingProfileExecute(request)
@@ -80,26 +77,26 @@ func (polling pollingActions) createPollingProfile(ctx context.Context, file fil
 		}
 
 		validationError := string(body)
-		return fmt.Errorf("invalid data store: %s", validationError)
+		return fmt.Errorf("invalid polling profile: %s", validationError)
 	}
 	if err != nil {
-		return fmt.Errorf("could not create data store: %w", err)
+		return fmt.Errorf("could not create polling profile: %w", err)
 	}
 
 	f, err := file.SetID(createdPollingProfile.Spec.Id)
 	if err != nil {
-		return fmt.Errorf("could no set data store id: %w", err)
+		return fmt.Errorf("could no set polling profile id: %w", err)
 	}
 
 	_, err = f.Write()
 	if err != nil {
-		return fmt.Errorf("could not write to data store file: %w", err)
+		return fmt.Errorf("could not write to polling profile file: %w", err)
 	}
 
 	return nil
 }
 
-func (polling pollingActions) updatePollingProfile(ctx context.Context, file file.File, pollingProfile openapi.PollingProfile) error {
+func (polling pollingActions) update(ctx context.Context, file file.File, pollingProfile openapi.PollingProfile) error {
 	request := polling.client.ResourceApiApi.UpdatePollingProfile(ctx, pollingProfile.Spec.Id)
 	request = request.PollingProfile(pollingProfile)
 	_, resp, err := polling.client.ResourceApiApi.UpdatePollingProfileExecute(request)
@@ -122,8 +119,12 @@ func (polling pollingActions) updatePollingProfile(ctx context.Context, file fil
 	return nil
 }
 
-func (polling pollingActions) List(ctx context.Context) error {
+func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error {
 	request := polling.client.ResourceApiApi.ListPollingProfiles(ctx)
+	request = request.Skip(listArgs.Skip)
+	request = request.Take(listArgs.Take)
+	request = request.SortBy(listArgs.SortBy)
+	request = request.SortDirection(listArgs.SortBy)
 	pollingProfileList, _, err := polling.client.ResourceApiApi.ListPollingProfilesExecute(request)
 
 	if err != nil {
@@ -138,7 +139,23 @@ func (polling pollingActions) List(ctx context.Context) error {
 }
 
 func (polling pollingActions) Export(ctx context.Context, ID string) error {
-	return ErrNotSupportedResourceAction
+	pollingProfileResponse, err := polling.get(ctx, ID)
+	if err != nil {
+		return err
+	}
+
+	yamlData, err := yaml.Marshal(&pollingProfileResponse)
+	if err != nil {
+		return fmt.Errorf("could not marshal polling profile: %w", err)
+	}
+
+	file, err := file.New(fmt.Sprintf("./%s.yaml", pollingProfileResponse.Spec.Name), []byte(yamlData))
+	if err != nil {
+		return fmt.Errorf("could not create file: %w", err)
+	}
+
+	_, err = file.Write()
+	return err
 }
 
 func (polling pollingActions) Delete(ctx context.Context, ID string) error {
@@ -153,29 +170,38 @@ func (polling pollingActions) Delete(ctx context.Context, ID string) error {
 }
 
 func (polling pollingActions) Get(ctx context.Context, ID string) error {
-	request := polling.client.ResourceApiApi.GetPollingProfile(ctx, ID)
-	pollingProfileResponse, resp, err := polling.client.ResourceApiApi.GetPollingProfileExecute(request)
-
-	if err != nil && resp == nil {
-		return fmt.Errorf("could not send request: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		validationError := string(body)
-		return fmt.Errorf("invalid polling profile: %s", validationError)
-	}
-
+	pollingProfileResponse, err := polling.get(ctx, ID)
 	if err != nil {
-		return fmt.Errorf("could not get polling profile: %w", err)
+		return err
 	}
 
 	formatter := formatters.PollingProfileFormatter(polling.config)
 	fmt.Println(formatter.Format(*pollingProfileResponse))
 
 	return err
+}
+
+func (polling pollingActions) get(ctx context.Context, ID string) (*openapi.PollingProfile, error) {
+	request := polling.client.ResourceApiApi.GetPollingProfile(ctx, ID)
+	pollingProfileResponse, resp, err := polling.client.ResourceApiApi.GetPollingProfileExecute(request)
+
+	if err != nil && resp == nil {
+		return &openapi.PollingProfile{}, fmt.Errorf("could not send request: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return &openapi.PollingProfile{}, err
+		}
+
+		validationError := string(body)
+		return &openapi.PollingProfile{}, fmt.Errorf("invalid polling profile: %s", validationError)
+	}
+
+	if err != nil {
+		return &openapi.PollingProfile{}, fmt.Errorf("could not get polling profile: %w", err)
+	}
+
+	return pollingProfileResponse, nil
 }

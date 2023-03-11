@@ -13,12 +13,19 @@ type ApplyArgs struct {
 	File string
 }
 
+type ListArgs struct {
+	Take          int32
+	Skip          int32
+	SortDirection string
+	SortBy        string
+}
+
 type ResourceActions interface {
-	Apply(ctx context.Context, args ApplyArgs) error
-	List(ctx context.Context) error
-	Get(ctx context.Context, ID string) error
-	Export(ctx context.Context, ID string) error
-	Delete(ctx context.Context, ID string) error
+	Apply(context.Context, ApplyArgs) error
+	List(context.Context, ListArgs) error
+	Get(context.Context, string) error
+	Export(context.Context, string) error
+	Delete(context.Context, string) error
 }
 
 type resourceArgs struct {
@@ -73,4 +80,14 @@ func WithConfig(config config.Config) ResourceArgsOption {
 	return func(args *resourceArgs) {
 		args.config = config
 	}
+}
+
+func NewResourceArgs(options ...ResourceArgsOption) resourceArgs {
+	args := resourceArgs{}
+
+	for _, option := range options {
+		option(&args)
+	}
+
+	return args
 }

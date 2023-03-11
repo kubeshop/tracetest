@@ -11,6 +11,13 @@ import (
 	"go.uber.org/zap"
 )
 
+var (
+	listTake          int32
+	listSkip          int32
+	listSortBy        string
+	listSortDirection string
+)
+
 var listCmd = &cobra.Command{
 	Use:    "list [resource type]",
 	Long:   "List resources from your Tracetest server",
@@ -33,7 +40,14 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		err = resourceActions.List(ctx)
+		listArgs := actions.ListArgs{
+			Take:          listTake,
+			Skip:          listSkip,
+			SortDirection: listSortDirection,
+			SortBy:        listSortBy,
+		}
+
+		err = resourceActions.List(ctx, listArgs)
 
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to list for type: %s", resourceType), zap.Error(err))
@@ -45,5 +59,9 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
+	listCmd.PersistentFlags().Int32VarP(&listTake, "take", "t", 20, "Take number")
+	listCmd.PersistentFlags().Int32VarP(&listSkip, "skip", "", 0, "Skip number")
+	listCmd.PersistentFlags().StringVarP(&listSortBy, "sortBy", "b", "", "Sort by")
+	listCmd.PersistentFlags().StringVarP(&listSortDirection, "sortDirection", "d", "desc", "Sort direction")
 	rootCmd.AddCommand(listCmd)
 }
