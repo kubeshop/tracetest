@@ -7,10 +7,11 @@ import (
 	"strings"
 	"testing"
 
+	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/require"
 )
 
-func buildGetRequest(rt ResourceTypeTest, ct contentType, testServer *httptest.Server, t *testing.T) *http.Request {
+func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
 	id := extractID(rt.SampleJSON)
 	url := fmt.Sprintf(
 		"%s/%s/%s",
@@ -26,65 +27,47 @@ func buildGetRequest(rt ResourceTypeTest, ct contentType, testServer *httptest.S
 
 const OperationGetSuccess Operation = "GetSuccess"
 
-type getSuccessOperation struct{}
+var getSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
+	name:               OperationGetSuccess,
+	neededForOperation: rm.OperationGet,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildGetRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 200, resp.StatusCode)
 
-func (op getSuccessOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+		jsonBody := responseBodyJSON(t, resp, ct)
 
-func (op getSuccessOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildGetRequest(rt, ct, testServer, t)
-}
+		expected := ct.toJSON(rt.SampleJSON)
 
-func (getSuccessOperation) name() Operation {
-	return OperationGetSuccess
-}
-
-func (getSuccessOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 200, resp.StatusCode)
-
-	jsonBody := responseBodyJSON(t, resp, ct)
-
-	expected := ct.toJSON(rt.SampleJSON)
-
-	require.JSONEq(t, expected, jsonBody)
-}
+		require.JSONEq(t, expected, jsonBody)
+	},
+})
 
 const OperationGetNotFound Operation = "GetNotFound"
 
-type getNotFoundOperation struct{}
+var getNotFoundOperation = buildSingleStepOperation(singleStepOperationTester{
+	name:               OperationGetNotFound,
+	neededForOperation: rm.OperationGet,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildGetRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		t.Helper()
+		require.Equal(t, 404, resp.StatusCode)
+	},
+})
 
-func (op getNotFoundOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-}
+const OperationGetInternalError Operation = "GetInternalError"
 
-func (op getNotFoundOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildGetRequest(rt, ct, testServer, t)
-}
-
-func (getNotFoundOperation) name() Operation {
-	return OperationGetNotFound
-}
-
-func (getNotFoundOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	t.Helper()
-	require.Equal(t, 404, resp.StatusCode)
-}
-
-const OperationGetInteralError Operation = "GetInteralError"
-
-type getInteralErrorOperation struct{}
-
-func (op getInteralErrorOperation) postAssert(t *testing.T, ct contentType, rt ResourceTypeTest, testServer *httptest.Server) {
-}
-
-func (op getInteralErrorOperation) buildRequest(t *testing.T, testServer *httptest.Server, ct contentType, rt ResourceTypeTest) *http.Request {
-	return buildGetRequest(rt, ct, testServer, t)
-}
-
-func (getInteralErrorOperation) name() Operation {
-	return OperationGetInteralError
-}
-
-func (getInteralErrorOperation) assertResponse(t *testing.T, resp *http.Response, ct contentType, rt ResourceTypeTest) {
-	assertInternalError(t, resp, ct, rt, "getting")
-}
+var getInternalErrorOperation = buildSingleStepOperation(singleStepOperationTester{
+	name:               OperationGetInternalError,
+	neededForOperation: rm.OperationGet,
+	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
+		return buildGetRequest(rt, ct, testServer, t)
+	},
+	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
+		assertInternalError(t, resp, ct, rt.ResourceType, "getting")
+	},
+})

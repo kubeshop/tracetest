@@ -5,17 +5,25 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFromFile(t *testing.T) {
+	db := testmock.MustGetRawTestingDatabase()
+
 	t.Run("Inexistent", func(t *testing.T) {
 		t.Parallel()
 
-		provisioner := provisioning.New(&testdb.MockRepository{})
+		configDB := configresource.NewRepository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+
+		provisioner := provisioning.New(&testdb.MockRepository{}, configDB)
 
 		err := provisioner.FromFile("notexists.yaml")
 		assert.ErrorIs(t, err, provisioning.ErrFileNotExists)
@@ -23,17 +31,27 @@ func TestFromFile(t *testing.T) {
 }
 
 func TestFromEnv(t *testing.T) {
+	db := testmock.MustGetRawTestingDatabase()
+
 	t.Run("Empty", func(t *testing.T) {
-		provisioner := provisioning.New(&testdb.MockRepository{})
+		configDB := configresource.NewRepository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+
+		provisioner := provisioning.New(&testdb.MockRepository{}, configDB)
 
 		err := provisioner.FromEnv()
 		assert.ErrorIs(t, err, provisioning.ErrEnvEmpty)
 	})
 
 	t.Run("InvalidData", func(t *testing.T) {
+		configDB := configresource.NewRepository(
+			testmock.MustCreateRandomMigratedDatabase(db),
+		)
+
 		os.Setenv("TRACETEST_PROVISIONING", "this is not base64")
 
-		provisioner := provisioning.New(&testdb.MockRepository{})
+		provisioner := provisioning.New(&testdb.MockRepository{}, configDB)
 
 		err := provisioner.FromEnv()
 		assert.ErrorContains(t, err, "cannot decode env variable TRACETEST_PROVISIONING")
@@ -41,6 +59,10 @@ func TestFromEnv(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			configDB := configresource.NewRepository(
+				testmock.MustCreateRandomMigratedDatabase(db),
+			)
+
 			t.Run("FromEnv", func(t *testing.T) {
 				c := c
 
@@ -52,7 +74,7 @@ func TestFromEnv(t *testing.T) {
 				}
 
 				mockRepo := &testdb.MockRepository{}
-				provisioner := provisioning.New(mockRepo)
+				provisioner := provisioning.New(mockRepo, configDB)
 
 				mockRepo.
 					On("CreateDataStore", expectedDataStore).

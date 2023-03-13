@@ -1,6 +1,5 @@
 import {Button, Form, Switch} from 'antd';
 
-import {useSettings} from 'providers/Settings/Settings.provider';
 import {IDraftSettings} from 'types/Settings.types';
 import * as S from '../common/Settings.styled';
 import OtelFields from './OtelFields';
@@ -12,10 +11,9 @@ const DemoForm = () => {
   const [form] = Form.useForm<IDraftSettings>();
   const pokeshopEnabled = Form.useWatch(['demo', 'pokeshopEnabled'], form);
   const otelEnabled = Form.useWatch(['demo', 'otelEnabled'], form);
-  const {onSubmit} = useSettings();
 
   return (
-    <Form<IDraftSettings> autoComplete="off" form={form} layout="vertical" name={FORM_ID} onFinish={onSubmit}>
+    <Form<IDraftSettings> autoComplete="off" form={form} layout="vertical" name={FORM_ID} onFinish={() => {}}>
       <S.SwitchContainer>
         <label htmlFor={`${FORM_ID}_demo_pokeshopEnabled`}>Enable Pokeshop</label>
         <Form.Item name={['demo', 'pokeshopEnabled']} valuePropName="checked">

@@ -16,11 +16,11 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -45,6 +45,8 @@ type App struct {
 	cfg              *config.Config
 	provisioningFile string
 	stopFns          []func()
+
+	serverID string
 }
 
 func New(config *config.Config) (*App, error) {
@@ -82,8 +84,8 @@ func WithProvisioningFile(path string) appOption {
 	}
 }
 
-func (app *App) provision(db model.Repository) {
-	p := provisioning.New(db)
+func (app *App) provision(db model.Repository, configDB *configresource.Repository) {
+	p := provisioning.New(db, configDB)
 
 	var err error
 
@@ -108,6 +110,23 @@ func (app *App) provision(db model.Repository) {
 	fmt.Println("[Provisioning]: success")
 }
 
+func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
+	sm.Subscribe(configresource.ResourceID, subscription.NewSubscriberFunction(
+		func(m subscription.Message) error {
+			configFromDB, ok := m.Content.(configresource.Config)
+			if !ok {
+				return fmt.Errorf("cannot read update to configFromDB. unexpected type %T", m.Content)
+			}
+
+			return app.initAnalytics(configFromDB)
+		}),
+	)
+}
+
+func (app *App) initAnalytics(configFromDB configresource.Config) error {
+	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env)
+}
+
 func (app *App) Start(opts ...appOption) error {
 	for _, opt := range opts {
 		opt(app)
@@ -116,10 +135,16 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
+	subscriptionManager := subscription.NewManager()
+	app.subscribeToConfigChanges(subscriptionManager)
+
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
 		return err
 	}
+
+	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
+	configFromDB := configRepo.Current(ctx)
 
 	testDB, err := testdb.Postgres(
 		testdb.WithDB(db),
@@ -141,8 +166,9 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
+	app.serverID = serverID
 
-	err = analytics.Init(app.cfg.AnalyticsEnabled(), serverID, Version, Env)
+	err = app.initAnalytics(configFromDB)
 	if err != nil {
 		return err
 	}
@@ -154,7 +180,7 @@ func (app *App) Start(opts ...appOption) error {
 			return err
 		}
 
-		app.provision(testDB)
+		app.provision(testDB, configRepo)
 
 	}
 
@@ -163,7 +189,6 @@ func (app *App) Start(opts ...appOption) error {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
 
-	subscriptionManager := subscription.NewManager()
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(
@@ -215,9 +240,12 @@ func (app *App) Start(opts ...appOption) error {
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	registerConfigResource(apiRouter, db)
+	registerConfigResource(configRepo, apiRouter, db)
 
-	registerSPAHandler(router, app.cfg, serverID)
+	pollingProfileRepo := pollingprofile.NewRepository(db)
+	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db)
+
+	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", app.cfg.ServerPort()),
@@ -235,12 +263,13 @@ func (app *App) Start(opts ...appOption) error {
 	return nil
 }
 
-func registerSPAHandler(router *mux.Router, cfg httpServerConfig, serverID string) {
+func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabled bool, serverID string) {
 	router.
 		PathPrefix(cfg.ServerPathPrefix()).
 		Handler(
 			httpServer.SPAHandler(
 				cfg,
+				analyticsEnabled,
 				serverID,
 				Version,
 				Env,
@@ -249,9 +278,21 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, serverID strin
 
 }
 
-func registerConfigResource(router *mux.Router, db *sql.DB) {
-	configRepo := configresource.Repository(db)
-	manager := resourcemanager.New[configresource.Config]("Config", configRepo, id.GenerateID)
+func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB) {
+	manager := resourcemanager.New[configresource.Config](
+		configresource.ResourceName,
+		configRepo,
+		resourcemanager.WithOperations(configresource.Operations...),
+	)
+	manager.RegisterRoutes(router)
+}
+
+func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB) {
+	manager := resourcemanager.New[pollingprofile.PollingProfile](
+		pollingprofile.ResourceName,
+		repository,
+		resourcemanager.WithOperations(pollingprofile.Operations...),
+	)
 	manager.RegisterRoutes(router)
 }
 
@@ -334,7 +375,6 @@ func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
 type httpServerConfig interface {
 	ServerPathPrefix() string
 	ServerPort() int
-	AnalyticsEnabled() bool
 	DemoEnabled() []string
 	DemoEndpoints() map[string]string
 	ExperimentalFeatures() []string

@@ -42,8 +42,8 @@ build-docker: goreleaser-version build-go build-web .goreleaser.dev.yaml ## buil
 
 .PHONY: generate generate-server generate-cli generate-web
 generate: generate-server generate-cli generate-web ## generate code entities from openapi definitions for all parts of the code
-generate-server: $(wildcard server/openapi/*.go) ## generate code entities from openapi definitions for server
-generate-cli: $(wildcard cli/openapi/*.go) ## generate code entities from openapi definitions for cli
+generate-server: server/openapi ## generate code entities from openapi definitions for server
+generate-cli: cli/openapi ## generate code entities from openapi definitions for cli
 generate-web: web/src/types/Generated.types.ts ## generate code entities from openapi definitions for web
 
 OPENAPI_SRC_FILES := $(shell find api -type f)
@@ -54,7 +54,7 @@ OPENAPI_TARGET_DIR=openapi/
 web/src/types/Generated.types.ts: $(OPENAPI_SRC_FILES)
 	cd web; npm run types:generate
 
-$(wildcard cli/openapi/*.go): $(OPENAPI_SRC_FILES)
+cli/openapi: $(OPENAPI_SRC_FILES)
 	$(eval BASE := ./cli)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
@@ -71,7 +71,7 @@ $(wildcard cli/openapi/*.go): $(OPENAPI_SRC_FILES)
 
 	cd $(BASE); go fmt ./...
 
-$(wildcard server/openapi/*.go): $(OPENAPI_SRC_FILES)
+server/openapi: $(OPENAPI_SRC_FILES)
 	$(eval BASE := ./server)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)
@@ -80,6 +80,7 @@ $(wildcard server/openapi/*.go): $(OPENAPI_SRC_FILES)
 	$(OPENAPI_GENERATOR_CLI) generate \
 		-i api/openapi.yaml \
 		-g go-server \
+		--global-property apis="api" \
 		-o $(BASE)/tmp \
 		--generate-alias-as-model
 	cp $(BASE)/tmp/go/*.go $(BASE)/$(OPENAPI_TARGET_DIR)

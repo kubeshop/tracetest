@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/mitchellh/mapstructure"
@@ -30,50 +32,112 @@ type Resource[T ResourceSpec] struct {
 	Spec T      `mapstructure:"spec"`
 }
 
-type ResourceHandler[T ResourceSpec] interface {
-	SetID(T, id.ID) T
-	List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
-	Count(_ context.Context, query string) (int, error)
-	Create(context.Context, T) (T, error)
-	Update(context.Context, T) (T, error)
-	Get(context.Context, id.ID) (T, error)
-	Delete(context.Context, id.ID) error
+type Manager interface {
+	EnabledOperations() []Operation
+	Handler() any
+	RegisterRoutes(*mux.Router) *mux.Router
 }
 
 type manager[T ResourceSpec] struct {
 	resourceType string
-	handler      ResourceHandler[T]
-	idgen        func() id.ID
+	handler      any
+	rh           resourceHandler[T]
+	config       config
 }
 
-func New[T ResourceSpec](resourceType string, handler ResourceHandler[T], idgenFn func() id.ID) *manager[T] {
+type config struct {
+	enabledOperations []Operation
+	idgen             func() id.ID
+}
+
+type managerOption func(*config)
+
+func WithIDGen(fn func() id.ID) managerOption {
+	return func(c *config) {
+		c.idgen = fn
+	}
+}
+
+func WithOperations(ops ...Operation) managerOption {
+	return func(c *config) {
+		c.enabledOperations = ops
+	}
+}
+
+func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption) Manager {
+	rh := &resourceHandler[T]{}
+
+	cfg := config{
+		enabledOperations: availableOperations,
+		idgen:             func() id.ID { return id.ID("") },
+	}
+
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	err := rh.bindOperations(cfg.enabledOperations, handler)
+
+	if err != nil {
+		err := fmt.Errorf(
+			"cannot create Resourcemanager '%s': %w",
+			resourceType,
+			err,
+		)
+		panic(err)
+	}
+
 	return &manager[T]{
 		resourceType: resourceType,
 		handler:      handler,
-		idgen:        idgenFn,
+		rh:           *rh,
+		config:       cfg,
 	}
+}
+
+func (m *manager[T]) EnabledOperations() []Operation {
+	return m.config.enabledOperations
+}
+
+func (m *manager[T]) Handler() any {
+	return m.handler
 }
 
 func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
 
-	subrouter.HandleFunc("/", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceType))
-	subrouter.HandleFunc("/", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
-	subrouter.HandleFunc("/", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
+	enabledOps := m.EnabledOperations()
 
-	subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
-	subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
+	if slices.Contains(enabledOps, OperationList) {
+		subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list")
+	}
+
+	if slices.Contains(enabledOps, OperationCreate) {
+		subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
+	}
+
+	if slices.Contains(enabledOps, OperationUpdate) {
+		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
+	}
+
+	if slices.Contains(enabledOps, OperationGet) {
+		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
+	}
+
+	if slices.Contains(enabledOps, OperationDelete) {
+		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
+	}
 
 	return subrouter
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
-	m.operationWithBody(w, r, http.StatusCreated, "creating", m.handler.Create)
+	m.operationWithBody(w, r, http.StatusCreated, "creating", m.rh.Create)
 }
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
-	m.operationWithBody(w, r, http.StatusOK, "updating", m.handler.Update)
+	m.operationWithBody(w, r, http.StatusOK, "updating", m.rh.Update)
 }
 
 func getIntFromQuery(r *http.Request, key string) (int, error) {
@@ -90,7 +154,7 @@ func getIntFromQuery(r *http.Request, key string) (int, error) {
 	return val, nil
 }
 
-func paginationParams(r *http.Request) (take, skip int, query, sortBy, sortDirection string, err error) {
+func paginationParams(r *http.Request, sortingFields []string) (take, skip int, query, sortBy, sortDirection string, err error) {
 	take, err = getIntFromQuery(r, "take")
 	if err != nil {
 		err = fmt.Errorf("error reading take param: %w", err)
@@ -104,6 +168,11 @@ func paginationParams(r *http.Request) (take, skip int, query, sortBy, sortDirec
 	}
 
 	sortBy = r.URL.Query().Get("sortBy")
+	if sortBy != "" && !slices.Contains(sortingFields, sortBy) {
+		err = fmt.Errorf("invalid sort field: %s", sortBy)
+		return
+	}
+
 	sortDirection = r.URL.Query().Get("sortDirection")
 
 	query = r.URL.Query().Get("query")
@@ -122,19 +191,19 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	take, skip,
 		query, sortBy,
-		sortDirection, err := paginationParams(r)
+		sortDirection, err := paginationParams(r, m.rh.SortingFields())
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
 		return
 	}
 
-	count, err := m.handler.Count(ctx, query)
+	count, err := m.rh.Count(ctx, query)
 	if err != nil {
 		m.handleResourceHandlerError(w, "listing", err, encoder)
 		return
 	}
 
-	items, err := m.handler.List(
+	items, err := m.rh.List(
 		ctx,
 		take,
 		skip,
@@ -147,6 +216,9 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: the name "count" can be misleading when using pagination.
+	//       an user can paginate the request and see a different number
+	//       of records inside "item"
 	resourceList := ResourceList[T]{
 		Count: count,
 		Items: []map[string]any{},
@@ -188,7 +260,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	item, err := m.handler.Get(r.Context(), id)
+	item, err := m.rh.Get(r.Context(), id)
 	if err != nil {
 		m.handleResourceHandlerError(w, "getting", err, encoder)
 		return
@@ -219,7 +291,7 @@ func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	err = m.handler.Delete(r.Context(), id)
+	err = m.rh.Delete(r.Context(), id)
 	if err != nil {
 		m.handleResourceHandlerError(w, "deleting", err, encoder)
 		return
@@ -265,7 +337,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 
 	// TODO: check if this needs to be done per operation
 	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.handler.SetID(targetResource.Spec, m.idgen())
+		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
 	}
 
 	created, err := fn(r.Context(), targetResource.Spec)

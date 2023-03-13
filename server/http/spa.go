@@ -52,13 +52,12 @@ func spaHandler(prefix, staticPath, indexPath string, tplVars map[string]string)
 
 type spaConfig interface {
 	ServerPathPrefix() string
-	AnalyticsEnabled() bool
 	DemoEnabled() []string
 	DemoEndpoints() map[string]string
 	ExperimentalFeatures() []string
 }
 
-func SPAHandler(conf spaConfig, serverID, version, env string) http.HandlerFunc {
+func SPAHandler(conf spaConfig, analyticsEnabled bool, serverID, version, env string) http.HandlerFunc {
 	pathPrefix := conf.ServerPathPrefix()
 	return spaHandler(
 		pathPrefix,
@@ -66,7 +65,7 @@ func SPAHandler(conf spaConfig, serverID, version, env string) http.HandlerFunc 
 		"index.html",
 		map[string]string{
 			"AnalyticsKey":         analytics.FrontendKey,
-			"AnalyticsEnabled":     fmt.Sprintf("%t", conf.AnalyticsEnabled()),
+			"AnalyticsEnabled":     fmt.Sprintf("%t", analyticsEnabled),
 			"ServerPathPrefix":     fmt.Sprintf("%s/", pathPrefix),
 			"ServerID":             serverID,
 			"AppVersion":           version,

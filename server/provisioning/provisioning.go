@@ -7,17 +7,19 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 )
 
-func New(db model.Repository) provisioner {
-	return provisioner{db}
+func New(db model.Repository, configDB *configresource.Repository) provisioner {
+	return provisioner{db, configDB}
 }
 
 type provisioner struct {
-	db model.Repository
+	db       model.Repository
+	configDB *configresource.Repository
 }
 
 var (
@@ -53,6 +55,7 @@ func (p provisioner) FromFile(path string) error {
 
 type provisionConfig struct {
 	DataStore dataStore `mapstructure:"dataStore"`
+	Config    config    `mapstructure:"config"`
 }
 
 func (p provisioner) do(data []byte) error {
@@ -68,12 +71,20 @@ func (p provisioner) do(data []byte) error {
 		return fmt.Errorf("cannot unmarshal yaml: %w", err)
 	}
 
+	// Provision data store
 	dsModel := config.DataStore.model()
 	dsModel.IsDefault = true
 
 	_, err = p.db.CreateDataStore(context.TODO(), dsModel)
 	if err != nil {
 		return fmt.Errorf("cannot provision data store: %w", err)
+	}
+
+	// Provision config
+	cfgModel := config.Config.model()
+	_, err = p.configDB.Update(context.TODO(), cfgModel)
+	if err != nil {
+		return fmt.Errorf("cannot provision config: %w", err)
 	}
 
 	return nil

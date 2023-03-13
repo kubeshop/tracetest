@@ -46,33 +46,32 @@ func configureBackend(conf configuration, ui cliUI.UI) configuration {
 	installBackend := !conf.Bool("installer.only_tracetest")
 	conf.set("tracetest.backend.install", installBackend)
 
-	if installBackend {
-
-		// default values
-		switch conf.String("installer") {
-		case "docker-compose":
-			conf.set("tracetest.backend.type", "otlp")
-			conf.set("tracetest.backend.tls.insecure", true)
-			conf.set("tracetest.backend.endpoint.collector", "http://otel-collector:4317")
-			conf.set("tracetest.backend.endpoint", "tracetest:21321")
-		case "kubernetes":
-			conf.set("tracetest.backend.type", "otlp")
-			conf.set("tracetest.backend.tls.insecure", true)
-			conf.set("tracetest.backend.endpoint.collector", "http://otel-collector.tracetest:4317")
-			conf.set("tracetest.backend.endpoint", "tracetest:21321")
-
-		default:
-			conf.set("tracetest.backend.type", "")
-		}
-
+	if !installBackend {
+		conf.set("tracetest.backend.type", "")
 		return conf
 	}
 
-	conf.set("tracetest.backend.type", "")
+	// default values
+	switch conf.String("installer") {
+	case "docker-compose":
+		conf.set("tracetest.backend.type", "otlp")
+		conf.set("tracetest.backend.tls.insecure", true)
+		conf.set("tracetest.backend.endpoint.collector", "http://otel-collector:4317")
+		conf.set("tracetest.backend.endpoint", "tracetest:21321")
+	case "kubernetes":
+		conf.set("tracetest.backend.type", "otlp")
+		conf.set("tracetest.backend.tls.insecure", true)
+		conf.set("tracetest.backend.endpoint.collector", "http://otel-collector.tracetest:4317")
+		conf.set("tracetest.backend.endpoint", "tracetest:21321")
+
+	default:
+		conf.set("tracetest.backend.type", "")
+	}
+
 	return conf
 }
 
-//go:embed config.yaml.tpl
+//go:embed templates/config.yaml.tpl
 var configTemplate string
 
 func getTracetestConfigFileContents(pHost, pUser, pPasswd string, ui cliUI.UI, config configuration) []byte {
@@ -99,6 +98,25 @@ func getTracetestConfigFileContents(pHost, pUser, pPasswd string, ui cliUI.UI, c
 		"otelCart":           config.String("demo.endpoint.otel.cart"),
 		"otelCheckout":       config.String("demo.endpoint.otel.checkout"),
 
+		"backendType": config.String("tracetest.backend.type"),
+	}
+
+	tpl, err := template.New("page").Parse(configTemplate)
+	if err != nil {
+		ui.Panic(fmt.Errorf("cannot parse config template: %w", err))
+	}
+
+	out := &bytes.Buffer{}
+	tpl.Execute(out, vals)
+
+	return out.Bytes()
+}
+
+//go:embed templates/provision.yaml.tpl
+var provisionTemplate string
+
+func getTracetestProvisionFileContents(ui cliUI.UI, config configuration) []byte {
+	vals := map[string]string{
 		"backendType":      config.String("tracetest.backend.type"),
 		"backendEndpoint":  config.String("tracetest.backend.endpoint.query"),
 		"backendInsecure":  config.String("tracetest.backend.tls.insecure"),
@@ -108,7 +126,7 @@ func getTracetestConfigFileContents(pHost, pUser, pPasswd string, ui cliUI.UI, c
 		"backendRealm":     config.String("tracetest.backend.realm"),
 	}
 
-	tpl, err := template.New("page").Parse(configTemplate)
+	tpl, err := template.New("page").Parse(provisionTemplate)
 	if err != nil {
 		ui.Panic(fmt.Errorf("cannot parse config template: %w", err))
 	}

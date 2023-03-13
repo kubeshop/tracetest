@@ -52,6 +52,7 @@ func configureDockerComposeOutput(conf configuration, ui cliUI.UI) configuration
 const (
 	dockerComposeFilename       = "docker-compose.yaml"
 	tracetestConfigFilename     = "tracetest.yaml"
+	tracetestProvisionFilename  = "tracetest-provision.yaml"
 	otelCollectorConfigFilename = "collector.config.yaml"
 )
 
@@ -79,6 +80,10 @@ func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 	saveFile(ui, filepath.Join(dir, tracetestConfigFilename), tracetestConfigFile)
 
 	if !config.Bool("installer.only_tracetest") {
+		// if we choose to install a backend, we need to add a provision file and a OTel Collector
+		tracetestProvisionFile := getTracetestProvisionFileContents(ui, config)
+		saveFile(ui, filepath.Join(dir, tracetestProvisionFilename), tracetestProvisionFile)
+
 		collectorConfigFile := getCollectorConfigFileContents(ui, config)
 		saveFile(ui, filepath.Join(dir, otelCollectorConfigFilename), collectorConfigFile)
 	}
@@ -106,10 +111,17 @@ func getDockerComposeFileContents(ui cliUI.UI, config configuration) []byte {
 		include = append(include, "cache", "queue", "demo-api", "demo-worker", "demo-rpc", "otel-collector")
 	}
 
-	filterContainers(ui, project, include)
+	// filter and update project
+	filterAndFixContainers(ui, project, include)
 
+	// set version for tracetest container
 	if err := fixTracetestContainer(config, project, cliConfig.Version); err != nil {
 		ui.Exit(fmt.Sprintf("cannot configure tracetest container: %s", err.Error()))
+	}
+
+	//remove provision parameters if we will not install a tracing backend
+	if !config.Bool("tracetest.backend.install") {
+		removeProvisioningInfo(ui, project)
 	}
 
 	output, err := yaml.Marshal(project)
@@ -130,7 +142,7 @@ func fixPortConfig(output string) string {
 	})
 }
 
-func filterContainers(ui cliUI.UI, project *types.Project, included []string) {
+func filterAndFixContainers(ui cliUI.UI, project *types.Project, included []string) {
 	containers := make(types.Services, 0, len(included))
 	if err := project.ForServices(included); err != nil {
 		ui.Exit(err.Error())
@@ -155,6 +167,22 @@ func filterContainers(ui cliUI.UI, project *types.Project, included []string) {
 	}
 
 	project.Services = containers
+}
+
+func removeProvisioningInfo(ui cliUI.UI, project *types.Project) {
+	const serviceName = "tracetest"
+
+	tts, err := project.GetService(serviceName)
+	if err != nil {
+		ui.Exit(err.Error())
+	}
+
+	// set command as empty
+	tts.Command = []string{}
+
+	// remove provisioning volume
+	tts.Volumes = []types.ServiceVolumeConfig{tts.Volumes[0]}
+	replaceService(project, serviceName, tts)
 }
 
 type msa = map[string]any

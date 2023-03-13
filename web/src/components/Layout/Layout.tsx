@@ -9,7 +9,7 @@ import Header from 'components/Header';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import EnvironmentProvider from 'providers/Environment';
-import {useDataStoreConfig} from 'providers/DataStoreConfig/DataStoreConfig.provider';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import NotificationProvider from 'providers/Notification/Notification.provider';
 import {ConfigMode} from 'types/DataStore.types';
@@ -46,7 +46,7 @@ const footerMenuItems = [
 
 const Layout = ({children, hasMenu = false}: IProps) => {
   useRouterSync();
-  const {dataStoreConfig, isLoading} = useDataStoreConfig();
+  const {dataStoreConfig, isLoading} = useSettingsValues();
   const pathname = useLocation().pathname;
   const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 

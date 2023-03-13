@@ -104,6 +104,11 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "configuration/connecting-to-data-stores/awsxray",
+              label: "AWS X-Ray",
+            },
+            {
+              type: "doc",
               id: "configuration/connecting-to-data-stores/datadog",
               label: "Datadog",
             },
@@ -273,6 +278,11 @@ const sidebars = {
           id: "cli/creating-tests",
           label: "Creating Tests",
         },
+        {
+          type: "doc",
+          id: "cli/running-tests",
+          label: "Running Tests",
+        },        
         // {
         //   type: "doc",
         //   id: "cli/creating-transactions",
@@ -375,6 +385,21 @@ const sidebars = {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
           label: "Node.js and Elastic APM",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray",
+          label: "X-Ray",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-adot",
+          label: "X-Ray and AWS Distro for OpenTelemetry",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
+          label: "X-Ray, AWS Distro for OpenTelemetry & Pokeshop API",
         },
         {
           type: "doc",

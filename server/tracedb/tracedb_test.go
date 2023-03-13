@@ -39,6 +39,78 @@ func TestCreateClient(t *testing.T) {
 			expectedType: "*tracedb.tempoTraceDB",
 		},
 		{
+			name: "ElasticSearch",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeElasticAPM,
+				Values: model.DataStoreValues{
+					ElasticApm: &model.ElasticSearchDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.elasticsearchDB",
+		},
+		{
+			name: "OpenSearch",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeOpenSearch,
+				Values: model.DataStoreValues{
+					OpenSearch: &model.ElasticSearchDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.opensearchDB",
+		},
+		{
+			name: "SignalFX",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeSignalFX,
+				Values: model.DataStoreValues{
+					SignalFx: &model.SignalFXDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.signalfxDB",
+		},
+		{
+			name: "AWSXRay",
+			ds: model.DataStore{
+				Type: model.DataStoreTypeAwsXRay,
+				Values: model.DataStoreValues{
+					AwsXRay: &model.AWSXRayDataStoreConfig{},
+				},
+			},
+			expectedType: "*tracedb.awsxrayDB",
+		},
+		{
+			name: "OTLP",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeOTLP,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "NewRelic",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeNewRelic,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "Lightstep",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeLighStep,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "DataDog",
+			ds: model.DataStore{
+				Type:   model.DataStoreTypeDataDog,
+				Values: model.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
 			name:         "EmptyConfig",
 			ds:           model.DataStore{},
 			expectedType: "*tracedb.noopTraceDB",
