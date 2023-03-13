@@ -14,35 +14,35 @@ import (
 	"encoding/json"
 )
 
-// checks if the PollingProfile type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &PollingProfile{}
+// checks if the Demo type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Demo{}
 
-// PollingProfile Represents a polling profile structured into the Resources format.
-type PollingProfile struct {
-	// Represents the type of this resource. It should always be set as 'PollingProfile'.
-	Type *string             `json:"type,omitempty"`
-	Spec *PollingProfileSpec `json:"spec,omitempty"`
+// Demo Represents a demonstration API structured into the Resources format.
+type Demo struct {
+	// Represents the type of this resource. It should always be set as 'Demo'.
+	Type *string   `json:"type,omitempty"`
+	Spec *DemoSpec `json:"spec,omitempty"`
 }
 
-// NewPollingProfile instantiates a new PollingProfile object
+// NewDemo instantiates a new Demo object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPollingProfile() *PollingProfile {
-	this := PollingProfile{}
+func NewDemo() *Demo {
+	this := Demo{}
 	return &this
 }
 
-// NewPollingProfileWithDefaults instantiates a new PollingProfile object
+// NewDemoWithDefaults instantiates a new Demo object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewPollingProfileWithDefaults() *PollingProfile {
-	this := PollingProfile{}
+func NewDemoWithDefaults() *Demo {
+	this := Demo{}
 	return &this
 }
 
 // GetType returns the Type field value if set, zero value otherwise.
-func (o *PollingProfile) GetType() string {
+func (o *Demo) GetType() string {
 	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
@@ -52,7 +52,7 @@ func (o *PollingProfile) GetType() string {
 
 // GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *PollingProfile) GetTypeOk() (*string, bool) {
+func (o *Demo) GetTypeOk() (*string, bool) {
 	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
@@ -60,7 +60,7 @@ func (o *PollingProfile) GetTypeOk() (*string, bool) {
 }
 
 // HasType returns a boolean if a field has been set.
-func (o *PollingProfile) HasType() bool {
+func (o *Demo) HasType() bool {
 	if o != nil && !isNil(o.Type) {
 		return true
 	}
@@ -69,14 +69,14 @@ func (o *PollingProfile) HasType() bool {
 }
 
 // SetType gets a reference to the given string and assigns it to the Type field.
-func (o *PollingProfile) SetType(v string) {
+func (o *Demo) SetType(v string) {
 	o.Type = &v
 }
 
 // GetSpec returns the Spec field value if set, zero value otherwise.
-func (o *PollingProfile) GetSpec() PollingProfileSpec {
+func (o *Demo) GetSpec() DemoSpec {
 	if o == nil || isNil(o.Spec) {
-		var ret PollingProfileSpec
+		var ret DemoSpec
 		return ret
 	}
 	return *o.Spec
@@ -84,7 +84,7 @@ func (o *PollingProfile) GetSpec() PollingProfileSpec {
 
 // GetSpecOk returns a tuple with the Spec field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *PollingProfile) GetSpecOk() (*PollingProfileSpec, bool) {
+func (o *Demo) GetSpecOk() (*DemoSpec, bool) {
 	if o == nil || isNil(o.Spec) {
 		return nil, false
 	}
@@ -92,7 +92,7 @@ func (o *PollingProfile) GetSpecOk() (*PollingProfileSpec, bool) {
 }
 
 // HasSpec returns a boolean if a field has been set.
-func (o *PollingProfile) HasSpec() bool {
+func (o *Demo) HasSpec() bool {
 	if o != nil && !isNil(o.Spec) {
 		return true
 	}
@@ -100,12 +100,12 @@ func (o *PollingProfile) HasSpec() bool {
 	return false
 }
 
-// SetSpec gets a reference to the given PollingProfileSpec and assigns it to the Spec field.
-func (o *PollingProfile) SetSpec(v PollingProfileSpec) {
+// SetSpec gets a reference to the given DemoSpec and assigns it to the Spec field.
+func (o *Demo) SetSpec(v DemoSpec) {
 	o.Spec = &v
 }
 
-func (o PollingProfile) MarshalJSON() ([]byte, error) {
+func (o Demo) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -113,7 +113,7 @@ func (o PollingProfile) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o PollingProfile) ToMap() (map[string]interface{}, error) {
+func (o Demo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Type) {
 		toSerialize["type"] = o.Type
@@ -124,38 +124,38 @@ func (o PollingProfile) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullablePollingProfile struct {
-	value *PollingProfile
+type NullableDemo struct {
+	value *Demo
 	isSet bool
 }
 
-func (v NullablePollingProfile) Get() *PollingProfile {
+func (v NullableDemo) Get() *Demo {
 	return v.value
 }
 
-func (v *NullablePollingProfile) Set(val *PollingProfile) {
+func (v *NullableDemo) Set(val *Demo) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullablePollingProfile) IsSet() bool {
+func (v NullableDemo) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullablePollingProfile) Unset() {
+func (v *NullableDemo) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullablePollingProfile(val *PollingProfile) *NullablePollingProfile {
-	return &NullablePollingProfile{value: val, isSet: true}
+func NewNullableDemo(val *Demo) *NullableDemo {
+	return &NullableDemo{value: val, isSet: true}
 }
 
-func (v NullablePollingProfile) MarshalJSON() ([]byte, error) {
+func (v NullableDemo) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullablePollingProfile) UnmarshalJSON(src []byte) error {
+func (v *NullableDemo) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

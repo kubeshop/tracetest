@@ -46,4 +46,4 @@ Tracetest can be compared with Cypress or Selenium; however Tracetest is fundame
 
 Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a request transaction.
 
-Move on to the [Quick Start](./getting-started/installation.md) to hit the ground running!
+Move on to the [Quick Start](./getting-started/installation) to hit the ground running!
