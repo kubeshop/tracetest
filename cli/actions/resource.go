@@ -24,7 +24,7 @@ type ResourceActions interface {
 	Apply(context.Context, ApplyArgs) error
 	List(context.Context, ListArgs) error
 	Get(context.Context, string) error
-	Export(context.Context, string) error
+	Export(context.Context, string, string) error
 	Delete(context.Context, string) error
 }
 

@@ -77,7 +77,7 @@ func (config configActions) List(ctx context.Context, listArgs ListArgs) error {
 	return ErrNotSupportedResourceAction
 }
 
-func (config configActions) Export(ctx context.Context, ID string) error {
+func (config configActions) Export(ctx context.Context, ID string, filePath string) error {
 	configResponse, err := config.get(ctx)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (config configActions) Export(ctx context.Context, ID string) error {
 		return fmt.Errorf("could not marshal config: %w", err)
 	}
 
-	file, err := file.New(fmt.Sprintf("./%s.yaml", *configResponse.Spec.Name), []byte(yamlData))
+	file, err := file.New(filePath, []byte(yamlData))
 	if err != nil {
 		return fmt.Errorf("could not create file: %w", err)
 	}
@@ -105,22 +105,22 @@ func (config configActions) get(ctx context.Context) (*openapi.ConfigurationReso
 	request := config.client.ResourceApiApi.GetConfiguration(ctx, "current")
 	configResponse, resp, err := config.client.ResourceApiApi.GetConfigurationExecute(request)
 
-	if err != nil && resp == nil {
-		return &openapi.ConfigurationResource{}, fmt.Errorf("could not send request: %w", err)
+	if err != nil {
+		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return &openapi.ConfigurationResource{}, err
+			return nil, err
 		}
 
 		validationError := string(body)
-		return &openapi.ConfigurationResource{}, fmt.Errorf("invalid config: %s", validationError)
+		return nil, fmt.Errorf("invalid config: %s", validationError)
 	}
 
 	if err != nil {
-		return &openapi.ConfigurationResource{}, fmt.Errorf("could not get config: %w", err)
+		return nil, fmt.Errorf("could not get config: %w", err)
 	}
 
 	return configResponse, nil

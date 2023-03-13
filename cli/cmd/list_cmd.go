@@ -59,9 +59,9 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	listCmd.PersistentFlags().Int32VarP(&listTake, "take", "t", 20, "Take number")
-	listCmd.PersistentFlags().Int32VarP(&listSkip, "skip", "", 0, "Skip number")
-	listCmd.PersistentFlags().StringVarP(&listSortBy, "sortBy", "b", "", "Sort by")
-	listCmd.PersistentFlags().StringVarP(&listSortDirection, "sortDirection", "d", "desc", "Sort direction")
+	listCmd.PersistentFlags().Int32Var(&listTake, "take", 20, "Take number")
+	listCmd.PersistentFlags().Int32Var(&listSkip, "skip", 0, "Skip number")
+	listCmd.PersistentFlags().StringVar(&listSortBy, "sortBy", "", "Sort by")
+	listCmd.PersistentFlags().StringVar(&listSortDirection, "sortDirection", "desc", "Sort direction")
 	rootCmd.AddCommand(listCmd)
 }

@@ -12,7 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var exportResourceID string
+var (
+	exportResourceID   string
+	exportResourceFile string
+)
 
 var exportCmd = &cobra.Command{
 	Use:    "export [resource type]",
@@ -35,7 +38,7 @@ var exportCmd = &cobra.Command{
 			return
 		}
 
-		err = resourceActions.Export(ctx, exportResourceID)
+		err = resourceActions.Export(ctx, exportResourceID, exportResourceFile)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to export resource for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
@@ -48,6 +51,7 @@ var exportCmd = &cobra.Command{
 }
 
 func init() {
-	exportCmd.PersistentFlags().StringVarP(&exportResourceID, "identifier", "i", "", "id of the resource to export")
+	exportCmd.PersistentFlags().StringVar(&exportResourceID, "id", "", "id of the resource to export")
+	exportCmd.PersistentFlags().StringVar(&exportResourceFile, "file", "f", "file path with name where to export the resource")
 	rootCmd.AddCommand(exportCmd)
 }

@@ -120,11 +120,7 @@ func (polling pollingActions) update(ctx context.Context, file file.File, pollin
 }
 
 func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error {
-	request := polling.client.ResourceApiApi.ListPollingProfiles(ctx)
-	request = request.Skip(listArgs.Skip)
-	request = request.Take(listArgs.Take)
-	request = request.SortBy(listArgs.SortBy)
-	request = request.SortDirection(listArgs.SortBy)
+	request := polling.client.ResourceApiApi.ListPollingProfiles(ctx).Skip(listArgs.Skip).Take(listArgs.Take).SortBy(listArgs.SortBy).SortDirection(listArgs.SortBy)
 	pollingProfileList, _, err := polling.client.ResourceApiApi.ListPollingProfilesExecute(request)
 
 	if err != nil {
@@ -138,7 +134,7 @@ func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error
 	return nil
 }
 
-func (polling pollingActions) Export(ctx context.Context, ID string) error {
+func (polling pollingActions) Export(ctx context.Context, ID string, filePath string) error {
 	pollingProfileResponse, err := polling.get(ctx, ID)
 	if err != nil {
 		return err
@@ -149,7 +145,7 @@ func (polling pollingActions) Export(ctx context.Context, ID string) error {
 		return fmt.Errorf("could not marshal polling profile: %w", err)
 	}
 
-	file, err := file.New(fmt.Sprintf("./%s.yaml", pollingProfileResponse.Spec.Name), []byte(yamlData))
+	file, err := file.New(filePath, []byte(yamlData))
 	if err != nil {
 		return fmt.Errorf("could not create file: %w", err)
 	}
@@ -185,22 +181,22 @@ func (polling pollingActions) get(ctx context.Context, ID string) (*openapi.Poll
 	request := polling.client.ResourceApiApi.GetPollingProfile(ctx, ID)
 	pollingProfileResponse, resp, err := polling.client.ResourceApiApi.GetPollingProfileExecute(request)
 
-	if err != nil && resp == nil {
-		return &openapi.PollingProfile{}, fmt.Errorf("could not send request: %w", err)
+	if err != nil {
+		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return &openapi.PollingProfile{}, err
+			return nil, err
 		}
 
 		validationError := string(body)
-		return &openapi.PollingProfile{}, fmt.Errorf("invalid polling profile: %s", validationError)
+		return nil, fmt.Errorf("invalid polling profile: %s", validationError)
 	}
 
 	if err != nil {
-		return &openapi.PollingProfile{}, fmt.Errorf("could not get polling profile: %w", err)
+		return nil, fmt.Errorf("could not get polling profile: %w", err)
 	}
 
 	return pollingProfileResponse, nil
