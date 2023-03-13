@@ -47,6 +47,6 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	getCmd.PersistentFlags().StringVar(&resourceID, "id", "", "id of the resource to get")
+	getCmd.Flags().StringVar(&resourceID, "id", "", "id of the resource to get")
 	rootCmd.AddCommand(getCmd)
 }

@@ -50,6 +50,6 @@ var deleteCmd = &cobra.Command{
 }
 
 func init() {
-	deleteCmd.PersistentFlags().StringVar(&deletedResourceID, "id", "", "id of the resource to delete")
+	deleteCmd.Flags().StringVar(&deletedResourceID, "id", "", "id of the resource to delete")
 	rootCmd.AddCommand(deleteCmd)
 }

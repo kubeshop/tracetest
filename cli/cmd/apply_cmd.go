@@ -54,6 +54,6 @@ var applyCmd = &cobra.Command{
 }
 
 func init() {
-	applyCmd.PersistentFlags().StringVar(&definitionFile, "file", "", "path to the definition file")
+	applyCmd.Flags().StringVar(&definitionFile, "file", "", "path to the definition file")
 	rootCmd.AddCommand(applyCmd)
 }
