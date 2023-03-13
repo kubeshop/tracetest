@@ -18,6 +18,16 @@ var (
 	DemoTypeOpentelemetryStore DemoType = "otelstore"
 )
 
+const ResourceName = "Demo"
+
+var Operations = []resourcemanager.Operation{
+	resourcemanager.OperationCreate,
+	resourcemanager.OperationDelete,
+	resourcemanager.OperationGet,
+	resourcemanager.OperationList,
+	resourcemanager.OperationUpdate,
+}
+
 type Demo struct {
 	ID                 id.ID                   `mapstructure:"id"`
 	Name               string                  `mapstructure:"name"`
