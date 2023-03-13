@@ -118,7 +118,11 @@ func (polling pollingActions) update(ctx context.Context, file file.File, pollin
 }
 
 func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error {
-	request := polling.client.ResourceApiApi.ListPollingProfiles(ctx).Skip(listArgs.Skip).Take(listArgs.Take).SortBy(listArgs.SortBy).SortDirection(listArgs.SortBy)
+	request := polling.client.ResourceApiApi.ListPollingProfiles(ctx).
+		Skip(listArgs.Skip).
+		Take(listArgs.Take).
+		SortBy(listArgs.SortBy).
+		SortDirection(listArgs.SortBy)
 	pollingProfileList, _, err := polling.client.ResourceApiApi.ListPollingProfilesExecute(request)
 
 	if err != nil {
