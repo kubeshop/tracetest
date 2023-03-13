@@ -111,15 +111,22 @@ components:
           description: "String defining that this demo is a Pokeshop demo."
           enum:
             - pokeshop
+        name:
+          type: string
+          description: Name of the demo
         enabled:
           type: boolean
           description: "Flag telling if this API is enabled on Tracetest."
-        httpEndpoint:
-          type: string
-          description: "HTTP endpoint for Pokeshop API"
-        grpcEndpoint:
-          type: string
-          description: "gRPC endpoint for Pokeshop API"
+        pokeshop:
+          type: object
+          description: "Represents the configuration for the pokeshop example"
+          properties:
+            httpEndpoint:
+              type: string
+              description: "HTTP endpoint for Pokeshop API"
+            grpcEndpoint:
+              type: string
+              description: "gRPC endpoint for Pokeshop API"
       required:
         - enabled
     DemoOpenTelemetryStore:
@@ -131,21 +138,28 @@ components:
           description: "String defining that this demo is a Open Telemetry Store demo."
           enum:
             - otelstore
+        name:
+          type: string
+          description: Name of the demo
         enabled:
           type: boolean
           description: "Flag telling if this API is enabled on Tracetest."
-        frontendEndpoint:
-          type: string
-          description: "Address of the root URL for the Frontend microservice on Open Telemetry Store."
-        productCatalogEndpoint:
-          type: string
-          description: "Address of the root URL for the Product Catalog microservice on Open Telemetry Store."
-        cartEndpoint:
-          type: string
-          description: "Address of the root URL for the Cart microservice on Open Telemetry Store."
-        checkoutEndpoint:
-          type: string
-          description: "Address of the root URL for the Checkout microservice on Open Telemetry Store."
+        openTelemetryStore:
+          type: object
+          description: "Represents the configuration for the OpenTelemetry store example"
+          properties:
+            frontendEndpoint:
+              type: string
+              description: "Address of the root URL for the Frontend microservice on Open Telemetry Store."
+            productCatalogEndpoint:
+              type: string
+              description: "Address of the root URL for the Product Catalog microservice on Open Telemetry Store."
+            cartEndpoint:
+              type: string
+              description: "Address of the root URL for the Cart microservice on Open Telemetry Store."
+            checkoutEndpoint:
+              type: string
+              description: "Address of the root URL for the Checkout microservice on Open Telemetry Store."
       required:
         - enabled
     Demo:
