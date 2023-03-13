@@ -10,8 +10,6 @@ export default function GtagInstallCliTabs() {
     'installationPlatform': installationPlatform,
     'event': 'installationPlatform',
     });
-
-    console.log(installationPlatform);
   }
   return (
     <Tabs groupId="operating-systems">
