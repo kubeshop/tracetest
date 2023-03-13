@@ -21,6 +21,8 @@ var encoders = []encoder{
 	yamlEncoder,
 }
 
+var defaultEncoder = jsonEncoder
+
 var jsonEncoder = basicEncoder{
 	contentType: "application/json",
 	marshalFn:   json.Marshal,
@@ -63,6 +65,10 @@ func encoderFromRequest(r *http.Request) (encoder, error) {
 		if enc.Accepts(contentType) || enc.Accepts(accept) {
 			return enc, nil
 		}
+	}
+
+	if accept == "" && contentType == "" {
+		return defaultEncoder, nil
 	}
 
 	return nil, fmt.Errorf("cannot handle content-type %s: %w", contentType, errUnacceptableContentType)

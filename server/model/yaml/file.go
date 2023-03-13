@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/config/configresource"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"gopkg.in/yaml.v3"
 )
 
@@ -14,11 +15,12 @@ func (ft FileType) String() string {
 }
 
 const (
-	FileTypeTest        FileType = "Test"
-	FileTypeTransaction FileType = "Transaction"
-	FileTypeEnvironment FileType = "Environment"
-	FileTypeDataStore   FileType = "DataStore"
-	FileTypeConfig      FileType = "Config"
+	FileTypeTest           FileType = "Test"
+	FileTypeTransaction    FileType = "Transaction"
+	FileTypeEnvironment    FileType = "Environment"
+	FileTypeDataStore      FileType = "DataStore"
+	FileTypeConfig         FileType = "Config"
+	FileTypePollingProfile FileType = "PollingProfile"
 )
 
 type File struct {
@@ -72,6 +74,19 @@ func (f File) Config() (configresource.Config, error) {
 	}
 
 	return config, nil
+}
+
+func (f File) PollingProfile() (pollingprofile.PollingProfile, error) {
+	if f.Type != FileTypePollingProfile {
+		return pollingprofile.PollingProfile{}, fmt.Errorf("file is not a test")
+	}
+
+	profile, ok := f.Spec.(pollingprofile.PollingProfile)
+	if !ok {
+		return pollingprofile.PollingProfile{}, fmt.Errorf("file spec cannot be casted to a test")
+	}
+
+	return profile, nil
 }
 
 func (f File) Transaction() (Transaction, error) {
