@@ -52,12 +52,10 @@ func (polling pollingActions) Apply(ctx context.Context, args ApplyArgs) error {
 	deepcopy.DeepCopy(fileContent.Definition().Spec, &pollingProfile.Spec)
 
 	if pollingProfile.Spec.Id == "" {
-		err := polling.create(ctx, fileContent, pollingProfile)
-		return err
-	} else {
-		err := polling.update(ctx, fileContent, pollingProfile)
-		return err
+		return polling.create(ctx, fileContent, pollingProfile)
 	}
+
+	return polling.update(ctx, fileContent, pollingProfile)
 }
 
 func (polling pollingActions) create(ctx context.Context, file file.File, pollingProfile openapi.PollingProfile) error {
