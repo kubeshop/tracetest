@@ -19,10 +19,6 @@ var _ MappedNullable = &DemoOpenTelemetryStore{}
 
 // DemoOpenTelemetryStore Represents the settings of the Open Telemetry Store demonstration.
 type DemoOpenTelemetryStore struct {
-	// String defining that this demo is a Open Telemetry Store demo.
-	Type *string `json:"type,omitempty"`
-	// Flag telling if this API is enabled on Tracetest.
-	Enabled bool `json:"enabled"`
 	// Address of the root URL for the Frontend microservice on Open Telemetry Store.
 	FrontendEndpoint *string `json:"frontendEndpoint,omitempty"`
 	// Address of the root URL for the Product Catalog microservice on Open Telemetry Store.
@@ -37,9 +33,8 @@ type DemoOpenTelemetryStore struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDemoOpenTelemetryStore(enabled bool) *DemoOpenTelemetryStore {
+func NewDemoOpenTelemetryStore() *DemoOpenTelemetryStore {
 	this := DemoOpenTelemetryStore{}
-	this.Enabled = enabled
 	return &this
 }
 
@@ -49,62 +44,6 @@ func NewDemoOpenTelemetryStore(enabled bool) *DemoOpenTelemetryStore {
 func NewDemoOpenTelemetryStoreWithDefaults() *DemoOpenTelemetryStore {
 	this := DemoOpenTelemetryStore{}
 	return &this
-}
-
-// GetType returns the Type field value if set, zero value otherwise.
-func (o *DemoOpenTelemetryStore) GetType() string {
-	if o == nil || isNil(o.Type) {
-		var ret string
-		return ret
-	}
-	return *o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DemoOpenTelemetryStore) GetTypeOk() (*string, bool) {
-	if o == nil || isNil(o.Type) {
-		return nil, false
-	}
-	return o.Type, true
-}
-
-// HasType returns a boolean if a field has been set.
-func (o *DemoOpenTelemetryStore) HasType() bool {
-	if o != nil && !isNil(o.Type) {
-		return true
-	}
-
-	return false
-}
-
-// SetType gets a reference to the given string and assigns it to the Type field.
-func (o *DemoOpenTelemetryStore) SetType(v string) {
-	o.Type = &v
-}
-
-// GetEnabled returns the Enabled field value
-func (o *DemoOpenTelemetryStore) GetEnabled() bool {
-	if o == nil {
-		var ret bool
-		return ret
-	}
-
-	return o.Enabled
-}
-
-// GetEnabledOk returns a tuple with the Enabled field value
-// and a boolean to check if the value has been set.
-func (o *DemoOpenTelemetryStore) GetEnabledOk() (*bool, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Enabled, true
-}
-
-// SetEnabled sets field value
-func (o *DemoOpenTelemetryStore) SetEnabled(v bool) {
-	o.Enabled = v
 }
 
 // GetFrontendEndpoint returns the FrontendEndpoint field value if set, zero value otherwise.
@@ -245,10 +184,6 @@ func (o DemoOpenTelemetryStore) MarshalJSON() ([]byte, error) {
 
 func (o DemoOpenTelemetryStore) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.Type) {
-		toSerialize["type"] = o.Type
-	}
-	toSerialize["enabled"] = o.Enabled
 	if !isNil(o.FrontendEndpoint) {
 		toSerialize["frontendEndpoint"] = o.FrontendEndpoint
 	}

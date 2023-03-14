@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/kubeshop/tracetest/server/config/configresource"
-	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
@@ -52,20 +50,6 @@ func Decode(contents []byte) (File, error) {
 			return File{}, fmt.Errorf("cannot decode datastore: %w", err)
 		}
 		f.Spec = dataStore
-	case FileTypeConfig:
-		var config configresource.Config
-		err := mapstructure.Decode(f.Spec, &config)
-		if err != nil {
-			return File{}, fmt.Errorf("cannot decode config: %w", err)
-		}
-		f.Spec = config
-	case FileTypePollingProfile:
-		var pollingprofile pollingprofile.PollingProfile
-		err := mapstructure.Decode(f.Spec, &pollingprofile)
-		if err != nil {
-			return File{}, fmt.Errorf("cannot decode polling profile: %w", err)
-		}
-		f.Spec = pollingprofile
 	default:
 		return File{}, fmt.Errorf("invalid file type %s", f.Type)
 	}

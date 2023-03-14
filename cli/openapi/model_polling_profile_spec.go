@@ -23,6 +23,8 @@ type PollingProfileSpec struct {
 	Id string `json:"id"`
 	// Name given for this profile.
 	Name string `json:"name"`
+	// Is default polling profile
+	Default *bool `json:"default,omitempty"`
 	// Name of the strategy that will be used on this profile.
 	Strategy string                      `json:"strategy"`
 	Periodic *PollingProfileSpecPeriodic `json:"periodic,omitempty"`
@@ -96,6 +98,38 @@ func (o *PollingProfileSpec) SetName(v string) {
 	o.Name = v
 }
 
+// GetDefault returns the Default field value if set, zero value otherwise.
+func (o *PollingProfileSpec) GetDefault() bool {
+	if o == nil || isNil(o.Default) {
+		var ret bool
+		return ret
+	}
+	return *o.Default
+}
+
+// GetDefaultOk returns a tuple with the Default field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PollingProfileSpec) GetDefaultOk() (*bool, bool) {
+	if o == nil || isNil(o.Default) {
+		return nil, false
+	}
+	return o.Default, true
+}
+
+// HasDefault returns a boolean if a field has been set.
+func (o *PollingProfileSpec) HasDefault() bool {
+	if o != nil && !isNil(o.Default) {
+		return true
+	}
+
+	return false
+}
+
+// SetDefault gets a reference to the given bool and assigns it to the Default field.
+func (o *PollingProfileSpec) SetDefault(v bool) {
+	o.Default = &v
+}
+
 // GetStrategy returns the Strategy field value
 func (o *PollingProfileSpec) GetStrategy() string {
 	if o == nil {
@@ -164,6 +198,9 @@ func (o PollingProfileSpec) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["name"] = o.Name
+	if !isNil(o.Default) {
+		toSerialize["default"] = o.Default
+	}
 	toSerialize["strategy"] = o.Strategy
 	if !isNil(o.Periodic) {
 		toSerialize["periodic"] = o.Periodic
