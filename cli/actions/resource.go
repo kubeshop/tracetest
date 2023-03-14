@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"go.uber.org/zap"
 )
 
@@ -29,9 +29,9 @@ type ResourceActions interface {
 }
 
 type resourceArgs struct {
-	logger *zap.Logger
-	client *openapi.APIClient
-	config config.Config
+	logger         *zap.Logger
+	resourceClient utils.ResourceClient
+	config         config.Config
 }
 
 type ResourceArgsOption = func(args *resourceArgs)
@@ -41,6 +41,7 @@ type SupportedResources string
 var (
 	SupportedResourceConfig         SupportedResources = "config"
 	SupportedResourcePollingProfile SupportedResources = "pollingprofile"
+	SupportedResourceDemo           SupportedResources = "demo"
 
 	ErrResourceNotRegistered      = errors.New("resource not registered")
 	ErrNotSupportedResourceAction = errors.New("the specified resource type doesn't support the action")
@@ -64,9 +65,9 @@ func (r ResourceRegistry) Get(resource SupportedResources) (ResourceActions, err
 	return resourceActions, nil
 }
 
-func WithClient(client *openapi.APIClient) ResourceArgsOption {
+func WithClient(client utils.ResourceClient) ResourceArgsOption {
 	return func(args *resourceArgs) {
-		args.client = client
+		args.resourceClient = client
 	}
 }
 

@@ -9,13 +9,14 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/variable"
-	"github.com/kubeshop/tracetest/server/model/yaml"
+	tracetestYaml "github.com/kubeshop/tracetest/server/model/yaml"
+	"gopkg.in/yaml.v3"
 )
 
 type File struct {
 	path     string
 	contents []byte
-	file     yaml.File
+	file     tracetestYaml.File
 }
 
 func Read(path string) (File, error) {
@@ -27,8 +28,17 @@ func Read(path string) (File, error) {
 	return New(path, b)
 }
 
+func ReadRaw(path string) (File, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return File{}, fmt.Errorf("could not read definition file %s: %w", path, err)
+	}
+
+	return NewFromRaw(path, b)
+}
+
 func New(path string, b []byte) (File, error) {
-	yf, err := yaml.Decode(b)
+	yf, err := tracetestYaml.Decode(b)
 	if err != nil {
 		return File{}, fmt.Errorf("could not parse definition file: %w", err)
 	}
@@ -37,6 +47,22 @@ func New(path string, b []byte) (File, error) {
 		contents: b,
 		file:     yf,
 		path:     path,
+	}
+
+	return file, nil
+}
+
+func NewFromRaw(path string, b []byte) (File, error) {
+	var f tracetestYaml.File
+	err := yaml.Unmarshal(b, &f)
+	if err != nil {
+		return File{}, fmt.Errorf("could not parse definition file: %w", err)
+	}
+
+	file := File{
+		contents: b,
+		path:     path,
+		file:     f,
 	}
 
 	return file, nil
@@ -65,7 +91,7 @@ func (f File) ResolveVariables() (File, error) {
 		return File{}, err
 	}
 
-	bytes, err := yaml.Encode(f.file)
+	bytes, err := tracetestYaml.Encode(f.file)
 	if err != nil {
 		return File{}, err
 	}
@@ -75,7 +101,7 @@ func (f File) ResolveVariables() (File, error) {
 	return f, nil
 }
 
-func (f File) Definition() yaml.File {
+func (f File) Definition() tracetestYaml.File {
 	return f.file
 }
 
@@ -128,4 +154,19 @@ func (f File) Write() (File, error) {
 	}
 
 	return Read(f.path)
+}
+
+func (f File) WriteRaw() (File, error) {
+	err := os.WriteFile(f.path, f.contents, 0644)
+	if err != nil {
+		return f, fmt.Errorf("could not write file: %w", err)
+	}
+
+	return ReadRaw(f.path)
+}
+
+func (f File) SaveChanges(changes string) (File, error) {
+	f.contents = []byte(changes)
+
+	return f.WriteRaw()
 }

@@ -19,10 +19,6 @@ var _ MappedNullable = &DemoPokeshop{}
 
 // DemoPokeshop Represents the settings of the Pokeshop API demonstration.
 type DemoPokeshop struct {
-	// String defining that this demo is a Pokeshop demo.
-	Type *string `json:"type,omitempty"`
-	// Flag telling if this API is enabled on Tracetest.
-	Enabled bool `json:"enabled"`
 	// HTTP endpoint for Pokeshop API
 	HttpEndpoint *string `json:"httpEndpoint,omitempty"`
 	// gRPC endpoint for Pokeshop API
@@ -33,9 +29,8 @@ type DemoPokeshop struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDemoPokeshop(enabled bool) *DemoPokeshop {
+func NewDemoPokeshop() *DemoPokeshop {
 	this := DemoPokeshop{}
-	this.Enabled = enabled
 	return &this
 }
 
@@ -45,62 +40,6 @@ func NewDemoPokeshop(enabled bool) *DemoPokeshop {
 func NewDemoPokeshopWithDefaults() *DemoPokeshop {
 	this := DemoPokeshop{}
 	return &this
-}
-
-// GetType returns the Type field value if set, zero value otherwise.
-func (o *DemoPokeshop) GetType() string {
-	if o == nil || isNil(o.Type) {
-		var ret string
-		return ret
-	}
-	return *o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DemoPokeshop) GetTypeOk() (*string, bool) {
-	if o == nil || isNil(o.Type) {
-		return nil, false
-	}
-	return o.Type, true
-}
-
-// HasType returns a boolean if a field has been set.
-func (o *DemoPokeshop) HasType() bool {
-	if o != nil && !isNil(o.Type) {
-		return true
-	}
-
-	return false
-}
-
-// SetType gets a reference to the given string and assigns it to the Type field.
-func (o *DemoPokeshop) SetType(v string) {
-	o.Type = &v
-}
-
-// GetEnabled returns the Enabled field value
-func (o *DemoPokeshop) GetEnabled() bool {
-	if o == nil {
-		var ret bool
-		return ret
-	}
-
-	return o.Enabled
-}
-
-// GetEnabledOk returns a tuple with the Enabled field value
-// and a boolean to check if the value has been set.
-func (o *DemoPokeshop) GetEnabledOk() (*bool, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Enabled, true
-}
-
-// SetEnabled sets field value
-func (o *DemoPokeshop) SetEnabled(v bool) {
-	o.Enabled = v
 }
 
 // GetHttpEndpoint returns the HttpEndpoint field value if set, zero value otherwise.
@@ -177,10 +116,6 @@ func (o DemoPokeshop) MarshalJSON() ([]byte, error) {
 
 func (o DemoPokeshop) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.Type) {
-		toSerialize["type"] = o.Type
-	}
-	toSerialize["enabled"] = o.Enabled
 	if !isNil(o.HttpEndpoint) {
 		toSerialize["httpEndpoint"] = o.HttpEndpoint
 	}

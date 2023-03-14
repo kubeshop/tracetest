@@ -52,6 +52,6 @@ var exportCmd = &cobra.Command{
 
 func init() {
 	exportCmd.Flags().StringVar(&exportResourceID, "id", "", "id of the resource to export")
-	exportCmd.Flags().StringVar(&exportResourceFile, "file", "f", "file path with name where to export the resource")
+	exportCmd.Flags().StringVar(&exportResourceFile, "file", "resource.yaml", "file path with name where to export the resource")
 	rootCmd.AddCommand(exportCmd)
 }

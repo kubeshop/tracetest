@@ -6,11 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/cli/file"
-	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/openapi"
-	"gopkg.in/yaml.v3"
+	"github.com/kubeshop/tracetest/cli/utils"
 )
 
 type configActions struct {
@@ -32,7 +29,7 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf("you must specify a file to be applied")
 	}
 
-	fileContent, err := file.Read(args.File)
+	fileContent, err := file.ReadRaw(args.File)
 	if err != nil {
 		return fmt.Errorf("could not read file: %w", err)
 	}
@@ -41,15 +38,13 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf(`file must be of type "Config"`)
 	}
 
-	var configurationResource openapi.ConfigurationResource
-	deepcopy.DeepCopy(fileContent.Definition(), &configurationResource)
-	deepcopy.DeepCopy(fileContent.Definition().Spec, &configurationResource.Spec)
+	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, "current")
+	request, err := config.resourceClient.GetRequest(url, http.MethodPut, fileContent.Contents())
+	if err != nil {
+		return fmt.Errorf("could not create request: %w", err)
+	}
 
-	request := config.client.ResourceApiApi.UpdateConfiguration(ctx, "current")
-	request = request.ConfigurationResource(configurationResource)
-
-	_, res, err := config.client.ResourceApiApi.UpdateConfigurationExecute(request)
-
+	res, err := config.resourceClient.Client.Do(request)
 	if err != nil {
 		return fmt.Errorf("could not send request: %w", err)
 	}
@@ -58,6 +53,7 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf("could not create config: %s", res.Status)
 	}
 
+	_, err = fileContent.SaveChanges(utils.IOReadCloserToString(res.Body))
 	return err
 }
 
@@ -67,9 +63,7 @@ func (config configActions) Get(ctx context.Context, ID string) error {
 		return err
 	}
 
-	formatter := formatters.ConfigFormatter(config.config)
-	fmt.Println(formatter.Format(*configResponse))
-
+	fmt.Println(configResponse)
 	return err
 }
 
@@ -83,17 +77,12 @@ func (config configActions) Export(ctx context.Context, ID string, filePath stri
 		return err
 	}
 
-	yamlData, err := yaml.Marshal(&configResponse)
-	if err != nil {
-		return fmt.Errorf("could not marshal config: %w", err)
-	}
-
-	file, err := file.New(filePath, []byte(yamlData))
+	file, err := file.NewFromRaw(filePath, []byte(configResponse))
 	if err != nil {
 		return fmt.Errorf("could not create file: %w", err)
 	}
 
-	_, err = file.Write()
+	_, err = file.WriteRaw()
 	return err
 }
 
@@ -101,27 +90,31 @@ func (config configActions) Delete(ctx context.Context, ID string) error {
 	return ErrNotSupportedResourceAction
 }
 
-func (config configActions) get(ctx context.Context) (*openapi.ConfigurationResource, error) {
-	request := config.client.ResourceApiApi.GetConfiguration(ctx, "current")
-	configResponse, resp, err := config.client.ResourceApiApi.GetConfigurationExecute(request)
-
+func (config configActions) get(ctx context.Context) (string, error) {
+	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, "current")
+	request, err := config.resourceClient.GetRequest(url, http.MethodGet, "")
 	if err != nil {
-		return nil, fmt.Errorf("could not send request: %w", err)
+		return "", fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := config.resourceClient.Client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("could not send request: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		validationError := string(body)
-		return nil, fmt.Errorf("invalid config: %s", validationError)
+		return "", fmt.Errorf("invalid config: %s", validationError)
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("could not get config: %w", err)
+		return "", fmt.Errorf("could not get config: %w", err)
 	}
 
-	return configResponse, nil
+	return utils.IOReadCloserToString(resp.Body), nil
 }
