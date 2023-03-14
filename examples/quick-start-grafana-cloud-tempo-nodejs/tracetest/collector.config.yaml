@@ -1,0 +1,33 @@
+extensions:
+  basicauth/otlp:
+    client_auth:
+      username: <userid>
+      password: <apitoken>
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  logging:
+    loglevel: debug
+  otlp:
+    endpoint: tempo-us-central1.grafana.net:443
+    tls:
+      insecure: false
+    auth:
+      authenticator: basicauth/otlp
+
+service:
+  extensions: [ basicauth/otlp ]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]

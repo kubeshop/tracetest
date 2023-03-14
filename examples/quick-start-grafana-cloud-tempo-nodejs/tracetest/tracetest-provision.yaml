@@ -1,0 +1,8 @@
+dataStore:
+  type: tempo
+  tempo:
+    type: http
+    http:
+      endpoint: https://<yourinstance>.grafana.net
+      headers:
+        Authorization: Bearer <apitoken>
