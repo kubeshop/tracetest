@@ -22,39 +22,39 @@ The steps that we should follow are:
 
 This is the entire checklist on what we should do to assert that Tracetest is working fine on each version release. On each version release, we can copy the contents of this checklist and open a Github Discussion to start each test.
 
-- [] Check if our release pipeline on [Release Tracetest](https://github.com/kubeshop/tracetest/actions/workflows/release-version.yml) workflow on Github Actions worked correctly.
-- [] Test CLI update on MacOS via homebrew
-- [] Test CLI update on MacOS via curl script
-- [] Test CLI update on Linux via APT
-- [] Test CLI update on Linux via YUM
-- [] Test CLI update on Linux via curl script
-- [] Test CLI update on Windows via chocolatey
-- [] Test CLI update on Windows via manual download
-- [] Test server installation via CLI with Docker Compose and no demo API
-- [] Test server installation via CLI with Docker Compose and demo API
-- [] Test server installation via CLI with Kubernetes and no demo API
-- [] Test server installation via CLI with Kubernetes and demo API
-- [] Double check [Detailed installation](https://docs.tracetest.io/getting-started/detailed-installation) doc and see if everything is documented correctly
+- [ ] Check if our release pipeline on [Release Tracetest](https://github.com/kubeshop/tracetest/actions/workflows/release-version.yml) workflow on Github Actions worked correctly.
+- [ ] Test CLI update on MacOS via homebrew
+- [ ] Test CLI update on MacOS via curl script
+- [ ] Test CLI update on Linux via APT
+- [ ] Test CLI update on Linux via YUM
+- [ ] Test CLI update on Linux via curl script
+- [ ] Test CLI update on Windows via chocolatey
+- [ ] Test CLI update on Windows via manual download
+- [ ] Test server installation via CLI with Docker Compose and no demo API
+- [ ] Test server installation via CLI with Docker Compose and demo API
+- [ ] Test server installation via CLI with Kubernetes and no demo API
+- [ ] Test server installation via CLI with Kubernetes and demo API
+- [ ] Double check [Detailed installation](https://docs.tracetest.io/getting-started/detailed-installation) doc and see if everything is documented correctly
 
-- [] Test Tracetest setup with [No tracing example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-no-tracing) by checking the last run for our CI on **Test examples** step
-- [] Test Tracetest setup with [Jaeger example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-jaeger) by checking the last run for our CI on **Test examples** step
-- [] Test Tracetest setup with [OpenSearch example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-opensearch) by checking the last run for our CI on **Test examples** step
-- [] Test Tracetest setup with [Tempo example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-tempo) by checking the last run for our CI on **Test examples** step
+- [ ] Test Tracetest setup with [No tracing example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-no-tracing) by checking the last run for our CI on **Test examples** step
+- [ ] Test Tracetest setup with [Jaeger example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-jaeger) by checking the last run for our CI on **Test examples** step
+- [ ] Test Tracetest setup with [OpenSearch example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-opensearch) by checking the last run for our CI on **Test examples** step
+- [ ] Test Tracetest setup with [Tempo example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-tempo) by checking the last run for our CI on **Test examples** step
 
-- [] Test Tracetest setup with [Amazon X-Ray example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray)
-- [] Test Tracetest setup with [Datadog example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-datadog)
-- [] Test Tracetest setup with [Elastic APM example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm)
-- [] Test Tracetest setup with [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
-- [] Test Tracetest setup with [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
-- [] Test Tracetest setup with [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
+- [ ] Test Tracetest setup with [Amazon X-Ray example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray)
+- [ ] Test Tracetest setup with [Datadog example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-datadog)
+- [ ] Test Tracetest setup with [Elastic APM example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm)
+- [ ] Test Tracetest setup with [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
+- [ ] Test Tracetest setup with [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
+- [ ] Test Tracetest setup with [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
 
-- [] Check if our End-to-end pipelines tested correctly our main features:
-  - [] The `WebUI End-to-end tests` Github action should run without errors
-  - [] The `Tracetesting API Server` Github action should run without errors
+- [ ] Check if our End-to-end pipelines tested correctly our main features:
+  - [ ] The `WebUI End-to-end tests` Github action should run without errors
+  - [ ] The `Tracetesting API Server` Github action should run without errors
 
-- [] Test specific features added/changed on this release on a local installation or in a Kubernetes installation:
-  - [] Feature 1
-  - [] Feature 2
+- [ ] Test specific features added/changed on this release on a local installation or in a Kubernetes installation:
+  - [ ] Feature 1
+  - [ ] Feature 2
 
 ## Automatic Tests
 
