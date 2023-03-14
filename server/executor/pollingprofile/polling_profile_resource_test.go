@@ -98,8 +98,10 @@ func TestPollingProfileResource(t *testing.T) {
 				}
 			}
 		}`,
-	}, rmtests.ExcludeOperations(
-		rmtests.OperationGetNotFound,
-		rmtests.OperationUpdateNotFound,
-	))
+	},
+		// TODO: remove this when we support multiple profiles
+		rmtests.ExcludeOperations(
+			rmtests.OperationGetNotFound,
+			rmtests.OperationUpdateNotFound,
+		))
 }
