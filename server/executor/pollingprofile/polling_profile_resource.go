@@ -172,9 +172,6 @@ func (r *Repository) clearDefaultFlag(ctx context.Context) error {
 }
 
 func (r *Repository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
-	// TODO: remove this id override when we support multiple profiles
-	profile.ID = id.ID("current")
-
 	err := r.Delete(ctx, profile.ID)
 	if err != nil && errors.Unwrap(err) != sql.ErrNoRows {
 		return PollingProfile{}, fmt.Errorf("could not delete old profile when updating it: %w", err)
