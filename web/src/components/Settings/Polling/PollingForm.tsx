@@ -26,7 +26,7 @@ const PollingForm = () => {
     <Form<TDraftPollingProfiles>
       autoComplete="off"
       form={form}
-      initialValues={SettingService.getDefaultPollingProfile(pollingProfiles)}
+      initialValues={SettingService.getPollingProfileInitialValues(pollingProfiles)}
       layout="vertical"
       name={FORM_ID}
       onFinish={handleOnSubmit}

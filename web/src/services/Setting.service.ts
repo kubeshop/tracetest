@@ -1,13 +1,37 @@
 import Demo from 'models/Demo.model';
 import Polling from 'models/Polling.model';
-import {ResourceType, SupportedDemosFormField, TDraftDemo, TDraftResource, TDraftSpec} from 'types/Settings.types';
+import Config from 'models/Config.model';
+import {
+  ResourceType,
+  SupportedDemosFormField,
+  TDraftConfig,
+  TDraftDemo,
+  TDraftPollingProfiles,
+  TDraftResource,
+  TDraftSpec,
+} from 'types/Settings.types';
 
 const SettingService = () => ({
   getEnabledDemos(demos: Demo[]): Demo[] {
     return demos.filter(demo => demo.enabled);
   },
-  getDefaultPollingProfile(pollingProfiles: Polling[]): Polling | undefined {
-    return pollingProfiles.find(pollingProfile => pollingProfile.default);
+  getConfigInitialValues(config: Config): TDraftConfig {
+    return (
+      config || {
+        name: 'current',
+        analyticsEnabled: false,
+      }
+    );
+  },
+
+  getPollingProfileInitialValues(pollingProfiles: Polling[]): TDraftPollingProfiles {
+    return (
+      pollingProfiles.find(pollingProfile => pollingProfile.default) || {
+        name: 'default',
+        default: true,
+        strategy: 'periodic',
+      }
+    );
   },
 
   // forms
