@@ -1,23 +1,27 @@
 import {Button, Form, Switch} from 'antd';
-
-import {rawToResource, TRawConfig} from 'models/Config.model';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
+import {useCallback} from 'react';
+import {ResourceType, TDraftConfig} from 'types/Settings.types';
+import SettingService from 'services/Setting.service';
 import * as S from '../common/Settings.styled';
 
 const FORM_ID = 'analytics';
 
 const AnalyticsForm = () => {
-  const [form] = Form.useForm<TRawConfig>();
+  const [form] = Form.useForm<TDraftConfig>();
   const {isLoading, onSubmit} = useSettings();
   const {config} = useSettingsValues();
 
-  const handleOnSubmit = (values: TRawConfig) => {
-    onSubmit(rawToResource(values));
-  };
+  const handleOnSubmit = useCallback(
+    (values: TDraftConfig) => {
+      onSubmit([SettingService.getDraftResource(ResourceType.ConfigType, values)]);
+    },
+    [onSubmit]
+  );
 
   return (
-    <Form<TRawConfig>
+    <Form<TDraftConfig>
       autoComplete="off"
       form={form}
       initialValues={config}
@@ -26,6 +30,7 @@ const AnalyticsForm = () => {
       onFinish={handleOnSubmit}
     >
       <Form.Item hidden name="id" />
+      <Form.Item hidden name="name" />
 
       <S.SwitchContainer>
         <label htmlFor={`${FORM_ID}_analyticsEnabled`}>Enable analytics</label>

@@ -5,6 +5,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
+import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
 <!-- Docusaurus imports end -->
 
@@ -16,32 +17,7 @@ You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/in
 
 ## Install the Tracetest CLI
 
-<Tabs groupId="operating-systems">
-  <TabItem value="mac" label="MAC" default>
-    <CodeBlock
-        language="bash"
-        title="Terminal"
-    >
-    {`brew install kubeshop/tracetest/tracetest`}
-    </CodeBlock>
-  </TabItem>
-  <TabItem value="linux" label="LINUX">
-    <CodeBlock
-        language="bash"
-        title="Terminal"
-    >
-    {`curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash`}
-    </CodeBlock>
-  </TabItem>
-  <TabItem value="win" label="WINDOWS">  
-    <CodeBlock
-        language="bash"
-        title="Terminal"
-    >
-    {`choco source add --name=kubeshop_repo --source=https://chocolatey.kubeshop.io/chocolatey & choco install tracetest`}
-    </CodeBlock>
-  </TabItem>
-</Tabs>
+<GtagInstallCliTabs></GtagInstallCliTabs>
 
 ## Install the Tracetest server
 

@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
+	"github.com/kubeshop/tracetest/server/config/demoresource"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -245,6 +246,9 @@ func (app *App) Start(opts ...appOption) error {
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db)
 
+	demoRepo := demoresource.NewRepository(db)
+	registerDemosResource(demoRepo, apiRouter, db)
+
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
 
 	httpServer := &http.Server{
@@ -292,6 +296,15 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 		pollingprofile.ResourceName,
 		repository,
 		resourcemanager.WithOperations(pollingprofile.Operations...),
+	)
+	manager.RegisterRoutes(router)
+}
+
+func registerDemosResource(repository *demoresource.Repository, router *mux.Router, db *sql.DB) {
+	manager := resourcemanager.New[demoresource.Demo](
+		demoresource.ResourceName,
+		repository,
+		resourcemanager.WithOperations(demoresource.Operations...),
 	)
 	manager.RegisterRoutes(router)
 }

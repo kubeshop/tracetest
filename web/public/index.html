@@ -66,8 +66,6 @@
           serverID: getTemplateValue('{{ .ServerID }}', '', parser.toString),
           appVersion: getTemplateValue('{{ .AppVersion }}', '', parser.toString),
           env: getTemplateValue('{{ .Env }}', '', parser.toString),
-          demoEnabled: getTemplateValue('{{ .DemoEnabled }}', '["pokeshop", "otel"]', parser.toArray),
-          demoEndpoints: getTemplateValue('{{ .DemoEndpoints }}', '{"PokeshopHttp": "http://demo-pokemon-api.demo.svc.cluster.local", "PokeshopGrpc": "demo-pokemon-api.demo.svc.cluster.local:8082", "OtelFrontend": "http://otel-frontend:8084" }', parser.toObject),
           experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '[]', parser.toArray),
         };
 
@@ -76,7 +74,7 @@
         document.getElementsByTagName('head')[0].appendChild(base);
       }
 
-      injectVariables();      
+      injectVariables();
     </script>
   </head>
   <body>

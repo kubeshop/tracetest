@@ -22,6 +22,114 @@ import (
 // ResourceApiApiService ResourceApiApi service
 type ResourceApiApiService service
 
+type ApiCreateDemoRequest struct {
+	ctx        context.Context
+	ApiService *ResourceApiApiService
+	demo       *Demo
+}
+
+func (r ApiCreateDemoRequest) Demo(demo Demo) ApiCreateDemoRequest {
+	r.demo = &demo
+	return r
+}
+
+func (r ApiCreateDemoRequest) Execute() (*Demo, *http.Response, error) {
+	return r.ApiService.CreateDemoExecute(r)
+}
+
+/*
+CreateDemo Create a Demonstration setting
+
+Create a demonstration used on Tracetest as quick start examples.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateDemoRequest
+*/
+func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoRequest {
+	return ApiCreateDemoRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return Demo
+func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Demo
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.CreateDemo")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/demo"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "text/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.demo
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiCreatePollingProfileRequest struct {
 	ctx            context.Context
 	ApiService     *ResourceApiApiService
@@ -128,6 +236,98 @@ func (a *ResourceApiApiService) CreatePollingProfileExecute(r ApiCreatePollingPr
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiDeleteDemoRequest struct {
+	ctx        context.Context
+	ApiService *ResourceApiApiService
+	demoId     string
+}
+
+func (r ApiDeleteDemoRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteDemoExecute(r)
+}
+
+/*
+DeleteDemo Delete a Demonstration setting
+
+Delete a demonstration used on Tracetest as quick start examples.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples.
+	@return ApiDeleteDemoRequest
+*/
+func (a *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) ApiDeleteDemoRequest {
+	return ApiDeleteDemoRequest{
+		ApiService: a,
+		ctx:        ctx,
+		demoId:     demoId,
+	}
+}
+
+// Execute executes the request
+func (a *ResourceApiApiService) DeleteDemoExecute(r ApiDeleteDemoRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.DeleteDemo")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/demo/{demoId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
 }
 
 type ApiDeletePollingProfileRequest struct {
@@ -326,6 +526,110 @@ func (a *ResourceApiApiService) GetConfigurationExecute(r ApiGetConfigurationReq
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetDemoRequest struct {
+	ctx        context.Context
+	ApiService *ResourceApiApiService
+	demoId     string
+}
+
+func (r ApiGetDemoRequest) Execute() (*Demo, *http.Response, error) {
+	return r.ApiService.GetDemoExecute(r)
+}
+
+/*
+GetDemo Get Demonstration setting
+
+Get a demonstration used on Tracetest as quick start examples.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples.
+	@return ApiGetDemoRequest
+*/
+func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiGetDemoRequest {
+	return ApiGetDemoRequest{
+		ApiService: a,
+		ctx:        ctx,
+		demoId:     demoId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return Demo
+func (a *ResourceApiApiService) GetDemoExecute(r ApiGetDemoRequest) (*Demo, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Demo
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.GetDemo")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/demo/{demoId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetPollingProfileRequest struct {
 	ctx              context.Context
 	ApiService       *ResourceApiApiService
@@ -430,6 +734,146 @@ func (a *ResourceApiApiService) GetPollingProfileExecute(r ApiGetPollingProfileR
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiListDemosRequest struct {
+	ctx           context.Context
+	ApiService    *ResourceApiApiService
+	take          *int32
+	skip          *int32
+	sortBy        *string
+	sortDirection *string
+}
+
+// Indicates the maximum number of demos that can be returned on this call.
+func (r ApiListDemosRequest) Take(take int32) ApiListDemosRequest {
+	r.take = &take
+	return r
+}
+
+// Indicates how many demos will be skipped when paginating.
+func (r ApiListDemosRequest) Skip(skip int32) ApiListDemosRequest {
+	r.skip = &skip
+	return r
+}
+
+// Indicates the sort field for on which all demos will be sorted.
+func (r ApiListDemosRequest) SortBy(sortBy string) ApiListDemosRequest {
+	r.sortBy = &sortBy
+	return r
+}
+
+// Indicates the sort direction for the demos (ascending or descending).
+func (r ApiListDemosRequest) SortDirection(sortDirection string) ApiListDemosRequest {
+	r.sortDirection = &sortDirection
+	return r
+}
+
+func (r ApiListDemosRequest) Execute() ([]Demo, *http.Response, error) {
+	return r.ApiService.ListDemosExecute(r)
+}
+
+/*
+ListDemos List Demonstrations
+
+List demonstrations used on Tracetest as quick start examples.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListDemosRequest
+*/
+func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosRequest {
+	return ApiListDemosRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return []Demo
+func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) ([]Demo, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue []Demo
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListDemos")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/demo"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.take != nil {
+		parameterAddToQuery(localVarQueryParams, "take", r.take, "")
+	}
+	if r.skip != nil {
+		parameterAddToQuery(localVarQueryParams, "skip", r.skip, "")
+	}
+	if r.sortBy != nil {
+		parameterAddToQuery(localVarQueryParams, "sortBy", r.sortBy, "")
+	}
+	if r.sortDirection != nil {
+		parameterAddToQuery(localVarQueryParams, "sortDirection", r.sortDirection, "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiListPollingProfilesRequest struct {
 	ctx           context.Context
 	ApiService    *ResourceApiApiService
@@ -463,7 +907,7 @@ func (r ApiListPollingProfilesRequest) SortDirection(sortDirection string) ApiLi
 	return r
 }
 
-func (r ApiListPollingProfilesRequest) Execute() ([]PollingProfile, *http.Response, error) {
+func (r ApiListPollingProfilesRequest) Execute() (*ListPollingProfiles200Response, *http.Response, error) {
 	return r.ApiService.ListPollingProfilesExecute(r)
 }
 
@@ -484,13 +928,13 @@ func (a *ResourceApiApiService) ListPollingProfiles(ctx context.Context) ApiList
 
 // Execute executes the request
 //
-//	@return []PollingProfile
-func (a *ResourceApiApiService) ListPollingProfilesExecute(r ApiListPollingProfilesRequest) ([]PollingProfile, *http.Response, error) {
+//	@return ListPollingProfiles200Response
+func (a *ResourceApiApiService) ListPollingProfilesExecute(r ApiListPollingProfilesRequest) (*ListPollingProfiles200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue []PollingProfile
+		localVarReturnValue *ListPollingProfiles200Response
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListPollingProfiles")
@@ -645,6 +1089,118 @@ func (a *ResourceApiApiService) UpdateConfigurationExecute(r ApiUpdateConfigurat
 	}
 	// body params
 	localVarPostBody = r.configurationResource
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUpdateDemoRequest struct {
+	ctx        context.Context
+	ApiService *ResourceApiApiService
+	demoId     string
+	demo       *Demo
+}
+
+func (r ApiUpdateDemoRequest) Demo(demo Demo) ApiUpdateDemoRequest {
+	r.demo = &demo
+	return r
+}
+
+func (r ApiUpdateDemoRequest) Execute() (*Demo, *http.Response, error) {
+	return r.ApiService.UpdateDemoExecute(r)
+}
+
+/*
+UpdateDemo Update a Demonstration setting
+
+Update a demonstration used on Tracetest as quick start examples.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples.
+	@return ApiUpdateDemoRequest
+*/
+func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) ApiUpdateDemoRequest {
+	return ApiUpdateDemoRequest{
+		ApiService: a,
+		ctx:        ctx,
+		demoId:     demoId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return Demo
+func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Demo
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.UpdateDemo")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/demo/{demoId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "text/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.demo
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

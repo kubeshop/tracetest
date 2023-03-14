@@ -78,6 +78,7 @@ export const {
   useLazyGetTransactionVersionByIdQuery,
   useGetConfigQuery,
   useGetPollingQuery,
+  useGetDemoQuery,
   useCreateSettingMutation,
   useUpdateSettingMutation,
 } = TraceTestAPI;

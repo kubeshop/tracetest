@@ -1,45 +1,31 @@
-import {EResourceType, TListResponse, TResource} from 'types/Settings.types';
+import {Model, TConfigSchemas} from 'types/Common.types';
 
-export type TRawPolling = {
-  default: boolean;
-  id: string;
-  name: string;
-  periodic: {
-    retryDelay: string;
-    timeout: string;
-  };
-  strategy: string;
-};
+export type TRawPolling = TConfigSchemas['PollingProfile'];
+type Polling = Model<Model<TRawPolling, {}>['spec'], {}>;
 
-type Polling = {
-  default: boolean;
-  id: string;
-  name: string;
-  periodic: {
-    retryDelay: string;
-    timeout: string;
-  };
-  strategy: string;
-};
-
-function Polling(rawPollings?: TListResponse<TRawPolling>): Polling {
-  const items = rawPollings?.items ?? [];
-  const polling = items.find(item => item?.spec?.default ?? false);
-
+function Polling({
+  spec: {
+    default: isDefault = false,
+    id = '',
+    name = '',
+    periodic: {retryDelay = '', timeout = ''} = {},
+    strategy = 'periodic',
+  } = {
+    id: '',
+    name: '',
+    strategy: 'periodic',
+  },
+}: TRawPolling = {}): Polling {
   return {
-    default: true,
-    id: polling?.spec?.id ?? '',
-    name: polling?.spec?.name ?? 'periodic',
+    default: isDefault,
+    id,
+    name,
     periodic: {
-      retryDelay: polling?.spec?.periodic?.retryDelay ?? '',
-      timeout: polling?.spec?.periodic?.timeout ?? '',
+      retryDelay,
+      timeout,
     },
-    strategy: polling?.spec?.strategy ?? 'periodic',
+    strategy,
   };
-}
-
-export function rawToResource(spec: TRawPolling): TResource<TRawPolling> {
-  return {spec, type: EResourceType.Polling};
 }
 
 export default Polling;
