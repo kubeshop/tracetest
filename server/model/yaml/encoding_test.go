@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -76,23 +75,6 @@ func TestDecode(t *testing.T) {
 				test, err := actual.Transaction()
 				require.NoError(t, err)
 				assert.Equal(t, expected.Spec.(yaml.Transaction), test)
-			},
-		},
-		{
-			name: "FileTypeConfig",
-			yaml: readFile("./testdata/config_resource.yaml"),
-			file: yaml.File{
-				Type: yaml.FileTypeConfig,
-				Spec: configresource.Config{
-					ID:               "current",
-					Name:             "config",
-					AnalyticsEnabled: true,
-				},
-			},
-			testSpecFn: func(t *testing.T, expected, actual yaml.File) {
-				config, err := actual.Config()
-				require.NoError(t, err)
-				assert.Equal(t, expected.Spec.(configresource.Config), config)
 			},
 		},
 	}
