@@ -3,6 +3,8 @@ import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
 import pokeshopProtoData from '../assets/pokeshop.proto.json';
 import otelProtoData from '../assets/otel-demo.proto.json';
 import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
+import SettingService from '../services/Setting.service';
+import {SupportedDemos} from '../types/Settings.types';
 
 const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
 const otelProtoFile = new File([otelProtoData?.proto], 'otel-demo.proto');
@@ -11,7 +13,9 @@ const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pok
 const userId = '2491f868-88f1-4345-8836-d5d8511a9f83';
 
 export function getPokeshopDemo(demoSettings: Demo) {
-  const {pokeshopGrpc, pokeshopHttp} = demoSettings;
+  const {
+    pokeshop: {httpEndpoint: pokeshopHttp = '', grpcEndpoint: pokeshopGrpc = ''},
+  } = demoSettings;
 
   return {
     [SupportedPlugins.REST]: [
@@ -114,7 +118,14 @@ export function getPokeshopDemo(demoSettings: Demo) {
 }
 
 export function getOtelDemo(demoSettings: Demo) {
-  const {otelCart, otelCheckout, otelFrontend, otelProductCatalog} = demoSettings;
+  const {
+    opentelemetryStore: {
+      cartEndpoint: otelCart = '',
+      checkoutEndpoint: otelCheckout = '',
+      frontendEndpoint: otelFrontend = '',
+      productCatalogEndpoint: otelProductCatalog = '',
+    },
+  } = demoSettings;
 
   return {
     [SupportedPlugins.REST]: [
@@ -236,22 +247,25 @@ export function getOtelDemo(demoSettings: Demo) {
   };
 }
 
-export function getDemoByPluginMap(demoSettings: Demo) {
-  const {otelEnabled, pokeshopEnabled} = demoSettings;
-  const pokeshopDemo = getPokeshopDemo(demoSettings);
-  const otelDemo = getOtelDemo(demoSettings);
+export function getDemoByPluginMap(demos: Demo[]) {
+  const enabledDemos = SettingService.getEnabledDemos(demos);
+  const pokeShopDemo = enabledDemos.find(demo => demo.type === SupportedDemos.Pokeshop);
+  const otelDemo = enabledDemos.find(demo => demo.type === SupportedDemos.OpentelemetryStore);
+
+  const pokeshopDemoMap = pokeShopDemo ? getPokeshopDemo(pokeShopDemo) : undefined;
+  const otelDemoMap = otelDemo ? getOtelDemo(otelDemo) : undefined;
 
   return {
     [SupportedPlugins.REST]: [
-      ...((pokeshopEnabled && pokeshopDemo[SupportedPlugins.REST]) || []),
-      ...((otelEnabled && otelDemo[SupportedPlugins.REST]) || []),
+      ...((pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.REST]) || []),
+      ...((otelDemoMap && otelDemoMap[SupportedPlugins.REST]) || []),
     ],
     [SupportedPlugins.GRPC]: [
-      ...((pokeshopEnabled && pokeshopDemo[SupportedPlugins.GRPC]) || []),
-      ...((otelEnabled && otelDemo[SupportedPlugins.GRPC]) || []),
+      ...((pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.GRPC]) || []),
+      ...((otelDemoMap && otelDemoMap[SupportedPlugins.GRPC]) || []),
     ],
-    [SupportedPlugins.Postman]: (pokeshopEnabled && pokeshopDemo[SupportedPlugins.Postman]) || [],
-    [SupportedPlugins.CURL]: (pokeshopEnabled && pokeshopDemo[SupportedPlugins.CURL]) || [],
+    [SupportedPlugins.Postman]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Postman]) || [],
+    [SupportedPlugins.CURL]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.CURL]) || [],
     [SupportedPlugins.TraceID]: [],
     [SupportedPlugins.Messaging]: [],
     [SupportedPlugins.OpenAPI]: [],

@@ -7,12 +7,12 @@ import {IPlugin} from 'types/Plugins.types';
 
 const createTestSelectorsStateSelector = (state: RootState) => state.createTest;
 
-const selectDemo = (state: RootState, demo: Demo) => demo;
+const selectDemos = (state: RootState, demos: Demo[]) => demos;
 
 const CreateTestSelectors = () => ({
   selectStepList: createSelector(createTestSelectorsStateSelector, ({stepList}) => stepList),
-  selectPlugin: createSelector(createTestSelectorsStateSelector, selectDemo, ({pluginName}, demo) => {
-    const demoByPluginMap = getDemoByPluginMap(demo);
+  selectPlugin: createSelector(createTestSelectorsStateSelector, selectDemos, ({pluginName}, demos) => {
+    const demoByPluginMap = getDemoByPluginMap(demos);
     const demoList = demoByPluginMap[pluginName];
     return {...Plugins[pluginName], demoList} as IPlugin;
   }),

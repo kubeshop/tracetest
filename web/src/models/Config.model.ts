@@ -1,27 +1,19 @@
-import {EResourceType, TResource} from 'types/Settings.types';
+import {Model, TConfigSchemas} from 'types/Common.types';
 
-export type TRawConfig = {
-  analyticsEnabled: boolean;
-  id: string;
-  name: string;
-};
+export type TRawConfig = TConfigSchemas['ConfigurationResource'];
 
-type Config = {
-  analyticsEnabled: boolean;
-  id: string;
-  name: string;
-};
+type Config = Model<Model<TRawConfig, {}>['spec'], {}>;
 
-function Config(rawConfig?: TResource<TRawConfig>): Config {
+function Config({
+  spec: {analyticsEnabled = false, id = 'current', name = 'Config'} = {
+    analyticsEnabled: false,
+  },
+}: TRawConfig = {}): Config {
   return {
-    analyticsEnabled: rawConfig?.spec?.analyticsEnabled ?? false,
-    id: rawConfig?.spec?.id ?? 'current',
-    name: rawConfig?.spec?.name ?? '',
+    analyticsEnabled,
+    id,
+    name,
   };
-}
-
-export function rawToResource(spec: TRawConfig): TResource<TRawConfig> {
-  return {spec, type: EResourceType.Config};
 }
 
 export default Config;

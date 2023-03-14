@@ -23,8 +23,8 @@ interface IContext {
   shouldDisplayConfigSetup: boolean;
   shouldDisplayConfigSetupFromTest: boolean;
   config: Config;
-  polling: Polling;
-  demo: Demo;
+  pollingProfiles: Polling[];
+  demos: Demo[];
 }
 
 const Context = createContext<IContext>({
@@ -37,8 +37,8 @@ const Context = createContext<IContext>({
   shouldDisplayConfigSetup: false,
   shouldDisplayConfigSetupFromTest: false,
   config: Config(),
-  polling: Polling(),
-  demo: Demo(),
+  pollingProfiles: [],
+  demos: [],
 });
 
 interface IProps {
@@ -88,10 +88,10 @@ const SettingsValuesProvider = ({children}: IProps) => {
   }, [config]);
 
   // Polling
-  const {data: polling = Polling()} = useGetPollingQuery({});
+  const {data: pollingProfiles = []} = useGetPollingQuery({});
 
   // Demo
-  const {data: demo = Demo()} = useGetDemoQuery({});
+  const {data: demos = []} = useGetDemoQuery({});
 
   const value = useMemo<IContext>(
     () => ({
@@ -104,21 +104,21 @@ const SettingsValuesProvider = ({children}: IProps) => {
       shouldDisplayConfigSetup,
       shouldDisplayConfigSetupFromTest,
       config,
-      polling,
-      demo,
+      pollingProfiles,
+      demos,
     }),
     [
       dataStoreConfig,
-      isError,
       isLoading,
       isFetching,
-      shouldDisplayConfigSetup,
-      shouldDisplayConfigSetupFromTest,
+      isError,
       skipConfigSetup,
       skipConfigSetupFromTest,
+      shouldDisplayConfigSetup,
+      shouldDisplayConfigSetupFromTest,
       config,
-      polling,
-      demo,
+      pollingProfiles,
+      demos,
     ]
   );
 

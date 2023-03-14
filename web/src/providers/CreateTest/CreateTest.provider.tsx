@@ -57,12 +57,12 @@ const CreateTestProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
   const {runTest, isEditLoading} = useTestCrud();
-  const {demo} = useSettingsValues();
+  const {demos} = useSettingsValues();
 
   const stepList = useAppSelector(CreateTestSelectors.selectStepList);
   const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
-  const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demo));
+  const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demos));
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
   const isFormValid = useAppSelector(CreateTestSelectors.selectIsFormValid);
   const isFinalStep = stepNumber === stepList.length - 1;

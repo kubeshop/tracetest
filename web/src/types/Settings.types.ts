@@ -1,21 +1,34 @@
-import {TRawConfig} from 'models/Config.model';
-import {TRawDemo} from 'models/Demo.model';
-import {TRawPolling} from 'models/Polling.model';
+import Config from 'models/Config.model';
+import Polling from 'models/Polling.model';
+import Demo from 'models/Demo.model';
 
 export type TListResponse<T> = {
   count: number;
-  items: TResource<T>[];
+  items: T[];
 };
 
-export type TResource<T> = {
-  spec: T;
-  type: EResourceType;
-};
-
-export enum EResourceType {
-  Config = 'Config',
-  Demo = 'Demo',
-  Polling = 'PollingProfile',
+export enum SupportedDemos {
+  Pokeshop = 'pokeshop',
+  OpentelemetryStore = 'otelstore',
 }
 
-export type TSpec = TRawConfig | TRawPolling | TRawDemo;
+export enum SupportedDemosFormField {
+  Pokeshop = 'pokeshop',
+  OpentelemetryStore = 'opentelemetryStore',
+}
+
+export enum ResourceType {
+  ConfigType = 'Config',
+  PollingProfileType = 'PollingProfile',
+  DemoType = 'Demo',
+}
+
+export type TDraftDemo = Record<Required<Demo['type']>, Partial<Demo>>;
+export type TDraftPollingProfiles = Partial<Polling>;
+export type TDraftConfig = Partial<Config>;
+export type TDraftSpec = TDraftConfig | TDraftPollingProfiles | Partial<Demo>;
+
+export type TDraftResource = {
+  type: ResourceType;
+  spec: TDraftSpec;
+};
