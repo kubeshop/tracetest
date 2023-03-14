@@ -15,6 +15,7 @@ type configActions struct {
 }
 
 var _ ResourceActions = &configActions{}
+var currentConfigID = "current"
 
 func NewConfigActions(options ...ResourceArgsOption) configActions {
 	args := NewResourceArgs(options...)
@@ -38,8 +39,8 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf(`file must be of type "Config"`)
 	}
 
-	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, "current")
-	request, err := config.resourceClient.GetRequest(url, http.MethodPut, fileContent.Contents())
+	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, currentConfigID)
+	request, err := config.resourceClient.NewRequest(url, http.MethodPut, fileContent.Contents())
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -91,8 +92,8 @@ func (config configActions) Delete(ctx context.Context, ID string) error {
 }
 
 func (config configActions) get(ctx context.Context) (string, error) {
-	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, "current")
-	request, err := config.resourceClient.GetRequest(url, http.MethodGet, "")
+	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, currentConfigID)
+	request, err := config.resourceClient.NewRequest(url, http.MethodGet, "")
 	if err != nil {
 		return "", fmt.Errorf("could not create request: %w", err)
 	}

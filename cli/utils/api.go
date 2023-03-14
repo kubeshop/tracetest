@@ -60,7 +60,7 @@ func GetResourceAPIClient(resourceType string, cliConfig config.Config) Resource
 	}
 }
 
-func (resourceClient ResourceClient) GetRequest(url string, method string, body string) (*http.Request, error) {
+func (resourceClient ResourceClient) NewRequest(url string, method string, body string) (*http.Request, error) {
 	var reqBody io.Reader
 	if body != "" {
 		reqBody = StringToIOReader(body)

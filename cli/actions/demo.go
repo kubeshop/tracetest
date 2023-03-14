@@ -57,7 +57,7 @@ func (demo demoActions) Apply(ctx context.Context, args ApplyArgs) error {
 }
 
 func (demo demoActions) create(ctx context.Context, file file.File) error {
-	request, err := demo.resourceClient.GetRequest(demo.resourceClient.BaseUrl, http.MethodPost, file.Contents())
+	request, err := demo.resourceClient.NewRequest(demo.resourceClient.BaseUrl, http.MethodPost, file.Contents())
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -71,7 +71,7 @@ func (demo demoActions) create(ctx context.Context, file file.File) error {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not read validation error: %w", err)
 		}
 
 		validationError := string(body)
@@ -87,7 +87,7 @@ func (demo demoActions) create(ctx context.Context, file file.File) error {
 
 func (demo demoActions) update(ctx context.Context, file file.File, ID string) error {
 	url := fmt.Sprintf("%s/%s", demo.resourceClient.BaseUrl, ID)
-	request, err := demo.resourceClient.GetRequest(url, http.MethodPut, file.Contents())
+	request, err := demo.resourceClient.NewRequest(url, http.MethodPut, file.Contents())
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -101,7 +101,7 @@ func (demo demoActions) update(ctx context.Context, file file.File, ID string) e
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not send request: %w", err)
 		}
 
 		validationError := string(body)
@@ -114,7 +114,7 @@ func (demo demoActions) update(ctx context.Context, file file.File, ID string) e
 
 func (demo demoActions) List(ctx context.Context, listArgs ListArgs) error {
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", demo.resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := demo.resourceClient.GetRequest(url, http.MethodGet, "")
+	request, err := demo.resourceClient.NewRequest(url, http.MethodGet, "")
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -145,7 +145,7 @@ func (demo demoActions) Export(ctx context.Context, ID string, filePath string) 
 
 func (demo demoActions) Delete(ctx context.Context, ID string) error {
 	url := fmt.Sprintf("%s/%s", demo.resourceClient.BaseUrl, ID)
-	request, err := demo.resourceClient.GetRequest(url, http.MethodDelete, "")
+	request, err := demo.resourceClient.NewRequest(url, http.MethodDelete, "")
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -165,7 +165,7 @@ func (demo demoActions) Get(ctx context.Context, ID string) error {
 }
 
 func (demo demoActions) get(ctx context.Context, ID string) (string, error) {
-	request, err := demo.resourceClient.GetRequest(fmt.Sprintf("%s/%s", demo.resourceClient.BaseUrl, ID), http.MethodGet, "")
+	request, err := demo.resourceClient.NewRequest(fmt.Sprintf("%s/%s", demo.resourceClient.BaseUrl, ID), http.MethodGet, "")
 	if err != nil {
 		return "", fmt.Errorf("could not create request: %w", err)
 	}

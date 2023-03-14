@@ -57,7 +57,7 @@ func (polling pollingActions) Apply(ctx context.Context, args ApplyArgs) error {
 }
 
 func (polling pollingActions) create(ctx context.Context, file file.File) error {
-	request, err := polling.resourceClient.GetRequest(polling.resourceClient.BaseUrl, http.MethodPost, file.Contents())
+	request, err := polling.resourceClient.NewRequest(polling.resourceClient.BaseUrl, http.MethodPost, file.Contents())
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -71,7 +71,7 @@ func (polling pollingActions) create(ctx context.Context, file file.File) error 
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not send request: %w", err)
 		}
 
 		validationError := string(body)
@@ -87,7 +87,7 @@ func (polling pollingActions) create(ctx context.Context, file file.File) error 
 
 func (polling pollingActions) update(ctx context.Context, file file.File, ID string) error {
 	url := fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID)
-	request, err := polling.resourceClient.GetRequest(url, http.MethodPut, file.Contents())
+	request, err := polling.resourceClient.NewRequest(url, http.MethodPut, file.Contents())
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -101,7 +101,7 @@ func (polling pollingActions) update(ctx context.Context, file file.File, ID str
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not send request: %w", err)
 		}
 
 		validationError := string(body)
@@ -114,7 +114,7 @@ func (polling pollingActions) update(ctx context.Context, file file.File, ID str
 
 func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error {
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", polling.resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := polling.resourceClient.GetRequest(url, http.MethodGet, "")
+	request, err := polling.resourceClient.NewRequest(url, http.MethodGet, "")
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -145,7 +145,7 @@ func (polling pollingActions) Export(ctx context.Context, ID string, filePath st
 
 func (polling pollingActions) Delete(ctx context.Context, ID string) error {
 	url := fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID)
-	request, err := polling.resourceClient.GetRequest(url, http.MethodDelete, "")
+	request, err := polling.resourceClient.NewRequest(url, http.MethodDelete, "")
 	if err != nil {
 		return fmt.Errorf("could not create request: %w", err)
 	}
@@ -165,7 +165,7 @@ func (polling pollingActions) Get(ctx context.Context, ID string) error {
 }
 
 func (polling pollingActions) get(ctx context.Context, ID string) (string, error) {
-	request, err := polling.resourceClient.GetRequest(fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID), http.MethodGet, "")
+	request, err := polling.resourceClient.NewRequest(fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID), http.MethodGet, "")
 	if err != nil {
 		return "", fmt.Errorf("could not create request: %w", err)
 	}
