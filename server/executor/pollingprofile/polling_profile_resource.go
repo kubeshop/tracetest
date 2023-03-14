@@ -176,7 +176,7 @@ func (r *Repository) Update(ctx context.Context, profile PollingProfile) (Pollin
 	profile.ID = id.ID("current")
 
 	err := r.Delete(ctx, profile.ID)
-	if err != nil {
+	if err != nil && errors.Unwrap(err) != sql.ErrNoRows {
 		return PollingProfile{}, fmt.Errorf("could not delete old profile when updating it: %w", err)
 	}
 
@@ -203,21 +203,11 @@ const (
 )
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
-	profile, err := r.get(ctx, getQuery, id)
-	if err != nil && errors.Unwrap(err) == sql.ErrNoRows {
-		return defaultPollingProfile, nil
-	}
-
-	return profile, err
+	return r.get(ctx, getQuery, id)
 }
 
 func (r *Repository) GetDefault(ctx context.Context) (PollingProfile, error) {
-	profile, err := r.get(ctx, getDefaultQuery)
-	if err != nil && err == sql.ErrNoRows {
-		return defaultPollingProfile, nil
-	}
-
-	return profile, err
+	return r.get(ctx, getDefaultQuery)
 }
 
 func (r *Repository) get(ctx context.Context, query string, args ...any) (PollingProfile, error) {
