@@ -14,9 +14,9 @@ This is a simple test to check if Tracetest is working correctly given it was pr
 
 The steps that we should follow are:
 
-- [] Open WebUI and go to `/settings` page. The provisioned Data Store should be selected.
-- [] Run `tracetest datastore export -d {provisioned_datastore}` and check if the data was exported correctly.
-- [] Create a test on WebUI that calls a demo API (like [Pokeshop](https://docs.tracetest.io/live-examples/pokeshop/overview) or [Open Telemetry Store](https://docs.tracetest.io/live-examples/opentelemetry-store/overview)). This test should fetch traces correctly and run without errors.
+- [ ] Open WebUI and go to `/settings` page. The provisioned Data Store should be selected.
+- [ ] Run `tracetest datastore export -d {provisioned_datastore}` and check if the data was exported correctly.
+- [ ] Create a test on WebUI that calls a demo API (like [Pokeshop](https://docs.tracetest.io/live-examples/pokeshop/overview) or [Open Telemetry Store](https://docs.tracetest.io/live-examples/opentelemetry-store/overview)). This test should fetch traces correctly and run without errors.
 
 ### Checklist on version release
 
