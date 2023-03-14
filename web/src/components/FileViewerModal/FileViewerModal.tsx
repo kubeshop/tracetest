@@ -1,11 +1,12 @@
 import {useCallback} from 'react';
-import {Button, message, Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import {DownloadOutlined} from '@ant-design/icons';
+import {downloadFile} from 'utils/Common';
+import useCopy from 'hooks/useCopy';
 
 import * as S from './FileViewerModal.styled';
-import {downloadFile} from '../../utils/Common';
 
 interface IProps {
   data: string;
@@ -22,10 +23,7 @@ const FileViewerModal = ({data, isOpen, onClose, title, language = 'javascript',
     downloadFile(data, fileName);
   }, [data, fileName]);
 
-  const onCopy = () => {
-    message.success('Content copied to the clipboard');
-    navigator.clipboard.writeText(data);
-  };
+  const copy = useCopy();
 
   const footer = (
     <>
@@ -54,7 +52,7 @@ const FileViewerModal = ({data, isOpen, onClose, title, language = 'javascript',
         <Typography.Text>{subtitle}</Typography.Text>
       </S.SubtitleContainer>
       <S.CodeContainer data-cy="file-viewer-code-container">
-        <S.CopyIconContainer onClick={onCopy}>
+        <S.CopyIconContainer onClick={() => copy(data)}>
           <S.CopyIcon />
         </S.CopyIconContainer>
         <SyntaxHighlighter language={language} style={arduinoLight}>

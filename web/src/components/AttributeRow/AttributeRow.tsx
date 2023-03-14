@@ -1,5 +1,5 @@
 import {MoreOutlined} from '@ant-design/icons';
-import {Dropdown, Menu, message, Popover} from 'antd';
+import {Dropdown, Menu, Popover} from 'antd';
 import parse from 'html-react-parser';
 import MarkdownIt from 'markdown-it';
 import {useMemo} from 'react';
@@ -10,6 +10,8 @@ import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import TestOutput from 'models/TestOutput.model';
+import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import useCopy from 'hooks/useCopy';
 import * as S from './AttributeRow.styled';
 import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
@@ -17,7 +19,6 @@ interface IProps {
   assertions?: TResultAssertions;
   attribute: TSpanFlatAttribute;
   searchText?: string;
-  onCopy(value: string): void;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
   semanticConventions: OtelReference;
@@ -34,13 +35,13 @@ const AttributeRow = ({
   assertions = {},
   attribute: {key, value},
   attribute,
-  onCopy,
   onCreateTestSpec,
   searchText,
   semanticConventions,
   onCreateOutput,
   outputs,
 }: IProps) => {
+  const copy = useCopy();
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
   const note = useMemo(() => parse(MarkdownIt().render(semanticConvention.note)), [semanticConvention]);
@@ -55,8 +56,8 @@ const AttributeRow = ({
 
   const handleOnClick = ({key: option}: {key: string}) => {
     if (option === Action.Copy) {
-      message.success('Value copied to the clipboard');
-      return onCopy(value);
+      TraceAnalyticsService.onAttributeCopy();
+      copy(value);
     }
 
     if (option === Action.Create_Spec) {

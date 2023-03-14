@@ -13,6 +13,7 @@ import {setUserPreference} from 'redux/slices/User.slice';
 import UserSelectors from 'selectors/User.selectors';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import GuidedTourService from 'services/GuidedTour.service';
+import {useNotification} from '../Notification/Notification.provider';
 
 const {onGuidedTourClick} = HomeAnalyticsService;
 const NOTIFICATION_KEY = 'guided-tour-notification';
@@ -39,7 +40,7 @@ const GuidedTourProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
   const pathname = useLocation().pathname;
   const tourByPathname = GuidedTourService.getByPathName(pathname);
-  const [api, contextHolder] = notification.useNotification();
+  const {showNotification} = useNotification();
   const [guidedTourState, setGuidedTourState] = useState<IGuidedTourState>({
     callback: noop,
     run: false,
@@ -82,15 +83,16 @@ const GuidedTourProvider = ({children}: IProps) => {
       </Space>
     );
 
-    api.open({
+    showNotification({
+      type: 'open',
       description: 'Walk through Tracetest features',
       duration: 0,
       btn,
       key: NOTIFICATION_KEY,
-      message: 'Do you want to take a quick tour of Tracetest?',
+      title: 'Do you want to take a quick tour of Tracetest?',
       onClose: onSkip,
     });
-  }, [api, dispatch, showGuidedTourNotification, tourByPathname]);
+  }, [dispatch, showGuidedTourNotification, showNotification, tourByPathname]);
 
   const onStart = useCallback(() => {
     if (!tourByPathname) return;
@@ -126,7 +128,6 @@ const GuidedTourProvider = ({children}: IProps) => {
         steps={guidedTourState.steps}
         tooltipComponent={StepContent}
       />
-      {contextHolder}
       {children}
     </Context.Provider>
   );

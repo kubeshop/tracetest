@@ -23,6 +23,7 @@ import useBlockNavigation from 'hooks/useBlockNavigation';
 import RouterActions from 'redux/actions/Router.actions';
 import {RouterSearchFields} from 'constants/Common.constants';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
+import {useNotification} from 'providers/Notification/Notification.provider';
 
 interface IProps {
   runId: string;
@@ -37,6 +38,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const {onOpen} = useConfirmationModal();
+  const {showNotification} = useNotification();
 
   const setSelectedSpec = useCallback(
     selector => {
@@ -70,8 +72,14 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
     const {id} = await dispatch(TestSpecsActions.publish({test, testId, runId})).unwrap();
     dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedAssertion]: ''}));
 
+    showNotification({
+      type: 'success',
+      title: 'Your test has been published successfully',
+      description: 'A new test run has been generated.',
+    });
+
     navigate(`/test/${testId}/run/${id}/test`);
-  }, [dispatch, navigate, runId, test, testId]);
+  }, [dispatch, navigate, runId, showNotification, test, testId]);
 
   const cancel = useCallback(() => {
     dispatch(resetSpecs());

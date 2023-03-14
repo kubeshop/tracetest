@@ -1,11 +1,10 @@
-import {notification} from 'antd';
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
-import {useTheme} from 'styled-components';
 
 import {useCreateSettingMutation, useUpdateSettingMutation} from 'redux/apis/TraceTest.api';
 import {TDraftResource} from 'types/Settings.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useNotification} from '../Notification/Notification.provider';
 
 interface IContext {
   isLoading: boolean;
@@ -21,13 +20,10 @@ interface IProps {
 export const useSettings = () => useContext(Context);
 
 const SettingsProvider = ({children}: IProps) => {
+  const {showNotification} = useNotification();
   const [createSetting, {isLoading: isLoadingCreate}] = useCreateSettingMutation();
   const [updateSetting, {isLoading: isLoadingUpdate}] = useUpdateSettingMutation();
-  const [notificationApi, notificationComponent] = notification.useNotification();
   const {onOpen: onOpenConfirmation} = useConfirmationModal();
-  const {
-    notification: {success},
-  } = useTheme();
 
   const onSaveResource = useCallback(
     async (resource: TDraftResource) => {
@@ -49,15 +45,11 @@ const SettingsProvider = ({children}: IProps) => {
         onConfirm: async () => {
           await Promise.all(resources.map(resource => onSaveResource(resource)));
 
-          notificationApi.success({
-            message: 'Settings saved',
-            description: 'Your settings were saved',
-            ...success,
-          });
+          showNotification({type: 'success', title: 'Settings saved', description: 'Your settings were saved'});
         },
       });
     },
-    [notificationApi, onOpenConfirmation, onSaveResource, success]
+    [onOpenConfirmation, onSaveResource, showNotification]
   );
 
   const value = useMemo<IContext>(
@@ -65,12 +57,7 @@ const SettingsProvider = ({children}: IProps) => {
     [isLoadingCreate, isLoadingUpdate, onSubmit]
   );
 
-  return (
-    <>
-      {notificationComponent}
-      <Context.Provider value={value}>{children}</Context.Provider>
-    </>
-  );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default SettingsProvider;

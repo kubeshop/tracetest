@@ -44,5 +44,24 @@ export const theme: DefaultTheme = {
         minWidth: '450px',
       },
     },
+    info: {
+      style: {
+        border: '1px solid #3B61F6',
+        background: '#3B61F61A',
+        minWidth: '450px',
+      },
+    },
+    warning: {
+      style: {
+        border: '1px solid #FAAD14',
+        background: '#FFFBE6',
+        minWidth: '450px',
+      },
+    },
+    open: {
+      style: {
+        minWidth: '450px',
+      },
+    },
   },
 };

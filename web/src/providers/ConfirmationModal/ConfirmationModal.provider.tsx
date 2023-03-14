@@ -40,8 +40,8 @@ const ConfirmationModalProvider = ({children}: IProps) => {
     setIsOpen(true);
   }, []);
 
-  const triggerConfirm = useCallback(() => {
-    onConfirm();
+  const triggerConfirm = useCallback(async () => {
+    await onConfirm();
     setIsOpen(false);
   }, [onConfirm]);
 
