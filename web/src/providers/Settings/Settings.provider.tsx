@@ -4,12 +4,12 @@ import {createContext, useCallback, useContext, useMemo} from 'react';
 import {useTheme} from 'styled-components';
 
 import {useCreateSettingMutation, useUpdateSettingMutation} from 'redux/apis/TraceTest.api';
-import {TResource, TSpec} from 'types/Settings.types';
+import {TDraftResource} from 'types/Settings.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 
 interface IContext {
   isLoading: boolean;
-  onSubmit(resource: TResource<TSpec>): void;
+  onSubmit(resource: TDraftResource[]): void;
 }
 
 const Context = createContext<IContext>({isLoading: false, onSubmit: noop});
@@ -29,18 +29,25 @@ const SettingsProvider = ({children}: IProps) => {
     notification: {success},
   } = useTheme();
 
+  const onSaveResource = useCallback(
+    async (resource: TDraftResource) => {
+      if (resource.spec.id) {
+        await updateSetting({resource});
+      } else {
+        await createSetting({resource});
+      }
+    },
+    [createSetting, updateSetting]
+  );
+
   const onSubmit = useCallback(
-    (resource: TResource<TSpec>) => {
+    (resources: TDraftResource[]) => {
       onOpenConfirmation({
         title: <p>Are you sure you want to save this Setting?</p>,
         heading: 'Save Confirmation',
         okText: 'Save',
         onConfirm: async () => {
-          if (resource.spec.id) {
-            await updateSetting({resource});
-          } else {
-            await createSetting({resource});
-          }
+          await Promise.all(resources.map(resource => onSaveResource(resource)));
 
           notificationApi.success({
             message: 'Settings saved',
@@ -50,7 +57,7 @@ const SettingsProvider = ({children}: IProps) => {
         },
       });
     },
-    [createSetting, notificationApi, onOpenConfirmation, success, updateSetting]
+    [notificationApi, onOpenConfirmation, onSaveResource, success]
   );
 
   const value = useMemo<IContext>(

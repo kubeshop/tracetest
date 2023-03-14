@@ -1,7 +1,7 @@
 import {Tabs} from 'antd';
 import Analytics from 'components/Settings/Analytics';
 import DataStore from 'components/Settings/DataStore';
-// import Demo from 'components/Settings/Demo';
+import Demo from 'components/Settings/Demo';
 import Polling from 'components/Settings/Polling';
 import * as S from './Settings.styled';
 
@@ -29,9 +29,9 @@ const Content = () => (
         <Tabs.TabPane key={TabsKeys.Polling} tab="Trace Polling">
           <Polling />
         </Tabs.TabPane>
-        {/* <Tabs.TabPane key={TabsKeys.Demo} tab="Demo">
+        <Tabs.TabPane key={TabsKeys.Demo} tab="Demo">
           <Demo />
-        </Tabs.TabPane> */}
+        </Tabs.TabPane>
       </Tabs>
     </S.TabsContainer>
   </S.Container>

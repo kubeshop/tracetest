@@ -4,8 +4,10 @@ import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import * as Step from 'components/CreateTestPlugins/Step.styled';
 import {ComponentNames} from 'constants/Plugins.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {IBasicValues, TDraftTest} from 'types/Test.types';
 import BasicDetailsForm from './BasicDetailsForm';
+import SettingService from '../../../../../services/Setting.service';
 
 const BasicDetails = () => {
   const [selectedDemo, setSelectedDemo] = useState<TDraftTest>();
@@ -17,6 +19,7 @@ const BasicDetails = () => {
     onIsFormValid,
   } = useCreateTest();
   const onValidate = useValidateTestDraft({pluginName, isBasicDetails: true, setIsValid: onIsFormValid});
+  const {demos} = useSettingsValues();
 
   const handleSelectDemo = useCallback(
     (demo: TDraftTest) => {
@@ -49,7 +52,12 @@ const BasicDetails = () => {
           onFinish={handleSubmit}
           onValuesChange={onValidate}
         >
-          <BasicDetailsForm onSelectDemo={handleSelectDemo} selectedDemo={selectedDemo} demoList={demoList} />
+          <BasicDetailsForm
+            onSelectDemo={handleSelectDemo}
+            selectedDemo={selectedDemo}
+            demoList={demoList}
+            isDemoEnabled={SettingService.getEnabledDemos(demos).length > 0}
+          />
         </Form>
       </Step.FormContainer>
     </Step.Step>
