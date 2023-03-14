@@ -22,7 +22,7 @@ describe('CreateTestSelectors', () => {
         {
           createTest: {pluginName} as ICreateTestState,
         } as RootState,
-        Demo()
+        [Demo()]
       );
       expect(result).toStrictEqual(Plugins.REST);
     });
