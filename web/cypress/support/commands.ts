@@ -186,6 +186,7 @@ Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
 });
 
 Cypress.Commands.add('createTest', () => {
+  cy.enableDemo();
   cy.interceptHomeApiCall();
   cy.clearLocalStorage();
   cy.visit('/');
@@ -250,5 +251,23 @@ Cypress.Commands.add('deleteTransaction', () => {
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
     cy.wait('@testList');
     cy.clearLocalStorage();
+  });
+});
+
+Cypress.Commands.add('enableDemo', () => {
+  cy.visit(`/settings`);
+
+  cy.get('[id*=tab-demo]').click();
+  cy.get('#demo_pokeshop_enabled').then(element => {
+    const isChecked = element.attr('aria-checked');
+
+    if (isChecked === 'false') {
+      cy.get('#demo_pokeshop_enabled').click();
+      cy.get('#demo_pokeshop_pokeshop_httpEndpoint').type('http://demo-pokemon-api.demo.svc.cluster.local');
+      cy.get('[data-cy=demo-form-save-button]').click();
+      cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
+    }
+
+    cy.visit(`/`);
   });
 });

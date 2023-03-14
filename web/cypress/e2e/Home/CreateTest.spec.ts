@@ -3,6 +3,7 @@ import {PokeshopDemo} from '../constants/Test';
 describe('Create test', () => {
   beforeEach(() => {
     cy.interceptHomeApiCall();
+    cy.enableDemo();
     cy.visit('/');
   });
   afterEach(() => cy.deleteTest(true));

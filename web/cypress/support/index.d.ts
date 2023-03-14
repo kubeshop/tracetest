@@ -28,5 +28,6 @@ declare namespace Cypress {
     deleteTransactionTests(): Chainable<Element>;
     openTransactionCreationModal(): Chainable<Element>;
     deleteTransaction(): Chainable<Element>;
+    enableDemo(): Chainable<Element>;
   }
 }

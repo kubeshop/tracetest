@@ -60,7 +60,7 @@ const DemoForm = () => {
       {otelEnabled && <OtelFields />}
 
       <S.FooterContainer>
-        <Button htmlType="submit" loading={isLoading} type="primary">
+        <Button htmlType="submit" loading={isLoading} type="primary" data-cy="demo-form-save-button">
           Save
         </Button>
       </S.FooterContainer>
