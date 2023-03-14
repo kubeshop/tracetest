@@ -67,6 +67,7 @@ func (polling pollingActions) create(ctx context.Context, file file.File) error 
 		return fmt.Errorf("could not send request: %w", err)
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
@@ -93,10 +94,11 @@ func (polling pollingActions) update(ctx context.Context, file file.File, ID str
 	}
 
 	resp, err := polling.resourceClient.Client.Do(request)
-
 	if err != nil {
 		return fmt.Errorf("could not update polling profile: %w", err)
 	}
+
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
@@ -124,6 +126,7 @@ func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error
 		return fmt.Errorf("could not send request: %w", err)
 	}
 
+	defer resp.Body.Close()
 	fmt.Println(utils.IOReadCloserToString(resp.Body))
 	return nil
 }
@@ -175,6 +178,7 @@ func (polling pollingActions) get(ctx context.Context, ID string) (string, error
 		return "", fmt.Errorf("could not get polling profile: %w", err)
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {

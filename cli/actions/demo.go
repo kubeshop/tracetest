@@ -67,6 +67,7 @@ func (demo demoActions) create(ctx context.Context, file file.File) error {
 		return fmt.Errorf("could not send request: %w", err)
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
@@ -76,9 +77,6 @@ func (demo demoActions) create(ctx context.Context, file file.File) error {
 
 		validationError := string(body)
 		return fmt.Errorf("invalid demo profile: %s", validationError)
-	}
-	if err != nil {
-		return fmt.Errorf("could not create demo profile: %w", err)
 	}
 
 	_, err = file.SaveChanges(utils.IOReadCloserToString(resp.Body))
@@ -93,10 +91,11 @@ func (demo demoActions) update(ctx context.Context, file file.File, ID string) e
 	}
 
 	resp, err := demo.resourceClient.Client.Do(request)
-
 	if err != nil {
 		return fmt.Errorf("could not update demo profile: %w", err)
 	}
+
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
@@ -124,6 +123,7 @@ func (demo demoActions) List(ctx context.Context, listArgs ListArgs) error {
 		return fmt.Errorf("could not send request: %w", err)
 	}
 
+	defer resp.Body.Close()
 	fmt.Println(utils.IOReadCloserToString(resp.Body))
 	return nil
 }
@@ -175,6 +175,7 @@ func (demo demoActions) get(ctx context.Context, ID string) (string, error) {
 		return "", fmt.Errorf("could not get demo profile: %w", err)
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {

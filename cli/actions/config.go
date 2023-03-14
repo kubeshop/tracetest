@@ -45,16 +45,17 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf("could not create request: %w", err)
 	}
 
-	res, err := config.resourceClient.Client.Do(request)
+	resp, err := config.resourceClient.Client.Do(request)
 	if err != nil {
 		return fmt.Errorf("could not send request: %w", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("could not create config: %s", res.Status)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("could not create config: %s", resp.Status)
 	}
 
-	_, err = fileContent.SaveChanges(utils.IOReadCloserToString(res.Body))
+	_, err = fileContent.SaveChanges(utils.IOReadCloserToString(resp.Body))
 	return err
 }
 
@@ -103,6 +104,7 @@ func (config configActions) get(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("could not send request: %w", err)
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
