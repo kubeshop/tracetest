@@ -1,5 +1,18 @@
-dataStore:
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: SignalFX
   type: signalfx
   signalfx:
-    token: <YOUR_TOKEN> # UPDATE THIS
-    realm: us1 # UPDATE THIS IF NEEDED
+    token: <YOUR_TOKEN> # Add SignalFX token
+    realm: us1 # Update this value if needed
