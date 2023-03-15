@@ -4,7 +4,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: "release-server"
+  group: "release-candidate"
   cancel-in-progress: true
 
 defaults:
