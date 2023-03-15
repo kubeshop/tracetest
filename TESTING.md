@@ -1,6 +1,6 @@
 # Testing Tracetest
 
-On Tracetest, we work in two ways to test the entire system and guarantee that everything is working fine. One is through automatic tests, where we run unit, integration and end-to-end tests on Tracetest CLI, Web UI and API server.
+On Tracetest, we work in two ways to test the entire system and guarantee that everything is working fine. One is through automatic tests, where we run unit, integration and end-to-end tests on Tracetest CLI, Web UI and Server.
 
 Another source of tests is the manual tests that we execute on each release, simulating users, and checking if everything is ok on these tests.
 
@@ -49,7 +49,7 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
 
 ## Automatic Tests
 
-Today Tracetest has 3 main components: a WebUI, a CLI and an API Server.
+Today Tracetest has 3 main components: a WebUI, a CLI and a Server.
 
 ### Web UI
 
@@ -60,7 +60,7 @@ Today Tracetest has 3 main components: a WebUI, a CLI and an API Server.
 
 - **Unit tests**: Run by executing `make test` on `./cli` folder
 
-### API Server
+### Server
 
 - **Unit tests**: Run by executing `make test` on `./server` folder
 - **Integration tests**: Run along with some unit tests running `make test` on `./server` folder, but also done in a matrix test on Github actions, by executing the `test-examples` action.
