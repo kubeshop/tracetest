@@ -1,5 +1,46 @@
-dataStore:
+---
+type: Config
+spec:
+  analyticsEnabled: true
+
+---
+type: Demo
+spec:
+  name: "OpenTelemetry Shop"
+  enabled: true
+  type: otelstore
+  opentelemetryStore:
+    frontendEndpoint: http://dev-frontend:9000
+    productCatalogEndpoint: http://dev-product:8081
+    cartEndpoint: http://dev-cart:8082
+    checkoutEndpoint: http://dev-checkout:8083
+
+---
+type: Demo
+spec:
+  name: "Pokeshop"
+  enabled: true
+  type: pokeshop
+  pokeshop:
+    grpcEndpoint: demo-api:8082
+    httpEndpoint: http://demo-api:8081
+
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 3s
+    timeout: 2m
+
+---
+type: DataStore
+spec:
+  name: Jaeger
   type: jaeger
+  default: true
   jaeger:
     endpoint: jaeger:16685
     tls:
