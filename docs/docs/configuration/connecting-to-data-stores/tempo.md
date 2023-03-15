@@ -1,14 +1,14 @@
 # Tempo
 
-Tracetest fetches traces from [Tempo on the default gRPC port](https://grafana.com/docs/tempo/latest/configuration/#server) `9095`.
+Tracetest fetches traces from [Tempo on the default gRPC port](https://grafana.com/docs/tempo/latest/configuration/#server) `9095`, or [default HTTP port](https://grafana.com/docs/tempo/latest/configuration/#server) `80`.
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configure Tempo
 
-Tempo uses port `9095` as the default `grpc_listen_port`. Here is an example config file:
+Tempo uses port `9095` as the default `grpc_listen_port`. The default `http_listen_port` is `80`, but in the example below it's set to `3100`. Here is a full example of a config file:
 
 ```yaml
 # tempo.config.yaml
@@ -59,27 +59,29 @@ storage:
 
 ## Configure Tracetest to Use Tempo as a Trace Data Store
 
-Configure Tracetest to be aware that it has to fetch trace data from Tempo. 
+Configure Tracetest to be aware that it has to fetch trace data from Tempo.
 
-Tracetest uses [Tempo's gRPC	endpoint](https://grafana.com/docs/tempo/latest/configuration/#server) on port `9095` to fetch trace data.
+Tracetest uses [Tempo's gRPC endpoint](https://grafana.com/docs/tempo/latest/configuration/#server) on port `9095` to fetch trace data. Alternatively, you can use Tempo's HTTP endpoint and default port `80`.
 
 :::tip
-Need help configuring the OpenTelemetry Collector so send trace data from your application to Jaeger? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)). 
+Need help configuring the OpenTelemetry Collector so send trace data from your application to Jaeger? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)).
 :::
 
 ## Connect Tracetest to Tempo with the Web UI
 
-In the Web UI, open settings, and select Tempo. If you are using Docker like in the screenshot below, use the service name as the hostname with port `9095` like this:
+In the Web UI, open settings, and select Tempo. Then, select either `gRPC` or `HTTP`. If you are using Docker and the `gRPC` endpoint like in the screenshot below, use the service name as the hostname with port `9095` like this:
 
 ```
 tempo:9095
 ```
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644545/Blogposts/Docs/screely-1674644541618_ly8ur3.png)
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1678891103/Blogposts/Docs/screely-1678891089174_jyclka.png)
 
 ## Connect Tracetest to Tempo with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
+
+For gRPC:
 
 ```yaml
 type: DataStore
@@ -88,9 +90,27 @@ spec:
   type: tempo
   isDefault: true
   tempo:
-    endpoint: tempo:9095
-    tls:
-      insecure: true
+    type: grpc
+    grpc:
+      endpoint: tempo:9095
+      tls:
+        insecure: true
+```
+
+For HTTP:
+
+```yaml
+type: DataStore
+spec:
+  name: Grafana Tempo
+  type: tempo
+  isDefault: true
+  tempo:
+    type: http
+    http:
+      endpoint: http://tempo
+      tls:
+        insecure: true
 ```
 
 Proceed to run this command in the terminal, and specify the file above.
