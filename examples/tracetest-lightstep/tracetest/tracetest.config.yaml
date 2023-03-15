@@ -6,35 +6,3 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
-
-poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
-
-demo:
-  enabled: [otel]
-  endpoints:
-    otelFrontend: http://otel-frontend:8084
-    otelProductCatalog: otel-productcatalogservice:3550
-    otelCart: otel-cartservice:7070
-    otelCheckout: otel-checkoutservice:5050
-
-experimentalFeatures: []
-
-googleAnalytics:
-  enabled: true
-
-telemetry:
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    exporter: collector
-    applicationExporter: collector

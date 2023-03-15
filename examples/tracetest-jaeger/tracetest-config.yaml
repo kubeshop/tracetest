@@ -5,30 +5,3 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
-
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
-telemetry:
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    dataStore: jaeger
-    exporter: collector

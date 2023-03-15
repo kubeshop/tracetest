@@ -26,7 +26,20 @@ locals {
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   provisioning = <<EOF
-dataStore:
+---
+type: PollingProfile
+spec:
+  name: default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: jaeger
   type: jaeger
   jaeger:
     endpoint: ${aws_lb.internal_tracetest_alb.dns_name}:16685
