@@ -1,5 +1,5 @@
 googleAnalytics:
-  enabled: false
+  enabled: true
 
 demo:
     endpoints:
