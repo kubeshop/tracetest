@@ -14,11 +14,12 @@ import (
 var deletedResourceID string
 
 var deleteCmd = &cobra.Command{
-	Use:    "delete [resource type]",
-	Long:   "Delete resources from your Tracetest server",
-	Short:  "Delete resources",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "delete [resource type]",
+	Long:    "Delete resources from your Tracetest server",
+	Short:   "Delete resources",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()

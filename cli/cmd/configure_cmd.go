@@ -15,10 +15,11 @@ var endpoint string
 var global bool
 
 var configureCmd = &cobra.Command{
-	Use:    "configure",
-	Short:  "Configure your tracetest CLI",
-	Long:   "Configure your tracetest CLI",
-	PreRun: setupLogger,
+	GroupID: cmdGroupCLIConfig.ID,
+	Use:     "configure",
+	Short:   "Configure your tracetest CLI",
+	Long:    "Configure your tracetest CLI",
+	PreRun:  setupLogger,
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.Track("Configure", "cmd", map[string]string{})
 

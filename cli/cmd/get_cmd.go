@@ -13,11 +13,12 @@ import (
 var resourceID string
 
 var getCmd = &cobra.Command{
-	Use:    "get [resource type]",
-	Long:   "Get a resource from your Tracetest server",
-	Short:  "Get resource",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "get [resource type]",
+	Long:    "Get a resource from your Tracetest server",
+	Short:   "Get resource",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()

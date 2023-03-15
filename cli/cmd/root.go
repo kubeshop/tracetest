@@ -36,10 +36,39 @@ func Execute() {
 	}
 }
 
+var (
+	cmdGroupResources = &cobra.Group{
+		ID:    "resources",
+		Title: "Resources",
+	}
+
+	cmdGroupServer = &cobra.Group{
+		ID:    "server",
+		Title: "Server",
+	}
+
+	cmdGroupCLIConfig = &cobra.Group{
+		ID:    "cli-config",
+		Title: "CLI Config",
+	}
+
+	cmdGroupTests = &cobra.Group{
+		ID:    "tests",
+		Title: "Tests",
+	}
+)
+
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", string(formatters.DefaultOutput), fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
 
 	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
+
+	rootCmd.AddGroup(
+		cmdGroupResources,
+		cmdGroupServer,
+		cmdGroupCLIConfig,
+		cmdGroupTests,
+	)
 }

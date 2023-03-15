@@ -19,11 +19,12 @@ var (
 )
 
 var listCmd = &cobra.Command{
-	Use:    "list [resource type]",
-	Long:   "List resources from your Tracetest server",
-	Short:  "List resources",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "list [resource type]",
+	Long:    "List resources from your Tracetest server",
+	Short:   "List resources",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()

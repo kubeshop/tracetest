@@ -17,11 +17,12 @@ var (
 )
 
 var exportCmd = &cobra.Command{
-	Use:    "export [resource type]",
-	Long:   "Export a resource from your Tracetest server",
-	Short:  "Export resource",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "export [resource type]",
+	Long:    "Export a resource from your Tracetest server",
+	Short:   "Export resource",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()
