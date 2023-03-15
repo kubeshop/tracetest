@@ -1,4 +1,4 @@
-name: Release Tracetest
+name: Release Tracetest (RC version)
 
 permissions:
   contents: write
