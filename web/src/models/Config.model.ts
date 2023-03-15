@@ -16,4 +16,18 @@ function Config({
   };
 }
 
+export type TRawLiveConfig = {
+  AnalyticsEnabled?: boolean;
+  ID: 'current';
+  Name: 'Config';
+};
+
+Config.FromLiveUpdate = ({AnalyticsEnabled: analyticsEnabled = false, Name: name, ID: id}: TRawLiveConfig): Config => {
+  return {
+    id,
+    name,
+    analyticsEnabled,
+  };
+};
+
 export default Config;
