@@ -1,9 +1,4 @@
 ---
-type: Config
-spec:
-  analyticsEnabled: true
-
----
 type: Demo
 spec:
   name: "OpenTelemetry Shop"

@@ -9,11 +9,6 @@ spec:
     timeout: 10m
 
 ---
-type: Config
-spec:
-  analyticsEnabled: true
-
----
 type: DataStore
 spec:
   name: OpenTelemetry Collector
