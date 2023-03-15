@@ -134,11 +134,11 @@ Do you have OpenTelemetry based tracing already set up, or would you like us to 
   Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
-After choosing this option, the installer will check if your docker installation is ok on your machine and will proceed to the next step.
+After choosing this option, the installer will check if your Docker installation is ok on your machine and will proceed to the next step.
 
-### 3. Select plain vanilla installation or installation with sample app
+### 3. Select a default installation or an installation with sample app.
 
-On this step, you can choose to install only Tracetest directly or install it with a sample app. By seeing the following options:
+In this step, you can choose to install just Tracetest alone or install it with a sample app. By seeing the following options:
 
 ```text title="Expected output:"
 Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
@@ -146,14 +146,14 @@ Do you have OpenTelemetry based tracing already set up, or would you like us to 
   Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
-By choosing any option, this installer will create a `tracetest` directory in the current directory and will add a `docker-compose.yaml` file on it.
+By choosing any option, this installer will create a `tracetest` directory in the current directory and will add a `docker-compose.yaml` file to it.
 If you choose the first one, the `docker-compose.yaml` will have only Tracetest and its dependencies. By choosing the second, a sample app called [Pokeshop](../live-examples/pokeshop/overview.md) will be installed with Tracetest, allowing you to create some tests against it in the future. 
 
 For demonstration purposes, we will choose `Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.` option.
 
-### 4. Finish the installation
+### 4. Finish the installation.
 
-After that, Tracetest will proceed the installation and show how you can start it.
+Tracetest will proceed with the installation and show how to start it.
 
 ```text title="Expected output:"
 -> Thanks! We are ready to install TraceTest now
@@ -171,7 +171,7 @@ Then, use your browser to navigate to:
 Happy TraceTesting =)
 ```
 
-### 5. Start Docker Compose
+### 5. Start Docker Compose.
 
 ```bash
 docker compose -f tracetest/docker-compose.yaml up -d
