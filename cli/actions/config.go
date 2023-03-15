@@ -25,6 +25,10 @@ func NewConfigActions(options ...ResourceArgsOption) configActions {
 	}
 }
 
+func (configActions) Name() string {
+	return "config"
+}
+
 func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 	if args.File == "" {
 		return fmt.Errorf("you must specify a file to be applied")

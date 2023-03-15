@@ -32,7 +32,7 @@ var listCmd = &cobra.Command{
 			resourceType: resourceType,
 		})
 
-		resourceActions, err := resourceRegistry.Get(actions.SupportedResources(resourceType))
+		resourceActions, err := resourceRegistry.Get(resourceType)
 
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))

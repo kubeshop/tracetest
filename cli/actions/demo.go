@@ -27,6 +27,10 @@ func NewDemoActions(options ...ResourceArgsOption) demoActions {
 	}
 }
 
+func (demoActions) Name() string {
+	return "demo"
+}
+
 func (demo demoActions) Apply(ctx context.Context, args ApplyArgs) error {
 	if args.File == "" {
 		return fmt.Errorf("you must specify a file to be applied")
