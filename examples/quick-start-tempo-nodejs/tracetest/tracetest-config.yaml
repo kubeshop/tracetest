@@ -9,6 +9,3 @@ postgres:
 poolingConfig:
   maxWaitTimeForTrace: 10m
   retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
