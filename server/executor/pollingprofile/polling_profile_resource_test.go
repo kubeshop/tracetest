@@ -59,7 +59,7 @@ func TestPollingProfileResource(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			pollingProfileRepo := manager.Handler().(resourcemanager.Create[pollingprofile.PollingProfile])
+			pollingProfileRepo := manager.Handler().(*pollingprofile.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,

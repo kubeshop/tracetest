@@ -59,7 +59,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			demoRepository := manager.Handler().(resourcemanager.Create[demoresource.Demo])
+			demoRepository := manager.Handler().(*demoresource.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
@@ -156,7 +156,7 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			demoRepository := manager.Handler().(resourcemanager.Create[demoresource.Demo])
+			demoRepository := manager.Handler().(*demoresource.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
