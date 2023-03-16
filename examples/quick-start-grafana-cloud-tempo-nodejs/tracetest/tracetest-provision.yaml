@@ -3,6 +3,7 @@ dataStore:
   tempo:
     type: http
     http:
-      endpoint: https://<yourinstance>.grafana.net
+      url: https://tempo-us-central1.grafana.net/tempo
       headers:
-        Authorization: Bearer <apitoken>
+        Authorization: Basic <base64 encoded version of user:password>
+        # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/

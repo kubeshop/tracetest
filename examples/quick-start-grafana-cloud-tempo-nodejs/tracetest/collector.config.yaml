@@ -1,9 +1,3 @@
-extensions:
-  basicauth/otlp:
-    client_auth:
-      username: <userid>
-      password: <apitoken>
-
 receivers:
   otlp:
     protocols:
@@ -19,13 +13,13 @@ exporters:
     loglevel: debug
   otlp:
     endpoint: tempo-us-central1.grafana.net:443
+    headers:
+      authorization: Basic <base64 encoded version of user:password>
+      # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/
     tls:
       insecure: false
-    auth:
-      authenticator: basicauth/otlp
 
 service:
-  extensions: [ basicauth/otlp ]
   pipelines:
     traces:
       receivers: [otlp]
