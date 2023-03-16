@@ -1,14 +1,4 @@
 ---
-type: PollingProfile
-spec:
-  name: Default
-  strategy: periodic
-  default: true
-  periodic:
-    retryDelay: 500ms
-    timeout: 30s
-
----
 type: DataStore
 spec:
   name: otlp
