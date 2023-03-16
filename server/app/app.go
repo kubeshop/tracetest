@@ -134,20 +134,20 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
-	subscriptionManager := subscription.NewManager()
-	app.subscribeToConfigChanges(subscriptionManager)
-
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
 		return err
 	}
+	testDB, err := testdb.Postgres(
+		testdb.WithDB(db),
+	)
+
+	subscriptionManager := subscription.NewManager()
+	app.subscribeToConfigChanges(subscriptionManager)
 
 	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
 
-	testDB, err := testdb.Postgres(
-		testdb.WithDB(db),
-	)
 	if err != nil {
 		log.Fatal(err)
 	}
