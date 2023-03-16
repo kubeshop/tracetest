@@ -37,7 +37,7 @@ type (
 	HttpClientConfig struct {
 		Url        string
 		Headers    map[string]string
-		TLSSetting configtls.TLSClientSetting
+		TLSSetting configtls.TLSClientSetting `mapstructure:"tls"`
 	}
 
 	OTELCollectorConfig struct {

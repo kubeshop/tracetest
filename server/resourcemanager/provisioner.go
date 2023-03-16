@@ -18,6 +18,7 @@ func (m *manager[T]) Provision(ctx context.Context, values map[string]any) error
 	if values["type"] != m.resourceType {
 		return ErrTypeNotSupported
 	}
+
 	targetResource := Resource[T]{}
 	err := mapstructure.Decode(values, &targetResource)
 	if err != nil {

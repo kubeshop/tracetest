@@ -173,9 +173,6 @@ var cases = []struct {
 	name         string
 	file         string
 	expectations expectations
-
-	dsType model.DataStoreType
-	values model.DataStoreValues
 }{
 	{
 		name: "JaegerGRPC",
@@ -183,8 +180,8 @@ var cases = []struct {
 		expectations: expectations{
 			dataStore: &model.DataStore{
 				Name:      "Jaeger",
-				Type:      model.DataStoreTypeJaeger,
 				IsDefault: true,
+				Type:      model.DataStoreTypeJaeger,
 				Values: model.DataStoreValues{
 					Jaeger: &configgrpc.GRPCClientSettings{
 						Endpoint:   "jaeger-query:16685",
@@ -194,66 +191,96 @@ var cases = []struct {
 			},
 		},
 	},
-	// {
-	// 	name:   "TempoGRPC",
-	// 	file:   "./testdata/tempo_grpc.yaml",
-	// 	dsType: model.DataStoreTypeTempo,
-	// 	values: model.DataStoreValues{
-	// 		Tempo: &model.BaseClientConfig{
-	// 			Grpc: configgrpc.GRPCClientSettings{
-	// 				Endpoint:   "tempo:9095",
-	// 				TLSSetting: configtls.TLSClientSetting{Insecure: true},
-	// 			},
-	// 		},
-	// 	},
-	// },
-	// {
-	// 	name:   "TempoHTTP",
-	// 	file:   "./testdata/tempo_http.yaml",
-	// 	dsType: model.DataStoreTypeTempo,
-	// 	values: model.DataStoreValues{
-	// 		Tempo: &model.BaseClientConfig{
-	// 			Http: model.HttpClientConfig{
-	// 				Url:        "tempo:80",
-	// 				TLSSetting: configtls.TLSClientSetting{Insecure: true},
-	// 			},
-	// 		},
-	// 	},
-	// },
-	// {
-	// 	name:   "OpenSearch",
-	// 	file:   "./testdata/opensearch.yaml",
-	// 	dsType: model.DataStoreTypeOpenSearch,
-	// 	values: model.DataStoreValues{
-	// 		OpenSearch: &model.ElasticSearchDataStoreConfig{
-	// 			Addresses: []string{"http://opensearch:9200"},
-	// 			Index:     "traces",
-	// 		},
-	// 	},
-	// },
-	// {
-	// 	name:   "SignalFX",
-	// 	file:   "./testdata/signalfx.yaml",
-	// 	dsType: model.DataStoreTypeSignalFX,
-	// 	values: model.DataStoreValues{
-	// 		SignalFx: &model.SignalFXDataStoreConfig{
-	// 			Token: "thetoken",
-	// 			Realm: "us1",
-	// 		},
-	// 	},
-	// },
-	// {
-	// 	name:   "ElasitcAPM",
-	// 	file:   "./testdata/elastic_apm.yaml",
-	// 	dsType: model.DataStoreTypeElasticAPM,
-	// 	values: model.DataStoreValues{
-	// 		ElasticApm: &model.ElasticSearchDataStoreConfig{
-	// 			Addresses:          []string{"https://es01:9200"},
-	// 			Username:           "elastic",
-	// 			Password:           "changeme",
-	// 			Index:              "traces-apm-default",
-	// 			InsecureSkipVerify: true,
-	// 		},
-	// 	},
-	// },
+	{
+		name: "TempoGRPC",
+		file: "./testdata/tempo_grpc.yaml",
+		expectations: expectations{
+			dataStore: &model.DataStore{
+				Name:      "Tempo (gRPC)",
+				IsDefault: true,
+				Type:      model.DataStoreTypeTempo,
+				Values: model.DataStoreValues{
+					Tempo: &model.BaseClientConfig{
+						Grpc: configgrpc.GRPCClientSettings{
+							Endpoint:   "tempo:9095",
+							TLSSetting: configtls.TLSClientSetting{Insecure: true},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "TempoHTTP",
+		file: "./testdata/tempo_http.yaml",
+		expectations: expectations{
+			dataStore: &model.DataStore{
+				Name:      "Tempo (HTTP)",
+				IsDefault: true,
+				Type:      model.DataStoreTypeTempo,
+				Values: model.DataStoreValues{
+					Tempo: &model.BaseClientConfig{
+						Http: model.HttpClientConfig{
+							Url:        "tempo:80",
+							TLSSetting: configtls.TLSClientSetting{Insecure: true},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "OpenSearch",
+		file: "./testdata/opensearch.yaml",
+		expectations: expectations{
+			dataStore: &model.DataStore{
+				Name:      "OpenSearch",
+				IsDefault: true,
+				Type:      model.DataStoreTypeOpenSearch,
+				Values: model.DataStoreValues{
+					OpenSearch: &model.ElasticSearchDataStoreConfig{
+						Addresses: []string{"http://opensearch:9200"},
+						Index:     "traces",
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "SignalFX",
+		file: "./testdata/signalfx.yaml",
+		expectations: expectations{
+			dataStore: &model.DataStore{
+				Name:      "SignalFX",
+				IsDefault: true,
+				Type:      model.DataStoreTypeSignalFX,
+				Values: model.DataStoreValues{
+					SignalFx: &model.SignalFXDataStoreConfig{
+						Token: "thetoken",
+						Realm: "us1",
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "ElasitcAPM",
+		file: "./testdata/elastic_apm.yaml",
+		expectations: expectations{
+			dataStore: &model.DataStore{
+				Name:      "elastic APM",
+				IsDefault: true,
+				Type:      model.DataStoreTypeElasticAPM,
+				Values: model.DataStoreValues{
+					ElasticApm: &model.ElasticSearchDataStoreConfig{
+						Addresses:          []string{"https://es01:9200"},
+						Username:           "elastic",
+						Password:           "changeme",
+						Index:              "traces-apm-default",
+						InsecureSkipVerify: true,
+					},
+				},
+			},
+		},
+	},
 }

@@ -349,7 +349,6 @@ func (dsr DataStoreResource) toModel() model.DataStore {
 
 	deepcopy.DeepCopy(dsr, &actual)
 	if dsr.Jaeger != nil {
-		fmt.Println("***", dsr.Jaeger)
 		deepcopy.DeepCopy(dsr.Jaeger, &actual.Values.Jaeger)
 		deepcopy.DeepCopy(dsr.Jaeger.TLSSetting, &actual.Values.Jaeger.TLSSetting)
 	}
@@ -363,6 +362,10 @@ func (dsr DataStoreResource) toModel() model.DataStore {
 	}
 	if dsr.SignalFx != nil {
 		deepcopy.DeepCopy(dsr.SignalFx, &actual.Values.SignalFx)
+	}
+
+	if dsr.ElasticApm != nil {
+		deepcopy.DeepCopy(dsr.ElasticApm, &actual.Values.ElasticApm)
 	}
 	if dsr.AwsXRay != nil {
 		deepcopy.DeepCopy(dsr.AwsXRay, &actual.Values.AwsXRay)
