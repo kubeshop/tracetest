@@ -137,8 +137,7 @@ func (f provisioningFixture) assert(t *testing.T, expected expectations) {
 	}
 
 	if expected.pollingprofile != nil {
-		actual, err := f.pollingProfiles.GetDefault(context.TODO())
-		require.NoError(t, err)
+		actual := f.pollingProfiles.GetDefault(context.TODO())
 
 		// ignore ID for assertion
 		expected.pollingprofile.ID = "0"
