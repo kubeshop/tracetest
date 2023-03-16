@@ -44,8 +44,7 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
 - [ ] Test Tracetest setup with [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
 
 - [ ] Test specific features added/changed on this release on a local installation or in a Kubernetes installation:
-  - [ ] Feature 1
-  - [ ] Feature 2
+  - [ ] Merge https://github.com/kubeshop/helm-charts/pull/436
 
 ## Automatic Tests
 
