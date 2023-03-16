@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -25,7 +26,7 @@ var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationUpdate,
 }
 
-var defaultPollingProfile = PollingProfile{
+var DefaultPollingProfile = PollingProfile{
 	ID:       id.ID("current"),
 	Name:     "default",
 	Default:  true,
@@ -47,6 +48,20 @@ type PollingProfile struct {
 type PeriodicPollingConfig struct {
 	RetryDelay string `mapstructure:"retryDelay"`
 	Timeout    string `mapstructure:"timeout"`
+}
+
+func (ppc *PeriodicPollingConfig) TimeoutDuration() time.Duration {
+	d, _ := time.ParseDuration(ppc.Timeout)
+	return d
+}
+
+func (ppc *PeriodicPollingConfig) RetryDelayDuration() time.Duration {
+	d, _ := time.ParseDuration(ppc.RetryDelay)
+	return d
+}
+
+func (ppc *PeriodicPollingConfig) MaxTracePollRetry() int {
+	return int(math.Ceil(float64(ppc.TimeoutDuration()) / float64(ppc.RetryDelayDuration())))
 }
 
 func (ppc *PeriodicPollingConfig) Validate() error {
@@ -158,8 +173,9 @@ const (
 		FROM polling_profiles `
 )
 
-func (r *Repository) GetDefault(ctx context.Context) (PollingProfile, error) {
-	return r.Get(ctx, id.ID("current"))
+func (r *Repository) GetDefault(ctx context.Context) PollingProfile {
+	pp, _ := r.Get(ctx, id.ID("current"))
+	return pp
 }
 func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
 	profile := PollingProfile{
@@ -178,7 +194,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) 
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return defaultPollingProfile, nil
+			return DefaultPollingProfile, nil
 		}
 		return PollingProfile{}, fmt.Errorf("sql query: %w", err)
 	}

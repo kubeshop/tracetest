@@ -187,8 +187,10 @@ func (app *App) Start(opts ...appOption) error {
 
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
+	pollingProfileRepo := pollingprofile.NewRepository(db)
+
 	rf := newRunnerFacades(
-		app.cfg,
+		pollingProfileRepo,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -240,7 +242,6 @@ func (app *App) Start(opts ...appOption) error {
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	registerConfigResource(configRepo, apiRouter, db, provisioner)
 
-	pollingProfileRepo := pollingprofile.NewRepository(db)
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner)
 
 	demoRepo := demoresource.NewRepository(db)
@@ -326,7 +327,7 @@ type facadeConfig interface {
 }
 
 func newRunnerFacades(
-	cfg facadeConfig,
+	ppRepo *pollingprofile.Repository,
 	testDB model.Repository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
@@ -345,12 +346,8 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	retryDelay := cfg.PoolingRetryDelay()
-	maxWaitTime := cfg.PoolingMaxWaitTimeForTraceDuration()
-
 	pollerExecutor := executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTime,
+		ppRepo,
 		tracer,
 		execTestUpdater,
 		tracedb.Factory(testDB),
@@ -359,10 +356,9 @@ func newRunnerFacades(
 
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
+		ppRepo,
 		execTestUpdater,
 		assertionRunner,
-		retryDelay,
-		maxWaitTime,
 		subscriptionManager,
 	)
 
