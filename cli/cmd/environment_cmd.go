@@ -5,10 +5,11 @@ import (
 )
 
 var environmentCmd = &cobra.Command{
-	Use:    "environment",
-	Short:  "Manage your tracetest environments",
-	Long:   "Manage your tracetest environments",
-	PreRun: setupCommand(),
+	GroupID: cmdGroupConfig.ID,
+	Use:     "environment",
+	Short:   "Manage your tracetest environments",
+	Long:    "Manage your tracetest environments",
+	PreRun:  setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

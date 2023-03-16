@@ -15,10 +15,11 @@ var docsOutputDir string
 var docusaurusFolder string
 
 var docGenCmd = &cobra.Command{
-	Use:    "docgen",
-	Short:  "Generate the CLI documentation",
-	Long:   "Generate the CLI documentation",
-	PreRun: setupCommand(),
+	GroupID: cmdGroupMisc.ID,
+	Use:     "docgen",
+	Short:   "Generate the CLI documentation",
+	Long:    "Generate the CLI documentation",
+	PreRun:  setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		os.RemoveAll(docsOutputDir)
 		err := os.MkdirAll(docsOutputDir, os.ModePerm)

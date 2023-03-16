@@ -27,6 +27,10 @@ func NewPollingActions(options ...ResourceArgsOption) pollingActions {
 	}
 }
 
+func (pollingActions) Name() string {
+	return "pollingprofile"
+}
+
 func (polling pollingActions) Apply(ctx context.Context, args ApplyArgs) error {
 	if args.File == "" {
 		return fmt.Errorf("you must specify a file to be applied")

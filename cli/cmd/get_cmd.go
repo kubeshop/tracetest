@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -14,11 +13,12 @@ import (
 var resourceID string
 
 var getCmd = &cobra.Command{
-	Use:    "get [resource type]",
-	Long:   "Get a resource from your Tracetest server",
-	Short:  "Get resource",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "get [resource type]",
+	Long:    "Get a resource from your Tracetest server",
+	Short:   "Get resource",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()
@@ -27,7 +27,7 @@ var getCmd = &cobra.Command{
 			resourceType: resourceType,
 		})
 
-		resourceActions, err := resourceRegistry.Get(actions.SupportedResources(resourceType))
+		resourceActions, err := resourceRegistry.Get(resourceType)
 
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))

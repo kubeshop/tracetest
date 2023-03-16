@@ -21,6 +21,7 @@ type ListArgs struct {
 }
 
 type ResourceActions interface {
+	Name() string
 	Apply(context.Context, ApplyArgs) error
 	List(context.Context, ListArgs) error
 	Get(context.Context, string) error
@@ -35,28 +36,23 @@ type resourceArgs struct {
 }
 
 type ResourceArgsOption = func(args *resourceArgs)
-type ResourceRegistry map[SupportedResources]ResourceActions
-type SupportedResources string
+type ResourceRegistry map[string]ResourceActions
 
 var (
-	SupportedResourceConfig         SupportedResources = "config"
-	SupportedResourcePollingProfile SupportedResources = "pollingprofile"
-	SupportedResourceDemo           SupportedResources = "demo"
-
 	ErrResourceNotRegistered      = errors.New("resource not registered")
 	ErrNotSupportedResourceAction = errors.New("the specified resource type doesn't support the action")
 )
 
 func NewResourceRegistry() ResourceRegistry {
-	return map[SupportedResources]ResourceActions{}
+	return ResourceRegistry{}
 }
 
-func (r ResourceRegistry) Register(resource SupportedResources, actions ResourceActions) {
-	r[resource] = actions
+func (r ResourceRegistry) Register(actions ResourceActions) {
+	r[actions.Name()] = actions
 }
 
-func (r ResourceRegistry) Get(resource SupportedResources) (ResourceActions, error) {
-	resourceActions, found := r[resource]
+func (r ResourceRegistry) Get(name string) (ResourceActions, error) {
+	resourceActions, found := r[name]
 
 	if !found {
 		return nil, ErrResourceNotRegistered

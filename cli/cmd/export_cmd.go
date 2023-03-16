@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -18,11 +17,12 @@ var (
 )
 
 var exportCmd = &cobra.Command{
-	Use:    "export [resource type]",
-	Long:   "Export a resource from your Tracetest server",
-	Short:  "Export resource",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "export [resource type]",
+	Long:    "Export a resource from your Tracetest server",
+	Short:   "Export resource",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()
@@ -31,7 +31,7 @@ var exportCmd = &cobra.Command{
 			resourceType: resourceType,
 		})
 
-		resourceActions, err := resourceRegistry.Get(actions.SupportedResources(resourceType))
+		resourceActions, err := resourceRegistry.Get(resourceType)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to export resource instance for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)

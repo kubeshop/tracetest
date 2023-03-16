@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -15,11 +14,12 @@ import (
 var deletedResourceID string
 
 var deleteCmd = &cobra.Command{
-	Use:    "delete [resource type]",
-	Long:   "Delete resources from your Tracetest server",
-	Short:  "Delete resources",
-	PreRun: setupCommand(),
-	Args:   cobra.MinimumNArgs(1),
+	GroupID: cmdGroupResources.ID,
+	Use:     "delete [resource type]",
+	Long:    "Delete resources from your Tracetest server",
+	Short:   "Delete resources",
+	PreRun:  setupCommand(),
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()
@@ -28,7 +28,7 @@ var deleteCmd = &cobra.Command{
 			resourceType: resourceType,
 		})
 
-		resourceActions, err := resourceRegistry.Get(actions.SupportedResources(resourceType))
+		resourceActions, err := resourceRegistry.Get(resourceType)
 
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))

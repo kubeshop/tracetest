@@ -5,10 +5,11 @@ import (
 )
 
 var dataStoreCmd = &cobra.Command{
-	Use:    "datastore",
-	Short:  "Manage your tracetest data stores",
-	Long:   "Manage your tracetest data stores",
-	PreRun: setupCommand(),
+	GroupID: cmdGroupConfig.ID,
+	Use:     "datastore",
+	Short:   "Manage your tracetest data stores",
+	Long:    "Manage your tracetest data stores",
+	PreRun:  setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
