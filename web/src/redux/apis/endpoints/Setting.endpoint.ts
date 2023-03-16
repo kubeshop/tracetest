@@ -1,10 +1,12 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
-import Config, {TRawConfig} from 'models/Config.model';
+import Config, {TRawConfig, TRawLiveConfig} from 'models/Config.model';
 import Demo, {TRawDemo} from 'models/Demo.model';
 import Polling, {TRawPolling} from 'models/Polling.model';
 import {TDraftResource, TListResponse} from 'types/Settings.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
+import {IListenerFunction} from 'gateways/WebSocket.gateway';
+import WebSocketService from 'services/WebSocket.service';
 
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getConfig: builder.query<Config, unknown>({
@@ -17,6 +19,17 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     providesTags: () => [{type: TracetestApiTags.SETTING, id: 'Config'}],
     transformResponse: (rawConfig: TRawConfig) => Config(rawConfig),
+    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
+      const listener: IListenerFunction<TRawLiveConfig> = data => {
+        updateCachedData(() => Config.FromLiveUpdate(data.event));
+      };
+      await WebSocketService.initWebSocketSubscription({
+        listener,
+        resource: '/app/config/update',
+        waitToCleanSubscription: cacheEntryRemoved,
+        waitToInitSubscription: cacheDataLoaded,
+      });
+    },
   }),
   getPolling: builder.query<Polling[], unknown>({
     query: () => ({

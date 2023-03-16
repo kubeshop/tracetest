@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
@@ -20,11 +21,20 @@ const (
 const ResourceName = "PollingProfile"
 
 var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationCreate,
 	resourcemanager.OperationDelete,
 	resourcemanager.OperationGet,
-	resourcemanager.OperationList,
 	resourcemanager.OperationUpdate,
+}
+
+var defaultPollingProfile = PollingProfile{
+	ID:       id.ID("current"),
+	Name:     "default",
+	Default:  true,
+	Strategy: Periodic,
+	Periodic: &PeriodicPollingConfig{
+		Timeout:    "1m",
+		RetryDelay: "5s",
+	},
 }
 
 type PollingProfile struct {
@@ -40,13 +50,31 @@ type PeriodicPollingConfig struct {
 	Timeout    string `mapstructure:"timeout"`
 }
 
+func (ppc *PeriodicPollingConfig) Validate() error {
+	if ppc == nil {
+		return fmt.Errorf("missing periodic polling profile configuration")
+	}
+
+	if _, err := time.ParseDuration(ppc.RetryDelay); err != nil {
+		return fmt.Errorf("retry delay configuration is invalid: %w", err)
+	}
+
+	if _, err := time.ParseDuration(ppc.Timeout); err != nil {
+		return fmt.Errorf("timeout configuration is invalid: %w", err)
+	}
+
+	return nil
+}
+
 func (pp PollingProfile) HasID() bool {
 	return pp.ID.String() != ""
 }
 
 func (pp PollingProfile) Validate() error {
-	if pp.Strategy == Periodic && pp.Periodic == nil {
-		return fmt.Errorf("missing periodic polling profile configuration")
+	if pp.Strategy == Periodic {
+		if err := pp.Periodic.Validate(); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -81,7 +109,10 @@ func (r *Repository) Create(ctx context.Context, profile PollingProfile) (Pollin
 	)
 
 	if profile.ID == "" {
-		profile.ID = id.SlugFromString(profile.Name)
+		// TODO: update this to create the slug from the profile name
+		// when we support multiple profiles:
+		// profile.ID = id.SlugFromString(profile.Name)
+		profile.ID = id.ID("current")
 	}
 
 	if profile.Default {
@@ -140,63 +171,18 @@ func (r *Repository) clearDefaultFlag(ctx context.Context) error {
 	return err
 }
 
-const updateQuery = `
-	UPDATE polling_profiles SET
-		"name" = $2,
-		"default" = $3,
-		"strategy" = $4,
-		"periodic" = $5
-	WHERE "id" = $1`
-
 func (r *Repository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
-	var (
-		periodicJSON []byte
-		err          error
-	)
-
-	if profile.Default {
-		err := r.clearDefaultFlag(ctx)
-		if err != nil {
-			return PollingProfile{}, fmt.Errorf("could not update old default profile: %w", err)
-		}
+	err := r.Delete(ctx, profile.ID)
+	if err != nil && errors.Unwrap(err) != sql.ErrNoRows {
+		return PollingProfile{}, fmt.Errorf("could not delete old profile when updating it: %w", err)
 	}
 
-	if profile.Periodic != nil {
-		periodicJSON, err = json.Marshal(profile.Periodic)
-		if err != nil {
-			return PollingProfile{}, fmt.Errorf("could not marshal periodic strategy configuration: %w", err)
-		}
-	}
-
-	oldProfile, err := r.Get(ctx, profile.ID)
+	newProfile, err := r.Create(ctx, profile)
 	if err != nil {
-		return PollingProfile{}, err
+		return PollingProfile{}, fmt.Errorf("could not create updated profile: %w", err)
 	}
 
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return PollingProfile{}, err
-	}
-
-	_, err = tx.ExecContext(ctx, updateQuery,
-		oldProfile.ID,
-		profile.Name,
-		profile.Default,
-		profile.Strategy,
-		periodicJSON,
-	)
-
-	if err != nil {
-		tx.Rollback()
-		return PollingProfile{}, fmt.Errorf("sql exec: %w", err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return PollingProfile{}, fmt.Errorf("commit: %w", err)
-	}
-
-	return profile, nil
+	return newProfile, nil
 }
 
 const (
