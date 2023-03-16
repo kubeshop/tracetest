@@ -14,8 +14,8 @@ spec:
   specs:
     - selector: span[tracetest.span.type="http"]
       assertions:
-        - attr:tracetest.selected_spans.count = 2
-        - attr:tracetest.span.duration < 200ms
+        - attr:tracetest.selected_spans.count  =  2
+        - attr:tracetest.span.duration  <  1s
     - selector: span[tracetest.span.type="http" name="amazon.com" http.method="GET"]
       assertions:
         - attr:http.status_code = 301

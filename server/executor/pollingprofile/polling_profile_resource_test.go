@@ -1,7 +1,6 @@
 package pollingprofile_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -14,38 +13,16 @@ import (
 
 func TestPollingProfileResource(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
-	sampleProfile := pollingprofile.PollingProfile{
-		ID:       "1",
-		Name:     "test",
-		Default:  true,
-		Strategy: pollingprofile.Periodic,
-		Periodic: &pollingprofile.PeriodicPollingConfig{
-			RetryDelay: "10s",
-			Timeout:    "30m",
-		},
-	}
-
-	secondSampleProfile := pollingprofile.PollingProfile{
-		ID:       "2",
-		Name:     "fast test",
-		Default:  false,
-		Strategy: pollingprofile.Periodic,
-		Periodic: &pollingprofile.PeriodicPollingConfig{
-			RetryDelay: "1s",
-			Timeout:    "1m",
-		},
-	}
-
-	thirdSampleProfile := pollingprofile.PollingProfile{
-		ID:       "3",
-		Name:     "long running test",
-		Default:  false,
-		Strategy: pollingprofile.Periodic,
-		Periodic: &pollingprofile.PeriodicPollingConfig{
-			RetryDelay: "2m",
-			Timeout:    "45m",
-		},
-	}
+	// sampleProfile := pollingprofile.PollingProfile{
+	// 	ID:       "1",
+	// 	Name:     "test",
+	// 	Default:  true,
+	// 	Strategy: pollingprofile.Periodic,
+	// 	Periodic: &pollingprofile.PeriodicPollingConfig{
+	// 		RetryDelay: "10s",
+	// 		Timeout:    "30m",
+	// 	},
+	// }
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceType: "PollingProfile",
@@ -53,48 +30,50 @@ func TestPollingProfileResource(t *testing.T) {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			pollingProfileRepo := pollingprofile.NewRepository(db)
 
-			manager := resourcemanager.New[pollingprofile.PollingProfile]("PollingProfile", pollingProfileRepo, resourcemanager.WithIDGen(id.GenerateID))
+			manager := resourcemanager.New[pollingprofile.PollingProfile](
+				"PollingProfile",
+				pollingProfileRepo,
+				resourcemanager.WithOperations(pollingprofile.Operations...),
+				resourcemanager.WithIDGen(id.GenerateID),
+			)
 			manager.RegisterRoutes(router)
 
 			return manager
 		},
-		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			pollingProfileRepo := manager.Handler().(resourcemanager.Create[pollingprofile.PollingProfile])
-			switch op {
-			case rmtests.OperationGetSuccess,
-				rmtests.OperationUpdateSuccess,
-				rmtests.OperationDeleteSuccess,
-				rmtests.OperationListSuccess:
-				pollingProfileRepo.Create(context.TODO(), sampleProfile)
-			case rmtests.OperationListPaginatedSuccess:
-				pollingProfileRepo.Create(context.TODO(), sampleProfile)
-				pollingProfileRepo.Create(context.TODO(), secondSampleProfile)
-				pollingProfileRepo.Create(context.TODO(), thirdSampleProfile)
-			}
-		},
+		// Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
+		// 	pollingProfileRepo := manager.Handler().(*pollingprofile.Repository)
+		// 	switch op {
+		// 	case rmtests.OperationGetSuccess,
+		// 		pollingProfileRepo.Update(context.TODO(), sampleProfile)
+		// 	case rmtests.OperationListPaginatedSuccess:
+		// 		pollingProfileRepo.Create(context.TODO(), sampleProfile)
+		// 		pollingProfileRepo.Create(context.TODO(), secondSampleProfile)
+		// 		pollingProfileRepo.Create(context.TODO(), thirdSampleProfile)
+		// 	}
+		// },
 		SampleJSON: `{
 			"type": "PollingProfile",
 			"spec": {
-				"id": "1",
-				"name": "test",
+				"id": "current",
+				"name": "default",
 				"default": true,
 				"strategy": "periodic",
 				"periodic": {
-					"retryDelay": "10s",
-					"timeout": "30m"
+					"timeout": "1m",
+					"retryDelay": "5s"
 				}
 			}
 		}`,
 		SampleJSONUpdated: `{
 			"type": "PollingProfile",
 			"spec": {
-				"id": "1",
+				"id": "current",
 				"name": "long test",
 				"default": true,
 				"strategy": "periodic",
 				"periodic": {
-					"retryDelay": "25s",
-					"timeout": "1h"
+					"timeout": "1h",
+					"retryDelay": "25s"
 				}
 			}
 		}`,

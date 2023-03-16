@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
@@ -31,21 +31,21 @@ type TraceFetcher interface {
 	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
+type PollingProfileGetter interface {
+	GetDefault(ctx context.Context) pollingprofile.PollingProfile
+}
+
 func NewTracePoller(
 	pe PollerExecutor,
+	ppGetter PollingProfileGetter,
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
-	retryDelay time.Duration,
-	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 ) PersistentTracePoller {
-	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		updater:             updater,
+		ppGetter:            ppGetter,
 		pollerExecutor:      pe,
-		maxWaitTimeForTrace: maxWaitTimeForTrace,
-		maxTracePollRetry:   maxTracePollRetry,
-		retryDelay:          retryDelay,
 		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
 		assertionRunner:     assertionRunner,
@@ -54,13 +54,10 @@ func NewTracePoller(
 }
 
 type tracePoller struct {
-	updater             RunUpdater
-	pollerExecutor      PollerExecutor
-	maxWaitTimeForTrace time.Duration
-	assertionRunner     AssertionRunner
-
-	retryDelay        time.Duration
-	maxTracePollRetry int
+	updater         RunUpdater
+	ppGetter        PollingProfileGetter
+	pollerExecutor  PollerExecutor
+	assertionRunner AssertionRunner
 
 	subscriptionManager *subscription.Manager
 
@@ -159,15 +156,17 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	run := job.run
 
+	pp := *tp.ppGetter.GetDefault(job.ctx).Periodic
+
 	// Edge case: the trace still not avaiable on Data Store during polling
-	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < tp.maxWaitTimeForTrace {
+	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < pp.TimeoutDuration() {
 		log.Println("[TracePoller] Trace not found on Data Store yet. Requeuing...")
 		tp.requeue(job)
 		return
 	}
 
 	if errors.Is(err, connection.ErrTraceNotFound) {
-		err = fmt.Errorf("timed out waiting for traces after %s", tp.maxWaitTimeForTrace.String())
+		err = fmt.Errorf("timed out waiting for traces after %s", pp.Timeout)
 		fmt.Println("[TracePoller] Timed-out", err)
 	} else {
 		err = fmt.Errorf("cannot fetch trace: %w", err)
@@ -185,8 +184,9 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 
 func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
+		pp := *tp.ppGetter.GetDefault(job.ctx).Periodic
 		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
-		time.Sleep(tp.retryDelay)
+		time.Sleep(pp.RetryDelayDuration())
 		tp.enqueueJob(job)
 	}()
 }

@@ -91,6 +91,11 @@ func TestSampleResource(t *testing.T) {
 			mockManager.Test(t)
 
 			switch op {
+			// Provisioning
+			case rmtests.OperationProvisioningSuccess:
+				mockManager.
+					On("Provision", sample).
+					Return(nil)
 			// Create
 			case rmtests.OperationCreateNoID:
 				withGenID := sample
@@ -231,10 +236,13 @@ func TestRestrictedResource(t *testing.T) {
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager rm.Manager) {
 			mockManager := manager.Handler().(*restrictedResourceManager)
-			mockManager.Test(t)
 
 			switch op {
-
+			// Provisioning
+			case rmtests.OperationProvisioningSuccess:
+				mockManager.
+					On("Provision", sample).
+					Return(nil)
 			// Update
 			case rmtests.OperationUpdateNotFound:
 				mockManager.
@@ -314,6 +322,16 @@ func (m *baseResourceManager) Update(_ context.Context, s sampleResource) (sampl
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
+func (m *baseResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
+	sr.ID = id
+	return sr
+}
+
+func (m *baseResourceManager) Provision(_ context.Context, s sampleResource) error {
+	args := m.Called(s)
+	return args.Error(0)
+}
+
 type restrictedResourceManager struct {
 	baseResourceManager
 }
@@ -327,11 +345,6 @@ func (m *restrictedResourceManager) Operations() []rm.Operation {
 
 type sampleResourceManager struct {
 	baseResourceManager
-}
-
-func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
-	sr.ID = id
-	return sr
 }
 
 func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {

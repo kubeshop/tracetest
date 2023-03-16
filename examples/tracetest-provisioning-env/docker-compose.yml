@@ -24,8 +24,8 @@ services:
             retries: 60
         environment:
             TRACETEST_DEV: ${TRACETEST_DEV}
-            # base64 encoded jaeger datastore
-            TRACETEST_PROVISIONING: "ZGF0YVN0b3JlOgogIHR5cGU6IGphZWdlcgogIGphZWdlcjoKICAgIGVuZHBvaW50OiBqYWVnZXI6MTY2ODUKICAgIHRsczoKICAgICAgaW5zZWN1cmU6IHRydWU="
+            # contents of `tracetest-provision.yaml` encoded as base64
+            TRACETEST_PROVISIONING: "LS0tCnR5cGU6IFBvbGxpbmdQcm9maWxlCnNwZWM6CiAgbmFtZTogRGVmYXVsdAogIHN0cmF0ZWd5OiBwZXJpb2RpYwogIGRlZmF1bHQ6IHRydWUKICBwZXJpb2RpYzoKICAgIHJldHJ5RGVsYXk6IDVzCiAgICB0aW1lb3V0OiAxMG0KCi0tLQp0eXBlOiBEYXRhU3RvcmUKc3BlYzoKICBuYW1lOiBKYWVnZXIKICB0eXBlOiBqYWVnZXIKICBkZWZhdWx0OiB0cnVlCiAgamFlZ2VyOgogICAgZW5kcG9pbnQ6IGphZWdlcjoxNjY4NQogICAgdGxzOgogICAgICBpbnNlY3VyZTogdHJ1ZQo="
 
     postgres:
         image: postgres:14

@@ -3,7 +3,7 @@ import {TracetestApiTags} from 'constants/Test.constants';
 import Config, {TRawConfig, TRawLiveConfig} from 'models/Config.model';
 import Demo, {TRawDemo} from 'models/Demo.model';
 import Polling, {TRawPolling} from 'models/Polling.model';
-import {TDraftResource, TListResponse} from 'types/Settings.types';
+import {ResourceType, TDraftResource, TListResponse} from 'types/Settings.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {IListenerFunction} from 'gateways/WebSocket.gateway';
 import WebSocketService from 'services/WebSocket.service';
@@ -17,7 +17,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
         'content-type': 'application/json',
       },
     }),
-    providesTags: () => [{type: TracetestApiTags.SETTING, id: 'Config'}],
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.ConfigType}],
     transformResponse: (rawConfig: TRawConfig) => Config(rawConfig),
     async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
       const listener: IListenerFunction<TRawLiveConfig> = data => {
@@ -31,16 +31,16 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
       });
     },
   }),
-  getPolling: builder.query<Polling[], unknown>({
+  getPolling: builder.query<Polling, unknown>({
     query: () => ({
-      url: '/pollingprofile',
+      url: '/pollingprofile/current',
       method: HTTP_METHOD.GET,
       headers: {
         'content-type': 'application/json',
       },
     }),
-    providesTags: () => [{type: TracetestApiTags.SETTING, id: 'Polling'}],
-    transformResponse: ({items = []}: TListResponse<TRawPolling>) => items.map(rawPolling => Polling(rawPolling)),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.PollingProfileType}],
+    transformResponse: (rawPolling: TRawPolling) => Polling(rawPolling),
   }),
   getDemo: builder.query<Demo[], unknown>({
     query: () => ({
@@ -50,7 +50,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
         'content-type': 'application/json',
       },
     }),
-    providesTags: () => [{type: TracetestApiTags.SETTING, id: 'Demo'}],
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.DemoType}],
     transformResponse: ({items = []}: TListResponse<TRawDemo>) => items.map(rawDemo => Demo(rawDemo)),
   }),
   createSetting: builder.mutation<undefined, {resource: TDraftResource}>({

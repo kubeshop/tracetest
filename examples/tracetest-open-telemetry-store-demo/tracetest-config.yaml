@@ -6,20 +6,6 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: false
-
-demo:
-  enabled: [otel]
-  endpoints:
-    otelFrontend: http://frontend:8080
-
-experimentalFeatures: []
-
 telemetry:
   exporters:
     collector:

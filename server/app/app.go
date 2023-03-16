@@ -85,14 +85,12 @@ func WithProvisioningFile(path string) appOption {
 	}
 }
 
-func (app *App) provision(db model.Repository, configDB *configresource.Repository) {
-	p := provisioning.New(db, configDB)
-
+func provision(provisioner *provisioning.Provisioner, file string) {
 	var err error
 
-	if app.provisioningFile != "" {
-		log.Println("[provisioning] attempting file: ", app.provisioningFile)
-		err = p.FromFile(app.provisioningFile)
+	if file != "" {
+		log.Println("[provisioning] attempting file: ", file)
+		err = provisioner.FromFile(file)
 		if err != nil {
 			log.Fatalf("[provisioning] error: %s", err.Error())
 		}
@@ -100,7 +98,7 @@ func (app *App) provision(db model.Repository, configDB *configresource.Reposito
 		return
 	}
 
-	err = p.FromEnv()
+	err = provisioner.FromEnv()
 	log.Println("[provisioning] attempting env var")
 	if err != nil {
 		if !errors.Is(err, provisioning.ErrEnvEmpty) {
@@ -136,20 +134,20 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
-	subscriptionManager := subscription.NewManager()
-	app.subscribeToConfigChanges(subscriptionManager)
-
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
 		return err
 	}
+	testDB, err := testdb.Postgres(
+		testdb.WithDB(db),
+	)
+
+	subscriptionManager := subscription.NewManager()
+	app.subscribeToConfigChanges(subscriptionManager)
 
 	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
 
-	testDB, err := testdb.Postgres(
-		testdb.WithDB(db),
-	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -180,9 +178,6 @@ func (app *App) Start(opts ...appOption) error {
 		if err != nil {
 			return err
 		}
-
-		app.provision(testDB, configRepo)
-
 	}
 
 	applicationTracer, err := tracing.GetApplicationTracer(ctx, app.cfg)
@@ -192,8 +187,10 @@ func (app *App) Start(opts ...appOption) error {
 
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
+	pollingProfileRepo := pollingprofile.NewRepository(db)
+
 	rf := newRunnerFacades(
-		app.cfg,
+		pollingProfileRepo,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -237,19 +234,31 @@ func (app *App) Start(opts ...appOption) error {
 		otlpServer.Stop()
 	})
 
+	provisioner := provisioning.New()
+
 	router, mappers := controller(app.cfg, testDB, tracer, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	registerConfigResource(configRepo, apiRouter, db)
+	registerConfigResource(configRepo, apiRouter, db, provisioner)
 
-	pollingProfileRepo := pollingprofile.NewRepository(db)
-	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db)
+	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner)
 
 	demoRepo := demoresource.NewRepository(db)
-	registerDemosResource(demoRepo, apiRouter, db)
+	registerDemosResource(demoRepo, apiRouter, db, provisioner)
+
+	dataStoreManager := resourcemanager.New[testdb.DataStoreResource](
+		testdb.DataStoreResourceName,
+		testdb.NewDataStoreResourceProvisioner(testDB),
+		resourcemanager.WithOperations(resourcemanager.OperationNoop),
+	)
+	provisioner.AddResourceProvisioner(dataStoreManager)
 
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
+
+	if isNewInstall {
+		provision(provisioner, app.provisioningFile)
+	}
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", app.cfg.ServerPort()),
@@ -282,31 +291,34 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 
 }
 
-func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB) {
+func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
 	manager := resourcemanager.New[configresource.Config](
 		configresource.ResourceName,
 		configRepo,
 		resourcemanager.WithOperations(configresource.Operations...),
 	)
 	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB) {
+func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
 	manager := resourcemanager.New[pollingprofile.PollingProfile](
 		pollingprofile.ResourceName,
 		repository,
 		resourcemanager.WithOperations(pollingprofile.Operations...),
 	)
 	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerDemosResource(repository *demoresource.Repository, router *mux.Router, db *sql.DB) {
+func registerDemosResource(repository *demoresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
 	manager := resourcemanager.New[demoresource.Demo](
 		demoresource.ResourceName,
 		repository,
 		resourcemanager.WithOperations(demoresource.Operations...),
 	)
 	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
 }
 
 type facadeConfig interface {
@@ -315,7 +327,7 @@ type facadeConfig interface {
 }
 
 func newRunnerFacades(
-	cfg facadeConfig,
+	ppRepo *pollingprofile.Repository,
 	testDB model.Repository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
@@ -334,12 +346,8 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	retryDelay := cfg.PoolingRetryDelay()
-	maxWaitTime := cfg.PoolingMaxWaitTimeForTraceDuration()
-
 	pollerExecutor := executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTime,
+		ppRepo,
 		tracer,
 		execTestUpdater,
 		tracedb.Factory(testDB),
@@ -348,10 +356,9 @@ func newRunnerFacades(
 
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
+		ppRepo,
 		execTestUpdater,
 		assertionRunner,
-		retryDelay,
-		maxWaitTime,
 		subscriptionManager,
 	)
 

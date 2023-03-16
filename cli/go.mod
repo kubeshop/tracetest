@@ -1,6 +1,6 @@
 module github.com/kubeshop/tracetest/cli
 
-go 1.18
+go 1.20
 
 require (
 	github.com/alexeyco/simpletable v1.0.0

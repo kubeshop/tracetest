@@ -22,6 +22,6 @@ spec:
       assertions:
         - attr:http.url = "https://pokeapi.co/api/v2/pokemon/6"
     - name: Matching db result with the Pokemon Name
-      selector: span[tracetest.span.type="general" name="postgres@postgres"]
+      selector: span[tracetest.span.type="general" name="postgres@postgres"]:first
       assertions:
-        - attr:aws.xray.metadata.default  contains   "charizard"
+        - attr:aws.xray.metadata.default   contains    "charizard"

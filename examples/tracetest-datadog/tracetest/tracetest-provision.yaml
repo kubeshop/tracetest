@@ -1,11 +1,4 @@
 ---
-type: DataStore
-spec:
-  name: New Relic
-  type: newrelic
-  isdefault: true
-
----
 type: Demo
 spec:
   name: "OpenTelemetry Shop"
@@ -16,3 +9,19 @@ spec:
     productCatalogEndpoint: productcatalogservice:3550
     cartEndpoint: cartservice:7070
     checkoutEndpoint: checkoutservice:5050
+
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 180s
+
+---
+type: DataStore
+spec:
+  name: datadog
+  type: datadog

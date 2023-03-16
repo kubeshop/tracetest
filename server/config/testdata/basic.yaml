@@ -8,6 +8,3 @@ postgres:
 server:
   pathPrefix: /tracetest
   httpPort: 9999
-poolingConfig:
-  maxWaitTimeForTrace: 1m
-  retryDelay: 3s

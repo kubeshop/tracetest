@@ -53,42 +53,39 @@ func (polling pollingActions) Apply(ctx context.Context, args ApplyArgs) error {
 	var pollingProfile openapi.PollingProfile
 	mapstructure.Decode(fileContent.Definition().Spec, &pollingProfile.Spec)
 
-	if pollingProfile.Spec.Id == "" {
-		return polling.create(ctx, fileContent)
-	}
-
-	return polling.update(ctx, fileContent, pollingProfile.Spec.Id)
+	return polling.update(ctx, fileContent, currentConfigID)
 }
 
-func (polling pollingActions) create(ctx context.Context, file file.File) error {
-	request, err := polling.resourceClient.NewRequest(polling.resourceClient.BaseUrl, http.MethodPost, file.Contents())
-	if err != nil {
-		return fmt.Errorf("could not create request: %w", err)
-	}
+// NOT NEEDED AT THE MOMENT
+// func (polling pollingActions) create(ctx context.Context, file file.File) error {
+// 	request, err := polling.resourceClient.NewRequest(polling.resourceClient.BaseUrl, http.MethodPost, file.Contents())
+// 	if err != nil {
+// 		return fmt.Errorf("could not create request: %w", err)
+// 	}
 
-	resp, err := polling.resourceClient.Client.Do(request)
-	if err != nil {
-		return fmt.Errorf("could not send request: %w", err)
-	}
+// 	resp, err := polling.resourceClient.Client.Do(request)
+// 	if err != nil {
+// 		return fmt.Errorf("could not send request: %w", err)
+// 	}
 
-	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusUnprocessableEntity {
-		// validation error
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return fmt.Errorf("could not send request: %w", err)
-		}
+// 	defer resp.Body.Close()
+// 	if resp.StatusCode == http.StatusUnprocessableEntity {
+// 		// validation error
+// 		body, err := ioutil.ReadAll(resp.Body)
+// 		if err != nil {
+// 			return fmt.Errorf("could not send request: %w", err)
+// 		}
 
-		validationError := string(body)
-		return fmt.Errorf("invalid polling profile: %s", validationError)
-	}
-	if err != nil {
-		return fmt.Errorf("could not create polling profile: %w", err)
-	}
+// 		validationError := string(body)
+// 		return fmt.Errorf("invalid polling profile: %s", validationError)
+// 	}
+// 	if err != nil {
+// 		return fmt.Errorf("could not create polling profile: %w", err)
+// 	}
 
-	_, err = file.SaveChanges(utils.IOReadCloserToString(resp.Body))
-	return err
-}
+// 	_, err = file.SaveChanges(utils.IOReadCloserToString(resp.Body))
+// 	return err
+// }
 
 func (polling pollingActions) update(ctx context.Context, file file.File, ID string) error {
 	url := fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID)
@@ -119,24 +116,26 @@ func (polling pollingActions) update(ctx context.Context, file file.File, ID str
 }
 
 func (polling pollingActions) List(ctx context.Context, listArgs ListArgs) error {
-	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", polling.resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := polling.resourceClient.NewRequest(url, http.MethodGet, "")
-	if err != nil {
-		return fmt.Errorf("could not create request: %w", err)
-	}
+	// url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", polling.resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
+	// request, err := polling.resourceClient.NewRequest(url, http.MethodGet, "")
+	// if err != nil {
+	// 	return fmt.Errorf("could not create request: %w", err)
+	// }
 
-	resp, err := polling.resourceClient.Client.Do(request)
-	if err != nil {
-		return fmt.Errorf("could not send request: %w", err)
-	}
+	// resp, err := polling.resourceClient.Client.Do(request)
+	// if err != nil {
+	// 	return fmt.Errorf("could not send request: %w", err)
+	// }
 
-	defer resp.Body.Close()
-	fmt.Println(utils.IOReadCloserToString(resp.Body))
-	return nil
+	// defer resp.Body.Close()
+	// fmt.Println(utils.IOReadCloserToString(resp.Body))
+	// return nil
+
+	return ErrNotSupportedResourceAction
 }
 
 func (polling pollingActions) Export(ctx context.Context, ID string, filePath string) error {
-	pollingProfile, err := polling.get(ctx, ID)
+	pollingProfile, err := polling.get(ctx)
 	if err != nil {
 		return err
 	}
@@ -151,18 +150,20 @@ func (polling pollingActions) Export(ctx context.Context, ID string, filePath st
 }
 
 func (polling pollingActions) Delete(ctx context.Context, ID string) error {
-	url := fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID)
-	request, err := polling.resourceClient.NewRequest(url, http.MethodDelete, "")
-	if err != nil {
-		return fmt.Errorf("could not create request: %w", err)
-	}
+	// url := fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID)
+	// request, err := polling.resourceClient.NewRequest(url, http.MethodDelete, "")
+	// if err != nil {
+	// 	return fmt.Errorf("could not create request: %w", err)
+	// }
 
-	_, err = polling.resourceClient.Client.Do(request)
-	return err
+	// _, err = polling.resourceClient.Client.Do(request)
+	// return err
+
+	return ErrNotSupportedResourceAction
 }
 
 func (polling pollingActions) Get(ctx context.Context, ID string) error {
-	pollingProfileResponse, err := polling.get(ctx, ID)
+	pollingProfileResponse, err := polling.get(ctx)
 	if err != nil {
 		return err
 	}
@@ -171,8 +172,8 @@ func (polling pollingActions) Get(ctx context.Context, ID string) error {
 	return err
 }
 
-func (polling pollingActions) get(ctx context.Context, ID string) (string, error) {
-	request, err := polling.resourceClient.NewRequest(fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, ID), http.MethodGet, "")
+func (polling pollingActions) get(ctx context.Context) (string, error) {
+	request, err := polling.resourceClient.NewRequest(fmt.Sprintf("%s/%s", polling.resourceClient.BaseUrl, currentConfigID), http.MethodGet, "")
 	if err != nil {
 		return "", fmt.Errorf("could not create request: %w", err)
 	}

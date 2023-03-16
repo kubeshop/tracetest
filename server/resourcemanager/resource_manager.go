@@ -36,6 +36,7 @@ type Manager interface {
 	EnabledOperations() []Operation
 	Handler() any
 	RegisterRoutes(*mux.Router) *mux.Router
+	Provisioner
 }
 
 type manager[T ResourceSpec] struct {
@@ -69,7 +70,7 @@ func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption
 
 	cfg := config{
 		enabledOperations: availableOperations,
-		idgen:             func() id.ID { return id.ID("") },
+		idgen:             func() id.ID { return id.GenerateID() },
 	}
 
 	for _, opt := range opts {

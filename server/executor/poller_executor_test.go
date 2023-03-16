@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -481,6 +482,24 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	}
 }
 
+type defaultProfileGetter struct {
+	retryDelay, maxWaitTimeForTrace time.Duration
+}
+
+func (dpc defaultProfileGetter) GetDefault(context.Context) pollingprofile.PollingProfile {
+	pp := pollingprofile.DefaultPollingProfile
+
+	if dpc.retryDelay > 0 {
+		pp.Periodic.RetryDelay = dpc.retryDelay.String()
+	}
+
+	if dpc.maxWaitTimeForTrace > 0 {
+		pp.Periodic.Timeout = dpc.maxWaitTimeForTrace.String()
+	}
+
+	return pp
+}
+
 func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
@@ -488,8 +507,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
 
 	return executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTimeForTrace,
+		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
 		tracer,
 		updater,
 		traceDBFactory,

@@ -1,4 +1,6 @@
-dataStore:
+type: DataStore
+spec:
+  name: OpenSearch
   type: opensearch
   opensearch:
     addresses:
