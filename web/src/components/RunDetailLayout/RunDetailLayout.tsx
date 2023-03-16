@@ -1,14 +1,15 @@
 import {Tabs, TabsProps} from 'antd';
-import {useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
-import {RunDetailModes} from 'constants/TestRun.constants';
+import {RunDetailModes, TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import Test from 'models/Test.model';
+import {useNotification} from 'providers/Notification/Notification.provider';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
@@ -31,8 +32,21 @@ const renderTab = (title: string, testId: string, runId: string, mode: string) =
 
 const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
   const {mode = RunDetailModes.TRIGGER} = useParams();
+  const {showNotification} = useNotification();
   const {isError, run} = useTestRun();
+  const [prevState, setPrevState] = useState(run.state);
   useDocumentTitle(`${name} - ${run.state}`);
+
+  useEffect(() => {
+    if (run.state === TestState.FINISHED && prevState !== TestState.FINISHED) {
+      showNotification({
+        type: 'success',
+        title: 'Trace has been fetched successfully',
+      });
+    }
+
+    setPrevState(run.state);
+  }, [prevState, run.state, showNotification]);
 
   const tabBarExtraContent = useMemo(
     () => ({

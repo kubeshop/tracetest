@@ -49,7 +49,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const [deleteDataStore] = useDeleteDataStoreMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
-  const {contextHolder, showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
+  const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
 
   const onSaveConfig = useCallback(
@@ -143,12 +143,7 @@ const DataStoreProvider = ({children}: IProps) => {
     ]
   );
 
-  return (
-    <>
-      {contextHolder}
-      <Context.Provider value={value}>{isFetching ? null : children}</Context.Provider>
-    </>
-  );
+  return <Context.Provider value={value}>{isFetching ? null : children}</Context.Provider>;
 };
 
 export default DataStoreProvider;

@@ -1,15 +1,14 @@
-import {notification} from 'antd';
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
-import {useTheme} from 'styled-components';
 
 import {useCreateSettingMutation, useUpdateSettingMutation} from 'redux/apis/TraceTest.api';
-import {TResource, TSpec} from 'types/Settings.types';
+import {TDraftResource} from 'types/Settings.types';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useNotification} from '../Notification/Notification.provider';
 
 interface IContext {
   isLoading: boolean;
-  onSubmit(resource: TResource<TSpec>): void;
+  onSubmit(resource: TDraftResource[]): void;
 }
 
 const Context = createContext<IContext>({isLoading: false, onSubmit: noop});
@@ -21,36 +20,36 @@ interface IProps {
 export const useSettings = () => useContext(Context);
 
 const SettingsProvider = ({children}: IProps) => {
+  const {showNotification} = useNotification();
   const [createSetting, {isLoading: isLoadingCreate}] = useCreateSettingMutation();
   const [updateSetting, {isLoading: isLoadingUpdate}] = useUpdateSettingMutation();
-  const [notificationApi, notificationComponent] = notification.useNotification();
   const {onOpen: onOpenConfirmation} = useConfirmationModal();
-  const {
-    notification: {success},
-  } = useTheme();
+
+  const onSaveResource = useCallback(
+    async (resource: TDraftResource) => {
+      if (resource.spec.id) {
+        await updateSetting({resource});
+      } else {
+        await createSetting({resource});
+      }
+    },
+    [createSetting, updateSetting]
+  );
 
   const onSubmit = useCallback(
-    (resource: TResource<TSpec>) => {
+    (resources: TDraftResource[]) => {
       onOpenConfirmation({
         title: <p>Are you sure you want to save this Setting?</p>,
         heading: 'Save Confirmation',
         okText: 'Save',
         onConfirm: async () => {
-          if (resource.spec.id) {
-            await updateSetting({resource});
-          } else {
-            await createSetting({resource});
-          }
+          await Promise.all(resources.map(resource => onSaveResource(resource)));
 
-          notificationApi.success({
-            message: 'Settings saved',
-            description: 'Your settings were saved',
-            ...success,
-          });
+          showNotification({type: 'success', title: 'Settings saved', description: 'Your settings were saved'});
         },
       });
     },
-    [createSetting, notificationApi, onOpenConfirmation, success, updateSetting]
+    [onOpenConfirmation, onSaveResource, showNotification]
   );
 
   const value = useMemo<IContext>(
@@ -58,12 +57,7 @@ const SettingsProvider = ({children}: IProps) => {
     [isLoadingCreate, isLoadingUpdate, onSubmit]
   );
 
-  return (
-    <>
-      {notificationComponent}
-      <Context.Provider value={value}>{children}</Context.Provider>
-    </>
-  );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default SettingsProvider;

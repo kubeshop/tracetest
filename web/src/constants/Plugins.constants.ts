@@ -1,6 +1,5 @@
 import {IPlugin} from 'types/Plugins.types';
 import {SupportedPlugins} from './Common.constants';
-import {DemoByPluginMap} from './Demo.constants';
 import {TriggerTypes} from './Test.constants';
 
 export enum ComponentNames {
@@ -44,7 +43,7 @@ const Rest: IPlugin = {
   description: 'Create a basic HTTP request',
   isActive: true,
   type: TriggerTypes.http,
-  demoList: DemoByPluginMap.REST,
+  demoList: [],
   stepList: [
     ...Default.stepList,
     {
@@ -62,7 +61,7 @@ const GRPC: IPlugin = {
   description: 'Test and debug your GRPC request',
   isActive: true,
   type: TriggerTypes.grpc,
-  demoList: DemoByPluginMap.GRPC,
+  demoList: [],
   stepList: [
     ...Default.stepList,
     {
@@ -90,7 +89,7 @@ const Postman: IPlugin = {
   description: 'Define your HTTP Request via a Postman Collection',
   type: TriggerTypes.http,
   isActive: true,
-  demoList: DemoByPluginMap.Postman,
+  demoList: [],
   stepList: [
     ...Default.stepList,
     {
@@ -132,7 +131,7 @@ const Curl: IPlugin = {
       component: ComponentNames.RequestDetails,
     },
   ],
-  demoList: DemoByPluginMap.CURL,
+  demoList: [],
   type: TriggerTypes.http,
 };
 

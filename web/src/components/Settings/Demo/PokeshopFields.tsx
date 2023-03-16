@@ -1,19 +1,24 @@
 import {Col, Form, Input, Row} from 'antd';
+import {SupportedDemos} from 'types/Settings.types';
 
-const PokeshopFields = () => (
-  <Row gutter={[16, 16]}>
-    <Col span={12}>
-      <Form.Item label="HTTP Endpoint" name={['demo', 'pokeshopHttp']}>
-        <Input placeholder="http://demo-pokemon-api.demo" />
-      </Form.Item>
-    </Col>
+const PokeshopFields = () => {
+  const baseName = [SupportedDemos.Pokeshop, SupportedDemos.Pokeshop];
 
-    <Col span={12}>
-      <Form.Item label="GRPC Endpoint" name={['demo', 'pokeshopGrpc']}>
-        <Input placeholder="demo-pokemon-api.demo:8082" />
-      </Form.Item>
-    </Col>
-  </Row>
-);
+  return (
+    <Row gutter={[16, 16]}>
+      <Col span={12}>
+        <Form.Item label="HTTP Endpoint" name={[...baseName, 'httpEndpoint']}>
+          <Input placeholder="http://demo-pokemon-api.demo" />
+        </Form.Item>
+      </Col>
+
+      <Col span={12}>
+        <Form.Item label="GRPC Endpoint" name={[...baseName, 'grpcEndpoint']}>
+          <Input placeholder="demo-pokemon-api.demo:8082" />
+        </Form.Item>
+      </Col>
+    </Row>
+  );
+};
 
 export default PokeshopFields;

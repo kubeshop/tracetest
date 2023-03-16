@@ -6,24 +6,23 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/cli/file"
-	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/utils"
 )
 
-type configActions = resourceArgs
+type configActions struct {
+	resourceArgs
+}
 
 var _ ResourceActions = &configActions{}
+var currentConfigID = "current"
 
 func NewConfigActions(options ...ResourceArgsOption) configActions {
-	cfgActions := configActions{}
+	args := NewResourceArgs(options...)
 
-	for _, option := range options {
-		option(&cfgActions)
+	return configActions{
+		resourceArgs: args,
 	}
-
-	return cfgActions
 }
 
 func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
@@ -31,7 +30,7 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf("you must specify a file to be applied")
 	}
 
-	fileContent, err := file.Read(args.File)
+	fileContent, err := file.ReadRaw(args.File)
 	if err != nil {
 		return fmt.Errorf("could not read file: %w", err)
 	}
@@ -40,62 +39,85 @@ func (config configActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf(`file must be of type "Config"`)
 	}
 
-	var configurationResource openapi.ConfigurationResource
-	deepcopy.DeepCopy(fileContent.Definition(), &configurationResource)
-	deepcopy.DeepCopy(fileContent.Definition().Spec, &configurationResource.Spec)
+	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, currentConfigID)
+	request, err := config.resourceClient.NewRequest(url, http.MethodPut, fileContent.Contents())
+	if err != nil {
+		return fmt.Errorf("could not create request: %w", err)
+	}
 
-	request := config.client.ResourceApiApi.UpdateConfiguration(ctx, "current")
-	request = request.ConfigurationResource(configurationResource)
-
-	_, res, err := config.client.ResourceApiApi.UpdateConfigurationExecute(request)
-
+	resp, err := config.resourceClient.Client.Do(request)
 	if err != nil {
 		return fmt.Errorf("could not send request: %w", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("could not create config: %s", res.Status)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("could not create config: %s", resp.Status)
 	}
 
+	_, err = fileContent.SaveChanges(utils.IOReadCloserToString(resp.Body))
 	return err
 }
 
 func (config configActions) Get(ctx context.Context, ID string) error {
-	request := config.client.ResourceApiApi.GetConfiguration(ctx, "current")
-	configResponse, resp, err := config.client.ResourceApiApi.GetConfigurationExecute(request)
-
-	if err != nil && resp == nil {
-		return fmt.Errorf("could not send request: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		validationError := string(body)
-		return fmt.Errorf("invalid data store: %s", validationError)
-	}
-
+	configResponse, err := config.get(ctx)
 	if err != nil {
-		return fmt.Errorf("could not create data store: %w", err)
+		return err
 	}
 
-	formatter := formatters.ConfigFormatter(config.config)
-	fmt.Println(formatter.Format(*configResponse))
-
+	fmt.Println(configResponse)
 	return err
 }
 
-func (config configActions) List(ctx context.Context) error {
+func (config configActions) List(ctx context.Context, listArgs ListArgs) error {
 	return ErrNotSupportedResourceAction
 }
 
-func (config configActions) Export(ctx context.Context, ID string) error {
-	return ErrNotSupportedResourceAction
+func (config configActions) Export(ctx context.Context, ID string, filePath string) error {
+	configResponse, err := config.get(ctx)
+	if err != nil {
+		return err
+	}
+
+	file, err := file.NewFromRaw(filePath, []byte(configResponse))
+	if err != nil {
+		return fmt.Errorf("could not create file: %w", err)
+	}
+
+	_, err = file.WriteRaw()
+	return err
 }
 
 func (config configActions) Delete(ctx context.Context, ID string) error {
 	return ErrNotSupportedResourceAction
+}
+
+func (config configActions) get(ctx context.Context) (string, error) {
+	url := fmt.Sprintf("%s/%s", config.resourceClient.BaseUrl, currentConfigID)
+	request, err := config.resourceClient.NewRequest(url, http.MethodGet, "")
+	if err != nil {
+		return "", fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := config.resourceClient.Client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("could not send request: %w", err)
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return "", err
+		}
+
+		validationError := string(body)
+		return "", fmt.Errorf("invalid config: %s", validationError)
+	}
+
+	if err != nil {
+		return "", fmt.Errorf("could not get config: %w", err)
+	}
+
+	return utils.IOReadCloserToString(resp.Body), nil
 }

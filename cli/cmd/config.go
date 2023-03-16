@@ -44,11 +44,19 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		loadConfig(cmd, args)
 		overrideConfig()
 
-		apiClient := utils.GetAPIClient(cliConfig)
+		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
-		options := []actions.ResourceArgsOption{actions.WithClient(apiClient), actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
-		configActions := actions.NewConfigActions(options...)
+		configOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("config", cliConfig)))
+		configActions := actions.NewConfigActions(configOptions...)
 		resourceRegistry.Register(actions.SupportedResourceConfig, configActions)
+
+		pollingOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("pollingprofile", cliConfig)))
+		pollingActions := actions.NewPollingActions(pollingOptions...)
+		resourceRegistry.Register(actions.SupportedResourcePollingProfile, pollingActions)
+
+		demoOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("demo", cliConfig)))
+		demoActions := actions.NewDemoActions(demoOptions...)
+		resourceRegistry.Register(actions.SupportedResourceDemo, demoActions)
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)

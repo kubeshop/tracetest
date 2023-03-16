@@ -1,5 +1,8 @@
 describe('Create test from Postman Collection', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => {
+    cy.enableDemo();
+    cy.visit('/');
+  });
 
   it('should create a basic GET test', () => {
     cy.interceptHomeApiCall();

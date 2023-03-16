@@ -83,6 +83,9 @@ components:
             name:
               type: string
               description: "Name given for this profile."
+            default:
+              type: boolean
+              description: "Is default polling profile"
             strategy:
               type: string
               description: "Name of the strategy that will be used on this profile."
@@ -106,34 +109,16 @@ components:
       type: object
       description: "Represents the settings of the Pokeshop API demonstration."
       properties:
-        type:
-          type: string
-          description: "String defining that this demo is a Pokeshop demo."
-          enum:
-            - pokeshop
-        enabled:
-          type: boolean
-          description: "Flag telling if this API is enabled on Tracetest."
         httpEndpoint:
           type: string
           description: "HTTP endpoint for Pokeshop API"
         grpcEndpoint:
           type: string
           description: "gRPC endpoint for Pokeshop API"
-      required:
-        - enabled
     DemoOpenTelemetryStore:
       type: object
       description: "Represents the settings of the Open Telemetry Store demonstration."
       properties:
-        type:
-          type: string
-          description: "String defining that this demo is a Open Telemetry Store demo."
-          enum:
-            - otelstore
-        enabled:
-          type: boolean
-          description: "Flag telling if this API is enabled on Tracetest."
         frontendEndpoint:
           type: string
           description: "Address of the root URL for the Frontend microservice on Open Telemetry Store."
@@ -146,8 +131,6 @@ components:
         checkoutEndpoint:
           type: string
           description: "Address of the root URL for the Checkout microservice on Open Telemetry Store."
-      required:
-        - enabled
     Demo:
       type: object
       description: "Represents a demonstration API structured into the Resources format."
@@ -159,6 +142,25 @@ components:
             - Demo
         spec:
           description: "Represents the attributes of a Demonstration API."
-          oneOf:
-            - $ref: "#/components/schemas/DemoPokeshop"
-            - $ref: "#/components/schemas/DemoOpenTelemetryStore"
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+              description: "String defining that this demo is a Open Telemetry Store demo."
+              enum:
+                - otelstore
+                - pokeshop
+            name:
+              type: string
+              description: Name of the demo
+            enabled:
+              type: boolean
+              description: "Flag telling if this API is enabled on Tracetest."
+            pokeshop:
+              $ref: "#/components/schemas/DemoPokeshop"
+            opentelemetryStore:
+              $ref: "#/components/schemas/DemoOpenTelemetryStore"
+          required:
+            - enabled

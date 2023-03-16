@@ -1,31 +1,32 @@
+import {useEffect} from 'react';
 import {Button, Col, Form, Input, Row} from 'antd';
-
-import {rawToResource, TRawPolling} from 'models/Polling.model';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
-import {useEffect} from 'react';
+
+import {ResourceType, TDraftPollingProfiles} from 'types/Settings.types';
+import SettingService from 'services/Setting.service';
 import * as S from '../common/Settings.styled';
 
 const FORM_ID = 'polling';
 
 const PollingForm = () => {
-  const [form] = Form.useForm<TRawPolling>();
+  const [form] = Form.useForm<TDraftPollingProfiles>();
   const {isLoading, onSubmit} = useSettings();
-  const {polling} = useSettingsValues();
+  const {pollingProfiles} = useSettingsValues();
 
   useEffect(() => {
     form.resetFields();
-  }, [form, polling]);
+  }, [form, pollingProfiles]);
 
-  const handleOnSubmit = (values: TRawPolling) => {
-    onSubmit(rawToResource(values));
+  const handleOnSubmit = (values: TDraftPollingProfiles) => {
+    onSubmit([SettingService.getDraftResource(ResourceType.PollingProfileType, values)]);
   };
 
   return (
-    <Form<TRawPolling>
+    <Form<TDraftPollingProfiles>
       autoComplete="off"
       form={form}
-      initialValues={polling}
+      initialValues={SettingService.getPollingProfileInitialValues(pollingProfiles)}
       layout="vertical"
       name={FORM_ID}
       onFinish={handleOnSubmit}

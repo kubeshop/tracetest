@@ -17,7 +17,7 @@ import (
 // checks if the PollingProfile type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &PollingProfile{}
 
-// PollingProfile Represents a polling profile into the Resources format.
+// PollingProfile Represents a polling profile structured into the Resources format.
 type PollingProfile struct {
 	// Represents the type of this resource. It should always be set as 'PollingProfile'.
 	Type *string             `json:"type,omitempty"`

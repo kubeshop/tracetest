@@ -1,5 +1,0 @@
-type: Config
-spec:
-  id: current
-  name: config
-  analyticsenabled: true

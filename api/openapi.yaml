@@ -1173,9 +1173,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "./config.yaml#/components/schemas/PollingProfile"
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: "./config.yaml#/components/schemas/PollingProfile"
             text/yaml:
               schema:
                 type: array

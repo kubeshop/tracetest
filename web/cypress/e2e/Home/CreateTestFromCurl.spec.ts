@@ -1,7 +1,10 @@
 import {SupportedPlugins} from '../../../src/constants/Common.constants';
 
 describe('Create test from CURL Command', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => {
+    cy.enableDemo();
+    cy.visit('/');
+  });
 
   it('should create a basic GET test', () => {
     cy.interceptHomeApiCall();

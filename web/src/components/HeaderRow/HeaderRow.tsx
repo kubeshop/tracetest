@@ -1,21 +1,20 @@
 import {CopyOutlined} from '@ant-design/icons';
-import {message} from 'antd';
 import {useTheme} from 'styled-components';
 import {THeader} from 'types/Test.types';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import useCopy from 'hooks/useCopy';
 import Highlighted from '../Highlighted';
 import * as S from './HeaderRow.styled';
 
 interface IProps {
   header: THeader;
-  onCopy(value: string): void;
 }
 
-const HeaderRow = ({header: {key = '', value = ''}, onCopy}: IProps) => {
+const HeaderRow = ({header: {key = '', value = ''}}: IProps) => {
+  const copy = useCopy();
   const handleOnClick = () => {
-    message.success('Value copied to the clipboard');
     TestRunAnalyticsService.onTriggerResponseHeaderCopy();
-    return onCopy(value);
+    return copy(value);
   };
 
   const theme = useTheme();

@@ -22,7 +22,7 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh
 
 It works for systems with Homebrew, `apt-get`, `dpkg`, `yum`, `rpm` installed, and if no package manager is available, it will try to download the build and install it manually.
 
-You can also manually install with one of the following methods.
+You can also manually install it with one of the following methods.
 
 #### Homebrew
 
@@ -85,13 +85,13 @@ tracetest server install
 ```
 
 ```text title="Expected output:"
-████████ ██████   █████   ██████ ███████ ████████ ███████ ███████ ████████
-   ██    ██   ██ ██   ██ ██      ██         ██    ██      ██         ██
-   ██    ██████  ███████ ██      █████      ██    █████   ███████    ██
-   ██    ██   ██ ██   ██ ██      ██         ██    ██           ██    ██
-   ██    ██   ██ ██   ██  ██████ ███████    ██    ███████ ███████    ██
+████████ ██████   █████   ██████ ███████ ████████ ███████ ███████ ████████ 
+   ██    ██   ██ ██   ██ ██      ██         ██    ██      ██         ██    
+   ██    ██████  ███████ ██      █████      ██    █████   ███████    ██    
+   ██    ██   ██ ██   ██ ██      ██         ██    ██           ██    ██    
+   ██    ██   ██ ██   ██  ██████ ███████    ██    ███████ ███████    ██    
 
-
+Version: v0.10.1
 
 
 Hi! Welcome to the TraceTest server installer. I'll help you set up your TraceTest server by asking you a few questions
@@ -103,7 +103,7 @@ If you have any issues, please let us know by creating an issue (https://github.
 or reach us on Discord https://discord.gg/6zupCZFQbe
 
 
-How do you want to run TraceTest? [type to search]:
+How do you want to run TraceTest? [type to search]: 
 > Using Docker Compose
   Using Kubernetes
 ```
@@ -112,10 +112,14 @@ How do you want to run TraceTest? [type to search]:
 
 This prompts you to select if you want to get either a Docker Compose or Kubernetes setup generated for you.
 
-Select Docker Compose.
+Select `Using Docker Compose`.
 
 ```text title="Expected output:"
 ...
+
+How do you want to run TraceTest?: 
+  > Using Docker Compose
+
 
 -> Let's check if your system has everything we need
 
@@ -125,79 +129,31 @@ Select Docker Compose.
 
 -> Your system is ready! Now, let's configure TraceTest
 
-Project's docker-compose file [docker-compose.yaml]:
+Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
+> I have a tracing environment already. Just install Tracetest
+  Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
-### 3. Generate a Docker Compose File
+After choosing this option, the installer will check if your Docker installation is ok on your machine and will proceed to the next step.
 
-Add the name of the Docker Compose file, if you have one, or just hit enter to proceed and add one.
+### 3. Select a default installation or an installation with sample app.
+
+In this step, you can choose to install just Tracetest alone or install it with a sample app. By seeing the following options:
 
 ```text title="Expected output:"
-ERROR   File "docker-compose.yaml" does not exist. You need an existing docker-compose file.
-Do you want me to create an empty docker-compose file? [Y/n]:
+Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
+> I have a tracing environment already. Just install Tracetest
+  Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
-Now, hit enter again and this will generate a default `docker-compose.yaml` file.
+By choosing any option, this installer will create a `tracetest` directory in the current directory and will add a `docker-compose.yaml` file to it.
+If you choose the first one, the `docker-compose.yaml` will have only Tracetest and its dependencies. By choosing the second, a sample app called [Pokeshop](../live-examples/pokeshop/overview.md) will be installed with Tracetest, allowing you to create some tests against it in the future. 
 
-### 4. Configure Jaeger as the Trace Data Source
+For demonstration purposes, we will choose `Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.` option.
 
-Next up you'll be prompted to connect a trace data store, if you have one.
+### 4. Finish the installation.
 
-```text title="Expected output:"
-Do you have a supported tracing backend you want to use? (Jaeger, Tempo, OpenSearch, SignalFX) [y/N]:
-```
-
-Write `Y` and hit enter, or just proceed if you do not have a trace data store configured.
-
-```text title="Expected output:"
-Do you want me to set up Jaeger? [Y/n]:
-```
-
-We can set up Jaeger for you if you wish. Proceed to use Jaeger as the trace data store. We'll generate a Jaeger config for you.
-
-:::info
-If you have an existing trace data source, [read this](../configuration/overview.md), or see how to use OpenTelemetry Collector [here](../configuration/connecting-to-data-stores/opentelemetry-collector).
-:::
-
-### 5. Configure OpenTelemetry Collector
-
-Next, you'll be prompted about OpenTelemetry Collector. Proceed with `N`.
-
-```text title="Expected output:"
-Do you have an OpenTelemetry Collector? [y/N]:
-```
-
-Now we prompt you if you want us to generate an OpenTelemetry Collector config for you. Select `Y`.
-
-```text title="Expected output:"
-Do you want me to set up one? [Y/n]:
-```
-
-This will generate an OpenTelemetry Collector config for you.
-
-:::info
-Want to read in more detail how to use OpenTelemetry Collector? [Check this out](../configuration/connecting-to-data-stores/opentelemetry-collector).
-:::
-
-### (Optional) Enable a Demo App
-
-In the next step, the CLI will ask if you want a demo app to try out your Tracetest config.
-
-```text title="Expected output:"
-Do you want to enable the PokeShop demo app? (https://github.com/kubeshop/pokeshop/) [Y/n]:
-```
-
-Proceed with `Y` again.
-
-### 6. Select Output Directory for Tracetest Server Installation
-
-Lastly, select the output directory where to store all files related to Tracetest. 
-
-```text title="Expected output:"
-Tracetest output directory [tracetest/]:
-```
-
-Proceeding will set it to `tracetest/` by default.
+Tracetest will proceed with the installation and show how to start it.
 
 ```text title="Expected output:"
 -> Thanks! We are ready to install TraceTest now
@@ -206,7 +162,7 @@ Proceeding will set it to `tracetest/` by default.
 
 To start tracetest:
 
-	docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up -d
+        docker compose -f tracetest/docker-compose.yaml  up -d
 
 Then, use your browser to navigate to:
 
@@ -215,14 +171,10 @@ Then, use your browser to navigate to:
 Happy TraceTesting =)
 ```
 
-:::note
-This means all Tracetest-related config files, files for Docker Compose, and any config file for OpenTelemetry Collector will be located in a `./tracetest/` directory, with a `docker-compose.yaml` file located in the root directory where you ran the `tracetest server install` command.
-:::
-
-### 7. Start Docker Compose
+### 5. Start Docker Compose.
 
 ```bash
-docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up -d
+docker compose -f tracetest/docker-compose.yaml up -d
 ```
 
 ```bash title="Condensed expected output from the Tracetest container:"

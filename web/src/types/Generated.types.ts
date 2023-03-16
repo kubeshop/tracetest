@@ -136,6 +136,40 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
+  "/config/{configId}": {
+    /** Get Tracetest configuration */
+    get: operations["getConfiguration"];
+    /** Update Tracetest configuration */
+    put: operations["updateConfiguration"];
+  };
+  "/pollingprofile": {
+    /** List polling profiles used on Tracetest to configure how to fetch traces in a test. */
+    get: operations["listPollingProfiles"];
+    /** Create a polling profile used on Tracetest to configure how to fetch traces in a test. */
+    post: operations["createPollingProfile"];
+  };
+  "/pollingprofile/{pollingProfileId}": {
+    /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
+    get: operations["getPollingProfile"];
+    /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
+    put: operations["updatePollingProfile"];
+    /** Delete a polling profile used on Tracetest to configure how to fetch traces in a test. */
+    delete: operations["deletePollingProfile"];
+  };
+  "/demo": {
+    /** List demonstrations used on Tracetest as quick start examples. */
+    get: operations["listDemos"];
+    /** Create a demonstration used on Tracetest as quick start examples. */
+    post: operations["createDemo"];
+  };
+  "/demo/{demoId}": {
+    /** Get a demonstration used on Tracetest as quick start examples. */
+    get: operations["getDemo"];
+    /** Update a demonstration used on Tracetest as quick start examples. */
+    put: operations["updateDemo"];
+    /** Delete a demonstration used on Tracetest as quick start examples. */
+    delete: operations["deleteDemo"];
+  };
   "/datastores": {
     /** Get all Data Stores */
     get: operations["getDataStores"];
@@ -931,6 +965,293 @@ export interface operations {
       };
     };
   };
+  /** Get Tracetest configuration */
+  getConfiguration: {
+    parameters: {
+      path: {
+        /** ID of the configuration resource used on Tracetest. It should be set as 'current'. */
+        configId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
+        };
+      };
+      /** problem getting a configuration */
+      500: unknown;
+    };
+  };
+  /** Update Tracetest configuration */
+  updateConfiguration: {
+    parameters: {
+      path: {
+        /** ID of the configuration resource used on Tracetest. It should be set as 'current'. */
+        configId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
+        };
+      };
+      /** problem updating configuration */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
+      };
+    };
+  };
+  /** List polling profiles used on Tracetest to configure how to fetch traces in a test. */
+  listPollingProfiles: {
+    parameters: {
+      query: {
+        /** Indicates the maximum number of polling profiles that can be returned on this call. */
+        take?: number;
+        /** Indicates how many polling profiles will be skipped when paginating. */
+        skip?: number;
+        /** Indicates the sort field for on which all polling profiles will be sorted. */
+        sortBy?: "id" | "name" | "strategy";
+        /** Indicates the sort direction for the polling profiles (ascending or descending). */
+        sortDirection?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": {
+            count?: number;
+            items?: external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
+          };
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
+        };
+      };
+      /** invalid query for polling profiles, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing polling profile */
+      500: unknown;
+    };
+  };
+  /** Create a polling profile used on Tracetest to configure how to fetch traces in a test. */
+  createPollingProfile: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        };
+      };
+      /** problem creating a polling profile */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+      };
+    };
+  };
+  /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
+  getPollingProfile: {
+    parameters: {
+      path: {
+        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
+        pollingProfileId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        };
+      };
+      /** polling profile not found */
+      404: unknown;
+      /** problem getting a polling profile */
+      500: unknown;
+    };
+  };
+  /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
+  updatePollingProfile: {
+    parameters: {
+      path: {
+        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
+        pollingProfileId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        };
+      };
+      /** invalid polling profile, some data was sent in incorrect format. */
+      400: unknown;
+      /** polling profile not found */
+      404: unknown;
+      /** problem updating a polling profile */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+      };
+    };
+  };
+  /** Delete a polling profile used on Tracetest to configure how to fetch traces in a test. */
+  deletePollingProfile: {
+    parameters: {
+      path: {
+        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
+        pollingProfileId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid polling profile, some data was sent in incorrect format. */
+      400: unknown;
+      /** polling profile not found */
+      404: unknown;
+      /** problem deleting a polling profile */
+      500: unknown;
+    };
+  };
+  /** List demonstrations used on Tracetest as quick start examples. */
+  listDemos: {
+    parameters: {
+      query: {
+        /** Indicates the maximum number of demos that can be returned on this call. */
+        take?: number;
+        /** Indicates how many demos will be skipped when paginating. */
+        skip?: number;
+        /** Indicates the sort field for on which all demos will be sorted. */
+        sortBy?: "type" | "enabled";
+        /** Indicates the sort direction for the demos (ascending or descending). */
+        sortDirection?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["Demo"][];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"][];
+        };
+      };
+      /** invalid query for demos, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing demos */
+      500: unknown;
+    };
+  };
+  /** Create a demonstration used on Tracetest as quick start examples. */
+  createDemo: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["Demo"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"];
+        };
+      };
+      /** problem creating a demo */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["Demo"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"];
+      };
+    };
+  };
+  /** Get a demonstration used on Tracetest as quick start examples. */
+  getDemo: {
+    parameters: {
+      path: {
+        /** ID of a demonstration used on Tracetest as quick start examples. */
+        demoId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["Demo"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"];
+        };
+      };
+      /** demo not found */
+      404: unknown;
+      /** problem getting a demo */
+      500: unknown;
+    };
+  };
+  /** Update a demonstration used on Tracetest as quick start examples. */
+  updateDemo: {
+    parameters: {
+      path: {
+        /** ID of a demonstration used on Tracetest as quick start examples. */
+        demoId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["Demo"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"];
+        };
+      };
+      /** invalid demo, some data was sent in incorrect format. */
+      400: unknown;
+      /** demo not found */
+      404: unknown;
+      /** problem updating a demo */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["Demo"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"];
+      };
+    };
+  };
+  /** Delete a demonstration used on Tracetest as quick start examples. */
+  deleteDemo: {
+    parameters: {
+      path: {
+        /** ID of a demonstration used on Tracetest as quick start examples. */
+        demoId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid demo, some data was sent in incorrect format. */
+      400: unknown;
+      /** demo not found */
+      404: unknown;
+      /** problem deleting a demo */
+      500: unknown;
+    };
+  };
   /** Get all Data Stores */
   getDataStores: {
     parameters: {
@@ -1068,6 +1389,99 @@ export interface external {
           status?: "passed" | "warning" | "failed";
           message?: string;
           error?: string;
+        };
+        /** @description Represents a configuration structured into the Resources format. */
+        ConfigurationResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Config'.
+           * @enum {string}
+           */
+          type?: "Config";
+          /** @description Represents the set of configuration common options for Tracetest. */
+          spec?: {
+            /**
+             * @description ID of the configuration resource. It should always be set as 'current'.
+             * @enum {string}
+             */
+            id?: "current";
+            /**
+             * @description Name given for this configuration set. It should always be set as 'Config'.
+             * @enum {string}
+             */
+            name?: "Config";
+            /** @description Flag telling if a user allow Tracetest to send analytics about its usage. */
+            analyticsEnabled: boolean;
+          };
+        };
+        /** @description Represents a polling profile structured into the Resources format. */
+        PollingProfile: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'PollingProfile'.
+           * @enum {string}
+           */
+          type?: "PollingProfile";
+          /** @description Represents the attributes of a Polling Profile. */
+          spec?: {
+            /** @description ID of this Polling Profile. */
+            id: string;
+            /** @description Name given for this profile. */
+            name: string;
+            /** @description Is default polling profile */
+            default?: boolean;
+            /**
+             * @description Name of the strategy that will be used on this profile.
+             * @enum {string}
+             */
+            strategy: "periodic";
+            /** @description Configuration for the strategy 'periodic'. It only should be filled if the field strategy is equals to 'periodic'. */
+            periodic?: {
+              /** @description Time that the poller should wait until try to fetch more traces. It should be written in duration format (example: 1s, 30s, 1m). */
+              retryDelay?: string;
+              /** @description Total time that the poller should try to continue to fetch traces. It should be written in duration format (example: 1s, 30s, 1m). */
+              timeout?: string;
+            };
+          };
+        };
+        /** @description Represents the settings of the Pokeshop API demonstration. */
+        DemoPokeshop: {
+          /** @description HTTP endpoint for Pokeshop API */
+          httpEndpoint?: string;
+          /** @description gRPC endpoint for Pokeshop API */
+          grpcEndpoint?: string;
+        };
+        /** @description Represents the settings of the Open Telemetry Store demonstration. */
+        DemoOpenTelemetryStore: {
+          /** @description Address of the root URL for the Frontend microservice on Open Telemetry Store. */
+          frontendEndpoint?: string;
+          /** @description Address of the root URL for the Product Catalog microservice on Open Telemetry Store. */
+          productCatalogEndpoint?: string;
+          /** @description Address of the root URL for the Cart microservice on Open Telemetry Store. */
+          cartEndpoint?: string;
+          /** @description Address of the root URL for the Checkout microservice on Open Telemetry Store. */
+          checkoutEndpoint?: string;
+        };
+        /** @description Represents a demonstration API structured into the Resources format. */
+        Demo: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Demo'.
+           * @enum {string}
+           */
+          type?: "Demo";
+          /** @description Represents the attributes of a Demonstration API. */
+          spec?: {
+            id?: string;
+            /**
+             * @description String defining that this demo is a Open Telemetry Store demo.
+             * @enum {string}
+             */
+            type?: "otelstore" | "pokeshop";
+            /** @description Name of the demo */
+            name?: string;
+            /** @description Flag telling if this API is enabled on Tracetest. */
+            enabled: boolean;
+            pokeshop?: external["config.yaml"]["components"]["schemas"]["DemoPokeshop"];
+            opentelemetryStore?: external["config.yaml"]["components"]["schemas"]["DemoOpenTelemetryStore"];
+          };
         };
       };
     };

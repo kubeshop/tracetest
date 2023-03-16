@@ -9,7 +9,6 @@ const attribute: TSpanFlatAttribute = {
 
 const onCreateOutput = jest.fn();
 const onCreateTestSpec = jest.fn();
-const onCopy = jest.fn();
 
 describe('AttributeRow', () => {
   it('should render correctly', () => {
@@ -19,7 +18,6 @@ describe('AttributeRow', () => {
         attribute={attribute}
         onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
-        onCopy={onCopy}
         semanticConventions={{}}
         outputs={[]}
       />
