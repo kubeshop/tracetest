@@ -1,12 +1,10 @@
 import Demo from 'models/Demo.model';
-import Polling from 'models/Polling.model';
 import Config from 'models/Config.model';
 import {
   ResourceType,
   SupportedDemosFormField,
   TDraftConfig,
   TDraftDemo,
-  TDraftPollingProfiles,
   TDraftResource,
   TDraftSpec,
 } from 'types/Settings.types';
@@ -20,16 +18,6 @@ const SettingService = () => ({
       config || {
         name: 'current',
         analyticsEnabled: false,
-      }
-    );
-  },
-
-  getPollingProfileInitialValues(pollingProfiles: Polling[]): TDraftPollingProfiles {
-    return (
-      pollingProfiles.find(pollingProfile => pollingProfile.default) || {
-        name: 'default',
-        default: true,
-        strategy: 'periodic',
       }
     );
   },

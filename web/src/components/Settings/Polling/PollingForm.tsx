@@ -12,11 +12,11 @@ const FORM_ID = 'polling';
 const PollingForm = () => {
   const [form] = Form.useForm<TDraftPollingProfiles>();
   const {isLoading, onSubmit} = useSettings();
-  const {pollingProfiles} = useSettingsValues();
+  const {pollingProfile} = useSettingsValues();
 
   useEffect(() => {
     form.resetFields();
-  }, [form, pollingProfiles]);
+  }, [form, pollingProfile]);
 
   const handleOnSubmit = (values: TDraftPollingProfiles) => {
     onSubmit([SettingService.getDraftResource(ResourceType.PollingProfileType, values)]);
@@ -26,7 +26,7 @@ const PollingForm = () => {
     <Form<TDraftPollingProfiles>
       autoComplete="off"
       form={form}
-      initialValues={SettingService.getPollingProfileInitialValues(pollingProfiles)}
+      initialValues={pollingProfile}
       layout="vertical"
       name={FORM_ID}
       onFinish={handleOnSubmit}

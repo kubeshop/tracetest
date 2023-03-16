@@ -23,7 +23,7 @@ interface IContext {
   shouldDisplayConfigSetup: boolean;
   shouldDisplayConfigSetupFromTest: boolean;
   config: Config;
-  pollingProfiles: Polling[];
+  pollingProfile: Polling;
   demos: Demo[];
 }
 
@@ -37,7 +37,7 @@ const Context = createContext<IContext>({
   shouldDisplayConfigSetup: false,
   shouldDisplayConfigSetupFromTest: false,
   config: Config(),
-  pollingProfiles: [],
+  pollingProfile: Polling(),
   demos: [],
 });
 
@@ -88,7 +88,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
   }, [config]);
 
   // Polling
-  const {data: pollingProfiles = []} = useGetPollingQuery({});
+  const {data: pollingProfile = Polling()} = useGetPollingQuery({});
 
   // Demo
   const {data: demos = []} = useGetDemoQuery({});
@@ -104,7 +104,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       shouldDisplayConfigSetup,
       shouldDisplayConfigSetupFromTest,
       config,
-      pollingProfiles,
+      pollingProfile,
       demos,
     }),
     [
@@ -117,7 +117,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       shouldDisplayConfigSetup,
       shouldDisplayConfigSetupFromTest,
       config,
-      pollingProfiles,
+      pollingProfile,
       demos,
     ]
   );
