@@ -61,6 +61,8 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 	t.Helper()
 
 	t.Run(rt.ResourceType, func(t *testing.T) {
+		testProvisioning(t, rt)
+
 		for _, op := range operations {
 			t.Run(string(op.name), func(t *testing.T) {
 				op := op

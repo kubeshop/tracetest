@@ -36,6 +36,7 @@ type Manager interface {
 	EnabledOperations() []Operation
 	Handler() any
 	RegisterRoutes(*mux.Router) *mux.Router
+	Provisioner
 }
 
 type manager[T ResourceSpec] struct {

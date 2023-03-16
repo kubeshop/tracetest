@@ -53,6 +53,10 @@ type Delete[T ResourceSpec] interface {
 	Delete(context.Context, id.ID) error
 }
 
+type Provision[T ResourceSpec] interface {
+	Provision(context.Context, T) error
+}
+
 type resourceHandler[T ResourceSpec] struct {
 	SetID         func(T, id.ID) T
 	List          func(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
@@ -62,6 +66,7 @@ type resourceHandler[T ResourceSpec] struct {
 	Update        func(context.Context, T) (T, error)
 	Get           func(context.Context, id.ID) (T, error)
 	Delete        func(context.Context, id.ID) error
+	Provision     func(context.Context, T) error
 }
 
 func (rh *resourceHandler[T]) bindOperations(enabledOperations []Operation, handler any) error {
@@ -102,6 +107,11 @@ func (rh *resourceHandler[T]) bindOperations(enabledOperations []Operation, hand
 		if err != nil {
 			return err
 		}
+	}
+
+	err := rh.bindProvisionOperation(handler)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -158,6 +168,16 @@ func (rh *resourceHandler[T]) bindDeleteOperation(handler any) error {
 		return fmt.Errorf("handler does not implement interface `Delete[T]`")
 	}
 	rh.Delete = casted.Delete
+
+	return nil
+}
+
+func (rh *resourceHandler[T]) bindProvisionOperation(handler any) error {
+	casted, ok := handler.(Provision[T])
+	if !ok {
+		return fmt.Errorf("handler does not implement interface `Provision[T]`")
+	}
+	rh.Provision = casted.Provision
 
 	return nil
 }
