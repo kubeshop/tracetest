@@ -20,6 +20,12 @@ var getCmd = &cobra.Command{
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		if resourceID == "" {
+			cliLogger.Error("id of the resource to get must be specified")
+			os.Exit(1)
+			return
+		}
+
 		resourceType := args[0]
 		ctx := context.Background()
 

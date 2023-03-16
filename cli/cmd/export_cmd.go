@@ -24,6 +24,12 @@ var exportCmd = &cobra.Command{
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		if exportResourceID == "" {
+			cliLogger.Error("id of the resource to export must be specified")
+			os.Exit(1)
+			return
+		}
+
 		resourceType := args[0]
 		ctx := context.Background()
 
@@ -52,6 +58,6 @@ var exportCmd = &cobra.Command{
 
 func init() {
 	exportCmd.Flags().StringVar(&exportResourceID, "id", "", "id of the resource to export")
-	exportCmd.Flags().StringVar(&exportResourceFile, "file", "resource.yaml", "file path with name where to export the resource")
+	exportCmd.Flags().StringVarP(&exportResourceFile, "file", "f", "resource.yaml", "file path with name where to export the resource")
 	rootCmd.AddCommand(exportCmd)
 }
