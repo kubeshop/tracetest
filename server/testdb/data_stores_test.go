@@ -4,8 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
+	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -167,4 +171,40 @@ func TestGetDataStores(t *testing.T) {
 		assert.Equal(t, "VerySpecificName", actual.Items[0].Name)
 	})
 
+}
+
+func TestDataSourceProvisioner(t *testing.T) {
+
+	db := testmock.MustGetRawTestingDatabase()
+
+	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
+		ResourceType: testdb.DataStoreResourceName,
+		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
+			db := testmock.MustCreateRandomMigratedDatabase(db)
+			dsRepo, err := testdb.Postgres(testdb.WithDB(db))
+			require.NoError(t, err)
+
+			manager := resourcemanager.New[model.DataStore](
+				testdb.DataStoreResourceName,
+				testdb.NewDataStoreResourceProvisioner(dsRepo),
+				// this resource exists only for provisiooning at the moment``
+				resourcemanager.WithOperations(resourcemanager.OperationNoop),
+			)
+			manager.RegisterRoutes(router)
+
+			return manager
+		},
+		SampleJSON: `{
+			"type": "DataStore",
+			"spec": {
+				"id": "signalfx",
+				"name": "SignalFX",
+				"type": "signalfx",
+				"signalfx": {
+					"token": "thetoken",
+    			"realm": "us1"
+				}
+			}
+		}`,
+	})
 }

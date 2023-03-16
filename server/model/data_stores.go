@@ -105,6 +105,10 @@ var otlpBasedDataStores = []DataStoreType{
 	DataStoreTypeDataDog,
 }
 
+func (ds DataStore) HasID() bool {
+	return ds.ID != ""
+}
+
 func (ds DataStore) Validate() error {
 	if !slices.Contains(validTypes, ds.Type) {
 		return fmt.Errorf("unsupported data store")

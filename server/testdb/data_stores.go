@@ -333,3 +333,19 @@ func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.
 
 	return dataStore, nil
 }
+
+const DataStoreResourceName = "DataStore"
+
+// at the moment only used for provisioning
+type DataStoreResourceProvisioner struct {
+	repo model.DataStoreRepository
+}
+
+func NewDataStoreResourceProvisioner(repo model.DataStoreRepository) DataStoreResourceProvisioner {
+	return DataStoreResourceProvisioner{repo}
+}
+
+func (dsp DataStoreResourceProvisioner) Provision(ctx context.Context, ds model.DataStore) error {
+	_, err := dsp.repo.CreateDataStore(ctx, ds)
+	return err
+}
