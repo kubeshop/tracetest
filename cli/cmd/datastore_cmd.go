@@ -5,7 +5,7 @@ import (
 )
 
 var dataStoreCmd = &cobra.Command{
-	GroupID: cmdGroupTests.ID,
+	GroupID: cmdGroupConfig.ID,
 	Use:     "datastore",
 	Short:   "Manage your tracetest data stores",
 	Long:    "Manage your tracetest data stores",

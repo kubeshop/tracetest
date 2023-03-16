@@ -15,7 +15,7 @@ var endpoint string
 var global bool
 
 var configureCmd = &cobra.Command{
-	GroupID: cmdGroupCLIConfig.ID,
+	GroupID: cmdGroupConfig.ID,
 	Use:     "configure",
 	Short:   "Configure your tracetest CLI",
 	Long:    "Configure your tracetest CLI",

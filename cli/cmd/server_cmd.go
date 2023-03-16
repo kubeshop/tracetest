@@ -5,7 +5,7 @@ import (
 )
 
 var serverCmd = &cobra.Command{
-	GroupID: cmdGroupServer.ID,
+	GroupID: cmdGroupConfig.ID,
 	Use:     "server",
 	Short:   "Manage your tracetest server",
 	Long:    "Manage your tracetest server",

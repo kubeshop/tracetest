@@ -37,24 +37,24 @@ func Execute() {
 }
 
 var (
+	cmdGroupConfig = &cobra.Group{
+		ID:    "configuration",
+		Title: "Configuration",
+	}
+
 	cmdGroupResources = &cobra.Group{
 		ID:    "resources",
 		Title: "Resources",
 	}
 
-	cmdGroupServer = &cobra.Group{
-		ID:    "server",
-		Title: "Server",
-	}
-
-	cmdGroupCLIConfig = &cobra.Group{
-		ID:    "cli-config",
-		Title: "CLI Config",
-	}
-
 	cmdGroupTests = &cobra.Group{
 		ID:    "tests",
 		Title: "Tests",
+	}
+
+	cmdGroupMisc = &cobra.Group{
+		ID:    "misc",
+		Title: "Misc",
 	}
 )
 
@@ -66,9 +66,12 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
 
 	rootCmd.AddGroup(
+		cmdGroupConfig,
 		cmdGroupResources,
-		cmdGroupServer,
-		cmdGroupCLIConfig,
 		cmdGroupTests,
+		cmdGroupMisc,
 	)
+
+	rootCmd.SetCompletionCommandGroupID(cmdGroupConfig.ID)
+	rootCmd.SetHelpCommandGroupID(cmdGroupMisc.ID)
 }

@@ -9,7 +9,7 @@ import (
 )
 
 var versionCmd = &cobra.Command{
-	GroupID: cmdGroupCLIConfig.ID,
+	GroupID: cmdGroupMisc.ID,
 	Use:     "version",
 	Short:   "Display this CLI tool version",
 	Long:    "Display this CLI tool version",

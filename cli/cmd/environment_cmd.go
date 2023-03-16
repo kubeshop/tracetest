@@ -5,7 +5,7 @@ import (
 )
 
 var environmentCmd = &cobra.Command{
-	GroupID: cmdGroupTests.ID,
+	GroupID: cmdGroupConfig.ID,
 	Use:     "environment",
 	Short:   "Manage your tracetest environments",
 	Long:    "Manage your tracetest environments",
