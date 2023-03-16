@@ -23,7 +23,9 @@ func TestCreateClient(t *testing.T) {
 			ds: model.DataStore{
 				Type: model.DataStoreTypeJaeger,
 				Values: model.DataStoreValues{
-					Jaeger: &configgrpc.GRPCClientSettings{},
+					Jaeger: &configgrpc.GRPCClientSettings{
+						Endpoint: "notexists:123",
+					},
 				},
 			},
 			expectedType: "*tracedb.jaegerTraceDB",
