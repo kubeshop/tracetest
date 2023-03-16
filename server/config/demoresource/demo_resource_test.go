@@ -82,8 +82,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 				"pokeshop": {
 					"httpEndpoint": "http://dev-endpoint:1234",
 					"grpcEndpoint": "dev-grpc:9091"
-				},
-				"opentelemetryStore": {}
+				}
 			}
 		}`,
 		SampleJSONUpdated: `{
@@ -96,8 +95,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 				"pokeshop": {
 					"httpEndpoint": "http://new-dev-endpoint:1234",
 					"grpcEndpoint": "new-dev-grpc:9091"
-				},
-				"opentelemetryStore": {}
+				}
 			}
 		}`,
 	})
@@ -176,7 +174,6 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 				"name": "dev",
 				"enabled": true,
 				"type": "otelstore",
-				"pokeshop": {},
 				"opentelemetryStore": {
 					"frontendEndpoint": "http://dev-frontend:9000",
 					"productCatalogEndpoint": "http://dev-product:8081",
@@ -192,7 +189,6 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 				"name": "new-dev",
 				"enabled": true,
 				"type": "otelstore",
-				"pokeshop": {},
 				"opentelemetryStore": {
 					"frontendEndpoint": "http://dev-frontend",
 					"productCatalogEndpoint": "http://dev-product",

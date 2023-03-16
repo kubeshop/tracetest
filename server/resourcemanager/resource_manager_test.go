@@ -322,6 +322,11 @@ func (m *baseResourceManager) Update(_ context.Context, s sampleResource) (sampl
 	return args.Get(0).(sampleResource), args.Error(1)
 }
 
+func (m *baseResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
+	sr.ID = id
+	return sr
+}
+
 func (m *baseResourceManager) Provision(_ context.Context, s sampleResource) error {
 	args := m.Called(s)
 	return args.Error(0)
@@ -340,11 +345,6 @@ func (m *restrictedResourceManager) Operations() []rm.Operation {
 
 type sampleResourceManager struct {
 	baseResourceManager
-}
-
-func (m *sampleResourceManager) SetID(sr sampleResource, id id.ID) sampleResource {
-	sr.ID = id
-	return sr
 }
 
 func (m *sampleResourceManager) Create(_ context.Context, s sampleResource) (sampleResource, error) {

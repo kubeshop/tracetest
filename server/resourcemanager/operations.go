@@ -37,9 +37,13 @@ type List[T ResourceSpec] interface {
 	Count(_ context.Context, query string) (int, error)
 }
 
+type IDSetter[T ResourceSpec] interface {
+	SetID(T, id.ID) T
+}
+
 type Create[T ResourceSpec] interface {
 	Create(context.Context, T) (T, error)
-	SetID(T, id.ID) T
+	IDSetter[T]
 }
 
 type Update[T ResourceSpec] interface {
@@ -56,6 +60,7 @@ type Delete[T ResourceSpec] interface {
 
 type Provision[T ResourceSpec] interface {
 	Provision(context.Context, T) error
+	IDSetter[T]
 }
 
 type resourceHandler[T ResourceSpec] struct {
@@ -179,6 +184,7 @@ func (rh *resourceHandler[T]) bindProvisionOperation(handler any) error {
 		return fmt.Errorf("handler does not implement interface `Provision[T]`")
 	}
 	rh.Provision = casted.Provision
+	rh.SetID = casted.SetID
 
 	return nil
 }

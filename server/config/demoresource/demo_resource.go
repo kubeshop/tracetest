@@ -13,7 +13,7 @@ import (
 
 type DemoType string
 
-var (
+const (
 	DemoTypePokeshop           DemoType = "pokeshop"
 	DemoTypeOpentelemetryStore DemoType = "otelstore"
 )
@@ -83,10 +83,6 @@ const insertQuery = `INSERT INTO demos (
 	VALUES ($1, $2, $3, $4, $5, $6)`
 
 func (r *Repository) Create(ctx context.Context, demo Demo) (Demo, error) {
-	if !demo.HasID() {
-		demo.ID = id.SlugFromString(demo.Name)
-	}
-
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Demo{}, err
@@ -320,7 +316,7 @@ func readRow(row scanner) (Demo, error) {
 		return Demo{}, fmt.Errorf("could not read row: %w", err)
 	}
 
-	if len(pokeshopJSON) > 0 {
+	if string(pokeshopJSON) != "null" {
 		pokeshop := PokeshopDemo{}
 		err = json.Unmarshal(pokeshopJSON, &pokeshop)
 		if err != nil {
@@ -330,7 +326,7 @@ func readRow(row scanner) (Demo, error) {
 		demo.Pokeshop = &pokeshop
 	}
 
-	if len(openTelemetryStoreJSON) > 0 {
+	if string(openTelemetryStoreJSON) != "null" {
 		openTelemetryStore := OpenTelemetryStoreDemo{}
 		err = json.Unmarshal(openTelemetryStoreJSON, &openTelemetryStore)
 		if err != nil {

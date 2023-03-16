@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/exp/slices"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/mitchellh/mapstructure"
@@ -70,7 +71,7 @@ func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption
 
 	cfg := config{
 		enabledOperations: availableOperations,
-		idgen:             func() id.ID { return id.ID("") },
+		idgen:             func() id.ID { return id.GenerateID() },
 	}
 
 	for _, opt := range opts {
@@ -233,6 +234,8 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 
 		var values map[string]any
 		err := mapstructure.Decode(resource, &values)
+		spew.Dump(resource)
+		spew.Dump(values)
 		if err != nil {
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 			return

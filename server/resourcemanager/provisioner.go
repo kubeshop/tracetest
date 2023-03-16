@@ -28,5 +28,12 @@ func (m *manager[T]) Provision(ctx context.Context, values map[string]any) error
 		)
 	}
 
+	if !targetResource.Spec.HasID() {
+		targetResource.Spec = m.rh.SetID(
+			targetResource.Spec,
+			m.config.idgen(),
+		)
+	}
+
 	return m.rh.Provision(ctx, targetResource.Spec)
 }

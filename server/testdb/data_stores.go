@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/fluidtruck/deepcopy"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -336,7 +337,7 @@ func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.
 }
 
 type DataStoreResource struct {
-	ID        string
+	ID        id.ID
 	Name      string
 	Type      model.DataStoreType
 	IsDefault bool
@@ -391,6 +392,11 @@ type DataStoreResourceProvisioner struct {
 
 func NewDataStoreResourceProvisioner(repo model.DataStoreRepository) DataStoreResourceProvisioner {
 	return DataStoreResourceProvisioner{repo}
+}
+
+func (dsp DataStoreResourceProvisioner) SetID(dsr DataStoreResource, id id.ID) DataStoreResource {
+	dsr.ID = id
+	return dsr
 }
 
 func (dsp DataStoreResourceProvisioner) Provision(ctx context.Context, ds DataStoreResource) error {

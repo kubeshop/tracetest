@@ -121,6 +121,46 @@ func (f provisioningFixture) assert(t *testing.T, expected expectations) {
 
 		assert.Equal(t, *expected.dataStore, actual)
 	}
+
+	if expected.config != nil {
+		actual := f.configs.Current(context.TODO())
+
+		// ignore ID for assertion
+		expected.config.ID = "0"
+		actual.ID = "0"
+
+		// ignore Name for assertion
+		expected.config.Name = ""
+		actual.Name = ""
+
+		assert.Equal(t, *expected.config, actual)
+	}
+
+	if expected.pollingprofile != nil {
+		actual, err := f.pollingProfiles.GetDefault(context.TODO())
+		require.NoError(t, err)
+
+		// ignore ID for assertion
+		expected.pollingprofile.ID = "0"
+		actual.ID = "0"
+
+		assert.Equal(t, *expected.pollingprofile, actual)
+	}
+
+	if demosCount := len(expected.demos); demosCount > 0 {
+		list, err := f.demos.List(context.TODO(), demosCount, 0, "", "", "")
+		require.NoError(t, err)
+
+		require.Equal(t, demosCount, len(list))
+
+		for i, actual := range list {
+			// ignore ID for assertion
+			actual.ID = "0"
+			expected.demos[i].ID = "0"
+
+			assert.Equal(t, expected.demos[i], actual)
+		}
+	}
 }
 
 func setup(db *sql.DB) provisioningFixture {
@@ -174,6 +214,54 @@ var cases = []struct {
 	file         string
 	expectations expectations
 }{
+	{
+		name: "AllSettings",
+		file: "./testdata/all_settings.yaml",
+		expectations: expectations{
+			dataStore: &model.DataStore{
+				Name:      "Jaeger",
+				IsDefault: true,
+				Type:      model.DataStoreTypeJaeger,
+				Values: model.DataStoreValues{
+					Jaeger: &configgrpc.GRPCClientSettings{
+						Endpoint:   "jaeger-query:16685",
+						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+					},
+				},
+			},
+			config: &configresource.Config{
+				AnalyticsEnabled: true,
+			},
+			pollingprofile: &pollingprofile.PollingProfile{
+				Name:     "Custom Profile",
+				Default:  true,
+				Strategy: pollingprofile.Periodic,
+				Periodic: &pollingprofile.PeriodicPollingConfig{
+					Timeout:    "2h",
+					RetryDelay: "30m",
+				},
+			},
+			demos: []demoresource.Demo{
+				{
+					Name:    "pokeshop",
+					Type:    demoresource.DemoTypePokeshop,
+					Enabled: true,
+					Pokeshop: &demoresource.PokeshopDemo{
+						HTTPEndpoint: "http://localhost/api",
+						GRPCEndpoint: "localhost:8080",
+					},
+				},
+				{
+					Name:    "otel",
+					Type:    demoresource.DemoTypeOpentelemetryStore,
+					Enabled: true,
+					OpenTelemetryStore: &demoresource.OpenTelemetryStoreDemo{
+						FrontendEndpoint: "http://frontend:8080/",
+					},
+				},
+			},
+		},
+	},
 	{
 		name: "JaegerGRPC",
 		file: "./testdata/jaeger_grpc.yaml",

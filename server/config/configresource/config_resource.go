@@ -158,6 +158,11 @@ func (r *Repository) Update(ctx context.Context, updated Config) (Config, error)
 	return updated, nil
 }
 
+func (r *Repository) SetID(cfg Config, id id.ID) Config {
+	cfg.ID = id
+	return cfg
+}
+
 func (r *Repository) Provision(ctx context.Context, updated Config) error {
 	_, err := r.Update(ctx, updated)
 	return err
