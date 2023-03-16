@@ -22,6 +22,12 @@ var applyCmd = &cobra.Command{
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		if definitionFile == "" {
+			cliLogger.Error("file with definition must be specified")
+			os.Exit(1)
+			return
+		}
+
 		resourceType := args[0]
 		ctx := context.Background()
 
@@ -55,6 +61,6 @@ var applyCmd = &cobra.Command{
 }
 
 func init() {
-	applyCmd.Flags().StringVar(&definitionFile, "file", "", "path to the definition file")
+	applyCmd.Flags().StringVarP(&definitionFile, "file", "f", "", "file path with name where to export the resource")
 	rootCmd.AddCommand(applyCmd)
 }

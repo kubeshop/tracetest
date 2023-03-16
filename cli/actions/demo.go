@@ -133,6 +133,10 @@ func (demo demoActions) List(ctx context.Context, listArgs ListArgs) error {
 }
 
 func (demo demoActions) Export(ctx context.Context, ID string, filePath string) error {
+	if ID == "" {
+		return fmt.Errorf("you must specify a demo profile ID to be exported")
+	}
+
 	demoProfile, err := demo.get(ctx, ID)
 	if err != nil {
 		return err
