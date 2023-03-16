@@ -16,8 +16,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      tempo:
-        condition: service_started
       otel-collector:
         condition: service_started
     healthcheck:
@@ -40,17 +38,9 @@ services:
       retries: 60
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.73.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-    depends_on:
-      - tempo
-
-  tempo:
-    image: grafana/tempo:2.0.0
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-      - ./tracetest/tempo.config.yaml:/etc/tempo.yaml
