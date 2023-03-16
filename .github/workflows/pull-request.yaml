@@ -101,7 +101,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v4
       with:
         distribution: goreleaser-pro
-        version: v1.15.2
+        version: v1.16.1
         args: build --single-target --clean --snapshot
       env:
         VERSION: pr-${{ github.event.pull_request.number }}
@@ -175,7 +175,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: v1.15.2
+          version: v1.16.1
           args: release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
         env:
           VERSION: pr-${{ github.event.pull_request.number }}

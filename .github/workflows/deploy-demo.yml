@@ -79,7 +79,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: v1.15.2
+          version: v1.16.1
           args: release --clean --skip-announce -f .goreleaser.dev.yaml
         env:
           VERSION: ${{ github.ref_name}}-demo

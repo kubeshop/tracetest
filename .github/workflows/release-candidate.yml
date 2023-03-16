@@ -82,7 +82,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.15.2
+          version: v1.16.1
           args: release --clean --nightly
         env:
           VERSION: ${{ github.ref_name}}
