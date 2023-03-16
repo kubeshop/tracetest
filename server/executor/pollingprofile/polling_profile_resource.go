@@ -354,3 +354,8 @@ func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 
 	return count, nil
 }
+
+func (r *Repository) Provision(ctx context.Context, profile PollingProfile) error {
+	_, err := r.Create(ctx, profile)
+	return err
+}

@@ -342,3 +342,8 @@ func readRow(row scanner) (Demo, error) {
 
 	return demo, nil
 }
+
+func (r *Repository) Provision(ctx context.Context, demo Demo) error {
+	_, err := r.Create(ctx, demo)
+	return err
+}

@@ -157,3 +157,8 @@ func (r *Repository) Update(ctx context.Context, updated Config) (Config, error)
 
 	return updated, nil
 }
+
+func (r *Repository) Provision(ctx context.Context, updated Config) error {
+	_, err := r.Update(ctx, updated)
+	return err
+}
