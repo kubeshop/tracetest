@@ -24,12 +24,6 @@ var exportCmd = &cobra.Command{
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if exportResourceID == "" {
-			cliLogger.Error("id of the resource to export must be specified")
-			os.Exit(1)
-			return
-		}
-
 		resourceType := args[0]
 		ctx := context.Background()
 
