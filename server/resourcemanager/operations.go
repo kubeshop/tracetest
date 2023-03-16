@@ -11,6 +11,7 @@ import (
 type Operation string
 
 const (
+	OperationNoop   Operation = ""
 	OperationList   Operation = "list"
 	OperationCreate Operation = "create"
 	OperationUpdate Operation = "update"

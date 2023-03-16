@@ -173,7 +173,7 @@ func TestGetDataStores(t *testing.T) {
 
 }
 
-func TestDataSourceProvisioner(t *testing.T) {
+func TestDataStoreProvisioner(t *testing.T) {
 
 	db := testmock.MustGetRawTestingDatabase()
 
@@ -184,7 +184,7 @@ func TestDataSourceProvisioner(t *testing.T) {
 			dsRepo, err := testdb.Postgres(testdb.WithDB(db))
 			require.NoError(t, err)
 
-			manager := resourcemanager.New[model.DataStore](
+			manager := resourcemanager.New[testdb.DataStoreResource](
 				testdb.DataStoreResourceName,
 				testdb.NewDataStoreResourceProvisioner(dsRepo),
 				// this resource exists only for provisiooning at the moment``

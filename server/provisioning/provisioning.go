@@ -1,32 +1,50 @@
 package provisioning
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
-	"github.com/kubeshop/tracetest/server/config/configresource"
-	"github.com/kubeshop/tracetest/server/model"
-	"github.com/mitchellh/mapstructure"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"gopkg.in/yaml.v2"
 )
 
-func New(db model.Repository, configDB *configresource.Repository) provisioner {
-	return provisioner{db, configDB}
+func WithResourceProvisioners(provs ...resourcemanager.Provisioner) option {
+	return func(p *Provisioner) {
+		for _, prov := range provs {
+			p.AddResourceProvisioner(prov)
+		}
+	}
 }
 
-type provisioner struct {
-	db       model.Repository
-	configDB *configresource.Repository
+type option func(p *Provisioner)
+
+func New(opts ...option) *Provisioner {
+	p := &Provisioner{}
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
+}
+
+type Provisioner struct {
+	provisioners []resourcemanager.Provisioner
+}
+
+func (p *Provisioner) AddResourceProvisioner(prov resourcemanager.Provisioner) {
+	p.provisioners = append(p.provisioners, prov)
 }
 
 var (
 	ErrEnvEmpty = errors.New("cannot read provisioning from env variable TRACETEST_PROVISIONING: variable is empty")
 )
 
-func (p provisioner) FromEnv() error {
+func (p Provisioner) FromEnv() error {
 	envVar := os.Getenv("TRACETEST_PROVISIONING")
 	if envVar == "" {
 		return ErrEnvEmpty
@@ -41,7 +59,7 @@ func (p provisioner) FromEnv() error {
 
 var ErrFileNotExists = errors.New("provisioning file does not exists")
 
-func (p provisioner) FromFile(path string) error {
+func (p Provisioner) FromFile(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -53,39 +71,42 @@ func (p provisioner) FromFile(path string) error {
 	return p.do(data)
 }
 
-type provisionConfig struct {
-	DataStore dataStore `mapstructure:"dataStore"`
-	Config    config    `mapstructure:"config"`
-}
+func (p Provisioner) do(data []byte) error {
 
-func (p provisioner) do(data []byte) error {
-	var rawYaml map[string]interface{}
-	err := yaml.Unmarshal(data, &rawYaml)
-	if err != nil {
-		return fmt.Errorf("cannot unmarshal yaml: %w", err)
+	ctx := context.Background()
+
+	d := yaml.NewDecoder(bytes.NewBuffer(data))
+	for {
+		var rawYaml map[string]any
+		err := d.Decode(&rawYaml)
+
+		if errors.Is(err, io.EOF) {
+			break
+		}
+
+		if err != nil {
+			return fmt.Errorf("cannot unmarshal yaml: %w", err)
+		}
+
+		if rawYaml == nil {
+			continue
+		}
+
+		success := false
+		for _, p := range p.provisioners {
+			err := p.Provision(ctx, rawYaml)
+			if errors.Is(err, resourcemanager.ErrTypeNotSupported) {
+				continue
+			}
+			if err != nil {
+				return fmt.Errorf("cannot provision resource from yaml: %w", err)
+			}
+			success = true
+		}
+
+		if !success {
+			return fmt.Errorf("invalid resource type from yaml")
+		}
 	}
-
-	config := provisionConfig{}
-	mapstructure.Decode(rawYaml, &config)
-	if err != nil {
-		return fmt.Errorf("cannot unmarshal yaml: %w", err)
-	}
-
-	// Provision data store
-	dsModel := config.DataStore.model()
-	dsModel.IsDefault = true
-
-	_, err = p.db.CreateDataStore(context.TODO(), dsModel)
-	if err != nil {
-		return fmt.Errorf("cannot provision data store: %w", err)
-	}
-
-	// Provision config
-	cfgModel := config.Config.model()
-	_, err = p.configDB.Update(context.TODO(), cfgModel)
-	if err != nil {
-		return fmt.Errorf("cannot provision config: %w", err)
-	}
-
 	return nil
 }

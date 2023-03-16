@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -334,6 +335,50 @@ func (td *postgresDB) updateIntoDataStores(ctx context.Context, dataStore model.
 	return dataStore, nil
 }
 
+type DataStoreResource struct {
+	ID        string
+	Name      string
+	Type      model.DataStoreType
+	IsDefault bool
+
+	model.DataStoreValues `mapstructure:",squash"`
+}
+
+func (dsr DataStoreResource) toModel() model.DataStore {
+	actual := model.DataStore{}
+
+	deepcopy.DeepCopy(dsr, &actual)
+	if dsr.Jaeger != nil {
+		fmt.Println("***", dsr.Jaeger)
+		deepcopy.DeepCopy(dsr.Jaeger, &actual.Values.Jaeger)
+		deepcopy.DeepCopy(dsr.Jaeger.TLSSetting, &actual.Values.Jaeger.TLSSetting)
+	}
+	if dsr.Tempo != nil {
+		deepcopy.DeepCopy(dsr.Tempo, &actual.Values.Tempo)
+		deepcopy.DeepCopy(dsr.Tempo.Grpc.TLSSetting, &actual.Values.Tempo.Grpc.TLSSetting)
+		deepcopy.DeepCopy(dsr.Tempo.Http.TLSSetting, &actual.Values.Tempo.Http.TLSSetting)
+	}
+	if dsr.OpenSearch != nil {
+		deepcopy.DeepCopy(dsr.OpenSearch, &actual.Values.OpenSearch)
+	}
+	if dsr.SignalFx != nil {
+		deepcopy.DeepCopy(dsr.SignalFx, &actual.Values.SignalFx)
+	}
+	if dsr.AwsXRay != nil {
+		deepcopy.DeepCopy(dsr.AwsXRay, &actual.Values.AwsXRay)
+	}
+
+	return actual
+}
+
+func (dsr DataStoreResource) HasID() bool {
+	return dsr.toModel().HasID()
+}
+
+func (dsr DataStoreResource) Validate() error {
+	return dsr.toModel().Validate()
+}
+
 const DataStoreResourceName = "DataStore"
 
 // at the moment only used for provisioning
@@ -345,7 +390,9 @@ func NewDataStoreResourceProvisioner(repo model.DataStoreRepository) DataStoreRe
 	return DataStoreResourceProvisioner{repo}
 }
 
-func (dsp DataStoreResourceProvisioner) Provision(ctx context.Context, ds model.DataStore) error {
-	_, err := dsp.repo.CreateDataStore(ctx, ds)
+func (dsp DataStoreResourceProvisioner) Provision(ctx context.Context, ds DataStoreResource) error {
+	ds.IsDefault = true
+
+	_, err := dsp.repo.CreateDataStore(ctx, ds.toModel())
 	return err
 }
