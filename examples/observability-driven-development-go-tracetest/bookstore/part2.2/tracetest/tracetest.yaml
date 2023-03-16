@@ -1,19 +1,3 @@
-googleAnalytics:
-  enabled: false
-
-demo:
-    endpoints:
-        otelcart: otel-cartservice:7070
-        otelcheckout: otel-checkoutservice:5050
-        otelfrontend: http://otel-frontend:8084
-        otelproductcatalog: otel-productcatalogservice:3550
-        pokeshopgrpc: demo-api:8082
-        pokeshophttp: http://demo-api:8081
-
-poolingconfig:
-    maxwaittimefortrace: 2m
-    retrydelay: 3s
-
 postgres:
   host: postgres
   user: postgres
@@ -23,15 +7,15 @@ postgres:
   params: sslmode=disable
 
 server:
-    telemetry:
-        exporter: collector
+  telemetry:
+    exporter: collector
 
 telemetry:
-    exporters:
+  exporters:
+    collector:
+      exporter:
         collector:
-            exporter:
-                collector:
-                    endpoint: otel-collector:4317
-                type: collector
-            sampling: 100
-            servicename: tracetest
+          endpoint: otel-collector:4317
+        type: collector
+      sampling: 100
+      servicename: tracetest

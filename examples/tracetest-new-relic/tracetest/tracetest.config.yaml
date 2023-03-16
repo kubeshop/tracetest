@@ -1,4 +1,3 @@
----
 postgres:
   host: postgres
   user: postgres
@@ -7,10 +6,6 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
-
 demo:
   enabled: [otel]
   endpoints:
@@ -18,11 +13,6 @@ demo:
     otelProductCatalog: otel-productcatalogservice:3550
     otelCart: otel-cartservice:7070
     otelCheckout: otel-checkoutservice:5050
-
-experimentalFeatures: []
-
-googleAnalytics:
-  enabled: true
 
 telemetry:
   exporters:

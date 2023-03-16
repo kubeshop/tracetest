@@ -1,2 +1,6 @@
-dataStore:
+---
+type: DataStore
+spec:
+  name: Datadog
   type: datadog
+  isdefault: true

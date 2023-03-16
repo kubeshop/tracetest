@@ -1,2 +1,18 @@
-dataStore:
-  type: otlp
+---
+type: DataStore
+spec:
+  name: New Relic
+  type: newrelic
+  isdefault: true
+
+---
+type: Demo
+spec:
+  name: "OpenTelemetry Shop"
+  enabled: true
+  type: otelstore
+  opentelemetryStore:
+    frontendEndpoint: http://frontend:8084
+    productCatalogEndpoint: productcatalogservice:3550
+    cartEndpoint: cartservice:7070
+    checkoutEndpoint: checkoutservice:5050

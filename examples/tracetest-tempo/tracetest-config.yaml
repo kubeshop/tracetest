@@ -6,18 +6,6 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
 telemetry:
   exporters:
     collector:
