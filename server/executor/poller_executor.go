@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -16,10 +14,10 @@ import (
 type traceDBFactoryFn func(ds model.DataStore) (tracedb.TraceDB, error)
 
 type DefaultPollerExecutor struct {
-	updater           RunUpdater
-	newTraceDBFn      traceDBFactoryFn
-	dsRepo            model.DataStoreRepository
-	maxTracePollRetry int
+	ppGetter     PollingProfileGetter
+	updater      RunUpdater
+	newTraceDBFn traceDBFactoryFn
+	dsRepo       model.DataStoreRepository
 }
 
 type InstrumentedPollerExecutor struct {
@@ -56,20 +54,18 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 }
 
 func NewPollerExecutor(
-	retryDelay time.Duration,
-	maxWaitTimeForTrace time.Duration,
+	ppGetter PollingProfileGetter,
 	tracer trace.Tracer,
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
 ) PollerExecutor {
 
-	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	pollerExecutor := &DefaultPollerExecutor{
-		updater:           updater,
-		newTraceDBFn:      newTraceDBFn,
-		dsRepo:            dsRepo,
-		maxTracePollRetry: maxTracePollRetry,
+		ppGetter:     ppGetter,
+		updater:      updater,
+		newTraceDBFn: newTraceDBFn,
+		dsRepo:       dsRepo,
 	}
 
 	return &InstrumentedPollerExecutor{
@@ -152,9 +148,11 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
+	pp := *pe.ppGetter.GetDefault(job.ctx).Periodic
+	maxTracePollRetry := pp.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	if job.count == pe.maxTracePollRetry {
-		return true, fmt.Sprintf("Hit MaxRetry of %d", pe.maxTracePollRetry)
+	if job.count == maxTracePollRetry {
+		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
 	}
 
 	if job.run.Trace == nil {

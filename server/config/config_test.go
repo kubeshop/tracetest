@@ -3,7 +3,6 @@ package config_test
 import (
 	"os"
 	"testing"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/spf13/pflag"
@@ -68,9 +67,6 @@ func TestFlags(t *testing.T) {
 
 		assert.Equal(t, "/tracetest", cfg.ServerPathPrefix())
 		assert.Equal(t, 9999, cfg.ServerPort())
-
-		assert.Equal(t, 1*time.Minute, cfg.PoolingMaxWaitTimeForTraceDuration())
-		assert.Equal(t, 3*time.Second, cfg.PoolingRetryDelay())
 	})
 
 	t.Run("ConfigFileDefault", func(t *testing.T) {
