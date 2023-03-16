@@ -6,23 +6,6 @@ postgres:
   dbname: tracetest
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 10s
-  retryDelay: 500ms
-
-googleAnalytics:
-  enabled: false
-
-demo:
-  enabled: [pokeshop]
-  endpoints:
-    pokeshopHttp: http://demo-pokemon-api.demo
-    pokeshopGrpc: demo-pokemon-api.demo:8082
-    otelFrontend: http://otel-frontend.otel-demo:8084
-    otelProductCatalog: http://otel-productcatalogservice.otel-demo:3550
-    otelCart: http://otel-cartservice.otel-demo:7070
-    otelCheckout: http://otel-checkoutservice.otel-demo:5050
-
 experimentalFeatures: []
 
 telemetry:
@@ -38,4 +21,3 @@ telemetry:
 server:
   telemetry:
     exporter: collector
-    dataStore: jaeger

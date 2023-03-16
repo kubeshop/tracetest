@@ -1,6 +1,42 @@
-dataStore:
+---
+type: DataStore
+spec:
+  name: Jaeger
   type: jaeger
   jaeger:
     endpoint: jaeger-query.tracetest:16685
     tls:
       insecure: true
+---
+type: Config
+spec:
+  analyticsEnabled: false
+---
+type: PollingProfile
+spec:
+  name: Custom Profile
+  strategy: periodic
+  default: true
+  periodic:
+    timeout: 10s
+    retryDelay: 500ms
+---
+type: Demo
+spec:
+  name: pokeshop
+  type: pokeshop
+  enabled: true
+  pokeshop:
+    httpEndpoint: http://demo-pokemon-api.demo
+    grpcEndpoint: demo-pokemon-api.demo:8082
+---
+type: Demo
+spec:
+  name: otel
+  type: otelstore
+  enabled: true
+  opentelemetryStore:
+    frontendEndpoint: http://otel-frontend.otel-demo:8084
+    productCatalogEndpoint: http://otel-productcatalogservice.otel-demo:3550
+    cartEndpoint: http://otel-cartservice.otel-demo:7070
+    checkoutEndpoint: http://otel-checkoutservice.otel-demo:5050
