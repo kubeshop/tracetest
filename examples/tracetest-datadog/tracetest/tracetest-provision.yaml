@@ -1,17 +1,27 @@
 ---
-type: DataStore
-spec:
-  name: otlp
-  type: otlp
-
----
 type: Demo
 spec:
   name: "OpenTelemetry Shop"
   enabled: true
   type: otelstore
   opentelemetryStore:
-    frontendEndpoint: http://frontend:8080
+    frontendEndpoint: http://frontend:8084
     productCatalogEndpoint: productcatalogservice:3550
     cartEndpoint: cartservice:7070
     checkoutEndpoint: checkoutservice:5050
+
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 180s
+
+---
+type: DataStore
+spec:
+  name: datadog
+  type: datadog

@@ -1,2 +1,17 @@
-dataStore:
+---
+type: DataStore
+spec:
+  name: otlp
   type: otlp
+
+---
+type: Demo
+spec:
+  name: "OpenTelemetry Shop"
+  enabled: true
+  type: otelstore
+  opentelemetryStore:
+    frontendEndpoint: http://otel-frontend:8084
+    productCatalogEndpoint: otel-productcatalogservice:3550
+    cartEndpoint: otel-cartservice:7070
+    checkoutEndpoint: otel-checkoutservice:5050
