@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
@@ -32,20 +32,15 @@ type TraceFetcher interface {
 }
 
 func NewTracePoller(
+	pollingProfileRepo pollingprofile.Repository,
 	pe PollerExecutor,
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
-	retryDelay time.Duration,
-	maxWaitTimeForTrace time.Duration,
 	subscriptionManager *subscription.Manager,
 ) PersistentTracePoller {
-	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	return tracePoller{
 		updater:             updater,
 		pollerExecutor:      pe,
-		maxWaitTimeForTrace: maxWaitTimeForTrace,
-		maxTracePollRetry:   maxTracePollRetry,
-		retryDelay:          retryDelay,
 		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
 		assertionRunner:     assertionRunner,

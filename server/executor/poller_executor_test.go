@@ -7,12 +7,14 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"go.opentelemetry.io/otel/trace"
@@ -20,6 +22,17 @@ import (
 
 var (
 	randomIDGenerator = id.NewRandGenerator()
+
+	defaultPollingProfile = pollingprofile.PollingProfile{
+		ID:       id.ID("default"),
+		Name:     "default",
+		Default:  true,
+		Strategy: pollingprofile.Periodic,
+		Periodic: &pollingprofile.PeriodicPollingConfig{
+			RetryDelay: "1s",
+			Timeout:    "30s",
+		},
+	}
 )
 
 func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
@@ -32,19 +45,13 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	// Then it will not send a finished flag
 	// And it will return a connection error on every call
 
-	// Given conditions
-
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
-
 	tracePerIteration := []model.Trace{
 		model.Trace{},
 		model.Trace{},
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -69,18 +76,12 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	// And it should handle the trace error on first iteration
 	// And a root span should be added to it
 
-	// Given conditions
-
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
-
 	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
 		{
 			ID:        randomIDGenerator.SpanID(),
 			Name:      "HTTP API",
 			StartTime: time.Now(),
-			EndTime:   time.Now().Add(retryDelay),
+			EndTime:   time.Now().Add(1 * time.Second),
 			Attributes: map[string]string{
 				"testSpan": "true",
 			},
@@ -96,7 +97,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -121,17 +122,13 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 
 	// Given conditions
 
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
-
 	traceID := randomIDGenerator.TraceID().String()
 
 	firstSpan := model.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "HTTP API",
 		StartTime: time.Now(),
-		EndTime:   time.Now().Add(retryDelay),
+		EndTime:   time.Now().Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
@@ -142,7 +139,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "Database query",
 		StartTime: firstSpan.EndTime,
-		EndTime:   firstSpan.EndTime.Add(retryDelay),
+		EndTime:   firstSpan.EndTime.Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan":  "true",
 			"parent_id": firstSpan.ID.String(),
@@ -162,7 +159,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -184,17 +181,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	// Then it should stop on third iteration
 	// And it should handle the trace error on first iteration
 
-	// Given conditions
-
-	// maxRetries=3 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 3 * time.Second
-
 	rootSpan := model.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      model.TriggerSpanName,
 		StartTime: time.Now(),
-		EndTime:   time.Now().Add(retryDelay),
+		EndTime:   time.Now().Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
@@ -211,7 +202,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -235,12 +226,6 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 	// And it should handle the trace error on first iteration
 	// And a root span should be added to it
 
-	// Given conditions
-
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
-
 	rootSpanID := randomIDGenerator.SpanID()
 
 	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
@@ -248,7 +233,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			ID:        rootSpanID,
 			Name:      model.TriggerSpanName,
 			StartTime: time.Now(),
-			EndTime:   time.Now().Add(retryDelay),
+			EndTime:   time.Now().Add(1 * time.Second),
 			Attributes: map[string]string{
 				"testSpan": "true",
 			},
@@ -258,7 +243,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			ID:        randomIDGenerator.SpanID(),
 			Name:      "HTTP API",
 			StartTime: time.Now(),
-			EndTime:   time.Now().Add(retryDelay),
+			EndTime:   time.Now().Add(1 * time.Second),
 			Attributes: map[string]string{
 				"testSpan":  "true",
 				"parent_id": rootSpanID.String(),
@@ -275,7 +260,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -298,17 +283,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 	// And it should handle the trace error on first iteration
 	// And a root span should be added to it
 
-	// Given conditions
-
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
-
 	rootSpan := model.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      model.TriggerSpanName,
 		StartTime: time.Now(),
-		EndTime:   time.Now().Add(retryDelay),
+		EndTime:   time.Now().Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
@@ -319,7 +298,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "HTTP API",
 		StartTime: time.Now(),
-		EndTime:   time.Now().Add(retryDelay),
+		EndTime:   time.Now().Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan":  "true",
 			"parent_id": rootSpan.ID.String(),
@@ -340,7 +319,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -365,19 +344,13 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 	// And it should handle the trace error on first iteration
 	// And a root span should be added to it
 
-	// Given conditions
-
-	// maxRetries=30 (inferred by the calculation: maxWaitTimeForTrace / retryDelay)
-	retryDelay := 1 * time.Second
-	maxWaitTimeForTrace := 30 * time.Second
-
 	traceID := randomIDGenerator.TraceID().String()
 
 	rootSpan := model.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      model.TriggerSpanName,
 		StartTime: time.Now(),
-		EndTime:   time.Now().Add(retryDelay),
+		EndTime:   time.Now().Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
@@ -388,7 +361,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "HTTP API",
 		StartTime: time.Now(),
-		EndTime:   time.Now().Add(retryDelay),
+		EndTime:   time.Now().Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan":  "true",
 			"parent_id": rootSpan.ID.String(),
@@ -400,7 +373,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "Database query",
 		StartTime: firstSpan.EndTime,
-		EndTime:   firstSpan.EndTime.Add(retryDelay),
+		EndTime:   firstSpan.EndTime.Add(1 * time.Second),
 		Attributes: map[string]string{
 			"testSpan":  "true",
 			"parent_id": firstSpan.ID.String(),
@@ -420,7 +393,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
@@ -481,15 +454,15 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	}
 }
 
-func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
+func getPollerExecutorWithMocks(t *testing.T, tracePerIteration []model.Trace) executor.PollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
 	testDB := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+	pollingProfileRepository := getPollingProfileRepositoryMock(t)
 
 	return executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTimeForTrace,
+		pollingProfileRepository,
 		tracer,
 		updater,
 		traceDBFactory,
@@ -584,4 +557,51 @@ func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state 
 			state:             state,
 		}, nil
 	}
+}
+
+type repositoryMock struct {
+	mock.Mock
+	T mock.TestingT
+}
+
+func (*repositoryMock) GetDefault(ctx context.Context) (pollingprofile.PollingProfile, error) {
+	return defaultPollingProfile, nil
+}
+
+func (*repositoryMock) Count(ctx context.Context, query string) (int, error) {
+	panic("unimplemented")
+}
+
+func (*repositoryMock) Create(ctx context.Context, profile pollingprofile.PollingProfile) (pollingprofile.PollingProfile, error) {
+	panic("unimplemented")
+}
+
+func (*repositoryMock) Delete(ctx context.Context, id id.ID) error {
+	panic("unimplemented")
+}
+
+func (*repositoryMock) Get(ctx context.Context, id id.ID) (pollingprofile.PollingProfile, error) {
+	panic("unimplemented")
+}
+
+func (*repositoryMock) List(ctx context.Context, take int, skip int, query string, sortBy string, sortDirection string) ([]pollingprofile.PollingProfile, error) {
+	panic("unimplemented")
+}
+
+func (*repositoryMock) SetID(profile pollingprofile.PollingProfile, id id.ID) pollingprofile.PollingProfile {
+	panic("unimplemented")
+}
+
+func (*repositoryMock) Update(ctx context.Context, profile pollingprofile.PollingProfile) (pollingprofile.PollingProfile, error) {
+	panic("unimplemented")
+}
+
+func getPollingProfileRepositoryMock(t *testing.T) pollingprofile.Repository {
+	t.Helper()
+
+	mock := new(repositoryMock)
+	mock.T = t
+	mock.Test(t)
+
+	return mock
 }

@@ -145,6 +145,9 @@ func (app *App) Start(opts ...appOption) error {
 	}
 
 	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
+	pollingProfileRepo := pollingprofile.NewRepository(db)
+	demoRepo := demoresource.NewRepository(db)
+
 	configFromDB := configRepo.Current(ctx)
 
 	testDB, err := testdb.Postgres(
@@ -193,7 +196,7 @@ func (app *App) Start(opts ...appOption) error {
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	rf := newRunnerFacades(
-		app.cfg,
+		pollingProfileRepo,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -241,12 +244,9 @@ func (app *App) Start(opts ...appOption) error {
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
+
 	registerConfigResource(configRepo, apiRouter, db)
-
-	pollingProfileRepo := pollingprofile.NewRepository(db)
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db)
-
-	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db)
 
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
@@ -291,7 +291,7 @@ func registerConfigResource(configRepo *configresource.Repository, router *mux.R
 	manager.RegisterRoutes(router)
 }
 
-func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB) {
+func registerPollingProfilesResource(repository pollingprofile.Repository, router *mux.Router, db *sql.DB) {
 	manager := resourcemanager.New[pollingprofile.PollingProfile](
 		pollingprofile.ResourceName,
 		repository,
@@ -315,7 +315,7 @@ type facadeConfig interface {
 }
 
 func newRunnerFacades(
-	cfg facadeConfig,
+	pollingProfileRepo pollingprofile.Repository,
 	testDB model.Repository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
@@ -334,12 +334,8 @@ func newRunnerFacades(
 		subscriptionManager,
 	)
 
-	retryDelay := cfg.PoolingRetryDelay()
-	maxWaitTime := cfg.PoolingMaxWaitTimeForTraceDuration()
-
 	pollerExecutor := executor.NewPollerExecutor(
-		retryDelay,
-		maxWaitTime,
+		pollingProfileRepo,
 		tracer,
 		execTestUpdater,
 		tracedb.Factory(testDB),
@@ -347,11 +343,10 @@ func newRunnerFacades(
 	)
 
 	tracePoller := executor.NewTracePoller(
+		pollingProfileRepo,
 		pollerExecutor,
 		execTestUpdater,
 		assertionRunner,
-		retryDelay,
-		maxWaitTime,
 		subscriptionManager,
 	)
 

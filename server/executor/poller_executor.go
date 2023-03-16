@@ -2,11 +2,13 @@ package executor
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
-	"math"
-	"time"
 
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
@@ -16,10 +18,10 @@ import (
 type traceDBFactoryFn func(ds model.DataStore) (tracedb.TraceDB, error)
 
 type DefaultPollerExecutor struct {
-	updater           RunUpdater
-	newTraceDBFn      traceDBFactoryFn
-	dsRepo            model.DataStoreRepository
-	maxTracePollRetry int
+	pollingProfileRepo pollingprofile.Repository
+	updater            RunUpdater
+	newTraceDBFn       traceDBFactoryFn
+	dsRepo             model.DataStoreRepository
 }
 
 type InstrumentedPollerExecutor struct {
@@ -56,20 +58,17 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 }
 
 func NewPollerExecutor(
-	retryDelay time.Duration,
-	maxWaitTimeForTrace time.Duration,
+	pollingProfileRepo pollingprofile.Repository,
 	tracer trace.Tracer,
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
 ) PollerExecutor {
-
-	maxTracePollRetry := int(math.Ceil(float64(maxWaitTimeForTrace) / float64(retryDelay)))
 	pollerExecutor := &DefaultPollerExecutor{
-		updater:           updater,
-		newTraceDBFn:      newTraceDBFn,
-		dsRepo:            dsRepo,
-		maxTracePollRetry: maxTracePollRetry,
+		pollingProfileRepo: pollingProfileRepo,
+		updater:            updater,
+		newTraceDBFn:       newTraceDBFn,
+		dsRepo:             dsRepo,
 	}
 
 	return &InstrumentedPollerExecutor{
@@ -152,9 +151,13 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
-	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	if job.count == pe.maxTracePollRetry {
-		return true, fmt.Sprintf("Hit MaxRetry of %d", pe.maxTracePollRetry)
+
+	pollingProfile := pe.getDefaultPollingProfile(job.ctx)
+
+	// we're done if we have the same amount of spans after polling or `maxRetries` times
+	maxRetries := pollingProfile.Periodic.GetMaxRetries()
+	if job.count == maxRetries {
+		return true, fmt.Sprintf("Hit MaxRetry of %d", maxRetries)
 	}
 
 	if job.run.Trace == nil {
@@ -175,4 +178,24 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	}
 
 	return false, fmt.Sprintf("New spans found. Before: %d After: %d", len(job.run.Trace.Flat), len(trace.Flat))
+}
+
+var defaultPollingProfile = pollingprofile.PollingProfile{
+	ID:       id.ID("current"),
+	Name:     "default",
+	Default:  true,
+	Strategy: pollingprofile.Periodic,
+	Periodic: &pollingprofile.PeriodicPollingConfig{
+		Timeout:    "1m",
+		RetryDelay: "5s",
+	},
+}
+
+func (pe DefaultPollerExecutor) getDefaultPollingProfile(ctx context.Context) pollingprofile.PollingProfile {
+	profile, err := pe.pollingProfileRepo.GetDefault(ctx)
+	if err != nil && errors.Unwrap(err) == sql.ErrNoRows {
+		return defaultPollingProfile
+	}
+
+	return profile
 }

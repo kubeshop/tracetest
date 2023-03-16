@@ -26,17 +26,6 @@ var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationUpdate,
 }
 
-var defaultPollingProfile = PollingProfile{
-	ID:       id.ID("current"),
-	Name:     "default",
-	Default:  true,
-	Strategy: Periodic,
-	Periodic: &PeriodicPollingConfig{
-		Timeout:    "1m",
-		RetryDelay: "5s",
-	},
-}
-
 type PollingProfile struct {
 	ID       id.ID                  `mapstructure:"id"`
 	Name     string                 `mapstructure:"name"`
@@ -48,6 +37,13 @@ type PollingProfile struct {
 type PeriodicPollingConfig struct {
 	RetryDelay string `mapstructure:"retryDelay"`
 	Timeout    string `mapstructure:"timeout"`
+}
+
+func (ppc PeriodicPollingConfig) GetMaxRetries() int {
+	timeout, _ := time.ParseDuration(ppc.Timeout)
+	retryDelay, _ := time.ParseDuration(ppc.RetryDelay)
+
+	return int(timeout / retryDelay)
 }
 
 func (ppc *PeriodicPollingConfig) Validate() error {
@@ -80,15 +76,26 @@ func (pp PollingProfile) Validate() error {
 	return nil
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{db}
+func NewRepository(db *sql.DB) Repository {
+	return &DBRepository{db}
 }
 
-type Repository struct {
+type Repository interface {
+	SetID(profile PollingProfile, id id.ID) PollingProfile
+	Create(ctx context.Context, profile PollingProfile) (PollingProfile, error)
+	Update(ctx context.Context, profile PollingProfile) (PollingProfile, error)
+	Get(ctx context.Context, id id.ID) (PollingProfile, error)
+	GetDefault(ctx context.Context) (PollingProfile, error)
+	Delete(ctx context.Context, id id.ID) error
+	List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error)
+	Count(ctx context.Context, query string) (int, error)
+}
+
+type DBRepository struct {
 	db *sql.DB
 }
 
-func (r *Repository) SetID(profile PollingProfile, id id.ID) PollingProfile {
+func (r *DBRepository) SetID(profile PollingProfile, id id.ID) PollingProfile {
 	profile.ID = id
 	return profile
 }
@@ -102,7 +109,7 @@ const insertQuery = `INSERT INTO polling_profiles (
 	)
 	VALUES ($1, $2, $3, $4, $5)`
 
-func (r *Repository) Create(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
+func (r *DBRepository) Create(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
 	var (
 		periodicJSON []byte
 		err          error
@@ -155,7 +162,7 @@ func (r *Repository) Create(ctx context.Context, profile PollingProfile) (Pollin
 	return profile, nil
 }
 
-func (r *Repository) clearDefaultFlag(ctx context.Context) error {
+func (r *DBRepository) clearDefaultFlag(ctx context.Context) error {
 	defaultProfile, err := r.GetDefault(ctx)
 	if err != nil {
 		wrappedError := errors.Unwrap(err)
@@ -171,7 +178,7 @@ func (r *Repository) clearDefaultFlag(ctx context.Context) error {
 	return err
 }
 
-func (r *Repository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
+func (r *DBRepository) Update(ctx context.Context, profile PollingProfile) (PollingProfile, error) {
 	err := r.Delete(ctx, profile.ID)
 	if err != nil && errors.Unwrap(err) != sql.ErrNoRows {
 		return PollingProfile{}, fmt.Errorf("could not delete old profile when updating it: %w", err)
@@ -199,15 +206,15 @@ const (
 	getDefaultQuery = baseSelect + `WHERE "default" = true`
 )
 
-func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
+func (r *DBRepository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
 	return r.get(ctx, getQuery, id)
 }
 
-func (r *Repository) GetDefault(ctx context.Context) (PollingProfile, error) {
+func (r *DBRepository) GetDefault(ctx context.Context) (PollingProfile, error) {
 	return r.get(ctx, getDefaultQuery)
 }
 
-func (r *Repository) get(ctx context.Context, query string, args ...any) (PollingProfile, error) {
+func (r *DBRepository) get(ctx context.Context, query string, args ...any) (PollingProfile, error) {
 	profile := PollingProfile{}
 
 	var periodicJSON []byte
@@ -240,7 +247,7 @@ func (r *Repository) get(ctx context.Context, query string, args ...any) (Pollin
 
 const deleteQuery = `DELETE FROM polling_profiles WHERE "id" = $1`
 
-func (r *Repository) Delete(ctx context.Context, id id.ID) error {
+func (r *DBRepository) Delete(ctx context.Context, id id.ID) error {
 	profile, err := r.Get(ctx, id)
 	if err != nil {
 		return err
@@ -266,11 +273,11 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	return nil
 }
 
-func (r Repository) SortingFields() []string {
+func (r DBRepository) SortingFields() []string {
 	return []string{"id", "name", "strategy"}
 }
 
-func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
+func (r *DBRepository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
 	listQuery := baseSelect
 
 	if sortDirection == "" {
@@ -335,7 +342,7 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 
 const baseCountQuery = `SELECT COUNT(*) FROM polling_profiles`
 
-func (r *Repository) Count(ctx context.Context, query string) (int, error) {
+func (r *DBRepository) Count(ctx context.Context, query string) (int, error) {
 	countQuery := baseCountQuery
 
 	if query != "" {
