@@ -656,7 +656,7 @@ services:
     volumes:
       - type: bind
         source: ./tracetest/tracetest.config.yaml
-        target: /app/config.yaml
+        target: /app/tracetest.yaml
       - type: bind
         source: ./tracetest/tracetest-provision.yaml
         target: /app/provision.yaml
