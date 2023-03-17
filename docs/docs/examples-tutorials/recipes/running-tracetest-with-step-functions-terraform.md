@@ -95,7 +95,10 @@ Tracetest supports the native AWS SDK library to connect to X-Ray to find traces
 This can be done by either providing them from the initial bootstrap using:
 
 ```yaml
-dataStore:
+---
+type: DataStore
+spec:
+  name: awsxray
   type: awsxray
   awsxray:
     accessKeyId: <your-accessKeyId>
@@ -104,7 +107,7 @@ dataStore:
     region: "us-west-2"
 ```
 
-Or from the the Tracetest settings page:
+Or from the Tracetest settings page:
 ![AWS X-Ray Settings](../img/awsxray-settings.png)
 
 ## How do traces reach AWS X-Ray?
@@ -123,7 +126,7 @@ terraform apply
 ```
 
 After accepting the changes after running the `terraform apply` command and finalizing the infra creation, you can find the output with the required endpoints to continue with tests.
-The final output from the Terraform command should be a list of endpoints that similar to the following:
+The final output from the Terraform command should be a list of endpoints that are similar to the following:
 
 ![Terraform Step Functions Output](../img/terraform-step-functions.png)
 
@@ -141,13 +144,13 @@ sam deploy --guided
 ```
 
 You'll be asked to fill in some details like the app name, email settings and a Sendgrid API key.
-The output from the previous command should look similar ot this:
+The output from the previous command should look similar to this:
 
 ![SAM Step Functions](../img/sam-step-functions.png)
 
 ## Running Trace-based Tests
 
-Now that all of the required services and infra has been created, you can start running trace-based testing by doing the following:
+Now that all of the required services and infra have been created, you can start running trace-based testing by doing the following:
 
 1. Run this `sam list stack-outputs --stack-name <your_app_name>` sam command where you can copy the `StepFunctionsAPIUrl` value and add the `<your_api_endpoint>` placeholder from the `tests/incident.yaml` and `tests/exam.yaml` files.
 2. From the Terraform output configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --endpoint <tracetest_url>`.

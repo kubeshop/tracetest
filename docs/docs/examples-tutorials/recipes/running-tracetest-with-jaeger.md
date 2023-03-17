@@ -222,11 +222,11 @@ server:
 
 ```
 
-The `tracetest.provision.`yaml` file defines the trace data store, set to Jaeger, meaning the traces will be stored in Jaeger and Tracetest will fetch them from Jaeger when running tests.
+The `tracetest.provision.yaml` file defines the trace data store, set to Jaeger, meaning the traces will be stored in Jaeger and Tracetest will fetch them from Jaeger when running tests.
 
 But how does Tracetest fetch traces?
 
-Tracetest uses `jaeger.endpoint:jaeger:16685` to connect to Jaeger and fetch trace data.
+Tracetest uses `jaeger:16685` to connect to Jaeger and fetch trace data.
 
 ```yaml
 ---

@@ -135,16 +135,23 @@ They will start in this order:
 5. Tracetest
 
 ```yaml
-version: '3'
+version: "3"
 services:
-
   tracetest:
-    image: kubeshop/tracetest:latest
+    image: kubeshop/tracetest:${TAG:-latest}
     platform: linux/amd64
     volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
+      - type: bind
+        source: ./tracetest-config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest-provision.yaml
+        target: /app/provision.yaml
+    command: --provisioning-file /app/provision.yaml
     ports:
       - 11633:11633
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
@@ -155,12 +162,16 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres:14
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
     healthcheck:
       test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
       interval: 1s
@@ -168,34 +179,45 @@ services:
       retries: 60
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector:0.54.0
+    ports:
+      - "55679:55679"
+      - "4317:4317"
+      - "8888:8888"
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+      - ./collector.config.yaml:/otel-local-config.yaml
     depends_on:
       data-prepper:
-        condition: service_started
+        condition: service_healthy
 
   data-prepper:
     restart: unless-stopped
     image: opensearchproject/data-prepper:1.5.1
     volumes:
-      - ./tracetest/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
-      - ./tracetest/opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
+      - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
+      - ./opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
+    healthcheck:
+      test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/21890"]
+      interval: 1s
+      timeout: 30s
+      retries: 60
     depends_on:
       opensearch:
         condition: service_healthy
 
   opensearch:
-    image: opensearchproject/opensearch:2.3.0
+    image: opensearchproject/opensearch:2.4.1
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
     volumes:
-      - ./tracetest/opensearch/opensearch.yaml:/usr/share/opensearch/config/opensearch.yml
+      - ./opensearch/opensearch.yaml:/usr/share/opensearch/config/opensearch.yml
+    ports:
+      - "9200:9200"
     ulimits:
       memlock:
         soft: -1
@@ -223,14 +245,17 @@ OpenSearch and Data Prepper require config files to be loaded via a volume as we
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and defines the trace data store and exporter. The data store is set to OpenSearch, meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests. The exporter is set to the OpenTelemetry Collector.
+The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and defines telemetry exporter. The exporter is set to the OpenTelemetry Collector.
+The `tracetest-provisioni.yaml` file contains the data store setup, which is set to OpenSearch meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests.
 
 But how does Tracetest fetch traces?
 
 Tracetest connects to OpenSearch to fetch trace data:
 
 ```yaml
-opensearch:
+type: DataStore
+spec:
+  name: OpenSearch
   type: opensearch
   opensearch:
     addresses:
@@ -249,33 +274,19 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
 telemetry:
-  dataStores:
-    jaeger:
-      type: jaeger
-      jaeger:
-        endpoint: jaeger:16685
-        tls:
-          insecure: true
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
 
 server:
   telemetry:
-    dataStore: jaeger
     exporter: collector
-    applicationExporter: collector
-
 ```
 
 How do traces reach Jaeger?
