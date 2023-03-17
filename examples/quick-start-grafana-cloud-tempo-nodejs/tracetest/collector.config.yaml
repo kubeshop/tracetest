@@ -14,7 +14,7 @@ exporters:
   otlp:
     endpoint: tempo-us-central1.grafana.net:443
     headers:
-      authorization: Basic <base64 encoded version of user:password>
+      authorization: Basic <grafana_auth_hash>
       # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/
     tls:
       insecure: false

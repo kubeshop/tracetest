@@ -1,9 +1,12 @@
-dataStore:
+---
+type: DataStore
+spec:
+  name: Grafana Tempo Cloud
   type: tempo
   tempo:
     type: http
     http:
       url: https://tempo-us-central1.grafana.net/tempo
       headers:
-        Authorization: Basic <base64 encoded version of user:password>
+        Authorization: Basic <grafana_auth_hash>
         # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/
