@@ -12,7 +12,7 @@ In the Tracetest Web UI, open Settings and select Analytics:
 
 ![Analytics Settings](./img/analytics-settings.png)
 
-From this analytics settings page you can enable or disable the analytics.
+From this analytics settings page, you can enable or disable the analytics.
 
 ## Changing Analytics Settings with the CLI
 
