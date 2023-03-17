@@ -62,7 +62,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		)
 
 		cfg := repo.Current(context.TODO())
-		assert.False(t, cfg.IsAnalyticsEnabled())
+		assert.True(t, cfg.IsAnalyticsEnabled())
 
 	})
 
@@ -73,11 +73,11 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 			testmock.MustCreateRandomMigratedDatabase(db),
 		)
 		repo.Update(context.TODO(), configresource.Config{
-			AnalyticsEnabled: true,
+			AnalyticsEnabled: false,
 		})
 
 		cfg := repo.Current(context.TODO())
-		assert.True(t, cfg.IsAnalyticsEnabled())
+		assert.False(t, cfg.IsAnalyticsEnabled())
 	})
 
 	t.Run("EnvOverride", func(t *testing.T) {
@@ -122,7 +122,7 @@ func TestConfigResource(t *testing.T) {
 			"spec": {
 				"id": "current",
 				"name": "Config",
-				"analyticsEnabled": false
+				"analyticsEnabled": true
 			}
 		}`,
 		SampleJSONUpdated: `{
@@ -130,7 +130,7 @@ func TestConfigResource(t *testing.T) {
 			"spec": {
 				"id": "current",
 				"name": "Config",
-				"analyticsEnabled": true
+				"analyticsEnabled": false
 			}
 		}`,
 	},
