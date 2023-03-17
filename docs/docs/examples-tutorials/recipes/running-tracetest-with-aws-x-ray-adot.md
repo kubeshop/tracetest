@@ -166,16 +166,18 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
-
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
 ```
 
-The `tracetest.provision.yaml` file defines the trace data store, set to the Otel Collector, meaning the traces will be sent to the ADOT instance where later on will be pushed to the AWX X-Ray service and to the OTLP Tracetest endpoint.
+The `tracetest.provision.yaml` file defines the trace data store, set to the OTel Collector, meaning the traces will be sent to the ADOT instance where later on will be pushed to the AWX X-Ray service and the OTLP Tracetest endpoint.
+
+```yaml
+---
+type: DataStore
+spec:
+  name: otlp
+  type: otlp
+
+```
 
 But how does Tracetest fetch traces?
 

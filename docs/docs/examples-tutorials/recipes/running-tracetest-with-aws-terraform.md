@@ -215,13 +215,34 @@ resource "aws_acm_certificate" "cert" {
 The provisioning configuration for Tracetest can be found in the `variables.tf` file under the `locals` configuration which uses the internal load balancer DNS endpoint to build the data store entry.
 
 ```tf
-privisioning = <<EOF
-dataStore:
+provisioning = <<EOF
+---
+type: PollingProfile
+spec:
+  name: default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: jaeger
   type: jaeger
   jaeger:
     endpoint: ${aws_lb.internal_tracetest_alb.dns_name}:16685
     tls:
       insecure_skip_verify: true
+  EOF
+
+  tags = {
+    Name    = local.name
+    Example = local.name
+  }
+}
+
   EOF
 ```
 
@@ -254,9 +275,9 @@ The final output from the Terraform command should be a list of endpoints that i
 
 ## Running Trace-based Tests
 
-Now that all of the required services and infra has been created, you can start running some Trace-based testing by doing the following:
+Now that all of the required services and infra have been created, you can start running some Trace-based testing by doing the following:
 
-1. From the Terraform outputs you can copy the `api_endpoint` and add replace the `<your_api_endpoint>` placeholder from the `tests/test.yaml` file.
+1. From the Terraform output you can copy the `api_endpoint` and replace the `<your_api_endpoint>` placeholder from the `tests/test.yaml` file.
 2. Configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --endpoint <tracetest_url>`.
 3. Run the test YAML file using the CLI `tracetest test run -d tests/test.yaml`.
 4. Follow the link to find the results.

@@ -133,24 +133,6 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
-
-# This will populate sample tests in the Tracetest Web UI you can run to try out Tracetest.
-demo:
-  enabled: [otel]
-  endpoints:
-    otelFrontend: http://otel-frontend:8084
-    otelProductCatalog: otel-productcatalogservice:3550
-    otelCart: otel-cartservice:7070
-    otelCheckout: otel-checkoutservice:5050
-
-experimentalFeatures: []
-
-googleAnalytics:
-  enabled: false
-
 telemetry:
   exporters:
     collector:
@@ -167,13 +149,28 @@ server:
     applicationExporter: collector
 ```
 
-The `tracetest-provision.yaml` file contains the data store setup. The data store is set to OTLP meaning the traces will be stored in Tracetest itself.
+The `tracetest-provision.yaml` file contains the data store setup. The data store is set to `lightstep` meaning the traces will be received by Tracetest OTLP API and stored in Tracetest itself.
 
 ```yaml
 # tracetest-provision.yaml
 ---
-dataStore:
-  type: otlp
+type: DataStore
+spec:
+  name: Lightstep
+  type: lightstep
+
+---
+type: Demo
+spec:
+  name: "OpenTelemetry Shop"
+  enabled: true
+  type: otelstore
+  opentelemetryStore:
+    frontendEndpoint: http://otel-frontend:8084
+    productCatalogEndpoint: otel-productcatalogservice:3550
+    cartEndpoint: otel-cartservice:7070
+    checkoutEndpoint: otel-checkoutservice:5050
+
 ```
 
 **How to send traces to Tracetest and Lightstep?**

@@ -6,14 +6,6 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-demo:
-  enabled: [otel]
-  endpoints:
-    otelFrontend: http://otel-frontend:8084
-    otelProductCatalog: otel-productcatalogservice:3550
-    otelCart: otel-cartservice:7070
-    otelCheckout: otel-checkoutservice:5050
-
 telemetry:
   exporters:
     collector:

@@ -195,7 +195,7 @@ Tracetest depends on Postgres, Jaeger and the OpenTelemetry Collector. Both Trac
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
+The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
 
 ```yaml
 postgres:
@@ -206,32 +206,39 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
+telemetry:
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
 
-googleAnalytics:
-  enabled: true
+server:
+  telemetry:
+    exporter: collector
 
-demo:
-  enabled: []
-
-experimentalFeatures: []
 ```
 
- The `tracetest.provision.yaml` file definines the trace data store, set to Jaeger, meaning the traces will be stored in Jaeger and Tracetest will fetch them from Jaeger when running tests.
+The `tracetest.provision.yaml` file defines the trace data store, set to Jaeger, meaning the traces will be stored in Jaeger and Tracetest will fetch them from Jaeger when running tests.
 
 But how does Tracetest fetch traces?
 
-Tracetest uses `jaeger.endpoint:jaeger:16685` to connect to Jaeger and fetch trace data.
+Tracetest uses `jaeger:16685` to connect to Jaeger and fetch trace data.
 
 ```yaml
-dataStore:
+---
+type: DataStore
+spec:
+  name: jaeger
   type: jaeger
   jaeger:
     endpoint: jaeger:16685
     tls:
       insecure: true
+
 ```
 
 How do traces reach Jaeger?

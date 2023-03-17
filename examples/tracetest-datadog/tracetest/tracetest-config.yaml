@@ -6,3 +6,18 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
+
+telemetry:
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
+server:
+  telemetry:
+    exporter: collector
+    applicationExporter: collector

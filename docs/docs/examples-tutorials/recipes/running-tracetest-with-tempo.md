@@ -130,52 +130,60 @@ The `docker-compose.yaml` in the `tracetest` directory is configured with four s
 version: '3'
 services:
 
-  tracetest:
-    image: kubeshop/tracetest
-    platform: linux/amd64
-    volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
-    ports:
-      - 11633:11633
-    depends_on:
-      postgres:
-        condition: service_healthy
-      tempo:
-        condition: service_started
-      otel-collector:
-        condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
+    tracetest:
+        image: kubeshop/tracetest:${TAG:-latest}
+        platform: linux/amd64
+        volumes:
+            - type: bind
+              source: ./tracetest-config.yaml
+              target: /app/tracetest.yaml
+            - type: bind
+              source: ./tracetest-provision.yaml
+              target: /app/provision.yaml
+        command: --provisioning-file /app/provision.yaml
+        ports:
+            - 11633:11633
+        extra_hosts:
+          - "host.docker.internal:host-gateway"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            otel-collector:
+                condition: service_started
+        healthcheck:
+            test: ["CMD", "wget", "--spider", "localhost:11633"]
+            interval: 1s
+            timeout: 3s
+            retries: 60
+        environment:
+            TRACETEST_DEV: ${TRACETEST_DEV}
 
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
+    postgres:
+        image: postgres:14
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+        healthcheck:
+            test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+            interval: 1s
+            timeout: 5s
+            retries: 60
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-    depends_on:
-      - tempo
+    otel-collector:
+        image: otel/opentelemetry-collector:0.54.0
+        command:
+            - "--config"
+            - "/otel-local-config.yaml"
+        volumes:
+            - ./collector.config.yaml:/otel-local-config.yaml
+        depends_on:
+            - tempo
 
-  tempo:
-    image: grafana/tempo:1.5.0
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-    - ./tracetest/tempo.config.yaml:/etc/tempo.yaml
+    tempo:
+        image: grafana/tempo:2.0.0
+        command: ["-config.file=/etc/tempo.yaml"]
+        volumes:
+        - ./tempo.config.yaml:/etc/tempo.yaml
 
 ```
 
@@ -253,7 +261,9 @@ storage:
 
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to Tempo, meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests. The exporter is set to the OpenTelemetry Collector.
+The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter.  The exporter is set to the OpenTelemetry Collector.
+
+The `tracetest.provision.yaml` file defines the trace data store, set to Tempo, meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests.
 
 But how does Tracetest fetch traces?
 
@@ -270,32 +280,47 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
-
-demo:
-  enabled: []
-
-experimentalFeatures: []
-
 telemetry:
-  dataStores:
-    tempo:
-      type: tempo
-      tempo:
-        endpoint: tempo:9095
-        tls:
-          insecure: true
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
 
 server:
   telemetry:
-    dataStore: tempo
     exporter: collector
-    applicationExporter: collector
+
+
+```
+
+```yaml
+# tracetest-provision.yaml
+
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: Tempo
+  type: tempo
+  tempo:
+    type: grpc
+    grpc:
+      endpoint: tempo:9095
+      tls:
+        insecure: true
 
 ```
 

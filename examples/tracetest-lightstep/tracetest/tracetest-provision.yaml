@@ -1,8 +1,8 @@
 ---
 type: DataStore
 spec:
-  name: otlp
-  type: otlp
+  name: Lightstep
+  type: lightstep
 
 ---
 type: Demo
