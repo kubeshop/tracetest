@@ -1,6 +1,6 @@
 # Demo Settings
 
-Tracetest has the option to enable Test examples for our Pokeshop Demo App or the OpenTelemetry Astronomy Shop Demo. You will require an instance of those applications running alongside your Tracetest server to be able to use them. The demo settings can be adjust both from the Tracetest UI and from the CLI. 
+Tracetest has the option to enable Test examples for our Pokeshop Demo App or the OpenTelemetry Astronomy Shop Demo. You will require an instance of those applications running alongside your Tracetest server to be able to use them. The demo settings can be adjusted both from the Tracetest UI and from the CLI. 
 
 ## Changing Demo Settings from the UI
 
