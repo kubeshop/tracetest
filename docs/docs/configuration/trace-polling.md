@@ -41,7 +41,7 @@ From this trace polling page, under settings, you can adjust the speed with whic
 
 ## Changing Trace Polling Settings with the CLI
 
-Or, if you prefer using the CLI, you can use this resource definition to set the polling parameters for the Tracetest server:
+Or, if you prefer using the CLI, you can use this resource definition file to set the polling parameters for the Tracetest server:
 
 ```yaml
 type: PollingProfile
