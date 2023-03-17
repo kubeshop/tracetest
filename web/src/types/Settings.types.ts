@@ -17,6 +17,11 @@ export enum SupportedDemosFormField {
   OpentelemetryStore = 'opentelemetryStore',
 }
 
+export const SupportedDemosFormFieldMap = {
+  [SupportedDemosFormField.Pokeshop]: SupportedDemos.Pokeshop,
+  [SupportedDemosFormField.OpentelemetryStore]: SupportedDemos.OpentelemetryStore,
+};
+
 export enum ResourceType {
   ConfigType = 'Config',
   PollingProfileType = 'PollingProfile',

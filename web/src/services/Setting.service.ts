@@ -3,6 +3,7 @@ import Config from 'models/Config.model';
 import {
   ResourceType,
   SupportedDemosFormField,
+  SupportedDemosFormFieldMap,
   TDraftConfig,
   TDraftDemo,
   TDraftResource,
@@ -25,12 +26,13 @@ const SettingService = () => ({
   // forms
   getDemoFormInitialValues(demos: Demo[]): TDraftDemo {
     return Object.values(SupportedDemosFormField).reduce((draft, demoName) => {
-      const enabledDemo = demos.find(demo => demo.type === demoName);
+      const demoType = SupportedDemosFormFieldMap[demoName];
+      const enabledDemo = demos.find(demo => demo.type === demoType);
 
       return {
         ...draft,
         [demoName]: enabledDemo || {
-          type: demoName,
+          type: demoType,
           enabled: false,
           name: demoName,
         },
