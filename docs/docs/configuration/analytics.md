@@ -16,7 +16,7 @@ From this analytics settings page, you can enable or disable the analytics.
 
 ## Changing Analytics Settings with the CLI
 
-Or, if you prefer using the CLI, you can use this file config to disable analytics:
+Or, if you prefer to use the CLI, you can use this file config to disable analytics:
 
 ```yaml
 type: Config
