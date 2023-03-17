@@ -2,6 +2,7 @@ import Demo from 'models/Demo.model';
 import Config from 'models/Config.model';
 import {
   ResourceType,
+  SupportedDemos,
   SupportedDemosFormField,
   TDraftConfig,
   TDraftDemo,
@@ -24,10 +25,18 @@ const SettingService = () => ({
 
   // forms
   getDemoFormInitialValues(demos: Demo[]): TDraftDemo {
-    return Object.values(SupportedDemosFormField).reduce((draft, demoName) => {
-      const enabledDemo = demos.find(demo => demo.type === demoName);
+    const supportedDemos = Object.values(SupportedDemos);
+    const supportedDemoFields = Object.values(SupportedDemosFormField);
 
-      return {
+    let draft = {};
+
+    for (let i = 0; i < supportedDemos.length; i+=1) {
+      const demoType = supportedDemos[i];
+      const demoName = supportedDemoFields[i];
+
+      const enabledDemo = demos.find(demo => demo.type === demoType);
+
+      draft = {
         ...draft,
         [demoName]: enabledDemo || {
           type: demoName,
@@ -35,7 +44,9 @@ const SettingService = () => ({
           name: demoName,
         },
       };
-    }, {} as TDraftDemo);
+    }
+
+    return draft as TDraftDemo;
   },
 
   getDemoFormValues(draft: TDraftDemo): TDraftResource[] {
