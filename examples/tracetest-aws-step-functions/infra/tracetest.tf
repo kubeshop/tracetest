@@ -41,12 +41,8 @@ resource "aws_ecs_task_definition" "tracetest" {
           "value" : "${module.db.db_instance_password}"
         },
         {
-          "name" : "TRACETEST_POOLINGCONFIG_MAXWAITTIMEFORTRACE",
-          "value" : "2m"
-        },
-        {
-          "name" : "TRACETEST_POOLINGCONFIG_RETRYDELAY",
-          "value" : "5s"
+          "name" : "TRACETEST_PROVISIONING",
+          "value" : base64encode(local.provisioning),
         }
       ],
       "logConfiguration" : {

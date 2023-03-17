@@ -15,6 +15,7 @@ services:
   # AdService
   otel-adservice:
     image: otel/demo:v0.3.4-alpha-adservice
+    platform: linux/amd64
     environment:
       - AD_SERVICE_PORT
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
@@ -26,6 +27,7 @@ services:
   # CartService
   otel-cartservice:
     image: otel/demo:v0.3.4-alpha-cartservice
+    platform: linux/amd64
     environment:
       - CART_SERVICE_PORT
       - REDIS_ADDR
@@ -39,6 +41,7 @@ services:
   # CheckoutService
   otel-checkoutservice:
     image: otel/demo:v0.3.4-alpha-checkoutservice
+    platform: linux/amd64
     environment:
       - CHECKOUT_SERVICE_PORT
       - CART_SERVICE_ADDR
@@ -61,6 +64,7 @@ services:
   # CurrencyService
   otel-currencyservice:
     image: otel/demo:v0.3.4-alpha-currencyservice
+    platform: linux/amd64
     environment:
       - CURRENCY_SERVICE_PORT
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
@@ -71,6 +75,7 @@ services:
   # EmailService
   otel-emailservice:
     image: otel/demo:v0.3.4-alpha-emailservice
+    platform: linux/amd64
     environment:
       - APP_ENV=production
       - EMAIL_SERVICE_PORT
@@ -82,6 +87,7 @@ services:
   # Frontend
   otel-frontend:
     image: otel/demo:v0.3.4-alpha-frontend
+    platform: linux/amd64
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     environment:
@@ -112,6 +118,7 @@ services:
   # PaymentService
   otel-paymentservice:
     image: otel/demo:v0.3.4-alpha-paymentservice
+    platform: linux/amd64
     environment:
       - PAYMENT_SERVICE_PORT
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
@@ -122,6 +129,7 @@ services:
   # ProductCatalogService
   otel-productcatalogservice:
     image: otel/demo:v0.3.4-alpha-productcatalogservice
+    platform: linux/amd64
     environment:
       - PRODUCT_CATALOG_SERVICE_PORT
       - FEATURE_FLAG_GRPC_SERVICE_ADDR
@@ -133,6 +141,7 @@ services:
   # RecommendationService
   otel-recommendationservice:
     image: otel/demo:v0.3.4-alpha-recommendationservice
+    platform: linux/amd64
     depends_on:
       - otel-productcatalogservice
       - otel-collector
@@ -146,6 +155,7 @@ services:
   # ShippingService
   otel-shippingservice:
     image: otel/demo:v0.3.4-alpha-shippingservice
+    platform: linux/amd64
     environment:
       - SHIPPING_SERVICE_PORT
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
@@ -156,6 +166,7 @@ services:
   # FeatureFlagService
   otel-featureflagservice:
     image: otel/demo:v0.3.4-alpha-featureflagservice
+    platform: linux/amd64
     ports:
       - "${FEATURE_FLAG_GRPC_SERVICE_PORT}" # Feature Flag Service gRPC API
     environment:

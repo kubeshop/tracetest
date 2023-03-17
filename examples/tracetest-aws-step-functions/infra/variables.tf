@@ -25,6 +25,18 @@ locals {
   vpc_cidr = "192.168.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
+  provisioning = <<EOF
+---
+type: PollingProfile
+spec:
+  name: default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 2m
+  EOF
+
   tags = {
     Name    = local.name
     Example = local.name

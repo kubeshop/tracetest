@@ -2,7 +2,7 @@
 type: DataStore
 spec:
   name: Lightstep
-  type: lightstep
+  type: lighstep
 
 ---
 type: Demo

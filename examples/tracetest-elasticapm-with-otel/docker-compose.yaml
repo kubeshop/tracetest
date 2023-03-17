@@ -167,7 +167,7 @@ services:
 
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
-    # platform: linux/amd64
+    platform: linux/amd64
     environment:
       - ELASTICSEARCH_SSL_VERIFICATION_MODE=none
       - TRACETEST_DEV=${TRACETEST_DEV}

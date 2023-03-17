@@ -35,6 +35,7 @@ services:
   # Accounting service
   accountingservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-accountingservice
+    platform: linux/amd64
     container_name: accounting-service
     deploy:
       resources:
@@ -58,6 +59,7 @@ services:
   # AdService
   adservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-adservice
+    platform: linux/amd64
     container_name: ad-service
     deploy:
       resources:
@@ -81,6 +83,7 @@ services:
   # Cart service
   cartservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-cartservice
+    platform: linux/amd64
     container_name: cart-service
     deploy:
       resources:
@@ -104,6 +107,7 @@ services:
   # Checkout service
   checkoutservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-checkoutservice
+    platform: linux/amd64
     container_name: checkout-service
     deploy:
       resources:
@@ -148,6 +152,7 @@ services:
   # Currency service
   currencyservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-currencyservice
+    platform: linux/amd64
     container_name: currency-service
     deploy:
       resources:
@@ -167,6 +172,7 @@ services:
   # Email service
   emailservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-emailservice
+    platform: linux/amd64
     container_name: email-service
     deploy:
       resources:
@@ -188,6 +194,7 @@ services:
   # Feature Flag service
   featureflagservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-featureflagservice
+    platform: linux/amd64
     container_name: feature-flag-service
     deploy:
       resources:
@@ -215,6 +222,7 @@ services:
   # Fraud Detection service
   frauddetectionservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-frauddetectionservice
+    platform: linux/amd64
     container_name: frauddetection-service
     deploy:
       resources:
@@ -238,11 +246,8 @@ services:
   # Frontend
   frontend:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-frontend
+    platform: linux/amd64
     container_name: frontend
-    deploy:
-      resources:
-        limits:
-          memory: 200M
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT}"
@@ -280,6 +285,7 @@ services:
   # Payment service
   paymentservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-paymentservice
+    platform: linux/amd64
     container_name: payment-service
     deploy:
       resources:
@@ -302,6 +308,7 @@ services:
   # Product Catalog service
   productcatalogservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-productcatalogservice
+    platform: linux/amd64
     container_name: product-catalog-service
     deploy:
       resources:
@@ -325,6 +332,7 @@ services:
   # Quote service
   quoteservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-quoteservice
+    platform: linux/amd64
     container_name: quote-service
     deploy:
       resources:
@@ -346,6 +354,7 @@ services:
   # Recommendation service
   recommendationservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-recommendationservice
+    platform: linux/amd64
     container_name: recommendation-service
     deploy:
       resources:
@@ -375,6 +384,7 @@ services:
   # Shipping service
   shippingservice:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-shippingservice
+    platform: linux/amd64
     container_name: shipping-service
     deploy:
       resources:
@@ -420,6 +430,7 @@ services:
   # Kafka used by Checkout, Accounting, and Fraud Detection services
   kafka:
     image: ${IMAGE_NAME}:${IMAGE_VERSION}-kafka
+    platform: linux/amd64
     container_name: kafka
     deploy:
       resources:
