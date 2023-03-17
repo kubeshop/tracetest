@@ -282,13 +282,6 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
-
-poolingConfig:
-  maxWaitTimeForTrace: 10m
-  retryDelay: 5s
-
-googleAnalytics:
-  enabled: true
 ```
 
 The `tracetest.provision.yaml` file definines the trace data store, set to AWS X-Ray, meaning the traces will be stored in X-Ray and Tracetest will fetch them from X-Ray when running tests.
@@ -298,13 +291,17 @@ But how does Tracetest fetch traces?
 Tracetest uses the Golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
 
 ```yaml
-dataStore:
+---
+type: DataStore
+spec:
+  name: awsxray
   type: awsxray
   awsxray:
     accessKeyId: <your-accessKeyId>
     secretAccessKey: <your-secretAccessKey>
     sessionToken: <your-session-token>
     region: "us-west-2"
+
 ```
 
 How do traces reach AWS X-Ray?

@@ -156,7 +156,7 @@ type: DataStore
 spec:
   name: Elastic Data Store
   type: elasticapm
-  isDefault: true
+  isdefault: true
     elasticapm:
       addresses:
         - https://es01:9200

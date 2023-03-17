@@ -78,8 +78,12 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - type: bind
-        source: ./tracetest/tracetest.config.yaml
-        target: /app/config.yaml
+        source: ./tracetest-config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest-provision.yaml
+        target: /app/provisioning.yaml
+    command: --provisioning-file /app/provisioning.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
@@ -125,35 +129,20 @@ Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracete
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and defining the trace data store and exporter. The data store is set to OTLP meaning the traces will be stored in Tracetest itself. The exporter is set to the OpenTelemetry Collector.
+The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and telemetry exporter. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
 # tracetest.config.yaml
 ---
-postgresConnString: "host=tt-postgres user=postgres password=postgres port=5432 sslmode=disable"
-
-poolingConfig:
-  maxWaitTimeForTrace: 180s
-  retryDelay: 5s
-
-demo:
-  enabled: [otel]
-  endpoints:
-    otelFrontend: http://frontend:8084
-    otelProductCatalog: productcatalogservice:3550
-    otelCart: cartservice:7070
-    otelCheckout: checkoutservice:5050
-
-experimentalFeatures: []
-
-googleAnalytics:
-  enabled: true
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
 
 telemetry:
-  dataStores:
-    otlp:
-      type: otlp
-
   exporters:
     collector:
       serviceName: tracetest
@@ -165,9 +154,41 @@ telemetry:
 
 server:
   telemetry:
-    dataStore: otlp
     exporter: collector
     applicationExporter: collector
+```
+
+The `tracetest-provision.yaml` file contains the setup of the demonstration APIs that Tracetest can use as an example for tests, of the polling profiles that say how Tracetest should fetch traces received from data store, and the configuration for the data store (in our case, Datadog).
+
+```yaml
+---
+type: Demo
+spec:
+  name: "OpenTelemetry Shop"
+  enabled: true
+  type: otelstore
+  opentelemetryStore:
+    frontendEndpoint: http://frontend:8084
+    productCatalogEndpoint: productcatalogservice:3550
+    cartEndpoint: cartservice:7070
+    checkoutEndpoint: checkoutservice:5050
+
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 180s
+
+---
+type: DataStore
+spec:
+  name: datadog
+  type: datadog
+
 ```
 
 **How to Send Traces to Tracetest and Lightstep**
