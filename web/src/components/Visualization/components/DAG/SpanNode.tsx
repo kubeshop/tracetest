@@ -11,6 +11,8 @@ import {INodeDataSpan} from 'types/DAG.types';
 import AssertionResultChecks from 'components/AssertionResultChecks/AssertionResultChecks';
 import {selectOutputsBySpanId} from 'redux/testOutputs/selectors';
 import TestOutputMark from 'components/TestOutputMark';
+import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
+import CurrentSpanSelector from 'components/CurrentSpanSelector';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
@@ -19,53 +21,57 @@ const SpanNode = ({data, id, selected}: IProps) => {
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, data?.id || ''));
   const outputs = useAppSelector(state => selectOutputsBySpanId(state, data?.id || ''));
   const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
-
-  const className = data.isMatched ? 'matched' : '';
+  const {isOpen: isTestSpecFormOpen} = useTestSpecForm();
+  const showSelectAsCurrent = !data.isMatched && isTestSpecFormOpen && selected;
+  const className = `${data.isMatched ? 'matched' : ''} ${showSelectAsCurrent ? 'selectedAsCurrent' : ''}`;
 
   return (
-    <S.Container
-      className={className}
-      data-cy={`trace-node-${data.type}`}
-      $matched={data.isMatched}
-      $selected={selected}
-    >
-      <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
+    <>
+      <S.Container
+        className={className}
+        data-cy={`trace-node-${data.type}`}
+        $matched={data.isMatched}
+        $selected={selected}
+      >
+        <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
 
-      <S.TopLine $type={data.type} />
+        <S.TopLine $type={data.type} />
 
-      <S.Header>
-        <S.BadgeContainer>
-          <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
-        </S.BadgeContainer>
-        <S.HeaderText>{data.name}</S.HeaderText>
-      </S.Header>
+        <S.Header>
+          <S.BadgeContainer>
+            <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
+          </S.BadgeContainer>
+          <S.HeaderText>{data.name}</S.HeaderText>
+        </S.Header>
 
-      <S.Body>
-        <S.Item>
-          <SettingOutlined />
-          <S.ItemText>
-            {data.service} {SpanKindToText[data.kind]}
-          </S.ItemText>
-        </S.Item>
-        {Boolean(data.system) && (
+        <S.Body>
           <S.Item>
-            <ToolOutlined />
-            <S.ItemText>{data.system}</S.ItemText>
+            <SettingOutlined />
+            <S.ItemText>
+              {data.service} {SpanKindToText[data.kind]}
+            </S.ItemText>
           </S.Item>
-        )}
-        <S.Item>
-          <ClockCircleOutlined />
-          <S.ItemText>{data.duration}</S.ItemText>
-        </S.Item>
-      </S.Body>
+          {Boolean(data.system) && (
+            <S.Item>
+              <ToolOutlined />
+              <S.ItemText>{data.system}</S.ItemText>
+            </S.Item>
+          )}
+          <S.Item>
+            <ClockCircleOutlined />
+            <S.ItemText>{data.duration}</S.ItemText>
+          </S.Item>
+        </S.Body>
 
-      <S.Footer>
-        {!!outputs.length && <TestOutputMark outputs={outputs} />}
-        <AssertionResultChecks failed={failed} passed={passed} styleType="node" />
-      </S.Footer>
+        <S.Footer>
+          {!!outputs.length && <TestOutputMark outputs={outputs} />}
+          <AssertionResultChecks failed={failed} passed={passed} styleType="node" />
+        </S.Footer>
 
-      <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />
-    </S.Container>
+        <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />
+      </S.Container>
+      {showSelectAsCurrent && <CurrentSpanSelector spanId={data.id} />}
+    </>
   );
 };
 
