@@ -47,8 +47,6 @@ Or, if you prefer using the CLI, you can use this resource definition to set the
 type: PollingProfile
 spec:
   default: true
-  id: current
-  name: default
   periodic:
     retryDelay: 500ms
     timeout: 50s
