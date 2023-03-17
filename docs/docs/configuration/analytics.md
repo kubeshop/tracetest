@@ -1,6 +1,6 @@
 # Analytics Settings
 
-To improve the end user experience and to help the team decide where to focus resources to improve the tool, Tracetest collects analytics and telemetry information from the system.
+To improve the end user experience and to help determine where to focus team resources to improve the tool, Tracetest collects analytics and telemetry information from the system.
 
 Participation in this program is optional, and you may opt-out by following the directions below if you'd prefer not to share any information.
 
