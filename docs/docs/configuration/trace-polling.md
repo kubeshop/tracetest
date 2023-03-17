@@ -33,7 +33,7 @@ flowchart TD
 
 ## Changing Trace Polling Settings from the UI
 
-In the Web UI, open settings, and select Trace Polling.
+In the Tracetest Web UI, open Settings and select Trace Polling:
 
 ![Demo Settings](./img/trace-polling.png)
 
