@@ -8,7 +8,7 @@ The data collected is anonymous and is not traceable to the source. You can lear
 
 ## Changing Analytics Settings from the UI
 
-In the Web UI, open settings, and select Analytics.
+In the Tracetest Web UI, open Settings and select Analytics:
 
 ![Analytics Settings](./img/analytics-settings.png)
 
