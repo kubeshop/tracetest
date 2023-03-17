@@ -22,8 +22,6 @@ Or, if you prefer using the CLI, you can use this file config to disable analyti
 type: Config
 spec:
   analyticsEnabled: false
-  id: current
-  name: Config
 ```
 
 Proceed to run this command in the terminal, and specify the file above.
