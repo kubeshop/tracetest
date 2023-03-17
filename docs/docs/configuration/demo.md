@@ -12,7 +12,7 @@ From this demo settings page, you can enable the Pokeshop and/or OpenTelemetry A
 
 ## Changing Demo Settings with the CLI
 
-Or, if you prefer using the CLI, you can use this resource definition to enable the Pokemon app demo:
+Or, if you prefer using the CLI, you can use this resource definition file to enable the Pokemon app demo:
 
 ```yaml
 type: Demo
