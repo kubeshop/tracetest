@@ -119,6 +119,21 @@ const sidebars = {
           id: "configuration/opentelemetry-collector-configuration-file-reference",
           label: "OpenTelemetry Collector Configuration File Reference",
         },
+        {
+          type: "doc",
+          id: "configuration/trace-polling",
+          label: "Trace Polling",
+        },
+        {
+          type: "doc",
+          id: "configuration/demo",
+          label: "Demo Applications",
+        },
+        {
+          type: "doc",
+          id: "configuration/analytics",
+          label: "Analytics",
+        },
       ],
     },
     {
