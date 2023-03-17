@@ -37,7 +37,7 @@ In the Tracetest Web UI, open Settings and select Trace Polling:
 
 ![Demo Settings](./img/trace-polling.png)
 
-From this trace polling page under settings you can adjust the speed that the trace data store is polled when gathering the trace associated with a test run.
+From this trace polling page, under settings, you can adjust the speed with which the trace data store is polled when gathering the trace associated with a test run.
 
 ## Changing Trace Polling Settings with the CLI
 
