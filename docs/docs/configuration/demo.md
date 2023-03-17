@@ -4,7 +4,7 @@ Tracetest has the option to enable Test examples for our Pokeshop Demo App or th
 
 ## Changing Demo Settings from the UI
 
-In the Web UI, open settings, and select Demo.
+In the Web UI, open Settings and select Demo:
 
 ![Demo Settings](./img/demo-settings.png)
 
