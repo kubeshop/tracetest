@@ -8,7 +8,7 @@ In the Web UI, open Settings and select Demo:
 
 ![Demo Settings](./img/demo-settings.png)
 
-From this demo settings page you can enable the Pokeshop and/or OpenTelemetry Astronomy Shop demos. For each demo, you will need to tell Tracetest the location of the relevant demo's endpoints, adjusting the domain name / ip address and possibly the port to match your configuration.
+From this demo settings page, you can enable the Pokeshop and/or OpenTelemetry Astronomy Shop demos. For each demo, you will need to tell Tracetest the location of the relevant demo's endpoints, adjusting the domain name/ip address and, possibly, the port to match your configuration.
 
 ## Changing Demo Settings with the CLI
 
