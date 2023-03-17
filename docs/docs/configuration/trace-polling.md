@@ -53,7 +53,7 @@ spec:
   strategy: periodic
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Proceed to run this command in the terminal and specify the file above.
 
 ```bash
 tracetest apply pollingprofile -file my/resource/pollingprofile-resource.yaml
