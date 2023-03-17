@@ -246,7 +246,7 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add 
 ```
 
 The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and defines telemetry exporter. The exporter is set to the OpenTelemetry Collector.
-The `tracetest-provisioni.yaml` file contains the data store setup, which is set to OpenSearch meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests.
+The `tracetest-provision.yaml` file contains the data store setup, which is set to OpenSearch meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests.
 
 But how does Tracetest fetch traces?
 

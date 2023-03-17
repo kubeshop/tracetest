@@ -180,7 +180,7 @@ services:
             - tempo
 
     tempo:
-        image: grafana/tempo:1.5.0
+        image: grafana/tempo:2.0.0
         command: ["-config.file=/etc/tempo.yaml"]
         volumes:
         - ./tempo.config.yaml:/etc/tempo.yaml
