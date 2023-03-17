@@ -79,7 +79,7 @@ const (
 	DataStoreTypeSignalFX   DataStoreType = "signalfx"
 	DataStoreTypeOTLP       DataStoreType = "otlp"
 	DataStoreTypeNewRelic   DataStoreType = "newrelic"
-	DataStoreTypeLighStep   DataStoreType = "lighstep"
+	DataStoreTypeLighStep   DataStoreType = "lightstep"
 	DataStoreTypeElasticAPM DataStoreType = "elasticapm"
 	DataStoreTypeDataDog    DataStoreType = "datadog"
 	DataStoreTypeAwsXRay    DataStoreType = "awsxray"

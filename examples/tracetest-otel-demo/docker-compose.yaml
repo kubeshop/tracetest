@@ -12,13 +12,17 @@ services:
       - type: bind
         source: ./tracetest-config.yaml
         target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest-provision.yaml
+        target: /app/provision.yaml
+    command: --provisioning-file /app/provision.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
       interval: 1s
       timeout: 3s
       retries: 60
     depends_on:
-      postgres:
+      tt_postgres:
         condition: service_healthy
       jaeger:
         condition: service_healthy
@@ -28,6 +32,17 @@ services:
       TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  tt_postgres:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
