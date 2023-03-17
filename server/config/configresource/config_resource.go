@@ -97,7 +97,7 @@ const selectQuery = `SELECT "analytics_enabled" FROM config`
 var defaultConfig = Config{
 	ID:               id.ID("current"),
 	Name:             "Config",
-	AnalyticsEnabled: false,
+	AnalyticsEnabled: true,
 }
 
 func (r *Repository) Get(ctx context.Context, i id.ID) (Config, error) {
