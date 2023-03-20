@@ -19,7 +19,6 @@ type: Demo
 spec:
   type: pokeshop
   enabled: true
-  id: pokeshop
   name: pokeshop
   opentelemetryStore: {}
   pokeshop:
@@ -30,7 +29,7 @@ spec:
 Proceed to run this command in the terminal, and specify the file above.
 
 ```bash
-tracetest apply demo -file my/resource/demo-resource.yaml
+tracetest apply demo -f my/resource/demo-resource.yaml
 ```
 
 You can configure the OpenTelemetry Community Demo using the same commands with this yaml file:
@@ -40,7 +39,6 @@ type: Demo
 spec:
   type: opentelemetryStore
   enabled: true
-  id: opentelemetrystore
   name: opentelemetryStore
   opentelemetryStore:
     cartEndpoint: http://otel-cartservice.otel-demo:7070

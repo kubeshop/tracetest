@@ -55,5 +55,5 @@ spec:
 Proceed to run this command in the terminal and specify the file above.
 
 ```bash
-tracetest apply pollingprofile -file my/resource/pollingprofile-resource.yaml
+tracetest apply pollingprofile -f my/resource/pollingprofile-resource.yaml
 ```
