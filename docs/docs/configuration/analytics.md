@@ -27,6 +27,6 @@ spec:
 Proceed to run this command in the terminal and specify the file above.
 
 ```bash
-tracetest apply config -file my/resource/analytics-resource.yaml
+tracetest apply config -f my/resource/analytics-resource.yaml
 ```
 
