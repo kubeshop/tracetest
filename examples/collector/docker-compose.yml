@@ -3,10 +3,11 @@ services:
 
     tracetest:
         image: kubeshop/tracetest:${TAG:-latest}
-        platform: linux/amd64
+        # uncommentig this line breaks the portability of this file, that is the base for the installer
+        # platform: linux/amd64
         volumes:
             - type: bind
-              source: ./tracetest-config.yaml
+              source: ./tracetest-config.yaml`
               target: /app/tracetest.yaml
             - type: bind
               source: ./tracetest-provision.yaml

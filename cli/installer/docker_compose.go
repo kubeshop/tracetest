@@ -79,11 +79,11 @@ func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 	saveFile(ui, dockerComposeFName, dockerComposeFile)
 	saveFile(ui, filepath.Join(dir, tracetestConfigFilename), tracetestConfigFile)
 
-	if !config.Bool("installer.only_tracetest") {
-		// if we choose to install a backend, we need to add a provision file and a OTel Collector
-		tracetestProvisionFile := getTracetestProvisionFileContents(ui, config)
-		saveFile(ui, filepath.Join(dir, tracetestProvisionFilename), tracetestProvisionFile)
+	// if we choose to install a backend, we need to add a provision file and a OTel Collector
+	tracetestProvisionFile := getTracetestProvisionFileContents(ui, config)
+	saveFile(ui, filepath.Join(dir, tracetestProvisionFilename), tracetestProvisionFile)
 
+	if !config.Bool("installer.only_tracetest") {
 		collectorConfigFile := getCollectorConfigFileContents(ui, config)
 		saveFile(ui, filepath.Join(dir, otelCollectorConfigFilename), collectorConfigFile)
 	}
