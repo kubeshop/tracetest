@@ -1,16 +1,43 @@
-# Testkube Tracetest Executor
+# Tracetest and Testkube - Running scheduled trace-based tests
 
-Testkube Tracetest Executor is a test executor to run Tracetest tests with Testkube.
+[Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) is a test executor to run Tracetest tests with Testkube.
 
-**Why?**
+## Why do we want to run Tracetest with Testkube?
 
-Tracetest leverages existing OpenTelemetry instrumentation to run assertions against every part of an HTTP transaction. But, by integrating with Testkube you can now add Tracetest to the native CI/CD pipeline in your Kubernetes cluster. This allows you to run scheduled test runs and synthetic tests. All while following the trace-based testing principle and enabling full in-depth assertions against trace data, not just the response.
+Tracetest leverages existing OpenTelemetry instrumentation to run assertions against every part of an HTTP transaction.
+
+But, by integrating with Testkube you can now add Tracetest to the native CI/CD pipeline in your Kubernetes cluster. It allows you to run scheduled test runs and synthetic tests. All while following the trace-based testing principle and enabling full in-depth assertions against trace data, not just the response.
+
+## Infrastructure Overview
+
+The following is high level sequence diagram on how Testkube and Tracetest interact with the different pieces of the system:
+
+```mermaid
+sequenceDiagram
+    testkube client->>+testkube: Trigger Testkube test run
+    testkube->>+executor CRDs: Get executor details
+    executor CRDs-->>-testkube: Send details
+    testkube->>+tracetest executor job: Schedules execution
+    tracetest executor job->>+tracetest executor job: Configure Tracetest CLI
+    tracetest executor job->>+tracetest server: Executes the Tracetest test run
+    tracetest server->>+instrumented service: Trigger request
+    instrumented service-->>-tracetest server: Get response
+    instrumented service->>+data store: Send telemetry data
+    tracetest server->>+data store: Fetch trace
+    data store-->>-tracetest server: Get trace
+    tracetest server->>+tracetest server: Run assertions
+    tracetest server-->>-tracetest executor job: Return test run results
+    tracetest executor job-->>-testkube: Return test run results
+    testkube-->>-testkube client: Send details
+```
 
 ## Prerequisites
 
-1. Make sure you have a running Kubernetes cluster.
-2. Kubectl
-3. Helm
+Make sure you have these three things installed before starting.
+
+1. A running Kubernetes cluster (either locally or in the cloud)
+2. [Kubectl](https://kubernetes.io/docs/tasks/tools/)
+3. [Helm](https://helm.sh/docs/intro/install/)
 
 ## Quickstart
 
@@ -35,8 +62,9 @@ Confirm that Testkube is running:
 
 ```bash
 kubectl get all -n testkube
+```
 
-[Output]
+```text title="Expected output"
 NAME                                                        READY   STATUS    RESTARTS      AGE
 pod/testkube-api-server-8f5cf8b8f-vrpk6                     1/1     Running   3 (14m ago)   18m
 pod/testkube-dashboard-584846b754-4sxq8                     1/1     Running   0             18m
@@ -98,19 +126,31 @@ brew install kubeshop/tracetest/tracetest
 
 ```bash
 tracetest server install
+```
 
-[Output]
+```text title="Expected output"
 How do you want to run TraceTest? [type to search]:
   Using Docker Compose
 > Using Kubernetes
 ```
 
+Select `Using Kubernetes`.
+
+```text title="Expected output"
+Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]:
+  I have a tracing environment already. Just install Tracetest
+> Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
+```
+
+Select `Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.`.
+
 Confirm that Tracetest is running:
 
 ```bash
 kubectl get all -n tracetest
+```
 
-[Output]
+```text title="Expected output"
 NAME                                  READY   STATUS    RESTARTS        AGE
 pod/otel-collector-7f4d87489f-vp6zn   1/1     Running   0               5m41s
 pod/tracetest-78b9c84c57-t4prx        1/1     Running   3 (4m15s ago)   5m29s
@@ -185,9 +225,10 @@ Let's introduce how Testkube makes it possible.
 Testkube works with the concept of Executors. An Executor is a wrapper around a testing framework, Tracetest in this case, in the form of a Docker container and runs as a Kubernetes job. To start you need to register and deploy the Tracetest executor in your cluster using the Testkube CLI.
 
 ```bash
-kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:latest --types "tracetest/test" --name tracetest-executor
+kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:latest --types "tracetest/test" --name tracetest-executor --icon-uri icon --content-type string --content-type file-uri
+```
 
-[Output]
+```text title="Expected output"
 Executor created tracetest-executor 🥇
 ```
 
@@ -226,10 +267,13 @@ spec:
 
 Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument, and also the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable`.
 
-```bash
-kubectl testkube create test --file location/test.yaml --type "tracetest/test" --name pokeshop-tracetest-test --variable TRACETEST_ENDPOINT=http://tracetest
+Remember that your `TRACETEST_ENDPOINT` should be reachable from Testkube in your cluster. Use your Tracetest service's `CLUSTER-IP:PORT`. E.g: `10.96.93.106:11633`.
 
-[Output]
+```bash
+kubectl testkube create test --file ./test.yaml --type "tracetest/test" --name pokeshop-tracetest-test --variable TRACETEST_ENDPOINT=http://CLUSTER-IP:PORT
+```
+
+```text title="Expected output"
 Test created testkube / pokeshop-tracetest-test 🥇
 ```
 
@@ -245,31 +289,97 @@ Finally, to run the test, execute the following command, or run the test from th
 kubectl testkube run test --watch pokeshop-tracetest-test
 ```
 
-Here's what the Testkube Dashboard will look like if the test fails.
-![testkube failing tests](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679322512/Blogposts/Docs/screely-1679322504316_v7qfbf.png)
+Here's what the Testkube CLI will look like if the test fails.
 
-And, if they pass, it'll look like this.
-![testkube passing tests]()
+```text title="Expected output"
+Type:              tracetest/test
+Name:              pokeshop-tracetest-test
+Execution ID:      641885f39922b3e1003dd5b6
+Execution name:    pokeshop-tracetest-test-3
+Execution number:  3
+Status:            running
+Start time:        2023-03-20 16:12:35.268197087 +0000 UTC
+End time:          0001-01-01 00:00:00 +0000 UTC
+Duration:
 
-## Infrastructure Overview
+  Variables:    1
+  - TRACETEST_ENDPOINT = http://10.96.93.106:11633
 
-The following is high level sequence diagram on how Testkube and Tracetest interact with the different pieces of the system:
+Getting logs from test job 641885f39922b3e1003dd5b6
+Execution completed
+🔬 Executing in directory :
+ $ tracetest test run --server-url http://10.96.93.106:11633 --definition /tmp/test-content737616681 --wait-for-result --output pretty
+✘ Pokeshop - List (http://10.96.93.106:11633/test/RUkKQ_aVR/run/2/test)
+	✘ Database queries less than 500 ms
+		✘ #2b213392d0e3ff21
+			✘ attr:tracetest.span.duration  <  500ms (502ms) (http://10.96.93.106:11633/test/RUkKQ_aVR/run/2/test?selectedAssertion=0&selectedSpan=2b213392d0e3ff21)
+		✔ #7e6657f6a43fceeb
+			✔ attr:tracetest.span.duration  <  500ms (72ms)
+		✔ #6ee2fb69690eed47
+			✔ attr:tracetest.span.duration  <  500ms (13ms)
+		✘ #a82c304a3558763b
+			✘ attr:tracetest.span.duration  <  500ms (679ms) (http://10.96.93.106:11633/test/RUkKQ_aVR/run/2/test?selectedAssertion=0&selectedSpan=a82c304a3558763b)
+		✔ #6ae21f2251101fd6
+			✔ attr:tracetest.span.duration  <  500ms (393ms)
+		✔ #2a9b9422af8ba1a8
+			✔ attr:tracetest.span.duration  <  500ms (61ms)
+		✔ #010a8a0d53687276
+			✔ attr:tracetest.span.duration  <  500ms (36ms)
+		✘ #895d66286b6325ae
+			✘ attr:tracetest.span.duration  <  500ms (686ms) (http://10.96.93.106:11633/test/RUkKQ_aVR/run/2/test?selectedAssertion=0&selectedSpan=895d66286b6325ae)
 
-```mermaid
-sequenceDiagram
-    testkube client->>+testkube: Trigger Testkube test run
-    testkube->>+executor CRDs: Get executor details
-    executor CRDs-->>-testkube: Send details
-    testkube->>+tracetest executor job: Schedules execution
-    tracetest executor job->>+tracetest executor job: Configure Tracetest CLI
-    tracetest executor job->>+tracetest server: Executes the Tracetest test run
-    tracetest server->>+instrumented service: Trigger request
-    instrumented service-->>-tracetest server: Get response
-    instrumented service->>+data store: Send telemetry data
-    tracetest server->>+data store: Fetch trace
-    data store-->>-tracetest server: Get trace
-    tracetest server->>+tracetest server: Run assertions
-    tracetest server-->>-tracetest executor job: Return test run results
-    tracetest executor job-->>-testkube: Return test run results
-    testkube-->>-testkube client: Send details
 ```
+
+And, here's the Testkube Dashboard.
+![testkube failing tests](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679328982/Blogposts/Docs/screely-1679328961663_nt3f2m.png)
+
+And, if the test passes, it'll look like this.
+
+```text title="Expected output"
+Type:              tracetest/test
+Name:              pokeshop-tracetest-test
+Execution ID:      6418873d9922b3e1003dd5b8
+Execution name:    pokeshop-tracetest-test-4
+Execution number:  4
+Status:            running
+Start time:        2023-03-20 16:18:05.60245717 +0000 UTC
+End time:          0001-01-01 00:00:00 +0000 UTC
+Duration:
+
+  Variables:    1
+  - TRACETEST_ENDPOINT = http://10.96.93.106:11633
+
+
+Getting logs from test job 6418873d9922b3e1003dd5b8
+Execution completed
+🔬 Executing in directory :
+ $ tracetest test run --server-url http://10.96.93.106:11633 --definition /tmp/test-content1901459587 --wait-for-result --output pretty
+✔ Pokeshop - List (http://10.96.93.106:11633/test/RUkKQ_aVR/run/3/test)
+	✔ Database queries less than 500 ms
+
+✅ Execution succeeded
+Execution completed ✔ Pokeshop - List (http://10.96.93.106:11633/test/RUkKQ_aVR/run/3/test)
+	✔ Database queries less than 500 ms
+```
+
+![testkube passing tests](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679329231/Blogposts/Docs/screely-1679329224534_qnqcl1.png)
+
+## 9. Create a trace-based test that runs every minute
+
+By using Testkube's [scheduling](https://docs.testkube.io/concepts/scheduling), you can trigger this test every minute.
+
+```bash
+kubectl testkube create test --file ./test.yaml --type "tracetest/test" --name pokeshop-tracetest-scheduled-test --schedule="*/1 * * * *" --variable TRACETEST_ENDPOINT=http://CLUSTER-IP:PORT
+```
+
+```text title="Expected output"
+Test created testkube / pokeshop-tracetest-scheduled-test 🥇
+```
+
+In your Testkube Dashboard you'll see this test run continuously and get triggered every minute.
+
+![scheduled test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679330588/Blogposts/Docs/screely-1679330581788_izl5vs.png)
+
+## Next steps
+
+To explore more options Testkube gives you, check out [test triggers](https://docs.testkube.io/concepts/triggers). They enable you to trigger tests based on Kubernetes events.
