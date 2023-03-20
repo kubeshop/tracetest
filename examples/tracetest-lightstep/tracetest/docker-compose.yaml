@@ -10,7 +10,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - type: bind
-        source: ./tracetest/tracetest.config.yaml
+        source: ./tracetest/tracetest-config.yaml
         target: /app/tracetest.yaml
       - type: bind
         source: ./tracetest/tracetest-provision.yaml
