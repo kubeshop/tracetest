@@ -2,7 +2,7 @@ version: "3.2"
 services:
   tracetest:
     restart: unless-stopped
-    image: kubeshop/tracetest:latest
+    image: kubeshop/tracetest:${TAG:-latest}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
