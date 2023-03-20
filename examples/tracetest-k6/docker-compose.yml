@@ -2,7 +2,7 @@ version: "3"
 services:
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
-    # platform: linux/amd64
+    platform: linux/amd64
     volumes:
       - type: bind
         source: ./tracetest-config.yaml

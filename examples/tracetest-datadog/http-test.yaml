@@ -9,17 +9,18 @@ spec:
       url: http://frontend:8084/api/products
       method: GET
       headers:
-      - key: Content-Type
-        value: application/json
+        - key: Content-Type
+          value: application/json
   specs:
-  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
-    assertions:
-    - attr:tracetest.response.status   =   200
-    - attr:tracetest.span.duration  <  10ms
-  - selector: span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
-    assertions:
-    - attr:rpc.grpc.status_code = 0
-  - selector: span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts"
-      rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
-    assertions:
-    - attr:rpc.grpc.status_code = 0
+    - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+      assertions:
+        - attr:tracetest.response.status   =   200
+        - attr:tracetest.span.duration  <  10ms
+    - selector: span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
+      assertions:
+        - attr:rpc.grpc.status_code = 0
+    - selector:
+        span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts"
+        rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
+      assertions:
+        - attr:rpc.grpc.status_code = 0
