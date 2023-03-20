@@ -22,7 +22,7 @@ The project is built with Docker Compose. It contains two distinct `docker-compo
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
 
 ### 2. Tracetest
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
+The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
@@ -33,7 +33,7 @@ All `services` in the `docker-compose.yaml` are on the same network and will be 
 
 The Node.js app is a simple Express app, contained in the `app.js` file.
 
-The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively. 
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively.
 Traces will be sent to the OpenTelemetry Collector.
 
 Here's the content of the `tracing.otel.grpc.js` file:
