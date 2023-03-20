@@ -37,7 +37,7 @@ brew install kubeshop/tracetest/tracetest
 sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates
 
 # add repo
-echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | sudo tee /etc/apt/stores.list.d/fury.list
+echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | sudo tee /etc/apt/sources.list.d/fury.list
 
 # update and install
 sudo apt-get update
@@ -48,7 +48,7 @@ sudo apt-get install tracetest
 
 ```sh
 # add repository
-cat <<EOF | $SUDO tee /etc/yum.repos.d/tracetest.repo
+cat <<EOF | sudo tee /etc/yum.repos.d/tracetest.repo
 [tracetest]
 name=Tracetest
 baseurl=https://yum.fury.io/tracetest/
