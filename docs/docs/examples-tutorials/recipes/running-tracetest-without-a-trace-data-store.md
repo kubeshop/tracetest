@@ -124,15 +124,21 @@ The `docker-compose.yaml` in the `tracetest` directory is configured with three 
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
 
 ```yaml
-version: '3'
+version: "3"
 services:
-
   tracetest:
-    image: kubeshop/tracetest
+    image: kubeshop/tracetest:latest
+    platform: linux/amd64
     volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
+      - type: bind
+        source: ./tracetest/tracetest-config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest/tracetest-provision.yaml
+        target: /app/provisioning.yaml
     ports:
       - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
     depends_on:
       postgres:
         condition: service_healthy
@@ -143,6 +149,8 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres:14
@@ -173,7 +181,7 @@ Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracete
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the trace data store and exporter. The data store is set to OTLP meaning the traces will be stored in Tracetest itself. The exporter is set to the OpenTelemetry Collector.
+The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
 
 ```yaml
 postgres:
@@ -184,22 +192,9 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-telemetry:
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100 # 100%
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    exporter: collector
-    applicationExporter: collector
-
 ```
+
+The `tracetest-provision.yaml` file provisions the trace data store and polling to store in the Postgres database. The data store is set to OTLP meaning the traces will be stored in Tracetest itself.
 
 But how are traces sent to Tracetest?
 
@@ -220,7 +215,9 @@ exporters:
   logging:
     loglevel: debug
   otlp/1:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here. (TODO ADD LINK)
+    endpoint: tracetest:21321
+    # Send traces to Tracetest.
+    # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
 
@@ -232,8 +229,6 @@ service:
       exporters: [otlp/1]
 
 ```
-
-**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests.
 
 ## Run both the Node.js app and Tracetest
 
