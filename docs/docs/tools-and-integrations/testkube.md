@@ -10,7 +10,7 @@ For Testkube, tests are meant to be part of a cluster's state and can be execute
 - Externally triggered via API (CI, external tooling, etc).
 - Automatically on deployment of annotated/labeled services/pods/etc.
 
-By using the [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) you can unlock Testkube's capacity in conjunction with Tracetest, and leverage the work you have already done to instrument your services.  
+By using the [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) you can unlock Testkube's capacity in conjunction with Tracetest, and leverage the work you have already done to instrument your services.
 
 ## How it works?
 
@@ -45,7 +45,7 @@ In your Kubernetes cluster you should have:
 
 1. `Testkube`: Use HELM or the Testkube CLI to [install](https://kubeshop.github.io/testkube/installing) Testkube Server components in your cluster.
 2. `Trecetest Server`: You need a running instance of Tracetest which is going to be executing your assertions. To do so you can follow the instructions defined in the Tracetest [documentation](https://docs.tracetest.io/deployment/kubernetes).
-3. `OpenTelemetry Instrumented Service`:  In order to generate traces and spans, the service under test must support the basics for [propagation](https://opentelemetry.io/docs/reference/specification/context/api-propagators/) through HTTP requests, and also store traces and spans into a Data Store Backend (Jaeger, Grafana Tempo, OpenSearch, etc) or use the [OpenTelemetry Collector](https://docs.tracetest.io/configuration/overview#using-tracetest-without-a-trace-data-store). 
+3. `OpenTelemetry Instrumented Service`: In order to generate traces and spans, the service under test must support the basics for [propagation](https://opentelemetry.io/docs/reference/specification/context/api-propagators/) through HTTP requests, and also store traces and spans into a Data Store Backend (Jaeger, Grafana Tempo, OpenSearch, etc) or use the [OpenTelemetry Collector](https://docs.tracetest.io/configuration/overview#using-tracetest-without-a-trace-data-store).
 
 On your machine you should have:
 
@@ -59,7 +59,7 @@ With everything set up, we will start configuring Testkube and Tracetest.
 Testkube works with the concept of [Executors](https://kubeshop.github.io/testkube/test-types/executor-custom). An Executor is a wrapper around a testing framework (Tracetest in this case) in the form of a Docker container and runs as a Kubernetes job. To start you need to register and deploy the Tracetest executor in your cluster using the Testkube CLI:
 
 ```bash
-kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:latest --types "tracetest/test" --name tracetest-executor
+kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:latest --types "tracetest/test" --name tracetest-executor --icon-uri icon --content-type string --content-type file-uri
 ```
 
 ### 2. Create your test
@@ -89,11 +89,13 @@ spec:
         - attr:db.name = "pokeshop"
 ```
 
-Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument, and also the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable`:
+Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument, and also the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable` (remember that the TRACETEST_ENDPOINT should be reachable from the Testkube instance):
 
 ```bash
 kubectl testkube create test --file my/file/location.yaml --type "tracetest/test" --name pokeshop-tracetest-test --variable TRACETEST_ENDPOINT=http://tracetest
 ```
+
+Note: In case you are doing a port forward to your Tracetest instance and you want to have the correct Tracetest URL in your results printed by the Testkube output, you can also provide an optional `TRACETEST_OUTPUT_ENDPOINT` variable (e.g. `--variable TRACETEST_OUTPUT_ENDPOINT=http://localhost:11633`).
 
 ### 3. Run your test
 
