@@ -431,6 +431,11 @@ const sidebars = {
           id: "examples-tutorials/recipes/running-tracetest-with-datadog",
           label: "OpenTelemetry Demo and Datadog",
         },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-testkube",
+          label: "Tracetest and Testkube - Running scheduled trace-based tests",
+        },
       ],
     },
     {
