@@ -26,13 +26,13 @@ The `docker-compose.yaml` file and `Dockerfile` in the root directory are for th
 
 ### 2. Tracetest
 
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest, Jaeger, and the OpenTelemetry Collector.
+The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for the setting up Tracetest, Jaeger, and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `jaeger:14250` in the `collector.config.yaml` will map to the `jaeger` service, where the port `14250` is the port where Jaeger accepts traces. And, `jaeger:16685` in the `tracetest.config.yaml` will map to the `jaeger` service and port `16685` where Tracetest will fetch trace data from Jaeger.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `jaeger:14250` in the `collector.config.yaml` will map to the `jaeger` service, where the port `14250` is the port where Jaeger accepts traces. And, `jaeger:16685` in the `tracetest-provision.yaml` will map to the `jaeger` service and port `16685` where Tracetest will fetch trace data from Jaeger.
 
 ## Node.js app
 
@@ -140,8 +140,12 @@ services:
     image: kubeshop/tracetest:${TAG:-latest}
     platform: linux/amd64
     volumes:
-      - ./tracetest/tracetest.config.yaml:/app/config.yaml
-      - ./tracetest/tracetest.provision.yaml:/app/provision.yaml
+      - type: bind
+        source: ./tracetest/tracetest.config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: tracetest/tracetest-provision.yaml
+        target: /app/provision.yaml
     command: --provisioning-file /app/provision.yaml
     ports:
       - 11633:11633
@@ -157,6 +161,8 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres:14
@@ -180,11 +186,14 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: unless-stopped
+    ports:
+      - "16686:16686"
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s
       timeout: 3s
       retries: 60
+
 ```
 
 Tracetest depends on Postgres, Jaeger and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -230,10 +239,21 @@ Tracetest uses `jaeger:16685` to connect to Jaeger and fetch trace data.
 
 ```yaml
 ---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
 type: DataStore
 spec:
-  name: jaeger
+  name: Jaeger
   type: jaeger
+  isdefault: true
   jaeger:
     endpoint: jaeger:16685
     tls:

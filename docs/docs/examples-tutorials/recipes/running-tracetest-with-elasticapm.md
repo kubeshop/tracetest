@@ -28,13 +28,16 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 The project is built with Docker Compose.
 
 ### 1. Node.js app
+
 The `docker-compose.yaml` contains a service called `app` for the Node.js app.
 
 ### 2. Tracetest
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` contain configs for setting up Tracetest, Elastic APM, Elasticsearch, Kibana, and the OpenTelemetry Collector.
+
+The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` contain configs for setting up Tracetest, Elastic APM, Elasticsearch, Kibana, and the OpenTelemetry Collector.
 
 ### Docker Compose Network
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `apm-server:8200` in the `elastic-apm-agent.js` will map to the `apm-server` service, where the port `8200` is the port where the Elastic APM accepts traces. And, `https://es01:9200` in the `tracetest.config.yaml` will map to the `es01` service and port `9200` where Tracetest will fetch trace data from Elasticsearch.
+
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `apm-server:8200` in the `elastic-apm-agent.js` will map to the `apm-server` service, where the port `8200` is the port where the Elastic APM accepts traces. And, `https://es01:9200` in the `tracetest-provision.yaml` will map to the `es01` service and port `9200` where Tracetest will fetch trace data from Elasticsearch.
 
 ## Node.js app
 
@@ -152,18 +155,19 @@ In the Web UI, open settings, and select Elastic APM.
 Or, if you prefer using the CLI, you can use this file config.
 
 ```yaml
+---
 type: DataStore
 spec:
-  name: Elastic Data Store
+  name: elasticapm
   type: elasticapm
-  isdefault: true
-    elasticapm:
-      addresses:
-        - https://es01:9200
-      username: elastic
-      password: changeme
-      index: traces-apm-default
-      insecureSkipVerify: true
+  elasticapm:
+    addresses:
+      - https://es01:9200
+    username: elastic
+    password: changeme
+    index: traces-apm-default
+    insecureSkipVerify: true
+
 ```
 
 Proceed to run this command in the terminal, and specify the file above.
@@ -187,15 +191,18 @@ Open `http://localhost:11633/` to configure the connection to Elasticsearch:
 6. Test the connection and Save it, if all is successful.
 
 Create a new test:
+
 1. Use the "HTTP Request" option. Hit Next.
 2. Name your test and add a description. Hit Next.
 3. Configure the GET URL to be `http://app:8080` since the tests will be running in docker compose network. Hit Create.
 4. Running the test should succeed.
 
 ## Open Kibana
+
 Open `https://localhost:5601` and login using `elastic:changeme` credentials. The credentials can be changed in the `.env` file. Navigate to APM (upper lefthand corner menu) -> Services and you should see the `tracetest` service with the rest of the details.
 
 ## Steps to stop the environment
+
 ```bash
 docker compose down -v
 

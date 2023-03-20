@@ -28,7 +28,7 @@ The project is built with Docker Compose.
 
 ### 1. Tracetest
 
-The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest-config.yaml` in the `root` directory are for the setting up the Pokeshop API, Tracetest and ADOT Collector.
+The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest.config.yaml` in the `root` directory are for the setting up the Pokeshop API, Tracetest and ADOT Collector.
 
 ### Docker Compose Network
 

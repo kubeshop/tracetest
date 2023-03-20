@@ -26,7 +26,7 @@ The `docker-compose.yaml` file and `.env` file in the root directory are for the
 
 ### 2. Tracetest
 
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
+The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest, as well as routing all traces the OpenTelemetry Demo generates to Lightstep.
 
@@ -74,7 +74,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - type: bind
-        source: ./tracetest/tracetest.config.yaml
+        source: ./tracetest/tracetest-config.yaml
         target: /app/tracetest.yaml
       - type: bind
         source: ./tracetest/tracetest-provision.yaml
@@ -90,6 +90,8 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres
@@ -110,6 +112,7 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -120,10 +123,11 @@ Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracete
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the exporter. The exporter is set to the OpenTelemetry Collector.
+The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the exporter. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
-# tracetest.config.yaml
+# tracetest-config.yaml
+
 ---
 postgres:
   host: postgres
@@ -147,6 +151,7 @@ server:
   telemetry:
     exporter: collector
     applicationExporter: collector
+
 ```
 
 The `tracetest-provision.yaml` file contains the data store setup. The data store is set to `lightstep` meaning the traces will be received by Tracetest OTLP API and stored in Tracetest itself.
@@ -215,8 +220,6 @@ service:
       exporters: [logging, otlp/ls]
 ```
 
-**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests.
-
 ## Run both the OpenTelemetry Demo app and Tracetest
 
 To start both the OpenTelemetry and Tracetest we will run this command:
@@ -235,15 +238,15 @@ This is because your OpenTelemetry Demo and Tracetest are in the same network.
 
 Here's a sample of a failed test run, which happens if you add this assertion:
 
-```
+```css
 attr:tracetest.span.duration  < 50ms
 ```
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998179/Blogposts/tracetest-lightstep-partnership/screely-1672998159326_depw45.png)
+![failing test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998179/Blogposts/tracetest-lightstep-partnership/screely-1672998159326_depw45.png)
 
 Increasing the duration to a more reasonable `500ms` will make the test pass.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998252/Blogposts/tracetest-lightstep-partnership/screely-1672998249450_mngghb.png)
+![passing test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998252/Blogposts/tracetest-lightstep-partnership/screely-1672998249450_mngghb.png)
 
 ## Run Tracetest tests with the Tracetest CLI
 
@@ -321,11 +324,11 @@ If you edit the duration as in the Web UI example above, the test will pass!
 
 To access a historical overview of all the trace spans the OpenTelemetry Demo generates, jump over to your Lightstep account.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998664/Blogposts/tracetest-lightstep-partnership/screely-1672998658856_lae7ml.png)
+![lightstep trace overview](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998664/Blogposts/tracetest-lightstep-partnership/screely-1672998658856_lae7ml.png)
 
 You can also drill down into a particular trace as well.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998974/Blogposts/tracetest-lightstep-partnership/screely-1672998969770_iwmjy5.png)
+![lightstep trace drilldown](https://res.cloudinary.com/djwdcmwdz/image/upload/v1672998974/Blogposts/tracetest-lightstep-partnership/screely-1672998969770_iwmjy5.png)
 
 With Lightstep and Tracetest, you get the best of both worlds. You can run trace-based tests and automate running E2E and integration tests against real trace data. And, use Lightstep to get a historical overview of all traces your distributed application generates.
 

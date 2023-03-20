@@ -21,10 +21,12 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
 ### 1. OpenTelemetry Demo
+
 The `docker-compose.yaml` file and `.env` file in the root directory are for the OpenTelemetry Demo.
 
 ### 2. Tracetest
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for setting up Tracetest and the OpenTelemetry Collector.
+
+The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest, as well as routing all traces the OpenTelemetry Demo generates to Lightstep.
 
@@ -132,7 +134,8 @@ docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
 The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and telemetry exporter. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
-# tracetest.config.yaml
+# tracetest-config.yaml
+
 ---
 postgres:
   host: postgres
@@ -158,7 +161,7 @@ server:
     applicationExporter: collector
 ```
 
-The `tracetest-provision.yaml` file contains the setup of the demonstration APIs that Tracetest can use as an example for tests, of the polling profiles that say how Tracetest should fetch traces received from data store, and the configuration for the data store (in our case, Datadog).
+The `tracetest-provision.yaml` file contains the setup of the demo APIs that Tracetest can use as an example for tests, the polling profiles that say how Tracetest should fetch traces from the data store, and the configuration for the data store, in our case, Datadog.
 
 ```yaml
 ---
@@ -191,9 +194,9 @@ spec:
 
 ```
 
-**How to Send Traces to Tracetest and Lightstep**
+**How to Send Traces to Tracetest and Datadog?**
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to Lightstep in another.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to Datadog in another.
 
 Make sure to add your Datadog API Key on `datadog` exporter.
 
@@ -213,17 +216,18 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest.
-                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:21321
+    # Send traces to Tracetest.
+    # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # Datadog exporter
-  # One example on how to set up a collector configuration for Datadog can be seen here:
-  # https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=onahost
   datadog:
     api:
       site: datadoghq.com
       key: ${DATADOG_API_KEY} # Add here you API key for Datadog
+    # One example on how to set up a collector configuration for Datadog can be seen here:
+    # https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=onahost
 
 service:
   pipelines:
@@ -236,8 +240,6 @@ service:
       processors: [batch]
       exporters: [datadog]
 ```
-
-**Important!** Take a closer look at the sampling configs in both the `collector.config.yaml` and `tracetest.config.yaml`. They both set sampling to 100%. This is crucial when running trace-based e2e and integration tests.
 
 ## Run Both the OpenTelemetry Demo App and Tracetest
 
@@ -257,7 +259,7 @@ This is because your OpenTelemetry Demo and Tracetest are in the same network.
 
 Here's a sample of a failed test run, which happens if you add this assertion:
 
-```
+```css
 attr:tracetest.span.duration  < 10ms
 ```
 

@@ -26,7 +26,7 @@ The `docker-compose.yaml` file and `.env` file in the root directory are for the
 
 ### 2. Tracetest
 
-The `docker-compose.yaml` file, `collector.config.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
+The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest, as well as routing all traces the OpenTelemetry Demo generates to New Relic.
 
@@ -74,7 +74,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - type: bind
-        source: ./tracetest/tracetest.config.yaml
+        source: ./tracetest/tracetest-config.yaml
         target: /app/tracetest.yaml
       - type: bind
         source: ./tracetest/tracetest-provision.yaml
@@ -90,6 +90,8 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres
@@ -110,6 +112,7 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -120,10 +123,10 @@ Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracete
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the exporter. The exporter is set to the OpenTelemetry Collector.
+The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance, and defining the exporter. The exporter is set to the OpenTelemetry Collector.
 
 ```yaml
-# tracetest.config.yaml
+# tracetest-config.yaml
 postgres:
   host: postgres
   user: postgres
