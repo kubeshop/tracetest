@@ -29,13 +29,12 @@ flowchart TD
     P --> Q[Finish]
     L --> ES
 ```
-  
 
 ## Changing Trace Polling Settings from the UI
 
 In the Tracetest Web UI, open Settings and select Trace Polling:
 
-![Demo Settings](./img/trace-polling.png)
+![Demo Settings](./img/trace-polling-settings.png)
 
 From this trace polling page, under settings, you can adjust the speed with which the trace data store is polled when gathering the trace associated with a test run.
 
