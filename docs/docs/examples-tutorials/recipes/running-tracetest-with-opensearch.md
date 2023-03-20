@@ -21,14 +21,17 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
 ### 1. Node.js app
+
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
 
 ### 2. Tracetest
+
 The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for the setting up Tracetest, OpenSearch, and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
 ### Docker Compose Network
+
 All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `data-prepper:21890` in the `collector.config.yaml` will map to the `data-prepper` service, where the port `21890` is the port where the Data Prepper accepts traces. And, `http://opensearch:9200` in the `tracetest-provision.yaml` will map to the `opensearch` service and port `9200` where Tracetest will fetch trace data from OpenSearch.
 
 ## Node.js app
