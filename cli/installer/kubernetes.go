@@ -77,7 +77,7 @@ func kubernetesInstaller(config configuration, ui cliUI.UI) {
 
 func installCollector(config configuration, ui cliUI.UI) {
 	execCmd(
-		kubectlNamespaceCmd(config, "create -f "+collectorYaml),
+		kubectlNamespaceCmd(config, "apply -f "+collectorYaml),
 		ui,
 	)
 
@@ -144,10 +144,16 @@ func fixTracetestConfiguration(conf configuration, ui cliUI.UI) {
 	c := getTracetestConfigFileContents("tracetest-postgresql", "tracetest", "not-secure-database-password", ui, conf)
 	ttc := createTmpFile("tracetest-config", string(c), ui)
 	defer os.Remove(ttc.Name())
+
+	p := getTracetestProvisionFileContents(ui, conf)
+	ttp := createTmpFile("tracetest-provisioning", string(p), ui)
+	defer os.Remove(ttp.Name())
+
 	execCmd(
 		kubectlNamespaceCmd(conf,
-			"create configmap tracetest --from-file="+ttc.Name()+" -o yaml --dry-run=client",
-			"| sed 's#"+path.Base(ttc.Name())+"#config.yaml#' |",
+			"create configmap tracetest --from-file="+ttc.Name()+" --from-file="+ttp.Name()+" -o yaml --dry-run=client",
+			"| sed 's#"+path.Base(ttc.Name())+"#config.yaml#'",
+			"| sed 's#"+path.Base(ttp.Name())+"#provisioning.yaml#' |",
 			kubectlNamespaceCmd(conf, "replace -f -"),
 		),
 		ui,

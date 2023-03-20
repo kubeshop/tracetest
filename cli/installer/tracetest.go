@@ -6,7 +6,6 @@ import (
 	"html/template"
 
 	"fmt"
-	"strings"
 
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
@@ -75,30 +74,10 @@ func configureBackend(conf configuration, ui cliUI.UI) configuration {
 var configTemplate string
 
 func getTracetestConfigFileContents(pHost, pUser, pPasswd string, ui cliUI.UI, config configuration) []byte {
-	enabledDemos := []string{}
-	if config.Bool("demo.enable.pokeshop") {
-		enabledDemos = append(enabledDemos, "pokeshop")
-	}
-	if config.Bool("demo.enable.otel") {
-		enabledDemos = append(enabledDemos, "otel")
-	}
-
 	vals := map[string]string{
-		"installBackend":   fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
-		"pHost":            pHost,
-		"pUser":            pUser,
-		"pPasswd":          pPasswd,
-		"analyticsEnabled": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
-
-		"enabledDemos":       strings.Join(enabledDemos, ", "),
-		"pokeshopHttp":       config.String("demo.endpoint.pokeshop.http"),
-		"pokeshopGrpc":       config.String("demo.endpoint.pokeshop.grpc"),
-		"otelFrontend":       config.String("demo.endpoint.otel.frontend"),
-		"otelProductCatalog": config.String("demo.endpoint.otel.product_catalog"),
-		"otelCart":           config.String("demo.endpoint.otel.cart"),
-		"otelCheckout":       config.String("demo.endpoint.otel.checkout"),
-
-		"backendType": config.String("tracetest.backend.type"),
+		"pHost":   pHost,
+		"pUser":   pUser,
+		"pPasswd": pPasswd,
 	}
 
 	tpl, err := template.New("page").Parse(configTemplate)
@@ -117,6 +96,7 @@ var provisionTemplate string
 
 func getTracetestProvisionFileContents(ui cliUI.UI, config configuration) []byte {
 	vals := map[string]string{
+		"installBackend":   fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
 		"backendType":      config.String("tracetest.backend.type"),
 		"backendEndpoint":  config.String("tracetest.backend.endpoint.query"),
 		"backendInsecure":  config.String("tracetest.backend.tls.insecure"),
@@ -124,6 +104,17 @@ func getTracetestProvisionFileContents(ui cliUI.UI, config configuration) []byte
 		"backendIndex":     config.String("tracetest.backend.index"),
 		"backendToken":     config.String("tracetest.backend.token"),
 		"backendRealm":     config.String("tracetest.backend.realm"),
+
+		"analyticsEnabled": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
+
+		"enablePokeshopDemo": fmt.Sprintf("%t", config.Bool("demo.enable.pokeshop")),
+		"enableOtelDemo":     fmt.Sprintf("%t", config.Bool("demo.enable.otel")),
+		"pokeshopHttp":       config.String("demo.endpoint.pokeshop.http"),
+		"pokeshopGrpc":       config.String("demo.endpoint.pokeshop.grpc"),
+		"otelFrontend":       config.String("demo.endpoint.otel.frontend"),
+		"otelProductCatalog": config.String("demo.endpoint.otel.product_catalog"),
+		"otelCart":           config.String("demo.endpoint.otel.cart"),
+		"otelCheckout":       config.String("demo.endpoint.otel.checkout"),
 	}
 
 	tpl, err := template.New("page").Parse(provisionTemplate)
