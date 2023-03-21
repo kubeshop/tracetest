@@ -1,4 +1,3 @@
-import {MoreOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, Popover} from 'antd';
 import parse from 'html-react-parser';
 import MarkdownIt from 'markdown-it';
@@ -125,8 +124,8 @@ const AttributeRow = ({
       </S.Header>
 
       <Dropdown overlay={menu}>
-        <a onClick={e => e.preventDefault()}>
-          <MoreOutlined />
+        <a onClick={e => e.preventDefault()} style={{height: 'fit-content'}}>
+          <S.MoreIcon />
         </a>
       </Dropdown>
     </S.Container>

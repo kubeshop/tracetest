@@ -1,9 +1,8 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
-
-import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
 import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from './GrcpClient.styled';
+import * as FS from '../../DataStorePluginForm.styled';
 import GrpcClientSecure from './GrpcClientSecure';
 
 const COMPRESSION_LIST = [
@@ -78,7 +77,7 @@ const GrpcClient = () => {
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
+          <FS.HeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
         </Col>
       </Row>
 

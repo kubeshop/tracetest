@@ -1,7 +1,7 @@
 import {Checkbox, Col, Form, Input, Row, Space, Switch} from 'antd';
-import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
 import {TDraftDataStore} from 'types/DataStore.types';
 import GrpcClientSecure from '../GrpcClient/GrpcClientSecure';
+import * as S from '../../DataStorePluginForm.styled';
 
 const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 
@@ -23,7 +23,7 @@ const HttpClient = () => {
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <RequestDetailsHeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
+          <S.HeadersInput initialValue={HEADER_DEFAULT_VALUES} name={[...baseName, 'rawHeaders']} />
         </Col>
       </Row>
 
