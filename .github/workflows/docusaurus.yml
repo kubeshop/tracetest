@@ -3,8 +3,8 @@ name: docusaurus
 on:
   push:
   # TODO: uncomment this
-    # branches:
-    #   - main
+    branches:
+      - "*"
     paths:
       - "docs/**"
       - "api/*"
