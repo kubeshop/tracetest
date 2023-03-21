@@ -174,7 +174,7 @@ NAME                                    READY   AGE
 statefulset.apps/tracetest-postgresql   1/1     5m42s
 ```
 
-By default, Testkube is installed in the `tracetest` namespace.
+By default, Tracetest is installed in the `tracetest` namespace.
 
 To explore the Tracetest Web UI, run the command:
 
