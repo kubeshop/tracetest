@@ -100,6 +100,10 @@ func (demo demoActions) update(ctx context.Context, file file.File, ID string) e
 	}
 
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("demo id doesn't exist on server. Remove it from the definition file and try again")
+	}
+
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
