@@ -2,8 +2,9 @@ name: docusaurus
 
 on:
   push:
-    branches:
-      - main
+  # TODO: uncomment this
+    # branches:
+    #   - main
     paths:
       - "docs/**"
       - "api/*"
