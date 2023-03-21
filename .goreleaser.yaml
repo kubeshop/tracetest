@@ -122,7 +122,7 @@ archives:
 - name_template: >-
     {{ .ProjectName }}_
     {{ .Version }}_
-    {{- title .Os }}_
+    {{-  .Os }}_
     {{- if eq .Arch "386" }}i386
     {{- else }}{{ .Arch }}{{ end }}
 checksum:
@@ -142,7 +142,7 @@ nfpms:
   file_name_template: >-
     {{ .ProjectName }}_
     {{ .Version }}_
-    {{- title .Os }}_
+    {{- .Os }}_
     {{- if eq .Arch "386" }}i386
     {{- else }}{{ .Arch }}{{ end }}
     {{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
