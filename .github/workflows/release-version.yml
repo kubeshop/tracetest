@@ -56,6 +56,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      # fix for this issue: https://github.com/goreleaser/goreleaser/issues/1163
+      - name: Configure Goreleaser Tags
+        shell: bash
+        run: |
+          prevTag=$(git describe --tags --abbrev=0 v0.11.1^ --exclude='*-rc.*')
+          echo "GORELEASER_CURRENT_TAG=${{ github.ref_name}}" >> $GITHUB_ENV
+          echo "GORELEASER_PREVIOUS_TAG="$prevTag >> $GITHUB_ENV
       - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
