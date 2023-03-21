@@ -2,9 +2,15 @@ name: docusaurus
 
 on:
   push:
-  # TODO: uncomment this
+  # TODO: remove this
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  # /TODO
     branches:
-      - "*"
+      - main
     paths:
       - "docs/**"
       - "api/*"
