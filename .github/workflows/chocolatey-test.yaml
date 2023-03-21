@@ -50,8 +50,7 @@ jobs:
           cd scripts/choco
           choco pack
 
-          choco apikey --key $CHOCOLATEY_API_KEY --source $CHOCOLATEY_REPO
-          choco push tracetest.$PACKAGE_VERSION.nupkg --source $CHOCOLATEY_REPO
+          choco push tracetest.$PACKAGE_VERSION.nupkg --source $CHOCOLATEY_REPO --api-key $CHOCOLATEY_API_KEY
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.COMMOM_CHOCO_API_KEY }}
           CHOCOLATEY_REPO: ${{ secrets.CHOCOLATEY_REPO }}
