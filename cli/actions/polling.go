@@ -100,6 +100,10 @@ func (polling pollingActions) update(ctx context.Context, file file.File, ID str
 	}
 
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("polling profile id doesn't exist on server. Remove it from the definition file and try again")
+	}
+
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
