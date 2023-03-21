@@ -121,8 +121,8 @@ docker_manifests:
 archives:
 - name_template: >-
     {{ .ProjectName }}_
-    {{ .Version }}_
-    {{-  .Os }}_
+    {{- .Version }}_
+    {{- .Os }}_
     {{- if eq .Arch "386" }}i386
     {{- else }}{{ .Arch }}{{ end }}
 checksum:
@@ -141,7 +141,7 @@ nfpms:
     - rpm
   file_name_template: >-
     {{ .ProjectName }}_
-    {{ .Version }}_
+    {{- .Version }}_
     {{- .Os }}_
     {{- if eq .Arch "386" }}i386
     {{- else }}{{ .Arch }}{{ end }}
