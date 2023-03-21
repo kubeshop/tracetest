@@ -41,7 +41,7 @@ jobs:
           node-version: "18"
 
       # build CLI docs
-      - name: Build Docusaurus website
+      - name: Generate tracetest CLI reference docs
         run: |
           cd cli
           make docgen
