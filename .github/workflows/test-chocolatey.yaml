@@ -28,7 +28,7 @@ jobs:
           echo "::set-output name=hash::$hash"
           echo "::set-output name=version::$version"
         env:
-          TAG: v0.11.0
+          TAG: v0.10.11
       - name: Generate release files
         shell: pwsh
         run: |
