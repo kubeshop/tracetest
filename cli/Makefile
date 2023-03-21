@@ -8,6 +8,4 @@ test: ## execute unit tests
 	@go test -coverprofile=coverage.out ./...
 
 docgen: ## generate CLI documentation
-	@go build main.go
-	@./main docgen -o ../docs/docs/cli/reference/ -d ../docs/docs
-	@rm main
+	@go run main.go docgen -o ../docs/docs/cli/reference/ -d ../docs/docs
