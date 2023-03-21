@@ -39,7 +39,7 @@ export default function GtagInstallCliTabs() {
               language="bash"
               title="Terminal"
           >
-          {`choco source add --name=kubeshop_repo --source=https://chocolatey.kubeshop.io/chocolatey & choco install tracetest`}
+          {`choco source add --name=kubeshop_repo --source=https://chocolatey.kubeshop.io/chocolatey ; choco install tracetest`}
           </CodeBlock>
         </div>
       </TabItem>
