@@ -50,8 +50,7 @@ jobs:
           cd scripts/choco
           choco pack
 
-          #choco --debug --verbose push tracetest.$PACKAGE_VERSION.nupkg --source $CHOCOLATEY_REPO --api-key $CHOCOLATEY_API_KEY
+          choco push --source https://chocolatey.kubeshop.io/ --api-key $CHOCOLATEY_API_KEY tracetest.$PACKAGE_VERSION.nupkg
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.COMMOM_CHOCO_API_KEY }}
-          CHOCOLATEY_REPO: ${{ secrets.CHOCOLATEY_REPO }}
           PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
