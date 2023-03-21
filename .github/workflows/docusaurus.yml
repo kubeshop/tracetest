@@ -2,13 +2,6 @@ name: docusaurus
 
 on:
   push:
-  # TODO: remove this
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-  # /TODO
     branches:
       - main
     paths:
