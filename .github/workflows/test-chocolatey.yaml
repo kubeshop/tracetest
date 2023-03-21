@@ -1,0 +1,52 @@
+name: Test chocolatey
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  chocolatey-release:
+    name: Release on Chocolatey
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download newest version
+        id: cliDownload
+        shell: pwsh
+        run: |
+          $tag = $env:TAG
+          $version = $tag.trimStart("v")
+          echo "$version"
+          Invoke-Webrequest -URI "https://github.com/kubeshop/tracetest/releases/download/v${version}/tracetest_${version}_windows_amd64.tar.gz" -OutFile tracetest.tar.gz
+          $hash = Get-FileHash tracetest.tar.gz | Select -ExpandProperty Hash
+
+          echo '::echo::on'
+          echo "::set-output name=hash::$hash"
+          echo "::set-output name=version::$version"
+        env:
+          TAG: v0.11.0
+      - name: Generate release files
+        shell: pwsh
+        run: |
+          (Get-Content scripts/choco/tools/chocolateyinstall.ps1) -Replace '%checksum%', $env:PACKAGE_CHECKSUM | Set-Content scripts/choco/tools/chocolateyinstall.ps1
+          (Get-Content scripts/choco/tracetest.nuspec) -Replace '%version%', $env:PACKAGE_VERSION | Set-Content scripts/choco/tracetest.nuspec
+        env:
+          PACKAGE_CHECKSUM: ${{ steps.cliDownload.outputs.hash }}
+          PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
+      - name: Pack and release
+        shell: pwsh
+        run: |
+          # install choco
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+          cd scripts/choco
+          choco pack
+
+          choco push --source https://chocolatey.kubeshop.io/ --api-key $CHOCOLATEY_API_KEY tracetest.$PACKAGE_VERSION.nupkg
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.COMMOM_CHOCO_API_KEY }}
+          PACKAGE_VERSION: ${{ steps.cliDownload.outputs.version }}
