@@ -148,7 +148,9 @@ nfpms:
     {{- .Os }}_
     {{- if eq .Arch "386" }}i386
     {{- else }}{{ .Arch }}{{ end }}
-    {{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
+    {{- with .Arm }}v{{ . }}{{ end }}
+    {{- with .Mips }}_{{ . }}{{ end }}
+    {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
   deb:
     lintian_overrides:
       - statically-linked-binary
