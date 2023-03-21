@@ -2,7 +2,7 @@ name: Installer Pull Request
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   linux:
