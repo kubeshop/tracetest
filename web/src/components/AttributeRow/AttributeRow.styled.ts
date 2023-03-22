@@ -2,11 +2,11 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {Tag as AntdTag, Typography} from 'antd';
 import styled from 'styled-components';
 import TestOutputMark from 'components/TestOutputMark';
+import moreIcon from 'assets/more.svg';
 
 export {default as AttributeTitle} from './AttributeTitle';
 
 export const Container = styled.div`
-  align-items: center;
   background-color: ${({theme}) => theme.color.white};
   display: flex;
   margin-bottom: 4px;
@@ -74,3 +74,7 @@ export const OutputsMark = styled(TestOutputMark)`
     margin: 4px;
   }
 `;
+
+export const MoreIcon = styled.img.attrs({
+  src: moreIcon,
+})``;

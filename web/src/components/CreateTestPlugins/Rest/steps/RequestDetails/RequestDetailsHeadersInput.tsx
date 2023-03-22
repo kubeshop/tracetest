@@ -1,7 +1,6 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
 import {DEFAULT_HEADERS, IKeyValue} from 'constants/Test.constants';
-import React from 'react';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './RequestDetails.styled';
@@ -11,14 +10,16 @@ interface IProps {
   name?: string[];
   unit?: string;
   label?: string;
+  className?: string;
 }
-const RequestDetailsHeadersInput: React.FC<IProps> = ({
+const RequestDetailsHeadersInput = ({
   unit = 'Header',
   name = ['headers'],
   initialValue = DEFAULT_HEADERS,
   label = 'Header',
-}) => (
-  <Form.Item className="input-headers" label={`${label} list`} shouldUpdate>
+  className = '',
+}: IProps) => (
+  <Form.Item className={`input-headers ${className}`} label={`${label} list`} shouldUpdate>
     <Form.List name={name.length === 1 ? name[0] : name} initialValue={initialValue}>
       {(fields, {add, remove}) => (
         <>
@@ -50,7 +51,7 @@ const RequestDetailsHeadersInput: React.FC<IProps> = ({
             style={{fontWeight: 600, height: 'auto', padding: 0}}
             type="link"
           >
-            {`Add ${label}`}
+            Add {label}
           </Button>
         </>
       )}

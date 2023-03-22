@@ -31,6 +31,7 @@ const BasicDetailsForm = ({
         <Form.Item
           className="input-name"
           data-cy="create-test-name-input"
+          data-tour={StepsID.Trigger}
           label="Name"
           name="name"
           rules={[{required: true, message: 'Please enter a test name'}]}
@@ -41,7 +42,6 @@ const BasicDetailsForm = ({
         <Form.Item
           className="input-description"
           data-cy="create-test-description-input"
-          data-tour={StepsID.Trigger}
           label="Description"
           name="description"
           style={{marginBottom: 0}}

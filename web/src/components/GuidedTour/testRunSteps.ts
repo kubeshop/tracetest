@@ -10,18 +10,18 @@ export enum StepsID {
 
 const Steps: Step[] = [
   {
-    title: 'Response',
-    target: GuidedTourService.getStepSelector(StepsID.Response),
-    content: 'View various responses here. When the test is finished, you will get the following results.',
-    placement: 'left',
-    disableBeacon: true,
-  },
-  {
     title: 'Trigger',
     target: GuidedTourService.getStepSelector(StepsID.Trigger),
     placement: 'right',
     content:
       'You can change the trigger by altering the details and saving. This will rerun the test with the updated trigger.',
+    disableBeacon: true,
+  },
+  {
+    title: 'Response',
+    target: GuidedTourService.getStepSelector(StepsID.Response),
+    content: 'View various responses here. When the test is finished, you will get the following results.',
+    placement: 'left',
     disableBeacon: true,
   },
   {
