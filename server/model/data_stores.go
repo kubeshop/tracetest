@@ -63,6 +63,7 @@ type (
 		AccessKeyID     string
 		SecretAccessKey string
 		SessionToken    string
+		UseDefaultAuth  bool
 	}
 )
 

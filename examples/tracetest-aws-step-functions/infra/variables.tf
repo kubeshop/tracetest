@@ -35,6 +35,15 @@ spec:
   periodic:
     retryDelay: 5s
     timeout: 2m
+
+---
+type: DataStore
+spec:
+  name: awsxray
+  type: awsxray
+  awsxray:
+    useDefaultAuth: true
+    region: us-west-2
   EOF
 
   tags = {

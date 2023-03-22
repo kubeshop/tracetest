@@ -61,6 +61,7 @@ type AwsXRay struct {
 	AccessKeyId     string `mapstructure:"accessKeyId"`
 	SecretAccessKey string `mapstructure:"secretAccessKey"`
 	SessionToken    string `mapstructure:"sessionToken"`
+	UseDefaultAuth  bool   `mapstructure:"useDefaultAuth"`
 }
 
 type OpenSearch struct {

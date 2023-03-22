@@ -23,6 +23,7 @@ type AwsXRay struct {
 	AccessKeyId     *string `json:"accessKeyId,omitempty"`
 	SecretAccessKey *string `json:"secretAccessKey,omitempty"`
 	SessionToken    *string `json:"sessionToken,omitempty"`
+	UseDefaultAuth  *bool   `json:"useDefaultAuth,omitempty"`
 }
 
 // NewAwsXRay instantiates a new AwsXRay object
@@ -170,6 +171,38 @@ func (o *AwsXRay) SetSessionToken(v string) {
 	o.SessionToken = &v
 }
 
+// GetUseDefaultAuth returns the UseDefaultAuth field value if set, zero value otherwise.
+func (o *AwsXRay) GetUseDefaultAuth() bool {
+	if o == nil || isNil(o.UseDefaultAuth) {
+		var ret bool
+		return ret
+	}
+	return *o.UseDefaultAuth
+}
+
+// GetUseDefaultAuthOk returns a tuple with the UseDefaultAuth field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AwsXRay) GetUseDefaultAuthOk() (*bool, bool) {
+	if o == nil || isNil(o.UseDefaultAuth) {
+		return nil, false
+	}
+	return o.UseDefaultAuth, true
+}
+
+// HasUseDefaultAuth returns a boolean if a field has been set.
+func (o *AwsXRay) HasUseDefaultAuth() bool {
+	if o != nil && !isNil(o.UseDefaultAuth) {
+		return true
+	}
+
+	return false
+}
+
+// SetUseDefaultAuth gets a reference to the given bool and assigns it to the UseDefaultAuth field.
+func (o *AwsXRay) SetUseDefaultAuth(v bool) {
+	o.UseDefaultAuth = &v
+}
+
 func (o AwsXRay) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o AwsXRay) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.SessionToken) {
 		toSerialize["sessionToken"] = o.SessionToken
+	}
+	if !isNil(o.UseDefaultAuth) {
+		toSerialize["useDefaultAuth"] = o.UseDefaultAuth
 	}
 	return toSerialize, nil
 }
