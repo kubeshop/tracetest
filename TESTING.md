@@ -25,11 +25,8 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
 - [ ] Check if our release pipeline on [Release Tracetest](https://github.com/kubeshop/tracetest/actions/workflows/release-version.yml) workflow on Github Actions worked correctly.
 - [ ] Double check [Detailed installation](https://docs.tracetest.io/getting-started/detailed-installation) doc and see if everything is documented correctly
 
-- Test CLI updates
-  - [ ] MacOS via homebrew
-  - [ ] MacOS via curl script
-  - [ ] Windows via chocolatey
-  - [ ] Windows via manual download
+
+### Tests to validate RC
 
 - Test server installation via CLI
   - [ ] Docker Compose and no demo API
@@ -45,8 +42,19 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
   - [ ] [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
   - [ ] [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
 
-- Test specific features added/changed on this release on a local installation or in a Kubernetes installation:
+- Test specific features added/changed on this release:
   - [ ] Add features here
+  
+  ### Tests to validate final release
+- Test CLI updates
+  - [ ] MacOS via homebrew
+  - [ ] MacOS via curl script
+  - [ ] Windows via chocolatey
+  - [ ] Windows via manual download
+
+- Test specific features added/changed on this release:
+  - [ ] Add features here
+  
 
 ## Automatic Tests
 
