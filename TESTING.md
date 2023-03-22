@@ -23,28 +23,30 @@ The steps that we should follow are:
 This is the entire checklist on what we should do to assert that Tracetest is working fine on each version release. On each version release, we can copy the contents of this checklist and open a Github Discussion to start each test.
 
 - [ ] Check if our release pipeline on [Release Tracetest](https://github.com/kubeshop/tracetest/actions/workflows/release-version.yml) workflow on Github Actions worked correctly.
-- [ ] Test CLI update on MacOS via homebrew
-- [ ] Test CLI update on MacOS via curl script
-- [ ] Test CLI update on Linux via APT
-- [ ] Test CLI update on Linux via YUM
-- [ ] Test CLI update on Linux via curl script
-- [ ] Test CLI update on Windows via chocolatey
-- [ ] Test CLI update on Windows via manual download
-- [ ] Test server installation via CLI with Docker Compose and no demo API
-- [ ] Test server installation via CLI with Docker Compose and demo API
-- [ ] Test server installation via CLI with Kubernetes and no demo API
-- [ ] Test server installation via CLI with Kubernetes and demo API
 - [ ] Double check [Detailed installation](https://docs.tracetest.io/getting-started/detailed-installation) doc and see if everything is documented correctly
 
-- [ ] Test Tracetest setup with [Amazon X-Ray example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray)
-- [ ] Test Tracetest setup with [Datadog example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-datadog)
-- [ ] Test Tracetest setup with [Elastic APM example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm)
-- [ ] Test Tracetest setup with [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
-- [ ] Test Tracetest setup with [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
-- [ ] Test Tracetest setup with [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
+- Test CLI updates
+  - [ ] MacOS via homebrew
+  - [ ] MacOS via curl script
+  - [ ] Windows via chocolatey
+  - [ ] Windows via manual download
 
-- [ ] Test specific features added/changed on this release on a local installation or in a Kubernetes installation:
-  - [ ] Merge https://github.com/kubeshop/helm-charts/pull/436
+- Test server installation via CLI
+  - [ ] Docker Compose and no demo API
+  - [ ] Docker Compose and demo API
+  - [ ] Kubernetes and no demo API
+  - [ ] Kubernetes and demo API
+
+- Test Tracetest examples
+  - [ ] [Amazon X-Ray example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray)
+  - [ ] [Datadog example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-datadog)
+  - [ ] [Elastic APM example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm)
+  - [ ] [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
+  - [ ] [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
+  - [ ] [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
+
+- Test specific features added/changed on this release on a local installation or in a Kubernetes installation:
+  - [ ] Add features here
 
 ## Automatic Tests
 
