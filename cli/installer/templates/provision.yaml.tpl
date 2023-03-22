@@ -41,7 +41,7 @@ spec:
   default: true
   periodic:
     timeout: 2m
-    retryDelay: 3S
+    retryDelay: 3s
 {{ if eq .enablePokeshopDemo "true" }}---
 type: Demo
 spec:
