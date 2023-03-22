@@ -119,8 +119,15 @@ docker_manifests:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
 
 archives:
-- replacements:
-    386: i386
+- name_template: >-
+    {{ .ProjectName }}_
+    {{- .Version }}_
+    {{- .Os }}_
+    {{- if eq .Arch "386" }}i386
+    {{- else }}{{ .Arch }}{{ end }}
+    {{- with .Arm }}v{{ . }}{{ end }}
+    {{- with .Mips }}_{{ . }}{{ end }}
+    {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
 checksum:
   name_template: 'checksums.txt'
 
@@ -135,8 +142,15 @@ nfpms:
   formats:
     - deb
     - rpm
-  replacements:
-    386: i386
+  file_name_template: >-
+    {{ .ProjectName }}_
+    {{- .Version }}_
+    {{- .Os }}_
+    {{- if eq .Arch "386" }}i386
+    {{- else }}{{ .Arch }}{{ end }}
+    {{- with .Arm }}v{{ . }}{{ end }}
+    {{- with .Mips }}_{{ . }}{{ end }}
+    {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
   deb:
     lintian_overrides:
       - statically-linked-binary
