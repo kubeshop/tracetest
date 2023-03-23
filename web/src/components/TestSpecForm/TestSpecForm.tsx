@@ -1,15 +1,16 @@
 import {Button, Form, Input, Tag} from 'antd';
+import {LoadingOutlined} from '@ant-design/icons';
 import {useEffect, useState} from 'react';
 
 import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
-import SpanSelectors from 'selectors/Span.selectors';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import OperatorService from 'services/Operator.service';
 import {TStructuredAssertion} from 'types/Assertion.types';
 import {singularOrPlural} from 'utils/Common';
+import {useSpan} from 'providers/Span/Span.provider';
 import AssertionCheckList from './AssertionCheckList';
 import useOnFieldsChange from './hooks/useOnFieldsChange';
 import useOnValuesChange from './hooks/useOnValuesChange';
@@ -34,18 +35,16 @@ interface IProps {
   testId: string;
 }
 
+const initialAssertions = [
+  {
+    left: '',
+    comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
+    right: '',
+  },
+];
+
 const TestSpecForm = ({
-  defaultValues: {
-    assertions = [
-      {
-        left: '',
-        comparator: OperatorService.getOperatorSymbol(CompareOperator.EQUALS),
-        right: '',
-      },
-    ],
-    selector = '',
-    name = '',
-  } = {},
+  defaultValues: {assertions = initialAssertions, selector = '', name = ''} = {},
   isEditing = false,
   onCancel,
   onClearSelectorSuggestions,
@@ -57,7 +56,7 @@ const TestSpecForm = ({
   const [form] = Form.useForm<IValues>();
   const [isValid, setIsValid] = useState(false);
 
-  const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
+  const {matchedSpans: spanIdList, isTriggerSelectorLoading} = useSpan();
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
@@ -67,15 +66,21 @@ const TestSpecForm = ({
 
   useEffect(() => {
     onValuesChange(null, {assertions, selector, name});
+
+    return () => {
+      onCancel();
+    };
   }, []);
 
   useEffect(() => {
-    form.setFieldsValue({
-      assertions,
-      selector,
-      name,
-    });
-  }, [assertions, form, name, selector]);
+    if (!isEditing) {
+      form.setFieldsValue({
+        selector,
+        name,
+        assertions,
+      });
+    }
+  }, [form, isEditing, name, selector]);
 
   const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
   const prevSelector = useAppSelector(TestSpecsSelectors.selectPrevSelector);
@@ -106,7 +111,13 @@ const TestSpecForm = ({
           <S.FormSectionHeaderSelector>
             <S.FormSectionRow1>
               <S.FormSectionTitle $noMargin>1. Select Spans</S.FormSectionTitle>
-              <Tag color="blue">{`${spanIdList.length} ${singularOrPlural('span', spanIdList.length)} selected`}</Tag>
+              <Tag color="blue">
+                {isTriggerSelectorLoading ? (
+                  <LoadingOutlined />
+                ) : (
+                  `${spanIdList.length} ${singularOrPlural('span', spanIdList.length)} selected`
+                )}
+              </Tag>
             </S.FormSectionRow1>
             <a href={SELECTOR_LANGUAGE_CHEAT_SHEET_URL} target="_blank">
               <S.ReadIcon /> SL cheat sheet

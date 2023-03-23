@@ -35,6 +35,16 @@ const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmi
     }
   }, [form, onValidate]);
 
+  useEffect(() => {
+    form.setFieldsValue({selector: output?.selector});
+  }, [form, output?.selector]);
+
+  useEffect(() => {
+    return () => {
+      onCancel();
+    };
+  }, []);
+
   return (
     <S.Container>
       <S.Title>{isEditing ? 'Edit Test Output' : 'Add Test Output'}</S.Title>

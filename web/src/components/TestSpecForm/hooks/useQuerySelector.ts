@@ -5,7 +5,6 @@ import {useEffect, useMemo, useState} from 'react';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
 import {useAppSelector} from 'redux/hooks';
 import SpanSelectors from 'selectors/Span.selectors';
 import EditorService from 'services/Editor.service';
@@ -28,12 +27,12 @@ interface IProps {
 }
 
 const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
-  const {onSetMatchedSpans, onClearMatchedSpans, selectedSpan} = useSpan();
+  const {onClearMatchedSpans, selectedSpan, onTriggerSelector, triggerSelectorResult, isTriggerSelectorError} =
+    useSpan();
   const {setSelectorSuggestions} = useTestSpecs();
   const [isLoading, setIsLoading] = useState(true);
   const {currentSelector} = useAssertionFormValues(form);
-  const [onTriggerSelectedSpans, {data: selectedSpansData, isError}] = useLazyGetSelectedSpansQuery();
-  const [isValid, setIsValid] = useState(!isError);
+  const [isValid, setIsValid] = useState(!isTriggerSelectorError);
   const selectedParentSpan = useAppSelector(state =>
     SpanSelectors.selectSpanById(state, selectedSpan?.parentId ?? '', testId, runId)
   );
@@ -45,18 +44,11 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
 
         setIsValid(isValidSelector);
 
-        if (isValidSelector) {
-          const data = await onTriggerSelectedSpans({
-            query: q,
-            testId: tId,
-            runId: rId,
-          }).unwrap();
-          onSetMatchedSpans(data.spanIds);
-        }
+        if (isValidSelector) await onTriggerSelector(q, tId, rId);
 
         setIsLoading(false);
       }, 500),
-    [onSetMatchedSpans, onTriggerSelectedSpans]
+    [onTriggerSelector]
   );
 
   useEffect(() => {
@@ -65,21 +57,21 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   }, [handleSelector, currentSelector, runId, testId]);
 
   useEffect(() => {
-    if (!selectedSpansData) return;
+    if (!triggerSelectorResult) return;
 
     const selectedSpanId = selectedSpan?.id ?? '';
     const selectedSpanSelector = SpanService.getSelectorInformation(selectedSpan!);
     const selectedParentSpanSelector = selectedParentSpan ? SpanService.getSelectorInformation(selectedParentSpan) : '';
 
     const selectorSuggestions = SelectorSuggestionsService.getSuggestions(
-      selectedSpansData.selector,
-      selectedSpansData.spanIds,
+      triggerSelectorResult.selector,
+      triggerSelectorResult.spanIds,
       selectedSpanId,
       selectedSpanSelector,
       selectedParentSpanSelector
     );
     setSelectorSuggestions(selectorSuggestions);
-  }, [selectedParentSpan, selectedSpan, selectedSpansData, setSelectorSuggestions]);
+  }, [selectedParentSpan, selectedSpan, setSelectorSuggestions, triggerSelectorResult]);
 
   useEffect(() => {
     return () => {
@@ -88,8 +80,8 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   }, [onClearMatchedSpans]);
 
   useEffect(() => {
-    setIsValid(!isError);
-  }, [isError]);
+    setIsValid(!isTriggerSelectorError);
+  }, [isTriggerSelectorError]);
 
   useEffect(() => {
     form.setFields([
@@ -102,7 +94,7 @@ const useQuerySelector = ({form, runId, testId, onValidSelector}: IProps) => {
   }, [form, isValid, onValidSelector]);
 
   return {
-    spanIdList: selectedSpansData?.spanIds ?? [],
+    spanIdList: triggerSelectorResult?.spanIds ?? [],
     isValid,
     isLoading,
   };

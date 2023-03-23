@@ -13,6 +13,8 @@ import {selectOutputsBySpanId} from 'redux/testOutputs/selectors';
 import TestOutputMark from 'components/TestOutputMark';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import CurrentSpanSelector from 'components/CurrentSpanSelector';
+import {useSpan} from 'providers/Span/Span.provider';
+import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
@@ -22,7 +24,10 @@ const SpanNode = ({data, id, selected}: IProps) => {
   const outputs = useAppSelector(state => selectOutputsBySpanId(state, data?.id || ''));
   const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
   const {isOpen: isTestSpecFormOpen} = useTestSpecForm();
-  const showSelectAsCurrent = !data.isMatched && isTestSpecFormOpen && selected;
+  const {isOpen: isTestOutputFormOpen} = useTestOutput();
+  const {matchedSpans} = useSpan();
+  const showSelectAsCurrent =
+    !data.isMatched && !!matchedSpans.length && (isTestSpecFormOpen || isTestOutputFormOpen) && selected;
   const className = `${data.isMatched ? 'matched' : ''} ${showSelectAsCurrent ? 'selectedAsCurrent' : ''}`;
 
   return (
