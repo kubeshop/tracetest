@@ -74,7 +74,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
 
     showNotification({
       type: 'success',
-      title: 'Your test has been published successfully',
+      title: 'Your test has been saved successfully',
       description: 'A new test run has been generated.',
     });
 
