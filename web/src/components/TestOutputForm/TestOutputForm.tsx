@@ -8,7 +8,6 @@ import {useAppSelector} from 'redux/hooks';
 import SpanSelectors from 'selectors/Span.selectors';
 import {singularOrPlural} from 'utils/Common';
 import TestOutput from 'models/TestOutput.model';
-import useValidateOutput from './hooks/useValidateOutput';
 import SelectorInput from './SelectorInput';
 import * as S from './TestOutputForm.styled';
 
@@ -17,16 +16,27 @@ interface IProps {
   isLoading?: boolean;
   onCancel(): void;
   onSubmit(values: TestOutput, spanId?: string): void;
+  onValidate(_: any, output: TestOutput): void;
+  isValid: boolean;
   output?: TestOutput;
   runId: string;
   testId: string;
 }
 
-const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmit, output, runId, testId}: IProps) => {
+const TestOutputForm = ({
+  isEditing = false,
+  isLoading = false,
+  onCancel,
+  onSubmit,
+  output,
+  runId,
+  testId,
+  onValidate,
+  isValid,
+}: IProps) => {
   const [form] = Form.useForm<TestOutput>();
-  const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
-  const {isValid, onValidate} = useValidateOutput({spanIdList});
   const selector = Form.useWatch('selector', form) || '';
+  const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
 
   useEffect(() => {
     if (form.getFieldValue('selector') && form.getFieldValue('value') && form.getFieldValue('name')) {
@@ -34,6 +44,18 @@ const TestOutputForm = ({isEditing = false, isLoading = false, onCancel, onSubmi
       form.validateFields();
     }
   }, [form, onValidate]);
+
+  useEffect(() => {
+    if (!isEditing) {
+      form.setFieldsValue({selector: output?.selector, value: output?.value, name: output?.name});
+    }
+  }, [form, isEditing, output?.name, output?.selector, output?.value]);
+
+  useEffect(() => {
+    return () => {
+      onCancel();
+    };
+  }, []);
 
   return (
     <S.Container>

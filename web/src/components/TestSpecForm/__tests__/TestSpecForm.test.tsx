@@ -9,6 +9,8 @@ const defaultProps = {
   onClickPrevSelector: jest.fn(),
   testId: 'testId',
   runId: 'runId',
+  isValid: false,
+  onIsValid: jest.fn(),
 };
 
 describe('TestSpecForm', () => {
