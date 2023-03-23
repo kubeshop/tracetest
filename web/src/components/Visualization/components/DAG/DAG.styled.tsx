@@ -46,7 +46,7 @@ export const Container = styled.div<{$showMatched: boolean}>`
   ${({$showMatched}) =>
     $showMatched &&
     css`
-      .react-flow__node-span > div:not(.matched) {
+      .react-flow__node-span > div:not(.matched):not(.selectedAsCurrent) {
         opacity: 0.5;
       }
     `}

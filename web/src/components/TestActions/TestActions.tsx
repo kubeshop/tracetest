@@ -37,7 +37,7 @@ const TestActions = () => {
           publish();
         }}
       >
-        Publish
+        Save
       </Button>
     </S.Container>
   );

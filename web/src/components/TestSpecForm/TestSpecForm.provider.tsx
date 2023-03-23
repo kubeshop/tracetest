@@ -12,8 +12,9 @@ import RouterActions from 'redux/actions/Router.actions';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 import AssertionService from 'services/Assertion.service';
-import { TTestSpecEntry } from 'models/TestSpecs.model';
+import {TTestSpecEntry} from 'models/TestSpecs.model';
 import {IValues} from './TestSpecForm';
+import {useConfirmationModal} from '../../providers/ConfirmationModal/ConfirmationModal.provider';
 
 interface IFormProps {
   defaultValues?: IValues;
@@ -23,10 +24,12 @@ interface IFormProps {
 
 interface IContext {
   isOpen: boolean;
+  isValid: boolean;
+  formProps: IFormProps;
   open(props?: IFormProps): void;
   close(): void;
   onSubmit(values: IValues, spanId?: string): void;
-  formProps: IFormProps;
+  onIsValid(isValid: boolean): void;
 }
 
 const initialFormProps = {
@@ -35,10 +38,12 @@ const initialFormProps = {
 
 export const Context = createContext<IContext>({
   isOpen: false,
+  isValid: false,
+  formProps: initialFormProps,
   open: noop,
   close: noop,
-  formProps: initialFormProps,
   onSubmit: noop,
+  onIsValid: noop,
 });
 
 export const useTestSpecForm = () => useContext<IContext>(Context);
@@ -48,13 +53,15 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [formProps, setFormProps] = useState<IFormProps>(initialFormProps);
+  const [isValid, onIsValid] = useState(false);
   const {test} = useTest();
   const {update, add, isDraftMode} = useTestSpecs();
   const {run} = useTestRun();
   const {onClearMatchedSpans} = useSpan();
+  const {onOpen} = useConfirmationModal();
   const specs = useAppSelector(state => TestSpecsSelectors.selectSpecs(state));
 
-  const open = useCallback(
+  const handleOpen = useCallback(
     (props: IFormProps = {}) => {
       const {isEditing, defaultValues: {assertions = [], selector: defaultSelector, name = ''} = {}} = props;
       const spec = specs.find(({selector}) => defaultSelector === selector);
@@ -90,11 +97,28 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
     [dispatch, specs, isDraftMode, run.testVersion, test?.version]
   );
 
+  const open = useCallback(
+    (props: IFormProps) => {
+      if (isValid) {
+        onOpen({
+          title: 'Unsaved changes',
+          heading: 'Discard unsaved changes?',
+          okText: 'Discard',
+          onConfirm: () => {
+            handleOpen(props);
+          },
+        });
+      } else handleOpen(props);
+    },
+    [handleOpen, isValid, onOpen]
+  );
+
   const close = useCallback(() => {
     setFormProps(initialFormProps);
     onClearMatchedSpans();
 
     setIsOpen(false);
+    onIsValid(false);
   }, [onClearMatchedSpans]);
 
   const onConfirm = useCallback(() => {
@@ -130,8 +154,8 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
   );
 
   const contextValue = useMemo(
-    () => ({isOpen, open, close, formProps, onSubmit}),
-    [isOpen, open, close, formProps, onSubmit]
+    () => ({isOpen, open, close, formProps, onSubmit, isValid, onIsValid}),
+    [isOpen, open, close, formProps, onSubmit, isValid, onIsValid]
   );
 
   return (

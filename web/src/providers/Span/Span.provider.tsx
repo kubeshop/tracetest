@@ -7,14 +7,20 @@ import SpanSelectors from 'selectors/Span.selectors';
 import {RouterSearchFields} from 'constants/Common.constants';
 import Span from 'models/Span.model';
 import RouterActions from 'redux/actions/Router.actions';
+import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import SelectedSpans from 'models/SelectedSpans.model';
 
 interface IContext {
   selectedSpan?: Span;
+  triggerSelectorResult?: SelectedSpans;
   matchedSpans: string[];
   focusedSpan: string;
+  isTriggerSelectorError: boolean;
+  isTriggerSelectorLoading: boolean;
   onSelectSpan(spanId: string): void;
   onSetMatchedSpans(spanIdList: string[]): void;
   onSetFocusedSpan(spanId: string): void;
+  onTriggerSelector(query: string, testId: string, runId: string): void;
   onClearMatchedSpans(): void;
   onClearSelectedSpan(): void;
 }
@@ -27,6 +33,9 @@ export const Context = createContext<IContext>({
   onClearMatchedSpans: noop,
   onSetMatchedSpans: noop,
   onClearSelectedSpan: noop,
+  onTriggerSelector: noop,
+  isTriggerSelectorError: false,
+  isTriggerSelectorLoading: false,
 });
 
 interface IProps {
@@ -40,6 +49,10 @@ const SpanProvider = ({children}: IProps) => {
   const selectedSpan = useSelector(SpanSelectors.selectSelectedSpan);
   const matchedSpans = useSelector(SpanSelectors.selectMatchedSpans);
   const focusedSpan = useSelector(SpanSelectors.selectFocusedSpan);
+  const [
+    triggerSelector,
+    {data: triggerSelectorResult, isError: isTriggerSelectorError, isFetching: isTriggerSelectorLoading},
+  ] = useLazyGetSelectedSpansQuery();
 
   useEffect(() => {
     return () => {
@@ -66,6 +79,18 @@ const SpanProvider = ({children}: IProps) => {
     [dispatch]
   );
 
+  const onTriggerSelector = useCallback(
+    async (query: string, testId: string, runId: string) => {
+      const {spanIds = []} = await triggerSelector({
+        query,
+        testId,
+        runId,
+      }).unwrap();
+      onSetMatchedSpans(spanIds);
+    },
+    [onSetMatchedSpans, triggerSelector]
+  );
+
   const onSetFocusedSpan = useCallback(
     (spanId: string) => {
       dispatch(setFocusedSpan({spanId}));
@@ -87,16 +112,24 @@ const SpanProvider = ({children}: IProps) => {
       onSetFocusedSpan,
       onClearMatchedSpans,
       onClearSelectedSpan,
+      onTriggerSelector,
+      triggerSelectorResult,
+      isTriggerSelectorError,
+      isTriggerSelectorLoading,
     }),
     [
+      selectedSpan,
       matchedSpans,
       focusedSpan,
-      onClearMatchedSpans,
       onSelectSpan,
       onSetMatchedSpans,
       onSetFocusedSpan,
-      selectedSpan,
+      onClearMatchedSpans,
       onClearSelectedSpan,
+      onTriggerSelector,
+      triggerSelectorResult,
+      isTriggerSelectorError,
+      isTriggerSelectorLoading,
     ]
   );
 

@@ -15,17 +15,20 @@ import {
   outputsTestRunOutputsMerged,
   outputUpdated,
 } from 'redux/testOutputs/slice';
-import TestOutput from '../../models/TestOutput.model';
+import TestOutput from 'models/TestOutput.model';
+import SpanSelectors from 'selectors/Span.selectors';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
 import {useTestRun} from '../TestRun/TestRun.provider';
+import useValidateOutput from './hooks/useValidateOutput';
 
 interface IContext {
   isDraftMode: boolean;
   isEditing: boolean;
   isLoading: boolean;
   isOpen: boolean;
+  isValid: boolean;
   onCancel(): void;
   onClose(): void;
   onDelete(id: number): void;
@@ -33,6 +36,7 @@ interface IContext {
   onOpen(draft?: TestOutput): void;
   onSubmit(values: TestOutput): void;
   onSelectedOutputs(outputs: TestOutput[]): void;
+  onValidate(_: any, output: TestOutput): void;
   output?: TestOutput;
   outputs: TestOutput[];
   selectedOutputs: TestOutput[];
@@ -43,6 +47,7 @@ export const Context = createContext<IContext>({
   isEditing: false,
   isLoading: false,
   isOpen: false,
+  isValid: false,
   onCancel: noop,
   onClose: noop,
   onDelete: noop,
@@ -50,6 +55,7 @@ export const Context = createContext<IContext>({
   onOpen: noop,
   onSubmit: noop,
   onSelectedOutputs: noop,
+  onValidate: noop,
   output: undefined,
   outputs: [],
   selectedOutputs: [],
@@ -81,6 +87,8 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const outputs = useAppSelector(state => selectTestOutputs(state));
   const selectedOutputs = useAppSelector(selectSelectedOutputs);
   const isDraftMode = useAppSelector(selectIsPending);
+  const spanIdList = useAppSelector(SpanSelectors.selectMatchedSpans);
+  const {isValid, onValidate} = useValidateOutput({spanIdList});
 
   useEffect(() => {
     dispatch(outputsInitiated(testOutputs));
@@ -94,16 +102,33 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
     dispatch(outputsTestRunOutputsMerged(runOutputs));
   }, [dispatch, runOutputs]);
 
-  const onOpen = useCallback((values?: TestOutput) => {
+  const handleOpen = useCallback((values?: TestOutput) => {
     setDraft(values);
     setIsOpen(true);
     const id = values?.id ?? -1;
     setIsEditing(id !== -1);
   }, []);
 
+  const onOpen = useCallback(
+    (values?: TestOutput) => {
+      if (isValid) {
+        onOpenConfirmationModal({
+          title: 'Unsaved changes',
+          heading: 'Discard unsaved changes?',
+          okText: 'Discard',
+          onConfirm: () => {
+            handleOpen(values);
+          },
+        });
+      } else handleOpen(values);
+    },
+    [handleOpen, isValid, onOpenConfirmationModal]
+  );
+
   const onClose = useCallback(() => {
     setDraft(undefined);
     setIsOpen(false);
+    onValidate(undefined, TestOutput({}));
   }, []);
 
   const onCancel = useCallback(() => {
@@ -171,6 +196,8 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       isEditing,
       isLoading,
       isOpen,
+      isValid,
+      onValidate,
       onCancel,
       onClose,
       onDelete,
@@ -188,6 +215,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       isEditing,
       isLoading,
       isOpen,
+      isValid,
       onCancel,
       onClose,
       onDelete,
@@ -195,6 +223,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       onOpen,
       onSelectedOutputs,
       onSubmit,
+      onValidate,
       outputs,
       selectedOutputs,
     ]
