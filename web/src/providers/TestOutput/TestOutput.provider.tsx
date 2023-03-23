@@ -128,6 +128,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const onClose = useCallback(() => {
     setDraft(undefined);
     setIsOpen(false);
+    onValidate(undefined, TestOutput({}));
   }, []);
 
   const onCancel = useCallback(() => {
