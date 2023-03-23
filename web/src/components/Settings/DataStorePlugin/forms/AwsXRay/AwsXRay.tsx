@@ -1,35 +1,44 @@
-import {Col, Form, Input, Row} from 'antd';
-import {SupportedDataStores} from 'types/DataStore.types';
+import {Checkbox, Col, Form, Input, Row} from 'antd';
+import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 
 const AwsXRay = () => {
   const baseName = ['dataStore', SupportedDataStores.AWSXRay];
+  const form = Form.useFormInstance<TDraftDataStore>();
+  const useDefaultAuth = Form.useWatch([...baseName, 'useDefaultAuth'], form) ?? false;
 
   return (
     <>
       <Row gutter={[16, 16]}>
         <Col span={12}>
+          <Form.Item name={[...baseName, 'useDefaultAuth']} valuePropName="checked">
+            <Checkbox>Use Default AWS Authentication</Checkbox>
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={12}>
           <Form.Item
             label="Access Key Id"
             name={[...baseName, 'accessKeyId']}
-            rules={[{required: true, message: 'Access Key Id is required'}]}
+            rules={[{required: !useDefaultAuth, message: 'Access Key Id is required'}]}
           >
-            <Input placeholder="Access Key Id" type="password" />
+            <Input placeholder="Access Key Id" type="password" disabled={useDefaultAuth} />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
             label="Secret Access Key"
             name={[...baseName, 'secretAccessKey']}
-            rules={[{required: true, message: 'Secret Access Key is required'}]}
+            rules={[{required: !useDefaultAuth, message: 'Secret Access Key is required'}]}
           >
-            <Input placeholder="Secret Access Key" type="password" />
+            <Input placeholder="Secret Access Key" type="password" disabled={useDefaultAuth} />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item label="Session Token" name={[...baseName, 'sessionToken']}>
-            <Input placeholder="Session Token" type="password" />
+            <Input placeholder="Session Token" type="password" disabled={useDefaultAuth} />
           </Form.Item>
         </Col>
         <Col span={12}>

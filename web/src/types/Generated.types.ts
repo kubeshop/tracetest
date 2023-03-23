@@ -1527,6 +1527,7 @@ export interface external {
           accessKeyId?: string;
           secretAccessKey?: string;
           sessionToken?: string;
+          useDefaultAuth?: boolean;
         };
         HTTPClientSettings: {
           url?: string;

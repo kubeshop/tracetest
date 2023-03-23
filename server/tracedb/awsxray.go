@@ -26,18 +26,20 @@ import (
 type awsxrayDB struct {
 	realTraceDB
 
-	credentials *credentials.Credentials
-	session     *session.Session
-	region      string
-	service     *xray.XRay
+	credentials    *credentials.Credentials
+	session        *session.Session
+	region         string
+	service        *xray.XRay
+	useDefaultAuth bool
 }
 
 func NewAwsXRayDB(cfg *model.AWSXRayDataStoreConfig) (TraceDB, error) {
 	sessionCredentials := credentials.NewStaticCredentials(cfg.AccessKeyID, cfg.SecretAccessKey, cfg.SessionToken)
 
 	return &awsxrayDB{
-		credentials: sessionCredentials,
-		region:      cfg.Region,
+		credentials:    sessionCredentials,
+		region:         cfg.Region,
+		useDefaultAuth: cfg.UseDefaultAuth,
 	}, nil
 }
 
@@ -54,10 +56,17 @@ func (db *awsxrayDB) GetTraceID() trace.TraceID {
 }
 
 func (db *awsxrayDB) Connect(ctx context.Context) error {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      &db.region,
-		Credentials: db.credentials,
-	})
+	awsConfig := &aws.Config{}
+
+	if db.useDefaultAuth {
+		awsConfig = aws.NewConfig().WithRegion(db.region)
+	} else {
+		awsConfig = &aws.Config{
+			Region:      &db.region,
+			Credentials: db.credentials,
+		}
+	}
+	sess, err := session.NewSession(awsConfig)
 
 	if err != nil {
 		return err

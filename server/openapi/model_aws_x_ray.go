@@ -17,6 +17,8 @@ type AwsXRay struct {
 	SecretAccessKey string `json:"secretAccessKey,omitempty"`
 
 	SessionToken string `json:"sessionToken,omitempty"`
+
+	UseDefaultAuth bool `json:"useDefaultAuth,omitempty"`
 }
 
 // AssertAwsXRayRequired checks if the required fields are not zero-ed

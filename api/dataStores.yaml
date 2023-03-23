@@ -75,6 +75,8 @@ components:
           type: string
         sessionToken:
           type: string
+        useDefaultAuth:
+          type: boolean
     HTTPClientSettings:
       type: object
       properties:

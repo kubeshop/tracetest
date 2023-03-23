@@ -69,6 +69,61 @@ resource "aws_iam_role" "tracetest_task_execution_role" {
   tags = local.tags
 }
 
+resource "aws_iam_role" "tracetest_task_role" {
+  name = "${local.name}_task_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = ["ecs-tasks.amazonaws.com", "ecs.amazonaws.com"]
+        }
+      },
+    ]
+  })
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy" "tracetest_task_x_ray_role_policy" {
+  name = "${local.name}_task_x_ray_role_policy"
+  role = aws_iam_role.tracetest_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:GetSamplingStatisticSummaries",
+          "xray:BatchGetTraces",
+          "xray:BatchGetTraceSummaryById",
+          "xray:GetDistinctTraceGraphs",
+          "xray:GetServiceGraph",
+          "xray:GetTraceGraph",
+          "xray:GetTraceSummaries",
+          "xray:GetGroups",
+          "xray:GetGroup",
+          "xray:ListTagsForResource",
+          "xray:ListResourcePolicies",
+          "xray:GetTimeSeriesServiceStatistics",
+          "xray:GetInsightSummaries",
+          "xray:GetInsight",
+          "xray:GetInsightEvents",
+          "xray:GetInsightImpactGraph"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "tracetest_task_execution_role_policy" {
   name = "${local.name}_task_execution_role_policy"
   role = aws_iam_role.tracetest_task_execution_role.id
