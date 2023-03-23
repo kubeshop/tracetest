@@ -49,7 +49,7 @@ const CurrentSpanSelector = ({spanId}: IProps) => {
             Updating selected span <LoadingOutlined />
           </>
         ) : (
-          <>Select as Current span</>
+          <>Select as current span</>
         )}
       </S.FloatingText>
     </S.Container>
