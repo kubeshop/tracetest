@@ -5,7 +5,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: https://ihcjsmi526.execute-api.us-west-2.amazonaws.com/v2/incident
+      url: <your_api_endpoint>/incident
       method: POST
       headers:
         - key: Content-Type
