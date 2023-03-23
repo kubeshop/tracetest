@@ -1,6 +1,6 @@
 import {Button, Form, Input, Tag} from 'antd';
 import {LoadingOutlined} from '@ant-design/icons';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
 import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
@@ -31,6 +31,8 @@ interface IProps {
   onClearSelectorSuggestions(): void;
   onClickPrevSelector(prevSelector: string): void;
   onSubmit(values: IValues): void;
+  isValid: boolean;
+  onIsValid(isValid: boolean): void;
   runId: string;
   testId: string;
 }
@@ -52,16 +54,17 @@ const TestSpecForm = ({
   onSubmit,
   runId,
   testId,
+  isValid,
+  onIsValid,
 }: IProps) => {
   const [form] = Form.useForm<IValues>();
-  const [isValid, setIsValid] = useState(false);
 
   const {matchedSpans: spanIdList, isTriggerSelectorLoading} = useSpan();
   const attributeList = useAppSelector(state =>
     AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList)
   );
 
-  const onValuesChange = useOnValuesChange({setIsValid});
+  const onValuesChange = useOnValuesChange({setIsValid: onIsValid});
   const onFieldsChange = useOnFieldsChange();
 
   useEffect(() => {
@@ -126,7 +129,7 @@ const TestSpecForm = ({
           <S.FormSectionRow>
             <S.FormSectionText>Select the spans to which a set of assertions will be applied</S.FormSectionText>
           </S.FormSectionRow>
-          <SelectorInput form={form} testId={testId} runId={runId} onValidSelector={setIsValid} />
+          <SelectorInput form={form} testId={testId} runId={runId} onValidSelector={onIsValid} />
 
           <S.SuggestionsContainer>
             <SelectorSuggestions

@@ -40,7 +40,7 @@ const RunDetailTest = ({run, testId}: IProps) => {
   const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
   const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector, specs} =
     useTestSpecs();
-  const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close} = useTestSpecForm();
+  const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close, isValid, onIsValid} = useTestSpecForm();
   const {
     isEditing,
     isLoading,
@@ -49,6 +49,8 @@ const RunDetailTest = ({run, testId}: IProps) => {
     onSubmit: onSubmitTestOutput,
     output,
     outputs,
+    isValid: isOutputFormValid,
+    onValidate,
   } = useTestOutput();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
   const {isGuidedTourRunning, setGuidedTourStep} = useGuidedTour();
@@ -134,6 +136,8 @@ const RunDetailTest = ({run, testId}: IProps) => {
                     setPrevSelector('');
                     onSubmit(values);
                   }}
+                  isValid={isValid}
+                  onIsValid={onIsValid}
                   runId={run.id}
                   testId={testId}
                   {...formProps}
@@ -160,6 +164,8 @@ const RunDetailTest = ({run, testId}: IProps) => {
                   output={output}
                   runId={run.id}
                   testId={testId}
+                  isValid={isOutputFormValid}
+                  onValidate={onValidate}
                 />
               )}
 

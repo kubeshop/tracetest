@@ -8,7 +8,6 @@ import SpanSelectors from 'selectors/Span.selectors';
 import {useSpan} from 'providers/Span/Span.provider';
 import TestOutput from 'models/TestOutput.model';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
-import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {useTestSpecForm} from '../TestSpecForm/TestSpecForm.provider';
 import * as S from './CurrentSpanSelector.styled';
 
@@ -19,7 +18,6 @@ interface IProps {
 const CurrentSpanSelector = ({spanId}: IProps) => {
   const {open, isOpen: isTestSpecFormOpen} = useTestSpecForm();
   const {onOpen} = useTestOutput();
-  const {onOpen: onConfirmModalOpen} = useConfirmationModal();
   const {
     run: {id: runId},
   } = useTestRun();
@@ -31,25 +29,17 @@ const CurrentSpanSelector = ({spanId}: IProps) => {
 
   const handleOnClick = useCallback(() => {
     const selector = SpanService.getSelectorInformation(span!);
-    onConfirmModalOpen({
-      title: 'Unsaved changes',
-      heading: 'Discard unsaved changes?',
-      okText: 'Discard',
-      onConfirm: () => {
-        if (isTestSpecFormOpen) {
-          open({
-            isEditing: false,
-            selector,
-            defaultValues: {
-              selector,
-            },
-          });
-        } else {
-          onOpen(TestOutput({selector: {query: selector}}));
-        }
-      },
-    });
-  }, [isTestSpecFormOpen, onConfirmModalOpen, onOpen, open, span]);
+
+    if (isTestSpecFormOpen)
+      open({
+        isEditing: false,
+        selector,
+        defaultValues: {
+          selector,
+        },
+      });
+    else onOpen(TestOutput({selector: {query: selector}}));
+  }, [isTestSpecFormOpen, onOpen, open, span]);
 
   return (
     <S.Container className="matched">
