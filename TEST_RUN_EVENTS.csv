@@ -1,0 +1,9 @@
+Test Run Events,,,
+,,,
+Stage  ,Event Type,Description,Definition
+Trigger,CREATED_INFO,Trigger Run has been created,
+Trigger,RESOLVE_TRIGGER_INFO,Resolving trigger details based on environment variables,
+Trigger,EXECUTING_TRIGGER_INFO,Initial Trigger execution,
+Trigger,HTTP_UNREACHABLE_HOST_ERROR,Tracetest could not reach the defined host in the trigger,
+Trigger,DOCKER_COMPOSE_HOST_MISMATCH_ERROR,"We identified Tracetest is running in docker compose, to connect to the host machine use the `host.docker.internal` hostname. For more information see https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds",
+Trigger,,,
