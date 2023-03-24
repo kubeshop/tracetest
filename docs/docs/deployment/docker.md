@@ -26,18 +26,22 @@ How do you want to run TraceTest? [type to search]:
 Select `Using Docker Compose` and follow the instructions.
 
 **Tools required (installed if missing)**:
+
 - Docker
 - Docker Compose
 
 **Requirements**:
+
 - Jaeger or other compatible backend. If missing, the installer will help you configure one.
 - OpenTelemetry Collector. If missing, the installer will help you configure one.
 - A `docker-compose.yaml` (configurable) file in the project directory. If missing, the installer will create an empty file.
 
 **Optionals**:
+
 - [PokeShop demo app](https://github.com/kubeshop/pokeshop/). A sample microservice app to test your Tracetest installation.
 
 **Result**:
+
 - `tracetest/` directory (configurable) with a `docker-compose.yaml` and other config files.
 - [Jaeger](https://www.jaegertracing.io/) instance, if selected.
 - [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), if selected.
@@ -48,7 +52,7 @@ Select `Using Docker Compose` and follow the instructions.
 In the folder where you ran `tracetest server install`, run this command to start the Tracetest cluster:
 
 ```bash
-docker compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
+docker compose -f tracetest/docker-compose.yaml up -d
 ```
 
 ```bash title="Condensed expected output from the Tracetest container:"
