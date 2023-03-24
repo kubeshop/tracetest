@@ -47,7 +47,7 @@ export const ContainerHeader = styled.div`
 
   .ant-tabs-tab {
     font-weight: 600;
-    padding: 5px 16px;
+    padding: 0;
     margin: 7px 0;
     border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
     border-right: none;
@@ -122,6 +122,7 @@ export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
 export const TabLink = styled(Link)<{$isActive: boolean}>`
   && {
     color: ${({theme, $isActive}) => $isActive && theme.color.white};
+    padding: 5px 16px;
 
     &:hover,
     &:visited,
