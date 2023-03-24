@@ -82,7 +82,7 @@ Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]):
   cy.selectTestFromDemoList();
   cy.get('[data-cy=auth-type-select]').click();
   cy.get(`[data-cy=auth-type-select-option-${authMethod}]`).click();
-  keys.forEach(key => cy.get(`[data-cy=${authMethod}-${key}]`).type(key));
+  keys.forEach(key => cy.get(`[data-cy=${authMethod}-${key}] [contenteditable]`).first().type('key'));
   return cy.wrap(PokeshopDemo[0].name);
 });
 
@@ -265,7 +265,6 @@ Cypress.Commands.add('enableDemo', () => {
       cy.get('#demo_pokeshop_enabled').click();
       cy.get('#demo_pokeshop_pokeshop_httpEndpoint').type('http://demo-pokemon-api.demo.svc.cluster.local');
       cy.get('[data-cy=demo-form-save-button]').click();
-      cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
     }
 
     cy.visit(`/`);
