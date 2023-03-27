@@ -201,6 +201,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestRun,
 		},
 		{
+			"GetTestRunEvents",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}/run/{runId}/events",
+			c.GetTestRunEvents,
+		},
+		{
 			"GetTestRuns",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run",
@@ -831,6 +837,24 @@ func (c *ApiApiController) GetTestRun(w http.ResponseWriter, r *http.Request) {
 	runIdParam := params["runId"]
 
 	result, err := c.service.GetTestRun(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestRunEvents - get events from a test run
+func (c *ApiApiController) GetTestRunEvents(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam := params["runId"]
+
+	result, err := c.service.GetTestRunEvents(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

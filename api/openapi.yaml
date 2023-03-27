@@ -826,6 +826,34 @@ paths:
               schema:
                 type: string
 
+  # Test events
+  /tests/{testId}/run/{runId}/events:
+    get:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: string
+          required: true
+      summary: "get events from a test run"
+      description: "get events from a test run"
+      operationId: getTestRunEvents
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./testEvents.yaml#/components/schemas/TestRunEvent"
   # Environments
   /environments:
     get:
