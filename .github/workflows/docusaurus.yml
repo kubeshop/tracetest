@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - "docs/**"
       - "api/*"
+      - "cli/**"
+      - "docs/**"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
