@@ -31,6 +31,7 @@ export const theme: DefaultTheme = {
   },
   notification: {
     success: {
+      color: '#52C41A',
       style: {
         border: '1px solid #52C41A',
         background: '#F6FFED',
@@ -38,20 +39,23 @@ export const theme: DefaultTheme = {
       },
     },
     error: {
+      color: '#EE1847',
       style: {
-        border: '1px solid #F5222D',
+        border: '1px solid #EE1847',
         background: '#FFF1F0',
         minWidth: '450px',
       },
     },
     info: {
+      color: '#3B61F6',
       style: {
         border: '1px solid #3B61F6',
-        background: '#3B61F61A',
+        background: '#E7EBFE',
         minWidth: '450px',
       },
     },
     warning: {
+      color: '#FAAD14',
       style: {
         border: '1px solid #FAAD14',
         background: '#FFFBE6',
@@ -59,6 +63,7 @@ export const theme: DefaultTheme = {
       },
     },
     open: {
+      color: '#3B61F6',
       style: {
         minWidth: '450px',
       },
