@@ -825,6 +825,29 @@ paths:
             application/yaml:
               schema:
                 type: string
+  /test/{testId}/run/{runId}/stop:
+    post:
+      tags:
+        - api
+      parameters:
+        - in: path
+          name: testId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: runId
+          schema:
+            type: string
+          required: true
+      summary: "stops the execution of a test run"
+      description: "stops the execution of a test run"
+      operationId: stopTestRun
+      responses:
+        200:
+          description: successful operation
+        422:
+          description: could not stop execution, probably it's not running anymore
 
   # Test events
   /tests/{testId}/run/{runId}/events:

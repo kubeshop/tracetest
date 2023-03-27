@@ -106,6 +106,10 @@ export interface paths {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
   };
+  "/test/{testId}/run/{runId}/stop": {
+    /** stops the execution of a test run */
+    post: operations["stopTestRun"];
+  };
   "/tests/{testId}/run/{runId}/events": {
     /** get events from a test run */
     get: operations["getTestRunEvents"];
@@ -792,6 +796,21 @@ export interface operations {
           "application/yaml": string;
         };
       };
+    };
+  };
+  /** stops the execution of a test run */
+  stopTestRun: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: unknown;
+      /** could not stop execution, probably it's not running anymore */
+      422: unknown;
     };
   };
   /** get events from a test run */

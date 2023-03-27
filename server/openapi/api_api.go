@@ -297,6 +297,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTransaction,
 		},
 		{
+			"StopTestRun",
+			strings.ToUpper("Post"),
+			"/api/test/{testId}/run/{runId}/stop",
+			c.StopTestRun,
+		},
+		{
 			"TestConnection",
 			strings.ToUpper("Post"),
 			"/api/config/connection",
@@ -1201,6 +1207,24 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// StopTestRun - stops the execution of a test run
+func (c *ApiApiController) StopTestRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam := params["runId"]
+
+	result, err := c.service.StopTestRun(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

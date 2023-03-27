@@ -314,6 +314,10 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
+func (*controller) StopTestRun(context.Context, string, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusOK, nil), nil
+}
+
 func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.Test) (openapi.ImplResponse, error) {
 	updated, err := c.mappers.In.Test(in)
 	if err != nil {
