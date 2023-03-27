@@ -19,6 +19,7 @@ var docGenCmd = &cobra.Command{
 	Use:     "docgen",
 	Short:   "Generate the CLI documentation",
 	Long:    "Generate the CLI documentation",
+	Hidden:  true,
 	PreRun:  setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		os.RemoveAll(docsOutputDir)
