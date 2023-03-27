@@ -10,17 +10,20 @@
 package openapi
 
 type PollingInfo struct {
-	NumberSpans int32 `json:"numberSpans,omitempty"`
-
-	NumberIterations int32 `json:"numberIterations,omitempty"`
+	Type string `json:"type,omitempty"`
 
 	ReasonNextIteration string `json:"reasonNextIteration,omitempty"`
 
 	IsComplete bool `json:"isComplete,omitempty"`
+
+	Periodic PollingInfoPeriodic `json:"periodic,omitempty"`
 }
 
 // AssertPollingInfoRequired checks if the required fields are not zero-ed
 func AssertPollingInfoRequired(obj PollingInfo) error {
+	if err := AssertPollingInfoPeriodicRequired(obj.Periodic); err != nil {
+		return err
+	}
 	return nil
 }
 

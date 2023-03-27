@@ -33,14 +33,21 @@ components:
     PollingInfo:
       type: object
       properties:
-        numberSpans:
-          type: integer
-        numberIterations:
-          type: integer
+        type:
+          type: string
+          enum:
+            - periodic
         reasonNextIteration:
           type: string
         isComplete:
           type: boolean
+        periodic:
+          type: object
+          properties:
+            numberSpans:
+              type: integer
+            numberIterations:
+              type: integer
 
     OutputInfo:
       type: object

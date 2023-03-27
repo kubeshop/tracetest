@@ -19,10 +19,10 @@ var _ MappedNullable = &PollingInfo{}
 
 // PollingInfo struct for PollingInfo
 type PollingInfo struct {
-	NumberSpans         *int32  `json:"numberSpans,omitempty"`
-	NumberIterations    *int32  `json:"numberIterations,omitempty"`
-	ReasonNextIteration *string `json:"reasonNextIteration,omitempty"`
-	IsComplete          *bool   `json:"isComplete,omitempty"`
+	Type                *string              `json:"type,omitempty"`
+	ReasonNextIteration *string              `json:"reasonNextIteration,omitempty"`
+	IsComplete          *bool                `json:"isComplete,omitempty"`
+	Periodic            *PollingInfoPeriodic `json:"periodic,omitempty"`
 }
 
 // NewPollingInfo instantiates a new PollingInfo object
@@ -42,68 +42,36 @@ func NewPollingInfoWithDefaults() *PollingInfo {
 	return &this
 }
 
-// GetNumberSpans returns the NumberSpans field value if set, zero value otherwise.
-func (o *PollingInfo) GetNumberSpans() int32 {
-	if o == nil || isNil(o.NumberSpans) {
-		var ret int32
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *PollingInfo) GetType() string {
+	if o == nil || isNil(o.Type) {
+		var ret string
 		return ret
 	}
-	return *o.NumberSpans
+	return *o.Type
 }
 
-// GetNumberSpansOk returns a tuple with the NumberSpans field value if set, nil otherwise
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *PollingInfo) GetNumberSpansOk() (*int32, bool) {
-	if o == nil || isNil(o.NumberSpans) {
+func (o *PollingInfo) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
-	return o.NumberSpans, true
+	return o.Type, true
 }
 
-// HasNumberSpans returns a boolean if a field has been set.
-func (o *PollingInfo) HasNumberSpans() bool {
-	if o != nil && !isNil(o.NumberSpans) {
+// HasType returns a boolean if a field has been set.
+func (o *PollingInfo) HasType() bool {
+	if o != nil && !isNil(o.Type) {
 		return true
 	}
 
 	return false
 }
 
-// SetNumberSpans gets a reference to the given int32 and assigns it to the NumberSpans field.
-func (o *PollingInfo) SetNumberSpans(v int32) {
-	o.NumberSpans = &v
-}
-
-// GetNumberIterations returns the NumberIterations field value if set, zero value otherwise.
-func (o *PollingInfo) GetNumberIterations() int32 {
-	if o == nil || isNil(o.NumberIterations) {
-		var ret int32
-		return ret
-	}
-	return *o.NumberIterations
-}
-
-// GetNumberIterationsOk returns a tuple with the NumberIterations field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *PollingInfo) GetNumberIterationsOk() (*int32, bool) {
-	if o == nil || isNil(o.NumberIterations) {
-		return nil, false
-	}
-	return o.NumberIterations, true
-}
-
-// HasNumberIterations returns a boolean if a field has been set.
-func (o *PollingInfo) HasNumberIterations() bool {
-	if o != nil && !isNil(o.NumberIterations) {
-		return true
-	}
-
-	return false
-}
-
-// SetNumberIterations gets a reference to the given int32 and assigns it to the NumberIterations field.
-func (o *PollingInfo) SetNumberIterations(v int32) {
-	o.NumberIterations = &v
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *PollingInfo) SetType(v string) {
+	o.Type = &v
 }
 
 // GetReasonNextIteration returns the ReasonNextIteration field value if set, zero value otherwise.
@@ -170,6 +138,38 @@ func (o *PollingInfo) SetIsComplete(v bool) {
 	o.IsComplete = &v
 }
 
+// GetPeriodic returns the Periodic field value if set, zero value otherwise.
+func (o *PollingInfo) GetPeriodic() PollingInfoPeriodic {
+	if o == nil || isNil(o.Periodic) {
+		var ret PollingInfoPeriodic
+		return ret
+	}
+	return *o.Periodic
+}
+
+// GetPeriodicOk returns a tuple with the Periodic field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PollingInfo) GetPeriodicOk() (*PollingInfoPeriodic, bool) {
+	if o == nil || isNil(o.Periodic) {
+		return nil, false
+	}
+	return o.Periodic, true
+}
+
+// HasPeriodic returns a boolean if a field has been set.
+func (o *PollingInfo) HasPeriodic() bool {
+	if o != nil && !isNil(o.Periodic) {
+		return true
+	}
+
+	return false
+}
+
+// SetPeriodic gets a reference to the given PollingInfoPeriodic and assigns it to the Periodic field.
+func (o *PollingInfo) SetPeriodic(v PollingInfoPeriodic) {
+	o.Periodic = &v
+}
+
 func (o PollingInfo) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -180,17 +180,17 @@ func (o PollingInfo) MarshalJSON() ([]byte, error) {
 
 func (o PollingInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.NumberSpans) {
-		toSerialize["numberSpans"] = o.NumberSpans
-	}
-	if !isNil(o.NumberIterations) {
-		toSerialize["numberIterations"] = o.NumberIterations
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
 	if !isNil(o.ReasonNextIteration) {
 		toSerialize["reasonNextIteration"] = o.ReasonNextIteration
 	}
 	if !isNil(o.IsComplete) {
 		toSerialize["isComplete"] = o.IsComplete
+	}
+	if !isNil(o.Periodic) {
+		toSerialize["periodic"] = o.Periodic
 	}
 	return toSerialize, nil
 }

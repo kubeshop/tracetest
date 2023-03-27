@@ -1788,10 +1788,14 @@ export interface external {
           outputs?: external["testEvents.yaml"]["components"]["schemas"]["OutputInfo"][];
         };
         PollingInfo: {
-          numberSpans?: number;
-          numberIterations?: number;
+          /** @enum {string} */
+          type?: "periodic";
           reasonNextIteration?: string;
           isComplete?: boolean;
+          periodic?: {
+            numberSpans?: number;
+            numberIterations?: number;
+          };
         };
         OutputInfo: {
           /** @enum {string} */
