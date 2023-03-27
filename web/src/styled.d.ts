@@ -3,6 +3,7 @@ import {CSSProperties} from 'react';
 import 'styled-components';
 
 type TNotification = {
+  color: string;
   style: CSSProperties;
 };
 
