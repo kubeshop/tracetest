@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -41,6 +42,7 @@ func NewTracePoller(
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
 	subscriptionManager *subscription.Manager,
+	eventEmitter event.Emitter,
 ) PersistentTracePoller {
 	return tracePoller{
 		updater:             updater,

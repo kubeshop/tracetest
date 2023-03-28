@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
@@ -505,6 +506,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 	tracer := getTracerMock(t)
 	testDB := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+	eventEmitter := getEventEmitterMock(t)
 
 	return executor.NewPollerExecutor(
 		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
@@ -512,6 +514,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 		updater,
 		traceDBFactory,
 		testDB,
+		eventEmitter,
 	)
 }
 
@@ -554,6 +557,20 @@ func getTracerMock(t *testing.T) trace.Tracer {
 	require.NoError(t, err)
 
 	return tracer
+}
+
+// EventEmitter
+type eventEmitterMock struct {
+}
+
+func (em *eventEmitterMock) Emit(ctx context.Context, event model.TestRunEvent) error {
+	return nil
+}
+
+func getEventEmitterMock(t *testing.T) event.Emitter {
+	t.Helper()
+
+	return &eventEmitterMock{}
 }
 
 // TraceDB
