@@ -281,3 +281,13 @@ func (m *MockRepository) GetDataStores(_ context.Context, take, skip int32, quer
 	}
 	return list, args.Error(1)
 }
+
+func (m *MockRepository) CreateTestRunEvent(_ context.Context, event model.TestRunEvent) error {
+	args := m.Called(event)
+	return args.Error(0)
+}
+
+func (m *MockRepository) GetTestRunEvents(_ context.Context, testID id.ID, runID int) ([]model.TestRunEvent, error) {
+	args := m.Called(testID, runID)
+	return args.Get(0).([]model.TestRunEvent), args.Error(1)
+}
