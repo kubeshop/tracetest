@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +27,7 @@ type DataSource interface {
 	Connect(ctx context.Context) error
 	Ready() bool
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
-	TestConnection(ctx context.Context) connection.ConnectionTestStepResult
+	TestConnection(ctx context.Context) model.ConnectionTestStep
 	Close() error
 }
 
@@ -41,8 +40,8 @@ func (db *noopDataSource) Endpoint() string                  { return "" }
 func (db *noopDataSource) Connect(ctx context.Context) error { return nil }
 func (db *noopDataSource) Close() error                      { return nil }
 func (db *noopDataSource) Ready() bool                       { return true }
-func (db *noopDataSource) TestConnection(ctx context.Context) connection.ConnectionTestStepResult {
-	return connection.ConnectionTestStepResult{}
+func (db *noopDataSource) TestConnection(ctx context.Context) model.ConnectionTestStep {
+	return model.ConnectionTestStep{}
 }
 
 func New(name string, cfg *model.BaseClientConfig, callbacks Callbacks) DataSource {

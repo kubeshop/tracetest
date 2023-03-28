@@ -6,16 +6,17 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
+	"github.com/kubeshop/tracetest/server/model"
 )
 
 type connectivityTestStep struct {
 	endpoints []string
-	protocol  Protocol
+	protocol  model.Protocol
 }
 
 var _ TestStep = &connectivityTestStep{}
 
-func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestStepResult {
+func (s *connectivityTestStep) TestConnection(_ context.Context) model.ConnectionTestStep {
 	unreachableEndpoints := make([]string, 0)
 	var connectionErr error
 	for _, endpoint := range s.endpoints {
@@ -30,29 +31,29 @@ func (s *connectivityTestStep) TestConnection(_ context.Context) ConnectionTestS
 	}
 
 	if len(s.endpoints) == 0 {
-		return ConnectionTestStepResult{
-			OperationDescription: "Tracetest tried to connect but no endpoints were provided",
-			Error:                fmt.Errorf("no endpoints provided"),
+		return model.ConnectionTestStep{
+			Message: "Tracetest tried to connect but no endpoints were provided",
+			Error:   fmt.Errorf("no endpoints provided"),
 		}
 	}
 
 	if connectionErr != nil {
 		endpoints := strings.Join(unreachableEndpoints, ", ")
-		return ConnectionTestStepResult{
-			OperationDescription: fmt.Sprintf("Tracetest tried to connect to the following endpoints and failed: %s", endpoints),
-			Status:               StatusFailed,
-			Error:                connectionErr,
+		return model.ConnectionTestStep{
+			Message: fmt.Sprintf("Tracetest tried to connect to the following endpoints and failed: %s", endpoints),
+			Status:  model.StatusFailed,
+			Error:   connectionErr,
 		}
 	}
 
 	endpoints := strings.Join(s.endpoints, ", ")
-	return ConnectionTestStepResult{
-		OperationDescription: fmt.Sprintf(`Tracetest connected to %s`, endpoints),
-		Status:               StatusPassed,
+	return model.ConnectionTestStep{
+		Message: fmt.Sprintf(`Tracetest connected to %s`, endpoints),
+		Status:  model.StatusPassed,
 	}
 }
 
-func ConnectivityStep(protocol Protocol, endpoints ...string) TestStep {
+func ConnectivityStep(protocol model.Protocol, endpoints ...string) TestStep {
 	return &connectivityTestStep{
 		endpoints: endpoints,
 		protocol:  protocol,

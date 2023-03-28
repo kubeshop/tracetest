@@ -17,20 +17,20 @@ type tracePollingTestStep struct {
 	dataStore DataStore
 }
 
-func (s *tracePollingTestStep) TestConnection(ctx context.Context) ConnectionTestStepResult {
+func (s *tracePollingTestStep) TestConnection(ctx context.Context) model.ConnectionTestStep {
 	_, err := s.dataStore.GetTraceByID(ctx, s.dataStore.GetTraceID().String())
 	if !errors.Is(err, ErrTraceNotFound) {
-		return ConnectionTestStepResult{
-			OperationDescription: "Tracetest could not get traces back from the data store",
-			Error:                err,
-			Status:               StatusFailed,
+		return model.ConnectionTestStep{
+			Message: "Tracetest could not get traces back from the data store",
+			Error:   err,
+			Status:  model.StatusFailed,
 		}
 	}
 
-	return ConnectionTestStepResult{
-		OperationDescription: "Traces were obtained successfully",
-		Error:                nil,
-		Status:               StatusPassed,
+	return model.ConnectionTestStep{
+		Message: "Traces were obtained successfully",
+		Error:   nil,
+		Status:  model.StatusPassed,
 	}
 }
 
