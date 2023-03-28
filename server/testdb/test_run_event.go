@@ -18,6 +18,7 @@ const insertTestRunEventQuery = `
 		"run_id",
 		"type",
 		"stage",
+		"title",
 		"description",
 		"created_at",
 		"data_store_connection",
@@ -28,11 +29,12 @@ const insertTestRunEventQuery = `
 		$2, -- run_id
 		$3, -- type
 		$4, -- stage
-		$5, -- description
-		$6, -- created_at
-		$7, -- data_store_connection
-		$8, -- polling
-		$9  -- outputs
+		$5, -- title
+		$6, -- description
+		$7, -- created_at
+		$8, -- data_store_connection
+		$9, -- polling
+		$10  -- outputs
 	)
 	RETURNING "id"
 `
@@ -64,6 +66,7 @@ func (td *postgresDB) CreateTestRunEvent(ctx context.Context, event model.TestRu
 		event.RunID,
 		event.Type,
 		event.Stage,
+		event.Title,
 		event.Description,
 		event.CreatedAt,
 		dataStoreConnectionJSON,
@@ -85,6 +88,7 @@ const getTestRunEventsQuery = `
 		"run_id",
 		"type",
 		"stage",
+		"title",
 		"description",
 		"created_at",
 		"data_store_connection",
@@ -123,6 +127,7 @@ func readTestRunEventFromRows(rows *sql.Rows) (model.TestRunEvent, error) {
 		&event.RunID,
 		&event.Type,
 		&event.Stage,
+		&event.Title,
 		&event.Description,
 		&event.CreatedAt,
 		&dataStoreConnectionBytes,

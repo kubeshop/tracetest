@@ -19,10 +19,10 @@ func TestRunEvents(t *testing.T) {
 	run2 := createRun(t, db, test1)
 
 	events := []model.TestRunEvent{
-		{TestID: test1.ID, RunID: run1.ID, Type: "EVENT_1", Stage: model.StageTrigger, Description: "This happened"},
-		{TestID: test1.ID, RunID: run1.ID, Type: "EVENT_2", Stage: model.StageTrigger, Description: "That happened now"},
+		{TestID: test1.ID, RunID: run1.ID, Type: "EVENT_1", Stage: model.StageTrigger, Title: "OP 1", Description: "This happened"},
+		{TestID: test1.ID, RunID: run1.ID, Type: "EVENT_2", Stage: model.StageTrigger, Title: "OP 2", Description: "That happened now"},
 
-		{TestID: test1.ID, RunID: run2.ID, Type: "EVENT_1", Stage: model.StageTrigger, Description: "That happened", DataStoreConnection: model.ConnectionResult{
+		{TestID: test1.ID, RunID: run2.ID, Type: "EVENT_1", Stage: model.StageTrigger, Title: "OP 1", Description: "That happened", DataStoreConnection: model.ConnectionResult{
 			PortCheck: model.ConnectionTestStep{
 				Passed:  true,
 				Status:  model.StatusPassed,
@@ -30,14 +30,14 @@ func TestRunEvents(t *testing.T) {
 				Error:   nil,
 			},
 		}},
-		{TestID: test1.ID, RunID: run2.ID, Type: "EVENT_2_FAILED", Stage: model.StageTrigger, Description: "That happened, but failed", Polling: model.PollingInfo{
+		{TestID: test1.ID, RunID: run2.ID, Type: "EVENT_2_FAILED", Stage: model.StageTrigger, Title: "OP 2", Description: "That happened, but failed", Polling: model.PollingInfo{
 			Type: model.PollingTypePeriodic,
 			Periodic: &model.PeriodicPollingConfig{
 				NumberSpans:      3,
 				NumberIterations: 1,
 			},
 		}},
-		{TestID: test1.ID, RunID: run2.ID, Type: "ANOTHER_EVENT", Stage: model.StageTrigger, Description: "Clean up after error", Outputs: []model.OutputInfo{
+		{TestID: test1.ID, RunID: run2.ID, Type: "ANOTHER_EVENT", Stage: model.StageTrigger, Title: "OP 3", Description: "Clean up after error", Outputs: []model.OutputInfo{
 			{LogLevel: model.LogLevelWarn, Message: "INVALID SYNTAX", OutputName: "my_output"},
 		}},
 	}
@@ -52,6 +52,8 @@ func TestRunEvents(t *testing.T) {
 
 	assert.Len(t, events, 2)
 	assert.LessOrEqual(t, events[0].CreatedAt, events[1].CreatedAt)
+	assert.Equal(t, "OP 1", events[0].Title)
+	assert.Equal(t, "OP 2", events[1].Title)
 
 	eventsFromRun2, err := db.GetTestRunEvents(context.Background(), test1.ID, run2.ID)
 	require.NoError(t, err)
@@ -60,7 +62,7 @@ func TestRunEvents(t *testing.T) {
 	assert.LessOrEqual(t, eventsFromRun2[0].CreatedAt, eventsFromRun2[1].CreatedAt)
 	assert.LessOrEqual(t, eventsFromRun2[1].CreatedAt, eventsFromRun2[2].CreatedAt)
 
-	// assert eevents from run 2 have fields that were stored as JSON
+	// assert events from run 2 have fields that were stored as JSON
 	// data store connection
 	assert.Equal(t, true, eventsFromRun2[0].DataStoreConnection.PortCheck.Passed)
 	assert.Equal(t, model.StatusPassed, eventsFromRun2[0].DataStoreConnection.PortCheck.Status)

@@ -44,6 +44,7 @@ type TestRunEvent struct {
 	ID                  int64
 	Type                string
 	Stage               TestRunEventStage
+	Title               string
 	Description         string
 	CreatedAt           time.Time
 	TestID              id.ID
