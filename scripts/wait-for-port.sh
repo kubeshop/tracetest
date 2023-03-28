@@ -1,7 +1,7 @@
 #!/bin/bash
 PORT=$1
 
-TIME_OUT=30s
+TIME_OUT=60s
 CONDITION='nc -z -w 1 localhost '$PORT' > /dev/null 2>&1'
 IF_TRUE='echo "port '$PORT' ready"'
 IF_FALSE='echo "port '$PORT' not available, retry"'
