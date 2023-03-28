@@ -6,7 +6,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -18,7 +17,7 @@ type TraceDB interface {
 	ShouldRetry() bool
 	GetTraceID() trace.TraceID
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
-	TestConnection(ctx context.Context) connection.ConnectionTestResult
+	TestConnection(ctx context.Context) model.ConnectionResult
 	Close() error
 }
 
@@ -35,8 +34,8 @@ func (db *noopTraceDB) Connect(ctx context.Context) error { return nil }
 func (db *noopTraceDB) Close() error                      { return nil }
 func (db *noopTraceDB) ShouldRetry() bool                 { return false }
 func (db *noopTraceDB) Ready() bool                       { return true }
-func (db *noopTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
-	return connection.ConnectionTestResult{}
+func (db *noopTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
+	return model.ConnectionResult{}
 }
 
 func WithFallback(fn func(ds model.DataStore) (TraceDB, error), fallbackDS model.DataStore) func(ds model.DataStore) (TraceDB, error) {

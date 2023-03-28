@@ -46,10 +46,10 @@ func (db *signalfxDB) Close() error {
 	return nil
 }
 
-func (db *signalfxDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+func (db *signalfxDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
 	tester := connection.NewTester(
-		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, url)),
+		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, url)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
