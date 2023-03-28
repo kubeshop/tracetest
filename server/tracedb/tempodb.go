@@ -45,7 +45,7 @@ func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
 	return tdb.dataSource.Connect(ctx)
 }
 
-func (ttd *tempoTraceDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
+func (ttd *tempoTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("Tempo", tempoDefaultPorts(), ttd.dataSource.Endpoint())),
 		connection.WithConnectivityTest(ttd.dataSource),

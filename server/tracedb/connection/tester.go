@@ -1,9 +1,13 @@
 package connection
 
-import "context"
+import (
+	"context"
+
+	"github.com/kubeshop/tracetest/server/model"
+)
 
 type TestStep interface {
-	TestConnection(ctx context.Context) ConnectionTestStepResult
+	TestConnection(ctx context.Context) model.ConnectionTestStep
 }
 
 type TesterOption func(*Tester)
@@ -25,30 +29,30 @@ func NewTester(opts ...TesterOption) Tester {
 	return tester
 }
 
-func (t *Tester) TestConnection(ctx context.Context) (res ConnectionTestResult) {
+func (t *Tester) TestConnection(ctx context.Context) (res model.ConnectionResult) {
 	if t.portLinterStep != nil {
-		res.EndpointLintTestResult = t.portLinterStep.TestConnection(ctx)
-		if res.EndpointLintTestResult.Error != nil {
-			res.EndpointLintTestResult.Status = StatusFailed
+		res.PortCheck = t.portLinterStep.TestConnection(ctx)
+		if res.PortCheck.Error != nil {
+			res.PortCheck.Status = model.StatusFailed
 			return
 		}
 	}
 
-	res.ConnectivityTestResult = t.connectivityTestStep.TestConnection(ctx)
-	if res.ConnectivityTestResult.Error != nil {
-		res.ConnectivityTestResult.Status = StatusFailed
+	res.Connectivity = t.connectivityTestStep.TestConnection(ctx)
+	if res.Connectivity.Error != nil {
+		res.Connectivity.Status = model.StatusFailed
 		return
 	}
 
-	res.AuthenticationTestResult = t.authenticationTestStep.TestConnection(ctx)
-	if res.AuthenticationTestResult.Error != nil {
-		res.AuthenticationTestResult.Status = StatusFailed
+	res.Authentication = t.authenticationTestStep.TestConnection(ctx)
+	if res.Authentication.Error != nil {
+		res.Authentication.Status = model.StatusFailed
 		return
 	}
 
-	res.TraceRetrievalTestResult = t.pollingTestStep.TestConnection(ctx)
-	if res.TraceRetrievalTestResult.Error != nil {
-		res.TraceRetrievalTestResult.Status = StatusFailed
+	res.FetchTraces = t.pollingTestStep.TestConnection(ctx)
+	if res.FetchTraces.Error != nil {
+		res.FetchTraces.Status = model.StatusFailed
 	}
 
 	return
