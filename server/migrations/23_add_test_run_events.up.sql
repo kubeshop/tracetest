@@ -13,4 +13,7 @@ CREATE TABLE "test_run_events" (
   "outputs" JSONB
 );
 
+CREATE INDEX test_run_event_test_id_idx ON test_run_events(test_id);
+CREATE INDEX test_run_event_run_id_idx ON test_run_events(run_id);
+
 COMMIT;
