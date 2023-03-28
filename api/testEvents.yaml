@@ -1,0 +1,63 @@
+version: 3.0.0
+components:
+  schemas:
+    TestRunEvent:
+      type: object
+      properties:
+        type:
+          type: string
+        stage:
+          type: string
+          enum:
+            - trigger
+            - trace
+            - test
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        testId:
+          type: string
+        runId:
+          type: string
+        dataStoreConnection:
+          $ref: "./config.yaml#/components/schemas/ConnectionResult"
+        polling:
+          $ref: "#/components/schemas/PollingInfo"
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutputInfo"
+
+    PollingInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - periodic
+        reasonNextIteration:
+          type: string
+        isComplete:
+          type: boolean
+        periodic:
+          type: object
+          properties:
+            numberSpans:
+              type: integer
+            numberIterations:
+              type: integer
+
+    OutputInfo:
+      type: object
+      properties:
+        logLevel:
+          type: string
+          enum:
+            - warning
+            - error
+        message:
+          type: string
+        outputName:
+          type: string

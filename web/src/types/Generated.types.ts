@@ -106,6 +106,14 @@ export interface paths {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
   };
+  "/test/{testId}/run/{runId}/stop": {
+    /** stops the execution of a test run */
+    post: operations["stopTestRun"];
+  };
+  "/tests/{testId}/run/{runId}/events": {
+    /** get events from a test run */
+    get: operations["getTestRunEvents"];
+  };
   "/environments": {
     /** Get Environments */
     get: operations["getEnvironments"];
@@ -786,6 +794,38 @@ export interface operations {
       200: {
         content: {
           "application/yaml": string;
+        };
+      };
+    };
+  };
+  /** stops the execution of a test run */
+  stopTestRun: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: unknown;
+      /** could not stop execution, probably it's not running anymore */
+      422: unknown;
+    };
+  };
+  /** get events from a test run */
+  getTestRunEvents: {
+    parameters: {
+      path: {
+        testId: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["testEvents.yaml"]["components"]["schemas"]["TestRunEvent"][];
         };
       };
     };
@@ -1744,6 +1784,43 @@ export interface external {
         Resource: {
           type: string;
           item: unknown;
+        };
+      };
+    };
+    operations: {};
+  };
+  "testEvents.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        TestRunEvent: {
+          type?: string;
+          /** @enum {string} */
+          stage?: "trigger" | "trace" | "test";
+          description?: string;
+          /** Format: date-time */
+          createdAt?: string;
+          testId?: string;
+          runId?: string;
+          dataStoreConnection?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"];
+          polling?: external["testEvents.yaml"]["components"]["schemas"]["PollingInfo"];
+          outputs?: external["testEvents.yaml"]["components"]["schemas"]["OutputInfo"][];
+        };
+        PollingInfo: {
+          /** @enum {string} */
+          type?: "periodic";
+          reasonNextIteration?: string;
+          isComplete?: boolean;
+          periodic?: {
+            numberSpans?: number;
+            numberIterations?: number;
+          };
+        };
+        OutputInfo: {
+          /** @enum {string} */
+          logLevel?: "warning" | "error";
+          message?: string;
+          outputName?: string;
         };
       };
     };
