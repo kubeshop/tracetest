@@ -54,25 +54,25 @@ func (client *GrpcClient) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (client *GrpcClient) TestConnection(ctx context.Context) model.ConnectionTestStep {
-	connectionTestResult := model.ConnectionTestStep{
-		Message: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.Endpoint),
+func (client *GrpcClient) TestConnection(ctx context.Context) connection.ConnectionTestStepResult {
+	connectionTestResult := connection.ConnectionTestStepResult{
+		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.Endpoint),
 	}
 
-	err := connection.CheckReachability(client.config.Endpoint, model.ProtocolGRPC)
+	err := connection.CheckReachability(client.config.Endpoint, connection.ProtocolGRPC)
 	if err != nil {
-		return model.ConnectionTestStep{
-			Message: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.Endpoint),
-			Error:   err,
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.Endpoint),
+			Error:                err,
 		}
 	}
 
 	err = client.Connect(ctx)
 	wrappedErr := errors.Unwrap(err)
 	if errors.Is(wrappedErr, connection.ErrConnectionFailed) {
-		return model.ConnectionTestStep{
-			Message: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, client.config.Endpoint),
-			Error:   err,
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to open a gRPC connection against "%s" and failed`, client.config.Endpoint),
+			Error:                err,
 		}
 	}
 

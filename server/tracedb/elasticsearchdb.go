@@ -38,10 +38,10 @@ func (db *elasticsearchDB) Close() error {
 	return nil
 }
 
-func (db *elasticsearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
+func (db *elasticsearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("ElasticSearch", elasticSearchDefaultPorts(), db.config.Addresses...)),
-		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, db.config.Addresses...)),
+		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := getClusterInfo(db.client)

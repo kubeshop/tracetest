@@ -36,10 +36,10 @@ func (db *opensearchDB) Close() error {
 	return nil
 }
 
-func (db *opensearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
+func (db *opensearchDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("OpenSearch", opensearchDefaultPorts(), db.config.Addresses...)),
-		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, db.config.Addresses...)),
+		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, db.config.Addresses...)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())

@@ -71,25 +71,25 @@ func (client *HttpClient) Connect(ctx context.Context) error {
 	return err
 }
 
-func (client *HttpClient) TestConnection(ctx context.Context) model.ConnectionTestStep {
-	connectionTestResult := model.ConnectionTestStep{
-		Message: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.URL.String()),
+func (client *HttpClient) TestConnection(ctx context.Context) connection.ConnectionTestStepResult {
+	connectionTestResult := connection.ConnectionTestStepResult{
+		OperationDescription: fmt.Sprintf(`Tracetest connected to "%s"`, client.config.URL.String()),
 	}
 
-	err := connection.CheckReachability(client.config.URL.String(), model.ProtocolHTTP)
+	err := connection.CheckReachability(client.config.URL.String(), connection.ProtocolHTTP)
 	if err != nil {
-		return model.ConnectionTestStep{
-			Message: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.URL.String()),
-			Error:   err,
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to connect to "%s" and failed`, client.config.URL.String()),
+			Error:                err,
 		}
 	}
 
 	err = client.Connect(ctx)
 	wrappedErr := errors.Unwrap(err)
 	if errors.Is(wrappedErr, connection.ErrConnectionFailed) {
-		return model.ConnectionTestStep{
-			Message: fmt.Sprintf(`Tracetest tried to open a connection against "%s" and failed`, client.config.URL.String()),
-			Error:   err,
+		return connection.ConnectionTestStepResult{
+			OperationDescription: fmt.Sprintf(`Tracetest tried to open a connection against "%s" and failed`, client.config.URL.String()),
+			Error:                err,
 		}
 	}
 

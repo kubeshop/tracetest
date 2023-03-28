@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,37 +13,37 @@ func TestPortLinter(t *testing.T) {
 		Name           string
 		Endpoints      []string
 		ExpectedPorts  []string
-		ExpectedStatus model.Status
+		ExpectedStatus connection.Status
 	}{
 		{
 			Name:           "shouldSucceedIfPortIsExpected",
 			Endpoints:      []string{"jaeger:16685"},
 			ExpectedPorts:  []string{"16685"},
-			ExpectedStatus: model.StatusPassed,
+			ExpectedStatus: connection.StatusPassed,
 		},
 		{
 			Name:           "shouldShowWarningInCaseOfDifferentPort",
 			Endpoints:      []string{"jaeger:16686"},
 			ExpectedPorts:  []string{"16685"},
-			ExpectedStatus: model.StatusWarning,
+			ExpectedStatus: connection.StatusWarning,
 		},
 		{
 			Name:           "shouldSupportSchemas",
 			Endpoints:      []string{"https://us2.endpoint:9200"},
 			ExpectedPorts:  []string{"9200"},
-			ExpectedStatus: model.StatusPassed,
+			ExpectedStatus: connection.StatusPassed,
 		},
 		{
 			Name:           "shouldSupportTwoPorts",
 			Endpoints:      []string{"https://us2.endpoint:9100"},
 			ExpectedPorts:  []string{"9200", "9250"},
-			ExpectedStatus: model.StatusWarning,
+			ExpectedStatus: connection.StatusWarning,
 		},
 		{
 			Name:           "shouldSupportTwoPorts",
 			Endpoints:      []string{"https://us2.endpoint:9100"},
 			ExpectedPorts:  []string{"9200", "9250", "9300"},
-			ExpectedStatus: model.StatusWarning,
+			ExpectedStatus: connection.StatusWarning,
 		},
 	}
 

@@ -87,10 +87,10 @@ func (db *awsxrayDB) Close() error {
 	return nil
 }
 
-func (db *awsxrayDB) TestConnection(ctx context.Context) model.ConnectionResult {
+func (db *awsxrayDB) TestConnection(ctx context.Context) connection.ConnectionTestResult {
 	url := fmt.Sprintf("xray.%s.amazonaws.com:443", db.region)
 	tester := connection.NewTester(
-		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, url)),
+		connection.WithConnectivityTest(connection.ConnectivityStep(connection.ProtocolHTTP, url)),
 		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := db.GetTraceByID(ctx, db.GetTraceID().String())

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-
-	"github.com/kubeshop/tracetest/server/model"
 )
 
 type portLinter struct {
@@ -25,22 +23,22 @@ func PortLinter(dataStoreName string, expectedPorts []string, endpoints ...strin
 	}
 }
 
-func (s *portLinter) TestConnection(ctx context.Context) model.ConnectionTestStep {
+func (s *portLinter) TestConnection(ctx context.Context) ConnectionTestStepResult {
 	for _, endpoint := range s.endpoints {
 		port := parsePort(endpoint)
 
 		if !sliceContains(s.expectedPorts, port) {
 			suggestedPorts := formatAvailablePortsMessage(s.expectedPorts)
-			return model.ConnectionTestStep{
-				Message: fmt.Sprintf(`For %s, port "%s" is not the default port for accessing traces programmatically. Typically, %s uses port %s. If you continue experiencing issues, you may want to verify the correct port to specify.`, s.dataStoreName, port, s.dataStoreName, suggestedPorts),
-				Status:  model.StatusWarning,
+			return ConnectionTestStepResult{
+				OperationDescription: fmt.Sprintf(`For %s, port "%s" is not the default port for accessing traces programmatically. Typically, %s uses port %s. If you continue experiencing issues, you may want to verify the correct port to specify.`, s.dataStoreName, port, s.dataStoreName, suggestedPorts),
+				Status:               StatusWarning,
 			}
 		}
 	}
 
-	return model.ConnectionTestStep{
-		Message: `You are using a commonly used port`,
-		Status:  model.StatusPassed,
+	return ConnectionTestStepResult{
+		OperationDescription: `You are using a commonly used port`,
+		Status:               StatusPassed,
 	}
 }
 

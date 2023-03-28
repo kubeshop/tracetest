@@ -1,41 +1,41 @@
 package mappings
 
 import (
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 )
 
-func (m *OpenAPI) ConnectionTestResult(in model.ConnectionResult) openapi.ConnectionResult {
+func (m *OpenAPI) ConnectionTestResult(in connection.ConnectionTestResult) openapi.ConnectionResult {
 	result := openapi.ConnectionResult{}
 
-	if in.PortCheck.IsSet() {
-		result.PortCheck = m.ConnectionTestStep(in.PortCheck)
+	if in.EndpointLintTestResult.IsSet() {
+		result.PortCheck = m.ConnectionTestStep(in.EndpointLintTestResult)
 	}
 
-	if in.Connectivity.IsSet() {
-		result.Connectivity = m.ConnectionTestStep(in.Connectivity)
+	if in.ConnectivityTestResult.IsSet() {
+		result.Connectivity = m.ConnectionTestStep(in.ConnectivityTestResult)
 	}
 
-	if in.Authentication.IsSet() {
-		result.Authentication = m.ConnectionTestStep(in.Authentication)
+	if in.AuthenticationTestResult.IsSet() {
+		result.Authentication = m.ConnectionTestStep(in.AuthenticationTestResult)
 	}
 
-	if in.FetchTraces.IsSet() {
-		result.FetchTraces = m.ConnectionTestStep(in.FetchTraces)
+	if in.TraceRetrievalTestResult.IsSet() {
+		result.FetchTraces = m.ConnectionTestStep(in.TraceRetrievalTestResult)
 	}
 
 	return result
 }
 
-func (m *OpenAPI) ConnectionTestStep(in model.ConnectionTestStep) openapi.ConnectionTestStep {
+func (m *OpenAPI) ConnectionTestStep(in connection.ConnectionTestStepResult) openapi.ConnectionTestStep {
 	errMessage := ""
 	if in.Error != nil {
 		errMessage = in.Error.Error()
 	}
 
 	return openapi.ConnectionTestStep{
-		Passed:  in.Status != model.StatusFailed,
-		Message: in.Message,
+		Passed:  in.Status != connection.StatusFailed,
+		Message: in.OperationDescription,
 		Status:  string(in.Status),
 		Error:   errMessage,
 	}

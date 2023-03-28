@@ -7,11 +7,32 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/kubeshop/tracetest/server/model"
 )
 
 const reachabilityTimeout = 5 * time.Second
+
+type (
+	Protocol string
+	Status   string
+)
+
+var (
+	ProtocolHTTP Protocol = "http"
+	ProtocolGRPC Protocol = "grpc"
+)
+
+var (
+	StatusPassed  Status = "passed"
+	StatusWarning Status = "warning"
+	StatusFailed  Status = "failed"
+)
+
+type ConnectionTestResult struct {
+	EndpointLintTestResult   ConnectionTestStepResult
+	ConnectivityTestResult   ConnectionTestStepResult
+	AuthenticationTestResult ConnectionTestStepResult
+	TraceRetrievalTestResult ConnectionTestStepResult
+}
 
 var (
 	ErrTraceNotFound        = errors.New("trace not found")
@@ -19,8 +40,26 @@ var (
 	ErrConnectionFailed     = errors.New("could not connect to data store")
 )
 
-func CheckReachability(endpoint string, protocol model.Protocol) error {
-	if protocol == model.ProtocolHTTP {
+func (c ConnectionTestResult) HasSucceed() bool {
+	return c.AuthenticationTestResult.HasSucceed() && c.ConnectivityTestResult.HasSucceed() && c.TraceRetrievalTestResult.HasSucceed()
+}
+
+type ConnectionTestStepResult struct {
+	OperationDescription string
+	Status               Status
+	Error                error
+}
+
+func (r ConnectionTestStepResult) HasSucceed() bool {
+	return r.Error == nil
+}
+
+func (r ConnectionTestStepResult) IsSet() bool {
+	return r.OperationDescription != ""
+}
+
+func CheckReachability(endpoint string, protocol Protocol) error {
+	if protocol == ProtocolHTTP {
 		address, err := url.Parse(endpoint)
 		if err != nil {
 			return err

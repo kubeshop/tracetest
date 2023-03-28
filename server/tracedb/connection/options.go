@@ -1,10 +1,6 @@
 package connection
 
-import (
-	"context"
-
-	"github.com/kubeshop/tracetest/server/model"
-)
+import "context"
 
 func WithPortLintingTest(step TestStep) TesterOption {
 	return func(t *Tester) {
@@ -34,11 +30,11 @@ type functionTestStep struct {
 	fn func(ctx context.Context) (string, error)
 }
 
-func (s *functionTestStep) TestConnection(ctx context.Context) model.ConnectionTestStep {
+func (s *functionTestStep) TestConnection(ctx context.Context) ConnectionTestStepResult {
 	str, err := s.fn(ctx)
-	return model.ConnectionTestStep{
-		Message: str,
-		Error:   err,
+	return ConnectionTestStepResult{
+		OperationDescription: str,
+		Error:                err,
 	}
 }
 
