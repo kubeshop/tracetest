@@ -70,6 +70,11 @@ type DataStoreRepository interface {
 	DataStoreIDExists(context.Context, string) (bool, error)
 }
 
+type TestRunEventRepository interface {
+	CreateTestRunEvent(context.Context, TestRunEvent) error
+	GetTestRunEvents(context.Context, id.ID, int) ([]TestRunEvent, error)
+}
+
 type Repository interface {
 	TestRepository
 	RunRepository
@@ -79,6 +84,8 @@ type Repository interface {
 	TransactionRunRepository
 
 	DataStoreRepository
+
+	TestRunEventRepository
 
 	ServerID() (id string, isNew bool, _ error)
 	Close() error

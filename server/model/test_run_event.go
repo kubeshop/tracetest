@@ -1,10 +1,17 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/kubeshop/tracetest/server/id"
+)
 
 type (
-	Protocol string
-	Status   string
+	Protocol          string
+	Status            string
+	TestRunEventStage string
+	PollingType       string
+	LogLevel          string
 )
 
 var (
@@ -18,32 +25,48 @@ var (
 	StatusFailed  Status = "failed"
 )
 
+var (
+	LogLevelWarn  LogLevel = "warning"
+	LogLevelError LogLevel = "error"
+)
+
+var (
+	StageTrigger TestRunEventStage = "trigger"
+	StageTrace   TestRunEventStage = "trace"
+	StageTest    TestRunEventStage = "test"
+)
+
+var (
+	PollingTypePeriodic PollingType = "periodic"
+)
+
 type TestRunEvent struct {
+	ID                  int64
 	Type                string
-	Stage               string
+	Stage               TestRunEventStage
 	Description         string
 	CreatedAt           time.Time
-	TestId              string
-	RunId               string
+	TestID              id.ID
+	RunID               int
 	DataStoreConnection ConnectionResult
 	Polling             PollingInfo
 	Outputs             []OutputInfo
 }
 
 type PollingInfo struct {
-	Type                string
+	Type                PollingType
 	ReasonNextIteration string
 	IsComplete          bool
 	Periodic            *PeriodicPollingConfig
 }
 
 type PeriodicPollingConfig struct {
-	NumberSpans      int32
-	NumberIterations int32
+	NumberSpans      int
+	NumberIterations int
 }
 
 type OutputInfo struct {
-	LogLevel   string
+	LogLevel   LogLevel
 	Message    string
 	OutputName string
 }
