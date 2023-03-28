@@ -22,6 +22,7 @@ var _ MappedNullable = &TestRunEvent{}
 type TestRunEvent struct {
 	Type                *string           `json:"type,omitempty"`
 	Stage               *string           `json:"stage,omitempty"`
+	Title               *string           `json:"title,omitempty"`
 	Description         *string           `json:"description,omitempty"`
 	CreatedAt           *time.Time        `json:"createdAt,omitempty"`
 	TestId              *string           `json:"testId,omitempty"`
@@ -110,6 +111,38 @@ func (o *TestRunEvent) HasStage() bool {
 // SetStage gets a reference to the given string and assigns it to the Stage field.
 func (o *TestRunEvent) SetStage(v string) {
 	o.Stage = &v
+}
+
+// GetTitle returns the Title field value if set, zero value otherwise.
+func (o *TestRunEvent) GetTitle() string {
+	if o == nil || isNil(o.Title) {
+		var ret string
+		return ret
+	}
+	return *o.Title
+}
+
+// GetTitleOk returns a tuple with the Title field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRunEvent) GetTitleOk() (*string, bool) {
+	if o == nil || isNil(o.Title) {
+		return nil, false
+	}
+	return o.Title, true
+}
+
+// HasTitle returns a boolean if a field has been set.
+func (o *TestRunEvent) HasTitle() bool {
+	if o != nil && !isNil(o.Title) {
+		return true
+	}
+
+	return false
+}
+
+// SetTitle gets a reference to the given string and assigns it to the Title field.
+func (o *TestRunEvent) SetTitle(v string) {
+	o.Title = &v
 }
 
 // GetDescription returns the Description field value if set, zero value otherwise.
@@ -351,6 +384,9 @@ func (o TestRunEvent) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Stage) {
 		toSerialize["stage"] = o.Stage
+	}
+	if !isNil(o.Title) {
+		toSerialize["title"] = o.Title
 	}
 	if !isNil(o.Description) {
 		toSerialize["description"] = o.Description
