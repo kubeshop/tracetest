@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -16,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
-	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
@@ -142,15 +140,15 @@ func (app *App) Start(opts ...appOption) error {
 		testdb.WithDB(db),
 	)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
 
 	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	tracer, err := tracing.NewTracer(ctx, app.cfg)
 	if err != nil {
@@ -319,68 +317,6 @@ func registerDemosResource(repository *demoresource.Repository, router *mux.Rout
 	)
 	manager.RegisterRoutes(router)
 	provisioner.AddResourceProvisioner(manager)
-}
-
-type facadeConfig interface {
-	PoolingRetryDelay() time.Duration
-	PoolingMaxWaitTimeForTraceDuration() time.Duration
-}
-
-func newRunnerFacades(
-	ppRepo *pollingprofile.Repository,
-	testDB model.Repository,
-	appTracer trace.Tracer,
-	tracer trace.Tracer,
-	subscriptionManager *subscription.Manager,
-	triggerRegistry *trigger.Registry,
-) *runnerFacade {
-
-	execTestUpdater := (executor.CompositeUpdater{}).
-		Add(executor.NewDBUpdater(testDB)).
-		Add(executor.NewSubscriptionUpdater(subscriptionManager))
-
-	assertionRunner := executor.NewAssertionRunner(
-		execTestUpdater,
-		executor.NewAssertionExecutor(tracer),
-		executor.InstrumentedOutputProcessor(tracer),
-		subscriptionManager,
-	)
-
-	pollerExecutor := executor.NewPollerExecutor(
-		ppRepo,
-		tracer,
-		execTestUpdater,
-		tracedb.Factory(testDB),
-		testDB,
-	)
-
-	tracePoller := executor.NewTracePoller(
-		pollerExecutor,
-		ppRepo,
-		execTestUpdater,
-		assertionRunner,
-		subscriptionManager,
-	)
-
-	runner := executor.NewPersistentRunner(
-		triggerRegistry,
-		testDB,
-		execTestUpdater,
-		tracePoller,
-		tracer,
-		subscriptionManager,
-		tracedb.Factory(testDB),
-		testDB,
-	)
-
-	transactionRunner := executor.NewTransactionRunner(runner, testDB, subscriptionManager)
-
-	return &runnerFacade{
-		runner:            runner,
-		transactionRunner: transactionRunner,
-		assertionRunner:   assertionRunner,
-		tracePoller:       tracePoller,
-	}
 }
 
 func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {

@@ -46,6 +46,7 @@ func NewAssertionRunner(
 	assertionExecutor AssertionExecutor,
 	op OutputsProcessorFn,
 	subscriptionManager *subscription.Manager,
+	eventEmitter EventEmitter,
 ) AssertionRunner {
 	return &defaultAssertionRunner{
 		outputsProcessor:    op,
