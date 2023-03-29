@@ -12,6 +12,8 @@ components:
             - trigger
             - trace
             - test
+        title:
+          type: string
         description:
           type: string
         createdAt:

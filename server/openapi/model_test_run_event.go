@@ -18,6 +18,8 @@ type TestRunEvent struct {
 
 	Stage string `json:"stage,omitempty"`
 
+	Title string `json:"title,omitempty"`
+
 	Description string `json:"description,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`

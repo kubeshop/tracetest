@@ -1797,6 +1797,7 @@ export interface external {
           type?: string;
           /** @enum {string} */
           stage?: "trigger" | "trace" | "test";
+          title?: string;
           description?: string;
           /** Format: date-time */
           createdAt?: string;
