@@ -140,6 +140,10 @@ const config = {
             from: ['/cli/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
+            to: '/cli/configuring-your-cli/',
+            from: ['/cli/command-line-tool' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
             to: '/ci-cd-automation/github-actions-pipeline',
             from: ['/ci-cd-automation/ci-cd-best-practices' /*, '/docs/legacyDocFrom2016'*/],
           },
