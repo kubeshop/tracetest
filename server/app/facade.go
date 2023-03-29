@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
@@ -40,7 +39,7 @@ func newRunnerFacades(
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
 ) *runnerFacade {
-	eventEmitter := event.NewEmitter(testDB, subscriptionManager)
+	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 
 	execTestUpdater := (executor.CompositeUpdater{}).
 		Add(executor.NewDBUpdater(testDB)).

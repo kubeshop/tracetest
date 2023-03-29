@@ -1,4 +1,4 @@
-package event
+package executor
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type Emitter interface {
+type EventEmitter interface {
 	Emit(ctx context.Context, event model.TestRunEvent) error
 }
 
@@ -14,19 +14,19 @@ type publisher interface {
 	Publish(eventID string, message any)
 }
 
-type internalEmitter struct {
+type internalEventEmitter struct {
 	repository model.TestRunEventRepository
 	publisher  publisher
 }
 
-func NewEmitter(repository model.TestRunEventRepository, publisher publisher) Emitter {
-	return &internalEmitter{
+func NewEventEmitter(repository model.TestRunEventRepository, publisher publisher) EventEmitter {
+	return &internalEventEmitter{
 		repository: repository,
 		publisher:  publisher,
 	}
 }
 
-func (em *internalEmitter) Emit(ctx context.Context, event model.TestRunEvent) error {
+func (em *internalEventEmitter) Emit(ctx context.Context, event model.TestRunEvent) error {
 	err := em.repository.CreateTestRunEvent(ctx, event)
 	if err != nil {
 		return err

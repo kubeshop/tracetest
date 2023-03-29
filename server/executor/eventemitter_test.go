@@ -1,11 +1,11 @@
-package event_test
+package executor_test
 
 import (
 	"context"
 	"errors"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/executor/event"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -39,7 +39,7 @@ func TestEventEmitter_SuccessfulScenario(t *testing.T) {
 	repository := getTestRunEventRepositoryMock(t, false)
 	subscriptionManager, subscriber := getSubscriptionManagerMock(t, testRunEvent)
 
-	eventEmitter := event.NewEmitter(repository, subscriptionManager)
+	eventEmitter := executor.NewEventEmitter(repository, subscriptionManager)
 
 	err := eventEmitter.Emit(context.Background(), testRunEvent)
 	require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestEventEmitter_FailedScenario(t *testing.T) {
 	repository := getTestRunEventRepositoryMock(t, true)
 	subscriptionManager, subscriber := getSubscriptionManagerMock(t, testRunEvent)
 
-	eventEmitter := event.NewEmitter(repository, subscriptionManager)
+	eventEmitter := executor.NewEventEmitter(repository, subscriptionManager)
 
 	err := eventEmitter.Emit(context.Background(), testRunEvent)
 	require.Error(t, err)

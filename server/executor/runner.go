@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -38,7 +37,7 @@ func NewPersistentRunner(
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
-	eventEmitter event.Emitter,
+	eventEmitter EventEmitter,
 ) PersistentRunner {
 	return persistentRunner{
 		triggers:            triggers,

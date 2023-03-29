@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
@@ -60,7 +59,7 @@ func NewPollerExecutor(
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
-	eventEmitter event.Emitter,
+	eventEmitter EventEmitter,
 ) PollerExecutor {
 
 	pollerExecutor := &DefaultPollerExecutor{

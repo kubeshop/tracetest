@@ -7,7 +7,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
@@ -567,7 +566,7 @@ func (em *eventEmitterMock) Emit(ctx context.Context, event model.TestRunEvent) 
 	return nil
 }
 
-func getEventEmitterMock(t *testing.T) event.Emitter {
+func getEventEmitterMock(t *testing.T) *eventEmitterMock {
 	t.Helper()
 
 	return &eventEmitterMock{}

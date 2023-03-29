@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/executor/event"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -47,7 +46,7 @@ func NewAssertionRunner(
 	assertionExecutor AssertionExecutor,
 	op OutputsProcessorFn,
 	subscriptionManager *subscription.Manager,
-	eventEmitter event.Emitter,
+	eventEmitter EventEmitter,
 ) AssertionRunner {
 	return &defaultAssertionRunner{
 		outputsProcessor:    op,
