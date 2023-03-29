@@ -818,7 +818,7 @@ export interface operations {
     parameters: {
       path: {
         testId: string;
-        runId: string;
+        runId: number;
       };
     };
     responses: {
@@ -1802,7 +1802,7 @@ export interface external {
           /** Format: date-time */
           createdAt?: string;
           testId?: string;
-          runId?: string;
+          runId?: number;
           dataStoreConnection?: external["config.yaml"]["components"]["schemas"]["ConnectionResult"];
           polling?: external["testEvents.yaml"]["components"]["schemas"]["PollingInfo"];
           outputs?: external["testEvents.yaml"]["components"]["schemas"]["OutputInfo"][];

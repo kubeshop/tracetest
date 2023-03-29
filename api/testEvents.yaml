@@ -22,7 +22,7 @@ components:
         testId:
           type: string
         runId:
-          type: string
+          type: integer
         dataStoreConnection:
           $ref: "./config.yaml#/components/schemas/ConnectionResult"
         polling:

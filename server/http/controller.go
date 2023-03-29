@@ -184,8 +184,13 @@ func (c *controller) GetTestRun(ctx context.Context, testID, runID string) (open
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
-func (*controller) GetTestRunEvents(context.Context, string, string) (openapi.ImplResponse, error) {
-	return openapi.Response(http.StatusOK, []openapi.TestRunEvent{}), nil
+func (c *controller) GetTestRunEvents(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	events, err := c.testDB.GetTestRunEvents(ctx, id.ID(testID), int(runID))
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, nil), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.TestRunEvents(events)), nil
 }
 
 func (c *controller) DeleteTestRun(ctx context.Context, testID, runID string) (openapi.ImplResponse, error) {
