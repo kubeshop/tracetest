@@ -863,7 +863,7 @@ paths:
         - in: path
           name: runId
           schema:
-            type: string
+            type: integer
           required: true
       summary: "get events from a test run"
       description: "get events from a test run"

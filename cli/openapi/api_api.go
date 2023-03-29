@@ -2742,7 +2742,7 @@ type ApiGetTestRunEventsRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
 	testId     string
-	runId      string
+	runId      int32
 }
 
 func (r ApiGetTestRunEventsRequest) Execute() ([]TestRunEvent, *http.Response, error) {
@@ -2759,7 +2759,7 @@ get events from a test run
  @param runId
  @return ApiGetTestRunEventsRequest
 */
-func (a *ApiApiService) GetTestRunEvents(ctx context.Context, testId string, runId string) ApiGetTestRunEventsRequest {
+func (a *ApiApiService) GetTestRunEvents(ctx context.Context, testId string, runId int32) ApiGetTestRunEventsRequest {
 	return ApiGetTestRunEventsRequest{
 		ApiService: a,
 		ctx:        ctx,
