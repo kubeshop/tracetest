@@ -146,11 +146,9 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)
 
-	eventEmitter := getEventEmitterMock(t)
-
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer, subscription.NewManager(), tracedb.Factory(&testDB), &testDB, eventEmitter),
+		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer, subscription.NewManager(), tracedb.Factory(&testDB), &testDB),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,
