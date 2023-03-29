@@ -199,7 +199,6 @@ func (app *App) Start(opts ...appOption) error {
 	// worker count. should be configurable
 	rf.tracePoller.Start(5)
 	rf.runner.Start(5)
-	rf.runner.Start(5)
 	rf.transactionRunner.Start(5)
 	rf.assertionRunner.Start(5)
 

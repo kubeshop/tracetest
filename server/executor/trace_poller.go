@@ -41,7 +41,6 @@ func NewTracePoller(
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
 	subscriptionManager *subscription.Manager,
-	eventEmitter EventEmitter,
 ) PersistentTracePoller {
 	return tracePoller{
 		updater:             updater,

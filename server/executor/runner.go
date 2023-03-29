@@ -37,7 +37,6 @@ func NewPersistentRunner(
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
-	eventEmitter EventEmitter,
 ) PersistentRunner {
 	return persistentRunner{
 		triggers:            triggers,

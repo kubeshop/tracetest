@@ -59,7 +59,6 @@ func NewPollerExecutor(
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
-	eventEmitter EventEmitter,
 ) PollerExecutor {
 
 	pollerExecutor := &DefaultPollerExecutor{
