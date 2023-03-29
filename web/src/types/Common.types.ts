@@ -11,8 +11,6 @@ export interface IEnv {
   segmentLoaded: boolean;
 }
 
-export type Modify<T, R> = Omit<T, keyof R> & R;
-
 export interface IMockFactory<T, R> {
   (): {
     raw(data?: Partial<R>): R;
@@ -33,7 +31,10 @@ export type TResourceSchemas = external['resources.yaml']['components']['schemas
 export type TDataStoreSchemas = external['dataStores.yaml']['components']['schemas'];
 export type TConfigSchemas = external['config.yaml']['components']['schemas'];
 export type TVariablesSchemas = external['variables.yaml']['components']['schemas'];
+export type TTestEventsSchemas = external['testEvents.yaml']['components']['schemas'];
 
 export type TSelector = TTestSchemas['Selector'];
+
+export type Modify<T, R> = Omit<T, keyof R> & R;
 
 export type Model<T, R> = Modify<Required<T>, R>;

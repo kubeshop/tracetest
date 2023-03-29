@@ -1,19 +1,21 @@
 import EditTest from 'components/EditTest';
-import FailedTrace from 'components/FailedTrace';
 import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse/RunDetailTriggerResponseFactory';
+import RunEvents from 'components/RunEvents';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
+import TestRunEvent, {TestRunStage} from 'models/TestRunEvent.model';
 import * as S from './RunDetailTrigger.styled';
 
 interface IProps {
   test: Test;
   run: TestRun;
+  runEvents: TestRunEvent[];
   isError: boolean;
 }
 
-const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, run, isError}: IProps) => {
+const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, runEvents, isError}: IProps) => {
   const shouldDisplayError = isError || state === TestState.FAILED;
 
   return (
@@ -23,7 +25,7 @@ const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, run, 
       </S.SectionLeft>
       <S.SectionRight>
         {shouldDisplayError ? (
-          <FailedTrace isDisplayingError={shouldDisplayError} run={run} />
+          <RunEvents events={runEvents} stage={TestRunStage.Trigger} />
         ) : (
           <RunDetailTriggerResponseFactory
             state={state}
