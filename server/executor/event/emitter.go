@@ -2,7 +2,6 @@ package event
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
 )
@@ -33,8 +32,7 @@ func (em *internalEmitter) Emit(ctx context.Context, event model.TestRunEvent) e
 		return err
 	}
 
-	eventIDAsString := fmt.Sprintf("%d", event.ID)
-	em.publisher.Publish(eventIDAsString, event)
+	em.publisher.Publish(event.ResourceID(), event)
 
 	return nil
 }
