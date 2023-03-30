@@ -141,6 +141,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 
 	outputs, err := e.outputsProcessor(ctx, req.Test.Outputs, *run.Trace, ds)
 	if err != nil {
+		// handle output problem
 		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
 	}
 
