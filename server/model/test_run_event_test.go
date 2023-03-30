@@ -23,7 +23,7 @@ func TestNewTestRunEvent_CorrectEvent(t *testing.T) {
 	testID := id.NewRandGenerator().ID()
 	runID := 1
 
-	event := model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_START", testID, runID)
+	event := model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunStart, testID, runID)
 
 	assert.NotEqual(t, event.ID, 0)
 	assert.LessOrEqual(t, event.CreatedAt, time.Now())
@@ -39,7 +39,7 @@ func TestNewTestRunEventWithArgs_CorrectEvent(t *testing.T) {
 	testID := id.NewRandGenerator().ID()
 	runID := 1
 
-	event := model.NewTestRunEventWithArgs(model.StageTrace, "POLLING_ITERATION_INFO", testID, runID, map[string]string{
+	event := model.NewTestRunEventWithArgs(model.StageTrace, model.TraceEventType_PollingIterationInfo, testID, runID, map[string]string{
 		"NUMBER_OF_SPANS":  "3",
 		"ITERATION_NUMBER": "2",
 		"ITERATION_REASON": "More spans found",
@@ -58,11 +58,11 @@ func TestNewTestRunEvent_BaseEventImmutable(t *testing.T) {
 	testID := id.NewRandGenerator().ID()
 	runID := 1
 
-	event := model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_START", testID, runID)
+	event := model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunStart, testID, runID)
 	event.Title = "some title"
 	event.Description = "some description"
 
-	anotherEvent := model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_START", testID, runID)
+	anotherEvent := model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunStart, testID, runID)
 
 	assert.NotEqual(t, event.Title, anotherEvent.Title)
 	assert.NotEqual(t, event.Description, anotherEvent.Description)
@@ -79,4 +79,12 @@ func TestNewTestRunEvent_EventNotFound(t *testing.T) {
 	assert.Empty(t, event.RunID)
 	assert.Empty(t, event.Title)
 	assert.Empty(t, event.Description)
+
+	anotherEvent := model.NewTestRunEvent("MY_UNKNOWN_STAGE", "MY_UNKNOWN_TYPE", testID, runID)
+
+	assert.Empty(t, anotherEvent.ID)
+	assert.Empty(t, anotherEvent.TestID.String())
+	assert.Empty(t, anotherEvent.RunID)
+	assert.Empty(t, anotherEvent.Title)
+	assert.Empty(t, anotherEvent.Description)
 }

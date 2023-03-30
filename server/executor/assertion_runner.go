@@ -106,12 +106,12 @@ func (e *defaultAssertionRunner) startWorker() {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
 	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
-	e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_START", request.Test.ID, request.Run.ID))
+	e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunStart, request.Test.ID, request.Run.ID))
 
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
-		e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_ERROR", request.Test.ID, request.Run.ID))
+		e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunError, request.Test.ID, request.Run.ID))
 		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
 	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
@@ -119,11 +119,11 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	err = e.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
-		e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_ERROR", request.Test.ID, request.Run.ID))
+		e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunError, request.Test.ID, request.Run.ID))
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
-	e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, "TEST_SPECS_RUN_SUCCESS", request.Test.ID, request.Run.ID))
+	e.eventEmitter.Emit(ctx, model.NewTestRunEvent(model.StageTest, model.TestEventType_TestSpecsRunSuccess, request.Test.ID, request.Run.ID))
 
 	return run, nil
 }
