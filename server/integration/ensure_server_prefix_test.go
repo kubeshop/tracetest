@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 
@@ -21,9 +22,16 @@ func getTracetestApp(options ...testmock.TestingAppOption) (*app.App, error) {
 		return nil, err
 	}
 
-	go tracetestApp.Start()
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	time.Sleep(1 * time.Second)
+	go func() {
+		tracetestApp.Start()
+		time.Sleep(1 * time.Second)
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	return tracetestApp, nil
 }
