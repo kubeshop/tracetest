@@ -8,6 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -36,6 +37,7 @@ type defaultAssertionRunner struct {
 	inputChannel        chan AssertionRequest
 	exitChannel         chan bool
 	subscriptionManager *subscription.Manager
+	eventEmitter        EventEmitter
 }
 
 var _ WorkerPool = &defaultAssertionRunner{}
@@ -54,6 +56,7 @@ func NewAssertionRunner(
 		assertionExecutor:   assertionExecutor,
 		inputChannel:        make(chan AssertionRequest, 1),
 		subscriptionManager: subscriptionManager,
+		eventEmitter:        eventEmitter,
 	}
 }
 
@@ -103,9 +106,13 @@ func (e *defaultAssertionRunner) startWorker() {
 
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
 	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
+
+	e.eventEmitter.Emit(ctx, events.TestSpecsRunStart(request.Test.ID, request.Run.ID))
+
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
 		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
 	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
@@ -113,8 +120,11 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	err = e.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
+
+	e.eventEmitter.Emit(ctx, events.TestSpecsRunSuccess(request.Test.ID, request.Run.ID))
 
 	return run, nil
 }

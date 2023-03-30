@@ -11,6 +11,7 @@ type (
 	Protocol          string
 	Status            string
 	TestRunEventStage string
+	TestRunEventType  string
 	PollingType       string
 	LogLevel          string
 )
