@@ -60,7 +60,7 @@ var (
 			"QUEUED_INFO":                TestRunEvent{Stage: StageTrace, Type: "QUEUED_INFO", Title: "Trace Run has been queued to start the fetching process", Description: "Trace Run has been queued to start the fetching process"},
 			"DATA_STORE_CONNECTION_INFO": TestRunEvent{Stage: StageTrace, Type: "DATA_STORE_CONNECTION_INFO", Title: "A Data store connection request has been executed,test connection result information", Description: "A Data store connection request has been executed,test connection result information"},
 			"POLLING_START":              TestRunEvent{Stage: StageTrace, Type: "POLLING_START", Title: "Starting the trace polling process", Description: "Starting the trace polling process"},
-			"POLLING_ITERATION_INFO":     TestRunEvent{Stage: StageTrace, Type: "POLLING_ITERATION_INFO", Title: "A polling iteration has been executed", Description: "A polling iteration has been executed, {{NUMBER_OF_SPANS}} of spans - iteration {{ITERATION_NUMBER}} - reason of next iteration: {{ITERATION_REASON}}"},
+			"POLLING_ITERATION_INFO":     TestRunEvent{Stage: StageTrace, Type: "POLLING_ITERATION_INFO", Title: "A polling iteration has been executed", Description: "A polling iteration has been executed, {{NUMBER_OF_SPANS}} spans - iteration {{ITERATION_NUMBER}} - reason of next iteration: {{ITERATION_REASON}}"},
 			"POLLING_SUCCESS":            TestRunEvent{Stage: StageTrace, Type: "POLLING_SUCCESS", Title: "The polling strategy has succeeded in fetching the trace from the Data Store", Description: "The polling strategy has succeeded in fetching the trace from the Data Store"},
 			"POLLING_ERROR":              TestRunEvent{Stage: StageTrace, Type: "POLLING_ERROR", Title: "The polling strategy has failed to fetch the trace", Description: "The polling strategy has failed to fetch the trace"},
 			"FETCHING_SUCCESS":           TestRunEvent{Stage: StageTrace, Type: "FETCHING_SUCCESS", Title: "The trace was successfully processed by the backend", Description: "The trace was successfully processed by the backend"},
@@ -68,7 +68,7 @@ var (
 			"STOPPED_INFO":               TestRunEvent{Stage: StageTrace, Type: "STOPPED_INFO", Title: "The test run was stopped during its execution", Description: "The test run was stopped during its execution"},
 		},
 		StageTest: map[string]TestRunEvent{
-			"OUTPUT_GENERATION_WARNING": TestRunEvent{Stage: StageTest, Type: "OUTPUT_GENERATION_WARNING", Title: "Output {{OUTPUT_NAME}} could not be generated", Description: "The value for output {{OUTPUT_NAME}} could not be generated"},
+			"OUTPUT_GENERATION_WARNING": TestRunEvent{Stage: StageTest, Type: "OUTPUT_GENERATION_WARNING", Title: "Output {{OUTPUT_NAME}} not be generated", Description: "The value for output {{OUTPUT_NAME}} could not be generated"},
 			"RESOLVE_START":             TestRunEvent{Stage: StageTest, Type: "RESOLVE_START", Title: "Resolving test specs details start", Description: "Resolving test specs details start"},
 			"RESOLVE_SUCCESS":           TestRunEvent{Stage: StageTest, Type: "RESOLVE_SUCCESS", Title: "Resolving test specs details success", Description: "Resolving test specs details success"},
 			"RESOLVE_ERROR":             TestRunEvent{Stage: StageTest, Type: "RESOLVE_ERROR", Title: "An error ocurred while parsing the test specs", Description: "An error ocurred while parsing the test specs"},
