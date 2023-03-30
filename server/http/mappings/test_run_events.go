@@ -16,7 +16,7 @@ func (m OpenAPI) TestRunEvents(in []model.TestRunEvent) []openapi.TestRunEvent {
 
 func (m OpenAPI) TestRunEvent(in model.TestRunEvent) openapi.TestRunEvent {
 	return openapi.TestRunEvent{
-		Type:                string(in.Type),
+		Type:                in.Type,
 		Stage:               string(in.Stage),
 		Description:         in.Description,
 		CreatedAt:           in.CreatedAt,
