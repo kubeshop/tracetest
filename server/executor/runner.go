@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
+	"os"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -233,6 +235,10 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	if err != nil {
 		if isConnectionError(err) {
 			r.emitUnreachableEndpointEvent(job, err)
+
+			if isTargetLocalhost(job, err) && isServerRunningInsideContainer() {
+				r.emitMismatchEndpointEvent(job, err)
+			}
 		}
 
 		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerExecutionError(job.run.TestID, job.run.ID, err))
@@ -287,6 +293,13 @@ func (r persistentRunner) emitUnreachableEndpointEvent(job execReq, err error) {
 	}
 }
 
+func (r persistentRunner) emitMismatchEndpointEvent(job execReq, err error) {
+	emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerDockerComposeHostMismatchError(job.run.TestID, job.run.ID))
+	if emitErr != nil {
+		r.handleError(job.run, emitErr)
+	}
+}
+
 func isConnectionError(err error) bool {
 	for err != nil {
 		// a dial error means we couldn't open a TCP connection (either host is not available or DNS doesn't exist)
@@ -300,6 +313,45 @@ func isConnectionError(err error) bool {
 		}
 
 		err = errors.Unwrap(err)
+	}
+
+	return false
+}
+
+func isTargetLocalhost(job execReq, err error) bool {
+	var endpoint string
+	switch job.test.ServiceUnderTest.Type {
+	case model.TriggerTypeHTTP:
+		endpoint = job.test.ServiceUnderTest.HTTP.URL
+	case model.TriggerTypeGRPC:
+		endpoint = job.test.ServiceUnderTest.GRPC.Address
+	}
+
+	url, err := url.Parse(endpoint)
+	if err != nil {
+		return false
+	}
+
+	// removes port
+	host := url.Host
+	colonPosition := strings.Index(url.Host, ":")
+	if colonPosition >= 0 {
+		host = host[0:colonPosition]
+	}
+
+	return host == "localhost" || host == "127.0.0.1"
+}
+
+func isServerRunningInsideContainer() bool {
+	// Check if running on Docker
+	// Reference: https://paulbradley.org/indocker/
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return true
+	}
+
+	// Check if running on k8s
+	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
+		return true
 	}
 
 	return false
