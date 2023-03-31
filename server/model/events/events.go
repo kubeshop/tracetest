@@ -98,6 +98,21 @@ func TriggerExecutionSuccess(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
+func TriggerExecutionError(testID id.ID, runID int, err error) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrigger,
+		Type:                "EXECUTION_ERROR",
+		Title:               "Failed to trigger execution",
+		Description:         fmt.Sprintf("Failed to trigger execution: %s", err.Error()),
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
 func TriggerHTTPUnreachableHostError(testID id.ID, runID int) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,

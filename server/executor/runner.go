@@ -221,7 +221,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		}
 	}
 
-	err = r.eventEmitter.Emit(job.ctx, events.TriggerCreatedInfo(job.run.TestID, job.run.ID))
+	err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionStart(job.run.TestID, job.run.ID))
 	if err != nil {
 		r.handleError(job.run, err)
 	}
@@ -229,17 +229,22 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
 	if err != nil {
+		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerExecutionError(job.run.TestID, job.run.ID, err))
+		if emitErr != nil {
+			r.handleError(job.run, emitErr)
+		}
+
 		fmt.Printf("test %s run #%d trigger error: %s\n", run.TestID, run.ID, err.Error())
 		r.subscriptionManager.PublishUpdate(subscription.Message{
 			ResourceID: run.TransactionStepResourceID(),
 			Type:       "run_update",
 			Content:    RunResult{Run: run, Err: err},
 		})
-	}
-
-	err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionSuccess(job.run.TestID, job.run.ID))
-	if err != nil {
-		r.handleDBError(job.run, err)
+	} else {
+		err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionSuccess(job.run.TestID, job.run.ID))
+		if err != nil {
+			r.handleDBError(job.run, err)
+		}
 	}
 
 	run.SpanID = response.SpanID
