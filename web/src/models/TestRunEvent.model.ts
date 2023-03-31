@@ -75,7 +75,7 @@ function TestRunEvent({
   description = '',
   createdAt = '',
   testId = '',
-  runId = '',
+  runId = 0,
   dataStoreConnection = {},
   polling = {},
   outputs = [],

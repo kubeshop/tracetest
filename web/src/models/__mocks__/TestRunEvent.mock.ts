@@ -12,7 +12,7 @@ const TestRunEventMock: IMockFactory<TestRunEvent, TRawTestRunEvent> = () => ({
       description: faker.lorem.lines(),
       createdAt: faker.date.past().toISOString(),
       testId: faker.datatype.uuid(),
-      runId: faker.datatype.uuid(),
+      runId: faker.datatype.number(),
       ...data,
     };
   },
