@@ -288,9 +288,14 @@ func (r persistentRunner) emitUnreachableEndpointEvent(job execReq, err error) {
 }
 
 func isConnectionError(err error) bool {
-	// check if root cause is a dial error
 	for err != nil {
+		// a dial error means we couldn't open a TCP connection (either host is not available or DNS doesn't exist)
 		if strings.HasPrefix(err.Error(), "dial ") {
+			return true
+		}
+
+		// it means a trigger timeout
+		if errors.Is(err, context.DeadlineExceeded) {
 			return true
 		}
 
