@@ -48,7 +48,6 @@ func TestPersistentRunner(t *testing.T) {
 		test2 := model.Test{ID: id.ID("test2"), ServiceUnderTest: sampleTrigger}
 
 		f := runnerSetup(t)
-
 		f.expectSuccessExecLong(test1)
 		f.expectSuccessExec(test2)
 
@@ -145,10 +144,13 @@ func runnerSetup(t *testing.T) runnerFixture {
 	testDB := testdb.MockRepository{}
 
 	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)
+	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
+
+	eventEmitter := executor.NewEventEmitter(&testDB, subscription.NewManager())
 
 	mtp.Test(t)
 	return runnerFixture{
-		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer, subscription.NewManager(), tracedb.Factory(&testDB), &testDB),
+		runner:          executor.NewPersistentRunner(reg, db, executor.NewDBUpdater(db), mtp, tracer, subscription.NewManager(), tracedb.Factory(&testDB), &testDB, eventEmitter),
 		mockExecutor:    me,
 		mockDB:          db,
 		mockTracePoller: mtp,

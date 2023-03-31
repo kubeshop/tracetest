@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel"
@@ -37,6 +38,7 @@ func NewPersistentRunner(
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
+	eventEmitter EventEmitter,
 ) PersistentRunner {
 	return persistentRunner{
 		triggers:            triggers,
@@ -47,6 +49,7 @@ func NewPersistentRunner(
 		newTraceDBFn:        newTraceDBFn,
 		dsRepo:              dsRepo,
 		subscriptionManager: subscriptionManager,
+		eventEmitter:        eventEmitter,
 		executeQueue:        make(chan execReq, 5),
 		exit:                make(chan bool, 1),
 	}
@@ -61,6 +64,7 @@ type persistentRunner struct {
 	subscriptionManager *subscription.Manager
 	newTraceDBFn        traceDBFactoryFn
 	dsRepo              model.DataStoreRepository
+	eventEmitter        EventEmitter
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -76,6 +80,12 @@ type execReq struct {
 }
 
 func (r persistentRunner) handleDBError(run model.Run, err error) {
+	if err != nil {
+		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
+	}
+}
+
+func (r persistentRunner) handleError(run model.Run, err error) {
 	if err != nil {
 		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
@@ -160,15 +170,19 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	run := job.run.Start()
 	r.handleDBError(run, r.updater.Update(job.ctx, run))
 
+	err := r.eventEmitter.Emit(job.ctx, events.TriggerCreatedInfo(job.run.TestID, job.run.ID))
+	if err != nil {
+		r.handleError(job.run, err)
+	}
+
 	triggerer, err := r.triggers.Get(job.test.ServiceUnderTest.Type)
 	if err != nil {
-		// TODO: actually handle the error
-		panic(err)
+		r.handleError(job.run, err)
 	}
 
 	tdb, err := r.traceDB(job.ctx)
 	if err != nil {
-		panic(err)
+		r.handleError(job.run, err)
 	}
 
 	traceID := tdb.GetTraceID()
@@ -180,9 +194,24 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		Executor: job.executor,
 	}
 
+	err = r.eventEmitter.Emit(job.ctx, events.TriggerResolveStart(job.run.TestID, job.run.ID))
+	if err != nil {
+		r.handleError(job.run, err)
+	}
+
 	resolvedTest, err := triggerer.Resolve(job.ctx, job.test, triggerOptions)
 	if err != nil {
-		panic(err)
+		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerResolveError(job.run.TestID, job.run.ID, err))
+		if emitErr != nil {
+			r.handleError(job.run, emitErr)
+		}
+
+		r.handleError(job.run, err)
+	}
+
+	err = r.eventEmitter.Emit(job.ctx, events.TriggerResolveSuccess(job.run.TestID, job.run.ID))
+	if err != nil {
+		r.handleError(job.run, err)
 	}
 
 	if job.test.ServiceUnderTest.Type == model.TriggerTypeTRACEID {
@@ -192,15 +221,30 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		}
 	}
 
+	err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionStart(job.run.TestID, job.run.ID))
+	if err != nil {
+		r.handleError(job.run, err)
+	}
+
 	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
 	if err != nil {
+		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerExecutionError(job.run.TestID, job.run.ID, err))
+		if emitErr != nil {
+			r.handleError(job.run, emitErr)
+		}
+
 		fmt.Printf("test %s run #%d trigger error: %s\n", run.TestID, run.ID, err.Error())
 		r.subscriptionManager.PublishUpdate(subscription.Message{
 			ResourceID: run.TransactionStepResourceID(),
 			Type:       "run_update",
 			Content:    RunResult{Run: run, Err: err},
 		})
+	} else {
+		err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionSuccess(job.run.TestID, job.run.ID))
+		if err != nil {
+			r.handleDBError(job.run, err)
+		}
 	}
 
 	run.SpanID = response.SpanID

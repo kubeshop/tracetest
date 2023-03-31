@@ -23,14 +23,14 @@ func TriggerCreatedInfo(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TriggerResolveError(testID id.ID, runID int) model.TestRunEvent {
+func TriggerResolveError(testID id.ID, runID int, err error) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrigger,
 		Type:                "RESOLVE_ERROR",
 		Title:               "Resolving trigger details failed",
-		Description:         "Resolving trigger details failed",
+		Description:         fmt.Sprintf("Resolving trigger details failed: %s", err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
@@ -91,6 +91,21 @@ func TriggerExecutionSuccess(testID id.ID, runID int) model.TestRunEvent {
 		Type:                "EXECUTION_SUCCESS",
 		Title:               "Successful trigger execution",
 		Description:         "Successful trigger execution",
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
+func TriggerExecutionError(testID id.ID, runID int, err error) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrigger,
+		Type:                "EXECUTION_ERROR",
+		Title:               "Failed to trigger execution",
+		Description:         fmt.Sprintf("Failed to trigger execution: %s", err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
