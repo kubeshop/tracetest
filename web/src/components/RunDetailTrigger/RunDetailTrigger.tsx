@@ -3,9 +3,10 @@ import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse
 import RunEvents from 'components/RunEvents';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
+import {TestRunStage} from 'constants/TestRunEvents.constants';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
-import TestRunEvent, {TestRunStage} from 'models/TestRunEvent.model';
+import TestRunEvent from 'models/TestRunEvent.model';
 import * as S from './RunDetailTrigger.styled';
 
 interface IProps {
@@ -25,7 +26,7 @@ const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, runEv
       </S.SectionLeft>
       <S.SectionRight>
         {shouldDisplayError ? (
-          <RunEvents events={runEvents} stage={TestRunStage.Trigger} />
+          <RunEvents events={runEvents} stage={TestRunStage.Trigger} state={state} />
         ) : (
           <RunDetailTriggerResponseFactory
             state={state}

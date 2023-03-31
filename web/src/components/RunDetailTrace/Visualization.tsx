@@ -1,5 +1,7 @@
-import SkeletonDiagram from 'components/SkeletonDiagram';
+import RunEvents from 'components/RunEvents';
 import {TestState} from 'constants/TestRun.constants';
+import {TestRunStage} from 'constants/TestRunEvents.constants';
+import TestRunEvent from 'models/TestRunEvent.model';
 import {useCallback, useEffect} from 'react';
 import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
@@ -15,12 +17,13 @@ import Timeline from '../Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
 
 interface IProps {
+  runEvents: TestRunEvent[];
   runState: TTestRunState;
   spans: Span[];
   type: VisualizationType;
 }
 
-const Visualization = ({runState, spans, type}: IProps) => {
+const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(TraceSelectors.selectEdges);
   const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
@@ -67,7 +70,7 @@ const Visualization = ({runState, spans, type}: IProps) => {
   );
 
   if (runState !== TestState.FINISHED) {
-    return <SkeletonDiagram />;
+    return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 
   return type === VisualizationType.Dag ? (

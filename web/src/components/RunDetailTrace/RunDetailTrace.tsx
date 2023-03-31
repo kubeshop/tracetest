@@ -5,10 +5,11 @@ import Drawer from 'components/Drawer';
 import SpanDetail from 'components/SpanDetail';
 import Switch from 'components/Visualization/components/Switch';
 import {TestState} from 'constants/TestRun.constants';
+import TestRun from 'models/TestRun.model';
+import TestRunEvent from 'models/TestRunEvent.model';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import TestRun from 'models/TestRun.model';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
 import Visualization from './Visualization';
@@ -16,6 +17,7 @@ import SetupAlert from '../SetupAlert';
 
 interface IProps {
   run: TestRun;
+  runEvents: TestRunEvent[];
   testId: string;
 }
 
@@ -24,7 +26,7 @@ export enum VisualizationType {
   Timeline,
 }
 
-const RunDetailTrace = ({run, testId}: IProps) => {
+const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const searchText = useAppSelector(TraceSelectors.selectSearchText);
   const span = useAppSelector(state => SpanSelectors.selectSpanById(state, selectedSpan, testId, run.id));
@@ -58,7 +60,12 @@ const RunDetailTrace = ({run, testId}: IProps) => {
                   />
                 )}
               </S.SwitchContainer>
-              <Visualization runState={run.state} spans={run?.trace?.spans ?? []} type={visualizationType} />
+              <Visualization
+                runEvents={runEvents}
+                runState={run.state}
+                spans={run?.trace?.spans ?? []}
+                type={visualizationType}
+              />
             </S.VisualizationContainer>
           </S.Section>
         }

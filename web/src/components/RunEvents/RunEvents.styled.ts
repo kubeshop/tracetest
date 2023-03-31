@@ -1,8 +1,7 @@
-import {CloseCircleFilled} from '@ant-design/icons';
+import {CloseCircleFilled, InfoCircleFilled, LoadingOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
-import styled, {DefaultTheme} from 'styled-components';
-
-import {LogLevel} from 'models/TestRunEvent.model';
+import styled, {css, DefaultTheme} from 'styled-components';
+import {LogLevel} from 'constants/TestRunEvents.constants';
 
 function getLogLevelColor(logLevel: LogLevel, theme: DefaultTheme): string {
   if (logLevel === LogLevel.Error) return theme.color.error;
@@ -11,12 +10,29 @@ function getLogLevelColor(logLevel: LogLevel, theme: DefaultTheme): string {
   return theme.color.textLight;
 }
 
-export const Container = styled.div`
+export const Column = styled.div`
+  align-items: start;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+`;
+
+export const Container = styled.div<{$hasScroll?: boolean}>`
   align-items: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 70px 120px;
+  padding: 70px 20%;
+
+  ${({$hasScroll}) =>
+    $hasScroll &&
+    css`
+      height: 100%;
+      overflow-y: auto;
+    `}
+`;
+
+export const Content = styled.div`
+  margin: 16px;
 `;
 
 export const Dot = styled.div<{$logLevel?: LogLevel}>`
@@ -42,12 +58,23 @@ export const EventContainer = styled.div`
   position: relative;
 `;
 
+export const InfoIcon = styled(InfoCircleFilled)`
+  color: ${({theme}) => theme.color.textLight};
+  margin-top: 3px;
+`;
+
 export const Link = styled(Typography.Link)`
   font-weight: bold;
 `;
 
 export const ListContainer = styled.div`
   padding: 24px 0;
+`;
+
+export const LoadingIcon = styled(LoadingOutlined)`
+  color: ${({theme}) => theme.color.primary};
+  font-size: 32px;
+  margin-bottom: 26px;
 `;
 
 export const Paragraph = styled(Typography.Paragraph)`

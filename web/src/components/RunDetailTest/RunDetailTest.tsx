@@ -13,6 +13,9 @@ import TestSpecDetail from 'components/TestSpecDetail';
 import TestSpecForm from 'components/TestSpecForm';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import Switch from 'components/Visualization/components/Switch';
+import {TAssertionResultEntry} from 'models/AssertionResults.model';
+import TestRun from 'models/TestRun.model';
+import TestRunEvent from 'models/TestRunEvent.model';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
@@ -20,8 +23,6 @@ import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
-import TestRun from 'models/TestRun.model';
-import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
 
@@ -32,10 +33,11 @@ const TABS = {
 
 interface IProps {
   run: TestRun;
+  runEvents: TestRunEvent[];
   testId: string;
 }
 
-const RunDetailTest = ({run, testId}: IProps) => {
+const RunDetailTest = ({run, runEvents, testId}: IProps) => {
   const [query, updateQuery] = useSearchParams();
   const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
   const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector, specs} =
@@ -125,7 +127,12 @@ const RunDetailTest = ({run, testId}: IProps) => {
                 />
               </S.SwitchContainer>
 
-              <Visualization runState={run.state} spans={run?.trace?.spans ?? []} type={visualizationType} />
+              <Visualization
+                runEvents={runEvents}
+                runState={run.state}
+                spans={run?.trace?.spans ?? []}
+                type={visualizationType}
+              />
             </S.SectionLeft>
 
             <S.SectionRight $shouldScroll={!selectedTestSpec}>
