@@ -26,7 +26,7 @@ type TestRunEvent struct {
 
 	TestId string `json:"testId,omitempty"`
 
-	RunId string `json:"runId,omitempty"`
+	RunId int32 `json:"runId,omitempty"`
 
 	DataStoreConnection ConnectionResult `json:"dataStoreConnection,omitempty"`
 

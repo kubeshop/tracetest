@@ -26,7 +26,7 @@ type TestRunEvent struct {
 	Description         *string           `json:"description,omitempty"`
 	CreatedAt           *time.Time        `json:"createdAt,omitempty"`
 	TestId              *string           `json:"testId,omitempty"`
-	RunId               *string           `json:"runId,omitempty"`
+	RunId               *int32            `json:"runId,omitempty"`
 	DataStoreConnection *ConnectionResult `json:"dataStoreConnection,omitempty"`
 	Polling             *PollingInfo      `json:"polling,omitempty"`
 	Outputs             []OutputInfo      `json:"outputs,omitempty"`
@@ -242,9 +242,9 @@ func (o *TestRunEvent) SetTestId(v string) {
 }
 
 // GetRunId returns the RunId field value if set, zero value otherwise.
-func (o *TestRunEvent) GetRunId() string {
+func (o *TestRunEvent) GetRunId() int32 {
 	if o == nil || isNil(o.RunId) {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.RunId
@@ -252,7 +252,7 @@ func (o *TestRunEvent) GetRunId() string {
 
 // GetRunIdOk returns a tuple with the RunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRunEvent) GetRunIdOk() (*string, bool) {
+func (o *TestRunEvent) GetRunIdOk() (*int32, bool) {
 	if o == nil || isNil(o.RunId) {
 		return nil, false
 	}
@@ -268,8 +268,8 @@ func (o *TestRunEvent) HasRunId() bool {
 	return false
 }
 
-// SetRunId gets a reference to the given string and assigns it to the RunId field.
-func (o *TestRunEvent) SetRunId(v string) {
+// SetRunId gets a reference to the given int32 and assigns it to the RunId field.
+func (o *TestRunEvent) SetRunId(v int32) {
 	o.RunId = &v
 }
 

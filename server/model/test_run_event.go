@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
@@ -10,6 +11,7 @@ type (
 	Protocol          string
 	Status            string
 	TestRunEventStage string
+	TestRunEventType  string
 	PollingType       string
 	LogLevel          string
 )
@@ -52,6 +54,10 @@ type TestRunEvent struct {
 	DataStoreConnection ConnectionResult
 	Polling             PollingInfo
 	Outputs             []OutputInfo
+}
+
+func (e TestRunEvent) ResourceID() string {
+	return fmt.Sprintf("test/%s/run/%d/event", e.TestID, e.RunID)
 }
 
 type PollingInfo struct {

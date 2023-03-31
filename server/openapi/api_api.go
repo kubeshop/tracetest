@@ -858,7 +858,11 @@ func (c *ApiApiController) GetTestRunEvents(w http.ResponseWriter, r *http.Reque
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	runIdParam := params["runId"]
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 
 	result, err := c.service.GetTestRunEvents(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
