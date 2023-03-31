@@ -64,21 +64,25 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 
 		value := ""
 		spanId := ""
+		resolved := false
 		spans.
 			ForEach(func(_ int, span model.Span) bool {
 				value = extractAttr(span, stores, out.expr)
 				spanId = span.ID.String()
+				resolved = true
 				// take only the first value
 				return false
 			}).
 			OrEmpty(func() {
 				value = extractAttr(model.Span{}, stores, out.expr)
+				resolved = false
 			})
 
 		res, err = res.Add(key, model.RunOutput{
-			Value:  value,
-			SpanID: spanId,
-			Name:   key,
+			Value:    value,
+			SpanID:   spanId,
+			Name:     key,
+			Resolved: resolved,
 		})
 		if err != nil {
 			return fmt.Errorf(`cannot process output "%s": %w`, key, err)

@@ -118,9 +118,10 @@ type (
 	}
 
 	RunOutput struct {
-		Name   string
-		Value  string
-		SpanID string
+		Name     string
+		Value    string
+		SpanID   string
+		Resolved bool
 	}
 
 	AssertionResult struct {
