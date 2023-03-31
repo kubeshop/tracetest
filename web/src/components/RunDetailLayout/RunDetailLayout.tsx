@@ -33,7 +33,7 @@ const renderTab = (title: string, testId: string, runId: string, mode: string) =
 const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {showNotification} = useNotification();
-  const {isError, run} = useTestRun();
+  const {isError, run, runEvents} = useTestRun();
   const [prevState, setPrevState] = useState(run.state);
   useDocumentTitle(`${name} - ${run.state}`);
 
@@ -69,7 +69,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
         destroyInactiveTabPane
       >
         <Tabs.TabPane tab={renderTab('Trigger', id, run.id, mode)} key={RunDetailModes.TRIGGER}>
-          <RunDetailTrigger test={test} run={run} isError={isError} />
+          <RunDetailTrigger test={test} run={run} runEvents={runEvents} isError={isError} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Trace', id, run.id, mode)} key={RunDetailModes.TRACE}>
           <RunDetailTrace run={run} testId={id} />

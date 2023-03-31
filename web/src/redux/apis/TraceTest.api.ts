@@ -42,6 +42,7 @@ export const {
   useRunTestMutation,
   useDeleteTestByIdMutation,
   useGetRunByIdQuery,
+  useGetRunEventsQuery,
   useGetRunListQuery,
   useGetSelectedSpansQuery,
   useLazyGetSelectedSpansQuery,

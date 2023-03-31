@@ -48,16 +48,12 @@ export const StatusText = styled(Typography.Text)`
 `;
 
 export const LoadingResponseBody = styled.div`
-  margin-top: 25px;
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
   justify-items: center;
-  gap: 8px;
-  height: 100px;
+  gap: 16px;
   padding: 0.4em 0.6em;
-  background: ${({theme}) => theme.color.background};
-  border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
-  font-size: ${({theme}) => theme.size.sm};
 `;
 
 export const TextHolder = styled.div<{$width?: number}>`
@@ -71,7 +67,7 @@ export const TextHolder = styled.div<{$width?: number}>`
   }
 
   animation: skeleton-loading 1s linear infinite alternate;
-  height: 8px;
+  height: 16px;
   border-radius: 2px;
   width: ${({$width = 100}) => $width}%;
 `;
