@@ -1,28 +1,6 @@
+import {LogLevel, OutputInfoLogLevel, PollingInfoType, TestRunStage} from 'constants/TestRunEvents.constants';
 import {Model, TTestEventsSchemas} from 'types/Common.types';
 import ConnectionResult from './ConnectionResult.model';
-
-export enum TestRunStage {
-  Trigger = 'trigger',
-  Trace = 'trace',
-  Test = 'test',
-}
-
-enum PollingInfoType {
-  Periodic = 'periodic',
-}
-
-enum OutputInfoLogLevel {
-  Warning = 'warning',
-  Error = 'error',
-}
-
-export enum LogLevel {
-  Error = 'Error',
-  Info = 'Info',
-  Start = 'Start',
-  Success = 'Success',
-  Warning = 'Warning',
-}
 
 export type TRawTestRunEvent = TTestEventsSchemas['TestRunEvent'];
 export type TRawPollingInfo = TTestEventsSchemas['PollingInfo'];

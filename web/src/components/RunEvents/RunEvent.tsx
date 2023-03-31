@@ -2,11 +2,11 @@ import {Typography} from 'antd';
 import TestRunEvent from 'models/TestRunEvent.model';
 import * as S from './RunEvents.styled';
 
-interface IProps {
+export interface IPropsEvent {
   event: TestRunEvent;
 }
 
-const RunEvent = ({event}: IProps) => (
+const RunEvent = ({event}: IPropsEvent) => (
   <S.EventContainer>
     <S.Dot $logLevel={event.logLevel} />
     <Typography.Title level={3}>{event.title}</Typography.Title>

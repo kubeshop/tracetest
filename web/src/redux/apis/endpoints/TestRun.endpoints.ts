@@ -10,8 +10,7 @@ import RunError from 'models/RunError.model';
 import {TEnvironmentValue} from 'models/Environment.model';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
 import Test from 'models/Test.model';
-import TestRunEvent from 'models/TestRunEvent.model';
-import TestRunEventMock from 'models/__mocks__/TestRunEvent.mock';
+import TestRunEvent, {TRawTestRunEvent} from 'models/TestRunEvent.model';
 
 function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);
@@ -102,11 +101,7 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getRunEvents: builder.query<TestRunEvent[], {runId: string; testId: string}>({
     query: ({runId, testId}) => `/tests/${testId}/run/${runId}/events`,
     providesTags: [{type: TracetestApiTags.TEST_RUN, id: 'EVENTS'}],
-    // transformResponse: (rawTestRunEvent: TRawTestRunEvent[]) => rawTestRunEvent.map(event => TestRunEvent(event)),
-    transformResponse: () => {
-      const rawTestRunEvent = new Array(10).fill(null).map(() => TestRunEventMock.raw());
-      return rawTestRunEvent.map(event => TestRunEvent(event));
-    },
+    transformResponse: (rawTestRunEvent: TRawTestRunEvent[]) => rawTestRunEvent.map(event => TestRunEvent(event)),
     /* async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
       const listener: IListenerFunction<TRawTestRun> = data => {
         updateCachedData(() => TestRun(data.event));

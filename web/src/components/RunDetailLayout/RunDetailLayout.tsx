@@ -72,10 +72,10 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
           <RunDetailTrigger test={test} run={run} runEvents={runEvents} isError={isError} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Trace', id, run.id, mode)} key={RunDetailModes.TRACE}>
-          <RunDetailTrace run={run} testId={id} />
+          <RunDetailTrace run={run} runEvents={runEvents} testId={id} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Test', id, run.id, mode)} key={RunDetailModes.TEST}>
-          <RunDetailTest run={run} testId={id} />
+          <RunDetailTest run={run} runEvents={runEvents} testId={id} />
         </Tabs.TabPane>
       </Tabs>
     </S.Container>
