@@ -236,7 +236,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		if isConnectionError(err) {
 			r.emitUnreachableEndpointEvent(job, err)
 
-			if isTargetLocalhost(job, err) && isServerRunningInsideDocker() {
+			if isTargetLocalhost(job, err) && isServerRunningInsideContainer() {
 				r.emitMismatchEndpointEvent(job, err)
 			}
 		}
@@ -332,12 +332,25 @@ func isTargetLocalhost(job execReq, err error) bool {
 		return false
 	}
 
-	return url.Host == "localhost" || url.Host == "127.0.0.1"
+	// removes port
+	host := url.Host
+	colonPosition := strings.Index(url.Host, ":")
+	if colonPosition >= 0 {
+		host = host[0:colonPosition]
+	}
+
+	return host == "localhost" || host == "127.0.0.1"
 }
 
-func isServerRunningInsideDocker() bool {
-	// reference: https://paulbradley.org/indocker/
+func isServerRunningInsideContainer() bool {
+	// Check if running on Docker
+	// Reference: https://paulbradley.org/indocker/
 	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return true
+	}
+
+	// Check if running on k8s
+	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
 		return true
 	}
 
