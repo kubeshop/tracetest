@@ -129,9 +129,9 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
 
-		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunPersistenceError(request.Test.ID, request.Run.ID, err))
 		if anotherErr != nil {
-			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunPersistenceError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
 		}
 
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)

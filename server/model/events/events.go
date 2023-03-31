@@ -398,6 +398,21 @@ func TestSpecsRunError(testID id.ID, runID int, err error) model.TestRunEvent {
 	}
 }
 
+func TestSpecsRunPersistenceError(testID id.ID, runID int, err error) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTest,
+		Type:                "TEST_SPECS_RUN_PERSISTENCE_ERROR",
+		Title:               "Test Specs persistence error",
+		Description:         fmt.Sprintf("Test specs were succesfully executed, however an error happened when trying to persist them. Error: %s", err.Error()),
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
 func TestSpecsRunStart(testID id.ID, runID int) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
