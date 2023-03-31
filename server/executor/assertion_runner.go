@@ -107,12 +107,20 @@ func (e *defaultAssertionRunner) startWorker() {
 func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
 	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
-	e.eventEmitter.Emit(ctx, events.TestSpecsRunStart(request.Test.ID, request.Run.ID))
+	err := e.eventEmitter.Emit(ctx, events.TestSpecsRunStart(request.Test.ID, request.Run.ID))
+	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunStart event: %s\n", request.Test.ID, request.Run.ID, err.Error())
+	}
 
 	run, err := e.executeAssertions(ctx, request)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
-		e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
+
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
+		if anotherErr != nil {
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+		}
+
 		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
 	}
 	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
@@ -120,11 +128,19 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	err = e.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
-		e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
+
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunPersistenceError(request.Test.ID, request.Run.ID, err))
+		if anotherErr != nil {
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunPersistenceError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+		}
+
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
-	e.eventEmitter.Emit(ctx, events.TestSpecsRunSuccess(request.Test.ID, request.Run.ID))
+	err = e.eventEmitter.Emit(ctx, events.TestSpecsRunSuccess(request.Test.ID, request.Run.ID))
+	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunSuccess event: %s\n", request.Test.ID, request.Run.ID, err.Error())
+	}
 
 	return run, nil
 }
@@ -143,6 +159,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	if err != nil {
 		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
 	}
+	e.validateOutputResolution(ctx, req, outputs)
 
 	newEnvironment := createEnvironment(req.Run.Environment, outputs)
 
@@ -183,4 +200,23 @@ func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request Asse
 	request.carrier = carrier
 
 	e.inputChannel <- request
+}
+
+func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, request AssertionRequest, outputs model.OrderedMap[string, model.RunOutput]) {
+	err := outputs.ForEach(func(outputName string, outputModel model.RunOutput) error {
+		if outputModel.Resolved {
+			return nil
+		}
+
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestOutputGenerationWarning(request.Test.ID, request.Run.ID, outputName))
+		if anotherErr != nil {
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestOutputGenerationWarning event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: fail to validate outputs: %s\n", request.Test.ID, request.Run.ID, err.Error())
+	}
 }
