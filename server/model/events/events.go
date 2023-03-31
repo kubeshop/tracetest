@@ -113,14 +113,14 @@ func TriggerExecutionError(testID id.ID, runID int, err error) model.TestRunEven
 	}
 }
 
-func TriggerHTTPUnreachableHostError(testID id.ID, runID int) model.TestRunEvent {
+func TriggerHTTPUnreachableHostError(testID id.ID, runID int, err error) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrigger,
 		Type:                "HTTP_UNREACHABLE_HOST_ERROR",
 		Title:               "Tracetest could not reach the defined host in the trigger",
-		Description:         "Tracetest could not reach the defined host in the trigger",
+		Description:         fmt.Sprintf("Tracetest could not reach the defined host in the trigger: %s", err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
@@ -143,14 +143,14 @@ func TriggerDockerComposeHostMismatchError(testID id.ID, runID int) model.TestRu
 	}
 }
 
-func TriggergRPCUnreachableHostError(testID id.ID, runID int) model.TestRunEvent {
+func TriggergRPCUnreachableHostError(testID id.ID, runID int, err error) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrigger,
 		Type:                "GRPC_UNREACHABLE_HOST_ERROR",
 		Title:               "Tracetest could not reach the defined host in the trigger",
-		Description:         "Tracetest could not reach the defined host in the trigger",
+		Description:         fmt.Sprintf("Tracetest could not reach the defined host in the trigger: %s", err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},

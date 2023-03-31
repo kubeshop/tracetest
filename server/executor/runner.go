@@ -2,7 +2,9 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
@@ -229,6 +231,10 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	response, err := triggerer.Trigger(job.ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
 	if err != nil {
+		if isConnectionError(err) {
+			r.emitUnreachableEndpointEvent(job, err)
+		}
+
 		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerExecutionError(job.run.TestID, job.run.ID, err))
 		if emitErr != nil {
 			r.handleError(job.run, emitErr)
@@ -264,4 +270,37 @@ func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.
 	}
 
 	return run.SuccessfullyTriggered()
+}
+
+func (r persistentRunner) emitUnreachableEndpointEvent(job execReq, err error) {
+	var event model.TestRunEvent
+	switch job.test.ServiceUnderTest.Type {
+	case model.TriggerTypeHTTP:
+		event = events.TriggerHTTPUnreachableHostError(job.run.TestID, job.run.ID, err)
+	case model.TriggerTypeGRPC:
+		event = events.TriggergRPCUnreachableHostError(job.run.TestID, job.run.ID, err)
+	}
+
+	emitErr := r.eventEmitter.Emit(job.ctx, event)
+	if emitErr != nil {
+		r.handleError(job.run, emitErr)
+	}
+}
+
+func isConnectionError(err error) bool {
+	for err != nil {
+		// a dial error means we couldn't open a TCP connection (either host is not available or DNS doesn't exist)
+		if strings.HasPrefix(err.Error(), "dial ") {
+			return true
+		}
+
+		// it means a trigger timeout
+		if errors.Is(err, context.DeadlineExceeded) {
+			return true
+		}
+
+		err = errors.Unwrap(err)
+	}
+
+	return false
 }
