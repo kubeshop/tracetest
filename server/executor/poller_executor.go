@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -18,6 +19,7 @@ type DefaultPollerExecutor struct {
 	updater      RunUpdater
 	newTraceDBFn traceDBFactoryFn
 	dsRepo       model.DataStoreRepository
+	eventEmitter EventEmitter
 }
 
 type InstrumentedPollerExecutor struct {
@@ -59,6 +61,7 @@ func NewPollerExecutor(
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo model.DataStoreRepository,
+	eventEmitter EventEmitter,
 ) PollerExecutor {
 
 	pollerExecutor := &DefaultPollerExecutor{
@@ -66,6 +69,7 @@ func NewPollerExecutor(
 		updater:      updater,
 		newTraceDBFn: newTraceDBFn,
 		dsRepo:       dsRepo,
+		eventEmitter: eventEmitter,
 	}
 
 	return &InstrumentedPollerExecutor{
@@ -98,16 +102,36 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, m
 		return false, model.Run{}, err
 	}
 
+	err = pe.eventEmitter.Emit(request.ctx, events.TraceFetchingStart(request.test.ID, request.run.ID))
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingStart event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+	}
+
 	traceID := run.TraceID.String()
 	trace, err := traceDB.GetTraceByID(request.ctx, traceID)
 	if err != nil {
+		anotherErr := pe.eventEmitter.Emit(request.ctx, events.TraceFetchingError(request.test.ID, request.run.ID, err))
+		if anotherErr != nil {
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingError event: error: %s\n", request.test.ID, request.run.ID, anotherErr.Error())
+		}
+
 		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
 		return false, model.Run{}, err
+	}
+
+	err = pe.eventEmitter.Emit(request.ctx, events.TraceFetchingSuccess(request.test.ID, request.run.ID))
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingSuccess event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 	}
 
 	trace.ID = run.TraceID
 
 	done, reason := pe.donePollingTraces(request, traceDB, trace)
+
+	err = pe.eventEmitter.Emit(request.ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, len(trace.Flat), request.count))
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+	}
 
 	if !done {
 		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)\n", request.test.ID, request.run.ID, reason)

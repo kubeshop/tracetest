@@ -505,6 +505,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 	tracer := getTracerMock(t)
 	testDB := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+	eventEmitter := getEventEmitterMock(t)
 
 	return executor.NewPollerExecutor(
 		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
@@ -512,6 +513,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 		updater,
 		traceDBFactory,
 		testDB,
+		eventEmitter,
 	)
 }
 
@@ -544,6 +546,19 @@ func getDataStoreRepositoryMock(t *testing.T) model.Repository {
 	mock.Test(t)
 
 	return mock
+}
+
+// EventEmitter
+type eventEmitterMock struct{}
+
+func (em *eventEmitterMock) Emit(ctx context.Context, event model.TestRunEvent) error {
+	return nil
+}
+
+func getEventEmitterMock(t *testing.T) executor.EventEmitter {
+	t.Helper()
+
+	return &eventEmitterMock{}
 }
 
 // Tracer

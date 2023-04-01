@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -41,6 +42,7 @@ func NewTracePoller(
 	updater RunUpdater,
 	assertionRunner AssertionRunner,
 	subscriptionManager *subscription.Manager,
+	eventEmitter EventEmitter,
 ) PersistentTracePoller {
 	return tracePoller{
 		updater:             updater,
@@ -50,34 +52,37 @@ func NewTracePoller(
 		exit:                make(chan bool, 1),
 		assertionRunner:     assertionRunner,
 		subscriptionManager: subscriptionManager,
+		eventEmitter:        eventEmitter,
 	}
 }
 
 type tracePoller struct {
-	updater         RunUpdater
-	ppGetter        PollingProfileGetter
-	pollerExecutor  PollerExecutor
-	assertionRunner AssertionRunner
-
+	updater             RunUpdater
+	ppGetter            PollingProfileGetter
+	pollerExecutor      PollerExecutor
+	assertionRunner     AssertionRunner
 	subscriptionManager *subscription.Manager
+	eventEmitter        EventEmitter
 
 	executeQueue chan PollingRequest
 	exit         chan bool
 }
 
 type PollingRequest struct {
-	ctx   context.Context
-	test  model.Test
-	run   model.Run
-	count int
+	ctx        context.Context
+	test       model.Test
+	run        model.Run
+	count      int
+	hadRequeue bool
 }
 
 func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
 	return &PollingRequest{
-		ctx:   ctx,
-		test:  test,
-		run:   run,
-		count: count,
+		ctx:        ctx,
+		test:       test,
+		run:        run,
+		count:      count,
+		hadRequeue: false,
 	}
 }
 
@@ -123,10 +128,25 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
+	if !job.hadRequeue {
+		err := tp.eventEmitter.Emit(job.ctx, events.TracePollingStart(job.test.ID, job.run.ID))
+		if err != nil {
+			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.test.ID, job.run.ID, err.Error())
+		}
+	}
+
 	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.test.ID, job.run.ID, err.Error())
-		tp.handleTraceDBError(job, err)
+		jobFailed, reason := tp.handleTraceDBError(job, err)
+
+		if jobFailed {
+			anotherErr := tp.eventEmitter.Emit(job.ctx, events.TracePollingError(job.test.ID, job.run.ID, reason, err))
+			if anotherErr != nil {
+				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
+			}
+		}
+
 		return
 	}
 
@@ -137,6 +157,11 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	}
 
 	log.Printf("[TracePoller] Test %s Run %d: Done polling. Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, job.count+1, len(run.Trace.Flat))
+
+	err = tp.eventEmitter.Emit(job.ctx, events.TracePollingSuccess(job.test.ID, job.run.ID))
+	if err != nil {
+		log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingSuccess event: %s \n", job.test.ID, job.run.ID, err.Error())
+	}
 
 	tp.handleDBError(tp.updater.Update(job.ctx, run))
 
@@ -153,7 +178,7 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 	tp.assertionRunner.RunAssertions(job.ctx, assertionRequest)
 }
 
-func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
+func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, string) {
 	run := job.run
 
 	pp := *tp.ppGetter.GetDefault(job.ctx).Periodic
@@ -162,13 +187,19 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < pp.TimeoutDuration() {
 		log.Println("[TracePoller] Trace not found on Data Store yet. Requeuing...")
 		tp.requeue(job)
-		return
+		return false, "Trace not found" // job without fail
 	}
 
+	reason := ""
+
 	if errors.Is(err, connection.ErrTraceNotFound) {
+		reason = "Timed out without finding trace"
+
 		err = fmt.Errorf("timed out waiting for traces after %s", pp.Timeout)
 		fmt.Println("[TracePoller] Timed-out", err)
 	} else {
+		reason = "Unexpected error"
+
 		err = fmt.Errorf("cannot fetch trace: %w", err)
 		fmt.Println("[TracePoller] Unknown error", err)
 	}
@@ -180,6 +211,8 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 		Type:       "update_run",
 		Content:    RunResult{Run: run, Err: err},
 	})
+
+	return true, reason // job failed
 }
 
 func (tp tracePoller) requeue(job PollingRequest) {
@@ -187,6 +220,8 @@ func (tp tracePoller) requeue(job PollingRequest) {
 		pp := *tp.ppGetter.GetDefault(job.ctx).Periodic
 		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
 		time.Sleep(pp.RetryDelayDuration())
+
+		job.hadRequeue = true
 		tp.enqueueJob(job)
 	}()
 }
