@@ -10,10 +10,12 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"go.opentelemetry.io/otel/trace"
@@ -505,7 +507,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 	tracer := getTracerMock(t)
 	testDB := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
-	eventEmitter := getEventEmitterMock(t)
+	eventEmitter := getEventEmitterMock(t, testDB)
 
 	return executor.NewPollerExecutor(
 		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
@@ -529,36 +531,22 @@ func getRunUpdaterMock(t *testing.T) executor.RunUpdater {
 }
 
 // DataStoreRepository
-type dataStoreRepositoryMock struct {
-	testdb.MockRepository
-	// ...
-}
-
-func (m dataStoreRepositoryMock) DefaultDataStore(_ context.Context) (model.DataStore, error) {
-	return model.DataStore{}, nil
-}
-
 func getDataStoreRepositoryMock(t *testing.T) model.Repository {
 	t.Helper()
 
-	mock := new(dataStoreRepositoryMock)
-	mock.T = t
-	mock.Test(t)
+	testDB := testdb.MockRepository{}
 
-	return mock
+	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)
+	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
+
+	return &testDB
 }
 
 // EventEmitter
-type eventEmitterMock struct{}
-
-func (em *eventEmitterMock) Emit(ctx context.Context, event model.TestRunEvent) error {
-	return nil
-}
-
-func getEventEmitterMock(t *testing.T) executor.EventEmitter {
+func getEventEmitterMock(t *testing.T, db model.Repository) executor.EventEmitter {
 	t.Helper()
 
-	return &eventEmitterMock{}
+	return executor.NewEventEmitter(db, subscription.NewManager())
 }
 
 // Tracer
