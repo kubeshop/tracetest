@@ -12,8 +12,6 @@ package openapi
 type PollingInfo struct {
 	Type string `json:"type,omitempty"`
 
-	ReasonNextIteration string `json:"reasonNextIteration,omitempty"`
-
 	IsComplete bool `json:"isComplete,omitempty"`
 
 	Periodic PollingInfoPeriodic `json:"periodic,omitempty"`

@@ -158,6 +158,21 @@ func TriggergRPCUnreachableHostError(testID id.ID, runID int, err error) model.T
 	}
 }
 
+func TraceDataStoreConnectionInfo(testID id.ID, runID int, connectionResult model.ConnectionResult) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "DATA_STORE_CONNECTION_INFO",
+		Title:               "A Data store connection request has been executed",
+		Description:         "A Data store connection request has been executed,test connection result information",
+		CreatedAt:           time.Now(),
+		DataStoreConnection: connectionResult,
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
 func TracePollingStart(testID id.ID, runID int) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
@@ -168,12 +183,19 @@ func TracePollingStart(testID id.ID, runID int) model.TestRunEvent {
 		Description:         "Starting the trace polling process",
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
-		Polling:             model.PollingInfo{},
-		Outputs:             []model.OutputInfo{},
+		Polling: model.PollingInfo{
+			Type:       model.PollingTypePeriodic,
+			IsComplete: false,
+			Periodic: &model.PeriodicPollingConfig{
+				NumberSpans:      0,
+				NumberIterations: 0,
+			},
+		},
+		Outputs: []model.OutputInfo{},
 	}
 }
 
-func TracePollingIterationInfo(testID id.ID, runID int, numberOfSpans, iteration int) model.TestRunEvent {
+func TracePollingIterationInfo(testID id.ID, runID, numberOfSpans, iteration int, isComplete bool) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
@@ -183,8 +205,15 @@ func TracePollingIterationInfo(testID id.ID, runID int, numberOfSpans, iteration
 		Description:         fmt.Sprintf("A polling iteration has been executed, %d spans collected - iteration %d", numberOfSpans, iteration),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
-		Polling:             model.PollingInfo{},
-		Outputs:             []model.OutputInfo{},
+		Polling: model.PollingInfo{
+			Type:       model.PollingTypePeriodic,
+			IsComplete: isComplete,
+			Periodic: &model.PeriodicPollingConfig{
+				NumberSpans:      numberOfSpans,
+				NumberIterations: iteration,
+			},
+		},
+		Outputs: []model.OutputInfo{},
 	}
 }
 
@@ -248,7 +277,7 @@ func TraceFetchingSuccess(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TraceFetchingError(testID id.ID, runID int, err error) model.TestRunEvent {
+func TraceFetchingError(testID id.ID, runID int, connectionResult model.ConnectionResult, err error) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
@@ -257,7 +286,7 @@ func TraceFetchingError(testID id.ID, runID int, err error) model.TestRunEvent {
 		Title:               "The trace was not able to be fetched",
 		Description:         fmt.Sprintf("The trace was not able to be fetched from the DataStore. Error: %s", err),
 		CreatedAt:           time.Now(),
-		DataStoreConnection: model.ConnectionResult{},
+		DataStoreConnection: connectionResult,
 		Polling:             model.PollingInfo{},
 		Outputs:             []model.OutputInfo{},
 	}

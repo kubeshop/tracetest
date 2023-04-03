@@ -457,15 +457,17 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	for i, value := range expectedValues {
 		request := executor.NewPollingRequest(ctx, test, run, i)
 
-		finished, anotherRun, err := pollerExecutor.ExecuteRequest(request)
+		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(request)
 		run = anotherRun // should store a run to use in another iteration
 
 		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
 
 		if value.finished {
 			require.Truef(t, finished, "The poller should have finished on iteration %d", i)
+			require.NotEmptyf(t, finishReason, "The poller should not have finish reason on iteration %d", i)
 		} else {
 			require.Falsef(t, finished, "The poller should have not finished on iteration %d", i)
+			require.Emptyf(t, finishReason, "The poller should have finish reason on iteration %d", i)
 		}
 
 		if value.expectNoTraceError {

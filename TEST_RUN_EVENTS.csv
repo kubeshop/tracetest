@@ -20,6 +20,7 @@ Trigger,EXECUTION_SUCCESS,Successful trigger execution,
 Trigger,HTTP_UNREACHABLE_HOST_ERROR,Tracetest could not reach the defined host in the trigger,
 Trigger,DOCKER_COMPOSE_HOST_MISMATCH_ERROR,"We identified Tracetest is running inside a docker compose container, so if you are trying to access your local host machine please use the host.docker.internal hostname. For more information, see https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds",
 Trigger,GRPC_UNREACHABLE_HOST_ERROR,Tracetest could not reach the defined host in the trigger,
+Trace,DATA_STORE_CONNECTION_INFO,A Data store connection request has been executed,test connection result information
 Trace,POLLING_START,Starting the trace polling process,
 Trace,POLLING_ITERATION_INFO,A polling iteration has been executed,# of spans - iteration # - reason of next iteration
 Trace,POLLING_SUCCESS,The polling strategy has succeeded in fetching the trace from the Data Store,

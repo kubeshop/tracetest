@@ -1810,7 +1810,6 @@ export interface external {
         PollingInfo: {
           /** @enum {string} */
           type?: "periodic";
-          reasonNextIteration?: string;
           isComplete?: boolean;
           periodic?: {
             numberSpans?: number;

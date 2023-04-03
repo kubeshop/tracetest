@@ -25,7 +25,7 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(*PollingRequest) (bool, model.Run, error)
+	ExecuteRequest(*PollingRequest) (bool, string, model.Run, error)
 }
 
 type TraceFetcher interface {
@@ -74,6 +74,10 @@ type PollingRequest struct {
 	run        model.Run
 	count      int
 	hadRequeue bool
+}
+
+func (pr PollingRequest) IsFirstRequest() bool {
+	return !pr.hadRequeue
 }
 
 func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
@@ -128,14 +132,14 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
-	if !job.hadRequeue {
+	if job.IsFirstRequest() {
 		err := tp.eventEmitter.Emit(job.ctx, events.TracePollingStart(job.test.ID, job.run.ID))
 		if err != nil {
 			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.test.ID, job.run.ID, err.Error())
 		}
 	}
 
-	finished, run, err := tp.pollerExecutor.ExecuteRequest(&job)
+	finished, finishReason, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.test.ID, job.run.ID, err.Error())
 		jobFailed, reason := tp.handleTraceDBError(job, err)
@@ -150,13 +154,18 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		return
 	}
 
+	err = tp.eventEmitter.Emit(job.ctx, events.TracePollingIterationInfo(job.test.ID, job.run.ID, len(run.Trace.Flat), job.count, finished))
+	if err != nil {
+		log.Printf("[TracePoller] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", job.test.ID, job.run.ID, err.Error())
+	}
+
 	if !finished {
 		job.count += 1
 		tp.requeue(job)
 		return
 	}
 
-	log.Printf("[TracePoller] Test %s Run %d: Done polling. Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, job.count+1, len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, finishReason, job.count+1, len(run.Trace.Flat))
 
 	err = tp.eventEmitter.Emit(job.ctx, events.TracePollingSuccess(job.test.ID, job.run.ID))
 	if err != nil {
