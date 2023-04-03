@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -21,7 +22,12 @@ func (ds AttributeDataStore) Source() string {
 }
 
 func (ds AttributeDataStore) Get(name string) (string, error) {
-	return ds.Span.Attributes.Get(name), nil
+	value := ds.Span.Attributes.Get(name)
+	if value == "" {
+		return "", errors.New("attribute not found")
+	}
+
+	return value, nil
 }
 
 type MetaAttributesDataStore struct {
@@ -74,5 +80,5 @@ func (ds EnvironmentDataStore) Get(name string) (string, error) {
 		}
 	}
 
-	return "", nil
+	return "", fmt.Errorf("environment variable not found")
 }

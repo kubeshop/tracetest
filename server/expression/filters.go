@@ -21,7 +21,7 @@ var filterFunctions = map[string]filterFn{
 func executeFilter(input value.Value, filterName string, args []string) (value.Value, error) {
 	fn, found := filterFunctions[filterName]
 	if !found {
-		return value.Value{}, fmt.Errorf("filter %s was not found", filterName)
+		return value.Nil, resolutionError(ResourceTypeFilter, filterName, fmt.Errorf("filter not found"))
 	}
 
 	output, err := fn(input, args...)

@@ -131,14 +131,14 @@ func (e Executor) Expression(expression string) (value.Value, error) {
 func (e Executor) ResolveExpression(expr *Expr) (value.Value, error) {
 	currentValue, err := e.resolveTerm(expr.Left)
 	if err != nil {
-		return value.Nil, fmt.Errorf("could not resolve term: %w", err)
+		return value.Nil, err
 	}
 
 	if expr.Right != nil {
 		for _, opTerm := range expr.Right {
 			newValue, err := e.executeOperation(currentValue.Value(), opTerm)
 			if err != nil {
-				return value.Nil, fmt.Errorf("could not execute operation: %w", err)
+				return value.Nil, err
 			}
 
 			currentValue = newValue
@@ -235,7 +235,7 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 	attributeDataStore := e.Stores["attr"]
 	attributeValue, err := attributeDataStore.Get(attribute.Name())
 	if err != nil {
-		return value.Nil, fmt.Errorf("could not resolve attribute %s: %w", attribute.Name(), err)
+		return value.Nil, resolutionError(ResourceTypeAttribute, attribute.Name(), err)
 	}
 
 	return value.NewFromString(attributeValue), nil
@@ -249,7 +249,7 @@ func (e Executor) resolveEnvironment(environment *Environment) (value.Value, err
 	envDataStore := e.Stores["env"]
 	envValue, err := envDataStore.Get(environment.Name())
 	if err != nil {
-		return value.Nil, fmt.Errorf("could not resolve variable %s: %w", environment.Name(), err)
+		return value.Nil, resolutionError(ResourceTypeEnvironmentVariable, environment.Name(), err)
 	}
 
 	return value.NewFromString(envValue), nil
@@ -260,7 +260,7 @@ func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (value.Value, 
 	for i, arg := range functionCall.Args {
 		functionValue, err := e.resolveTerm(arg)
 		if err != nil {
-			return value.Nil, fmt.Errorf("could not execute function %s: invalid argument on index %d: %w", functionCall.Name, i, err)
+			return value.Nil, resolutionError(ResourceTypeFunctionArgument, functionCall.Name, fmt.Errorf("invalid argument on index %d: %w", i, err))
 		}
 
 		args = append(args, functionValue.Value())
@@ -268,7 +268,7 @@ func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (value.Value, 
 
 	function, err := functions.DefaultRegistry().Get(functionCall.Name)
 	if err != nil {
-		return value.Nil, fmt.Errorf("function %s doesn't exist", functionCall.Name)
+		return value.Nil, resolutionError(ResourceTypeFunction, functionCall.Name, nil)
 	}
 
 	typedValue, err := function.Invoke(args...)
@@ -280,7 +280,7 @@ func (e Executor) resolveArray(array *Array) (value.Value, error) {
 	for index, item := range array.Items {
 		termValue, err := e.resolveTerm(item)
 		if err != nil {
-			return value.Value{}, fmt.Errorf("could not resolve item at index %d: %w", index, err)
+			return value.Nil, resolutionError(ResourceTypeArrayItem, fmt.Sprintf("index %d", index), err)
 		}
 
 		typedValues = append(typedValues, termValue.Value())
@@ -301,7 +301,7 @@ func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (value.
 
 	operatorFunction, err := getOperationRegistry().Get(right.Operator)
 	if err != nil {
-		return value.Nil, err
+		return value.Nil, resolutionError(ResourceTypeOperator, right.Operator, nil)
 	}
 
 	newValue, err := operatorFunction(left, rightValue.Value())
@@ -331,7 +331,7 @@ func (e Executor) executeFilter(input value.Value, filter *Filter) (value.Value,
 	for _, arg := range filter.Args {
 		resolvedArg, err := e.resolveTerm(arg)
 		if err != nil {
-			return value.Value{}, err
+			return value.Nil, err
 		}
 
 		args = append(args, resolvedArg.Value().Value)
