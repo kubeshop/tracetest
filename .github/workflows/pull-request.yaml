@@ -315,6 +315,14 @@ jobs:
 
           ./scripts/wait-for-port.sh 11633
 
+      - name: Connecting with PR env (port-forwarding)
+        run: |
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 11634:11633 &
+
+          ./scripts/wait-for-port.sh 11634
+
       - name: Run integration tests
         run: |
           cd tracetesting
