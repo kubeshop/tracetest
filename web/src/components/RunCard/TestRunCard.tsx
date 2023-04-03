@@ -2,7 +2,7 @@ import {Tooltip} from 'antd';
 import {Link} from 'react-router-dom';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
-import TestRun, {isRunStateFailed, isRunStateFinished} from 'models/TestRun.model';
+import TestRun, {isRunStateFailed, isRunStateFinished, isRunStateStopped} from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 
@@ -15,6 +15,9 @@ interface IProps {
 function getIcon(state: TestRun['state'], failedAssertions: number) {
   if (!isRunStateFinished(state)) {
     return null;
+  }
+  if (isRunStateStopped(state)) {
+    return <S.IconInfo />;
   }
   if (isRunStateFailed(state) || failedAssertions > 0) {
     return <S.IconFail />;

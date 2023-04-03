@@ -6,7 +6,6 @@ import RunEvents from 'components/RunEvents';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import DAG from 'components/Visualization/components/DAG';
 import Timeline from 'components/Visualization/components/Timeline';
-import {TestState} from 'constants/TestRun.constants';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
 import Span from 'models/Span.model';
 import TestRunEvent from 'models/TestRunEvent.model';
@@ -16,6 +15,7 @@ import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.
 import DAGSelectors from 'selectors/DAG.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
+import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
 
 export interface IProps {
@@ -69,7 +69,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     [onSelectSpan, onSetFocusedSpan]
   );
 
-  if (runState !== TestState.FINISHED) {
+  if (TestRunService.shouldDisplayTraceEvents(runState, spans.length)) {
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 

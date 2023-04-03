@@ -50,6 +50,7 @@ export const {
   useLazyGetRunListQuery,
   useDryRunMutation,
   useDeleteRunByIdMutation,
+  useStopRunMutation,
   useGetJUnitByRunIdQuery,
   useLazyGetJUnitByRunIdQuery,
   useEditTestMutation,
