@@ -1,9 +1,5 @@
 package expression
 
-import (
-	"fmt"
-)
-
 type Token struct {
 	Identifier string
 	Type       TermType
@@ -12,7 +8,7 @@ type Token struct {
 func GetTokens(statement string) ([]Token, error) {
 	parsedStatement, err := ParseStatement(statement)
 	if err != nil {
-		return []Token{}, fmt.Errorf("could not parse statement: %w", err)
+		return []Token{}, invalidSyntaxError(err, statement)
 	}
 
 	leftTokens := extractTokensFromExpression(parsedStatement.Left)
@@ -31,7 +27,7 @@ func GetTokens(statement string) ([]Token, error) {
 func GetTokensFromExpression(expression string) ([]Token, error) {
 	parsedExpression, err := Parse(expression)
 	if err != nil {
-		return []Token{}, fmt.Errorf("could not parse statement: %w", err)
+		return []Token{}, invalidSyntaxError(err, expression)
 	}
 
 	return extractTokensFromExpression(&parsedExpression), nil

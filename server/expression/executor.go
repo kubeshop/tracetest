@@ -34,7 +34,7 @@ func NewExecutor(dataStores ...DataStore) Executor {
 func (e Executor) Statement(statement string) (string, string, error) {
 	parsedStatement, err := ParseStatement(statement)
 	if err != nil {
-		return "", "", fmt.Errorf("could not parse statement: %w", err)
+		return "", "", err
 	}
 
 	leftValue, err := e.ResolveExpression(parsedStatement.Left)
@@ -77,7 +77,7 @@ func (e Executor) GetParsedStatement(statement string) (Statement, error) {
 		expression, err := Parse(statement)
 		if err != nil {
 			// it's really invalid
-			return Statement{}, fmt.Errorf("could not parse statement: %w", err)
+			return Statement{}, invalidSyntaxError(err, statement)
 		}
 
 		parsedStatement.Left = &expression
@@ -122,7 +122,7 @@ func (e Executor) Expression(expression string) (value.Value, error) {
 	var expr Expr
 	err = parser.ParseString("", expression, &expr)
 	if err != nil {
-		return value.Nil, fmt.Errorf(`could not parse expression "%s": %w`, expression, err)
+		return value.Nil, invalidSyntaxError(err, expression)
 	}
 
 	return e.ResolveExpression(&expr)
