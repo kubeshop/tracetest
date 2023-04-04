@@ -128,7 +128,9 @@ components:
               AWAITING_TRACE,
               AWAITING_TEST_RESULTS,
               FINISHED,
-              FAILED,
+              TRIGGER_FAILED,
+              TRACE_FAILED,
+              ASSERTION_FAILED,
             ]
           description: Current execution state
         lastErrorState:
