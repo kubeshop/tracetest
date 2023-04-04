@@ -33,7 +33,7 @@ func ParseStatement(statement string) (Statement, error) {
 
 	err = parser.ParseString("", statement, &parsedStatement)
 	if err != nil {
-		return Statement{}, fmt.Errorf(`could not parse statement "%s": %w`, statement, err)
+		return Statement{}, invalidSyntaxError(err, statement)
 	}
 
 	return parsedStatement, nil
@@ -63,7 +63,7 @@ func Parse(expression string) (Expr, error) {
 
 	err = parser.ParseString("", expression, &parsedExpression)
 	if err != nil {
-		return Expr{}, fmt.Errorf(`could not parse statement "%s": %w`, expression, err)
+		return Expr{}, invalidSyntaxError(err, expression)
 	}
 
 	return parsedExpression, nil
