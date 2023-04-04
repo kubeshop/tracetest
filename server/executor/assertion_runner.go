@@ -196,6 +196,16 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 					))
 				}
 
+				if errors.Is(spanAssertionResult.CompareErr, expression.ErrInvalidSyntax) {
+					e.eventEmitter.Emit(ctx, events.TestSpecsAssertionError(
+						req.Run.TestID,
+						req.Run.ID,
+						spanAssertionResult.CompareErr,
+						spanAssertionResult.SpanID.String(),
+						string(assertionResult.Assertion),
+					))
+				}
+
 			}
 		}
 	}
