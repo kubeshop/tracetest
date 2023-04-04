@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -167,6 +168,8 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 
 	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace, ds)
 
+	e.emitFailedAssertions(ctx, req, assertionResult)
+
 	run = run.SuccessfullyAsserted(
 		outputs,
 		newEnvironment,
@@ -175,6 +178,27 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	)
 
 	return run, nil
+}
+
+func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req AssertionRequest, result model.OrderedMap[model.SpanQuery, []model.AssertionResult]) {
+	for _, assertionResults := range result.Unordered() {
+		for _, assertionResult := range assertionResults {
+			for _, spanAssertionResult := range assertionResult.Results {
+
+				if errors.Is(spanAssertionResult.CompareErr, expression.ErrExpressionResolution) {
+					unwrappedError := errors.Unwrap(spanAssertionResult.CompareErr)
+					e.eventEmitter.Emit(ctx, events.TestSpecsAssertionError(
+						req.Run.TestID,
+						req.Run.ID,
+						unwrappedError,
+						spanAssertionResult.SpanID.String(),
+						string(assertionResult.Assertion),
+					))
+				}
+
+			}
+		}
+	}
 }
 
 func createEnvironment(environment model.Environment, outputs model.OrderedMap[string, model.RunOutput]) model.Environment {

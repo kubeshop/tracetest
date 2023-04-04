@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -29,6 +28,7 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
+	tracer          trace.Tracer
 	testDB          model.Repository
 	runner          runner
 	newTraceDBFn    func(ds model.DataStore) (tracedb.TraceDB, error)
@@ -48,8 +48,10 @@ func NewController(
 	runner runner,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
+	tracer trace.Tracer,
 ) openapi.ApiApiServicer {
 	return &controller{
+		tracer:          tracer,
 		testDB:          testDB,
 		runner:          runner,
 		newTraceDBFn:    newTraceDBFn,
@@ -372,7 +374,9 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID, runID string, 
 		Values: run.Environment.Values,
 	}}
 
-	results, allPassed := assertions.Assert(definition, *run.Trace, ds)
+	assertionExecutor := executor.NewAssertionExecutor(c.tracer)
+
+	results, allPassed := assertionExecutor.Assert(ctx, definition, *run.Trace, ds)
 	res := c.mappers.Out.Result(&model.RunResults{
 		AllPassed: allPassed,
 		Results:   results,

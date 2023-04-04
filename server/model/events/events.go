@@ -323,51 +323,6 @@ func TestOutputGenerationWarning(testID id.ID, runID int, output string) model.T
 	}
 }
 
-func TestResolveStart(testID id.ID, runID int) model.TestRunEvent {
-	return model.TestRunEvent{
-		TestID:              testID,
-		RunID:               runID,
-		Stage:               model.StageTest,
-		Type:                "RESOLVE_START",
-		Title:               "Resolving test specs details start",
-		Description:         "Resolving test specs details start",
-		CreatedAt:           time.Now(),
-		DataStoreConnection: model.ConnectionResult{},
-		Polling:             model.PollingInfo{},
-		Outputs:             []model.OutputInfo{},
-	}
-}
-
-func TestResolveSuccess(testID id.ID, runID int) model.TestRunEvent {
-	return model.TestRunEvent{
-		TestID:              testID,
-		RunID:               runID,
-		Stage:               model.StageTest,
-		Type:                "RESOLVE_SUCCESS",
-		Title:               "Resolving test specs details success",
-		Description:         "Resolving test specs details success",
-		CreatedAt:           time.Now(),
-		DataStoreConnection: model.ConnectionResult{},
-		Polling:             model.PollingInfo{},
-		Outputs:             []model.OutputInfo{},
-	}
-}
-
-func TestResolveError(testID id.ID, runID int) model.TestRunEvent {
-	return model.TestRunEvent{
-		TestID:              testID,
-		RunID:               runID,
-		Stage:               model.StageTest,
-		Type:                "RESOLVE_ERROR",
-		Title:               "An error ocurred while parsing the test specs",
-		Description:         "An error ocurred while parsing the test specs",
-		CreatedAt:           time.Now(),
-		DataStoreConnection: model.ConnectionResult{},
-		Polling:             model.PollingInfo{},
-		Outputs:             []model.OutputInfo{},
-	}
-}
-
 func TestSpecsRunSuccess(testID id.ID, runID int) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
@@ -421,6 +376,21 @@ func TestSpecsRunStart(testID id.ID, runID int) model.TestRunEvent {
 		Type:                "TEST_SPECS_RUN_START",
 		Title:               "Test specs execution start",
 		Description:         "Test specs execution start",
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
+func TestSpecsAssertionError(testID id.ID, runID int, err error, spanID string, assertion string) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTest,
+		Type:                "TEST_SPECS_ASSERTION_ERROR",
+		Title:               "Assertion execution failed",
+		Description:         fmt.Sprintf(`Assertion '%s' returned an error on span %s: %s`, assertion, spanID, err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
