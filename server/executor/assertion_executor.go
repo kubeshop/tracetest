@@ -14,9 +14,7 @@ type AssertionExecutor interface {
 	Assert(context.Context, model.OrderedMap[model.SpanQuery, model.NamedAssertions], model.Trace, []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool)
 }
 
-type defaultAssertionExecutor struct {
-	eventEmitter EventEmitter
-}
+type defaultAssertionExecutor struct{}
 
 func (e defaultAssertionExecutor) Assert(ctx context.Context, defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace model.Trace, ds []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
@@ -105,9 +103,9 @@ func (e instrumentedAssertionExecutor) Assert(ctx context.Context, defs model.Or
 	return result, allPassed
 }
 
-func NewAssertionExecutor(tracer trace.Tracer, eventEmitter EventEmitter) AssertionExecutor {
+func NewAssertionExecutor(tracer trace.Tracer) AssertionExecutor {
 	return &instrumentedAssertionExecutor{
-		assertionExecutor: defaultAssertionExecutor{eventEmitter: eventEmitter},
+		assertionExecutor: defaultAssertionExecutor{},
 		tracer:            tracer,
 	}
 }

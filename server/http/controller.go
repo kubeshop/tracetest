@@ -374,9 +374,7 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID, runID string, 
 		Values: run.Environment.Values,
 	}}
 
-	// We are passing nil as the event emitter because dry runs should not generate events
-	// for a run because the run doesn't exist.
-	assertionExecutor := executor.NewAssertionExecutor(c.tracer, nil)
+	assertionExecutor := executor.NewAssertionExecutor(c.tracer)
 
 	results, allPassed := assertionExecutor.Assert(ctx, definition, *run.Trace, ds)
 	res := c.mappers.Out.Result(&model.RunResults{

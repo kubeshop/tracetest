@@ -208,7 +208,7 @@ func TestAssertion(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			cl := c
 
-			executor := executor.NewAssertionExecutor(trace.NewNoopTracerProvider().Tracer("tracer"), nil)
+			executor := executor.NewAssertionExecutor(trace.NewNoopTracerProvider().Tracer("tracer"))
 			actual, allPassed := executor.Assert(context.Background(), cl.testDef, cl.trace, []expression.DataStore{})
 
 			assert.Equal(t, cl.expectedAllPassed, allPassed)
