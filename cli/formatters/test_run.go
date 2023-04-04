@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/pterm/pterm"
 )
 
@@ -77,7 +78,7 @@ func (f testRun) json(output TestRunOutput) string {
 }
 
 func (f testRun) pretty(output TestRunOutput) string {
-	if output.Run.State != nil && *output.Run.State == "FAILED" {
+	if utils.RunStateIsFailed(output.Run.GetState()) {
 		return f.getColoredText(false, f.formatMessage("Failed to execute test: %s", *output.Run.LastErrorState))
 	}
 

@@ -19,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/ui"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
 )
@@ -440,7 +441,7 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 	fmt.Print(formattedOutput)
 
 	if params.WaitForResult {
-		if tro.Run.GetState() == "FAILED" {
+		if utils.RunStateIsFailed(tro.Run.GetState()) {
 			// It failed, so we have to return an error status
 			os.Exit(1)
 		}
@@ -579,7 +580,7 @@ func (a runTestAction) isTestReady(ctx context.Context, testID, testRunId string
 		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
 	}
 
-	if *run.State == "FAILED" || *run.State == "FINISHED" {
+	if utils.RunStateIsFinished(run.GetState()) {
 		return run, nil
 	}
 
@@ -598,7 +599,7 @@ func (a runTestAction) isTransactionReady(ctx context.Context, transactionID, tr
 		return nil, fmt.Errorf("could not execute GetTestRun request: %w", err)
 	}
 
-	if *run.State == "FAILED" || *run.State == "FINISHED" {
+	if utils.RunStateIsFinished(run.GetState()) {
 		return run, nil
 	}
 
