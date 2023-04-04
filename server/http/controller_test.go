@@ -16,6 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -121,6 +122,7 @@ func setupController(t *testing.T) controllerFixture {
 			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb),
 			&trigger.Registry{},
+			trace.NewNoopTracerProvider().Tracer("tracer"),
 		),
 	}
 }
