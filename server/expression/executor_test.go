@@ -1,21 +1,26 @@
 package expression_test
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type executorTestCase struct {
-	Name       string
-	Query      string
-	ShouldPass bool
+	Name                 string
+	Query                string
+	ShouldPass           bool
+	ExpectedErrorMessage string
 
 	AttributeDataStore      expression.DataStore
 	MetaAttributesDataStore expression.DataStore
+	EnvironmentDataStore    expression.DataStore
 }
 
 func TestBasicExpressionExecution(t *testing.T) {
@@ -405,19 +410,76 @@ func TestResolveStatementFilterExecution(t *testing.T) {
 	executeResolveStatementTestCases(t, testCases)
 }
 
+func TestFailureCases(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:                 "should_report_missing_environment_variable",
+			Query:                `env:test = "abc"`,
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: environment variable "test" not found`,
+
+			EnvironmentDataStore: expression.EnvironmentDataStore{
+				Values: []model.EnvironmentValue{},
+			},
+		},
+		{
+			Name:                 "should_report_missing_attribute",
+			Query:                `attr:my_attribute = "abc"`,
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: attribute "my_attribute" not found`,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: model.Span{
+					Attributes: model.Attributes{
+						"attr1": "1",
+						"attr2": "2",
+					},
+				},
+			},
+		},
+		{
+			Name:                 "should_report_missing_filter",
+			Query:                `"value" | missingFilter = "abc"`,
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: filter "missingFilter" not found`,
+		},
+		{
+			Name:                 "should_report_problem_resolving_array_item",
+			Query:                `["value", env:test, "anotherValue"] | get_index 0`,
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: at index 1 of array: environment variable "test" not found`,
+
+			EnvironmentDataStore: expression.EnvironmentDataStore{
+				Values: []model.EnvironmentValue{},
+			},
+		},
+	}
+
+	executeResolveStatementTestCases(t, testCases)
+}
+
 func executeResolveStatementTestCases(t *testing.T, testCases []executorTestCase) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			executor := expression.NewExecutor(
 				testCase.AttributeDataStore,
 				testCase.MetaAttributesDataStore,
+				testCase.EnvironmentDataStore,
 			)
 			left, err := executor.ResolveStatement(testCase.Query)
 			debugMessage := fmt.Sprintf("left value: %s", left)
 			if testCase.ShouldPass {
 				assert.NoError(t, err, debugMessage)
 			} else {
-				assert.Error(t, err, debugMessage)
+				require.Error(t, err, debugMessage)
+				if testCase.ExpectedErrorMessage != "" {
+					assert.Equal(t, testCase.ExpectedErrorMessage, err.Error())
+					// all validation erros should be ErrExpressionResolution errors
+					assert.ErrorIs(t, err, expression.ErrExpressionResolution)
+
+					errorMessageDoesntStartWithResolutionError := !strings.HasPrefix(errors.Unwrap(err).Error(), "resolution error:")
+					assert.True(t, errorMessageDoesntStartWithResolutionError)
+				}
 			}
 		})
 	}
