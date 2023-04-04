@@ -1,7 +1,9 @@
 package expression_test
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression"
@@ -474,6 +476,9 @@ func executeResolveStatementTestCases(t *testing.T, testCases []executorTestCase
 					assert.Equal(t, testCase.ExpectedErrorMessage, err.Error())
 					// all validation erros should be ErrExpressionResolution errors
 					assert.ErrorIs(t, err, expression.ErrExpressionResolution)
+
+					errorMessageDoesntStartWithResolutionError := !strings.HasPrefix(errors.Unwrap(err).Error(), "resolution error:")
+					assert.True(t, errorMessageDoesntStartWithResolutionError)
 				}
 			}
 		})
