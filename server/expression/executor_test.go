@@ -414,7 +414,7 @@ func TestFailureCases(t *testing.T) {
 			Name:                 "should_report_missing_environment_variable",
 			Query:                `env:test = "abc"`,
 			ShouldPass:           false,
-			ExpectedErrorMessage: `error when resolving expression: environment variable "test": environment variable not found`,
+			ExpectedErrorMessage: `resolution error: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
 				Values: []model.EnvironmentValue{},
@@ -424,7 +424,7 @@ func TestFailureCases(t *testing.T) {
 			Name:                 "should_report_missing_attribute",
 			Query:                `attr:my_attribute = "abc"`,
 			ShouldPass:           false,
-			ExpectedErrorMessage: `error when resolving expression: attribute "my_attribute": attribute not found`,
+			ExpectedErrorMessage: `resolution error: attribute "my_attribute" not found`,
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: model.Span{
@@ -439,13 +439,13 @@ func TestFailureCases(t *testing.T) {
 			Name:                 "should_report_missing_filter",
 			Query:                `"value" | missingFilter = "abc"`,
 			ShouldPass:           false,
-			ExpectedErrorMessage: `error when resolving expression: filter "missingFilter": filter not found`,
+			ExpectedErrorMessage: `resolution error: filter "missingFilter" not found`,
 		},
 		{
 			Name:                 "should_report_problem_resolving_array_item",
 			Query:                `["value", env:test, "anotherValue"] | get_index 0`,
 			ShouldPass:           false,
-			ExpectedErrorMessage: `error when resolving expression: array item "index 1": error when resolving expression: environment variable "test": environment variable not found`,
+			ExpectedErrorMessage: `resolution error: at index 1 of array: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
 				Values: []model.EnvironmentValue{},
@@ -471,7 +471,9 @@ func executeResolveStatementTestCases(t *testing.T, testCases []executorTestCase
 			} else {
 				require.Error(t, err, debugMessage)
 				if testCase.ExpectedErrorMessage != "" {
-					assert.Contains(t, err.Error(), testCase.ExpectedErrorMessage)
+					assert.Equal(t, testCase.ExpectedErrorMessage, err.Error())
+					// all validation erros should be ErrExpressionResolution errors
+					assert.ErrorIs(t, err, expression.ErrExpressionResolution)
 				}
 			}
 		})

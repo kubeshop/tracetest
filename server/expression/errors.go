@@ -5,32 +5,29 @@ import (
 	"fmt"
 )
 
-var ErrExpressionResolution error = errors.New("error when resolving expression")
-
-type ResourceType string
-
-var (
-	ResourceTypeAttribute           ResourceType = "attribute"
-	ResourceTypeEnvironmentVariable ResourceType = "environment variable"
-	ResourceTypeFunction            ResourceType = "function"
-	ResourceTypeArrayItem           ResourceType = "array item"
-	ResourceTypeFunctionArgument    ResourceType = "function argument"
-	ResourceTypeFilter              ResourceType = "filter"
-	ResourceTypeOperator            ResourceType = "operator"
-)
+var ErrExpressionResolution error = errors.New("resolution error")
 
 type ResolutionError struct {
-	Type     ResourceType
-	Name     string
-	InnerErr error
+	innerErr error
 }
 
-func resolutionError(typ ResourceType, name string, innerErr error) error {
-	newError := fmt.Errorf(`%w: %s "%s"`, ErrExpressionResolution, typ, name)
+func (e *ResolutionError) Error() string {
+	return fmt.Sprintf("%s: %s", ErrExpressionResolution.Error(), e.innerErr.Error())
+}
 
-	if innerErr != nil {
-		newError = fmt.Errorf("%w: %s", newError, innerErr.Error())
+func (e *ResolutionError) Is(target error) bool {
+	// all Resolution errors are ErrExpressionResolution
+	if errors.Is(target, ErrExpressionResolution) {
+		return true
 	}
 
-	return newError
+	return errors.Is(e.innerErr, target)
+}
+
+func (e *ResolutionError) Unwrap() error {
+	return e.innerErr
+}
+
+func resolutionError(innerErr error) error {
+	return &ResolutionError{innerErr: innerErr}
 }

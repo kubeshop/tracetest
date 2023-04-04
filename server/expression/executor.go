@@ -39,12 +39,12 @@ func (e Executor) Statement(statement string) (string, string, error) {
 
 	leftValue, err := e.ResolveExpression(parsedStatement.Left)
 	if err != nil {
-		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
+		return "", "", err
 	}
 
 	rightValue, err := e.ResolveExpression(parsedStatement.Right)
 	if err != nil {
-		return "", "", fmt.Errorf("could not parse left side expression: %w", err)
+		return "", "", err
 	}
 
 	// https://github.com/kubeshop/tracetest/issues/1203
@@ -96,7 +96,7 @@ func (e Executor) ResolveStatement(statement string) (string, error) {
 
 	leftValue, err := e.ResolveExpression(parsedStatement.Left)
 	if err != nil {
-		return "", fmt.Errorf("could not parse left side expression: %w", err)
+		return "", err
 	}
 
 	parsed = parsed + leftValue.String()
@@ -104,7 +104,7 @@ func (e Executor) ResolveStatement(statement string) (string, error) {
 	if parsedStatement.Right != nil {
 		rightValue, err := e.ResolveExpression(parsedStatement.Right)
 		if err != nil {
-			return "", fmt.Errorf("could not parse left side expression: %w", err)
+			return "", err
 		}
 
 		parsed = fmt.Sprintf("%s %s %s", parsed, parsedStatement.Comparator, rightValue.String())
@@ -235,7 +235,7 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 	attributeDataStore := e.Stores["attr"]
 	attributeValue, err := attributeDataStore.Get(attribute.Name())
 	if err != nil {
-		return value.Nil, resolutionError(ResourceTypeAttribute, attribute.Name(), err)
+		return value.Nil, resolutionError(err)
 	}
 
 	return value.NewFromString(attributeValue), nil
@@ -249,7 +249,7 @@ func (e Executor) resolveEnvironment(environment *Environment) (value.Value, err
 	envDataStore := e.Stores["env"]
 	envValue, err := envDataStore.Get(environment.Name())
 	if err != nil {
-		return value.Nil, resolutionError(ResourceTypeEnvironmentVariable, environment.Name(), err)
+		return value.Nil, resolutionError(err)
 	}
 
 	return value.NewFromString(envValue), nil
@@ -257,10 +257,11 @@ func (e Executor) resolveEnvironment(environment *Environment) (value.Value, err
 
 func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (value.Value, error) {
 	args := make([]types.TypedValue, 0, len(functionCall.Args))
-	for i, arg := range functionCall.Args {
+	for index, arg := range functionCall.Args {
 		functionValue, err := e.resolveTerm(arg)
 		if err != nil {
-			return value.Nil, resolutionError(ResourceTypeFunctionArgument, functionCall.Name, fmt.Errorf("invalid argument on index %d: %w", i, err))
+			newErr := fmt.Errorf("on argument %d of function %s: %w", index, functionCall.Name, err)
+			return value.Nil, resolutionError(newErr)
 		}
 
 		args = append(args, functionValue.Value())
@@ -268,7 +269,7 @@ func (e Executor) resolveFunctionCall(functionCall *FunctionCall) (value.Value, 
 
 	function, err := functions.DefaultRegistry().Get(functionCall.Name)
 	if err != nil {
-		return value.Nil, resolutionError(ResourceTypeFunction, functionCall.Name, nil)
+		return value.Nil, resolutionError(err)
 	}
 
 	typedValue, err := function.Invoke(args...)
@@ -280,7 +281,9 @@ func (e Executor) resolveArray(array *Array) (value.Value, error) {
 	for index, item := range array.Items {
 		termValue, err := e.resolveTerm(item)
 		if err != nil {
-			return value.Nil, resolutionError(ResourceTypeArrayItem, fmt.Sprintf("index %d", index), err)
+			innerError := errors.Unwrap(err)
+			newErr := fmt.Errorf("at index %d of array: %w", index, innerError)
+			return value.Nil, resolutionError(newErr)
 		}
 
 		typedValues = append(typedValues, termValue.Value())
@@ -301,7 +304,7 @@ func (e Executor) executeOperation(left types.TypedValue, right *OpTerm) (value.
 
 	operatorFunction, err := getOperationRegistry().Get(right.Operator)
 	if err != nil {
-		return value.Nil, resolutionError(ResourceTypeOperator, right.Operator, nil)
+		return value.Nil, resolutionError(err)
 	}
 
 	newValue, err := operatorFunction(left, rightValue.Value())

@@ -1,7 +1,6 @@
 package expression
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -24,7 +23,7 @@ func (ds AttributeDataStore) Source() string {
 func (ds AttributeDataStore) Get(name string) (string, error) {
 	value := ds.Span.Attributes.Get(name)
 	if value == "" {
-		return "", errors.New("attribute not found")
+		return "", fmt.Errorf(`attribute "%s" not found`, name)
 	}
 
 	return value, nil
@@ -80,5 +79,5 @@ func (ds EnvironmentDataStore) Get(name string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("environment variable not found")
+	return "", fmt.Errorf(`environment variable "%s" not found`, name)
 }
