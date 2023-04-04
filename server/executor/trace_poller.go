@@ -173,7 +173,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) {
 		fmt.Println("[TracePoller] Unknown error", err)
 	}
 
-	tp.handleDBError(tp.updater.Update(job.ctx, run.Failed(err)))
+	tp.handleDBError(tp.updater.Update(job.ctx, run.TraceFailed(err)))
 
 	tp.subscriptionManager.PublishUpdate(subscription.Message{
 		ResourceID: run.TransactionStepResourceID(),

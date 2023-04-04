@@ -272,7 +272,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.Response, err error) model.Run {
 	run = run.TriggerCompleted(response.Result)
 	if err != nil {
-		return run.Failed(err)
+		return run.TriggerFailed(err)
 	}
 
 	return run.SuccessfullyTriggered()

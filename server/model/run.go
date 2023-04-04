@@ -121,8 +121,20 @@ func (r Run) Finish() Run {
 	return r
 }
 
-func (r Run) Failed(err error) Run {
-	r.State = RunStateFailed
+func (r Run) TriggerFailed(err error) Run {
+	r.State = RunStateTriggerFailed
+	r.LastError = err
+	return r.Finish()
+}
+
+func (r Run) TraceFailed(err error) Run {
+	r.State = RunStateTraceFailed
+	r.LastError = err
+	return r.Finish()
+}
+
+func (r Run) AssertionFailed(err error) Run {
+	r.State = RunStateAssertionFailed
 	r.LastError = err
 	return r.Finish()
 }
