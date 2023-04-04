@@ -47,7 +47,7 @@ func newRunnerFacades(
 
 	assertionRunner := executor.NewAssertionRunner(
 		execTestUpdater,
-		executor.NewAssertionExecutor(tracer),
+		executor.NewAssertionExecutor(tracer, eventEmitter),
 		executor.InstrumentedOutputProcessor(tracer),
 		subscriptionManager,
 		eventEmitter,

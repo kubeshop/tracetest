@@ -1,15 +1,17 @@
-package assertions_test
+package executor_test
 
 import (
+	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/assertions"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func TestAssertion(t *testing.T) {
@@ -205,9 +207,9 @@ func TestAssertion(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			cl := c
-			// t.Parallel()
 
-			actual, allPassed := assertions.Assert(cl.testDef, cl.trace, []expression.DataStore{})
+			executor := executor.NewAssertionExecutor(trace.NewNoopTracerProvider().Tracer("tracer"), nil)
+			actual, allPassed := executor.Assert(context.Background(), cl.testDef, cl.trace, []expression.DataStore{})
 
 			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
