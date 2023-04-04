@@ -1,5 +1,6 @@
+import {TestState} from 'constants/TestRun.constants';
+import {Model, Modify, TTestSchemas, TTriggerSchemas} from 'types/Common.types';
 import {TTestRunState} from 'types/TestRun.types';
-import {Model, Modify, TTestSchemas, TTriggerSchemas} from '../types/Common.types';
 import AssertionResults, {TRawAssertionResults} from './AssertionResults.model';
 import Environment from './Environment.model';
 import TestRunOutput from './TestRunOutput.model';
@@ -54,6 +55,16 @@ const getTestResultCount = (
     }
   }).length;
 };
+
+export function isRunStateFinished(state: TTestRunState) {
+  return (
+    [TestState.FINISHED, TestState.TRIGGER_FAILED, TestState.TRACE_FAILED, TestState.ASSERTION_FAILED] as string[]
+  ).includes(state);
+}
+
+export function isRunStateFailed(state: TTestRunState) {
+  return ([TestState.TRIGGER_FAILED, TestState.TRACE_FAILED, TestState.ASSERTION_FAILED] as string[]).includes(state);
+}
 
 const TestRun = ({
   id = '',

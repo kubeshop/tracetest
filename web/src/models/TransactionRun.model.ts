@@ -1,4 +1,4 @@
-import { Model, TTransactionsSchemas } from '../types/Common.types';
+import {Model, TTransactionsSchemas} from 'types/Common.types';
 import Environment from './Environment.model';
 import TestRun from './TestRun.model';
 

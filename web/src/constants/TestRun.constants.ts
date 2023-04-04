@@ -3,6 +3,9 @@ export enum TestState {
   EXECUTING = 'EXECUTING',
   AWAITING_TRACE = 'AWAITING_TRACE',
   AWAITING_TEST_RESULTS = 'AWAITING_TEST_RESULTS',
+  TRIGGER_FAILED = 'TRIGGER_FAILED',
+  TRACE_FAILED = 'TRACE_FAILED',
+  ASSERTION_FAILED = 'ASSERTION_FAILED',
   FAILED = 'FAILED',
   FINISHED = 'FINISHED',
   WAITING = 'WAITING',
@@ -35,6 +38,18 @@ export const TestStateMap: Record<
   [TestState.FAILED]: {
     status: 'error',
     label: 'Failed',
+  },
+  [TestState.TRIGGER_FAILED]: {
+    status: 'error',
+    label: 'Trigger Failed',
+  },
+  [TestState.TRACE_FAILED]: {
+    status: 'error',
+    label: 'Trace Failed',
+  },
+  [TestState.ASSERTION_FAILED]: {
+    status: 'error',
+    label: 'Test Specs Failed',
   },
   [TestState.FINISHED]: {
     status: 'success',

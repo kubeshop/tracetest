@@ -93,7 +93,6 @@ export const StateContainer = styled.div`
   align-items: center;
   display: flex;
   justify-self: flex-end;
-  cursor: pointer;
 `;
 
 export const StateText = styled(Typography.Text)`

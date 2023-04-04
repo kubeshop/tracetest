@@ -5,4 +5,4 @@ export enum RunErrorTypes {
   Unknown = 'unknown',
 }
 
-export type TTestRunState = NonNullable<TTestSchemas['TestRun']['state'] | 'WAITING' | 'SKIPPED'>;
+export type TTestRunState = NonNullable<TTestSchemas['TestRun']['state'] | 'WAITING' | 'SKIPPED' | 'FAILED'>;
