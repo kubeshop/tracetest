@@ -186,7 +186,7 @@ jobs:
 
   test-examples:
     name: Test examples
-    needs:  [build-docker]
+    needs:  [test-server, build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
