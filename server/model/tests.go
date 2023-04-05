@@ -137,6 +137,14 @@ type (
 	}
 )
 
+func (sar SpanAssertionResult) SafeSpanIDString() string {
+	if sar.SpanID == nil {
+		return ""
+	}
+
+	return sar.SpanID.String()
+}
+
 func (t Test) HasID() bool {
 	return t.ID != ""
 }
