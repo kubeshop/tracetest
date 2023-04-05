@@ -1,10 +1,24 @@
 import {TestRunStage, TraceEventType} from 'constants/TestRunEvents.constants';
-import {filter, findLastIndex} from 'lodash';
+import {filter, findLastIndex, flow} from 'lodash';
 import TestRunEvent from 'models/TestRunEvent.model';
 
 const TestRunService = () => ({
   getTestRunEventsByStage(events: TestRunEvent[], stage: TestRunStage) {
     return events.filter(event => event.stage === stage);
+  },
+
+  getTestRunTraceEvents(events: TestRunEvent[]): TestRunEvent[] {
+    return flow([this.getTestRunEventsWithoutFetching, this.getTestRunEventsWithLastPolling])(events);
+  },
+
+  getTestRunEventsWithoutFetching(events: TestRunEvent[]) {
+    return filter(
+      events,
+      event =>
+        !(
+          [TraceEventType.FETCHING_START, TraceEventType.FETCHING_ERROR, TraceEventType.FETCHING_SUCCESS] as string[]
+        ).includes(event.type)
+    );
   },
 
   getTestRunEventsWithLastPolling(events: TestRunEvent[]) {

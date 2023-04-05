@@ -4,21 +4,21 @@ import Empty from './Empty';
 import * as S from './TestSpecs.styled';
 
 interface IProps {
-  assertionResults: AssertionResults;
+  assertionResults?: AssertionResults;
   onDelete(selector: string): void;
   onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onOpen(selector: string): void;
   onRevert(originalSelector: string): void;
 }
 
-const TestSpecs = ({assertionResults: {resultList}, onDelete, onEdit, onOpen, onRevert}: IProps) => {
-  if (!resultList.length) {
+const TestSpecs = ({assertionResults, onDelete, onEdit, onOpen, onRevert}: IProps) => {
+  if (!assertionResults?.resultList?.length) {
     return <Empty />;
   }
 
   return (
     <S.Container data-cy="test-specs-container">
-      {resultList.map(specResult =>
+      {assertionResults?.resultList?.map(specResult =>
         specResult.resultList.length ? (
           <TestSpec
             key={specResult.id}

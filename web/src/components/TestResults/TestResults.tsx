@@ -38,15 +38,15 @@ const TestResults = ({onDelete, onEdit, onRevert}: IProps) => {
     <S.Container>
       <Header selectedSpan={selectedSpan!} totalFailedSpecs={totalFailedSpecs} totalPassedSpecs={totalPassedSpecs} />
 
-      {(isLoading || !assertionResults) && (
+      {isLoading && (
         <S.LoadingContainer>
           <LoadingSpinner />
         </S.LoadingContainer>
       )}
 
-      {!isLoading && Boolean(assertionResults) && (
+      {!isLoading && (
         <TestSpecs
-          assertionResults={assertionResults!}
+          assertionResults={assertionResults}
           onDelete={onDelete}
           onEdit={onEdit}
           onOpen={handleOpen}

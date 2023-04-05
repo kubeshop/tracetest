@@ -102,17 +102,19 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({runId, testId}) => `/tests/${testId}/run/${runId}/events`,
     providesTags: [{type: TracetestApiTags.TEST_RUN, id: 'EVENTS'}],
     transformResponse: (rawTestRunEvent: TRawTestRunEvent[]) => rawTestRunEvent.map(event => TestRunEvent(event)),
-    /* async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-      const listener: IListenerFunction<TRawTestRun> = data => {
-        updateCachedData(() => TestRun(data.event));
+    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
+      const listener: IListenerFunction<TRawTestRunEvent> = data => {
+        updateCachedData(draft => {
+          draft.push(TestRunEvent(data.event));
+        });
       };
       await WebSocketService.initWebSocketSubscription({
         listener,
-        resource: `test/${arg.testId}/run/${arg.runId}`,
+        resource: `test/${arg.testId}/run/${arg.runId}/event`,
         waitToCleanSubscription: cacheEntryRemoved,
         waitToInitSubscription: cacheDataLoaded,
       });
-    }, */
+    },
   }),
 });
 
