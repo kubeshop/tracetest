@@ -49,7 +49,7 @@ There is one [Public Application Load Balancer](https://aws.amazon.com/elasticlo
 The `infra/tracetest.tf` file contains the required services for the Tracetest server which include.
 
 - **Postgres RDS** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**Tracetest Task Definition**](https://tracetest.io/) - The information on how to configure and provision Tracetest using ECS.
+- [**Tracetest Task Definition**](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html) - The information on how to configure and provision Tracetest using ECS.
 - [**ECS Service**](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html) - The server provisioning metadata to run the Tracetest Task Definition.
 - **Networking** - Security groups, target groups and load balancer listeners required to have Tracetest connected to the rest of the AWS infrastructure.
 
