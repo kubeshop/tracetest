@@ -19,10 +19,9 @@ var _ MappedNullable = &PollingInfo{}
 
 // PollingInfo struct for PollingInfo
 type PollingInfo struct {
-	Type                *string              `json:"type,omitempty"`
-	ReasonNextIteration *string              `json:"reasonNextIteration,omitempty"`
-	IsComplete          *bool                `json:"isComplete,omitempty"`
-	Periodic            *PollingInfoPeriodic `json:"periodic,omitempty"`
+	Type       *string              `json:"type,omitempty"`
+	IsComplete *bool                `json:"isComplete,omitempty"`
+	Periodic   *PollingInfoPeriodic `json:"periodic,omitempty"`
 }
 
 // NewPollingInfo instantiates a new PollingInfo object
@@ -72,38 +71,6 @@ func (o *PollingInfo) HasType() bool {
 // SetType gets a reference to the given string and assigns it to the Type field.
 func (o *PollingInfo) SetType(v string) {
 	o.Type = &v
-}
-
-// GetReasonNextIteration returns the ReasonNextIteration field value if set, zero value otherwise.
-func (o *PollingInfo) GetReasonNextIteration() string {
-	if o == nil || isNil(o.ReasonNextIteration) {
-		var ret string
-		return ret
-	}
-	return *o.ReasonNextIteration
-}
-
-// GetReasonNextIterationOk returns a tuple with the ReasonNextIteration field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *PollingInfo) GetReasonNextIterationOk() (*string, bool) {
-	if o == nil || isNil(o.ReasonNextIteration) {
-		return nil, false
-	}
-	return o.ReasonNextIteration, true
-}
-
-// HasReasonNextIteration returns a boolean if a field has been set.
-func (o *PollingInfo) HasReasonNextIteration() bool {
-	if o != nil && !isNil(o.ReasonNextIteration) {
-		return true
-	}
-
-	return false
-}
-
-// SetReasonNextIteration gets a reference to the given string and assigns it to the ReasonNextIteration field.
-func (o *PollingInfo) SetReasonNextIteration(v string) {
-	o.ReasonNextIteration = &v
 }
 
 // GetIsComplete returns the IsComplete field value if set, zero value otherwise.
@@ -182,9 +149,6 @@ func (o PollingInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Type) {
 		toSerialize["type"] = o.Type
-	}
-	if !isNil(o.ReasonNextIteration) {
-		toSerialize["reasonNextIteration"] = o.ReasonNextIteration
 	}
 	if !isNil(o.IsComplete) {
 		toSerialize["isComplete"] = o.IsComplete

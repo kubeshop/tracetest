@@ -39,8 +39,6 @@ components:
           type: string
           enum:
             - periodic
-        reasonNextIteration:
-          type: string
         isComplete:
           type: boolean
         periodic:

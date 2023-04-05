@@ -15,7 +15,6 @@ type TestRunEvent = Model<
 
 function PollingInfo({
   type = PollingInfoType.Periodic,
-  reasonNextIteration = '',
   isComplete = false,
   periodic = {},
 }: TRawPollingInfo): PollingInfo {
@@ -23,7 +22,6 @@ function PollingInfo({
 
   return {
     type: types.includes(type) ? type : PollingInfoType.Periodic,
-    reasonNextIteration,
     isComplete,
     periodic: {
       numberSpans: periodic?.numberSpans ?? 0,

@@ -59,6 +59,7 @@ func newRunnerFacades(
 		execTestUpdater,
 		tracedb.Factory(testDB),
 		testDB,
+		eventEmitter,
 	)
 
 	tracePoller := executor.NewTracePoller(
@@ -67,6 +68,7 @@ func newRunnerFacades(
 		execTestUpdater,
 		assertionRunner,
 		subscriptionManager,
+		eventEmitter,
 	)
 
 	runner := executor.NewPersistentRunner(

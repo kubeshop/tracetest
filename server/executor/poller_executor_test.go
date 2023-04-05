@@ -10,10 +10,12 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"go.opentelemetry.io/otel/trace"
@@ -455,15 +457,17 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	for i, value := range expectedValues {
 		request := executor.NewPollingRequest(ctx, test, run, i)
 
-		finished, anotherRun, err := pollerExecutor.ExecuteRequest(request)
+		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(request)
 		run = anotherRun // should store a run to use in another iteration
 
 		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
 
 		if value.finished {
 			require.Truef(t, finished, "The poller should have finished on iteration %d", i)
+			require.NotEmptyf(t, finishReason, "The poller should not have finish reason on iteration %d", i)
 		} else {
 			require.Falsef(t, finished, "The poller should have not finished on iteration %d", i)
+			require.Emptyf(t, finishReason, "The poller should have finish reason on iteration %d", i)
 		}
 
 		if value.expectNoTraceError {
@@ -505,6 +509,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 	tracer := getTracerMock(t)
 	testDB := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+	eventEmitter := getEventEmitterMock(t, testDB)
 
 	return executor.NewPollerExecutor(
 		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
@@ -512,6 +517,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 		updater,
 		traceDBFactory,
 		testDB,
+		eventEmitter,
 	)
 }
 
@@ -527,23 +533,22 @@ func getRunUpdaterMock(t *testing.T) executor.RunUpdater {
 }
 
 // DataStoreRepository
-type dataStoreRepositoryMock struct {
-	testdb.MockRepository
-	// ...
-}
-
-func (m dataStoreRepositoryMock) DefaultDataStore(_ context.Context) (model.DataStore, error) {
-	return model.DataStore{}, nil
-}
-
 func getDataStoreRepositoryMock(t *testing.T) model.Repository {
 	t.Helper()
 
-	mock := new(dataStoreRepositoryMock)
-	mock.T = t
-	mock.Test(t)
+	testDB := testdb.MockRepository{}
 
-	return mock
+	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)
+	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
+
+	return &testDB
+}
+
+// EventEmitter
+func getEventEmitterMock(t *testing.T, db model.Repository) executor.EventEmitter {
+	t.Helper()
+
+	return executor.NewEventEmitter(db, subscription.NewManager())
 }
 
 // Tracer

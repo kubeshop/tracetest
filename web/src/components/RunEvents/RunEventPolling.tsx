@@ -23,13 +23,6 @@ const RunEventPolling = ({event}: IPropsEvent) => (
             <Typography.Text>{event.polling.periodic.numberIterations}</Typography.Text>
           </div>
         </S.Column>
-        <S.Column>
-          <S.InfoIcon />
-          <div>
-            <Typography.Title level={3}>Reason why the next iteration will be executed:</Typography.Title>
-            <Typography.Text>{event.polling.reasonNextIteration}</Typography.Text>
-          </div>
-        </S.Column>
       </S.Content>
     )}
   </S.EventContainer>
