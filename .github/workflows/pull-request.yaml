@@ -88,6 +88,7 @@ jobs:
 
   build-go:
     name: Build go binaries (API Server and CLI)
+    needs: [unit-test-cli, test-server]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -186,7 +187,7 @@ jobs:
 
   test-examples:
     name: Test examples
-    needs:  [test-server, build-docker]
+    needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
