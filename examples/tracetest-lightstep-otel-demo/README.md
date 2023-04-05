@@ -84,7 +84,7 @@ The `TRACETEST_SERVICE_PORT` is configured in the `.env` file
 
   # Postgres used by the Tracetest instance
   tt_postgres:
-    image: postgres
+    image: postgres:14
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
