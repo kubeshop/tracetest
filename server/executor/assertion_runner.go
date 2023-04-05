@@ -191,7 +191,7 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 						req.Run.TestID,
 						req.Run.ID,
 						unwrappedError,
-						spanAssertionResult.SpanID.String(),
+						spanAssertionResult.SafeSpanIDString(),
 						string(assertionResult.Assertion),
 					))
 				}
@@ -201,7 +201,7 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 						req.Run.TestID,
 						req.Run.ID,
 						spanAssertionResult.CompareErr,
-						spanAssertionResult.SpanID.String(),
+						spanAssertionResult.SafeSpanIDString(),
 						string(assertionResult.Assertion),
 					))
 				}
