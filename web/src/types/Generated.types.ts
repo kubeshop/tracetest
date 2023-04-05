@@ -1888,7 +1888,9 @@ export interface external {
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
             | "FINISHED"
-            | "FAILED";
+            | "TRIGGER_FAILED"
+            | "TRACE_FAILED"
+            | "ASSERTION_FAILED";
           /** @description Details of the cause for the last `FAILED` state */
           lastErrorState?: string;
           /** @description time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */

@@ -2,8 +2,7 @@ import {Tooltip} from 'antd';
 import {Link} from 'react-router-dom';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
-import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import TestRun from 'models/TestRun.model';
+import TestRun, {isRunStateFailed, isRunStateFinished} from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 
@@ -14,10 +13,10 @@ interface IProps {
 }
 
 function getIcon(state: TestRun['state'], failedAssertions: number) {
-  if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
+  if (!isRunStateFinished(state)) {
     return null;
   }
-  if (state === TestStateEnum.FAILED || failedAssertions > 0) {
+  if (isRunStateFailed(state) || failedAssertions > 0) {
     return <S.IconFail />;
   }
   return <S.IconSuccess />;
@@ -58,9 +57,7 @@ const TestRunCard = ({
               <S.Text>{Date.getTimeAgo(createdAt)}</S.Text>
             </Tooltip>
 
-            {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
-              <S.Text>&nbsp;• {executionTime}s</S.Text>
-            )}
+            {isRunStateFinished(state) && <S.Text>&nbsp;• {executionTime}s</S.Text>}
 
             {metadataName && (
               <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
@@ -73,13 +70,13 @@ const TestRunCard = ({
 
         {!!transactionId && !!transactionRunId && <S.Text>Part of transaction</S.Text>}
 
-        {state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED && (
+        {!isRunStateFinished(state) && (
           <div data-cy={`test-run-result-status-${runId}`}>
             <TestState testState={state} />
           </div>
         )}
 
-        {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
+        {isRunStateFinished(state) && (
           <S.Row>
             <Tooltip title="Passed assertions">
               <S.HeaderDetail>

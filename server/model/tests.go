@@ -188,13 +188,20 @@ const (
 	RunStateCreated             RunState = "CREATED"
 	RunStateExecuting           RunState = "EXECUTING"
 	RunStateAwaitingTrace       RunState = "AWAITING_TRACE"
-	RunStateFailed              RunState = "FAILED"
+	RunStateTriggerFailed       RunState = "TRIGGER_FAILED"
+	RunStateTraceFailed         RunState = "TRACE_FAILED"
+	RunStateAssertionFailed     RunState = "ASSERTION_FAILED"
 	RunStateFinished            RunState = "FINISHED"
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"
 )
 
 func (rs RunState) IsFinal() bool {
-	return rs == RunStateFailed || rs == RunStateFinished
+	return rs.IsError() || rs == RunStateFinished
+}
+
+func (rs RunState) IsError() bool {
+	return rs == RunStateTriggerFailed ||
+		rs == RunStateTraceFailed
 }
 
 func (r Run) ResultsCount() (pass, fail int) {

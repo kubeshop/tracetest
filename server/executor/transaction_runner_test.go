@@ -35,7 +35,7 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 		time.Sleep(100 * time.Millisecond) // simulate some real work
 
 		if r.returnErr {
-			newRun.State = model.RunStateFailed
+			newRun.State = model.RunStateTriggerFailed
 			newRun.LastError = fmt.Errorf("failed to do something")
 		} else {
 			newRun.State = model.RunStateFinished
@@ -87,7 +87,7 @@ func TestTransactionRunner(t *testing.T) {
 		runTransactionRunnerTest(t, true, func(t *testing.T, actual model.TransactionRun) {
 			assert.Equal(t, model.TransactionRunStateFailed, actual.State)
 			require.Len(t, actual.Steps, 1)
-			assert.Equal(t, model.RunStateFailed, actual.Steps[0].State)
+			assert.Equal(t, model.RunStateTriggerFailed, actual.Steps[0].State)
 		})
 	})
 

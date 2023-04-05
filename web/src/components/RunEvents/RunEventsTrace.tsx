@@ -3,6 +3,7 @@ import {Typography} from 'antd';
 import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
 import {TestState} from 'constants/TestRun.constants';
 import {TraceEventType} from 'constants/TestRunEvents.constants';
+import {isRunStateFailed} from 'models/TestRun.model';
 import TestRunService from 'services/TestRun.service';
 import RunEvent, {IPropsEvent} from './RunEvent';
 import RunEventDataStore from './RunEventDataStore';
@@ -33,7 +34,19 @@ const RunEventsTrace = ({events, state}: IPropsComponent) => {
     </>
   );
 
-  const failedHeader = (
+  const failedTriggerHeader = (
+    <>
+      <S.ErrorIcon />
+      <Typography.Title level={2} type="secondary">
+        Test Trigger Failed
+      </Typography.Title>
+      <S.Paragraph type="secondary">
+        The test failed in the Trigger stage, review the Trigger tab to see the breakdown of diagnostic steps.
+      </S.Paragraph>
+    </>
+  );
+
+  const failedTraceHeader = (
     <>
       <S.ErrorIcon />
       <Typography.Title level={2} type="secondary">
@@ -47,7 +60,9 @@ const RunEventsTrace = ({events, state}: IPropsComponent) => {
 
   return (
     <S.Container $hasScroll>
-      {state === TestState.FAILED ? failedHeader : loadingHeader}
+      {state === TestState.TRIGGER_FAILED && failedTriggerHeader}
+      {state === TestState.TRACE_FAILED && failedTraceHeader}
+      {!isRunStateFailed(state) && loadingHeader}
 
       <S.ListContainer>
         {filteredEvents.map(event => {

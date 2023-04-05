@@ -87,7 +87,7 @@ func TestRunEncoding(t *testing.T) {
 				ID:                 1,
 				TraceID:            tid,
 				SpanID:             sid,
-				State:              model.RunStateFailed,
+				State:              model.RunStateTriggerFailed,
 				LastError:          errors.New("some error"),
 				CreatedAt:          t1,
 				ServiceTriggeredAt: t1,

@@ -122,7 +122,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
 		}
 
-		return model.Run{}, e.updater.Update(ctx, run.Failed(err))
+		return model.Run{}, e.updater.Update(ctx, run.AssertionFailed(err))
 	}
 	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
 

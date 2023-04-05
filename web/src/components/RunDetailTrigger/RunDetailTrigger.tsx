@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, runEvents, isError}: IProps) => {
-  const shouldDisplayError = isError || state === TestState.FAILED;
+  const shouldDisplayError = isError || state === TestState.TRIGGER_FAILED;
 
   return (
     <S.Container>

@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/pterm/pterm"
 )
 
@@ -78,7 +79,7 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 }
 
 func (f transactionRun) pretty(output TransactionRunOutput) string {
-	if output.Run.GetState() == "FAILED" {
+	if utils.RunStateIsFailed(output.Run.GetState()) {
 		errorMessage := ""
 		if len(output.Run.Steps) > 0 {
 			lastStep := output.Run.Steps[len(output.Run.Steps)-1]

@@ -42,8 +42,8 @@ CreateDemo Create a Demonstration setting
 
 Create a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateDemoRequest
 */
 func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoRequest {
 	return ApiCreateDemoRequest{
@@ -53,7 +53,8 @@ func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoReq
 }
 
 // Execute executes the request
-//  @return Demo
+//
+//	@return Demo
 func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -149,8 +150,8 @@ CreatePollingProfile Create a Polling Profile
 
 Create a polling profile used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreatePollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreatePollingProfileRequest
 */
 func (a *ResourceApiApiService) CreatePollingProfile(ctx context.Context) ApiCreatePollingProfileRequest {
 	return ApiCreatePollingProfileRequest{
@@ -160,7 +161,8 @@ func (a *ResourceApiApiService) CreatePollingProfile(ctx context.Context) ApiCre
 }
 
 // Execute executes the request
-//  @return PollingProfile
+//
+//	@return PollingProfile
 func (a *ResourceApiApiService) CreatePollingProfileExecute(r ApiCreatePollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -251,9 +253,9 @@ DeleteDemo Delete a Demonstration setting
 
 Delete a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param demoId ID of a demonstration used on Tracetest as quick start examples.
- @return ApiDeleteDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples.
+	@return ApiDeleteDemoRequest
 */
 func (a *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) ApiDeleteDemoRequest {
 	return ApiDeleteDemoRequest{
@@ -343,9 +345,9 @@ DeletePollingProfile Delete a Polling Profile
 
 Delete a polling profile used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
- @return ApiDeletePollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
+	@return ApiDeletePollingProfileRequest
 */
 func (a *ResourceApiApiService) DeletePollingProfile(ctx context.Context, pollingProfileId string) ApiDeletePollingProfileRequest {
 	return ApiDeletePollingProfileRequest{
@@ -435,9 +437,9 @@ GetConfiguration Get Tracetest configuration
 
 Get Tracetest configuration
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param configId ID of the configuration resource used on Tracetest. It should be set as 'current'.
- @return ApiGetConfigurationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param configId ID of the configuration resource used on Tracetest. It should be set as 'current'.
+	@return ApiGetConfigurationRequest
 */
 func (a *ResourceApiApiService) GetConfiguration(ctx context.Context, configId string) ApiGetConfigurationRequest {
 	return ApiGetConfigurationRequest{
@@ -448,7 +450,8 @@ func (a *ResourceApiApiService) GetConfiguration(ctx context.Context, configId s
 }
 
 // Execute executes the request
-//  @return ConfigurationResource
+//
+//	@return ConfigurationResource
 func (a *ResourceApiApiService) GetConfigurationExecute(r ApiGetConfigurationRequest) (*ConfigurationResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -538,9 +541,9 @@ GetDemo Get Demonstration setting
 
 Get a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param demoId ID of a demonstration used on Tracetest as quick start examples.
- @return ApiGetDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples.
+	@return ApiGetDemoRequest
 */
 func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiGetDemoRequest {
 	return ApiGetDemoRequest{
@@ -551,7 +554,8 @@ func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiG
 }
 
 // Execute executes the request
-//  @return Demo
+//
+//	@return Demo
 func (a *ResourceApiApiService) GetDemoExecute(r ApiGetDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -641,9 +645,9 @@ GetPollingProfile Get Polling Profile
 
 Get a polling profile used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
- @return ApiGetPollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
+	@return ApiGetPollingProfileRequest
 */
 func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingProfileId string) ApiGetPollingProfileRequest {
 	return ApiGetPollingProfileRequest{
@@ -654,7 +658,8 @@ func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 }
 
 // Execute executes the request
-//  @return PollingProfile
+//
+//	@return PollingProfile
 func (a *ResourceApiApiService) GetPollingProfileExecute(r ApiGetPollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -771,8 +776,8 @@ ListDemos List Demonstrations
 
 List demonstrations used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListDemosRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListDemosRequest
 */
 func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosRequest {
 	return ApiListDemosRequest{
@@ -782,7 +787,8 @@ func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosReque
 }
 
 // Execute executes the request
-//  @return []Demo
+//
+//	@return []Demo
 func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) ([]Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -910,8 +916,8 @@ ListPollingProfiles List Polling Profiles
 
 List polling profiles used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListPollingProfilesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListPollingProfilesRequest
 */
 func (a *ResourceApiApiService) ListPollingProfiles(ctx context.Context) ApiListPollingProfilesRequest {
 	return ApiListPollingProfilesRequest{
@@ -921,7 +927,8 @@ func (a *ResourceApiApiService) ListPollingProfiles(ctx context.Context) ApiList
 }
 
 // Execute executes the request
-//  @return ListPollingProfiles200Response
+//
+//	@return ListPollingProfiles200Response
 func (a *ResourceApiApiService) ListPollingProfilesExecute(r ApiListPollingProfilesRequest) (*ListPollingProfiles200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1028,9 +1035,9 @@ UpdateConfiguration Update Tracetest configuration
 
 Update Tracetest configuration
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param configId ID of the configuration resource used on Tracetest. It should be set as 'current'.
- @return ApiUpdateConfigurationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param configId ID of the configuration resource used on Tracetest. It should be set as 'current'.
+	@return ApiUpdateConfigurationRequest
 */
 func (a *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configId string) ApiUpdateConfigurationRequest {
 	return ApiUpdateConfigurationRequest{
@@ -1041,7 +1048,8 @@ func (a *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configI
 }
 
 // Execute executes the request
-//  @return ConfigurationResource
+//
+//	@return ConfigurationResource
 func (a *ResourceApiApiService) UpdateConfigurationExecute(r ApiUpdateConfigurationRequest) (*ConfigurationResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -1139,9 +1147,9 @@ UpdateDemo Update a Demonstration setting
 
 Update a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param demoId ID of a demonstration used on Tracetest as quick start examples.
- @return ApiUpdateDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples.
+	@return ApiUpdateDemoRequest
 */
 func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) ApiUpdateDemoRequest {
 	return ApiUpdateDemoRequest{
@@ -1152,7 +1160,8 @@ func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) A
 }
 
 // Execute executes the request
-//  @return Demo
+//
+//	@return Demo
 func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -1250,9 +1259,9 @@ UpdatePollingProfile Update a Polling Profile
 
 Update a polling profile used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
- @return ApiUpdatePollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
+	@return ApiUpdatePollingProfileRequest
 */
 func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollingProfileId string) ApiUpdatePollingProfileRequest {
 	return ApiUpdatePollingProfileRequest{
@@ -1263,7 +1272,8 @@ func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollin
 }
 
 // Execute executes the request
-//  @return PollingProfile
+//
+//	@return PollingProfile
 func (a *ResourceApiApiService) UpdatePollingProfileExecute(r ApiUpdatePollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
