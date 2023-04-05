@@ -18,7 +18,7 @@ spec:
   strategy: periodic
   default: true
   periodic:
-    timeout: 10s
+    timeout: 60s
     retryDelay: 500ms
 ---
 type: Demo
