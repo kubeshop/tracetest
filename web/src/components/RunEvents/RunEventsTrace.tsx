@@ -11,13 +11,18 @@ import RunEventPolling from './RunEventPolling';
 import {IPropsComponent} from './RunEvents';
 import * as S from './RunEvents.styled';
 
-const ComponentMap: Record<TraceEventType, (props: IPropsEvent) => React.ReactElement> = {
+type TraceEventTypeWithoutFetching = Exclude<
+  TraceEventType,
+  TraceEventType.FETCHING_START | TraceEventType.FETCHING_ERROR | TraceEventType.FETCHING_SUCCESS
+>;
+
+const ComponentMap: Record<TraceEventTypeWithoutFetching, (props: IPropsEvent) => React.ReactElement> = {
   [TraceEventType.DATA_STORE_CONNECTION_INFO]: RunEventDataStore,
   [TraceEventType.POLLING_ITERATION_INFO]: RunEventPolling,
 };
 
 const RunEventsTrace = ({events, state}: IPropsComponent) => {
-  const filteredEvents = TestRunService.getTestRunEventsWithLastPolling(events);
+  const filteredEvents = TestRunService.getTestRunTraceEvents(events);
 
   const loadingHeader = (
     <>
@@ -66,7 +71,7 @@ const RunEventsTrace = ({events, state}: IPropsComponent) => {
 
       <S.ListContainer>
         {filteredEvents.map(event => {
-          const Component = ComponentMap[event.type as TraceEventType] ?? RunEvent;
+          const Component = ComponentMap[event.type as TraceEventTypeWithoutFetching] ?? RunEvent;
           return <Component event={event} key={event.type} />;
         })}
       </S.ListContainer>
