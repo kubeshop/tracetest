@@ -1,67 +1,45 @@
 package subscription
 
-import "sync"
+import "time"
 
 type Manager struct {
-	subscriptions map[string][]Subscriber
-	mutex         sync.Mutex
+	subscriptions *BufferedSubscriptions
+	cleanupPeriod time.Duration
 }
 
 func NewManager() *Manager {
-	return &Manager{
-		subscriptions: make(map[string][]Subscriber),
-		mutex:         sync.Mutex{},
+	manager := &Manager{
+		subscriptions: NewBufferedSubscriptions(),
+		cleanupPeriod: 10 * time.Second,
 	}
+
+	manager.startCleanupProcess()
+
+	return manager
 }
 
 func (m *Manager) Subscribe(resourceID string, subscriber Subscriber) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	array := make([]Subscriber, 0)
-
-	if existingArray, ok := m.subscriptions[resourceID]; ok {
-		array = existingArray
-	}
-
-	array = append(array, subscriber)
-	m.subscriptions[resourceID] = array
+	m.subscriptions.AddSubscriber(resourceID, subscriber)
 }
 
 func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	array, exists := m.subscriptions[resourceID]
-	if !exists {
-		return
-	}
-
-	newArray := make([]Subscriber, 0, len(array)-1)
-	for _, item := range array {
-		if item.ID() != subscriptionID {
-			newArray = append(newArray, item)
-		}
-	}
-
-	m.subscriptions[resourceID] = newArray
+	m.subscriptions.RemoveSubscriber(resourceID, subscriptionID)
 }
 
 func (m *Manager) PublishUpdate(message Message) {
-	if subscribers, ok := m.subscriptions[message.ResourceID]; ok {
-		for _, subscriber := range subscribers {
-			subscriber.Notify(message)
-		}
-	}
+	m.subscriptions.NotifySubscribers(message.ResourceID, message)
 }
 
 func (m *Manager) Publish(resourceID string, message any) {
-	if subscribers, ok := m.subscriptions[resourceID]; ok {
-		for _, subscriber := range subscribers {
-			subscriber.Notify(Message{
-				ResourceID: resourceID,
-				Content:    message,
-			})
+	m.subscriptions.NotifySubscribers(resourceID, Message{ResourceID: resourceID, Content: message})
+}
+
+func (m *Manager) startCleanupProcess() {
+	go func() {
+		ticker := time.NewTicker(m.cleanupPeriod)
+		select {
+		case <-ticker.C:
+			m.subscriptions.CleanUp()
 		}
-	}
+	}()
 }
