@@ -16,7 +16,7 @@ postgres:
   params: sslmode=disable
 ```
 
-Alternatively, we support setting ana series of environment variables which can contain the connection information for the Postgres instance. If these environment variables are set, they will be used by the Tracetest server to connect to the database. The variables are:
+Alternatively, we support setting a series of environment variables which can contain the connection information for the Postgres instance. If these environment variables are set, they will be used by the Tracetest server to connect to the database.
 
 The list of environment variables, and example values is:
 - TRACETEST_POSTGRES_HOST - example: postgres
