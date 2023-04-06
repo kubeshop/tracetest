@@ -18,7 +18,7 @@ postgres:
 
 Alternatively, we support setting a series of environment variables which can contain the connection information for the Postgres instance. If these environment variables are set, they will be used by the Tracetest server to connect to the database.
 
-The list of environment variables, and example values is:
+The list of environment variables and example values is:
 - TRACETEST_POSTGRES_HOST - example: postgres
 - TRACETEST_POSTGRES_PORT - example: 5432
 - TRACETEST_POSTGRES_DBNAME - example: postgres
