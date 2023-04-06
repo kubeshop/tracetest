@@ -21,7 +21,7 @@ Alternatively, we support setting a series of environment variables which can co
 The list of environment variables and example values is:
 - TRACETEST_POSTGRES_HOST - example: postgres
 - TRACETEST_POSTGRES_PORT - example: 5432
-- TRACETEST_POSTGRES_DBNAME - example: postgres
+- `TRACETEST_POSTGRES_DBNAME: "postgres"`
 - TRACETEST_POSTGRES_USER - example: postgres
 - TRACETEST_POSTGRES_PASSWORD - example: postgres
 
