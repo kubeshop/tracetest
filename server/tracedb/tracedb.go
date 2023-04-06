@@ -17,8 +17,11 @@ type TraceDB interface {
 	ShouldRetry() bool
 	GetTraceID() trace.TraceID
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
-	TestConnection(ctx context.Context) model.ConnectionResult
 	Close() error
+}
+
+type TestableTraceDB interface {
+	TestConnection(ctx context.Context) model.ConnectionResult
 }
 
 type noopTraceDB struct{}

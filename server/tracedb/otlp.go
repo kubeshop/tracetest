@@ -33,10 +33,6 @@ func (tdb *OTLPTraceDB) Close() error {
 	return nil
 }
 
-func (jtd *OTLPTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
-	return model.ConnectionResult{}
-}
-
 // GetTraceByID implements TraceDB
 func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (model.Trace, error) {
 	run, err := tdb.db.GetRunByTraceID(ctx, traces.DecodeTraceID(id))

@@ -109,11 +109,13 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 	}
 
 	if request.IsFirstRequest() {
-		connectionResult := traceDB.TestConnection(request.ctx)
+		if testableTraceDB, ok := traceDB.(tracedb.TestableTraceDB); ok {
+			connectionResult := testableTraceDB.TestConnection(request.ctx)
 
-		err = pe.eventEmitter.Emit(request.ctx, events.TraceDataStoreConnectionInfo(request.test.ID, request.run.ID, connectionResult))
-		if err != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+			err = pe.eventEmitter.Emit(request.ctx, events.TraceDataStoreConnectionInfo(request.test.ID, request.run.ID, connectionResult))
+			if err != nil {
+				log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+			}
 		}
 	}
 
@@ -129,7 +131,9 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 
 		if !errors.Is(err, connection.ErrTraceNotFound) {
 			// run test connection to give a diagnostic when an unknown error happens
-			connectionResult = traceDB.TestConnection(request.ctx)
+			if testableTraceDB, ok := traceDB.(tracedb.TestableTraceDB); ok {
+				connectionResult = testableTraceDB.TestConnection(request.ctx)
+			}
 		}
 
 		anotherErr := pe.eventEmitter.Emit(request.ctx, events.TraceFetchingError(request.test.ID, request.run.ID, connectionResult, err))
