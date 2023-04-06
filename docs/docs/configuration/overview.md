@@ -1,10 +1,8 @@
 # Configuration Overview
 
-There is one way you can set configuration options in Tracetest. By using a configuration file, commonly known as the `tracetest.config.yaml` file.
-
-When using Docker, ensure that the configuration file is mounted to `/app/config.yaml` within the Tracetest Docker container.
-
-<!-- To view all the configuration options see the [config file reference page](./config-file-reference). -->
+There are several configuration options with Tracetest:
+- [Server configuration](./server) to set database connection information needed to connect to required PostgreSQL instance.
+- [Provisioning configuration](./provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
 
 ## Supported Trace Data Stores
 
