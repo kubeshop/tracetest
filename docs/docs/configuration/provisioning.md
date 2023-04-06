@@ -10,7 +10,7 @@ Currently, the following resources can be provisioned:
 - Config
 - Demo
 
-For docker based installs, the provisioning file is placed in the ./tracetest/tracetest-provisioning.yaml file by default when you run the 'tracetest server install' command and select the 'Using Docker Compose' option. The first time you start tracetest with a 'docker compose -f tracetest/docker-compose.yaml  up -d' command, the server will use the contents of this file to provision the server. To provision differently, you would alter the contents of the tracetest-provisioning.yaml file before launching tracetest in docker.
+For Docker based installs, the provisioning file is placed in the ./tracetest/tracetest-provisioning.yaml file by default when you run the 'tracetest server install' command and select the 'Using Docker Compose' option. The first time you start Tracetest with a 'docker compose -f tracetest/docker-compose.yaml  up -d' command, the server will use the contents of this file to provision the server. To provision differently, you would alter the contents of the tracetest-provisioning.yaml file before launching Tracetest in Docker.
 
 This is an example of a tracetest-provisioning.yaml file:
 
