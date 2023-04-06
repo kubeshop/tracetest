@@ -1,4 +1,4 @@
-# Configuring the Tracetest server
+# Configuring the Tracetest Server
 
 Tracetest requires a very minimal configuration to be launched, needing just the connection information to connect with the PostgreSQL database which is installed as part of the server install. There are a couple ways to provide this database connection information.
 
