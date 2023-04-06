@@ -20,8 +20,7 @@ type: DataStore
 spec:
   name: otlp
   type: otlp
-  otlp:
-    type: otlp
+  isdefault: true
 ---
 type: Config
 spec:
