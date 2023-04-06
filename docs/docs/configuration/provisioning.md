@@ -2,7 +2,7 @@
 
 Tracetest allows a server to be provisioned the first time a new Tracetest server is installed and launched. Provisioning sets certain resources in the server to the specified values, allowing you to configure the server. It is convenient in a CI/CD flow where you want to launch a server with a specified configuration. 
 
-The server is provisioned by specifying a series of YAML snippets which will configure various resources. Each snippet is separated with the YAML separator, ---.
+The server is provisioned by specifying a series of YAML snippets which will configure various resources. Each snippet is separated with the YAML separator, `---`.
 
 Currently, the following resources can be provisioned: 
 - DataStore
