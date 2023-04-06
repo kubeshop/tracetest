@@ -46,5 +46,5 @@ spec:
     grpcEndpoint: demo-api:8082
 ```
 
-Alternatively, we support setting an environment variable called TRACETEST_PROVISIONING to provision the server when it is first started. Base64 encode the provisioning YAML you want to utilize and set the TRACETEST_PROVISIONING environment variable with the result. The Tracetest server will then provision based on the Base64 encoded provisioning data in this environment variable the first time it is launched.
+Alternatively, we support setting an environment variable called `TRACETEST_PROVISIONING` to provision the server when it is first started. Base64 encode the provisioning YAML you want to utilize and set the `TRACETEST_PROVISIONING` environment variable with the result. The Tracetest server will then provision based on the Base64 encoded provisioning data in this environment variable the first time it is launched.
 
