@@ -24,6 +24,8 @@ The list of environment variables and example values is:
 - `TRACETEST_POSTGRES_DBNAME: "postgres"`
 - `TRACETEST_POSTGRES_USER: "postgres"`
 - `TRACETEST_POSTGRES_PASSWORD: "postgres"`
+- `TRACETEST_POSTGRES_PARAMS: ""`
+
 
 You can also intitalize the server with a number of resources the first time it is launched by using [provisioning](./provisioning).
 
