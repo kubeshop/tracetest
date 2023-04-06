@@ -127,7 +127,7 @@ const sidebars = {
         {
           type: "doc",
           id: "configuration/provisioning",
-          label: "Provisioning Server",
+          label: "Provisioning a Tracetest Server",
         },
         {
           type: "doc",
