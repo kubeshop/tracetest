@@ -4,7 +4,7 @@ Tracetest requires a very minimal configuration to be launched, needing just the
 
 For Docker-based installs, the server configuration file is placed in the `./tracetest/tracetest.yaml` file by default when you run the `tracetest server install` command and select the `Using Docker Compose` option. The configuration file is mounted to `/app/config.yaml` within the Tracetest Docker container. When Tracetest is run with a `docker compose -f tracetest/docker-compose.yaml  up -d` command, the server will use the contents of this file to connect to the Postgres database. All other configuration data is stored in the Postgres instance.
 
-This is an example of a tracetest.yaml file:
+This is an example of a `tracetest.yaml` file:
 
 ```yaml
 postgres:
