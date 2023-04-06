@@ -1274,10 +1274,15 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	testResult := tdb.TestConnection(ctx)
+	testResult := model.ConnectionResult{}
 	statusCode := http.StatusOK
-	if !testResult.HasSucceed() {
-		statusCode = http.StatusUnprocessableEntity
+
+	if testableTraceDB, ok := tdb.(tracedb.TestableTraceDB); ok {
+		testResult = testableTraceDB.TestConnection(ctx)
+		statusCode = http.StatusOK
+		if !testResult.HasSucceed() {
+			statusCode = http.StatusUnprocessableEntity
+		}
 	}
 
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
