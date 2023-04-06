@@ -39,7 +39,9 @@ func (s *ConnectionTestStep) UnmarshalJSON(bytes []byte) error {
 	s.Passed = step.Passed
 	s.Status = step.Status
 	s.Message = step.Message
-	s.Error = errors.New(step.ErrorMessage)
+	if step.ErrorMessage != "" {
+		s.Error = errors.New(step.ErrorMessage)
+	}
 
 	return nil
 }
