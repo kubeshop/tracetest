@@ -21,6 +21,7 @@ type TraceDB interface {
 }
 
 type TestableTraceDB interface {
+	TraceDB
 	TestConnection(ctx context.Context) model.ConnectionResult
 }
 
