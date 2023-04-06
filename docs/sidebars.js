@@ -121,6 +121,16 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "configuration/server",
+          label: "Tracetest Server Configuration",
+        },
+        {
+          type: "doc",
+          id: "configuration/provisioning",
+          label: "Provisioning Server",
+        },
+        {
+          type: "doc",
           id: "configuration/trace-polling",
           label: "Trace Polling",
         },

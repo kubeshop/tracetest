@@ -1,0 +1,50 @@
+# Provisioning server
+
+Tracetest allows a server to be provisioned the first time a new Tracetest server is installed and launched. Provisioning sets certain resources in the server to the specified values, allowing you to configure the server. It is convenient in a CI/CD flow where you want to launch a server with a specified configuration. 
+
+The server is provisioned by specifying a series of yaml snippets which will configure various resources. Each snippet is separated with the yaml separator, ---.
+
+Currently, the following resources can be provisioned: 
+- DataStore
+- PollingProfile
+- Config
+- Demo
+
+For docker based installs, the provisioning file is placed in the ./tracetest/tracetest-provisioning.yaml file by default when you run the 'tracetest server install' command and select the 'Using Docker Compose' option. The first time you start tracetest with a 'docker compose -f tracetest/docker-compose.yaml  up -d' command, the server will use the contents of this file to provision the server. To provision differently, you would alter the contents of the tracetest-provisioning.yaml file before launching tracetest in docker.
+
+This is an example of a tracetest-provisioning.yaml file:
+
+```yaml
+---
+type: DataStore
+spec:
+  name: otlp
+  type: otlp
+  otlp:
+    type: otlp
+---
+type: Config
+spec:
+  analyticsEnabled: true
+---
+type: PollingProfile
+spec:
+  name: Custom Profile
+  strategy: periodic
+  default: true
+  periodic:
+    timeout: 2m
+    retryDelay: 3s
+---
+type: Demo
+spec:
+  name: pokeshop
+  type: pokeshop
+  enabled: true
+  pokeshop:
+    httpEndpoint: http://demo-api:8081
+    grpcEndpoint: demo-api:8082
+```
+
+Alternatively, we support setting an environment variable called TRACETEST_PROVISIONING to provision the server when it first is started. Take the provisioning YAML you want to utilize, base64 encode it, and set the TRACETEST_PROVISIONING environment variable with the result. The Tracetest server will then provision based on the base64 encoded provisioning data in this environment variable the first time it is launched.
+
