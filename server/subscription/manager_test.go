@@ -2,7 +2,6 @@ package subscription_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/stretchr/testify/assert"
@@ -106,64 +105,4 @@ func TestManagerUnsubscribe(t *testing.T) {
 	assert.Equal(t, message1.Type, receivedMessage.Type, "subscriber should not be notified after unsubscribed")
 	assert.Equal(t, message1.Content, receivedMessage.Content, "subscriber should not be notified after unsubscribed")
 
-}
-
-func TestBufferedMessages(t *testing.T) {
-	manager := subscription.NewManager()
-	receivedMessages := make([]subscription.Message, 0)
-
-	subscriber := subscription.NewSubscriberFunction(func(message subscription.Message) error {
-		receivedMessages = append(receivedMessages, message)
-		return nil
-	})
-
-	message1 := subscription.Message{
-		ResourceID: "test:1",
-		Type:       "test_update",
-		Content:    "Test was updated",
-	}
-
-	message2 := subscription.Message{
-		ResourceID: "test:1",
-		Type:       "test_deleted",
-		Content:    "Test was deleted",
-	}
-
-	manager.PublishUpdate(message1)
-	time.Sleep(1 * time.Second)
-	manager.Subscribe("test:1", subscriber)
-
-	manager.PublishUpdate(message2)
-
-	assert.Len(t, receivedMessages, 2)
-}
-
-func TestBufferedMessagesDisapearAfter10S(t *testing.T) {
-	manager := subscription.NewManager()
-	receivedMessages := make([]subscription.Message, 0)
-
-	subscriber := subscription.NewSubscriberFunction(func(message subscription.Message) error {
-		receivedMessages = append(receivedMessages, message)
-		return nil
-	})
-
-	message1 := subscription.Message{
-		ResourceID: "test:1",
-		Type:       "test_update",
-		Content:    "Test was updated",
-	}
-
-	message2 := subscription.Message{
-		ResourceID: "test:1",
-		Type:       "test_deleted",
-		Content:    "Test was deleted",
-	}
-
-	manager.PublishUpdate(message1)
-	time.Sleep(10 * time.Second)
-	manager.Subscribe("test:1", subscriber)
-
-	manager.PublishUpdate(message2)
-
-	assert.Len(t, receivedMessages, 1)
 }

@@ -1,45 +1,67 @@
 package subscription
 
-import "time"
+import "sync"
 
 type Manager struct {
-	subscriptions *BufferedSubscriptions
-	cleanupPeriod time.Duration
+	subscriptions map[string][]Subscriber
+	mutex         sync.Mutex
 }
 
 func NewManager() *Manager {
-	manager := &Manager{
-		subscriptions: NewBufferedSubscriptions(),
-		cleanupPeriod: 10 * time.Second,
+	return &Manager{
+		subscriptions: make(map[string][]Subscriber),
+		mutex:         sync.Mutex{},
 	}
-
-	manager.startCleanupProcess()
-
-	return manager
 }
 
 func (m *Manager) Subscribe(resourceID string, subscriber Subscriber) {
-	m.subscriptions.AddSubscriber(resourceID, subscriber)
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	array := make([]Subscriber, 0)
+
+	if existingArray, ok := m.subscriptions[resourceID]; ok {
+		array = existingArray
+	}
+
+	array = append(array, subscriber)
+	m.subscriptions[resourceID] = array
 }
 
 func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
-	m.subscriptions.RemoveSubscriber(resourceID, subscriptionID)
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	array, exists := m.subscriptions[resourceID]
+	if !exists {
+		return
+	}
+
+	newArray := make([]Subscriber, 0, len(array)-1)
+	for _, item := range array {
+		if item.ID() != subscriptionID {
+			newArray = append(newArray, item)
+		}
+	}
+
+	m.subscriptions[resourceID] = newArray
 }
 
 func (m *Manager) PublishUpdate(message Message) {
-	m.subscriptions.NotifySubscribers(message.ResourceID, message)
+	if subscribers, ok := m.subscriptions[message.ResourceID]; ok {
+		for _, subscriber := range subscribers {
+			subscriber.Notify(message)
+		}
+	}
 }
 
 func (m *Manager) Publish(resourceID string, message any) {
-	m.subscriptions.NotifySubscribers(resourceID, Message{ResourceID: resourceID, Content: message})
-}
-
-func (m *Manager) startCleanupProcess() {
-	go func() {
-		ticker := time.NewTicker(m.cleanupPeriod)
-		select {
-		case <-ticker.C:
-			m.subscriptions.CleanUp()
+	if subscribers, ok := m.subscriptions[resourceID]; ok {
+		for _, subscriber := range subscribers {
+			subscriber.Notify(Message{
+				ResourceID: resourceID,
+				Content:    message,
+			})
 		}
-	}()
+	}
 }
