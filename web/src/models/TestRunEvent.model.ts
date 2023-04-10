@@ -1,5 +1,6 @@
 import {LogLevel, OutputInfoLogLevel, PollingInfoType, TestRunStage} from 'constants/TestRunEvents.constants';
 import {Model, TTestEventsSchemas} from 'types/Common.types';
+import Date from 'utils/Date';
 import ConnectionResult from './ConnectionResult.model';
 
 export type TRawTestRunEvent = TTestEventsSchemas['TestRunEvent'];
@@ -10,7 +11,13 @@ type PollingInfo = Model<TRawPollingInfo, {}>;
 type OutputInfo = Model<TRawOutputInfo, {}>;
 type TestRunEvent = Model<
   TRawTestRunEvent,
-  {logLevel: LogLevel; dataStoreConnection?: ConnectionResult; polling?: PollingInfo; outputs?: OutputInfo[]}
+  {
+    timestamp: Number;
+    logLevel: LogLevel;
+    dataStoreConnection?: ConnectionResult;
+    polling?: PollingInfo;
+    outputs?: OutputInfo[];
+  }
 >;
 
 function PollingInfo({
@@ -66,6 +73,7 @@ function TestRunEvent({
     title,
     description,
     createdAt,
+    timestamp: Date.getTimestamp(createdAt),
     testId,
     runId,
     logLevel: logLevel ?? LogLevel.Info,

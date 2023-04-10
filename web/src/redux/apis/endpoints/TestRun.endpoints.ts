@@ -11,6 +11,7 @@ import {TEnvironmentValue} from 'models/Environment.model';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
 import Test from 'models/Test.model';
 import TestRunEvent, {TRawTestRunEvent} from 'models/TestRunEvent.model';
+import {last} from 'lodash';
 
 function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);
@@ -105,7 +106,11 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
     async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
       const listener: IListenerFunction<TRawTestRunEvent> = data => {
         updateCachedData(draft => {
-          draft.push(TestRunEvent(data.event));
+          const lastTestRunEvent = last(draft);
+          const testRunEvent = TestRunEvent(data.event);
+          if (!lastTestRunEvent || testRunEvent.timestamp > lastTestRunEvent.timestamp) {
+            draft.push(TestRunEvent(data.event));
+          }
         });
       };
       await WebSocketService.initWebSocketSubscription({

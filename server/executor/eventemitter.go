@@ -29,6 +29,7 @@ func NewEventEmitter(repository model.TestRunEventRepository, publisher publishe
 }
 
 func (em *internalEventEmitter) Emit(ctx context.Context, event model.TestRunEvent) error {
+	event.CreatedAt = event.CreatedAt.UTC()
 	err := em.repository.CreateTestRunEvent(ctx, event)
 	if err != nil {
 		return err
