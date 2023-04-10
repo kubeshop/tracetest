@@ -83,4 +83,13 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  # Validate hosts that can access this API
+  config.hosts = [
+    IPAddr.new("0.0.0.0/0"),        # All IPv4 addresses.
+    IPAddr.new("::/0"),             # All IPv6 addresses.
+    "localhost",                    # The localhost reserved domain.
+    "app",                          # The internal docker reserved domain.
+    ENV["RAILS_DEVELOPMENT_HOSTS"]  # Additional comma-separated hosts for development.
+  ]
 end

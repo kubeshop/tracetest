@@ -10,7 +10,7 @@ spec:
       - key: Content-Type
         value: application/json
   specs:
-  - selector: span[tracetest.span.type="http" name="GET /hello" http.method="GET"]
+  - selector: span[tracetest.span.type="http" name="HelloController#show" http.method="GET"]
     assertions:
     - attr:http.status_code  =  200
     - attr:tracetest.span.duration  <  500ms

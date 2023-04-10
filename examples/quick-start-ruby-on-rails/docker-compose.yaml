@@ -10,7 +10,7 @@ services:
     environment:
       - APP_ENV=production
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
-      - OTEL_SERVICE_NAME=app
+      - OTEL_SERVICE_NAME=quick_start_ruby_on_rails
 
   tracetest:
     image: kubeshop/tracetest:latest

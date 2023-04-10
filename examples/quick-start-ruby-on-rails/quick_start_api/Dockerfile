@@ -9,4 +9,4 @@ RUN chmod 666 ./Gemfile.lock
 
 EXPOSE 8080
 
-CMD [ "bundle", "exec", "rails", "server", "--port", "8080" ]
+CMD [ "bundle", "exec", "rails", "server", "--port", "8080", "--binding", "0.0.0.0" ]
