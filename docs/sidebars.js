@@ -383,6 +383,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
+          label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
+        },
+        {
+          type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
           label: "Node.js and Jaeger",
         },
