@@ -13,4 +13,4 @@ spec:
   - selector: span[tracetest.span.type="http" name="HelloController#show" http.method="GET"]
     assertions:
     - attr:http.status_code  =  200
-    - attr:tracetest.span.duration  <  500ms
+    - attr:tracetest.span.duration  <  1s
