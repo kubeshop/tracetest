@@ -3,6 +3,7 @@ services:
   app:
     image: quick-start-ruby-on-rails
     build: ./quick_start_api/.
+    platform: linux/amd64
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
