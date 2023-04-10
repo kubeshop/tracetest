@@ -2,6 +2,7 @@ version: '3'
 services:
   app:
     image: quick-start-ruby-sinatra
+    platform: linux/amd64
     build: .
     extra_hosts:
       - "host.docker.internal:host-gateway"
