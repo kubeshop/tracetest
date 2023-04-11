@@ -1887,6 +1887,7 @@ export interface external {
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
             | "FINISHED"
+            | "STOPPED"
             | "TRIGGER_FAILED"
             | "TRACE_FAILED"
             | "ASSERTION_FAILED";
