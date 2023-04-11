@@ -14,6 +14,10 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
+
+server: 
+  httpPort: 11633
+  pathPrefix: /
 ```
 
 Alternatively, we support setting a series of environment variables which can contain the connection information for the Postgres instance. If these environment variables are set, they will be used by the Tracetest server to connect to the database.
