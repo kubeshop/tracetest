@@ -37,6 +37,7 @@ type controller struct {
 }
 
 type runner interface {
+	StopTest(testID id.ID, runID int)
 	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run
 	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
@@ -321,8 +322,15 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
-func (*controller) StopTestRun(context.Context, string, string) (openapi.ImplResponse, error) {
-	return openapi.Response(http.StatusOK, nil), nil
+func (c *controller) StopTestRun(_ context.Context, testID, runID string) (openapi.ImplResponse, error) {
+	parsedRunID, err := strconv.Atoi(runID)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), nil
+	}
+
+	c.runner.StopTest(id.ID(testID), parsedRunID)
+
+	return openapi.Response(http.StatusOK, map[string]string{"result": "success"}), nil
 }
 
 func (c *controller) UpdateTest(ctx context.Context, testID string, in openapi.Test) (openapi.ImplResponse, error) {

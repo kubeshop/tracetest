@@ -192,6 +192,7 @@ const (
 	RunStateTraceFailed         RunState = "TRACE_FAILED"
 	RunStateAssertionFailed     RunState = "ASSERTION_FAILED"
 	RunStateFinished            RunState = "FINISHED"
+	RunStateStopped             RunState = "STOPPED"
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"
 )
 

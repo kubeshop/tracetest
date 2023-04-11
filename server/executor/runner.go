@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -76,12 +78,11 @@ type persistentRunner struct {
 }
 
 type execReq struct {
-	ctx                 context.Context
-	test                model.Test
-	run                 model.Run
-	subscriptionManager *subscription.Manager
-	Headers             propagation.MapCarrier
-	executor            expression.Executor
+	ctx      context.Context
+	test     model.Test
+	run      model.Run
+	Headers  propagation.MapCarrier
+	executor expression.Executor
 }
 
 func (r persistentRunner) handleDBError(run model.Run, err error) {
@@ -132,14 +133,63 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
+type StopRequest struct {
+	TestID id.ID
+	RunID  int
+}
+
+func (sr StopRequest) ResourceID() string {
+	runID := (model.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
+	return runID + "/stop"
+}
+
+func (sr StopRequest) AppliesTo(run model.Run) bool {
+	return sr.TestID == run.TestID && sr.RunID == run.ID
+}
+
 func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
-	ctx = getNewCtx(ctx)
+	ctx, cancelCtx := context.WithCancel(
+		getNewCtx(ctx),
+	)
 
 	run := model.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
 	run, err := r.runs.CreateRun(ctx, test, run)
 	r.handleDBError(run, err)
+
+	var sfn subscription.Subscriber
+	sfn = subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		stopRequest, ok := m.Content.(StopRequest)
+		if !ok {
+			return nil
+		}
+
+		ctx, _ := r.tracer.Start(ctx, "User Requested Stop Run")
+		// refresh data from DB to make sure we have the altest possible data before updating
+		run, err := r.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
+		if err != nil {
+			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
+			return err
+		}
+
+		run = run.Stopped()
+		r.handleDBError(run, r.updater.Update(ctx, run))
+
+		evt := events.TraceStoppedInfo(stopRequest.TestID, stopRequest.RunID)
+		err = r.eventEmitter.Emit(ctx, evt)
+		if err != nil {
+			log.Printf("[TracePoller] Test %s Run %d: fail to emit TraceStoppedInfo event: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
+			return err
+		}
+
+		cancelCtx()
+
+		r.subscriptionManager.Unsubscribe(stopRequest.ResourceID(), sfn.ID())
+
+		return nil
+	})
+	r.subscriptionManager.Subscribe((StopRequest{run.TestID, run.ID}).ResourceID(), sfn)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
 		Values: environment.Values,

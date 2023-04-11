@@ -7,6 +7,7 @@ export enum TestState {
   TRACE_FAILED = 'TRACE_FAILED',
   ASSERTION_FAILED = 'ASSERTION_FAILED',
   FAILED = 'FAILED',
+  STOPPED = 'STOPPED',
   FINISHED = 'FINISHED',
   WAITING = 'WAITING',
   SKIPPED = 'SKIPPED',
@@ -38,6 +39,10 @@ export const TestStateMap: Record<
   [TestState.FAILED]: {
     status: 'error',
     label: 'Failed',
+  },
+  [TestState.STOPPED]: {
+    status: 'error',
+    label: 'Stopped by user',
   },
   [TestState.TRIGGER_FAILED]: {
     status: 'error',

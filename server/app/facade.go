@@ -6,6 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
+	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -13,10 +14,23 @@ import (
 )
 
 type runnerFacade struct {
+	sm                *subscription.Manager
 	runner            executor.PersistentRunner
 	transactionRunner executor.PersistentTransactionRunner
 	assertionRunner   executor.AssertionRunner
 	tracePoller       executor.PersistentTracePoller
+}
+
+func (rf runnerFacade) StopTest(testID id.ID, runID int) {
+	sr := executor.StopRequest{
+		TestID: testID,
+		RunID:  runID,
+	}
+
+	rf.sm.PublishUpdate(subscription.Message{
+		ResourceID: sr.ResourceID(),
+		Content:    sr,
+	})
 }
 
 func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run {
@@ -90,6 +104,7 @@ func newRunnerFacades(
 	)
 
 	return &runnerFacade{
+		sm:                subscriptionManager,
 		runner:            runner,
 		transactionRunner: transactionRunner,
 		assertionRunner:   assertionRunner,

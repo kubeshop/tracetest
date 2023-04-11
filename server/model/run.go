@@ -121,6 +121,11 @@ func (r Run) Finish() Run {
 	return r
 }
 
+func (r Run) Stopped() Run {
+	r.State = RunStateStopped
+	return r.Finish()
+}
+
 func (r Run) TriggerFailed(err error) Run {
 	r.State = RunStateTriggerFailed
 	r.LastError = err
