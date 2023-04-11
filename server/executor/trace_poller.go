@@ -136,7 +136,8 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	select {
 	default:
 	case <-job.ctx.Done():
-		fmt.Println("trace poller. Context cancelled.")
+		log.Printf("[TracePoller] Context cancelled.")
+		return
 	}
 
 	if job.IsFirstRequest() {
