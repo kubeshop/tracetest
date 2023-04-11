@@ -1,53 +1,6 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "4.55.0"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = "4.0.4"
-    }
-  }
-}
-
-provider "aws" {
-  region = local.region
-}
-
-data "aws_caller_identity" "current" {}
-data "aws_availability_zones" "available" {}
-
 resource "aws_ecs_cluster" "tracetest-cluster" {
   name = "tracetest"
   tags = local.tags
-}
-
-module "tracetest_ecs_service_security_group" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
-
-  name        = "tracetest_ecs_service_security_group"
-  description = "ECS Service security group"
-  vpc_id      = module.network.vpc_id
-
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "tcp"
-      description = "HTTP access from VPC"
-      cidr_blocks = local.vpc_cidr
-  }]
-
-  egress_with_cidr_blocks = [
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "-1"
-      description = "HTTP access to anywhere"
-      cidr_blocks = "0.0.0.0/0"
-  }]
 }
 
 resource "aws_iam_role" "tracetest_task_execution_role" {

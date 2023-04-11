@@ -1,3 +1,23 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "4.55.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "4.0.4"
+    }
+  }
+}
+
+provider "aws" {
+  region = local.region
+}
+
+data "aws_caller_identity" "current" {}
+data "aws_availability_zones" "available" {}
+
 variable "aws_region" {
   type    = string
   default = "us-west-2"
