@@ -26,6 +26,11 @@ The list of environment variables and example values is:
 - `TRACETEST_POSTGRES_PASSWORD: "postgres"`
 - `TRACETEST_POSTGRES_PARAMS: ""`
 
+You can also change the defaults for the Tracetest server, altering the port and path you access the dashboard from. For a docker based install done locally, this url is typically http://localhost:11633/. You can alter it by setting either of these environmental variables: 
+
+- `TRACETEST_SERVER_HTTPPORT=11633`
+- `TRACETEST_SERVER_PATHPREFIX="/"`
+
 
 You can also intitalize the server with a number of resources the first time it is launched by using [provisioning](./provisioning).
 
