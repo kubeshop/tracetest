@@ -5,7 +5,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: https://3x6vvt7l5d.execute-api.us-west-2.amazonaws.com/dev/hello
+      url: <your_api_endpoint>
       method: GET
       headers:
         - key: Content-Type
