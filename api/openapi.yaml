@@ -1429,89 +1429,17 @@ paths:
           description: "problem deleting a demo"
 
   # Data Stores
-  /datastores:
-    get:
-      tags:
-        - api
-      summary: "Get all Data Stores"
-      description: "Get all Data Stores"
-      operationId: getDataStores
-      parameters:
-        - in: query
-          name: take
-          description: "indicates how many data stores can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many data stores will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: query
-          description: "query to search data stores, based on data store name"
-          schema:
-            type: string
-        - in: query
-          name: sortBy
-          description: "indicates the sort field for the data stores"
-          schema:
-            type: string
-            enum: [created, name]
-        - in: query
-          name: sortDirection
-          description: "indicates the sort direction for the data stores"
-          schema:
-            type: string
-            enum: [asc, desc]
-      responses:
-        200:
-          description: successful operation
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-              description: Total records count
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "./dataStores.yaml#/components/schemas/DataStore"
-        500:
-          description: "problem with getting data stores"
-    post:
-      tags:
-        - api
-      summary: "Create a new Data Store"
-      description: "Create a new Data Store"
-      operationId: createDataStore
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "./dataStores.yaml#/components/schemas/DataStore"
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "./dataStores.yaml#/components/schemas/DataStore"
-        400:
-          description: "trying to create a data store with an already existing ID"
   /datastores/{dataStoreId}:
     get:
       tags:
-        - api
+        - resource-api
       parameters:
         - in: path
           name: dataStoreId
           schema:
             type: string
           required: true
+          description: "ID of a data store used by Tracetest to fetch traces. It should be set as 'current'."
       summary: "Get a Data Store"
       description: "Get a Data Store"
       operationId: getDataStore
@@ -1522,17 +1450,20 @@ paths:
             application/json:
               schema:
                 $ref: "./dataStores.yaml#/components/schemas/DataStore"
+        404:
+          description: "data store not found"
         500:
           description: "problem with getting a data store"
     put:
       tags:
-        - api
+        - resource-api
       parameters:
         - in: path
           name: dataStoreId
           schema:
             type: string
           required: true
+          description: "ID of a data store used by Tracetest to fetch traces. It should be set as 'current'."
       summary: "Update a Data Store"
       description: "Update a Data Store"
       operationId: updateDataStore
@@ -1544,40 +1475,7 @@ paths:
       responses:
         204:
           description: successful operation
+        400:
+          description: "invalid data store, some data was sent in incorrect format."
         500:
           description: "problem with updating data store"
-    delete:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: dataStoreId
-          schema:
-            type: string
-          required: true
-      summary: "Delete a Data Store"
-      description: "Delete a Data Store"
-      operationId: deleteDataStore
-      responses:
-        "204":
-          description: OK
-  /datastores/{dataStoreId}/definition.yaml:
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: dataStoreId
-          schema:
-            type: string
-          required: true
-      summary: Get the data store definition as an YAML file
-      description: Get the data store as an YAML file
-      operationId: getDataStoreDefinitionFile
-      responses:
-        200:
-          description: OK
-          content:
-            application/yaml:
-              schema:
-                type: string
