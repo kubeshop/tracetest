@@ -111,6 +111,7 @@ func (ds DataStore) HasID() bool {
 }
 
 func (ds DataStore) Validate() error {
+	//TODO: replace for resource validate
 	if !slices.Contains(validTypes, ds.Type) {
 		return fmt.Errorf("unsupported data store")
 	}
@@ -119,5 +120,6 @@ func (ds DataStore) Validate() error {
 }
 
 func (ds DataStore) IsOTLPBasedProvider() bool {
+	//TODO: replace for resource validate
 	return slices.Contains(otlpBasedDataStores, ds.Type)
 }

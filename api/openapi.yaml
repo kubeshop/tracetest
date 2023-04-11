@@ -621,7 +621,6 @@ paths:
           description: successful operation
         422:
           description: could not stop execution, probably it's not running anymore
-
   # Test events
   /tests/{testId}/run/{runId}/events:
     get:

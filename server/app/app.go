@@ -28,6 +28,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
@@ -245,13 +246,8 @@ func (app *App) Start(opts ...appOption) error {
 	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner)
 
-	dataStoreManager := resourcemanager.New[testdb.DataStoreResource](
-		testdb.DataStoreResourceName,
-		testdb.DataStoreResourceNamePlural,
-		testdb.NewDataStoreResourceProvisioner(testDB),
-		resourcemanager.WithOperations(resourcemanager.OperationNoop),
-	)
-	provisioner.AddResourceProvisioner(dataStoreManager)
+	dataStoreRepo := datastoreresource.NewRepository(db)
+	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner)
 
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
 
@@ -318,6 +314,17 @@ func registerDemosResource(repository *demoresource.Repository, router *mux.Rout
 		demoresource.ResourceNamePlural,
 		repository,
 		resourcemanager.WithOperations(demoresource.Operations...),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
+func registerDataStoreResource(repository *datastoreresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
+	manager := resourcemanager.New[datastoreresource.DataStore](
+		datastoreresource.ResourceName,
+		datastoreresource.ResourceNamePlural,
+		repository,
+		resourcemanager.WithOperations(datastoreresource.Operations...),
 	)
 	manager.RegisterRoutes(router)
 	provisioner.AddResourceProvisioner(manager)
