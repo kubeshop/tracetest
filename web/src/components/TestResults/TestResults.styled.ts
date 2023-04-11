@@ -40,12 +40,15 @@ export const LoadingContainer = styled.div`
   text-align: center;
 `;
 
-export const PrimaryButton = styled(Button).attrs({
-  type: 'primary',
-})``;
-
 export const Row = styled.div`
   align-items: center;
   display: flex;
   gap: 8px;
+`;
+
+export const CaretDropdownButton = styled(Button)`
+  font-weight: 600;
+  opacity: 0.7;
+  width: 32px;
+  padding: 0px;
 `;
