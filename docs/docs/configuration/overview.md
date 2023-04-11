@@ -31,3 +31,14 @@ View the [configuration for OpenTelemetry Collector](./connecting-to-data-stores
 Examples of configuring Tracetest to access different data stores can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). Check out the [**Recipes**](../examples-tutorials/recipes.md) for guided walkthroughs of sample use cases.
 
 We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) any additional data stores you would like to see us support.
+
+## Configuring the Server
+
+Tracetest has a configuration file to contain the minimal information needed to start the Tracetest server. See more at [Tracetest Server Configuration](./server)
+
+You can also provision the server when it first starts, configuring most aspects of your Tracetest server environment. This is useful in a CI/CD environment to preload and configure the server. See more at [Provisioning a Tracetest Server](./provisioning)
+
+Many of the server configuration settings can be set individually in the UI or via the CLI. See:
+- [Trace Polling](./trace-polling)
+- [Demo Applications](./demo)
+- [Analytics](./analytics)
