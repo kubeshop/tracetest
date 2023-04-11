@@ -1,18 +1,20 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {CaretDownOutlined} from '@ant-design/icons';
 import {Dropdown, Menu} from 'antd';
 import SpanService from 'services/Span.service';
 import Span from 'models/Span.model';
+import {TEST_SPEC_SNIPPETS, TSnippet} from 'constants/TestSpecs.constants';
 import * as S from './TestResults.styled';
 import {useTestSpecForm} from '../TestSpecForm/TestSpecForm.provider';
-import {TEST_SPEC_SNIPPETS, TSnippet} from '../../constants/TestSpecs.constants';
 
 interface IProps {
   selectedSpan: Span;
+  visibleByDefault?: boolean;
 }
 
-const AddTestSpecButton = ({selectedSpan}: IProps) => {
+const AddTestSpecButton = ({selectedSpan, visibleByDefault = false}: IProps) => {
   const {open} = useTestSpecForm();
+  const caretRef = useRef<HTMLElement>(null);
   const handleEmptyTestSpec = useCallback(() => {
     const selector = SpanService.getSelectorInformation(selectedSpan);
 
@@ -36,6 +38,12 @@ const AddTestSpecButton = ({selectedSpan}: IProps) => {
     [open]
   );
 
+  useEffect(() => {
+    if (visibleByDefault && caretRef.current) {
+      caretRef.current?.click();
+    }
+  }, [visibleByDefault]);
+
   const menu = useMemo(
     () => (
       <Menu
@@ -50,10 +58,16 @@ const AddTestSpecButton = ({selectedSpan}: IProps) => {
               onClick: () => onSnippetClick(snippet),
             })),
           },
+          {type: 'divider'},
+          {
+            label: 'Empty Test Spec',
+            key: 'empty-test-spec',
+            onClick: handleEmptyTestSpec,
+          },
         ]}
       />
     ),
-    [onSnippetClick]
+    [handleEmptyTestSpec, onSnippetClick]
   );
 
   return (
@@ -65,7 +79,7 @@ const AddTestSpecButton = ({selectedSpan}: IProps) => {
       type="primary"
       buttonsRender={([leftButton]) => [
         React.cloneElement(leftButton as React.ReactElement<any, string>, {'data-cy': 'add-test-spec-button'}),
-        <S.CaretDropdownButton type="primary" data-cy="create-button">
+        <S.CaretDropdownButton ref={caretRef} type="primary" data-cy="create-button">
           <CaretDownOutlined />
         </S.CaretDropdownButton>,
       ]}

@@ -38,8 +38,47 @@ export const DB_SPANS_RESPONSE_TIME: TSnippet = {
   ],
 };
 
+export const TRIGGER_SPAN_RESPONSE_BODY_CONTAINS: TSnippet = {
+  name: 'Trigger Span: Response body contains "this string"',
+  selector: 'span[tracetest.span.type="general" name="Tracetest trigger"]',
+  assertions: [
+    {
+      left: 'attr:tracetest.response.body',
+      comparator: 'contains',
+      right: '"this string"',
+    },
+  ],
+};
+
+export const GRPC_SPANS_STATUS_CODE: TSnippet = {
+  name: 'All gRPC Spans: Status is Ok',
+  selector: 'span[tracetest.span.type="rpc" rpc.system="grpc"]',
+  assertions: [
+    {
+      left: 'attr:grpc.status_code',
+      comparator: '=',
+      right: '0',
+    },
+  ],
+};
+
+export const DB_SPANS_QUALITY_DB_STATEMENT_PRESENT: TSnippet = {
+  name: 'All Database Spans: db.statement should always be defined (QUALITY)',
+  selector: 'span[tracetest.span.type="database"]',
+  assertions: [
+    {
+      left: 'attr:db.system',
+      comparator: '!=',
+      right: '""',
+    },
+  ],
+};
+
 export const TEST_SPEC_SNIPPETS: TSnippet[] = [
   HTTP_SPANS_STATUS_CODE,
+  GRPC_SPANS_STATUS_CODE,
   TRIGGER_SPAN_RESPONSE_TIME,
+  TRIGGER_SPAN_RESPONSE_BODY_CONTAINS,
   DB_SPANS_RESPONSE_TIME,
+  DB_SPANS_QUALITY_DB_STATEMENT_PRESENT,
 ];

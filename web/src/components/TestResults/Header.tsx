@@ -10,6 +10,8 @@ interface IProps {
 }
 
 const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => {
+  const hasSpecs = !!(totalFailedSpecs || totalPassedSpecs);
+
   return (
     <S.HeaderContainer>
       <S.Row>
@@ -30,7 +32,7 @@ const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => {
         </div>
       </S.Row>
 
-      <AddTestSpecButton selectedSpan={selectedSpan} />
+      <AddTestSpecButton selectedSpan={selectedSpan} visibleByDefault={!hasSpecs} />
     </S.HeaderContainer>
   );
 };
