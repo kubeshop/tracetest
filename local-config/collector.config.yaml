@@ -13,7 +13,7 @@ exporters:
     loglevel: debug
 
   otlp/1:
-    endpoint: host.docker.internal:21321
+    endpoint: tracetest:21321
     tls:
       insecure: true
 
