@@ -106,7 +106,7 @@ export interface paths {
     /** Get the test definition as an YAML file */
     get: operations["getTestVersionDefinitionFile"];
   };
-  "/test/{testId}/run/{runId}/stop": {
+  "/tests/{testId}/run/{runId}/stop": {
     /** stops the execution of a test run */
     post: operations["stopTestRun"];
   };

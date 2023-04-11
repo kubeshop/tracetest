@@ -299,7 +299,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"StopTestRun",
 			strings.ToUpper("Post"),
-			"/api/test/{testId}/run/{runId}/stop",
+			"/api/tests/{testId}/run/{runId}/stop",
 			c.StopTestRun,
 		},
 		{
