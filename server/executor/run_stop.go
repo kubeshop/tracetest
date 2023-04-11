@@ -28,7 +28,7 @@ func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx c
 		}
 
 		ctx, _ := r.tracer.Start(ctx, "User Requested Stop Run")
-		// refresh data from DB to make sure we have the altest possible data before updating
+		// refresh data from DB to make sure we have the latest possible data before updating
 		run, err := r.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
 		if err != nil {
 			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
