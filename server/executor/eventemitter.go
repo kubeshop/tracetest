@@ -2,7 +2,6 @@ package executor
 
 import (
 	"context"
-	"sync"
 
 	"github.com/kubeshop/tracetest/server/model"
 )
@@ -18,7 +17,6 @@ type publisher interface {
 type internalEventEmitter struct {
 	repository model.TestRunEventRepository
 	publisher  publisher
-	mutex      sync.Mutex
 }
 
 func NewEventEmitter(repository model.TestRunEventRepository, publisher publisher) EventEmitter {
@@ -33,9 +31,6 @@ func (em *internalEventEmitter) Emit(ctx context.Context, event model.TestRunEve
 	if err != nil {
 		return err
 	}
-
-	em.mutex.Lock()
-	defer em.mutex.Unlock()
 
 	em.publisher.Publish(event.ResourceID(), event)
 
