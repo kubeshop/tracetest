@@ -21,9 +21,7 @@ func (sr StopRequest) ResourceID() string {
 }
 
 func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, run model.Run) {
-	var sfn subscription.Subscriber
-
-	sfn = subscription.NewSubscriberFunction(func(m subscription.Message) error {
+	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		stopRequest, ok := m.Content.(StopRequest)
 		if !ok {
 			return nil
@@ -48,8 +46,6 @@ func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx c
 		}
 
 		cancelCtx()
-
-		r.subscriptionManager.Unsubscribe(stopRequest.ResourceID(), sfn.ID())
 
 		return nil
 	})
