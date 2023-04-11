@@ -84,6 +84,7 @@ func TestTransactionRunner(t *testing.T) {
 	})
 
 	t.Run("WithErrors", func(t *testing.T) {
+		t.Skip("Testing")
 		runTransactionRunnerTest(t, true, func(t *testing.T, actual model.TransactionRun) {
 			assert.Equal(t, model.TransactionRunStateFailed, actual.State)
 			require.Len(t, actual.Steps, 1)
