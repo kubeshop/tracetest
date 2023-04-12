@@ -1,4 +1,4 @@
-import {Link} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {useMemo} from 'react';
 import {LinkOutlined} from '@ant-design/icons';
 
@@ -9,14 +9,14 @@ import * as S from './RunDetailLayout.styled';
 
 interface IProps {
   name: string;
-  testId: string;
   triggerType: string;
 }
 
-const HeaderLeft = ({name, testId, triggerType}: IProps) => {
+const HeaderLeft = ({name, triggerType}: IProps) => {
   const {run: {createdAt, transactionId, transactionRunId, executionTime, trace, traceId, testVersion} = {}, run} =
     useTestRun();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
+  const navigate = useNavigate();
 
   const description = useMemo(() => {
     return (
@@ -37,9 +37,9 @@ const HeaderLeft = ({name, testId, triggerType}: IProps) => {
 
   return (
     <S.Section $justifyContent="flex-start">
-      <Link data-cy="test-header-back-button" to={`/test/${testId}`}>
+      <a data-cy="test-header-back-button" onClick={() => navigate(-1)}>
         <S.BackIcon />
-      </Link>
+      </a>
       <S.InfoContainer>
         <S.Row>
           <S.Title data-cy="test-details-name">

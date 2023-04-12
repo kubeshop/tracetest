@@ -1,5 +1,5 @@
 import {Button} from 'antd';
-import {Link} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import Transaction from 'models/Transaction.model';
@@ -18,13 +18,14 @@ const TransactionHeader = ({
   transactionRun: {state, id: runId},
 }: IProps) => {
   const {onRun} = useTransaction();
+  const navigate = useNavigate();
 
   return (
     <S.Container>
       <S.Section>
-        <Link to={`/transaction/${transactionId}`} data-cy="transaction-header-back-button">
+        <a onClick={() => navigate(-1)} data-cy="transaction-header-back-button">
           <S.BackIcon />
-        </Link>
+        </a>
         <div>
           <S.Title data-cy="transaction-details-name">
             {name} (v{version})

@@ -1,5 +1,6 @@
 import {UseQuery} from '@reduxjs/toolkit/dist/query/react/buildHooks';
 import {useCallback, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 
 type TParams<P> = P & {
   take?: number;
@@ -35,7 +36,9 @@ const usePagination = <T, P>(
   useGetDataListQuery: UseQuery<any>,
   {take = 20, ...queryParams}: TParams<P>
 ): IPagination<T> => {
-  const [params, setParams] = useState<{page: number; query: string}>({page: 0, query: ''});
+  const [searchParams] = useSearchParams();
+  const defaultPage = searchParams.get('page') ? Number(searchParams.get('page')) - 1 : 0;
+  const [params, setParams] = useState<{page: number; query: string}>({page: defaultPage, query: ''});
 
   const {data, isFetching, isLoading} = useGetDataListQuery({
     skip: params.page * take,
