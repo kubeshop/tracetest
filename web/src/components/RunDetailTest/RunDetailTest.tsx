@@ -13,6 +13,7 @@ import TestSpecDetail from 'components/TestSpecDetail';
 import TestSpecForm from 'components/TestSpecForm';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import Switch from 'components/Visualization/components/Switch';
+import {TestState} from 'constants/TestRun.constants';
 import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import TestRun from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
@@ -118,13 +119,15 @@ const RunDetailTest = ({run, runEvents, testId}: IProps) => {
           <S.Container>
             <S.SectionLeft>
               <S.SwitchContainer>
-                <Switch
-                  onChange={type => {
-                    TestRunAnalytics.onSwitchDiagramView(type);
-                    setVisualizationType(type);
-                  }}
-                  type={visualizationType}
-                />
+                {run.state === TestState.FINISHED && (
+                  <Switch
+                    onChange={type => {
+                      TestRunAnalytics.onSwitchDiagramView(type);
+                      setVisualizationType(type);
+                    }}
+                    type={visualizationType}
+                  />
+                )}
               </S.SwitchContainer>
 
               <Visualization
