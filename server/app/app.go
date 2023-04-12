@@ -172,7 +172,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	fmt.Println("New install?", isNewInstall)
 	if isNewInstall {
-		err = analytics.SendEvent("Install", "beacon", "")
+		err = analytics.SendEvent("Install", "beacon", "", nil)
 		if err != nil {
 			return err
 		}
@@ -220,7 +220,7 @@ func (app *App) Start(opts ...appOption) error {
 		rf.assertionRunner.Stop()
 	})
 
-	err = analytics.SendEvent("Server Started", "beacon", "")
+	err = analytics.SendEvent("Server Started", "beacon", "", nil)
 	if err != nil {
 		return err
 	}

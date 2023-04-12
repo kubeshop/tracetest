@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -213,7 +214,12 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 		fmt.Println("[TracePoller] Unknown error", err)
 	}
 
-	tp.handleDBError(tp.updater.Update(job.ctx, run.TraceFailed(err)))
+	run = run.TraceFailed(err)
+	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+		"finalState": string(run.State),
+	})
+
+	tp.handleDBError(tp.updater.Update(job.ctx, run))
 
 	tp.subscriptionManager.PublishUpdate(subscription.Message{
 		ResourceID: run.TransactionStepResourceID(),
