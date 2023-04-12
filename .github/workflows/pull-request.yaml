@@ -384,8 +384,8 @@ jobs:
 
       - name: Run integration tests
         run: |
-          ./scripts/wait-for-port.sh 3000
-          ./scripts/check-port.sh 3000& &
+          ./scripts/wait-for-port.sh 3000 &
+          ./scripts/check-port.sh 3000 &
           cd web/
           npm run cy:ci
         env:

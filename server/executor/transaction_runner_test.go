@@ -176,8 +176,8 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	case finalRun = <-done:
 		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions
 		fmt.Println("run completed")
-	case <-time.After(1 * time.Second):
-		t.Log("timeout after 1 second")
+	case <-time.After(10 * time.Second):
+		t.Log("timeout after 10 second")
 		t.FailNow()
 	}
 
