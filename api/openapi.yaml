@@ -1291,23 +1291,25 @@ paths:
           description: successful operation
           content:
             application/json:
-              schema: object
-              properties:
-                count:
-                  type: integer
-                items:
-                  type: array
+              schema:
+                teyp: object
+                properties:
+                  count:
+                    type: integer
                   items:
-                    $ref: "./config.yaml#/components/schemas/Demo"
+                    type: array
+                    items:
+                      $ref: "./config.yaml#/components/schemas/Demo"
             text/yaml:
-              schema: object
-              properties:
-                count:
-                  type: integer
-                items:
-                  type: array
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
                   items:
-                    $ref: "./config.yaml#/components/schemas/Demo"
+                    type: array
+                    items:
+                      $ref: "./config.yaml#/components/schemas/Demo"
         400:
           description: "invalid query for demos, some data was sent in incorrect format."
         500:
