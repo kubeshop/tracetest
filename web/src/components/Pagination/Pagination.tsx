@@ -38,9 +38,14 @@ const Pagination = <T extends any>({
   }, [hasPrev, isLoading, loadPrev]);
 
   useEffect(() => {
-    navigate({
-      search: `page=${page}`,
-    });
+    navigate(
+      {
+        search: `page=${page}`,
+      },
+      {
+        replace: true,
+      }
+    );
   }, [navigate, page]);
 
   return (
