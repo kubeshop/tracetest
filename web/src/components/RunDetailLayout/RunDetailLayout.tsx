@@ -50,7 +50,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
 
   const tabBarExtraContent = useMemo(
     () => ({
-      left: <HeaderLeft testId={id} name={name} triggerType={trigger.type.toUpperCase()} />,
+      left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} />,
       right: <HeaderRight testId={id} testVersion={version} />,
     }),
     [id, name, trigger.type, version]
