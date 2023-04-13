@@ -1,0 +1,129 @@
+version: 3.0.0
+components:
+  parameters:
+
+    # Test parameters
+    testId:
+      in: path
+      name: testId
+      required: true
+      description: id of the test
+      schema:
+        type: string
+
+    # versioning and runs
+
+    runId:
+        in: path
+        name: runId
+        required: true
+        description: id of the run
+        schema:
+          type: integer
+
+    version:
+      in: path
+      name: version
+      required: true
+      description: version of the test
+      schema:
+        type: integer
+
+    # transaction
+    transactionId:
+      in: path
+      name: transactionId
+      required: true
+      description: id of the transaction
+      schema:
+        type: string
+
+    # Query parameters
+    take:
+      in: query
+      name: take
+      description: "indicates how many resources can be returned by each page"
+      schema:
+        type: integer
+        default: 20
+
+    skip:
+      in: query
+      name: skip
+      description: "indicates how many resources will be skipped when paginating"
+      schema:
+        type: integer
+        default: 0
+
+    query:
+      in: query
+      name: query
+      description: "query to search resources"
+      schema:
+        type: string
+
+    runnableResourceSortBy:
+      in: query
+      name: sortBy
+      description: "indicates the sort field for the resources"
+      schema:
+        type: string
+        enum: [created, name, last_run]
+
+    sortBy:
+      in: query
+      name: sortBy
+      description: "indicates the sort field for the resources"
+      schema:
+        type: string
+        enum: [created, name]
+
+    switchableResourceSortBy:
+      in: query
+      name: sortBy
+      description: "indicates the sort field for the resources"
+      schema:
+        type: string
+        enum: [type, enabled]
+
+    sortDirection:
+      in: query
+      name: sortDirection
+      description: "indicates the sort direction for the resources"
+      schema:
+        type: string
+        enum: [asc, desc]
+
+    # resource ids
+
+    configId:
+      in: path
+      name: configId
+      schema:
+        type: string
+      required: true
+      description: "ID of the configuration resource used on Tracetest. It should be set as 'current'"
+
+    demoId:
+      in: path
+      name: demoId
+      required: true
+      description: "ID of a demonstration used on Tracetest as quick start examples"
+      schema:
+        type: string
+
+    pollingProfileId:
+      in: path
+      name: pollingProfileId
+      required: true
+      description: "ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'"
+      schema:
+        type: string
+
+    dataStoreId:
+      in: path
+      name: dataStoreId
+      required: true
+      description: "ID of a datastore used on Tracetest to configure how to fetch traces in a test"
+      schema:
+        type: string

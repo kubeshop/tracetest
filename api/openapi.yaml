@@ -66,35 +66,11 @@ paths:
       description: "get transactions"
       operationId: getTransactions
       parameters:
-        - in: query
-          name: take
-          description: "indicates how many transactions can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many transactions will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: query
-          description: "query to search transactions, based on transaction name and description"
-          schema:
-            type: string
-        - in: query
-          name: sortBy
-          description: "indicates the sort field for the transactions"
-          schema:
-            type: string
-            enum: [created, name, last_run]
-        - in: query
-          name: sortDirection
-          description: "indicates the sort direction for the transactions"
-          schema:
-            type: string
-            enum: [asc, desc]
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/runnableResourceSortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
           description: successful operation
@@ -136,11 +112,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
       summary: "get transaction"
       description: "get transaction"
       operationId: getTransaction
@@ -157,11 +129,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
       summary: "update transaction"
       description: "update transaction action"
       operationId: updateTransaction
@@ -179,11 +147,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
       summary: "delete a transaction"
       description: "delete a transaction"
       operationId: deleteTransaction
@@ -195,16 +159,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: version
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
+        - $ref: "./parameters.yaml#/components/parameters/version"
       summary: "get a transaction specific version"
       description: "get a transaction specific version"
       operationId: getTransactionVersion
@@ -222,16 +178,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: version
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
+        - $ref: "./parameters.yaml#/components/parameters/version"
       summary: Get the transaction definition as an YAML file
       description: Get the transaction as an YAML file
       operationId: getTransactionVersionDefinitionFile
@@ -247,11 +195,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
       summary: "run transaction"
       description: "run a particular transaction"
       operationId: runTransaction
@@ -271,23 +215,9 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: take
-          description: "indicates how many results can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many results will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
       summary: "Get all runs from a particular transaction"
       description: "Get all runs from a particular transaction"
       operationId: getTransactionRuns
@@ -305,16 +235,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "Get a specific run from a particular transaction"
       description: "Get a specific run from a particular transaction"
       operationId: getTransactionRun
@@ -332,16 +254,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: transactionId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/transactionId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "Delete a specific run from a particular transaction"
       description: "Delete a specific run from a particular transaction"
       operationId: deleteTransactionRun
@@ -360,35 +274,11 @@ paths:
       description: "get tests"
       operationId: getTests
       parameters:
-        - in: query
-          name: take
-          description: "indicates how many tests can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many tests will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: query
-          description: "query to search tests, based on test name and description"
-          schema:
-            type: string
-        - in: query
-          name: sortBy
-          description: "indicates the sort field for the tests"
-          schema:
-            type: string
-            enum: [created, name, last_run]
-        - in: query
-          name: sortDirection
-          description: "indicates the sort direction for the tests"
-          schema:
-            type: string
-            enum: [asc, desc]
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/runnableResourceSortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
           description: successful operation
@@ -430,11 +320,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "get test"
       description: "get test"
       operationId: getTest
@@ -451,11 +337,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "update test"
       description: "update test action"
       operationId: updateTest
@@ -473,11 +355,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "delete a test"
       description: "delete a test"
       operationId: deleteTest
@@ -489,11 +367,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "run test"
       description: "run a particular test"
       operationId: runTest
@@ -519,23 +393,9 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: take
-          description: "indicates how many results can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many results will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
       summary: "get the runs for a test"
       description: "get the runs from a particular test"
       operationId: getTestRuns
@@ -558,20 +418,9 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: query
-          schema:
-            type: string
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
+        - $ref: "./parameters.yaml#/components/parameters/query"
       summary: "retrieve spans that will be selected by selector"
       description: "get the spans ids that would be selected by a specific selector query"
       operationId: getTestResultSelectedSpans
@@ -587,16 +436,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "run given assertions against the traces from the given run without persisting anything"
       description: "use this method to test a definition against an actual trace without creating a new version or persisting anything"
       operationId: dryRunAssertion
@@ -617,16 +458,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "rerun a test run"
       description: "rerun a test run"
       operationId: rerunTestRun
@@ -642,16 +475,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "get test run results in JUnit xml format"
       description: "get test run results in JUnit xml format"
       operationId: getRunResultJUnit
@@ -667,16 +492,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: export test and test run information
       description: export test and test run information for debugging
       operationId: exportTestRun
@@ -711,16 +528,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "get test Run"
       description: "get a particular test Run"
       operationId: getTestRun
@@ -735,16 +544,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "delete a test run"
       description: "delete a test run"
       operationId: deleteTestRun
@@ -756,11 +557,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
       operationId: getTestSpecs
       summary: "Get definition for a test"
       description: "Gets definition for a test"
@@ -778,16 +575,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: version
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/version"
       summary: "get a test specific version"
       description: "get a test specific version"
       operationId: getTestVersion
@@ -805,16 +594,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: version
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/version"
       summary: Get the test definition as an YAML file
       description: Get the test definition as an YAML file
       operationId: getTestVersionDefinitionFile
@@ -830,16 +611,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "stops the execution of a test run"
       description: "stops the execution of a test run"
       operationId: stopTestRun
@@ -855,16 +628,8 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: testId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: runId
-          schema:
-            type: integer
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "get events from a test run"
       description: "get events from a test run"
       operationId: getTestRunEvents
@@ -887,35 +652,11 @@ paths:
       description: "Get Environments"
       operationId: getEnvironments
       parameters:
-        - in: query
-          name: take
-          description: "indicates how many environments can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many environments will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: query
-          description: "query to search environments, based on environments name and description"
-          schema:
-            type: string
-        - in: query
-          name: sortBy
-          description: "indicates the sort field for the environments"
-          schema:
-            type: string
-            enum: [created, name]
-        - in: query
-          name: sortDirection
-          description: "indicates the sort direction for the environments"
-          schema:
-            type: string
-            enum: [asc, desc]
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/sortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
           description: successful operation
@@ -1062,35 +803,11 @@ paths:
       description: "get resources"
       operationId: getResources
       parameters:
-        - in: query
-          name: take
-          description: "indicates how many transactions can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many transactions will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: query
-          description: "query to search transactions, based on transaction name and description"
-          schema:
-            type: string
-        - in: query
-          name: sortBy
-          description: "indicates the sort field for the transactions"
-          schema:
-            type: string
-            enum: [created, name, last_run]
-        - in: query
-          name: sortDirection
-          description: "indicates the sort direction for the transactions"
-          schema:
-            type: string
-            enum: [asc, desc]
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/sortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
           description: successful operation
@@ -1131,12 +848,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: configId
-          schema:
-            type: string
-          required: true
-          description: "ID of the configuration resource used on Tracetest. It should be set as 'current'."
+        - $ref: "./parameters.yaml#/components/parameters/configId"
       summary: "Get Tracetest configuration"
       description: "Get Tracetest configuration"
       operationId: getConfiguration
@@ -1156,12 +868,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: configId
-          schema:
-            type: string
-          required: true
-          description: "ID of the configuration resource used on Tracetest. It should be set as 'current'."
+        - $ref: "./parameters.yaml#/components/parameters/configId"
       summary: "Update Tracetest configuration"
       description: "Update Tracetest configuration"
       operationId: updateConfiguration
@@ -1192,12 +899,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: pollingProfileId
-          schema:
-            type: string
-          required: true
-          description: "ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'."
+        - $ref: "./parameters.yaml#/components/parameters/pollingProfileId"
       summary: "Get Polling Profile"
       description: "Get a polling profile used on Tracetest to configure how to fetch traces in a test."
       operationId: getPollingProfile
@@ -1219,12 +921,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: pollingProfileId
-          schema:
-            type: string
-          required: true
-          description: "ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'."
+        - $ref: "./parameters.yaml#/components/parameters/pollingProfileId"
       summary: "Update a Polling Profile"
       description: "Update a polling profile used on Tracetest to configure how to fetch traces in a test."
       operationId: updatePollingProfile
@@ -1262,30 +959,10 @@ paths:
       description: "List demonstrations used on Tracetest as quick start examples."
       operationId: listDemos
       parameters:
-        - in: query
-          name: take
-          description: "Indicates the maximum number of demos that can be returned on this call."
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "Indicates how many demos will be skipped when paginating."
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: sortBy
-          description: "Indicates the sort field for on which all demos will be sorted."
-          schema:
-            type: string
-            enum: [type, enabled]
-        - in: query
-          name: sortDirection
-          description: "Indicates the sort direction for the demos (ascending or descending)."
-          schema:
-            type: string
-            enum: [asc, desc]
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/switchableResourceSortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
           description: successful operation
@@ -1345,12 +1022,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: demoId
-          schema:
-            type: string
-          required: true
-          description: "ID of a demonstration used on Tracetest as quick start examples."
+        - $ref: "./parameters.yaml#/components/parameters/demoId"
       summary: "Get Demonstration setting"
       description: "Get a demonstration used on Tracetest as quick start examples."
       operationId: getDemo
@@ -1372,12 +1044,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: demoId
-          schema:
-            type: string
-          required: true
-          description: "ID of a demonstration used on Tracetest as quick start examples."
+        - $ref: "./parameters.yaml#/components/parameters/demoId"
       summary: "Update a Demonstration setting"
       description: "Update a demonstration used on Tracetest as quick start examples."
       operationId: updateDemo
@@ -1409,12 +1076,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - in: path
-          name: demoId
-          schema:
-            type: string
-          required: true
-          description: "ID of a demonstration used on Tracetest as quick start examples."
+        - $ref: "./parameters.yaml#/components/parameters/demoId"
       summary: "Delete a Demonstration setting"
       description: "Delete a demonstration used on Tracetest as quick start examples."
       operationId: deleteDemo
@@ -1437,35 +1099,11 @@ paths:
       description: "Get all Data Stores"
       operationId: getDataStores
       parameters:
-        - in: query
-          name: take
-          description: "indicates how many data stores can be returned by each page"
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: skip
-          description: "indicates how many data stores will be skipped when paginating"
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: query
-          description: "query to search data stores, based on data store name"
-          schema:
-            type: string
-        - in: query
-          name: sortBy
-          description: "indicates the sort field for the data stores"
-          schema:
-            type: string
-            enum: [created, name]
-        - in: query
-          name: sortDirection
-          description: "indicates the sort direction for the data stores"
-          schema:
-            type: string
-            enum: [asc, desc]
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/sortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
           description: successful operation
@@ -1507,11 +1145,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: dataStoreId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/dataStoreId"
       summary: "Get a Data Store"
       description: "Get a Data Store"
       operationId: getDataStore
@@ -1528,11 +1162,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: dataStoreId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/dataStoreId"
       summary: "Update a Data Store"
       description: "Update a Data Store"
       operationId: updateDataStore
@@ -1550,11 +1180,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: dataStoreId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/dataStoreId"
       summary: "Delete a Data Store"
       description: "Delete a Data Store"
       operationId: deleteDataStore
@@ -1566,11 +1192,7 @@ paths:
       tags:
         - api
       parameters:
-        - in: path
-          name: dataStoreId
-          schema:
-            type: string
-          required: true
+        - $ref: "./parameters.yaml#/components/parameters/dataStoreId"
       summary: Get the data store definition as an YAML file
       description: Get the data store as an YAML file
       operationId: getDataStoreDefinitionFile
