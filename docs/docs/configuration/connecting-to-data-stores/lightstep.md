@@ -73,9 +73,11 @@ Configure your Tracetest instance to expose an `otlp` endpoint to make it aware 
 
 ## Connect Tracetest to Lightstep with the Web UI
 
-In the Web UI, open settings, and select Lightstep.
+In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) Lightstep.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643396/Blogposts/Docs/screely-1674643391899_w6k22s.png)
+![Lightstep](../img/Lightstep-settings.png)
+
+<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643396/Blogposts/Docs/screely-1674643391899_w6k22s.png)-->
 
 ## Connect Tracetest to Lightstep with the CLI
 
@@ -89,7 +91,7 @@ spec:
   isDefault: true
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Proceed to run this command in the terminal and specify the file above.
 
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml

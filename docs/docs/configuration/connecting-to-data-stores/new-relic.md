@@ -6,7 +6,7 @@ If you want to use [New Relic](https://newrelic.com/) as the trace data store, y
 Examples of configuring Tracetest with New Relic can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 :::
 
-## Configuring OpenTelemetry Collector to Send Traces to both New Relic and Tracetest
+## Configuring OpenTelemetry Collector to Send Traces to B New Relic and Tracetest
 
 In your OpenTelemetry Collector config file:
 
@@ -14,14 +14,14 @@ In your OpenTelemetry Collector config file:
 - Set the `endpoint` to your Tracetest instance on port `21321`
 
 :::tip
-If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
+If you are running Tracetest with Docker and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
 :::
 
 Additionally, add another config:
 
-- Set the `exporter` to `otlp/nr`
-- Set the `endpoint` pointing to your New Relic account and the New Relic ingest API
-- Set your New Relic access token as a `header`
+- Set the `exporter` to `otlp/nr`.
+- Set the `endpoint` pointing to your New Relic account and the New Relic ingest API.
+- Set your New Relic access token as a `header`.
 
 ```yaml
 # collector.config.yaml
@@ -76,9 +76,11 @@ Configure your Tracetest instance to expose an `otlp` endpoint to make it aware 
 
 ## Connect Tracetest to New Relic with the Web UI
 
-In the Web UI, open settings, and select New Relic.
+In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) New Relic.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643685/Blogposts/Docs/screely-1674643680615_de8fry.png)
+![NewRelic](../img/New-Relic-settings.png)
+
+<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643685/Blogposts/Docs/screely-1674643680615_de8fry.png)-->
 
 
 ## Connect Tracetest to New Relic with the CLI
@@ -93,7 +95,7 @@ spec:
   isDefault: true
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Proceed to run this command in the terminal and specify the file above.
 
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml

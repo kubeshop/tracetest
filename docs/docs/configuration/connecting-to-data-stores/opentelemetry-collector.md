@@ -56,15 +56,17 @@ service:
       exporters: [otlp/1] # your exporter pointing to your tracetest instance
 ```
 
-## Configure Tracetest to use OpenTelemetry Collector
+## Configure Tracetest to Use OpenTelemetry Collector
 
 Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
 
 ## Connect Tracetest to OpenTelemetry Collector with the Web UI
 
-In the Web UI, open settings, and select OpenTelemetry Collector.
+In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) OpenTelemetry.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644190/Blogposts/Docs/screely-1674644186486_pahrds.png)
+![OpenTelemetry](../img/open-telemetry-settings.png)
+
+<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644190/Blogposts/Docs/screely-1674644186486_pahrds.png) -->
 
 
 ## Connect Tracetest to OpenTelemetry Collector with the CLI
