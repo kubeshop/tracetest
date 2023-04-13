@@ -53,13 +53,13 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"CreateDemo",
 			strings.ToUpper("Post"),
-			"/api/demo",
+			"/api/demos",
 			c.CreateDemo,
 		},
 		{
 			"DeleteDemo",
 			strings.ToUpper("Delete"),
-			"/api/demo/{demoId}",
+			"/api/demos/{demoId}",
 			c.DeleteDemo,
 		},
 		{
@@ -71,19 +71,19 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"GetDemo",
 			strings.ToUpper("Get"),
-			"/api/demo/{demoId}",
+			"/api/demos/{demoId}",
 			c.GetDemo,
 		},
 		{
 			"GetPollingProfile",
 			strings.ToUpper("Get"),
-			"/api/pollingprofile/{pollingProfileId}",
+			"/api/pollingprofiles/{pollingProfileId}",
 			c.GetPollingProfile,
 		},
 		{
 			"ListDemos",
 			strings.ToUpper("Get"),
-			"/api/demo",
+			"/api/demos",
 			c.ListDemos,
 		},
 		{
@@ -95,13 +95,13 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"UpdateDemo",
 			strings.ToUpper("Put"),
-			"/api/demo/{demoId}",
+			"/api/demos/{demoId}",
 			c.UpdateDemo,
 		},
 		{
 			"UpdatePollingProfile",
 			strings.ToUpper("Put"),
-			"/api/pollingprofile/{pollingProfileId}",
+			"/api/pollingprofiles/{pollingProfileId}",
 			c.UpdatePollingProfile,
 		},
 	}

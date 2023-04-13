@@ -1187,7 +1187,7 @@ paths:
           description: "problem updating configuration"
 
   # Polling Profile
-  /pollingprofile/{pollingProfileId}:
+  /pollingprofiles/{pollingProfileId}:
     get:
       tags:
         - resource-api
@@ -1254,7 +1254,7 @@ paths:
           description: "problem updating a polling profile"
 
   # Demo
-  /demo:
+  /demos:
     get:
       tags:
         - resource-api
@@ -1340,7 +1340,7 @@ paths:
                 $ref: "./config.yaml#/components/schemas/Demo"
         500:
           description: "problem creating a demo"
-  /demo/{demoId}:
+  /demos/{demoId}:
     get:
       tags:
         - resource-api

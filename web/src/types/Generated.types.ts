@@ -150,19 +150,19 @@ export interface paths {
     /** Update Tracetest configuration */
     put: operations["updateConfiguration"];
   };
-  "/pollingprofile/{pollingProfileId}": {
+  "/pollingprofiles/{pollingProfileId}": {
     /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
     get: operations["getPollingProfile"];
     /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
     put: operations["updatePollingProfile"];
   };
-  "/demo": {
+  "/demos": {
     /** List demonstrations used on Tracetest as quick start examples. */
     get: operations["listDemos"];
     /** Create a demonstration used on Tracetest as quick start examples. */
     post: operations["createDemo"];
   };
-  "/demo/{demoId}": {
+  "/demos/{demoId}": {
     /** Get a demonstration used on Tracetest as quick start examples. */
     get: operations["getDemo"];
     /** Update a demonstration used on Tracetest as quick start examples. */

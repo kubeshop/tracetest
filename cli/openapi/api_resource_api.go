@@ -68,7 +68,7 @@ func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/demo"
+	localVarPath := localBasePath + "/demos"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -170,7 +170,7 @@ func (a *ResourceApiApiService) DeleteDemoExecute(r ApiDeleteDemoRequest) (*http
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/demo/{demoId}"
+	localVarPath := localBasePath + "/demos/{demoId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -369,7 +369,7 @@ func (a *ResourceApiApiService) GetDemoExecute(r ApiGetDemoRequest) (*Demo, *htt
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/demo/{demoId}"
+	localVarPath := localBasePath + "/demos/{demoId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -473,7 +473,7 @@ func (a *ResourceApiApiService) GetPollingProfileExecute(r ApiGetPollingProfileR
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/pollingprofile/{pollingProfileId}"
+	localVarPath := localBasePath + "/pollingprofiles/{pollingProfileId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"pollingProfileId"+"}", url.PathEscape(parameterValueToString(r.pollingProfileId, "pollingProfileId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -602,7 +602,7 @@ func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*ListDe
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/demo"
+	localVarPath := localBasePath + "/demos"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -835,7 +835,7 @@ func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/demo/{demoId}"
+	localVarPath := localBasePath + "/demos/{demoId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -947,7 +947,7 @@ func (a *ResourceApiApiService) UpdatePollingProfileExecute(r ApiUpdatePollingPr
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/pollingprofile/{pollingProfileId}"
+	localVarPath := localBasePath + "/pollingprofiles/{pollingProfileId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"pollingProfileId"+"}", url.PathEscape(parameterValueToString(r.pollingProfileId, "pollingProfileId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
