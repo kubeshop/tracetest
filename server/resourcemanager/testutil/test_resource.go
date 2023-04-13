@@ -61,6 +61,14 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 	t.Parallel()
 	t.Helper()
 
+	if rt.ResourceTypeSingular == "" {
+		t.Fatalf("ResourceTypeTest.ResourceTypeSingular not set")
+	}
+
+	if rt.ResourceTypePlural == "" {
+		t.Fatalf("ResourceTypeTest.ResourceTypePlural not set")
+	}
+
 	t.Run(rt.ResourceTypeSingular, func(t *testing.T) {
 		testProvisioning(t, rt)
 
