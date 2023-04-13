@@ -103,7 +103,7 @@ func TestConfigResource(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: configresource.ResourceName,
+		ResourceTypeSingular: configresource.ResourceName,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			configRepo := configresource.NewRepository(db)

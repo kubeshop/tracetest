@@ -16,7 +16,7 @@ func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 	url := fmt.Sprintf(
 		"%s/%s/%s",
 		testServer.URL,
-		strings.ToLower(rt.ResourceType),
+		strings.ToLower(rt.ResourceTypePlural),
 		id,
 	)
 
@@ -68,6 +68,6 @@ var deleteInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 		return buildDeleteRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "deleting")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "deleting")
 	},
 })

@@ -15,7 +15,7 @@ type Provisioner interface {
 }
 
 func (m *manager[T]) Provision(ctx context.Context, values map[string]any) error {
-	if values["type"] != m.resourceType {
+	if values["type"] != m.resourceTypeSingular {
 		return ErrTypeNotSupported
 	}
 
@@ -24,7 +24,7 @@ func (m *manager[T]) Provision(ctx context.Context, values map[string]any) error
 	if err != nil {
 		return fmt.Errorf(
 			"cannot read provisioning for resource type %s: %w",
-			m.resourceType, err,
+			m.resourceTypeSingular, err,
 		)
 	}
 

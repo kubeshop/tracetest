@@ -13,9 +13,10 @@ import (
 )
 
 type ResourceTypeTest struct {
-	ResourceType      string
-	RegisterManagerFn func(*mux.Router) rm.Manager
-	Prepare           func(t *testing.T, operation Operation, manager rm.Manager)
+	ResourceTypeSingular string
+	ResourceTypePlural   string
+	RegisterManagerFn    func(*mux.Router) rm.Manager
+	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
 
 	SampleJSON        string
 	SampleJSONUpdated string
@@ -60,7 +61,7 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 	t.Parallel()
 	t.Helper()
 
-	t.Run(rt.ResourceType, func(t *testing.T) {
+	t.Run(rt.ResourceTypeSingular, func(t *testing.T) {
 		testProvisioning(t, rt)
 
 		for _, op := range operations {

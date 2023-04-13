@@ -48,7 +48,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: "Demo",
+		ResourceTypeSingular: "Demo",
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			demoRepository := demoresource.NewRepository(db)
@@ -143,7 +143,7 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: "Demo",
+		ResourceTypeSingular: "Demo",
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			demoRepository := demoresource.NewRepository(db)
