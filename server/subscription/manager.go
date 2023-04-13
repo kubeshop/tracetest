@@ -48,8 +48,6 @@ func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
 }
 
 func (m *Manager) PublishUpdate(message Message) {
-	m.mutex.RLock()
-	defer m.mutex.RUnlock()
 	if subscribers, ok := m.subscriptions[message.ResourceID]; ok {
 		for _, subscriber := range subscribers {
 			subscriber.Notify(message)
