@@ -133,6 +133,13 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
+	select {
+	default:
+	case <-job.ctx.Done():
+		log.Printf("[TracePoller] Context cancelled.")
+		return
+	}
+
 	if job.IsFirstRequest() {
 		err := tp.eventEmitter.Emit(job.ctx, events.TracePollingStart(job.test.ID, job.run.ID))
 		if err != nil {
@@ -191,7 +198,13 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, string) {
 	run := job.run
 
-	pp := *tp.ppGetter.GetDefault(job.ctx).Periodic
+	profile := tp.ppGetter.GetDefault(job.ctx)
+	if profile.Periodic == nil {
+		log.Println("[TracePoller] cannot get polling profile.")
+		return true, "Cannot get polling profile"
+	}
+
+	pp := *profile.Periodic
 
 	// Edge case: the trace still not avaiable on Data Store during polling
 	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < pp.TimeoutDuration() {

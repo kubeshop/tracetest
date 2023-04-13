@@ -76,12 +76,11 @@ type persistentRunner struct {
 }
 
 type execReq struct {
-	ctx                 context.Context
-	test                model.Test
-	run                 model.Run
-	subscriptionManager *subscription.Manager
-	Headers             propagation.MapCarrier
-	executor            expression.Executor
+	ctx      context.Context
+	test     model.Test
+	run      model.Run
+	Headers  propagation.MapCarrier
+	executor expression.Executor
 }
 
 func (r persistentRunner) handleDBError(run model.Run, err error) {
@@ -133,13 +132,17 @@ func getNewCtx(ctx context.Context) context.Context {
 }
 
 func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
-	ctx = getNewCtx(ctx)
+	ctx, cancelCtx := context.WithCancel(
+		getNewCtx(ctx),
+	)
 
 	run := model.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
 	run, err := r.runs.CreateRun(ctx, test, run)
 	r.handleDBError(run, err)
+
+	r.listenForStopRequests(ctx, cancelCtx, run)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
 		Values: environment.Values,

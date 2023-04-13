@@ -32,26 +32,27 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 	}
 
 	go func() {
+		run := newRun                      // make a local copy to avoid race conditions
 		time.Sleep(100 * time.Millisecond) // simulate some real work
 
 		if r.returnErr {
-			newRun.State = model.RunStateTriggerFailed
-			newRun.LastError = fmt.Errorf("failed to do something")
+			run.State = model.RunStateTriggerFailed
+			run.LastError = fmt.Errorf("failed to do something")
 		} else {
-			newRun.State = model.RunStateFinished
+			run.State = model.RunStateFinished
 		}
 
 		r.uid++
 
-		newRun.Outputs = (model.OrderedMap[string, model.RunOutput]{}).MustAdd("USER_ID", model.RunOutput{
+		run.Outputs = (model.OrderedMap[string, model.RunOutput]{}).MustAdd("USER_ID", model.RunOutput{
 			Value: strconv.Itoa(r.uid),
 		})
 
-		err = r.db.UpdateRun(ctx, newRun)
+		err = r.db.UpdateRun(ctx, run)
 		r.subscriptionManager.PublishUpdate(subscription.Message{
 			ResourceID: newRun.ResourceID(),
 			Type:       "result_update",
-			Content:    newRun,
+			Content:    run,
 		})
 	}()
 
@@ -70,7 +71,7 @@ func TestTransactionRunner(t *testing.T) {
 
 			assert.Equal(t, model.RunOutput{Name: "", Value: "1", SpanID: ""}, actual.Steps[0].Outputs.Get("USER_ID"))
 
-			// this assertom is supposed to test that the output from the previous step
+			// this assertion is supposed to test that the output from the previous step
 			// is injected in the env for the next. In practice, this depends
 			// on the `fakeTestRunner` used here to actually save the environment
 			// to the test run, like the real test runner would.
@@ -159,20 +160,26 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 
 	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
 
-	done := make(chan bool, 1)
-	subscriptionManager.Subscribe(transactionRun.ResourceID(), subscription.NewSubscriberFunction(
-		func(m subscription.Message) error {
-			tr := m.Content.(model.TransactionRun)
-			if tr.State.IsFinal() {
-				transactionRun = tr
-				done <- true
-			}
+	done := make(chan model.TransactionRun, 1)
+	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		tr := m.Content.(model.TransactionRun)
+		if tr.State.IsFinal() {
+			done <- tr
+		}
 
-			return nil
-		}),
-	)
-	// TODO: this will block indefinitely. we need to set a timeout or something
-	<-done
+		return nil
+	})
+	subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
 
-	assert(t, transactionRun)
+	var finalRun model.TransactionRun
+	select {
+	case finalRun = <-done:
+		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions
+		fmt.Println("run completed")
+	case <-time.After(10 * time.Second):
+		t.Log("timeout after 10 second")
+		t.FailNow()
+	}
+
+	assert(t, finalRun)
 }

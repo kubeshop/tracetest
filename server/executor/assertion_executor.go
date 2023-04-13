@@ -16,7 +16,7 @@ type AssertionExecutor interface {
 
 type defaultAssertionExecutor struct{}
 
-func (e defaultAssertionExecutor) Assert(ctx context.Context, defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace model.Trace, ds []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
+func (e defaultAssertionExecutor) Assert(_ context.Context, defs model.OrderedMap[model.SpanQuery, model.NamedAssertions], trace model.Trace, ds []expression.DataStore) (model.OrderedMap[model.SpanQuery, []model.AssertionResult], bool) {
 	testResult := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
 	allPassed := true
 	defs.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {

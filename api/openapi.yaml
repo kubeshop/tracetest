@@ -825,7 +825,7 @@ paths:
             application/yaml:
               schema:
                 type: string
-  /test/{testId}/run/{runId}/stop:
+  /tests/{testId}/run/{runId}/stop:
     post:
       tags:
         - api

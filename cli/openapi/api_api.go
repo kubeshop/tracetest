@@ -4654,7 +4654,7 @@ func (a *ApiApiService) StopTestRunExecute(r ApiStopTestRunRequest) (*http.Respo
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/test/{testId}/run/{runId}/stop"
+	localVarPath := localBasePath + "/tests/{testId}/run/{runId}/stop"
 	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterValueToString(r.testId, "testId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterValueToString(r.runId, "runId")), -1)
 
