@@ -12,7 +12,6 @@ components:
         type: string
 
     # versioning and runs
-
     runId:
         in: path
         name: runId
@@ -95,7 +94,6 @@ components:
         enum: [asc, desc]
 
     # resource ids
-
     configId:
       in: path
       name: configId
