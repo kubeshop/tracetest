@@ -186,6 +186,7 @@ func TestDataStoreProvisioner(t *testing.T) {
 
 			manager := resourcemanager.New[testdb.DataStoreResource](
 				testdb.DataStoreResourceName,
+				testdb.DataStoreResourceNamePlural,
 				testdb.NewDataStoreResourceProvisioner(dsRepo),
 				// this resource exists only for provisiooning at the moment``
 				resourcemanager.WithOperations(resourcemanager.OperationNoop),

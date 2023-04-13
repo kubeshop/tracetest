@@ -247,6 +247,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	dataStoreManager := resourcemanager.New[testdb.DataStoreResource](
 		testdb.DataStoreResourceName,
+		testdb.DataStoreResourceNamePlural,
 		testdb.NewDataStoreResourceProvisioner(testDB),
 		resourcemanager.WithOperations(resourcemanager.OperationNoop),
 	)
@@ -292,6 +293,7 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
 	manager := resourcemanager.New[configresource.Config](
 		configresource.ResourceName,
+		configresource.ResourceNamePlural,
 		configRepo,
 		resourcemanager.WithOperations(configresource.Operations...),
 	)
@@ -302,6 +304,7 @@ func registerConfigResource(configRepo *configresource.Repository, router *mux.R
 func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
 	manager := resourcemanager.New[pollingprofile.PollingProfile](
 		pollingprofile.ResourceName,
+		pollingprofile.ResourceNamePlural,
 		repository,
 		resourcemanager.WithOperations(pollingprofile.Operations...),
 	)
@@ -312,6 +315,7 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 func registerDemosResource(repository *demoresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
 	manager := resourcemanager.New[demoresource.Demo](
 		demoresource.ResourceName,
+		demoresource.ResourceNamePlural,
 		repository,
 		resourcemanager.WithOperations(demoresource.Operations...),
 	)
