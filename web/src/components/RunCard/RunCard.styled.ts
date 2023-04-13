@@ -1,4 +1,4 @@
-import {CheckCircleFilled, MinusCircleFilled, MoreOutlined} from '@ant-design/icons';
+import {CheckCircleFilled, InfoCircleFilled, MinusCircleFilled, MoreOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -47,6 +47,10 @@ export const IconSuccess = styled(CheckCircleFilled)`
 
 export const IconFail = styled(MinusCircleFilled)`
   color: ${({theme}) => theme.color.error};
+`;
+
+export const IconInfo = styled(InfoCircleFilled)`
+  color: ${({theme}) => theme.color.textLight};
 `;
 
 export const Info = styled.div`

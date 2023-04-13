@@ -58,9 +58,17 @@ export const EventContainer = styled.div`
   position: relative;
 `;
 
-export const InfoIcon = styled(InfoCircleFilled)`
+export const InfoIcon = styled(InfoCircleFilled)<{$isLarge?: boolean}>`
   color: ${({theme}) => theme.color.textLight};
   margin-top: 3px;
+
+  ${({$isLarge}) =>
+    $isLarge &&
+    css`
+      font-size: 32px;
+      margin-bottom: 26px;
+      margin-top: 0;
+    `}
 `;
 
 export const Link = styled(Typography.Link)`

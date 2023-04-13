@@ -41,7 +41,7 @@ export const TestStateMap: Record<
     label: 'Failed',
   },
   [TestState.STOPPED]: {
-    status: 'error',
+    status: 'default',
     label: 'Stopped by user',
   },
   [TestState.TRIGGER_FAILED]: {

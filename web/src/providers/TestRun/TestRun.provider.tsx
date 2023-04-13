@@ -1,5 +1,6 @@
-import {createContext, useContext, useMemo} from 'react';
-import {useGetRunByIdQuery, useGetRunEventsQuery} from 'redux/apis/TraceTest.api';
+import {noop} from 'lodash';
+import {createContext, useCallback, useContext, useMemo} from 'react';
+import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
 import TestRun from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import TestProvider from '../Test';
@@ -7,13 +8,17 @@ import TestProvider from '../Test';
 interface IContext {
   run: TestRun;
   isError: boolean;
+  isLoadingStop: boolean;
   runEvents: TestRunEvent[];
+  stopRun(): void;
 }
 
 export const Context = createContext<IContext>({
   run: {} as TestRun,
   isError: false,
+  isLoadingStop: false,
   runEvents: [],
+  stopRun: noop,
 });
 
 interface IProps {
@@ -27,8 +32,16 @@ export const useTestRun = () => useContext(Context);
 const TestRunProvider = ({children, testId, runId = ''}: IProps) => {
   const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId});
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId});
+  const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
 
-  const value = useMemo<IContext>(() => ({run: run!, isError, runEvents}), [run, isError, runEvents]);
+  const stopRun = useCallback(async () => {
+    await stopRunAction({runId, testId});
+  }, [runId, stopRunAction, testId]);
+
+  const value = useMemo<IContext>(
+    () => ({run: run!, isError, isLoadingStop, runEvents, stopRun}),
+    [run, isError, isLoadingStop, runEvents, stopRun]
+  );
 
   return run ? (
     <Context.Provider value={value}>

@@ -1,5 +1,4 @@
 import RunEvents from 'components/RunEvents';
-import {TestState} from 'constants/TestRun.constants';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useCallback, useEffect} from 'react';
@@ -9,6 +8,7 @@ import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
+import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
 import Span from 'models/Span.model';
 import {useDrawer} from '../Drawer/Drawer';
@@ -69,7 +69,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     [dispatch]
   );
 
-  if (runState !== TestState.FINISHED) {
+  if (TestRunService.shouldDisplayTraceEvents(runState, spans.length)) {
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 

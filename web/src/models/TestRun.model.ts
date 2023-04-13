@@ -58,12 +58,26 @@ const getTestResultCount = (
 
 export function isRunStateFinished(state: TTestRunState) {
   return (
-    [TestState.FINISHED, TestState.TRIGGER_FAILED, TestState.TRACE_FAILED, TestState.ASSERTION_FAILED] as string[]
+    [
+      TestState.FINISHED,
+      TestState.STOPPED,
+      TestState.TRIGGER_FAILED,
+      TestState.TRACE_FAILED,
+      TestState.ASSERTION_FAILED,
+    ] as string[]
   ).includes(state);
 }
 
 export function isRunStateFailed(state: TTestRunState) {
   return ([TestState.TRIGGER_FAILED, TestState.TRACE_FAILED, TestState.ASSERTION_FAILED] as string[]).includes(state);
+}
+
+export function isRunStateSucceeded(state: TTestRunState) {
+  return state === TestState.FINISHED;
+}
+
+export function isRunStateStopped(state: TTestRunState) {
+  return state === TestState.STOPPED;
 }
 
 const TestRun = ({

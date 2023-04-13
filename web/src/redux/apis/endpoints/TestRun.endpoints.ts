@@ -86,6 +86,12 @@ const TestRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
+  stopRun: builder.mutation<null, {runId: string; testId: string}>({
+    query: ({runId, testId}) => ({
+      url: `/tests/${testId}/run/${runId}/stop`,
+      method: HTTP_METHOD.POST,
+    }),
+  }),
   getJUnitByRunId: builder.query<string, {testId: string; runId: string}>({
     query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),
     providesTags: (result, error, {testId, runId}) => [

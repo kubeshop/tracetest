@@ -1,15 +1,23 @@
-import {Typography} from 'antd';
-
-import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
 import {TestState} from 'constants/TestRun.constants';
 import {TraceEventType} from 'constants/TestRunEvents.constants';
-import {isRunStateFailed} from 'models/TestRun.model';
 import TestRunService from 'services/TestRun.service';
 import RunEvent, {IPropsEvent} from './RunEvent';
 import RunEventDataStore from './RunEventDataStore';
 import RunEventPolling from './RunEventPolling';
 import {IPropsComponent} from './RunEvents';
 import * as S from './RunEvents.styled';
+import FailedTraceHeader from './TraceHeader/FailedTraceHeader';
+import FailedTriggerHeader from './TraceHeader/FailedTriggerHeader';
+import LoadingHeader from './TraceHeader/LoadingHeader';
+import StoppedHeader from './TraceHeader/StoppedHeader';
+
+type TestStateType = TestState.TRIGGER_FAILED | TestState.TRACE_FAILED | TestState.STOPPED;
+
+const HeaderComponentMap: Record<TestStateType, () => React.ReactElement> = {
+  [TestState.TRIGGER_FAILED]: FailedTriggerHeader,
+  [TestState.TRACE_FAILED]: FailedTraceHeader,
+  [TestState.STOPPED]: StoppedHeader,
+};
 
 type TraceEventTypeWithoutFetching = Exclude<
   TraceEventType,
@@ -23,51 +31,11 @@ const ComponentMap: Record<TraceEventTypeWithoutFetching, (props: IPropsEvent) =
 
 const RunEventsTrace = ({events, state}: IPropsComponent) => {
   const filteredEvents = TestRunService.getTestRunTraceEvents(events);
-
-  const loadingHeader = (
-    <>
-      <S.LoadingIcon />
-      <Typography.Title level={3} type="secondary">
-        We are working to gather the trace associated with this test run
-      </Typography.Title>
-      <S.Paragraph type="secondary">
-        Want to know more about traces? Head to the official{' '}
-        <S.Link href={TRACE_DOCUMENTATION_URL} target="_blank">
-          Open Telemetry Documentation
-        </S.Link>
-      </S.Paragraph>
-    </>
-  );
-
-  const failedTriggerHeader = (
-    <>
-      <S.ErrorIcon />
-      <Typography.Title level={2} type="secondary">
-        Test Trigger Failed
-      </Typography.Title>
-      <S.Paragraph type="secondary">
-        The test failed in the Trigger stage, review the Trigger tab to see the breakdown of diagnostic steps.
-      </S.Paragraph>
-    </>
-  );
-
-  const failedTraceHeader = (
-    <>
-      <S.ErrorIcon />
-      <Typography.Title level={2} type="secondary">
-        Trace Fetch Failed
-      </Typography.Title>
-      <S.Paragraph type="secondary">
-        We prepared the breakdown of diagnostic steps and tips to help identify the source of the issue:
-      </S.Paragraph>
-    </>
-  );
+  const HeaderComponent = HeaderComponentMap[state as TestStateType] ?? LoadingHeader;
 
   return (
     <S.Container $hasScroll>
-      {state === TestState.TRIGGER_FAILED && failedTriggerHeader}
-      {state === TestState.TRACE_FAILED && failedTraceHeader}
-      {!isRunStateFailed(state) && loadingHeader}
+      <HeaderComponent />
 
       <S.ListContainer>
         {filteredEvents.map(event => {

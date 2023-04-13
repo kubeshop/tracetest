@@ -95,6 +95,10 @@ export const StateContainer = styled.div`
   justify-self: flex-end;
 `;
 
+export const StopContainer = styled.div`
+  margin-left: 12px;
+`;
+
 export const StateText = styled(Typography.Text)`
   && {
     margin-right: 8px;
