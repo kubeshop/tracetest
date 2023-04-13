@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -272,7 +273,13 @@ func (r persistentRunner) processExecQueue(job execReq) {
 func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.Response, err error) model.Run {
 	run = run.TriggerCompleted(response.Result)
 	if err != nil {
-		return run.TriggerFailed(err)
+		run = run.TriggerFailed(err)
+
+		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+			"finalState": string(run.State),
+		})
+
+		return run
 	}
 
 	return run.SuccessfullyTriggered()

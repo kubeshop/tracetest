@@ -244,7 +244,7 @@ func toWords(str string) string {
 func (c *customController) analytics(name string, f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		machineID := r.Header.Get("x-client-id")
-		analytics.SendEvent(toWords(name), "test", machineID)
+		analytics.SendEvent(toWords(name), "test", machineID, nil)
 
 		f(w, r)
 	}
