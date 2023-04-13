@@ -1126,7 +1126,7 @@ paths:
             application/json:
               schema:
                 $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
-  /config/{configId}:
+  /configs/{configId}:
     get:
       tags:
         - resource-api

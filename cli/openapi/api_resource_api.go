@@ -130,114 +130,6 @@ func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiCreatePollingProfileRequest struct {
-	ctx            context.Context
-	ApiService     *ResourceApiApiService
-	pollingProfile *PollingProfile
-}
-
-func (r ApiCreatePollingProfileRequest) PollingProfile(pollingProfile PollingProfile) ApiCreatePollingProfileRequest {
-	r.pollingProfile = &pollingProfile
-	return r
-}
-
-func (r ApiCreatePollingProfileRequest) Execute() (*PollingProfile, *http.Response, error) {
-	return r.ApiService.CreatePollingProfileExecute(r)
-}
-
-/*
-CreatePollingProfile Create a Polling Profile
-
-Create a polling profile used on Tracetest to configure how to fetch traces in a test.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiCreatePollingProfileRequest
-*/
-func (a *ResourceApiApiService) CreatePollingProfile(ctx context.Context) ApiCreatePollingProfileRequest {
-	return ApiCreatePollingProfileRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-//
-//	@return PollingProfile
-func (a *ResourceApiApiService) CreatePollingProfileExecute(r ApiCreatePollingProfileRequest) (*PollingProfile, *http.Response, error) {
-	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PollingProfile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.CreatePollingProfile")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/pollingprofile"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json", "text/yaml"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.pollingProfile
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
 type ApiDeleteDemoRequest struct {
 	ctx        context.Context
 	ApiService *ResourceApiApiService
@@ -280,98 +172,6 @@ func (a *ResourceApiApiService) DeleteDemoExecute(r ApiDeleteDemoRequest) (*http
 
 	localVarPath := localBasePath + "/demo/{demoId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"demoId"+"}", url.PathEscape(parameterValueToString(r.demoId, "demoId")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDeletePollingProfileRequest struct {
-	ctx              context.Context
-	ApiService       *ResourceApiApiService
-	pollingProfileId string
-}
-
-func (r ApiDeletePollingProfileRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DeletePollingProfileExecute(r)
-}
-
-/*
-DeletePollingProfile Delete a Polling Profile
-
-Delete a polling profile used on Tracetest to configure how to fetch traces in a test.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
-	@return ApiDeletePollingProfileRequest
-*/
-func (a *ResourceApiApiService) DeletePollingProfile(ctx context.Context, pollingProfileId string) ApiDeletePollingProfileRequest {
-	return ApiDeletePollingProfileRequest{
-		ApiService:       a,
-		ctx:              ctx,
-		pollingProfileId: pollingProfileId,
-	}
-}
-
-// Execute executes the request
-func (a *ResourceApiApiService) DeletePollingProfileExecute(r ApiDeletePollingProfileRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.DeletePollingProfile")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/pollingprofile/{pollingProfileId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"pollingProfileId"+"}", url.PathEscape(parameterValueToString(r.pollingProfileId, "pollingProfileId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -465,7 +265,7 @@ func (a *ResourceApiApiService) GetConfigurationExecute(r ApiGetConfigurationReq
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/config/{configId}"
+	localVarPath := localBasePath + "/configs/{configId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"configId"+"}", url.PathEscape(parameterValueToString(r.configId, "configId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -646,7 +446,7 @@ GetPollingProfile Get Polling Profile
 Get a polling profile used on Tracetest to configure how to fetch traces in a test.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'.
 	@return ApiGetPollingProfileRequest
 */
 func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingProfileId string) ApiGetPollingProfileRequest {
@@ -767,7 +567,7 @@ func (r ApiListDemosRequest) SortDirection(sortDirection string) ApiListDemosReq
 	return r
 }
 
-func (r ApiListDemosRequest) Execute() ([]Demo, *http.Response, error) {
+func (r ApiListDemosRequest) Execute() (*ListDemos200Response, *http.Response, error) {
 	return r.ApiService.ListDemosExecute(r)
 }
 
@@ -788,13 +588,13 @@ func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosReque
 
 // Execute executes the request
 //
-//	@return []Demo
-func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) ([]Demo, *http.Response, error) {
+//	@return ListDemos200Response
+func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*ListDemos200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue []Demo
+		localVarReturnValue *ListDemos200Response
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListDemos")
@@ -803,146 +603,6 @@ func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) ([]Demo,
 	}
 
 	localVarPath := localBasePath + "/demo"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	if r.take != nil {
-		parameterAddToQuery(localVarQueryParams, "take", r.take, "")
-	}
-	if r.skip != nil {
-		parameterAddToQuery(localVarQueryParams, "skip", r.skip, "")
-	}
-	if r.sortBy != nil {
-		parameterAddToQuery(localVarQueryParams, "sortBy", r.sortBy, "")
-	}
-	if r.sortDirection != nil {
-		parameterAddToQuery(localVarQueryParams, "sortDirection", r.sortDirection, "")
-	}
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiListPollingProfilesRequest struct {
-	ctx           context.Context
-	ApiService    *ResourceApiApiService
-	take          *int32
-	skip          *int32
-	sortBy        *string
-	sortDirection *string
-}
-
-// Indicates the maximum number of polling profiles that can be returned on this call.
-func (r ApiListPollingProfilesRequest) Take(take int32) ApiListPollingProfilesRequest {
-	r.take = &take
-	return r
-}
-
-// Indicates how many polling profiles will be skipped when paginating.
-func (r ApiListPollingProfilesRequest) Skip(skip int32) ApiListPollingProfilesRequest {
-	r.skip = &skip
-	return r
-}
-
-// Indicates the sort field for on which all polling profiles will be sorted.
-func (r ApiListPollingProfilesRequest) SortBy(sortBy string) ApiListPollingProfilesRequest {
-	r.sortBy = &sortBy
-	return r
-}
-
-// Indicates the sort direction for the polling profiles (ascending or descending).
-func (r ApiListPollingProfilesRequest) SortDirection(sortDirection string) ApiListPollingProfilesRequest {
-	r.sortDirection = &sortDirection
-	return r
-}
-
-func (r ApiListPollingProfilesRequest) Execute() (*ListPollingProfiles200Response, *http.Response, error) {
-	return r.ApiService.ListPollingProfilesExecute(r)
-}
-
-/*
-ListPollingProfiles List Polling Profiles
-
-List polling profiles used on Tracetest to configure how to fetch traces in a test.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiListPollingProfilesRequest
-*/
-func (a *ResourceApiApiService) ListPollingProfiles(ctx context.Context) ApiListPollingProfilesRequest {
-	return ApiListPollingProfilesRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-//
-//	@return ListPollingProfiles200Response
-func (a *ResourceApiApiService) ListPollingProfilesExecute(r ApiListPollingProfilesRequest) (*ListPollingProfiles200Response, *http.Response, error) {
-	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ListPollingProfiles200Response
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListPollingProfiles")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/pollingprofile"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -1063,7 +723,7 @@ func (a *ResourceApiApiService) UpdateConfigurationExecute(r ApiUpdateConfigurat
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/config/{configId}"
+	localVarPath := localBasePath + "/configs/{configId}"
 	localVarPath = strings.Replace(localVarPath, "{"+"configId"+"}", url.PathEscape(parameterValueToString(r.configId, "configId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1260,7 +920,7 @@ UpdatePollingProfile Update a Polling Profile
 Update a polling profile used on Tracetest to configure how to fetch traces in a test.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test.
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'.
 	@return ApiUpdatePollingProfileRequest
 */
 func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollingProfileId string) ApiUpdatePollingProfileRequest {

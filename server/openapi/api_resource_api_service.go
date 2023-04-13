@@ -40,20 +40,6 @@ func (s *ResourceApiApiService) CreateDemo(ctx context.Context, demo Demo) (Impl
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateDemo method not implemented")
 }
 
-// CreatePollingProfile - Create a Polling Profile
-func (s *ResourceApiApiService) CreatePollingProfile(ctx context.Context, pollingProfile PollingProfile) (ImplResponse, error) {
-	// TODO - update CreatePollingProfile with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(201, PollingProfile{}) or use other options such as http.Ok ...
-	//return Response(201, PollingProfile{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("CreatePollingProfile method not implemented")
-}
-
 // DeleteDemo - Delete a Demonstration setting
 func (s *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) (ImplResponse, error) {
 	// TODO - update DeleteDemo with the required logic for this service method.
@@ -72,26 +58,6 @@ func (s *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) (
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteDemo method not implemented")
-}
-
-// DeletePollingProfile - Delete a Polling Profile
-func (s *ResourceApiApiService) DeletePollingProfile(ctx context.Context, pollingProfileId string) (ImplResponse, error) {
-	// TODO - update DeletePollingProfile with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
-	//return Response(204, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
-	//return Response(400, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
-	//return Response(404, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("DeletePollingProfile method not implemented")
 }
 
 // GetConfiguration - Get Tracetest configuration
@@ -147,8 +113,8 @@ func (s *ResourceApiApiService) ListDemos(ctx context.Context, take int32, skip 
 	// TODO - update ListDemos with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, []Demo{}) or use other options such as http.Ok ...
-	//return Response(200, []Demo{}), nil
+	//TODO: Uncomment the next line to return response Response(200, ListDemos200Response{}) or use other options such as http.Ok ...
+	//return Response(200, ListDemos200Response{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil
@@ -157,23 +123,6 @@ func (s *ResourceApiApiService) ListDemos(ctx context.Context, take int32, skip 
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("ListDemos method not implemented")
-}
-
-// ListPollingProfiles - List Polling Profiles
-func (s *ResourceApiApiService) ListPollingProfiles(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
-	// TODO - update ListPollingProfiles with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, ListPollingProfiles200Response{}) or use other options such as http.Ok ...
-	//return Response(200, ListPollingProfiles200Response{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
-	//return Response(400, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("ListPollingProfiles method not implemented")
 }
 
 // UpdateConfiguration - Update Tracetest configuration
