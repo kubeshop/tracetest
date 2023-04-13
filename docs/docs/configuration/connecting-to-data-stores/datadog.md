@@ -6,7 +6,7 @@ If you want to use [Datadog](https://www.datadoghq.com/) as the trace data store
 Examples of configuring Tracetest with Datadog can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
 :::
 
-## Configuring OpenTelemetry Collector to Send Traces to both Datadog and Tracetest
+## Configuring OpenTelemetry Collector to Send Traces to Both Datadog and Tracetest
 
 In your OpenTelemetry Collector config file:
 
@@ -19,10 +19,10 @@ If you are running Tracetest with Docker, and Tracetest's service name is `trace
 
 Additionally, add another config:
 
-- Set the `exporter` to `datadog`
-- Set the `api` pointing to your Datadog account
-- Set the `site` to Datadog API `datadoghq.com`
-- Set the `key` to your Datadog API key
+- Set the `exporter` to `datadog`.
+- Set the `api` pointing to your Datadog account.
+- Set the `site` to Datadog API `datadoghq.com`.
+- Set the `key` to your Datadog API key.
 
 ```yaml
 # collector.config.yaml
@@ -77,9 +77,9 @@ Configure your Tracetest instance to expose an `otlp` endpoint to make it aware 
 
 ## Connect Tracetest to Datadog with the Web UI
 
-In the Web UI, open settings, and select Datadog.
+In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) Datadog.
 
-![](../img/configure-datadog.png)
+![Datadog](../img/configure-datadog-0.11.3.png)
 
 ## Connect Tracetest to Datadog with the CLI
 
@@ -93,7 +93,7 @@ spec:
   isDefault: true
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Proceed to run this command in the terminal and specify the file above.
 
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml

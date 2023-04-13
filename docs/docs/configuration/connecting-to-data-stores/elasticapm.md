@@ -28,18 +28,20 @@ To configure Elastic APM you will need to download the CA certificate from the D
 - Alternatively, you can skip CA certificate validation by setting the `Enable TLS but don't verify the certificate` option.
 
 :::tip
-Need help configuring the OpenTelemetry Collector so send trace data from your application to Elastic? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)).
+Need help configuring the OpenTelemetry Collector so send trace data from your application to Elastic? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
 :::
 
 ## Connect Tracetest to Elastic with the Web UI
 
-In the Web UI, open settings, and select Elastic APM. If you are using Docker like in the screenshot below, use the service name as the hostname with port `9200`. Use `http`, or `https` if TLS is enabled.
+In the Web UI, (1) open Settings and, on the (2) Configure Data Store tab, select (3) Elastic APM. If you are using Docker, as in the screenshot below, use the service name as the hostname with port `9200`. Use `http`, or `https` if TLS is enabled.
 
 ```
 https://es01:9200
 ```
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674566041/Blogposts/Docs/screely-1674566018046_ci0st9.png)
+![ElasticAPM](../img/ElasticAPM-settings.png)
+
+<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674566041/Blogposts/Docs/screely-1674566018046_ci0st9.png)-->
 
 
 ## Connect Tracetest to Elastic with the CLI
@@ -61,7 +63,7 @@ spec:
       insecureSkipVerify: true
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Proceed to run this command in the terminal and specify the file above.
 
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml

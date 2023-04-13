@@ -1,0 +1,31 @@
+{
+  "name": "async-value",
+  "version": "1.2.2",
+  "description": "Async value container",
+  "author": "Stephen Belanger <admin@stephenbelanger.com> (https://github.com/qard)",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "bench": "node benchmark.js",
+    "test": "tap test.js"
+  },
+  "keywords": [
+    "async",
+    "value",
+    "container",
+    "slot"
+  ],
+  "homepage": "https://github.com/Qard/async-value#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Qard/async-value.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Qard/async-value/issues"
+  },
+  "devDependencies": {
+    "benchmark-fn-list": "^1.0.0",
+    "benchmark-fn-pretty-print": "^1.0.0",
+    "tap": "^11.1.2"
+  }
+}

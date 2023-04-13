@@ -1,0 +1,28 @@
+{
+  "name": "after-all-results",
+  "version": "2.0.0",
+  "description": "Bundle results of async functions calls into one callback with all the results",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/watson/after-all-results.git"
+  },
+  "keywords": [
+    "parallel",
+    "callback",
+    "async",
+    "done"
+  ],
+  "author": "Thomas Watson Steen <w@tson.dk>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/watson/after-all-results/issues"
+  },
+  "homepage": "https://github.com/watson/after-all-results",
+  "devDependencies": {
+    "tape": "^2.14.0"
+  }
+}

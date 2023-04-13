@@ -1,0 +1,40 @@
+{
+  "name": "relative-microtime",
+  "version": "2.0.0",
+  "description": "Get the number of microseconds elapsed since January 1, 1970 00:00:00 UTC without fear of clock drift",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^12.0.1"
+  },
+  "scripts": {
+    "test": "standard && node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/watson/relative-microtime.git"
+  },
+  "keywords": [
+    "time",
+    "timer",
+    "clock",
+    "micro",
+    "microtime",
+    "hrtime",
+    "drift",
+    "skew",
+    "unix",
+    "epoch",
+    "posix"
+  ],
+  "author": "Thomas Watson <w@tson.dk> (https://twitter.com/wa7son)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/watson/relative-microtime/issues"
+  },
+  "homepage": "https://github.com/watson/relative-microtime#readme",
+  "coordinates": [
+    55.778279,
+    12.593066
+  ]
+}

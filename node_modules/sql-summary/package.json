@@ -1,0 +1,35 @@
+{
+  "name": "sql-summary",
+  "version": "1.0.1",
+  "description": "Summarize any SQL query",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^11.0.1"
+  },
+  "scripts": {
+    "test": "standard && node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/sql-summary.git"
+  },
+  "keywords": [
+    "sql",
+    "summary",
+    "query",
+    "log",
+    "logging",
+    "analyze"
+  ],
+  "author": "Thomas Watson Steen <w@tson.dk> (https://twitter.com/wa7son)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elastic/sql-summary/issues"
+  },
+  "homepage": "https://github.com/elastic/sql-summary",
+  "coordinates": [
+    55.778263,
+    12.592376
+  ]
+}

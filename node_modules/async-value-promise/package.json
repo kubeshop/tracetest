@@ -1,0 +1,34 @@
+{
+  "name": "async-value-promise",
+  "version": "1.1.1",
+  "description": "Creates a value/error pair to mimic promise behavior",
+  "author": "Stephen Belanger <admin@stephenbelanger.com> (https://github.com/qard)",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "bench": "node benchmark.js",
+    "test": "tap test.js"
+  },
+  "keywords": [
+    "async",
+    "value",
+    "container",
+    "promise"
+  ],
+  "homepage": "https://github.com/Qard/async-value-promise#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Qard/async-value-promise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Qard/async-value-promise/issues"
+  },
+  "dependencies": {
+    "async-value": "^1.2.2"
+  },
+  "devDependencies": {
+    "benchmark-fn-list": "^1.0.0",
+    "benchmark-fn-pretty-print": "^1.0.0",
+    "tap": "^11.1.2"
+  }
+}

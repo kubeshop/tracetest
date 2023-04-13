@@ -24,7 +24,7 @@ Currently, Tracetest supports the following data stores. Click on the respective
 
 Another option is to send traces directly to Tracetest using the OpenTelemetry Collector. And, you don't have to change your existing pipelines to do so.
 
-View the [configuration for OpenTelemetry Collector](./connecting-to-data-stores/opentelemetry-collector) for more details.
+View [configuration for OpenTelemetry Collector](./connecting-to-data-stores/opentelemetry-collector) for more details.
 
 ## Trace Data Store Configuration Examples
 

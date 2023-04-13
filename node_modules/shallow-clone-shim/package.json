@@ -1,0 +1,50 @@
+{
+  "name": "shallow-clone-shim",
+  "version": "2.0.0",
+  "description": "Shallow clones an object while respecting the original property descriptors",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^14.3.1",
+    "tape": "^4.11.0"
+  },
+  "scripts": {
+    "test": "standard && node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/watson/shallow-clone-shim.git"
+  },
+  "keywords": [
+    "clone",
+    "shallow",
+    "copy",
+    "getter",
+    "setter",
+    "configurable",
+    "enumerable",
+    "writable",
+    "property",
+    "properties",
+    "descritor",
+    "descriptors",
+    "shim",
+    "shimming",
+    "overwrite",
+    "override",
+    "monkey",
+    "patch",
+    "monkey-patch",
+    "monkeypatch"
+  ],
+  "author": "Thomas Watson <w@tson.dk> (https://twitter.com/wa7son)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/watson/shallow-clone-shim/issues"
+  },
+  "homepage": "https://github.com/watson/shallow-clone-shim#readme",
+  "coordinates": [
+    55.778278,
+    12.592982
+  ]
+}

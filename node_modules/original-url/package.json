@@ -1,0 +1,54 @@
+{
+  "name": "original-url",
+  "version": "1.2.3",
+  "description": "Reconstruct the original URL used in an HTTP request based on the HTTP request headers",
+  "main": "index.js",
+  "dependencies": {
+    "forwarded-parse": "^2.1.0"
+  },
+  "devDependencies": {
+    "https-pem": "^2.0.0",
+    "standard": "^11.0.1",
+    "tape": "^4.9.1"
+  },
+  "scripts": {
+    "format": "standard --fix",
+    "bench": "node benchmark/benchmark.js",
+    "test": "standard && node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/watson/original-url.git"
+  },
+  "keywords": [
+    "http",
+    "https",
+    "url",
+    "original",
+    "resolve",
+    "parse",
+    "reconstruct",
+    "forward",
+    "proxy",
+    "rewrite",
+    "host",
+    "forwarded",
+    "x-forwarded-proto",
+    "X-forwarded-protocol",
+    "x-url-scheme",
+    "front-end-https",
+    "x-forwarded-ssl",
+    "x-forwarded-host",
+    "x-forwarded-port"
+  ],
+  "author": "Thomas Watson <w@tson.dk> (https://twitter.com/wa7son)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/watson/original-url/issues"
+  },
+  "homepage": "https://github.com/watson/original-url#readme",
+  "coordinates": [
+    55.778257,
+    12.593204
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "optional-js",
+  "version": "2.3.0",
+  "description": "Optionals for JS - wrapper for possibly undefined values, inspired by Java Optional API",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "clean": "mkdir -p ./dist && rm -rf ./dist/*",
+    "build": "npm run clean && browserify ./index.js --standalone Optional -o ./dist/optional.js && npm run minify",
+    "minify": "uglifyjs ./dist/optional.js > ./dist/optional.min.js",
+    "test": "mocha"
+  },
+  "repository": "https://github.com/JasonStorey/Optional.js.git",
+  "author": "Jason A. Storey (https://github.com/JasonStorey)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JasonStorey/Optional.js/issues"
+  },
+  "homepage": "https://github.com/JasonStorey/Optional.js",
+  "devDependencies": {
+    "browserify": "^16.5.1",
+    "mocha": "^8.0.1",
+    "uglify-js": "^3.10.0"
+  },
+  "keywords": [
+    "optional",
+    "java",
+    "javascript"
+  ]
+}

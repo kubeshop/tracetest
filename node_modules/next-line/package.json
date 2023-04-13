@@ -1,0 +1,38 @@
+{
+  "name": "next-line",
+  "version": "1.1.0",
+  "description": "Iterator over lines in a string",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && tape test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/watson/next-line.git"
+  },
+  "keywords": [
+    "line",
+    "lines",
+    "string",
+    "str",
+    "crlf",
+    "iterate",
+    "iterator",
+    "loop",
+    "next"
+  ],
+  "author": "Thomas Watson Steen <w@tson.dk> (https://twitter.com/wa7son)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/watson/next-line/issues"
+  },
+  "homepage": "https://github.com/watson/next-line#readme",
+  "devDependencies": {
+    "standard": "^5.1.1",
+    "tape": "^4.2.0"
+  },
+  "coordinates": [
+    55.6877161,
+    12.5955598
+  ]
+}
