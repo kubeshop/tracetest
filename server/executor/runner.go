@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -75,12 +76,11 @@ type persistentRunner struct {
 }
 
 type execReq struct {
-	ctx                 context.Context
-	test                model.Test
-	run                 model.Run
-	subscriptionManager *subscription.Manager
-	Headers             propagation.MapCarrier
-	executor            expression.Executor
+	ctx      context.Context
+	test     model.Test
+	run      model.Run
+	Headers  propagation.MapCarrier
+	executor expression.Executor
 }
 
 func (r persistentRunner) handleDBError(run model.Run, err error) {
@@ -132,13 +132,17 @@ func getNewCtx(ctx context.Context) context.Context {
 }
 
 func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
-	ctx = getNewCtx(ctx)
+	ctx, cancelCtx := context.WithCancel(
+		getNewCtx(ctx),
+	)
 
 	run := model.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
 	run, err := r.runs.CreateRun(ctx, test, run)
 	r.handleDBError(run, err)
+
+	r.listenForStopRequests(ctx, cancelCtx, run)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
 		Values: environment.Values,
@@ -272,7 +276,13 @@ func (r persistentRunner) processExecQueue(job execReq) {
 func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.Response, err error) model.Run {
 	run = run.TriggerCompleted(response.Result)
 	if err != nil {
-		return run.TriggerFailed(err)
+		run = run.TriggerFailed(err)
+
+		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+			"finalState": string(run.State),
+		})
+
+		return run
 	}
 
 	return run.SuccessfullyTriggered()

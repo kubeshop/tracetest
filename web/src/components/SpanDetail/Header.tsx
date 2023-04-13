@@ -18,6 +18,14 @@ const Header = ({span, assertions = {}}: IProps) => {
   const {kind, name, service, system, type} = SpanService.getSpanInfo(span);
   const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
 
+  if (!span) {
+    return (
+      <S.Header>
+        <S.HeaderTitle level={3}>Span Attributes</S.HeaderTitle>
+      </S.Header>
+    );
+  }
+
   return (
     <S.Header>
       <S.Column>

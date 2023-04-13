@@ -14,6 +14,10 @@ postgres:
   port: 5432
   dbname: postgres
   params: sslmode=disable
+
+server: 
+  httpPort: 11633
+  pathPrefix: /
 ```
 
 Alternatively, we support setting a series of environment variables which can contain the connection information for the Postgres instance. If these environment variables are set, they will be used by the Tracetest server to connect to the database.
@@ -25,6 +29,11 @@ The list of environment variables and example values is:
 - `TRACETEST_POSTGRES_USER: "postgres"`
 - `TRACETEST_POSTGRES_PASSWORD: "postgres"`
 - `TRACETEST_POSTGRES_PARAMS: ""`
+
+You can also change the defaults for the Tracetest server, altering the port and path you access the dashboard from. For a Docker-based install done locally, this URL is typically `http://localhost:11633/`. You can alter it by setting either of the environment variables or using the `server` object in the server configuration file:
+
+- `TRACETEST_SERVER_HTTPPORT=11633`
+- `TRACETEST_SERVER_PATHPREFIX="/"`
 
 
 You can also intitalize the server with a number of resources the first time it is launched by using [provisioning](./provisioning).

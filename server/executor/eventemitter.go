@@ -25,6 +25,7 @@ func NewEventEmitter(repository model.TestRunEventRepository, publisher publishe
 	return &internalEventEmitter{
 		repository: repository,
 		publisher:  publisher,
+		mutex:      sync.Mutex{},
 	}
 }
 

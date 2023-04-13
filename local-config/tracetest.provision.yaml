@@ -4,3 +4,12 @@ spec:
   name: OpenTelemetry Collector
   type: otlp
   isdefault: true
+---
+type: Demo
+spec:
+  name: "Pokeshop"
+  enabled: true
+  type: pokeshop
+  pokeshop:
+    grpcEndpoint: demo-api:8082
+    httpEndpoint: http://demo-api:8081

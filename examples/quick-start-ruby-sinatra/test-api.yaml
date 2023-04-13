@@ -1,0 +1,16 @@
+type: Test
+spec:
+  name: Call Ruby API
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080/hello
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /hello" http.method="GET"]
+    assertions:
+    - attr:http.status_code  =  200
+    - attr:tracetest.span.duration  <  500ms

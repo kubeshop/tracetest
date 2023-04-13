@@ -101,3 +101,57 @@ resource "aws_lb" "internal_tracetest_alb" {
   enable_deletion_protection = false
   tags                       = local.tags
 }
+
+module "lambda_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 4.0"
+
+  name        = "${local.name}_lambda_security_group"
+  description = "Lambda security group"
+  vpc_id      = module.network.vpc_id
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "-1"
+      description = "HTTP access from anywhere"
+      cidr_blocks = "0.0.0.0/0"
+  }]
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "-1"
+      description = "HTTP access to anywhere"
+      cidr_blocks = "0.0.0.0/0"
+  }]
+}
+
+module "tracetest_ecs_service_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 4.0"
+
+  name        = "tracetest_ecs_service_security_group"
+  description = "ECS Service security group"
+  vpc_id      = module.network.vpc_id
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      description = "HTTP access from VPC"
+      cidr_blocks = local.vpc_cidr
+  }]
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "-1"
+      description = "HTTP access to anywhere"
+      cidr_blocks = "0.0.0.0/0"
+  }]
+}
