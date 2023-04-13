@@ -362,12 +362,6 @@ jobs:
           location: ${{ secrets.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Forward port
-        run: |
-          kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
-
       - name: Cache dependencies
         id: cache-nodemodules
         uses: actions/cache@v3
@@ -382,10 +376,16 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: cd web/; npm ci
 
+
+      - name: Forward port
+        run: |
+          kubectl port-forward \
+            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
+            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
+
       - name: Run integration tests
         run: |
           ./scripts/wait-for-port.sh 3000 &
-          ./scripts/check-port.sh 3000 &
           cd web/
           npm run cy:ci
         env:
