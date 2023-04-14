@@ -806,7 +806,7 @@ paths:
         - $ref: "./parameters.yaml#/components/parameters/take"
         - $ref: "./parameters.yaml#/components/parameters/skip"
         - $ref: "./parameters.yaml#/components/parameters/query"
-        - $ref: "./parameters.yaml#/components/parameters/sortBy"
+        - $ref: "./parameters.yaml#/components/parameters/runnableResourceSortBy"
         - $ref: "./parameters.yaml#/components/parameters/sortDirection"
       responses:
         200:
