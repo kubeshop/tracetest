@@ -11,7 +11,7 @@ import WebSocketService from 'services/WebSocket.service';
 const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getConfig: builder.query<Config, unknown>({
     query: () => ({
-      url: '/config/current',
+      url: '/configs/current',
       method: HTTP_METHOD.GET,
       headers: {
         'content-type': 'application/json',
@@ -33,7 +33,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   getPolling: builder.query<Polling, unknown>({
     query: () => ({
-      url: '/pollingprofile/current',
+      url: '/pollingprofiles/current',
       method: HTTP_METHOD.GET,
       headers: {
         'content-type': 'application/json',
@@ -44,7 +44,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   getDemo: builder.query<Demo[], unknown>({
     query: () => ({
-      url: '/demo',
+      url: '/demos',
       method: HTTP_METHOD.GET,
       headers: {
         'content-type': 'application/json',
@@ -55,7 +55,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   createSetting: builder.mutation<undefined, {resource: TDraftResource}>({
     query: ({resource}) => ({
-      url: `/${resource.type?.toLowerCase()}`,
+      url: `/${resource.typePlural?.toLowerCase()}`,
       method: HTTP_METHOD.POST,
       body: resource,
     }),
@@ -63,7 +63,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   updateSetting: builder.mutation<undefined, {resource: TDraftResource}>({
     query: ({resource}) => ({
-      url: `/${resource.type?.toLowerCase()}/${resource.spec.id}`,
+      url: `/${resource.typePlural?.toLowerCase()}/${resource.spec.id}`,
       method: HTTP_METHOD.PUT,
       body: resource,
     }),
