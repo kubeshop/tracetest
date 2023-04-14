@@ -44,7 +44,7 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{},
 			ct,
 			testServer,
@@ -72,7 +72,7 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{},
 			ct,
 			testServer,
@@ -102,7 +102,7 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 		invalidSortField := generateRandomString()
 
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
@@ -145,7 +145,7 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 	return operationTesterStep{
 		buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 			return buildListRequest(
-				rt.ResourceType,
+				rt.ResourceTypePlural,
 				map[string]string{
 					"take":          "2",
 					"skip":          "1",
@@ -203,7 +203,7 @@ var listInternalErrorOperation = buildSingleStepOperation(singleStepOperationTes
 	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{},
 			ct,
 			testServer,
@@ -211,6 +211,6 @@ var listInternalErrorOperation = buildSingleStepOperation(singleStepOperationTes
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "listing")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "listing")
 	},
 })

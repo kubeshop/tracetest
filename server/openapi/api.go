@@ -73,14 +73,11 @@ type ApiApiRouter interface {
 // pass the data to a ResourceApiApiServicer to perform the required actions, then write the service results to the http response.
 type ResourceApiApiRouter interface {
 	CreateDemo(http.ResponseWriter, *http.Request)
-	CreatePollingProfile(http.ResponseWriter, *http.Request)
 	DeleteDemo(http.ResponseWriter, *http.Request)
-	DeletePollingProfile(http.ResponseWriter, *http.Request)
 	GetConfiguration(http.ResponseWriter, *http.Request)
 	GetDemo(http.ResponseWriter, *http.Request)
 	GetPollingProfile(http.ResponseWriter, *http.Request)
 	ListDemos(http.ResponseWriter, *http.Request)
-	ListPollingProfiles(http.ResponseWriter, *http.Request)
 	UpdateConfiguration(http.ResponseWriter, *http.Request)
 	UpdateDemo(http.ResponseWriter, *http.Request)
 	UpdatePollingProfile(http.ResponseWriter, *http.Request)
@@ -147,14 +144,11 @@ type ApiApiServicer interface {
 // and updated with the logic required for the API.
 type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
-	CreatePollingProfile(context.Context, PollingProfile) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)
-	DeletePollingProfile(context.Context, string) (ImplResponse, error)
 	GetConfiguration(context.Context, string) (ImplResponse, error)
 	GetDemo(context.Context, string) (ImplResponse, error)
 	GetPollingProfile(context.Context, string) (ImplResponse, error)
 	ListDemos(context.Context, int32, int32, string, string) (ImplResponse, error)
-	ListPollingProfiles(context.Context, int32, int32, string, string) (ImplResponse, error)
 	UpdateConfiguration(context.Context, string, ConfigurationResource) (ImplResponse, error)
 	UpdateDemo(context.Context, string, Demo) (ImplResponse, error)
 	UpdatePollingProfile(context.Context, string, PollingProfile) (ImplResponse, error)

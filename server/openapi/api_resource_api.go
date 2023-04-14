@@ -53,73 +53,55 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"CreateDemo",
 			strings.ToUpper("Post"),
-			"/api/demo",
+			"/api/demos",
 			c.CreateDemo,
-		},
-		{
-			"CreatePollingProfile",
-			strings.ToUpper("Post"),
-			"/api/pollingprofile",
-			c.CreatePollingProfile,
 		},
 		{
 			"DeleteDemo",
 			strings.ToUpper("Delete"),
-			"/api/demo/{demoId}",
+			"/api/demos/{demoId}",
 			c.DeleteDemo,
-		},
-		{
-			"DeletePollingProfile",
-			strings.ToUpper("Delete"),
-			"/api/pollingprofile/{pollingProfileId}",
-			c.DeletePollingProfile,
 		},
 		{
 			"GetConfiguration",
 			strings.ToUpper("Get"),
-			"/api/config/{configId}",
+			"/api/configs/{configId}",
 			c.GetConfiguration,
 		},
 		{
 			"GetDemo",
 			strings.ToUpper("Get"),
-			"/api/demo/{demoId}",
+			"/api/demos/{demoId}",
 			c.GetDemo,
 		},
 		{
 			"GetPollingProfile",
 			strings.ToUpper("Get"),
-			"/api/pollingprofile/{pollingProfileId}",
+			"/api/pollingprofiles/{pollingProfileId}",
 			c.GetPollingProfile,
 		},
 		{
 			"ListDemos",
 			strings.ToUpper("Get"),
-			"/api/demo",
+			"/api/demos",
 			c.ListDemos,
-		},
-		{
-			"ListPollingProfiles",
-			strings.ToUpper("Get"),
-			"/api/pollingprofile",
-			c.ListPollingProfiles,
 		},
 		{
 			"UpdateConfiguration",
 			strings.ToUpper("Put"),
-			"/api/config/{configId}",
+			"/api/configs/{configId}",
 			c.UpdateConfiguration,
 		},
 		{
 			"UpdateDemo",
 			strings.ToUpper("Put"),
-			"/api/demo/{demoId}",
+			"/api/demos/{demoId}",
 			c.UpdateDemo,
 		},
 		{
 			"UpdatePollingProfile",
 			strings.ToUpper("Put"),
-			"/api/pollingprofile/{pollingProfileId}",
+			"/api/pollingprofiles/{pollingProfileId}",
 			c.UpdatePollingProfile,
 		},
 	}
@@ -149,52 +131,12 @@ func (c *ResourceApiApiController) CreateDemo(w http.ResponseWriter, r *http.Req
 
 }
 
-// CreatePollingProfile - Create a Polling Profile
-func (c *ResourceApiApiController) CreatePollingProfile(w http.ResponseWriter, r *http.Request) {
-	pollingProfileParam := PollingProfile{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&pollingProfileParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertPollingProfileRequired(pollingProfileParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreatePollingProfile(r.Context(), pollingProfileParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
 // DeleteDemo - Delete a Demonstration setting
 func (c *ResourceApiApiController) DeleteDemo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	demoIdParam := params["demoId"]
 
 	result, err := c.service.DeleteDemo(r.Context(), demoIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// DeletePollingProfile - Delete a Polling Profile
-func (c *ResourceApiApiController) DeletePollingProfile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	pollingProfileIdParam := params["pollingProfileId"]
-
-	result, err := c.service.DeletePollingProfile(r.Context(), pollingProfileIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -269,32 +211,6 @@ func (c *ResourceApiApiController) ListDemos(w http.ResponseWriter, r *http.Requ
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.ListDemos(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// ListPollingProfiles - List Polling Profiles
-func (c *ResourceApiApiController) ListPollingProfiles(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.ListPollingProfiles(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

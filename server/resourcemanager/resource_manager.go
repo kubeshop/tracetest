@@ -40,10 +40,11 @@ type Manager interface {
 }
 
 type manager[T ResourceSpec] struct {
-	resourceType string
-	handler      any
-	rh           resourceHandler[T]
-	config       config
+	resourceTypeSingular string
+	resourceTypePlural   string
+	handler              any
+	rh                   resourceHandler[T]
+	config               config
 }
 
 type config struct {
@@ -65,7 +66,7 @@ func WithOperations(ops ...Operation) managerOption {
 	}
 }
 
-func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption) Manager {
+func New[T ResourceSpec](resourceTypeSingular, resourceTypePlural string, handler any, opts ...managerOption) Manager {
 	rh := &resourceHandler[T]{}
 
 	cfg := config{
@@ -82,17 +83,18 @@ func New[T ResourceSpec](resourceType string, handler any, opts ...managerOption
 	if err != nil {
 		err := fmt.Errorf(
 			"cannot create Resourcemanager '%s': %w",
-			resourceType,
+			resourceTypeSingular,
 			err,
 		)
 		panic(err)
 	}
 
 	return &manager[T]{
-		resourceType: resourceType,
-		handler:      handler,
-		rh:           *rh,
-		config:       cfg,
+		resourceTypeSingular: resourceTypeSingular,
+		resourceTypePlural:   resourceTypePlural,
+		handler:              handler,
+		rh:                   *rh,
+		config:               cfg,
 	}
 }
 
@@ -106,7 +108,7 @@ func (m *manager[T]) Handler() any {
 
 func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
-	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceType)).Subrouter()
+	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceTypePlural)).Subrouter()
 
 	enabledOps := m.EnabledOperations()
 
@@ -115,19 +117,19 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	}
 
 	if slices.Contains(enabledOps, OperationCreate) {
-		subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceType))
+		subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural))
 	}
 
 	if slices.Contains(enabledOps, OperationUpdate) {
-		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceType))
+		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural))
 	}
 
 	if slices.Contains(enabledOps, OperationGet) {
-		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceType))
+		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural))
 	}
 
 	if slices.Contains(enabledOps, OperationDelete) {
-		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceType))
+		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural))
 	}
 
 	return subrouter
@@ -227,7 +229,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 
 	for _, item := range items {
 		resource := Resource[T]{
-			Type: m.resourceType,
+			Type: m.resourceTypeSingular,
 			Spec: item,
 		}
 
@@ -268,7 +270,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newResource := Resource[T]{
-		Type: m.resourceType,
+		Type: m.resourceTypeSingular,
 		Spec: item,
 	}
 
@@ -309,7 +311,7 @@ func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb stri
 	}
 
 	// 500 - internal server error
-	err = fmt.Errorf("error %s resource %s: %w", verb, m.resourceType, err)
+	err = fmt.Errorf("error %s resource %s: %w", verb, m.resourceTypeSingular, err)
 	writeError(w, encoder, http.StatusInternalServerError, err)
 }
 
@@ -348,7 +350,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 	}
 
 	newResource := Resource[T]{
-		Type: m.resourceType,
+		Type: m.resourceTypeSingular,
 		Spec: created,
 	}
 

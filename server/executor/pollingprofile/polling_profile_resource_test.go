@@ -25,13 +25,15 @@ func TestPollingProfileResource(t *testing.T) {
 	// }
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: "PollingProfile",
+		ResourceTypeSingular: pollingprofile.ResourceName,
+		ResourceTypePlural:   pollingprofile.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			pollingProfileRepo := pollingprofile.NewRepository(db)
 
 			manager := resourcemanager.New[pollingprofile.PollingProfile](
-				"PollingProfile",
+				pollingprofile.ResourceName,
+				pollingprofile.ResourceNamePlural,
 				pollingProfileRepo,
 				resourcemanager.WithOperations(pollingprofile.Operations...),
 				resourcemanager.WithIDGen(id.GenerateID),

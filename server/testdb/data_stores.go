@@ -383,7 +383,10 @@ func (dsr DataStoreResource) Validate() error {
 	return dsr.toModel().Validate()
 }
 
-const DataStoreResourceName = "DataStore"
+const (
+	DataStoreResourceName       = "DataStore"
+	DataStoreResourceNamePlural = "DataStores"
+)
 
 // at the moment only used for provisioning
 type DataStoreResourceProvisioner struct {

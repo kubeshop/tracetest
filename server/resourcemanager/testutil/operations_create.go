@@ -28,7 +28,7 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			removeIDFromJSON(rt.SampleJSON),
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
@@ -55,7 +55,7 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
@@ -79,13 +79,13 @@ var createInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "creating")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "creating")
 	},
 })
