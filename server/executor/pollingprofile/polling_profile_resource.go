@@ -19,7 +19,10 @@ const (
 	Periodic Strategy = "periodic"
 )
 
-const ResourceName = "PollingProfile"
+const (
+	ResourceName       = "PollingProfile"
+	ResourceNamePlural = "PollingProfiles"
+)
 
 var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationGet,

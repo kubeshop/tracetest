@@ -178,7 +178,8 @@ func TestDataStoreProvisioner(t *testing.T) {
 	db := testmock.MustGetRawTestingDatabase()
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: testdb.DataStoreResourceName,
+		ResourceTypeSingular: testdb.DataStoreResourceName,
+		ResourceTypePlural:   testdb.DataStoreResourceName,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			dsRepo, err := testdb.Postgres(testdb.WithDB(db))
@@ -186,6 +187,7 @@ func TestDataStoreProvisioner(t *testing.T) {
 
 			manager := resourcemanager.New[testdb.DataStoreResource](
 				testdb.DataStoreResourceName,
+				testdb.DataStoreResourceNamePlural,
 				testdb.NewDataStoreResourceProvisioner(dsRepo),
 				// this resource exists only for provisiooning at the moment``
 				resourcemanager.WithOperations(resourcemanager.OperationNoop),

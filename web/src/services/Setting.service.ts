@@ -2,6 +2,7 @@ import Demo from 'models/Demo.model';
 import Config from 'models/Config.model';
 import {
   ResourceType,
+  ResourceTypePlural,
   SupportedDemosFormField,
   SupportedDemosFormFieldMap,
   TDraftConfig,
@@ -45,8 +46,10 @@ const SettingService = () => ({
   },
 
   getDraftResource(resourceType: ResourceType, draft: TDraftSpec): TDraftResource {
+    let pluralKey = `${resourceType}Type` as keyof typeof ResourceTypePlural;
     return {
       type: resourceType,
+      typePlural: ResourceTypePlural[pluralKey],
       spec: draft,
     };
   },

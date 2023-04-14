@@ -48,12 +48,18 @@ func TestPokeshopDemoResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: "Demo",
+		ResourceTypeSingular: demoresource.ResourceName,
+		ResourceTypePlural:   demoresource.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			demoRepository := demoresource.NewRepository(db)
 
-			manager := resourcemanager.New[demoresource.Demo]("Demo", demoRepository, resourcemanager.WithIDGen(id.GenerateID))
+			manager := resourcemanager.New[demoresource.Demo](
+				demoresource.ResourceName,
+				demoresource.ResourceNamePlural,
+				demoRepository,
+				resourcemanager.WithIDGen(id.GenerateID),
+			)
 			manager.RegisterRoutes(router)
 
 			return manager
@@ -143,12 +149,18 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceType: "Demo",
+		ResourceTypeSingular: demoresource.ResourceName,
+		ResourceTypePlural:   demoresource.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
 			db := testmock.MustCreateRandomMigratedDatabase(db)
 			demoRepository := demoresource.NewRepository(db)
 
-			manager := resourcemanager.New[demoresource.Demo]("Demo", demoRepository, resourcemanager.WithIDGen(id.GenerateID))
+			manager := resourcemanager.New[demoresource.Demo](
+				demoresource.ResourceName,
+				demoresource.ResourceNamePlural,
+				demoRepository,
+				resourcemanager.WithIDGen(id.GenerateID),
+			)
 			manager.RegisterRoutes(router)
 
 			return manager
