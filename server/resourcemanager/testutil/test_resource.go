@@ -20,12 +20,14 @@ type ResourceTypeTest struct {
 	SampleJSON        string
 	SampleJSONUpdated string
 
-	// private files
-	sortFields []string
+	// private fields
+	sortFields         []string
+	customJSONComparer func(t require.TestingT, operation Operation, firstValue, secondValue string)
 }
 
 type config struct {
-	operations operationTesters
+	operations         operationTesters
+	customJSONComparer func(t require.TestingT, operation Operation, firstValue, secondValue string)
 }
 
 type testOption func(*config)
@@ -34,6 +36,16 @@ func ExcludeOperations(ops ...Operation) testOption {
 	return func(c *config) {
 		c.operations = c.operations.exclude(ops...)
 	}
+}
+
+func JSONComparer(comparer func(t require.TestingT, operation Operation, firstValue, secondValue string)) testOption {
+	return func(c *config) {
+		c.customJSONComparer = comparer
+	}
+}
+
+func rawJSONComparer(t require.TestingT, operation Operation, firstValue, secondValue string) {
+	require.JSONEq(t, firstValue, secondValue)
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
@@ -47,11 +59,20 @@ func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
 		opt(&cfg)
 	}
 
+	// consider customJSONComparer option
+	if cfg.customJSONComparer == nil {
+		cfg.customJSONComparer = rawJSONComparer
+	}
+	rt.customJSONComparer = cfg.customJSONComparer
+
 	TestResourceTypeOperations(t, rt, cfg.operations)
 }
 
 func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
 	t.Helper()
+
+	// assumes default
+	rt.customJSONComparer = rawJSONComparer
 
 	TestResourceTypeOperations(t, rt, append(defaultOperations, errorOperations...))
 }

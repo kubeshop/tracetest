@@ -41,7 +41,7 @@ var getSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 
 		expected := ct.toJSON(rt.SampleJSON)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationGetSuccess, expected, jsonBody)
 	},
 })
 
