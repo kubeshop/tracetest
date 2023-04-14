@@ -1,6 +1,6 @@
 PROJECT_ROOT=${PWD}
 
-GORELEASER_VERSION=1.16.2-pro
+GORELEASER_VERSION=1.17.0-pro
 CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 1 | cut -d' ' -f3-)
 goreleaser-version:
 ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"

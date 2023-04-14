@@ -395,6 +395,7 @@ jobs:
     name: Cleanup test infra
     runs-on: ubuntu-latest
     needs: [trace-testing, e2e]
+    if: always()
     steps:
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:
