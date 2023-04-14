@@ -84,12 +84,22 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
-		expected := `{
-			"count": 1,
-			"items": [` + ct.toJSON(rt.SampleJSON) + `]
-		}`
+		var parsedJsonBody struct {
+			Count int   `json:"count"`
+			Items []any `json:"items"`
+		}
+		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-		require.JSONEq(t, expected, jsonBody)
+		require.Equal(t, 1, parsedJsonBody.Count)
+		require.Equal(t, len(parsedJsonBody.Items), 1)
+
+		obtainedAsBytes, err := json.Marshal(parsedJsonBody.Items[0])
+		require.NoError(t, err)
+
+		expected := ct.toJSON(rt.SampleJSON)
+		obtained := string(obtainedAsBytes)
+
+		rt.customJSONComparer(t, OperationListSuccess, expected, obtained)
 	},
 })
 

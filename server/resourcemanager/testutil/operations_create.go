@@ -42,7 +42,7 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 		clean := removeIDFromJSON(rt.SampleJSON)
 		expected := ct.toJSON(clean)
 
-		require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
+		rt.customJSONComparer(t, OperationCreateNoID, expected, removeIDFromJSON(jsonBody))
 		require.NotEmpty(t, extractID(jsonBody))
 	},
 })
@@ -67,7 +67,7 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		jsonBody := responseBodyJSON(t, resp, ct)
 		expected := ct.toJSON(rt.SampleJSON)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationCreateSuccess, expected, jsonBody)
 	},
 })
 

@@ -16,12 +16,28 @@ func generateRandomString() string {
 	return generator.TraceID().String()
 }
 
-func removeID(input map[string]any) map[string]any {
+func RemoveFieldFromJSONResource(field, jsonResource string) string {
+	resourceAsMap := parseJSON(jsonResource)
+
+	clean := removeFieldFromResource(field, resourceAsMap)
+
+	out, err := json.Marshal(clean)
+	if err != nil {
+		panic(err)
+	}
+	return string(out)
+}
+
+func removeIDFromJSON(input string) string {
+	return RemoveFieldFromJSONResource("id", input)
+}
+
+func removeFieldFromResource(field string, input map[string]any) map[string]any {
 	out := map[string]any{}
 	out["type"] = input["type"]
 	newSpec := map[string]any{}
 	for k, v := range input["spec"].(map[string]any) {
-		if k == "id" {
+		if k == field {
 			continue
 		}
 		newSpec[k] = v
@@ -40,17 +56,6 @@ func parseJSON(input string) map[string]any {
 	}
 
 	return parsed
-}
-
-func removeIDFromJSON(input string) string {
-
-	clean := removeID(parseJSON(input))
-
-	out, err := json.Marshal(clean)
-	if err != nil {
-		panic(err)
-	}
-	return string(out)
 }
 
 func extractID(input string) string {

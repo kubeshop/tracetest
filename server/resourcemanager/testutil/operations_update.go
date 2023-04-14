@@ -38,7 +38,7 @@ var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 
 		expected := ct.toJSON(rt.SampleJSONUpdated)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationUpdateSuccess, expected, jsonBody)
 	},
 })
 
