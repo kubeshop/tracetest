@@ -13,7 +13,7 @@ type TestRunEvent = Model<
   {logLevel: LogLevel; dataStoreConnection?: ConnectionResult; polling?: PollingInfo; outputs?: OutputInfo[]}
 >;
 
-function PollingInfo({
+export function PollingInfo({
   type = PollingInfoType.Periodic,
   isComplete = false,
   periodic = {},
