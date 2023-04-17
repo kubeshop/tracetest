@@ -31,6 +31,7 @@ const TestSpec = ({
     name = '',
   } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
+  const hasError = useMemo(() => AssertionService.hasError(resultList), [resultList]);
 
   return (
     <S.Container
@@ -44,6 +45,7 @@ const TestSpec = ({
         affectedSpans={spanIds.length}
         assertionsFailed={totalPassedChecks?.false ?? 0}
         assertionsPassed={totalPassedChecks?.true ?? 0}
+        hasError={hasError}
         selector={selector}
         title={!selector && !name ? 'All Spans' : name}
       />

@@ -1,4 +1,4 @@
-import {CheckCircleFilled, MinusCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, InfoCircleFilled, MinusCircleFilled} from '@ant-design/icons';
 import {Card, Drawer, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -85,6 +85,10 @@ export const IconError = styled(MinusCircleFilled)`
 
 export const IconSuccess = styled(CheckCircleFilled)`
   color: ${({theme}) => theme.color.success};
+`;
+
+export const IconWarning = styled(InfoCircleFilled)`
+  color: ${({theme}) => theme.color.error};
 `;
 
 export const Row = styled.div<{$align?: string; $hasGap?: boolean; $justify?: string}>`

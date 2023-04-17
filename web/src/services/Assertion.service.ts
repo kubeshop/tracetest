@@ -42,6 +42,10 @@ const AssertionService = () => ({
     return countBy(passedResults);
   },
 
+  hasError(resultList: AssertionResult[]) {
+    return resultList.map(({spanResults}) => spanResults.some(({error}) => !!error)).some(result => !!result);
+  },
+
   getResultsHashedBySpanId(resultList: AssertionResult[]) {
     return resultList
       .flatMap(({assertion, spanResults}) => spanResults.map(spanResult => ({result: spanResult, assertion})))
