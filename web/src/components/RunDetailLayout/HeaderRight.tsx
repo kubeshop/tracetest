@@ -10,6 +10,7 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './RunDetailLayout.styled';
+import EventLogPopover from '../EventLogPopover/EventLogPopover';
 
 interface IProps {
   testId: string;
@@ -20,7 +21,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
   const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
-  const {isLoadingStop, run, stopRun} = useTestRun();
+  const {isLoadingStop, run, stopRun, runEvents} = useTestRun();
   const {onRun} = useTest();
   const state = run.state;
 
@@ -51,6 +52,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
           Run Test
         </Button>
       )}
+      <EventLogPopover runEvents={runEvents} />
       <RunActionsMenu
         isRunView
         resultId={run.id}

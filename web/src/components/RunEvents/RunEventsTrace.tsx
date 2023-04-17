@@ -19,7 +19,7 @@ const HeaderComponentMap: Record<TestStateType, () => React.ReactElement> = {
   [TestState.STOPPED]: StoppedHeader,
 };
 
-type TraceEventTypeWithoutFetching = Exclude<
+export type TraceEventTypeWithoutFetching = Exclude<
   TraceEventType,
   TraceEventType.FETCHING_START | TraceEventType.FETCHING_ERROR | TraceEventType.FETCHING_SUCCESS
 >;
