@@ -181,18 +181,18 @@ func (c *ResourceApiApiController) CreateDemo(w http.ResponseWriter, r *http.Req
 
 // CreateEnvironment - Create an environment
 func (c *ResourceApiApiController) CreateEnvironment(w http.ResponseWriter, r *http.Request) {
-	environmentResourceParam := EnvironmentResource{}
+	environmentParam := Environment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&environmentResourceParam); err != nil {
+	if err := d.Decode(&environmentParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
+	if err := AssertEnvironmentRequired(environmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateEnvironment(r.Context(), environmentResourceParam)
+	result, err := c.service.CreateEnvironment(r.Context(), environmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -469,18 +469,18 @@ func (c *ResourceApiApiController) UpdateEnvironment(w http.ResponseWriter, r *h
 	params := mux.Vars(r)
 	environmentIdParam := params["environmentId"]
 
-	environmentResourceParam := EnvironmentResource{}
+	environmentParam := Environment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&environmentResourceParam); err != nil {
+	if err := d.Decode(&environmentParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
+	if err := AssertEnvironmentRequired(environmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentResourceParam)
+	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

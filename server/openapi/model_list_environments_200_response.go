@@ -12,13 +12,13 @@ package openapi
 type ListEnvironments200Response struct {
 	Count int32 `json:"count,omitempty"`
 
-	Items []EnvironmentResource `json:"items,omitempty"`
+	Items []Environment `json:"items,omitempty"`
 }
 
 // AssertListEnvironments200ResponseRequired checks if the required fields are not zero-ed
 func AssertListEnvironments200ResponseRequired(obj ListEnvironments200Response) error {
 	for _, el := range obj.Items {
-		if err := AssertEnvironmentResourceRequired(el); err != nil {
+		if err := AssertEnvironmentRequired(el); err != nil {
 			return err
 		}
 	}

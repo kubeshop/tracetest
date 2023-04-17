@@ -923,11 +923,11 @@ export interface operations {
         content: {
           "application/json": {
             count?: number;
-            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+            items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
           };
           "text/yaml": {
             count?: number;
-            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+            items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
           };
         };
       };
@@ -943,8 +943,8 @@ export interface operations {
       /** successful operation */
       201: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
         };
       };
       /** problem creating an environment */
@@ -952,8 +952,8 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
       };
     };
   };
@@ -964,8 +964,8 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
         };
       };
       /** environment not found */
@@ -981,8 +981,8 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
         };
       };
       /** invalid environment, some data was sent in incorrect format. */
@@ -994,8 +994,8 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
       };
     };
   };

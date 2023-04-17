@@ -130,17 +130,17 @@ func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo
 }
 
 type ApiCreateEnvironmentRequest struct {
-	ctx                 context.Context
-	ApiService          *ResourceApiApiService
-	environmentResource *EnvironmentResource
+	ctx         context.Context
+	ApiService  *ResourceApiApiService
+	environment *Environment
 }
 
-func (r ApiCreateEnvironmentRequest) EnvironmentResource(environmentResource EnvironmentResource) ApiCreateEnvironmentRequest {
-	r.environmentResource = &environmentResource
+func (r ApiCreateEnvironmentRequest) Environment(environment Environment) ApiCreateEnvironmentRequest {
+	r.environment = &environment
 	return r
 }
 
-func (r ApiCreateEnvironmentRequest) Execute() (*EnvironmentResource, *http.Response, error) {
+func (r ApiCreateEnvironmentRequest) Execute() (*Environment, *http.Response, error) {
 	return r.ApiService.CreateEnvironmentExecute(r)
 }
 
@@ -160,13 +160,13 @@ func (a *ResourceApiApiService) CreateEnvironment(ctx context.Context) ApiCreate
 }
 
 // Execute executes the request
-//  @return EnvironmentResource
-func (a *ResourceApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
+//  @return Environment
+func (a *ResourceApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *EnvironmentResource
+		localVarReturnValue *Environment
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.CreateEnvironment")
@@ -198,7 +198,7 @@ func (a *ResourceApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentR
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.environmentResource
+	localVarPostBody = r.environment
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -827,7 +827,7 @@ type ApiGetEnvironmentRequest struct {
 	environmentId string
 }
 
-func (r ApiGetEnvironmentRequest) Execute() (*EnvironmentResource, *http.Response, error) {
+func (r ApiGetEnvironmentRequest) Execute() (*Environment, *http.Response, error) {
 	return r.ApiService.GetEnvironmentExecute(r)
 }
 
@@ -849,13 +849,13 @@ func (a *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentI
 }
 
 // Execute executes the request
-//  @return EnvironmentResource
-func (a *ResourceApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
+//  @return Environment
+func (a *ResourceApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *EnvironmentResource
+		localVarReturnValue *Environment
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.GetEnvironment")
@@ -1628,18 +1628,18 @@ func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo
 }
 
 type ApiUpdateEnvironmentRequest struct {
-	ctx                 context.Context
-	ApiService          *ResourceApiApiService
-	environmentId       string
-	environmentResource *EnvironmentResource
+	ctx           context.Context
+	ApiService    *ResourceApiApiService
+	environmentId string
+	environment   *Environment
 }
 
-func (r ApiUpdateEnvironmentRequest) EnvironmentResource(environmentResource EnvironmentResource) ApiUpdateEnvironmentRequest {
-	r.environmentResource = &environmentResource
+func (r ApiUpdateEnvironmentRequest) Environment(environment Environment) ApiUpdateEnvironmentRequest {
+	r.environment = &environment
 	return r
 }
 
-func (r ApiUpdateEnvironmentRequest) Execute() (*EnvironmentResource, *http.Response, error) {
+func (r ApiUpdateEnvironmentRequest) Execute() (*Environment, *http.Response, error) {
 	return r.ApiService.UpdateEnvironmentExecute(r)
 }
 
@@ -1661,13 +1661,13 @@ func (a *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environme
 }
 
 // Execute executes the request
-//  @return EnvironmentResource
-func (a *ResourceApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
+//  @return Environment
+func (a *ResourceApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentRequest) (*Environment, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *EnvironmentResource
+		localVarReturnValue *Environment
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.UpdateEnvironment")
@@ -1700,7 +1700,7 @@ func (a *ResourceApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentR
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.environmentResource
+	localVarPostBody = r.environment
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
