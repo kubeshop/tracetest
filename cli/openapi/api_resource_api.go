@@ -643,8 +643,7 @@ func (a *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId st
 }
 
 // Execute executes the request
-//
-//	@return DataStoreResource
+//  @return DataStoreResource
 func (a *ResourceApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStoreResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
