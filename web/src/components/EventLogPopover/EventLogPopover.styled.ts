@@ -14,7 +14,7 @@ function getLogLevelColor(logLevel: LogLevel, theme: DefaultTheme): string {
 export const GlobalStyle = createGlobalStyle`
   #eventlog-popover {
     .ant-popover-inner-content {
-      padding: 5px;
+      padding: 5px 16px;
     }
   }
 `;
@@ -24,7 +24,6 @@ export const Container = styled.div`
   max-height: calc(100vh - 200px);
   width: 550px;
   overflow-y: auto;
-  padding: 5px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -32,18 +31,9 @@ export const Container = styled.div`
   position: relative;
 `;
 
-export const CopyIconContainer = styled.div`
-  position: absolute;
-  right: 8px;
-  top: 9px;
-  padding: 0 2px;
-  border-radius: 2px;
-  cursor: pointer;
-  z-index: 101;
-`;
-
 export const CopyIcon = styled(CopyOutlined)`
-  color: ${({theme}) => theme.color.text};
+  color: ${({theme}) => theme.color.primary};
+  cursor: pointer;
 `;
 
 export const EventEntry = styled(Typography.Text)<{$logLevel?: LogLevel}>`
@@ -56,4 +46,17 @@ export const TerminalIcon = styled.img.attrs({src: terminalIcon})`
   width: 20px;
   height: 20px;
   cursor: pointer;
+`;
+
+export const TitleContainer = styled.div`
+  padding: 5px 0;
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const Title = styled(Typography.Title)`
+  && {
+    margin: 0;
+    font-size: ${({theme}) => theme.size.md};
+  }
 `;

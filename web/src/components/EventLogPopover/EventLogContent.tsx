@@ -1,7 +1,6 @@
 import {useEffect, useRef} from 'react';
 import TestRunEvent from 'models/TestRunEvent.model';
 import EventLogService from 'services/EventLog.service';
-import useCopy from 'hooks/useCopy';
 import * as S from './EventLogPopover.styled';
 
 interface IProps {
@@ -9,8 +8,6 @@ interface IProps {
 }
 
 const EventLogContent = ({runEvents}: IProps) => {
-  const copy = useCopy();
-
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,9 +16,6 @@ const EventLogContent = ({runEvents}: IProps) => {
 
   return (
     <S.Container>
-      <S.CopyIconContainer onClick={() => copy(EventLogService.listToString(runEvents))}>
-        <S.CopyIcon />
-      </S.CopyIconContainer>
       {runEvents.map(event => (
         <S.EventEntry key={`${event.type}-${event.createdAt}`} $logLevel={event.logLevel}>
           <b>{EventLogService.typeToString(event)}</b> {EventLogService.detailsToString(event)}

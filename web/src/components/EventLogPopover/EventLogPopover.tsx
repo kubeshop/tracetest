@@ -1,5 +1,7 @@
-import {Popover} from 'antd';
+import {Popover, Tooltip} from 'antd';
 import TestRunEvent from 'models/TestRunEvent.model';
+import useCopy from 'hooks/useCopy';
+import EventLogService from 'services/EventLog.service';
 import EventLogContent from './EventLogContent';
 import * as S from './EventLogPopover.styled';
 
@@ -8,6 +10,8 @@ interface IProps {
 }
 
 const EventLogPopover = ({runEvents}: IProps) => {
+  const copy = useCopy();
+
   return (
     <>
       <S.GlobalStyle />
@@ -16,6 +20,14 @@ const EventLogPopover = ({runEvents}: IProps) => {
         content={<EventLogContent runEvents={runEvents} />}
         trigger="click"
         placement="bottomLeft"
+        title={
+          <S.TitleContainer>
+            <S.Title>Event Log</S.Title>
+            <Tooltip title="Copy Text">
+              <S.CopyIcon onClick={() => copy(EventLogService.listToString(runEvents))} />
+            </Tooltip>
+          </S.TitleContainer>
+        }
       >
         <S.TerminalIcon />
       </Popover>

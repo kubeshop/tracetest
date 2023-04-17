@@ -1,3 +1,4 @@
+import {parseISO, formatISO} from 'date-fns';
 import TestRunEvent, {PollingInfo} from 'models/TestRunEvent.model';
 import ConnectionResult from 'models/ConnectionResult.model';
 import {TraceEventType} from 'constants/TestRunEvents.constants';
@@ -13,10 +14,9 @@ const dataStoreEventToString = (event: TestRunEvent): string => {
   const baseText = eventToString(event);
   const configValidText = allPassed ? 'Data store configuration is valid.' : 'Data store configuration is not valid.';
 
-  const connectionStepsDetailsText = Object.entries(dataStoreConnection || {}).reduce(
-    (acc, [key, {message, error}]) => `${acc} - ${key.toUpperCase} - ${message} - ${error}`,
-    ''
-  );
+  const connectionStepsDetailsText = Object.entries(dataStoreConnection || {})
+    .map(([key, {message, error}]) => `${key.toUpperCase()} - ${message} ${error ? ` - ${error}` : ''}`, '')
+    .join(' - ');
 
   return `${baseText} - ${configValidText} - ${connectionStepsDetailsText}`;
 };
@@ -42,8 +42,10 @@ const EventLogService = () => ({
 
     return eventToStringFn(event);
   },
-  typeToString({logLevel, type}: TestRunEvent) {
-    return `[${logLevel.toUpperCase()}] ${type}:`;
+  typeToString({type, createdAt}: TestRunEvent) {
+    const createdAtDate = parseISO(createdAt);
+
+    return `[${formatISO(createdAtDate)} - ${type}]`;
   },
   listToString(events: TestRunEvent[]) {
     return events.map(event => `${this.typeToString(event)} ${this.detailsToString(event)}`).join('\r');
