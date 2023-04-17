@@ -57,12 +57,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.CreateDataStore,
 		},
 		{
-			"CreateEnvironment",
-			strings.ToUpper("Post"),
-			"/api/environments",
-			c.CreateEnvironment,
-		},
-		{
 			"CreateTest",
 			strings.ToUpper("Post"),
 			"/api/tests",
@@ -79,12 +73,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/datastores/{dataStoreId}",
 			c.DeleteDataStore,
-		},
-		{
-			"DeleteEnvironment",
-			strings.ToUpper("Delete"),
-			"/api/environments/{environmentId}",
-			c.DeleteEnvironment,
 		},
 		{
 			"DeleteTest",
@@ -151,24 +139,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/datastores",
 			c.GetDataStores,
-		},
-		{
-			"GetEnvironment",
-			strings.ToUpper("Get"),
-			"/api/environments/{environmentId}",
-			c.GetEnvironment,
-		},
-		{
-			"GetEnvironmentDefinitionFile",
-			strings.ToUpper("Get"),
-			"/api/environments/{environmentId}/definition.yaml",
-			c.GetEnvironmentDefinitionFile,
-		},
-		{
-			"GetEnvironments",
-			strings.ToUpper("Get"),
-			"/api/environments",
-			c.GetEnvironments,
 		},
 		{
 			"GetResources",
@@ -315,12 +285,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.UpdateDataStore,
 		},
 		{
-			"UpdateEnvironment",
-			strings.ToUpper("Put"),
-			"/api/environments/{environmentId}",
-			c.UpdateEnvironment,
-		},
-		{
 			"UpdateTest",
 			strings.ToUpper("Put"),
 			"/api/tests/{testId}",
@@ -355,30 +319,6 @@ func (c *ApiApiController) CreateDataStore(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	result, err := c.service.CreateDataStore(r.Context(), dataStoreParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// CreateEnvironment - Create new environment
-func (c *ApiApiController) CreateEnvironment(w http.ResponseWriter, r *http.Request) {
-	environmentParam := Environment{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&environmentParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertEnvironmentRequired(environmentParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreateEnvironment(r.Context(), environmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -443,22 +383,6 @@ func (c *ApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Reques
 	dataStoreIdParam := params["dataStoreId"]
 
 	result, err := c.service.DeleteDataStore(r.Context(), dataStoreIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// DeleteEnvironment - delete a environment
-func (c *ApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.DeleteEnvironment(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -697,65 +621,6 @@ func (c *ApiApiController) GetDataStores(w http.ResponseWriter, r *http.Request)
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.GetDataStores(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetEnvironment - get environment
-func (c *ApiApiController) GetEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.GetEnvironment(r.Context(), environmentIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetEnvironmentDefinitionFile - Get the environment definition as an YAML file
-func (c *ApiApiController) GetEnvironmentDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.GetEnvironmentDefinitionFile(r.Context(), environmentIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetEnvironments - Get Environments
-func (c *ApiApiController) GetEnvironments(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	queryParam := query.Get("query")
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.GetEnvironments(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1312,33 +1177,6 @@ func (c *ApiApiController) UpdateDataStore(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	result, err := c.service.UpdateDataStore(r.Context(), dataStoreIdParam, dataStoreParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpdateEnvironment - update environment
-func (c *ApiApiController) UpdateEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	environmentParam := Environment{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&environmentParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertEnvironmentRequired(environmentParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
