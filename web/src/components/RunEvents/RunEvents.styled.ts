@@ -88,3 +88,10 @@ export const LoadingIcon = styled(LoadingOutlined)`
 export const Paragraph = styled(Typography.Paragraph)`
   text-align: center;
 `;
+
+export const InvalidDataStoreContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 5px;
+`;

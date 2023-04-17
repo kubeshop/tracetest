@@ -216,7 +216,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 	reason := ""
 
 	if errors.Is(err, connection.ErrTraceNotFound) {
-		reason = "Timed out without finding trace"
+		reason = fmt.Sprintf("Timed out without finding trace, trace id \"%s\"", run.TraceID.String())
 
 		err = fmt.Errorf("timed out waiting for traces after %s", pp.Timeout)
 		fmt.Println("[TracePoller] Timed-out", err)
