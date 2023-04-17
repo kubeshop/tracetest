@@ -57,6 +57,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateDemo,
 		},
 		{
+			"CreateEnvironment",
+			strings.ToUpper("Post"),
+			"/api/environments",
+			c.CreateEnvironment,
+		},
+		{
 			"DeleteDataStore",
 			strings.ToUpper("Delete"),
 			"/api/datastores/{dataStoreId}",
@@ -67,6 +73,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/demos/{demoId}",
 			c.DeleteDemo,
+		},
+		{
+			"DeleteEnvironment",
+			strings.ToUpper("Delete"),
+			"/api/environments/{environmentId}",
+			c.DeleteEnvironment,
 		},
 		{
 			"GetConfiguration",
@@ -87,6 +99,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetDemo,
 		},
 		{
+			"GetEnvironment",
+			strings.ToUpper("Get"),
+			"/api/environments/{environmentId}",
+			c.GetEnvironment,
+		},
+		{
 			"GetPollingProfile",
 			strings.ToUpper("Get"),
 			"/api/pollingprofiles/{pollingProfileId}",
@@ -97,6 +115,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/demos",
 			c.ListDemos,
+		},
+		{
+			"ListEnvironments",
+			strings.ToUpper("Get"),
+			"/api/environments",
+			c.ListEnvironments,
 		},
 		{
 			"UpdateConfiguration",
@@ -115,6 +139,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/demos/{demoId}",
 			c.UpdateDemo,
+		},
+		{
+			"UpdateEnvironment",
+			strings.ToUpper("Put"),
+			"/api/environments/{environmentId}",
+			c.UpdateEnvironment,
 		},
 		{
 			"UpdatePollingProfile",
@@ -149,6 +179,30 @@ func (c *ResourceApiApiController) CreateDemo(w http.ResponseWriter, r *http.Req
 
 }
 
+// CreateEnvironment - Create an environment
+func (c *ResourceApiApiController) CreateEnvironment(w http.ResponseWriter, r *http.Request) {
+	environmentParam := Environment{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentRequired(environmentParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateEnvironment(r.Context(), environmentParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // DeleteDataStore - Delete a Data Store
 func (c *ResourceApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -171,6 +225,22 @@ func (c *ResourceApiApiController) DeleteDemo(w http.ResponseWriter, r *http.Req
 	demoIdParam := params["demoId"]
 
 	result, err := c.service.DeleteDemo(r.Context(), demoIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteEnvironment - Delete an environment
+func (c *ResourceApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.DeleteEnvironment(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -229,6 +299,22 @@ func (c *ResourceApiApiController) GetDemo(w http.ResponseWriter, r *http.Reques
 
 }
 
+// GetEnvironment - Get a specific environment
+func (c *ResourceApiApiController) GetEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.GetEnvironment(r.Context(), environmentIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetPollingProfile - Get Polling Profile
 func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -261,6 +347,32 @@ func (c *ResourceApiApiController) ListDemos(w http.ResponseWriter, r *http.Requ
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.ListDemos(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ListEnvironments - List environments
+func (c *ResourceApiApiController) ListEnvironments(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListEnvironments(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -342,6 +454,33 @@ func (c *ResourceApiApiController) UpdateDemo(w http.ResponseWriter, r *http.Req
 		return
 	}
 	result, err := c.service.UpdateDemo(r.Context(), demoIdParam, demoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateEnvironment - Update an environment
+func (c *ResourceApiApiController) UpdateEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	environmentParam := Environment{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentRequired(environmentParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
