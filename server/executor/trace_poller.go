@@ -16,6 +16,8 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
+const PollingRequestStartIteration = 1
+
 type TracePoller interface {
 	Poll(context.Context, model.Test, model.Run)
 }
@@ -123,7 +125,7 @@ func (tp tracePoller) Stop() {
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 
-	job := NewPollingRequest(ctx, test, run, 1)
+	job := NewPollingRequest(ctx, test, run, PollingRequestStartIteration)
 
 	tp.enqueueJob(*job)
 }
