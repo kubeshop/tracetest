@@ -1,4 +1,5 @@
 import {SupportedPlugins} from '../../../src/constants/Common.constants';
+import {POKEMON_HTTP_ENDPOINT} from '../constants/Test';
 
 describe('Create test from CURL Command', () => {
   beforeEach(() => {
@@ -16,7 +17,7 @@ describe('Create test from CURL Command', () => {
     cy.get('[data-cy=curl-command-editor] [contenteditable]')
       .first()
       .type(
-        `curl -XPOST 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon'
+        `curl -XPOST ${POKEMON_HTTP_ENDPOINT}/pokemon
     -H Content-type: application/json
     --data '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}'
    `,

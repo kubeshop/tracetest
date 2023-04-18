@@ -1,9 +1,8 @@
 #/bin/bash
 
-set -e
-
 export TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
-if ! command -v "$TRACETEST_CLI" &> /dev/null; then
+cmdExitCode=$("$TRACETEST_CLI" &> /dev/null; echo $?)
+if [ $cmdExitCode -ne 0 ]; then
   echo "\$TRACETEST_CLI not set to executable. set to $TRACETEST_CLI";
   exit 2
 fi
