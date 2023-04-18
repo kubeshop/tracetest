@@ -176,7 +176,6 @@ services:
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
 
-**Why?** To start both the Python app and Tracetest we will run this command:
 
 The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
 
