@@ -85,7 +85,7 @@ RUN opentelemetry-bootstrap -a install
 EXPOSE 8080
 ```
 
-And, the `docker-compose.yaml` contains just one service for the Go app.
+The `docker-compose.yaml` contains just one service for the Python app. The service is stared with the `command` parameter.
 
 ```yaml
 version: '3'
