@@ -8,8 +8,6 @@
 A `Resource` is, conceptually, any entity that can be created, read, updated and/or deleted.
 Some examples in Tracetest includes `Test`, `Transaction`, `PollingProfile`, etc.
 
-Not all resources supports all operations. For example, `Config` is a "single row" entity, so it doesn't support the `list` operation, since there is only one row.
-
 ## How this works
 
 A `ResourceManager` can be instantiated with a few arguments: 
