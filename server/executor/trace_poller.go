@@ -123,7 +123,7 @@ func (tp tracePoller) Stop() {
 func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 
-	job := NewPollingRequest(ctx, test, run, 0)
+	job := NewPollingRequest(ctx, test, run, 1)
 
 	tp.enqueueJob(*job)
 }
@@ -141,11 +141,13 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	}
 
 	if job.IsFirstRequest() {
-		err := tp.eventEmitter.Emit(job.ctx, events.TracePollingStart(job.test.ID, job.run.ID))
+		err := tp.eventEmitter.Emit(job.ctx, events.TraceFetchingStart(job.test.ID, job.run.ID))
 		if err != nil {
 			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.test.ID, job.run.ID, err.Error())
 		}
 	}
+
+	fmt.Println("tracePoller processJob", job.count)
 
 	finished, finishReason, run, err := tp.pollerExecutor.ExecuteRequest(&job)
 	if err != nil {
@@ -157,14 +159,14 @@ func (tp tracePoller) processJob(job PollingRequest) {
 			if anotherErr != nil {
 				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
 			}
+
+			anotherErr = tp.eventEmitter.Emit(job.ctx, events.TraceFetchingError(job.test.ID, job.run.ID, err))
+			if anotherErr != nil {
+				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
+			}
 		}
 
 		return
-	}
-
-	err = tp.eventEmitter.Emit(job.ctx, events.TracePollingIterationInfo(job.test.ID, job.run.ID, len(run.Trace.Flat), job.count, finished))
-	if err != nil {
-		log.Printf("[TracePoller] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", job.test.ID, job.run.ID, err.Error())
 	}
 
 	if !finished {
@@ -175,7 +177,7 @@ func (tp tracePoller) processJob(job PollingRequest) {
 
 	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, finishReason, job.count+1, len(run.Trace.Flat))
 
-	err = tp.eventEmitter.Emit(job.ctx, events.TracePollingSuccess(job.test.ID, job.run.ID))
+	err = tp.eventEmitter.Emit(job.ctx, events.TraceFetchingSuccess(job.test.ID, job.run.ID))
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingSuccess event: %s \n", job.test.ID, job.run.ID, err.Error())
 	}
@@ -209,6 +211,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 	// Edge case: the trace still not avaiable on Data Store during polling
 	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < pp.TimeoutDuration() {
 		log.Println("[TracePoller] Trace not found on Data Store yet. Requeuing...")
+		job.count += 1
 		tp.requeue(job)
 		return false, "Trace not found" // job without fail
 	}

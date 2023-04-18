@@ -2,14 +2,12 @@ package executor
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -117,48 +115,42 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 				log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 			}
 		}
-	}
 
-	err = pe.eventEmitter.Emit(request.ctx, events.TraceFetchingStart(request.test.ID, request.run.ID))
-	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingStart event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+		err = pe.eventEmitter.Emit(request.ctx, events.TracePollingStart(request.test.ID, request.run.ID))
+		if err != nil {
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingStart event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+		}
 	}
 
 	traceID := run.TraceID.String()
 	trace, err := traceDB.GetTraceByID(request.ctx, traceID)
 	if err != nil {
-		connectionResult := model.ConnectionResult{}
-
-		if !errors.Is(err, connection.ErrTraceNotFound) {
-			// run test connection to give a diagnostic when an unknown error happens
-			if testableTraceDB, ok := traceDB.(tracedb.TestableTraceDB); ok {
-				connectionResult = testableTraceDB.TestConnection(request.ctx)
-			}
-		}
-
-		anotherErr := pe.eventEmitter.Emit(request.ctx, events.TraceFetchingError(request.test.ID, request.run.ID, connectionResult, err))
+		anotherErr := pe.eventEmitter.Emit(request.ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, 0, request.count, false, err.Error()))
 		if anotherErr != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingError event: error: %s\n", request.test.ID, request.run.ID, anotherErr.Error())
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, anotherErr.Error())
 		}
 
 		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
 		return false, "", model.Run{}, err
 	}
 
-	err = pe.eventEmitter.Emit(request.ctx, events.TraceFetchingSuccess(request.test.ID, request.run.ID))
-	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceFetchingSuccess event: error: %s\n", request.test.ID, request.run.ID, err.Error())
-	}
-
 	trace.ID = run.TraceID
-
 	done, reason := pe.donePollingTraces(request, traceDB, trace)
-
 	if !done {
+		err := pe.eventEmitter.Emit(request.ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, len(trace.Flat), request.count, false, reason))
+		if err != nil {
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+		}
+
 		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)\n", request.test.ID, request.run.ID, reason)
 		run.Trace = &trace
 		request.run = run
 		return false, "", run, nil
+	}
+
+	err = pe.eventEmitter.Emit(request.ctx, events.TracePollingSuccess(request.test.ID, request.run.ID, reason))
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 	}
 
 	log.Printf("[PollerExecutor] Test %s Run %d: Done polling. (%s)\n", request.test.ID, request.run.ID, reason)
