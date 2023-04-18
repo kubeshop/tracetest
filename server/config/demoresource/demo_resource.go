@@ -18,7 +18,10 @@ const (
 	DemoTypeOpentelemetryStore DemoType = "otelstore"
 )
 
-const ResourceName = "Demo"
+const (
+	ResourceName       = "Demo"
+	ResourceNamePlural = "Demos"
+)
 
 var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationCreate,

@@ -1,10 +1,11 @@
 package analytics
 
 import (
+	"os"
+
 	"github.com/denisbrodbeck/machineid"
 	"github.com/kubeshop/tracetest/cli/config"
 	segment "github.com/segmentio/analytics-go/v3"
-	"os"
 )
 
 var (

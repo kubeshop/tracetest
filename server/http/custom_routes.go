@@ -95,9 +95,12 @@ func (c *customController) GetTestRuns(w http.ResponseWriter, r *http.Request) {
 func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
-	runIdParam := params["runId"]
+	runIdParam, err := strconv.Atoi(params["runId"])
+	if err != nil {
+		c.errorHandler(w, r, fmt.Errorf("could not convert runId to integer: %w", err), nil)
+	}
 
-	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
+	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, int32(runIdParam))
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

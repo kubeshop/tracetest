@@ -72,11 +72,13 @@ func TestSampleResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
-		ResourceType: "SampleResource",
+		ResourceTypeSingular: "SampleResource",
+		ResourceTypePlural:   "SampleResources",
 		RegisterManagerFn: func(router *mux.Router) rm.Manager {
 			mockManager := new(sampleResourceManager)
 			manager := rm.New[sampleResource](
 				"SampleResource",
+				"SampleResources",
 				mockManager,
 				rm.WithIDGen(func() id.ID {
 					return id.ID("3")
@@ -219,11 +221,13 @@ func TestRestrictedResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
-		ResourceType: "RestrictedResource",
+		ResourceTypeSingular: "RestrictedResource",
+		ResourceTypePlural:   "RestrictedResources",
 		RegisterManagerFn: func(router *mux.Router) rm.Manager {
 			mockManager := new(restrictedResourceManager)
 			manager := rm.New[sampleResource](
 				"RestrictedResource",
+				"RestrictedResources",
 				mockManager,
 				rm.WithIDGen(func() id.ID {
 					return id.ID("3")

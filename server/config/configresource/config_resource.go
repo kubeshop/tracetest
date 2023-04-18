@@ -61,8 +61,9 @@ func NewRepository(db *sql.DB, opts ...option) *Repository {
 }
 
 const (
-	ResourceID   = "/app/config/update"
-	ResourceName = "Config"
+	ResourceID         = "/app/config/update"
+	ResourceName       = "Config"
+	ResourceNamePlural = "Configs"
 )
 
 type publisher interface {

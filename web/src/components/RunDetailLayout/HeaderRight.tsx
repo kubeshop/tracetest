@@ -1,4 +1,5 @@
-import {Button} from 'antd';
+import {CloseCircleOutlined} from '@ant-design/icons';
+import {Button, Tooltip} from 'antd';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
@@ -9,6 +10,7 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './RunDetailLayout.styled';
+import EventLogPopover from '../EventLogPopover/EventLogPopover';
 
 interface IProps {
   testId: string;
@@ -19,7 +21,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
   const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
-  const {run} = useTestRun();
+  const {isLoadingStop, run, stopRun, runEvents} = useTestRun();
   const {onRun} = useTest();
   const state = run.state;
 
@@ -30,6 +32,19 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
         <S.StateContainer data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
           <TestState testState={state} />
+          {state === TestStateEnum.AWAITING_TRACE && (
+            <S.StopContainer>
+              <Tooltip title="Stop test execution">
+                <Button
+                  disabled={isLoadingStop}
+                  icon={<CloseCircleOutlined />}
+                  onClick={stopRun}
+                  shape="circle"
+                  type="link"
+                />
+              </Tooltip>
+            </S.StopContainer>
+          )}
         </S.StateContainer>
       )}
       {!isDraftMode && state && isRunStateFinished(state) && (
@@ -37,6 +52,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
           Run Test
         </Button>
       )}
+      <EventLogPopover runEvents={runEvents} />
       <RunActionsMenu
         isRunView
         resultId={run.id}

@@ -144,33 +144,25 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
-  "/config/{configId}": {
+  "/configs/{configId}": {
     /** Get Tracetest configuration */
     get: operations["getConfiguration"];
     /** Update Tracetest configuration */
     put: operations["updateConfiguration"];
   };
-  "/pollingprofile": {
-    /** List polling profiles used on Tracetest to configure how to fetch traces in a test. */
-    get: operations["listPollingProfiles"];
-    /** Create a polling profile used on Tracetest to configure how to fetch traces in a test. */
-    post: operations["createPollingProfile"];
-  };
-  "/pollingprofile/{pollingProfileId}": {
+  "/pollingprofiles/{pollingProfileId}": {
     /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
     get: operations["getPollingProfile"];
     /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
     put: operations["updatePollingProfile"];
-    /** Delete a polling profile used on Tracetest to configure how to fetch traces in a test. */
-    delete: operations["deletePollingProfile"];
   };
-  "/demo": {
+  "/demos": {
     /** List demonstrations used on Tracetest as quick start examples. */
     get: operations["listDemos"];
     /** Create a demonstration used on Tracetest as quick start examples. */
     post: operations["createDemo"];
   };
-  "/demo/{demoId}": {
+  "/demos/{demoId}": {
     /** Get a demonstration used on Tracetest as quick start examples. */
     get: operations["getDemo"];
     /** Update a demonstration used on Tracetest as quick start examples. */
@@ -1051,62 +1043,11 @@ export interface operations {
       };
     };
   };
-  /** List polling profiles used on Tracetest to configure how to fetch traces in a test. */
-  listPollingProfiles: {
-    parameters: {
-      query: {
-        /** Indicates the maximum number of polling profiles that can be returned on this call. */
-        take?: number;
-        /** Indicates how many polling profiles will be skipped when paginating. */
-        skip?: number;
-        /** Indicates the sort field for on which all polling profiles will be sorted. */
-        sortBy?: "id" | "name" | "strategy";
-        /** Indicates the sort direction for the polling profiles (ascending or descending). */
-        sortDirection?: "asc" | "desc";
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": {
-            count?: number;
-            items?: external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
-          };
-          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
-        };
-      };
-      /** invalid query for polling profiles, some data was sent in incorrect format. */
-      400: unknown;
-      /** problem listing polling profile */
-      500: unknown;
-    };
-  };
-  /** Create a polling profile used on Tracetest to configure how to fetch traces in a test. */
-  createPollingProfile: {
-    responses: {
-      /** successful operation */
-      201: {
-        content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-        };
-      };
-      /** problem creating a polling profile */
-      500: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-        "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-      };
-    };
-  };
   /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
   getPollingProfile: {
     parameters: {
       path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
+        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'. */
         pollingProfileId: string;
       };
     };
@@ -1128,7 +1069,7 @@ export interface operations {
   updatePollingProfile: {
     parameters: {
       path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
+        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'. */
         pollingProfileId: string;
       };
     };
@@ -1154,25 +1095,6 @@ export interface operations {
       };
     };
   };
-  /** Delete a polling profile used on Tracetest to configure how to fetch traces in a test. */
-  deletePollingProfile: {
-    parameters: {
-      path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
-        pollingProfileId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      204: never;
-      /** invalid polling profile, some data was sent in incorrect format. */
-      400: unknown;
-      /** polling profile not found */
-      404: unknown;
-      /** problem deleting a polling profile */
-      500: unknown;
-    };
-  };
   /** List demonstrations used on Tracetest as quick start examples. */
   listDemos: {
     parameters: {
@@ -1191,8 +1113,14 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["Demo"][];
-          "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"][];
+          "application/json": {
+            count?: number;
+            items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
+          };
+          "text/yaml": {
+            count?: number;
+            items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
+          };
         };
       };
       /** invalid query for demos, some data was sent in incorrect format. */

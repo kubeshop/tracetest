@@ -15,7 +15,7 @@ func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 	id := extractID(rt.SampleJSON)
 	input := ct.fromJSON(rt.SampleJSONUpdated)
 
-	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(rt.ResourceType), id)
+	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(rt.ResourceTypePlural), id)
 
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(input))
 	require.NoError(t, err)
@@ -38,7 +38,7 @@ var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 
 		expected := ct.toJSON(rt.SampleJSONUpdated)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationUpdateSuccess, expected, jsonBody)
 	},
 })
 
@@ -65,6 +65,6 @@ var updateInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 		return buildUpdateRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "updating")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "updating")
 	},
 })

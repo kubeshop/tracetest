@@ -40,7 +40,7 @@ const Menu = () => {
               key: 'discord',
               label: (
                 <a data-cy="discord-link" href={DISCORD_URL} target="_blank">
-                  Discord
+                  Online Chat
                 </a>
               ),
             },

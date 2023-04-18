@@ -16,7 +16,7 @@ func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *h
 	url := fmt.Sprintf(
 		"%s/%s/%s",
 		testServer.URL,
-		strings.ToLower(rt.ResourceType),
+		strings.ToLower(rt.ResourceTypePlural),
 		id,
 	)
 
@@ -41,7 +41,7 @@ var getSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 
 		expected := ct.toJSON(rt.SampleJSON)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationGetSuccess, expected, jsonBody)
 	},
 })
 
@@ -68,6 +68,6 @@ var getInternalErrorOperation = buildSingleStepOperation(singleStepOperationTest
 		return buildGetRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "getting")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "getting")
 	},
 })

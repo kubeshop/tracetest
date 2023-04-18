@@ -25,13 +25,15 @@ Need help configuring the OpenTelemetry Collector so send trace data from your a
 
 ## Connect Tracetest to OpenSearch with the Web UI
 
-In the Web UI, open settings, and select OpenSearch. If you are using Docker like in the screenshot below, use the service name as the hostname with port `9200`. Use `http`, or `https` if TLS is enabled.
+In the Web UI, (1) open settings, and, on the (2) Configure Data Store tab, select (3) OpenSearch. If you are using Docker like in the screenshot below, use the service name as the hostname with port `9200`. Use `http`, or `https` if TLS is enabled.
 
 ```
 http://opensearch:9200
 ```
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644099/Blogposts/Docs/screely-1674644094600_svcwp6.png)
+![OpenSearch](../img/opensearch-settings.png)
+
+<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644099/Blogposts/Docs/screely-1674644094600_svcwp6.png)-->
 
 
 ## Connect Tracetest to OpenSearch with the CLI

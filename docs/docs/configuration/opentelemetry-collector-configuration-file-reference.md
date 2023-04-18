@@ -1,6 +1,6 @@
 # OpenTelemetry Collector Configuration File Reference
 
-This page contains a reference for using OpenTelemetry Collector to send trace data from your application to any of Tracetest's supported trace data stores.
+This page contains a reference for using the OpenTelemetry Collector to send trace data from your application to any of Tracetest's supported trace data stores.
 
 :::tip
 Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
@@ -24,7 +24,7 @@ Continue reading below to learn how to configure the OpenTelemetry Collector to 
 
 ## Configure OpenTelemetry Collector to Send Traces to Jaeger
 
-In your OpenTelemetry Collector config file, make sure to set the `exporter` to `jaeger`, with the `endpoint` pointing to your Jaeger's instance on port `14250`. If you are running Tracetest with Docker, the endpoint might look like this `http://jaeger:14250`.
+In your OpenTelemetry Collector config file, make sure to set the `exporter` to `jaeger`, with the `endpoint` pointing to your Jaeger instance on port `14250`. If you are running Tracetest with Docker, the endpoint might look like this `http://jaeger:14250`.
 
 ```yaml
 # collector.config.yaml

@@ -179,7 +179,7 @@ const sidebars = {
         {
           type: "doc",
           id: "concepts/what-is-trace-based-testing",
-          label: "What is trace-based testing",
+          label: "What is Trace-based Testing",
         },
         // {
         //   type: "doc",

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -81,7 +82,17 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 	if tReq.Body != "" {
 		body = bytes.NewBufferString(tReq.Body)
 	}
-	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(string(tReq.Method)), tReq.URL, body)
+
+	parsedUrl, err := url.Parse(tReq.URL)
+	if err != nil {
+		return response, err
+	}
+
+	if parsedUrl.Scheme == "" {
+		parsedUrl.Scheme = "http"
+	}
+
+	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(string(tReq.Method)), parsedUrl.String(), body)
 	if err != nil {
 		return response, err
 	}

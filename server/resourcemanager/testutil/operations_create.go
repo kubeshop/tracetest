@@ -28,7 +28,7 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			removeIDFromJSON(rt.SampleJSON),
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
@@ -42,7 +42,7 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 		clean := removeIDFromJSON(rt.SampleJSON)
 		expected := ct.toJSON(clean)
 
-		require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
+		rt.customJSONComparer(t, OperationCreateNoID, expected, removeIDFromJSON(jsonBody))
 		require.NotEmpty(t, extractID(jsonBody))
 	},
 })
@@ -55,7 +55,7 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
@@ -67,7 +67,7 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		jsonBody := responseBodyJSON(t, resp, ct)
 		expected := ct.toJSON(rt.SampleJSON)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationCreateSuccess, expected, jsonBody)
 	},
 })
 
@@ -79,13 +79,13 @@ var createInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "creating")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "creating")
 	},
 })
