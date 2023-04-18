@@ -1,4 +1,4 @@
-import {PokeshopDemo} from '../constants/Test';
+import {POKEMON_HTTP_ENDPOINT, PokeshopDemo} from '../constants/Test';
 
 describe('Create test', () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('Create test', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.openTestCreationModal();
     cy.fillCreateFormBasicStep(name);
-    cy.setCreateFormUrl('GET', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
+    cy.setCreateFormUrl('GET', `${POKEMON_HTTP_ENDPOINT}/pokemon`);
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
     cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
@@ -22,7 +22,7 @@ describe('Create test', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.openTestCreationModal();
     cy.fillCreateFormBasicStep(name);
-    cy.setCreateFormUrl('POST', 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon');
+    cy.setCreateFormUrl('POST', `${POKEMON_HTTP_ENDPOINT}/pokemon`);
     cy.get('[data-cy=bodyMode-json]').click();
     cy.get('[data-cy=body] [data-cy=interpolation-editor] [contenteditable]')
       .first()

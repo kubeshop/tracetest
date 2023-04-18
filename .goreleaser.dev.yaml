@@ -49,11 +49,11 @@ builds:
     - amd64
 
 dockers:
-- image_templates:
+- skip_push: true
+  image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}'
   extra_files:
     - web/build
-    - server/migrations
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"

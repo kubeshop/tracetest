@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
+
+help_message() {
+  echo "usage: ./run.sh [cypress|tracetests|up|build|down|logstt|logs|ps|restart]"
+}
 
 restart() {
   make build-docker
@@ -26,42 +30,65 @@ down() {
   docker compose $opts down
 }
 
-up() {
+build() {
   make build-docker
+}
+
+up() {
   docker compose $opts up -d --remove-orphans
 }
 
-test() {
+cypress() {
 
-  echo "Running tests: "${TESTS[@]}
+  echo "Running cypress"
 
-  docker compose $opts -f local-config/docker-compose.testrunner.yaml build ${TESTS[@]}
-  docker compose $opts -f local-config/docker-compose.testrunner.yaml run ${TESTS[@]}
+
+  export CYPRESS_BASE_URL=http://localhost:11633
+  export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
+  export NO_COLOR=1
+
+  cd web
+  ./node_modules/.bin/cypress run
 }
 
-TESTS=()
+tracetests() {
+
+  echo "Running tracetests"
+
+  SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+  export TRACETEST_CLI=${SCRIPT_DIR}/dist/tracetest
+  export TARGET_URL=http://localhost:11633
+  export TRACETEST_ENDPOINT=localhost:11633
+  export DEMO_APP_URL=http://demo-api:8081
+  export DEMO_APP_GRPC_URL=demo-rpc:8082
+
+  cd tracetesting
+  ./run.bash
+}
+
 CMD=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     cypress)
-      TESTS+=("cypress")
+      CMD+=("cypress")
       shift
       ;;
-    dogfood)
-      TESTS+=("dogfood")
+    tracetests)
+      CMD+=("tracetests")
       shift
       ;;
     up)
       CMD+=("up")
       shift
       ;;
-    down)
-      CMD+=("down")
+    build)
+      CMD+=("build")
       shift
       ;;
-    test)
-      CMD+=("test")
+    down)
+      CMD+=("down")
       shift
       ;;
     logstt)
@@ -90,7 +117,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ ${#CMD[@]} -eq 0 ]; then
-  echo "missing command. usage: ./run.sh [up|down|ps|logs|restart|test|dogfood|cypress]"
+  echo "Missing command"
+  help_message
   exit 1
 fi
 

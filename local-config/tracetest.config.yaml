@@ -6,17 +6,16 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-poolingConfig:
-  maxWaitTimeForTrace: 30s
-  retryDelay: 500ms
+telemetry:
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
 
-googleAnalytics:
-  enabled: false
-
-demo:
-  enabled: [pokeshop]
-  endpoints:
-    pokeshopHttp: http://demo-api:8081
-    pokeshopGrpc: demo-rpc:8082
-
-experimentalFeatures: []
+server:
+  telemetry:
+    exporter: collector

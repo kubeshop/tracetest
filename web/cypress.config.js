@@ -16,7 +16,7 @@ module.exports = defineConfig({
       return require('./cypress/plugins/index.js')(on, config);
     },
     specPattern: 'cypress/e2e/**/*.spec.{js,ts,jsx,tsx}',
-    baseUrl: 'http://localhost:3000',
+    baseUrl: process.env.CYPRESS_BASE_URL ||'http://localhost:3000',
   },
   // @ts-ignore
   component: {
