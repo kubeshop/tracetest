@@ -69,6 +69,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetConfiguration,
 		},
 		{
+			"GetDataStore",
+			strings.ToUpper("Get"),
+			"/api/datastores/{dataStoreId}",
+			c.GetDataStore,
+		},
+		{
 			"GetDemo",
 			strings.ToUpper("Get"),
 			"/api/demos/{demoId}",
@@ -91,6 +97,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/configs/{configId}",
 			c.UpdateConfiguration,
+		},
+		{
+			"UpdateDataStore",
+			strings.ToUpper("Put"),
+			"/api/datastores/{dataStoreId}",
+			c.UpdateDataStore,
 		},
 		{
 			"UpdateDemo",
@@ -153,6 +165,22 @@ func (c *ResourceApiApiController) GetConfiguration(w http.ResponseWriter, r *ht
 	configIdParam := params["configId"]
 
 	result, err := c.service.GetConfiguration(r.Context(), configIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetDataStore - Get a Data Store
+func (c *ResourceApiApiController) GetDataStore(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	result, err := c.service.GetDataStore(r.Context(), dataStoreIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -238,6 +266,33 @@ func (c *ResourceApiApiController) UpdateConfiguration(w http.ResponseWriter, r 
 		return
 	}
 	result, err := c.service.UpdateConfiguration(r.Context(), configIdParam, configurationResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateDataStore - Update a Data Store
+func (c *ResourceApiApiController) UpdateDataStore(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	dataStoreParam := DataStore{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&dataStoreParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertDataStoreRequired(dataStoreParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateDataStore(r.Context(), dataStoreIdParam, dataStoreParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

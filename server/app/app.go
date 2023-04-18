@@ -187,9 +187,11 @@ func (app *App) Start(opts ...appOption) error {
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	pollingProfileRepo := pollingprofile.NewRepository(db)
+	dataStoreRepo := datastoreresource.NewRepository(db)
 
 	rf := newRunnerFacades(
 		pollingProfileRepo,
+		dataStoreRepo,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -226,7 +228,7 @@ func (app *App) Start(opts ...appOption) error {
 		return err
 	}
 
-	otlpServer := otlp.NewServer(":21321", testDB)
+	otlpServer := otlp.NewServer(":21321", testDB, dataStoreRepo)
 	go otlpServer.Start()
 	app.registerStopFn(func() {
 		fmt.Println("stopping otlp server")
@@ -246,7 +248,6 @@ func (app *App) Start(opts ...appOption) error {
 	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner)
 
-	dataStoreRepo := datastoreresource.NewRepository(db)
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner)
 
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)

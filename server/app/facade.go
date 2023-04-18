@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -47,6 +48,7 @@ func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.Asser
 
 func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
+	dsRepo *datastoreresource.Repository,
 	testDB model.Repository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
@@ -72,7 +74,7 @@ func newRunnerFacades(
 		tracer,
 		execTestUpdater,
 		tracedb.Factory(testDB),
-		testDB,
+		dsRepo,
 		eventEmitter,
 	)
 
@@ -93,7 +95,7 @@ func newRunnerFacades(
 		tracer,
 		subscriptionManager,
 		tracedb.Factory(testDB),
-		testDB,
+		dsRepo,
 		eventEmitter,
 	)
 

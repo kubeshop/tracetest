@@ -387,7 +387,7 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 		Default:   true,
 		CreatedAt: "2023-03-09T17:53:10.256383Z",
 		Values: datastore.DataStoreValues{
-			SignalFx: &datastore.SignalFXDataStoreConfig{
+			SignalFx: &datastore.SignalFXConfig{
 				Realm: "some-realm",
 				Token: "some-token",
 			},
@@ -446,8 +446,8 @@ func TestDataStoreResource_Tempo(t *testing.T) {
 		Default:   true,
 		CreatedAt: "2023-03-09T17:53:10.256383Z",
 		Values: datastore.DataStoreValues{
-			Tempo: &datastore.TempoClientConfig{
-				Type: datastore.TempoClientTypeGRPC,
+			Tempo: &datastore.MultiChannelClientConfig{
+				Type: datastore.MultiChannelClientTypeGRPC,
 				Grpc: &datastore.GRPCClientSettings{
 					Endpoint: "some-endpoint",
 					TLS: &datastore.TLS{

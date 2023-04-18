@@ -7,18 +7,20 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type traceDBFactoryFn func(ds model.DataStore) (tracedb.TraceDB, error)
+type traceDBFactoryFn func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
 
 type DefaultPollerExecutor struct {
 	ppGetter     PollingProfileGetter
 	updater      RunUpdater
 	newTraceDBFn traceDBFactoryFn
-	dsRepo       model.DataStoreRepository
+	dsRepo       resourcemanager.Current[datastoreresource.DataStore]
 	eventEmitter EventEmitter
 }
 
@@ -64,7 +66,7 @@ func NewPollerExecutor(
 	tracer trace.Tracer,
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
-	dsRepo model.DataStoreRepository,
+	dsRepo resourcemanager.Current[datastoreresource.DataStore],
 	eventEmitter EventEmitter,
 ) PollerExecutor {
 
@@ -83,7 +85,7 @@ func NewPollerExecutor(
 }
 
 func (pe DefaultPollerExecutor) traceDB(ctx context.Context) (tracedb.TraceDB, error) {
-	ds, err := pe.dsRepo.DefaultDataStore(ctx)
+	ds, err := pe.dsRepo.Current(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get default datastore: %w", err)
 	}

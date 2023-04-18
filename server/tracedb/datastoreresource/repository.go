@@ -86,7 +86,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 
 	_, err = tx.ExecContext(ctx, deleteQuery)
 	if err != nil {
-		return DataStore{}, fmt.Errorf("sql exec delete: %w", err)
+		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
 	}
 
 	valuesJSON, err := json.Marshal(dataStore.Values)
@@ -103,12 +103,12 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		dataStore.CreatedAt,
 	)
 	if err != nil {
-		return DataStore{}, fmt.Errorf("sql exec create: %w", err)
+		return DataStore{}, fmt.Errorf("datastore repository sql exec create: %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return DataStore{}, fmt.Errorf("commit: %w", err)
+		return DataStore{}, fmt.Errorf("datastore repository commit: %w", err)
 	}
 
 	return dataStore, nil
@@ -125,12 +125,21 @@ SELECT
 FROM data_stores
 WHERE "id" = $1`
 
+func (r *Repository) Current(ctx context.Context) (DataStore, error) {
+	dataStore, err := r.Get(ctx, "current")
+	if err != nil {
+		return DataStore{}, fmt.Errorf("datastore repository get current: %w", err)
+	}
+
+	return dataStore, nil
+}
+
 func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
 	row := r.db.QueryRowContext(ctx, getQuery, id)
 
 	dataStore, err := r.readRow(row)
 	if err != nil {
-		return DataStore{}, fmt.Errorf("sql query: %w", err)
+		return DataStore{}, fmt.Errorf("datastore repository get sql query: %w", err)
 	}
 
 	return dataStore, nil

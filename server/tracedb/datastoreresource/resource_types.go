@@ -23,12 +23,12 @@ type DataStore struct {
 }
 
 type DataStoreValues struct {
-	AwsXRay    *AWSXRayConfig           `mapstructure:"awsXRay,omitempty"`
-	ElasticApm *ElasticSearchConfig     `mapstructure:"elasticAPM,omitempty"`
-	Jaeger     *GRPCClientSettings      `mapstructure:"jaeger,omitempty"`
-	OpenSearch *ElasticSearchConfig     `mapstructure:"openSearch,omitempty"`
-	SignalFx   *SignalFXDataStoreConfig `mapstructure:"signalFX,omitempty"`
-	Tempo      *TempoClientConfig       `mapstructure:"tempo,omitempty"`
+	AwsXRay    *AWSXRayConfig            `mapstructure:"awsXRay,omitempty"`
+	ElasticApm *ElasticSearchConfig      `mapstructure:"elasticAPM,omitempty"`
+	Jaeger     *GRPCClientSettings       `mapstructure:"jaeger,omitempty"`
+	OpenSearch *ElasticSearchConfig      `mapstructure:"openSearch,omitempty"`
+	SignalFx   *SignalFXConfig           `mapstructure:"signalFX,omitempty"`
+	Tempo      *MultiChannelClientConfig `mapstructure:"tempo,omitempty"`
 }
 
 type AWSXRayConfig struct {
@@ -55,40 +55,9 @@ type GRPCClientSettings struct {
 	WaitForReady    bool              `mapstructure:"waitForReady,omitempty"`
 	Headers         map[string]string `mapstructure:"headers,omitempty"`
 	BalancerName    string            `mapstructure:"balancerName,omitempty"`
-	Compression     *GRPCCompression  `mapstructure:"compression,omitempty"`
+	Compression     GRPCCompression   `mapstructure:"compression,omitempty"`
 	TLS             *TLS              `mapstructure:"tls,omitempty"`
-	Auth            *HttpAuth         `mapstructure:"auth,omitempty"`
 }
-
-type HttpAuth struct {
-	Type   HttpAuthType    `mapstructure:"type,omitempty"`
-	ApiKey *HttpAuthApiKey `mapstructure:"apiKey,omitempty"`
-	Basic  *HttpAuthBasic  `mapstructure:"basic,omitempty"`
-	Bearer *HttpAuthBearer `mapstructure:"bearer,omitempty"`
-}
-
-type HttpAuthApiKey struct {
-	Key   string `mapstructure:"key,omitempty"`
-	Value string `mapstructure:"value,omitempty"`
-	In    string `mapstructure:"in,omitempty"`
-}
-
-type HttpAuthBasic struct {
-	Username string `mapstructure:"username,omitempty"`
-	Password string `mapstructure:"password,omitempty"`
-}
-
-type HttpAuthBearer struct {
-	Token string `mapstructure:"token,omitempty"`
-}
-
-type HttpAuthType string
-
-const (
-	HttpAuthTypeApiKey HttpAuthType = "apiKey"
-	HttpAuthTypeBasic  HttpAuthType = "basic"
-	HttpAuthTypeBearer HttpAuthType = "bearer"
-)
 
 type GRPCCompression string
 
@@ -116,17 +85,17 @@ type TLSSetting struct {
 	MaxVersion string `mapstructure:"maxVersion,omitempty"`
 }
 
-type TempoClientType string
+type MultiChannelClientType string
 
 const (
-	TempoClientTypeGRPC TempoClientType = "grpc"
-	TempoClientTypeHTTP TempoClientType = "http"
+	MultiChannelClientTypeGRPC MultiChannelClientType = "grpc"
+	MultiChannelClientTypeHTTP MultiChannelClientType = "http"
 )
 
-type TempoClientConfig struct {
-	Type TempoClientType     `mapstructure:"type"`
-	Grpc *GRPCClientSettings `mapstructure:"grpc,omitempty"`
-	Http *HttpClientConfig   `mapstructure:"http,omitempty"`
+type MultiChannelClientConfig struct {
+	Type MultiChannelClientType `mapstructure:"type"`
+	Grpc *GRPCClientSettings    `mapstructure:"grpc,omitempty"`
+	Http *HttpClientConfig      `mapstructure:"http,omitempty"`
 }
 
 type HttpClientConfig struct {
@@ -135,7 +104,7 @@ type HttpClientConfig struct {
 	TLS     *TLS              `mapstructure:"tls,omitempty"`
 }
 
-type SignalFXDataStoreConfig struct {
+type SignalFXConfig struct {
 	Realm string `mapstructure:"realm"`
 	Token string `mapstructure:"token"`
 }
