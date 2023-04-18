@@ -51,7 +51,7 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 ```
 
-There are 3 endpoints to the application which gets hit everytime for manual instrumention & automatic instrumention("/manual", "/automatic", "/") respectively. 
+There are 3 endpoints in the Flask app. For seeing manual instrumentation trigger the `"/manual"` endpoint. For seeing the automatic instrumentation trigger the `"/automatic"` endpoint respectively. 
 
 ```
 app = Flask(__name__)
