@@ -32,7 +32,7 @@ All `services` in the `docker-compose.yaml` are on the same network and will be 
 
 The Python app is a simple flask app, contained in the `app.py` file.
 
-The below code imports all the flask, opentelemetry libraries and represents opentelemetry manual instrumentation. 
+The code below imports all the Flask, and OpenTelemetry libraries and configures both manual and automatic OpenTelemetry instrumentation. 
 
 ```
 from flask import Flask, request
