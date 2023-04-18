@@ -196,7 +196,14 @@ postgres:
 ```
 
 The `tracetest-provision.yaml` file provisions the trace data store and polling to store in the Postgres database. The data store is set to OTLP meaning the traces will be stored in Tracetest itself.
+```yaml
 
+---
+type: DataStore
+spec:
+  name: OpenTelemetry Collector
+  type: otlp
+  isdefault: true
 But how are traces sent to Tracetest?
 
 The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's otlp endpoint `tracetest:21321`.
