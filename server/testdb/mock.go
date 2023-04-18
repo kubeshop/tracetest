@@ -3,8 +3,8 @@ package testdb
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/trace"

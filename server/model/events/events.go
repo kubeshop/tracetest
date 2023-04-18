@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 func TriggerCreatedInfo(testID id.ID, runID int) model.TestRunEvent {

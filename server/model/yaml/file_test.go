@@ -3,9 +3,9 @@ package yaml_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
