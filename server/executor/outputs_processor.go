@@ -8,12 +8,13 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type OutputsProcessorFn func(context.Context, model.OrderedMap[string, model.Output], model.Trace, []expression.DataStore) (model.OrderedMap[string, model.RunOutput], error)
+type OutputsProcessorFn func(context.Context, maps.Ordered[string, model.Output], model.Trace, []expression.DataStore) (maps.Ordered[string, model.RunOutput], error)
 
 func InstrumentedOutputProcessor(tracer trace.Tracer) OutputsProcessorFn {
 	op := instrumentedOutputProcessor{tracer}
@@ -24,7 +25,7 @@ type instrumentedOutputProcessor struct {
 	tracer trace.Tracer
 }
 
-func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model.OrderedMap[string, model.Output], t model.Trace, ds []expression.DataStore) (model.OrderedMap[string, model.RunOutput], error) {
+func (op instrumentedOutputProcessor) process(ctx context.Context, outputs maps.Ordered[string, model.Output], t model.Trace, ds []expression.DataStore) (maps.Ordered[string, model.RunOutput], error) {
 	ctx, span := op.tracer.Start(ctx, "Process outputs")
 	defer span.End()
 
@@ -49,8 +50,8 @@ func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model
 	return result, err
 }
 
-func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model.Output], tr model.Trace, ds []expression.DataStore) (model.OrderedMap[string, model.RunOutput], error) {
-	res := model.OrderedMap[string, model.RunOutput]{}
+func outputProcessor(ctx context.Context, outputs maps.Ordered[string, model.Output], tr model.Trace, ds []expression.DataStore) (maps.Ordered[string, model.RunOutput], error) {
+	res := maps.Ordered[string, model.RunOutput]{}
 
 	parsed, err := parseOutputs(outputs)
 	if err != nil {
@@ -92,7 +93,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 	})
 
 	if err != nil {
-		return model.OrderedMap[string, model.RunOutput]{}, err
+		return maps.Ordered[string, model.RunOutput]{}, err
 	}
 
 	return res, nil
@@ -113,8 +114,8 @@ type parsedOutput struct {
 	expr     expression.Expr
 }
 
-func parseOutputs(outputs model.OrderedMap[string, model.Output]) (model.OrderedMap[string, parsedOutput], error) {
-	var parsed model.OrderedMap[string, parsedOutput]
+func parseOutputs(outputs maps.Ordered[string, model.Output]) (maps.Ordered[string, parsedOutput], error) {
+	var parsed maps.Ordered[string, parsedOutput]
 
 	parseErr := outputs.ForEach(func(key string, out model.Output) error {
 		expr, err := expression.Parse(out.Value)
@@ -135,7 +136,7 @@ func parseOutputs(outputs model.OrderedMap[string, model.Output]) (model.Ordered
 	})
 
 	if parseErr != nil {
-		return model.OrderedMap[string, parsedOutput]{}, parseErr
+		return maps.Ordered[string, parsedOutput]{}, parseErr
 	}
 
 	return parsed, nil

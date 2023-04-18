@@ -6,6 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -256,7 +257,7 @@ func TestTestModel(t *testing.T) {
 						Method: "POST",
 					},
 				},
-				Specs: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).
+				Specs: (maps.Ordered[model.SpanQuery, model.NamedAssertions]{}).
 					MustAdd(model.SpanQuery(`span[tracetest.span.type="http"]`), model.NamedAssertions{
 						Name: "",
 						Assertions: []model.Assertion{
@@ -296,7 +297,7 @@ func TestTestModel(t *testing.T) {
 						Method: "POST",
 					},
 				},
-				Outputs: (model.OrderedMap[string, model.Output]{}).
+				Outputs: (maps.Ordered[string, model.Output]{}).
 					MustAdd("USER_ID", model.Output{
 						Selector: `span[name = "create user"]`,
 						Value:    `attr:myapp.user_id`,

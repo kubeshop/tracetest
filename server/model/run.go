@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 )
 
 var (
@@ -101,9 +102,9 @@ func (r Run) SuccessfullyPolledTraces(t *Trace) Run {
 }
 
 func (r Run) SuccessfullyAsserted(
-	outputs OrderedMap[string, RunOutput],
+	outputs maps.Ordered[string, RunOutput],
 	environment Environment,
-	res OrderedMap[SpanQuery, []AssertionResult],
+	res maps.Ordered[SpanQuery, []AssertionResult],
 	allPassed bool,
 ) Run {
 	r.Outputs = outputs

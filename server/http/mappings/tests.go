@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -113,7 +114,7 @@ func (m OpenAPI) EnvironmentValues(in []model.EnvironmentValue) []openapi.Enviro
 	return values
 }
 
-func (m OpenAPI) Outputs(in model.OrderedMap[string, model.Output]) []openapi.TestOutput {
+func (m OpenAPI) Outputs(in maps.Ordered[string, model.Output]) []openapi.TestOutput {
 	res := make([]openapi.TestOutput, 0, in.Len())
 	in.ForEach(func(key string, val model.Output) error {
 		res = append(res, openapi.TestOutput{
@@ -168,7 +169,7 @@ func (m OpenAPI) Environments(in []model.Environment) []openapi.Environment {
 	return environments
 }
 
-func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
+func (m OpenAPI) Specs(in maps.Ordered[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
 
 	specs := make([]openapi.TestSpecsSpecsInner, in.Len())
 
@@ -316,7 +317,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 	}
 }
 
-func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []openapi.TestRunOutputsInner {
+func (m OpenAPI) RunOutputs(in maps.Ordered[string, model.RunOutput]) []openapi.TestRunOutputsInner {
 	res := make([]openapi.TestRunOutputsInner, 0, in.Len())
 
 	in.ForEach(func(key string, val model.RunOutput) error {
@@ -389,8 +390,8 @@ func (m Model) Test(in openapi.Test) (model.Test, error) {
 	}, nil
 }
 
-func (m Model) Outputs(in []openapi.TestOutput) (model.OrderedMap[string, model.Output], error) {
-	res := model.OrderedMap[string, model.Output]{}
+func (m Model) Outputs(in []openapi.TestOutput) (maps.Ordered[string, model.Output], error) {
+	res := maps.Ordered[string, model.Output]{}
 
 	var err error
 	for _, output := range in {
@@ -433,8 +434,8 @@ func (m Model) ValidateDefinition(in openapi.TestSpecs) error {
 	return nil
 }
 
-func (m Model) Definition(in openapi.TestSpecs) (model.OrderedMap[model.SpanQuery, model.NamedAssertions], error) {
-	specs := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
+func (m Model) Definition(in openapi.TestSpecs) (maps.Ordered[model.SpanQuery, model.NamedAssertions], error) {
+	specs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
 	for _, spec := range in.Specs {
 		asserts := make([]model.Assertion, len(spec.Assertions))
 		for i, a := range spec.Assertions {
@@ -487,8 +488,8 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 	}, nil
 }
 
-func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) model.OrderedMap[string, model.RunOutput] {
-	res := model.OrderedMap[string, model.RunOutput]{}
+func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) maps.Ordered[string, model.RunOutput] {
+	res := maps.Ordered[string, model.RunOutput]{}
 
 	for _, output := range in {
 		res.Add(output.Name, model.RunOutput{
@@ -521,7 +522,7 @@ func (m Model) TriggerResult(in openapi.TriggerResult) model.TriggerResult {
 }
 
 func (m Model) Result(in openapi.AssertionResults) (*model.RunResults, error) {
-	results := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
+	results := maps.Ordered[model.SpanQuery, []model.AssertionResult]{}
 
 	for _, res := range in.Results {
 		ars := make([]model.AssertionResult, len(res.Results))

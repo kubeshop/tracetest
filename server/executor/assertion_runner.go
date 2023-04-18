@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -190,7 +191,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req AssertionRequest, result model.OrderedMap[model.SpanQuery, []model.AssertionResult]) {
+func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req AssertionRequest, result maps.Ordered[model.SpanQuery, []model.AssertionResult]) {
 	for _, assertionResults := range result.Unordered() {
 		for _, assertionResult := range assertionResults {
 			for _, spanAssertionResult := range assertionResult.Results {
@@ -221,7 +222,7 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 	}
 }
 
-func createEnvironment(environment model.Environment, outputs model.OrderedMap[string, model.RunOutput]) model.Environment {
+func createEnvironment(environment model.Environment, outputs maps.Ordered[string, model.RunOutput]) model.Environment {
 	outputVariables := make([]model.EnvironmentValue, 0)
 	outputs.ForEach(func(key string, val model.RunOutput) error {
 		outputVariables = append(outputVariables, model.EnvironmentValue{
@@ -246,7 +247,7 @@ func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request Asse
 	e.inputChannel <- request
 }
 
-func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, request AssertionRequest, outputs model.OrderedMap[string, model.RunOutput]) {
+func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, request AssertionRequest, outputs maps.Ordered[string, model.RunOutput]) {
 	err := outputs.ForEach(func(outputName string, outputModel model.RunOutput) error {
 		if outputModel.Resolved {
 			return nil

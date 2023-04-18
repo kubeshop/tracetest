@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
@@ -31,7 +32,7 @@ func TestTestEncoding(t *testing.T) {
 				Method: model.HTTPMethodGET,
 			},
 		},
-		Specs: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).
+		Specs: (maps.Ordered[model.SpanQuery, model.NamedAssertions]{}).
 			MustAdd(model.SpanQuery(`span[name="test"]`), model.NamedAssertions{
 				Name: "test",
 				Assertions: []model.Assertion{
@@ -155,11 +156,11 @@ func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
 		Description      string
 		Version          int
 		ServiceUnderTest model.Trigger
-		Specs            model.OrderedMap[model.SpanQuery, []model.Assertion]
+		Specs            maps.Ordered[model.SpanQuery, []model.Assertion]
 		Summary          model.Summary
 	}
 
-	expectedSpecs := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
+	expectedSpecs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
 	expectedSpecs = expectedSpecs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), model.NamedAssertions{
 		Name: "",
 		Assertions: []model.Assertion{
@@ -167,7 +168,7 @@ func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
 		},
 	})
 
-	specs := model.OrderedMap[model.SpanQuery, []model.Assertion]{}
+	specs := maps.Ordered[model.SpanQuery, []model.Assertion]{}
 	specs = specs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), []model.Assertion{
 		model.Assertion(`attr:http.status = 200`),
 	})
@@ -200,7 +201,7 @@ func TestNewAssertionSpecFormat(t *testing.T) {
 		Description:      gofakeit.AdjectiveDescriptive(),
 		Version:          1,
 		ServiceUnderTest: model.Trigger{},
-		Specs: model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}.MustAdd(
+		Specs: maps.Ordered[model.SpanQuery, model.NamedAssertions]{}.MustAdd(
 			model.SpanQuery(`span[tracetest.span.type = "http"`), model.NamedAssertions{
 				Name: "my test",
 				Assertions: []model.Assertion{
