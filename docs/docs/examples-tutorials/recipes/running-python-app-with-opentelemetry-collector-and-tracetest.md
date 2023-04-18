@@ -74,7 +74,7 @@ def home():
 ```
 
 
-As you can see the `Dockerfile` uses the command above.
+The `Dockerfile` includes bootstrapping the needed OpenTelemetry packages. As you can see it does not have the `CMD` command. Instead, it's configured in the `docker-compose.yaml` below.
 
 ```Dockerfile
 FROM python:3.10.1-slim
