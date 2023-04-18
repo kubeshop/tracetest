@@ -192,7 +192,14 @@ postgres:
 
 The `tracetest-provision.yaml` file provisions the trace data store and polling to store in the Postgres database. The data store is set to OTLP meaning the traces will be stored in Tracetest itself.
 ```yaml
+```yaml
 
+---
+type: DataStore
+spec:
+  name: OpenTelemetry Collector
+  type: otlp
+  isdefault: true
 ---
 type: DataStore
 spec:
