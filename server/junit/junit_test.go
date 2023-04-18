@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +23,7 @@ func TestConversion(t *testing.T) {
 	}
 
 	results := model.RunResults{
-		Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(
+		Results: (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).MustAdd(
 			model.SpanQuery(`span[tracetest.span.type = "database"]`), []model.AssertionResult{
 				{
 					Assertion: `attr:db.statement contains "INSERT"`,

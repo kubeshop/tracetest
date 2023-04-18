@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -16,8 +17,8 @@ type (
 		Description      string
 		Version          int
 		ServiceUnderTest Trigger
-		Specs            OrderedMap[SpanQuery, NamedAssertions]
-		Outputs          OrderedMap[string, Output]
+		Specs            maps.Ordered[SpanQuery, NamedAssertions]
+		Outputs          maps.Ordered[string, Output]
 		Summary          Summary
 	}
 
@@ -96,7 +97,7 @@ type (
 		TriggerResult TriggerResult
 		Results       *RunResults
 		Trace         *Trace
-		Outputs       OrderedMap[string, RunOutput]
+		Outputs       maps.Ordered[string, RunOutput]
 		LastError     error
 		Pass          int
 		Fail          int
@@ -114,7 +115,7 @@ type (
 
 	RunResults struct {
 		AllPassed bool
-		Results   OrderedMap[SpanQuery, []AssertionResult]
+		Results   maps.Ordered[SpanQuery, []AssertionResult]
 	}
 
 	RunOutput struct {

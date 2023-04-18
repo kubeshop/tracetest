@@ -6,6 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,7 +25,7 @@ func Test_OpenApiToModel_Outputs(t *testing.T) {
 		},
 	}
 
-	expected := (model.OrderedMap[string, model.Output]{}).MustAdd("OUTPUT", model.Output{
+	expected := (maps.Ordered[string, model.Output]{}).MustAdd("OUTPUT", model.Output{
 		Selector: `span[name="root"]`,
 		Value:    "attr:tracetest.selected_spans.count",
 	})

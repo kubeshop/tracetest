@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,7 +26,7 @@ func TestCreateTest(t *testing.T) {
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
-		Outputs: (model.OrderedMap[string, model.Output]{}).
+		Outputs: (maps.Ordered[string, model.Output]{}).
 			MustAdd("output1", model.Output{
 				Selector: model.SpanQuery(`span[name="root"]`),
 				Value:    "${attr:myapp.some_attribute}",
@@ -215,7 +216,7 @@ func TestSummary(t *testing.T) {
 			result[0].Results = append(result[0].Results, model.SpanAssertionResult{CompareErr: fmt.Errorf("err")})
 		}
 		run.Results = &model.RunResults{
-			Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).
+			Results: (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).
 				MustAdd("span", result),
 		}
 

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 

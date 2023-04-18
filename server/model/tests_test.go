@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +33,7 @@ func TestSpec(t *testing.T) {
 
 	})
 
-	generateSpec := func() model.OrderedMap[model.SpanQuery, model.NamedAssertions] {
+	generateSpec := func() maps.Ordered[model.SpanQuery, model.NamedAssertions] {
 		spec := (model.Test{}).Specs
 
 		spec, _ = spec.Add(model.SpanQuery("1"), model.NamedAssertions{
@@ -87,7 +88,7 @@ func TestSpec(t *testing.T) {
 		encoded, err := json.Marshal(spec)
 		require.NoError(t, err)
 
-		decoded := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
+		decoded := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
 		err = json.Unmarshal(encoded, &decoded)
 		require.NoError(t, err)
 
@@ -113,7 +114,7 @@ func TestResults(t *testing.T) {
 
 	})
 
-	generateDef := func() model.OrderedMap[model.SpanQuery, []model.AssertionResult] {
+	generateDef := func() maps.Ordered[model.SpanQuery, []model.AssertionResult] {
 		def := (model.RunResults{}).Results
 
 		def, _ = def.Add(model.SpanQuery("1"), []model.AssertionResult{{Assertion: model.Assertion(`1 = 1`)}})
@@ -161,7 +162,7 @@ func TestResults(t *testing.T) {
 		encoded, err := json.Marshal(def)
 		require.NoError(t, err)
 
-		decoded := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
+		decoded := maps.Ordered[model.SpanQuery, []model.AssertionResult]{}
 		err = json.Unmarshal(encoded, &decoded)
 		require.NoError(t, err)
 

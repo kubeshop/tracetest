@@ -3,7 +3,7 @@ package model
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.opentelemetry.io/otel/trace"
 )
 
