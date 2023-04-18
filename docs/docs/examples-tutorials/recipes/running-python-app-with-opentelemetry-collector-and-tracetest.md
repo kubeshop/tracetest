@@ -53,7 +53,7 @@ tracer = trace.get_tracer(__name__)
 
 There are 3 endpoints in the Flask app. For seeing manual instrumentation trigger the `"/manual"` endpoint. For seeing the automatic instrumentation trigger the `"/automatic"` endpoint respectively. 
 
-```
+```python
 app = Flask(__name__)
 
 @app.route("/manual")
