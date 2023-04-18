@@ -194,7 +194,14 @@ The `tracetest-provision.yaml` file provisions the trace data store and polling 
 ```yaml
 ```yaml
 ```yaml
+```yaml
 
+---
+type: DataStore
+spec:
+  name: OpenTelemetry Collector
+  type: otlp
+  isdefault: true
 ---
 type: DataStore
 spec:
