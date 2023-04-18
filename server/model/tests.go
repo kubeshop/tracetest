@@ -123,6 +123,7 @@ type (
 		Value    string
 		SpanID   string
 		Resolved bool
+		Error    error
 	}
 
 	AssertionResult struct {

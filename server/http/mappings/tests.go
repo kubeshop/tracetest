@@ -325,6 +325,7 @@ func (m OpenAPI) RunOutputs(in maps.Ordered[string, model.RunOutput]) []openapi.
 			Name:   key,
 			Value:  val.Value,
 			SpanId: val.SpanID,
+			Error:  errToString(val.Error),
 		})
 		return nil
 	})
@@ -496,6 +497,7 @@ func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) maps.Ordered[string,
 			Value:  output.Value,
 			Name:   output.Name,
 			SpanID: output.SpanId,
+			Error:  fmt.Errorf(output.Error),
 		})
 	}
 

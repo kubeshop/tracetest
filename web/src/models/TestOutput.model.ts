@@ -11,6 +11,7 @@ type TestOutput = {
   valueRunDraft: string;
   id: number;
   spanId: string;
+  error: string;
 };
 
 function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id = -1): TestOutput {
@@ -24,6 +25,7 @@ function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id =
     valueRun: '',
     valueRunDraft: '',
     spanId: '',
+    error: '',
   };
 }
 

@@ -48,6 +48,7 @@ const testOutputsSlice = createSlice({
         ...output,
         valueRun: runOutputs[index]?.value ?? '',
         spanId: runOutputs[index]?.spanId ?? '',
+        error: runOutputs[index]?.error ?? '',
       }));
     },
   },

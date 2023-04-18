@@ -59,6 +59,21 @@ func outputProcessor(ctx context.Context, outputs maps.Ordered[string, model.Out
 	}
 
 	err = parsed.ForEach(func(key string, out parsedOutput) error {
+		if out.err != nil {
+			res, err = res.Add(key, model.RunOutput{
+				Value:    "",
+				SpanID:   "",
+				Name:     key,
+				Resolved: false,
+				Error:    out.err,
+			})
+			if err != nil {
+				return fmt.Errorf(`cannot process output "%s": %w`, key, err)
+			}
+
+			return nil
+		}
+
 		spans := out.selector.Filter(tr)
 
 		stores := append([]expression.DataStore{expression.MetaAttributesDataStore{SelectedSpans: spans}}, ds...)
@@ -66,6 +81,7 @@ func outputProcessor(ctx context.Context, outputs maps.Ordered[string, model.Out
 		value := ""
 		spanId := ""
 		resolved := false
+		var outputError error = nil
 		spans.
 			ForEach(func(_ int, span model.Span) bool {
 				value = extractAttr(span, stores, out.expr)
@@ -77,6 +93,7 @@ func outputProcessor(ctx context.Context, outputs maps.Ordered[string, model.Out
 			OrEmpty(func() {
 				value = extractAttr(model.Span{}, stores, out.expr)
 				resolved = false
+				outputError = fmt.Errorf(`cannot find matching spans for output "%s"`, key)
 			})
 
 		res, err = res.Add(key, model.RunOutput{
@@ -84,6 +101,7 @@ func outputProcessor(ctx context.Context, outputs maps.Ordered[string, model.Out
 			SpanID:   spanId,
 			Name:     key,
 			Resolved: resolved,
+			Error:    outputError,
 		})
 		if err != nil {
 			return fmt.Errorf(`cannot process output "%s": %w`, key, err)
@@ -112,25 +130,31 @@ func extractAttr(span model.Span, ds []expression.DataStore, expr expression.Exp
 type parsedOutput struct {
 	selector selectors.Selector
 	expr     expression.Expr
+	err      error
 }
 
 func parseOutputs(outputs maps.Ordered[string, model.Output]) (maps.Ordered[string, parsedOutput], error) {
 	var parsed maps.Ordered[string, parsedOutput]
 
 	parseErr := outputs.ForEach(func(key string, out model.Output) error {
+		var selector selectors.Selector
+		var expr expression.Expr
+		var outputErr error = nil
+
 		expr, err := expression.Parse(out.Value)
 		if err != nil {
-			return fmt.Errorf(`cannot parse output "%s" value "%s": %w`, key, out.Value, err)
+			outputErr = fmt.Errorf(`cannot parse output "%s" value "%s": %w`, key, out.Value, err)
 		}
 
-		selector, err := selectors.New(string(out.Selector))
+		selector, err = selectors.New(string(out.Selector))
 		if err != nil {
-			return fmt.Errorf(`cannot parse output "%s" selector "%s": %w`, key, string(out.Selector), err)
+			outputErr = fmt.Errorf(`cannot parse output "%s" selector "%s": %w`, key, string(out.Selector), err)
 		}
 
 		parsed, _ = parsed.Add(key, parsedOutput{
 			selector: selector,
 			expr:     expr,
+			err:      outputErr,
 		})
 		return nil
 	})
