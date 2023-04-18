@@ -178,10 +178,6 @@ Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracete
 
 **Why?** To start both the Python app and Tracetest we will run this command:
 
-```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
-```
-
 The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
 
 ```yaml
