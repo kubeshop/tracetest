@@ -62,5 +62,5 @@ export const ActionsContainer = styled.div`
 `;
 
 export const IconWarning = styled(InfoCircleFilled)`
-  color: ${({theme}) => theme.color.error};
+  color: ${({theme}) => theme.color.warningYellow};
 `;
