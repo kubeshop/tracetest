@@ -88,7 +88,7 @@ export const IconSuccess = styled(CheckCircleFilled)`
 `;
 
 export const IconWarning = styled(InfoCircleFilled)`
-  color: ${({theme}) => theme.color.error};
+  color: ${({theme}) => theme.color.warningYellow};
 `;
 
 export const Row = styled.div<{$align?: string; $hasGap?: boolean; $justify?: string}>`

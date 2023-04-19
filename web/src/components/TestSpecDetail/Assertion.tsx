@@ -21,7 +21,7 @@ const Assertion = ({check, testId, runId, selector}: IProps) => (
           <S.Row $justify="center">
             <S.IconWarning />
           </S.Row>
-          <AttributeValue strong type="danger" value={check.result.error} />
+          <AttributeValue strong type="warning" value={check.result.error} />
         </>
       ) : (
         <>

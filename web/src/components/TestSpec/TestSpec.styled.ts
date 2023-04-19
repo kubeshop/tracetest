@@ -60,7 +60,7 @@ export const Title = styled(Typography.Text)`
 `;
 
 export const WarningIcon = styled(InfoCircleFilled)`
-  color: ${({theme}) => theme.color.error};
+  color: ${({theme}) => theme.color.warningYellow};
   font-size: ${({theme}) => theme.size.lg};
   margin-right: 4px;
 `;
