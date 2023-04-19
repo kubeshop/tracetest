@@ -225,13 +225,7 @@ func (app *App) Start(opts ...appOption) error {
 		return err
 	}
 
-	otlpServer := otlp.NewServer(":21321", testDB)
-	go otlpServer.Start()
-	app.registerStopFn(func() {
-		fmt.Println("stopping otlp server")
-		otlpServer.Stop()
-	})
-
+	registerOtlpServer(app, testDB)
 	provisioner := provisioning.New()
 
 	router, mappers := controller(app.cfg, testDB, tracer, rf, triggerRegistry)
@@ -287,7 +281,22 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 				Env,
 			),
 		)
+}
 
+func registerOtlpServer(app *App, testDB model.Repository) {
+	exporter := otlp.NewExporter(testDB)
+	grpcOtlpServer := otlp.NewGrpcServer(":4318", exporter)
+	httpOtlpServer := otlp.NewHttpServer(":4317", exporter)
+	go grpcOtlpServer.Start()
+	go httpOtlpServer.Start()
+
+	fmt.Println("OTLP server started on :4318 (grpc) and :4317 (http)")
+
+	app.registerStopFn(func() {
+		fmt.Println("stopping otlp server")
+		grpcOtlpServer.Stop()
+		httpOtlpServer.Stop()
+	})
 }
 
 func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
