@@ -13,7 +13,6 @@ import (
 )
 
 func TestPokeshopDemoResource(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
 	sampleDemo := demoresource.Demo{
 		ID:      "1",
 		Name:    "dev",
@@ -51,7 +50,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 		ResourceTypeSingular: demoresource.ResourceName,
 		ResourceTypePlural:   demoresource.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.MustCreateRandomMigratedDatabase(db)
+			db := testmock.CreateMigratedDatabase()
 			demoRepository := demoresource.NewRepository(db)
 
 			manager := resourcemanager.New[demoresource.Demo](
@@ -108,7 +107,6 @@ func TestPokeshopDemoResource(t *testing.T) {
 }
 
 func TestOpenTelemetryStoreDemoResource(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
 	sampleDemo := demoresource.Demo{
 		ID:      "1",
 		Name:    "dev",
@@ -152,7 +150,7 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 		ResourceTypeSingular: demoresource.ResourceName,
 		ResourceTypePlural:   demoresource.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.MustCreateRandomMigratedDatabase(db)
+			db := testmock.CreateMigratedDatabase()
 			demoRepository := demoresource.NewRepository(db)
 
 			manager := resourcemanager.New[demoresource.Demo](

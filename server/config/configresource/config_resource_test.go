@@ -38,9 +38,8 @@ func TestPublishing(t *testing.T) {
 
 	publisher.On("Publish", configresource.ResourceID, updated)
 
-	db := testmock.MustGetRawTestingDatabase()
 	repo := configresource.NewRepository(
-		testmock.MustCreateRandomMigratedDatabase(db),
+		testmock.CreateMigratedDatabase(),
 		configresource.WithPublisher(publisher),
 	)
 
@@ -52,13 +51,12 @@ func TestPublishing(t *testing.T) {
 }
 
 func TestIsAnalyticsEnabled(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
 	t.Run("DefaultValues", func(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
 
 		repo := configresource.NewRepository(
-			testmock.MustCreateRandomMigratedDatabase(db),
+			testmock.CreateMigratedDatabase(),
 		)
 
 		cfg := repo.Current(context.TODO())
@@ -70,7 +68,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
 		repo := configresource.NewRepository(
-			testmock.MustCreateRandomMigratedDatabase(db),
+			testmock.CreateMigratedDatabase(),
 		)
 		repo.Update(context.TODO(), configresource.Config{
 			AnalyticsEnabled: false,
@@ -84,7 +82,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
 		repo := configresource.NewRepository(
-			testmock.MustCreateRandomMigratedDatabase(db),
+			testmock.CreateMigratedDatabase(),
 		)
 		repo.Update(context.TODO(), configresource.Config{
 			AnalyticsEnabled: true,
@@ -99,14 +97,11 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 }
 
 func TestConfigResource(t *testing.T) {
-
-	db := testmock.MustGetRawTestingDatabase()
-
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: configresource.ResourceName,
 		ResourceTypePlural:   configresource.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.MustCreateRandomMigratedDatabase(db)
+			db := testmock.CreateMigratedDatabase()
 			configRepo := configresource.NewRepository(db)
 
 			manager := resourcemanager.New[configresource.Config](

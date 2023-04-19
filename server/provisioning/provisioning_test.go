@@ -30,7 +30,7 @@ func TestFromFile(t *testing.T) {
 		assert.ErrorIs(t, err, provisioning.ErrFileNotExists)
 	})
 
-	db := testmock.MustGetRawTestingDatabase()
+	db := testmock.GetRawTestingDatabase()
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -50,7 +50,7 @@ func TestFromFile(t *testing.T) {
 }
 
 func TestFromEnv(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
+	db := testmock.GetRawTestingDatabase()
 
 	t.Run("Empty", func(t *testing.T) {
 		provisioner := provisioning.New()

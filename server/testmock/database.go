@@ -4,53 +4,100 @@ import (
 	"database/sql"
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/preset/postgres"
 )
 
-var pgContainer *gnomock.Container
+const baseDatabaseName = "tracetest"
 
-func GetTestingDatabase() (model.Repository, error) {
-	db, err := GetRawTestingDatabase()
-	if err != nil {
-		return nil, err
-	}
+var singletonTestDatabaseEnvironment *testDatabaseEnvironment
 
-	return testdb.Postgres(testdb.WithDB(db))
+type testDatabaseEnvironment struct {
+	container      *gnomock.Container
+	mainConnection *sql.DB
+
+	mutex sync.Mutex
 }
 
-func ConfigureDB(cfg *config.Config) error {
-	pgContainer, err := getPostgresContainer()
-	if err != nil {
-		return err
+func getTestDatabaseEnvironment() *testDatabaseEnvironment {
+	if singletonTestDatabaseEnvironment == nil {
+		panic(fmt.Errorf("testing database environment not started"))
 	}
 
-	cfg.Set("postgres.host", pgContainer.Host)
-	cfg.Set("postgres.user", "tracetest")
-	cfg.Set("postgres.password", "tracetest")
-	cfg.Set("postgres.dbname", "postgres")
-	cfg.Set("postgres.port", pgContainer.DefaultPort())
-
-	return nil
-
+	return singletonTestDatabaseEnvironment
 }
 
-func MustGetRawTestingDatabase() *sql.DB {
-	db, err := GetRawTestingDatabase()
+func StartTestEnvironment() {
+	if singletonTestDatabaseEnvironment != nil {
+		return // Already started
+	}
+
+	db := &testDatabaseEnvironment{
+		mutex: sync.Mutex{},
+	}
+
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
+
+	container, err := getPostgresContainer()
+	if err != nil {
+		panic(err)
+	}
+	db.container = container
+
+	connection, err := getMainDatabaseConnection(db.container)
+	if err != nil {
+		panic(err)
+	}
+	db.mainConnection = connection
+
+	// Starts this singleton only here, to guarantee that we
+	// will only initiate this singleton when starting the environment
+	singletonTestDatabaseEnvironment = db
+}
+
+func StopTestEnvironment() {
+	db := getTestDatabaseEnvironment()
+
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
+
+	// Close main connection
+	if db.mainConnection != nil {
+		err := db.mainConnection.Close()
+		if err != nil {
+			panic(err)
+		}
+
+		db.mainConnection = nil
+	}
+
+	if db.container != nil {
+		err := gnomock.Stop(db.container)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func GetTestingDatabase() model.Repository {
+	dbConnection := GetRawTestingDatabase()
+
+	testingDatabase, err := testdb.Postgres(testdb.WithDB(dbConnection))
 	if err != nil {
 		panic(err)
 	}
 
-	return db
+	return testingDatabase
 }
 
-func MustCreateRandomMigratedDatabase(db *sql.DB) *sql.DB {
-	newConn, err := createRandomDatabaseForTest(db, "tracetest")
+func CreateMigratedDatabase() *sql.DB {
+	newConn, err := createRandomDatabaseForTest(baseDatabaseName)
 	if err != nil {
 		panic(err)
 	}
@@ -62,25 +109,47 @@ func MustCreateRandomMigratedDatabase(db *sql.DB) *sql.DB {
 	}
 
 	return newConn
-
 }
 
-func GetRawTestingDatabase() (*sql.DB, error) {
-	pgContainer, err := getPostgresContainer()
-	if err != nil {
-		return nil, err
-	}
-	db, err := getMainDatabaseConnection(pgContainer)
-	if err != nil {
-		return nil, err
-	}
-	newDbConnection, err := createRandomDatabaseForTest(db, "tracetest")
+func GetRawTestingDatabase() *sql.DB {
+	newDbConnection, err := createRandomDatabaseForTest(baseDatabaseName)
 
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	return newDbConnection, nil
+	return newDbConnection
+}
+
+func createRandomDatabaseForTest(baseDatabase string) (*sql.DB, error) {
+	db := getTestDatabaseEnvironment()
+
+	newDatabaseName := fmt.Sprintf("%s_%d%d%d", baseDatabase, randomInt(), randomInt(), randomInt())
+	_, err := db.mainConnection.Exec(fmt.Sprintf("CREATE DATABASE %s WITH TEMPLATE %s", newDatabaseName, baseDatabase))
+	if err != nil {
+		return nil, fmt.Errorf("could not create database %s: %w", newDatabaseName, err)
+	}
+
+	connStr := fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s  dbname=%s sslmode=disable",
+		db.container.Host, db.container.DefaultPort(), "tracetest", "tracetest", newDatabaseName,
+	)
+
+	return sql.Open("postgres", connStr)
+}
+
+func getPostgresContainer() (*gnomock.Container, error) {
+	preset := postgres.Preset(
+		postgres.WithUser("tracetest", "tracetest"),
+		postgres.WithDatabase("tracetest"),
+	)
+
+	dbContainer, err := gnomock.Start(preset)
+	if err != nil {
+		return nil, fmt.Errorf("could not start postgres container")
+	}
+
+	return dbContainer, nil
 }
 
 func getMainDatabaseConnection(container *gnomock.Container) (*sql.DB, error) {
@@ -97,39 +166,4 @@ func randomInt() int {
 	min := 1
 	max := 1000000
 	return rand.Intn(max-min) + min
-}
-
-func createRandomDatabaseForTest(db *sql.DB, baseDatabase string) (*sql.DB, error) {
-	newDatabaseName := fmt.Sprintf("%s_%d%d%d", baseDatabase, randomInt(), randomInt(), randomInt())
-	_, err := db.Exec(fmt.Sprintf("CREATE DATABASE %s WITH TEMPLATE %s", newDatabaseName, baseDatabase))
-	if err != nil {
-		return nil, fmt.Errorf("could not create database %s: %w", newDatabaseName, err)
-	}
-
-	connStr := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s  dbname=%s sslmode=disable",
-		pgContainer.Host, pgContainer.DefaultPort(), "tracetest", "tracetest", newDatabaseName,
-	)
-
-	return sql.Open("postgres", connStr)
-}
-
-func getPostgresContainer() (*gnomock.Container, error) {
-	if pgContainer != nil {
-		return pgContainer, nil
-	}
-
-	preset := postgres.Preset(
-		postgres.WithUser("tracetest", "tracetest"),
-		postgres.WithDatabase("tracetest"),
-	)
-
-	dbContainer, err := gnomock.Start(preset)
-	if err != nil {
-		return nil, fmt.Errorf("could not start postgres container")
-	}
-
-	pgContainer = dbContainer
-
-	return dbContainer, nil
 }

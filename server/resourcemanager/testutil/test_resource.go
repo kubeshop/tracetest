@@ -17,6 +17,7 @@ type ResourceTypeTest struct {
 	ResourceTypePlural   string
 	RegisterManagerFn    func(*mux.Router) rm.Manager
 	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
+	Cleanup              func(t *testing.T, manager rm.Manager)
 
 	SampleJSON        string
 	SampleJSONUpdated string
@@ -110,7 +111,6 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	for _, ct := range contentTypeConverters {
 		t.Run(ct.name, func(t *testing.T) {
 			ct := ct
-			t.Parallel()
 
 			testOperationForContentType(t, op, ct, rt)
 		})
@@ -122,7 +122,14 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 
 	router := mux.NewRouter()
 	testServer := httptest.NewServer(router)
+	defer testServer.Close()
+
 	manager := rt.RegisterManagerFn(router)
+	defer func() {
+		if rt.Cleanup != nil {
+			rt.Cleanup(t, manager)
+		}
+	}()
 
 	sortable, ok := manager.Handler().(rm.SortableHandler)
 	if ok {
