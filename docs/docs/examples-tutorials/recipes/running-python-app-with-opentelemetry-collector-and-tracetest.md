@@ -199,6 +199,7 @@ spec:
   name: OpenTelemetry Collector
   type: otlp
   isdefault: true
+ ```
   
 But how are traces sent to Tracetest?
 
