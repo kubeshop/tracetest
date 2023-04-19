@@ -46,6 +46,10 @@ INSERT INTO data_stores (
 
 const deleteQuery = `DELETE FROM data_stores`
 
+func newCreateAtDateString() string {
+	return time.Now().UTC().Format(time.RFC3339Nano)
+}
+
 func (r *Repository) getCreatedAt(ctx context.Context, dataStore DataStore) (string, error) {
 	if dataStore.CreatedAt != "" {
 		// client passed date, keeping it
@@ -57,7 +61,7 @@ func (r *Repository) getCreatedAt(ctx context.Context, dataStore DataStore) (str
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			// record not found, return a new date
-			return time.Now().UTC().Format(time.RFC3339Nano), nil
+			return newCreateAtDateString(), nil
 		}
 
 		return "", err
@@ -142,6 +146,11 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
 	row := r.db.QueryRowContext(ctx, getQuery, id)
 
 	dataStore, err := r.readRow(row)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return DataStore{
+			CreatedAt: newCreateAtDateString(),
+		}, nil // Assumes an empty datastore
+	}
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository get sql query: %w", err)
 	}

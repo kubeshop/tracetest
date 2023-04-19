@@ -118,7 +118,7 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
@@ -187,7 +187,7 @@ func TestDataStoreResource_ElasticAPM(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
@@ -250,7 +250,7 @@ func TestDataStoreResource_Jaeger(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
@@ -294,7 +294,7 @@ func TestDataStoreResource_OTLP(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
@@ -363,7 +363,7 @@ func TestDataStoreResource_OpenSearch(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
@@ -420,7 +420,7 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
@@ -492,7 +492,7 @@ func TestDataStoreResource_Tempo(t *testing.T) {
 		}`,
 	}
 
-	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound)
+	excludedOperations := rmtests.ExcludeOperations(rmtests.OperationUpdateNotFound, rmtests.OperationGetNotFound)
 	jsonComparer := rmtests.JSONComparer(compareJSONDataStores)
 
 	rmtests.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
