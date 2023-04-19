@@ -24,10 +24,18 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 	for _, option := range options {
 		option(cfg)
 	}
-	err := ConfigureDB(cfg)
-	if err != nil {
-		panic(err)
-	}
+
+	ConfigureDB(cfg)
 
 	return app.New(cfg)
+}
+
+func ConfigureDB(cfg *config.Config) {
+	db := getTestDatabaseEnvironment()
+
+	cfg.Set("postgres.host", db.container.Host)
+	cfg.Set("postgres.user", "tracetest")
+	cfg.Set("postgres.password", "tracetest")
+	cfg.Set("postgres.dbname", "postgres")
+	cfg.Set("postgres.port", db.container.DefaultPort())
 }

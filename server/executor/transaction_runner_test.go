@@ -96,13 +96,10 @@ func TestTransactionRunner(t *testing.T) {
 }
 
 func getDB() (model.Repository, func()) {
-	db, err := testmock.GetTestingDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := testmock.GetTestingDatabase()
 
 	clean := func() {
-		err = db.Drop()
+		err := db.Drop()
 		if err != nil {
 			panic(err)
 		}

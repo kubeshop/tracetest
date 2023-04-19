@@ -12,23 +12,11 @@ import (
 )
 
 func TestPollingProfileResource(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	// sampleProfile := pollingprofile.PollingProfile{
-	// 	ID:       "1",
-	// 	Name:     "test",
-	// 	Default:  true,
-	// 	Strategy: pollingprofile.Periodic,
-	// 	Periodic: &pollingprofile.PeriodicPollingConfig{
-	// 		RetryDelay: "10s",
-	// 		Timeout:    "30m",
-	// 	},
-	// }
-
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: pollingprofile.ResourceName,
 		ResourceTypePlural:   pollingprofile.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.MustCreateRandomMigratedDatabase(db)
+			db := testmock.CreateMigratedDatabase()
 			pollingProfileRepo := pollingprofile.NewRepository(db)
 
 			manager := resourcemanager.New[pollingprofile.PollingProfile](
@@ -42,17 +30,6 @@ func TestPollingProfileResource(t *testing.T) {
 
 			return manager
 		},
-		// Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-		// 	pollingProfileRepo := manager.Handler().(*pollingprofile.Repository)
-		// 	switch op {
-		// 	case rmtests.OperationGetSuccess,
-		// 		pollingProfileRepo.Update(context.TODO(), sampleProfile)
-		// 	case rmtests.OperationListPaginatedSuccess:
-		// 		pollingProfileRepo.Create(context.TODO(), sampleProfile)
-		// 		pollingProfileRepo.Create(context.TODO(), secondSampleProfile)
-		// 		pollingProfileRepo.Create(context.TODO(), thirdSampleProfile)
-		// 	}
-		// },
 		SampleJSON: `{
 			"type": "PollingProfile",
 			"spec": {

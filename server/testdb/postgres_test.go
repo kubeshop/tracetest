@@ -11,14 +11,11 @@ import (
 )
 
 func getDB() (model.Repository, func()) {
-	db, err := testmock.GetTestingDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := testmock.GetTestingDatabase()
 
 	clean := func() {
 		defer db.Close()
-		err = db.Drop()
+		err := db.Drop()
 		if err != nil {
 			panic(err)
 		}

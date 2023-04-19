@@ -27,7 +27,7 @@ func TestFromFile(t *testing.T) {
 		assert.ErrorIs(t, err, provisioning.ErrFileNotExists)
 	})
 
-	db := testmock.MustCreateRandomMigratedDatabase(testmock.MustGetRawTestingDatabase())
+	db := testmock.CreateMigratedDatabase()
 	defer db.Close()
 
 	for _, c := range cases {
@@ -48,7 +48,7 @@ func TestFromFile(t *testing.T) {
 }
 
 func TestFromEnv(t *testing.T) {
-	db := testmock.MustCreateRandomMigratedDatabase(testmock.MustGetRawTestingDatabase())
+	db := testmock.CreateMigratedDatabase()
 	defer db.Close()
 
 	t.Run("Empty", func(t *testing.T) {

@@ -2,7 +2,6 @@ package datastoreresource_test
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -26,22 +25,26 @@ func compareJSONDataStores(t require.TestingT, operation rmtests.Operation, firs
 	require.JSONEq(t, expected, obtained)
 }
 
-func getRegisterManagerFn(db *sql.DB) func(router *mux.Router) resourcemanager.Manager {
-	return func(router *mux.Router) resourcemanager.Manager {
-		db := testmock.MustCreateRandomMigratedDatabase(db)
-		dataStoreRepository := datastore.NewRepository(db)
+func registerManagerFn(router *mux.Router) resourcemanager.Manager {
+	db := testmock.CreateMigratedDatabase()
+	dataStoreRepository := datastore.NewRepository(db)
 
-		manager := resourcemanager.New[datastore.DataStore](
-			datastore.ResourceName,
-			datastore.ResourceNamePlural,
-			dataStoreRepository,
-			resourcemanager.WithOperations(datastore.Operations...),
-			resourcemanager.WithIDGen(id.GenerateID),
-		)
-		manager.RegisterRoutes(router)
+	manager := resourcemanager.New[datastore.DataStore](
+		datastore.ResourceName,
+		datastore.ResourceNamePlural,
+		dataStoreRepository,
+		resourcemanager.WithOperations(datastore.Operations...),
+		resourcemanager.WithIDGen(id.GenerateID),
+	)
+	manager.RegisterRoutes(router)
 
-		return manager
-	}
+	return manager
+}
+
+func cleanup(t *testing.T, manager resourcemanager.Manager) {
+	repository := manager.Handler().(*datastore.Repository)
+	err := repository.Close()
+	require.NoError(t, err)
 }
 
 func getScenarioPreparation(sample datastore.DataStore) func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
@@ -56,9 +59,6 @@ func getScenarioPreparation(sample datastore.DataStore) func(t *testing.T, op rm
 }
 
 func TestDataStoreResource_AWSXRay(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -79,8 +79,9 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -124,9 +125,6 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 }
 
 func TestDataStoreResource_ElasticAPM(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -148,8 +146,9 @@ func TestDataStoreResource_ElasticAPM(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -195,9 +194,6 @@ func TestDataStoreResource_ElasticAPM(t *testing.T) {
 }
 
 func TestDataStoreResource_Jaeger(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -217,8 +213,9 @@ func TestDataStoreResource_Jaeger(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -260,9 +257,6 @@ func TestDataStoreResource_Jaeger(t *testing.T) {
 }
 
 func TestDataStoreResource_OTLP(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -275,8 +269,9 @@ func TestDataStoreResource_OTLP(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -306,9 +301,6 @@ func TestDataStoreResource_OTLP(t *testing.T) {
 }
 
 func TestDataStoreResource_OpenSearch(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -330,8 +322,9 @@ func TestDataStoreResource_OpenSearch(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -377,9 +370,6 @@ func TestDataStoreResource_OpenSearch(t *testing.T) {
 }
 
 func TestDataStoreResource_SignalFX(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -397,8 +387,9 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -436,9 +427,6 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 }
 
 func TestDataStoreResource_Tempo(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
-	defer db.Close()
-
 	sample := datastore.DataStore{
 		ID:        "current",
 		Name:      "default",
@@ -461,8 +449,9 @@ func TestDataStoreResource_Tempo(t *testing.T) {
 	testSpec := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: datastore.ResourceName,
 		ResourceTypePlural:   datastore.ResourceNamePlural,
-		RegisterManagerFn:    getRegisterManagerFn(db),
+		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
+		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
