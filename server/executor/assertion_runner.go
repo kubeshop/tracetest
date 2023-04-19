@@ -253,7 +253,7 @@ func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, r
 			return nil
 		}
 
-		anotherErr := e.eventEmitter.Emit(ctx, events.TestOutputGenerationWarning(request.Test.ID, request.Run.ID, outputName))
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestOutputGenerationWarning(request.Test.ID, request.Run.ID, outputModel.Error, outputName))
 		if anotherErr != nil {
 			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestOutputGenerationWarning event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
 		}

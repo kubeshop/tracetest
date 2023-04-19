@@ -15,6 +15,8 @@ type TestRunOutputsInner struct {
 	SpanId string `json:"spanId,omitempty"`
 
 	Value string `json:"value,omitempty"`
+
+	Error string `json:"error,omitempty"`
 }
 
 // AssertTestRunOutputsInnerRequired checks if the required fields are not zero-ed

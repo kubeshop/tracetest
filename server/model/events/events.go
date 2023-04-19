@@ -307,14 +307,14 @@ func TraceStoppedInfo(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TestOutputGenerationWarning(testID id.ID, runID int, output string) model.TestRunEvent {
+func TestOutputGenerationWarning(testID id.ID, runID int, err error, output string) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTest,
 		Type:                "OUTPUT_GENERATION_WARNING",
 		Title:               fmt.Sprintf(`Output '%s' not generated`, output),
-		Description:         fmt.Sprintf(`The value for the output '%s' could not be generated`, output),
+		Description:         fmt.Sprintf(`The output '%s' returned an error. Error: %s`, output, err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
