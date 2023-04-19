@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 )
 
@@ -178,7 +179,7 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr model
 	return tr, nil
 }
 
-func mergeOutputsIntoEnv(env model.Environment, outputs model.OrderedMap[string, model.RunOutput]) model.Environment {
+func mergeOutputsIntoEnv(env model.Environment, outputs maps.Ordered[string, model.RunOutput]) model.Environment {
 	newEnv := make([]model.EnvironmentValue, 0, outputs.Len())
 	outputs.ForEach(func(key string, val model.RunOutput) error {
 		newEnv = append(newEnv, model.EnvironmentValue{

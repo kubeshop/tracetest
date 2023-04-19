@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -327,7 +327,7 @@ SELECT
 	"test_results",
 	"trace",
 	"outputs",
-	"last_error",	
+	"last_error",
 	"metadata",
 	"environment",
 

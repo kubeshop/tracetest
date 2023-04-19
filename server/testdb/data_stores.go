@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/fluidtruck/deepcopy"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 var _ model.DataStoreRepository = &postgresDB{}

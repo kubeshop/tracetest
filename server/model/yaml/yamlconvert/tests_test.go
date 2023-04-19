@@ -6,6 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/model/yaml/yamlconvert"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,14 +34,14 @@ func TestConverter(t *testing.T) {
 				},
 			},
 		},
-		Specs: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).
+		Specs: (maps.Ordered[model.SpanQuery, model.NamedAssertions]{}).
 			MustAdd(model.SpanQuery(`span[name="Test Span"]`), model.NamedAssertions{
 				Name: "count test spans",
 				Assertions: []model.Assertion{
 					"attr:tracetest.selected_spans.count = 2",
 				},
 			}),
-		Outputs: (model.OrderedMap[string, model.Output]{}).
+		Outputs: (maps.Ordered[string, model.Output]{}).
 			MustAdd("user_id", model.Output{
 				Selector: model.SpanQuery(`span[name="Create User"]`),
 				Value:    "attr:myapp.user_id",

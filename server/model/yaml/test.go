@@ -5,12 +5,13 @@ import (
 
 	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 )
 
 type TestSpecs []TestSpec
 
-func (ts TestSpecs) Model() model.OrderedMap[model.SpanQuery, model.NamedAssertions] {
-	mts := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
+func (ts TestSpecs) Model() maps.Ordered[model.SpanQuery, model.NamedAssertions] {
+	mts := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
 	for _, spec := range ts {
 		assertions := make([]model.Assertion, 0, len(spec.Assertions))
 		for _, a := range spec.Assertions {
@@ -27,8 +28,8 @@ func (ts TestSpecs) Model() model.OrderedMap[model.SpanQuery, model.NamedAsserti
 
 type Outputs []Output
 
-func (outs Outputs) Model() model.OrderedMap[string, model.Output] {
-	mos := model.OrderedMap[string, model.Output]{}
+func (outs Outputs) Model() maps.Ordered[string, model.Output] {
+	mos := maps.Ordered[string, model.Output]{}
 	for _, output := range outs {
 		mos, _ = mos.Add(output.Name, model.Output{
 			Selector: model.SpanQuery(output.Selector),

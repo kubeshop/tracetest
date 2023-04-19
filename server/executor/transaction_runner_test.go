@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
@@ -44,7 +45,7 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 
 		r.uid++
 
-		run.Outputs = (model.OrderedMap[string, model.RunOutput]{}).MustAdd("USER_ID", model.RunOutput{
+		run.Outputs = (maps.Ordered[string, model.RunOutput]{}).MustAdd("USER_ID", model.RunOutput{
 			Value: strconv.Itoa(r.uid),
 		})
 

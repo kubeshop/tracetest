@@ -6,9 +6,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/id"
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
