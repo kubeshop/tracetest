@@ -12,7 +12,7 @@ Undefined variables are dependent on the environment selected and whether or not
 
 ### **Supply Variable Value at Runtime** 
 
-A user wants a test or transaction they can run on a particular user, order id, etc that is configurable at run time. This would make running an adhoc test in an environment, even production, very easy and convenient. In this case, the user would reference the variable, but not add it to the environment. Each time they run the test or transaction, they would be prompted for the unspecified variables.
+A user wants a test or transaction they can run on a particular user, order id, etc. that is configurable at run time. This makes running an adhoc test in an environment, even production, very easy and convenient. In this case, the user references the variable, but doesn't add it to the environment. Each time they run the test or transaction, they will be prompted for the unspecified variables.
 
 ### **Supply Variable Value from a Previous Test**
 
@@ -30,7 +30,7 @@ In Tracetest, undefined variables can be used in both the UI and CLI.
 
 ![Create Test Spec Assertionsl](../img/create-test-spec-assertions.png)
 
-3. Create a GRPC pokemon add test that uses environment variables for hostname and pokemon name:
+3. Create a GRPC Pokemon add test that uses environment variables for hostname and Pokemon name:
 
 ![Create GRPC](../img/create-grpc.png)
 

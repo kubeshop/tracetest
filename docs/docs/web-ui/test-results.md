@@ -2,44 +2,47 @@
 
 From the **All Tests** screen, you can access all your existing tests, create new tests and see the results of any test that has been run.  
 
-![All Tests List](../img/all-tests-list-0.6.png)
+![All Tests List](../img/all-tests-list-0.11.png)
 
 CLick on the settings icon to the right of each test. You can delete the test from here:
 
-![Tests Actions](../img/tests-actions-0.6.png)
+![Tests Actions](../img/tests-actions-0.11.png)
 
 Click on the arrow next to the test name and the list of test runs will appear:
 
-![Select Test](../img/select-test-0.6.png)
+![Select Test](../img/select-test-0.11.png)
 
 Click on a test run and the Trigger Details screen will open. From here, you can change and save the details of the test. On the top right, there is a button to run the test and a settings icon with the following options:
 
 - JUnit Results - The test results in JUnit format.
 - Test Definition - The test defintion YAML file.
+- Edit - Edit the test.
 - Delete - Delete the test.
 
-![Run Tests & Options](../img/run-test-and-option-0.6.png)
+![Run Tests & Options](../img/run-test-and-option-0.11.png)
 
 Click on the **Trace** tab to open the Trace Details screen:
 
-![Trace Tab View](../img/trace-tab-0.6.png)
+![Trace Tab View](../img/trace-tab-0.11.png)
 
- Use the icons at the top right to manipulate the graph. The options are:
+ Use the icons at the bottom left to manipulate the test image. The options are:
 
+- Graph View
+- Timeline View
 - Zoom In
 - Zoom Out
 - Fit View
 - Mini Map
 
-![Trace Tab Icons](../img/trace-tab-icons-0.6.png)
+![Trace Tab Icons](../img/trace-tab-icons-0.11.png)
 
-Use the toggle button highlighted below to switch to the **Timeline View**:
+The following shows the test in the **Timeline View**:
 
-![Timeline View](../img/timeline-view-0.6.png)
+![Timeline View](../img/timeline-view-0.11.png)
 
 Click on the **Test** tab to see the details of Test Specs and Assertions for the test:
 
-![Test Tab](../img/test-tab-0.6.png)
+![Test Tab](../img/test-tab-0.11.png)
 
 <!-- The test results include:
 
