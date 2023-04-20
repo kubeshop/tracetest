@@ -97,7 +97,6 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 }
 
 func TestConfigResource(t *testing.T) {
-
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: configresource.ResourceName,
 		ResourceTypePlural:   configresource.ResourceNamePlural,

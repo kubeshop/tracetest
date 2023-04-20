@@ -48,8 +48,12 @@ func TestFromFile(t *testing.T) {
 }
 
 func TestFromEnv(t *testing.T) {
+<<<<<<< HEAD
 	db := testmock.CreateMigratedDatabase()
 	defer db.Close()
+=======
+	db := testmock.GetRawTestingDatabase()
+>>>>>>> feature/datastore-as-resource
 
 	t.Run("Empty", func(t *testing.T) {
 		provisioner := provisioning.New()
