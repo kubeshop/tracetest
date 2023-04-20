@@ -3,7 +3,7 @@ package environment
 import (
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 type (
