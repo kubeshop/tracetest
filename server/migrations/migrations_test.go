@@ -17,16 +17,15 @@ import (
 )
 
 func TestMigrations(t *testing.T) {
-	db, err := testmock.GetRawTestingDatabase()
-	require.NoError(t, err)
+	db := testmock.GetRawTestingDatabase()
 
 	t.Run("applying migrations", func(t *testing.T) {
-		_, err = testdb.Postgres(testdb.WithDB(db))
+		_, err := testdb.Postgres(testdb.WithDB(db))
 		require.NoError(t, err, "postgres migrations up should not fail")
 	})
 
 	t.Run("rolling back migrations", func(t *testing.T) {
-		err = rollback(db)
+		err := rollback(db)
 		assert.NoError(t, err, "rollback should not fail")
 	})
 }

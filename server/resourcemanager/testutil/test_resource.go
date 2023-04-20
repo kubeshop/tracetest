@@ -110,7 +110,6 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	for _, ct := range contentTypeConverters {
 		t.Run(ct.name, func(t *testing.T) {
 			ct := ct
-			t.Parallel()
 
 			testOperationForContentType(t, op, ct, rt)
 		})
