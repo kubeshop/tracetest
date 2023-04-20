@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testmock"
@@ -15,7 +15,6 @@ import (
 )
 
 func TestEnvironment(t *testing.T) {
-	db := testmock.MustGetRawTestingDatabase()
 	sampleEnvironment := environment.Environment{
 		ID:          "dev",
 		Name:        "dev",
@@ -52,7 +51,7 @@ func TestEnvironment(t *testing.T) {
 		ResourceTypeSingular: environment.ResourceName,
 		ResourceTypePlural:   environment.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.MustCreateRandomMigratedDatabase(db)
+			db := testmock.CreateMigratedDatabase()
 			environmentRepository := environment.NewRepository(db)
 
 			manager := resourcemanager.New[environment.Environment](
