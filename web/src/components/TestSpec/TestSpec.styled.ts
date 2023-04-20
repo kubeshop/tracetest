@@ -1,4 +1,4 @@
-import {ApartmentOutlined} from '@ant-design/icons';
+import {ApartmentOutlined, InfoCircleFilled} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -57,4 +57,10 @@ export const Selector = styled.div`
 export const Title = styled(Typography.Text)`
   color: ${({theme}) => theme.color.text};
   font-size: ${({theme}) => theme.size.md};
+`;
+
+export const WarningIcon = styled(InfoCircleFilled)`
+  color: ${({theme}) => theme.color.warningYellow};
+  font-size: ${({theme}) => theme.size.lg};
+  margin-right: 4px;
 `;

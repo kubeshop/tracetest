@@ -3,8 +3,9 @@ package testdb
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -77,12 +78,12 @@ func (m *MockRepository) GetTests(_ context.Context, take, skip int32, query, so
 	return list, args.Error(1)
 }
 
-func (m *MockRepository) GetSpec(_ context.Context, test model.Test) (model.OrderedMap[model.SpanQuery, []model.Assertion], error) {
+func (m *MockRepository) GetSpec(_ context.Context, test model.Test) (maps.Ordered[model.SpanQuery, []model.Assertion], error) {
 	args := m.Called(test)
-	return args.Get(0).(model.OrderedMap[model.SpanQuery, []model.Assertion]), args.Error(1)
+	return args.Get(0).(maps.Ordered[model.SpanQuery, []model.Assertion]), args.Error(1)
 }
 
-func (m *MockRepository) SetSpec(_ context.Context, test model.Test, def model.OrderedMap[model.SpanQuery, []model.Assertion]) error {
+func (m *MockRepository) SetSpec(_ context.Context, test model.Test, def maps.Ordered[model.SpanQuery, []model.Assertion]) error {
 	args := m.Called(test, def)
 	return args.Error(0)
 }

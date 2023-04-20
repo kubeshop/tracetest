@@ -1,3 +1,4 @@
+import {Tooltip} from 'antd';
 import {singularOrPlural} from 'utils/Common';
 import {SupportedEditors} from 'constants/Editor.constants';
 import Editor from 'components/Editor';
@@ -7,11 +8,12 @@ interface IProps {
   affectedSpans: number;
   assertionsFailed: number;
   assertionsPassed: number;
+  hasError: boolean;
   selector: string;
   title: string;
 }
 
-const Header = ({affectedSpans, assertionsFailed, assertionsPassed, selector, title}: IProps) => {
+const Header = ({affectedSpans, assertionsFailed, assertionsPassed, hasError, selector, title}: IProps) => {
   return (
     <S.Column>
       {title ? (
@@ -27,13 +29,13 @@ const Header = ({affectedSpans, assertionsFailed, assertionsPassed, selector, ti
       )}
 
       <div>
-        {Boolean(assertionsPassed) && (
+        {!!assertionsPassed && (
           <S.HeaderDetail>
             <S.HeaderDot $passed />
             {assertionsPassed}
           </S.HeaderDetail>
         )}
-        {Boolean(assertionsFailed) && (
+        {!!assertionsFailed && (
           <S.HeaderDetail>
             <S.HeaderDot $passed={false} />
             {assertionsFailed}
@@ -43,6 +45,13 @@ const Header = ({affectedSpans, assertionsFailed, assertionsPassed, selector, ti
           <S.HeaderSpansIcon />
           {`${affectedSpans} ${singularOrPlural('span', affectedSpans)}`}
         </S.HeaderDetail>
+        {hasError && (
+          <span>
+            <Tooltip title="This spec has errors">
+              <S.WarningIcon />
+            </Tooltip>
+          </span>
+        )}
       </div>
     </S.Column>
   );

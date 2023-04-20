@@ -1,4 +1,4 @@
-import {Tag} from 'antd';
+import {Tag, Tooltip} from 'antd';
 import {useCallback} from 'react';
 import AttributeValue from 'components/AttributeValue';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
@@ -18,7 +18,7 @@ interface IProps {
 
 const TestOutput = ({
   index,
-  output: {id, name, isDeleted, isDraft, spanId, selector, value, valueRun, valueRunDraft},
+  output: {id, name, isDeleted, isDraft, spanId, selector, value, valueRun, valueRunDraft, error},
   output,
   onEdit,
   onDelete,
@@ -74,6 +74,11 @@ const TestOutput = ({
               <S.Key>Run value</S.Key>
               <AttributeValue value={valueRunDraft} />
             </>
+          )}
+          {error && (
+            <Tooltip title={error}>
+              <S.IconWarning />
+            </Tooltip>
           )}
         </S.Entry>
       </S.Row>

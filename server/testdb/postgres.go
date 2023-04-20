@@ -9,8 +9,8 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/migrations"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 type postgresDB struct {

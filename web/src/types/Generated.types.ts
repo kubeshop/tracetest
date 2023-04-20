@@ -239,20 +239,7 @@ export interface operations {
   };
   /** get transactions */
   getTransactions: {
-    parameters: {
-      query: {
-        /** indicates how many transactions can be returned by each page */
-        take?: number;
-        /** indicates how many transactions will be skipped when paginating */
-        skip?: number;
-        /** query to search transactions, based on transaction name and description */
-        query?: string;
-        /** indicates the sort field for the transactions */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the transactions */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -288,11 +275,7 @@ export interface operations {
   };
   /** get transaction */
   getTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -306,11 +289,7 @@ export interface operations {
   };
   /** update transaction action */
   updateTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
@@ -325,11 +304,7 @@ export interface operations {
   };
   /** delete a transaction */
   deleteTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -337,12 +312,7 @@ export interface operations {
   };
   /** get a transaction specific version */
   getTransactionVersion: {
-    parameters: {
-      path: {
-        transactionId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -356,12 +326,7 @@ export interface operations {
   };
   /** Get the transaction as an YAML file */
   getTransactionVersionDefinitionFile: {
-    parameters: {
-      path: {
-        transactionId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -373,17 +338,7 @@ export interface operations {
   };
   /** Get all runs from a particular transaction */
   getTransactionRuns: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-      query: {
-        /** indicates how many results can be returned by each page */
-        take?: number;
-        /** indicates how many results will be skipped when paginating */
-        skip?: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -395,11 +350,7 @@ export interface operations {
   };
   /** run a particular transaction */
   runTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -416,12 +367,7 @@ export interface operations {
   };
   /** Get a specific run from a particular transaction */
   getTransactionRun: {
-    parameters: {
-      path: {
-        transactionId: string;
-        runId: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -435,12 +381,7 @@ export interface operations {
   };
   /** Delete a specific run from a particular transaction */
   deleteTransactionRun: {
-    parameters: {
-      path: {
-        transactionId: string;
-        runId: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -450,20 +391,7 @@ export interface operations {
   };
   /** get tests */
   getTests: {
-    parameters: {
-      query: {
-        /** indicates how many tests can be returned by each page */
-        take?: number;
-        /** indicates how many tests will be skipped when paginating */
-        skip?: number;
-        /** query to search tests, based on test name and description */
-        query?: string;
-        /** indicates the sort field for the tests */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the tests */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -499,11 +427,7 @@ export interface operations {
   };
   /** get test */
   getTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -517,11 +441,7 @@ export interface operations {
   };
   /** update test action */
   updateTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
@@ -536,11 +456,7 @@ export interface operations {
   };
   /** delete a test */
   deleteTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -548,17 +464,7 @@ export interface operations {
   };
   /** get the runs from a particular test */
   getTestRuns: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-      query: {
-        /** indicates how many results can be returned by each page */
-        take?: number;
-        /** indicates how many results will be skipped when paginating */
-        skip?: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -574,11 +480,7 @@ export interface operations {
   };
   /** run a particular test */
   runTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -601,15 +503,7 @@ export interface operations {
   };
   /** get the spans ids that would be selected by a specific selector query */
   getTestResultSelectedSpans: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-      query: {
-        query?: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -621,12 +515,7 @@ export interface operations {
   };
   /** use this method to test a definition against an actual trace without creating a new version or persisting anything */
   dryRunAssertion: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -643,12 +532,7 @@ export interface operations {
   };
   /** rerun a test run */
   rerunTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -660,12 +544,7 @@ export interface operations {
   };
   /** get test run results in JUnit xml format */
   getRunResultJUnit: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** JUnit formatted file */
       200: {
@@ -677,12 +556,7 @@ export interface operations {
   };
   /** export test and test run information for debugging */
   exportTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successfuly exported test and test run information */
       200: {
@@ -710,12 +584,7 @@ export interface operations {
   };
   /** get a particular test Run */
   getTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -727,12 +596,7 @@ export interface operations {
   };
   /** delete a test run */
   deleteTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -740,11 +604,7 @@ export interface operations {
   };
   /** Gets definition for a test */
   getTestSpecs: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       201: {
@@ -756,12 +616,7 @@ export interface operations {
   };
   /** get a test specific version */
   getTestVersion: {
-    parameters: {
-      path: {
-        testId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -775,12 +630,7 @@ export interface operations {
   };
   /** Get the test definition as an YAML file */
   getTestVersionDefinitionFile: {
-    parameters: {
-      path: {
-        testId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -792,12 +642,7 @@ export interface operations {
   };
   /** stops the execution of a test run */
   stopTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: unknown;
@@ -807,12 +652,7 @@ export interface operations {
   };
   /** get events from a test run */
   getTestRunEvents: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -824,20 +664,7 @@ export interface operations {
   };
   /** Get Environments */
   getEnvironments: {
-    parameters: {
-      query: {
-        /** indicates how many environments can be returned by each page */
-        take?: number;
-        /** indicates how many environments will be skipped when paginating */
-        skip?: number;
-        /** query to search environments, based on environments name and description */
-        query?: string;
-        /** indicates the sort field for the environments */
-        sortBy?: "created" | "name";
-        /** indicates the sort direction for the environments */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -954,20 +781,7 @@ export interface operations {
   };
   /** get resources */
   getResources: {
-    parameters: {
-      query: {
-        /** indicates how many transactions can be returned by each page */
-        take?: number;
-        /** indicates how many transactions will be skipped when paginating */
-        skip?: number;
-        /** query to search transactions, based on transaction name and description */
-        query?: string;
-        /** indicates the sort field for the transactions */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the transactions */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -999,12 +813,7 @@ export interface operations {
   };
   /** Get Tracetest configuration */
   getConfiguration: {
-    parameters: {
-      path: {
-        /** ID of the configuration resource used on Tracetest. It should be set as 'current'. */
-        configId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1019,12 +828,7 @@ export interface operations {
   };
   /** Update Tracetest configuration */
   updateConfiguration: {
-    parameters: {
-      path: {
-        /** ID of the configuration resource used on Tracetest. It should be set as 'current'. */
-        configId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1045,12 +849,7 @@ export interface operations {
   };
   /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
   getPollingProfile: {
-    parameters: {
-      path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'. */
-        pollingProfileId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1067,12 +866,7 @@ export interface operations {
   };
   /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
   updatePollingProfile: {
-    parameters: {
-      path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'. */
-        pollingProfileId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1097,18 +891,7 @@ export interface operations {
   };
   /** List demonstrations used on Tracetest as quick start examples. */
   listDemos: {
-    parameters: {
-      query: {
-        /** Indicates the maximum number of demos that can be returned on this call. */
-        take?: number;
-        /** Indicates how many demos will be skipped when paginating. */
-        skip?: number;
-        /** Indicates the sort field for on which all demos will be sorted. */
-        sortBy?: "type" | "enabled";
-        /** Indicates the sort direction for the demos (ascending or descending). */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1151,12 +934,7 @@ export interface operations {
   };
   /** Get a demonstration used on Tracetest as quick start examples. */
   getDemo: {
-    parameters: {
-      path: {
-        /** ID of a demonstration used on Tracetest as quick start examples. */
-        demoId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1173,12 +951,7 @@ export interface operations {
   };
   /** Update a demonstration used on Tracetest as quick start examples. */
   updateDemo: {
-    parameters: {
-      path: {
-        /** ID of a demonstration used on Tracetest as quick start examples. */
-        demoId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1203,12 +976,7 @@ export interface operations {
   };
   /** Delete a demonstration used on Tracetest as quick start examples. */
   deleteDemo: {
-    parameters: {
-      path: {
-        /** ID of a demonstration used on Tracetest as quick start examples. */
-        demoId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
@@ -1222,20 +990,7 @@ export interface operations {
   };
   /** Get all Data Stores */
   getDataStores: {
-    parameters: {
-      query: {
-        /** indicates how many data stores can be returned by each page */
-        take?: number;
-        /** indicates how many data stores will be skipped when paginating */
-        skip?: number;
-        /** query to search data stores, based on data store name */
-        query?: string;
-        /** indicates the sort field for the data stores */
-        sortBy?: "created" | "name";
-        /** indicates the sort direction for the data stores */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1271,11 +1026,7 @@ export interface operations {
   };
   /** Get a Data Store */
   getDataStore: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1289,11 +1040,7 @@ export interface operations {
   };
   /** Update a Data Store */
   updateDataStore: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
@@ -1308,11 +1055,7 @@ export interface operations {
   };
   /** Delete a Data Store */
   deleteDataStore: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -1320,11 +1063,7 @@ export interface operations {
   };
   /** Get the data store as an YAML file */
   getDataStoreDefinitionFile: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -1705,6 +1444,44 @@ export interface external {
     };
     operations: {};
   };
+  "parameters.yaml": {
+    paths: {};
+    components: {
+      parameters: {
+        /** @description id of the test */
+        testId: string;
+        /** @description id of the run */
+        runId: number;
+        /** @description version of the test */
+        version: number;
+        /** @description id of the transaction */
+        transactionId: string;
+        /** @description indicates how many resources can be returned by each page */
+        take: number;
+        /** @description indicates how many resources will be skipped when paginating */
+        skip: number;
+        /** @description query to search resources */
+        query: string;
+        /** @description indicates the sort field for the resources */
+        runnableResourceSortBy: "created" | "name" | "last_run";
+        /** @description indicates the sort field for the resources */
+        sortBy: "created" | "name";
+        /** @description indicates the sort field for the resources */
+        switchableResourceSortBy: "type" | "enabled";
+        /** @description indicates the sort direction for the resources */
+        sortDirection: "asc" | "desc";
+        /** @description ID of the configuration resource used on Tracetest. It should be set as 'current' */
+        configId: string;
+        /** @description ID of a demonstration used on Tracetest as quick start examples */
+        demoId: string;
+        /** @description ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current' */
+        pollingProfileId: string;
+        /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
+        dataStoreId: string;
+      };
+    };
+    operations: {};
+  };
   "resources.yaml": {
     paths: {};
     components: {
@@ -1843,6 +1620,7 @@ export interface external {
             name?: string;
             spanId?: string;
             value?: string;
+            error?: string;
           }[];
           metadata?: { [key: string]: string };
           transactionId?: string;

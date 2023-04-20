@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -102,7 +103,7 @@ func TestUpdateRun(t *testing.T) {
 	}
 	run.Results = &model.RunResults{
 		AllPassed: true,
-		Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+		Results: (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
 			{
 				Assertion: model.Assertion(`attr:tracetest.span.duration = 2000`),
 				Results: []model.SpanAssertionResult{
@@ -116,7 +117,7 @@ func TestUpdateRun(t *testing.T) {
 		}),
 	}
 
-	run.Outputs = (model.OrderedMap[string, model.RunOutput]{}).
+	run.Outputs = (maps.Ordered[string, model.RunOutput]{}).
 		MustAdd("key", model.RunOutput{
 			Value: "value",
 		})

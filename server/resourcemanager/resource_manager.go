@@ -13,7 +13,7 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/mitchellh/mapstructure"
 )
 

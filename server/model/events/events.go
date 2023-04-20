@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 func TriggerCreatedInfo(testID id.ID, runID int) model.TestRunEvent {
@@ -195,14 +195,14 @@ func TracePollingStart(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TracePollingIterationInfo(testID id.ID, runID, numberOfSpans, iteration int, isComplete bool) model.TestRunEvent {
+func TracePollingIterationInfo(testID id.ID, runID, numberOfSpans, iteration int, isComplete bool, reason string) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrace,
 		Type:                "POLLING_ITERATION_INFO",
 		Title:               "Trace polling iteration executed",
-		Description:         "A trace polling iteration has been executed",
+		Description:         fmt.Sprintf("A trace polling iteration has been executed. Reason: %s", reason),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling: model.PollingInfo{
@@ -217,14 +217,14 @@ func TracePollingIterationInfo(testID id.ID, runID, numberOfSpans, iteration int
 	}
 }
 
-func TracePollingSuccess(testID id.ID, runID int) model.TestRunEvent {
+func TracePollingSuccess(testID id.ID, runID int, reason string) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrace,
 		Type:                "POLLING_SUCCESS",
 		Title:               "Trace polling strategy succeeded",
-		Description:         "The polling strategy has succeeded in fetching the trace from the data store",
+		Description:         fmt.Sprintf("The polling strategy has succeeded in fetching the trace from the data store. Reason: %s", reason),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
@@ -277,7 +277,7 @@ func TraceFetchingSuccess(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TraceFetchingError(testID id.ID, runID int, connectionResult model.ConnectionResult, err error) model.TestRunEvent {
+func TraceFetchingError(testID id.ID, runID int, err error) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
@@ -286,7 +286,7 @@ func TraceFetchingError(testID id.ID, runID int, connectionResult model.Connecti
 		Title:               "Trace fetching failed",
 		Description:         fmt.Sprintf("The trace was not able to be fetched from the data store. Error: %s", err),
 		CreatedAt:           time.Now(),
-		DataStoreConnection: connectionResult,
+		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
 		Outputs:             []model.OutputInfo{},
 	}
@@ -307,14 +307,14 @@ func TraceStoppedInfo(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TestOutputGenerationWarning(testID id.ID, runID int, output string) model.TestRunEvent {
+func TestOutputGenerationWarning(testID id.ID, runID int, err error, output string) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTest,
 		Type:                "OUTPUT_GENERATION_WARNING",
 		Title:               fmt.Sprintf(`Output '%s' not generated`, output),
-		Description:         fmt.Sprintf(`The value for the output '%s' could not be generated`, output),
+		Description:         fmt.Sprintf(`The output '%s' returned an error. Error: %s`, output, err.Error()),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
@@ -382,12 +382,12 @@ func TestSpecsRunStart(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TestSpecsAssertionError(testID id.ID, runID int, err error, spanID string, assertion string) model.TestRunEvent {
+func TestSpecsAssertionWarning(testID id.ID, runID int, err error, spanID string, assertion string) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTest,
-		Type:                "TEST_SPECS_ASSERTION_ERROR",
+		Type:                "TEST_SPECS_ASSERTION_WARNING",
 		Title:               fmt.Sprintf(`Assertion '%s' failed`, assertion),
 		Description:         fmt.Sprintf(`The assertion '%s' returned an error on span %s. Error: %s`, assertion, spanID, err.Error()),
 		CreatedAt:           time.Now(),

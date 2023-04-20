@@ -10,6 +10,45 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+func (ro RunOutput) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name     string
+		Value    string
+		SpanID   string
+		Resolved bool
+		Error    string
+	}{
+		Name:     ro.Name,
+		Value:    ro.Value,
+		SpanID:   ro.SpanID,
+		Resolved: ro.Resolved,
+		Error:    errToString(ro.Error),
+	})
+}
+
+func (ro *RunOutput) UnmarshalJSON(data []byte) error {
+	aux := struct {
+		Name     string
+		Value    string
+		SpanID   string
+		Resolved bool
+		Error    string
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	ro.Name = aux.Name
+	ro.Value = aux.Value
+	ro.SpanID = aux.SpanID
+	ro.Resolved = aux.Resolved
+	if err := stringToErr(aux.Error); err != nil {
+		ro.Error = err
+	}
+
+	return nil
+}
+
 func (sar SpanAssertionResult) MarshalJSON() ([]byte, error) {
 	sid := ""
 	if sar.SpanID != nil {

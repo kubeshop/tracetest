@@ -8,12 +8,13 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type OutputsProcessorFn func(context.Context, model.OrderedMap[string, model.Output], model.Trace, []expression.DataStore) (model.OrderedMap[string, model.RunOutput], error)
+type OutputsProcessorFn func(context.Context, maps.Ordered[string, model.Output], model.Trace, []expression.DataStore) (maps.Ordered[string, model.RunOutput], error)
 
 func InstrumentedOutputProcessor(tracer trace.Tracer) OutputsProcessorFn {
 	op := instrumentedOutputProcessor{tracer}
@@ -24,7 +25,7 @@ type instrumentedOutputProcessor struct {
 	tracer trace.Tracer
 }
 
-func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model.OrderedMap[string, model.Output], t model.Trace, ds []expression.DataStore) (model.OrderedMap[string, model.RunOutput], error) {
+func (op instrumentedOutputProcessor) process(ctx context.Context, outputs maps.Ordered[string, model.Output], t model.Trace, ds []expression.DataStore) (maps.Ordered[string, model.RunOutput], error) {
 	ctx, span := op.tracer.Start(ctx, "Process outputs")
 	defer span.End()
 
@@ -49,8 +50,8 @@ func (op instrumentedOutputProcessor) process(ctx context.Context, outputs model
 	return result, err
 }
 
-func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model.Output], tr model.Trace, ds []expression.DataStore) (model.OrderedMap[string, model.RunOutput], error) {
-	res := model.OrderedMap[string, model.RunOutput]{}
+func outputProcessor(ctx context.Context, outputs maps.Ordered[string, model.Output], tr model.Trace, ds []expression.DataStore) (maps.Ordered[string, model.RunOutput], error) {
+	res := maps.Ordered[string, model.RunOutput]{}
 
 	parsed, err := parseOutputs(outputs)
 	if err != nil {
@@ -58,6 +59,21 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 	}
 
 	err = parsed.ForEach(func(key string, out parsedOutput) error {
+		if out.err != nil {
+			res, err = res.Add(key, model.RunOutput{
+				Value:    "",
+				SpanID:   "",
+				Name:     key,
+				Resolved: false,
+				Error:    out.err,
+			})
+			if err != nil {
+				return fmt.Errorf(`cannot process output "%s": %w`, key, err)
+			}
+
+			return nil
+		}
+
 		spans := out.selector.Filter(tr)
 
 		stores := append([]expression.DataStore{expression.MetaAttributesDataStore{SelectedSpans: spans}}, ds...)
@@ -65,6 +81,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 		value := ""
 		spanId := ""
 		resolved := false
+		var outputError error = nil
 		spans.
 			ForEach(func(_ int, span model.Span) bool {
 				value = extractAttr(span, stores, out.expr)
@@ -76,6 +93,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 			OrEmpty(func() {
 				value = extractAttr(model.Span{}, stores, out.expr)
 				resolved = false
+				outputError = fmt.Errorf(`cannot find matching spans for output "%s"`, key)
 			})
 
 		res, err = res.Add(key, model.RunOutput{
@@ -83,6 +101,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 			SpanID:   spanId,
 			Name:     key,
 			Resolved: resolved,
+			Error:    outputError,
 		})
 		if err != nil {
 			return fmt.Errorf(`cannot process output "%s": %w`, key, err)
@@ -92,7 +111,7 @@ func outputProcessor(ctx context.Context, outputs model.OrderedMap[string, model
 	})
 
 	if err != nil {
-		return model.OrderedMap[string, model.RunOutput]{}, err
+		return maps.Ordered[string, model.RunOutput]{}, err
 	}
 
 	return res, nil
@@ -111,31 +130,37 @@ func extractAttr(span model.Span, ds []expression.DataStore, expr expression.Exp
 type parsedOutput struct {
 	selector selectors.Selector
 	expr     expression.Expr
+	err      error
 }
 
-func parseOutputs(outputs model.OrderedMap[string, model.Output]) (model.OrderedMap[string, parsedOutput], error) {
-	var parsed model.OrderedMap[string, parsedOutput]
+func parseOutputs(outputs maps.Ordered[string, model.Output]) (maps.Ordered[string, parsedOutput], error) {
+	var parsed maps.Ordered[string, parsedOutput]
 
 	parseErr := outputs.ForEach(func(key string, out model.Output) error {
+		var selector selectors.Selector
+		var expr expression.Expr
+		var outputErr error = nil
+
 		expr, err := expression.Parse(out.Value)
 		if err != nil {
-			return fmt.Errorf(`cannot parse output "%s" value "%s": %w`, key, out.Value, err)
+			outputErr = fmt.Errorf(`cannot parse output "%s" value "%s": %w`, key, out.Value, err)
 		}
 
-		selector, err := selectors.New(string(out.Selector))
+		selector, err = selectors.New(string(out.Selector))
 		if err != nil {
-			return fmt.Errorf(`cannot parse output "%s" selector "%s": %w`, key, string(out.Selector), err)
+			outputErr = fmt.Errorf(`cannot parse output "%s" selector "%s": %w`, key, string(out.Selector), err)
 		}
 
 		parsed, _ = parsed.Add(key, parsedOutput{
 			selector: selector,
 			expr:     expr,
+			err:      outputErr,
 		})
 		return nil
 	})
 
 	if parseErr != nil {
-		return model.OrderedMap[string, parsedOutput]{}, parseErr
+		return maps.Ordered[string, parsedOutput]{}, parseErr
 	}
 
 	return parsed, nil

@@ -22,6 +22,7 @@ type TestRunOutputsInner struct {
 	Name   *string `json:"name,omitempty"`
 	SpanId *string `json:"spanId,omitempty"`
 	Value  *string `json:"value,omitempty"`
+	Error  *string `json:"error,omitempty"`
 }
 
 // NewTestRunOutputsInner instantiates a new TestRunOutputsInner object
@@ -137,6 +138,38 @@ func (o *TestRunOutputsInner) SetValue(v string) {
 	o.Value = &v
 }
 
+// GetError returns the Error field value if set, zero value otherwise.
+func (o *TestRunOutputsInner) GetError() string {
+	if o == nil || isNil(o.Error) {
+		var ret string
+		return ret
+	}
+	return *o.Error
+}
+
+// GetErrorOk returns a tuple with the Error field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRunOutputsInner) GetErrorOk() (*string, bool) {
+	if o == nil || isNil(o.Error) {
+		return nil, false
+	}
+	return o.Error, true
+}
+
+// HasError returns a boolean if a field has been set.
+func (o *TestRunOutputsInner) HasError() bool {
+	if o != nil && !isNil(o.Error) {
+		return true
+	}
+
+	return false
+}
+
+// SetError gets a reference to the given string and assigns it to the Error field.
+func (o *TestRunOutputsInner) SetError(v string) {
+	o.Error = &v
+}
+
 func (o TestRunOutputsInner) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o TestRunOutputsInner) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Value) {
 		toSerialize["value"] = o.Value
+	}
+	if !isNil(o.Error) {
+		toSerialize["error"] = o.Error
 	}
 	return toSerialize, nil
 }

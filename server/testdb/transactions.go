@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 var _ model.TestRepository = &postgresDB{}
