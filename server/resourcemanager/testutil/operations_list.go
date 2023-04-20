@@ -91,7 +91,7 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
 		require.Equal(t, 1, parsedJsonBody.Count)
-		require.Equal(t, len(parsedJsonBody.Items), 1)
+		require.Equal(t, 1, len(parsedJsonBody.Items))
 
 		obtainedAsBytes, err := json.Marshal(parsedJsonBody.Items[0])
 		require.NoError(t, err)

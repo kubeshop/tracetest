@@ -37,13 +37,11 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
-	routes[c.getRouteIndex("GetEnvironmentDefinitionFile")].HandlerFunc = c.GetEnvironmentDefinitionFile
 	routes[c.getRouteIndex("GetDataStoreDefinitionFile")].HandlerFunc = c.GetDataStoreDefinitionFile
 
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 
 	routes[c.getRouteIndex("GetTests")].HandlerFunc = paginatedEndpoint[openapi.Test](c.service.GetTests, c.errorHandler)
-	routes[c.getRouteIndex("GetEnvironments")].HandlerFunc = paginatedEndpoint[openapi.Environment](c.service.GetEnvironments, c.errorHandler)
 	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = paginatedEndpoint[openapi.Transaction](c.service.GetTransactions, c.errorHandler)
 	routes[c.getRouteIndex("GetResources")].HandlerFunc = paginatedEndpoint[openapi.Resource](c.service.GetResources, c.errorHandler)
 	routes[c.getRouteIndex("GetDataStores")].HandlerFunc = paginatedEndpoint[openapi.DataStore](c.service.GetDataStores, c.errorHandler)
@@ -144,21 +142,6 @@ func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWr
 	}
 
 	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
-}
-
-// GetTransactionVersionDefinitionFile - Get the test definition as an YAML file
-func (c *customController) GetEnvironmentDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.GetEnvironmentDefinitionFile(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
