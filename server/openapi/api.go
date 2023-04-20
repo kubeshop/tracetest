@@ -67,6 +67,7 @@ type ApiApiRouter interface {
 // pass the data to a ResourceApiApiServicer to perform the required actions, then write the service results to the http response.
 type ResourceApiApiRouter interface {
 	CreateDemo(http.ResponseWriter, *http.Request)
+	DeleteDataStore(http.ResponseWriter, *http.Request)
 	DeleteDemo(http.ResponseWriter, *http.Request)
 	GetConfiguration(http.ResponseWriter, *http.Request)
 	GetDataStore(http.ResponseWriter, *http.Request)
@@ -134,6 +135,7 @@ type ApiApiServicer interface {
 // and updated with the logic required for the API.
 type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
+	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)
 	GetConfiguration(context.Context, string) (ImplResponse, error)
 	GetDataStore(context.Context, string) (ImplResponse, error)

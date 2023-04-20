@@ -1131,3 +1131,16 @@ paths:
           description: "invalid data store, some data was sent in incorrect format."
         500:
           description: "problem with updating data store"
+    delete:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/dataStoreId"
+      summary: "Delete a Data Store"
+      description: "Delete a Data Store"
+      operationId: deleteDataStore
+      responses:
+        204:
+          description: successful operation
+        500:
+          description: "problem with data store deletion"

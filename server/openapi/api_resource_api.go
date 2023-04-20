@@ -57,6 +57,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateDemo,
 		},
 		{
+			"DeleteDataStore",
+			strings.ToUpper("Delete"),
+			"/api/datastores/{dataStoreId}",
+			c.DeleteDataStore,
+		},
+		{
 			"DeleteDemo",
 			strings.ToUpper("Delete"),
 			"/api/demos/{demoId}",
@@ -133,6 +139,22 @@ func (c *ResourceApiApiController) CreateDemo(w http.ResponseWriter, r *http.Req
 		return
 	}
 	result, err := c.service.CreateDemo(r.Context(), demoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteDataStore - Delete a Data Store
+func (c *ResourceApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	dataStoreIdParam := params["dataStoreId"]
+
+	result, err := c.service.DeleteDataStore(r.Context(), dataStoreIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

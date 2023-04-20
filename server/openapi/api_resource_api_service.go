@@ -40,6 +40,20 @@ func (s *ResourceApiApiService) CreateDemo(ctx context.Context, demo Demo) (Impl
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateDemo method not implemented")
 }
 
+// DeleteDataStore - Delete a Data Store
+func (s *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) (ImplResponse, error) {
+	// TODO - update DeleteDataStore with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteDataStore method not implemented")
+}
+
 // DeleteDemo - Delete a Demonstration setting
 func (s *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) (ImplResponse, error) {
 	// TODO - update DeleteDemo with the required logic for this service method.

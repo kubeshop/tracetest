@@ -15,6 +15,7 @@ import (
 var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationGet,
 	resourcemanager.OperationUpdate,
+	resourcemanager.OperationDelete,
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -34,6 +35,8 @@ func (r *Repository) SetID(dataStore DataStore, id id.ID) DataStore {
 	return dataStore
 }
 
+const dataStoreSingleID id.ID = "current"
+
 const insertQuery = `
 INSERT INTO data_stores (
 	"id",
@@ -44,7 +47,7 @@ INSERT INTO data_stores (
 	"created_at"
 ) VALUES ($1, $2, $3, $4, $5, $6)`
 
-const deleteQuery = `DELETE FROM data_stores`
+const deleteQuery = `DELETE FROM data_stores WHERE "id" = $1`
 
 func newCreateAtDateString() string {
 	return time.Now().UTC().Format(time.RFC3339Nano)
@@ -73,7 +76,7 @@ func (r *Repository) getCreatedAt(ctx context.Context, dataStore DataStore) (str
 
 func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore, error) {
 	// enforce ID and default
-	dataStore.ID = "current"
+	dataStore.ID = dataStoreSingleID
 	dataStore.Default = true
 
 	// reuse the created_at field for auditing purposes,
@@ -92,7 +95,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery)
+	_, err = tx.ExecContext(ctx, deleteQuery, dataStoreSingleID)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
 	}
@@ -120,6 +123,26 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 
 	return dataStore, nil
+}
+
+func (r *Repository) Delete(ctx context.Context, id id.ID) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.ExecContext(ctx, deleteQuery, dataStoreSingleID)
+	if err != nil {
+		return fmt.Errorf("datastore repository sql exec delete: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("commit: %w", err)
+	}
+
+	return nil
 }
 
 const getQuery = `
