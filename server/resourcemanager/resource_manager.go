@@ -234,7 +234,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var values map[string]any
-		err := mapstructure.Decode(resource, &values)
+		err := decode(resource, &values)
 		if err != nil {
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 			return
@@ -330,7 +330,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 	}
 
 	targetResource := Resource[T]{}
-	err = mapstructure.Decode(values, &targetResource)
+	err = decode(values, &targetResource)
 	if err != nil {
 		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot unmarshal body values: %w", err))
 		return
@@ -383,12 +383,11 @@ func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
 }
 
 func encodeValues(resource any, enc encoder) ([]byte, error) {
-	// mapstructure doesn't have a `Decode`, but encoding with reversed provides this func.
-	// See https://github.com/mitchellh/mapstructure/issues/53#issuecomment-273342420
 	var values map[string]any
-	err := mapstructure.Decode(resource, &values)
+
+	err := decode(resource, &values)
 	if err != nil {
-		return nil, fmt.Errorf("cannot encode values: %w", err)
+		return nil, fmt.Errorf("cannot code resource: %w", err)
 	}
 
 	return enc.Marshal(values)
@@ -419,4 +418,8 @@ func readBody(r *http.Request) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func decode(input interface{}, output interface{}) error {
+	return mapstructure.Decode(input, output)
 }
