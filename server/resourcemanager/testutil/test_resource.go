@@ -17,7 +17,6 @@ type ResourceTypeTest struct {
 	ResourceTypePlural   string
 	RegisterManagerFn    func(*mux.Router) rm.Manager
 	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
-	Cleanup              func(t *testing.T, manager rm.Manager)
 
 	SampleJSON        string
 	SampleJSONUpdated string
@@ -122,14 +121,7 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 
 	router := mux.NewRouter()
 	testServer := httptest.NewServer(router)
-	defer testServer.Close()
-
 	manager := rt.RegisterManagerFn(router)
-	defer func() {
-		if rt.Cleanup != nil {
-			rt.Cleanup(t, manager)
-		}
-	}()
 
 	sortable, ok := manager.Handler().(rm.SortableHandler)
 	if ok {
