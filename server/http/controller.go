@@ -31,7 +31,6 @@ var IDGen = id.NewRandGenerator()
 type controller struct {
 	tracer          trace.Tracer
 	testDB          model.Repository
-	dsRepository    datastoreresource.Repository
 	runner          runner
 	newTraceDBFn    func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
 	mappers         mappings.Mappings
