@@ -19,10 +19,10 @@ type dataStoreActions struct {
 
 var _ ResourceActions = &dataStoreActions{}
 
-func NewDataStoreActions(options ...ResourceArgsOption) dataStoreActions {
+func NewDataStoreActions(options ...ResourceArgsOption) *dataStoreActions {
 	args := NewResourceArgs(options...)
 
-	return dataStoreActions{
+	return &dataStoreActions{
 		resourceArgs: args,
 	}
 }
