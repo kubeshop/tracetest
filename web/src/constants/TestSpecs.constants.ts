@@ -82,3 +82,5 @@ export const TEST_SPEC_SNIPPETS: TSnippet[] = [
   DB_SPANS_RESPONSE_TIME,
   DB_SPANS_QUALITY_DB_STATEMENT_PRESENT,
 ];
+
+export const TestSpecErrors = ['resolution error', 'invalid syntax'];
