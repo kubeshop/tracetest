@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 
+	ptraceotlp "go.opentelemetry.io/collector/pdata/ptrace/ptraceotlp"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -88,13 +89,18 @@ func (s HttpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, e
 }
 
 func (s HttpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error) {
-	request := pb.ExportTraceServiceRequest{}
-	err := json.Unmarshal(body, &request)
+	exportRequest := ptraceotlp.NewRequest()
+	err := exportRequest.UnmarshalJSON(body)
 	if err != nil {
 		return nil, err
 	}
 
-	return &request, nil
+	protoBody, err := exportRequest.MarshalProto()
+	if err != nil {
+		return nil, err
+	}
+
+	return s.parseProtoBuf(protoBody)
 }
 
 func (s HttpServer) parseBody(reqBody io.ReadCloser, contentType string, shouldDecompress bool) (*pb.ExportTraceServiceRequest, error) {
