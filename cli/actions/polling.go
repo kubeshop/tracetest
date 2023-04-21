@@ -47,7 +47,7 @@ func (polling pollingActions) Apply(ctx context.Context, args ApplyArgs) error {
 	}
 
 	if fileContent.Definition().Type != "PollingProfile" {
-		return fmt.Errorf(`file must be of type "Config"`)
+		return fmt.Errorf(`file must be of type "PollingProfile"`)
 	}
 
 	var pollingProfile openapi.PollingProfile
