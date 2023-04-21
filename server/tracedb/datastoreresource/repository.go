@@ -26,10 +26,6 @@ type Repository struct {
 	db *sql.DB
 }
 
-func (r *Repository) Close() error {
-	return r.db.Close()
-}
-
 func (r *Repository) SetID(dataStore DataStore, id id.ID) DataStore {
 	dataStore.ID = id
 	return dataStore

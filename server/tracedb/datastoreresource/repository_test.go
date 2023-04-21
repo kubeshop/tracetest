@@ -2,13 +2,13 @@ package datastoreresource_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
-	"github.com/kubeshop/tracetest/server/testmock"
 	datastore "github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/stretchr/testify/require"
 )
@@ -35,8 +35,7 @@ func compareJSONDataStores(t require.TestingT, operation rmtests.Operation, firs
 	require.JSONEq(t, expected, obtained)
 }
 
-func registerManagerFn(router *mux.Router) resourcemanager.Manager {
-	db := testmock.CreateMigratedDatabase()
+func registerManagerFn(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 	dataStoreRepository := datastore.NewRepository(db)
 
 	manager := resourcemanager.New[datastore.DataStore](
@@ -49,12 +48,6 @@ func registerManagerFn(router *mux.Router) resourcemanager.Manager {
 	manager.RegisterRoutes(router)
 
 	return manager
-}
-
-func cleanup(t *testing.T, manager resourcemanager.Manager) {
-	repository := manager.Handler().(*datastore.Repository)
-	err := repository.Close()
-	require.NoError(t, err)
 }
 
 func getScenarioPreparation(sample datastore.DataStore) func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
@@ -91,7 +84,6 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -155,7 +147,6 @@ func TestDataStoreResource_ElasticAPM(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -219,7 +210,6 @@ func TestDataStoreResource_Jaeger(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -272,7 +262,6 @@ func TestDataStoreResource_OTLP(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -322,7 +311,6 @@ func TestDataStoreResource_OpenSearch(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -384,7 +372,6 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {
@@ -443,7 +430,6 @@ func TestDataStoreResource_Tempo(t *testing.T) {
 		ResourceTypePlural:   datastore.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
 		Prepare:              getScenarioPreparation(sample),
-		Cleanup:              cleanup,
 		SampleJSON: `{
 			"type": "DataStore",
 			"spec": {

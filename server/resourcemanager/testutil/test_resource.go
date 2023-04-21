@@ -19,7 +19,6 @@ type ResourceTypeTest struct {
 	ResourceTypePlural   string
 	RegisterManagerFn    func(*mux.Router, *sql.DB) rm.Manager
 	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
-	Cleanup              func(t *testing.T, manager rm.Manager)
 
 	SampleJSON        string
 	SampleJSONUpdated string
