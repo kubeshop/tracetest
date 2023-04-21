@@ -87,7 +87,7 @@ func (m Model) DataStore(in openapi.DataStore) datastoreresource.DataStore {
 		ID:        "current",
 		Name:      in.Name,
 		Type:      m.DataStoreType(in.Type),
-		Default:   in.IsDefault,
+		Default:   in.Default,
 		CreatedAt: in.CreatedAt.Format(time.RFC3339Nano),
 	}
 

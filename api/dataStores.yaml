@@ -14,7 +14,7 @@ components:
           type: string
         type:
           $ref: "#/components/schemas/SupportedDataStores"
-        isDefault:
+        default:
           type: boolean
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
