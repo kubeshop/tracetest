@@ -46,7 +46,7 @@ func (s *httpServer) Start() error {
 
 	s.hServer = &http.Server{
 		Addr:    s.addr,
-		Handler: handlers.CompressHandler(fixGzipHeaderHandler(handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType))),
+		Handler: handlers.CompressHandler(decompressBodyHandler(handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType))),
 	}
 	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
@@ -164,7 +164,7 @@ func (r httpResponse) paseResponseBody(data proto.Message) ([]byte, error) {
 	return json.Marshal(data)
 }
 
-func fixGzipHeaderHandler(h http.Handler) http.Handler {
+func decompressBodyHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.Header.Get("content-encoding"), "gzip") {
 			compressedBody, err := decompressBody(r.Body)
