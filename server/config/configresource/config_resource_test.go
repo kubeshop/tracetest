@@ -2,6 +2,7 @@ package configresource_test
 
 import (
 	"context"
+	"database/sql"
 	"os"
 	"testing"
 
@@ -100,8 +101,7 @@ func TestConfigResource(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: configresource.ResourceName,
 		ResourceTypePlural:   configresource.ResourceNamePlural,
-		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.CreateMigratedDatabase()
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			configRepo := configresource.NewRepository(db)
 
 			manager := resourcemanager.New[configresource.Config](

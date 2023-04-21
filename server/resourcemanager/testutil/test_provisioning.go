@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
@@ -19,7 +20,10 @@ const (
 func testProvisioning(t *testing.T, rt ResourceTypeTest) {
 	t.Run("Provisioning", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
-			manager := rt.RegisterManagerFn(mux.NewRouter())
+			db := testmock.CreateMigratedDatabase()
+			defer db.Close()
+
+			manager := rt.RegisterManagerFn(mux.NewRouter(), db)
 			if rt.Prepare != nil {
 				rt.Prepare(t, OperationProvisioningSuccess, manager)
 			}
@@ -34,7 +38,10 @@ func testProvisioning(t *testing.T, rt ResourceTypeTest) {
 		})
 
 		t.Run("UnacceptableType", func(t *testing.T) {
-			manager := rt.RegisterManagerFn(mux.NewRouter())
+			db := testmock.CreateMigratedDatabase()
+			defer db.Close()
+
+			manager := rt.RegisterManagerFn(mux.NewRouter(), db)
 			if rt.Prepare != nil {
 				rt.Prepare(t, OperationProvisioningTypeNotSupported, manager)
 			}

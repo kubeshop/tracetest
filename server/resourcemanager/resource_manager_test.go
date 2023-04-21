@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/stretchr/testify/mock"
@@ -74,7 +75,7 @@ func TestSampleResource(t *testing.T) {
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: "SampleResource",
 		ResourceTypePlural:   "SampleResources",
-		RegisterManagerFn: func(router *mux.Router) rm.Manager {
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			mockManager := new(sampleResourceManager)
 			manager := rm.New[sampleResource](
 				"SampleResource",
@@ -223,7 +224,7 @@ func TestRestrictedResource(t *testing.T) {
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: "RestrictedResource",
 		ResourceTypePlural:   "RestrictedResources",
-		RegisterManagerFn: func(router *mux.Router) rm.Manager {
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) rm.Manager {
 			mockManager := new(restrictedResourceManager)
 			manager := rm.New[sampleResource](
 				"RestrictedResource",
