@@ -2,6 +2,7 @@ package demoresource_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -9,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
-	"github.com/kubeshop/tracetest/server/testmock"
 )
 
 func TestPokeshopDemoResource(t *testing.T) {
@@ -49,8 +49,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: demoresource.ResourceName,
 		ResourceTypePlural:   demoresource.ResourceNamePlural,
-		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.CreateMigratedDatabase()
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			demoRepository := demoresource.NewRepository(db)
 
 			manager := resourcemanager.New[demoresource.Demo](
@@ -149,8 +148,7 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: demoresource.ResourceName,
 		ResourceTypePlural:   demoresource.ResourceNamePlural,
-		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.CreateMigratedDatabase()
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			demoRepository := demoresource.NewRepository(db)
 
 			manager := resourcemanager.New[demoresource.Demo](

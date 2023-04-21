@@ -2,6 +2,7 @@ package testdb_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -9,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/config/configgrpc"
@@ -177,8 +177,7 @@ func TestDataStoreProvisioner(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: testdb.DataStoreResourceName,
 		ResourceTypePlural:   testdb.DataStoreResourceName,
-		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.CreateMigratedDatabase()
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			dsRepo, err := testdb.Postgres(testdb.WithDB(db))
 			require.NoError(t, err)
 
@@ -186,7 +185,7 @@ func TestDataStoreProvisioner(t *testing.T) {
 				testdb.DataStoreResourceName,
 				testdb.DataStoreResourceNamePlural,
 				testdb.NewDataStoreResourceProvisioner(dsRepo),
-				// this resource exists only for provisiooning at the moment``
+				// this resource exists only for provisioning at the moment
 				resourcemanager.WithOperations(resourcemanager.OperationNoop),
 			)
 			manager.RegisterRoutes(router)

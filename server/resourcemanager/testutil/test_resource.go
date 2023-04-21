@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"database/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,12 +11,13 @@ import (
 	"gotest.tools/v3/assert"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/kubeshop/tracetest/server/testmock"
 )
 
 type ResourceTypeTest struct {
 	ResourceTypeSingular string
 	ResourceTypePlural   string
-	RegisterManagerFn    func(*mux.Router) rm.Manager
+	RegisterManagerFn    func(*mux.Router, *sql.DB) rm.Manager
 	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
 
 	SampleJSON        string
@@ -119,9 +121,15 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 func testOperationForContentType(t *testing.T, op operationTester, ct contentTypeConverter, rt ResourceTypeTest) {
 	t.Helper()
 
+	db := testmock.CreateMigratedDatabase()
+	defer db.Close()
+
 	router := mux.NewRouter()
+
 	testServer := httptest.NewServer(router)
-	manager := rt.RegisterManagerFn(router)
+	defer testServer.Close()
+
+	manager := rt.RegisterManagerFn(router, db)
 
 	sortable, ok := manager.Handler().(rm.SortableHandler)
 	if ok {
