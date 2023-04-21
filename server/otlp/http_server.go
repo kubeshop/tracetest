@@ -11,6 +11,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+
 	ptraceotlp "go.opentelemetry.io/collector/pdata/ptrace/ptraceotlp"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc/codes"
@@ -18,30 +21,33 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const protoBufContentType = "application/x-protobuf"
-const jsonContentType = "application/json"
-const gzipEncoding = "gzip"
+const (
+	protoBufContentType = "application/x-protobuf"
+	jsonContentType     = "application/json"
+)
 
-type HttpServer struct {
+type httpServer struct {
 	addr     string
-	exporter IExporter
+	ingester ingester
 
 	hServer *http.Server
 }
 
-func NewHttpServer(addr string, exporter IExporter) *HttpServer {
-	return &HttpServer{
+func NewHttpServer(addr string, ingester ingester) *httpServer {
+	return &httpServer{
 		addr:     addr,
-		exporter: exporter,
+		ingester: ingester,
 	}
 }
 
-func (s *HttpServer) Start() error {
+func (s *httpServer) Start() error {
+	r := mux.NewRouter()
+	r.HandleFunc("/v1/traces", s.Export).Methods("POST")
+
 	s.hServer = &http.Server{
 		Addr:    s.addr,
-		Handler: s,
+		Handler: handlers.CompressHandler(fixGzipHeaderHandler(handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType))),
 	}
-
 	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
 		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
@@ -50,34 +56,30 @@ func (s *HttpServer) Start() error {
 	return s.hServer.Serve(listener)
 }
 
-func (s *HttpServer) Stop() {}
+func (s *httpServer) Stop() {
+	s.hServer.Close()
+}
 
-func (s HttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	contentType, contentEncoding, err := s.validateRequest(r)
-	shouldDecompress := contentEncoding == gzipEncoding
-	shouldEncode := strings.Contains(r.Header.Get("Accept-Encoding"), gzipEncoding)
+func (s httpServer) Export(w http.ResponseWriter, r *http.Request) {
+	contentType := r.Header.Get("content-type")
+	response := newHttpResponse(w, contentType)
 
-	response := newHttpResponse(w, contentType, shouldEncode)
-	if err != nil {
-		response.sendError(http.StatusBadRequest, status.Errorf(codes.InvalidArgument, "Error when validating request %s", err.Error()))
-		return
-	}
-
-	request, err := s.parseBody(r.Body, contentType, shouldDecompress)
+	request, err := s.parseBody(r.Body, contentType)
 	if err != nil {
 		response.sendError(http.StatusUnprocessableEntity, status.Errorf(codes.InvalidArgument, "Could not parse request body %s", err.Error()))
 		return
 	}
 
-	result, err := s.exporter.Ingest(r.Context(), request)
+	result, err := s.ingester.Ingest(r.Context(), request)
 	if err != nil {
 		response.sendError(http.StatusInternalServerError, status.Errorf(codes.InvalidArgument, "Error when ingesting spans %s", err.Error()))
 		return
 	}
+
 	response.send(http.StatusOK, result)
 }
 
-func (s HttpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, error) {
+func (s httpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, error) {
 	request := pb.ExportTraceServiceRequest{}
 
 	err := proto.Unmarshal(body, &request)
@@ -88,8 +90,9 @@ func (s HttpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, e
 	return &request, nil
 }
 
-func (s HttpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error) {
+func (s httpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error) {
 	exportRequest := ptraceotlp.NewRequest()
+
 	err := exportRequest.UnmarshalJSON(body)
 	if err != nil {
 		return nil, err
@@ -103,7 +106,7 @@ func (s HttpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error
 	return s.parseProtoBuf(protoBody)
 }
 
-func (s HttpServer) parseBody(reqBody io.ReadCloser, contentType string, shouldDecompress bool) (*pb.ExportTraceServiceRequest, error) {
+func (s httpServer) parseBody(reqBody io.ReadCloser, contentType string) (*pb.ExportTraceServiceRequest, error) {
 	var body []byte
 	if b, err := io.ReadAll(reqBody); err == nil {
 		body = b
@@ -115,43 +118,78 @@ func (s HttpServer) parseBody(reqBody io.ReadCloser, contentType string, shouldD
 		return nil, fmt.Errorf("empty body")
 	}
 
-	if shouldDecompress {
-		decompressedBody, err := s.decompressBody(body)
-		if err != nil {
-			return nil, err
+	if contentType == protoBufContentType {
+		return s.parseProtoBuf(body)
+	}
+
+	return s.parseJson(body)
+}
+
+type httpResponse struct {
+	w           http.ResponseWriter
+	contentType string
+}
+
+func newHttpResponse(w http.ResponseWriter, contentType string) httpResponse {
+	return httpResponse{
+		w:           w,
+		contentType: contentType,
+	}
+}
+
+func (r httpResponse) send(statusCode int, message proto.Message) error {
+	body, err := r.paseResponseBody(message)
+	if err != nil {
+		fmt.Println("Could not attach body to response", err.Error())
+		return err
+	}
+
+	r.w.WriteHeader(statusCode)
+	r.w.Write(body)
+
+	return nil
+}
+
+func (r httpResponse) sendError(code int, err error) {
+	rpcError, _ := status.FromError(err)
+
+	r.send(code, rpcError.Proto())
+}
+
+func (r httpResponse) paseResponseBody(data proto.Message) ([]byte, error) {
+	if r.contentType == protoBufContentType {
+		return proto.Marshal(data)
+	}
+
+	return json.Marshal(data)
+}
+
+func fixGzipHeaderHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.Header.Get("content-encoding"), "gzip") {
+			compressedBody, err := decompressBody(r.Body)
+			if err != nil {
+				response := newHttpResponse(w, r.Header.Get("content-type"))
+				response.sendError(http.StatusUnprocessableEntity, status.Errorf(codes.InvalidArgument, "Could not parse request body %s", err.Error()))
+				return
+			}
+
+			r.Body = compressedBody
+			r.Header.Set("accept-encoding", "gzip")
 		}
 
-		body = decompressedBody
-	}
-
-	switch contentType {
-	case protoBufContentType:
-		return s.parseProtoBuf(body)
-	case jsonContentType:
-		return s.parseJson(body)
-	}
-
-	return nil, fmt.Errorf("content-type %s not supported", contentType)
+		h.ServeHTTP(w, r)
+	})
 }
 
-func (s HttpServer) validateRequest(r *http.Request) (string, string, error) {
-	contentEncoding := r.Header.Get("content-encoding")
-	contentType := r.Header.Get("content-type")
-
-	if r.URL.Path != "/v1/traces" {
-		return contentType, contentEncoding, fmt.Errorf("path %s not supported", r.URL.Path)
-	}
-	if r.Method != http.MethodPost {
-		return contentType, contentEncoding, fmt.Errorf("method %s not supported", r.Method)
-	}
-	if contentType != "" && contentType != protoBufContentType && contentType != jsonContentType {
-		return contentType, contentEncoding, fmt.Errorf("content-type %s not supported", contentType)
+func decompressBody(reqBody io.ReadCloser) (io.ReadCloser, error) {
+	var body []byte
+	if b, err := io.ReadAll(reqBody); err == nil {
+		body = b
+	} else {
+		return nil, err
 	}
 
-	return contentType, contentEncoding, nil
-}
-
-func (s HttpServer) decompressBody(body []byte) ([]byte, error) {
 	reader := bytes.NewReader(body)
 	gzReader, err := gzip.NewReader(reader)
 	if err != nil {
@@ -163,66 +201,5 @@ func (s HttpServer) decompressBody(body []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	return output, nil
-}
-
-type httpResponse struct {
-	w            http.ResponseWriter
-	shouldEncode bool
-	contentType  string
-}
-
-func newHttpResponse(w http.ResponseWriter, contentType string, shouldEncode bool) httpResponse {
-
-	return httpResponse{
-		w:            w,
-		shouldEncode: shouldEncode,
-		contentType:  contentType,
-	}
-}
-
-func (r httpResponse) send(statusCode int, message proto.Message) error {
-	body, err := r.paseBody(message)
-	if err != nil {
-		fmt.Println("Could not attach body to response", err.Error())
-		return err
-	}
-
-	r.w.Header().Set("Content-Type", r.contentType)
-	if r.shouldEncode {
-		r.w.Header().Set("Content-Encoding", gzipEncoding)
-		r.w.WriteHeader(statusCode)
-		r.w.Write(r.compressBody(body))
-	} else {
-		r.w.WriteHeader(statusCode)
-		r.w.Write(body)
-	}
-
-	return nil
-}
-
-func (r httpResponse) sendError(code int, err error) {
-	rpcError, _ := status.FromError(err)
-
-	r.send(code, rpcError.Proto())
-}
-
-func (r httpResponse) paseBody(data proto.Message) ([]byte, error) {
-	switch r.contentType {
-	case protoBufContentType:
-		return proto.Marshal(data)
-	case jsonContentType:
-		return json.Marshal(data)
-	}
-
-	return []byte(fmt.Sprintf("content-type <%s> not supported", r.contentType)), nil
-}
-
-func (r httpResponse) compressBody(body []byte) []byte {
-	var b bytes.Buffer
-	w := gzip.NewWriter(&b)
-	w.Write(body)
-	w.Close()
-
-	return b.Bytes()
+	return io.NopCloser(bytes.NewReader(output)), nil
 }

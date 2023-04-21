@@ -284,9 +284,9 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 }
 
 func registerOtlpServer(app *App, testDB model.Repository) {
-	exporter := otlp.NewExporter(testDB)
-	grpcOtlpServer := otlp.NewGrpcServer(":4317", exporter)
-	httpOtlpServer := otlp.NewHttpServer(":4318", exporter)
+	ingester := otlp.NewIngester(testDB)
+	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
+	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
 	go httpOtlpServer.Start()
 

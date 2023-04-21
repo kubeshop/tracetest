@@ -12,24 +12,18 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-type IExporter interface {
-	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error)
-}
-
-type Exporter struct {
+type ingester struct {
 	db model.Repository
 }
 
-var _ IExporter = Exporter{}
-
-func NewExporter(db model.Repository) Exporter {
-	return Exporter{
+func NewIngester(db model.Repository) ingester {
+	return ingester{
 		db: db,
 	}
 }
 
-func (e Exporter) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
-	ds, err := e.db.DefaultDataStore(ctx)
+func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
+	ds, err := i.db.DefaultDataStore(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
 		fmt.Println("OTLP server is not enabled. Ignoring request")
@@ -40,10 +34,10 @@ func (e Exporter) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 		return &pb.ExportTraceServiceResponse{}, nil
 	}
 
-	spansByTrace := e.getSpansByTrace(request)
+	spansByTrace := i.getSpansByTrace(request)
 
 	for traceID, spans := range spansByTrace {
-		e.saveSpansIntoTest(ctx, traceID, spans)
+		i.saveSpansIntoTest(ctx, traceID, spans)
 	}
 
 	return &pb.ExportTraceServiceResponse{
@@ -53,7 +47,7 @@ func (e Exporter) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	}, nil
 }
 
-func (e Exporter) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace.TraceID][]model.Span {
+func (i ingester) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace.TraceID][]model.Span {
 	otelSpans := make([]*v1.Span, 0)
 	for _, resourceSpan := range request.ResourceSpans {
 		for _, spans := range resourceSpan.ScopeSpans {
@@ -79,7 +73,7 @@ func (e Exporter) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[tra
 	return spansByTrace
 }
 
-func (e Exporter) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span) error {
+func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span) error {
 	run, err := e.db.GetRunByTraceID(ctx, traceID)
 	if err != nil && strings.Contains(err.Error(), "record not found") {
 		// span is not part of any known test run. So it will be ignored

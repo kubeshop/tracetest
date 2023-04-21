@@ -9,23 +9,23 @@ import (
 	"google.golang.org/grpc"
 )
 
-type GrpcServer struct {
+type grpcServer struct {
 	pb.UnimplementedTraceServiceServer
 
 	addr     string
-	exporter IExporter
+	ingester ingester
 
 	gServer *grpc.Server
 }
 
-func NewGrpcServer(addr string, exporter IExporter) *GrpcServer {
-	return &GrpcServer{
+func NewGrpcServer(addr string, ingester ingester) *grpcServer {
+	return &grpcServer{
 		addr:     addr,
-		exporter: exporter,
+		ingester: ingester,
 	}
 }
 
-func (s *GrpcServer) Start() error {
+func (s *grpcServer) Start() error {
 	s.gServer = grpc.NewServer()
 	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
@@ -35,10 +35,10 @@ func (s *GrpcServer) Start() error {
 	return s.gServer.Serve(listener)
 }
 
-func (s *GrpcServer) Stop() {
+func (s *grpcServer) Stop() {
 	s.gServer.Stop()
 }
 
-func (s GrpcServer) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
-	return s.exporter.Ingest(ctx, request)
+func (s grpcServer) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
+	return s.ingester.Ingest(ctx, request)
 }
