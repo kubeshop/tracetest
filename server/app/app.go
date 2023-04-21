@@ -285,12 +285,12 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 
 func registerOtlpServer(app *App, testDB model.Repository) {
 	exporter := otlp.NewExporter(testDB)
-	grpcOtlpServer := otlp.NewGrpcServer(":4318", exporter)
-	httpOtlpServer := otlp.NewHttpServer(":4317", exporter)
+	grpcOtlpServer := otlp.NewGrpcServer(":4317", exporter)
+	httpOtlpServer := otlp.NewHttpServer(":4318", exporter)
 	go grpcOtlpServer.Start()
 	go httpOtlpServer.Start()
 
-	fmt.Println("OTLP server started on :4318 (grpc) and :4317 (http)")
+	fmt.Println("OTLP server started on :4317 (grpc) and :4318 (http)")
 
 	app.registerStopFn(func() {
 		fmt.Println("stopping otlp server")

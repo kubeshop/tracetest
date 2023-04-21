@@ -13,7 +13,7 @@ import (
 )
 
 type IExporter interface {
-	Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error)
+	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error)
 }
 
 type Exporter struct {
@@ -28,7 +28,7 @@ func NewExporter(db model.Repository) Exporter {
 	}
 }
 
-func (e Exporter) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
+func (e Exporter) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := e.db.DefaultDataStore(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {

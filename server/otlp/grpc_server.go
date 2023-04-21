@@ -40,5 +40,5 @@ func (s *GrpcServer) Stop() {
 }
 
 func (s GrpcServer) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
-	return s.exporter.Export(ctx, request)
+	return s.exporter.Ingest(ctx, request)
 }
