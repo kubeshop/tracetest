@@ -24,7 +24,7 @@ Create variables in Tracetest based on the trace obtained by the test to enable 
 
 ### **Arithmetic Operations**
 
-Sometimes we need to manipulate data to ensure our test data is correct. As an example we will us a purchase operation. How you would make sure that after the purchase the product inventory is smaller than before? For this, we might want to use arithmetic operations:
+Sometimes we need to manipulate data to ensure our test data is correct. As an example, we will use a purchase operation. How you would make sure that, after the purchase, the product inventory is smaller than before? For this, we might want to use arithmetic operations:
 
 ```css
 attr:product.stock = attr:product.stok_before_purchase - attr:product.number_bought_items
@@ -35,7 +35,7 @@ attr:product.stock = attr:product.stok_before_purchase - attr:product.number_bou
 Some tests might require strings to be compared, but maybe you need to generate a dynamic string that relies on a dynamic value. This might be used in an assertion or even in the request body referencing an environment variable.
 
 ```css
-attr:error.message = "could not withdraw ${attr:withdraw.amount}, your balance is insufficient"
+attr:error.message = "Could not withdraw ${attr:withdraw.amount}, your balance is insufficient."
 ```
 
 Note that within `${}` you can add any expression, including arithmetic operations and filters.
@@ -58,15 +58,15 @@ If multiple values are matched, the output will be a flat array containing all v
 '{ "array": [{"name": "Jorge", "age": 27}, {"name": "Tim", "age": 52}]}' | json_path '$.array[*]..["name", "age"] = '["Jorge", 27, "Tim", 52]'
 ```
 
-#### **Regex**
-Filters part of the input that match a regex. Imagine you have a specific part of a text that you want to extract:
+#### **RegEx**
+Filters part of the input that match a RegEx. Imagine you have a specific part of a text that you want to extract:
 
 ```css
 'My account balance is $48.52' | regex '\$\d+(\.\d+)?' = '$48.52'
 ```
 
-#### **Regex Group**
-If matching more than one value is required, you can define groups for your regex and extract multiple values at once.
+#### **RegEx Group**
+If matching more than one value is required, you can define groups for your RegEx and extract multiple values at once.
 
 Wrap the groups you want to extract with parentheses.
 
@@ -90,7 +90,7 @@ You can select the last item from a list by specifying `'last'` as the argument 
 
 ### **Length**
 
-Return the size of the input array. If it's a single value, it will return 1. Otherwise it will return `length(input_array)`.
+Returns the size of the input array. If it's a single value, it will return 1. Otherwise it will return `length(input_array)`.
 
 ```css
 '{ "array": [1, 2, 3] }' | json_path '$.array[*]' | length = 3

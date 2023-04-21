@@ -1,12 +1,12 @@
 # Transactions
 
-Most End-to-End tests are not simple to run. They require some setup before the actual test is run. Actions like creating a new user, removing all items from a cart, etc. So, it's important that you can execute multiple steps as part of your test suite. Tracetest introduces the concept of **Transactions** to achieve this goal.
+Most End-to-End tests are not simple to run. They require some setup before the actual test is run. Actions like creating a new user, removing all items from a cart, etc. It is important that you can execute multiple steps as part of your test suite. Tracetest introduces the concept of **Transactions** to achieve this goal.
 
-## What is a transaction?
+## What is a Transaction?
 A transaction is defined as a group of steps that are executed in the defined order and can access information exported by previous step executions. Each step is a test.
 
 ## Chaining Tests
-The main benefit of using transactions is to be able to chain tests together and use values obtained from a test in a subsequent test.
+The main benefit of using transactions is to chain tests together and use values obtained from a test in a subsequent test.
 
 ### How Values are Shared by Tests
 When a transaction is run, a context object is created with information about that specific run. One of those pieces of information is an `environment variables` object, which is empty by default. If the transaction is run when referencing an [environment](./environments), all values from the selected environments will be copied to the `environment variables` object.
@@ -33,7 +33,7 @@ This would create an output called `TIME_CANCEL_SUBSCRIPTION_MESSAGE_OBTAINED` t
 
 ### Transactions Execution Flow
 
-Transaction steps are executed sequentially. A next step is only executed after the previous step finishes executing successfully. A successful step is one which managed to trigger an operation and received a trace back from the data store. Failing assertions do not make a transaction stop executing the next steps.
+Transaction steps are executed sequentially. A next step is only executed after the previous step finishes executing successfully. A successful step is one which managed to trigger an operation and received a trace back from the data store. Failing assertions do not stop a transaction from executing the next steps.
 
 Examples:
 
