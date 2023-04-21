@@ -89,19 +89,58 @@ func (m Model) DataStore(in openapi.DataStore) datastoreresource.DataStore {
 		Type:      m.DataStoreType(in.Type),
 		Default:   in.Default,
 		CreatedAt: in.CreatedAt.Format(time.RFC3339Nano),
+		Values:    datastoreresource.DataStoreValues{},
 	}
 
-	deepcopy.DeepCopy(in.Jaeger, &dataStore.Values.Jaeger)
-	deepcopy.DeepCopy(in.Jaeger.Tls, &dataStore.Values.Jaeger.TLS)
+	// Jaeger
+	if dataStore.Type == datastoreresource.DataStoreTypeJaeger {
+		dataStore.Values.Jaeger = &datastoreresource.GRPCClientSettings{
+			TLS: &datastoreresource.TLS{},
+		}
 
-	deepcopy.DeepCopy(in.Tempo, &dataStore.Values.Tempo)
-	deepcopy.DeepCopy(in.Tempo.Grpc.Tls, &dataStore.Values.Tempo.Grpc.TLS)
-	deepcopy.DeepCopy(in.Tempo.Http.Tls, &dataStore.Values.Tempo.Http.TLS)
+		deepcopy.DeepCopy(in.Jaeger, &dataStore.Values.Jaeger)
+		deepcopy.DeepCopy(in.Jaeger.Tls, &dataStore.Values.Jaeger.TLS)
+	}
 
-	deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.OpenSearch)
-	deepcopy.DeepCopy(in.ElasticApm, &dataStore.Values.ElasticApm)
-	deepcopy.DeepCopy(in.SignalFx, &dataStore.Values.SignalFx)
-	deepcopy.DeepCopy(in.Awsxray, &dataStore.Values.AwsXRay)
+	// Tempo
+	if dataStore.Type == datastoreresource.DataStoreTypeTempo {
+		dataStore.Values.Tempo = &datastoreresource.MultiChannelClientConfig{
+			Grpc: &datastoreresource.GRPCClientSettings{
+				TLS: &datastoreresource.TLS{},
+			},
+			Http: &datastoreresource.HttpClientConfig{
+				TLS: &datastoreresource.TLS{},
+			},
+		}
+
+		deepcopy.DeepCopy(in.Tempo, &dataStore.Values.Tempo)
+		deepcopy.DeepCopy(in.Tempo.Grpc.Tls, &dataStore.Values.Tempo.Grpc.TLS)
+		deepcopy.DeepCopy(in.Tempo.Http.Tls, &dataStore.Values.Tempo.Http.TLS)
+	}
+
+	// AWS XRay
+	if dataStore.Type == datastoreresource.DataStoreTypeAwsXRay {
+		dataStore.Values.AwsXRay = &datastoreresource.AWSXRayConfig{}
+		deepcopy.DeepCopy(in.Awsxray, &dataStore.Values.AwsXRay)
+	}
+
+	// OpenSearch
+	if dataStore.Type == datastoreresource.DataStoreTypeOpenSearch {
+		dataStore.Values.OpenSearch = &datastoreresource.ElasticSearchConfig{}
+		deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.OpenSearch)
+	}
+
+	// ElasticAPM
+	if dataStore.Type == datastoreresource.DataStoreTypeElasticAPM {
+		dataStore.Values.OpenSearch = &datastoreresource.ElasticSearchConfig{}
+		deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.ElasticApm)
+	}
+
+	// SignalFX
+	if dataStore.Type == datastoreresource.DataStoreTypeSignalFX {
+		dataStore.Values.SignalFx = &datastoreresource.SignalFXConfig{}
+		deepcopy.DeepCopy(in.SignalFx, &dataStore.Values.SignalFx)
+	}
 
 	return dataStore
 }
