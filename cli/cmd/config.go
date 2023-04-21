@@ -58,7 +58,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		demoActions := actions.NewDemoActions(demoOptions...)
 		resourceRegistry.Register(demoActions)
 
-		dataStoreOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("datastore", cliConfig)))
+		dataStoreOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("datastores", cliConfig)))
 		dataStoreActions := actions.NewDataStoreActions(dataStoreOptions...)
 		resourceRegistry.Register(dataStoreActions)
 
