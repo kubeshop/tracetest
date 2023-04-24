@@ -70,7 +70,7 @@ func (s httpServer) Export(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := s.ingester.Ingest(r.Context(), request)
+	result, err := s.ingester.Ingest(r.Context(), request, "HTTP")
 	if err != nil {
 		response.sendError(http.StatusInternalServerError, status.Errorf(codes.InvalidArgument, "Error when ingesting spans %s", err.Error()))
 		return

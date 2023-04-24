@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
@@ -187,6 +188,9 @@ func (app *App) Start(opts ...appOption) error {
 
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 
+	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
+	registerOtlpServer(app, testDB, eventEmitter)
+
 	rf := newRunnerFacades(
 		pollingProfileRepo,
 		testDB,
@@ -225,7 +229,6 @@ func (app *App) Start(opts ...appOption) error {
 		return err
 	}
 
-	registerOtlpServer(app, testDB)
 	provisioner := provisioning.New()
 
 	router, mappers := controller(app.cfg, testDB, tracer, rf, triggerRegistry)
@@ -283,8 +286,8 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, testDB model.Repository) {
-	ingester := otlp.NewIngester(testDB)
+func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter) {
+	ingester := otlp.NewIngester(testDB, eventEmitter)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
