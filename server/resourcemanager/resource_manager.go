@@ -297,11 +297,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var values map[string]any
-<<<<<<< HEAD
 		err := encode(resource, &values)
-=======
-		err := decode(resource, &values)
->>>>>>> b0232f70 (implement environments as a resource)
 		if err != nil {
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 			return
@@ -452,11 +448,7 @@ func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
 func encodeValues(resource any, enc encoder) ([]byte, error) {
 	var values map[string]any
 
-<<<<<<< HEAD
 	err := encode(resource, &values)
-=======
-	err := decode(resource, &values)
->>>>>>> b0232f70 (implement environments as a resource)
 	if err != nil {
 		return nil, fmt.Errorf("cannot code resource: %w", err)
 	}
