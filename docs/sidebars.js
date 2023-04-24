@@ -388,6 +388,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
+          label: "Python with Manual Instrumentation and OpenTelemetry Collector",
+        },
+        {
+          type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
           label: "Node.js and Jaeger",
         },
