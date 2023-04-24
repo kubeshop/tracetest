@@ -18,7 +18,7 @@ var (
 		rmtests.OperationUpdateNotFound,
 		rmtests.OperationGetNotFound,
 		rmtests.OperationDeleteNotFound,
-		rmtests.OperationListPaginatedSuccess,
+		rmtests.OperationListSortSuccess,
 		rmtests.OperationListNoResults,
 	)
 	operationsWithoutPostAssert = rmtests.IgnorePostAssertForOperations(rmtests.OperationDeleteSuccess)

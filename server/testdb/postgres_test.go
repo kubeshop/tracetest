@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/tests"
 )
 
 func getDB() (model.Repository, func()) {
@@ -48,28 +49,28 @@ func createTest(t *testing.T, db model.Repository) model.Test {
 	return createTestWithName(t, db, "first test")
 }
 
-func createTransaction(t *testing.T, db model.Repository) model.Transaction {
+func createTransaction(t *testing.T, tr *tests.TransactionsRepository) tests.Transaction {
 	t.Helper()
-	transaction := model.Transaction{
+	transaction := tests.Transaction{
 		Name:        "first transaction",
 		Description: "description",
 	}
 
-	updated, err := db.CreateTransaction(context.TODO(), transaction)
+	updated, err := tr.Create(context.TODO(), transaction)
 	if err != nil {
 		panic(err)
 	}
 	return updated
 }
 
-func createTransactionWithName(t *testing.T, db model.Repository, name string) model.Transaction {
+func createTransactionWithName(t *testing.T, tr *tests.TransactionsRepository, name string) tests.Transaction {
 	t.Helper()
-	transaction := model.Transaction{
+	transaction := tests.Transaction{
 		Name:        name,
 		Description: "description",
 	}
 
-	updated, err := db.CreateTransaction(context.TODO(), transaction)
+	updated, err := tr.Create(context.TODO(), transaction)
 	if err != nil {
 		panic(err)
 	}

@@ -18,7 +18,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slices"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/goccy/go-yaml"
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -77,6 +76,12 @@ func WithOperations(ops ...Operation) managerOption {
 func WithTracer(tracer trace.Tracer) managerOption {
 	return func(c *config) {
 		c.tracer = tracer
+	}
+}
+
+func CanBeAugmented() managerOption {
+	return func(c *config) {
+		c.enabledOperations = append(c.enabledOperations, augmentedOperations...)
 	}
 }
 
@@ -226,6 +231,10 @@ func paginationParams(r *http.Request, sortingFields []string) (take, skip int, 
 	if err != nil {
 		err = fmt.Errorf("error reading take param: %w", err)
 		return
+	}
+
+	if take == 0 {
+		take = 20
 	}
 
 	skip, err = getIntFromQuery(r, "skip")
@@ -445,15 +454,11 @@ func readValues(r *http.Request, enc encoder, target any) error {
 	if err != nil {
 		return fmt.Errorf("cannot read yaml body: %w", err)
 	}
-	fmt.Println("*****")
-	fmt.Println(string(body))
 
 	err = enc.Unmarshal(body, target)
 	if err != nil {
 		return fmt.Errorf("cannot unmarshal request: %w", err)
 	}
-	spew.Dump(target)
-	fmt.Println("*****")
 
 	return nil
 }

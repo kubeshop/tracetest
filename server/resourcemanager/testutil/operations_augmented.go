@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,11 +29,14 @@ var getAugmentedSuccessOperation = buildSingleStepOperation(singleStepOperationT
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
+		require.NotEqual(t, rt.SampleJSON, rt.SampleJSONAugmented, "Augmented and non-augmented samples are equal")
 		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
 		expected := ct.toJSON(rt.SampleJSONAugmented)
+
+		fmt.Println(jsonBody)
 
 		rt.customJSONComparer(t, OperationGetAugmentedSuccess, expected, jsonBody)
 	},
@@ -52,7 +56,7 @@ func buildAugmentedListRequest(rt ResourceTypeTest, ct contentTypeConverter, tes
 
 const OperationListAugmentedSuccess Operation = "ListAugmentedSuccess"
 
-var ListAugmentedSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
+var listAugmentedSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name:               OperationListAugmentedSuccess,
 	neededForOperation: rm.OperationListAugmented,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
@@ -60,12 +64,7 @@ var ListAugmentedSuccessOperation = buildSingleStepOperation(singleStepOperation
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
-
-		jsonBody := responseBodyJSON(t, resp, ct)
-
-		expected := ct.toJSON(rt.SampleJSONAugmented)
-
-		rt.customJSONComparer(t, OperationGetAugmentedSuccess, expected, jsonBody)
+		require.NotEqual(t, rt.SampleJSON, rt.SampleJSONAugmented, "Augmented and non-augmented samples are equal")
+		assertListSuccessResponse(t, resp, ct, rt, rt.SampleJSONAugmented)
 	},
 })

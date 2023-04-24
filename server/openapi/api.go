@@ -89,10 +89,8 @@ type ResourceApiApiRouter interface {
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
 	CreateTest(context.Context, Test) (ImplResponse, error)
-	CreateTransaction(context.Context, Transaction) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, int32) (ImplResponse, error)
-	DeleteTransaction(context.Context, string) (ImplResponse, error)
 	DeleteTransactionRun(context.Context, string, int32) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, int32, TestSpecs) (ImplResponse, error)
 	ExecuteDefinition(context.Context, TextDefinition) (ImplResponse, error)
@@ -109,12 +107,9 @@ type ApiApiServicer interface {
 	GetTestVersion(context.Context, string, int32) (ImplResponse, error)
 	GetTestVersionDefinitionFile(context.Context, string, int32) (ImplResponse, error)
 	GetTests(context.Context, int32, int32, string, string, string) (ImplResponse, error)
-	GetTransaction(context.Context, string) (ImplResponse, error)
 	GetTransactionRun(context.Context, string, int32) (ImplResponse, error)
 	GetTransactionRuns(context.Context, string, int32, int32) (ImplResponse, error)
 	GetTransactionVersion(context.Context, string, int32) (ImplResponse, error)
-	GetTransactionVersionDefinitionFile(context.Context, string, int32) (ImplResponse, error)
-	GetTransactions(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	GetVersion(context.Context) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, int32) (ImplResponse, error)
@@ -123,7 +118,6 @@ type ApiApiServicer interface {
 	StopTestRun(context.Context, string, int32) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
 	UpdateTest(context.Context, string, Test) (ImplResponse, error)
-	UpdateTransaction(context.Context, string, Transaction) (ImplResponse, error)
 	UpsertDefinition(context.Context, TextDefinition) (ImplResponse, error)
 }
 

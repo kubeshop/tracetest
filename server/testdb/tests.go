@@ -10,6 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/tests"
 )
 
 var _ model.TestRepository = &postgresDB{}
@@ -369,4 +370,25 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	default:
 		return model.Test{}, err
 	}
+}
+
+func (td *postgresDB) GetTransactionSteps(ctx context.Context, transaction tests.Transaction) ([]model.Test, error) {
+	stmt, err := td.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
+	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
+	if err != nil {
+		return []model.Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, transaction.ID, transaction.Version)
+	if err != nil {
+		return []model.Test{}, fmt.Errorf("query context: %w", err)
+	}
+
+	steps, err := td.readTestRows(ctx, rows)
+	if err != nil {
+		return []model.Test{}, fmt.Errorf("read row: %w", err)
+	}
+
+	return steps, nil
 }

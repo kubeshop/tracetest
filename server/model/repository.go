@@ -32,25 +32,6 @@ type RunRepository interface {
 	GetLatestRunByTestVersion(context.Context, id.ID, int) (Run, error)
 }
 
-type TransactionRepository interface {
-	CreateTransaction(context.Context, Transaction) (Transaction, error)
-	UpdateTransaction(context.Context, Transaction) (Transaction, error)
-	DeleteTransaction(context.Context, Transaction) error
-	TransactionIDExists(context.Context, id.ID) (bool, error)
-	GetLatestTransactionVersion(context.Context, id.ID) (Transaction, error)
-	GetTransactionVersion(_ context.Context, _ id.ID, version int) (Transaction, error)
-	GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[Transaction], error)
-}
-
-type TransactionRunRepository interface {
-	CreateTransactionRun(context.Context, TransactionRun) (TransactionRun, error)
-	UpdateTransactionRun(context.Context, TransactionRun) error
-	DeleteTransactionRun(context.Context, TransactionRun) error
-	GetTransactionRun(context.Context, id.ID, int) (TransactionRun, error)
-	GetTransactionsRuns(context.Context, id.ID, int32, int32) ([]TransactionRun, error)
-	GetLatestRunByTransactionVersion(context.Context, id.ID, int) (TransactionRun, error)
-}
-
 type TestRunEventRepository interface {
 	CreateTestRunEvent(context.Context, TestRunEvent) error
 	GetTestRunEvents(context.Context, id.ID, int) ([]TestRunEvent, error)
@@ -59,9 +40,6 @@ type TestRunEventRepository interface {
 type Repository interface {
 	TestRepository
 	RunRepository
-
-	TransactionRepository
-	TransactionRunRepository
 
 	TestRunEventRepository
 

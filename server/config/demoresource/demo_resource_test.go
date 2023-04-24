@@ -70,7 +70,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				demoRepository.Create(context.TODO(), sampleDemo)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				demoRepository.Create(context.TODO(), sampleDemo)
 				demoRepository.Create(context.TODO(), secondSampleDemo)
 				demoRepository.Create(context.TODO(), thirdSampleDemo)
@@ -169,7 +169,7 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				demoRepository.Create(context.TODO(), sampleDemo)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				demoRepository.Create(context.TODO(), sampleDemo)
 				demoRepository.Create(context.TODO(), secondSampleDemo)
 				demoRepository.Create(context.TODO(), thirdSampleDemo)
