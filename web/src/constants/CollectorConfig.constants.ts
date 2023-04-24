@@ -15,7 +15,7 @@ exporters:
     logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Lightstep
@@ -48,7 +48,7 @@ processors:
 
 exporters:
   otlp/1:
-    endpoint: tracetest:21321
+    endpoint: tracetest:4317
     tls:
       insecure: true
 
@@ -75,7 +75,7 @@ exporters:
     logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for New Relic
@@ -113,7 +113,7 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # Datadog exporter
