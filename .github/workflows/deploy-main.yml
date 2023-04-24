@@ -132,15 +132,15 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: dist/linux
-          key: dist-linux
+          name: dist-linux
       - uses: actions/download-artifact@v3
         with:
           path: dist/darwin
-          key: dist-darwin
+          name: dist-darwin
       - uses: actions/download-artifact@v3
         with:
           path: dist/windows
-          key: dist-windows
+          name: dist-windows
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
