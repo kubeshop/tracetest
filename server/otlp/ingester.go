@@ -26,7 +26,8 @@ func NewIngester(db model.Repository, eventEmitter executor.EventEmitter) ingest
 	}
 }
 
-func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
+func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType string) (*pb.ExportTraceServiceResponse, error) {
+	fmt.Println(">>>> INGESTING REQUEST")
 	ds, err := i.db.DefaultDataStore(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
@@ -41,7 +42,7 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	spansByTrace := i.getSpansByTrace(request)
 
 	for traceID, spans := range spansByTrace {
-		i.saveSpansIntoTest(ctx, traceID, spans)
+		i.saveSpansIntoTest(ctx, traceID, spans, requestType)
 	}
 
 	return &pb.ExportTraceServiceResponse{
@@ -77,7 +78,7 @@ func (i ingester) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[tra
 	return spansByTrace
 }
 
-func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span) error {
+func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span, requestType string) error {
 	run, err := e.db.GetRunByTraceID(ctx, traceID)
 	if err != nil && strings.Contains(err.Error(), "record not found") {
 		// span is not part of any known test run. So it will be ignored
@@ -108,7 +109,7 @@ func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, 
 	newSpans := append(existingSpans, spans...)
 	newTrace := model.NewTrace(traceID.String(), newSpans)
 
-	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans)))
+	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans), requestType))
 	run.Trace = &newTrace
 
 	err = e.db.UpdateRun(ctx, run)

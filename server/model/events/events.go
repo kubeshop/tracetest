@@ -397,14 +397,14 @@ func TestSpecsAssertionWarning(testID id.ID, runID int, err error, spanID string
 	}
 }
 
-func TraceOtlpServerReceivedSpans(testID id.ID, runID int, spanCount int) model.TestRunEvent {
+func TraceOtlpServerReceivedSpans(testID id.ID, runID, spanCount int, requestType string) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrace,
 		Type:                "OTLP_SERVER_RECEIVED_SPANS",
-		Title:               "OTLP server received spans",
-		Description:         fmt.Sprintf("The Tracetest OTLP server received %d spans", spanCount),
+		Title:               fmt.Sprintf("%s OTLP server endpoint received spans", requestType),
+		Description:         fmt.Sprintf("The Tracetest %s OTLP endpoint server received %d spans", requestType, spanCount),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
