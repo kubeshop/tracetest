@@ -8,16 +8,16 @@ import (
 
 type (
 	Environment struct {
-		ID          id.ID              `mapstructure:"id" json:"id"`
-		Name        string             `mapstructure:"name" json:"name"`
-		Description string             `mapstructure:"description" json:"description"`
-		CreatedAt   string             `mapstructure:"createdAt" json:"createdAt"`
-		Values      []EnvironmentValue `mapstructure:"values" json:"values"`
+		ID          id.ID              `mapstructure:"id"`
+		Name        string             `mapstructure:"name"`
+		Description string             `mapstructure:"description"`
+		CreatedAt   string             `mapstructure:"createdAt"`
+		Values      []EnvironmentValue `mapstructure:"values"`
 	}
 
 	EnvironmentValue struct {
-		Key   string `mapstructure:"key" json:"key"`
-		Value string `mapstructure:"value" json:"value"`
+		Key   string `mapstructure:"key"`
+		Value string `mapstructure:"value"`
 	}
 )
 
