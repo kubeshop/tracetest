@@ -2,6 +2,7 @@ package environment_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
-	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,8 +50,7 @@ func TestEnvironment(t *testing.T) {
 	resourceTypeTest := rmtests.ResourceTypeTest{
 		ResourceTypeSingular: environment.ResourceName,
 		ResourceTypePlural:   environment.ResourceNamePlural,
-		RegisterManagerFn: func(router *mux.Router) resourcemanager.Manager {
-			db := testmock.CreateMigratedDatabase()
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			environmentRepository := environment.NewRepository(db)
 
 			manager := resourcemanager.New[environment.Environment](
