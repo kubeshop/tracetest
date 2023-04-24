@@ -1,4 +1,4 @@
-package testdb
+package tests
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
@@ -66,26 +65,26 @@ func replaceTransactionRunSequenceName(sql string, transactionID id.ID) string {
 	return strings.ReplaceAll(sql, runSequenceName, seqName)
 }
 
-func (td *postgresDB) CreateTransactionRun(ctx context.Context, tr model.TransactionRun) (model.TransactionRun, error) {
+func (td *TransactionsRepository) CreateRun(ctx context.Context, tr TransactionRun) (TransactionRun, error) {
 	jsonMetadata, err := json.Marshal(tr.Metadata)
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("failed to marshal transaction run metadata: %w", err)
+		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run metadata: %w", err)
 	}
 
 	jsonEnvironment, err := json.Marshal(tr.Environment)
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("failed to marshal transaction run environment: %w", err)
+		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run environment: %w", err)
 	}
 
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("sql beginTx: %w", err)
+		return TransactionRun{}, fmt.Errorf("sql beginTx: %w", err)
 	}
 
 	_, err = tx.ExecContext(ctx, replaceTransactionRunSequenceName(createSequeceQuery, tr.TransactionID))
 	if err != nil {
 		tx.Rollback()
-		return model.TransactionRun{}, fmt.Errorf("sql exec: %w", err)
+		return TransactionRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
 	var runID int
@@ -102,12 +101,12 @@ func (td *postgresDB) CreateTransactionRun(ctx context.Context, tr model.Transac
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
-		return model.TransactionRun{}, fmt.Errorf("sql exec: %w", err)
+		return TransactionRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("commit: %w", err)
+		return TransactionRun{}, fmt.Errorf("commit: %w", err)
 	}
 
 	tr.ID = runID
@@ -138,7 +137,7 @@ UPDATE transaction_runs SET
 WHERE id = $9 AND transaction_id = $10
 `
 
-func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.TransactionRun) error {
+func (td *TransactionsRepository) UpdateRun(ctx context.Context, tr TransactionRun) error {
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
@@ -189,7 +188,7 @@ func (td *postgresDB) UpdateTransactionRun(ctx context.Context, tr model.Transac
 	return td.setTransactionRunSteps(ctx, tx, tr)
 }
 
-func (td *postgresDB) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr model.TransactionRun) error {
+func (td *TransactionsRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
 	// delete existing steps
 	stmt, err := tx.Prepare("DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2")
 	if err != nil {
@@ -228,7 +227,7 @@ func (td *postgresDB) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr
 	return tx.Commit()
 }
 
-func (td *postgresDB) DeleteTransactionRun(ctx context.Context, tr model.TransactionRun) error {
+func (td *TransactionsRepository) DeleteTransactionRun(ctx context.Context, tr TransactionRun) error {
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
@@ -277,56 +276,56 @@ SELECT
 FROM transaction_runs
 `
 
-func (td *postgresDB) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (model.TransactionRun, error) {
+func (td *TransactionsRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE id = $1 AND transaction_id = $2")
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("prepare: %w", err)
+		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
-	run, err := readTransactionRow(stmt.QueryRowContext(ctx, runID, transactionID))
+	run, err := td.readRunRow(stmt.QueryRowContext(ctx, runID, transactionID))
 	if err != nil {
-		return model.TransactionRun{}, err
+		return TransactionRun{}, err
 	}
-	run.Steps, err = td.getTransactionRunSteps(ctx, run)
-	if err != nil {
-		return model.TransactionRun{}, err
-	}
+	// run.Steps, err = td.getTransactionRunSteps(ctx, run)
+	// if err != nil {
+	// 	return TransactionRun{}, err
+	// }
 	return run, nil
 }
 
-func (td *postgresDB) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (model.TransactionRun, error) {
+func (td *TransactionsRepository) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 AND transaction_version = $2 ORDER BY created_at DESC LIMIT 1")
 	if err != nil {
-		return model.TransactionRun{}, fmt.Errorf("prepare: %w", err)
+		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
-	run, err := readTransactionRow(stmt.QueryRowContext(ctx, transactionID, version))
+	run, err := td.readRunRow(stmt.QueryRowContext(ctx, transactionID, version))
 	if err != nil {
-		return model.TransactionRun{}, err
+		return TransactionRun{}, err
 	}
-	run.Steps, err = td.getTransactionRunSteps(ctx, run)
-	if err != nil {
-		return model.TransactionRun{}, err
-	}
+	// run.Steps, err = td.getTransactionRunSteps(ctx, run)
+	// if err != nil {
+	// 	return TransactionRun{}, err
+	// }
 	return run, nil
 }
 
-func (td *postgresDB) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]model.TransactionRun, error) {
+func (td *TransactionsRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
-		return []model.TransactionRun{}, fmt.Errorf("prepare: %w", err)
+		return []TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
 	rows, err := stmt.QueryContext(ctx, transactionID.String(), take, skip)
 	if err != nil {
-		return []model.TransactionRun{}, fmt.Errorf("query: %w", err)
+		return []TransactionRun{}, fmt.Errorf("query: %w", err)
 	}
 
-	var runs []model.TransactionRun
+	var runs []TransactionRun
 	for rows.Next() {
-		run, err := readTransactionRow(rows)
+		run, err := td.readRunRow(rows)
 		if err != nil {
-			return []model.TransactionRun{}, err
+			return []TransactionRun{}, err
 		}
 		runs = append(runs, run)
 	}
@@ -334,8 +333,8 @@ func (td *postgresDB) GetTransactionsRuns(ctx context.Context, transactionID id.
 	return runs, nil
 }
 
-func readTransactionRow(row scanner) (model.TransactionRun, error) {
-	r := model.TransactionRun{}
+func (td *TransactionsRepository) readRunRow(row scanner) (TransactionRun, error) {
+	r := TransactionRun{}
 
 	var (
 		jsonEnvironment,
@@ -360,60 +359,31 @@ func readTransactionRow(row scanner) (model.TransactionRun, error) {
 		&jsonMetadata,
 		&jsonEnvironment,
 	)
-
-	switch err {
-	case sql.ErrNoRows:
-		return model.TransactionRun{}, ErrNotFound
-	case nil:
-		err = json.Unmarshal(jsonMetadata, &r.Metadata)
-		if err != nil {
-			return model.TransactionRun{}, fmt.Errorf("cannot parse Metadata: %w", err)
-		}
-
-		err = json.Unmarshal(jsonEnvironment, &r.Environment)
-		if err != nil {
-			return model.TransactionRun{}, fmt.Errorf("cannot parse Environment: %w", err)
-		}
-
-		if lastError != nil && *lastError != "" {
-			r.LastError = fmt.Errorf(*lastError)
-		}
-
-		if pass.Valid {
-			r.Pass = int(pass.Int32)
-		}
-
-		if fail.Valid {
-			r.Fail = int(fail.Int32)
-		}
-
-		return r, nil
-
-	default:
-		return model.TransactionRun{}, fmt.Errorf("read run row: %w", err)
-	}
-}
-
-func (td *postgresDB) getTransactionRunSteps(ctx context.Context, tr model.TransactionRun) ([]model.Run, error) {
-	// stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1 AND test_id = $2")
-	stmt, err := td.db.Prepare(selectRunQuery + ` INNER JOIN
-		transaction_run_steps trs ON
-			test_runs.id = trs.test_run_id AND test_runs.test_id = trs.test_run_test_id
-		WHERE trs.transaction_run_id = $1 AND trs.transaction_run_transaction_id = $2`)
 	if err != nil {
-		return []model.Run{}, fmt.Errorf("prepare: %w", err)
+		return TransactionRun{}, fmt.Errorf("cannot read row: %w", err)
 	}
-	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, tr.ID, tr.TransactionID)
+	err = json.Unmarshal(jsonMetadata, &r.Metadata)
 	if err != nil {
-		return []model.Run{}, fmt.Errorf("query context: %w", err)
+		return TransactionRun{}, fmt.Errorf("cannot parse Metadata: %w", err)
 	}
 
-	steps, err := td.readRunRows(ctx, rows)
+	err = json.Unmarshal(jsonEnvironment, &r.Environment)
 	if err != nil {
-		return []model.Run{}, fmt.Errorf("read row: %w", err)
+		return TransactionRun{}, fmt.Errorf("cannot parse Environment: %w", err)
 	}
 
-	return steps, nil
+	if lastError != nil && *lastError != "" {
+		r.LastError = fmt.Errorf(*lastError)
+	}
+
+	if pass.Valid {
+		r.Pass = int(pass.Int32)
+	}
+
+	if fail.Valid {
+		r.Fail = int(fail.Int32)
+	}
+
+	return r, nil
 }

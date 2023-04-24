@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -31,7 +32,7 @@ func optionalTime(in time.Time) *time.Time {
 	return &in
 }
 
-func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
+func (m OpenAPI) Transaction(in tests.Transaction) openapi.Transaction {
 	steps := make([]openapi.Test, len(in.Steps))
 	for i, step := range in.Steps {
 		steps[i] = m.Test(step)
@@ -41,9 +42,9 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 		Id:          in.ID.String(),
 		Name:        in.Name,
 		Description: in.Description,
-		Version:     int32(in.Version),
+		Version:     int32(in.GetVersion()),
 		Steps:       steps,
-		CreatedAt:   in.CreatedAt,
+		CreatedAt:   in.GetCreatedAt(),
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
@@ -55,7 +56,7 @@ func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
 	}
 }
 
-func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun {
+func (m OpenAPI) TransactionRun(in tests.TransactionRun) openapi.TransactionRun {
 	steps := make([]openapi.TestRun, 0, len(in.Steps))
 
 	for _, step := range in.Steps {
@@ -136,7 +137,7 @@ func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
 		TriggerSettings: openapi.TriggerTriggerSettings{
 			Http:    m.HTTPRequest(in.HTTP),
 			Grpc:    m.GRPCRequest(in.GRPC),
-			Traceid: m.TRACEIDRequest(in.TRACEID),
+			Traceid: m.TRACEIDRequest(in.TraceID),
 		},
 	}
 }
@@ -351,23 +352,25 @@ type Model struct {
 	testRepository        model.TestRepository
 }
 
-func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (model.Transaction, error) {
-	tests := make([]model.Test, len(in.Steps))
+func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (tests.Transaction, error) {
+	steps := make([]model.Test, len(in.Steps))
 	for i, test := range in.Steps {
 		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(test.Id))
 		if err != nil {
-			return model.Transaction{}, err
+			return tests.Transaction{}, err
 		}
 
-		tests[i] = test
+		steps[i] = test
 	}
 
-	return model.Transaction{
+	v := int(in.Version)
+
+	return tests.Transaction{
 		ID:          id.ID(in.Id),
 		Name:        in.Name,
 		Description: in.Description,
-		Version:     int(in.Version),
-		Steps:       tests,
+		Version:     &v,
+		Steps:       steps,
 	}, nil
 }
 
@@ -511,7 +514,7 @@ func (m Model) Trigger(in openapi.Trigger) model.Trigger {
 		Type:    model.TriggerType(in.TriggerType),
 		HTTP:    m.HTTPRequest(in.TriggerSettings.Http),
 		GRPC:    m.GRPCRequest(in.TriggerSettings.Grpc),
-		TRACEID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
+		TraceID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
 	}
 }
 

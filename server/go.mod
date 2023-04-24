@@ -5,6 +5,7 @@ go 1.20
 replace k8s.io/client-go => k8s.io/client-go v0.18.0
 
 require (
+	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/aws/aws-sdk-go v1.44.196
 	github.com/brianvoe/gofakeit/v6 v6.17.0

@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tests"
 )
 
 var ErrMissingVariables = errors.New("variables are missing")
@@ -85,8 +86,7 @@ func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test
 	return map[string]environment.EnvironmentValue{}, nil
 }
 
-func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction model.Transaction, env environment.Environment) (openapi.MissingVariablesError, error) {
-	missingVariables := make([]openapi.MissingVariable, 0)
+func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction tests.Transaction, environment environment.Environment) (openapi.MissingVariablesError, error) {	missingVariables := make([]openapi.MissingVariable, 0)
 	for _, step := range transaction.Steps {
 		stepValidationResult, err := ValidateMissingVariables(ctx, db, step, env)
 		if err != ErrMissingVariables {
