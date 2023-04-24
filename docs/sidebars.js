@@ -116,11 +116,6 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "configuration/opentelemetry-collector-configuration-file-reference",
-          label: "OpenTelemetry Collector Configuration File Reference",
-        },
-        {
-          type: "doc",
           id: "configuration/server",
           label: "Tracetest Server Configuration",
         },
@@ -143,6 +138,11 @@ const sidebars = {
           type: "doc",
           id: "configuration/analytics",
           label: "Analytics",
+        },
+        {
+          type: "doc",
+          id: "configuration/opentelemetry-collector-configuration-file-reference",
+          label: "OpenTelemetry Collector Configuration File Reference",
         },
       ],
     },
