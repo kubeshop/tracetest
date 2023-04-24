@@ -3,7 +3,7 @@
 If you want to use [Lightstep](https://lightstep.com/) as the trace data store, you'll configure the OpenTelemetry Collector to receive traces from your system and then send them to both Tracetest and Lightstep. And, you don't have to change your existing pipelines to do so.
 
 :::tip
-Examples of configuring Tracetest with Lightstep can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest with Lightstep can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configuring OpenTelemetry Collector to Send Traces to both Lightstep and Tracetest
@@ -50,7 +50,7 @@ exporters:
   otlp/ls:
     endpoint: ingest.lightstep.com:443
     headers:
-      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start 
+      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start
 
 service:
   pipelines:
@@ -62,7 +62,7 @@ service:
       processors: [batch]
       exporters: [otlp/tt] # your exporter pointing to your tracetest instance
     traces/ls:
-      receivers: [otlp]  # your receiver
+      receivers: [otlp] # your receiver
       processors: [batch]
       exporters: [logging, otlp/ls] # your exporter pointing to your lighstep account
 ```
@@ -88,7 +88,7 @@ type: DataStore
 spec:
   name: Opentelemetry Collector pipeline
   type: otlp
-  isDefault: true
+  default: true
 ```
 
 Proceed to run this command in the terminal and specify the file above.

@@ -3,7 +3,7 @@
 If you want to use [Datadog](https://www.datadoghq.com/) as the trace data store, you'll configure the OpenTelemetry Collector to receive traces from your system and then send them to both Tracetest and Datadog. And, you don't have to change your existing pipelines to do so.
 
 :::tip
-Examples of configuring Tracetest with Datadog can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest with Datadog can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configuring OpenTelemetry Collector to Send Traces to Both Datadog and Tracetest
@@ -37,7 +37,7 @@ receivers:
 
 processors:
   # This configuration is needed to guarantee that the data is sent correctly to Datadog
-  batch: 
+  batch:
     send_batch_max_size: 100
     send_batch_size: 10
     timeout: 10s
@@ -50,7 +50,7 @@ exporters:
     endpoint: tracetest:21321
     tls:
       insecure: true
-  
+
   # Datadog exporter
   # One example on how to set up a collector configuration for Datadog can be seen here:
   # https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter/?tab=onahost
@@ -90,7 +90,7 @@ type: DataStore
 spec:
   name: Datadog pipeline
   type: datadog
-  isDefault: true
+  default: true
 ```
 
 Proceed to run this command in the terminal and specify the file above.
@@ -98,6 +98,7 @@ Proceed to run this command in the terminal and specify the file above.
 ```bash
 tracetest datastore apply -f my/data-store/file/location.yaml
 ```
+
 :::tip
 To learn more, [read the recipe for running a sample app with Datadog and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-datadog.md).
 :::

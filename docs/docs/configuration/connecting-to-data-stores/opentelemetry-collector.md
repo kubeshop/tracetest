@@ -7,7 +7,7 @@ http://your-tracetest-instance.com:21321
 ```
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configuring OpenTelemetry Collector to Send Traces to Tracetest
@@ -68,7 +68,6 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 
 <!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644190/Blogposts/Docs/screely-1674644186486_pahrds.png) -->
 
-
 ## Connect Tracetest to OpenTelemetry Collector with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
@@ -78,7 +77,7 @@ type: DataStore
 spec:
   name: Opentelemetry Collector pipeline
   type: otlp
-  isDefault: true
+  default: true
 ```
 
 Proceed to run this command in the terminal, and specify the file above.

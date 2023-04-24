@@ -1,19 +1,19 @@
 # Jaeger
 
-Tracetest fetches traces from [Jaeger's gRPC	Protobuf/gRPC QueryService](https://www.jaegertracing.io/docs/1.42/deployment/#query-service--ui) on port `16685`.
+Tracetest fetches traces from [Jaeger's gRPC Protobuf/gRPC QueryService](https://www.jaegertracing.io/docs/1.42/deployment/#query-service--ui) on port `16685`.
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configure Tracetest to Use Jaeger as a Trace Data Store
 
-Configure Tracetest to be aware that it has to fetch trace data from Jaeger. 
+Configure Tracetest to be aware that it has to fetch trace data from Jaeger.
 
-Tracetest uses [Jaeger's gRPC	Protobuf/gRPC QueryService](https://www.jaegertracing.io/docs/1.42/deployment/#query-service--ui) on port `16685` to fetch trace data.
+Tracetest uses [Jaeger's gRPC Protobuf/gRPC QueryService](https://www.jaegertracing.io/docs/1.42/deployment/#query-service--ui) on port `16685` to fetch trace data.
 
 :::tip
-Need help configuring the OpenTelemetry Collector so send trace data from your application to Jaeger? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)). 
+Need help configuring the OpenTelemetry Collector so send trace data from your application to Jaeger? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)).
 :::
 
 ## Connect Tracetest to Jaeger with the Web UI
@@ -26,9 +26,7 @@ jaeger:16685
 
 ![Jaeger](../img/Jaeger-settings.png)
 
-
 <!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643178/Blogposts/Docs/screely-1674643170953_vazb9h.png)-->
-
 
 ## Connect Tracetest to Jaeger with the CLI
 
@@ -39,7 +37,7 @@ type: DataStore
 spec:
   name: jaeger
   type: jaeger
-  isDefault: true
+  default: true
   jaeger:
     endpoint: jaeger:16685
     tls:

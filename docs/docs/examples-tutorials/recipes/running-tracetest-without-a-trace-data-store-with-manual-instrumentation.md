@@ -19,14 +19,17 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
 ### 1. Node.js app
+
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
 
 ### 2. Tracetest
+
 The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up Tracetest and the OpenTelemetry Collector.
 
 The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
 ### Docker Compose Network
+
 All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `collector.config.yaml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
 
 ## Node.js app
@@ -39,33 +42,40 @@ Traces will be sent to the OpenTelemetry Collector.
 Here's the content of the `tracing.otel.grpc.js` file:
 
 ```js
-const opentelemetry = require("@opentelemetry/sdk-node")
-const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node")
-const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
-const { Resource } = require("@opentelemetry/resources")
-const { SemanticResourceAttributes } = require("@opentelemetry/semantic-conventions")
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node")
-const { BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base")
+const opentelemetry = require("@opentelemetry/sdk-node");
+const {
+  getNodeAutoInstrumentations,
+} = require("@opentelemetry/auto-instrumentations-node");
+const {
+  OTLPTraceExporter,
+} = require("@opentelemetry/exporter-trace-otlp-grpc");
+const { Resource } = require("@opentelemetry/resources");
+const {
+  SemanticResourceAttributes,
+} = require("@opentelemetry/semantic-conventions");
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base");
 
 const resource = Resource.default().merge(
   new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: "quick-start-nodejs-manual-instrumentation",
+    [SemanticResourceAttributes.SERVICE_NAME]:
+      "quick-start-nodejs-manual-instrumentation",
     [SemanticResourceAttributes.SERVICE_VERSION]: "0.0.1",
   })
-)
+);
 
-const provider = new NodeTracerProvider({ resource: resource })
-const exporter = new OTLPTraceExporter({ url: 'http://otel-collector:4317' })
-const processor = new BatchSpanProcessor(exporter)
-provider.addSpanProcessor(processor)
-provider.register()
+const provider = new NodeTracerProvider({ resource: resource });
+const exporter = new OTLPTraceExporter({ url: "http://otel-collector:4317" });
+const processor = new BatchSpanProcessor(exporter);
+provider.addSpanProcessor(processor);
+provider.register();
 
 const sdk = new opentelemetry.NodeSDK({
   traceExporter: exporter,
   instrumentations: [getNodeAutoInstrumentations()],
-  serviceName: 'quick-start-nodejs-manual-instrumentation'
-})
-sdk.start()
+  serviceName: "quick-start-nodejs-manual-instrumentation",
+});
+sdk.start();
 ```
 
 Depending on which of these you choose, traces will be sent to either the `grpc` or `http` endpoint.
@@ -122,7 +132,7 @@ EXPOSE 8080
 Instead, the `docker-compose.yaml` contains the `CMD` section for both services.
 
 ```yaml
-version: '3'
+version: "3"
 services:
   app:
     image: quick-start-nodejs
@@ -204,7 +214,6 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -245,7 +254,7 @@ type: DataStore
 spec:
   name: OpenTelemetry Collector
   type: otlp
-  isdefault: true
+  default: true
 ```
 
 But how are traces sent to Tracetest?
@@ -279,7 +288,6 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/1]
-
 ```
 
 ## Run both the Node.js app and Tracetest
@@ -297,7 +305,7 @@ This will start your Tracetest instance on `http://localhost:11633/`. Go ahead a
 Here's a sample of a failed test run, which happens if you add this assertion:
 
 ```css
-attr:books.list.count = 4
+attr: books.list.count = 4;
 ```
 
 ![assertion](https://res.cloudinary.com/djwdcmwdz/image/upload/v1673808310/screely-1673808287031_sol4it.png)
@@ -329,15 +337,15 @@ spec:
       url: http://app:8080/books
       method: GET
       headers:
-      - key: Content-Type
-        value: application/json
+        - key: Content-Type
+          value: application/json
   specs:
-  - selector: span[tracetest.span.type="http" name="GET /books" http.target="/books" http.method="GET"]
-    assertions:
-    - attr:http.status_code = 200
-  - selector: span[tracetest.span.type="general" name="Books List"]
-    assertions:
-    - attr:books.list.count = 4
+    - selector: span[tracetest.span.type="http" name="GET /books" http.target="/books" http.method="GET"]
+      assertions:
+        - attr:http.status_code = 200
+    - selector: span[tracetest.span.type="general" name="Books List"]
+      assertions:
+        - attr:books.list.count = 4
 ```
 
 This file defines the a test the same way you would through the Web UI.
@@ -363,7 +371,7 @@ This test will fail just like the sample above due to the `attr:books.list.count
 The tests will pass if you change the assertion to:
 
 ```css
-attr:books.list.count = 3
+attr: books.list.count = 3;
 ```
 
 Feel free to check out our [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
