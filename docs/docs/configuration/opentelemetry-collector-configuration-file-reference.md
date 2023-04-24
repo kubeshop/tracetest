@@ -3,7 +3,7 @@
 This page contains a reference for using the OpenTelemetry Collector to send trace data from your application to any of Tracetest's supported trace data stores.
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Supported Trace Data Stores
@@ -19,6 +19,7 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [Grafana Tempo](./connecting-to-data-stores/tempo)
 - [Lightstep](./connecting-to-data-stores/lightstep)
 - [New Relic](./connecting-to-data-stores/new-relic)
+- [Datadog](./connecting-to-data-stores/datadog)
 
 Continue reading below to learn how to configure the OpenTelemetry Collector to send trace data from your application to any of the trace data stores above.
 
