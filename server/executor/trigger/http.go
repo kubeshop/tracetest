@@ -7,11 +7,11 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/goware/urlx"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"go.opentelemetry.io/otel/propagation"
@@ -83,13 +83,9 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 		body = bytes.NewBufferString(tReq.Body)
 	}
 
-	parsedUrl, err := url.Parse(tReq.URL)
+	parsedUrl, err := urlx.Parse(tReq.URL)
 	if err != nil {
 		return response, err
-	}
-
-	if parsedUrl.Scheme == "" {
-		parsedUrl.Scheme = "http"
 	}
 
 	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(string(tReq.Method)), parsedUrl.String(), body)
