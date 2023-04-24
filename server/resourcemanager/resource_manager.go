@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -234,7 +235,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var values map[string]any
-		err := decode(resource, &values)
+		err := encode(resource, &values)
 		if err != nil {
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 			return
@@ -385,7 +386,7 @@ func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
 func encodeValues(resource any, enc encoder) ([]byte, error) {
 	var values map[string]any
 
-	err := decode(resource, &values)
+	err := encode(resource, &values)
 	if err != nil {
 		return nil, fmt.Errorf("cannot code resource: %w", err)
 	}
@@ -420,6 +421,38 @@ func readBody(r *http.Request) ([]byte, error) {
 	return body, nil
 }
 
-func decode(input interface{}, output interface{}) error {
+func decode(input any, output any) error {
 	return mapstructure.Decode(input, output)
+}
+
+func encode(input any, output *map[string]any) error {
+	err := mapstructure.Decode(input, output)
+	if err != nil {
+		return err
+	}
+
+	fixInterlaSlicesMapping(output)
+
+	return nil
+}
+
+func fixInterlaSlicesMapping(output *map[string]any) {
+	for k, v := range *output {
+		value := reflect.ValueOf(v)
+		if value.Kind() == reflect.Map {
+			submap := v.(map[string]any)
+			fixInterlaSlicesMapping(&submap)
+		}
+		if value.Kind() == reflect.Slice {
+			dereferencedOuput := *output
+
+			newOutput := make([]map[string]any, value.Len())
+			for i := 0; i < value.Len(); i++ {
+				item := value.Index(i).Interface()
+				mapstructure.Decode(item, &newOutput[i])
+			}
+			dereferencedOuput[k] = newOutput
+		}
+
+	}
 }
