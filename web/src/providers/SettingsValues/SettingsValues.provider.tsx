@@ -5,7 +5,7 @@ import Config from 'models/Config.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import Demo from 'models/Demo.model';
 import Polling from 'models/Polling.model';
-import {useGetDataStoresQuery, useGetConfigQuery, useGetDemoQuery, useGetPollingQuery} from 'redux/apis/TraceTest.api';
+import {useGetDataStoreQuery, useGetConfigQuery, useGetDemoQuery, useGetPollingQuery} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import UserSelectors from 'selectors/User.selectors';
@@ -28,7 +28,7 @@ interface IContext {
 }
 
 const Context = createContext<IContext>({
-  dataStoreConfig: DataStoreConfig([]),
+  dataStoreConfig: DataStoreConfig({}),
   skipConfigSetup: noop,
   skipConfigSetupFromTest: noop,
   isLoading: false,
@@ -50,7 +50,7 @@ export const useSettingsValues = () => useContext(Context);
 const SettingsValuesProvider = ({children}: IProps) => {
   // DataStore
   const dispatch = useAppDispatch();
-  const {data: dataStoreConfig = DataStoreConfig([]), isLoading, isError, isFetching} = useGetDataStoresQuery({});
+  const {data: dataStoreConfig = DataStoreConfig({}), isLoading, isError, isFetching} = useGetDataStoreQuery({});
   const initConfigSetup = useAppSelector(state => UserSelectors.selectUserPreference(state, 'initConfigSetup'));
   const initConfigSetupFromTest = useAppSelector(state =>
     UserSelectors.selectUserPreference(state, 'initConfigSetupFromTest')

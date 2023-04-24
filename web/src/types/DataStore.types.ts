@@ -1,7 +1,7 @@
 import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
 import ConnectionTestStep from 'models/ConnectionResultStep.model';
-import {TRawDataStore} from 'models/DataStore.model';
+import DataStore from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {THeader} from './Test.types';
 
@@ -39,7 +39,7 @@ export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
 export type TRawBaseClientSettings = TDataStoreSchemas['BaseClient'];
 export type TRawHttpClientSettings = TDataStoreSchemas['HTTPClientSettings'];
 
-export type TTestConnectionRequest = TRawDataStore;
+export type TTestConnectionRequest = DataStore;
 export type TRawConnectionResult = TConfigSchemas['ConnectionResult'];
 export type TConnectionResult = Model<
   TRawConnectionResult,
@@ -76,7 +76,7 @@ export interface IElasticSearch extends TRawElasticSearch {
   certificateFile?: File;
 }
 
-type IDataStore = TRawDataStore & {
+type IDataStore = DataStore & {
   jaeger?: IBaseClientSettings;
   tempo?: IBaseClientSettings;
   openSearch?: IElasticSearch;
@@ -85,7 +85,7 @@ type IDataStore = TRawDataStore & {
   lightstep?: {};
   newRelic?: {};
   datadog?: {};
-}
+};
 
 export type TDraftDataStore = {
   dataStore?: IDataStore;
@@ -95,7 +95,7 @@ export type TDraftDataStore = {
 export type TDataStoreForm = FormInstance<TDraftDataStore>;
 
 export type TDataStoreService = {
-  getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<TRawDataStore>;
+  getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<DataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
   getInitialValues(draft: DataStoreConfig, dataStoreType?: SupportedDataStores): TDraftDataStore;
 };
