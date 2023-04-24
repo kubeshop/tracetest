@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -13,12 +15,14 @@ import (
 )
 
 type ingester struct {
-	db model.Repository
+	db           model.Repository
+	eventEmitter executor.EventEmitter
 }
 
-func NewIngester(db model.Repository) ingester {
+func NewIngester(db model.Repository, eventEmitter executor.EventEmitter) ingester {
 	return ingester{
-		db: db,
+		db:           db,
+		eventEmitter: eventEmitter,
 	}
 }
 
@@ -104,6 +108,7 @@ func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, 
 	newSpans := append(existingSpans, spans...)
 	newTrace := model.NewTrace(traceID.String(), newSpans)
 
+	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans)))
 	run.Trace = &newTrace
 
 	err = e.db.UpdateRun(ctx, run)
