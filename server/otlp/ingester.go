@@ -27,7 +27,6 @@ func NewIngester(db model.Repository, eventEmitter executor.EventEmitter) ingest
 }
 
 func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType string) (*pb.ExportTraceServiceResponse, error) {
-	fmt.Println(">>>> INGESTING REQUEST")
 	ds, err := i.db.DefaultDataStore(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
