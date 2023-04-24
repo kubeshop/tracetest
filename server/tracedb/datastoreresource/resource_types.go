@@ -143,7 +143,7 @@ var otlpBasedDataStores = []DataStoreType{
 }
 
 func (ds DataStore) Validate() error {
-	if ds.Type != "" {
+	if ds.Type == "" {
 		return fmt.Errorf("data store should have a type")
 	}
 
@@ -151,7 +151,7 @@ func (ds DataStore) Validate() error {
 		return fmt.Errorf("unsupported data store type %s", ds.Type)
 	}
 
-	if ds.Name != "" {
+	if ds.Name == "" {
 		return fmt.Errorf("data store should have a name")
 	}
 
