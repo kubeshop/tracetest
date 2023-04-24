@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -42,48 +43,39 @@ func (db *noopTraceDB) TestConnection(ctx context.Context) model.ConnectionResul
 	return model.ConnectionResult{}
 }
 
-func WithFallback(fn func(ds model.DataStore) (TraceDB, error), fallbackDS model.DataStore) func(ds model.DataStore) (TraceDB, error) {
-	return func(ds model.DataStore) (TraceDB, error) {
-		if ds.IsZero() {
-			ds = fallbackDS
-		}
-		return fn(ds)
-	}
-}
-
 type traceDBFactory struct {
-	repo model.Repository
+	runRepository model.RunRepository
 }
 
-func Factory(repo model.Repository) func(ds model.DataStore) (TraceDB, error) {
+func Factory(runRepository model.RunRepository) func(ds datastoreresource.DataStore) (TraceDB, error) {
 	f := traceDBFactory{
-		repo: repo,
+		runRepository: runRepository,
 	}
 
 	return f.New
 }
 
-func (f *traceDBFactory) getTraceDBInstance(ds model.DataStore) (TraceDB, error) {
+func (f *traceDBFactory) getTraceDBInstance(ds datastoreresource.DataStore) (TraceDB, error) {
 	var tdb TraceDB
 	var err error
 
 	if ds.IsOTLPBasedProvider() {
-		tdb, err = newCollectorDB(f.repo)
+		tdb, err = newCollectorDB(f.runRepository)
 		return tdb, err
 	}
 
 	switch ds.Type {
-	case model.DataStoreTypeJaeger:
+	case datastoreresource.DataStoreTypeJaeger:
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
-	case model.DataStoreTypeTempo:
+	case datastoreresource.DataStoreTypeTempo:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	case model.DataStoreTypeElasticAPM:
+	case datastoreresource.DataStoreTypeElasticAPM:
 		tdb, err = newElasticSearchDB(ds.Values.ElasticApm)
-	case model.DataStoreTypeOpenSearch:
+	case datastoreresource.DataStoreTypeOpenSearch:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
-	case model.DataStoreTypeSignalFX:
+	case datastoreresource.DataStoreTypeSignalFX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
-	case model.DataStoreTypeAwsXRay:
+	case datastoreresource.DataStoreTypeAwsXRay:
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
 	default:
 		return &noopTraceDB{}, nil
@@ -100,7 +92,7 @@ func (f *traceDBFactory) getTraceDBInstance(ds model.DataStore) (TraceDB, error)
 	return tdb, err
 }
 
-func (f *traceDBFactory) New(ds model.DataStore) (TraceDB, error) {
+func (f *traceDBFactory) New(ds datastoreresource.DataStore) (TraceDB, error) {
 	tdb, err := f.getTraceDBInstance(ds)
 
 	if err != nil {

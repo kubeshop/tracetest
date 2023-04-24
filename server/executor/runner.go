@@ -13,8 +13,10 @@ import (
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -42,7 +44,7 @@ func NewPersistentRunner(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
-	dsRepo model.DataStoreRepository,
+	dsRepo resourcemanager.Current[datastoreresource.DataStore],
 	eventEmitter EventEmitter,
 ) PersistentRunner {
 	return persistentRunner{
@@ -68,7 +70,7 @@ type persistentRunner struct {
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
 	newTraceDBFn        traceDBFactoryFn
-	dsRepo              model.DataStoreRepository
+	dsRepo              resourcemanager.Current[datastoreresource.DataStore]
 	eventEmitter        EventEmitter
 
 	executeQueue chan execReq
@@ -161,7 +163,7 @@ func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata mod
 }
 
 func (r persistentRunner) traceDB(ctx context.Context) (tracedb.TraceDB, error) {
-	ds, err := r.dsRepo.DefaultDataStore(ctx)
+	ds, err := r.dsRepo.Current(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get default datastore: %w", err)
 	}

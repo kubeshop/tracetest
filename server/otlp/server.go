@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -17,16 +18,18 @@ import (
 type Server struct {
 	pb.UnimplementedTraceServiceServer
 
-	addr string
-	db   model.Repository
+	addr   string
+	db     model.Repository
+	dsRepo *datastoreresource.Repository
 
 	gServer *grpc.Server
 }
 
-func NewServer(addr string, db model.Repository) *Server {
+func NewServer(addr string, db model.Repository, dsRepo *datastoreresource.Repository) *Server {
 	return &Server{
-		addr: addr,
-		db:   db,
+		addr:   addr,
+		db:     db,
+		dsRepo: dsRepo,
 	}
 }
 
@@ -45,7 +48,7 @@ func (s *Server) Stop() {
 }
 
 func (s Server) Export(ctx context.Context, request *pb.ExportTraceServiceRequest) (*pb.ExportTraceServiceResponse, error) {
-	ds, err := s.db.DefaultDataStore(ctx)
+	ds, err := s.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
 		fmt.Println("OTLP server is not enabled. Ignoring request")
