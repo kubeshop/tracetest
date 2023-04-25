@@ -25,6 +25,7 @@ func NewIngester(db model.Repository, eventEmitter executor.EventEmitter, dsRepo
 	return ingester{
 		db:           db,
 		eventEmitter: eventEmitter,
+		dsRepo:       dsRepo,
 	}
 }
 
