@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -187,6 +188,7 @@ func (app *App) Start(opts ...appOption) error {
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	pollingProfileRepo := pollingprofile.NewRepository(db)
+	environmentRepo := environment.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, testDB, eventEmitter)
@@ -238,6 +240,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerConfigResource(configRepo, apiRouter, db, provisioner)
 
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner)
+	registerEnvironmentResource(&environmentRepo, apiRouter, db, provisioner)
 
 	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner)
@@ -319,6 +322,17 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 		pollingprofile.ResourceNamePlural,
 		repository,
 		resourcemanager.WithOperations(pollingprofile.Operations...),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
+func registerEnvironmentResource(repository *environment.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
+	manager := resourcemanager.New[environment.Environment](
+		environment.ResourceName,
+		environment.ResourceNamePlural,
+		repository,
+		resourcemanager.WithOperations(environment.Operations...),
 	)
 	manager.RegisterRoutes(router)
 	provisioner.AddResourceProvisioner(manager)
