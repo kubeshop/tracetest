@@ -174,6 +174,20 @@ export interface paths {
     /** Delete an environment from Tracetest */
     delete: operations["deleteEnvironment"];
   };
+  "/environments": {
+    /** List environments available in Tracetest. */
+    get: operations["listEnvironments"];
+    /** Create an environment that can be used by tests and transactions */
+    post: operations["createEnvironment"];
+  };
+  "/environments/{environmentId}": {
+    /** Get one environment by its id */
+    get: operations["getEnvironment"];
+    /** Update an environment used on Tracetest */
+    put: operations["updateEnvironment"];
+    /** Delete an environment from Tracetest */
+    delete: operations["deleteEnvironment"];
+  };
 }
 
 export interface components {}
