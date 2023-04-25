@@ -1106,7 +1106,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./dataStores.yaml#/components/schemas/DataStore"
+                $ref: "./dataStores.yaml#/components/schemas/DataStoreResource"
         404:
           description: "data store not found"
         500:

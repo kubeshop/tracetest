@@ -2,7 +2,6 @@ import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
-import DataStore from 'models/DataStore.model';
 import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
@@ -20,7 +19,7 @@ interface IProps {
   onTestConnection(): void;
   isConfigReady: boolean;
   isTestConnectionLoading: boolean;
-  onDeleteConfig(dataStore: DataStore): void;
+  onDeleteConfig(): void;
   isLoading: boolean;
   isFormValid: boolean;
 }
@@ -83,13 +82,7 @@ const DataStoreForm = ({
           </S.TopContainer>
           <S.ButtonsContainer>
             {isConfigReady ? (
-              <Button
-                disabled={isLoading}
-                type="primary"
-                ghost
-                onClick={() => onDeleteConfig(dataStoreConfig.defaultDataStore)}
-                danger
-              >
+              <Button disabled={isLoading} type="primary" ghost onClick={onDeleteConfig} danger>
                 {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
               </Button>
             ) : (
