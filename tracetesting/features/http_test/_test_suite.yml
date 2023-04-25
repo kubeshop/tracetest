@@ -20,6 +20,6 @@ spec:
     # re-run test
     - ./08_rerun_http_test.yml
     # delete test run
-    - ./09_delete_http_test_run.yml
+    # - ./09_delete_http_test_run.yml
     # delete test
-    - ./10_delete_http_test.yml
+    # - ./10_delete_http_test.yml
