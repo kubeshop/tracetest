@@ -93,6 +93,11 @@ jobs:
           TRACETEST_ENV: main
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
+      - name: Upload assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ matrix.GOOS }}
+          path: dist/${{ matrix.GOOS }}
 
   release:
     runs-on: ubuntu-latest
@@ -124,18 +129,18 @@ jobs:
       - shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short=8 $GITHUB_SHA)" >> $GITHUB_ENV
-      - uses: actions/cache@v3
+      - uses: actions/download-artifact@v3
         with:
           path: dist/linux
-          key: linux-${{ env.sha_short }}
-      - uses: actions/cache@v3
+          name: dist-linux
+      - uses: actions/download-artifact@v3
         with:
           path: dist/darwin
-          key: darwin-${{ env.sha_short }}
-      - uses: actions/cache@v3
+          name: dist-darwin
+      - uses: actions/download-artifact@v3
         with:
           path: dist/windows
-          key: windows-${{ env.sha_short }}
+          name: dist-windows
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
