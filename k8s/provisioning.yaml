@@ -1,8 +1,10 @@
 ---
 type: DataStore
 spec:
-  name: Jaeger
+  id: current
+  name: current
   type: jaeger
+  default: true
   jaeger:
     endpoint: jaeger-query.tracetest:16685
     tls:
