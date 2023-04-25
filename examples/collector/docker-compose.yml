@@ -49,4 +49,4 @@ services:
         volumes:
             - ./collector.config.yaml:/otel-local-config.yaml
         environment:
-            - TRACETEST_ENDPOINT=tracetest:21321
+            - TRACETEST_ENDPOINT=tracetest:4317

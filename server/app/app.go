@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
@@ -189,6 +190,9 @@ func (app *App) Start(opts ...appOption) error {
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastoreresource.NewRepository(db)
 
+	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
+	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
+
 	rf := newRunnerFacades(
 		pollingProfileRepo,
 		dataStoreRepo,
@@ -227,13 +231,6 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
-
-	otlpServer := otlp.NewServer(":21321", testDB, dataStoreRepo)
-	go otlpServer.Start()
-	app.registerStopFn(func() {
-		fmt.Println("stopping otlp server")
-		otlpServer.Stop()
-	})
 
 	provisioner := provisioning.New()
 
@@ -284,7 +281,22 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 				Env,
 			),
 		)
+}
 
+func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastoreresource.Repository) {
+	ingester := otlp.NewIngester(testDB, eventEmitter, dsRepo)
+	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
+	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
+	go grpcOtlpServer.Start()
+	go httpOtlpServer.Start()
+
+	fmt.Println("OTLP server started on :4317 (grpc) and :4318 (http)")
+
+	app.registerStopFn(func() {
+		fmt.Println("stopping otlp server")
+		grpcOtlpServer.Stop()
+		httpOtlpServer.Stop()
+	})
 }
 
 func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {

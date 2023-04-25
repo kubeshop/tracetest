@@ -116,11 +116,6 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "configuration/opentelemetry-collector-configuration-file-reference",
-          label: "OpenTelemetry Collector Configuration File Reference",
-        },
-        {
-          type: "doc",
           id: "configuration/server",
           label: "Tracetest Server Configuration",
         },
@@ -143,6 +138,11 @@ const sidebars = {
           type: "doc",
           id: "configuration/analytics",
           label: "Analytics",
+        },
+        {
+          type: "doc",
+          id: "configuration/opentelemetry-collector-configuration-file-reference",
+          label: "OpenTelemetry Collector Configuration File Reference",
         },
       ],
     },
@@ -385,6 +385,11 @@ const sidebars = {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
           label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
+          label: "Python with Manual Instrumentation and OpenTelemetry Collector",
         },
         {
           type: "doc",
