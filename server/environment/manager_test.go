@@ -56,7 +56,7 @@ func TestEnvironment(t *testing.T) {
 			manager := resourcemanager.New[environment.Environment](
 				environment.ResourceName,
 				environment.ResourceNamePlural,
-				environmentRepository,
+				&environmentRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
 				resourcemanager.WithOperations(environment.Operations...),
 			)
@@ -65,7 +65,7 @@ func TestEnvironment(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			environmentRepository := manager.Handler().(environment.Repository)
+			environmentRepository := manager.Handler().(*environment.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,

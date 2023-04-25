@@ -21,6 +21,9 @@ const EnvironmentForm = ({form, initialValues, onSubmit, onValidate}: IProps) =>
       onFinish={onSubmit}
       onValuesChange={onValidate}
     >
+      <Form.Item name="id" hidden>
+        <Input type="hidden" />
+      </Form.Item>
       <Form.Item label="Name" name="name" rules={[{required: true, message: 'Please input a name'}]}>
         <Input />
       </Form.Item>

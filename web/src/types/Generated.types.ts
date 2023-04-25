@@ -977,11 +977,11 @@ export interface operations {
         content: {
           "application/json": {
             count?: number;
-            items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
           };
           "text/yaml": {
             count?: number;
-            items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
           };
         };
       };
@@ -997,8 +997,8 @@ export interface operations {
       /** successful operation */
       201: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
         };
       };
       /** problem creating an environment */
@@ -1006,8 +1006,8 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-        "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
       };
     };
   };
@@ -1018,8 +1018,8 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
         };
       };
       /** environment not found */
@@ -1035,8 +1035,8 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
         };
       };
       /** invalid environment, some data was sent in incorrect format. */
@@ -1048,8 +1048,8 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-        "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
       };
     };
   };
@@ -1318,6 +1318,15 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        /** @description Represents an environment structured into the Resources format. */
+        EnvironmentResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Environment'.
+           * @enum {string}
+           */
+          type?: "Environment";
+          spec?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
         Environment: {
           id?: string;
           name?: string;
