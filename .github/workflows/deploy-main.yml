@@ -37,6 +37,7 @@ jobs:
       - name: generate graph
         run: |
           cd server
+          mkdir -p ../dist/
           /tmp/go-arch/go-arch ../dist/architecture.png
       - name: Upload assets
         uses: actions/upload-artifact@v3
