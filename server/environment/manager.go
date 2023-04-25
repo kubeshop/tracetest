@@ -12,23 +12,12 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
-type Repository interface {
-	SortingFields() []string
-	SetID(environment Environment, id id.ID) Environment
-	Create(ctx context.Context, environment Environment) (Environment, error)
-	Update(ctx context.Context, environment Environment) (Environment, error)
-	Delete(ctx context.Context, id id.ID) error
-	List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Environment, error)
-	Count(ctx context.Context, query string) (int, error)
-	Get(ctx context.Context, id id.ID) (Environment, error)
-}
-
-type repository struct {
+type Repository struct {
 	db *sql.DB
 }
 
 func NewRepository(db *sql.DB) Repository {
-	return &repository{db}
+	return Repository{db}
 }
 
 type scanner interface {
@@ -76,31 +65,31 @@ const (
 	`
 )
 
-var _ resourcemanager.Create[Environment] = &repository{}
-var _ resourcemanager.Delete[Environment] = &repository{}
-var _ resourcemanager.Get[Environment] = &repository{}
-var _ resourcemanager.List[Environment] = &repository{}
-var _ resourcemanager.Update[Environment] = &repository{}
-var _ resourcemanager.IDSetter[Environment] = &repository{}
-var _ resourcemanager.Provision[Environment] = &repository{}
+var _ resourcemanager.Create[Environment] = &Repository{}
+var _ resourcemanager.Delete[Environment] = &Repository{}
+var _ resourcemanager.Get[Environment] = &Repository{}
+var _ resourcemanager.List[Environment] = &Repository{}
+var _ resourcemanager.Update[Environment] = &Repository{}
+var _ resourcemanager.IDSetter[Environment] = &Repository{}
+var _ resourcemanager.Provision[Environment] = &Repository{}
 
-func (*repository) SortingFields() []string {
+func (*Repository) SortingFields() []string {
 	return []string{"name", "createdAt"}
 }
 
-func (r *repository) SetID(environment Environment, id id.ID) Environment {
+func (r *Repository) SetID(environment Environment, id id.ID) Environment {
 	environment.ID = id
 	return environment
 }
 
-func (r *repository) Create(ctx context.Context, environment Environment) (Environment, error) {
+func (r *Repository) Create(ctx context.Context, environment Environment) (Environment, error) {
 	environment.ID = environment.Slug()
 	environment.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
 
 	return r.insertIntoEnvironments(ctx, environment)
 }
 
-func (r *repository) Update(ctx context.Context, environment Environment) (Environment, error) {
+func (r *Repository) Update(ctx context.Context, environment Environment) (Environment, error) {
 	oldEnvironment, err := r.Get(ctx, environment.ID)
 	if err != nil {
 		return Environment{}, err
@@ -113,7 +102,7 @@ func (r *repository) Update(ctx context.Context, environment Environment) (Envir
 	return r.updateIntoEnvironments(ctx, environment, oldEnvironment.ID)
 }
 
-func (r *repository) Delete(ctx context.Context, id id.ID) error {
+func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	_, err := r.Get(ctx, id)
 	if err != nil {
 		return err
@@ -139,7 +128,7 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	return nil
 }
 
-func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Environment, error) {
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Environment, error) {
 	if take == 0 {
 		take = 20
 	}
@@ -187,7 +176,7 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	return environments, nil
 }
 
-func (r *repository) Count(ctx context.Context, query string) (int, error) {
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	return r.countEnvironments(ctx, query)
 }
 
@@ -206,7 +195,7 @@ func sortQuery(sql, sortBy, sortDirection string, sortingFields map[string]strin
 	return fmt.Sprintf("%s ORDER BY %s %s", sql, sortField, dir)
 }
 
-func (r *repository) Get(ctx context.Context, id id.ID) (Environment, error) {
+func (r *Repository) Get(ctx context.Context, id id.ID) (Environment, error) {
 	stmt, err := r.db.Prepare(getQuery + " WHERE e.id = $1")
 
 	if err != nil {
@@ -222,7 +211,7 @@ func (r *repository) Get(ctx context.Context, id id.ID) (Environment, error) {
 	return environment, nil
 }
 
-func (r *repository) EnvironmentIDExists(ctx context.Context, id string) (bool, error) {
+func (r *Repository) EnvironmentIDExists(ctx context.Context, id string) (bool, error) {
 	exists := false
 
 	row := r.db.QueryRowContext(ctx, idExistsQuery, id)
@@ -232,7 +221,7 @@ func (r *repository) EnvironmentIDExists(ctx context.Context, id string) (bool, 
 	return exists, err
 }
 
-func (r *repository) readEnvironmentRow(ctx context.Context, row scanner) (Environment, error) {
+func (r *Repository) readEnvironmentRow(ctx context.Context, row scanner) (Environment, error) {
 	environment := Environment{}
 
 	var (
@@ -261,7 +250,7 @@ func (r *repository) readEnvironmentRow(ctx context.Context, row scanner) (Envir
 	}
 }
 
-func (r *repository) countEnvironments(ctx context.Context, query string) (int, error) {
+func (r *Repository) countEnvironments(ctx context.Context, query string) (int, error) {
 	var (
 		count  int
 		params []any
@@ -279,7 +268,7 @@ func (r *repository) countEnvironments(ctx context.Context, query string) (int, 
 	return count, nil
 }
 
-func (r *repository) insertIntoEnvironments(ctx context.Context, environment Environment) (Environment, error) {
+func (r *Repository) insertIntoEnvironments(ctx context.Context, environment Environment) (Environment, error) {
 	stmt, err := r.db.Prepare(insertQuery)
 	if err != nil {
 		return Environment{}, fmt.Errorf("sql prepare: %w", err)
@@ -307,7 +296,7 @@ func (r *repository) insertIntoEnvironments(ctx context.Context, environment Env
 	return environment, nil
 }
 
-func (r *repository) updateIntoEnvironments(ctx context.Context, environment Environment, oldId id.ID) (Environment, error) {
+func (r *Repository) updateIntoEnvironments(ctx context.Context, environment Environment, oldId id.ID) (Environment, error) {
 	stmt, err := r.db.Prepare(updateQuery)
 	if err != nil {
 		return Environment{}, fmt.Errorf("sql prepare: %w", err)
@@ -336,7 +325,7 @@ func (r *repository) updateIntoEnvironments(ctx context.Context, environment Env
 	return environment, nil
 }
 
-func (r *repository) Provision(ctx context.Context, environment Environment) error {
+func (r *Repository) Provision(ctx context.Context, environment Environment) error {
 	_, err := r.Create(ctx, environment)
 	return err
 }
