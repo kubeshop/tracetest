@@ -30,7 +30,7 @@ const TransactionRun = ({
     completedAt,
     state,
     steps: steps.map(step => TestRun(step)),
-    environment: Environment(environment),
+    environment: Environment.fromRun(environment),
     metadata,
     version,
     pass,

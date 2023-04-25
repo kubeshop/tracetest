@@ -1176,6 +1176,15 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        /** @description Represents an environment structured into the Resources format. */
+        EnvironmentResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Environment'.
+           * @enum {string}
+           */
+          type?: "Environment";
+          spec?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
         Environment: {
           id?: string;
           name?: string;

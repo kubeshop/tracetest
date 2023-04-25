@@ -6,7 +6,9 @@ import {setUserPreference} from 'redux/slices/User.slice';
 import EnvironmentSelectors from 'selectors/Environment.selectors';
 import Environment from 'models/Environment.model';
 import EnvironmentModal from 'components/EnvironmentModal';
+import EnvironmentService from 'services/Environment.service';
 import useEnvironmentCrud from './hooks/useEnvironmentCrud';
+
 
 interface IContext {
   environmentList: Environment[];
@@ -54,10 +56,11 @@ const EnvironmentProvider = ({children}: IProps) => {
 
   const onSubmit = useCallback(
     (values: Environment) => {
+      const request = EnvironmentService.getRequest(values);
       if (environment) {
-        edit(environment.id, values);
+        edit(environment.id, request);
       } else {
-        create(values);
+        create(request);
       }
       setIsModalOpen(false);
     },

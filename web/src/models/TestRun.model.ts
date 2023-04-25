@@ -125,7 +125,7 @@ const TestRun = ({
     passedAssertionCount: getTestResultCount(result, 'passed'),
     metadata,
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
-    environment: Environment(environment),
+    environment: Environment.fromRun(environment),
     transactionId,
     transactionRunId,
   };
