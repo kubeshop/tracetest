@@ -5,8 +5,8 @@ import {
   useUpdateEnvironmentMutation,
 } from 'redux/apis/TraceTest.api';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import Environment from 'models/Environment.model';
 import {useNotification} from 'providers/Notification/Notification.provider';
+import {TRawEnvironment} from 'models/Environment.model';
 
 const useEnvironmentCrud = () => {
   const [deleteEnvironment] = useDeleteEnvironmentMutation();
@@ -33,7 +33,7 @@ const useEnvironmentCrud = () => {
   );
 
   const edit = useCallback(
-    async (environmentId: string, environment: Environment) => {
+    async (environmentId: string, environment: TRawEnvironment) => {
       await updateEnvironment({environmentId, environment});
       showNotification({
         type: 'success',
@@ -44,7 +44,7 @@ const useEnvironmentCrud = () => {
   );
 
   const create = useCallback(
-    async (environment: Environment) => {
+    async (environment: TRawEnvironment) => {
       await createEnvironment(environment);
 
       showNotification({

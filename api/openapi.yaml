@@ -1101,7 +1101,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "./environments.yaml#/components/schemas/Environment"
+                      $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
             text/yaml:
               schema:
                 type: object
@@ -1111,7 +1111,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "./environments.yaml#/components/schemas/Environment"
+                      $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
         400:
           description: "invalid query for environments, some data was sent in incorrect format."
         500:
@@ -1126,20 +1126,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./environments.yaml#/components/schemas/Environment"
+              $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
           text/yaml:
             schema:
-              $ref: "./environments.yaml#/components/schemas/Environment"
+              $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
       responses:
         201:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./environments.yaml#/components/schemas/Environment"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
             text/yaml:
               schema:
-                $ref: "./environments.yaml#/components/schemas/Environment"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
         500:
           description: "problem creating an environment"
   /environments/{environmentId}:
@@ -1157,10 +1157,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./environments.yaml#/components/schemas/Environment"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
             text/yaml:
               schema:
-                $ref: "./environments.yaml#/components/schemas/Environment"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
         404:
           description: "environment not found"
         500:
@@ -1177,20 +1177,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./environments.yaml#/components/schemas/Environment"
+              $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
           text/yaml:
             schema:
-              $ref: "./environments.yaml#/components/schemas/Environment"
+              $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./environments.yaml#/components/schemas/Environment"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
             text/yaml:
               schema:
-                $ref: "./environments.yaml#/components/schemas/Environment"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
         400:
           description: "invalid environment, some data was sent in incorrect format."
         404:
