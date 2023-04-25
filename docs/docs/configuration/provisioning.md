@@ -1,10 +1,11 @@
 # Provisioning server
 
-Tracetest allows a server to be provisioned the first time a new Tracetest server is installed and launched. Provisioning sets certain resources in the server to the specified values, allowing you to configure the server. It is convenient in a CI/CD flow where you want to launch a server with a specified configuration. 
+Tracetest allows a server to be provisioned the first time a new Tracetest server is installed and launched. Provisioning sets certain resources in the server to the specified values, allowing you to configure the server. It is convenient in a CI/CD flow where you want to launch a server with a specified configuration.
 
 The server is provisioned by specifying a series of YAML snippets which will configure various resources. Each snippet is separated with the YAML separator, `---`.
 
-Currently, the following resources can be provisioned: 
+Currently, the following resources can be provisioned:
+
 - DataStore
 - PollingProfile
 - Config
@@ -20,7 +21,7 @@ type: DataStore
 spec:
   name: otlp
   type: otlp
-  isdefault: true
+  default: true
 ---
 type: Config
 spec:
@@ -46,4 +47,3 @@ spec:
 ```
 
 Alternatively, we support setting an environment variable called `TRACETEST_PROVISIONING` to provision the server when it is first started. Base64 encode the provisioning YAML you want to utilize and set the `TRACETEST_PROVISIONING` environment variable with the result. The Tracetest server will then provision based on the Base64 encoded provisioning data in this environment variable the first time it is launched.
-
