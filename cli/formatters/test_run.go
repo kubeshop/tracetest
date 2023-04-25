@@ -85,7 +85,7 @@ func (f testRun) pretty(output TestRunOutput) string {
 				*output.Test.Name,
 				output.RunWebURL,
 			),
-			f.formatMessage("\tReason: %s",
+			f.formatMessage("\tReason: %s\n",
 				*output.Run.LastErrorState,
 			),
 		))
