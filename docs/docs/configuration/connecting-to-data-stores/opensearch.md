@@ -54,7 +54,7 @@ spec:
 Proceed to run this command in the terminal, and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

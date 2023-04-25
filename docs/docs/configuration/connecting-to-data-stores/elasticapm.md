@@ -53,19 +53,19 @@ spec:
   name: Elastic Data Store
   type: elasticapm
   default: true
-    elasticapm:
-      addresses:
-        - https://es01:9200
-      username: elastic
-      password: changeme
-      index: traces-apm-default
-      insecureSkipVerify: true
+  elasticapm:
+    addresses:
+      - https://es01:9200
+    username: elastic
+    password: changeme
+    index: traces-apm-default
+    insecureSkipVerify: true
 ```
 
 Proceed to run this command in the terminal and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

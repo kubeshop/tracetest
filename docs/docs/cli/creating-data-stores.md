@@ -74,7 +74,7 @@ spec:
 To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then you just have to enter:
 
 ```
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 ## Additional Information
@@ -84,5 +84,5 @@ In the current version, you can only have one active data store at any given tim
 After a configuration is applied, you can export it using the CLI by using the following command:
 
 ```
-tracetest datastore export --output my/file/location.yaml --id my-data-store-id
+tracetest export datastore -f my/file/location.yaml --id my-data-store-id
 ```
