@@ -129,15 +129,18 @@ func (a runTestAction) processEnv(ctx context.Context, envID string) (string, er
 
 	name := filepath.Base(envID)
 
-	req := openapi.Environment{
-		Id:     &name,
-		Name:   &name,
-		Values: values,
+	req := openapi.EnvironmentResource{
+		Type: openapi.PtrString("environment"),
+		Spec: &openapi.Environment{
+			Id:     &name,
+			Name:   &name,
+			Values: values,
+		},
 	}
 
-	body, resp, err := a.client.ApiApi.
+	body, resp, err := a.client.ResourceApiApi.
 		CreateEnvironment(ctx).
-		Environment(req).
+		EnvironmentResource(req).
 		Execute()
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusBadRequest {
@@ -147,13 +150,13 @@ func (a runTestAction) processEnv(ctx context.Context, envID string) (string, er
 		return "", fmt.Errorf("could not create environment: %w", err)
 	}
 
-	return body.GetId(), nil
+	return body.Spec.GetId(), nil
 }
 
-func (a runTestAction) updateEnv(ctx context.Context, req openapi.Environment) (string, error) {
-	resp, err := a.client.ApiApi.
-		UpdateEnvironment(ctx, req.GetId()).
-		Environment(req).
+func (a runTestAction) updateEnv(ctx context.Context, req openapi.EnvironmentResource) (string, error) {
+	_, resp, err := a.client.ResourceApiApi.
+		UpdateEnvironment(ctx, req.Spec.GetId()).
+		EnvironmentResource(req).
 		Execute()
 	if err != nil {
 		return "", fmt.Errorf("could not update environment: %w", err)
@@ -163,7 +166,7 @@ func (a runTestAction) updateEnv(ctx context.Context, req openapi.Environment) (
 		return "", fmt.Errorf("error updating environment")
 	}
 
-	return req.GetId(), nil
+	return req.Spec.GetId(), nil
 }
 
 func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath string) (string, error) {
