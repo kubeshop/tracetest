@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"context"
 	"errors"
 
 	"github.com/kubeshop/tracetest/cli/config"
@@ -13,30 +12,18 @@ type ApplyArgs struct {
 	File string
 }
 
-type ListArgs struct {
-	Take          int32
-	Skip          int32
-	SortDirection string
-	SortBy        string
-}
-
-type ResourceActions interface {
-	Name() string
-	Apply(context.Context, ApplyArgs) error
-	List(context.Context, ListArgs) error
-	Get(context.Context, string) error
-	Export(context.Context, string, string) error
-	Delete(context.Context, string) error
-}
-
 type resourceArgs struct {
 	logger         *zap.Logger
 	resourceClient utils.ResourceClient
 	config         config.Config
 }
 
+func (r resourceArgs) Logger() *zap.Logger {
+	return r.logger
+}
+
 type ResourceArgsOption = func(args *resourceArgs)
-type ResourceRegistry map[string]ResourceActions
+type ResourceRegistry map[string]resourceActions
 
 var (
 	ErrResourceNotRegistered      = errors.New("resource not registered")
@@ -48,17 +35,17 @@ func NewResourceRegistry() ResourceRegistry {
 }
 
 func (r ResourceRegistry) Register(actions ResourceActions) {
-	r[actions.Name()] = actions
+	r[actions.Name()] = WrapActions(actions)
 }
 
-func (r ResourceRegistry) Get(name string) (ResourceActions, error) {
-	resourceActions, found := r[name]
+func (r ResourceRegistry) Get(name string) (resourceActions, error) {
+	actions, found := r[name]
 
 	if !found {
-		return nil, ErrResourceNotRegistered
+		return resourceActions{}, ErrResourceNotRegistered
 	}
 
-	return resourceActions, nil
+	return actions, nil
 }
 
 func WithClient(client utils.ResourceClient) ResourceArgsOption {

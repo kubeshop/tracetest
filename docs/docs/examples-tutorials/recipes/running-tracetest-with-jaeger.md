@@ -193,7 +193,6 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
-
 ```
 
 Tracetest depends on Postgres, Jaeger and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -228,7 +227,6 @@ telemetry:
 server:
   telemetry:
     exporter: collector
-
 ```
 
 The `tracetest.provision.yaml` file defines the trace data store, set to Jaeger, meaning the traces will be stored in Jaeger and Tracetest will fetch them from Jaeger when running tests.
@@ -253,12 +251,11 @@ type: DataStore
 spec:
   name: Jaeger
   type: jaeger
-  isdefault: true
+  default: true
   jaeger:
     endpoint: jaeger:16685
     tls:
       insecure: true
-
 ```
 
 How do traces reach Jaeger?

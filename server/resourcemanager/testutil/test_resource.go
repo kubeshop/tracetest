@@ -24,13 +24,15 @@ type ResourceTypeTest struct {
 	SampleJSONUpdated string
 
 	// private fields
-	sortFields         []string
-	customJSONComparer func(t require.TestingT, operation Operation, firstValue, secondValue string)
+	sortFields                  []string
+	customJSONComparer          func(t require.TestingT, operation Operation, firstValue, secondValue string)
+	operationsWithoutPostAssert []Operation
 }
 
 type config struct {
-	operations         operationTesters
-	customJSONComparer func(t require.TestingT, operation Operation, firstValue, secondValue string)
+	operations                  operationTesters
+	operationsWithoutPostAssert []Operation
+	customJSONComparer          func(t require.TestingT, operation Operation, firstValue, secondValue string)
 }
 
 type testOption func(*config)
@@ -38,6 +40,12 @@ type testOption func(*config)
 func ExcludeOperations(ops ...Operation) testOption {
 	return func(c *config) {
 		c.operations = c.operations.exclude(ops...)
+	}
+}
+
+func IgnorePostAssertForOperations(ops ...Operation) testOption {
+	return func(c *config) {
+		c.operationsWithoutPostAssert = ops
 	}
 }
 
@@ -67,6 +75,9 @@ func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
 		cfg.customJSONComparer = rawJSONComparer
 	}
 	rt.customJSONComparer = cfg.customJSONComparer
+
+	// consider operationsWithoutPostAssert option
+	rt.operationsWithoutPostAssert = cfg.operationsWithoutPostAssert
 
 	TestResourceTypeOperations(t, rt, cfg.operations)
 }

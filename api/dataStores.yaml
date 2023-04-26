@@ -1,6 +1,17 @@
 openapi: 3.0.0
 components:
   schemas:
+    DataStoreResource:
+      type: object
+      description: "Represents a data store structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'DataStore'."
+          enum:
+            - DataStore
+        spec:
+          $ref: "#/components/schemas/DataStore"
     DataStore:
       type: object
       required:
@@ -14,7 +25,7 @@ components:
           type: string
         type:
           $ref: "#/components/schemas/SupportedDataStores"
-        isDefault:
+        default:
           type: boolean
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
@@ -147,19 +158,7 @@ components:
           type: string
     SupportedDataStores:
       type: string
-      enum:
-        [
-          jaeger,
-          openSearch,
-          tempo,
-          signalFx,
-          otlp,
-          elasticApm,
-          newRelic,
-          lightstep,
-          datadog,
-          awsxray,
-        ]
+      enum: [jaeger, openSearch, tempo, signalFx, otlp, elasticApm, newRelic, lightstep, datadog, awsxray]
     SupportedClients:
       type: string
       enum: [http, grpc]

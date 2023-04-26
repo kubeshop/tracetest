@@ -13,7 +13,7 @@ exporters:
     loglevel: debug
 
   otlp/1:
-    endpoint: tracetest:21321
+    endpoint: tracetest:4317
     tls:
       insecure: true
 

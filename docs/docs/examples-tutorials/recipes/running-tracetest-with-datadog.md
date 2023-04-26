@@ -32,7 +32,8 @@ The `tracetest` directory is self-contained and will run all the prerequisites f
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network, defined by the `networks` section on each file, and will be reachable by hostname from within other services. For example, `tracetest:21321` in the `collector.config.yaml` will map to the `tracetest` service, where port `21321` is the port where Tracetest accepts traces.
+All `services` in the `docker-compose.yaml` are on the same network, defined by the `networks` section on each file, and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `collector.config.yaml` will map to the `tracetest` service, where port `4317` is the port where Tracetest accepts traces.
+
 
 ## OpenTelemetry Demo
 
@@ -196,7 +197,7 @@ spec:
 
 **Sending Traces to Tracetest and Datadog**
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to Datadog in another.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:4317` in one pipeline, and to Datadog in another.
 
 Make sure to add your Datadog API Key to the `datadog` exporter.
 
@@ -216,7 +217,7 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321
+    endpoint: tracetest:4317
     # Send traces to Tracetest.
     # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:

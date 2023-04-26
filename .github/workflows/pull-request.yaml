@@ -17,6 +17,39 @@ on:
       - k8s/**
 
 jobs:
+  backend-arch-graph:
+    name: Generate backend architecture graph
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.work'
+          cache: true
+          cache-dependency-path: go.work
+      - name: install graph tool
+        run: |
+          mkdir /tmp/go-arch
+          cd /tmp/go-arch
+          curl -SLO https://github.com/mathnogueira/golang-arch-viewer/archive/refs/heads/master.zip
+          unzip master.zip
+          cd golang-arch-viewer-master
+          make
+          mv dist/go-arch /tmp/go-arch/go-arch
+      - name: generate graph
+        run: |
+          cd server
+          mkdir -p ../dist/
+          /tmp/go-arch/go-arch ../dist/architecture.png
+      - name: Upload assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: architecture-graph
+          path: dist/architecture.png
+
   unit-test-cli:
     name: CLI unit tests
     runs-on: ubuntu-latest

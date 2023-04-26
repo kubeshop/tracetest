@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -41,7 +41,7 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		listArgs := actions.ListArgs{
+		listArgs := utils.ListArgs{
 			Take:          listTake,
 			Skip:          listSkip,
 			SortDirection: listSortDirection,

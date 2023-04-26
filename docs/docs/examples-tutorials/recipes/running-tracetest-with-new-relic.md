@@ -32,7 +32,7 @@ The `tracetest` directory is self-contained and will run all the prerequisites f
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `collector.config.yaml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `collector.config.yaml` will map to the `tracetest` service, where the port `4317` is the port where Tracetest accepts traces.
 
 ## OpenTelemetry Demo
 
@@ -112,7 +112,6 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -160,7 +159,7 @@ type: DataStore
 spec:
   name: New Relic
   type: newrelic
-  isdefault: true
+  default: true
 
 ---
 type: Demo
@@ -173,12 +172,11 @@ spec:
     productCatalogEndpoint: otel-productcatalogservice:3550
     cartEndpoint: otel-cartservice:7070
     checkoutEndpoint: otel-checkoutservice:5050
-
 ```
 
 **How to Send Traces to Tracetest and New Relic**
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to New Relic in another.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:4317` in one pipeline, and to New Relic in another.
 
 Make sure to add your New Relic ingest licence key in the headers of the `otlp/nr` exporter.
 You access the licence key in your New Relic account settings.
@@ -207,7 +205,7 @@ exporters:
     logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for New Relic

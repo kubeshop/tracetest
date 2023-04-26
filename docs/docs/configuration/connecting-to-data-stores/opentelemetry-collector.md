@@ -1,13 +1,13 @@
 # OpenTelemetry Collector
 
-Tracetest receives trace data on port `21321`. Tracetest's trace receiver endpoint might look like:
+Tracetest receives trace data on port `4317`. Tracetest's trace receiver endpoint might look like:
 
 ```
-http://your-tracetest-instance.com:21321
+http://your-tracetest-instance.com:4317
 ```
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configuring OpenTelemetry Collector to Send Traces to Tracetest
@@ -17,10 +17,10 @@ If you don't want to use a trace data store, you can send all traces directly to
 In your OpenTelemetry Collector config file:
 
 - Set the `exporter` to `otlp/1`
-- Set the `endpoint` to your Tracetest instance on port `21321`
+- Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
-If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
+If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:4317`
 :::
 
 ```yaml
@@ -41,7 +41,7 @@ processors:
 exporters:
   # This is the exporter that will send traces to Tracetest
   otlp/1:
-    endpoint: http://your-tracetest-instance.com:21321
+    endpoint: http://your-tracetest-instance.com:4317
     tls:
       insecure: true
 
@@ -58,7 +58,7 @@ service:
 
 ## Configure Tracetest to Use OpenTelemetry Collector
 
-Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
+Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `4317`.
 
 ## Connect Tracetest to OpenTelemetry Collector with the Web UI
 
@@ -67,7 +67,6 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 ![OpenTelemetry](../img/open-telemetry-settings.png)
 
 <!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644190/Blogposts/Docs/screely-1674644186486_pahrds.png) -->
-
 
 ## Connect Tracetest to OpenTelemetry Collector with the CLI
 
@@ -78,13 +77,13 @@ type: DataStore
 spec:
   name: Opentelemetry Collector pipeline
   type: otlp
-  isDefault: true
+  default: true
 ```
 
 Proceed to run this command in the terminal, and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
