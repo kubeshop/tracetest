@@ -3,6 +3,7 @@ package resourcemanager
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -11,6 +12,11 @@ import (
 	"strconv"
 	"strings"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/propagation"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
@@ -51,6 +57,7 @@ type manager[T ResourceSpec] struct {
 type config struct {
 	enabledOperations []Operation
 	idgen             func() id.ID
+	tracer            trace.Tracer
 }
 
 type managerOption func(*config)
@@ -64,6 +71,12 @@ func WithIDGen(fn func() id.ID) managerOption {
 func WithOperations(ops ...Operation) managerOption {
 	return func(c *config) {
 		c.enabledOperations = ops
+	}
+}
+
+func WithTracer(tracer trace.Tracer) managerOption {
+	return func(c *config) {
+		c.tracer = tracer
 	}
 }
 
@@ -110,6 +123,7 @@ func (m *manager[T]) Handler() any {
 func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceTypePlural)).Subrouter()
+	subrouter.Use(m.tracingMiddleware)
 
 	enabledOps := m.EnabledOperations()
 
@@ -134,6 +148,52 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	}
 
 	return subrouter
+}
+
+func (m *manager[T]) tracingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if m.config.tracer == nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		method := r.Method
+		resourceName := m.resourceTypePlural
+
+		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
+		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, resourceName))
+		defer span.End()
+
+		params := make(map[string]interface{}, 0)
+		for key, value := range mux.Vars(r) {
+			params[key] = value
+		}
+
+		paramsJson, _ := json.Marshal(params)
+
+		queryString := make(map[string]interface{}, 0)
+		for key, value := range r.URL.Query() {
+			queryString[key] = value
+		}
+		queryStringJson, _ := json.Marshal(queryString)
+
+		headers := make(map[string]interface{}, 0)
+		for key, value := range r.Header {
+			headers[key] = value
+		}
+		headersJson, _ := json.Marshal(headers)
+
+		span.SetAttributes(
+			attribute.String(string(semconv.HTTPMethodKey), r.Method),
+			attribute.String(string(semconv.HTTPRouteKey), r.URL.Path),
+			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
+			attribute.String("http.request.params", string(paramsJson)),
+			attribute.String("http.request.query", string(queryStringJson)),
+			attribute.String("http.request.headers", string(headersJson)),
+		)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
