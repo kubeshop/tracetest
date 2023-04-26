@@ -1,0 +1,13 @@
+type: Test
+spec:
+  id: nyY5pmsVg
+  name: TEST
+  description: Get a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:HOST}
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json

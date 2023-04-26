@@ -1,0 +1,13 @@
+spec:
+  createdAt: "2023-04-26T20:43:09.101243Z"
+  description: TEST
+  id: test
+  name: TEST
+  values:
+  - key: "123"
+    value: "123"
+  - key: ABC
+    value: ABC
+  - key: HOST
+    value: amazon.com
+type: Environment

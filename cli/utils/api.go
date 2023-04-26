@@ -87,36 +87,37 @@ func (resourceClient ResourceClient) NewRequest(url string, method string, body 
 	return request, err
 }
 
-func (resourceClient ResourceClient) Update(ctx context.Context, file file.File, ID string) error {
+func (resourceClient ResourceClient) Update(ctx context.Context, file file.File, ID string) (*file.File, error) {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
 	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents())
 	if err != nil {
-		return fmt.Errorf("could not create request: %w", err)
+		return nil, fmt.Errorf("could not create request: %w", err)
 	}
 
 	resp, err := resourceClient.Client.Do(request)
 	if err != nil {
-		return fmt.Errorf("could not update %s: %w", resourceClient.ResourceType, err)
+		return nil, fmt.Errorf("could not update %s: %w", resourceClient.ResourceType, err)
 	}
 
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return fmt.Errorf("%s id doesn't exist on server. Remove it from the definition file and try again", resourceClient.ResourceType)
+		return nil, fmt.Errorf("%s id doesn't exist on server. Remove it from the definition file and try again", resourceClient.ResourceType)
 	}
 
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("could not send request: %w", err)
+			return nil, fmt.Errorf("could not send request: %w", err)
 		}
 
 		validationError := string(body)
-		return fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
 	}
 
-	_, err = file.SaveChanges(IOReadCloserToString(resp.Body))
-	return err
+	file = file.SaveChanges(IOReadCloserToString(resp.Body))
+
+	return &file, nil
 }
 
 func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) error {
@@ -130,56 +131,65 @@ func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) erro
 	return err
 }
 
-func (resourceClient ResourceClient) Get(ctx context.Context, id string) (string, error) {
+func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.File, error) {
 	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "")
 	if err != nil {
-		return "", fmt.Errorf("could not create request: %w", err)
+		return nil, fmt.Errorf("could not create request: %w", err)
 	}
 
 	resp, err := resourceClient.Client.Do(request)
 	if err != nil {
-		return "", fmt.Errorf("could not get %s: %w", resourceClient.ResourceType, err)
+		return nil, fmt.Errorf("could not get %s: %w", resourceClient.ResourceType, err)
 	}
 
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		validationError := string(body)
-		return "", fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
 	}
 
-	return IOReadCloserToString(resp.Body), nil
+	file, err := file.NewFromRaw(fmt.Sprintf("%s_%s.yaml", resourceClient.ResourceType, id), []byte(IOReadCloserToString(resp.Body)))
+	if err != nil {
+		return nil, err
+	}
+
+	return &file, nil
 }
 
-func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (string, error) {
+func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (*file.File, error) {
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
 	request, err := resourceClient.NewRequest(url, http.MethodGet, "")
 	if err != nil {
-		return "", fmt.Errorf("could not create request: %w", err)
+		return nil, fmt.Errorf("could not create request: %w", err)
 	}
 
 	resp, err := resourceClient.Client.Do(request)
 	if err != nil {
-		return "", fmt.Errorf("could not send request: %w", err)
+		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
-	defer resp.Body.Close()
-	return IOReadCloserToString(resp.Body), nil
+	file, err := file.NewFromRaw(fmt.Sprintf("%s_list.yaml", resourceClient.ResourceType), []byte(IOReadCloserToString(resp.Body)))
+	if err != nil {
+		return nil, err
+	}
+
+	return &file, nil
 }
 
-func (resourceClient ResourceClient) Create(ctx context.Context, file file.File) error {
+func (resourceClient ResourceClient) Create(ctx context.Context, file file.File) (*file.File, error) {
 	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents())
 	if err != nil {
-		return fmt.Errorf("could not create request: %w", err)
+		return nil, fmt.Errorf("could not create request: %w", err)
 	}
 
 	resp, err := resourceClient.Client.Do(request)
 	if err != nil {
-		return fmt.Errorf("could not send request: %w", err)
+		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -187,16 +197,16 @@ func (resourceClient ResourceClient) Create(ctx context.Context, file file.File)
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("could not send request: %w", err)
+			return nil, fmt.Errorf("could not send request: %w", err)
 		}
 
 		validationError := string(body)
-		return fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
 	}
 	if err != nil {
-		return fmt.Errorf("could not create %s: %w", resourceClient.ResourceType, err)
+		return nil, fmt.Errorf("could not create %s: %w", resourceClient.ResourceType, err)
 	}
 
-	_, err = file.SaveChanges(IOReadCloserToString(resp.Body))
-	return err
+	file = file.SaveChanges(IOReadCloserToString(resp.Body))
+	return &file, nil
 }
