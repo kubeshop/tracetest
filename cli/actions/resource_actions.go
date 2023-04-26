@@ -14,9 +14,9 @@ type ResourceActions interface {
 	Logger() *zap.Logger
 	FileType() yaml.FileType
 	Name() string
-	Apply(context.Context, file.File) error
-	List(context.Context, utils.ListArgs) (string, error)
-	Get(context.Context, string) (string, error)
+	Apply(context.Context, file.File) (*file.File, error)
+	List(context.Context, utils.ListArgs) (*file.File, error)
+	Get(context.Context, string) (*file.File, error)
 	Delete(context.Context, string) error
 }
 
@@ -53,7 +53,13 @@ func (r *resourceActions) Apply(ctx context.Context, args ApplyArgs) error {
 		return fmt.Errorf(fmt.Sprintf(`file must be of type "%s"`, r.actions.FileType()))
 	}
 
-	return r.actions.Apply(ctx, fileContent)
+	file, err := r.actions.Apply(ctx, fileContent)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.WriteRaw()
+	return err
 }
 
 func (r *resourceActions) List(ctx context.Context, args utils.ListArgs) error {
@@ -62,7 +68,7 @@ func (r *resourceActions) List(ctx context.Context, args utils.ListArgs) error {
 		return err
 	}
 
-	fmt.Println(resources)
+	fmt.Println(resources.Contents())
 	return nil
 }
 
@@ -72,19 +78,14 @@ func (r *resourceActions) Get(ctx context.Context, id string) error {
 		return err
 	}
 
-	fmt.Println(resource)
+	fmt.Println(resource.Contents())
 	return nil
 }
 
 func (r *resourceActions) Export(ctx context.Context, id string, filePath string) error {
-	resource, err := r.actions.Get(ctx, id)
+	file, err := r.actions.Get(ctx, id)
 	if err != nil {
 		return err
-	}
-
-	file, err := file.NewFromRaw(filePath, []byte(resource))
-	if err != nil {
-		return fmt.Errorf("could not create file: %w", err)
 	}
 
 	_, err = file.WriteRaw()

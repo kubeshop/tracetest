@@ -23,13 +23,17 @@ var testRunCmd = &cobra.Command{
 	Short:  "Run a test on your Tracetest server",
 	Long:   "Run a test on your Tracetest server",
 	PreRun: setupCommand(),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		analytics.Track("Test Run", "cmd", map[string]string{})
 
 		ctx := context.Background()
 		client := utils.GetAPIClient(cliConfig)
 
-		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client)
+		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
+		environmentOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)))
+		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
+
+		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, environmentActions)
 		actionArgs := actions.RunTestConfig{
 			DefinitionFile: runTestFileDefinition,
 			EnvID:          runTestEnvID,

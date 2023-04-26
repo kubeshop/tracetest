@@ -2,7 +2,6 @@ package actions
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -33,36 +32,21 @@ func (pollingActions) Name() string {
 	return "pollingprofile"
 }
 
-func (polling pollingActions) Apply(ctx context.Context, fileContent file.File) error {
+func (polling pollingActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
 	var pollingProfile openapi.PollingProfile
 	mapstructure.Decode(fileContent.Definition().Spec, &pollingProfile.Spec)
 
 	return polling.resourceClient.Update(ctx, fileContent, currentConfigID)
 }
 
-func (polling pollingActions) List(ctx context.Context, listArgs utils.ListArgs) (string, error) {
-	return "", ErrNotSupportedResourceAction
-}
-
-func (polling pollingActions) Export(ctx context.Context, ID string, filePath string) error {
-	pollingProfile, err := polling.resourceClient.Get(ctx, currentConfigID)
-	if err != nil {
-		return err
-	}
-
-	file, err := file.NewFromRaw(filePath, []byte(pollingProfile))
-	if err != nil {
-		return fmt.Errorf("could not create file: %w", err)
-	}
-
-	_, err = file.WriteRaw()
-	return err
+func (polling pollingActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
+	return nil, ErrNotSupportedResourceAction
 }
 
 func (polling pollingActions) Delete(ctx context.Context, ID string) error {
 	return ErrNotSupportedResourceAction
 }
 
-func (polling pollingActions) Get(ctx context.Context, ID string) (string, error) {
+func (polling pollingActions) Get(ctx context.Context, ID string) (*file.File, error) {
 	return polling.resourceClient.Get(ctx, currentConfigID)
 }
