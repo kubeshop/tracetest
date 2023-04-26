@@ -42,6 +42,7 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
   - [ ] [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
   - [ ] [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
   - [ ] [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
+  - [ ] [Tempo Cloud example](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-grafana-cloud-tempo-nodejs)
 
 - Test specific features added/changed on this release:
 
