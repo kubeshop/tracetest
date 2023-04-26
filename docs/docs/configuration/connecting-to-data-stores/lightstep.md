@@ -3,7 +3,7 @@
 If you want to use [Lightstep](https://lightstep.com/) as the trace data store, you'll configure the OpenTelemetry Collector to receive traces from your system and then send them to both Tracetest and Lightstep. And, you don't have to change your existing pipelines to do so.
 
 :::tip
-Examples of configuring Tracetest with Lightstep can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest with Lightstep can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configuring OpenTelemetry Collector to Send Traces to both Lightstep and Tracetest
@@ -11,10 +11,10 @@ Examples of configuring Tracetest with Lightstep can be found in the [`examples`
 In your OpenTelemetry Collector config file:
 
 - Set the `exporter` to `otlp/tt`
-- Set the `endpoint` to your Tracetest instance on port `21321`
+- Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
-If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
+If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:4317`
 :::
 
 Additionally, add another config:
@@ -43,14 +43,14 @@ exporters:
     logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Lightstep
   otlp/ls:
     endpoint: ingest.lightstep.com:443
     headers:
-      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start 
+      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start
 
 service:
   pipelines:
@@ -62,14 +62,14 @@ service:
       processors: [batch]
       exporters: [otlp/tt] # your exporter pointing to your tracetest instance
     traces/ls:
-      receivers: [otlp]  # your receiver
+      receivers: [otlp] # your receiver
       processors: [batch]
       exporters: [logging, otlp/ls] # your exporter pointing to your lighstep account
 ```
 
 ## Configure Tracetest to Use Lightstep as a Trace Data Store
 
-Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
+Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `4317`.
 
 ## Connect Tracetest to Lightstep with the Web UI
 
@@ -88,13 +88,13 @@ type: DataStore
 spec:
   name: Opentelemetry Collector pipeline
   type: otlp
-  isDefault: true
+  default: true
 ```
 
 Proceed to run this command in the terminal and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

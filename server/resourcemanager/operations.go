@@ -63,6 +63,10 @@ type Provision[T ResourceSpec] interface {
 	IDSetter[T]
 }
 
+type Current[T ResourceSpec] interface {
+	Current(context.Context) (T, error)
+}
+
 type resourceHandler[T ResourceSpec] struct {
 	SetID         func(T, id.ID) T
 	List          func(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)

@@ -60,16 +60,6 @@ type TransactionRunRepository interface {
 	GetLatestRunByTransactionVersion(context.Context, id.ID, int) (TransactionRun, error)
 }
 
-type DataStoreRepository interface {
-	CreateDataStore(context.Context, DataStore) (DataStore, error)
-	UpdateDataStore(context.Context, DataStore) (DataStore, error)
-	DeleteDataStore(context.Context, DataStore) error
-	DefaultDataStore(_ context.Context) (DataStore, error)
-	GetDataStore(_ context.Context, id string) (DataStore, error)
-	GetDataStores(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (List[DataStore], error)
-	DataStoreIDExists(context.Context, string) (bool, error)
-}
-
 type TestRunEventRepository interface {
 	CreateTestRunEvent(context.Context, TestRunEvent) error
 	GetTestRunEvents(context.Context, id.ID, int) ([]TestRunEvent, error)
@@ -82,8 +72,6 @@ type Repository interface {
 
 	TransactionRepository
 	TransactionRunRepository
-
-	DataStoreRepository
 
 	TestRunEventRepository
 

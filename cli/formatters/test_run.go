@@ -79,7 +79,16 @@ func (f testRun) json(output TestRunOutput) string {
 
 func (f testRun) pretty(output TestRunOutput) string {
 	if utils.RunStateIsFailed(output.Run.GetState()) {
-		return f.getColoredText(false, f.formatMessage("Failed to execute test: %s", *output.Run.LastErrorState))
+		return f.getColoredText(false, fmt.Sprintf("%s\n%s",
+			f.formatMessage("%s %s (%s)",
+				FAILED_TEST_ICON,
+				*output.Test.Name,
+				output.RunWebURL,
+			),
+			f.formatMessage("\tReason: %s\n",
+				*output.Run.LastErrorState,
+			),
+		))
 	}
 
 	if !output.HasResults {

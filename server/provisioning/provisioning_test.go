@@ -10,15 +10,12 @@ import (
 	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
-	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/config/configgrpc"
-	"go.opentelemetry.io/collector/config/configtls"
 )
 
 func TestFromFile(t *testing.T) {
@@ -30,7 +27,8 @@ func TestFromFile(t *testing.T) {
 		assert.ErrorIs(t, err, provisioning.ErrFileNotExists)
 	})
 
-	db := testmock.GetRawTestingDatabase()
+	db := testmock.CreateMigratedDatabase()
+	defer db.Close()
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -50,7 +48,8 @@ func TestFromFile(t *testing.T) {
 }
 
 func TestFromEnv(t *testing.T) {
-	db := testmock.GetRawTestingDatabase()
+	db := testmock.CreateMigratedDatabase()
+	defer db.Close()
 
 	t.Run("Empty", func(t *testing.T) {
 		provisioner := provisioning.New()
@@ -89,11 +88,10 @@ func TestFromEnv(t *testing.T) {
 			})
 		})
 	}
-
 }
 
 type expectations struct {
-	dataStore      *model.DataStore
+	dataStore      *datastoreresource.DataStore
 	config         *configresource.Config
 	pollingprofile *pollingprofile.PollingProfile
 	demos          []demoresource.Demo
@@ -104,12 +102,12 @@ type provisioningFixture struct {
 	configs         *configresource.Repository
 	pollingProfiles *pollingprofile.Repository
 	demos           *demoresource.Repository
-	dataStores      model.DataStoreRepository
+	dataStores      *datastoreresource.Repository
 }
 
 func (f provisioningFixture) assert(t *testing.T, expected expectations) {
 	if expected.dataStore != nil {
-		actual, err := f.dataStores.DefaultDataStore(context.TODO())
+		actual, err := f.dataStores.Current(context.TODO())
 		require.NoError(t, err)
 
 		// ignore ID for assertion
@@ -163,15 +161,11 @@ func (f provisioningFixture) assert(t *testing.T, expected expectations) {
 }
 
 func setup(db *sql.DB) provisioningFixture {
-	testDB, err := testdb.Postgres(testdb.WithDB(db))
-	if err != nil {
-		panic(err)
-	}
 	f := provisioningFixture{
 		configs:         configresource.NewRepository(db),
 		pollingProfiles: pollingprofile.NewRepository(db),
 		demos:           demoresource.NewRepository(db),
-		dataStores:      testDB,
+		dataStores:      datastoreresource.NewRepository(db),
 	}
 
 	configManager := resourcemanager.New[configresource.Config](
@@ -195,11 +189,11 @@ func setup(db *sql.DB) provisioningFixture {
 		resourcemanager.WithOperations(demoresource.Operations...),
 	)
 
-	dataStoreManager := resourcemanager.New[testdb.DataStoreResource](
-		testdb.DataStoreResourceName,
-		testdb.DataStoreResourceNamePlural,
-		testdb.NewDataStoreResourceProvisioner(f.dataStores),
-		resourcemanager.WithOperations(resourcemanager.OperationNoop),
+	dataStoreManager := resourcemanager.New[datastoreresource.DataStore](
+		datastoreresource.ResourceName,
+		datastoreresource.ResourceNamePlural,
+		f.dataStores,
+		resourcemanager.WithOperations(datastoreresource.Operations...),
 	)
 
 	f.provisioner = provisioning.New(provisioning.WithResourceProvisioners(
@@ -221,14 +215,14 @@ var cases = []struct {
 		name: "AllSettings",
 		file: "./testdata/all_settings.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "Jaeger",
-				IsDefault: true,
-				Type:      model.DataStoreTypeJaeger,
-				Values: model.DataStoreValues{
-					Jaeger: &configgrpc.GRPCClientSettings{
-						Endpoint:   "jaeger-query:16685",
-						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+			dataStore: &datastoreresource.DataStore{
+				Name:    "Jaeger",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeJaeger,
+				Values: datastoreresource.DataStoreValues{
+					Jaeger: &datastoreresource.GRPCClientSettings{
+						Endpoint: "jaeger-query:16685",
+						TLS:      &datastoreresource.TLS{Insecure: true},
 					},
 				},
 			},
@@ -269,14 +263,14 @@ var cases = []struct {
 		name: "JaegerGRPC",
 		file: "./testdata/jaeger_grpc.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "Jaeger",
-				IsDefault: true,
-				Type:      model.DataStoreTypeJaeger,
-				Values: model.DataStoreValues{
-					Jaeger: &configgrpc.GRPCClientSettings{
-						Endpoint:   "jaeger-query:16685",
-						TLSSetting: configtls.TLSClientSetting{Insecure: true},
+			dataStore: &datastoreresource.DataStore{
+				Name:    "Jaeger",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeJaeger,
+				Values: datastoreresource.DataStoreValues{
+					Jaeger: &datastoreresource.GRPCClientSettings{
+						Endpoint: "jaeger-query:16685",
+						TLS:      &datastoreresource.TLS{Insecure: true},
 					},
 				},
 			},
@@ -286,15 +280,15 @@ var cases = []struct {
 		name: "TempoGRPC",
 		file: "./testdata/tempo_grpc.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "Tempo (gRPC)",
-				IsDefault: true,
-				Type:      model.DataStoreTypeTempo,
-				Values: model.DataStoreValues{
-					Tempo: &model.BaseClientConfig{
-						Grpc: configgrpc.GRPCClientSettings{
-							Endpoint:   "tempo:9095",
-							TLSSetting: configtls.TLSClientSetting{Insecure: true},
+			dataStore: &datastoreresource.DataStore{
+				Name:    "Tempo (gRPC)",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeTempo,
+				Values: datastoreresource.DataStoreValues{
+					Tempo: &datastoreresource.MultiChannelClientConfig{
+						Grpc: &datastoreresource.GRPCClientSettings{
+							Endpoint: "tempo:9095",
+							TLS:      &datastoreresource.TLS{Insecure: true},
 						},
 					},
 				},
@@ -305,15 +299,15 @@ var cases = []struct {
 		name: "TempoHTTP",
 		file: "./testdata/tempo_http.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "Tempo (HTTP)",
-				IsDefault: true,
-				Type:      model.DataStoreTypeTempo,
-				Values: model.DataStoreValues{
-					Tempo: &model.BaseClientConfig{
-						Http: model.HttpClientConfig{
-							Url:        "tempo:80",
-							TLSSetting: configtls.TLSClientSetting{Insecure: true},
+			dataStore: &datastoreresource.DataStore{
+				Name:    "Tempo (HTTP)",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeTempo,
+				Values: datastoreresource.DataStoreValues{
+					Tempo: &datastoreresource.MultiChannelClientConfig{
+						Http: &datastoreresource.HttpClientConfig{
+							Url: "tempo:80",
+							TLS: &datastoreresource.TLS{Insecure: true},
 						},
 					},
 				},
@@ -324,12 +318,12 @@ var cases = []struct {
 		name: "OpenSearch",
 		file: "./testdata/opensearch.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "OpenSearch",
-				IsDefault: true,
-				Type:      model.DataStoreTypeOpenSearch,
-				Values: model.DataStoreValues{
-					OpenSearch: &model.ElasticSearchDataStoreConfig{
+			dataStore: &datastoreresource.DataStore{
+				Name:    "OpenSearch",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeOpenSearch,
+				Values: datastoreresource.DataStoreValues{
+					OpenSearch: &datastoreresource.ElasticSearchConfig{
 						Addresses: []string{"http://opensearch:9200"},
 						Index:     "traces",
 					},
@@ -341,12 +335,12 @@ var cases = []struct {
 		name: "SignalFX",
 		file: "./testdata/signalfx.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "SignalFX",
-				IsDefault: true,
-				Type:      model.DataStoreTypeSignalFX,
-				Values: model.DataStoreValues{
-					SignalFx: &model.SignalFXDataStoreConfig{
+			dataStore: &datastoreresource.DataStore{
+				Name:    "SignalFX",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeSignalFX,
+				Values: datastoreresource.DataStoreValues{
+					SignalFx: &datastoreresource.SignalFXConfig{
 						Token: "thetoken",
 						Realm: "us1",
 					},
@@ -355,15 +349,15 @@ var cases = []struct {
 		},
 	},
 	{
-		name: "ElasitcAPM",
+		name: "ElasticAPM",
 		file: "./testdata/elastic_apm.yaml",
 		expectations: expectations{
-			dataStore: &model.DataStore{
-				Name:      "elastic APM",
-				IsDefault: true,
-				Type:      model.DataStoreTypeElasticAPM,
-				Values: model.DataStoreValues{
-					ElasticApm: &model.ElasticSearchDataStoreConfig{
+			dataStore: &datastoreresource.DataStore{
+				Name:    "elastic APM",
+				Default: true,
+				Type:    datastoreresource.DataStoreTypeElasticAPM,
+				Values: datastoreresource.DataStoreValues{
+					ElasticApm: &datastoreresource.ElasticSearchConfig{
 						Addresses:          []string{"https://es01:9200"},
 						Username:           "elastic",
 						Password:           "changeme",

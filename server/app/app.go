@@ -30,6 +30,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
@@ -189,12 +190,14 @@ func (app *App) Start(opts ...appOption) error {
 
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
+	dataStoreRepo := datastoreresource.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
-	registerOtlpServer(app, testDB, eventEmitter)
+	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
 
 	rf := newRunnerFacades(
 		pollingProfileRepo,
+		dataStoreRepo,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -245,13 +248,7 @@ func (app *App) Start(opts ...appOption) error {
 	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner)
 
-	dataStoreManager := resourcemanager.New[testdb.DataStoreResource](
-		testdb.DataStoreResourceName,
-		testdb.DataStoreResourceNamePlural,
-		testdb.NewDataStoreResourceProvisioner(testDB),
-		resourcemanager.WithOperations(resourcemanager.OperationNoop),
-	)
-	provisioner.AddResourceProvisioner(dataStoreManager)
+	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner)
 
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
 
@@ -289,8 +286,8 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter) {
-	ingester := otlp.NewIngester(testDB, eventEmitter)
+func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastoreresource.Repository) {
+	ingester := otlp.NewIngester(testDB, eventEmitter, dsRepo)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
@@ -344,6 +341,17 @@ func registerDemosResource(repository *demoresource.Repository, router *mux.Rout
 		demoresource.ResourceNamePlural,
 		repository,
 		resourcemanager.WithOperations(demoresource.Operations...),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
+func registerDataStoreResource(repository *datastoreresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner) {
+	manager := resourcemanager.New[datastoreresource.DataStore](
+		datastoreresource.ResourceName,
+		datastoreresource.ResourceNamePlural,
+		repository,
+		resourcemanager.WithOperations(datastoreresource.Operations...),
 	)
 	manager.RegisterRoutes(router)
 	provisioner.AddResourceProvisioner(manager)

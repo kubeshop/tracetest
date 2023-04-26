@@ -41,17 +41,28 @@ func (s *ResourceApiApiService) CreateDemo(ctx context.Context, demo Demo) (Impl
 }
 
 // CreateEnvironment - Create an environment
-func (s *ResourceApiApiService) CreateEnvironment(ctx context.Context, environment Environment) (ImplResponse, error) {
+func (s *ResourceApiApiService) CreateEnvironment(ctx context.Context, environmentResource EnvironmentResource) (ImplResponse, error) {
 	// TODO - update CreateEnvironment with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(201, Environment{}) or use other options such as http.Ok ...
-	//return Response(201, Environment{}), nil
+	//TODO: Uncomment the next line to return response Response(201, EnvironmentResource{}) or use other options such as http.Ok ...
+	//return Response(201, EnvironmentResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateEnvironment method not implemented")
+}
+
+// DeleteDataStore - Delete a Data Store
+func (s *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) (ImplResponse, error) {
+	// TODO - update DeleteDataStore with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteDataStore method not implemented")
 }
 
 // DeleteDemo - Delete a Demonstration setting
@@ -108,6 +119,23 @@ func (s *ResourceApiApiService) GetConfiguration(ctx context.Context, configId s
 	return Response(http.StatusNotImplemented, nil), errors.New("GetConfiguration method not implemented")
 }
 
+// GetDataStore - Get a Data Store
+func (s *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId string) (ImplResponse, error) {
+	// TODO - update GetDataStore with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, DataStoreResource{}) or use other options such as http.Ok ...
+	//return Response(200, DataStoreResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetDataStore method not implemented")
+}
+
 // GetDemo - Get Demonstration setting
 func (s *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) (ImplResponse, error) {
 	// TODO - update GetDemo with the required logic for this service method.
@@ -130,8 +158,8 @@ func (s *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentI
 	// TODO - update GetEnvironment with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, Environment{}) or use other options such as http.Ok ...
-	//return Response(200, Environment{}), nil
+	//TODO: Uncomment the next line to return response Response(200, EnvironmentResource{}) or use other options such as http.Ok ...
+	//return Response(200, EnvironmentResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	//return Response(404, nil),nil
@@ -207,6 +235,23 @@ func (s *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configI
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateConfiguration method not implemented")
 }
 
+// UpdateDataStore - Update a Data Store
+func (s *ResourceApiApiService) UpdateDataStore(ctx context.Context, dataStoreId string, dataStore DataStore) (ImplResponse, error) {
+	// TODO - update UpdateDataStore with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateDataStore method not implemented")
+}
+
 // UpdateDemo - Update a Demonstration setting
 func (s *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string, demo Demo) (ImplResponse, error) {
 	// TODO - update UpdateDemo with the required logic for this service method.
@@ -228,12 +273,12 @@ func (s *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string, d
 }
 
 // UpdateEnvironment - Update an environment
-func (s *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environmentId string, environment Environment) (ImplResponse, error) {
+func (s *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environmentId string, environmentResource EnvironmentResource) (ImplResponse, error) {
 	// TODO - update UpdateEnvironment with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, Environment{}) or use other options such as http.Ok ...
-	//return Response(200, Environment{}), nil
+	//TODO: Uncomment the next line to return response Response(200, EnvironmentResource{}) or use other options such as http.Ok ...
+	//return Response(200, EnvironmentResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil

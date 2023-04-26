@@ -3,12 +3,12 @@
 Tracetest fetches traces from [OpenSearch's default port](https://logz.io/blog/opensearch-tutorial-installation-configuration/#:~:text=This%20is%20because%20OpenSearch%20runs,use%20port%205601%20by%20default.) `9200`.
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configure Tracetest to Use OpenSearch as a Trace Data Store
 
-Configure Tracetest to fetch trace data from OpenSearch. 
+Configure Tracetest to fetch trace data from OpenSearch.
 
 Tracetest uses OpenSearch's **default port** `9200` to fetch trace data.
 
@@ -35,7 +35,6 @@ http://opensearch:9200
 
 <!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644099/Blogposts/Docs/screely-1674644094600_svcwp6.png)-->
 
-
 ## Connect Tracetest to OpenSearch with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
@@ -45,7 +44,7 @@ type: DataStore
 spec:
   name: OpenSearch Data Store
   type: openSearch
-  isDefault: true
+  default: true
   opensearch:
     addresses:
       - http://opensearch:9200
@@ -55,7 +54,7 @@ spec:
 Proceed to run this command in the terminal, and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

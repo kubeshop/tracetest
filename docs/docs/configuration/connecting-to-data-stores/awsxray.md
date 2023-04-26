@@ -33,6 +33,7 @@ Or, if you prefer using the CLI, you can use this file config.
 type: DataStore
 spec:
   type: awsxray
+  default: true
   awsxray:
     accessKeyId: <your-accessKeyId>
     secretAccessKey: <your-secretAccessKey>
@@ -43,7 +44,7 @@ spec:
 Run this command in the terminal and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

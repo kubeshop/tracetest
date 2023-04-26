@@ -22,6 +22,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -31,7 +32,7 @@ type controller struct {
 	tracer          trace.Tracer
 	testDB          model.Repository
 	runner          runner
-	newTraceDBFn    func(ds model.DataStore) (tracedb.TraceDB, error)
+	newTraceDBFn    func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
 	mappers         mappings.Mappings
 	triggerRegistry *trigger.Registry
 }
@@ -45,7 +46,7 @@ type runner interface {
 
 func NewController(
 	testDB model.Repository,
-	newTraceDBFn func(ds model.DataStore) (tracedb.TraceDB, error),
+	newTraceDBFn func(ds datastoreresource.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
@@ -1066,106 +1067,7 @@ func takeResources(transactions []openapi.Transaction, tests []openapi.Test, tak
 	return items[skip:upperLimit]
 }
 
-// DataStores
-
-func (c *controller) CreateDataStore(ctx context.Context, in openapi.DataStore) (openapi.ImplResponse, error) {
-	dataStore := c.mappers.In.DataStore(in)
-
-	if dataStore.ID != "" {
-		exists, err := c.testDB.DataStoreIDExists(ctx, dataStore.ID)
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		if exists {
-			err := fmt.Errorf(`cannot create data store with ID "%s: %w`, dataStore.ID, errTestExists)
-			r := map[string]string{
-				"error": err.Error(),
-			}
-			return openapi.Response(http.StatusBadRequest, r), err
-		}
-	}
-
-	dataStore, err := c.testDB.CreateDataStore(ctx, dataStore)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	return openapi.Response(200, c.mappers.Out.DataStore(dataStore)), nil
-}
-
-func (c *controller) DeleteDataStore(ctx context.Context, dataStoreId string) (openapi.ImplResponse, error) {
-	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreId)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	err = c.testDB.DeleteDataStore(ctx, dataStore)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(204, nil), nil
-}
-
-func (c *controller) GetDataStore(ctx context.Context, dataStoreId string) (openapi.ImplResponse, error) {
-	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreId)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(200, c.mappers.Out.DataStore(dataStore)), nil
-}
-
-func (c *controller) GetDataStores(ctx context.Context, take, skip int32, query string, sortBy string, sortDirection string) (openapi.ImplResponse, error) {
-	if take == 0 {
-		take = 20
-	}
-
-	dataStores, err := c.testDB.GetDataStores(ctx, take, skip, query, sortBy, sortDirection)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(200, paginated[openapi.DataStore]{
-		items: c.mappers.Out.DataStores(dataStores.Items),
-		count: dataStores.TotalCount,
-	}), nil
-}
-
-func (c *controller) UpdateDataStore(ctx context.Context, dataStoreId string, in openapi.DataStore) (openapi.ImplResponse, error) {
-	updated := c.mappers.In.DataStore(in)
-
-	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreId)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	updated.ID = dataStore.ID
-
-	_, err = c.testDB.UpdateDataStore(ctx, updated)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(204, nil), nil
-}
-
-func (c *controller) GetDataStoreDefinitionFile(ctx context.Context, dataStoreID string) (openapi.ImplResponse, error) {
-	dataStore, err := c.testDB.GetDataStore(ctx, dataStoreID)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	enc, err := yaml.Encode(yamlconvert.DataStore(dataStore))
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	return openapi.Response(200, enc), nil
-}
-
-// TestConnection implements openapi.ApiApiServicer
+// TestConnection implements openapi.ApiApiService
 func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
 	ds := c.mappers.In.DataStore(dataStore)
 

@@ -12,7 +12,7 @@ exporters:
   logging:
     loglevel: debug
   otlp/1:
-    endpoint: tracetest:21321
+    endpoint: tracetest:4317
     # Send traces to Tracetest.
     # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:

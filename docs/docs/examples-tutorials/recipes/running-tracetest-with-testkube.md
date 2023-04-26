@@ -158,7 +158,7 @@ pod/tracetest-postgresql-0            1/1     Running   0               5m42s
 
 NAME                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)               AGE
 service/otel-collector            ClusterIP   10.96.173.226   <none>        4317/TCP              5m46s
-service/tracetest                 ClusterIP   10.96.248.146   <none>        11633/TCP,21321/TCP   5m42s
+service/tracetest                 ClusterIP   10.96.248.146   <none>        11633/TCP,4317/TCP   5m42s
 service/tracetest-postgresql      ClusterIP   10.96.155.147   <none>        5432/TCP              5m42s
 service/tracetest-postgresql-hl   ClusterIP   None            <none>        5432/TCP              5m42s
 

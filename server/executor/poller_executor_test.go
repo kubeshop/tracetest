@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -507,7 +508,8 @@ func (dpc defaultProfileGetter) GetDefault(context.Context) pollingprofile.Polli
 func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
-	testDB := getDataStoreRepositoryMock(t)
+	testDB := getRunRepositoryMock(t)
+	dataStoreRepo := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
 	eventEmitter := getEventEmitterMock(t, testDB)
 
@@ -516,7 +518,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 		tracer,
 		updater,
 		traceDBFactory,
-		testDB,
+		dataStoreRepo,
 		eventEmitter,
 	)
 }
@@ -532,16 +534,25 @@ func getRunUpdaterMock(t *testing.T) executor.RunUpdater {
 	return runUpdaterMock{}
 }
 
-// DataStoreRepository
-func getDataStoreRepositoryMock(t *testing.T) model.Repository {
+// RunRepository
+func getRunRepositoryMock(t *testing.T) model.Repository {
 	t.Helper()
 
 	testDB := testdb.MockRepository{}
-
-	testDB.Mock.On("DefaultDataStore", mock.Anything).Return(model.DataStore{Type: model.DataStoreTypeOTLP}, nil)
 	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
 
 	return &testDB
+}
+
+// DataStoreRepository
+type dataStoreRepositoryMock struct{}
+
+func (m *dataStoreRepositoryMock) Current(ctx context.Context) (datastoreresource.DataStore, error) {
+	return datastoreresource.DataStore{Type: datastoreresource.DataStoreTypeOTLP}, nil
+}
+
+func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {
+	return &dataStoreRepositoryMock{}
 }
 
 // EventEmitter
@@ -598,10 +609,10 @@ type traceDBState struct {
 	currentIteration int
 }
 
-func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(model.DataStore) (tracedb.TraceDB, error) {
+func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(datastoreresource.DataStore) (tracedb.TraceDB, error) {
 	t.Helper()
 
-	return func(ds model.DataStore) (tracedb.TraceDB, error) {
+	return func(ds datastoreresource.DataStore) (tracedb.TraceDB, error) {
 		return &traceDBMock{
 			tracePerIteration: tracePerIteration,
 			state:             state,

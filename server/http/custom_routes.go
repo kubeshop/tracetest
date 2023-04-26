@@ -38,13 +38,13 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
 	routes[c.getRouteIndex("GetDataStoreDefinitionFile")].HandlerFunc = c.GetDataStoreDefinitionFile
+	routes[c.getRouteIndex("GetEnvironmentDefinitionFile")].HandlerFunc = c.GetEnvironmentDefinitionFile
 
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 
 	routes[c.getRouteIndex("GetTests")].HandlerFunc = paginatedEndpoint[openapi.Test](c.service.GetTests, c.errorHandler)
 	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = paginatedEndpoint[openapi.Transaction](c.service.GetTransactions, c.errorHandler)
 	routes[c.getRouteIndex("GetResources")].HandlerFunc = paginatedEndpoint[openapi.Resource](c.service.GetResources, c.errorHandler)
-	routes[c.getRouteIndex("GetDataStores")].HandlerFunc = paginatedEndpoint[openapi.DataStore](c.service.GetDataStores, c.errorHandler)
 
 	for index, route := range routes {
 		routeName := fmt.Sprintf("%s %s", route.Method, route.Pattern)
@@ -156,6 +156,20 @@ func (c *customController) GetDataStoreDefinitionFile(w http.ResponseWriter, r *
 	dataStoreIdParam := params["dataStoreId"]
 
 	result, err := c.service.GetDataStoreDefinitionFile(r.Context(), dataStoreIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
+	w.Write(result.Body.([]byte))
+}
+
+func (c *customController) GetEnvironmentDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIdParam := params["environmentId"]
+
+	result, err := c.service.GetEnvironmentDefinitionFile(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

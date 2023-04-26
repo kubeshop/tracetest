@@ -152,12 +152,6 @@ export interface paths {
     /** Delete a demonstration used on Tracetest as quick start examples. */
     delete: operations["deleteDemo"];
   };
-  "/datastores": {
-    /** Get all Data Stores */
-    get: operations["getDataStores"];
-    /** Create a new Data Store */
-    post: operations["createDataStore"];
-  };
   "/datastores/{dataStoreId}": {
     /** Get a Data Store */
     get: operations["getDataStore"];
@@ -883,42 +877,6 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Get all Data Stores */
-  getDataStores: {
-    parameters: {};
-    responses: {
-      /** successful operation */
-      200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
-        content: {
-          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"][];
-        };
-      };
-      /** problem with getting data stores */
-      500: unknown;
-    };
-  };
-  /** Create a new Data Store */
-  createDataStore: {
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
-        };
-      };
-      /** trying to create a data store with an already existing ID */
-      400: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
-      };
-    };
-  };
   /** Get a Data Store */
   getDataStore: {
     parameters: {};
@@ -926,9 +884,11 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStoreResource"];
         };
       };
+      /** data store not found */
+      404: unknown;
       /** problem with getting a data store */
       500: unknown;
     };
@@ -939,6 +899,8 @@ export interface operations {
     responses: {
       /** successful operation */
       204: never;
+      /** invalid data store, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with updating data store */
       500: unknown;
     };
@@ -1192,11 +1154,20 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        /** @description Represents a data store structured into the Resources format. */
+        DataStoreResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'DataStore'.
+           * @enum {string}
+           */
+          type?: "DataStore";
+          spec?: external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+        };
         DataStore: {
           id?: string;
           name: string;
           type: external["dataStores.yaml"]["components"]["schemas"]["SupportedDataStores"];
-          isDefault?: boolean;
+          default?: boolean;
           jaeger?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["dataStores.yaml"]["components"]["schemas"]["BaseClient"];
           openSearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];

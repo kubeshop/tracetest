@@ -23,7 +23,7 @@ type DataStore struct {
 	Id         *string             `json:"id,omitempty"`
 	Name       string              `json:"name"`
 	Type       SupportedDataStores `json:"type"`
-	IsDefault  *bool               `json:"isDefault,omitempty"`
+	Default    *bool               `json:"default,omitempty"`
 	Jaeger     *GRPCClientSettings `json:"jaeger,omitempty"`
 	Tempo      *BaseClient         `json:"tempo,omitempty"`
 	OpenSearch *ElasticSearch      `json:"openSearch,omitempty"`
@@ -132,36 +132,36 @@ func (o *DataStore) SetType(v SupportedDataStores) {
 	o.Type = v
 }
 
-// GetIsDefault returns the IsDefault field value if set, zero value otherwise.
-func (o *DataStore) GetIsDefault() bool {
-	if o == nil || isNil(o.IsDefault) {
+// GetDefault returns the Default field value if set, zero value otherwise.
+func (o *DataStore) GetDefault() bool {
+	if o == nil || isNil(o.Default) {
 		var ret bool
 		return ret
 	}
-	return *o.IsDefault
+	return *o.Default
 }
 
-// GetIsDefaultOk returns a tuple with the IsDefault field value if set, nil otherwise
+// GetDefaultOk returns a tuple with the Default field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DataStore) GetIsDefaultOk() (*bool, bool) {
-	if o == nil || isNil(o.IsDefault) {
+func (o *DataStore) GetDefaultOk() (*bool, bool) {
+	if o == nil || isNil(o.Default) {
 		return nil, false
 	}
-	return o.IsDefault, true
+	return o.Default, true
 }
 
-// HasIsDefault returns a boolean if a field has been set.
-func (o *DataStore) HasIsDefault() bool {
-	if o != nil && !isNil(o.IsDefault) {
+// HasDefault returns a boolean if a field has been set.
+func (o *DataStore) HasDefault() bool {
+	if o != nil && !isNil(o.Default) {
 		return true
 	}
 
 	return false
 }
 
-// SetIsDefault gets a reference to the given bool and assigns it to the IsDefault field.
-func (o *DataStore) SetIsDefault(v bool) {
-	o.IsDefault = &v
+// SetDefault gets a reference to the given bool and assigns it to the Default field.
+func (o *DataStore) SetDefault(v bool) {
+	o.Default = &v
 }
 
 // GetJaeger returns the Jaeger field value if set, zero value otherwise.
@@ -401,8 +401,8 @@ func (o DataStore) ToMap() (map[string]interface{}, error) {
 	// skip: id is readOnly
 	toSerialize["name"] = o.Name
 	toSerialize["type"] = o.Type
-	if !isNil(o.IsDefault) {
-		toSerialize["isDefault"] = o.IsDefault
+	if !isNil(o.Default) {
+		toSerialize["default"] = o.Default
 	}
 	if !isNil(o.Jaeger) {
 		toSerialize["jaeger"] = o.Jaeger
