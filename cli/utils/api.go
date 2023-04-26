@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -10,8 +12,16 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
+
+type ListArgs struct {
+	Take          int32
+	Skip          int32
+	SortDirection string
+	SortBy        string
+}
 
 func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
 	config := openapi.NewConfiguration()
@@ -30,9 +40,10 @@ func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
 }
 
 type ResourceClient struct {
-	Client     http.Client
-	BaseUrl    string
-	BaseHeader http.Header
+	Client       http.Client
+	BaseUrl      string
+	BaseHeader   http.Header
+	ResourceType string
 }
 
 func GetResourceAPIClient(resourceType string, cliConfig config.Config) ResourceClient {
@@ -54,9 +65,10 @@ func GetResourceAPIClient(resourceType string, cliConfig config.Config) Resource
 	}
 
 	return ResourceClient{
-		Client:     client,
-		BaseUrl:    baseUrl,
-		BaseHeader: baseHeader,
+		Client:       client,
+		BaseUrl:      baseUrl,
+		BaseHeader:   baseHeader,
+		ResourceType: resourceType,
 	}
 }
 
@@ -73,4 +85,118 @@ func (resourceClient ResourceClient) NewRequest(url string, method string, body 
 
 	request.Header = resourceClient.BaseHeader
 	return request, err
+}
+
+func (resourceClient ResourceClient) Update(ctx context.Context, file file.File, ID string) error {
+	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
+	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents())
+	if err != nil {
+		return fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return fmt.Errorf("could not update %s: %w", resourceClient.ResourceType, err)
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("%s id doesn't exist on server. Remove it from the definition file and try again", resourceClient.ResourceType)
+	}
+
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		// validation error
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("could not send request: %w", err)
+		}
+
+		validationError := string(body)
+		return fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+	}
+
+	_, err = file.SaveChanges(IOReadCloserToString(resp.Body))
+	return err
+}
+
+func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) error {
+	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
+	request, err := resourceClient.NewRequest(url, http.MethodDelete, "")
+	if err != nil {
+		return fmt.Errorf("could not delete resource: %w", err)
+	}
+
+	_, err = resourceClient.Client.Do(request)
+	return err
+}
+
+func (resourceClient ResourceClient) Get(ctx context.Context, id string) (string, error) {
+	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "")
+	if err != nil {
+		return "", fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("could not get %s: %w", resourceClient.ResourceType, err)
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return "", err
+		}
+
+		validationError := string(body)
+		return "", fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+	}
+
+	return IOReadCloserToString(resp.Body), nil
+}
+
+func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (string, error) {
+	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
+	request, err := resourceClient.NewRequest(url, http.MethodGet, "")
+	if err != nil {
+		return "", fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("could not send request: %w", err)
+	}
+
+	defer resp.Body.Close()
+	return IOReadCloserToString(resp.Body), nil
+}
+
+func (resourceClient ResourceClient) Create(ctx context.Context, file file.File) error {
+	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents())
+	if err != nil {
+		return fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return fmt.Errorf("could not send request: %w", err)
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		// validation error
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("could not send request: %w", err)
+		}
+
+		validationError := string(body)
+		return fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+	}
+	if err != nil {
+		return fmt.Errorf("could not create %s: %w", resourceClient.ResourceType, err)
+	}
+
+	_, err = file.SaveChanges(IOReadCloserToString(resp.Body))
+	return err
 }

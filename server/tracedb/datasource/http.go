@@ -14,6 +14,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 )
 
 type HttpClient struct {
@@ -23,11 +24,11 @@ type HttpClient struct {
 	callback HttpCallback
 }
 
-func NewHttpClient(name string, config *model.HttpClientConfig, callback HttpCallback) DataSource {
+func NewHttpClient(name string, config *datastoreresource.HttpClientConfig, callback HttpCallback) DataSource {
 	endpoint, _ := url.Parse(config.Url)
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: getTlsConfig(config.TLSSetting.CAFile, config.TLSSetting.Insecure),
+			TLSClientConfig: getTlsConfig(config.TLS.Settings.CAFile, config.TLS.Insecure),
 		},
 	}
 

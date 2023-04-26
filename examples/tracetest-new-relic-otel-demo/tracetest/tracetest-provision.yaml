@@ -3,7 +3,7 @@ type: DataStore
 spec:
   name: New Relic
   type: newrelic
-  isdefault: true
+  default: true
 
 ---
 type: Demo

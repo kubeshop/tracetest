@@ -35,7 +35,7 @@ type: DataStore
 spec:
   name: Jaeger
   type: jaeger
-  isdefault: true
+  default: true
   jaeger:
     endpoint: jaeger:16685
     tls:

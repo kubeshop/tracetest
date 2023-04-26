@@ -3,7 +3,7 @@
 If you want to use [New Relic](https://newrelic.com/) as the trace data store, you'll configure the OpenTelemetry Collector to receive traces from your system and then send them to both Tracetest and New Relic. And, you don't have to change your existing pipelines to do so.
 
 :::tip
-Examples of configuring Tracetest with New Relic can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest with New Relic can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configuring OpenTelemetry Collector to Send Traces to B New Relic and Tracetest
@@ -66,8 +66,7 @@ service:
     traces/nr:
       receivers: [otlp] # your receiver
       processors: [batch]
-      exporters: [logging, otlp/nr]  # your exporter pointing to your lighstep account
-
+      exporters: [logging, otlp/nr] # your exporter pointing to your lighstep account
 ```
 
 ## Configure Tracetest to Use New Relic as a Trace Data Store
@@ -82,7 +81,6 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 
 <!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643685/Blogposts/Docs/screely-1674643680615_de8fry.png)-->
 
-
 ## Connect Tracetest to New Relic with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
@@ -92,13 +90,13 @@ type: DataStore
 spec:
   name: Opentelemetry Collector pipeline
   type: otlp
-  isDefault: true
+  default: true
 ```
 
 Proceed to run this command in the terminal and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

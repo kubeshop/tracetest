@@ -106,20 +106,3 @@ func createEnvironment(t *testing.T, db model.Repository, name string) model.Env
 
 	return updated
 }
-
-func createDataStore(t *testing.T, db model.Repository, name string) model.DataStore {
-	t.Helper()
-	dataStore := model.DataStore{
-		Name:      name,
-		Type:      "jaeger",
-		IsDefault: true,
-		Values:    model.DataStoreValues{},
-	}
-
-	created, err := db.CreateDataStore(context.TODO(), dataStore)
-	if err != nil {
-		panic(err)
-	}
-
-	return created
-}

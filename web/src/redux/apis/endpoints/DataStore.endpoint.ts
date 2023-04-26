@@ -1,37 +1,34 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import ConnectionResult from 'models/ConnectionResult.model';
+import {TRawDataStore} from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {TConnectionResult, TRawConnectionResult, TTestConnectionRequest} from 'types/DataStore.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {TRawDataStore} from 'models/DataStore.model';
 
 const DataStoreEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  getDataStores: builder.query<DataStoreConfig, unknown>({
-    query: () => '/datastores?take=50',
-    providesTags: () => [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
-    transformResponse: (rawDataStores: TRawDataStore[]) => DataStoreConfig(rawDataStores),
-  }),
-  createDataStore: builder.mutation<undefined, TRawDataStore>({
-    query: dataStore => ({
-      url: '/datastores',
-      method: HTTP_METHOD.POST,
-      body: dataStore,
+  getDataStore: builder.query<DataStoreConfig, unknown>({
+    query: () => ({
+      url: '/datastores/current',
+      method: HTTP_METHOD.GET,
+      headers: {'content-type': 'application/json'},
     }),
-    invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
+    providesTags: () => [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
+    transformResponse: (rawDataStore: TRawDataStore) => DataStoreConfig(rawDataStore),
   }),
-  updateDataStore: builder.mutation<undefined, {dataStore: TRawDataStore; dataStoreId: string}>({
-    query: ({dataStore, dataStoreId}) => ({
-      url: `/datastores/${dataStoreId}`,
+  updateDataStore: builder.mutation<undefined, {dataStore: TRawDataStore}>({
+    query: ({dataStore}) => ({
+      url: `/datastores/current`,
       method: HTTP_METHOD.PUT,
       body: dataStore,
     }),
     invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
   }),
-  deleteDataStore: builder.mutation<undefined, {dataStoreId: string}>({
-    query: ({dataStoreId}) => ({
-      url: `/datastores/${dataStoreId}`,
+  deleteDataStore: builder.mutation<undefined, void>({
+    query: () => ({
+      url: `/datastores/current`,
       method: HTTP_METHOD.DELETE,
+      headers: {'content-type': 'application/json'},
     }),
     invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
   }),

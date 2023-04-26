@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -17,17 +18,19 @@ import (
 type ingester struct {
 	db           model.Repository
 	eventEmitter executor.EventEmitter
+	dsRepo       *datastoreresource.Repository
 }
 
-func NewIngester(db model.Repository, eventEmitter executor.EventEmitter) ingester {
+func NewIngester(db model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastoreresource.Repository) ingester {
 	return ingester{
 		db:           db,
 		eventEmitter: eventEmitter,
+		dsRepo:       dsRepo,
 	}
 }
 
 func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType string) (*pb.ExportTraceServiceResponse, error) {
-	ds, err := i.db.DefaultDataStore(ctx)
+	ds, err := i.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
 		fmt.Println("OTLP server is not enabled. Ignoring request")

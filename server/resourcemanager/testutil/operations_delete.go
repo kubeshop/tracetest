@@ -9,6 +9,7 @@ import (
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/slices"
 )
 
 func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
@@ -31,6 +32,10 @@ var deleteSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name:               OperationDeleteSuccess,
 	neededForOperation: rm.OperationDelete,
 	postAssert: func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+		if slices.Contains(rt.operationsWithoutPostAssert, OperationDeleteSuccess) {
+			return
+		}
+
 		req := buildGetRequest(rt, ct, testServer, t)
 		resp := doRequest(t, req, ct.contentType, testServer)
 		require.Equal(t, 404, resp.StatusCode)

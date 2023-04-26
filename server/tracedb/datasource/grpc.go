@@ -6,9 +6,12 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/config/configcompression"
 	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configtls"
 	"google.golang.org/grpc"
 )
 
@@ -19,10 +22,51 @@ type GrpcClient struct {
 	callback GrpcCallback
 }
 
-func NewGrpcClient(name string, config *configgrpc.GRPCClientSettings, callback GrpcCallback) DataSource {
+func convertDomainConfigToOpenTelemetryConfig(config *datastoreresource.GRPCClientSettings) *configgrpc.GRPCClientSettings {
+	// manual map domain fields to OTel fields
+
+	otelConfig := &configgrpc.GRPCClientSettings{
+		Endpoint:        config.Endpoint,
+		ReadBufferSize:  config.ReadBufferSize,
+		WriteBufferSize: config.WriteBufferSize,
+		WaitForReady:    config.WaitForReady,
+		Headers:         config.Headers,
+		BalancerName:    config.BalancerName,
+
+		Compression: configcompression.CompressionType(config.Compression),
+	}
+
+	if config.TLS == nil {
+		return otelConfig
+	}
+
+	otelConfig.TLSSetting = configtls.TLSClientSetting{
+		Insecure:           config.TLS.Insecure,
+		InsecureSkipVerify: config.TLS.InsecureSkipVerify,
+		ServerName:         config.TLS.ServerName,
+	}
+
+	if config.TLS.Settings == nil {
+		return otelConfig
+	}
+
+	otelConfig.TLSSetting.TLSSetting = configtls.TLSSetting{
+		CAFile:     config.TLS.Settings.CAFile,
+		CertFile:   config.TLS.Settings.CertFile,
+		KeyFile:    config.TLS.Settings.KeyFile,
+		MinVersion: config.TLS.Settings.MinVersion,
+		MaxVersion: config.TLS.Settings.MaxVersion,
+	}
+
+	return otelConfig
+}
+
+func NewGrpcClient(name string, config *datastoreresource.GRPCClientSettings, callback GrpcCallback) DataSource {
+	otelConfig := convertDomainConfigToOpenTelemetryConfig(config)
+
 	return &GrpcClient{
 		name:     name,
-		config:   config,
+		config:   otelConfig,
 		callback: callback,
 	}
 }
