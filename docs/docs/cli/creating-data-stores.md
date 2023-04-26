@@ -65,7 +65,7 @@ spec:
 
 ## Apply Configuration
 
-To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then you just have to enter:
+To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then use the following command:
 
 ```
 tracetest datastore apply -f my/data-store/file/location.yaml

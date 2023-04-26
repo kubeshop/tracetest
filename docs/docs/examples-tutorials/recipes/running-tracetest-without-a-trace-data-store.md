@@ -8,17 +8,17 @@
 
 ## Sample Node.js app with OpenTelemetry Collector and Tracetest
 
-This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your e2e and integration tests with trace-based testing.
+This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
 
 ## Prerequisites
 
 You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
 
-## Project structure
+## Project Structure
 
 The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
 
-### 1. Node.js app
+### 1. Node.js App
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
 
 ### 2. Tracetest
@@ -29,11 +29,11 @@ The `tracetest` directory is self-contained and will run all the prerequisites f
 ### Docker Compose Network
 All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `collector.config.yaml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
 
-## Node.js app
+## Node.js App
 
 The Node.js app is a simple Express app, contained in the `app.js` file.
 
-The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively.
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files.
 Traces will be sent to the OpenTelemetry Collector.
 
 Here's the content of the `tracing.otel.grpc.js` file:
@@ -63,7 +63,7 @@ Enabling the tracer is done by preloading the trace file.
 node -r ./tracing.otel.grpc.js app.js
 ```
 
-In the `package.json` you will see two npm script for running the respective tracers alongside the `app.js`.
+In the `package.json` you will see two npm scripts for running the respective tracers alongside the `app.js`.
 
 ```json
 "scripts": {
@@ -72,7 +72,7 @@ In the `package.json` you will see two npm script for running the respective tra
 },
 ```
 
-To start the server you run this command.
+To start the server, run this command:
 
 ```bash
 npm run with-grpc-tracer
@@ -80,7 +80,7 @@ npm run with-grpc-tracer
 npm run with-http-tracer
 ```
 
-As you can see the `Dockerfile` uses the command above.
+As you can see, the `Dockerfile` uses the command above.
 
 ```Dockerfile
 FROM node:slim
@@ -175,7 +175,7 @@ services:
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
 
-**Why?** To start both the Node.js app and Tracetest we will run this command:
+To start both the Node.js app and Tracetest we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
@@ -194,11 +194,11 @@ postgres:
 
 ```
 
-The `tracetest-provision.yaml` file provisions the trace data store and polling to store in the Postgres database. The data store is set to OTLP meaning the traces will be stored in Tracetest itself.
+The `tracetest-provision.yaml` file provisions the trace data store and polling to store in the Postgres database. The data store is set to OTLP, meaning the traces will be stored in Tracetest itself.
 
 But how are traces sent to Tracetest?
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's otlp endpoint `tracetest:21321`.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OLTP endpoint `tracetest:21321`.
 
 ```yaml
 receivers:
@@ -230,18 +230,18 @@ service:
 
 ```
 
-## Run both the Node.js app and Tracetest
+## Run Both the Node.js App and Tracetest
 
-To start both the Node.js app and Tracetest we will run this command:
+To start both the Node.js app and Tracetest, run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`. Go ahead and open it up.
+This will start your Tracetest instance on `http://localhost:11633/`.
 
-Start creating tests! Make sure to use the `http://app:8080/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+Open the URL and start creating tests! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and Tracetest are in the same network.
 
-## Learn more
+## Learn More
 
-Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out our [examples in GitHub](https://github.com/kubeshop/tracetest/tree/main/examples) and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

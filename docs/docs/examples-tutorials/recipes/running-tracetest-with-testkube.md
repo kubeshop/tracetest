@@ -1,4 +1,4 @@
-# Tracetest and Testkube - Running scheduled trace-based tests
+# Tracetest and Testkube - Running Scheduled Trace-based Tests
 
 [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) is a test executor to run Tracetest tests with Testkube.
 
@@ -6,7 +6,7 @@
 
 Tracetest leverages existing OpenTelemetry instrumentation to run assertions against every part of an HTTP transaction.
 
-But, by integrating with Testkube you can now add Tracetest to the native CI/CD pipeline in your Kubernetes cluster. It allows you to run scheduled test runs and synthetic tests. All while following the trace-based testing principle and enabling full in-depth assertions against trace data, not just the response.
+By integrating with Testkube you can now add Tracetest to the native CI/CD pipeline in your Kubernetes cluster. It allows you to run scheduled test runs and synthetic tests. All while following the trace-based testing principle and enabling full in-depth assertions against trace data, not just the response.
 
 ## Infrastructure Overview
 
@@ -35,7 +35,7 @@ sequenceDiagram
 
 Make sure you have these three things installed before starting.
 
-1. A running Kubernetes cluster (either locally or in the cloud)
+1. A running Kubernetes cluster (either locally or in the cloud).
 2. [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 3. [Helm](https://helm.sh/docs/intro/install/)
 
@@ -52,7 +52,7 @@ Install Testkube CLI by following [these instructions](https://docs.testkube.io/
 brew install testkube
 ```
 
-## 2. Install Testkube in your Kubernetes cluster
+## 2. Install Testkube in Your Kubernetes Cluster
 
 ```bash
 testkube init
@@ -122,7 +122,7 @@ Install Tracetest CLI by following [these instructions](https://docs.tracetest.i
 brew install kubeshop/tracetest/tracetest
 ```
 
-## 4. Install Tracetest in your Kubernetes cluster
+## 4. Install Tracetest in Your Kubernetes Cluster
 
 ```bash
 tracetest server install
@@ -184,9 +184,9 @@ kubectl --kubeconfig ${HOME}/.kube/config --context kind-kind --namespace tracet
 
 ![Tracetest Web UI](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679064296/Blogposts/Docs/screely-1679064291876_jxlhmn.png)
 
-## 5. Create a test in Tracetest
+## 5. Create a Test in Tracetest
 
-Start by clicking `Create` > `Create New Test` > `HTTP Request` > `Next` > `Choose Example` (dropdown) > `Pokeshop - List` (generates a sample test from the Tracetest demo) > `Next` > `URL` is prefilled with `http://demo-pokemon-api.demo/pokemon?take=20&skip=0` > `Create & Run`
+Start by clicking `Create` > `Create New Test` > `HTTP Request` > `Next` > `Choose Example` (dropdown) > `Pokeshop - List` (generates a sample test from the Tracetest demo) > `Next` > `URL` is prefilled with `http://demo-pokemon-api.demo/pokemon?take=20&skip=0` > `Create & Run`.
 
 This will trigger the test and display a distributed trace in the `Trace` tab to run assertions against.
 
@@ -232,7 +232,7 @@ kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:la
 Executor created tracetest-executor 🥇
 ```
 
-## 7. Create a trace-based test with Tracetest in Testkube
+## 7. Create a Trace-based Test with Tracetest in Testkube
 
 Click the ⚙️ button in the top right. Then click `Test Definition`.
 
@@ -265,7 +265,7 @@ spec:
     - attr:tracetest.span.duration  <  500ms
 ```
 
-Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument, and also the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable`.
+Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument and also the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable`.
 
 Remember that your `TRACETEST_ENDPOINT` should be reachable from Testkube in your cluster. Use your Tracetest service's `CLUSTER-IP:PORT`. E.g: `10.96.93.106:11633`.
 
@@ -281,7 +281,7 @@ Opening the Testkube Dashboard will show the test is created successfully.
 
 ![Tracetest test created in Testkube](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679071918/Blogposts/Docs/screely-1679071913649_yrgucd.png)
 
-## 8. Run the Tracetest trace-based test in Testkube
+## 8. Run the Tracetest Trace-based Test in Testkube
 
 Finally, to run the test, execute the following command, or run the test from the Testkube Dashboard.
 
@@ -333,7 +333,7 @@ Execution completed
 And, here's the Testkube Dashboard.
 ![testkube failing tests](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679328982/Blogposts/Docs/screely-1679328961663_nt3f2m.png)
 
-And, if the test passes, it'll look like this.
+If the test passes, it'll look like this.
 
 ```text title="Expected output"
 Type:              tracetest/test
@@ -364,7 +364,7 @@ Execution completed ✔ Pokeshop - List (http://10.96.93.106:11633/test/RUkKQ_aV
 
 ![testkube passing tests](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679329231/Blogposts/Docs/screely-1679329224534_qnqcl1.png)
 
-## 9. Create a trace-based test that runs every minute
+## 9. Create a Trace-based Test That Runs Every Minute
 
 By using Testkube's [scheduling](https://docs.testkube.io/concepts/scheduling), you can trigger this test every minute.
 
@@ -380,6 +380,6 @@ In your Testkube Dashboard you'll see this test run continuously and get trigger
 
 ![scheduled test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679330588/Blogposts/Docs/screely-1679330581788_izl5vs.png)
 
-## Next steps
+## Next Steps
 
-To explore more options Testkube gives you, check out [test triggers](https://docs.testkube.io/concepts/triggers). They enable you to trigger tests based on Kubernetes events.
+To explore more options that Testkube gives you, check out [test triggers](https://docs.testkube.io/concepts/triggers). They enable you to trigger tests based on Kubernetes events.

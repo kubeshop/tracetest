@@ -1,7 +1,5 @@
 # Overview
 
-Below you can find tutorials to help you get started with Tracetest.
-
 <!-- If you're already building something with Tracetest, please explore recipes — short, self-contained, and runnable solutions to popular use cases. -->
 
 ## Tutorials

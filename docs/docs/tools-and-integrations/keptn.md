@@ -33,15 +33,15 @@ actions:
 
 ## Quickstart
 
-Here we will show how to use Tracetest to run these tests and help in your delivery and testing workflows using the [Pokeshop](https://docs.tracetest.io/pokeshop/) example, available at `http://demo-pokemon-api.demo` in a Kubernetes cluster.
+In this guide, we will show how to use Tracetest to run these tests and help in your delivery and testing workflows using the Pokeshop example, available on http://localhost:8081 if you are using docker compose or on http://demo-pokemon-api.demo/ if you installed it on Kubernetes and are using Tracetest on the same cluster.
 
 ### Prerequisites
 
 In your Kubernetes cluster you should have:
 
-1. `Keptn 1.0.x` [installed](https://keptn.sh/docs/1.0.x/install/)
-2. `Job Executor Service 0.3.x` [installed](https://github.com/keptn-contrib/job-executor-service/blob/main/docs/INSTALL.md)
-3. `Tracetest` server [installed](https://docs.tracetest.io/deployment/kubernetes) on `tracetest` namespace 
+1. `Keptn 1.0.x` [installed](https://keptn.sh/docs/1.0.x/install/).
+2. `Job Executor Service 0.3.x` [installed](https://github.com/keptn-contrib/job-executor-service/blob/main/docs/INSTALL.md).
+3. `Tracetest` server [installed](https://docs.tracetest.io/deployment/kubernetes) on the `tracetest` namespace. 
 
 On your machine you should have:
 
@@ -156,7 +156,7 @@ This job will run Tracetest every time a `test` event happens, listening to the 
 keptn add-resource --project keptn-tracetest-integration --service pokeshop --stage production --resource job-config.yaml --resourceUri job/config.yaml
 ```
  
-### 3. Setup Job Executor Service to see events emitted by the test step.
+### 3. Setup a Job Executor Service to see events emitted by the test step.
  
 To guarantee that our job will be called by Keptn when we execute the `deployment` sequence, we need to configure the integration `Job Executor Service` on `keptn-tracetest-integration` project to listen to `sh.keptn.event.test.triggered` events if it is not configured. We can do that only through the Keptn Bridge (their Web UI), by going to our project, choosing the `Settings` option, and later `Integrations`.
  
