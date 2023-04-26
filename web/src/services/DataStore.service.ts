@@ -33,16 +33,19 @@ const DataStoreService = (): IDataStoreService => ({
     const dataStoreValues = await dataStoreServiceMap[dataStoreType].getRequest(draft, dataStoreType);
     const isUpdate = !!defaultDataStore.id;
 
-    const dataStore: TRawDataStore = isUpdate
-      ? {id: defaultDataStore.id, ...dataStoreValues, isDefault: true}
+    const dataStore: DataStore = isUpdate
+      ? {id: defaultDataStore.id, ...dataStoreValues, default: true}
       : {
           ...dataStoreValues,
           name: dataStoreType,
           type: dataStoreType as SupportedDataStores,
-          isDefault: true,
+          default: true,
         };
 
-    return dataStore;
+    return {
+      type: 'DataStore',
+      spec: dataStore,
+    } as TRawDataStore;
   },
 
   getInitialValues(dataStoreConfig) {

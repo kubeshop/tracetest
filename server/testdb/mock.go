@@ -240,49 +240,6 @@ func (m *MockRepository) UpdateTransactionRun(ctx context.Context, run model.Tra
 	return args.Error(0)
 }
 
-// data stores
-
-func (m *MockRepository) CreateDataStore(_ context.Context, dataStore model.DataStore) (model.DataStore, error) {
-	args := m.Called(dataStore)
-	return args.Get(0).(model.DataStore), args.Error(1)
-}
-
-func (m *MockRepository) UpdateDataStore(_ context.Context, dataStore model.DataStore) (model.DataStore, error) {
-	args := m.Called(dataStore)
-	return args.Get(0).(model.DataStore), args.Error(1)
-}
-
-func (m *MockRepository) DeleteDataStore(_ context.Context, dataStore model.DataStore) error {
-	args := m.Called(dataStore)
-	return args.Error(0)
-}
-
-func (m *MockRepository) DataStoreIDExists(_ context.Context, id string) (bool, error) {
-	args := m.Called(id)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockRepository) GetDataStore(_ context.Context, id string) (model.DataStore, error) {
-	args := m.Called(id)
-	return args.Get(0).(model.DataStore), args.Error(1)
-}
-
-func (m *MockRepository) DefaultDataStore(_ context.Context) (model.DataStore, error) {
-	args := m.Called()
-	return args.Get(0).(model.DataStore), args.Error(1)
-}
-
-func (m *MockRepository) GetDataStores(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[model.DataStore], error) {
-	args := m.Called(take, skip, query, sortBy, sortDirection)
-	dataStores := args.Get(0).([]model.DataStore)
-
-	list := model.List[model.DataStore]{
-		Items:      dataStores,
-		TotalCount: len(dataStores),
-	}
-	return list, args.Error(1)
-}
-
 func (m *MockRepository) CreateTestRunEvent(_ context.Context, event model.TestRunEvent) error {
 	args := m.Called(event)
 	return args.Error(0)

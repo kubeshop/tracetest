@@ -287,10 +287,10 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		}
 	}
 
-	runID := body.GetRunId()
+	runID := getTestRunIDFromString(body.GetRunId())
 	a.logger.Debug(
 		"executed",
-		zap.String("runID", runID),
+		zap.Int32("runID", runID),
 		zap.String("runType", body.GetType()),
 	)
 
@@ -372,7 +372,7 @@ func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, er
 	return *test, nil
 }
 
-func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID string, params runDefParams) error {
+func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID int32, params runDefParams) error {
 	a.logger.Debug("run test", zap.Bool("wait-for-results", params.WaitForResult))
 	testID := test.GetId()
 	testRun, err := a.getTestRun(ctx, testID, runID)
@@ -381,14 +381,14 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID str
 	}
 
 	if params.WaitForResult {
-		updatedTestRun, err := a.waitForTestResult(ctx, testID, testRun.GetId())
+		updatedTestRun, err := a.waitForTestResult(ctx, testID, getTestRunID(testRun))
 		if err != nil {
 			return fmt.Errorf("could not wait for result: %w", err)
 		}
 
 		testRun = updatedTestRun
 
-		if err := a.saveJUnitFile(ctx, testID, testRun.GetId(), params.JunitFile); err != nil {
+		if err := a.saveJUnitFile(ctx, testID, getTestRunID(testRun), params.JunitFile); err != nil {
 			return fmt.Errorf("could not save junit file: %w", err)
 		}
 	}
@@ -412,8 +412,7 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID str
 	return nil
 }
 
-func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.Transaction, runID string, params runDefParams) error {
-	rid, _ := strconv.Atoi(runID)
+func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.Transaction, rid int32, params runDefParams) error {
 	a.logger.Debug("run transaction", zap.Bool("wait-for-results", params.WaitForResult))
 	transactionID := transaction.GetId()
 	transactionRun, err := a.getTransactionRun(ctx, transactionID, int32(rid))
@@ -457,7 +456,7 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 	return nil
 }
 
-func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, outputFile string) error {
+func (a runTestAction) saveJUnitFile(ctx context.Context, testId string, testRunId int32, outputFile string) error {
 	if outputFile == "" {
 		return nil
 	}
@@ -479,7 +478,7 @@ func (a runTestAction) saveJUnitFile(ctx context.Context, testId, testRunId, out
 
 }
 
-func (a runTestAction) getTestRun(ctx context.Context, testID, runID string) (openapi.TestRun, error) {
+func (a runTestAction) getTestRun(ctx context.Context, testID string, runID int32) (openapi.TestRun, error) {
 	run, _, err := a.client.ApiApi.
 		GetTestRun(ctx, testID, runID).
 		Execute()
@@ -501,7 +500,7 @@ func (a runTestAction) getTransactionRun(ctx context.Context, transactionID stri
 	return *run, nil
 }
 
-func (a runTestAction) waitForTestResult(ctx context.Context, testID, testRunID string) (openapi.TestRun, error) {
+func (a runTestAction) waitForTestResult(ctx context.Context, testID string, testRunID int32) (openapi.TestRun, error) {
 	var (
 		testRun   openapi.TestRun
 		lastError error
@@ -573,7 +572,7 @@ func (a runTestAction) waitForTransactionResult(ctx context.Context, transaction
 	return transactionRun, nil
 }
 
-func (a runTestAction) isTestReady(ctx context.Context, testID, testRunId string) (*openapi.TestRun, error) {
+func (a runTestAction) isTestReady(ctx context.Context, testID string, testRunId int32) (*openapi.TestRun, error) {
 	req := a.client.ApiApi.GetTestRun(ctx, testID, testRunId)
 	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
 	if err != nil {
@@ -625,4 +624,13 @@ func (a runTestAction) getMetadata() map[string]string {
 	}
 
 	return metadata
+}
+
+func getTestRunIDFromString(testRunIDAsString string) int32 {
+	testRunID, _ := strconv.Atoi(testRunIDAsString)
+	return int32(testRunID)
+}
+
+func getTestRunID(testRun openapi.TestRun) int32 {
+	return getTestRunIDFromString(testRun.GetId())
 }

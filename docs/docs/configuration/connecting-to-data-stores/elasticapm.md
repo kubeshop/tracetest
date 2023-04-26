@@ -3,12 +3,12 @@
 Tracetest fetches traces from [Elasticsearch's default port](https://discuss.elastic.co/t/what-are-ports-9200-and-9300-used-for/238578) `9200`.
 
 :::tip
-Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). 
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
 ## Configure Tracetest to Use Elastic APM as a Trace Data Store
 
-Configure Tracetest to fetch trace data from Elasticsearch. 
+Configure Tracetest to fetch trace data from Elasticsearch.
 
 Tracetest uses Elasticsearch's **default port** `9200` to fetch trace data.
 
@@ -24,7 +24,7 @@ The defaults can be:
 To configure Elastic APM you will need to download the CA certificate from the Docker image and upload it to the config under "Upload CA file".
 
 - The command to download the `ca.crt` file is:
-`docker cp tracetest-elasticapm-with-elastic-agent-es01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt .`
+  `docker cp tracetest-elasticapm-with-elastic-agent-es01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt .`
 - Alternatively, you can skip CA certificate validation by setting the `Enable TLS but don't verify the certificate` option.
 
 :::tip
@@ -43,7 +43,6 @@ https://es01:9200
 
 <!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674566041/Blogposts/Docs/screely-1674566018046_ci0st9.png)-->
 
-
 ## Connect Tracetest to Elastic with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
@@ -53,20 +52,20 @@ type: DataStore
 spec:
   name: Elastic Data Store
   type: elasticapm
-  isDefault: true
-    elasticapm:
-      addresses:
-        - https://es01:9200
-      username: elastic
-      password: changeme
-      index: traces-apm-default
-      insecureSkipVerify: true
+  default: true
+  elasticapm:
+    addresses:
+      - https://es01:9200
+    username: elastic
+    password: changeme
+    index: traces-apm-default
+    insecureSkipVerify: true
 ```
 
 Proceed to run this command in the terminal and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

@@ -20,6 +20,7 @@ const (
 	FileTypeEnvironment    FileType = "Environment"
 	FileTypeDataStore      FileType = "DataStore"
 	FileTypeConfig         FileType = "Config"
+	FileTypeDemo           FileType = "Demo"
 	FileTypePollingProfile FileType = "PollingProfile"
 )
 

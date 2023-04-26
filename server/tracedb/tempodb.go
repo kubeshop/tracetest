@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datasource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/trace"
@@ -30,7 +31,7 @@ type tempoTraceDB struct {
 	dataSource datasource.DataSource
 }
 
-func newTempoDB(config *model.BaseClientConfig) (TraceDB, error) {
+func newTempoDB(config *datastoreresource.MultiChannelClientConfig) (TraceDB, error) {
 	dataSource := datasource.New("Tempo", config, datasource.Callbacks{
 		HTTP: httpGetTraceByID,
 		GRPC: grpcGetTraceByID,

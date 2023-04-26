@@ -112,7 +112,6 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-
 ```
 
 Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -160,7 +159,7 @@ type: DataStore
 spec:
   name: New Relic
   type: newrelic
-  isdefault: true
+  default: true
 
 ---
 type: Demo
@@ -173,7 +172,6 @@ spec:
     productCatalogEndpoint: otel-productcatalogservice:3550
     cartEndpoint: otel-cartservice:7070
     checkoutEndpoint: otel-checkoutservice:5050
-
 ```
 
 **How to send traces to Tracetest and New Relic?**
