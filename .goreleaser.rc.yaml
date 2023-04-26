@@ -10,8 +10,6 @@ release:
   # discussion_category_name: General
   draft: false
   prerelease: "true"
-  extra_files:
-    - glob: ./dist/architecture.png
 before:
   hooks:
     - dir: ./server
