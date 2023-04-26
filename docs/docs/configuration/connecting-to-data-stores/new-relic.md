@@ -11,10 +11,10 @@ Examples of configuring Tracetest with New Relic can be found in the [`examples`
 In your OpenTelemetry Collector config file:
 
 - Set the `exporter` to `otlp/tt`
-- Set the `endpoint` to your Tracetest instance on port `21321`
+- Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
-If you are running Tracetest with Docker and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
+If you are running Tracetest with Docker and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:4317`
 :::
 
 Additionally, add another config:
@@ -43,7 +43,7 @@ exporters:
     logLevel: debug
   # OTLP for Tracetest
   otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for New Relic
@@ -71,7 +71,7 @@ service:
 
 ## Configure Tracetest to Use New Relic as a Trace Data Store
 
-Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
+Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `4317`.
 
 ## Connect Tracetest to New Relic with the Web UI
 

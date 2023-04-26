@@ -11,10 +11,10 @@ Examples of configuring Tracetest with Datadog can be found in the [`examples` f
 In your OpenTelemetry Collector config file:
 
 - Set the `exporter` to `otlp/tt`
-- Set the `endpoint` to your Tracetest instance on port `21321`
+- Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
-If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:21321`
+If you are running Tracetest with Docker, and Tracetest's service name is `tracetest`, then the endpoint might look like this `http://tracetest:4317`
 :::
 
 Additionally, add another config:
@@ -47,7 +47,7 @@ exporters:
   # Send traces to Tracetest.
   # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
   otlp/tt:
-    endpoint: tracetest:21321
+    endpoint: tracetest:4317
     tls:
       insecure: true
 
@@ -73,7 +73,7 @@ service:
 
 ## Configure Tracetest to Use Datadog as a Trace Data Store
 
-Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `21321`.
+Configure your Tracetest instance to expose an `otlp` endpoint to make it aware it will receive traces from the OpenTelemetry Collector. This will expose Tracetest's trace receiver on port `4317`.
 
 ## Connect Tracetest to Datadog with the Web UI
 

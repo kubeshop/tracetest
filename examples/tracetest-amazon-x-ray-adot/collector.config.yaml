@@ -9,7 +9,7 @@ exporters:
   awsxray:
     region: ${AWS_REGION}
   otlp/tt:
-    endpoint: tracetest:21321
+    endpoint: tracetest:4317
     tls:
       insecure: true
 
