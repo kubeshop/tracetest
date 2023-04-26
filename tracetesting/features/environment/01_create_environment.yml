@@ -13,6 +13,8 @@ spec:
           value: application/json
       body: |
         {
+          "type": "Environment",
+          "spec"": {
             "name": "test-environment",
             "description": "test-environment",
             "values": [
@@ -25,6 +27,7 @@ spec:
                     "value": "3000"
                 }
             ]
+          }
         }
   specs:
     - selector: span[name = "Tracetest trigger"]
@@ -43,6 +46,6 @@ spec:
       assertions:
         - attr:sql.query contains "INSERT INTO environments"
   outputs:
-  - name: ENVIRONMENT_ID
-    selector: span[name = "Tracetest trigger"]
-    value: attr:tracetest.response.body | json_path '$.id'
+    - name: ENVIRONMENT_ID
+      selector: span[name = "Tracetest trigger"]
+      value: attr:tracetest.response.body | json_path '$.id'
