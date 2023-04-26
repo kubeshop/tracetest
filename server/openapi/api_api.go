@@ -111,12 +111,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.ExpressionResolve,
 		},
 		{
-			"GetDataStoreDefinitionFile",
-			strings.ToUpper("Get"),
-			"/api/datastores/{dataStoreId}/definition.yaml",
-			c.GetDataStoreDefinitionFile,
-		},
-		{
 			"GetResources",
 			strings.ToUpper("Get"),
 			"/api/resources",
@@ -492,22 +486,6 @@ func (c *ApiApiController) ExpressionResolve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.ExpressionResolve(r.Context(), resolveRequestInfoParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetDataStoreDefinitionFile - Get the data store definition as an YAML file
-func (c *ApiApiController) GetDataStoreDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	dataStoreIdParam := params["dataStoreId"]
-
-	result, err := c.service.GetDataStoreDefinitionFile(r.Context(), dataStoreIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -37,8 +37,6 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
-	routes[c.getRouteIndex("GetDataStoreDefinitionFile")].HandlerFunc = c.GetDataStoreDefinitionFile
-	routes[c.getRouteIndex("GetEnvironmentDefinitionFile")].HandlerFunc = c.GetEnvironmentDefinitionFile
 
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 
@@ -142,34 +140,6 @@ func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWr
 	}
 
 	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
-}
-
-func (c *customController) GetDataStoreDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	dataStoreIdParam := params["dataStoreId"]
-
-	result, err := c.service.GetDataStoreDefinitionFile(r.Context(), dataStoreIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
-}
-
-func (c *customController) GetEnvironmentDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.GetEnvironmentDefinitionFile(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

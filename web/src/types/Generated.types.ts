@@ -160,10 +160,6 @@ export interface paths {
     /** Delete a Data Store */
     delete: operations["deleteDataStore"];
   };
-  "/datastores/{dataStoreId}/definition.yaml": {
-    /** Get the data store as an YAML file */
-    get: operations["getDataStoreDefinitionFile"];
-  };
   "/environments": {
     /** List environments available in Tracetest. */
     get: operations["listEnvironments"];
@@ -916,18 +912,6 @@ export interface operations {
     responses: {
       /** OK */
       204: never;
-    };
-  };
-  /** Get the data store as an YAML file */
-  getDataStoreDefinitionFile: {
-    parameters: {};
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
-        };
-      };
     };
   };
   /** List environments available in Tracetest. */

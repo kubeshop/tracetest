@@ -1012,23 +1012,6 @@ paths:
       responses:
         "204":
           description: OK
-  /datastores/{dataStoreId}/definition.yaml:
-    get:
-      tags:
-        - api
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/dataStoreId"
-      summary: Get the data store definition as an YAML file
-      description: Get the data store as an YAML file
-      operationId: getDataStoreDefinitionFile
-      responses:
-        200:
-          description: OK
-          content:
-            application/yaml:
-              schema:
-                type: string
-
 
   # Environments
   /environments:
