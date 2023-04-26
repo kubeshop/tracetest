@@ -33,7 +33,7 @@ type DataStoreValues struct {
 
 type AWSXRayConfig struct {
 	Region          string `mapstructure:"region"`
-	AccessKeyID     string `mapstructure:"accessKeyID"`
+	AccessKeyID     string `mapstructure:"accessKeyId"`
 	SecretAccessKey string `mapstructure:"secretAccessKey"`
 	SessionToken    string `mapstructure:"sessionToken"`
 	UseDefaultAuth  bool   `mapstructure:"useDefaultAuth"`
