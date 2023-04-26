@@ -94,7 +94,7 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 				"createdAt": "2023-03-09T17:53:10.256383Z",
 				"awsxray": {
 					"region": "some-region",
-					"accessKeyID": "some-access-key",
+					"accessKeyId": "some-access-key",
 					"secretAccessKey": "some-secret-access-key",
 					"sessionToken": "some-session-token",
 					"useDefaultAuth": true
@@ -111,7 +111,7 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 				"createdAt": "2023-03-09T17:53:10.256383Z",
 				"awsxray": {
 					"region": "some-region-updated",
-					"accessKeyID": "some-access-key-updated",
+					"accessKeyId": "some-access-key-updated",
 					"secretAccessKey": "some-access-key-updated",
 					"sessionToken": "some-session-token-updated",
 					"useDefaultAuth": true
