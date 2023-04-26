@@ -491,28 +491,38 @@ func encode(input any, output *map[string]any) error {
 		return err
 	}
 
-	fixInterlaSlicesMapping(output)
+	fixInternalSlicesMapping(output)
 
 	return nil
 }
 
-func fixInterlaSlicesMapping(output *map[string]any) {
+func fixInternalSlicesMapping(output *map[string]any) {
 	for k, v := range *output {
 		value := reflect.ValueOf(v)
 		if value.Kind() == reflect.Map {
-			submap := v.(map[string]any)
-			fixInterlaSlicesMapping(&submap)
+			if submap, ok := v.(map[string]any); ok {
+				fixInternalSlicesMapping(&submap)
+			}
 		}
+
 		if value.Kind() == reflect.Slice {
-			dereferencedOuput := *output
+			if value.Len() == 0 {
+				continue
+			}
+
+			firstItem := value.Index(0)
+			if firstItem.Kind() != reflect.Struct {
+				continue
+			}
 
 			newOutput := make([]map[string]any, value.Len())
-			for i := 0; i < value.Len(); i++ {
-				item := value.Index(i).Interface()
-				mapstructure.Decode(item, &newOutput[i])
-			}
-			dereferencedOuput[k] = newOutput
-		}
 
+			for i := 0; i < value.Len(); i++ {
+				mapstructure.Decode(value.Index(i).Interface(), &newOutput[i])
+			}
+
+			deferencedOutput := *output
+			deferencedOutput[k] = newOutput
+		}
 	}
 }
