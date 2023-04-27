@@ -132,8 +132,8 @@ func (m Model) DataStore(in openapi.DataStore) datastoreresource.DataStore {
 
 	// ElasticAPM
 	if dataStore.Type == datastoreresource.DataStoreTypeElasticAPM {
-		dataStore.Values.OpenSearch = &datastoreresource.ElasticSearchConfig{}
-		deepcopy.DeepCopy(in.Opensearch, &dataStore.Values.ElasticApm)
+		dataStore.Values.ElasticApm = &datastoreresource.ElasticSearchConfig{}
+		deepcopy.DeepCopy(in.Elasticapm, &dataStore.Values.ElasticApm)
 	}
 
 	// SignalFX
