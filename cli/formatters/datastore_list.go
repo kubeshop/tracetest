@@ -68,7 +68,7 @@ func (f dataStoreList) pretty(dataStores []openapi.DataStore) string {
 }
 
 func (f dataStoreList) getDefaultMark(dataStore openapi.DataStore) string {
-	if dataStore.IsDefault != nil && *dataStore.IsDefault {
+	if dataStore.Default != nil && *dataStore.Default {
 		return "*"
 	}
 

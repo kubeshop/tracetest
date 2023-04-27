@@ -424,7 +424,7 @@ type ApiGetDataStoreRequest struct {
 	dataStoreId string
 }
 
-func (r ApiGetDataStoreRequest) Execute() (*DataStore, *http.Response, error) {
+func (r ApiGetDataStoreRequest) Execute() (*DataStoreResource, *http.Response, error) {
 	return r.ApiService.GetDataStoreExecute(r)
 }
 
@@ -447,13 +447,13 @@ func (a *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId st
 
 // Execute executes the request
 //
-//	@return DataStore
-func (a *ResourceApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStore, *http.Response, error) {
+//	@return DataStoreResource
+func (a *ResourceApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStoreResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *DataStore
+		localVarReturnValue *DataStoreResource
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.GetDataStore")

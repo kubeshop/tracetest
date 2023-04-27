@@ -26,11 +26,11 @@ type DataStore struct {
 
 	Tempo BaseClient `json:"tempo,omitempty"`
 
-	OpenSearch ElasticSearch `json:"openSearch,omitempty"`
+	Opensearch ElasticSearch `json:"opensearch,omitempty"`
 
-	ElasticApm ElasticSearch `json:"elasticApm,omitempty"`
+	Elasticapm ElasticSearch `json:"elasticapm,omitempty"`
 
-	SignalFx SignalFx `json:"signalFx,omitempty"`
+	Signalfx SignalFx `json:"signalfx,omitempty"`
 
 	Awsxray AwsXRay `json:"awsxray,omitempty"`
 
@@ -55,13 +55,13 @@ func AssertDataStoreRequired(obj DataStore) error {
 	if err := AssertBaseClientRequired(obj.Tempo); err != nil {
 		return err
 	}
-	if err := AssertElasticSearchRequired(obj.OpenSearch); err != nil {
+	if err := AssertElasticSearchRequired(obj.Opensearch); err != nil {
 		return err
 	}
-	if err := AssertElasticSearchRequired(obj.ElasticApm); err != nil {
+	if err := AssertElasticSearchRequired(obj.Elasticapm); err != nil {
 		return err
 	}
-	if err := AssertSignalFxRequired(obj.SignalFx); err != nil {
+	if err := AssertSignalFxRequired(obj.Signalfx); err != nil {
 		return err
 	}
 	if err := AssertAwsXRayRequired(obj.Awsxray); err != nil {

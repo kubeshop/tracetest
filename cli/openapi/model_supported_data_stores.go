@@ -20,27 +20,27 @@ type SupportedDataStores string
 
 // List of SupportedDataStores
 const (
-	JAEGER      SupportedDataStores = "jaeger"
-	OPEN_SEARCH SupportedDataStores = "openSearch"
-	TEMPO       SupportedDataStores = "tempo"
-	SIGNAL_FX   SupportedDataStores = "signalFx"
-	OTLP        SupportedDataStores = "otlp"
-	ELASTIC_APM SupportedDataStores = "elasticApm"
-	NEW_RELIC   SupportedDataStores = "newRelic"
-	LIGHTSTEP   SupportedDataStores = "lightstep"
-	DATADOG     SupportedDataStores = "datadog"
-	AWSXRAY     SupportedDataStores = "awsxray"
+	JAEGER     SupportedDataStores = "jaeger"
+	OPENSEARCH SupportedDataStores = "opensearch"
+	TEMPO      SupportedDataStores = "tempo"
+	SIGNALFX   SupportedDataStores = "signalfx"
+	OTLP       SupportedDataStores = "otlp"
+	ELASTICAPM SupportedDataStores = "elasticapm"
+	NEWRELIC   SupportedDataStores = "newrelic"
+	LIGHTSTEP  SupportedDataStores = "lightstep"
+	DATADOG    SupportedDataStores = "datadog"
+	AWSXRAY    SupportedDataStores = "awsxray"
 )
 
 // All allowed values of SupportedDataStores enum
 var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"jaeger",
-	"openSearch",
+	"opensearch",
 	"tempo",
-	"signalFx",
+	"signalfx",
 	"otlp",
-	"elasticApm",
-	"newRelic",
+	"elasticapm",
+	"newrelic",
 	"lightstep",
 	"datadog",
 	"awsxray",
