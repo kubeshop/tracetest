@@ -127,19 +127,19 @@ func (m Model) DataStore(in openapi.DataStore) datastoreresource.DataStore {
 	// OpenSearch
 	if dataStore.Type == datastoreresource.DataStoreTypeOpenSearch {
 		dataStore.Values.OpenSearch = &datastoreresource.ElasticSearchConfig{}
-		deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.OpenSearch)
+		deepcopy.DeepCopy(in.Opensearch, &dataStore.Values.OpenSearch)
 	}
 
 	// ElasticAPM
 	if dataStore.Type == datastoreresource.DataStoreTypeElasticAPM {
 		dataStore.Values.OpenSearch = &datastoreresource.ElasticSearchConfig{}
-		deepcopy.DeepCopy(in.OpenSearch, &dataStore.Values.ElasticApm)
+		deepcopy.DeepCopy(in.Opensearch, &dataStore.Values.ElasticApm)
 	}
 
 	// SignalFX
 	if dataStore.Type == datastoreresource.DataStoreTypeSignalFX {
 		dataStore.Values.SignalFx = &datastoreresource.SignalFXConfig{}
-		deepcopy.DeepCopy(in.SignalFx, &dataStore.Values.SignalFx)
+		deepcopy.DeepCopy(in.Signalfx, &dataStore.Values.SignalFx)
 	}
 
 	return dataStore
