@@ -16,7 +16,7 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 200
-        - attr:tracetest.response.body | json_path '$[*].id' contains env:ENVIRONMENT_ID # check if the environment is listed
+        - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains env:ENVIRONMENT_ID # check if the environment is listed
     - selector: span[name="GET /api/environments" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1

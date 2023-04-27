@@ -128,29 +128,33 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	enabledOps := m.EnabledOperations()
 
 	if slices.Contains(enabledOps, OperationList) {
-		subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list")
+		m.registerEndpoint(subrouter, "", m.list).Methods(http.MethodGet).Name("list")
 	}
 
 	if slices.Contains(enabledOps, OperationCreate) {
-		subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural))
+		m.registerEndpoint(subrouter, "", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural))
 	}
 
 	if slices.Contains(enabledOps, OperationUpdate) {
-		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural))
+		m.registerEndpoint(subrouter, "/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural))
 	}
 
 	if slices.Contains(enabledOps, OperationGet) {
-		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural))
+		m.registerEndpoint(subrouter, "/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural))
 	}
 
 	if slices.Contains(enabledOps, OperationDelete) {
-		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural))
+		m.registerEndpoint(subrouter, "/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural))
 	}
 
 	return subrouter
 }
 
-func (m *manager[T]) tracingMiddleware(next http.Handler) http.Handler {
+func (m *manager[T]) registerEndpoint(subrouter *mux.Router, path string, handler http.HandlerFunc) *mux.Route {
+	return subrouter.HandleFunc(path, m.tracingMiddleware(path, handler))
+}
+
+func (m *manager[T]) tracingMiddleware(path string, next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if m.config.tracer == nil {
 			next.ServeHTTP(w, r)
@@ -160,7 +164,7 @@ func (m *manager[T]) tracingMiddleware(next http.Handler) http.Handler {
 		method := r.Method
 
 		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
-		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, r.URL.Path))
+		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, r.URL.RawPath))
 		defer span.End()
 
 		params := make(map[string]interface{}, 0)
@@ -184,7 +188,7 @@ func (m *manager[T]) tracingMiddleware(next http.Handler) http.Handler {
 
 		span.SetAttributes(
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
-			attribute.String(string(semconv.HTTPRouteKey), r.URL.Path),
+			attribute.String(string(semconv.HTTPRouteKey), path),
 			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
 			attribute.String("http.request.params", string(paramsJson)),
 			attribute.String("http.request.query", string(queryStringJson)),
