@@ -1,6 +1,6 @@
----
 type: Test
 spec:
+  id: uzmv1MyVR
   name: Create Environment
   description: Test step of 'Environment Feature - Test Suite'
   trigger:
@@ -48,4 +48,4 @@ spec:
   outputs:
     - name: ENVIRONMENT_ID
       selector: span[name = "Tracetest trigger"]
-      value: attr:tracetest.response.body | json_path '$.id'
+      value: attr:tracetest.response.body | json_path '$.spec.id'
