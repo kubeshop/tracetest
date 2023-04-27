@@ -14,11 +14,11 @@ export enum SupportedDataStores {
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
   OtelCollector = 'otlp',
-  NewRelic = 'newRelic',
+  NewRelic = 'newrelic',
   Lightstep = 'lightstep',
-  OpenSearch = 'openSearch',
-  ElasticApm = 'elasticApm',
-  SignalFX = 'signalFx',
+  OpenSearch = 'opensearch',
+  ElasticApm = 'elasticapm',
+  SignalFX = 'signalfx',
   Datadog = 'datadog',
   AWSXRay = 'awsxray',
 }
@@ -79,11 +79,11 @@ export interface IElasticSearch extends TRawElasticSearch {
 type IDataStore = DataStore & {
   jaeger?: IBaseClientSettings;
   tempo?: IBaseClientSettings;
-  openSearch?: IElasticSearch;
-  elasticApm?: IElasticSearch;
+  opensearch?: IElasticSearch;
+  elasticapm?: IElasticSearch;
   otlp?: {};
   lightstep?: {};
-  newRelic?: {};
+  newrelic?: {};
   datadog?: {};
 };
 
