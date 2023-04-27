@@ -1,6 +1,7 @@
 # Configuration Overview
 
 There are several configuration options with Tracetest:
+
 - [Server configuration](./server) to set database connection information needed to connect to required PostgreSQL instance.
 - [Provisioning configuration](./provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
 
@@ -39,6 +40,7 @@ Tracetest has a configuration file to contain the minimal information needed to 
 You can also provision the server when it first starts, configuring most aspects of your Tracetest server environment. This is useful in a CI/CD environment to preload and configure the server. See more at [Provisioning a Tracetest Server](./provisioning).
 
 Many of the server configuration settings can be set individually in the UI or via the CLI. See:
+
 - [Trace Polling](./trace-polling)
 - [Demo Applications](./demo)
 - [Analytics](./analytics)
