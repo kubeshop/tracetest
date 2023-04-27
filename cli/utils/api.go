@@ -104,7 +104,7 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 		return nil, fmt.Errorf("%s id doesn't exist on server. Remove it from the definition file and try again", resourceClient.ResourceType)
 	}
 
-	if resp.StatusCode == http.StatusUnprocessableEntity {
+	if resp.StatusCode == http.StatusUnprocessableEntity || resp.StatusCode == http.StatusBadRequest {
 		// validation error
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {

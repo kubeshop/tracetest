@@ -69,6 +69,8 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		zap.String("junit", args.JUnit),
 	)
 
+	envID := args.EnvID
+
 	if utils.StringReferencesFile(args.EnvID) {
 		envResource, err := a.environmentActions.FromFile(ctx, args.EnvID)
 		if err != nil {
@@ -79,11 +81,13 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		if err != nil {
 			return fmt.Errorf("could not run definition: %w", err)
 		}
+
+		envID = *envResource.Spec.Id
 	}
 
 	params := runDefParams{
 		DefinitionFile: args.DefinitionFile,
-		EnvID:          args.EnvID,
+		EnvID:          envID,
 		WaitForResult:  args.WaitForResult,
 		JunitFile:      args.JUnit,
 		Metadata:       a.getMetadata(),

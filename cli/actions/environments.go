@@ -3,9 +3,8 @@ package actions
 import (
 	"context"
 	"fmt"
-	"path/filepath"
+	"io/ioutil"
 
-	"github.com/joho/godotenv"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
@@ -36,7 +35,10 @@ func (environmentsActions) Name() string {
 }
 
 func (environment environmentsActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
-	var envResource openapi.EnvironmentResource
+	envResource := openapi.EnvironmentResource{
+		Spec: &openapi.Environment{},
+	}
+
 	mapstructure.Decode(fileContent.Definition().Spec, &envResource.Spec)
 
 	if envResource.Spec.Id == nil || *envResource.Spec.Id == "" {
@@ -77,32 +79,36 @@ func (environment environmentsActions) FromFile(ctx context.Context, filePath st
 		return openapi.EnvironmentResource{}, fmt.Errorf(`env file "%s" does not exist`, filePath)
 	}
 
-	envVars, err := godotenv.Read(filePath)
+	fileContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return openapi.EnvironmentResource{}, fmt.Errorf(`cannot read env file "%s": %w`, filePath, err)
 	}
 
-	values := make([]openapi.EnvironmentValue, 0, len(envVars))
-	for k, v := range envVars {
+	model, err := yaml.Decode(fileContent)
+	if err != nil {
+		return openapi.EnvironmentResource{}, fmt.Errorf(`cannot parse env file "%s": %w`, filePath, err)
+	}
+
+	envModel := model.Spec.(yaml.Environment)
+
+	values := make([]openapi.EnvironmentValue, 0, len(envModel.Values))
+	for _, value := range envModel.Values {
+		v := value
 		values = append(values, openapi.EnvironmentValue{
-			Key:   openapi.PtrString(k),
-			Value: openapi.PtrString(v),
+			Key:   &v.Key,
+			Value: &v.Value,
 		})
 	}
 
-	name := filepath.Base(filePath)
-
-	env := openapi.Environment{
-		Id:     &name,
-		Name:   &name,
-		Values: values,
-	}
-	envType := "Environment"
-
-	resource := openapi.EnvironmentResource{
-		Type: &envType,
-		Spec: &env,
+	environmentResource := openapi.EnvironmentResource{
+		Type: (*string)(&model.Type),
+		Spec: &openapi.Environment{
+			Id:          &envModel.ID,
+			Name:        &envModel.Name,
+			Description: &envModel.Description,
+			Values:      values,
+		},
 	}
 
-	return resource, nil
+	return environmentResource, nil
 }
