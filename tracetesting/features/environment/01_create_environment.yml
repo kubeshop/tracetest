@@ -31,16 +31,10 @@ spec:
   specs:
     - selector: span[name = "Tracetest trigger"]
       assertions:
-<<<<<<< HEAD
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 201
         # ensure we can reference outputs declared in the same test
         - attr:tracetest.response.body | json_path '$.spec.id' = env:ENVIRONMENT_ID
-=======
-        - attr:tracetest.selected_spans.count  =  1
-        - attr:tracetest.response.status  =  201
-        - attr:tracetest.response.body | json_path '$.spec.id'  =  env:ENVIRONMENT_ID
->>>>>>> 0421b7a6 (fixing environments tracetest testing with tracetest)
     - selector: span[name="POST /api/environments" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count  =  1
