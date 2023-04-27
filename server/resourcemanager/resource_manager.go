@@ -127,36 +127,34 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	enabledOps := m.EnabledOperations()
 
 	if slices.Contains(enabledOps, OperationList) {
-		m.registerEndpoint(subrouter, "", m.list).Methods(http.MethodGet).Name("list")
+		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list"))
 	}
 
 	if slices.Contains(enabledOps, OperationCreate) {
-		m.registerEndpoint(subrouter, "", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationUpdate) {
-		m.registerEndpoint(subrouter, "/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationGet) {
-		m.registerEndpoint(subrouter, "/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationDelete) {
-		m.registerEndpoint(subrouter, "/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
 	}
 
 	return subrouter
 }
 
-func (m *manager[T]) registerEndpoint(subrouter *mux.Router, path string, handler http.HandlerFunc) *mux.Route {
-	return subrouter.HandleFunc(path, m.tracingMiddleware(path, handler))
-}
+func (m *manager[T]) instrumentRoute(route *mux.Route) {
+	originalHandler := route.GetHandler()
 
-func (m *manager[T]) tracingMiddleware(path string, next http.Handler) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	newHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if m.config.tracer == nil {
-			next.ServeHTTP(w, r)
+			originalHandler.ServeHTTP(w, r)
 			return
 		}
 
@@ -185,17 +183,21 @@ func (m *manager[T]) tracingMiddleware(path string, next http.Handler) http.Hand
 		}
 		headersJson, _ := json.Marshal(headers)
 
+		pathTemplate, _ := route.GetPathTemplate()
+
 		span.SetAttributes(
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
-			attribute.String(string(semconv.HTTPRouteKey), path),
+			attribute.String(string(semconv.HTTPRouteKey), pathTemplate),
 			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
 			attribute.String("http.request.params", string(paramsJson)),
 			attribute.String("http.request.query", string(queryStringJson)),
 			attribute.String("http.request.headers", string(headersJson)),
 		)
 
-		next.ServeHTTP(w, r.WithContext(ctx))
+		originalHandler.ServeHTTP(w, r.WithContext(ctx))
 	})
+
+	route.Handler(newHandler)
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
