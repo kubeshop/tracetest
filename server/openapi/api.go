@@ -128,7 +128,7 @@ type ApiApiServicer interface {
 // and updated with the logic required for the API.
 type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
-	CreateEnvironment(context.Context, Environment) (ImplResponse, error)
+	CreateEnvironment(context.Context, EnvironmentResource) (ImplResponse, error)
 	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)
 	DeleteEnvironment(context.Context, string) (ImplResponse, error)
@@ -142,6 +142,6 @@ type ResourceApiApiServicer interface {
 	UpdateConfiguration(context.Context, string, ConfigurationResource) (ImplResponse, error)
 	UpdateDataStore(context.Context, string, DataStore) (ImplResponse, error)
 	UpdateDemo(context.Context, string, Demo) (ImplResponse, error)
-	UpdateEnvironment(context.Context, string, Environment) (ImplResponse, error)
+	UpdateEnvironment(context.Context, string, EnvironmentResource) (ImplResponse, error)
 	UpdatePollingProfile(context.Context, string, PollingProfile) (ImplResponse, error)
 }

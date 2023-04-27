@@ -41,12 +41,12 @@ func (s *ResourceApiApiService) CreateDemo(ctx context.Context, demo Demo) (Impl
 }
 
 // CreateEnvironment - Create an environment
-func (s *ResourceApiApiService) CreateEnvironment(ctx context.Context, environment Environment) (ImplResponse, error) {
+func (s *ResourceApiApiService) CreateEnvironment(ctx context.Context, environmentResource EnvironmentResource) (ImplResponse, error) {
 	// TODO - update CreateEnvironment with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(201, Environment{}) or use other options such as http.Ok ...
-	//return Response(201, Environment{}), nil
+	//TODO: Uncomment the next line to return response Response(201, EnvironmentResource{}) or use other options such as http.Ok ...
+	//return Response(201, EnvironmentResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
 	//return Response(500, nil),nil
@@ -158,8 +158,8 @@ func (s *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentI
 	// TODO - update GetEnvironment with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, Environment{}) or use other options such as http.Ok ...
-	//return Response(200, Environment{}), nil
+	//TODO: Uncomment the next line to return response Response(200, EnvironmentResource{}) or use other options such as http.Ok ...
+	//return Response(200, EnvironmentResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	//return Response(404, nil),nil
@@ -273,12 +273,12 @@ func (s *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string, d
 }
 
 // UpdateEnvironment - Update an environment
-func (s *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environmentId string, environment Environment) (ImplResponse, error) {
+func (s *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environmentId string, environmentResource EnvironmentResource) (ImplResponse, error) {
 	// TODO - update UpdateEnvironment with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, Environment{}) or use other options such as http.Ok ...
-	//return Response(200, Environment{}), nil
+	//TODO: Uncomment the next line to return response Response(200, EnvironmentResource{}) or use other options such as http.Ok ...
+	//return Response(200, EnvironmentResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil

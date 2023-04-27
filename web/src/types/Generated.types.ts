@@ -174,20 +174,6 @@ export interface paths {
     /** Delete an environment from Tracetest */
     delete: operations["deleteEnvironment"];
   };
-  "/environments": {
-    /** List environments available in Tracetest. */
-    get: operations["listEnvironments"];
-    /** Create an environment that can be used by tests and transactions */
-    post: operations["createEnvironment"];
-  };
-  "/environments/{environmentId}": {
-    /** Get one environment by its id */
-    get: operations["getEnvironment"];
-    /** Update an environment used on Tracetest */
-    put: operations["updateEnvironment"];
-    /** Delete an environment from Tracetest */
-    delete: operations["deleteEnvironment"];
-  };
 }
 
 export interface components {}
@@ -924,8 +910,15 @@ export interface operations {
   deleteDataStore: {
     parameters: {};
     responses: {
+<<<<<<< HEAD
       /** OK */
       204: never;
+=======
+      /** successful operation */
+      204: never;
+      /** problem with data store deletion */
+      500: unknown;
+>>>>>>> 2c8f4d69 (fix rebase)
     };
   };
   /** List environments available in Tracetest. */
@@ -937,11 +930,19 @@ export interface operations {
         content: {
           "application/json": {
             count?: number;
+<<<<<<< HEAD
             items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
           };
           "text/yaml": {
             count?: number;
             items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
+=======
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          };
+          "text/yaml": {
+            count?: number;
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+>>>>>>> 2c8f4d69 (fix rebase)
           };
         };
       };
@@ -957,8 +958,13 @@ export interface operations {
       /** successful operation */
       201: {
         content: {
+<<<<<<< HEAD
           "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
           "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+=======
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+>>>>>>> 2c8f4d69 (fix rebase)
         };
       };
       /** problem creating an environment */
@@ -966,8 +972,13 @@ export interface operations {
     };
     requestBody: {
       content: {
+<<<<<<< HEAD
         "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
         "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+=======
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+>>>>>>> 2c8f4d69 (fix rebase)
       };
     };
   };
@@ -978,8 +989,13 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
+<<<<<<< HEAD
           "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
           "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+=======
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+>>>>>>> 2c8f4d69 (fix rebase)
         };
       };
       /** environment not found */
@@ -995,8 +1011,13 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
+<<<<<<< HEAD
           "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
           "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+=======
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+>>>>>>> 2c8f4d69 (fix rebase)
         };
       };
       /** invalid environment, some data was sent in incorrect format. */
@@ -1008,8 +1029,13 @@ export interface operations {
     };
     requestBody: {
       content: {
+<<<<<<< HEAD
         "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
         "text/yaml": external["environments.yaml"]["components"]["schemas"]["Environment"];
+=======
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+>>>>>>> 2c8f4d69 (fix rebase)
       };
     };
   };
