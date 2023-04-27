@@ -1,4 +1,4 @@
-# Configuration Overview
+# Configuration
 
 There are several configuration options with Tracetest:
 

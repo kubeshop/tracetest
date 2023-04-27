@@ -1,4 +1,4 @@
-# Overview
+# Tools and Integrations
 
 Tracetest can be integrated and used with another tools. See below which integrations we are working on:
 
