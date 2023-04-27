@@ -12,7 +12,7 @@ For Testkube, tests are meant to be part of a cluster's state and can be execute
 
 By using the [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) you can unlock Testkube's capacity in conjunction with Tracetest, and leverage the work you have already done to instrument your services.
 
-## How it works?
+## How does it work?
 
 The following is high level sequence diagram on how Testkube and Tracetest interact with the different pieces of the system:
 
@@ -37,7 +37,7 @@ sequenceDiagram
 
 ## Quickstart
 
-Here we will show how to use Testkube alongside Tracetest to run your tests in a Kubernetes cluster.
+This guide will show how to use Testkube alongside Tracetest to run your tests in a Kubernetes cluster.
 
 ### Prerequisites
 
@@ -49,20 +49,20 @@ In your Kubernetes cluster you should have:
 
 On your machine you should have:
 
-1. `Kubectl` [installed](https://kubernetes.io/docs/tasks/tools/)
-2. `Testkube CLI` [installed](https://kubeshop.github.io/testkube/installing#1-installing-the-testkube-cli)
+1. `Kubectl` [installed](https://kubernetes.io/docs/tasks/tools/).
+2. `Testkube CLI` [installed](https://kubeshop.github.io/testkube/installing#1-installing-the-testkube-cli).
 
 With everything set up, we will start configuring Testkube and Tracetest.
 
 ### 1. Deploy the Tracetest Executor
 
-Testkube works with the concept of [Executors](https://kubeshop.github.io/testkube/test-types/executor-custom). An Executor is a wrapper around a testing framework (Tracetest in this case) in the form of a Docker container and runs as a Kubernetes job. To start you need to register and deploy the Tracetest executor in your cluster using the Testkube CLI:
+Testkube works with the concept of [Executors](https://kubeshop.github.io/testkube/test-types/executor-custom). An Executor is a wrapper around a testing framework (Tracetest in this case) in the form of a Docker container and runs as a Kubernetes job. To start, you need to register and deploy the Tracetest executor in your cluster using the Testkube CLI:
 
 ```bash
 kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:latest --types "tracetest/test" --name tracetest-executor --icon-uri icon --content-type string --content-type file-uri
 ```
 
-### 2. Create your test
+### 2. Create a Test
 
 Now you need a Tracetest test. Have a look at the [Tracetest documentation](https://docs.tracetest.io/cli/creating-tests) for details on writing tests. Here is a simple test definition example:
 
@@ -97,9 +97,9 @@ kubectl testkube create test --file my/file/location.yaml --type "tracetest/test
 
 Note: In case you are doing a port forward to your Tracetest instance and you want to have the correct Tracetest URL in your results printed by the Testkube output, you can also provide an optional `TRACETEST_OUTPUT_ENDPOINT` variable (e.g. `--variable TRACETEST_OUTPUT_ENDPOINT=http://localhost:11633`).
 
-### 3. Run your test
+### 3. Run the Test
 
-Finally, to see the integration working, you only need to run the test by executing the following command:
+Finally, to see the integration working, run the test by executing the following command:
 
 ```bash
 kubectl testkube run test --watch pokeshop-tracetest-test

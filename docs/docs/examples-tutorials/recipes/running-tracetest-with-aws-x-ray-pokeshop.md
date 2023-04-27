@@ -32,7 +32,7 @@ The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest.confi
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `adot-collector:2000` in the `src/index.js` will map to the `adot-collector` service, where the port `2000` is the port where the X-Ray Daemon accepts telemetry data
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `adot-collector:2000` in the `src/index.js` will map to the `adot-collector` service, where the port `2000` is the port where the X-Ray Daemon accepts telemetry data.
 
 ## Pokeshop API
 
@@ -208,7 +208,7 @@ services:
 The `docker-compose.yaml` includes three other services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**AWS Distro for OpenTelemetry (ADOT**)](https://aws-otel.github.io/docs/getting-started/collector) - is a software application that listens for traffic on UDP port 2000, gathers raw segment data, and relays it to the AWS X-Ray API. The daemon works in conjunction with the AWS X-Ray SDKs and must be running so that data sent by the SDKs can reach the X-Ray service.
+- [**AWS Distro for OpenTelemetry (ADOT**)](https://aws-otel.github.io/docs/getting-started/collector) - Software application that listens for traffic on UDP port 2000, gathers raw segment data and relays it to the AWS X-Ray API. The daemon works in conjunction with the AWS X-Ray SDKs and must be running so that data sent by the SDKs can reach the X-Ray service.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
 
 ```yaml
@@ -284,7 +284,7 @@ postgres:
   params: sslmode=disable
 ```
 
-The `tracetest.provision.yaml` file definines the trace data store, set to AWS X-Ray, meaning the traces will be stored in X-Ray and Tracetest will fetch them from X-Ray when running tests.
+The `tracetest.provision.yaml` file defines the trace data store, set to AWS X-Ray, meaning the traces will be stored in X-Ray and Tracetest will fetch them from X-Ray when running tests.
 
 But how does Tracetest fetch traces?
 
