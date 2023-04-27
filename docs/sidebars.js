@@ -328,6 +328,9 @@ const sidebars = {
     {
       type: "category",
       label: "CI/CD automation",
+      link: {
+        type: 'doc', id: 'ci-cd-automation/overview'
+      },
       items: [
         {
           type: "doc",
