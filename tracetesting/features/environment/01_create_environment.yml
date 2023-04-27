@@ -14,7 +14,7 @@ spec:
       body: |
         {
           "type": "Environment",
-          "spec"": {
+          "spec": {
             "name": "test-environment",
             "description": "test-environment",
             "values": [
