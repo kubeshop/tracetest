@@ -1,0 +1,35 @@
+name: Docker Compose Start and Test on push and PR to main
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  start-and-test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Start containers
+      run: docker compose -f "docker-compose.yaml" -f "tracetest/docker-compose.yaml" up -d --build
+
+    - name: Install Tracetest CLI
+      shell: bash
+      run: curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+
+    - name: Configure Tracetest CLI
+      run: tracetest configure -g --endpoint http://localhost:11633
+
+    - name: Run tests via the Tracetest CLI
+      run: |
+        tracetest test run -d ./tracetest/tests/test-api.yaml -w
+        tracetest test run -d ./tracetest/tests/test-api-and-av.yaml -w
+        tracetest test run -d ./tracetest/tests/transaction-api.yaml -w
+
+    - name: Stop containers
+      if: always()
+      run: docker compose -f "docker-compose.yaml" -f "tracetest/docker-compose.yaml" down -v
