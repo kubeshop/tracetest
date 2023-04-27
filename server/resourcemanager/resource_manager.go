@@ -158,10 +158,9 @@ func (m *manager[T]) tracingMiddleware(next http.Handler) http.Handler {
 		}
 
 		method := r.Method
-		resourceName := m.resourceTypePlural
 
 		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
-		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, resourceName))
+		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, r.URL.Path))
 		defer span.End()
 
 		params := make(map[string]interface{}, 0)
