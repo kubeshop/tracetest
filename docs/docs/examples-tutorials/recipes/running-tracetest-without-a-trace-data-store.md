@@ -198,7 +198,7 @@ The `tracetest-provision.yaml` file provisions the trace data store and polling 
 
 But how are traces sent to Tracetest?
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OLTP endpoint `tracetest:21321`.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OLTP endpoint `tracetest:4317`.
 
 ```yaml
 receivers:
