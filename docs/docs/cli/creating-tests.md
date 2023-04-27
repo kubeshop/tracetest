@@ -1,6 +1,6 @@
 # Defining Tests as Text Files
 
-One important aspect of testing your code is the ability to quickly implement changes while not breaking your application. If you change your application, it is important that you are able to update your tests and run them against your new implementation as soon as possible for a timely development feedback loop.
+One important aspect of testing your code is the ability to quickly implement changes while not breaking your application. If you change your application, it is important to be able to update your tests and run them against your new implementation as soon as possible for a timely development feedback loop.
 
 As Tracetest is mainly a visual tool, this might make it difficult to update tests in an auditable way and execute those changes only when we are sure the application has been deployed with the new changes. With that in mind, we built a new way for you to define your tests: using a YAML test definition!
 
@@ -15,7 +15,7 @@ To solve that, the best approach would be to enable developers to define their t
 
 ## Definition
 
-The definition can be broken into three parts: `test information`, `triggering transaction`, `assertions`, and `outputs`. Here is a real test we have on Tracetest to test our Pokemon demo api:
+The definition can be broken into three parts: `test information` including `triggering transaction`, `assertions`, and `outputs`. Here is a real test we have on Tracetest to test our Pokemon demo API:
 
 ```yaml
 type: Test
@@ -70,7 +70,7 @@ The attribute `type` defines which trigger method you are going to use to intera
 
 ### HTTP Trigger
 
-When defining a HTTP trigger, you are required to define a `httpRequest` object containing the request Tracetest will send to your system, so here you can define: `url`, `method`, `headers`, `authentication`, and `body`.
+When defining a HTTP trigger, you are required to define a `httpRequest` object containing the request Tracetest will send to your system, this is where you define: `url`, `method`, `headers`, `authentication`, and `body`.
 
 > Note: Some APIs require the `Content-Type` header to respond. If you are not able to trigger your application, check if you are sending this header and if its value is correct.
 
@@ -134,7 +134,7 @@ trigger:
 
 #### Body
 
-Currently, Testkube supports `raw` body types that enable you to send text formats over HTTP, for example: JSON.
+Currently, Testkube supports `raw` body types that enable you to send text formats over HTTP: JSON, for example.
 
 ```yaml
 trigger:
@@ -243,7 +243,7 @@ For more information about selectors or assertions, take a look at the documenta
 
 ## Outputs
 
-Outputs are really useful when running [Transactions](../concepts/transactions). They allow to export values from a test so they become available in the [Environment Variables](environment-variables.md) of the current transaction.
+Outputs are really useful when running [Transactions](../concepts/transactions). They allow for exporting values from a test so they become available in the [Environment Variables](../concepts/environments.md) of the current transaction.
 
 An ouptut exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
@@ -263,7 +263,7 @@ The `value` attribute is an `expression`, and is a very powerful tool.
 
 ### Basic expression
 
-You can output basic expressions
+You can output basic expressions:
 
 ```yaml
 outputs:
@@ -278,9 +278,9 @@ outputs:
   # results in INTERPOLATE_STRING = "the value someValue comes from the env var PRE_EXISTING_VALUE
 ```
 
-### Extract a value from a JSON
+### Extract a Value from a JSON
 
-Imagine an hypotetical `/users/create` endpoint that returns the full `user` object, including the new ID, when the operation is successful.
+Imagine a hypotetical `/users/create` endpoint that returns the full `user` object, including the new ID, when the operation is successful.
 
 ```yaml
 outputs:
@@ -298,7 +298,7 @@ Using the same hypotethical user creation endpoint, a user creation might result
 - `UPDATE accounts SET remaining_users ...`
 
 In this case, the service is instrumented so that each query generates a span of type `database`.
-You can get a list of sql operations:
+You can get a list of SQL operations:
 
 ```yaml
 outputs:

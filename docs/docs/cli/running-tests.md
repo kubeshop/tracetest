@@ -1,5 +1,5 @@
 # Running Tests From the Command Line Interface (CLI)
-Once you have created a test, whether from the Tracetest UI of via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow. The documentation for running a test via the CLI can be found here: [tracetest test run](./reference/tracetest_test_run.md). This page will provide some examples of using this command.
+Once you have created a test, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow. The documentation for running a test via the CLI can be found here: [tracetest test run](./reference/tracetest_test_run.md). This page will provide some examples of using this command.
 
 ## Running Your First Test
 To run a test, give the path to the test definition file with the '-d' option. This will launch a test, providing us with a link to the created test run.
@@ -7,7 +7,7 @@ To run a test, give the path to the test definition file with the '-d' option. T
 ```
 tracetest test run -d path/to/test.yaml -w
 ```
-output:
+Output:
 ```
 ✔ Pokeshop - Import (http://localhost:11633/test/4oI08rA4g/run/3/test)
 ```
@@ -16,7 +16,7 @@ Now, let's run the same test but tell the CLI to wait for the test to complete r
 ```
 tracetest test run -d path/to/test.yaml -w
 ```
-output:
+Output:
 ```
 ✘ Pokeshop - Import (http://localhost:11633/test/4oI08rA4g/run/12/test)
 	✔ Response should be ok
@@ -38,7 +38,7 @@ Running the same command with the '-o json' option would change the output from 
 ```
 tracetest test run -d path/to/test.yaml -w - o json
 ```
-output:
+Output:
 ```
 {
   "testRunWebUrl": "http://localhost:11633/test/4oI08rA4g/run/13/test",
@@ -203,8 +203,9 @@ You can also reference an .env file which will be used to create a new environme
 POKEID=45
 POKENAME=vileplume
 ```
-
+```
 tracetest test run -d path/to/test.yaml -e path/to/local.env -w
+```
 
 If you use the .env approach, a new environment will be created in Tracetest. If it does not exist, the environment name and id will be the file name without the suffix .env. So, local.env becomes local.
 
