@@ -321,7 +321,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "CI/CD automation",
+      label: "CI/CD Automation",
       link: {
         type: 'doc', id: 'ci-cd-automation/overview'
       },
@@ -329,7 +329,7 @@ const sidebars = {
         {
           type: "doc",
           id: "ci-cd-automation/github-actions-pipeline",
-          label: "GitHub actions pipeline",
+          label: "GitHub Actions Pipeline",
         },
       ],
     },
@@ -453,7 +453,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Live examples",
+      label: "Live Examples",
       items: [
         {
           type: "category",
