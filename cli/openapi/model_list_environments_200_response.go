@@ -19,8 +19,8 @@ var _ MappedNullable = &ListEnvironments200Response{}
 
 // ListEnvironments200Response struct for ListEnvironments200Response
 type ListEnvironments200Response struct {
-	Count *int32        `json:"count,omitempty"`
-	Items []Environment `json:"items,omitempty"`
+	Count *int32                `json:"count,omitempty"`
+	Items []EnvironmentResource `json:"items,omitempty"`
 }
 
 // NewListEnvironments200Response instantiates a new ListEnvironments200Response object
@@ -73,9 +73,9 @@ func (o *ListEnvironments200Response) SetCount(v int32) {
 }
 
 // GetItems returns the Items field value if set, zero value otherwise.
-func (o *ListEnvironments200Response) GetItems() []Environment {
+func (o *ListEnvironments200Response) GetItems() []EnvironmentResource {
 	if o == nil || isNil(o.Items) {
-		var ret []Environment
+		var ret []EnvironmentResource
 		return ret
 	}
 	return o.Items
@@ -83,7 +83,7 @@ func (o *ListEnvironments200Response) GetItems() []Environment {
 
 // GetItemsOk returns a tuple with the Items field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ListEnvironments200Response) GetItemsOk() ([]Environment, bool) {
+func (o *ListEnvironments200Response) GetItemsOk() ([]EnvironmentResource, bool) {
 	if o == nil || isNil(o.Items) {
 		return nil, false
 	}
@@ -99,8 +99,8 @@ func (o *ListEnvironments200Response) HasItems() bool {
 	return false
 }
 
-// SetItems gets a reference to the given []Environment and assigns it to the Items field.
-func (o *ListEnvironments200Response) SetItems(v []Environment) {
+// SetItems gets a reference to the given []EnvironmentResource and assigns it to the Items field.
+func (o *ListEnvironments200Response) SetItems(v []EnvironmentResource) {
 	o.Items = v
 }
 
