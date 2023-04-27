@@ -916,6 +916,105 @@ export interface operations {
       500: unknown;
     };
   };
+  /** List environments available in Tracetest. */
+  listEnvironments: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": {
+            count?: number;
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          };
+          "text/yaml": {
+            count?: number;
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          };
+        };
+      };
+      /** invalid query for environments, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing environments */
+      500: unknown;
+    };
+  };
+  /** Create an environment that can be used by tests and transactions */
+  createEnvironment: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** problem creating an environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+      };
+    };
+  };
+  /** Get one environment by its id */
+  getEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** environment not found */
+      404: unknown;
+      /** problem getting the environment */
+      500: unknown;
+    };
+  };
+  /** Update an environment used on Tracetest */
+  updateEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** invalid environment, some data was sent in incorrect format. */
+      400: unknown;
+      /** environment not found */
+      404: unknown;
+      /** problem updating the environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+      };
+    };
+  };
+  /** Delete an environment from Tracetest */
+  deleteEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid environment, some data was sent in incorrect format. */
+      400: unknown;
+      /** environment not found */
+      404: unknown;
+      /** problem deleting an environment */
+      500: unknown;
+    };
+  };
 }
 
 export interface external {
