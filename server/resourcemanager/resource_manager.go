@@ -123,7 +123,6 @@ func (m *manager[T]) Handler() any {
 func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	// prefix is /{resourceType | lowercase}/
 	subrouter := r.PathPrefix("/" + strings.ToLower(m.resourceTypePlural)).Subrouter()
-	subrouter.Use(m.tracingMiddleware)
 
 	enabledOps := m.EnabledOperations()
 
