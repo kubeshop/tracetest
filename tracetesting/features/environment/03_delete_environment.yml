@@ -16,7 +16,7 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 204
-    - selector: span[name="DELETE /api/environments/{environmentId}" tracetest.span.type="http"]
+    - selector: span[tracetest.span.type="http" http.method = "DELETE"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
     - selector: span[name = "exec DELETE"]

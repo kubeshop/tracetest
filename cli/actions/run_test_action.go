@@ -13,7 +13,6 @@ import (
 	"time"
 
 	cienvironment "github.com/cucumber/ci-environment/go"
-	"github.com/joho/godotenv"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -32,9 +31,10 @@ type RunTestConfig struct {
 }
 
 type runTestAction struct {
-	config config.Config
-	logger *zap.Logger
-	client *openapi.APIClient
+	config             config.Config
+	logger             *zap.Logger
+	client             *openapi.APIClient
+	environmentActions environmentsActions
 }
 
 var _ Action[RunTestConfig] = &runTestAction{}
@@ -48,8 +48,8 @@ type runDefParams struct {
 	EnvironmentVariables map[string]string
 }
 
-func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) runTestAction {
-	return runTestAction{config, logger, client}
+func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, environmentActions environmentsActions) runTestAction {
+	return runTestAction{config, logger, client, environmentActions}
 }
 
 func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
@@ -69,9 +69,20 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		zap.String("junit", args.JUnit),
 	)
 
-	envID, err := a.processEnv(ctx, args.EnvID)
-	if err != nil {
-		return fmt.Errorf("could not run definition: %w", err)
+	envID := args.EnvID
+
+	if utils.StringReferencesFile(args.EnvID) {
+		envResource, err := a.environmentActions.FromFile(ctx, args.EnvID)
+		if err != nil {
+			return fmt.Errorf("could not run definition: %w", err)
+		}
+
+		_, err = a.environmentActions.ApplyResource(ctx, envResource)
+		if err != nil {
+			return fmt.Errorf("could not run definition: %w", err)
+		}
+
+		envID = *envResource.Spec.Id
 	}
 
 	params := runDefParams{
@@ -82,91 +93,12 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 		Metadata:       a.getMetadata(),
 	}
 
-	err = a.runDefinition(ctx, params)
+	err := a.runDefinition(ctx, params)
 	if err != nil {
 		return fmt.Errorf("could not run definition: %w", err)
 	}
 
 	return nil
-}
-
-func stringReferencesFile(path string) bool {
-	// for the current working dir, check if the file exists
-	// by finding its absolute path and executing a stat command
-
-	absolutePath, err := filepath.Abs(path)
-	if err != nil {
-		return false
-	}
-
-	info, err := os.Stat(absolutePath)
-	if err != nil {
-		return false
-	}
-
-	// if the string is empty the absolute path will the entire dir
-	// otherwise the user also could send a directory by mistake
-	return info != nil && !info.IsDir()
-}
-
-func (a runTestAction) processEnv(ctx context.Context, envID string) (string, error) {
-	if !stringReferencesFile(envID) { //not a file, do nothing
-		return envID, nil
-	}
-
-	envVars, err := godotenv.Read(envID)
-	if err != nil {
-		return "", fmt.Errorf(`cannot read env file "%s": %w`, envID, err)
-	}
-
-	values := make([]openapi.EnvironmentValue, 0, len(envVars))
-	for k, v := range envVars {
-		values = append(values, openapi.EnvironmentValue{
-			Key:   openapi.PtrString(k),
-			Value: openapi.PtrString(v),
-		})
-	}
-
-	name := filepath.Base(envID)
-
-	req := openapi.EnvironmentResource{
-		Type: openapi.PtrString("environment"),
-		Spec: &openapi.Environment{
-			Id:     &name,
-			Name:   &name,
-			Values: values,
-		},
-	}
-
-	body, resp, err := a.client.ResourceApiApi.
-		CreateEnvironment(ctx).
-		EnvironmentResource(req).
-		Execute()
-	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusBadRequest {
-			return a.updateEnv(ctx, req)
-		}
-
-		return "", fmt.Errorf("could not create environment: %w", err)
-	}
-
-	return body.Spec.GetId(), nil
-}
-
-func (a runTestAction) updateEnv(ctx context.Context, req openapi.EnvironmentResource) (string, error) {
-	_, resp, err := a.client.ResourceApiApi.
-		UpdateEnvironment(ctx, req.Spec.GetId()).
-		EnvironmentResource(req).
-		Execute()
-	if err != nil {
-		return "", fmt.Errorf("could not update environment: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return "", fmt.Errorf("error updating environment")
-	}
-
-	return req.Spec.GetId(), nil
 }
 
 func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath string) (string, error) {
@@ -216,7 +148,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 			// to check it properly we need to convert it to an absolute path
 			stepPath := filepath.Join(f.AbsDir(), step)
 
-			if !stringReferencesFile(stepPath) {
+			if !utils.StringReferencesFile(stepPath) {
 				// not referencing a file, keep the value
 				continue
 			}

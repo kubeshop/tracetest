@@ -165,8 +165,8 @@ func (f File) WriteRaw() (File, error) {
 	return ReadRaw(f.path)
 }
 
-func (f File) SaveChanges(changes string) (File, error) {
+func (f File) SaveChanges(changes string) File {
 	f.contents = []byte(changes)
 
-	return f.WriteRaw()
+	return f
 }

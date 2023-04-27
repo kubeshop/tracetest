@@ -62,9 +62,6 @@ func (s *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId
 	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
 	//return Response(204, nil),nil
 
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteDataStore method not implemented")
 }
 

@@ -1010,10 +1010,8 @@ paths:
       description: "Delete a Data Store"
       operationId: deleteDataStore
       responses:
-        204:
-          description: successful operation
-        500:
-          description: "problem with data store deletion"
+        "204":
+          description: OK
 
   # Environments
   /environments:
@@ -1082,6 +1080,7 @@ paths:
                 $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
         500:
           description: "problem creating an environment"
+
   /environments/{environmentId}:
     get:
       tags:

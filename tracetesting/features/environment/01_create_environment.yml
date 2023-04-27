@@ -1,4 +1,3 @@
----
 type: Test
 spec:
   name: Create Environment
@@ -13,6 +12,8 @@ spec:
           value: application/json
       body: |
         {
+          "type": "Environment",
+          "spec": {
             "name": "test-environment",
             "description": "test-environment",
             "values": [
@@ -25,6 +26,7 @@ spec:
                     "value": "3000"
                 }
             ]
+          }
         }
   specs:
     - selector: span[name = "Tracetest trigger"]
@@ -35,7 +37,7 @@ spec:
         - attr:tracetest.response.body | json_path '$.spec.id' = env:ENVIRONMENT_ID
     - selector: span[name="POST /api/environments" tracetest.span.type="http"]
       assertions:
-        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.selected_spans.count  =  1
     - selector: span[name = "exec INSERT"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
@@ -43,6 +45,6 @@ spec:
       assertions:
         - attr:sql.query contains "INSERT INTO environments"
   outputs:
-  - name: ENVIRONMENT_ID
-    selector: span[name = "Tracetest trigger"]
-    value: attr:tracetest.response.body | json_path '$.id'
+    - name: ENVIRONMENT_ID
+      selector: span[name = "Tracetest trigger"]
+      value: attr:tracetest.response.body | json_path '$.spec.id'

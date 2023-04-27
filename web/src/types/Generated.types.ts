@@ -910,10 +910,8 @@ export interface operations {
   deleteDataStore: {
     parameters: {};
     responses: {
-      /** successful operation */
+      /** OK */
       204: never;
-      /** problem with data store deletion */
-      500: unknown;
     };
   };
   /** List environments available in Tracetest. */
