@@ -31,11 +31,11 @@ components:
           $ref: "#/components/schemas/GRPCClientSettings"
         tempo:
           $ref: "#/components/schemas/BaseClient"
-        openSearch:
+        opensearch:
           $ref: "#/components/schemas/ElasticSearch"
-        elasticApm:
+        elasticapm:
           $ref: "#/components/schemas/ElasticSearch"
-        signalFx:
+        signalfx:
           $ref: "#/components/schemas/SignalFX"
         awsxray:
           $ref: "#/components/schemas/AwsXRay"
@@ -158,7 +158,7 @@ components:
           type: string
     SupportedDataStores:
       type: string
-      enum: [jaeger, openSearch, tempo, signalFx, otlp, elasticApm, newRelic, lightstep, datadog, awsxray]
+      enum: [jaeger, opensearch, tempo, signalfx, otlp, elasticapm, newrelic, lightstep, datadog, awsxray]
     SupportedClients:
       type: string
       enum: [http, grpc]

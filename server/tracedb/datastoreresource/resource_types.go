@@ -24,10 +24,10 @@ type DataStore struct {
 
 type DataStoreValues struct {
 	AwsXRay    *AWSXRayConfig            `mapstructure:"awsxray,omitempty"`
-	ElasticApm *ElasticSearchConfig      `mapstructure:"elasticApm,omitempty"`
+	ElasticApm *ElasticSearchConfig      `mapstructure:"elasticapm,omitempty"`
 	Jaeger     *GRPCClientSettings       `mapstructure:"jaeger,omitempty"`
-	OpenSearch *ElasticSearchConfig      `mapstructure:"openSearch,omitempty"`
-	SignalFx   *SignalFXConfig           `mapstructure:"signalFx,omitempty"`
+	OpenSearch *ElasticSearchConfig      `mapstructure:"opensearch,omitempty"`
+	SignalFx   *SignalFXConfig           `mapstructure:"signalfx,omitempty"`
 	Tempo      *MultiChannelClientConfig `mapstructure:"tempo,omitempty"`
 }
 

@@ -49,12 +49,12 @@ func (m *OpenAPI) ConnectionTestStep(in model.ConnectionTestStep) openapi.Connec
 var dataStoreTypesMapping = map[datastoreresource.DataStoreType]openapi.SupportedDataStores{
 	datastoreresource.DataStoreTypeJaeger:     openapi.JAEGER,
 	datastoreresource.DataStoreTypeTempo:      openapi.TEMPO,
-	datastoreresource.DataStoreTypeOpenSearch: openapi.OPEN_SEARCH,
-	datastoreresource.DataStoreTypeSignalFX:   openapi.SIGNAL_FX,
+	datastoreresource.DataStoreTypeOpenSearch: openapi.OPENSEARCH,
+	datastoreresource.DataStoreTypeSignalFX:   openapi.SIGNALFX,
 	datastoreresource.DataStoreTypeOTLP:       openapi.OTLP,
-	datastoreresource.DataStoreTypeNewRelic:   openapi.NEW_RELIC,
+	datastoreresource.DataStoreTypeNewRelic:   openapi.NEWRELIC,
 	datastoreresource.DataStoreTypeLighStep:   openapi.LIGHTSTEP,
-	datastoreresource.DataStoreTypeElasticAPM: openapi.ELASTIC_APM,
+	datastoreresource.DataStoreTypeElasticAPM: openapi.ELASTICAPM,
 	datastoreresource.DataStoreTypeDataDog:    openapi.DATADOG,
 	datastoreresource.DataStoreTypeAwsXRay:    openapi.AWSXRAY,
 }
