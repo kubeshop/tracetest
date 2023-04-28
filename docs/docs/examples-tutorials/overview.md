@@ -22,7 +22,7 @@ Check out the following blog posts with Tracetest-related content.
 - [Enabling Tracetest to Work Directly with OpenSearch](https://tracetest.io/blog/tracetest-opensearch-integration)
 - [Integrating Tracetest with GitHub Actions in a CI pipeline](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline)
 
-### Best practices
+### Best Practices
 
 - [Running Trace-Based Tests on the OpenTelemetry Demo App with Nomad](https://tracetest.io/blog/tracetest-in-action-running-trace-based-tests-on-the-opentelemetry-demo-app-with-nomad)
 - [Ad Hoc Testing of Distributed Systems](https://tracetest.io/blog/ad-hoc-testing-of-distributed-systems)
