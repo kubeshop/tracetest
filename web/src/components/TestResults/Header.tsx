@@ -9,32 +9,28 @@ interface IProps {
   totalPassedSpecs: number;
 }
 
-const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => {
-  const hasSpecs = !!(totalFailedSpecs || totalPassedSpecs);
+const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => (
+  <S.HeaderContainer>
+    <S.Row>
+      <div>
+        {Boolean(totalPassedSpecs) && (
+          <S.HeaderDetail>
+            <S.HeaderDot $passed />
+            {`${totalPassedSpecs} ${singularOrPlural('spec', totalPassedSpecs)} passed`}
+          </S.HeaderDetail>
+        )}
 
-  return (
-    <S.HeaderContainer>
-      <S.Row>
-        <div>
-          {Boolean(totalPassedSpecs) && (
-            <S.HeaderDetail>
-              <S.HeaderDot $passed />
-              {`${totalPassedSpecs} ${singularOrPlural('spec', totalPassedSpecs)} passed`}
-            </S.HeaderDetail>
-          )}
+        {Boolean(totalFailedSpecs) && (
+          <S.HeaderDetail>
+            <S.HeaderDot $passed={false} />
+            {`${totalFailedSpecs} ${singularOrPlural('spec', totalFailedSpecs)} failed`}
+          </S.HeaderDetail>
+        )}
+      </div>
+    </S.Row>
 
-          {Boolean(totalFailedSpecs) && (
-            <S.HeaderDetail>
-              <S.HeaderDot $passed={false} />
-              {`${totalFailedSpecs} ${singularOrPlural('spec', totalFailedSpecs)} failed`}
-            </S.HeaderDetail>
-          )}
-        </div>
-      </S.Row>
-
-      <AddTestSpecButton selectedSpan={selectedSpan} visibleByDefault={!hasSpecs} />
-    </S.HeaderContainer>
-  );
-};
+    <AddTestSpecButton selectedSpan={selectedSpan} />
+  </S.HeaderContainer>
+);
 
 export default Header;
