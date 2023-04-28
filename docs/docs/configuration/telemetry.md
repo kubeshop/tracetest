@@ -12,7 +12,6 @@ With these two additional sections, you define an exporter where the Tracetest s
 
 ```yaml
 # tracetest-config.yaml
-
 postgres:
 # [...]
 
