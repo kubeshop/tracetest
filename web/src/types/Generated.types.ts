@@ -175,6 +175,8 @@ export interface paths {
     get: operations["getDataStore"];
     /** Update a Data Store */
     put: operations["updateDataStore"];
+    /** Delete a Data Store */
+    delete: operations["deleteDataStore"];
   };
 }
 
@@ -1009,6 +1011,16 @@ export interface operations {
       };
     };
   };
+  /** Delete a Data Store */
+  deleteDataStore: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** problem with data store deletion */
+      500: unknown;
+    };
+  };
 }
 
 export interface external {
@@ -1150,9 +1162,9 @@ export interface external {
           default?: boolean;
           jaeger?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["dataStores.yaml"]["components"]["schemas"]["BaseClient"];
-          openSearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
-          elasticApm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
-          signalFx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
+          opensearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
+          elasticapm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
+          signalfx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
           awsxray?: external["dataStores.yaml"]["components"]["schemas"]["AwsXRay"];
           /** Format: date-time */
           createdAt?: string;
@@ -1222,12 +1234,12 @@ export interface external {
         /** @enum {string} */
         SupportedDataStores:
           | "jaeger"
-          | "openSearch"
+          | "opensearch"
           | "tempo"
-          | "signalFx"
+          | "signalfx"
           | "otlp"
-          | "elasticApm"
-          | "newRelic"
+          | "elasticapm"
+          | "newrelic"
           | "lightstep"
           | "datadog"
           | "awsxray";

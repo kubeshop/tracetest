@@ -28,7 +28,7 @@ func NewHttpClient(name string, config *datastoreresource.HttpClientConfig, call
 	endpoint, _ := url.Parse(config.Url)
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: getTlsConfig(config.TLS.Settings.CAFile, config.TLS.Insecure),
+			TLSClientConfig: getTlsConfig(config.TLS),
 		},
 	}
 
@@ -118,12 +118,22 @@ func (client *HttpClient) Request(ctx context.Context, path, method, body string
 	return response, nil
 }
 
-func getTlsConfig(caCertFile string, skipVerify bool) *tls.Config {
+func getTlsConfig(dataStoreTls *datastoreresource.TLS) *tls.Config {
 	tlsConfig := tls.Config{}
 
-	if skipVerify {
+	if dataStoreTls == nil {
+		return &tlsConfig
+	}
+
+	if dataStoreTls.Insecure {
 		tlsConfig.InsecureSkipVerify = true
 	}
+
+	if dataStoreTls.Settings == nil {
+		return &tlsConfig
+	}
+
+	caCertFile := dataStoreTls.Settings.CAFile
 
 	if caCertFile != "" {
 		caCertPool := x509.NewCertPool()

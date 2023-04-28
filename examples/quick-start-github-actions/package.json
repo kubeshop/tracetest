@@ -1,0 +1,29 @@
+{
+  "name": "quick-start-nodejs-manual-instrumentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "app-with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
+    "app-with-http-tracer": "node -r ./tracing.otel.http.js app.js",
+    "availability-with-grpc-tracer": "node -r ./tracing.otel.grpc.js availability.js",
+    "availability-with-http-tracer": "node -r ./tracing.otel.http.js availability.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.4.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.36.0",
+    "@opentelemetry/exporter-collector": "^0.25.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.35.0",
+    "@opentelemetry/instrumentation": "^0.35.0",
+    "@opentelemetry/resources": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.35.0",
+    "@opentelemetry/sdk-trace-node": "^1.9.0",
+    "@opentelemetry/semantic-conventions": "^1.9.0",
+    "@opentelemetry/tracing": "^0.24.0",
+    "axios": "^1.2.5",
+    "express": "^4.18.2"
+  }
+}

@@ -1,6 +1,6 @@
 # Configuring your CLI
 
-Our web interface makes it easier to visualize your traces and add assertions, but sometimes a CLI is needed for automation. The CLI was developed for users creating tests and executing them each time a change is made in the system, so Tracetest can detect regressions and check service SLOs.
+Our web interface makes it easier to visualize your traces and add assertions, but sometimes a CLI is needed for automation. The CLI was developed for users creating tests and executing them each time a change is made in the system, so Tracetest can detect regressions and check service Service Level Objectives (SLOs).
 
 
 ## **Available Commands**

@@ -24,16 +24,16 @@ type DataStore struct {
 
 type DataStoreValues struct {
 	AwsXRay    *AWSXRayConfig            `mapstructure:"awsxray,omitempty"`
-	ElasticApm *ElasticSearchConfig      `mapstructure:"elasticApm,omitempty"`
+	ElasticApm *ElasticSearchConfig      `mapstructure:"elasticapm,omitempty"`
 	Jaeger     *GRPCClientSettings       `mapstructure:"jaeger,omitempty"`
-	OpenSearch *ElasticSearchConfig      `mapstructure:"openSearch,omitempty"`
-	SignalFx   *SignalFXConfig           `mapstructure:"signalFx,omitempty"`
+	OpenSearch *ElasticSearchConfig      `mapstructure:"opensearch,omitempty"`
+	SignalFx   *SignalFXConfig           `mapstructure:"signalfx,omitempty"`
 	Tempo      *MultiChannelClientConfig `mapstructure:"tempo,omitempty"`
 }
 
 type AWSXRayConfig struct {
 	Region          string `mapstructure:"region"`
-	AccessKeyID     string `mapstructure:"accessKeyID"`
+	AccessKeyID     string `mapstructure:"accessKeyId"`
 	SecretAccessKey string `mapstructure:"secretAccessKey"`
 	SessionToken    string `mapstructure:"sessionToken"`
 	UseDefaultAuth  bool   `mapstructure:"useDefaultAuth"`

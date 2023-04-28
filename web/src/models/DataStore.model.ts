@@ -2,7 +2,7 @@ import {SupportedDataStores} from 'types/DataStore.types';
 import {Model, TDataStoreSchemas} from 'types/Common.types';
 
 export type TRawDataStore = TDataStoreSchemas['DataStoreResource'];
-type DataStore = Model<TRawDataStore, {}>['spec'] & {otlp?: {}; newRelic?: {}; lightstep?: {}; datadog?: {}};
+type DataStore = Model<TRawDataStore, {}>['spec'] & {otlp?: {}; newrelic?: {}; lightstep?: {}; datadog?: {}};
 
 const DataStore = ({
   spec: {
@@ -11,9 +11,9 @@ const DataStore = ({
     type = SupportedDataStores.JAEGER,
     default: isDefault = false,
     createdAt = '',
-    openSearch = {},
-    elasticApm = {},
-    signalFx = {},
+    opensearch = {},
+    elasticapm = {},
+    signalfx = {},
     jaeger = {},
     tempo = {},
     awsxray = {},
@@ -24,9 +24,9 @@ const DataStore = ({
   type,
   default: isDefault,
   createdAt,
-  openSearch,
-  elasticApm,
-  signalFx,
+  opensearch,
+  elasticapm,
+  signalfx,
   jaeger,
   tempo,
   awsxray,

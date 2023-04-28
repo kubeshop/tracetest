@@ -94,7 +94,7 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 				"createdAt": "2023-03-09T17:53:10.256383Z",
 				"awsxray": {
 					"region": "some-region",
-					"accessKeyID": "some-access-key",
+					"accessKeyId": "some-access-key",
 					"secretAccessKey": "some-secret-access-key",
 					"sessionToken": "some-session-token",
 					"useDefaultAuth": true
@@ -111,7 +111,7 @@ func TestDataStoreResource_AWSXRay(t *testing.T) {
 				"createdAt": "2023-03-09T17:53:10.256383Z",
 				"awsxray": {
 					"region": "some-region-updated",
-					"accessKeyID": "some-access-key-updated",
+					"accessKeyId": "some-access-key-updated",
 					"secretAccessKey": "some-access-key-updated",
 					"sessionToken": "some-session-token-updated",
 					"useDefaultAuth": true
@@ -155,7 +155,7 @@ func TestDataStoreResource_ElasticAPM(t *testing.T) {
 				"type": "elasticapm",
 				"default": true,
 				"createdAt": "2023-03-09T17:53:10.256383Z",
-				"elasticApm": {
+				"elasticapm": {
 					"addresses": ["1.2.3.4"],
 					"username": "some-user",
 					"password": "some-password",
@@ -173,7 +173,7 @@ func TestDataStoreResource_ElasticAPM(t *testing.T) {
 				"type": "elasticapm",
 				"default": true,
 				"createdAt": "2023-03-09T17:53:10.256383Z",
-				"elasticApm": {
+				"elasticapm": {
 					"addresses": ["4.3.2.1"],
 					"username": "some-user-updated",
 					"password": "some-password-updated",
@@ -319,7 +319,7 @@ func TestDataStoreResource_OpenSearch(t *testing.T) {
 				"type": "opensearch",
 				"default": true,
 				"createdAt": "2023-03-09T17:53:10.256383Z",
-				"openSearch": {
+				"opensearch": {
 					"addresses": ["1.2.3.4"],
 					"username": "some-user",
 					"password": "some-password",
@@ -337,7 +337,7 @@ func TestDataStoreResource_OpenSearch(t *testing.T) {
 				"type": "opensearch",
 				"default": true,
 				"createdAt": "2023-03-09T17:53:10.256383Z",
-				"openSearch": {
+				"opensearch": {
 					"addresses": ["4.3.2.1"],
 					"username": "some-user-updated",
 					"password": "some-password-updated",
@@ -380,7 +380,7 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 				"type": "signalfx",
 				"default": true,
 				"createdAt": "2023-03-09T17:53:10.256383Z",
-				"signalFx": {
+				"signalfx": {
 					"realm": "some-realm",
 					"token": "some-token"
 				}
@@ -394,7 +394,7 @@ func TestDataStoreResource_SignalFX(t *testing.T) {
 				"type": "signalfx",
 				"default": true,
 				"createdAt": "2023-03-09T17:53:10.256383Z",
-				"signalFx": {
+				"signalfx": {
 					"realm": "some-realm-updated",
 					"token": "some-token-updated"
 				}
