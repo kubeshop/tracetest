@@ -151,6 +151,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 
 func (m *manager[T]) instrumentRoute(route *mux.Route) {
 	originalHandler := route.GetHandler()
+	pathTemplate, _ := route.GetPathTemplate()
 
 	newHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if m.config.tracer == nil {
@@ -161,7 +162,7 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 		method := r.Method
 
 		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
-		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, r.URL.RawPath))
+		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, pathTemplate))
 		defer span.End()
 
 		params := make(map[string]interface{}, 0)
@@ -182,8 +183,6 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 			headers[key] = value
 		}
 		headersJson, _ := json.Marshal(headers)
-
-		pathTemplate, _ := route.GetPathTemplate()
 
 		span.SetAttributes(
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
