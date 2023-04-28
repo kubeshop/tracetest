@@ -1,6 +1,8 @@
 # Telemetry
 
-The Tracetest server generates internal trace data. You can configure an exporter to send the trace data to an OpenTelemetry Collector and then store it safely in your trace data store for further analysis.
+The Tracetest server generates internal observability trace data. Use this data to track Tracetest test runs over time.
+
+You can configure an exporter to send the trace data to an OpenTelemetry Collector and then store it safely in your trace data store for further historical analysis.
 
 ## Configuring Tracetest Server Internal Telemetry
 
