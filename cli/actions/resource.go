@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"go.uber.org/zap"
 )
@@ -16,10 +17,15 @@ type resourceArgs struct {
 	logger         *zap.Logger
 	resourceClient utils.ResourceClient
 	config         config.Config
+	formatter      formatters.ResourceFormatter
 }
 
 func (r resourceArgs) Logger() *zap.Logger {
 	return r.logger
+}
+
+func (r resourceArgs) Formatter() formatters.ResourceFormatter {
+	return r.formatter
 }
 
 type ResourceArgsOption = func(args *resourceArgs)
@@ -63,6 +69,12 @@ func WithLogger(logger *zap.Logger) ResourceArgsOption {
 func WithConfig(config config.Config) ResourceArgsOption {
 	return func(args *resourceArgs) {
 		args.config = config
+	}
+}
+
+func WithFormatter(formatter formatters.ResourceFormatter) ResourceArgsOption {
+	return func(args *resourceArgs) {
+		args.formatter = formatter
 	}
 }
 

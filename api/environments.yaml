@@ -2,6 +2,16 @@ openapi: 3.0.0
 
 components:
   schemas:
+    EnvironmentResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
+    
     EnvironmentResource:
       type: object
       description: "Represents an environment structured into the Resources format."

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -48,13 +49,24 @@ var listCmd = &cobra.Command{
 			SortBy:        listSortBy,
 		}
 
-		err = resourceActions.List(ctx, listArgs)
-
+		resource, err := resourceActions.List(ctx, listArgs)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to list for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
+
+		resourceFormatter := resourceActions.Formatter()
+		formatter := formatters.BuildFormatter(output, resourceFormatter.ToListTable, resourceFormatter.ToListStruct)
+
+		result, err := formatter.Format(resource)
+		if err != nil {
+			cliLogger.Error("failed to format resource", zap.Error(err))
+			os.Exit(1)
+			return
+		}
+
+		fmt.Println(result)
 	},
 	PostRun: teardownCommand,
 }
