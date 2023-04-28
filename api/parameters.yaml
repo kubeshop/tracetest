@@ -130,6 +130,6 @@ components:
       in: path
       name: environmentId
       required: true
-      description: "ID of an enviroment used on Tracetest to inject values into tests and transactions"
+      description: "ID of an environment used on Tracetest to inject values into tests and transactions"
       schema:
         type: string

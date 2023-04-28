@@ -1103,7 +1103,7 @@ paths:
         404:
           description: "environment not found"
         500:
-          description: "problem getting the environment"
+          description: "problem getting an environment"
     put:
       tags:
         - resource-api
@@ -1135,7 +1135,7 @@ paths:
         404:
           description: "environment not found"
         500:
-          description: "problem updating the environment"
+          description: "problem updating an environment"
     delete:
       tags:
         - resource-api

@@ -112,11 +112,10 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	if err != nil {
 		return fmt.Errorf("sql BeginTx: %w", err)
 	}
+	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, deleteQuery, id)
-
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql error: %w", err)
 	}
 

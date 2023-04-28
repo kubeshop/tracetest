@@ -451,7 +451,7 @@ func encodeValues(resource any, enc encoder) ([]byte, error) {
 
 	err := encode(resource, &values)
 	if err != nil {
-		return nil, fmt.Errorf("cannot code resource: %w", err)
+		return nil, fmt.Errorf("cannot encode resource: %w", err)
 	}
 
 	return enc.Marshal(values)
