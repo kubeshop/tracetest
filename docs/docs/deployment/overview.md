@@ -1,4 +1,4 @@
-# Deployment Overview
+# Deployment
 
 This section contains a general overview of deploying Tracetest in production. You can find platform-specific guides for:
 

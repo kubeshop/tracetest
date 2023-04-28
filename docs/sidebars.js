@@ -31,12 +31,10 @@ const sidebars = {
     {
       type: "category",
       label: "Getting Started",
+      link: {
+        type: 'doc', id: 'getting-started/installation'
+      },
       items: [
-        {
-          type: "doc",
-          id: "getting-started/installation",
-          label: "Quick Start",
-        },
         {
           type: "doc",
           id: "getting-started/detailed-installation",
@@ -47,12 +45,10 @@ const sidebars = {
     {
       type: "category",
       label: "Configuration",
+      link: {
+        type: 'doc', id: 'configuration/overview'
+      },
       items: [
-        {
-          type: "doc",
-          id: "configuration/overview",
-          label: "Overview",
-        },
         // {
         //   type: "doc",
         //   id: "configuration/config-file-reference",
@@ -149,12 +145,10 @@ const sidebars = {
     {
       type: "category",
       label: "Deployment",
+      link: {
+        type: 'doc', id: 'deployment/overview'
+      },
       items: [
-        {
-          type: "doc",
-          id: "deployment/overview",
-          label: "Deployment Overview",
-        },
         // {
         //   type: "doc",
         //   id: "deployment/production-checklist",
@@ -327,24 +321,25 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "CI/CD automation",
+      label: "CI/CD Automation",
+      link: {
+        type: 'doc', id: 'ci-cd-automation/overview'
+      },
       items: [
         {
           type: "doc",
           id: "ci-cd-automation/github-actions-pipeline",
-          label: "GitHub actions pipeline",
+          label: "GitHub Actions Pipeline",
         },
       ],
     },
     {
       type: "category",
       label: "Tools & Integrations",
+      link: {
+        type: 'doc', id: 'tools-and-integrations/overview'
+      },
       items: [
-        {
-          type: "doc",
-          id: "tools-and-integrations/overview",
-          label: "Overview",
-        },
         {
           type: "doc",
           id: "tools-and-integrations/keptn",
@@ -365,12 +360,10 @@ const sidebars = {
     {
       type: "category",
       label: "Examples & Tutorials",
+      link: {
+        type: 'doc', id: 'examples-tutorials/overview'
+      },
       items: [
-        {
-          type: "doc",
-          id: "examples-tutorials/overview",
-          label: "Overview",
-        },
         {
           type: "doc",
           id: "examples-tutorials/recipes",
@@ -460,7 +453,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Live examples",
+      label: "Live Examples",
       items: [
         {
           type: "category",

@@ -1,0 +1,21 @@
+type: Test
+spec:
+  id: phAZcrT4W
+  name: Books list
+  description: Testing the books list
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080/books
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /books" http.target="/books"
+      http.method="GET"]
+    assertions:
+    - attr:tracetest.span.duration  < 500ms
+  - selector: span[tracetest.span.type="general" name="Books List"]
+    assertions:
+    - attr:books.list.count = 3
