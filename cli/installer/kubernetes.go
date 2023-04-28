@@ -40,8 +40,8 @@ func windowsGnuToolsChecker(ui cliUI.UI) {
 
 	ui.Warning("I didn't find sed in your system")
 	option := ui.Select("What do you want to do?", []cliUI.Option{
-		{"Install sed", installSed},
-		{"Fix it manually", exitOption(
+		{Text: "Install sed", Fn: installSed},
+		{Text: "Fix it manually", Fn: exitOption(
 			"Check the helm install docs on https://community.chocolatey.org/packages/sed",
 		)},
 	}, 0)
