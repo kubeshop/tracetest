@@ -18,7 +18,7 @@ const CurlTriggerService = (): ICurlTriggerService => ({
 
   async validateDraft(draft) {
     const {url, method} = draft as ICurlValues;
-    return Validator.required(url) && Validator.required(method) && Validator.url(url);
+    return Validator.required(url) && Validator.required(method);
   },
 
   getRequestFromCommand(command) {

@@ -10,14 +10,17 @@ const ImportCommandForm = () => {
   return (
     <S.InputContainer>
       <Form.Item
+        label="Paste the CURL command"
         name="command"
         rules={[
           {required: true, message: 'Please enter a command'},
           {
             validator: (_, command) => {
-              if (!CurlService.getIsValidCommand(command)) throw new Error('Invalid command');
+              if (!CurlService.getIsValidCommand(command)) {
+                return Promise.reject(new Error('Invalid CURL command'));
+              }
 
-              return Promise.resolve(true);
+              return Promise.resolve();
             },
             message: 'Invalid CURL command',
           },
