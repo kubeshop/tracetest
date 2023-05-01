@@ -49,7 +49,7 @@ Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that 
 
 ### Traces
 
-Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, validation (an API internal operation), and database calls:
+Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, validation (an API internal operation) and database calls:
 ![](../images/add-pokemon-trace.png)
 
 ### Assertions
@@ -66,7 +66,7 @@ Now you can validate this entire use case.
 
 ### Test Definition
 
-If you want to replicate this entire test on Tracetest see by yourself, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
+If you want to replicate this entire test on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
 
 ```sh
 tracetest test run -d test-definition.yml --wait-for-results

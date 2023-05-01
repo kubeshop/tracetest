@@ -332,7 +332,7 @@ const sidebars = {
         {
           type: "doc",
           id: "ci-cd-automation/github-actions-pipeline",
-          label: "GitHub actions pipeline",
+          label: "GitHub Actions Pipeline",
         },
       ],
     },
@@ -454,7 +454,7 @@ const sidebars = {
         {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-testkube",
-          label: "Tracetest and Testkube - Running scheduled trace-based tests",
+          label: "Tracetest and Testkube - Running Scheduled Trace-based Tests",
         },
       ],
     },
@@ -515,12 +515,12 @@ const sidebars = {
                 {
                   type: "doc",
                   id: "live-examples/opentelemetry-store/use-cases/add-item-into-shopping-cart",
-                  label: "Add item into shopping cart",
+                  label: "Add Item into Shopping Cart",
                 },
                 {
                   type: "doc",
                   id: "live-examples/opentelemetry-store/use-cases/check-shopping-cart-contents",
-                  label: "Check shopping cart contents",
+                  label: "Check Shopping Cart Contents",
                 },
                 {
                   type: "doc",
@@ -530,12 +530,12 @@ const sidebars = {
                 {
                   type: "doc",
                   id: "live-examples/opentelemetry-store/use-cases/get-recommended-products",
-                  label: "Get recommended products",
+                  label: "Get Recommended Products",
                 },
                 {
                   type: "doc",
                   id: "live-examples/opentelemetry-store/use-cases/user-purchasing-products",
-                  label: "User purchasing products",
+                  label: "User Purchasing Products",
                 },
               ],
             },
@@ -545,7 +545,7 @@ const sidebars = {
     },
     {
       type: "link",
-      label: "Tracetest Open API definition",
+      label: "Tracetest Open API Definition",
       href: "/openapi",
     },
   ],

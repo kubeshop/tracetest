@@ -13,19 +13,19 @@ Tracetest allows you to quickly build integration and end-to-end tests, powered 
 
 ## In a Nutshell
 
-Tracetest uses your existing [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces to power trace-based testing with assertions against your trace data at every point of the request transaction. You only need to point Tracetest to your existing trace data source, or send traces to Tracetest directly!
+Tracetest uses your existing [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces to power trace-based testing with assertions against your trace data at every point of the request transaction. You only need to point Tracetest to your existing trace data source or send traces to Tracetest directly!
 
 We make it possible to:
 
 - Define tests and assertions against every single microservice that a request goes through.
-- Use your preferred trace back-end, like Jaeger or Tempo, or OpenTelemetry Collector.
+- Use your preferred trace back-end, like Jaeger or Tempo or OpenTelemetry Collector.
 - Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
 - Return both the response data and a full trace.
-- Define assertions against both the response and trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
+- Define assertions against both the response and trace data, ensuring both your response and the underlying processes worked correctly, quickly and without errors.
 - Save tests.
 - Run the tests manually or via CI build jobs with the Tracetest CLI.
 
-New to trace-based testing? Read more about the concepts, [here](./concepts/what-is-trace-based-testing).
+New to trace-based testing? Read more about the concepts [here](./concepts/what-is-trace-based-testing).
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/in
 
 ## Who Uses Tracetest?
 
-Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js, and Python.
+Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js and Python.
 
 Tracetest enables you to write detailed trace-based tests, primarily:
 
