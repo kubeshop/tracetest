@@ -12,7 +12,7 @@ const CurlCommand = ({value, onChange}: IEditorProps) => {
       basicSetup={{lineNumbers: true, indentOnInput: true}}
       extensions={[StreamLanguage.define(shell)]}
       spellCheck={false}
-      placeholder="Enter a curl command"
+      placeholder="curl -X POST http://site.com"
     />
   );
 };
