@@ -73,7 +73,7 @@ const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
           selector: defaultSelector,
           defaultValues: {
             selector: defaultSelector,
-            name,
+            name: isEditing ? name : spec.name,
             assertions: isEditing
               ? assertions
               : [
