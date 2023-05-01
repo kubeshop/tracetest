@@ -15,7 +15,7 @@ export const RESOURCE_SEMANTIC_CONVENTIONS_URL =
 export const TRACE_DOCUMENTATION_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
-export const ADD_TEST_SPECS_DOCUMENTATION_URL = 'https://docs.tracetest.io/web-ui/creating-test-specifications';
+export const ADD_TEST_URL = 'https://docs.tracetest.io/web-ui/creating-tests';
 export const ADD_TEST_OUTPUTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/web-ui/creating-test-outputs';
 export const EXPRESSIONS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/expressions';
 export const ENVIRONMENTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/environments';
