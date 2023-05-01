@@ -43,7 +43,7 @@ Or, if you prefer using the CLI, you can use this file config.
 type: DataStore
 spec:
   name: OpenSearch Data Store
-  type: openSearch
+  type: opensearch
   default: true
   opensearch:
     addresses:

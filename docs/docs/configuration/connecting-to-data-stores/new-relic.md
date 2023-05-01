@@ -6,7 +6,7 @@ If you want to use [New Relic](https://newrelic.com/) as the trace data store, y
 Examples of configuring Tracetest with New Relic can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
 :::
 
-## Configuring OpenTelemetry Collector to Send Traces to B New Relic and Tracetest
+## Configuring OpenTelemetry Collector to Send Traces to both New Relic and Tracetest
 
 In your OpenTelemetry Collector config file:
 
@@ -88,8 +88,8 @@ Or, if you prefer using the CLI, you can use this file config.
 ```yaml
 type: DataStore
 spec:
-  name: Opentelemetry Collector pipeline
-  type: otlp
+  name: New Relic pipeline
+  type: newrelic
   default: true
 ```
 

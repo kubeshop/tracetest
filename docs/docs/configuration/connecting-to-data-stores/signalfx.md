@@ -37,9 +37,9 @@ Or, if you prefer using the CLI, you can use this file config.
 type: DataStore
 spec:
   name: SignalFX
-  type: signalFx
+  type: signalfx
   default: true
-  signalFx:
+  signalfx:
     realm: us1
     token: mytoken
 ```
