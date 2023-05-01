@@ -1,20 +1,25 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {CaretDownOutlined} from '@ant-design/icons';
 import {Dropdown, Menu} from 'antd';
-import SpanService from 'services/Span.service';
-import Span from 'models/Span.model';
+import React, {useCallback, useMemo} from 'react';
+
+import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {TEST_SPEC_SNIPPETS, TSnippet} from 'constants/TestSpecs.constants';
+import Span from 'models/Span.model';
+import {isRunStateSucceeded} from 'models/TestRun.model';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import SpanService from 'services/Span.service';
 import * as S from './TestResults.styled';
-import {useTestSpecForm} from '../TestSpecForm/TestSpecForm.provider';
 
 interface IProps {
   selectedSpan: Span;
-  visibleByDefault?: boolean;
 }
 
-const AddTestSpecButton = ({selectedSpan, visibleByDefault = false}: IProps) => {
+const AddTestSpecButton = ({selectedSpan}: IProps) => {
+  const {
+    run: {state},
+  } = useTestRun();
   const {open} = useTestSpecForm();
-  const caretRef = useRef<HTMLElement>(null);
+
   const handleEmptyTestSpec = useCallback(() => {
     const selector = SpanService.getSelectorInformation(selectedSpan);
 
@@ -38,12 +43,6 @@ const AddTestSpecButton = ({selectedSpan, visibleByDefault = false}: IProps) => 
     [open]
   );
 
-  useEffect(() => {
-    if (visibleByDefault && caretRef.current) {
-      caretRef.current?.click();
-    }
-  }, [visibleByDefault]);
-
   const menu = useMemo(
     () => (
       <Menu
@@ -60,7 +59,7 @@ const AddTestSpecButton = ({selectedSpan, visibleByDefault = false}: IProps) => 
           },
           {type: 'divider'},
           {
-            label: 'Empty Test Spec',
+            label: 'Add empty Test Spec',
             key: 'empty-test-spec',
             onClick: handleEmptyTestSpec,
           },
@@ -72,6 +71,7 @@ const AddTestSpecButton = ({selectedSpan, visibleByDefault = false}: IProps) => 
 
   return (
     <Dropdown.Button
+      disabled={!isRunStateSucceeded(state)}
       overlay={menu}
       trigger={['click']}
       placement="bottomRight"
@@ -79,7 +79,7 @@ const AddTestSpecButton = ({selectedSpan, visibleByDefault = false}: IProps) => 
       type="primary"
       buttonsRender={([leftButton]) => [
         React.cloneElement(leftButton as React.ReactElement<any, string>, {'data-cy': 'add-test-spec-button'}),
-        <S.CaretDropdownButton ref={caretRef} type="primary" data-cy="create-button">
+        <S.CaretDropdownButton type="primary" data-cy="create-button">
           <CaretDownOutlined />
         </S.CaretDropdownButton>,
       ]}
