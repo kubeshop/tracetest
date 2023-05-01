@@ -1,6 +1,6 @@
 # Pokeshop API - Get Pokemon by ID
 
-This use case retrieves a specific Pokemon from the cache if it is cached, or from the database (Postgres) also populating the cache. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to evaluate a different behavior depending of its dependencies.
+This use case retrieves a specific Pokemon from the cache if it is cached or from the database (Postgres) also populating the cache. The idea of this query is to showcase a straightforward scenario, where the API layer receives a request from the outside and needs to evaluate a different behavior depending of its dependencies.
 
 ```mermaid
 sequenceDiagram

@@ -46,7 +46,7 @@ Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that 
 
 ### Traces
 
-Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call and database calls:
+Running these tests for the first time will create an Observability trace like the image below, where you can see spans for the API call and database calls:
 ![](../images/list-pokemons-trace.png)
 
 ### Assertions

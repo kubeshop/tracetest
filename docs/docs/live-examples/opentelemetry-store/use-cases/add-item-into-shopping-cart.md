@@ -41,7 +41,7 @@ Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that 
 
 ### Traces
 
-Running these tests for the first time will create an Observability trace like the image below, where you can see spans for the API calls (HTTP and gRPC), and database calls:
+Running these tests for the first time will create an Observability trace like the image below, where you can see spans for the API calls (HTTP and gRPC) and database calls:
 ![](../images/add-item-into-shopping-cart-trace.png)
 
 ### Assertions

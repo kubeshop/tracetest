@@ -3,8 +3,8 @@
 This system implements an Astronomy shop in a set of microservices in different languages with OpenTelemetry enabled, intended to be used as an example of OpenTelemetry instrumentation and observability.
 
 - **Source Code**: https://github.com/open-telemetry/opentelemetry-demo
-- **Running it Locally**: [instructions](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/docker_deployment.md#run-docker-compose)
-- **Running on Kubernetes**: [instructions](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/kubernetes_deployment.md)
+- **Running it Locally**: [Instructions](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/docker_deployment.md#run-docker-compose)
+- **Running on Kubernetes**: [Instructions](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/kubernetes_deployment.md)
 
 ## Running with Tracetest
 
@@ -13,7 +13,7 @@ To run the this demo locally with Tracetest, first clone OpenTelemetry demo repo
 git clone https://github.com/open-telemetry/opentelemetry-demo.git
 ```
 
-And then, run on that folder:
+And then, run in that folder:
 ```sh
 docker compose up --no-build
 ```
@@ -26,14 +26,14 @@ After that, Tracetest will start on [http://localhost:11633](http://localhost:11
 
 ## Use Cases
 
-- [Add item into shopping cart](./use-cases/add-item-into-shopping-cart.md): Simulate a user choosing an item and adding it to the shopping cart
-- [Check shopping cart content](./use-cases/check-shopping-cart-contents.md): Simulate a user choosing different products and checking the shopping cart later 
-- [Checkout](./use-cases/checkout.md): Simulates a user choosing a product and later doing a checkout of that product, with billing and shipping info
-- [Get recommended products](./use-cases/get-recommended-products.md): Simulates a user querying for recommended products
+- [Add item into shopping cart](./use-cases/add-item-into-shopping-cart.md): Simulate a user choosing an item and adding it to the shopping cart.
+- [Check shopping cart content](./use-cases/check-shopping-cart-contents.md): Simulate a user choosing different products and checking the shopping cart later. 
+- [Checkout](./use-cases/checkout.md): Simulates a user choosing a product and later doing a checkout of that product, with billing and shipping info.
+- [Get recommended products](./use-cases/get-recommended-products.md): Simulates a user querying for recommended products.
 
 ## System Architecture
 
 This demonstration environment consists of a series of microservices, handling each aspect of the store, such as Product Catalog, Payment, Currency, etc.
 
-A detailed description of these services can be seen [here](https://github.com/open-telemetry/opentelemetry-demo/tree/main/docs#service-documentation)
-and the architecture diagrams can be seen [here](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/current_architecture.md).
+A detailed description of these services can be seen [here](https://opentelemetry.io/docs/demo/services/)
+and the architecture diagrams can be seen [here](https://opentelemetry.io/docs/demo/architecture/).
