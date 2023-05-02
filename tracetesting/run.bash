@@ -37,14 +37,14 @@ spec:
   id: .env
   name: .env
   variables:
-  - key: TARGET_URL
-    value: $TARGET_URL
-  - key: DEMO_APP_URL
-    value: $DEMO_APP_URL
-  - key: DEMO_APP_GRPC_URL
-    value: $DEMO_APP_GRPC_URL
-  - key: EXAMPLE_TEST_ID
-    value: $EXAMPLE_TEST_ID
+    - key: TARGET_URL
+      value: $TARGET_URL
+    - key: DEMO_APP_URL
+      value: $DEMO_APP_URL
+    - key: DEMO_APP_GRPC_URL
+      value: $DEMO_APP_GRPC_URL
+    - key: EXAMPLE_TEST_ID
+      value: $EXAMPLE_TEST_ID
 EOF
 
 echo ""
