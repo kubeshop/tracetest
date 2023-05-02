@@ -1,8 +1,11 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
+import {useCallback} from 'react';
 import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
+import {useDataStore} from 'providers/DataStore/DataStore.provider';
+import DataStoreService from 'services/DataStore.service';
 import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
-import * as S from './GrcpClient.styled';
 import * as FS from '../../DataStorePluginForm.styled';
+import * as S from './GrcpClient.styled';
 import GrpcClientSecure from './GrpcClientSecure';
 
 const COMPRESSION_LIST = [
@@ -21,6 +24,15 @@ const GrpcClient = () => {
   const dataStoreType = form.getFieldValue('dataStoreType') as SupportedDataStores;
   const baseName = ['dataStore', dataStoreType, 'grpc'];
   const insecureValue = Form.useWatch([...baseName, 'tls', 'insecure'], form) ?? true;
+  const {onIsFormValid} = useDataStore();
+
+  const onValidation = useCallback(
+    async (draft: TDraftDataStore) => {
+      const isValid = await DataStoreService.validateDraft(draft);
+      onIsFormValid(isValid);
+    },
+    [onIsFormValid]
+  );
 
   return (
     <>
@@ -91,6 +103,7 @@ const GrpcClient = () => {
                 [dataStoreType]: {grpc: {tls: {insecure: !checked}}},
               },
             });
+            onValidation(form.getFieldsValue());
           }}
           checked={!insecureValue}
         />{' '}
