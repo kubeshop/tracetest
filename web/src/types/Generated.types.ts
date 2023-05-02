@@ -970,7 +970,7 @@ export interface operations {
       };
       /** environment not found */
       404: unknown;
-      /** problem getting the environment */
+      /** problem getting an environment */
       500: unknown;
     };
   };
@@ -989,7 +989,7 @@ export interface operations {
       400: unknown;
       /** environment not found */
       404: unknown;
-      /** problem updating the environment */
+      /** problem updating an environment */
       500: unknown;
     };
     requestBody: {
@@ -1436,7 +1436,7 @@ export interface external {
         pollingProfileId: string;
         /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
         dataStoreId: string;
-        /** @description ID of an enviroment used on Tracetest to inject values into tests and transactions */
+        /** @description ID of an environment used on Tracetest to inject values into tests and transactions */
         environmentId: string;
       };
     };
