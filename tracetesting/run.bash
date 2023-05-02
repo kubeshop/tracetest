@@ -32,10 +32,19 @@ echo "DEMO_APP_URL:       $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL:  $DEMO_APP_GRPC_URL"
 
 cat << EOF > .env
-TARGET_URL=$TARGET_URL
-DEMO_APP_URL=$DEMO_APP_URL
-DEMO_APP_GRPC_URL=$DEMO_APP_GRPC_URL
-EXAMPLE_TEST_ID=$EXAMPLE_TEST_ID
+type: Environment
+spec:
+  id: .env
+  name: .env
+  variables:
+  - key: TARGET_URL
+    value: $TARGET_URL
+  - key: DEMO_APP_URL
+    value: $DEMO_APP_URL
+  - key: DEMO_APP_GRPC_URL
+    value: $DEMO_APP_GRPC_URL
+  - key: EXAMPLE_TEST_ID
+    value: $EXAMPLE_TEST_ID
 EOF
 
 echo ""
