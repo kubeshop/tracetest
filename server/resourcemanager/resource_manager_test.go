@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/stretchr/testify/mock"
@@ -75,7 +74,7 @@ func TestSampleResource(t *testing.T) {
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: "SampleResource",
 		ResourceTypePlural:   "SampleResources",
-		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) rm.Manager {
 			mockManager := new(sampleResourceManager)
 			manager := rm.New[sampleResource](
 				"SampleResource",
@@ -99,7 +98,8 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("Provision", sample).
 					Return(nil)
-			// Create
+
+				// Create
 			case rmtests.OperationCreateNoID:
 				withGenID := sample
 				withGenID.ID = id.ID("3")
@@ -115,7 +115,7 @@ func TestSampleResource(t *testing.T) {
 					On("Create", sample).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
-				// Update
+			// Update
 			case rmtests.OperationUpdateNotFound:
 				mockManager.
 					On("Update", sampleUpdated).
@@ -129,7 +129,7 @@ func TestSampleResource(t *testing.T) {
 					On("Update", sampleUpdated).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
-				// Get
+			// Get
 			case rmtests.OperationGetNotFound:
 				mockManager.
 					On("Get", sample.ID).
@@ -160,7 +160,7 @@ func TestSampleResource(t *testing.T) {
 					On("Delete", sample.ID).
 					Return(fmt.Errorf("some error"))
 
-				// List
+			// List
 			case rmtests.OperationListSuccess:
 				mockManager.
 					On("Count", mock.Anything).
@@ -233,7 +233,7 @@ func TestRestrictedResource(t *testing.T) {
 				rm.WithIDGen(func() id.ID {
 					return id.ID("3")
 				}),
-				rm.WithOperations(rm.OperationGet, rm.OperationUpdate),
+				rm.WithOperations(mockManager.Operations()...),
 			)
 			manager.RegisterRoutes(router)
 
@@ -296,13 +296,95 @@ func TestRestrictedResource(t *testing.T) {
 	})
 }
 
+func TestAugmentedResource(t *testing.T) {
+	sample := sampleResource{
+		ID:        "1",
+		Name:      "the name",
+		SomeValue: "the value",
+	}
+
+	sampleAugmented := sampleResource{
+		ID:                     "1",
+		Name:                   "the name",
+		SomeValue:              "the value",
+		SomeAugmentedOnlyValue: "augmentation works",
+	}
+
+	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
+		ResourceTypeSingular: "AugmentedResource",
+		ResourceTypePlural:   "AugmentedResources",
+		RegisterManagerFn: func(router *mux.Router, db *sql.DB) rm.Manager {
+			mockManager := new(augmentedResourceManager)
+			manager := rm.New[sampleResource](
+				"AugmentedResource",
+				"AugmentedResources",
+				mockManager,
+				rm.WithOperations(mockManager.Operations()...),
+			)
+			manager.RegisterRoutes(router)
+
+			return manager
+		},
+		Prepare: func(t *testing.T, op rmtests.Operation, manager rm.Manager) {
+			mockManager := manager.Handler().(*augmentedResourceManager)
+			mockManager.Test(t)
+
+			switch op {
+			// Provisioning
+			case rmtests.OperationProvisioningSuccess:
+				mockManager.
+					On("Provision", sample).
+					Return(nil)
+
+			// Get
+			case rmtests.OperationGetNotFound:
+				mockManager.
+					On("Get", sample.ID).
+					Return(sampleResource{}, sql.ErrNoRows)
+			case rmtests.OperationGetSuccess:
+				mockManager.
+					On("Get", sample.ID).
+					Return(sample, nil)
+			case rmtests.OperationGetInternalError:
+				mockManager.
+					On("Get", sample.ID).
+					Return(sampleResource{}, fmt.Errorf("some error"))
+
+			// Augmented
+			case rmtests.OperationGetAugmentedSuccess:
+				mockManager.
+					On("GetAugmented", sampleAugmented.ID).
+					Return(sampleAugmented, nil)
+			}
+		},
+		SampleJSON: `{
+			"type": "AugmentedResource",
+			"spec": {
+				"id": "1",
+				"name": "the name",
+				"some_value": "the value"
+			}
+		}`,
+		SampleJSONAugmented: `{
+			"type": "AugmentedResource",
+			"spec": {
+				"id": "1",
+				"name": "the name",
+				"some_value": "the value",
+				"some_augmented_value": "augmentation works"
+			}
+		}`,
+	})
+}
+
 // test structures and mocks
 
 type sampleResource struct {
 	ID   id.ID  `mapstructure:"id"`
 	Name string `mapstructure:"name"`
 
-	SomeValue string `mapstructure:"some_value"`
+	SomeValue              string `mapstructure:"some_value"`
+	SomeAugmentedOnlyValue string `mapstructure:"some_augmented_value,omitempty"`
 }
 
 func (sr sampleResource) HasID() bool {
@@ -346,6 +428,22 @@ func (m *restrictedResourceManager) Operations() []rm.Operation {
 		rm.OperationGet,
 		rm.OperationUpdate,
 	}
+}
+
+type augmentedResourceManager struct {
+	baseResourceManager
+}
+
+func (m *augmentedResourceManager) Operations() []rm.Operation {
+	return []rm.Operation{
+		rm.OperationGet,
+		rm.OperationGetAugmented,
+	}
+}
+
+func (m *augmentedResourceManager) GetAugmented(_ context.Context, id id.ID) (sampleResource, error) {
+	args := m.Called(id)
+	return args.Get(0).(sampleResource), args.Error(1)
 }
 
 type sampleResourceManager struct {

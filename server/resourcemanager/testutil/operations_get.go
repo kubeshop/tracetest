@@ -11,8 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
-	id := extractID(rt.SampleJSON)
+func getRequestForID(id string, rt ResourceTypeTest, testServer *httptest.Server) (*http.Request, error) {
 	url := fmt.Sprintf(
 		"%s/%s/%s",
 		testServer.URL,
@@ -20,7 +19,12 @@ func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *h
 		id,
 	)
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	return http.NewRequest(http.MethodGet, url, nil)
+}
+
+func buildGetRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
+	id := extractID(rt.SampleJSON)
+	req, err := getRequestForID(id, rt, testServer)
 	require.NoError(t, err)
 	return req
 }

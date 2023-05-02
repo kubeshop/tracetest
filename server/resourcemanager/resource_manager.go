@@ -252,6 +252,12 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, http.StatusOK, string(bytes))
 }
 
+const HeaderAugmented = "X-Tracetest-Augmented"
+
+func isRequestForAugmented(r *http.Request) bool {
+	return r.Header.Get(HeaderAugmented) == "true"
+}
+
 func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	encoder, err := encoderFromRequest(r)
 	if err != nil {
@@ -263,7 +269,12 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	item, err := m.rh.Get(r.Context(), id)
+	getterFn := m.rh.Get
+	if isRequestForAugmented(r) {
+		getterFn = m.rh.GetAugmented
+	}
+
+	item, err := getterFn(r.Context(), id)
 	if err != nil {
 		m.handleResourceHandlerError(w, "getting", err, encoder)
 		return

@@ -20,8 +20,9 @@ type ResourceTypeTest struct {
 	RegisterManagerFn    func(*mux.Router, *sql.DB) rm.Manager
 	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
 
-	SampleJSON        string
-	SampleJSONUpdated string
+	SampleJSON          string
+	SampleJSONUpdated   string
+	SampleJSONAugmented string
 
 	// private fields
 	sortFields                  []string
