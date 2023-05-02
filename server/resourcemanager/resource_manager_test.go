@@ -26,51 +26,6 @@ func TestSampleResource(t *testing.T) {
 		SomeValue: "the value updated",
 	}
 
-	prepareSortByID := func(m *sampleResourceManager) {
-		m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "asc").
-			Return([]sampleResource{
-				{ID: "1", Name: "3", SomeValue: "3"},
-				{ID: "2", Name: "1", SomeValue: "1"},
-				{ID: "3", Name: "2", SomeValue: "2"},
-			}, nil)
-		m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "desc").
-			Return([]sampleResource{
-				{ID: "3", Name: "2", SomeValue: "2"},
-				{ID: "2", Name: "1", SomeValue: "1"},
-				{ID: "1", Name: "3", SomeValue: "3"},
-			}, nil)
-	}
-
-	prepareSortByName := func(m *sampleResourceManager) {
-		m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "asc").
-			Return([]sampleResource{
-				{Name: "1", ID: "3", SomeValue: "3"},
-				{Name: "2", ID: "1", SomeValue: "1"},
-				{Name: "3", ID: "2", SomeValue: "2"},
-			}, nil)
-		m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "desc").
-			Return([]sampleResource{
-				{Name: "3", ID: "2", SomeValue: "2"},
-				{Name: "2", ID: "1", SomeValue: "1"},
-				{Name: "1", ID: "3", SomeValue: "3"},
-			}, nil)
-	}
-
-	prepareSortBySomeValue := func(m *sampleResourceManager) {
-		m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "asc").
-			Return([]sampleResource{
-				{SomeValue: "1", ID: "3", Name: "3"},
-				{SomeValue: "2", ID: "1", Name: "1"},
-				{SomeValue: "3", ID: "2", Name: "2"},
-			}, nil)
-		m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "desc").
-			Return([]sampleResource{
-				{SomeValue: "3", ID: "2", Name: "2"},
-				{SomeValue: "2", ID: "1", Name: "1"},
-				{SomeValue: "1", ID: "3", Name: "3"},
-			}, nil)
-	}
-
 	rmtests.TestResourceTypeWithErrorOperations(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: "SampleResource",
 		ResourceTypePlural:   "SampleResources",
@@ -350,11 +305,46 @@ func TestAugmentedResource(t *testing.T) {
 					On("Get", sample.ID).
 					Return(sampleResource{}, fmt.Errorf("some error"))
 
+			// List
+			case rmtests.OperationListSuccess:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(1, nil)
+				mockManager.
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{sample}, nil)
+			case rmtests.OperationListNoResults:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(0, nil)
+				mockManager.
+					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{}, nil)
+			case rmtests.OperationListPaginatedSuccess:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(3, nil)
+
+				prepareSortByID(mockManager)
+				prepareSortByName(mockManager)
+				prepareSortBySomeValue(mockManager)
+			case rmtests.OperationListInternalError:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(0, fmt.Errorf("some error"))
+
 			// Augmented
 			case rmtests.OperationGetAugmentedSuccess:
 				mockManager.
 					On("GetAugmented", sampleAugmented.ID).
 					Return(sampleAugmented, nil)
+			case rmtests.OperationListAugmentedSuccess:
+				mockManager.
+					On("Count", mock.Anything).
+					Return(1, nil)
+				mockManager.
+					On("ListAugmented", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]sampleResource{sampleAugmented}, nil)
 			}
 		},
 		SampleJSON: `{
@@ -431,19 +421,26 @@ func (m *restrictedResourceManager) Operations() []rm.Operation {
 }
 
 type augmentedResourceManager struct {
-	baseResourceManager
+	sampleResourceManager
 }
 
 func (m *augmentedResourceManager) Operations() []rm.Operation {
 	return []rm.Operation{
 		rm.OperationGet,
 		rm.OperationGetAugmented,
+		rm.OperationList,
+		rm.OperationListAugmented,
 	}
 }
 
 func (m *augmentedResourceManager) GetAugmented(_ context.Context, id id.ID) (sampleResource, error) {
 	args := m.Called(id)
 	return args.Get(0).(sampleResource), args.Error(1)
+}
+
+func (m *augmentedResourceManager) ListAugmented(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]sampleResource, error) {
+	args := m.Called(take, skip, query, sortBy, sortDirection)
+	return args.Get(0).([]sampleResource), args.Error(1)
 }
 
 type sampleResourceManager struct {
@@ -472,4 +469,53 @@ func (m *sampleResourceManager) List(_ context.Context, take, skip int, query, s
 func (m *sampleResourceManager) Count(_ context.Context, query string) (int, error) {
 	args := m.Called(query)
 	return args.Int(0), args.Error(1)
+}
+
+type mockable interface {
+	On(string, ...interface{}) *mock.Call
+}
+
+func prepareSortByID(m mockable) {
+	m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "asc").
+		Return([]sampleResource{
+			{ID: "1", Name: "3", SomeValue: "3"},
+			{ID: "2", Name: "1", SomeValue: "1"},
+			{ID: "3", Name: "2", SomeValue: "2"},
+		}, nil)
+	m.On("List", mock.Anything, mock.Anything, mock.Anything, "id", "desc").
+		Return([]sampleResource{
+			{ID: "3", Name: "2", SomeValue: "2"},
+			{ID: "2", Name: "1", SomeValue: "1"},
+			{ID: "1", Name: "3", SomeValue: "3"},
+		}, nil)
+}
+
+func prepareSortByName(m mockable) {
+	m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "asc").
+		Return([]sampleResource{
+			{Name: "1", ID: "3", SomeValue: "3"},
+			{Name: "2", ID: "1", SomeValue: "1"},
+			{Name: "3", ID: "2", SomeValue: "2"},
+		}, nil)
+	m.On("List", mock.Anything, mock.Anything, mock.Anything, "name", "desc").
+		Return([]sampleResource{
+			{Name: "3", ID: "2", SomeValue: "2"},
+			{Name: "2", ID: "1", SomeValue: "1"},
+			{Name: "1", ID: "3", SomeValue: "3"},
+		}, nil)
+}
+
+func prepareSortBySomeValue(m mockable) {
+	m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "asc").
+		Return([]sampleResource{
+			{SomeValue: "1", ID: "3", Name: "3"},
+			{SomeValue: "2", ID: "1", Name: "1"},
+			{SomeValue: "3", ID: "2", Name: "2"},
+		}, nil)
+	m.On("List", mock.Anything, mock.Anything, mock.Anything, "some_value", "desc").
+		Return([]sampleResource{
+			{SomeValue: "3", ID: "2", Name: "2"},
+			{SomeValue: "2", ID: "1", Name: "1"},
+			{SomeValue: "1", ID: "3", Name: "3"},
+		}, nil)
 }

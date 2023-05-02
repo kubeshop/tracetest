@@ -206,7 +206,12 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := m.rh.List(
+	listFn := m.rh.List
+	if isRequestForAugmented(r) {
+		listFn = m.rh.ListAugmented
+	}
+
+	items, err := listFn(
 		ctx,
 		take,
 		skip,

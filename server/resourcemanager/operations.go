@@ -11,13 +11,15 @@ import (
 type Operation string
 
 const (
-	OperationNoop         Operation = ""
-	OperationList         Operation = "list"
-	OperationCreate       Operation = "create"
-	OperationUpdate       Operation = "update"
-	OperationGet          Operation = "get"
-	OperationGetAugmented Operation = "getAugmented"
-	OperationDelete       Operation = "delete"
+	OperationNoop   Operation = ""
+	OperationList   Operation = "list"
+	OperationCreate Operation = "create"
+	OperationUpdate Operation = "update"
+	OperationGet    Operation = "get"
+	OperationDelete Operation = "delete"
+
+	OperationGetAugmented  Operation = "getAugmented"
+	OperationListAugmented Operation = "listAugmented"
 )
 
 var availableOperations = []Operation{
@@ -55,10 +57,6 @@ type Get[T ResourceSpec] interface {
 	Get(context.Context, id.ID) (T, error)
 }
 
-type GetAugmented[T ResourceSpec] interface {
-	GetAugmented(context.Context, id.ID) (T, error)
-}
-
 type Delete[T ResourceSpec] interface {
 	Delete(context.Context, id.ID) error
 }
@@ -72,6 +70,14 @@ type Current[T ResourceSpec] interface {
 	Current(context.Context) (T, error)
 }
 
+type GetAugmented[T ResourceSpec] interface {
+	GetAugmented(context.Context, id.ID) (T, error)
+}
+
+type ListAugmented[T ResourceSpec] interface {
+	ListAugmented(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
+}
+
 type resourceHandler[T ResourceSpec] struct {
 	SetID         func(T, id.ID) T
 	List          func(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
@@ -80,9 +86,11 @@ type resourceHandler[T ResourceSpec] struct {
 	Create        func(context.Context, T) (T, error)
 	Update        func(context.Context, T) (T, error)
 	Get           func(context.Context, id.ID) (T, error)
-	GetAugmented  func(context.Context, id.ID) (T, error)
 	Delete        func(context.Context, id.ID) error
 	Provision     func(context.Context, T) error
+
+	GetAugmented  func(context.Context, id.ID) (T, error)
+	ListAugmented func(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]T, error)
 }
 
 func (rh *resourceHandler[T]) bindOperations(enabledOperations []Operation, handler any) error {
@@ -126,7 +134,14 @@ func (rh *resourceHandler[T]) bindOperations(enabledOperations []Operation, hand
 	}
 
 	if slices.Contains(enabledOperations, OperationGetAugmented) {
-		err := rh.bindAugmented(handler)
+		err := rh.bindGetAugmented(handler)
+		if err != nil {
+			return err
+		}
+	}
+
+	if slices.Contains(enabledOperations, OperationListAugmented) {
+		err := rh.bindListAugmented(handler)
 		if err != nil {
 			return err
 		}
@@ -206,12 +221,22 @@ func (rh *resourceHandler[T]) bindProvisionOperation(handler any) error {
 	return nil
 }
 
-func (rh *resourceHandler[T]) bindAugmented(handler any) error {
+func (rh *resourceHandler[T]) bindGetAugmented(handler any) error {
 	casted, ok := handler.(GetAugmented[T])
 	if !ok {
 		return fmt.Errorf("handler does not implement interface `GetAugmented[T]`")
 	}
 	rh.GetAugmented = casted.GetAugmented
+
+	return nil
+}
+
+func (rh *resourceHandler[T]) bindListAugmented(handler any) error {
+	casted, ok := handler.(ListAugmented[T])
+	if !ok {
+		return fmt.Errorf("handler does not implement interface `ListAugmented[T]`")
+	}
+	rh.ListAugmented = casted.ListAugmented
 
 	return nil
 }
