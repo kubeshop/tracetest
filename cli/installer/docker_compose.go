@@ -325,6 +325,9 @@ func getCompleteProject(ui cliUI.UI, config configuration) *types.Project {
 	project, err := loader.Load(types.ConfigDetails{
 		WorkingDir:  workingDir,
 		ConfigFiles: configFiles,
+		Environment: map[string]string{
+			"TRACETEST_DEV": "",
+		},
 	})
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot parse docker-compose file: %w", err).Error())

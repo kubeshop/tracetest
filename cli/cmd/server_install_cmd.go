@@ -7,7 +7,9 @@ import (
 )
 
 var (
-	force = false
+	force            = false
+	runEnvironment   = installer.NoneRunEnvironmentType
+	installationMode = installer.NotChosenInstallationModeType
 )
 
 var serverInstallCmd = &cobra.Command{
@@ -17,6 +19,9 @@ var serverInstallCmd = &cobra.Command{
 	PreRun: setupCommand(SkipConfigValidation()),
 	Run: func(cmd *cobra.Command, args []string) {
 		installer.Force = force
+		installer.RunEnvironment = runEnvironment
+		installer.InstallationMode = installationMode
+
 		analytics.Track("Server Install", "cmd", map[string]string{})
 		installer.Start()
 	},
@@ -24,6 +29,11 @@ var serverInstallCmd = &cobra.Command{
 }
 
 func init() {
-	serverInstallCmd.Flags().BoolVarP(&force, "force", "f", false, "overwrite existing files")
+	serverInstallCmd.Flags().BoolVarP(&force, "force", "f", false, "Overwrite existing files")
+
+	// these commands will not have shorthand parameters to avoid colision with existing ones in other commands
+	serverInstallCmd.Flags().Var(&installationMode, "mode", "Indicate the type of demo environment to be installed with Tracetest. It can be 'with-demo' or 'just-tracetest'.")
+	serverInstallCmd.Flags().Var(&runEnvironment, "run-environment", "Type of environment were Tracetest will be installed. It can be 'docker' or 'kubernetes'.")
+
 	serverCmd.AddCommand(serverInstallCmd)
 }
