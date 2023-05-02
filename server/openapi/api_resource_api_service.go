@@ -192,8 +192,8 @@ func (s *ResourceApiApiService) ListDemos(ctx context.Context, take int32, skip 
 	// TODO - update ListDemos with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, ListDemos200Response{}) or use other options such as http.Ok ...
-	//return Response(200, ListDemos200Response{}), nil
+	//TODO: Uncomment the next line to return response Response(200, DemoList{}) or use other options such as http.Ok ...
+	//return Response(200, DemoList{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil
@@ -209,8 +209,8 @@ func (s *ResourceApiApiService) ListEnvironments(ctx context.Context, take int32
 	// TODO - update ListEnvironments with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, ListEnvironments200Response{}) or use other options such as http.Ok ...
-	//return Response(200, ListEnvironments200Response{}), nil
+	//TODO: Uncomment the next line to return response Response(200, EnvironmentResourceList{}) or use other options such as http.Ok ...
+	//return Response(200, EnvironmentResourceList{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil
