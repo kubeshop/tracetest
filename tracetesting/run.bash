@@ -47,7 +47,8 @@ spec:
       value: $EXAMPLE_TEST_ID
 EOF
 
-echo ""
+echo "Environment variables set:"
+cat .env
 
 echo "Setting up tracetest CLI configuration..."
 cat << EOF > config.yml
