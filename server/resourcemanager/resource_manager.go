@@ -30,8 +30,8 @@ type ResourceSpec interface {
 }
 
 type ResourceList[T ResourceSpec] struct {
-	Count int              `mapstructure:"count"`
-	Items []map[string]any `mapstructure:"items"`
+	Count int   `mapstructure:"count"`
+	Items []any `mapstructure:"items"`
 }
 
 type Resource[T ResourceSpec] struct {
@@ -293,7 +293,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	//       of records inside "item"
 	resourceList := ResourceList[T]{
 		Count: count,
-		Items: []map[string]any{},
+		Items: []any{},
 	}
 
 	for _, item := range items {
@@ -302,14 +302,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 			Spec: item,
 		}
 
-		var values map[string]any
-		err := encode(resource, &values)
-		if err != nil {
-			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-			return
-		}
-
-		resourceList.Items = append(resourceList.Items, values)
+		resourceList.Items = append(resourceList.Items, resource)
 	}
 
 	bytes, err := encodeValues(resourceList, encoder)
@@ -470,7 +463,7 @@ func encodeValues(resource any, enc encoder) ([]byte, error) {
 		return nil, fmt.Errorf("cannot encode resource: %w", err)
 	}
 
-	return enc.Marshal(values)
+	return enc.Marshal(resource)
 }
 
 func readValues(r *http.Request, enc encoder) (map[string]any, error) {
