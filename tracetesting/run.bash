@@ -36,7 +36,7 @@ type: Environment
 spec:
   id: .env
   name: .env
-  variables:
+  values:
     - key: TARGET_URL
       value: $TARGET_URL
     - key: DEMO_APP_URL
