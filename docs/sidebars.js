@@ -108,6 +108,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/datadog",
               label: "Datadog",
             },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/honeycomb",
+              label: "Honeycomb",
+            },
           ],
         },
         {
