@@ -125,3 +125,11 @@ components:
       description: "ID of a datastore used on Tracetest to configure how to fetch traces in a test"
       schema:
         type: string
+
+    environmentId:
+      in: path
+      name: environmentId
+      required: true
+      description: "ID of an environment used on Tracetest to inject values into tests and transactions"
+      schema:
+        type: string

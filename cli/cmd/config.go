@@ -62,6 +62,10 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		dataStoreActions := actions.NewDataStoreActions(dataStoreOptions...)
 		resourceRegistry.Register(dataStoreActions)
 
+		environmentOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)))
+		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
+		resourceRegistry.Register(environmentActions)
+
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}

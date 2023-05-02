@@ -3,13 +3,20 @@ package resourcemanager
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/propagation"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
@@ -50,6 +57,7 @@ type manager[T ResourceSpec] struct {
 type config struct {
 	enabledOperations []Operation
 	idgen             func() id.ID
+	tracer            trace.Tracer
 }
 
 type managerOption func(*config)
@@ -63,6 +71,12 @@ func WithIDGen(fn func() id.ID) managerOption {
 func WithOperations(ops ...Operation) managerOption {
 	return func(c *config) {
 		c.enabledOperations = ops
+	}
+}
+
+func WithTracer(tracer trace.Tracer) managerOption {
+	return func(c *config) {
+		c.tracer = tracer
 	}
 }
 
@@ -113,26 +127,76 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	enabledOps := m.EnabledOperations()
 
 	if slices.Contains(enabledOps, OperationList) {
-		subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list")
+		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list"))
 	}
 
 	if slices.Contains(enabledOps, OperationCreate) {
-		subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationUpdate) {
-		subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationGet) {
-		subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationDelete) {
-		subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural))
+		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
 	}
 
 	return subrouter
+}
+
+func (m *manager[T]) instrumentRoute(route *mux.Route) {
+	originalHandler := route.GetHandler()
+	pathTemplate, _ := route.GetPathTemplate()
+
+	newHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if m.config.tracer == nil {
+			originalHandler.ServeHTTP(w, r)
+			return
+		}
+
+		method := r.Method
+
+		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
+		ctx, span := m.config.tracer.Start(ctx, fmt.Sprintf("%s %s", method, pathTemplate))
+		defer span.End()
+
+		params := make(map[string]interface{}, 0)
+		for key, value := range mux.Vars(r) {
+			params[key] = value
+		}
+
+		paramsJson, _ := json.Marshal(params)
+
+		queryString := make(map[string]interface{}, 0)
+		for key, value := range r.URL.Query() {
+			queryString[key] = value
+		}
+		queryStringJson, _ := json.Marshal(queryString)
+
+		headers := make(map[string]interface{}, 0)
+		for key, value := range r.Header {
+			headers[key] = value
+		}
+		headersJson, _ := json.Marshal(headers)
+
+		span.SetAttributes(
+			attribute.String(string(semconv.HTTPMethodKey), r.Method),
+			attribute.String(string(semconv.HTTPRouteKey), pathTemplate),
+			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
+			attribute.String("http.request.params", string(paramsJson)),
+			attribute.String("http.request.query", string(queryStringJson)),
+			attribute.String("http.request.headers", string(headersJson)),
+		)
+
+		originalHandler.ServeHTTP(w, r.WithContext(ctx))
+	})
+
+	route.Handler(newHandler)
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
@@ -234,7 +298,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var values map[string]any
-		err := mapstructure.Decode(resource, &values)
+		err := encode(resource, &values)
 		if err != nil {
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 			return
@@ -330,7 +394,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 	}
 
 	targetResource := Resource[T]{}
-	err = mapstructure.Decode(values, &targetResource)
+	err = decode(values, &targetResource)
 	if err != nil {
 		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot unmarshal body values: %w", err))
 		return
@@ -383,12 +447,11 @@ func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
 }
 
 func encodeValues(resource any, enc encoder) ([]byte, error) {
-	// mapstructure doesn't have a `Decode`, but encoding with reversed provides this func.
-	// See https://github.com/mitchellh/mapstructure/issues/53#issuecomment-273342420
 	var values map[string]any
-	err := mapstructure.Decode(resource, &values)
+
+	err := encode(resource, &values)
 	if err != nil {
-		return nil, fmt.Errorf("cannot encode values: %w", err)
+		return nil, fmt.Errorf("cannot encode resource: %w", err)
 	}
 
 	return enc.Marshal(values)
@@ -419,4 +482,50 @@ func readBody(r *http.Request) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func decode(input any, output any) error {
+	return mapstructure.Decode(input, output)
+}
+
+func encode(input any, output *map[string]any) error {
+	err := mapstructure.Decode(input, output)
+	if err != nil {
+		return err
+	}
+
+	fixInternalSlicesMapping(output)
+
+	return nil
+}
+
+func fixInternalSlicesMapping(output *map[string]any) {
+	for k, v := range *output {
+		value := reflect.ValueOf(v)
+		if value.Kind() == reflect.Map {
+			if submap, ok := v.(map[string]any); ok {
+				fixInternalSlicesMapping(&submap)
+			}
+		}
+
+		if value.Kind() == reflect.Slice {
+			if value.Len() == 0 {
+				continue
+			}
+
+			firstItem := value.Index(0)
+			if firstItem.Kind() != reflect.Struct {
+				continue
+			}
+
+			newOutput := make([]map[string]any, value.Len())
+
+			for i := 0; i < value.Len(); i++ {
+				mapstructure.Decode(value.Index(i).Interface(), &newOutput[i])
+			}
+
+			deferencedOutput := *output
+			deferencedOutput[k] = newOutput
+		}
+	}
 }

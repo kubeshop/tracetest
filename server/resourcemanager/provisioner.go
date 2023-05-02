@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/mitchellh/mapstructure"
 )
 
 var ErrTypeNotSupported = errors.New("type not supported")
@@ -20,7 +18,7 @@ func (m *manager[T]) Provision(ctx context.Context, values map[string]any) error
 	}
 
 	targetResource := Resource[T]{}
-	err := mapstructure.Decode(values, &targetResource)
+	err := decode(values, &targetResource)
 	if err != nil {
 		return fmt.Errorf(
 			"cannot read provisioning for resource type %s: %w",

@@ -32,18 +32,18 @@ func (d *dataStoreActions) Name() string {
 	return "datastore"
 }
 
-func (d *dataStoreActions) Apply(ctx context.Context, fileContent file.File) error {
+func (d *dataStoreActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
 	var dataStore openapi.DataStore
 	mapstructure.Decode(fileContent.Definition().Spec, &dataStore)
 
 	return d.resourceClient.Update(ctx, fileContent, currentConfigID)
 }
 
-func (d *dataStoreActions) List(ctx context.Context, args utils.ListArgs) (string, error) {
-	return "", ErrNotSupportedResourceAction
+func (d *dataStoreActions) List(ctx context.Context, args utils.ListArgs) (*file.File, error) {
+	return nil, ErrNotSupportedResourceAction
 }
 
-func (d *dataStoreActions) Get(ctx context.Context, id string) (string, error) {
+func (d *dataStoreActions) Get(ctx context.Context, id string) (*file.File, error) {
 	return d.resourceClient.Get(ctx, currentConfigID)
 }
 

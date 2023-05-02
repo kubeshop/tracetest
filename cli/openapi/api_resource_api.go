@@ -42,8 +42,8 @@ CreateDemo Create a Demonstration setting
 
 Create a demonstration used on Tracetest as quick start examples.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiCreateDemoRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateDemoRequest
 */
 func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoRequest {
 	return ApiCreateDemoRequest{
@@ -53,8 +53,7 @@ func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoReq
 }
 
 // Execute executes the request
-//
-//	@return Demo
+//  @return Demo
 func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -130,6 +129,113 @@ func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiCreateEnvironmentRequest struct {
+	ctx                 context.Context
+	ApiService          *ResourceApiApiService
+	environmentResource *EnvironmentResource
+}
+
+func (r ApiCreateEnvironmentRequest) EnvironmentResource(environmentResource EnvironmentResource) ApiCreateEnvironmentRequest {
+	r.environmentResource = &environmentResource
+	return r
+}
+
+func (r ApiCreateEnvironmentRequest) Execute() (*EnvironmentResource, *http.Response, error) {
+	return r.ApiService.CreateEnvironmentExecute(r)
+}
+
+/*
+CreateEnvironment Create an environment
+
+Create an environment that can be used by tests and transactions
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreateEnvironmentRequest
+*/
+func (a *ResourceApiApiService) CreateEnvironment(ctx context.Context) ApiCreateEnvironmentRequest {
+	return ApiCreateEnvironmentRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return EnvironmentResource
+func (a *ResourceApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *EnvironmentResource
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.CreateEnvironment")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/environments"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "text/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.environmentResource
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiDeleteDataStoreRequest struct {
 	ctx         context.Context
 	ApiService  *ResourceApiApiService
@@ -145,9 +251,9 @@ DeleteDataStore Delete a Data Store
 
 Delete a Data Store
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
-	@return ApiDeleteDataStoreRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
+ @return ApiDeleteDataStoreRequest
 */
 func (a *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) ApiDeleteDataStoreRequest {
 	return ApiDeleteDataStoreRequest{
@@ -237,9 +343,9 @@ DeleteDemo Delete a Demonstration setting
 
 Delete a demonstration used on Tracetest as quick start examples.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param demoId ID of a demonstration used on Tracetest as quick start examples
-	@return ApiDeleteDemoRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param demoId ID of a demonstration used on Tracetest as quick start examples
+ @return ApiDeleteDemoRequest
 */
 func (a *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) ApiDeleteDemoRequest {
 	return ApiDeleteDemoRequest{
@@ -314,6 +420,98 @@ func (a *ResourceApiApiService) DeleteDemoExecute(r ApiDeleteDemoRequest) (*http
 	return localVarHTTPResponse, nil
 }
 
+type ApiDeleteEnvironmentRequest struct {
+	ctx           context.Context
+	ApiService    *ResourceApiApiService
+	environmentId string
+}
+
+func (r ApiDeleteEnvironmentRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteEnvironmentExecute(r)
+}
+
+/*
+DeleteEnvironment Delete an environment
+
+Delete an environment from Tracetest
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param environmentId ID of an enviroment used on Tracetest to inject values into tests and transactions
+ @return ApiDeleteEnvironmentRequest
+*/
+func (a *ResourceApiApiService) DeleteEnvironment(ctx context.Context, environmentId string) ApiDeleteEnvironmentRequest {
+	return ApiDeleteEnvironmentRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		environmentId: environmentId,
+	}
+}
+
+// Execute executes the request
+func (a *ResourceApiApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironmentRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.DeleteEnvironment")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/environments/{environmentId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"environmentId"+"}", url.PathEscape(parameterValueToString(r.environmentId, "environmentId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiGetConfigurationRequest struct {
 	ctx        context.Context
 	ApiService *ResourceApiApiService
@@ -329,9 +527,9 @@ GetConfiguration Get Tracetest configuration
 
 Get Tracetest configuration
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
-	@return ApiGetConfigurationRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
+ @return ApiGetConfigurationRequest
 */
 func (a *ResourceApiApiService) GetConfiguration(ctx context.Context, configId string) ApiGetConfigurationRequest {
 	return ApiGetConfigurationRequest{
@@ -342,8 +540,7 @@ func (a *ResourceApiApiService) GetConfiguration(ctx context.Context, configId s
 }
 
 // Execute executes the request
-//
-//	@return ConfigurationResource
+//  @return ConfigurationResource
 func (a *ResourceApiApiService) GetConfigurationExecute(r ApiGetConfigurationRequest) (*ConfigurationResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -433,9 +630,9 @@ GetDataStore Get a Data Store
 
 Get a Data Store
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
-	@return ApiGetDataStoreRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
+ @return ApiGetDataStoreRequest
 */
 func (a *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId string) ApiGetDataStoreRequest {
 	return ApiGetDataStoreRequest{
@@ -446,8 +643,7 @@ func (a *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId st
 }
 
 // Execute executes the request
-//
-//	@return DataStoreResource
+//  @return DataStoreResource
 func (a *ResourceApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStoreResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -537,9 +733,9 @@ GetDemo Get Demonstration setting
 
 Get a demonstration used on Tracetest as quick start examples.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param demoId ID of a demonstration used on Tracetest as quick start examples
-	@return ApiGetDemoRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param demoId ID of a demonstration used on Tracetest as quick start examples
+ @return ApiGetDemoRequest
 */
 func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiGetDemoRequest {
 	return ApiGetDemoRequest{
@@ -550,8 +746,7 @@ func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiG
 }
 
 // Execute executes the request
-//
-//	@return Demo
+//  @return Demo
 func (a *ResourceApiApiService) GetDemoExecute(r ApiGetDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -626,6 +821,109 @@ func (a *ResourceApiApiService) GetDemoExecute(r ApiGetDemoRequest) (*Demo, *htt
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetEnvironmentRequest struct {
+	ctx           context.Context
+	ApiService    *ResourceApiApiService
+	environmentId string
+}
+
+func (r ApiGetEnvironmentRequest) Execute() (*EnvironmentResource, *http.Response, error) {
+	return r.ApiService.GetEnvironmentExecute(r)
+}
+
+/*
+GetEnvironment Get a specific environment
+
+Get one environment by its id
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param environmentId ID of an enviroment used on Tracetest to inject values into tests and transactions
+ @return ApiGetEnvironmentRequest
+*/
+func (a *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentId string) ApiGetEnvironmentRequest {
+	return ApiGetEnvironmentRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		environmentId: environmentId,
+	}
+}
+
+// Execute executes the request
+//  @return EnvironmentResource
+func (a *ResourceApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *EnvironmentResource
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.GetEnvironment")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/environments/{environmentId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"environmentId"+"}", url.PathEscape(parameterValueToString(r.environmentId, "environmentId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetPollingProfileRequest struct {
 	ctx              context.Context
 	ApiService       *ResourceApiApiService
@@ -641,9 +939,9 @@ GetPollingProfile Get Polling Profile
 
 Get a polling profile used on Tracetest to configure how to fetch traces in a test.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
-	@return ApiGetPollingProfileRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
+ @return ApiGetPollingProfileRequest
 */
 func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingProfileId string) ApiGetPollingProfileRequest {
 	return ApiGetPollingProfileRequest{
@@ -654,8 +952,7 @@ func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 }
 
 // Execute executes the request
-//
-//	@return PollingProfile
+//  @return PollingProfile
 func (a *ResourceApiApiService) GetPollingProfileExecute(r ApiGetPollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -772,8 +1069,8 @@ ListDemos List Demonstrations
 
 List demonstrations used on Tracetest as quick start examples.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiListDemosRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiListDemosRequest
 */
 func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosRequest {
 	return ApiListDemosRequest{
@@ -783,8 +1080,7 @@ func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosReque
 }
 
 // Execute executes the request
-//
-//	@return ListDemos200Response
+//  @return ListDemos200Response
 func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*ListDemos200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -799,6 +1095,145 @@ func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*ListDe
 	}
 
 	localVarPath := localBasePath + "/demos"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.take != nil {
+		parameterAddToQuery(localVarQueryParams, "take", r.take, "")
+	}
+	if r.skip != nil {
+		parameterAddToQuery(localVarQueryParams, "skip", r.skip, "")
+	}
+	if r.sortBy != nil {
+		parameterAddToQuery(localVarQueryParams, "sortBy", r.sortBy, "")
+	}
+	if r.sortDirection != nil {
+		parameterAddToQuery(localVarQueryParams, "sortDirection", r.sortDirection, "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListEnvironmentsRequest struct {
+	ctx           context.Context
+	ApiService    *ResourceApiApiService
+	take          *int32
+	skip          *int32
+	sortBy        *string
+	sortDirection *string
+}
+
+// indicates how many resources can be returned by each page
+func (r ApiListEnvironmentsRequest) Take(take int32) ApiListEnvironmentsRequest {
+	r.take = &take
+	return r
+}
+
+// indicates how many resources will be skipped when paginating
+func (r ApiListEnvironmentsRequest) Skip(skip int32) ApiListEnvironmentsRequest {
+	r.skip = &skip
+	return r
+}
+
+// indicates the sort field for the resources
+func (r ApiListEnvironmentsRequest) SortBy(sortBy string) ApiListEnvironmentsRequest {
+	r.sortBy = &sortBy
+	return r
+}
+
+// indicates the sort direction for the resources
+func (r ApiListEnvironmentsRequest) SortDirection(sortDirection string) ApiListEnvironmentsRequest {
+	r.sortDirection = &sortDirection
+	return r
+}
+
+func (r ApiListEnvironmentsRequest) Execute() (*ListEnvironments200Response, *http.Response, error) {
+	return r.ApiService.ListEnvironmentsExecute(r)
+}
+
+/*
+ListEnvironments List environments
+
+List environments available in Tracetest.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiListEnvironmentsRequest
+*/
+func (a *ResourceApiApiService) ListEnvironments(ctx context.Context) ApiListEnvironmentsRequest {
+	return ApiListEnvironmentsRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return ListEnvironments200Response
+func (a *ResourceApiApiService) ListEnvironmentsExecute(r ApiListEnvironmentsRequest) (*ListEnvironments200Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListEnvironments200Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListEnvironments")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/environments"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -891,9 +1326,9 @@ UpdateConfiguration Update Tracetest configuration
 
 Update Tracetest configuration
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
-	@return ApiUpdateConfigurationRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
+ @return ApiUpdateConfigurationRequest
 */
 func (a *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configId string) ApiUpdateConfigurationRequest {
 	return ApiUpdateConfigurationRequest{
@@ -904,8 +1339,7 @@ func (a *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configI
 }
 
 // Execute executes the request
-//
-//	@return ConfigurationResource
+//  @return ConfigurationResource
 func (a *ResourceApiApiService) UpdateConfigurationExecute(r ApiUpdateConfigurationRequest) (*ConfigurationResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -1003,9 +1437,9 @@ UpdateDataStore Update a Data Store
 
 Update a Data Store
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
-	@return ApiUpdateDataStoreRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
+ @return ApiUpdateDataStoreRequest
 */
 func (a *ResourceApiApiService) UpdateDataStore(ctx context.Context, dataStoreId string) ApiUpdateDataStoreRequest {
 	return ApiUpdateDataStoreRequest{
@@ -1103,9 +1537,9 @@ UpdateDemo Update a Demonstration setting
 
 Update a demonstration used on Tracetest as quick start examples.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param demoId ID of a demonstration used on Tracetest as quick start examples
-	@return ApiUpdateDemoRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param demoId ID of a demonstration used on Tracetest as quick start examples
+ @return ApiUpdateDemoRequest
 */
 func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) ApiUpdateDemoRequest {
 	return ApiUpdateDemoRequest{
@@ -1116,8 +1550,7 @@ func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) A
 }
 
 // Execute executes the request
-//
-//	@return Demo
+//  @return Demo
 func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -1194,6 +1627,117 @@ func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiUpdateEnvironmentRequest struct {
+	ctx                 context.Context
+	ApiService          *ResourceApiApiService
+	environmentId       string
+	environmentResource *EnvironmentResource
+}
+
+func (r ApiUpdateEnvironmentRequest) EnvironmentResource(environmentResource EnvironmentResource) ApiUpdateEnvironmentRequest {
+	r.environmentResource = &environmentResource
+	return r
+}
+
+func (r ApiUpdateEnvironmentRequest) Execute() (*EnvironmentResource, *http.Response, error) {
+	return r.ApiService.UpdateEnvironmentExecute(r)
+}
+
+/*
+UpdateEnvironment Update an environment
+
+Update an environment used on Tracetest
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param environmentId ID of an enviroment used on Tracetest to inject values into tests and transactions
+ @return ApiUpdateEnvironmentRequest
+*/
+func (a *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environmentId string) ApiUpdateEnvironmentRequest {
+	return ApiUpdateEnvironmentRequest{
+		ApiService:    a,
+		ctx:           ctx,
+		environmentId: environmentId,
+	}
+}
+
+// Execute executes the request
+//  @return EnvironmentResource
+func (a *ResourceApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *EnvironmentResource
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.UpdateEnvironment")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/environments/{environmentId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"environmentId"+"}", url.PathEscape(parameterValueToString(r.environmentId, "environmentId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json", "text/yaml"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.environmentResource
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiUpdatePollingProfileRequest struct {
 	ctx              context.Context
 	ApiService       *ResourceApiApiService
@@ -1215,9 +1759,9 @@ UpdatePollingProfile Update a Polling Profile
 
 Update a polling profile used on Tracetest to configure how to fetch traces in a test.
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
-	@return ApiUpdatePollingProfileRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
+ @return ApiUpdatePollingProfileRequest
 */
 func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollingProfileId string) ApiUpdatePollingProfileRequest {
 	return ApiUpdatePollingProfileRequest{
@@ -1228,8 +1772,7 @@ func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollin
 }
 
 // Execute executes the request
-//
-//	@return PollingProfile
+//  @return PollingProfile
 func (a *ResourceApiApiService) UpdatePollingProfileExecute(r ApiUpdatePollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut

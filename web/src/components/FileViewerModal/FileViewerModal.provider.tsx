@@ -1,7 +1,11 @@
 import {capitalize, noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import FileViewerModal from 'components/FileViewerModal';
-import {useLazyGetJUnitByRunIdQuery, useLazyGetResourceDefinitionQuery} from 'redux/apis/TraceTest.api';
+import {
+  useLazyGetJUnitByRunIdQuery,
+  useLazyGetResourceDefinitionQuery,
+  useLazyGetResourceDefinitionV2Query,
+} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
 
 interface IContext {
@@ -43,6 +47,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
   });
   const [getJUnit] = useLazyGetJUnitByRunIdQuery();
   const [getResourceDefinition] = useLazyGetResourceDefinitionQuery();
+  const [getResourceDefinitionV2] = useLazyGetResourceDefinitionV2Query();
   const [fileProps, setProps] = useState({
     title: '',
     language: '',
@@ -62,7 +67,9 @@ const FileViewerModalProvider = ({children}: IProps) => {
 
   const loadDefinition = useCallback(
     async (resourceType: ResourceType, resourceId: string, version?: number) => {
-      const data = await getResourceDefinition({resourceId, version, resourceType}).unwrap();
+      const data = await (resourceType === ResourceType.Environment
+        ? getResourceDefinitionV2({resourceId, resourceType}).unwrap()
+        : getResourceDefinition({resourceId, version, resourceType}).unwrap());
       setIsFileViewerOpen(true);
       setFileViewerData({data, type: 'definition'});
       setProps({
@@ -72,7 +79,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
         fileName: `${resourceType}-${resourceId}-${version || 0}-definition.yaml`,
       });
     },
-    [getResourceDefinition]
+    [getResourceDefinition, getResourceDefinitionV2]
   );
 
   const value: IContext = useMemo(() => ({loadJUnit, loadDefinition}), [loadJUnit, loadDefinition]);
