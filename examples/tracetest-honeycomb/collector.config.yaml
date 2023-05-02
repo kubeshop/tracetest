@@ -20,7 +20,7 @@ exporters:
   otlp/hc:
     endpoint: "api.honeycomb.io:443"
     headers:
-      "x-honeycomb-team": "mmxthNaPBrQLX1VhIjlAOD"
+      "x-honeycomb-team": <HONEYCOMB_API_KEY>
       # Read more in docs here: https://docs.honeycomb.io/getting-data-in/otel-collector/
 
 service:
