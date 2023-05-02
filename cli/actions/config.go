@@ -31,16 +31,16 @@ func (configActions) Name() string {
 	return "config"
 }
 
-func (config configActions) Apply(ctx context.Context, fileContent file.File) error {
+func (config configActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
 	return config.resourceClient.Update(ctx, fileContent, currentConfigID)
 }
 
-func (config configActions) Get(ctx context.Context, ID string) (string, error) {
+func (config configActions) Get(ctx context.Context, ID string) (*file.File, error) {
 	return config.resourceClient.Get(ctx, currentConfigID)
 }
 
-func (config configActions) List(ctx context.Context, listArgs utils.ListArgs) (string, error) {
-	return "", ErrNotSupportedResourceAction
+func (config configActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
+	return nil, ErrNotSupportedResourceAction
 }
 
 func (config configActions) Delete(ctx context.Context, ID string) error {

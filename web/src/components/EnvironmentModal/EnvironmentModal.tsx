@@ -5,6 +5,7 @@ import EnvironmentForm from 'components/EnvironmentForm';
 import Environment from 'models/Environment.model';
 import * as S from './EnvironmentModal.styled';
 import EnvironmentModalFooter from './EnvironmentModalFooter';
+import EnvironmentService from '../../services/Environment.service';
 
 interface IProps {
   environment?: Environment;
@@ -29,8 +30,8 @@ const EnvironmentModal = ({environment, isOpen, onClose, onSubmit, isLoading}: I
     }
   }, [environment, form, isOpen]);
 
-  const handleOnValidate = (changedValues: any, {name, description, values}: Environment) => {
-    setIsFormValid(Boolean(name) && Boolean(description) && Boolean(values.length));
+  const handleOnValidate = (changedValues: any, draft: Environment) => {
+    setIsFormValid(EnvironmentService.validateDraft(draft));
   };
 
   const handleOnSubmit = async (values: Environment) => {

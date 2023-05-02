@@ -3,22 +3,30 @@ import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
 import Environment, {TRawEnvironment} from 'models/Environment.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {getTotalCountFromHeaders} from 'utils/Common';
+import {TListResponse} from 'types/Settings.types';
 
 const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getEnvironments: builder.query<PaginationResponse<Environment>, {take?: number; skip?: number; query?: string}>({
-    query: ({take = 25, skip = 0, query = ''}) => `/environments?take=${take}&skip=${skip}&query=${query}`,
+    query: ({take = 25, skip = 0, query = ''}) => ({
+      url: `/environments?take=${take}&skip=${skip}&query=${query}`,
+      headers: {
+        'content-type': 'application/json',
+      },
+    }),
     providesTags: () => [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
-    transformResponse: (rawEnvironments: TRawEnvironment[], meta) => ({
-      items: rawEnvironments.map(rawEnv => Environment(rawEnv)),
-      total: getTotalCountFromHeaders(meta),
+    transformResponse: ({items, count}: TListResponse<TRawEnvironment>) => ({
+      items: items.map(rawEnv => Environment(rawEnv)),
+      total: count,
     }),
   }),
-  createEnvironment: builder.mutation<undefined, Environment>({
+  createEnvironment: builder.mutation<undefined, TRawEnvironment>({
     query: environment => ({
       url: '/environments',
       method: HTTP_METHOD.POST,
       body: environment,
+      headers: {
+        'content-type': 'application/json',
+      },
     }),
     invalidatesTags: [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
   }),
@@ -27,6 +35,9 @@ const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({
       url: `/environments/${environmentId}`,
       method: HTTP_METHOD.PUT,
       body: environment,
+      headers: {
+        'content-type': 'application/json',
+      },
     }),
     invalidatesTags: [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
   }),
@@ -34,6 +45,9 @@ const EnvironmentEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({environmentId}) => ({
       url: `/environments/${environmentId}`,
       method: HTTP_METHOD.DELETE,
+      headers: {
+        'content-type': 'application/json',
+      },
     }),
     invalidatesTags: [{type: TracetestApiTags.ENVIRONMENT, id: 'LIST'}],
   }),

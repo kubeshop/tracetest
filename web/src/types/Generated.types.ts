@@ -114,24 +114,6 @@ export interface paths {
     /** get events from a test run */
     get: operations["getTestRunEvents"];
   };
-  "/environments": {
-    /** Get Environments */
-    get: operations["getEnvironments"];
-    /** Create new environment action */
-    post: operations["createEnvironment"];
-  };
-  "/environments/{environmentId}": {
-    /** get environment */
-    get: operations["getEnvironment"];
-    /** update environment action */
-    put: operations["updateEnvironment"];
-    /** delete a environment */
-    delete: operations["deleteEnvironment"];
-  };
-  "/environments/{environmentId}/definition.yaml": {
-    /** Get the environment as an YAML file */
-    get: operations["getEnvironmentDefinitionFile"];
-  };
   "/expressions/resolve": {
     /** resolves an expression and returns the result string */
     post: operations["ExpressionResolve"];
@@ -177,6 +159,20 @@ export interface paths {
     put: operations["updateDataStore"];
     /** Delete a Data Store */
     delete: operations["deleteDataStore"];
+  };
+  "/environments": {
+    /** List environments available in Tracetest. */
+    get: operations["listEnvironments"];
+    /** Create an environment that can be used by tests and transactions */
+    post: operations["createEnvironment"];
+  };
+  "/environments/{environmentId}": {
+    /** Get one environment by its id */
+    get: operations["getEnvironment"];
+    /** Update an environment used on Tracetest */
+    put: operations["updateEnvironment"];
+    /** Delete an environment from Tracetest */
+    delete: operations["deleteEnvironment"];
   };
 }
 
@@ -652,107 +648,6 @@ export interface operations {
       };
     };
   };
-  /** Get Environments */
-  getEnvironments: {
-    parameters: {};
-    responses: {
-      /** successful operation */
-      200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
-        content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"][];
-        };
-      };
-      /** problem with getting environments */
-      500: unknown;
-    };
-  };
-  /** Create new environment action */
-  createEnvironment: {
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-        };
-      };
-      /** trying to create a environment with an already existing ID */
-      400: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-      };
-    };
-  };
-  /** get environment */
-  getEnvironment: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-        };
-      };
-      /** problem with getting a environment */
-      500: unknown;
-    };
-  };
-  /** update environment action */
-  updateEnvironment: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      204: never;
-      /** problem with updating environment */
-      500: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-      };
-    };
-  };
-  /** delete a environment */
-  deleteEnvironment: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** OK */
-      204: never;
-    };
-  };
-  /** Get the environment as an YAML file */
-  getEnvironmentDefinitionFile: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
-        };
-      };
-    };
-  };
   /** resolves an expression and returns the result string */
   ExpressionResolve: {
     responses: {
@@ -1015,9 +910,106 @@ export interface operations {
   deleteDataStore: {
     parameters: {};
     responses: {
+      /** OK */
+      204: never;
+    };
+  };
+  /** List environments available in Tracetest. */
+  listEnvironments: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": {
+            count?: number;
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          };
+          "text/yaml": {
+            count?: number;
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          };
+        };
+      };
+      /** invalid query for environments, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing environments */
+      500: unknown;
+    };
+  };
+  /** Create an environment that can be used by tests and transactions */
+  createEnvironment: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** problem creating an environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+      };
+    };
+  };
+  /** Get one environment by its id */
+  getEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** environment not found */
+      404: unknown;
+      /** problem getting the environment */
+      500: unknown;
+    };
+  };
+  /** Update an environment used on Tracetest */
+  updateEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** invalid environment, some data was sent in incorrect format. */
+      400: unknown;
+      /** environment not found */
+      404: unknown;
+      /** problem updating the environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+      };
+    };
+  };
+  /** Delete an environment from Tracetest */
+  deleteEnvironment: {
+    parameters: {};
+    responses: {
       /** successful operation */
       204: never;
-      /** problem with data store deletion */
+      /** invalid environment, some data was sent in incorrect format. */
+      400: unknown;
+      /** environment not found */
+      404: unknown;
+      /** problem deleting an environment */
       500: unknown;
     };
   };
@@ -1281,6 +1273,15 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        /** @description Represents an environment structured into the Resources format. */
+        EnvironmentResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Environment'.
+           * @enum {string}
+           */
+          type?: "Environment";
+          spec?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
         Environment: {
           id?: string;
           name?: string;
@@ -1435,6 +1436,8 @@ export interface external {
         pollingProfileId: string;
         /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
         dataStoreId: string;
+        /** @description ID of an enviroment used on Tracetest to inject values into tests and transactions */
+        environmentId: string;
       };
     };
     operations: {};

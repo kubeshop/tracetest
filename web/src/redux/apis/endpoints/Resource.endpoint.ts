@@ -29,6 +29,18 @@ const ResourceEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.RESOURCE, id: `${resourceId}-${version}-definition`},
     ],
   }),
+  getResourceDefinitionV2: builder.query<string, {resourceId: string; version?: number; resourceType: ResourceType}>({
+    query: ({resourceId, resourceType}) => ({
+      url: `/${resourceType}s/${resourceId}`,
+      responseHandler: 'text',
+      headers: {
+        'content-type': 'text/yaml',
+      }
+    }),
+    providesTags: (result, error, {resourceId, version}) => [
+      {type: TracetestApiTags.RESOURCE, id: `${resourceId}-${version}-definition`},
+    ],
+  }),
 });
 
 export default ResourceEndpoint;
