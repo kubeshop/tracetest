@@ -86,8 +86,8 @@ Or, if you prefer using the CLI, you can use this file config.
 ```yaml
 type: DataStore
 spec:
-  name: Opentelemetry Collector pipeline
-  type: otlp
+  name: Lightstep pipeline
+  type: lightstep
   default: true
 ```
 
