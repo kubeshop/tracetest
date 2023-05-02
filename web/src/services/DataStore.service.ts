@@ -24,6 +24,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.NewRelic]: OtelCollectorService,
   [SupportedDataStores.Lightstep]: OtelCollectorService,
   [SupportedDataStores.Datadog]: OtelCollectorService,
+  [SupportedDataStores.Honeycomb]: OtelCollectorService,
   [SupportedDataStores.AWSXRay]: AwsXRayService,
 } as const;
 

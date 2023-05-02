@@ -454,6 +454,11 @@ const sidebars = {
           id: "examples-tutorials/recipes/running-tracetest-with-testkube",
           label: "Tracetest and Testkube - Running Scheduled Trace-based Tests",
         },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
+          label: "Node.js and Honeycomb",
+        },
       ],
     },
     {

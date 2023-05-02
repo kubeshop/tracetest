@@ -57,6 +57,7 @@ var dataStoreTypesMapping = map[datastoreresource.DataStoreType]openapi.Supporte
 	datastoreresource.DataStoreTypeElasticAPM: openapi.ELASTICAPM,
 	datastoreresource.DataStoreTypeDataDog:    openapi.DATADOG,
 	datastoreresource.DataStoreTypeAwsXRay:    openapi.AWSXRAY,
+	datastoreresource.DataStoreTypeHoneycomb:  openapi.HONEYCOMB,
 }
 
 func (m OpenAPI) DataStoreType(in datastoreresource.DataStoreType) openapi.SupportedDataStores {

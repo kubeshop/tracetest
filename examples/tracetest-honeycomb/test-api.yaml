@@ -1,0 +1,18 @@
+type: Test
+spec:
+  id: W656Q0c4g
+  name: http://app:8080
+  description: akadlkasjdf
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+      assertions:
+        - attr:http.status_code  =  200
+        - attr:tracetest.span.duration  <  500ms

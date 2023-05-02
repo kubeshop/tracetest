@@ -7,7 +7,6 @@ require (
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
 	github.com/denisbrodbeck/machineid v1.0.1
-	github.com/fluidtruck/deepcopy v1.0.0
 	github.com/joho/godotenv v1.3.0
 	github.com/kubeshop/tracetest/server v0.0.0-20230208220354-63c9594b2160
 	github.com/mitchellh/mapstructure v1.5.0
@@ -31,6 +30,7 @@ require (
 	github.com/distribution/distribution/v3 v3.0.0-20220907155224-78b9c98c5c31 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
+	github.com/fluidtruck/deepcopy v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
