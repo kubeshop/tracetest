@@ -9,7 +9,6 @@ import EnvironmentModal from 'components/EnvironmentModal';
 import EnvironmentService from 'services/Environment.service';
 import useEnvironmentCrud from './hooks/useEnvironmentCrud';
 
-
 interface IContext {
   environmentList: Environment[];
   selectedEnvironment?: Environment;
