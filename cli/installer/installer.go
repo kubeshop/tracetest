@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	Force            = false
-	RunEnvironment   = NoneRunEnvironmentType
-	InstallationMode = NotChosenInstallationModeType
+	Force             = false
+	RunEnvironment    = NoneRunEnvironmentType
+	InstallationMode  = NotChosenInstallationModeType
+	KubernetesContext = ""
 )
 
 const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"

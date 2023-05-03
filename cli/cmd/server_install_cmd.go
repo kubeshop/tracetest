@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	force            = false
-	runEnvironment   = installer.NoneRunEnvironmentType
-	installationMode = installer.NotChosenInstallationModeType
+	force             = false
+	runEnvironment    = installer.NoneRunEnvironmentType
+	installationMode  = installer.NotChosenInstallationModeType
+	kubernetesContext = ""
 )
 
 var serverInstallCmd = &cobra.Command{
@@ -21,6 +22,7 @@ var serverInstallCmd = &cobra.Command{
 		installer.Force = force
 		installer.RunEnvironment = runEnvironment
 		installer.InstallationMode = installationMode
+		installer.KubernetesContext = kubernetesContext
 
 		analytics.Track("Server Install", "cmd", map[string]string{})
 		installer.Start()
@@ -30,6 +32,7 @@ var serverInstallCmd = &cobra.Command{
 
 func init() {
 	serverInstallCmd.Flags().BoolVarP(&force, "force", "f", false, "Overwrite existing files")
+	serverInstallCmd.Flags().StringVar(&kubernetesContext, "kubernetes-context", "", "Kubernetes context used to install Tracetest. It will be only used if 'run-environment' is set as 'kubernetes'.")
 
 	// these commands will not have shorthand parameters to avoid colision with existing ones in other commands
 	serverInstallCmd.Flags().Var(&installationMode, "mode", "Indicate the type of demo environment to be installed with Tracetest. It can be 'with-demo' or 'just-tracetest'.")
