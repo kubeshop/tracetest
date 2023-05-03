@@ -16,6 +16,7 @@ This integration point uses the OpenTelemetry Collector as a router to send trac
 - [Sending traces to Lightstep and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-lightstep.md)
 - [Sending traces to New Relic and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-new-relic.md)
 - [Sending traces to Datadog and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-datadog.md)
+- [Sending traces to Honeycomb and Tracetest from a Node.js app using the OpenTelemetry Collector](./recipes/running-tracetest-with-honeycomb.md)
 
 ### Jaeger
 

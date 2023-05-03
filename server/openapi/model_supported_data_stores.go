@@ -23,6 +23,7 @@ const (
 	LIGHTSTEP  SupportedDataStores = "lightstep"
 	DATADOG    SupportedDataStores = "datadog"
 	AWSXRAY    SupportedDataStores = "awsxray"
+	HONEYCOMB  SupportedDataStores = "honeycomb"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

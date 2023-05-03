@@ -2,7 +2,7 @@ import {SupportedDataStores} from 'types/DataStore.types';
 import {Model, TDataStoreSchemas} from 'types/Common.types';
 
 export type TRawDataStore = TDataStoreSchemas['DataStoreResource'];
-type DataStore = Model<TRawDataStore, {}>['spec'] & {otlp?: {}; newrelic?: {}; lightstep?: {}; datadog?: {}};
+type DataStore = Model<TRawDataStore, {}>['spec'] & {otlp?: {}; newrelic?: {}; lightstep?: {}; datadog?: {}, honeycomb?: {}};
 
 const DataStore = ({
   spec: {

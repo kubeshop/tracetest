@@ -11,6 +11,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.Lightstep]: 'Lightstep',
   [SupportedDataStores.Datadog]: 'Datadog',
   [SupportedDataStores.AWSXRay]: 'AWS X-Ray',
+  [SupportedDataStores.Honeycomb]: 'Honeycomb',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -25,6 +26,7 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.AWSXRay]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/aws-x-ray',
   [SupportedDataStores.OtelCollector]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector',
+  [SupportedDataStores.Honeycomb]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/honeycomb',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
@@ -38,6 +40,7 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.Lightstep]: '',
   [SupportedDataStores.Datadog]: '',
   [SupportedDataStores.AWSXRay]: '',
+  [SupportedDataStores.Honeycomb]: '',
 } as const;
 
 const collectorExplanation = (
