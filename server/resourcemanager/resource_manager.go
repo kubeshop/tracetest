@@ -463,7 +463,7 @@ func encodeValues(resource any, enc encoder) ([]byte, error) {
 		return nil, fmt.Errorf("cannot encode resource: %w", err)
 	}
 
-	return enc.Marshal(resource)
+	return enc.Marshal(values)
 }
 
 func readValues(r *http.Request, enc encoder) (map[string]any, error) {
@@ -523,14 +523,19 @@ func fixInternalSlicesMapping(output *map[string]any) {
 			}
 
 			firstItem := value.Index(0)
-			if firstItem.Kind() != reflect.Struct {
+			if firstItem.Kind() == reflect.Pointer {
+				firstItem = firstItem.Elem()
+			}
+
+			firstItemKind := firstItem.Kind()
+			if firstItemKind != reflect.Struct && firstItemKind != reflect.Interface {
 				continue
 			}
 
 			newOutput := make([]map[string]any, value.Len())
 
 			for i := 0; i < value.Len(); i++ {
-				mapstructure.Decode(value.Index(i).Interface(), &newOutput[i])
+				encode(value.Index(i).Interface(), &newOutput[i])
 			}
 
 			deferencedOutput := *output
