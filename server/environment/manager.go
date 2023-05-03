@@ -84,9 +84,17 @@ func (r *Repository) SetID(environment Environment, id id.ID) Environment {
 
 func (r *Repository) Create(ctx context.Context, environment Environment) (Environment, error) {
 	environment.ID = environment.Slug()
-	environment.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+	_, err := r.Get(ctx, environment.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			environment.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+			return r.insertIntoEnvironments(ctx, environment)
+		}
 
-	return r.insertIntoEnvironments(ctx, environment)
+		return Environment{}, err
+	}
+
+	return r.Update(ctx, environment)
 }
 
 func (r *Repository) Update(ctx context.Context, environment Environment) (Environment, error) {
