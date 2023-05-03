@@ -10,6 +10,7 @@ import Otlp from './Icons/Otlp';
 import SignalFx from './Icons/SignalFx';
 import Tempo from './Icons/Tempo';
 import AWSXRay from './Icons/AwsXRay';
+import Honeycomb from './Icons/Honeycomb';
 
 const iconMap = {
   [SupportedDataStores.JAEGER]: Jaeger,
@@ -22,6 +23,7 @@ const iconMap = {
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.AWSXRay]: AWSXRay,
+  [SupportedDataStores.Honeycomb]: Honeycomb,
 } as const;
 
 interface IProps {

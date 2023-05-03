@@ -120,6 +120,7 @@ const (
 	DataStoreTypeElasticAPM DataStoreType = "elasticapm"
 	DataStoreTypeDataDog    DataStoreType = "datadog"
 	DataStoreTypeAwsXRay    DataStoreType = "awsxray"
+	DataStoreTypeHoneycomb  DataStoreType = "honeycomb"
 )
 
 var validTypes = []DataStoreType{
@@ -133,6 +134,7 @@ var validTypes = []DataStoreType{
 	DataStoreTypeElasticAPM,
 	DataStoreTypeDataDog,
 	DataStoreTypeAwsXRay,
+	DataStoreTypeHoneycomb,
 }
 
 var otlpBasedDataStores = []DataStoreType{
@@ -140,6 +142,7 @@ var otlpBasedDataStores = []DataStoreType{
 	DataStoreTypeNewRelic,
 	DataStoreTypeLighStep,
 	DataStoreTypeDataDog,
+	DataStoreTypeHoneycomb,
 }
 
 func (ds DataStore) Validate() error {

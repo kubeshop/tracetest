@@ -1232,7 +1232,8 @@ export interface external {
           | "newrelic"
           | "lightstep"
           | "datadog"
-          | "awsxray";
+          | "awsxray"
+          | "honeycomb";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
       };

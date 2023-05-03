@@ -108,6 +108,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/datadog",
               label: "Datadog",
             },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/honeycomb",
+              label: "Honeycomb",
+            },
           ],
         },
         {
@@ -453,6 +458,11 @@ const sidebars = {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-testkube",
           label: "Tracetest and Testkube - Running Scheduled Trace-based Tests",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
+          label: "Node.js and Honeycomb",
         },
       ],
     },

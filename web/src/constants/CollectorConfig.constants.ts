@@ -134,9 +134,47 @@ service:
       exporters: [datadog]
 `;
 
+export const Honeycomb = `receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  logging:
+    logLevel: debug
+  # OTLP for Tracetest
+  otlp/tt:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true
+  # OTLP for Honeycomb
+  otlp/hc:
+    endpoint: "api.honeycomb.io:443"
+    headers:
+      "x-honeycomb-team": "YOUR_API_KEY"
+      # Read more in docs here: https://docs.honeycomb.io/getting-data-in/otel-collector/
+
+service:
+  pipelines:
+    traces/tt:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tt]
+    traces/hc:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/hc]
+`;
+
 export const CollectorConfigMap = {
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.OtelCollector]: OtelCollector,
+  [SupportedDataStores.Honeycomb]: Honeycomb,
 } as const;

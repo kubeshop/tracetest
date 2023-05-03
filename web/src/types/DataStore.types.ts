@@ -21,6 +21,7 @@ export enum SupportedDataStores {
   SignalFX = 'signalfx',
   Datadog = 'datadog',
   AWSXRay = 'awsxray',
+  Honeycomb = 'honeycomb',
 }
 
 export enum SupportedClientTypes {
@@ -85,6 +86,7 @@ type IDataStore = DataStore & {
   lightstep?: {};
   newrelic?: {};
   datadog?: {};
+  honeycomb?: {};
 };
 
 export type TDraftDataStore = {

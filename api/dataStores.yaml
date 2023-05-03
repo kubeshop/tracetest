@@ -158,7 +158,7 @@ components:
           type: string
     SupportedDataStores:
       type: string
-      enum: [jaeger, opensearch, tempo, signalfx, otlp, elasticapm, newrelic, lightstep, datadog, awsxray]
+      enum: [jaeger, opensearch, tempo, signalfx, otlp, elasticapm, newrelic, lightstep, datadog, awsxray, honeycomb]
     SupportedClients:
       type: string
       enum: [http, grpc]
