@@ -1,8 +1,6 @@
 package formatters
 
 import (
-	"fmt"
-
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -61,9 +59,6 @@ func (f PollingFormatter) getTableHeader() *simpletable.Header {
 			{Text: "ID"},
 			{Text: "NAME"},
 			{Text: "STRAGETY"},
-			{Text: "RETRY DELAY"},
-			{Text: "TIMEOUT"},
-			{Text: "DEFAULT"},
 		},
 	}
 }
@@ -73,8 +68,5 @@ func (f PollingFormatter) getTableRow(t openapi.PollingProfile) ([]*simpletable.
 		{Text: t.Spec.Id},
 		{Text: t.Spec.Name},
 		{Text: t.Spec.Strategy},
-		{Text: "TODO"},
-		{Text: *t.Spec.Periodic.Timeout},
-		{Text: fmt.Sprintf("%t", *t.Spec.Default)},
 	}, nil
 }

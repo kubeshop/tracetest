@@ -27,7 +27,7 @@ func (j Json) Format(file *file.File) (string, error) {
 		return "", fmt.Errorf("could not convert file to struct: %w", err)
 	}
 
-	bytes, err := json.Marshal(data)
+	bytes, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		return "", fmt.Errorf("could not marshal output json: %w", err)
 	}

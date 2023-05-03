@@ -57,7 +57,7 @@ var listCmd = &cobra.Command{
 		}
 
 		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, resourceFormatter.ToListTable, resourceFormatter.ToListStruct)
+		formatter := formatters.BuildFormatter(output, formatters.Pretty, resourceFormatter.ToListTable, resourceFormatter.ToListStruct)
 
 		result, err := formatter.Format(resource)
 		if err != nil {
@@ -66,7 +66,7 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println(result)
+		cmd.Println(result)
 	},
 	PostRun: teardownCommand,
 }
@@ -76,5 +76,6 @@ func init() {
 	listCmd.Flags().Int32Var(&listSkip, "skip", 0, "Skip number")
 	listCmd.Flags().StringVar(&listSortBy, "sortBy", "", "Sort by")
 	listCmd.Flags().StringVar(&listSortDirection, "sortDirection", "desc", "Sort direction")
+
 	rootCmd.AddCommand(listCmd)
 }

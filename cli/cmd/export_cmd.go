@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -45,7 +44,7 @@ var exportCmd = &cobra.Command{
 			return
 		}
 
-		cmd.Println(pterm.FgGreen.Sprintf(fmt.Sprintf("✔  Definition exported successfully for resource type: %s", resourceType)))
+		cmd.Println(fmt.Sprintf("✔  Definition exported successfully for resource type: %s", resourceType))
 	},
 	PostRun: teardownCommand,
 }

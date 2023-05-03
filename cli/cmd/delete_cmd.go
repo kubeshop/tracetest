@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -48,7 +47,7 @@ var deleteCmd = &cobra.Command{
 			return
 		}
 
-		cmd.Println(pterm.FgGreen.Sprintf(fmt.Sprintf("✔ %s", message)))
+		cmd.Println(fmt.Sprintf("✔ %s", message))
 	},
 	PostRun: teardownCommand,
 }

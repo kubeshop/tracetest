@@ -49,10 +49,18 @@ func (f Formatter) Format(file *file.File) (string, error) {
 	return formatter.Format(file)
 }
 
-func BuildFormatter(formatType string, toTable ToTable, toStruct ToStruct) Formatter {
+func BuildFormatter(formatType string, defaultType Output, toTable ToTable, toStruct ToStruct) Formatter {
 	jsonFormatter := NewJson(toStruct)
 	yamlFormatter := NewYaml(toStruct)
 	tableFormatter := NewTable(toTable)
+
+	if defaultType == "" {
+		defaultType = YAML
+	}
+
+	if formatType == "" {
+		formatType = string(defaultType)
+	}
 
 	return NewFormatter(formatType, jsonFormatter, yamlFormatter, tableFormatter)
 }

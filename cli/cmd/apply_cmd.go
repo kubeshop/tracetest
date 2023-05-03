@@ -8,7 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -48,17 +47,15 @@ var applyCmd = &cobra.Command{
 			File: definitionFile,
 		}
 
-		resource, message, err := resourceActions.Apply(ctx, applyArgs)
+		resource, _, err := resourceActions.Apply(ctx, applyArgs)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to apply definition for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
 
-		cmd.Println(pterm.FgGreen.Sprintf(fmt.Sprintf("✔ %s", message)))
-
 		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, resourceFormatter.ToTable, resourceFormatter.ToStruct)
+		formatter := formatters.BuildFormatter(output, formatters.DefaultOutput, resourceFormatter.ToTable, resourceFormatter.ToStruct)
 
 		result, err := formatter.Format(resource)
 		if err != nil {
@@ -67,7 +64,7 @@ var applyCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println(result)
+		cmd.Println(result)
 	},
 	PostRun: teardownCommand,
 }

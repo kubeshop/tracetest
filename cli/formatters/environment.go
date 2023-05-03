@@ -1,8 +1,6 @@
 package formatters
 
 import (
-	"encoding/json"
-
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -85,21 +83,14 @@ func (f EnvironmentsFormatter) getTableHeader() *simpletable.Header {
 			{Text: "ID"},
 			{Text: "NAME"},
 			{Text: "DESCRIPTION"},
-			{Text: "VALUES"},
 		},
 	}
 }
 
 func (f EnvironmentsFormatter) getTableRow(t openapi.EnvironmentResource) ([]*simpletable.Cell, error) {
-	values, err := json.Marshal(t.Spec.Values)
-	if err != nil {
-		return nil, err
-	}
-
 	return []*simpletable.Cell{
 		{Text: *t.Spec.Id},
 		{Text: *t.Spec.Name},
 		{Text: *t.Spec.Description},
-		{Text: string(values)},
 	}, nil
 }

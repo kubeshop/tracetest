@@ -11,10 +11,12 @@ var (
 		Pretty,
 		JSON,
 		YAML,
+		Empty,
 	}
 
-	DefaultOutput = Pretty
+	DefaultOutput = YAML
 
+	Empty  Output = ""
 	Pretty Output = "pretty"
 	JSON   Output = "json"
 	YAML   Output = "yaml"

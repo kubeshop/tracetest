@@ -50,7 +50,7 @@ var getCmd = &cobra.Command{
 		}
 
 		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, resourceFormatter.ToTable, resourceFormatter.ToStruct)
+		formatter := formatters.BuildFormatter(output, formatters.DefaultOutput, resourceFormatter.ToTable, resourceFormatter.ToStruct)
 
 		result, err := formatter.Format(resource)
 		if err != nil {
@@ -59,7 +59,7 @@ var getCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println(result)
+		cmd.Println(result)
 	},
 	PostRun: teardownCommand,
 }
