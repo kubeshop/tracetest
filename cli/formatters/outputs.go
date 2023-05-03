@@ -14,7 +14,7 @@ var (
 		Empty,
 	}
 
-	DefaultOutput = YAML
+	DefaultOutput = Pretty
 
 	Empty  Output = ""
 	Pretty Output = "pretty"
