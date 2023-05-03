@@ -59,7 +59,7 @@ var getCmd = &cobra.Command{
 			return
 		}
 
-		cmd.Println(result)
+		fmt.Println(result)
 	},
 	PostRun: teardownCommand,
 }
