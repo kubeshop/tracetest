@@ -66,6 +66,8 @@ var (
 		getNotFoundOperation,
 		getSuccessOperation,
 
+		getAugmentedSuccessOperation,
+
 		deleteNotFoundOperation,
 		deleteSuccessOperation,
 
