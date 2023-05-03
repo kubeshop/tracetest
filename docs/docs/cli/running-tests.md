@@ -198,15 +198,23 @@ We can run a test and specify that environment with this command:
 tracetest test run -d path/to/test.yaml -e testenv -w
 ```
 
-You can also reference an .env file which will be used to create a new environment or update an existing one. For example, if you have a .env file named local.env with this content:
+You can also reference an environment resource file which will be used to create a new environment or update an existing one. For example, if you have a file named local.env with this content:
 ```
-POKEID=45
-POKENAME=vileplume
+type: Environment
+spec:
+  id: local.env
+  name: local.env
+  values:
+  - key: POKEID
+    value: 45
+  - key: POKENAME
+    value: vileplume
 ```
+
 ```
 tracetest test run -d path/to/test.yaml -e path/to/local.env -w
 ```
 
-If you use the .env approach, a new environment will be created in Tracetest. If it does not exist, the environment name and id will be the file name without the suffix .env. So, local.env becomes local.
+If you use the environment resource approach, a new environment will be created in Tracetest.
 
 The second approach is very useful if you are running tests from a CI pipeline.
