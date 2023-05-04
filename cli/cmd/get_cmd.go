@@ -50,7 +50,7 @@ var getCmd = &cobra.Command{
 		}
 
 		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, formatters.YAML, resourceFormatter.ToTable, resourceFormatter.ToStruct)
+		formatter := formatters.BuildFormatter(output, formatters.YAML, resourceFormatter)
 
 		result, err := formatter.Format(resource)
 		if err != nil {

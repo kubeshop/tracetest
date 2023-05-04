@@ -42,10 +42,9 @@ func (f DemoFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpl
 		return nil, nil, err
 	}
 
-	demoList := rawDemoList.(openapi.DemoList)
-
 	body := simpletable.Body{}
-	for _, demo := range demoList.Items {
+	for _, rawDemo := range rawDemoList {
+		demo := rawDemo.(openapi.Demo)
 		row, err := f.getTableRow(demo)
 		if err != nil {
 			return nil, nil, err
@@ -58,16 +57,16 @@ func (f DemoFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpl
 }
 
 func (f DemoFormatter) ToStruct(file *file.File) (interface{}, error) {
-	var DemoResource openapi.Demo
-	err := yaml.Unmarshal([]byte(file.Contents()), &DemoResource)
+	var demoResource openapi.Demo
+	err := yaml.Unmarshal([]byte(file.Contents()), &demoResource)
 	if err != nil {
 		return nil, err
 	}
 
-	return DemoResource, nil
+	return demoResource, nil
 }
 
-func (f DemoFormatter) ToListStruct(file *file.File) (interface{}, error) {
+func (f DemoFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var demoList openapi.DemoList
 
 	err := yaml.Unmarshal([]byte(file.Contents()), &demoList)
@@ -75,7 +74,12 @@ func (f DemoFormatter) ToListStruct(file *file.File) (interface{}, error) {
 		return nil, err
 	}
 
-	return demoList, nil
+	items := make([]interface{}, len(demoList.Items))
+	for i, item := range demoList.Items {
+		items[i] = item
+	}
+
+	return items, nil
 }
 
 func (f DemoFormatter) getTableHeader() *simpletable.Header {

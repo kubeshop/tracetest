@@ -40,10 +40,11 @@ func (f EnvironmentsFormatter) ToListTable(file *file.File) (*simpletable.Header
 		return nil, nil, err
 	}
 
-	environmentResourceList := rawEnvironmentList.(openapi.EnvironmentResourceList)
+	// environmentResourceList := rawEnvironmentList.(openapi.EnvironmentResourceList)
 
 	body := simpletable.Body{}
-	for _, environmentResource := range environmentResourceList.Items {
+	for _, rawDemo := range rawEnvironmentList {
+		environmentResource := rawDemo.(openapi.EnvironmentResource)
 		row, err := f.getTableRow(environmentResource)
 		if err != nil {
 			return nil, nil, err
@@ -66,7 +67,7 @@ func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 	return environmentResource, nil
 }
 
-func (f EnvironmentsFormatter) ToListStruct(file *file.File) (interface{}, error) {
+func (f EnvironmentsFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var environmentResourceList openapi.EnvironmentResourceList
 
 	err := yaml.Unmarshal([]byte(file.Contents()), &environmentResourceList)
@@ -74,7 +75,12 @@ func (f EnvironmentsFormatter) ToListStruct(file *file.File) (interface{}, error
 		return nil, err
 	}
 
-	return environmentResourceList, nil
+	items := make([]interface{}, len(environmentResourceList.Items))
+	for i, item := range environmentResourceList.Items {
+		items[i] = item
+	}
+
+	return items, nil
 }
 
 func (f EnvironmentsFormatter) getTableHeader() *simpletable.Header {

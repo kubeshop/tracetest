@@ -57,9 +57,9 @@ var listCmd = &cobra.Command{
 		}
 
 		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, formatters.Pretty, resourceFormatter.ToListTable, resourceFormatter.ToListStruct)
+		formatter := formatters.BuildFormatter(output, formatters.Pretty, resourceFormatter)
 
-		result, err := formatter.Format(resource)
+		result, err := formatter.FormatList(resource)
 		if err != nil {
 			cliLogger.Error("failed to format resource", zap.Error(err))
 			os.Exit(1)

@@ -51,7 +51,7 @@ func (f ConfigFormatter) ToStruct(file *file.File) (interface{}, error) {
 	return ConfigResource, nil
 }
 
-func (f ConfigFormatter) ToListStruct(file *file.File) (interface{}, error) {
+func (f ConfigFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	return nil, nil
 }
 

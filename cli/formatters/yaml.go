@@ -9,17 +9,40 @@ import (
 )
 
 type Yaml struct {
-	toStructFn ToStruct
+	toStructFn     ToStruct
+	toListStructFn ToListStruct
 }
 
 var _ FormatterInterface = Yaml{}
 
-func NewYaml(toStructFn ToStruct) Yaml {
-	return Yaml{toStructFn}
+func NewYaml(resourceFormatter ResourceFormatter) Yaml {
+	return Yaml{
+		toStructFn:     resourceFormatter.ToStruct,
+		toListStructFn: resourceFormatter.ToListStruct,
+	}
 }
 
 func (Yaml) Type() string {
 	return "yaml"
+}
+
+func (y Yaml) FormatList(file *file.File) (string, error) {
+	data, err := y.toListStructFn(file)
+	if err != nil {
+		return "", fmt.Errorf("could not convert file to struct: %w", err)
+	}
+
+	result := ""
+	for _, value := range data {
+		bytes, err := yaml.Marshal(value)
+		if err != nil {
+			return "", fmt.Errorf("could not marshal output json: %w", err)
+		}
+
+		result += "---\n" + string(bytes) + "\n"
+	}
+
+	return result, nil
 }
 
 func (y Yaml) Format(file *file.File) (string, error) {
@@ -33,5 +56,5 @@ func (y Yaml) Format(file *file.File) (string, error) {
 		return "", fmt.Errorf("could not marshal output json: %w", err)
 	}
 
-	return string(bytes), nil
+	return "---\n" + string(bytes), nil
 }

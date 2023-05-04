@@ -39,17 +39,17 @@ func (f PollingFormatter) ToListTable(file *file.File) (*simpletable.Header, *si
 }
 
 func (f PollingFormatter) ToStruct(file *file.File) (interface{}, error) {
-	var PollingResource openapi.PollingProfile
+	var pollingResource openapi.PollingProfile
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &PollingResource)
+	err := yaml.Unmarshal([]byte(file.Contents()), &pollingResource)
 	if err != nil {
 		return nil, err
 	}
 
-	return PollingResource, nil
+	return pollingResource, nil
 }
 
-func (f PollingFormatter) ToListStruct(file *file.File) (interface{}, error) {
+func (f PollingFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	return nil, nil
 }
 

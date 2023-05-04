@@ -49,7 +49,7 @@ func (f DatastoreFormatter) ToStruct(file *file.File) (interface{}, error) {
 	return datastoreResource, nil
 }
 
-func (f DatastoreFormatter) ToListStruct(file *file.File) (interface{}, error) {
+func (f DatastoreFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	return nil, nil
 }
 

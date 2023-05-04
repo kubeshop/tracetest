@@ -8,7 +8,7 @@ import (
 )
 
 type ToStruct func(*file.File) (interface{}, error)
-type ToListStruct func(*file.File) (interface{}, error)
+type ToListStruct func(*file.File) ([]interface{}, error)
 
 type ToTable func(*file.File) (*simpletable.Header, *simpletable.Body, error)
 type ToListTable ToTable
@@ -17,11 +17,12 @@ type ResourceFormatter interface {
 	ToTable(*file.File) (*simpletable.Header, *simpletable.Body, error)
 	ToListTable(*file.File) (*simpletable.Header, *simpletable.Body, error)
 	ToStruct(*file.File) (interface{}, error)
-	ToListStruct(*file.File) (interface{}, error)
+	ToListStruct(*file.File) ([]interface{}, error)
 }
 
 type FormatterInterface interface {
 	Format(*file.File) (string, error)
+	FormatList(*file.File) (string, error)
 	Type() string
 }
 
@@ -49,10 +50,19 @@ func (f Formatter) Format(file *file.File) (string, error) {
 	return formatter.Format(file)
 }
 
-func BuildFormatter(formatType string, defaultType Output, toTable ToTable, toStruct ToStruct) Formatter {
-	jsonFormatter := NewJson(toStruct)
-	yamlFormatter := NewYaml(toStruct)
-	tableFormatter := NewTable(toTable)
+func (f Formatter) FormatList(file *file.File) (string, error) {
+	formatter, ok := f.registry[f.formatType]
+	if !ok {
+		return "", fmt.Errorf("formatter %s not found", f.formatType)
+	}
+
+	return formatter.FormatList(file)
+}
+
+func BuildFormatter(formatType string, defaultType Output, resourceFormatter ResourceFormatter) Formatter {
+	jsonFormatter := NewJson(resourceFormatter)
+	yamlFormatter := NewYaml(resourceFormatter)
+	tableFormatter := NewTable(resourceFormatter)
 
 	if defaultType == "" {
 		defaultType = YAML
