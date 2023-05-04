@@ -29,6 +29,12 @@ components:
           description: version number of the test
         steps:
           type: array
+          description: list of steps of the transaction containing just each test id
+          items:
+            type: string
+        fullSteps:
+          type: array
+          description: list of steps of the transaction containing the whole test object
           items:
             $ref: "./tests.yaml#/components/schemas/Test"
         createdAt:
