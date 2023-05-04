@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"io"
+	URL "net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -39,6 +40,11 @@ func StringReferencesFile(path string) bool {
 }
 
 func OpenBrowser(url string) error {
+	_, err := URL.Parse(url)
+	if err != nil {
+		return err
+	}
+
 	switch runtime.GOOS {
 	case "linux":
 		return exec.Command("xdg-open", url).Start()

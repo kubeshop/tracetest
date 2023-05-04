@@ -20,6 +20,12 @@ var dashboardCmd = &cobra.Command{
 		analytics.Track("Dashboard", "cmd", map[string]string{})
 		url := fmt.Sprintf("%s://%s", cliConfig.Scheme, cliConfig.Endpoint)
 
+		if cliConfig.IsEmpty() {
+			cliLogger.Error("Missing Tracetest endpoint configuration")
+			os.Exit(1)
+			return
+		}
+
 		err := utils.OpenBrowser(url)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to open the dashboard url: %s", url), zap.Error(err))
