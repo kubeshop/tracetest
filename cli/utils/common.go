@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -33,4 +36,17 @@ func StringReferencesFile(path string) bool {
 	// if the string is empty the absolute path will the entire dir
 	// otherwise the user also could send a directory by mistake
 	return info != nil && !info.IsDir()
+}
+
+func OpenBrowser(url string) error {
+	switch runtime.GOOS {
+	case "linux":
+		return exec.Command("xdg-open", url).Start()
+	case "windows":
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		return exec.Command("open", url).Start()
+	default:
+		return fmt.Errorf("unsupported platform")
+	}
 }
