@@ -66,4 +66,5 @@ export const NoTestConnectionDataStoreList = [
   SupportedDataStores.Lightstep,
   SupportedDataStores.Datadog,
   SupportedDataStores.NewRelic,
+  SupportedDataStores.Honeycomb,
 ];
