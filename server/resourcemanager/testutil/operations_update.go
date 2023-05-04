@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,7 +33,7 @@ var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		require.Equal(t, 200, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -52,7 +53,7 @@ var updateNotFoundOperation = buildSingleStepOperation(singleStepOperationTester
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		require.Equal(t, 404, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 404, resp.StatusCode), resp)
 	},
 })
 

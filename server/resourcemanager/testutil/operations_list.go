@@ -52,7 +52,7 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 200, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -61,7 +61,7 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 			"items": []
 		}`
 
-		require.JSONEq(t, expected, jsonBody)
+		dumpResponseIfNot(t, assert.JSONEq(t, expected, jsonBody), resp)
 	},
 })
 
@@ -80,7 +80,7 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 200, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -90,11 +90,11 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		}
 		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-		require.Equal(t, 1, parsedJsonBody.Count)
-		require.Equal(t, 1, len(parsedJsonBody.Items))
+		dumpResponseIfNot(t, assert.Equal(t, 1, parsedJsonBody.Count), resp)
+		dumpResponseIfNot(t, assert.Equal(t, 1, len(parsedJsonBody.Items)), resp)
 
 		obtainedAsBytes, err := json.Marshal(parsedJsonBody.Items[0])
-		require.NoError(t, err)
+		dumpResponseIfNot(t, assert.NoError(t, err), resp)
 
 		expected := ct.toJSON(rt.SampleJSON)
 		obtained := string(obtainedAsBytes)
@@ -125,7 +125,7 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 400, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 400, resp.StatusCode), resp)
 	},
 })
 
@@ -169,7 +169,7 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 		},
 		assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 			sortField := sortField
-			require.Equal(t, 200, resp.StatusCode)
+			dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 			jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -179,8 +179,8 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			}
 			json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-			require.Equal(t, 3, parsedJsonBody.Count)
-			require.Greater(t, len(parsedJsonBody.Items), 1)
+			dumpResponseIfNot(t, assert.Equal(t, 3, parsedJsonBody.Count), resp)
+			dumpResponseIfNot(t, assert.Greater(t, len(parsedJsonBody.Items), 1), resp)
 
 			// we skip the 1st item, so starting in 1 instead of 0
 			// makes things match later when comparing to len(parsedJsonBody.Items)
