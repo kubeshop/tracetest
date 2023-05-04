@@ -4,12 +4,26 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
+
+func dumpResponseIfNot(t *testing.T, success bool, resp *http.Response) {
+	t.Helper()
+
+	if success {
+		return
+	}
+
+	b, _ := httputil.DumpResponse(resp, true)
+	t.Log("\n", string(b))
+	t.FailNow()
+}
 
 func generateRandomString() string {
 	generator := id.NewRandGenerator()
@@ -83,7 +97,7 @@ func responseBodyJSON(t *testing.T, resp *http.Response, ct contentTypeConverter
 }
 
 func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConverter, resourceType, verb string) {
-	require.Equal(t, 500, resp.StatusCode)
+	dumpResponseIfNot(t, assert.Equal(t, 500, resp.StatusCode), resp)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -94,6 +108,6 @@ func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConver
 	}{}
 	json.Unmarshal([]byte(jsonBody), &bodyValues)
 
-	require.Equal(t, 500, bodyValues.Code)
-	require.Contains(t, bodyValues.Error, "error "+verb+" resource "+resourceType)
+	dumpResponseIfNot(t, assert.Equal(t, 500, bodyValues.Code), resp)
+	dumpResponseIfNot(t, assert.Contains(t, bodyValues.Error, "error "+verb+" resource "+resourceType), resp)
 }
