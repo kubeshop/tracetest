@@ -53,7 +53,7 @@ var updateNotFoundOperation = buildSingleStepOperation(singleStepOperationTester
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		dumpResponseIfNot(t, assert.Equal(t, 204, resp.StatusCode), resp)
+		dumpResponseIfNot(t, assert.Equal(t, 404, resp.StatusCode), resp)
 	},
 })
 
