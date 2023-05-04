@@ -1,6 +1,19 @@
 openapi: 3.0.0
 components:
   schemas:
+
+    TransactionResource:
+      type: object
+      description: "Represents a transaction structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Transaction'."
+          enum:
+            - Transaction
+        spec:
+          $ref: "#/components/schemas/Transaction"
+
     Transaction:
       type: object
       properties:

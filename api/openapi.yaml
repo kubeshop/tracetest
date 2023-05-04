@@ -84,7 +84,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "./transactions.yaml#/components/schemas/Transaction"
+                      $ref: "./transactions.yaml#/components/schemas/TransactionResource"
             text/yaml:
               schema:
                 type: object
@@ -94,7 +94,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "./transactions.yaml#/components/schemas/Transaction"
+                      $ref: "./transactions.yaml#/components/schemas/TransactionResource"
         400:
           description: "invalid query for transactions, some data was sent in incorrect format."
         500:
@@ -109,20 +109,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./transactions.yaml#/components/schemas/Transaction"
+              $ref: "./transactions.yaml#/components/schemas/TransactionResource"
           text/yaml:
             schema:
-              $ref: "./transactions.yaml#/components/schemas/Transaction"
+              $ref: "./transactions.yaml#/components/schemas/TransactionResource"
       responses:
         201:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./transactions.yaml#/components/schemas/Transaction"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResource"
             text/yaml:
               schema:
-                $ref: "./transactions.yaml#/components/schemas/Transaction"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResource"
         400:
           description: "trying to create a transaction with an already existing ID"
         500:
@@ -142,10 +142,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./transactions.yaml#/components/schemas/Transaction"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResource"
             text/yaml:
               schema:
-                $ref: "./transactions.yaml#/components/schemas/Transaction"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResource"
         404:
           description: "transaction not found"
         500:
@@ -162,20 +162,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./transactions.yaml#/components/schemas/Transaction"
+              $ref: "./transactions.yaml#/components/schemas/TransactionResource"
           text/yaml:
             schema:
-              $ref: "./transactions.yaml#/components/schemas/Transaction"
+              $ref: "./transactions.yaml#/components/schemas/TransactionResource"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./transactions.yaml#/components/schemas/Transaction"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResource"
             text/yaml:
               schema:
-                $ref: "./transactions.yaml#/components/schemas/Transaction"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResource"
         400:
           description: "invalid transaction, some data was sent in incorrect format."
         404:
