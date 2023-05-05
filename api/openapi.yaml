@@ -882,14 +882,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      $ref: "./config.yaml#/components/schemas/Demo"
+                $ref: "./config.yaml#/components/schemas/DemoList"
             text/yaml:
               schema:
                 type: object
@@ -1075,14 +1068,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
+                $ref: "./environments.yaml#/components/schemas/EnvironmentResourceList"
             text/yaml:
               schema:
                 type: object

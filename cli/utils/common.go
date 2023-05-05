@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode"
 )
 
 func StringToIOReader(s string) io.Reader {
@@ -33,4 +34,10 @@ func StringReferencesFile(path string) bool {
 	// if the string is empty the absolute path will the entire dir
 	// otherwise the user also could send a directory by mistake
 	return info != nil && !info.IsDir()
+}
+
+func Capitalize(str string) string {
+	runes := []rune(str)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }

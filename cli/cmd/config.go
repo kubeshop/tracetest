@@ -46,23 +46,43 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
-		configOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("configs", cliConfig)))
+		configOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("configs", cliConfig)),
+			actions.WithFormatter(formatters.NewConfigFormatter()),
+		)
 		configActions := actions.NewConfigActions(configOptions...)
 		resourceRegistry.Register(configActions)
 
-		pollingOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("pollingprofiles", cliConfig)))
+		pollingOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("pollingprofiles", cliConfig)),
+			actions.WithFormatter(formatters.NewPollingFormatter()),
+		)
 		pollingActions := actions.NewPollingActions(pollingOptions...)
 		resourceRegistry.Register(pollingActions)
 
-		demoOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("demos", cliConfig)))
+		demoOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("demos", cliConfig)),
+			actions.WithFormatter(formatters.NewDemoFormatter()),
+		)
 		demoActions := actions.NewDemoActions(demoOptions...)
 		resourceRegistry.Register(demoActions)
 
-		dataStoreOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("datastores", cliConfig)))
+		dataStoreOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("datastores", cliConfig)),
+			actions.WithFormatter(formatters.NewDatastoreFormatter()),
+		)
 		dataStoreActions := actions.NewDataStoreActions(dataStoreOptions...)
 		resourceRegistry.Register(dataStoreActions)
 
-		environmentOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)))
+		environmentOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)),
+			actions.WithFormatter(formatters.NewEnvironmentsFormatter()),
+		)
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
 

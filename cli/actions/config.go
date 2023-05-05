@@ -2,8 +2,10 @@ package actions
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/file"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 )
@@ -31,8 +33,18 @@ func (configActions) Name() string {
 	return "config"
 }
 
-func (config configActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
-	return config.resourceClient.Update(ctx, fileContent, currentConfigID)
+func (config configActions) GetID(file *file.File) (string, error) {
+	resource, err := config.formatter.ToStruct(file)
+	if err != nil {
+		return "", err
+	}
+
+	return *resource.(openapi.ConfigurationResource).Spec.Id, nil
+}
+
+func (config configActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
+	result, err = config.resourceClient.Update(ctx, fileContent, currentConfigID)
+	return result, err
 }
 
 func (config configActions) Get(ctx context.Context, ID string) (*file.File, error) {
@@ -40,9 +52,9 @@ func (config configActions) Get(ctx context.Context, ID string) (*file.File, err
 }
 
 func (config configActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
-	return nil, ErrNotSupportedResourceAction
+	return nil, fmt.Errorf("Config does not support listing. Try `tracetest get config` instead")
 }
 
-func (config configActions) Delete(ctx context.Context, ID string) error {
-	return ErrNotSupportedResourceAction
+func (config configActions) Delete(ctx context.Context, ID string) (string, error) {
+	return "Config successfully reset to default", ErrNotSupportedResourceAction
 }

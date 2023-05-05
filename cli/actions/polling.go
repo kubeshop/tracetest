@@ -32,19 +32,29 @@ func (pollingActions) Name() string {
 	return "pollingprofile"
 }
 
-func (polling pollingActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
+func (polling pollingActions) GetID(file *file.File) (string, error) {
+	resource, err := polling.formatter.ToStruct(file)
+	if err != nil {
+		return "", err
+	}
+
+	return resource.(openapi.PollingProfile).Spec.Id, nil
+}
+
+func (polling pollingActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
 	var pollingProfile openapi.PollingProfile
 	mapstructure.Decode(fileContent.Definition().Spec, &pollingProfile.Spec)
 
-	return polling.resourceClient.Update(ctx, fileContent, currentConfigID)
+	result, err = polling.resourceClient.Update(ctx, fileContent, currentConfigID)
+	return result, err
 }
 
 func (polling pollingActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
 	return nil, ErrNotSupportedResourceAction
 }
 
-func (polling pollingActions) Delete(ctx context.Context, ID string) error {
-	return ErrNotSupportedResourceAction
+func (polling pollingActions) Delete(ctx context.Context, ID string) (string, error) {
+	return "PollingProfile successfully reset to default", ErrNotSupportedResourceAction
 }
 
 func (polling pollingActions) Get(ctx context.Context, ID string) (*file.File, error) {

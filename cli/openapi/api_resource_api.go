@@ -1067,7 +1067,7 @@ func (r ApiListDemosRequest) SortDirection(sortDirection string) ApiListDemosReq
 	return r
 }
 
-func (r ApiListDemosRequest) Execute() (*ListDemos200Response, *http.Response, error) {
+func (r ApiListDemosRequest) Execute() (*DemoList, *http.Response, error) {
 	return r.ApiService.ListDemosExecute(r)
 }
 
@@ -1088,13 +1088,13 @@ func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosReque
 
 // Execute executes the request
 //
-//	@return ListDemos200Response
-func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*ListDemos200Response, *http.Response, error) {
+//	@return DemoList
+func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*DemoList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *ListDemos200Response
+		localVarReturnValue *DemoList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListDemos")
@@ -1207,7 +1207,7 @@ func (r ApiListEnvironmentsRequest) SortDirection(sortDirection string) ApiListE
 	return r
 }
 
-func (r ApiListEnvironmentsRequest) Execute() (*ListEnvironments200Response, *http.Response, error) {
+func (r ApiListEnvironmentsRequest) Execute() (*EnvironmentResourceList, *http.Response, error) {
 	return r.ApiService.ListEnvironmentsExecute(r)
 }
 
@@ -1228,13 +1228,13 @@ func (a *ResourceApiApiService) ListEnvironments(ctx context.Context) ApiListEnv
 
 // Execute executes the request
 //
-//	@return ListEnvironments200Response
-func (a *ResourceApiApiService) ListEnvironmentsExecute(r ApiListEnvironmentsRequest) (*ListEnvironments200Response, *http.Response, error) {
+//	@return EnvironmentResourceList
+func (a *ResourceApiApiService) ListEnvironmentsExecute(r ApiListEnvironmentsRequest) (*EnvironmentResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *ListEnvironments200Response
+		localVarReturnValue *EnvironmentResourceList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListEnvironments")

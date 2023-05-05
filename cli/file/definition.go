@@ -13,6 +13,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type SpecWithID struct {
+	ID string `yaml:"id"`
+}
+
 type File struct {
 	path     string
 	contents []byte
