@@ -52,6 +52,7 @@ func (e basicEncoder) Accepts(contentType string) bool {
 func (e basicEncoder) Marshal(in interface{}) (out []byte, err error) {
 	return e.marshalFn(in)
 }
+
 func (e basicEncoder) Unmarshal(in []byte, out interface{}) (err error) {
 	return e.unmarshalFn(in, out)
 }
