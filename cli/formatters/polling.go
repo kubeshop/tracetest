@@ -4,8 +4,6 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-
-	"gopkg.in/yaml.v2"
 )
 
 type PollingFormatter struct{}
@@ -40,8 +38,9 @@ func (f PollingFormatter) ToListTable(file *file.File) (*simpletable.Header, *si
 
 func (f PollingFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var pollingResource openapi.PollingProfile
+	nullablePolling := openapi.NewNullablePollingProfile(&pollingResource)
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &pollingResource)
+	err := nullablePolling.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}

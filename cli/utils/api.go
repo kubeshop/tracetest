@@ -61,7 +61,7 @@ func GetResourceAPIClient(resourceType string, cliConfig config.Config) Resource
 	baseUrl := fmt.Sprintf("%s://%s/api/%s", cliConfig.Scheme, cliConfig.Endpoint, resourceType)
 	baseHeader := http.Header{
 		"x-client-id":  []string{analytics.ClientID()},
-		"Content-Type": []string{"text/yaml"},
+		"Content-Type": []string{"application/json"},
 	}
 
 	return ResourceClient{

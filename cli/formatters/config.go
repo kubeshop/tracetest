@@ -6,8 +6,6 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-
-	"gopkg.in/yaml.v2"
 )
 
 type ConfigFormatter struct{}
@@ -42,8 +40,9 @@ func (f ConfigFormatter) ToListTable(file *file.File) (*simpletable.Header, *sim
 
 func (f ConfigFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var ConfigResource openapi.ConfigurationResource
+	nullableConfig := openapi.NewNullableConfigurationResource(&ConfigResource)
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &ConfigResource)
+	err := nullableConfig.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}
