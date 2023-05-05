@@ -4,8 +4,6 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-
-	"gopkg.in/yaml.v2"
 )
 
 type EnvironmentsFormatter struct{}
@@ -40,8 +38,6 @@ func (f EnvironmentsFormatter) ToListTable(file *file.File) (*simpletable.Header
 		return nil, nil, err
 	}
 
-	// environmentResourceList := rawEnvironmentList.(openapi.EnvironmentResourceList)
-
 	body := simpletable.Body{}
 	for _, rawDemo := range rawEnvironmentList {
 		environmentResource := rawDemo.(openapi.EnvironmentResource)
@@ -58,8 +54,9 @@ func (f EnvironmentsFormatter) ToListTable(file *file.File) (*simpletable.Header
 
 func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var environmentResource openapi.EnvironmentResource
+	nullableEnvironment := openapi.NewNullableEnvironmentResource(&environmentResource)
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &environmentResource)
+	err := nullableEnvironment.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +66,9 @@ func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 
 func (f EnvironmentsFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var environmentResourceList openapi.EnvironmentResourceList
+	nullableList := openapi.NewNullableEnvironmentResourceList(&environmentResourceList)
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &environmentResourceList)
+	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}

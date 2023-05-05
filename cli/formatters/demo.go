@@ -6,8 +6,6 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-
-	"gopkg.in/yaml.v2"
 )
 
 type DemoFormatter struct{}
@@ -58,7 +56,9 @@ func (f DemoFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpl
 
 func (f DemoFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var demoResource openapi.Demo
-	err := yaml.Unmarshal([]byte(file.Contents()), &demoResource)
+	nullableDemo := openapi.NewNullableDemo(&demoResource)
+
+	err := nullableDemo.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +68,9 @@ func (f DemoFormatter) ToStruct(file *file.File) (interface{}, error) {
 
 func (f DemoFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var demoList openapi.DemoList
+	nullableList := openapi.NewNullableDemoList(&demoList)
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &demoList)
+	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}
