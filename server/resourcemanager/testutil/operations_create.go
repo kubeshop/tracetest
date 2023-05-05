@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,7 +36,7 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 201, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 201, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -43,7 +44,7 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 		expected := ct.toJSON(clean)
 
 		rt.customJSONComparer(t, OperationCreateNoID, expected, removeIDFromJSON(jsonBody))
-		require.NotEmpty(t, extractID(jsonBody))
+		dumpResponseIfNot(t, assert.NotEmpty(t, extractID(jsonBody)), resp)
 	},
 })
 
@@ -62,7 +63,7 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 201, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 201, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 		expected := ct.toJSON(rt.SampleJSON)

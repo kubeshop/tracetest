@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -48,13 +49,24 @@ var listCmd = &cobra.Command{
 			SortBy:        listSortBy,
 		}
 
-		err = resourceActions.List(ctx, listArgs)
-
+		resource, err := resourceActions.List(ctx, listArgs)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to list for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
+
+		resourceFormatter := resourceActions.Formatter()
+		formatter := formatters.BuildFormatter(output, formatters.Pretty, resourceFormatter)
+
+		result, err := formatter.FormatList(resource)
+		if err != nil {
+			cliLogger.Error("failed to format resource", zap.Error(err))
+			os.Exit(1)
+			return
+		}
+
+		fmt.Println(result)
 	},
 	PostRun: teardownCommand,
 }
@@ -64,5 +76,6 @@ func init() {
 	listCmd.Flags().Int32Var(&listSkip, "skip", 0, "Skip number")
 	listCmd.Flags().StringVar(&listSortBy, "sortBy", "", "Sort by")
 	listCmd.Flags().StringVar(&listSortDirection, "sortDirection", "desc", "Sort direction")
+
 	rootCmd.AddCommand(listCmd)
 }

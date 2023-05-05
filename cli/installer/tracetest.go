@@ -17,7 +17,7 @@ func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
 	switch conf.String("installer") {
 	case "docker-compose":
 		conf.set("demo.endpoint.pokeshop.http", "http://demo-api:8081")
-		conf.set("demo.endpoint.pokeshop.grpc", "demo-api:8082")
+		conf.set("demo.endpoint.pokeshop.grpc", "demo-rpc:8082")
 		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend:8084")
 		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice:3550")
 		conf.set("demo.endpoint.otel.cart", "otel-cartservice:7070")
