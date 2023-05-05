@@ -11,6 +11,7 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
       url: '/transactions',
       method: HTTP_METHOD.POST,
       body: TransactionService.getRawFromDraft(transaction),
+      headers: {'content-type': 'application/json'},
     }),
     transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
     invalidatesTags: [
@@ -23,18 +24,26 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
       url: `/transactions/${transactionId}`,
       method: HTTP_METHOD.PUT,
       body: TransactionService.getRawFromDraft(transaction),
+      headers: {'content-type': 'application/json'},
     }),
     invalidatesTags: [{type: TracetestApiTags.TRANSACTION, id: 'LIST'}],
   }),
   deleteTransactionById: builder.mutation<Transaction, {transactionId: string}>({
-    query: ({transactionId}) => ({url: `/transactions/${transactionId}`, method: HTTP_METHOD.DELETE}),
+    query: ({transactionId}) => ({
+      url: `/transactions/${transactionId}`,
+      method: HTTP_METHOD.DELETE,
+      headers: {'content-type': 'application/json'},
+    }),
     invalidatesTags: [
       {type: TracetestApiTags.TRANSACTION, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
   getTransactionById: builder.query<Transaction, {transactionId: string}>({
-    query: ({transactionId}) => `/transactions/${transactionId}`,
+    query: ({transactionId}) => ({
+      url: `/transactions/${transactionId}`,
+      headers: {'content-type': 'application/json'},
+    }),
     providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: result?.id}],
     transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
   }),

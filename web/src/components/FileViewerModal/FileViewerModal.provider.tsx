@@ -67,7 +67,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
 
   const loadDefinition = useCallback(
     async (resourceType: ResourceType, resourceId: string, version?: number) => {
-      const data = await (resourceType === ResourceType.Environment
+      const data = await (resourceType === ResourceType.Environment || resourceType === ResourceType.Transaction
         ? getResourceDefinitionV2({resourceId, resourceType}).unwrap()
         : getResourceDefinition({resourceId, version, resourceType}).unwrap());
       setIsFileViewerOpen(true);
