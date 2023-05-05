@@ -1,19 +1,6 @@
 openapi: 3.0.0
 components:
   schemas:
-
-    TransactionResource:
-      type: object
-      description: "Represents a transaction structured into the Resources format."
-      properties:
-        type:
-          type: string
-          description: "Represents the type of this resource. It should always be set as 'Transaction'."
-          enum:
-            - Transaction
-        spec:
-          $ref: "#/components/schemas/Transaction"
-
     Transaction:
       type: object
       properties:
@@ -29,12 +16,6 @@ components:
           description: version number of the test
         steps:
           type: array
-          description: list of steps of the transaction containing just each test id
-          items:
-            type: string
-        fullSteps:
-          type: array
-          description: list of steps of the transaction containing the whole test object
           items:
             $ref: "./tests.yaml#/components/schemas/Test"
         createdAt:
