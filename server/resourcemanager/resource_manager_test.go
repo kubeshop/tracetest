@@ -370,11 +370,11 @@ func TestAugmentedResource(t *testing.T) {
 // test structures and mocks
 
 type sampleResource struct {
-	ID   id.ID  `mapstructure:"id"`
-	Name string `mapstructure:"name"`
+	ID   id.ID  `json:"id"`
+	Name string `json:"name"`
 
-	SomeValue              string `mapstructure:"some_value"`
-	SomeAugmentedOnlyValue string `mapstructure:"some_augmented_value,omitempty"`
+	SomeValue              string `json:"some_value"`
+	SomeAugmentedOnlyValue string `json:"some_augmented_value,omitempty"`
 }
 
 func (sr sampleResource) HasID() bool {
