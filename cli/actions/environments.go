@@ -34,7 +34,16 @@ func (environmentsActions) Name() string {
 	return "environment"
 }
 
-func (environment environmentsActions) Apply(ctx context.Context, fileContent file.File) (*file.File, error) {
+func (environment environmentsActions) GetID(file *file.File) (string, error) {
+	resource, err := environment.formatter.ToStruct(file)
+	if err != nil {
+		return "", err
+	}
+
+	return *resource.(openapi.EnvironmentResource).Spec.Id, nil
+}
+
+func (environment environmentsActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
 	envResource := openapi.EnvironmentResource{
 		Spec: &openapi.Environment{},
 	}
@@ -42,18 +51,20 @@ func (environment environmentsActions) Apply(ctx context.Context, fileContent fi
 	mapstructure.Decode(fileContent.Definition().Spec, &envResource.Spec)
 
 	if envResource.Spec.Id == nil || *envResource.Spec.Id == "" {
-		return environment.resourceClient.Create(ctx, fileContent)
+		result, err := environment.resourceClient.Create(ctx, fileContent)
+		return result, err
 	}
 
-	return environment.resourceClient.Update(ctx, fileContent, *envResource.Spec.Id)
+	result, err = environment.resourceClient.Update(ctx, fileContent, *envResource.Spec.Id)
+	return result, err
 }
 
 func (environment environmentsActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
 	return environment.resourceClient.List(ctx, listArgs)
 }
 
-func (environment environmentsActions) Delete(ctx context.Context, ID string) error {
-	return environment.resourceClient.Delete(ctx, ID)
+func (environment environmentsActions) Delete(ctx context.Context, ID string) (string, error) {
+	return "Environment successfully deleted", environment.resourceClient.Delete(ctx, ID)
 }
 
 func (environment environmentsActions) Get(ctx context.Context, ID string) (*file.File, error) {

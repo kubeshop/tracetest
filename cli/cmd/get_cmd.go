@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -41,13 +42,24 @@ var getCmd = &cobra.Command{
 			return
 		}
 
-		err = resourceActions.Get(ctx, resourceID)
-
+		resource, err := resourceActions.Get(ctx, resourceID)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to get resource for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
+
+		resourceFormatter := resourceActions.Formatter()
+		formatter := formatters.BuildFormatter(output, formatters.YAML, resourceFormatter)
+
+		result, err := formatter.Format(resource)
+		if err != nil {
+			cliLogger.Error("failed to format resource", zap.Error(err))
+			os.Exit(1)
+			return
+		}
+
+		fmt.Println(result)
 	},
 	PostRun: teardownCommand,
 }

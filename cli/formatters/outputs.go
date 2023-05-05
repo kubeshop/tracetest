@@ -10,12 +10,16 @@ var (
 	Outputs = []Output{
 		Pretty,
 		JSON,
+		YAML,
+		Empty,
 	}
 
 	DefaultOutput = Pretty
 
+	Empty  Output = ""
 	Pretty Output = "pretty"
 	JSON   Output = "json"
+	YAML   Output = "yaml"
 )
 
 func SetOutput(o Output) {

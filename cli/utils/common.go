@@ -3,12 +3,13 @@ package utils
 import (
 	"fmt"
 	"io"
-	URL "net/url"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"unicode"
 )
 
 func StringToIOReader(s string) io.Reader {
@@ -39,20 +40,26 @@ func StringReferencesFile(path string) bool {
 	return info != nil && !info.IsDir()
 }
 
-func OpenBrowser(url string) error {
-	_, err := URL.Parse(url)
+func OpenBrowser(u string) error {
+	_, err := url.Parse(u)
 	if err != nil {
 		return err
 	}
 
 	switch runtime.GOOS {
 	case "linux":
-		return exec.Command("xdg-open", url).Start()
+		return exec.Command("xdg-open", u).Start()
 	case "windows":
-		return exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", u).Start()
 	case "darwin":
-		return exec.Command("open", url).Start()
+		return exec.Command("open", u).Start()
 	default:
 		return fmt.Errorf("unsupported platform")
 	}
+}
+
+func Capitalize(str string) string {
+	runes := []rune(str)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }

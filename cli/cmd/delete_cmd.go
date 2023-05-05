@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -35,22 +34,20 @@ var deleteCmd = &cobra.Command{
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
-
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
 
-		err = resourceActions.Delete(ctx, deletedResourceID)
-
+		message, err := resourceActions.Delete(ctx, deletedResourceID)
 		if err != nil {
 			cliLogger.Error(fmt.Sprintf("failed to apply definition for type: %s", resourceType), zap.Error(err))
 			os.Exit(1)
 			return
 		}
 
-		cmd.Println(pterm.FgGreen.Sprintf(fmt.Sprintf("✔ Resource deleted successfully for resource type: %s", resourceType)))
+		cmd.Println(fmt.Sprintf("✔ %s", message))
 	},
 	PostRun: teardownCommand,
 }

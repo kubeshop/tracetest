@@ -781,10 +781,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": {
-            count?: number;
-            items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
-          };
+          "application/json": external["config.yaml"]["components"]["schemas"]["DemoList"];
           "text/yaml": {
             count?: number;
             items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
@@ -921,10 +918,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": {
-            count?: number;
-            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
-          };
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResourceList"];
           "text/yaml": {
             count?: number;
             items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
@@ -1130,6 +1124,10 @@ export interface external {
             opentelemetryStore?: external["config.yaml"]["components"]["schemas"]["DemoOpenTelemetryStore"];
           };
         };
+        DemoList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
+        };
       };
     };
     operations: {};
@@ -1274,6 +1272,10 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        EnvironmentResourceList: {
+          count?: number;
+          items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+        };
         /** @description Represents an environment structured into the Resources format. */
         EnvironmentResource: {
           /**

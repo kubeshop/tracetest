@@ -1,7 +1,7 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
-import TestRun from 'models/TestRun.model';
+import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import TestProvider from '../Test';
 
@@ -29,8 +29,11 @@ interface IProps {
 
 export const useTestRun = () => useContext(Context);
 
+const POLLING_INTERVAL = 5000;
+
 const TestRunProvider = ({children, testId, runId = ''}: IProps) => {
-  const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId});
+  const [pollingInterval, setPollingInterval] = useState<number | undefined>(POLLING_INTERVAL);
+  const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId, pollingInterval});
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId});
   const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
 
@@ -42,6 +45,11 @@ const TestRunProvider = ({children, testId, runId = ''}: IProps) => {
     () => ({run: run!, isError, isLoadingStop, runEvents, stopRun}),
     [run, isError, isLoadingStop, runEvents, stopRun]
   );
+
+  useEffect(() => {
+    const shouldStopPolling = run?.state && isRunStateFinished(run.state);
+    setPollingInterval(shouldStopPolling ? undefined : POLLING_INTERVAL);
+  }, [run?.state]);
 
   return run ? (
     <Context.Provider value={value}>
