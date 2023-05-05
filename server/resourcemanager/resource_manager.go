@@ -17,8 +17,8 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slices"
-	"gopkg.in/yaml.v3"
 
+	"github.com/goccy/go-yaml"
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
