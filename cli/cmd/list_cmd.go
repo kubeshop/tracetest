@@ -17,6 +17,7 @@ var (
 	listSkip          int32
 	listSortBy        string
 	listSortDirection string
+	listAll           bool
 )
 
 var listCmd = &cobra.Command{
@@ -47,6 +48,7 @@ var listCmd = &cobra.Command{
 			Skip:          listSkip,
 			SortDirection: listSortDirection,
 			SortBy:        listSortBy,
+			All:           listAll,
 		}
 
 		resource, err := resourceActions.List(ctx, listArgs)
@@ -76,6 +78,7 @@ func init() {
 	listCmd.Flags().Int32Var(&listSkip, "skip", 0, "Skip number")
 	listCmd.Flags().StringVar(&listSortBy, "sortBy", "", "Sort by")
 	listCmd.Flags().StringVar(&listSortDirection, "sortDirection", "desc", "Sort direction")
+	listCmd.Flags().BoolVar(&listAll, "all", false, "All")
 
 	rootCmd.AddCommand(listCmd)
 }
