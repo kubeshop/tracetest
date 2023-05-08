@@ -41,16 +41,16 @@ var DefaultPollingProfile = PollingProfile{
 }
 
 type PollingProfile struct {
-	ID       id.ID                  `mapstructure:"id"`
-	Name     string                 `mapstructure:"name"`
-	Default  bool                   `mapstructure:"default"`
-	Strategy Strategy               `mapstructure:"strategy"`
-	Periodic *PeriodicPollingConfig `mapstructure:"periodic"`
+	ID       id.ID                  `json:"id"`
+	Name     string                 `json:"name"`
+	Default  bool                   `json:"default"`
+	Strategy Strategy               `json:"strategy"`
+	Periodic *PeriodicPollingConfig `json:"periodic"`
 }
 
 type PeriodicPollingConfig struct {
-	RetryDelay string `mapstructure:"retryDelay"`
-	Timeout    string `mapstructure:"timeout"`
+	RetryDelay string `json:"retryDelay"`
+	Timeout    string `json:"timeout"`
 }
 
 func (ppc *PeriodicPollingConfig) TimeoutDuration() time.Duration {

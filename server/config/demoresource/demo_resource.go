@@ -32,12 +32,12 @@ var Operations = []resourcemanager.Operation{
 }
 
 type Demo struct {
-	ID                 id.ID                   `mapstructure:"id"`
-	Name               string                  `mapstructure:"name"`
-	Type               DemoType                `mapstructure:"type"`
-	Enabled            bool                    `mapstructure:"enabled"`
-	Pokeshop           *PokeshopDemo           `mapstructure:"pokeshop,omitempty"`
-	OpenTelemetryStore *OpenTelemetryStoreDemo `mapstructure:"opentelemetryStore,omitempty"`
+	ID                 id.ID                   `json:"id"`
+	Name               string                  `json:"name"`
+	Type               DemoType                `json:"type"`
+	Enabled            bool                    `json:"enabled"`
+	Pokeshop           *PokeshopDemo           `json:"pokeshop,omitempty"`
+	OpenTelemetryStore *OpenTelemetryStoreDemo `json:"opentelemetryStore,omitempty"`
 }
 
 func (d Demo) HasID() bool {
@@ -49,15 +49,15 @@ func (d Demo) Validate() error {
 }
 
 type PokeshopDemo struct {
-	HTTPEndpoint string `mapstructure:"httpEndpoint,omitempty"`
-	GRPCEndpoint string `mapstructure:"grpcEndpoint,omitempty"`
+	HTTPEndpoint string `json:"httpEndpoint,omitempty"`
+	GRPCEndpoint string `json:"grpcEndpoint,omitempty"`
 }
 
 type OpenTelemetryStoreDemo struct {
-	FrontendEndpoint       string `mapstructure:"frontendEndpoint,omitempty"`
-	ProductCatalogEndpoint string `mapstructure:"productCatalogEndpoint,omitempty"`
-	CartEndpoint           string `mapstructure:"cartEndpoint,omitempty"`
-	CheckoutEndpoint       string `mapstructure:"checkoutEndpoint,omitempty"`
+	FrontendEndpoint       string `json:"frontendEndpoint,omitempty"`
+	ProductCatalogEndpoint string `json:"productCatalogEndpoint,omitempty"`
+	CartEndpoint           string `json:"cartEndpoint,omitempty"`
+	CheckoutEndpoint       string `json:"checkoutEndpoint,omitempty"`
 }
 
 type Repository struct {

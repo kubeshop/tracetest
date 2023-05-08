@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -19,9 +18,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slices"
 
+	"github.com/goccy/go-yaml"
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/mitchellh/mapstructure"
 )
 
 type ResourceSpec interface {
@@ -30,13 +29,13 @@ type ResourceSpec interface {
 }
 
 type ResourceList[T ResourceSpec] struct {
-	Count int              `mapstructure:"count"`
-	Items []map[string]any `mapstructure:"items"`
+	Count int   `json:"count"`
+	Items []any `json:"items"`
 }
 
 type Resource[T ResourceSpec] struct {
-	Type string `mapstructure:"type"`
-	Spec T      `mapstructure:"spec"`
+	Type string `json:"type"`
+	Spec T      `json:"spec"`
 }
 
 type Manager interface {
@@ -293,7 +292,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	//       of records inside "item"
 	resourceList := ResourceList[T]{
 		Count: count,
-		Items: []map[string]any{},
+		Items: []any{},
 	}
 
 	for _, item := range items {
@@ -302,14 +301,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 			Spec: item,
 		}
 
-		var values map[string]any
-		err := encode(resource, &values)
-		if err != nil {
-			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-			return
-		}
-
-		resourceList.Items = append(resourceList.Items, values)
+		resourceList.Items = append(resourceList.Items, resource)
 	}
 
 	bytes, err := encodeValues(resourceList, encoder)
@@ -403,16 +395,10 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 	}
 	w.Header().Set("Content-Type", encoder.ResponseContentType())
 
-	values, err := readValues(r, encoder)
+	targetResource := Resource[T]{}
+	err = readValues(r, encoder, &targetResource)
 	if err != nil {
 		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
-		return
-	}
-
-	targetResource := Resource[T]{}
-	err = decode(values, &targetResource)
-	if err != nil {
-		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot unmarshal body values: %w", err))
 		return
 	}
 
@@ -463,29 +449,21 @@ func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
 }
 
 func encodeValues(resource any, enc encoder) ([]byte, error) {
-	var values map[string]any
-
-	err := encode(resource, &values)
-	if err != nil {
-		return nil, fmt.Errorf("cannot encode resource: %w", err)
-	}
-
-	return enc.Marshal(values)
+	return enc.Marshal(resource)
 }
 
-func readValues(r *http.Request, enc encoder) (map[string]any, error) {
+func readValues(r *http.Request, enc encoder, target any) error {
 	body, err := readBody(r)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read yaml body: %w", err)
+		return fmt.Errorf("cannot read yaml body: %w", err)
 	}
 
-	var out map[string]any
-	err = enc.Unmarshal(body, &out)
+	err = enc.Unmarshal(body, target)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal request: %w", err)
+		return fmt.Errorf("cannot unmarshal request: %w", err)
 	}
 
-	return out, err
+	return nil
 }
 
 func readBody(r *http.Request) ([]byte, error) {
@@ -501,47 +479,15 @@ func readBody(r *http.Request) ([]byte, error) {
 }
 
 func decode(input any, output any) error {
-	return mapstructure.Decode(input, output)
-}
-
-func encode(input any, output *map[string]any) error {
-	err := mapstructure.Decode(input, output)
+	yamlContent, err := yaml.Marshal(input)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't convert marshal input into YAML: %w", err)
 	}
 
-	fixInternalSlicesMapping(output)
+	err = yaml.Unmarshal(yamlContent, output)
+	if err != nil {
+		return fmt.Errorf("couldn't unmarshal YAML into target: %w", err)
+	}
 
 	return nil
-}
-
-func fixInternalSlicesMapping(output *map[string]any) {
-	for k, v := range *output {
-		value := reflect.ValueOf(v)
-		if value.Kind() == reflect.Map {
-			if submap, ok := v.(map[string]any); ok {
-				fixInternalSlicesMapping(&submap)
-			}
-		}
-
-		if value.Kind() == reflect.Slice {
-			if value.Len() == 0 {
-				continue
-			}
-
-			firstItem := value.Index(0)
-			if firstItem.Kind() != reflect.Struct {
-				continue
-			}
-
-			newOutput := make([]map[string]any, value.Len())
-
-			for i := 0; i < value.Len(); i++ {
-				mapstructure.Decode(value.Index(i).Interface(), &newOutput[i])
-			}
-
-			deferencedOutput := *output
-			deferencedOutput[k] = newOutput
-		}
-	}
 }

@@ -9,8 +9,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
-	"gopkg.in/yaml.v2"
 )
 
 func WithResourceProvisioners(provs ...resourcemanager.Provisioner) option {

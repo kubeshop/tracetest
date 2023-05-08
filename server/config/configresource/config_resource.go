@@ -17,10 +17,10 @@ var Operations = []resourcemanager.Operation{
 }
 
 type Config struct {
-	ID   id.ID  `mapstructure:"id"`
-	Name string `mapstructure:"name"`
+	ID   id.ID  `json:"id"`
+	Name string `json:"name"`
 
-	AnalyticsEnabled bool `mapstructure:"analyticsEnabled"`
+	AnalyticsEnabled bool `json:"analyticsEnabled"`
 }
 
 func (c Config) HasID() bool {
