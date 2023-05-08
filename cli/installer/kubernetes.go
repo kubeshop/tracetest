@@ -290,9 +290,17 @@ func getKubernetesContextArray(kubeconfig string) ([][]string, error) {
 	return records, nil
 }
 
-func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
-	conf.set("k8s.kubeconfig", "${HOME}/.kube/config")
+func kubernetesContextExists(name string, contexts []k8sContext) bool {
+	for _, context := range contexts {
+		if context.name == name {
+			return true
+		}
+	}
 
+	return false
+}
+
+func getKubernetesContext(conf configuration, ui cliUI.UI) string {
 	contexts := getK8sContexts(conf, ui)
 	if len(contexts) == 0 {
 		ui.Exit(
@@ -302,23 +310,38 @@ func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
 		)
 	}
 
+	if KubernetesContext != "" && kubernetesContextExists(KubernetesContext, contexts) {
+		ui.Println("On which kubectl context do you want to install Tracetest?")
+		ui.Println(fmt.Sprintf("  > %s", KubernetesContext))
+
+		return KubernetesContext
+	}
+
 	if len(contexts) == 1 {
-		conf.set("k8s.context", contexts[0].name)
+		ui.Println("On which kubectl context do you want to install Tracetest?")
+		ui.Println(fmt.Sprintf("  > %s", contexts[0].name))
+
+		return contexts[0].name
 	}
 
-	if len(contexts) > 1 {
-		options := []cliUI.Option{}
-		defaultIndex := 0
-		for i, c := range contexts {
-			if c.selected {
-				defaultIndex = i
-			}
-			options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
+	options := []cliUI.Option{}
+	defaultIndex := 0
+	for i, c := range contexts {
+		if c.selected {
+			defaultIndex = i
 		}
-
-		selected := ui.Select("Kubectl context", options, defaultIndex)
-		conf.set("k8s.context", selected.Text)
+		options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
 	}
+
+	selected := ui.Select("On which kubectl context do you want to install Tracetest?", options, defaultIndex)
+	return selected.Text
+}
+
+func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
+	conf.set("k8s.kubeconfig", "${HOME}/.kube/config")
+
+	context := getKubernetesContext(conf, ui)
+	conf.set("k8s.context", context)
 
 	conf.set("k8s.namespace", "tracetest")
 	return conf
