@@ -22,6 +22,7 @@ var (
 type Manager interface {
 	Start(t *testing.T)
 	Close(t *testing.T)
+	GetCLIConfig(t *testing.T) string
 }
 
 type internalManager struct {
@@ -64,6 +65,12 @@ func getDockerComposePath(environmentType string) string {
 	return fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, environmentType)
 }
 
+func getCLIConfigPath(environmentType string) string {
+	currentDir := getExecutingDir()
+
+	return fmt.Sprintf("%s/%s/cli-config.yaml", currentDir, environmentType)
+}
+
 // TODO: this module assumes that no test will be run in parallel
 // if we change this decision in the future, we will need to update the docker compose usage
 // to use something like github.com/testcontainers/testcontainers-go
@@ -91,4 +98,8 @@ func (m *internalManager) Close(t *testing.T) {
 	_, exitCode, err = command.Exec("docker", "compose", "-f", dockerComposeFilepath, "rm")
 	require.NoError(t, err)
 	require.Equal(t, 0, exitCode)
+}
+
+func (m *internalManager) GetCLIConfig(t *testing.T) string {
+	return getCLIConfigPath(m.environmentType)
 }

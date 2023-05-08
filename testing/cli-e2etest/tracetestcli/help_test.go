@@ -12,6 +12,7 @@ func TestHelpCommand(t *testing.T) {
 
 	possibleCommands := []string{"help", "--help", "-h"}
 
+	// test multiple help commands variations
 	for _, helpCommand := range possibleCommands {
 		t.Run(helpCommand, func(t *testing.T) {
 			_, exitCode, err := tracetestcli.Exec(helpCommand)
