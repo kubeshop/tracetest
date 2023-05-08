@@ -6,7 +6,18 @@ import (
 	"strings"
 )
 
-func Exec(command string, args ...string) (string, int, error) {
+type ExecResult struct {
+	CommandExecuted string
+	StdOut          string
+	StdErr          string
+	ExitCode        int
+}
+
+func (r *ExecResult) String() string {
+	return fmt.Sprintf("commandText: [%s] exitCode: %d stdout: [%s] stderr: [%s]", r.CommandExecuted, r.ExitCode, r.StdOut, r.StdErr)
+}
+
+func Exec(command string, args ...string) (*ExecResult, error) {
 	checkIfCommandExists(command)
 
 	fullCommand := fmt.Sprintf("%s %s", command, strings.Join(args, " "))
@@ -21,7 +32,11 @@ func Exec(command string, args ...string) (string, int, error) {
 	}
 
 	exitCode := cmd.ProcessState.ExitCode()
-	return output, exitCode, nil
+	return &ExecResult{
+		CommandExecuted: fullCommand,
+		StdOut:          output,
+		ExitCode:        exitCode,
+	}, nil
 }
 
 func checkIfCommandExists(command string) {
@@ -35,15 +50,19 @@ func checkIfCommandExists(command string) {
 	}
 }
 
-func handleRunError(err error, fullCommand string, output string, cmd *exec.Cmd) (string, int, error) {
+func handleRunError(err error, fullCommand string, output string, cmd *exec.Cmd) (*ExecResult, error) {
 	exitError, castOk := err.(*exec.ExitError)
 
-	if !castOk {
-		return "", -1, fmt.Errorf("error when executing command '%s', stdin '%s', error %w", fullCommand, output, err)
+	commandResult := &ExecResult{
+		CommandExecuted: fullCommand,
+		StdOut:          output,
+		ExitCode:        -1,
 	}
 
-	errorOutput := string(exitError.Stderr)
+	if castOk {
+		commandResult.StdErr = string(exitError.Stderr)
+		commandResult.ExitCode = exitError.ExitCode()
+	}
 
-	exitCode := exitError.ExitCode()
-	return "", exitCode, fmt.Errorf("error when executing tracetest command '%s', exit code %d, stdin '%s', stderr '%s'", fullCommand, exitCode, output, errorOutput)
+	return nil, fmt.Errorf("error when executing command: %s, error [%w]", commandResult, err)
 }

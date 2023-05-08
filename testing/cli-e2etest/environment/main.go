@@ -81,9 +81,9 @@ func (m *internalManager) Start(t *testing.T) {
 
 	dockerComposeFilepath := getDockerComposePath(m.environmentType)
 
-	_, exitCode, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "up", "-d")
+	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "up", "-d")
 	require.NoError(t, err)
-	require.Equal(t, 0, exitCode)
+	require.Equal(t, 0, result.ExitCode)
 }
 
 func (m *internalManager) Close(t *testing.T) {
@@ -91,13 +91,13 @@ func (m *internalManager) Close(t *testing.T) {
 
 	dockerComposeFilepath := getDockerComposePath(m.environmentType)
 
-	_, exitCode, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "stop")
+	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "stop")
 	require.NoError(t, err)
-	require.Equal(t, 0, exitCode)
+	require.Equal(t, 0, result.ExitCode)
 
-	_, exitCode, err = command.Exec("docker", "compose", "-f", dockerComposeFilepath, "rm")
+	result, err = command.Exec("docker", "compose", "-f", dockerComposeFilepath, "rm")
 	require.NoError(t, err)
-	require.Equal(t, 0, exitCode)
+	require.Equal(t, 0, result.ExitCode)
 }
 
 func (m *internalManager) GetCLIConfig(t *testing.T) string {

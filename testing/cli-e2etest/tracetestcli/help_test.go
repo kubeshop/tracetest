@@ -15,10 +15,10 @@ func TestHelpCommand(t *testing.T) {
 	// test multiple help commands variations
 	for _, helpCommand := range possibleCommands {
 		t.Run(helpCommand, func(t *testing.T) {
-			_, exitCode, err := tracetestcli.Exec(helpCommand)
+			result, err := tracetestcli.Exec(helpCommand)
 			require.NoError(t, err)
 
-			require.Equal(t, expectedExitCode, exitCode)
+			require.Equal(t, expectedExitCode, result.ExitCode)
 		})
 	}
 }

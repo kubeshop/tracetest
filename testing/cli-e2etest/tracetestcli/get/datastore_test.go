@@ -10,15 +10,17 @@ import (
 )
 
 func TestGetDatastoreCommand(t *testing.T) {
-	// test case: get current datastore without proper setup
-
 	env := environment.CreateAndStart(t)
 	defer env.Close(t)
 
 	cliConfig := env.GetCLIConfig(t)
 
-	_, exitCode, err := getCommand.Exec("datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	require.NoError(t, err)
+	// Given I am a Tracetest CLI user
+	// And I have my server recently created
 
-	require.Equal(t, 0, exitCode)
+	// When I try to get a datastore without any server setup
+	// Then I should receive an error, telling there is no datastores registered
+	result, err := getCommand.Exec("datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
+	require.ErrorContains(t, err, "invalid datastores: \"record not found\"")
+	require.Equal(t, 1, result.ExitCode)
 }

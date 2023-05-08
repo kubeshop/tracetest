@@ -291,6 +291,27 @@ jobs:
           TEST_ENV="${{ matrix.test_env }}" \
           ./run.bash
 
+  e2e-cli:
+    name: CLI e2e tests
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-go
+          path: dist/
+      - name: Run tests
+        run: |
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
+          chmod +x ./dist/tracetest
+
+          cd ./testing/cli-e2etest
+          PATH=$PATH:../../dist make test
+
   deploy:
     name: Deploy test infra
     needs: [build-docker, unit-test-cli, test-server, test-web]

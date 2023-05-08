@@ -11,9 +11,9 @@ const (
 	tracetestCommand = "tracetest"
 )
 
-type CLIExecCommand func(string, ...ExecOption) (string, int, error)
+type CLIExecCommand func(string, ...ExecOption) (*command.ExecResult, error)
 
-func Exec(tracetestSubCommand string, options ...ExecOption) (string, int, error) {
+func Exec(tracetestSubCommand string, options ...ExecOption) (*command.ExecResult, error) {
 	state := composeExecutionState(options...)
 
 	if state.cliConfigFile != "" {
@@ -26,9 +26,9 @@ func Exec(tracetestSubCommand string, options ...ExecOption) (string, int, error
 	return command.Exec(tracetestCommand, tracetestSubCommands...)
 }
 
-func GetComposedExecFunc(command string) CLIExecCommand {
-	return func(subCommand string, opts ...ExecOption) (string, int, error) {
-		fullSubCommand := fmt.Sprintf("%s %s", command, subCommand)
+func GetComposedExecFunc(cliCommand string) CLIExecCommand {
+	return func(subCommand string, opts ...ExecOption) (*command.ExecResult, error) {
+		fullSubCommand := fmt.Sprintf("%s %s", cliCommand, subCommand)
 		return Exec(fullSubCommand, opts...)
 	}
 }
