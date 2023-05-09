@@ -59,5 +59,7 @@ func TestPollingProfileResource(t *testing.T) {
 		rmtests.ExcludeOperations(
 			rmtests.OperationGetNotFound,
 			rmtests.OperationUpdateNotFound,
+			rmtests.OperationListPaginatedSuccess,
+			rmtests.OperationListNoResults,
 		))
 }

@@ -192,7 +192,7 @@ func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 }
 
 func (*Repository) SortingFields() []string {
-	return []string{}
+	return []string{"name"}
 }
 
 type scanner interface {
