@@ -20,6 +20,7 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [New Relic](./connecting-to-data-stores/new-relic)
 - [AWS X-Ray](./connecting-to-data-stores/awsxray)
 - [Datadog](./connecting-to-data-stores/datadog)
+- [Honeycomb](./connecting-to-data-stores/honeycomb)
 
 ## Using Tracetest without a Trace Data Store
 
