@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -14,12 +15,13 @@ import (
 var resourceID string
 
 var getCmd = &cobra.Command{
-	GroupID: cmdGroupResources.ID,
-	Use:     "get [resource type]",
-	Long:    "Get a resource from your Tracetest server",
-	Short:   "Get resource",
-	PreRun:  setupCommand(),
-	Args:    cobra.MinimumNArgs(1),
+	GroupID:   cmdGroupResources.ID,
+	Use:       fmt.Sprintf("get %s", strings.Join(validArgs, "|")),
+	Short:     "Get resource",
+	Long:      "Get a resource from your Tracetest server",
+	PreRun:    setupCommand(),
+	Args:      cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
+	ValidArgs: validArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if resourceID == "" {
 			cliLogger.Error("id of the resource to get must be specified")

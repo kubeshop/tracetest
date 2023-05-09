@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
@@ -15,12 +16,13 @@ import (
 var definitionFile string
 
 var applyCmd = &cobra.Command{
-	GroupID: cmdGroupResources.ID,
-	Use:     "apply [resource type]",
-	Short:   "Apply resources",
-	Long:    "Apply (create/update) resources to your Tracetest server",
-	PreRun:  setupCommand(),
-	Args:    cobra.MinimumNArgs(1),
+	GroupID:   cmdGroupResources.ID,
+	Use:       fmt.Sprintf("apply %s", strings.Join(validArgs, "|")),
+	Short:     "Apply resources",
+	Long:      "Apply (create/update) resources to your Tracetest server",
+	PreRun:    setupCommand(),
+	Args:      cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
+	ValidArgs: validArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if definitionFile == "" {
 			cliLogger.Error("file with definition must be specified")

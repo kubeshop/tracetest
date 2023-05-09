@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -20,12 +21,13 @@ var (
 )
 
 var listCmd = &cobra.Command{
-	GroupID: cmdGroupResources.ID,
-	Use:     "list [resource type]",
-	Long:    "List resources from your Tracetest server",
-	Short:   "List resources",
-	PreRun:  setupCommand(),
-	Args:    cobra.MinimumNArgs(1),
+	GroupID:   cmdGroupResources.ID,
+	Use:       fmt.Sprintf("list %s", strings.Join(validArgs, "|")),
+	Short:     "List resources",
+	Long:      "List resources from your Tracetest server",
+	PreRun:    setupCommand(),
+	Args:      cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
+	ValidArgs: validArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()

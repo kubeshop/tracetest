@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
@@ -13,12 +14,13 @@ import (
 var deletedResourceID string
 
 var deleteCmd = &cobra.Command{
-	GroupID: cmdGroupResources.ID,
-	Use:     "delete [resource type]",
-	Long:    "Delete resources from your Tracetest server",
-	Short:   "Delete resources",
-	PreRun:  setupCommand(),
-	Args:    cobra.MinimumNArgs(1),
+	GroupID:   cmdGroupResources.ID,
+	Use:       fmt.Sprintf("delete %s", strings.Join(validArgs, "|")),
+	Short:     "Delete resources",
+	Long:      "Delete resources from your Tracetest server",
+	PreRun:    setupCommand(),
+	Args:      cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
+	ValidArgs: validArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if deletedResourceID == "" {
 			cliLogger.Error("id of the resource to delete must be specified")
