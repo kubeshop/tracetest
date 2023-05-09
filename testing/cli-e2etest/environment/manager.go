@@ -6,6 +6,7 @@ import (
 	"path"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -15,9 +16,10 @@ import (
 )
 
 var (
-	mutex         = sync.Mutex{}
-	defaultEnv    = "jaeger"
-	supportedEnvs = []string{"jaeger"}
+	mutex               = sync.Mutex{}
+	envCounter    int64 = 0
+	defaultEnv          = "jaeger"
+	supportedEnvs       = []string{"jaeger"}
 )
 
 type Manager interface {
@@ -28,7 +30,9 @@ type Manager interface {
 }
 
 type internalManager struct {
-	environmentType string
+	environmentType       string
+	dockerComposeFilePath string
+	dockerProjectName     string
 }
 
 func CreateAndStart(t *testing.T) Manager {
@@ -47,10 +51,7 @@ func CreateAndStart(t *testing.T) Manager {
 		t.Fatalf("environment %s not registered", environmentName)
 	}
 
-	environment := &internalManager{
-		environmentType: environmentName,
-	}
-
+	environment := GetManager(environmentName)
 	environment.Start(t)
 
 	return environment
@@ -62,20 +63,35 @@ func getExecutingDir() string {
 }
 
 // Today we are assuming that the internal manager only deals with docker-compose,
-// but in the future we can extend it to also handle kubernetes environments
+// but in the future we can rename it do "dockerManager" and create another Manager to handle kubernetes environments
 
 // This module assumes that no test will be run in parallel
 // if we change this decision in the future, we will need to update the docker compose usage
 // to use something like github.com/testcontainers/testcontainers-go
 // (github.com/testcontainers/testcontainers-go/modules/compose in specific)
 
+func GetManager(environmentType string) Manager {
+	currentDir := getExecutingDir()
+	dockerComposeFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, environmentType)
+
+	atomic.AddInt64(&envCounter, 1)
+
+	return &internalManager{
+		environmentType:       environmentType,
+		dockerComposeFilePath: dockerComposeFilepath,
+		dockerProjectName:     fmt.Sprintf("tracetest-env-%d", envCounter),
+	}
+}
+
 func (m *internalManager) Start(t *testing.T) {
 	t.Helper()
 
-	currentDir := getExecutingDir()
-	dockerComposeFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, m.environmentType)
+	result, err := command.Exec(
+		"docker", "compose",
+		"--file", m.dockerComposeFilePath, // choose docker compose relative to the chosen environment
+		"--project-name", m.dockerProjectName, // create a project name to isolate this scenario
+		"up", "--detach")
 
-	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "up", "-d")
 	require.NoError(t, err)
 	require.Equal(t, 0, result.ExitCode)
 
@@ -86,10 +102,15 @@ func (m *internalManager) Start(t *testing.T) {
 func (m *internalManager) Close(t *testing.T) {
 	t.Helper()
 
-	currentDir := getExecutingDir()
-	dockerComposeFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, m.environmentType)
-
-	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "rm", "--force", "--volumes", "--stop")
+	result, err := command.Exec(
+		"docker", "compose",
+		"--file", m.dockerComposeFilePath, // choose docker compose relative to the chosen environment
+		"--project-name", m.dockerProjectName, // choose isolated project name
+		"rm",
+		"--force",   // bypass removal question
+		"--volumes", // remove volumes attached to this project
+		"--stop",    // force containers to stop
+	)
 	require.NoError(t, err)
 	require.Equal(t, 0, result.ExitCode)
 }

@@ -311,6 +311,7 @@ jobs:
 
           export TRACETEST_COMMAND=$PWD/dist/tracetest
           export TEST_ENVIRONMENT=jaeger
+          export TAG=pr-${{ github.event.pull_request.number }}
 
           cd ./testing/cli-e2etest
           make test
