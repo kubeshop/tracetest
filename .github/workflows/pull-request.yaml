@@ -310,7 +310,7 @@ jobs:
           chmod +x ./dist/tracetest
 
           cd ./testing/cli-e2etest
-          export TRACETEST_COMMAND=../../dist/tracetest
+          export TRACETEST_COMMAND=./dist/tracetest
           export TEST_ENVIRONMENT=jaeger
           make test
 
