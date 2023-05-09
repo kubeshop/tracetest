@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -250,7 +251,8 @@ func (app *App) Start(opts ...appOption) error {
 
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
 
-	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID)
+	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
+	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID, isTracetestDev)
 
 	if isNewInstall {
 		provision(provisioner, app.provisioningFile)
@@ -272,7 +274,7 @@ func (app *App) Start(opts ...appOption) error {
 	return nil
 }
 
-func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabled bool, serverID string) {
+func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabled bool, serverID string, isTracetestDev bool) {
 	router.
 		PathPrefix(cfg.ServerPathPrefix()).
 		Handler(
@@ -282,6 +284,7 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 				serverID,
 				Version,
 				Env,
+				isTracetestDev,
 			),
 		)
 }
