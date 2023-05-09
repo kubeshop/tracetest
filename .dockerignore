@@ -7,7 +7,7 @@ examples/
 k8s/
 local-config/
 scripts/
-tracetesting/
+testing/
 web/node_modules
 .codeclimate.yml
 .editorconfig
