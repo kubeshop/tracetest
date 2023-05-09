@@ -281,7 +281,7 @@ jobs:
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
-          cd ./cli/smoketest
+          cd ./testing/cli-smoketest
           chmod +x ./run.bash
 
           ../../scripts/wait-for-port.sh 11633
@@ -359,7 +359,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          cd tracetesting
+          cd testing/server-tracetesting
           TRACETEST_CLI="/tmp/tracetest" \
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
