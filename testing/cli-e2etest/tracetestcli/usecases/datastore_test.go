@@ -1,15 +1,14 @@
-package get_test
+package usecases
 
 import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
 	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
-	getCommand "github.com/kubeshop/tracetest/cli-e2etest/tracetestcli/get"
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetDatastoreCommand(t *testing.T) {
+func TestCreateDatastoreFromEmpty(t *testing.T) {
 	env := environment.CreateAndStart(t)
 	defer env.Close(t)
 
@@ -20,7 +19,8 @@ func TestGetDatastoreCommand(t *testing.T) {
 
 	// When I try to get a datastore without any server setup
 	// Then I should receive an error, telling there is no datastores registered
-	result, err := getCommand.Exec("datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	require.ErrorContains(t, err, "invalid datastores: \"record not found\"")
-	require.Equal(t, 1, result.ExitCode)
+	result, err := tracetestcli.Exec("get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
+	require.ErrorContains(t, err, "invalid datastores:")
+	require.ErrorContains(t, err, "record not found")
+	require.Nil(t, result)
 }

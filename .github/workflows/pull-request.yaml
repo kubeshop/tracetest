@@ -310,7 +310,9 @@ jobs:
           chmod +x ./dist/tracetest
 
           cd ./testing/cli-e2etest
-          PATH=$PATH:../../dist make test
+          export TRACETEST_COMMAND=../../dist/tracetest
+          export TEST_ENVIRONMENT=jaeger
+          make test
 
   deploy:
     name: Deploy test infra

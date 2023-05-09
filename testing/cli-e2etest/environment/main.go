@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/command"
 	"github.com/stretchr/testify/require"
@@ -35,7 +36,7 @@ func CreateAndStart(t *testing.T) Manager {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	environmentName := os.Getenv("TEST_ENV")
+	environmentName := os.Getenv("TEST_ENVIRONMENT")
 
 	if environmentName == "" {
 		environmentName = defaultEnv
@@ -59,18 +60,6 @@ func getExecutingDir() string {
 	return path.Dir(filename)
 }
 
-func getDockerComposePath(environmentType string) string {
-	currentDir := getExecutingDir()
-
-	return fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, environmentType)
-}
-
-func getCLIConfigPath(environmentType string) string {
-	currentDir := getExecutingDir()
-
-	return fmt.Sprintf("%s/%s/cli-config.yaml", currentDir, environmentType)
-}
-
 // TODO: this module assumes that no test will be run in parallel
 // if we change this decision in the future, we will need to update the docker compose usage
 // to use something like github.com/testcontainers/testcontainers-go
@@ -79,27 +68,34 @@ func getCLIConfigPath(environmentType string) string {
 func (m *internalManager) Start(t *testing.T) {
 	t.Helper()
 
-	dockerComposeFilepath := getDockerComposePath(m.environmentType)
+	currentDir := getExecutingDir()
+	dockerComposeFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, m.environmentType)
 
 	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "up", "-d")
 	require.NoError(t, err)
 	require.Equal(t, 0, result.ExitCode)
+
+	// TODO: think in a better way to assure readiness for Tracetest
+	time.Sleep(1 * time.Second)
 }
 
 func (m *internalManager) Close(t *testing.T) {
 	t.Helper()
 
-	dockerComposeFilepath := getDockerComposePath(m.environmentType)
+	currentDir := getExecutingDir()
+	dockerComposeFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, m.environmentType)
 
-	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "stop")
-	require.NoError(t, err)
-	require.Equal(t, 0, result.ExitCode)
-
-	result, err = command.Exec("docker", "compose", "-f", dockerComposeFilepath, "rm")
+	result, err := command.Exec("docker", "compose", "-f", dockerComposeFilepath, "rm", "--force", "--volumes", "--stop")
 	require.NoError(t, err)
 	require.Equal(t, 0, result.ExitCode)
 }
 
 func (m *internalManager) GetCLIConfig(t *testing.T) string {
-	return getCLIConfigPath(m.environmentType)
+	currentDir := getExecutingDir()
+	return fmt.Sprintf("%s/%s/cli-config.yaml", currentDir, m.environmentType)
+}
+
+func (m *internalManager) GetManisfestResource(t *testing.T, manifestName string) string {
+	currentDir := getExecutingDir()
+	return fmt.Sprintf("%s/%s/resources/%s.yaml", currentDir, m.environmentType, manifestName)
 }
