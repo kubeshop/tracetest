@@ -3,11 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var deletedResourceID string
@@ -19,11 +17,9 @@ var deleteCmd = &cobra.Command{
 	Short:   "Delete resources",
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(_ *cobra.Command, args []string) (string, error) {
 		if deletedResourceID == "" {
-			cliLogger.Error("id of the resource to delete must be specified")
-			os.Exit(1)
-			return
+			return "", fmt.Errorf("id of the resource to delete must be specified")
 		}
 
 		resourceType := args[0]
@@ -35,20 +31,16 @@ var deleteCmd = &cobra.Command{
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		message, err := resourceActions.Delete(ctx, deletedResourceID)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to apply definition for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
-		cmd.Println(fmt.Sprintf("✔ %s", message))
-	},
+		return fmt.Sprintf("✔ %s", message), nil
+	}),
 	PostRun: teardownCommand,
 }
 

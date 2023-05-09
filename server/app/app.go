@@ -409,7 +409,7 @@ func httpRouter(
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, triggerRegistry, tracer)
+	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, triggerRegistry, tracer, Version)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

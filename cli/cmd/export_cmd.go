@@ -3,11 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var (
@@ -22,7 +20,7 @@ var exportCmd = &cobra.Command{
 	Short:   "Export resource",
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
@@ -32,20 +30,16 @@ var exportCmd = &cobra.Command{
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to export resource instance for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		err = resourceActions.Export(ctx, exportResourceID, exportResourceFile)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to export resource for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
-		cmd.Println(fmt.Sprintf("✔  Definition exported successfully for resource type: %s", resourceType))
-	},
+		return fmt.Sprintf("✔  Definition exported successfully for resource type: %s", resourceType), nil
+	}),
 	PostRun: teardownCommand,
 }
 
