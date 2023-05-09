@@ -1,4 +1,4 @@
-package usecases
+package testscenarios
 
 import (
 	"testing"

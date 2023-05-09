@@ -26,7 +26,7 @@ func Exec(tracetestSubCommand string, options ...ExecOption) (*command.ExecResul
 
 	if state.cliConfigFile != "" {
 		// append config at the start of the command
-		tracetestSubCommand = fmt.Sprintf("-c %s %s", state.cliConfigFile, tracetestSubCommand)
+		tracetestSubCommand = fmt.Sprintf("--config %s %s", state.cliConfigFile, tracetestSubCommand)
 	}
 
 	tracetestCommand := getTracetestCommand()
