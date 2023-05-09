@@ -14,7 +14,7 @@ type ExecResult struct {
 }
 
 func (r *ExecResult) String() string {
-	return fmt.Sprintf("commandText: [%s] exitCode: %d stdout: [%s] stderr: [%s]", r.CommandExecuted, r.ExitCode, r.StdOut, r.StdErr)
+	return fmt.Sprintf("commandText: [%s] \nexitCode: %d \nstdout: [%s] \nstderr: [%s]", r.CommandExecuted, r.ExitCode, r.StdOut, r.StdErr)
 }
 
 func Exec(command string, args ...string) (*ExecResult, error) {
@@ -64,5 +64,5 @@ func handleRunError(err error, fullCommand string, output string, cmd *exec.Cmd)
 		commandResult.ExitCode = exitError.ExitCode()
 	}
 
-	return nil, fmt.Errorf("error when executing command: %s, error [%w]", commandResult, err)
+	return nil, fmt.Errorf("error when executing command: \n%s \nerror: %w", commandResult, err)
 }

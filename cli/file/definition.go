@@ -113,6 +113,10 @@ func (f File) Contents() string {
 	return string(f.contents)
 }
 
+func (f File) ContentType() string {
+	return "text/yaml"
+}
+
 var (
 	hasIDRegex      = regexp.MustCompile(`(?m:^\s+id:\s*[0-9a-zA-Z\-_]+$)`)
 	indentSizeRegex = regexp.MustCompile(`(?m:^(\s+)\w+)`)

@@ -8,7 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
-	"github.com/mitchellh/mapstructure"
 )
 
 type dataStoreActions struct {
@@ -43,11 +42,7 @@ func (d dataStoreActions) GetID(file *file.File) (string, error) {
 }
 
 func (d *dataStoreActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
-	var dataStore openapi.DataStore
-	mapstructure.Decode(fileContent.Definition().Spec, &dataStore)
-
-	result, err = d.resourceClient.Update(ctx, fileContent, currentConfigID)
-	return result, err
+	return d.resourceClient.Update(ctx, fileContent, currentConfigID)
 }
 
 func (d *dataStoreActions) List(ctx context.Context, args utils.ListArgs) (*file.File, error) {

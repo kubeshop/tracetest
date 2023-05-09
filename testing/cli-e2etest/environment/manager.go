@@ -96,7 +96,7 @@ func (m *internalManager) Start(t *testing.T) {
 	require.Equal(t, 0, result.ExitCode)
 
 	// TODO: think in a better way to assure readiness for Tracetest
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(1000 * time.Millisecond)
 }
 
 func (m *internalManager) Close(t *testing.T) {
