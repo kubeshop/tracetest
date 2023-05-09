@@ -294,7 +294,7 @@ jobs:
 
   deploy:
     name: Deploy test infra
-    needs: [build-docker, unit-test-cli, test-server, test-web]
+    needs: [build-docker]
     runs-on: ubuntu-latest
 
     steps:
