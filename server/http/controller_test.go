@@ -122,6 +122,7 @@ func setupController(t *testing.T) controllerFixture {
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb),
 			&trigger.Registry{},
 			trace.NewNoopTracerProvider().Tracer("tracer"),
+			"unit-test",
 		),
 	}
 }

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -21,6 +22,7 @@ type ListArgs struct {
 	Skip          int32
 	SortDirection string
 	SortBy        string
+	All           bool
 }
 
 func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
@@ -167,6 +169,22 @@ func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.
 	return &file, nil
 }
 
+type BaseListResponse struct {
+	Count int           `json:"count"`
+	Items []interface{} `json:"items"`
+}
+
+func parseListResponse(body string) (BaseListResponse, error) {
+	var response BaseListResponse
+
+	err := json.Unmarshal([]byte(body), &response)
+	if err != nil {
+		return BaseListResponse{}, fmt.Errorf("could not parse response: %w", err)
+	}
+
+	return response, nil
+}
+
 func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (*file.File, error) {
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
 	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "")
@@ -179,7 +197,25 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
-	file, err := file.NewFromRaw(fmt.Sprintf("%s_list.yaml", resourceClient.ResourceType), []byte(IOReadCloserToString(resp.Body)))
+	body := IOReadCloserToString(resp.Body)
+	if listArgs.All {
+		baseListResponse, err := parseListResponse(body)
+		if err != nil {
+			return nil, err
+		}
+
+		if baseListResponse.Count > len(baseListResponse.Items) {
+			return resourceClient.List(ctx, ListArgs{
+				Skip:          0,
+				Take:          int32(baseListResponse.Count) + 1,
+				SortBy:        listArgs.SortBy,
+				SortDirection: listArgs.SortDirection,
+				All:           false,
+			})
+		}
+	}
+
+	file, err := file.NewFromRaw(fmt.Sprintf("%s_list.yaml", resourceClient.ResourceType), []byte(body))
 	if err != nil {
 		return nil, err
 	}

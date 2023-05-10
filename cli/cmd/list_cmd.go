@@ -2,14 +2,11 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var (
@@ -17,6 +14,7 @@ var (
 	listSkip          int32
 	listSortBy        string
 	listSortDirection string
+	listAll           bool
 )
 
 var listCmd = &cobra.Command{
@@ -26,7 +24,7 @@ var listCmd = &cobra.Command{
 	Short:   "List resources",
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
@@ -35,11 +33,8 @@ var listCmd = &cobra.Command{
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
-
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		listArgs := utils.ListArgs{
@@ -47,13 +42,12 @@ var listCmd = &cobra.Command{
 			Skip:          listSkip,
 			SortDirection: listSortDirection,
 			SortBy:        listSortBy,
+			All:           listAll,
 		}
 
 		resource, err := resourceActions.List(ctx, listArgs)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to list for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		resourceFormatter := resourceActions.Formatter()
@@ -61,13 +55,11 @@ var listCmd = &cobra.Command{
 
 		result, err := formatter.FormatList(resource)
 		if err != nil {
-			cliLogger.Error("failed to format resource", zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
-		fmt.Println(result)
-	},
+		return result, nil
+	}),
 	PostRun: teardownCommand,
 }
 
@@ -76,6 +68,7 @@ func init() {
 	listCmd.Flags().Int32Var(&listSkip, "skip", 0, "Skip number")
 	listCmd.Flags().StringVar(&listSortBy, "sortBy", "", "Sort by")
 	listCmd.Flags().StringVar(&listSortDirection, "sortDirection", "desc", "Sort direction")
+	listCmd.Flags().BoolVar(&listAll, "all", false, "All")
 
 	rootCmd.AddCommand(listCmd)
 }

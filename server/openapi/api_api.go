@@ -213,6 +213,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTransactions,
 		},
 		{
+			"GetVersion",
+			strings.ToUpper("Get"),
+			"/api/version",
+			c.GetVersion,
+		},
+		{
 			"ImportTestRun",
 			strings.ToUpper("Post"),
 			"/api/tests/import",
@@ -869,6 +875,19 @@ func (c *ApiApiController) GetTransactions(w http.ResponseWriter, r *http.Reques
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.GetTransactions(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetVersion - Get the version of the API
+func (c *ApiApiController) GetVersion(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetVersion(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

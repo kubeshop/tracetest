@@ -2,7 +2,6 @@ package actions
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -46,7 +45,7 @@ func (d *dataStoreActions) Apply(ctx context.Context, fileContent file.File) (re
 }
 
 func (d *dataStoreActions) List(ctx context.Context, args utils.ListArgs) (*file.File, error) {
-	return nil, fmt.Errorf("DataStore does not support listing. Try `tracetest get datastore`")
+	return d.resourceClient.List(ctx, args)
 }
 
 func (d *dataStoreActions) Get(ctx context.Context, id string) (*file.File, error) {

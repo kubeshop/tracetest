@@ -713,6 +713,30 @@ paths:
             application/json:
               schema:
                 $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
+  /configs:
+    get:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/switchableResourceSortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
+      summary: "List Tracetest configuration"
+      description: "List Tracetest configuration"
+      operationId: listConfiguration
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/ConfigurationResourceList"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/ConfigurationResourceList"
+        500:
+          description: "problem getting the configuration list"
   /configs/{configId}:
     get:
       tags:
@@ -762,7 +786,31 @@ paths:
                 $ref: "./config.yaml#/components/schemas/ConfigurationResource"
         500:
           description: "problem updating configuration"
-
+  
+  /pollingprofiles:
+    get:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/switchableResourceSortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
+      summary: "List Polling Profile Configuration"
+      description: "List Polling Profile configuration"
+      operationId: listPollingProfile
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfileList"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfileList"
+        500:
+          description: "problem getting the polling profile list"
   # Polling Profile
   /pollingprofiles/{pollingProfileId}:
     get:
@@ -953,6 +1001,31 @@ paths:
         500:
           description: "problem deleting a demo"
 
+  /datastores:
+    get:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/switchableResourceSortBy"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
+      summary: "List Data Store"
+      description: "List Data Store"
+      operationId: listDataStore
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./dataStores.yaml#/components/schemas/DataStoreList"
+            text/yaml:
+              schema:
+                $ref: "./dataStores.yaml#/components/schemas/DataStoreList"
+        500:
+          description: "problem getting the data store list"
+
   # Data Stores
   /datastores/{dataStoreId}:
     get:
@@ -1139,3 +1212,20 @@ paths:
           description: "environment not found"
         500:
           description: "problem deleting an environment"
+
+  /version:
+    get:
+      tags:
+        - api
+      summary: "Get the version of the API"
+      description: "Get the version of the API"
+      operationId: getVersion
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./version.yaml#/components/schemas/Version"
+        500:
+          description: "problem getting the version of the API"

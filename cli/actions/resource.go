@@ -2,6 +2,7 @@ package actions
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -48,7 +49,7 @@ func (r ResourceRegistry) Get(name string) (resourceActions, error) {
 	actions, found := r[name]
 
 	if !found {
-		return resourceActions{}, ErrResourceNotRegistered
+		return resourceActions{}, fmt.Errorf("resource not found: %s", name)
 	}
 
 	return actions, nil

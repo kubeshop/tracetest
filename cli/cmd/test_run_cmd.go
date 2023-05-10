@@ -2,13 +2,11 @@ package cmd
 
 import (
 	"context"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var (
@@ -23,7 +21,7 @@ var testRunCmd = &cobra.Command{
 	Short:  "Run a test on your Tracetest server",
 	Long:   "Run a test on your Tracetest server",
 	PreRun: setupCommand(),
-	Run: func(_ *cobra.Command, _ []string) {
+	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
 		analytics.Track("Test Run", "cmd", map[string]string{})
 
 		ctx := context.Background()
@@ -42,12 +40,8 @@ var testRunCmd = &cobra.Command{
 		}
 
 		err := runTestAction.Run(ctx, actionArgs)
-		if err != nil {
-			cliLogger.Error("failed to run test", zap.Error(err))
-			os.Exit(1)
-			return
-		}
-	},
+		return "", err
+	}),
 	PostRun: teardownCommand,
 }
 

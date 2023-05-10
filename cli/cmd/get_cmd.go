@@ -3,12 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var resourceID string
@@ -20,11 +18,9 @@ var getCmd = &cobra.Command{
 	Short:   "Get resource",
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		if resourceID == "" {
-			cliLogger.Error("id of the resource to get must be specified")
-			os.Exit(1)
-			return
+			return "", fmt.Errorf("id of the resource to get must be specified")
 		}
 
 		resourceType := args[0]
@@ -35,18 +31,13 @@ var getCmd = &cobra.Command{
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
-
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		resource, err := resourceActions.Get(ctx, resourceID)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		resourceFormatter := resourceActions.Formatter()
@@ -54,13 +45,11 @@ var getCmd = &cobra.Command{
 
 		result, err := formatter.Format(resource)
 		if err != nil {
-			cliLogger.Error("failed to format resource", zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
-		fmt.Println(result)
-	},
+		return result, nil
+	}),
 	PostRun: teardownCommand,
 }
 

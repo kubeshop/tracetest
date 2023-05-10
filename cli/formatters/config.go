@@ -35,7 +35,23 @@ func (f ConfigFormatter) ToTable(file *file.File) (*simpletable.Header, *simplet
 }
 
 func (f ConfigFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpletable.Body, error) {
-	return nil, nil, nil
+	rawConfigList, err := f.ToListStruct(file)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	body := simpletable.Body{}
+	for _, rawConfig := range rawConfigList {
+		configResource := rawConfig.(openapi.ConfigurationResource)
+		row, err := f.getTableRow(configResource)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		body.Cells = append(body.Cells, row)
+	}
+
+	return f.getTableHeader(), &body, nil
 }
 
 func (f ConfigFormatter) ToStruct(file *file.File) (interface{}, error) {
@@ -51,7 +67,20 @@ func (f ConfigFormatter) ToStruct(file *file.File) (interface{}, error) {
 }
 
 func (f ConfigFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
-	return nil, nil
+	var ConfigResourceList openapi.ConfigurationResourceList
+	nullableList := openapi.NewNullableConfigurationResourceList(&ConfigResourceList)
+
+	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]interface{}, len(ConfigResourceList.Items))
+	for i, item := range ConfigResourceList.Items {
+		items[i] = item
+	}
+
+	return items, nil
 }
 
 func (f ConfigFormatter) getTableHeader() *simpletable.Header {

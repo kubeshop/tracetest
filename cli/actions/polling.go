@@ -50,7 +50,7 @@ func (polling pollingActions) Apply(ctx context.Context, fileContent file.File) 
 }
 
 func (polling pollingActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
-	return nil, ErrNotSupportedResourceAction
+	return polling.resourceClient.List(ctx, listArgs)
 }
 
 func (polling pollingActions) Delete(ctx context.Context, ID string) (string, error) {

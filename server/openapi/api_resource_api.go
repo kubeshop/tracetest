@@ -111,6 +111,18 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetPollingProfile,
 		},
 		{
+			"ListConfiguration",
+			strings.ToUpper("Get"),
+			"/api/configs",
+			c.ListConfiguration,
+		},
+		{
+			"ListDataStore",
+			strings.ToUpper("Get"),
+			"/api/datastores",
+			c.ListDataStore,
+		},
+		{
 			"ListDemos",
 			strings.ToUpper("Get"),
 			"/api/demos",
@@ -121,6 +133,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/environments",
 			c.ListEnvironments,
+		},
+		{
+			"ListPollingProfile",
+			strings.ToUpper("Get"),
+			"/api/pollingprofiles",
+			c.ListPollingProfile,
 		},
 		{
 			"UpdateConfiguration",
@@ -331,6 +349,58 @@ func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *h
 
 }
 
+// ListConfiguration - List Tracetest configuration
+func (c *ResourceApiApiController) ListConfiguration(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListConfiguration(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ListDataStore - List Data Store
+func (c *ResourceApiApiController) ListDataStore(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListDataStore(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // ListDemos - List Demonstrations
 func (c *ResourceApiApiController) ListDemos(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -373,6 +443,32 @@ func (c *ResourceApiApiController) ListEnvironments(w http.ResponseWriter, r *ht
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.ListEnvironments(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ListPollingProfile - List Polling Profile Configuration
+func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListPollingProfile(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
