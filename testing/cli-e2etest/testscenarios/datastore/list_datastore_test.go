@@ -29,6 +29,6 @@ func TestListDatastore(t *testing.T) {
 	// When I try to list datastore again
 	// Then it should receive a error message saying that a datastore cannot be listed
 	result, err = tracetestcli.Exec("list datastore", tracetestcli.WithCLIConfig(cliConfig))
-	require.ErrorContains(t, err, "DataStore does not support listing. Try `tracetest get datastore`")
-	require.Nil(t, result)
+	require.NoError(t, err)
+	require.Contains(t, result.StdOut, "DataStore does not support listing. Try `tracetest get datastore`")
 }

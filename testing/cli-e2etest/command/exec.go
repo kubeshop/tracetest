@@ -53,16 +53,16 @@ func checkIfCommandExists(command string) {
 func handleRunError(err error, fullCommand string, output string, cmd *exec.Cmd) (*ExecResult, error) {
 	exitError, castOk := err.(*exec.ExitError)
 
+	if !castOk {
+		return nil, fmt.Errorf("error when executing command: \n%s \nerror: %w", fullCommand, err)
+	}
+
 	commandResult := &ExecResult{
 		CommandExecuted: fullCommand,
 		StdOut:          output,
-		ExitCode:        -1,
+		StdErr:          string(exitError.Stderr),
+		ExitCode:        exitError.ExitCode(),
 	}
 
-	if castOk {
-		commandResult.StdErr = string(exitError.Stderr)
-		commandResult.ExitCode = exitError.ExitCode()
-	}
-
-	return nil, fmt.Errorf("error when executing command: \n%s \nerror: %w", commandResult, err)
+	return commandResult, nil
 }
