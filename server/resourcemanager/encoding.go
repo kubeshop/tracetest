@@ -2,8 +2,6 @@ package resourcemanager
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/goccy/go-yaml"
@@ -57,20 +55,27 @@ func (e basicEncoder) Unmarshal(in []byte, out interface{}) (err error) {
 	return e.unmarshalFn(in, out)
 }
 
-var errUnacceptableContentType = errors.New("unacceptable content type")
+func getInputEncoder(r *http.Request) encoder {
+	return getEncoderForHeader(r, "Content-Type", "Accept")
+}
 
-func encoderFromRequest(r *http.Request) (encoder, error) {
-	contentType := r.Header.Get("Content-Type")
-	accept := r.Header.Get("Accept")
-	for _, enc := range encoders {
-		if enc.Accepts(contentType) || enc.Accepts(accept) {
-			return enc, nil
+func getOutputEncoder(r *http.Request) encoder {
+	return getEncoderForHeader(r, "Accept", "Content-Type")
+}
+
+func getEncoderForHeader(r *http.Request, headerWaterfall ...string) encoder {
+	for _, header := range headerWaterfall {
+		headerValue := r.Header.Get(header)
+		if headerValue == "" {
+			continue
+		}
+
+		for _, enc := range encoders {
+			if enc.Accepts(headerValue) {
+				return enc
+			}
 		}
 	}
 
-	if accept == "" && contentType == "" {
-		return defaultEncoder, nil
-	}
-
-	return nil, fmt.Errorf("cannot handle content-type %s: %w", contentType, errUnacceptableContentType)
+	return defaultEncoder
 }
