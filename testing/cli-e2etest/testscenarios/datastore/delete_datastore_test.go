@@ -45,12 +45,9 @@ func TestDeleteDatastore(t *testing.T) {
 	// When I try to get a datastore again
 	// Then it should return an empty datastore
 	result, err = tracetestcli.Exec("get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	require.Error(t, err)
-	require.Nil(t, result)
-
 	// TODO: we haven't defined a valid output to tell to the user that we are on `no-tracing mode`
-	// require.NoError(t, err)
-	// require.Equal(t, 0, result.ExitCode)
-	// require.Contains(t, result.StdOut, "type: DataStore")
-	// require.Contains(t, result.StdOut, "default: false")
+	require.NoError(t, err)
+	require.Equal(t, 0, result.ExitCode)
+	require.Contains(t, result.StdOut, "type: DataStore")
+	require.Contains(t, result.StdOut, "default: false")
 }
