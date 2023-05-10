@@ -116,6 +116,11 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
 	}
 
+	responseContentType := resp.Header.Get("Content-type")
+	if responseContentType == "" {
+		responseContentType = "application/json"
+	}
+
 	file = file.SaveChanges(IOReadCloserToString(resp.Body))
 
 	return &file, nil
