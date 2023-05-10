@@ -126,11 +126,19 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
+  "/configs": {
+    /** List Tracetest configuration */
+    get: operations["listConfiguration"];
+  };
   "/configs/{configId}": {
     /** Get Tracetest configuration */
     get: operations["getConfiguration"];
     /** Update Tracetest configuration */
     put: operations["updateConfiguration"];
+  };
+  "/pollingprofiles": {
+    /** List Polling Profile configuration */
+    get: operations["listPollingProfile"];
   };
   "/pollingprofiles/{pollingProfileId}": {
     /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
@@ -151,6 +159,10 @@ export interface paths {
     put: operations["updateDemo"];
     /** Delete a demonstration used on Tracetest as quick start examples. */
     delete: operations["deleteDemo"];
+  };
+  "/datastores": {
+    /** List Data Store */
+    get: operations["listDataStore"];
   };
   "/datastores/{dataStoreId}": {
     /** Get a Data Store */
@@ -696,6 +708,21 @@ export interface operations {
       };
     };
   };
+  /** List Tracetest configuration */
+  listConfiguration: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResourceList"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResourceList"];
+        };
+      };
+      /** problem getting the configuration list */
+      500: unknown;
+    };
+  };
   /** Get Tracetest configuration */
   getConfiguration: {
     parameters: {};
@@ -730,6 +757,21 @@ export interface operations {
         "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
         "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
       };
+    };
+  };
+  /** List Polling Profile configuration */
+  listPollingProfile: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfileList"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfileList"];
+        };
+      };
+      /** problem getting the polling profile list */
+      500: unknown;
     };
   };
   /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
@@ -867,6 +909,21 @@ export interface operations {
       /** demo not found */
       404: unknown;
       /** problem deleting a demo */
+      500: unknown;
+    };
+  };
+  /** List Data Store */
+  listDataStore: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStoreList"];
+          "text/yaml": external["dataStores.yaml"]["components"]["schemas"]["DataStoreList"];
+        };
+      };
+      /** problem getting the data store list */
       500: unknown;
     };
   };
@@ -1031,6 +1088,10 @@ export interface external {
           message?: string;
           error?: string;
         };
+        ConfigurationResourceList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["ConfigurationResource"][];
+        };
         /** @description Represents a configuration structured into the Resources format. */
         ConfigurationResource: {
           /**
@@ -1053,6 +1114,10 @@ export interface external {
             /** @description Flag telling if a user allow Tracetest to send analytics about its usage. */
             analyticsEnabled: boolean;
           };
+        };
+        PollingProfileList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
         };
         /** @description Represents a polling profile structured into the Resources format. */
         PollingProfile: {
@@ -1136,6 +1201,10 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        DataStoreList: {
+          count?: number;
+          items?: external["dataStores.yaml"]["components"]["schemas"]["DataStoreResource"][];
+        };
         /** @description Represents a data store structured into the Resources format. */
         DataStoreResource: {
           /**

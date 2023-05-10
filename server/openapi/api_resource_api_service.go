@@ -187,6 +187,34 @@ func (s *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 	return Response(http.StatusNotImplemented, nil), errors.New("GetPollingProfile method not implemented")
 }
 
+// ListConfiguration - List Tracetest configuration
+func (s *ResourceApiApiService) ListConfiguration(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
+	// TODO - update ListConfiguration with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, ConfigurationResourceList{}) or use other options such as http.Ok ...
+	//return Response(200, ConfigurationResourceList{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("ListConfiguration method not implemented")
+}
+
+// ListDataStore - List Data Store
+func (s *ResourceApiApiService) ListDataStore(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
+	// TODO - update ListDataStore with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, DataStoreList{}) or use other options such as http.Ok ...
+	//return Response(200, DataStoreList{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("ListDataStore method not implemented")
+}
+
 // ListDemos - List Demonstrations
 func (s *ResourceApiApiService) ListDemos(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
 	// TODO - update ListDemos with the required logic for this service method.
@@ -219,6 +247,20 @@ func (s *ResourceApiApiService) ListEnvironments(ctx context.Context, take int32
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("ListEnvironments method not implemented")
+}
+
+// ListPollingProfile - List Polling Profile Configuration
+func (s *ResourceApiApiService) ListPollingProfile(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
+	// TODO - update ListPollingProfile with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, PollingProfileList{}) or use other options such as http.Ok ...
+	//return Response(200, PollingProfileList{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("ListPollingProfile method not implemented")
 }
 
 // UpdateConfiguration - Update Tracetest configuration
