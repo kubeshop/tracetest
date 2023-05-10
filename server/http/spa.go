@@ -57,7 +57,7 @@ type spaConfig interface {
 	ExperimentalFeatures() []string
 }
 
-func SPAHandler(conf spaConfig, analyticsEnabled bool, serverID, version, env string) http.HandlerFunc {
+func SPAHandler(conf spaConfig, analyticsEnabled bool, serverID, version, env string, isTracetestDev bool) http.HandlerFunc {
 	pathPrefix := conf.ServerPathPrefix()
 	return spaHandler(
 		pathPrefix,
@@ -73,6 +73,7 @@ func SPAHandler(conf spaConfig, analyticsEnabled bool, serverID, version, env st
 			"DemoEnabled":          jsonEscape(conf.DemoEnabled()),
 			"DemoEndpoints":        jsonEscape(conf.DemoEndpoints()),
 			"ExperimentalFeatures": jsonEscape(conf.ExperimentalFeatures()),
+			"IsTracetestDev":       fmt.Sprintf("%t", isTracetestDev),
 		},
 	)
 }

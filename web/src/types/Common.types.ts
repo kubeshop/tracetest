@@ -9,6 +9,7 @@ export interface IEnv {
   serverID: string;
   serverPathPrefix: string;
   segmentLoaded: boolean;
+  isTracetestDev: boolean;
 }
 
 export interface IMockFactory<T, R> {
