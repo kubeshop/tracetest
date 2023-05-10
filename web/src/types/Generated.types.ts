@@ -186,6 +186,10 @@ export interface paths {
     /** Delete an environment from Tracetest */
     delete: operations["deleteEnvironment"];
   };
+  "/version": {
+    /** Get the version of the API */
+    get: operations["getVersion"];
+  };
 }
 
 export interface components {}
@@ -1064,6 +1068,19 @@ export interface operations {
       500: unknown;
     };
   };
+  /** Get the version of the API */
+  getVersion: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["version.yaml"]["components"]["schemas"]["Version"];
+        };
+      };
+      /** problem getting the version of the API */
+      500: unknown;
+    };
+  };
 }
 
 export interface external {
@@ -1845,6 +1862,18 @@ export interface external {
         Variable: {
           key?: string;
           defaultValue?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "version.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Version: {
+          /** @example 1.0.0 */
+          version?: string;
         };
       };
     };

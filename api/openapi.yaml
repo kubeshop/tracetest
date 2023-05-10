@@ -1212,3 +1212,20 @@ paths:
           description: "environment not found"
         500:
           description: "problem deleting an environment"
+
+  /version:
+    get:
+      tags:
+        - api
+      summary: "Get the version of the API"
+      description: "Get the version of the API"
+      operationId: getVersion
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./version.yaml#/components/schemas/Version"
+        500:
+          description: "problem getting the version of the API"

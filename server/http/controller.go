@@ -35,6 +35,7 @@ type controller struct {
 	newTraceDBFn    func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
 	mappers         mappings.Mappings
 	triggerRegistry *trigger.Registry
+	version         string
 }
 
 type runner interface {
@@ -51,6 +52,7 @@ func NewController(
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 	tracer trace.Tracer,
+	version string,
 ) openapi.ApiApiServicer {
 	return &controller{
 		tracer:          tracer,
@@ -59,6 +61,7 @@ func NewController(
 		newTraceDBFn:    newTraceDBFn,
 		mappers:         mappers,
 		triggerRegistry: triggerRegistry,
+		version:         version,
 	}
 }
 
@@ -1092,4 +1095,12 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	}
 
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
+}
+
+func (c *controller) GetVersion(ctx context.Context) (openapi.ImplResponse, error) {
+	version := openapi.Version{
+		Version: c.version,
+	}
+
+	return openapi.Response(http.StatusOK, version), nil
 }
