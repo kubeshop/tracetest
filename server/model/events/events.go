@@ -173,14 +173,18 @@ func TraceDataStoreConnectionInfo(testID id.ID, runID int, connectionResult mode
 	}
 }
 
-func TracePollingStart(testID id.ID, runID int) model.TestRunEvent {
+func TracePollingStart(testID id.ID, runID int, dsType, endpoints string) model.TestRunEvent {
+	endpointsDescription := ""
+	if endpoints != "" {
+		endpointsDescription = fmt.Sprintf(" with the following endpoints: %s", endpoints)
+	}
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrace,
 		Type:                "POLLING_START",
 		Title:               "Trace polling started",
-		Description:         "The trace polling process has started",
+		Description:         fmt.Sprintf("The trace polling process has started using %s %s", dsType, endpointsDescription),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling: model.PollingInfo{

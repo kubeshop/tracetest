@@ -601,6 +601,7 @@ func (db *traceDBMock) GetTraceID() trace.TraceID {
 func (db *traceDBMock) Connect(ctx context.Context) error { return nil }
 func (db *traceDBMock) Close() error                      { return nil }
 func (db *traceDBMock) Ready() bool                       { return true }
+func (db *traceDBMock) GetEndpoints() string              { return "" }
 func (db *traceDBMock) TestConnection(ctx context.Context) model.ConnectionResult {
 	return model.ConnectionResult{}
 }

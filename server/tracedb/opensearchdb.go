@@ -37,6 +37,10 @@ func (db *opensearchDB) Close() error {
 	return nil
 }
 
+func (db *opensearchDB) GetEndpoints() string {
+	return strings.Join(db.config.Addresses, ", ")
+}
+
 func (db *opensearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("OpenSearch", opensearchDefaultPorts(), db.config.Addresses...)),
