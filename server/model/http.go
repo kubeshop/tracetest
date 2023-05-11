@@ -32,11 +32,12 @@ type HTTPHeader struct {
 }
 
 type HTTPRequest struct {
-	Method  HTTPMethod `expr_enabled:"true"`
-	URL     string     `expr_enabled:"true"`
-	Body    string     `expr_enabled:"true"`
-	Headers []HTTPHeader
-	Auth    *HTTPAuthenticator
+	Method          HTTPMethod `expr_enabled:"true"`
+	URL             string     `expr_enabled:"true"`
+	Body            string     `expr_enabled:"true"`
+	Headers         []HTTPHeader
+	Auth            *HTTPAuthenticator
+	SSLVerification bool
 }
 
 func (a HTTPRequest) Authenticate(req *http.Request) {

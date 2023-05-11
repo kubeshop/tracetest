@@ -19,11 +19,12 @@ var _ MappedNullable = &HTTPRequest{}
 
 // HTTPRequest struct for HTTPRequest
 type HTTPRequest struct {
-	Url     *string      `json:"url,omitempty"`
-	Method  *string      `json:"method,omitempty"`
-	Headers []HTTPHeader `json:"headers,omitempty"`
-	Body    *string      `json:"body,omitempty"`
-	Auth    *HTTPAuth    `json:"auth,omitempty"`
+	Url             *string      `json:"url,omitempty"`
+	Method          *string      `json:"method,omitempty"`
+	Headers         []HTTPHeader `json:"headers,omitempty"`
+	Body            *string      `json:"body,omitempty"`
+	Auth            *HTTPAuth    `json:"auth,omitempty"`
+	SslVerification *bool        `json:"sslVerification,omitempty"`
 }
 
 // NewHTTPRequest instantiates a new HTTPRequest object
@@ -32,6 +33,8 @@ type HTTPRequest struct {
 // will change when the set of required properties is changed
 func NewHTTPRequest() *HTTPRequest {
 	this := HTTPRequest{}
+	var sslVerification bool = false
+	this.SslVerification = &sslVerification
 	return &this
 }
 
@@ -40,6 +43,8 @@ func NewHTTPRequest() *HTTPRequest {
 // but it doesn't guarantee that properties required by API are set
 func NewHTTPRequestWithDefaults() *HTTPRequest {
 	this := HTTPRequest{}
+	var sslVerification bool = false
+	this.SslVerification = &sslVerification
 	return &this
 }
 
@@ -203,6 +208,38 @@ func (o *HTTPRequest) SetAuth(v HTTPAuth) {
 	o.Auth = &v
 }
 
+// GetSslVerification returns the SslVerification field value if set, zero value otherwise.
+func (o *HTTPRequest) GetSslVerification() bool {
+	if o == nil || isNil(o.SslVerification) {
+		var ret bool
+		return ret
+	}
+	return *o.SslVerification
+}
+
+// GetSslVerificationOk returns a tuple with the SslVerification field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *HTTPRequest) GetSslVerificationOk() (*bool, bool) {
+	if o == nil || isNil(o.SslVerification) {
+		return nil, false
+	}
+	return o.SslVerification, true
+}
+
+// HasSslVerification returns a boolean if a field has been set.
+func (o *HTTPRequest) HasSslVerification() bool {
+	if o != nil && !isNil(o.SslVerification) {
+		return true
+	}
+
+	return false
+}
+
+// SetSslVerification gets a reference to the given bool and assigns it to the SslVerification field.
+func (o *HTTPRequest) SetSslVerification(v bool) {
+	o.SslVerification = &v
+}
+
 func (o HTTPRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -227,6 +264,9 @@ func (o HTTPRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Auth) {
 		toSerialize["auth"] = o.Auth
+	}
+	if !isNil(o.SslVerification) {
+		toSerialize["sslVerification"] = o.SslVerification
 	}
 	return toSerialize, nil
 }

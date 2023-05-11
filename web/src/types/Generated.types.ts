@@ -1463,6 +1463,7 @@ export interface external {
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
           body?: string;
           auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+          sslVerification?: boolean;
         };
         HTTPResponse: {
           status?: string;

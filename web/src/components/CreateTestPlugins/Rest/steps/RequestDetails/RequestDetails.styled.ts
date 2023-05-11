@@ -32,3 +32,9 @@ export const DeleteIcon = styled(DeleteOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.md};
 `;
+
+export const SSLVerificationContainer = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 8px;
+`;
