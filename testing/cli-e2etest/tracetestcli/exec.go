@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/command"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -18,7 +20,7 @@ type executionState struct {
 	cliConfigFile string
 }
 
-func Exec(tracetestSubCommand string, options ...ExecOption) (*command.ExecResult, error) {
+func Exec(t *testing.T, tracetestSubCommand string, options ...ExecOption) *command.ExecResult {
 	state := &executionState{}
 	for _, option := range options {
 		option(state)
@@ -32,7 +34,10 @@ func Exec(tracetestSubCommand string, options ...ExecOption) (*command.ExecResul
 	tracetestCommand := getTracetestCommand()
 	tracetestSubCommands := strings.Split(tracetestSubCommand, " ")
 
-	return command.Exec(tracetestCommand, tracetestSubCommands...)
+	result, err := command.Exec(tracetestCommand, tracetestSubCommands...)
+	require.NoError(t, err)
+
+	return result
 }
 
 func getTracetestCommand() string {

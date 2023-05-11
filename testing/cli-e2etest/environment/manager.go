@@ -23,6 +23,7 @@ var (
 )
 
 type Manager interface {
+	Name() string
 	Start(t *testing.T)
 	Close(t *testing.T)
 	GetCLIConfigPath(t *testing.T) string
@@ -81,6 +82,10 @@ func GetManager(environmentType string) Manager {
 		dockerComposeFilePath: dockerComposeFilepath,
 		dockerProjectName:     fmt.Sprintf("tracetest-env-%d", envCounter),
 	}
+}
+
+func (m *internalManager) Name() string {
+	return m.environmentType
 }
 
 func (m *internalManager) Start(t *testing.T) {

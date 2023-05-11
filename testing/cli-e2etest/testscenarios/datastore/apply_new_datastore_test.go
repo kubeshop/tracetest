@@ -5,11 +5,17 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
+	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
+	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
 	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 )
 
 func TestApplyNewDatastore(t *testing.T) {
+	// instantiate require with testing helper
+	require := require.New(t)
+
+	// setup isolated e2e environment
 	env := environment.CreateAndStart(t)
 	defer env.Close(t)
 
@@ -20,29 +26,29 @@ func TestApplyNewDatastore(t *testing.T) {
 
 	// When I try to get a datastore without any server setup
 	// Then it should return an empty datastore
-	result, err := tracetestcli.Exec("get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
+	result := tracetestcli.Exec(t, "get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
 	// TODO: we haven't defined a valid output to tell to the user that we are on `no-tracing mode`
-	require.NoError(t, err)
-	require.Equal(t, 0, result.ExitCode)
-	require.Contains(t, result.StdOut, "type: DataStore")
-	require.Contains(t, result.StdOut, "default: false")
+	require.Equal(0, result.ExitCode)
+
+	dataStore := helpers.UnmarshalYAML[types.DataStoreResource](t, result.StdOut)
+	require.Equal("DataStore", dataStore.Type)
+	require.False(dataStore.Spec.Default)
 
 	// When I try to set up a new datastore
 	// Then it should be applied with success
 	dataStorePath := env.GetManisfestResourcePath(t, "data-store")
 
-	result, err = tracetestcli.Exec(fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
-	require.NoError(t, err)
-	require.Equal(t, 0, result.ExitCode)
+	result = tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
+	require.Equal(0, result.ExitCode)
 
 	// When I try to get a datastore again
 	// Then it should return the datastore applied on the last step
-	result, err = tracetestcli.Exec("get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	require.NoError(t, err)
-	require.Equal(t, 0, result.ExitCode)
-	require.Contains(t, result.StdOut, "type: DataStore")
-	require.Contains(t, result.StdOut, "default: true")
-	require.Contains(t, result.StdOut, "id: current")
-	// TODO: we are not testing datastore specific fields because they are dependant of the environment
-	// but we could read the dataStore file in the future and try to do a comparison
+	result = tracetestcli.Exec(t, "get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
+	require.Equal(0, result.ExitCode)
+
+	dataStore = helpers.UnmarshalYAML[types.DataStoreResource](t, result.StdOut)
+	require.Equal("DataStore", dataStore.Type)
+	require.Equal("current", dataStore.Spec.ID)
+	require.Equal(env.Name(), dataStore.Spec.Name)
+	require.True(dataStore.Spec.Default)
 }
