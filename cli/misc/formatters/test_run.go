@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	global_formatters "github.com/kubeshop/tracetest/cli/global/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/pterm/pterm"
@@ -52,10 +51,10 @@ type TestRunOutput struct {
 }
 
 func (f testRun) Format(output TestRunOutput) string {
-	switch global_formatters.CurrentOutput {
-	case global_formatters.Pretty:
+	switch CurrentOutput {
+	case Pretty:
 		return f.pretty(output)
-	case global_formatters.JSON:
+	case JSON:
 		return f.json(output)
 	}
 
