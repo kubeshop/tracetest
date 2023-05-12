@@ -1,7 +1,6 @@
 package testutil
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,8 +34,6 @@ var getAugmentedSuccessOperation = buildSingleStepOperation(singleStepOperationT
 		jsonBody := responseBodyJSON(t, resp, ct)
 
 		expected := ct.toJSON(rt.SampleJSONAugmented)
-
-		fmt.Println(jsonBody)
 
 		rt.customJSONComparer(t, OperationGetAugmentedSuccess, expected, jsonBody)
 	},

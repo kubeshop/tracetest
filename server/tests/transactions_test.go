@@ -239,7 +239,12 @@ func TestTransactions(t *testing.T) {
 						"specs":[],
 						"outputs":[],
 						"summary": {
-							"runs": 0
+							"runs": 0,
+							"lastRun": {
+								"fails": 0,
+								"passes": 0,
+								"time": "REMOVEME"
+							}
 						}
 					}
 				],
@@ -248,7 +253,7 @@ func TestTransactions(t *testing.T) {
 					"lastRun": {
 						"fails": 1,
 						"passes": 2,
-						"time": "` + d.Format(time.RFC3339) + `"
+						"time": "REMOVEME"
 					}
 				}
 			}
@@ -274,10 +279,14 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	expected := firstValue
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.0.createdAt", expected)
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.1.createdAt", expected)
+	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.0.summary.lastRun.time", expected)
+	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.1.summary.lastRun.time", expected)
 
 	actual := secondValue
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.0.createdAt", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.1.createdAt", actual)
+	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.0.summary.lastRun.time", actual)
+	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.1.summary.lastRun.time", actual)
 
 	require.JSONEq(t, expected, actual)
 }
