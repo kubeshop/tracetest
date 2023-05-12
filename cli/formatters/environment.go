@@ -55,22 +55,12 @@ func (f EnvironmentsFormatter) ToListTable(file *file.File) (*simpletable.Header
 
 func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var environmentResource openapi.EnvironmentResource
-	nullableEnvironment := openapi.NewNullableEnvironmentResource(&environmentResource)
 
-	if file.ContentType() == "text/yaml" {
-		err := yaml.Unmarshal([]byte(file.Contents()), &environmentResource)
-		if err != nil {
-			return nil, err
-		}
-
-		return environmentResource, nil
-	}
-
-	// fallback to JSON
-	err := nullableEnvironment.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &environmentResource)
 	if err != nil {
 		return nil, err
 	}
+
 	return environmentResource, nil
 }
 
