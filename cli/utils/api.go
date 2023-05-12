@@ -44,7 +44,6 @@ func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
 type ResourceClient struct {
 	Client       http.Client
 	BaseUrl      string
-	BaseHeader   http.Header
 	ResourceType string
 }
 
@@ -61,20 +60,15 @@ func GetResourceAPIClient(resourceType string, cliConfig config.Config) Resource
 	}
 
 	baseUrl := fmt.Sprintf("%s://%s/api/%s", cliConfig.Scheme, cliConfig.Endpoint, resourceType)
-	baseHeader := http.Header{
-		"x-client-id":  []string{analytics.ClientID()},
-		"Content-Type": []string{"application/json"},
-	}
 
 	return ResourceClient{
 		Client:       client,
 		BaseUrl:      baseUrl,
-		BaseHeader:   baseHeader,
 		ResourceType: resourceType,
 	}
 }
 
-func (resourceClient ResourceClient) NewRequest(url string, method string, body string) (*http.Request, error) {
+func (resourceClient ResourceClient) NewRequest(url, method, body, contentType string) (*http.Request, error) {
 	var reqBody io.Reader
 	if body != "" {
 		reqBody = StringToIOReader(body)
@@ -85,13 +79,20 @@ func (resourceClient ResourceClient) NewRequest(url string, method string, body 
 		return nil, err
 	}
 
-	request.Header = resourceClient.BaseHeader
+	if contentType == "" {
+		contentType = "application/json"
+	}
+
+	request.Header.Set("x-client-id", analytics.ClientID())
+	request.Header.Set("Content-Type", contentType)
+	request.Header.Set("Accept", contentType)
+
 	return request, err
 }
 
 func (resourceClient ResourceClient) Update(ctx context.Context, file file.File, ID string) (*file.File, error) {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
-	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents())
+	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents(), file.ContentType())
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -117,6 +118,11 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
 	}
 
+	responseContentType := resp.Header.Get("Content-type")
+	if responseContentType == "" {
+		responseContentType = "application/json"
+	}
+
 	file = file.SaveChanges(IOReadCloserToString(resp.Body))
 
 	return &file, nil
@@ -124,7 +130,7 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 
 func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) error {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
-	request, err := resourceClient.NewRequest(url, http.MethodDelete, "")
+	request, err := resourceClient.NewRequest(url, http.MethodDelete, "", "")
 	if err != nil {
 		return fmt.Errorf("could not delete resource: %w", err)
 	}
@@ -134,7 +140,7 @@ func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) erro
 }
 
 func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.File, error) {
-	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "")
+	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "", "")
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -181,7 +187,7 @@ func parseListResponse(body string) (BaseListResponse, error) {
 
 func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (*file.File, error) {
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := resourceClient.NewRequest(url, http.MethodGet, "")
+	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "")
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -218,7 +224,7 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 }
 
 func (resourceClient ResourceClient) Create(ctx context.Context, file file.File) (*file.File, error) {
-	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents())
+	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents(), file.ContentType())
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}

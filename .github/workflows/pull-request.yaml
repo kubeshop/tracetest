@@ -292,6 +292,31 @@ jobs:
           TEST_ENV="${{ matrix.test_env }}" \
           ./run.bash
 
+  e2e-cli:
+    name: CLI e2e tests
+    needs:  [build-docker]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-go
+          path: dist/
+      - name: Run tests
+        run: |
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
+          chmod +x ./dist/tracetest
+
+          export TRACETEST_COMMAND=$PWD/dist/tracetest
+          export TEST_ENVIRONMENT=jaeger
+          export TAG=pr-${{ github.event.pull_request.number }}
+
+          cd ./testing/cli-e2etest
+          make test
+
   deploy:
     name: Deploy test infra
     needs: [build-docker]

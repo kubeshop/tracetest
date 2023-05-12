@@ -3,7 +3,7 @@ package formatters
 import (
 	"fmt"
 
-	"gopkg.in/yaml.v2"
+	"github.com/goccy/go-yaml"
 
 	"github.com/kubeshop/tracetest/cli/file"
 )
