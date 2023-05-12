@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.opentelemetry.io/otel/trace"
@@ -495,7 +496,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		err = json.Unmarshal(jsonOutputs, &r.Outputs)
 		if err != nil {
 			// try with raw outputs
-			var rawOutputs []model.EnvironmentValue
+			var rawOutputs []environment.EnvironmentValue
 			err = json.Unmarshal(jsonOutputs, &rawOutputs)
 
 			for _, value := range rawOutputs {
