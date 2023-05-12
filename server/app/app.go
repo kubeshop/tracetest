@@ -244,7 +244,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerConfigResource(configRepo, apiRouter, db, provisioner, tracer)
 
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner, tracer)
-	registerEnvironmentResource(&environmentRepo, apiRouter, db, provisioner, tracer)
+	registerEnvironmentResource(environmentRepo, apiRouter, db, provisioner, tracer)
 
 	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
@@ -394,7 +394,7 @@ func controller(
 	cfg httpServerConfig,
 	testDB model.Repository,
 	tracer trace.Tracer,
-	environmentRepo environment.Repository,
+	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	triggerRegistry *trigger.Registry,
 ) (*mux.Router, mappings.Mappings) {
@@ -409,12 +409,12 @@ func httpRouter(
 	cfg httpServerConfig,
 	testDB model.Repository,
 	tracer trace.Tracer,
-	environmentRepo environment.Repository,
+	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, &environmentRepo, triggerRegistry, tracer, Version)
+	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

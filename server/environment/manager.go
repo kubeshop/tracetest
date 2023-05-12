@@ -15,8 +15,8 @@ type Repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) Repository {
-	return Repository{db}
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{db}
 }
 
 type scanner interface {
