@@ -192,13 +192,11 @@ func (td *TransactionsRepository) setTransactionRunSteps(ctx context.Context, tx
 	// delete existing steps
 	stmt, err := tx.Prepare("DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2")
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
 	_, err = stmt.ExecContext(ctx, tr.ID, tr.TransactionID)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -221,7 +219,6 @@ func (td *TransactionsRepository) setTransactionRunSteps(ctx context.Context, tx
 	sql := "INSERT INTO transaction_run_steps VALUES " + strings.Join(values, ", ")
 	_, err = tx.ExecContext(ctx, sql)
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("cannot save transaction run steps: %w", err)
 	}
 	return tx.Commit()

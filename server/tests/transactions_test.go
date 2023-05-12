@@ -3,12 +3,14 @@ package tests_test
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -39,11 +41,19 @@ func setupTests(t *testing.T, db *sql.DB) model.Run {
 		TraceID: id.NewRandGenerator().TraceID(),
 		SpanID:  id.NewRandGenerator().SpanID(),
 	}
-	_, err = testsDB.CreateRun(context.TODO(), test, run)
+	run, err = testsDB.CreateRun(context.TODO(), test, run)
 	require.NoError(t, err)
 
-	run.Pass = 2
-	run.Fail = 1
+	run.Results.Results = (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).
+		MustAdd("query", []model.AssertionResult{
+			{
+				Results: []model.SpanAssertionResult{
+					{CompareErr: nil},
+					{CompareErr: nil},
+					{CompareErr: fmt.Errorf("some error")},
+				},
+			},
+		})
 
 	err = testsDB.UpdateRun(context.TODO(), run)
 	require.NoError(t, err)
@@ -131,6 +141,13 @@ func TestTransactions(t *testing.T) {
 			case rmtests.OperationListAugmentedSuccess,
 				rmtests.OperationGetAugmentedSuccess:
 
+				transactionRepo.Create(context.TODO(), sample)
+				// create a local copy of sample, with all the data
+				sample, err := transactionRepo.GetAugmented(context.TODO(), sample.ID)
+				if err != nil {
+					panic(err)
+				}
+
 				run := setupTests(t, transactionRepo.DB())
 				transactionRepo.Create(context.TODO(), sample)
 
@@ -142,44 +159,12 @@ func TestTransactions(t *testing.T) {
 				tr.CompletedAt = d
 				tr.CreatedAt = d
 				tr.CurrentTest = 1
-				tr.StepIDs = []int{
-					run.ID,
-				}
+				tr.Steps = []model.Run{run}
 
 				err = transactionRepo.UpdateRun(context.TODO(), tr)
 				if err != nil {
 					panic(err)
 				}
-
-				// // fails and passes are calculated from actual results when using the repo so they cannot be 'hardcoded'.
-				// // generating all the DB info programatically is tedious, so we can just use SQL.
-				// sql := `
-				// INSERT INTO transaction_runs
-				// 	(
-				// 		id,
-				// 		transaction_version,
-				// 		state,
-				// 		current_test,
-
-				// 		transaction_id,
-				// 		created_at,
-				// 		completed_at,
-				// 		pass,
-				// 		fail
-				// )
-				// VALUES
-				// 	(1, 1, 'FINISHED', 1, $1, $2, $2, $3, $4)`
-
-				// _, err = transactionRepo.DB().Exec(
-				// 	sql,
-				// 	sample.ID, // transactionID
-				// 	d,         // createdAt date
-				// 	2,         // passes
-				// 	1,         // fails
-				// )
-				// if err != nil {
-				// 	panic(err)
-				// }
 
 				// TODO: reenable this tests when we figure out how to test it
 				// problems:
