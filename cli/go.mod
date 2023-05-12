@@ -34,10 +34,6 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-<<<<<<< Updated upstream
-=======
-	github.com/felixge/httpsnoop v1.0.3 // indirect
->>>>>>> Stashed changes
 	github.com/fluidtruck/deepcopy v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -87,10 +83,7 @@ require (
 	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-<<<<<<< Updated upstream
 	google.golang.org/genproto v0.0.0-20221227171554-f9683d7f8bef // indirect
-=======
->>>>>>> Stashed changes
 	google.golang.org/grpc v1.52.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
