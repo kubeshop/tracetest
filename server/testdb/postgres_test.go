@@ -90,19 +90,3 @@ func createRun(t *testing.T, db model.Repository, test model.Test) model.Run {
 
 	return updated
 }
-
-func createEnvironment(t *testing.T, db model.Repository, name string) model.Environment {
-	t.Helper()
-	environment := model.Environment{
-		Name:        name,
-		Description: "description",
-		Values:      []model.EnvironmentValue{{Key: "key1", Value: "value1"}, {Key: "key2", Value: "value2"}},
-	}
-
-	updated, err := db.CreateEnvironment(context.TODO(), environment)
-	if err != nil {
-		panic(err)
-	}
-
-	return updated
-}

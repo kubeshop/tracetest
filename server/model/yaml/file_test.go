@@ -326,53 +326,6 @@ func TestTestModel(t *testing.T) {
 	}
 }
 
-func TestEnvironmentModel(t *testing.T) {
-	cases := []struct {
-		name     string
-		in       yaml.Environment
-		expected model.Environment
-	}{
-		{
-			name: "Basic",
-			in: yaml.Environment{
-				ID:          "prod",
-				Name:        "prod",
-				Description: "Production",
-				Values: []yaml.EnvironmentValue{
-					{Key: "USER_ID", Value: "1"},
-				},
-			},
-			expected: model.Environment{
-				ID:          "prod",
-				Name:        "prod",
-				Description: "Production",
-				Values: []model.EnvironmentValue{
-					{Key: "USER_ID", Value: "1"},
-				},
-			},
-		},
-	}
-
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			cl := c
-			t.Parallel()
-
-			file := yaml.File{
-				Type: yaml.FileTypeEnvironment,
-				Spec: cl.in,
-			}
-
-			env, err := file.Environment()
-			require.NoError(t, err)
-
-			actual := env.Model()
-
-			assert.Equal(t, cl.expected, actual)
-		})
-	}
-}
-
 func TestTransactionModel(t *testing.T) {
 	cases := []struct {
 		name     string
