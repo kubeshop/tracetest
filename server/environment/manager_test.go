@@ -56,7 +56,7 @@ func TestEnvironment(t *testing.T) {
 			manager := resourcemanager.New[environment.Environment](
 				environment.ResourceName,
 				environment.ResourceNamePlural,
-				&environmentRepository,
+				environmentRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
 				resourcemanager.WithOperations(environment.Operations...),
 			)
