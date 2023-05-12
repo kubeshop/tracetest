@@ -86,7 +86,8 @@ func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test
 	return map[string]environment.EnvironmentValue{}, nil
 }
 
-func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction tests.Transaction, environment environment.Environment) (openapi.MissingVariablesError, error) {	missingVariables := make([]openapi.MissingVariable, 0)
+func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction tests.Transaction, env environment.Environment) (openapi.MissingVariablesError, error) {
+	missingVariables := make([]openapi.MissingVariable, 0)
 	for _, step := range transaction.Steps {
 		stepValidationResult, err := ValidateMissingVariables(ctx, db, step, env)
 		if err != ErrMissingVariables {

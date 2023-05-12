@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
@@ -110,7 +111,7 @@ type TransactionRun struct {
 	Metadata model.RunMetadata
 
 	// environment
-	Environment model.Environment
+	Environment environment.Environment
 }
 
 func (tr TransactionRun) ResourceID() string {
