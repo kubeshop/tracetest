@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -34,11 +35,11 @@ func (rf runnerFacade) StopTest(testID id.ID, runID int) {
 	})
 }
 
-func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run {
+func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env environment.Environment) model.Run {
 	return rf.runner.Run(ctx, test, rm, env)
 }
 
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun {
+func (rf runnerFacade) RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env environment.Environment) model.TransactionRun {
 	return rf.transactionRunner.Run(ctx, tr, rm, env)
 }
 

@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 )
 
 type TransactionRunner interface {
-	Run(context.Context, model.Transaction, model.RunMetadata, model.Environment) model.TransactionRun
+	Run(context.Context, model.Transaction, model.RunMetadata, environment.Environment) model.TransactionRun
 }
 
 type PersistentTransactionRunner interface {
@@ -52,7 +53,7 @@ type persistentTransactionRunner struct {
 	exit                chan bool
 }
 
-func (r persistentTransactionRunner) Run(ctx context.Context, transaction model.Transaction, metadata model.RunMetadata, environment model.Environment) model.TransactionRun {
+func (r persistentTransactionRunner) Run(ctx context.Context, transaction model.Transaction, metadata model.RunMetadata, environment environment.Environment) model.TransactionRun {
 	run := transaction.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
@@ -179,10 +180,10 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr model
 	return tr, nil
 }
 
-func mergeOutputsIntoEnv(env model.Environment, outputs maps.Ordered[string, model.RunOutput]) model.Environment {
-	newEnv := make([]model.EnvironmentValue, 0, outputs.Len())
+func mergeOutputsIntoEnv(env environment.Environment, outputs maps.Ordered[string, model.RunOutput]) environment.Environment {
+	newEnv := make([]environment.EnvironmentValue, 0, outputs.Len())
 	outputs.ForEach(func(key string, val model.RunOutput) error {
-		newEnv = append(newEnv, model.EnvironmentValue{
+		newEnv = append(newEnv, environment.EnvironmentValue{
 			Key:   key,
 			Value: val.Value,
 		})
@@ -190,7 +191,7 @@ func mergeOutputsIntoEnv(env model.Environment, outputs maps.Ordered[string, mod
 		return nil
 	})
 
-	return env.Merge(model.Environment{
+	return env.Merge(environment.Environment{
 		Values: newEnv,
 	})
 }

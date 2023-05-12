@@ -218,7 +218,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (Environment, error) {
 	return environment, nil
 }
 
-func (r *Repository) EnvironmentIDExists(ctx context.Context, id string) (bool, error) {
+func (r *Repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 
 	row := r.db.QueryRowContext(ctx, idExistsQuery, id)

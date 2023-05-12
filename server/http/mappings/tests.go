@@ -8,6 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -96,16 +97,17 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 	}
 }
 
-func (m OpenAPI) Environment(in model.Environment) openapi.Environment {
+// TODO: after migrating tests and transactions, we can remove this
+func (m OpenAPI) Environment(in environment.Environment) openapi.Environment {
 	return openapi.Environment{
-		Id:          in.ID,
+		Id:          in.ID.String(),
 		Name:        in.Name,
 		Description: in.Description,
 		Values:      m.EnvironmentValues(in.Values),
 	}
 }
 
-func (m OpenAPI) EnvironmentValues(in []model.EnvironmentValue) []openapi.EnvironmentValue {
+func (m OpenAPI) EnvironmentValues(in []environment.EnvironmentValue) []openapi.EnvironmentValue {
 	values := make([]openapi.EnvironmentValue, len(in))
 	for i, v := range in {
 		values[i] = openapi.EnvironmentValue{Key: v.Key, Value: v.Value}
@@ -160,7 +162,7 @@ func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPI) Environments(in []model.Environment) []openapi.Environment {
+func (m OpenAPI) Environments(in []environment.Environment) []openapi.Environment {
 	environments := make([]openapi.Environment, len(in))
 	for i, t := range in {
 		environments[i] = m.Environment(t)
@@ -573,20 +575,20 @@ func (m Model) Runs(in []openapi.TestRun) ([]model.Run, error) {
 	return runs, nil
 }
 
-func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []model.EnvironmentValue {
-	values := make([]model.EnvironmentValue, len(in))
-	for i, h := range in {
-		values[i] = model.EnvironmentValue{Key: h.Key, Value: h.Value}
-	}
-
-	return values
-}
-
-func (m Model) Environment(in openapi.Environment) model.Environment {
-	return model.Environment{
-		ID:          in.Id,
+func (m Model) Environment(in openapi.Environment) environment.Environment {
+	return environment.Environment{
+		ID:          id.ID(in.Id),
 		Name:        in.Name,
 		Description: in.Description,
 		Values:      m.EnvironmentValue(in.Values),
 	}
+}
+
+func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []environment.EnvironmentValue {
+	values := make([]environment.EnvironmentValue, len(in))
+	for i, h := range in {
+		values[i] = environment.EnvironmentValue{Key: h.Key, Value: h.Value}
+	}
+
+	return values
 }

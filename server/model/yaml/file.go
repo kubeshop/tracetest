@@ -3,8 +3,6 @@ package yaml
 import (
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/config/configresource"
-	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"gopkg.in/yaml.v3"
 )
 
@@ -64,32 +62,6 @@ func (f File) Test() (Test, error) {
 	return test, nil
 }
 
-func (f File) Config() (configresource.Config, error) {
-	if f.Type != FileTypeConfig {
-		return configresource.Config{}, fmt.Errorf("file is not a test")
-	}
-
-	config, ok := f.Spec.(configresource.Config)
-	if !ok {
-		return configresource.Config{}, fmt.Errorf("file spec cannot be casted to a test")
-	}
-
-	return config, nil
-}
-
-func (f File) PollingProfile() (pollingprofile.PollingProfile, error) {
-	if f.Type != FileTypePollingProfile {
-		return pollingprofile.PollingProfile{}, fmt.Errorf("file is not a test")
-	}
-
-	profile, ok := f.Spec.(pollingprofile.PollingProfile)
-	if !ok {
-		return pollingprofile.PollingProfile{}, fmt.Errorf("file spec cannot be casted to a test")
-	}
-
-	return profile, nil
-}
-
 func (f File) Transaction() (Transaction, error) {
 	if f.Type != FileTypeTransaction {
 		return Transaction{}, fmt.Errorf("file is not a transaction")
@@ -101,17 +73,4 @@ func (f File) Transaction() (Transaction, error) {
 	}
 
 	return transaction, nil
-}
-
-func (f File) Environment() (Environment, error) {
-	if f.Type != FileTypeEnvironment {
-		return Environment{}, fmt.Errorf("file is not an environment")
-	}
-
-	environment, ok := f.Spec.(Environment)
-	if !ok {
-		return Environment{}, fmt.Errorf("file spec cannot be casted to an environment")
-	}
-
-	return environment, nil
 }

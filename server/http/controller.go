@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
@@ -29,19 +30,20 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	tracer          trace.Tracer
-	testDB          model.Repository
-	runner          runner
-	newTraceDBFn    func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
-	mappers         mappings.Mappings
-	triggerRegistry *trigger.Registry
-	version         string
+	tracer                trace.Tracer
+	testDB                model.Repository
+	runner                runner
+	newTraceDBFn          func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
+	environmentRepository environment.Repository
+	mappers               mappings.Mappings
+	triggerRegistry       *trigger.Registry
+	version               string
 }
 
 type runner interface {
 	StopTest(testID id.ID, runID int)
-	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run
-	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun
+	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env environment.Environment) model.Run
+	RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env environment.Environment) model.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 
@@ -50,6 +52,7 @@ func NewController(
 	newTraceDBFn func(ds datastoreresource.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
+	environmentRepository environment.Repository,
 	triggerRegistry *trigger.Registry,
 	tracer trace.Tracer,
 	version string,
@@ -291,7 +294,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		Values: runInformation.Variables,
 	})
 
-	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId, variablesEnv)
+	environment, err := getEnvironment(ctx, c.environmentRepository, runInformation.EnvironmentId, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -483,10 +486,6 @@ func (c *controller) UpsertDefinition(ctx context.Context, testDefinition openap
 		return c.upsertTransaction(ctx, transaction.Model())
 	}
 
-	if environment, err := def.Environment(); err == nil {
-		return c.createEnvFromDefinition(ctx, environment.Model())
-	}
-
 	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
 }
 
@@ -504,35 +503,7 @@ func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition opena
 		return c.executeTransaction(ctx, transaction.Model(), testDefinition.RunInformation)
 	}
 
-	if environment, err := def.Environment(); err == nil {
-		return c.createEnvFromDefinition(ctx, environment.Model())
-	}
-
 	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
-}
-
-func (c *controller) createEnvFromDefinition(ctx context.Context, env model.Environment) (openapi.ImplResponse, error) {
-	if env.HasID() {
-		_, err := c.testDB.UpdateEnvironment(ctx, env)
-
-		if err != nil {
-			return handleDBError(err), err
-		}
-	} else {
-		var err error
-		env, err = c.testDB.CreateEnvironment(ctx, env)
-
-		if err != nil {
-			return handleDBError(err), err
-		}
-	}
-
-	res := openapi.ExecuteDefinitionResponse{
-		Id:   env.ID,
-		Type: yaml.FileTypeEnvironment.String(),
-	}
-
-	return openapi.Response(200, res), nil
 }
 
 func metadata(in *map[string]string) model.RunMetadata {
@@ -543,9 +514,9 @@ func metadata(in *map[string]string) model.RunMetadata {
 	return model.RunMetadata(*in)
 }
 
-func environment(ctx context.Context, testDB model.Repository, environmentId string, variablesEnv model.Environment) (model.Environment, error) {
+func getEnvironment(ctx context.Context, environmentRepository environment.Repository, environmentId string, variablesEnv environment.Environment) (environment.Environment, error) {
 	if environmentId != "" {
-		environment, err := testDB.GetEnvironment(ctx, environmentId)
+		environment, err := environmentRepository.Get(ctx, id.ID(environmentId))
 
 		if err != nil {
 			return variablesEnv, err
@@ -604,36 +575,7 @@ func (c *controller) upsertTest(ctx context.Context, test model.Test) (openapi.I
 	}, nil
 }
 
-// Environments
-
-func (c *controller) CreateEnvironment(ctx context.Context, in openapi.Environment) (openapi.ImplResponse, error) {
-	environment := c.mappers.In.Environment(in)
-	if environment.ID == "" {
-		environment.ID = environment.Slug()
-	}
-
-	exists, err := c.testDB.EnvironmentIDExists(ctx, environment.ID)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	if exists {
-		err := fmt.Errorf(`cannot create environment with ID "%s: %w`, environment.ID, errTestExists)
-		r := map[string]string{
-			"error": err.Error(),
-		}
-		return openapi.Response(http.StatusBadRequest, r), err
-	}
-
-	environment, err = c.testDB.CreateEnvironment(ctx, environment)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	return openapi.Response(200, c.mappers.Out.Environment(environment)), nil
-}
-
-// expressions
+// Expressions
 func (c *controller) ExpressionResolve(ctx context.Context, in openapi.ResolveRequestInfo) (openapi.ImplResponse, error) {
 	dsList, err := c.buildDataStores(ctx, in)
 
@@ -661,7 +603,7 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 	ds := []expression.DataStore{}
 
 	if context.EnvironmentId != "" {
-		environment, err := c.testDB.GetEnvironment(ctx, context.EnvironmentId)
+		environment, err := c.environmentRepository.Get(ctx, id.ID(context.EnvironmentId))
 
 		if err != nil {
 			return [][]expression.DataStore{}, err
@@ -866,7 +808,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	variablesEnv := c.mappers.In.Environment(openapi.Environment{
 		Values: runInformation.Variables,
 	})
-	environment, err := environment(ctx, c.testDB, runInformation.EnvironmentId, variablesEnv)
+	environment, err := getEnvironment(ctx, c.environmentRepository, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
 		return handleDBError(err), err

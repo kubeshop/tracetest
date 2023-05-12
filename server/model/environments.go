@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	Environment struct {
+	Environment2 struct {
 		ID          string
 		Name        string
 		Description string
@@ -20,15 +20,15 @@ type (
 	}
 )
 
-func (e Environment) HasID() bool {
+func (e Environment2) HasID() bool {
 	return e.ID != ""
 }
 
-func (e Environment) Slug() string {
+func (e Environment2) Slug() string {
 	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-"))
 }
 
-func (e Environment) Get(key string) string {
+func (e Environment2) Get(key string) string {
 	for _, v := range e.Values {
 		if v.Key == key {
 			return v.Value
@@ -37,7 +37,7 @@ func (e Environment) Get(key string) string {
 	return ""
 }
 
-func (e Environment) Merge(env Environment) Environment {
+func (e Environment2) Merge(env Environment2) Environment2 {
 	values := make(map[string]string)
 	for _, variable := range e.Values {
 		values[variable.Key] = variable.Value
