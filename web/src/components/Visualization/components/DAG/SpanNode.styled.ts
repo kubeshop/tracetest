@@ -62,7 +62,8 @@ export const Container = styled.div<{$matched: boolean; $selected: boolean}>`
   align-items: center;
   background-color: ${({theme}) => theme.color.white};
   border: ${({theme, $selected}) =>
-    $selected ? `1px solid ${theme.color.interactive}` : `1px solid ${theme.color.border}`};
+    $selected ? `2px solid ${theme.color.interactive}` : `1px solid ${theme.color.border}`};
+  box-shadow: ${({$selected}) => $selected && '3px 3px 6px 0px rgba(59, 97, 246, 0.6)'};
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -74,7 +75,7 @@ export const Container = styled.div<{$matched: boolean; $selected: boolean}>`
     $matched &&
     css`
       border: ${({theme}) => !$selected && `1px solid ${theme.color.text}`};
-      box-shadow: ${({theme}) => `2px 2px 0px ${theme.color.text}`};
+      box-shadow: ${({theme}) => !$selected && `2px 2px 0px ${theme.color.text}`};
     `}
 `;
 
