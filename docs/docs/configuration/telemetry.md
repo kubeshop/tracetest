@@ -31,6 +31,7 @@ telemetry:
 server:
   telemetry:
     exporter: collector
+    applicationExporter: collector
 ```
 
 :::note
