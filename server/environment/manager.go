@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type Repository struct {
@@ -64,14 +63,6 @@ const (
 		SELECT COUNT(*) FROM environments e
 	`
 )
-
-var _ resourcemanager.Create[Environment] = &Repository{}
-var _ resourcemanager.Delete[Environment] = &Repository{}
-var _ resourcemanager.Get[Environment] = &Repository{}
-var _ resourcemanager.List[Environment] = &Repository{}
-var _ resourcemanager.Update[Environment] = &Repository{}
-var _ resourcemanager.IDSetter[Environment] = &Repository{}
-var _ resourcemanager.Provision[Environment] = &Repository{}
 
 func (*Repository) SortingFields() []string {
 	return []string{"name", "createdAt"}

@@ -58,13 +58,14 @@ func NewController(
 	version string,
 ) openapi.ApiApiServicer {
 	return &controller{
-		tracer:          tracer,
-		testDB:          testDB,
-		runner:          runner,
-		newTraceDBFn:    newTraceDBFn,
-		mappers:         mappers,
-		triggerRegistry: triggerRegistry,
-		version:         version,
+		tracer:                tracer,
+		testDB:                testDB,
+		runner:                runner,
+		newTraceDBFn:          newTraceDBFn,
+		mappers:               mappers,
+		triggerRegistry:       triggerRegistry,
+		version:               version,
+		environmentRepository: environmentRepository,
 	}
 }
 
