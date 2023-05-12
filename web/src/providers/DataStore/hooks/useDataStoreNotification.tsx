@@ -15,7 +15,7 @@ const useDataStoreNotification = () => {
           type: 'info',
           title: <Typography.Title level={2}>No Automated Test</Typography.Title>,
           description:
-            'Since the OpenTelemetry Collector sends traces to Tracetest, there is no automated test. Once you have configured your OpenTelemetry Collector to send Tracetest spans to Tracetest, try running a Tracetest test against your application under test.',
+            'Please note that configuring your OpenTelemetry Collector to send spans to Tracetest is just the first step. To enable successful testing, save this data store, and then try running a Tracetest test against your application under test. Note that there is no automated test since the OpenTelemetry Collector sends traces to Tracetest.',
         });
       }
 
