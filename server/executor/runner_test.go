@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
@@ -96,7 +97,7 @@ func (f runnerFixture) run(tests []model.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, test := range tests {
-		f.runner.Run(context.TODO(), test, model.RunMetadata{}, model.Environment{})
+		f.runner.Run(context.TODO(), test, model.RunMetadata{}, environment.Environment{})
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()

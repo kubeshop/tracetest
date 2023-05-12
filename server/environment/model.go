@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -22,6 +23,16 @@ type (
 )
 
 func (e Environment) Validate() error {
+	if e.Name == "" {
+		return fmt.Errorf("environment name cannot be empty")
+	}
+
+	for _, v := range e.Values {
+		if v.Key == "" {
+			return fmt.Errorf("environment value name cannot be empty")
+		}
+	}
+
 	return nil
 }
 

@@ -237,14 +237,14 @@ func (app *App) Start(opts ...appOption) error {
 
 	provisioner := provisioning.New()
 
-	router, mappers := controller(app.cfg, testDB, tracer, rf, triggerRegistry)
+	router, mappers := controller(app.cfg, testDB, tracer, environmentRepo, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	registerConfigResource(configRepo, apiRouter, db, provisioner, tracer)
 
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner, tracer)
-	registerEnvironmentResource(&environmentRepo, apiRouter, db, provisioner, tracer)
+	registerEnvironmentResource(environmentRepo, apiRouter, db, provisioner, tracer)
 
 	demoRepo := demoresource.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
@@ -394,12 +394,13 @@ func controller(
 	cfg httpServerConfig,
 	testDB model.Repository,
 	tracer trace.Tracer,
+	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	triggerRegistry *trigger.Registry,
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
 
-	router := openapi.NewRouter(httpRouter(cfg, testDB, tracer, rf, mappers, triggerRegistry))
+	router := openapi.NewRouter(httpRouter(cfg, testDB, tracer, environmentRepo, rf, mappers, triggerRegistry))
 
 	return router, mappers
 }
@@ -408,11 +409,12 @@ func httpRouter(
 	cfg httpServerConfig,
 	testDB model.Repository,
 	tracer trace.Tracer,
+	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, triggerRegistry, tracer, Version)
+	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

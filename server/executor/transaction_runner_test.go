@@ -2,11 +2,13 @@ package executor_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -23,7 +25,7 @@ type fakeTestRunner struct {
 	uid                 int
 }
 
-func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
+func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env environment.Environment) model.Run {
 	run := model.NewRun()
 	run.Environment = env
 	run.State = model.RunStateCreated
@@ -95,8 +97,9 @@ func TestTransactionRunner(t *testing.T) {
 
 }
 
-func getDB() (model.Repository, func()) {
-	db := testmock.GetTestingDatabase()
+func getDB() (model.Repository, *sql.DB, func()) {
+	rawDB := testmock.GetRawTestingDatabase()
+	db := testmock.GetTestingDatabaseFromRawDB(rawDB)
 
 	clean := func() {
 		err := db.Drop()
@@ -105,12 +108,13 @@ func getDB() (model.Repository, func()) {
 		}
 	}
 
-	return db, clean
+	return db, rawDB, clean
 }
 
 func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual model.TransactionRun)) {
 	ctx := context.Background()
-	db, clear := getDB()
+	rawDB := testmock.GetRawTestingDatabase()
+	db, rawDB, clear := getDB()
 	defer clear()
 
 	subscriptionManager := subscription.NewManager()
@@ -139,9 +143,10 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 		"service":     "tracetest",
 	}
 
-	env, err := db.CreateEnvironment(ctx, model.Environment{
+	envRepository := environment.NewRepository(rawDB)
+	env, err := envRepository.Create(ctx, environment.Environment{
 		Name: "production",
-		Values: []model.EnvironmentValue{
+		Values: []environment.EnvironmentValue{
 			{
 				Key:   "url",
 				Value: "http://my-service.com",

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression/linting"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
@@ -12,9 +13,9 @@ import (
 
 var ErrMissingVariables = errors.New("variables are missing")
 
-func ValidateMissingVariables(ctx context.Context, db model.Repository, test model.Test, environment model.Environment) (openapi.MissingVariablesError, error) {
-	missingVariables := getMissingVariables(test, environment)
-	previousValues := map[string]model.EnvironmentValue{}
+func ValidateMissingVariables(ctx context.Context, db model.Repository, test model.Test, env environment.Environment) (openapi.MissingVariablesError, error) {
+	missingVariables := getMissingVariables(test, env)
+	previousValues := map[string]environment.EnvironmentValue{}
 	var err error
 	if len(missingVariables) > 0 {
 		previousValues, err = getPreviousEnvironmentValues(ctx, db, test)
@@ -25,7 +26,7 @@ func ValidateMissingVariables(ctx context.Context, db model.Repository, test mod
 	return buildErrorObject(test, missingVariables, previousValues)
 }
 
-func getMissingVariables(test model.Test, environment model.Environment) []string {
+func getMissingVariables(test model.Test, environment environment.Environment) []string {
 	availableTestVariables := getAvailableVariables(test, environment)
 	expectedVariables := linting.DetectMissingVariables(test, availableTestVariables)
 
@@ -45,7 +46,7 @@ func getMissingVariables(test model.Test, environment model.Environment) []strin
 	return missingVariables
 }
 
-func getAvailableVariables(test model.Test, environment model.Environment) []string {
+func getAvailableVariables(test model.Test, environment environment.Environment) []string {
 	availableVariables := make([]string, 0)
 	for _, env := range environment.Values {
 		availableVariables = append(availableVariables, env.Key)
@@ -59,10 +60,10 @@ func getAvailableVariables(test model.Test, environment model.Environment) []str
 	return availableVariables
 }
 
-func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test model.Test) (map[string]model.EnvironmentValue, error) {
+func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test model.Test) (map[string]environment.EnvironmentValue, error) {
 	latestTestVersion, err := db.GetLatestTestVersion(ctx, test.ID)
 	if err != nil {
-		return map[string]model.EnvironmentValue{}, err
+		return map[string]environment.EnvironmentValue{}, err
 	}
 
 	previousTestRun, err := db.GetLatestRunByTestVersion(ctx, test.ID, latestTestVersion.Version)
@@ -70,10 +71,10 @@ func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test
 		// If error is not found, it means this is the first run. So just ignore this error
 		// and provide empty values in the default values for the missing variables
 		if err != testdb.ErrNotFound {
-			return map[string]model.EnvironmentValue{}, err
+			return map[string]environment.EnvironmentValue{}, err
 		}
 	} else {
-		envMap := make(map[string]model.EnvironmentValue, len(previousTestRun.Environment.Values))
+		envMap := make(map[string]environment.EnvironmentValue, len(previousTestRun.Environment.Values))
 		for _, envVar := range previousTestRun.Environment.Values {
 			envMap[envVar.Key] = envVar
 		}
@@ -81,13 +82,13 @@ func getPreviousEnvironmentValues(ctx context.Context, db model.Repository, test
 		return envMap, nil
 	}
 
-	return map[string]model.EnvironmentValue{}, nil
+	return map[string]environment.EnvironmentValue{}, nil
 }
 
-func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction model.Transaction, environment model.Environment) (openapi.MissingVariablesError, error) {
+func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repository, transaction model.Transaction, env environment.Environment) (openapi.MissingVariablesError, error) {
 	missingVariables := make([]openapi.MissingVariable, 0)
 	for _, step := range transaction.Steps {
-		stepValidationResult, err := ValidateMissingVariables(ctx, db, step, environment)
+		stepValidationResult, err := ValidateMissingVariables(ctx, db, step, env)
 		if err != ErrMissingVariables {
 			return openapi.MissingVariablesError{}, err
 		}
@@ -95,13 +96,13 @@ func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repos
 		missingVariables = append(missingVariables, stepValidationResult.MissingVariables...)
 
 		// update env with this test outputs
-		outputs := make([]model.EnvironmentValue, 0)
+		outputs := make([]environment.EnvironmentValue, 0)
 		step.Outputs.ForEach(func(key string, val model.Output) error {
-			outputs = append(outputs, model.EnvironmentValue{Key: key})
+			outputs = append(outputs, environment.EnvironmentValue{Key: key})
 			return nil
 		})
 
-		environment.Values = append(environment.Values, outputs...)
+		env.Values = append(env.Values, outputs...)
 	}
 
 	if len(missingVariables) > 0 {
@@ -111,7 +112,7 @@ func ValidateMissingVariablesFromTransaction(ctx context.Context, db model.Repos
 	return openapi.MissingVariablesError{}, nil
 }
 
-func buildErrorObject(test model.Test, missingVariables []string, previousValues map[string]model.EnvironmentValue) (openapi.MissingVariablesError, error) {
+func buildErrorObject(test model.Test, missingVariables []string, previousValues map[string]environment.EnvironmentValue) (openapi.MissingVariablesError, error) {
 	if len(missingVariables) > 0 {
 		missingVariableObjects := make([]openapi.Variable, 0, len(missingVariables))
 		for _, variable := range missingVariables {

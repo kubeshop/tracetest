@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -28,7 +29,7 @@ type RunResult struct {
 }
 
 type Runner interface {
-	Run(context.Context, model.Test, model.RunMetadata, model.Environment) model.Run
+	Run(context.Context, model.Test, model.RunMetadata, environment.Environment) model.Run
 }
 
 type PersistentRunner interface {
@@ -133,7 +134,7 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
-func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment model.Environment) model.Run {
+func (r persistentRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, environment environment.Environment) model.Run {
 	ctx, cancelCtx := context.WithCancel(
 		getNewCtx(ctx),
 	)

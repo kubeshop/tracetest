@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
@@ -44,7 +45,7 @@ type (
 		Metadata RunMetadata
 
 		// environment
-		Environment Environment
+		Environment environment.Environment
 	}
 )
 

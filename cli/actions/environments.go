@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/mitchellh/mapstructure"
 )
@@ -34,8 +35,8 @@ func (environmentsActions) Name() string {
 	return "environment"
 }
 
-func (environment environmentsActions) GetID(file *file.File) (string, error) {
-	resource, err := environment.formatter.ToStruct(file)
+func (action environmentsActions) GetID(file *file.File) (string, error) {
+	resource, err := action.formatter.ToStruct(file)
 	if err != nil {
 		return "", err
 	}
@@ -85,7 +86,7 @@ func (environment environmentsActions) ApplyResource(ctx context.Context, resour
 	return environment.Apply(ctx, file)
 }
 
-func (environment environmentsActions) FromFile(ctx context.Context, filePath string) (openapi.EnvironmentResource, error) {
+func (action environmentsActions) FromFile(ctx context.Context, filePath string) (openapi.EnvironmentResource, error) {
 	if !utils.StringReferencesFile(filePath) {
 		return openapi.EnvironmentResource{}, fmt.Errorf(`env file "%s" does not exist`, filePath)
 	}
@@ -100,7 +101,7 @@ func (environment environmentsActions) FromFile(ctx context.Context, filePath st
 		return openapi.EnvironmentResource{}, fmt.Errorf(`cannot parse env file "%s": %w`, filePath, err)
 	}
 
-	envModel := model.Spec.(yaml.Environment)
+	envModel := model.Spec.(environment.Environment)
 
 	values := make([]openapi.EnvironmentValue, 0, len(envModel.Values))
 	for _, value := range envModel.Values {
@@ -114,7 +115,7 @@ func (environment environmentsActions) FromFile(ctx context.Context, filePath st
 	environmentResource := openapi.EnvironmentResource{
 		Type: (*string)(&model.Type),
 		Spec: &openapi.Environment{
-			Id:          &envModel.ID,
+			Id:          openapi.PtrString(envModel.ID.String()),
 			Name:        &envModel.Name,
 			Description: &envModel.Description,
 			Values:      values,

@@ -5,6 +5,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 )
@@ -103,7 +104,7 @@ func (r Run) SuccessfullyPolledTraces(t *Trace) Run {
 
 func (r Run) SuccessfullyAsserted(
 	outputs maps.Ordered[string, RunOutput],
-	environment Environment,
+	environment environment.Environment,
 	res maps.Ordered[SpanQuery, []AssertionResult],
 	allPassed bool,
 ) Run {
