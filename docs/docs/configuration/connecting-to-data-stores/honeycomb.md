@@ -10,7 +10,7 @@ Examples of configuring Tracetest with Honeycomb can be found in the [`examples`
 
 In your OpenTelemetry Collector config file:
 
-- Set the `exporter` to `otlp/tt`
+- Set the `exporter` to `otlp/tracetest`
 - Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
@@ -19,7 +19,7 @@ If you are running Tracetest with Docker, and Tracetest's service name is `trace
 
 Additionally, add another config:
 
-- Set the `exporter` to `otlp/hc`
+- Set the `exporter` to `otlp/honeycomb`
 - Set the `endpoint` pointing to the Honeycomb API and using Honeycomb API KEY
 
 ```yaml
@@ -41,12 +41,12 @@ exporters:
   logging:
     logLevel: debug
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Honeycomb
-  otlp/hc:
+  otlp/honeycomb:
     endpoint: "api.honeycomb.io:443"
     headers:
       "x-honeycomb-team": "YOUR_API_KEY"
@@ -54,14 +54,14 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/hc:
+      exporters: [otlp/tracetest]
+    traces/honeycomb:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/hc]
+      exporters: [logging, otlp/honeycomb]
 ```
 
 ## Configure Tracetest to Use Honeycomb as a Trace Data Store
