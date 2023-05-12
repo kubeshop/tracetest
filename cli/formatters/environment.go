@@ -1,8 +1,6 @@
 package formatters
 
 import (
-	"strings"
-
 	"github.com/alexeyco/simpletable"
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/file"
@@ -59,7 +57,7 @@ func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var environmentResource openapi.EnvironmentResource
 	nullableEnvironment := openapi.NewNullableEnvironmentResource(&environmentResource)
 
-	if strings.HasSuffix(file.Path(), ".yaml") || strings.HasSuffix(file.Path(), ".yml") {
+	if file.ContentType() == "text/yaml" {
 		err := yaml.Unmarshal([]byte(file.Contents()), &environmentResource)
 		if err != nil {
 			return nil, err
@@ -68,6 +66,7 @@ func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 		return environmentResource, nil
 	}
 
+	// fallback to JSON
 	err := nullableEnvironment.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err

@@ -30,14 +30,14 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	tracer                trace.Tracer
-	testDB                model.Repository
-	runner                runner
-	newTraceDBFn          func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
-	environmentRepository environment.Repository
-	mappers               mappings.Mappings
-	triggerRegistry       *trigger.Registry
-	version               string
+	tracer            trace.Tracer
+	testDB            model.Repository
+	runner            runner
+	newTraceDBFn      func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
+	environmentGetter environmentGetter
+	mappers           mappings.Mappings
+	triggerRegistry   *trigger.Registry
+	version           string
 }
 
 type runner interface {
@@ -47,25 +47,29 @@ type runner interface {
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 
+type environmentGetter interface {
+	Get(context.Context, id.ID) (environment.Environment, error)
+}
+
 func NewController(
 	testDB model.Repository,
 	newTraceDBFn func(ds datastoreresource.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
-	environmentRepository environment.Repository,
+	envGetter environmentGetter,
 	triggerRegistry *trigger.Registry,
 	tracer trace.Tracer,
 	version string,
 ) openapi.ApiApiServicer {
 	return &controller{
-		tracer:                tracer,
-		testDB:                testDB,
-		runner:                runner,
-		newTraceDBFn:          newTraceDBFn,
-		mappers:               mappers,
-		triggerRegistry:       triggerRegistry,
-		version:               version,
-		environmentRepository: environmentRepository,
+		tracer:            tracer,
+		testDB:            testDB,
+		runner:            runner,
+		newTraceDBFn:      newTraceDBFn,
+		mappers:           mappers,
+		triggerRegistry:   triggerRegistry,
+		version:           version,
+		environmentGetter: envGetter,
 	}
 }
 
@@ -295,7 +299,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		Values: runInformation.Variables,
 	})
 
-	environment, err := getEnvironment(ctx, c.environmentRepository, runInformation.EnvironmentId, variablesEnv)
+	environment, err := getEnvironment(ctx, c.environmentGetter, runInformation.EnvironmentId, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -515,7 +519,7 @@ func metadata(in *map[string]string) model.RunMetadata {
 	return model.RunMetadata(*in)
 }
 
-func getEnvironment(ctx context.Context, environmentRepository environment.Repository, environmentId string, variablesEnv environment.Environment) (environment.Environment, error) {
+func getEnvironment(ctx context.Context, environmentRepository environmentGetter, environmentId string, variablesEnv environment.Environment) (environment.Environment, error) {
 	if environmentId != "" {
 		environment, err := environmentRepository.Get(ctx, id.ID(environmentId))
 
@@ -604,7 +608,7 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 	ds := []expression.DataStore{}
 
 	if context.EnvironmentId != "" {
-		environment, err := c.environmentRepository.Get(ctx, id.ID(context.EnvironmentId))
+		environment, err := c.environmentGetter.Get(ctx, id.ID(context.EnvironmentId))
 
 		if err != nil {
 			return [][]expression.DataStore{}, err
@@ -809,7 +813,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	variablesEnv := c.mappers.In.Environment(openapi.Environment{
 		Values: runInformation.Variables,
 	})
-	environment, err := getEnvironment(ctx, c.environmentRepository, runInformation.EnvironmentId, variablesEnv)
+	environment, err := getEnvironment(ctx, c.environmentGetter, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
 		return handleDBError(err), err

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -121,7 +120,7 @@ func setupController(t *testing.T) controllerFixture {
 			nil,
 			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb),
-			environment.NewRepository(nil),
+			nil,
 			&trigger.Registry{},
 			trace.NewNoopTracerProvider().Tracer("tracer"),
 			"unit-test",
