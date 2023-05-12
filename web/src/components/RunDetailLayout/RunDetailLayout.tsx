@@ -4,12 +4,15 @@ import {useParams} from 'react-router-dom';
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
-import {RunDetailModes, TestState} from 'constants/TestRun.constants';
-import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {RunDetailModes} from 'constants/TestRun.constants';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import Test from 'models/Test.model';
+import {isRunStateSucceeded} from 'models/TestRun.model';
 import {useNotification} from 'providers/Notification/Notification.provider';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import {ConfigMode} from 'types/DataStore.types';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
@@ -34,19 +37,24 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {showNotification} = useNotification();
   const {isError, run, runEvents} = useTestRun();
+  const {dataStoreConfig} = useSettingsValues();
   const [prevState, setPrevState] = useState(run.state);
   useDocumentTitle(`${name} - ${run.state}`);
 
   useEffect(() => {
-    if (run.state === TestState.FINISHED && prevState !== TestState.FINISHED) {
+    const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
+
+    if (isRunStateSucceeded(run.state) && !isRunStateSucceeded(prevState)) {
       showNotification({
         type: 'success',
-        title: 'Trace has been fetched successfully',
+        title: isNoTracingMode
+          ? 'Response received. Skipping looking for trace as you are in No-Tracing Mode'
+          : 'Trace has been fetched successfully',
       });
     }
 
     setPrevState(run.state);
-  }, [prevState, run.state, showNotification]);
+  }, [dataStoreConfig.mode, prevState, run.state, showNotification]);
 
   const tabBarExtraContent = useMemo(
     () => ({
