@@ -35,7 +35,7 @@ func TestEncoder(t *testing.T) {
 
 		// process response
 		rec := httptest.NewRecorder()
-		err = enc.WriteEncodedResponse(rec, sampleResponseDecoded)
+		err = enc.WriteEncodedResponse(rec, 204, sampleResponseDecoded)
 		require.NoError(t, err)
 		resp := rec.Result()
 		actualResponseDecoded, err := io.ReadAll(resp.Body)
@@ -43,6 +43,7 @@ func TestEncoder(t *testing.T) {
 
 		assert.Equal(t, inputContentType, enc.RequestContentType())
 		assert.Equal(t, outputContentType, enc.ResponseContentType())
+		assert.Equal(t, 204, resp.StatusCode)
 		assert.Equal(t, outputContentType, resp.Header.Get("Content-Type"))
 
 		assert.Equal(t, expectedRequestDecoded, actualRequestDecoded)

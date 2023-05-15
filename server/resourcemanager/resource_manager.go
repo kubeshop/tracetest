@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +17,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/slices"
 
-	"github.com/goccy/go-yaml"
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
@@ -257,21 +255,20 @@ func paginationParams(r *http.Request, sortingFields []string) (take, skip int, 
 }
 
 func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
-	outputEncoder := getOutputEncoder(r)
-	w.Header().Set("Content-Type", outputEncoder.ContentType())
+	encoder := EncoderFromRequest(r)
 
 	ctx := r.Context()
 	take, skip,
 		query, sortBy,
 		sortDirection, err := paginationParams(r, m.rh.SortingFields())
 	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot process request: %s", err.Error()))
 		return
 	}
 
 	count, err := m.rh.Count(ctx, query)
 	if err != nil {
-		m.handleResourceHandlerError(w, "listing", err, outputEncoder)
+		m.handleResourceHandlerError(w, "listing", err, encoder)
 		return
 	}
 
@@ -289,7 +286,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		sortDirection,
 	)
 	if err != nil {
-		m.handleResourceHandlerError(w, "listing", err, outputEncoder)
+		m.handleResourceHandlerError(w, "listing", err, encoder)
 		return
 	}
 
@@ -310,13 +307,10 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 		resourceList.Items = append(resourceList.Items, resource)
 	}
 
-	bytes, err := encodeValues(resourceList, outputEncoder)
+	err = encoder.WriteEncodedResponse(w, http.StatusOK, resourceList)
 	if err != nil {
-		writeError(w, outputEncoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		return
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 	}
-
-	writeResponse(w, http.StatusOK, string(bytes))
 }
 
 const HeaderAugmented = "X-Tracetest-Augmented"
@@ -326,9 +320,7 @@ func isRequestForAugmented(r *http.Request) bool {
 }
 
 func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
-	outputEncoder := getOutputEncoder(r)
-	w.Header().Set("Content-Type", outputEncoder.ContentType())
-	w.Header().Set("Content-Type", outputEncoder.ContentType())
+	encoder := EncoderFromRequest(r)
 
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
@@ -340,7 +332,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 
 	item, err := getterFn(r.Context(), id)
 	if err != nil {
-		m.handleResourceHandlerError(w, "getting", err, outputEncoder)
+		m.handleResourceHandlerError(w, "getting", err, encoder)
 		return
 	}
 
@@ -349,36 +341,31 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 		Spec: item,
 	}
 
-	bytes, err := encodeValues(newResource, outputEncoder)
+	err = encoder.WriteEncodedResponse(w, http.StatusOK, newResource)
 	if err != nil {
-		writeError(w, outputEncoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		return
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 	}
-
-	writeResponse(w, http.StatusOK, string(bytes))
 }
 
 func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
-	outputEncoder := getOutputEncoder(r)
-
-	w.Header().Set("Content-Type", outputEncoder.ContentType())
+	encoder := EncoderFromRequest(r)
 
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
 	err := m.rh.Delete(r.Context(), id)
 	if err != nil {
-		m.handleResourceHandlerError(w, "deleting", err, outputEncoder)
+		m.handleResourceHandlerError(w, "deleting", err, encoder)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	encoder.WriteEncodedResponse(w, http.StatusNoContent, nil)
 }
 
-func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb string, err error, encoder encoder) {
+func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb string, err error, encoder Encoder) {
 	// 404 - not found
 	if errors.Is(err, sql.ErrNoRows) {
-		w.WriteHeader(http.StatusNotFound)
+		encoder.WriteEncodedResponse(w, http.StatusNotFound, nil)
 		return
 	}
 
@@ -388,14 +375,12 @@ func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb stri
 }
 
 func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
-	inputEncoder := getInputEncoder(r)
-	outputEncoder := getOutputEncoder(r)
-	w.Header().Set("Content-Type", outputEncoder.ContentType())
+	encoder := EncoderFromRequest(r)
 
 	targetResource := Resource[T]{}
-	err := readValues(r, inputEncoder, &targetResource)
+	err := encoder.DecodeRequestBody(&targetResource)
 	if err != nil {
-		writeError(w, outputEncoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
 		return
 	}
 
@@ -408,7 +393,7 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 
 	created, err := fn(r.Context(), targetResource.Spec)
 	if err != nil {
-		m.handleResourceHandlerError(w, operationVerb, err, outputEncoder)
+		m.handleResourceHandlerError(w, operationVerb, err, encoder)
 		return
 	}
 
@@ -417,74 +402,21 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 		Spec: created,
 	}
 
-	bytes, err := encodeValues(newResource, outputEncoder)
+	err = encoder.WriteEncodedResponse(w, statusCode, newResource)
 	if err != nil {
-		writeError(w, outputEncoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		return
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 	}
-
-	writeResponse(w, statusCode, string(bytes))
 }
 
-func writeResponse(w http.ResponseWriter, code int, msg string) {
-	w.WriteHeader(code)
-	w.Write([]byte(msg))
-}
-
-func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
-	body, err := enc.Marshal(map[string]any{
+func writeError(w http.ResponseWriter, enc Encoder, code int, err error) {
+	err = enc.WriteEncodedResponse(w, code, map[string]any{
 		"code":  code,
 		"error": err.Error(),
 	})
+
 	if err != nil {
 		// this panic is intentional. Since we have a hardcoded map to encode
 		// any errors means there's something very very wrong
 		panic(fmt.Errorf("cannot marshal error: %w", err))
 	}
-
-	writeResponse(w, code, string(body))
-}
-
-func encodeValues(resource any, enc encoder) ([]byte, error) {
-	return enc.Marshal(resource)
-}
-
-func readValues(r *http.Request, enc encoder, target any) error {
-	body, err := readBody(r)
-	if err != nil {
-		return fmt.Errorf("cannot read yaml body: %w", err)
-	}
-
-	err = enc.Unmarshal(body, target)
-	if err != nil {
-		return fmt.Errorf("cannot unmarshal request: %w", err)
-	}
-
-	return nil
-}
-
-func readBody(r *http.Request) ([]byte, error) {
-	if r.Body == nil {
-		return nil, fmt.Errorf("cannot read nil request body")
-	}
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read request body: %w", err)
-	}
-
-	return body, nil
-}
-
-func decode(input any, output any) error {
-	yamlContent, err := yaml.Marshal(input)
-	if err != nil {
-		return fmt.Errorf("couldn't convert marshal input into YAML: %w", err)
-	}
-
-	err = yaml.Unmarshal(yamlContent, output)
-	if err != nil {
-		return fmt.Errorf("couldn't unmarshal YAML into target: %w", err)
-	}
-
-	return nil
 }

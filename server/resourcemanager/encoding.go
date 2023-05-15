@@ -73,13 +73,18 @@ func (e Encoder) DecodeRequestBody(out interface{}) (err error) {
 	return e.input.Unmarshal(body, out)
 }
 
-func (e Encoder) WriteEncodedResponse(w http.ResponseWriter, data any) error {
+func (e Encoder) WriteEncodedResponse(w http.ResponseWriter, code int, data any) error {
 	encoded, err := e.output.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("cannot encode response data: %w", err)
 	}
 
 	w.Header().Set("Content-Type", e.output.ContentType())
+	w.WriteHeader(code)
+	if data == nil {
+		return nil
+	}
+
 	_, err = w.Write(encoded)
 
 	return err
