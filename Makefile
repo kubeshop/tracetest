@@ -1,7 +1,7 @@
 PROJECT_ROOT=${PWD}
 
-GORELEASER_VERSION=1.18.2-pro
-CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 9 | tail -n 1 |  tr -s ' ' | cut -d' ' -f2-)
+GORELEASER_VERSION=1.17.2-pro
+CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 1 | cut -d' ' -f3-)
 goreleaser-version:
 ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
 	@printf "\033[0;31m Bad goreleaser version $(CURRENT_GORELEASER_VERSION), please install $(GORELEASER_VERSION)\033[0m\n\n"
