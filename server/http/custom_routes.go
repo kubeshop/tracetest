@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -34,6 +35,9 @@ func (c *customController) Routes() openapi.Routes {
 
 	routes := c.router.Routes()
 
+	routes[c.getRouteIndex("GetTransactionVersion")].HandlerFunc = c.GetTransactionVersion
+	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
+
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 
@@ -55,6 +59,50 @@ func (c *customController) Routes() openapi.Routes {
 	}
 
 	return routes
+}
+
+// GetTransactionVersion - get a transaction specific version
+func (c *customController) GetTransactionVersion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+
+	enc := resourcemanager.EncoderFromRequest(r)
+	enc.WriteEncodedResponse(w, result.Code, result.Body)
+}
+
+// GetTransactionVersionDefinitionFile - Get the transaction definition as an YAML file
+func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+
+	enc := resourcemanager.EncoderFromRequest(r)
+	enc.WriteEncodedResponse(w, result.Code, result.Body)
 }
 
 // GetTestRuns - get the runs for a test

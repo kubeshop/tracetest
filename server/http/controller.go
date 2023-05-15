@@ -610,7 +610,16 @@ func (c *controller) doCreateTransaction(ctx context.Context, transaction tests.
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(http.StatusOK, c.mappers.Out.Transaction(createdTransaction)), nil
+	return openapi.Response(200, createdTransaction), nil
+}
+
+func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {
+	transaction, err := c.transactions.GetVersion(ctx, id.ID(transactionId), int(version))
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	return openapi.Response(200, transaction), nil
 }
 
 func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.ID, updated tests.Transaction) (openapi.ImplResponse, error) {
@@ -797,7 +806,7 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(http.StatusOK, c.mappers.Out.Transaction(transaction)), nil
+	return openapi.Response(http.StatusOK, transaction), nil
 }
 
 // RunTransaction implements openapi.ApiApiServicer

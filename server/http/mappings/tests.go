@@ -1,7 +1,6 @@
 package mappings
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"time"
@@ -30,30 +29,6 @@ func optionalTime(in time.Time) *time.Time {
 	}
 
 	return &in
-}
-
-func (m OpenAPI) Transaction(in tests.Transaction) openapi.Transaction {
-	steps := make([]openapi.Test, len(in.Steps))
-	for i, step := range in.Steps {
-		steps[i] = m.Test(step)
-	}
-
-	return openapi.Transaction{
-		Id:          in.ID.String(),
-		Name:        in.Name,
-		Description: in.Description,
-		Version:     int32(in.GetVersion()),
-		Steps:       steps,
-		CreatedAt:   in.GetCreatedAt(),
-		Summary: openapi.TestSummary{
-			Runs: int32(in.Summary.Runs),
-			LastRun: openapi.TestSummaryLastRun{
-				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: int32(in.Summary.LastRun.Fails),
-				Fails:  int32(in.Summary.LastRun.Passes),
-			},
-		},
-	}
 }
 
 func (m OpenAPI) TransactionRun(in tests.TransactionRun) openapi.TransactionRun {
@@ -350,28 +325,6 @@ type Model struct {
 	comparators           comparator.Registry
 	traceConversionConfig traces.ConversionConfig
 	testRepository        model.TestRepository
-}
-
-func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (tests.Transaction, error) {
-	steps := make([]model.Test, len(in.Steps))
-	for i, test := range in.Steps {
-		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(test.Id))
-		if err != nil {
-			return tests.Transaction{}, err
-		}
-
-		steps[i] = test
-	}
-
-	v := int(in.Version)
-
-	return tests.Transaction{
-		ID:          id.ID(in.Id),
-		Name:        in.Name,
-		Description: in.Description,
-		Version:     &v,
-		Steps:       steps,
-	}, nil
 }
 
 func (m Model) Test(in openapi.Test) (model.Test, error) {
