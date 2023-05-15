@@ -297,12 +297,14 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.1.createdAt", expected)
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.0.summary.lastRun.time", expected)
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.1.summary.lastRun.time", expected)
+	expected = rmtests.RemoveFieldFromJSONResource("summary.lastRun.time", expected)
 
 	actual := secondValue
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.0.createdAt", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.1.createdAt", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.0.summary.lastRun.time", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.1.summary.lastRun.time", actual)
+	actual = rmtests.RemoveFieldFromJSONResource("summary.lastRun.time", actual)
 
 	require.JSONEq(t, expected, actual)
 }
