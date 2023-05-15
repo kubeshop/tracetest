@@ -149,7 +149,7 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	transactionsRepository := tests.NewTransactionsRepository(db, testDB.GetTransactionSteps)
+	transactionsRepository := tests.NewTransactionsRepository(db, testDB)
 
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)

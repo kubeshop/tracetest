@@ -127,7 +127,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	require.NoError(t, err)
 
 	testsRepo, _ := testdb.Postgres(testdb.WithDB(rawDB))
-	transactionsRepo := tests.NewTransactionsRepository(rawDB, testsRepo.GetTransactionSteps)
+	transactionsRepo := tests.NewTransactionsRepository(rawDB, testsRepo)
 	transaction, err := transactionsRepo.Create(ctx, tests.Transaction{
 		Name:    "transaction",
 		StepIDs: []id.ID{test1.ID, test2.ID},

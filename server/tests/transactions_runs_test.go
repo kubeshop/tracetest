@@ -41,7 +41,7 @@ func getRepos() (*tests.TransactionsRepository, model.Repository) {
 		panic(err)
 	}
 
-	transactionRepo := tests.NewTransactionsRepository(db, testsRepo.GetTransactionSteps)
+	transactionRepo := tests.NewTransactionsRepository(db, testsRepo)
 
 	return transactionRepo, testsRepo
 }

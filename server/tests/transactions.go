@@ -133,20 +133,23 @@ func (tr TransactionRun) ResultsCount() (pass, fail int) {
 	return
 }
 
-type stepsGetterFn func(context.Context, Transaction) ([]model.Test, error)
+type stepsRepository interface {
+	GetTransactionSteps(context.Context, Transaction) ([]model.Test, error)
+	GetTransactionRunSteps(context.Context, TransactionRun) ([]model.Run, error)
+}
 
-func NewTransactionsRepository(db *sql.DB, stepsGetterFn stepsGetterFn) *TransactionsRepository {
+func NewTransactionsRepository(db *sql.DB, stepsRepository stepsRepository) *TransactionsRepository {
 	repo := &TransactionsRepository{
-		db:            db,
-		stepsGetterFn: stepsGetterFn,
+		db:              db,
+		stepsRepository: stepsRepository,
 	}
 
 	return repo
 }
 
 type TransactionsRepository struct {
-	db            *sql.DB
-	stepsGetterFn stepsGetterFn
+	db              *sql.DB
+	stepsRepository stepsRepository
 }
 
 // needed for test
@@ -579,7 +582,7 @@ func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augme
 	if !augmented {
 		removeNonAugmentedFields(&transaction)
 	} else {
-		steps, err := r.stepsGetterFn(ctx, transaction)
+		steps, err := r.stepsRepository.GetTransactionSteps(ctx, transaction)
 		if err != nil {
 			return Transaction{}, fmt.Errorf("cannot read row: %w", err)
 		}

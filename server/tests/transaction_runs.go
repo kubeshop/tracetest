@@ -283,10 +283,10 @@ func (td *TransactionsRepository) GetTransactionRun(ctx context.Context, transac
 	if err != nil {
 		return TransactionRun{}, err
 	}
-	// run.Steps, err = td.getTransactionRunSteps(ctx, run)
-	// if err != nil {
-	// 	return TransactionRun{}, err
-	// }
+	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run)
+	if err != nil {
+		return TransactionRun{}, err
+	}
 	return run, nil
 }
 
@@ -300,10 +300,10 @@ func (td *TransactionsRepository) GetLatestRunByTransactionVersion(ctx context.C
 	if err != nil {
 		return TransactionRun{}, err
 	}
-	// run.Steps, err = td.getTransactionRunSteps(ctx, run)
-	// if err != nil {
-	// 	return TransactionRun{}, err
-	// }
+	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run)
+	if err != nil {
+		return TransactionRun{}, err
+	}
 	return run, nil
 }
 

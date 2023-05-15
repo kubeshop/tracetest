@@ -157,7 +157,7 @@ func TestTransactions(t *testing.T) {
 			if err != nil {
 				panic(err)
 			}
-			transactionsRepo := tests.NewTransactionsRepository(db, testsDB.GetTransactionSteps)
+			transactionsRepo := tests.NewTransactionsRepository(db, testsDB)
 
 			manager := resourcemanager.New[tests.Transaction](
 				tests.TransactionResourceName,
