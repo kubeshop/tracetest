@@ -183,6 +183,18 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTransactionVersion,
 		},
 		{
+			"GetTransactionVersionDefinitionFile",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}/version/{version}/definition.yaml",
+			c.GetTransactionVersionDefinitionFile,
+		},
+		{
+			"GetVersion",
+			strings.ToUpper("Get"),
+			"/api/version",
+			c.GetVersion,
+		},
+		{
 			"ImportTestRun",
 			strings.ToUpper("Post"),
 			"/api/tests/import",
@@ -728,6 +740,28 @@ func (c *ApiApiController) GetTransactionVersion(w http.ResponseWriter, r *http.
 	}
 
 	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactionVersionDefinitionFile - Get the transaction definition as an YAML file
+func (c *ApiApiController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
