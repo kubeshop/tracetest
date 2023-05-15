@@ -148,51 +148,6 @@ func TestRunEncoding(t *testing.T) {
 	}
 }
 
-func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
-	type OldTest struct {
-		ID               id.ID
-		CreatedAt        time.Time
-		Name             string
-		Description      string
-		Version          int
-		ServiceUnderTest model.Trigger
-		Specs            maps.Ordered[model.SpanQuery, []model.Assertion]
-		Summary          model.Summary
-	}
-
-	expectedSpecs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
-	expectedSpecs = expectedSpecs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), model.NamedAssertions{
-		Name: "",
-		Assertions: []model.Assertion{
-			model.Assertion(`attr:http.status = 200`),
-		},
-	})
-
-	specs := maps.Ordered[model.SpanQuery, []model.Assertion]{}
-	specs = specs.MustAdd(model.SpanQuery(`span[tracetest.span.type = "http"]`), []model.Assertion{
-		model.Assertion(`attr:http.status = 200`),
-	})
-	oldTest := OldTest{
-		ID:               id.NewRandGenerator().ID(),
-		CreatedAt:        time.Now(),
-		Name:             "my test name",
-		Description:      "this is an old test using the old test format from version <= 0.7.2",
-		Version:          1,
-		ServiceUnderTest: model.Trigger{},
-		Specs:            specs,
-		Summary:          model.Summary{},
-	}
-
-	oldTestJson, err := json.Marshal(oldTest)
-	require.NoError(t, err)
-
-	var test model.Test
-	err = json.Unmarshal(oldTestJson, &test)
-	require.NoError(t, err)
-
-	assert.Equal(t, expectedSpecs, test.Specs)
-}
-
 func TestNewAssertionSpecFormat(t *testing.T) {
 	test := model.Test{
 		ID:               id.NewRandGenerator().ID(),

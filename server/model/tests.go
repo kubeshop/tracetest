@@ -11,16 +11,17 @@ import (
 )
 
 type (
+	// this file yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
-		ID               id.ID                                    `json:"id"`
-		CreatedAt        time.Time                                `json:"createdAt,omitempty"`
-		Name             string                                   `json:"name"`
-		Description      string                                   `json:"description"`
-		Version          int                                      `json:"version,omitempty"`
-		ServiceUnderTest Trigger                                  `json:"serviceUnderTest"`
-		Specs            maps.Ordered[SpanQuery, NamedAssertions] `json:"specs"`
-		Outputs          maps.Ordered[string, Output]             `json:"outputs"`
-		Summary          Summary                                  `json:"summary,omitempty"`
+		ID               id.ID
+		CreatedAt        time.Time
+		Name             string
+		Description      string
+		Version          int
+		ServiceUnderTest Trigger
+		Specs            maps.Ordered[SpanQuery, NamedAssertions]
+		Outputs          maps.Ordered[string, Output]
+		Summary          Summary
 	}
 
 	Output struct {

@@ -40,6 +40,18 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
+		Specs: (maps.Ordered[model.SpanQuery, model.NamedAssertions]{}).
+			MustAdd("query", model.NamedAssertions{
+				Name: "some assertion",
+				Assertions: []model.Assertion{
+					"attr:some_attr = 1",
+				},
+			}),
+		Outputs: (maps.Ordered[string, model.Output]{}).
+			MustAdd("output", model.Output{
+				Selector: "selector",
+				Value:    "value",
+			}),
 	}
 	test, err = testsDB.CreateTest(context.TODO(), test)
 	require.NoError(t, err)
@@ -78,6 +90,18 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
+		Specs: (maps.Ordered[model.SpanQuery, model.NamedAssertions]{}).
+			MustAdd("query", model.NamedAssertions{
+				Name: "some assertion",
+				Assertions: []model.Assertion{
+					"attr:some_attr = 1",
+				},
+			}),
+		Outputs: (maps.Ordered[string, model.Output]{}).
+			MustAdd("output", model.Output{
+				Selector: "selector",
+				Value:    "value",
+			}),
 	}
 
 	_, err = testsDB.CreateTest(context.TODO(), test)
@@ -229,8 +253,22 @@ func TestTransactions(t *testing.T) {
 								"url": "http://localhost:3030/hello-instrumented"
 							}
 						},
-						"specs":[],
-						"outputs":[],
+						"specs":[
+							{
+								"name": "some assertion",
+								"selector": "query",
+								"assertions": [
+									"attr:some_attr = 1"
+								]
+							}
+						],
+						"outputs":[
+							{
+								"name": "output",
+								"selector": "selector",
+								"value": "value"
+							}
+						],
 						"summary": {
 							"runs": 1,
 							"lastRun": {
@@ -252,8 +290,22 @@ func TestTransactions(t *testing.T) {
 								"url": "http://localhost:3030/hello-instrumented"
 							}
 						},
-						"specs":[],
-						"outputs":[],
+						"specs":[
+							{
+								"name": "some assertion",
+								"selector": "query",
+								"assertions": [
+									"attr:some_attr = 1"
+								]
+							}
+						],
+						"outputs":[
+							{
+								"name": "output",
+								"selector": "selector",
+								"value": "value"
+							}
+						],
 						"summary": {
 							"runs": 0,
 							"lastRun": {
