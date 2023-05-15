@@ -20,7 +20,7 @@ type PersistentTransactionRunner interface {
 	WorkerPool
 }
 
-type transactionRuns interface {
+type transactionRunRepository interface {
 	transactionUpdater
 	CreateRun(context.Context, tests.TransactionRun) (tests.TransactionRun, error)
 }
@@ -28,7 +28,7 @@ type transactionRuns interface {
 func NewTransactionRunner(
 	runner Runner,
 	db model.Repository,
-	transactionRuns transactionRuns,
+	transactionRuns transactionRunRepository,
 	subscriptionManager *subscription.Manager,
 ) persistentTransactionRunner {
 	updater := (CompositeTransactionUpdater{}).
@@ -55,7 +55,7 @@ type transactionRunJob struct {
 type persistentTransactionRunner struct {
 	testRunner          Runner
 	db                  model.Repository
-	transactionRuns     transactionRuns
+	transactionRuns     transactionRunRepository
 	updater             TransactionRunUpdater
 	subscriptionManager *subscription.Manager
 	executionChannel    chan transactionRunJob

@@ -149,7 +149,7 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	transactions := tests.NewTransactionsRepository(db, testDB.GetTransactionSteps)
+	transactionsRepository := tests.NewTransactionsRepository(db, testDB.GetTransactionSteps)
 
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
@@ -203,7 +203,7 @@ func (app *App) Start(opts ...appOption) error {
 		pollingProfileRepo,
 		dataStoreRepo,
 		testDB,
-		transactions,
+		transactionsRepository,
 		applicationTracer,
 		tracer,
 		subscriptionManager,
@@ -241,12 +241,12 @@ func (app *App) Start(opts ...appOption) error {
 
 	provisioner := provisioning.New()
 
-	router, mappers := controller(app.cfg, testDB, transactions, tracer, environmentRepo, rf, triggerRegistry)
+	router, mappers := controller(app.cfg, testDB, transactionsRepository, tracer, environmentRepo, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
-	registerTransactionResource(transactions, apiRouter, provisioner, tracer)
+	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
 
 	registerConfigResource(configRepo, apiRouter, db, provisioner, tracer)
 

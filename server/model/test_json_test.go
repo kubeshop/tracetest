@@ -2,7 +2,6 @@ package model_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
@@ -45,7 +44,6 @@ func TestJSONEncoding(t *testing.T) {
 
 	encoded, err := json.Marshal(original)
 	require.NoError(t, err)
-	fmt.Println(string(encoded))
 
 	decoded := model.Test{}
 	err = json.Unmarshal(encoded, &decoded)

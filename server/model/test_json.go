@@ -42,14 +42,8 @@ func (t Test) MarshalJSON() ([]byte, error) {
 
 	jt.SpecsJSON = make([]jsonSpec, 0, t.Specs.Len())
 	t.Specs.ForEach(func(key SpanQuery, val NamedAssertions) error {
-		// assertions := make([]string, len(val.Assertions))
-		// for i, a := range val.Assertions {
-		// 	assertions[i] = string(a)
-		// }
-
 		jt.SpecsJSON = append(jt.SpecsJSON, jsonSpec{
-			Name: val.Name,
-			// Assertions: assertions,
+			Name:       val.Name,
 			Assertions: val.Assertions,
 			Selector:   string(key),
 		})
