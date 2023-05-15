@@ -245,6 +245,9 @@ func (app *App) Start(opts ...appOption) error {
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
+
+	registerTransactionResource(transactions, apiRouter, provisioner, tracer)
+
 	registerConfigResource(configRepo, apiRouter, db, provisioner, tracer)
 
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner, tracer)
@@ -307,6 +310,18 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 		grpcOtlpServer.Stop()
 		httpOtlpServer.Stop()
 	})
+}
+
+func registerTransactionResource(repo *tests.TransactionsRepository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[tests.Transaction](
+		tests.TransactionResourceName,
+		tests.TransactionResourceNamePlural,
+		repo,
+		resourcemanager.CanBeAugmented(),
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
 }
 
 func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
