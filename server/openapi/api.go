@@ -19,8 +19,10 @@ import (
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
 	CreateTest(http.ResponseWriter, *http.Request)
+	CreateTransaction(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
+	DeleteTransaction(http.ResponseWriter, *http.Request)
 	DeleteTransactionRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
 	ExecuteDefinition(http.ResponseWriter, *http.Request)
@@ -37,10 +39,12 @@ type ApiApiRouter interface {
 	GetTestVersion(http.ResponseWriter, *http.Request)
 	GetTestVersionDefinitionFile(http.ResponseWriter, *http.Request)
 	GetTests(http.ResponseWriter, *http.Request)
+	GetTransaction(http.ResponseWriter, *http.Request)
 	GetTransactionRun(http.ResponseWriter, *http.Request)
 	GetTransactionRuns(http.ResponseWriter, *http.Request)
 	GetTransactionVersion(http.ResponseWriter, *http.Request)
 	GetTransactionVersionDefinitionFile(http.ResponseWriter, *http.Request)
+	GetTransactions(http.ResponseWriter, *http.Request)
 	GetVersion(http.ResponseWriter, *http.Request)
 	ImportTestRun(http.ResponseWriter, *http.Request)
 	RerunTestRun(http.ResponseWriter, *http.Request)
@@ -49,6 +53,7 @@ type ApiApiRouter interface {
 	StopTestRun(http.ResponseWriter, *http.Request)
 	TestConnection(http.ResponseWriter, *http.Request)
 	UpdateTest(http.ResponseWriter, *http.Request)
+	UpdateTransaction(http.ResponseWriter, *http.Request)
 	UpsertDefinition(http.ResponseWriter, *http.Request)
 }
 
@@ -58,18 +63,14 @@ type ApiApiRouter interface {
 type ResourceApiApiRouter interface {
 	CreateDemo(http.ResponseWriter, *http.Request)
 	CreateEnvironment(http.ResponseWriter, *http.Request)
-	CreateTransaction(http.ResponseWriter, *http.Request)
 	DeleteDataStore(http.ResponseWriter, *http.Request)
 	DeleteDemo(http.ResponseWriter, *http.Request)
 	DeleteEnvironment(http.ResponseWriter, *http.Request)
-	DeleteTransaction(http.ResponseWriter, *http.Request)
 	GetConfiguration(http.ResponseWriter, *http.Request)
 	GetDataStore(http.ResponseWriter, *http.Request)
 	GetDemo(http.ResponseWriter, *http.Request)
 	GetEnvironment(http.ResponseWriter, *http.Request)
 	GetPollingProfile(http.ResponseWriter, *http.Request)
-	GetTransaction(http.ResponseWriter, *http.Request)
-	GetTransactions(http.ResponseWriter, *http.Request)
 	ListConfiguration(http.ResponseWriter, *http.Request)
 	ListDataStore(http.ResponseWriter, *http.Request)
 	ListDemos(http.ResponseWriter, *http.Request)
@@ -80,7 +81,6 @@ type ResourceApiApiRouter interface {
 	UpdateDemo(http.ResponseWriter, *http.Request)
 	UpdateEnvironment(http.ResponseWriter, *http.Request)
 	UpdatePollingProfile(http.ResponseWriter, *http.Request)
-	UpdateTransaction(http.ResponseWriter, *http.Request)
 }
 
 // ApiApiServicer defines the api actions for the ApiApi service
@@ -110,7 +110,6 @@ type ApiApiServicer interface {
 	GetTransactionRun(context.Context, string, int32) (ImplResponse, error)
 	GetTransactionRuns(context.Context, string, int32, int32) (ImplResponse, error)
 	GetTransactionVersion(context.Context, string, int32) (ImplResponse, error)
-	GetTransactionVersionDefinitionFile(context.Context, string, int32) (ImplResponse, error)
 	GetVersion(context.Context) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, int32) (ImplResponse, error)
@@ -129,18 +128,14 @@ type ApiApiServicer interface {
 type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
 	CreateEnvironment(context.Context, EnvironmentResource) (ImplResponse, error)
-	CreateTransaction(context.Context, TransactionResource) (ImplResponse, error)
 	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)
 	DeleteEnvironment(context.Context, string) (ImplResponse, error)
-	DeleteTransaction(context.Context, string) (ImplResponse, error)
 	GetConfiguration(context.Context, string) (ImplResponse, error)
 	GetDataStore(context.Context, string) (ImplResponse, error)
 	GetDemo(context.Context, string) (ImplResponse, error)
 	GetEnvironment(context.Context, string) (ImplResponse, error)
 	GetPollingProfile(context.Context, string) (ImplResponse, error)
-	GetTransaction(context.Context, string) (ImplResponse, error)
-	GetTransactions(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	ListConfiguration(context.Context, int32, int32, string, string) (ImplResponse, error)
 	ListDataStore(context.Context, int32, int32, string, string) (ImplResponse, error)
 	ListDemos(context.Context, int32, int32, string, string) (ImplResponse, error)
@@ -151,5 +146,4 @@ type ResourceApiApiServicer interface {
 	UpdateDemo(context.Context, string, Demo) (ImplResponse, error)
 	UpdateEnvironment(context.Context, string, EnvironmentResource) (ImplResponse, error)
 	UpdatePollingProfile(context.Context, string, PollingProfile) (ImplResponse, error)
-	UpdateTransaction(context.Context, string, TransactionResource) (ImplResponse, error)
 }

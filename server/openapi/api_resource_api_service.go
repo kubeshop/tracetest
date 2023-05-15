@@ -54,23 +54,6 @@ func (s *ResourceApiApiService) CreateEnvironment(ctx context.Context, environme
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateEnvironment method not implemented")
 }
 
-// CreateTransaction - Create new transaction
-func (s *ResourceApiApiService) CreateTransaction(ctx context.Context, transactionResource TransactionResource) (ImplResponse, error) {
-	// TODO - update CreateTransaction with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(201, TransactionResource{}) or use other options such as http.Ok ...
-	//return Response(201, TransactionResource{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
-	//return Response(400, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("CreateTransaction method not implemented")
-}
-
 // DeleteDataStore - Delete a Data Store
 func (s *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) (ImplResponse, error) {
 	// TODO - update DeleteDataStore with the required logic for this service method.
@@ -120,23 +103,6 @@ func (s *ResourceApiApiService) DeleteEnvironment(ctx context.Context, environme
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteEnvironment method not implemented")
-}
-
-// DeleteTransaction - delete a transaction
-func (s *ResourceApiApiService) DeleteTransaction(ctx context.Context, transactionId string) (ImplResponse, error) {
-	// TODO - update DeleteTransaction with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
-	//return Response(204, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
-	//return Response(404, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("DeleteTransaction method not implemented")
 }
 
 // GetConfiguration - Get Tracetest configuration
@@ -219,40 +185,6 @@ func (s *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetPollingProfile method not implemented")
-}
-
-// GetTransaction - get transaction
-func (s *ResourceApiApiService) GetTransaction(ctx context.Context, transactionId string) (ImplResponse, error) {
-	// TODO - update GetTransaction with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, TransactionResource{}) or use other options such as http.Ok ...
-	//return Response(200, TransactionResource{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
-	//return Response(404, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetTransaction method not implemented")
-}
-
-// GetTransactions - Get transactions
-func (s *ResourceApiApiService) GetTransactions(ctx context.Context, take int32, skip int32, query string, sortBy string, sortDirection string) (ImplResponse, error) {
-	// TODO - update GetTransactions with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, GetTransactions200Response{}) or use other options such as http.Ok ...
-	//return Response(200, GetTransactions200Response{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
-	//return Response(400, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetTransactions method not implemented")
 }
 
 // ListConfiguration - List Tracetest configuration
@@ -420,24 +352,4 @@ func (s *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollin
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePollingProfile method not implemented")
-}
-
-// UpdateTransaction - update transaction
-func (s *ResourceApiApiService) UpdateTransaction(ctx context.Context, transactionId string, transactionResource TransactionResource) (ImplResponse, error) {
-	// TODO - update UpdateTransaction with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, TransactionResource{}) or use other options such as http.Ok ...
-	//return Response(200, TransactionResource{}), nil
-
-	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
-	//return Response(400, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
-	//return Response(404, nil),nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("UpdateTransaction method not implemented")
 }

@@ -245,19 +245,14 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
         content: {
-          "application/json": {
-            count?: number;
-            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
-          };
-          "text/yaml": {
-            count?: number;
-            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
-          };
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"][];
         };
       };
-      /** invalid query for transactions, some data was sent in incorrect format. */
-      400: unknown;
       /** problem with getting transactions */
       500: unknown;
     };
@@ -266,21 +261,17 @@ export interface operations {
   createTransaction: {
     responses: {
       /** successful operation */
-      201: {
+      200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
         };
       };
       /** trying to create a transaction with an already existing ID */
       400: unknown;
-      /** problem creating a transaction */
-      500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
       };
     };
   };
@@ -291,13 +282,10 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
         };
       };
-      /** transaction not found */
-      404: unknown;
-      /** problem getting an transaction */
+      /** problem with getting a transaction */
       500: unknown;
     };
   };
@@ -306,23 +294,13 @@ export interface operations {
     parameters: {};
     responses: {
       /** successful operation */
-      200: {
-        content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-        };
-      };
-      /** invalid transaction, some data was sent in incorrect format. */
-      400: unknown;
-      /** transaction not found */
-      404: unknown;
-      /** problem updating a transaction */
+      204: never;
+      /** problem with updating transaction */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
       };
     };
   };
@@ -330,12 +308,8 @@ export interface operations {
   deleteTransaction: {
     parameters: {};
     responses: {
-      /** successful operation */
+      /** OK */
       204: never;
-      /** transaction not found */
-      404: unknown;
-      /** problem deleting a transaction */
-      500: unknown;
     };
   };
   /** get a transaction specific version */
@@ -1817,25 +1791,13 @@ export interface external {
     paths: {};
     components: {
       schemas: {
-        /** @description Represents a transaction structured into the Resources format. */
-        TransactionResource: {
-          /**
-           * @description Represents the type of this resource. It should always be set as 'Transaction'.
-           * @enum {string}
-           */
-          type?: "Transaction";
-          spec?: external["transactions.yaml"]["components"]["schemas"]["Transaction"];
-        };
         Transaction: {
           id?: string;
           name?: string;
           description?: string;
           /** @description version number of the test */
           version?: number;
-          /** @description list of steps of the transaction containing just each test id */
-          steps?: string[];
-          /** @description list of steps of the transaction containing the whole test object */
-          fullSteps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
           /** Format: date-time */
           createdAt?: string;
           /** @description summary of transaction */
