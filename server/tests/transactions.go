@@ -95,7 +95,7 @@ type TransactionRun struct {
 	CreatedAt   time.Time
 	CompletedAt time.Time
 
-	//
+	// steps
 	StepIDs []int
 	Steps   []model.Run
 
