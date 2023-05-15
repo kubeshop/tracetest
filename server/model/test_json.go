@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/fluidtruck/deepcopy"
@@ -72,15 +74,13 @@ func (t *Test) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	specs := maps.Ordered[SpanQuery, NamedAssertions]{}
-	for _, spec := range jt.SpecsJSON {
-		specs, err = specs.Add(SpanQuery(spec.Selector), NamedAssertions{
-			Name:       spec.Name,
-			Assertions: spec.Assertions,
-		})
-		if err != nil {
-			return err
-		}
+	specs, err := unmarshalSpecs(jt)
+	if err != nil {
+		return err
+	}
+
+	if oldSpecs, shouldReplace := checkForOldSpecs(specs, data); shouldReplace {
+		specs = oldSpecs
 	}
 
 	outputs := maps.Ordered[string, Output]{}
@@ -103,6 +103,58 @@ func (t *Test) UnmarshalJSON(data []byte) error {
 	t.Outputs = outputs
 
 	return nil
+}
+
+func unmarshalSpecs(jt jsonTest) (specs maps.Ordered[SpanQuery, NamedAssertions], err error) {
+	for _, spec := range jt.SpecsJSON {
+		specs, err = specs.Add(SpanQuery(spec.Selector), NamedAssertions{
+			Name:       spec.Name,
+			Assertions: spec.Assertions,
+		})
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+var errOldFormatDetected = fmt.Errorf("old format detected")
+
+func checkForOldSpecs(newFormatSpecs maps.Ordered[SpanQuery, NamedAssertions], data []byte) (specs maps.Ordered[SpanQuery, NamedAssertions], shouldReplace bool) {
+	err := newFormatSpecs.ForEach(func(key SpanQuery, val NamedAssertions) error {
+		// assertions is nil for the old format
+		if val.Assertions == nil {
+			// dumb error, used for signaling the caller function
+			return errOldFormatDetected
+		}
+		return nil
+	})
+
+	if !errors.Is(err, errOldFormatDetected) {
+		shouldReplace = false
+		return
+	}
+	shouldReplace = true
+
+	testWithOldFormat := struct {
+		Specs maps.Ordered[SpanQuery, []Assertion]
+	}{}
+
+	err = json.Unmarshal(data, &testWithOldFormat)
+	if err != nil {
+		return
+	}
+
+	err = testWithOldFormat.Specs.ForEach(func(key SpanQuery, val []Assertion) error {
+		specs, err = specs.Add(key, NamedAssertions{
+			Name:       "",
+			Assertions: val,
+		})
+		return err
+	})
+
+	return
 }
 
 func (t Test) MarshalYAML() ([]byte, error) {
