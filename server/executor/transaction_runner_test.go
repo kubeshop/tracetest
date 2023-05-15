@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
@@ -108,7 +109,6 @@ func getDB() (model.Repository, *sql.DB) {
 
 func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual tests.TransactionRun)) {
 	ctx := context.Background()
-	rawDB := testmock.GetRawTestingDatabase()
 	db, rawDB := getDB()
 
 	subscriptionManager := subscription.NewManager()
@@ -129,9 +129,12 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	testsRepo, _ := testdb.Postgres(testdb.WithDB(rawDB))
 	transactionsRepo := tests.NewTransactionsRepository(rawDB, testsRepo.GetTransactionSteps)
 	transaction, err := transactionsRepo.Create(ctx, tests.Transaction{
-		Name:  "transaction",
-		Steps: []model.Test{test1, test2},
+		Name:    "transaction",
+		StepIDs: []id.ID{test1.ID, test2.ID},
 	})
+	require.NoError(t, err)
+
+	transaction, err = transactionsRepo.GetAugmented(context.TODO(), transaction.ID)
 	require.NoError(t, err)
 
 	metadata := model.RunMetadata{
