@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/tests"
@@ -12,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createTestWithName(t *testing.T, db model.Repository, name string) model.Test {
+func createTestWithName(t *testing.T, db model.TestRepository, name string) model.Test {
 	t.Helper()
 	test := model.Test{
 		Name:        name,
@@ -40,94 +41,99 @@ func getRepos() (*tests.TransactionsRepository, model.Repository) {
 		panic(err)
 	}
 
-	transactionsRepo := tests.NewTransactionsRepository(db, testsRepo.GetTransactionSteps)
+	transactionRepo := tests.NewTransactionsRepository(db, testsRepo.GetTransactionSteps)
 
-	return transactionsRepo, testsRepo
+	return transactionRepo, testsRepo
+}
+
+func getTransaction(t *testing.T, transactionRepo *tests.TransactionsRepository, testsRepo model.TestRepository) (tests.Transaction, transactionFixture) {
+	f := setupTransactionFixture(t, transactionRepo.DB())
+
+	transaction := tests.Transaction{
+		ID:          id.NewRandGenerator().ID(),
+		Name:        "first test",
+		Description: "description",
+		StepIDs: []id.ID{
+			f.t1.ID,
+			f.t2.ID,
+		},
+	}
+
+	_, err := transactionRepo.Create(context.TODO(), transaction)
+	require.NoError(t, err)
+
+	transaction, err = transactionRepo.GetAugmented(context.TODO(), transaction.ID)
+	require.NoError(t, err)
+
+	return transaction, f
 }
 
 func TestCreateTransactionRun(t *testing.T) {
-	transactionsRepo, testsRepo := getRepos()
+	transactionRepo, testsRepo := getRepos()
+	transaction, _ := getTransaction(t, transactionRepo, testsRepo)
 
-	transaction := tests.Transaction{
-		Name:        "first test",
-		Description: "description",
-		Steps: []model.Test{
-			createTestWithName(t, testsRepo, "first step"),
-			createTestWithName(t, testsRepo, "second step"),
-		},
-	}
-
-	transaction, err := transactionsRepo.Create(context.TODO(), transaction)
+	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
 	require.NoError(t, err)
 
-	run := transaction.NewRun()
-	newRun, err := transactionsRepo.CreateRun(context.TODO(), run)
-	require.NoError(t, err)
-
-	assert.Equal(t, newRun.TransactionID, transaction.ID)
-	assert.Equal(t, newRun.State, tests.TransactionRunStateCreated)
+	assert.Equal(t, tr.TransactionID, transaction.ID)
+	assert.Equal(t, tr.State, tests.TransactionRunStateCreated)
+	assert.Len(t, tr.Steps, 0)
 }
 
 func TestUpdateTransactionRun(t *testing.T) {
-	transactionsRepo, testsRepo := getRepos()
+	transactionRepo, testsRepo := getRepos()
+	transaction, fixture := getTransaction(t, transactionRepo, testsRepo)
 
-	transaction := tests.Transaction{
-		Name:        "first test",
-		Description: "description",
-		Steps: []model.Test{
-			createTestWithName(t, testsRepo, "first step"),
-			createTestWithName(t, testsRepo, "second step"),
-		},
-	}
-
-	transaction, err := transactionsRepo.Create(context.TODO(), transaction)
+	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
 	require.NoError(t, err)
 
-	run := transaction.NewRun()
-	run, err = transactionsRepo.CreateRun(context.TODO(), run)
+	tr.State = tests.TransactionRunStateExecuting
+	tr.Steps = []model.Run{fixture.testRun}
+	err = transactionRepo.UpdateRun(context.TODO(), tr)
 	require.NoError(t, err)
 
-	run.State = tests.TransactionRunStateExecuting
-	err = transactionsRepo.UpdateRun(context.TODO(), run)
+	updatedRun, err := transactionRepo.GetTransactionRun(context.TODO(), transaction.ID, tr.ID)
 	require.NoError(t, err)
 
-	updatedRun, err := transactionsRepo.GetTransactionRun(context.TODO(), transaction.ID, run.ID)
-	require.NoError(t, err)
-
-	assert.Equal(t, run.TransactionID, transaction.ID)
+	assert.Equal(t, tr.TransactionID, transaction.ID)
 	assert.Equal(t, tests.TransactionRunStateExecuting, updatedRun.State)
+	assert.Len(t, tr.Steps, 1)
 }
 
 func TestDeleteTransactionRun(t *testing.T) {
-	transactionsRepo, testsRepo := getRepos()
+	transactionRepo, testsRepo := getRepos()
+	transaction, _ := getTransaction(t, transactionRepo, testsRepo)
 
-	transaction := tests.Transaction{
-		Name:        "first test",
-		Description: "description",
-		Steps: []model.Test{
-			createTestWithName(t, testsRepo, "first step"),
-			createTestWithName(t, testsRepo, "second step"),
-		},
+	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
+	require.NoError(t, err)
+
+	err = transactionRepo.DeleteTransactionRun(context.TODO(), tr)
+	require.NoError(t, err)
+
+	_, err = transactionRepo.GetTransactionRun(context.TODO(), transaction.ID, tr.ID)
+	require.ErrorContains(t, err, "no rows in result set")
+}
+
+func createTransaction(t *testing.T, repo *tests.TransactionsRepository, tran tests.Transaction) tests.Transaction {
+	one := 1
+	tran.ID = id.GenerateID()
+	tran.Version = &one
+	for _, step := range tran.Steps {
+		tran.StepIDs = append(tran.StepIDs, step.ID)
 	}
-
-	transaction, err := transactionsRepo.Create(context.TODO(), transaction)
+	_, err := repo.Create(context.TODO(), tran)
 	require.NoError(t, err)
 
-	run := transaction.NewRun()
-	newRun, err := transactionsRepo.CreateRun(context.TODO(), run)
+	tran, err = repo.GetAugmented(context.TODO(), tran.ID)
 	require.NoError(t, err)
 
-	err = transactionsRepo.DeleteTransactionRun(context.TODO(), newRun)
-	require.NoError(t, err)
-
-	_, err = transactionsRepo.GetTransactionRun(context.TODO(), transaction.ID, newRun.ID)
-	require.ErrorContains(t, err, "record not found")
+	return tran
 }
 
 func TestListTransactionRun(t *testing.T) {
-	transactionsRepo, testsRepo := getRepos()
+	transactionRepo, testsRepo := getRepos()
 
-	transaction, err := transactionsRepo.Create(context.TODO(), tests.Transaction{
+	t1 := createTransaction(t, transactionRepo, tests.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
@@ -135,9 +141,8 @@ func TestListTransactionRun(t *testing.T) {
 			createTestWithName(t, testsRepo, "second step"),
 		},
 	})
-	require.NoError(t, err)
 
-	transaction2, err := transactionsRepo.Create(context.TODO(), tests.Transaction{
+	t2 := createTransaction(t, transactionRepo, tests.Transaction{
 		Name:        "second transaction",
 		Description: "description",
 		Steps: []model.Test{
@@ -145,18 +150,17 @@ func TestListTransactionRun(t *testing.T) {
 			createTestWithName(t, testsRepo, "second step"),
 		},
 	})
+
+	run1, err := transactionRepo.CreateRun(context.TODO(), t1.NewRun())
 	require.NoError(t, err)
 
-	run1, err := transactionsRepo.CreateRun(context.TODO(), transaction.NewRun())
+	run2, err := transactionRepo.CreateRun(context.TODO(), t1.NewRun())
 	require.NoError(t, err)
 
-	run2, err := transactionsRepo.CreateRun(context.TODO(), transaction.NewRun())
+	_, err = transactionRepo.CreateRun(context.TODO(), t2.NewRun())
 	require.NoError(t, err)
 
-	_, err = transactionsRepo.CreateRun(context.TODO(), transaction2.NewRun())
-	require.NoError(t, err)
-
-	runs, err := transactionsRepo.GetTransactionsRuns(context.TODO(), transaction.ID, 20, 0)
+	runs, err := transactionRepo.GetTransactionsRuns(context.TODO(), t1.ID, 20, 0)
 	require.NoError(t, err)
 
 	assert.Len(t, runs, 2)
@@ -165,41 +169,41 @@ func TestListTransactionRun(t *testing.T) {
 }
 
 func TestBug(t *testing.T) {
-	transactionsRepo, testsRepo := getRepos()
+	transactionRepo, testsRepo := getRepos()
 
 	ctx := context.TODO()
 
-	transaction := tests.Transaction{
+	transaction := createTransaction(t, transactionRepo, tests.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
 			createTestWithName(t, testsRepo, "first step"),
 			createTestWithName(t, testsRepo, "second step"),
 		},
-	}
+	})
 
-	transaction, err := transactionsRepo.Create(ctx, transaction)
+	run1, err := transactionRepo.CreateRun(ctx, transaction.NewRun())
 	require.NoError(t, err)
 
-	run1, err := transactionsRepo.CreateRun(ctx, transaction.NewRun())
+	run2, err := transactionRepo.CreateRun(ctx, transaction.NewRun())
 	require.NoError(t, err)
 
-	run2, err := transactionsRepo.CreateRun(ctx, transaction.NewRun())
-	require.NoError(t, err)
-
-	runs, err := transactionsRepo.GetTransactionsRuns(ctx, transaction.ID, 20, 0)
+	runs, err := transactionRepo.GetTransactionsRuns(ctx, transaction.ID, 20, 0)
 	require.NoError(t, err)
 	assert.Equal(t, runs[0].ID, run2.ID)
 	assert.Equal(t, runs[1].ID, run1.ID)
 
 	transaction.Name = "another thing"
-	newTransaction, err := transactionsRepo.Update(ctx, transaction)
+	_, err = transactionRepo.Update(ctx, transaction)
 	require.NoError(t, err)
 
-	run3, err := transactionsRepo.CreateRun(ctx, newTransaction.NewRun())
+	newTransaction, err := transactionRepo.GetAugmented(context.TODO(), transaction.ID)
 	require.NoError(t, err)
 
-	runs, err = transactionsRepo.GetTransactionsRuns(ctx, newTransaction.ID, 20, 0)
+	run3, err := transactionRepo.CreateRun(ctx, newTransaction.NewRun())
+	require.NoError(t, err)
+
+	runs, err = transactionRepo.GetTransactionsRuns(ctx, newTransaction.ID, 20, 0)
 	require.NoError(t, err)
 
 	assert.Len(t, runs, 3)

@@ -18,9 +18,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func setupTests(t *testing.T, db *sql.DB) model.Run {
+type transactionFixture struct {
+	t1      model.Test
+	t2      model.Test
+	testRun model.Run
+}
+
+func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 	testsDB, err := testdb.Postgres(testdb.WithDB(db))
 	require.NoError(t, err)
+
+	fixture := transactionFixture{}
 
 	test := model.Test{
 		ID:          "ezMn7bE4g",
@@ -35,6 +43,7 @@ func setupTests(t *testing.T, db *sql.DB) model.Run {
 	}
 	test, err = testsDB.CreateTest(context.TODO(), test)
 	require.NoError(t, err)
+	fixture.t1 = test
 
 	run := model.Run{
 		State:   model.RunStateFinished,
@@ -57,6 +66,7 @@ func setupTests(t *testing.T, db *sql.DB) model.Run {
 
 	err = testsDB.UpdateRun(context.TODO(), run)
 	require.NoError(t, err)
+	fixture.testRun = run
 
 	test = model.Test{
 		ID:          "2qOn7xPVg",
@@ -72,9 +82,15 @@ func setupTests(t *testing.T, db *sql.DB) model.Run {
 
 	_, err = testsDB.CreateTest(context.TODO(), test)
 	require.NoError(t, err)
+	fixture.t2 = test
 
-	return run
+	return fixture
+}
 
+func setupTests(t *testing.T, db *sql.DB) model.Run {
+	f := setupTransactionFixture(t, db)
+
+	return f.testRun
 }
 
 func TestTransactions(t *testing.T) {
