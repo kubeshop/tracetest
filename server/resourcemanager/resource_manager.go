@@ -258,7 +258,7 @@ func paginationParams(r *http.Request, sortingFields []string) (take, skip int, 
 
 func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	outputEncoder := getOutputEncoder(r)
-	w.Header().Set("Content-Type", outputEncoder.ResponseContentType())
+	w.Header().Set("Content-Type", outputEncoder.ContentType())
 
 	ctx := r.Context()
 	take, skip,
@@ -327,8 +327,8 @@ func isRequestForAugmented(r *http.Request) bool {
 
 func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	outputEncoder := getOutputEncoder(r)
-	w.Header().Set("Content-Type", outputEncoder.ResponseContentType())
-	w.Header().Set("Content-Type", outputEncoder.ResponseContentType())
+	w.Header().Set("Content-Type", outputEncoder.ContentType())
+	w.Header().Set("Content-Type", outputEncoder.ContentType())
 
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
@@ -361,7 +361,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
 	outputEncoder := getOutputEncoder(r)
 
-	w.Header().Set("Content-Type", outputEncoder.ResponseContentType())
+	w.Header().Set("Content-Type", outputEncoder.ContentType())
 
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
@@ -390,7 +390,7 @@ func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb stri
 func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
 	inputEncoder := getInputEncoder(r)
 	outputEncoder := getOutputEncoder(r)
-	w.Header().Set("Content-Type", outputEncoder.ResponseContentType())
+	w.Header().Set("Content-Type", outputEncoder.ContentType())
 
 	targetResource := Resource[T]{}
 	err := readValues(r, inputEncoder, &targetResource)
