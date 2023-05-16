@@ -3,24 +3,25 @@ package lintern
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/server/lintern/rules"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-func NewRunner(ruleset ...Rule) Runner {
+func NewRunner(ruleset ...rules.Rule) Runner {
 	return &runner{
 		ruleset: ruleset,
 	}
 }
 
 type runner struct {
-	ruleset []Rule
+	ruleset []rules.Rule
 }
 
 func (r *runner) Run(ctx context.Context, trace model.Trace) Result {
 	result := Result{
 		Passed:      true,
 		Score:       0,
-		RuleResults: make([]RuleResult, 0, len(r.ruleset)),
+		RuleResults: make([]rules.Result, 0, len(r.ruleset)),
 	}
 
 	totalWeight := r.getTotalWeight()
