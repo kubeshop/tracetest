@@ -18,6 +18,10 @@ components:
         spec:
           type: object
           properties:
+            id:
+              type: string
+            name:
+              type: string
             enabled:
               type: boolean
             minimumScore:

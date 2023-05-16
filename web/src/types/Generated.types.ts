@@ -1609,6 +1609,8 @@ export interface external {
           /** @enum {string} */
           type?: "Lintern";
           spec?: {
+            id?: string;
+            name?: string;
             enabled?: boolean;
             minimumScore?: number;
             plugins?: external["linterns.yaml"]["components"]["schemas"]["LinternResourcePlugin"][];
@@ -1801,6 +1803,7 @@ export interface external {
             | "EXECUTING"
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
+            | "ANALYZING_TRACE"
             | "FINISHED"
             | "STOPPED"
             | "TRIGGER_FAILED"

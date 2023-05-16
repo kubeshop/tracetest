@@ -10,6 +10,10 @@
 package openapi
 
 type LinternResourceSpec struct {
+	Id string `json:"id,omitempty"`
+
+	Name string `json:"name,omitempty"`
+
 	Enabled bool `json:"enabled,omitempty"`
 
 	MinimumScore int32 `json:"minimumScore,omitempty"`

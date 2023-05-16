@@ -19,6 +19,8 @@ var _ MappedNullable = &LinternResourceSpec{}
 
 // LinternResourceSpec struct for LinternResourceSpec
 type LinternResourceSpec struct {
+	Id           *string                 `json:"id,omitempty"`
+	Name         *string                 `json:"name,omitempty"`
 	Enabled      *bool                   `json:"enabled,omitempty"`
 	MinimumScore *int32                  `json:"minimumScore,omitempty"`
 	Plugins      []LinternResourcePlugin `json:"plugins,omitempty"`
@@ -39,6 +41,70 @@ func NewLinternResourceSpec() *LinternResourceSpec {
 func NewLinternResourceSpecWithDefaults() *LinternResourceSpec {
 	this := LinternResourceSpec{}
 	return &this
+}
+
+// GetId returns the Id field value if set, zero value otherwise.
+func (o *LinternResourceSpec) GetId() string {
+	if o == nil || isNil(o.Id) {
+		var ret string
+		return ret
+	}
+	return *o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinternResourceSpec) GetIdOk() (*string, bool) {
+	if o == nil || isNil(o.Id) {
+		return nil, false
+	}
+	return o.Id, true
+}
+
+// HasId returns a boolean if a field has been set.
+func (o *LinternResourceSpec) HasId() bool {
+	if o != nil && !isNil(o.Id) {
+		return true
+	}
+
+	return false
+}
+
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *LinternResourceSpec) SetId(v string) {
+	o.Id = &v
+}
+
+// GetName returns the Name field value if set, zero value otherwise.
+func (o *LinternResourceSpec) GetName() string {
+	if o == nil || isNil(o.Name) {
+		var ret string
+		return ret
+	}
+	return *o.Name
+}
+
+// GetNameOk returns a tuple with the Name field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinternResourceSpec) GetNameOk() (*string, bool) {
+	if o == nil || isNil(o.Name) {
+		return nil, false
+	}
+	return o.Name, true
+}
+
+// HasName returns a boolean if a field has been set.
+func (o *LinternResourceSpec) HasName() bool {
+	if o != nil && !isNil(o.Name) {
+		return true
+	}
+
+	return false
+}
+
+// SetName gets a reference to the given string and assigns it to the Name field.
+func (o *LinternResourceSpec) SetName(v string) {
+	o.Name = &v
 }
 
 // GetEnabled returns the Enabled field value if set, zero value otherwise.
@@ -147,6 +213,12 @@ func (o LinternResourceSpec) MarshalJSON() ([]byte, error) {
 
 func (o LinternResourceSpec) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !isNil(o.Name) {
+		toSerialize["name"] = o.Name
+	}
 	if !isNil(o.Enabled) {
 		toSerialize["enabled"] = o.Enabled
 	}

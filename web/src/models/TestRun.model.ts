@@ -102,6 +102,7 @@ const TestRun = ({
   environment = {},
   transactionId = '',
   transactionRunId = '',
+  lintern ={},
 }: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
@@ -128,6 +129,7 @@ const TestRun = ({
     environment: Environment.fromRun(environment),
     transactionId,
     transactionRunId,
+    lintern,
   };
 };
 
