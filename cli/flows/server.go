@@ -30,13 +30,3 @@ func NewServer(root global.Root) Server {
 	root.Cmd.AddCommand(server.Cmd)
 	return server
 }
-
-var server Server
-
-func GetServer() Server {
-	if server.Cmd == nil {
-		panic("server not initialized")
-	}
-
-	return server
-}
