@@ -89,6 +89,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
 
+		transactionOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
+			actions.WithFormatter(formatters.NewTransactionsFormatter()),
+		)
+		transactionActions := actions.NewTransactionsActions(transactionOptions...)
+		resourceRegistry.Register(transactionActions)
+
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
