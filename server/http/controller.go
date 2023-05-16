@@ -46,6 +46,7 @@ type controller struct {
 type transactionsRepository interface {
 	IDExists(ctx context.Context, id id.ID) (bool, error)
 	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]tests.Transaction, error)
+	GetAugmented(context.Context, id.ID) (tests.Transaction, error)
 	Count(ctx context.Context, query string) (int, error)
 	Get(context.Context, id.ID) (tests.Transaction, error)
 	GetVersion(context.Context, id.ID, int) (tests.Transaction, error)
@@ -813,7 +814,7 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 
 // RunTransaction implements openapi.ApiApiServicer
 func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
-	transaction, err := c.transactions.Get(ctx, id.ID(transactionID))
+	transaction, err := c.transactions.GetAugmented(ctx, id.ID(transactionID))
 	if err != nil {
 		return handleDBError(err), err
 	}
