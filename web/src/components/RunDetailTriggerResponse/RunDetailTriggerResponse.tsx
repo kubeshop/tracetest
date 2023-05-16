@@ -55,10 +55,10 @@ const RunDetailTriggerResponse = ({
           }}
         >
           <Tabs.TabPane key={TabsKeys.Body} tab="Body">
-            <ResponseBody body={body} bodyMimeType={bodyMimeType} />
+            <ResponseBody body={body} bodyMimeType={bodyMimeType} state={state} />
           </Tabs.TabPane>
           <Tabs.TabPane key={TabsKeys.Headers} tab="Headers">
-            <ResponseHeaders headers={headers} />
+            <ResponseHeaders headers={headers} state={state} />
           </Tabs.TabPane>
           <Tabs.TabPane key={TabsKeys.Environment} tab="Environment">
             <ResponseEnvironment />
