@@ -6,6 +6,7 @@ export enum TestState {
   TRIGGER_FAILED = 'TRIGGER_FAILED',
   TRACE_FAILED = 'TRACE_FAILED',
   ASSERTION_FAILED = 'ASSERTION_FAILED',
+  ANALYZING_TRACE = 'ANALYZING_TRACE',
   FAILED = 'FAILED',
   STOPPED = 'STOPPED',
   FINISHED = 'FINISHED',
@@ -68,6 +69,10 @@ export const TestStateMap: Record<
     status: 'warning',
     label: 'Skipped',
   },
+  [TestState.ANALYZING_TRACE]: {
+    status: 'default',
+    label: 'Analyzing trace',
+  }
 };
 
 export enum RunDetailModes {
