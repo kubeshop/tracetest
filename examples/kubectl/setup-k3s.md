@@ -17,7 +17,7 @@ For everything to work, we need the following environment configured:
 
 ## Setup
 
-k3s can be used to easily setup a cluster with the correct configuration. It's easy enought to be configured in any dev environment, even a CICD.
+k3s can be used to easily setup a cluster with the correct configuration. It's easy enough to be configured in any dev environment, even a CICD.
 
 The otelcollector cannot be deployed in the target cluster because it complicates the networking setup needed to have the k8s apiserver communicating with the collector.
 An easy solution for this is to have docker compose starting the otelcol/jaeger services, so their ports can be exposed directly to the host network.
