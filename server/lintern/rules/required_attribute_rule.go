@@ -67,7 +67,13 @@ func (r *requiredAttributesRule) Run(ctx context.Context, trace model.Trace) Res
 		}
 	}
 
-	score := totalScore / uint(len(spanResults))
+	var score uint
+
+	if len(spanResults) == 0 {
+		score = 100
+	} else {
+		score = totalScore / uint(len(spanResults))
+	}
 
 	return Result{
 		Name:             r.name,
