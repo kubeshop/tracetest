@@ -54,6 +54,20 @@ func (s *ResourceApiApiService) CreateEnvironment(ctx context.Context, environme
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateEnvironment method not implemented")
 }
 
+// CreateLintern - Create an lintern
+func (s *ResourceApiApiService) CreateLintern(ctx context.Context, linternResource LinternResource) (ImplResponse, error) {
+	// TODO - update CreateLintern with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(201, LinternResource{}) or use other options such as http.Ok ...
+	//return Response(201, LinternResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("CreateLintern method not implemented")
+}
+
 // DeleteDataStore - Delete a Data Store
 func (s *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) (ImplResponse, error) {
 	// TODO - update DeleteDataStore with the required logic for this service method.
@@ -103,6 +117,26 @@ func (s *ResourceApiApiService) DeleteEnvironment(ctx context.Context, environme
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteEnvironment method not implemented")
+}
+
+// DeleteLintern - Delete an lintern
+func (s *ResourceApiApiService) DeleteLintern(ctx context.Context, linternId string) (ImplResponse, error) {
+	// TODO - update DeleteLintern with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteLintern method not implemented")
 }
 
 // GetConfiguration - Get Tracetest configuration
@@ -168,6 +202,23 @@ func (s *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentI
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetEnvironment method not implemented")
+}
+
+// GetLintern - Get a specific lintern
+func (s *ResourceApiApiService) GetLintern(ctx context.Context, linternId string) (ImplResponse, error) {
+	// TODO - update GetLintern with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, LinternResource{}) or use other options such as http.Ok ...
+	//return Response(200, LinternResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetLintern method not implemented")
 }
 
 // GetPollingProfile - Get Polling Profile
@@ -247,6 +298,23 @@ func (s *ResourceApiApiService) ListEnvironments(ctx context.Context, take int32
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("ListEnvironments method not implemented")
+}
+
+// ListLinterns - List linterns
+func (s *ResourceApiApiService) ListLinterns(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
+	// TODO - update ListLinterns with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, LinternResourceList{}) or use other options such as http.Ok ...
+	//return Response(200, LinternResourceList{}), nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("ListLinterns method not implemented")
 }
 
 // ListPollingProfile - List Polling Profile Configuration
@@ -332,6 +400,26 @@ func (s *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environme
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateEnvironment method not implemented")
+}
+
+// UpdateLintern - Update a lintern
+func (s *ResourceApiApiService) UpdateLintern(ctx context.Context, linternId string, linternResource LinternResource) (ImplResponse, error) {
+	// TODO - update UpdateLintern with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, LinternResource{}) or use other options such as http.Ok ...
+	//return Response(200, LinternResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateLintern method not implemented")
 }
 
 // UpdatePollingProfile - Update a Polling Profile

@@ -190,6 +190,20 @@ export interface paths {
     /** Get the version of the API */
     get: operations["getVersion"];
   };
+  "/linterns": {
+    /** List linterns available in Tracetest. */
+    get: operations["listLinterns"];
+    /** Create an lintern that can be used by tests and linterns */
+    post: operations["createLintern"];
+  };
+  "/linterns/{linternId}": {
+    /** Get one lintern by its id */
+    get: operations["getLintern"];
+    /** Update a lintern used on Tracetest */
+    put: operations["updateLintern"];
+    /** Delete an lintern from Tracetest */
+    delete: operations["deleteLintern"];
+  };
 }
 
 export interface components {}
@@ -1081,6 +1095,99 @@ export interface operations {
       500: unknown;
     };
   };
+  /** List linterns available in Tracetest. */
+  listLinterns: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linterns.yaml"]["components"]["schemas"]["LinternResourceList"];
+          "text/yaml": external["linterns.yaml"]["components"]["schemas"]["LinternResourceList"];
+        };
+      };
+      /** invalid query for linterns, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing linterns */
+      500: unknown;
+    };
+  };
+  /** Create an lintern that can be used by tests and linterns */
+  createLintern: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+          "text/yaml": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+        };
+      };
+      /** problem creating an lintern */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+        "text/yaml": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+      };
+    };
+  };
+  /** Get one lintern by its id */
+  getLintern: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+          "text/yaml": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+        };
+      };
+      /** lintern not found */
+      404: unknown;
+      /** problem getting a lintern */
+      500: unknown;
+    };
+  };
+  /** Update a lintern used on Tracetest */
+  updateLintern: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+          "text/yaml": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+        };
+      };
+      /** invalid lintern, some data was sent in incorrect format. */
+      400: unknown;
+      /** lintern not found */
+      404: unknown;
+      /** problem updating an lintern */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+        "text/yaml": external["linterns.yaml"]["components"]["schemas"]["LinternResource"];
+      };
+    };
+  };
+  /** Delete an lintern from Tracetest */
+  deleteLintern: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid lintern, some data was sent in incorrect format. */
+      400: unknown;
+      /** lintern not found */
+      404: unknown;
+      /** problem deleting an lintern */
+      500: unknown;
+    };
+  };
 }
 
 export interface external {
@@ -1491,6 +1598,58 @@ export interface external {
     };
     operations: {};
   };
+  "linterns.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        LinternResourceList: {
+          items?: external["linterns.yaml"]["components"]["schemas"]["LinternResource"][];
+        };
+        LinternResource: {
+          /** @enum {string} */
+          type?: "Lintern";
+          spec?: {
+            enabled?: boolean;
+            minimumScore?: number;
+            plugins?: external["linterns.yaml"]["components"]["schemas"]["LinternResourcePlugin"][];
+          };
+        };
+        LinternResourcePlugin: {
+          name?: string;
+          enabled?: boolean;
+          required?: boolean;
+        };
+        LinternResult: {
+          passed?: boolean;
+          score?: number;
+          plugins?: external["linterns.yaml"]["components"]["schemas"]["LinternResultPlugin"][];
+        };
+        LinternResultPlugin: {
+          name?: string;
+          description?: string;
+          passed?: boolean;
+          score?: number;
+          rules?: external["linterns.yaml"]["components"]["schemas"]["LinternResultPluginRule"][];
+        };
+        LinternResultPluginRule: {
+          name?: string;
+          description?: string;
+          passed?: boolean;
+          weight?: number;
+          tips?: string;
+          results?: external["linterns.yaml"]["components"]["schemas"]["LinternResultPluginRuleResult"][];
+        };
+        LinternResultPluginRuleResult: {
+          spanId?: string;
+          error?: string;
+          passed?: boolean;
+          /** @enum {string} */
+          severity?: "error" | "warning";
+        };
+      };
+    };
+    operations: {};
+  };
   "parameters.yaml": {
     paths: {};
     components: {
@@ -1527,6 +1686,8 @@ export interface external {
         dataStoreId: string;
         /** @description ID of an environment used on Tracetest to inject values into tests and transactions */
         environmentId: string;
+        /** @description ID of an lintern */
+        linternId: string;
       };
     };
     operations: {};
@@ -1665,6 +1826,7 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          lintern?: external["linterns.yaml"]["components"]["schemas"]["LinternResult"];
           outputs?: {
             name?: string;
             spanId?: string;
