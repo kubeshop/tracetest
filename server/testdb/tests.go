@@ -376,7 +376,7 @@ func (td *postgresDB) GetTransactionSteps(ctx context.Context, transaction tests
 	stmt, err := td.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
 	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
 	if err != nil {
-		return []model.Test{}, fmt.Errorf("prepare: %w", err)
+		return []model.Test{}, fmt.Errorf("prepare 2: %w", err)
 	}
 	defer stmt.Close()
 

@@ -400,9 +400,9 @@ func (r *TransactionsRepository) get(ctx context.Context, id id.ID, augmented bo
 }
 
 func (r *TransactionsRepository) GetVersion(ctx context.Context, id id.ID, version int) (Transaction, error) {
-	stmt, err := r.db.Prepare(getTransactionSQL + " WHERE t.id = $1 AND t.version = $2")
+	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
-		return Transaction{}, fmt.Errorf("prepare: %w", err)
+		return Transaction{}, fmt.Errorf("prepare 1: %w", err)
 	}
 	defer stmt.Close()
 

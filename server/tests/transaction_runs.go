@@ -2,7 +2,9 @@ package tests
 
 import (
 	"context"
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -55,6 +57,17 @@ INSERT INTO transaction_runs (
 	$7 -- environment
 )
 RETURNING "id"`
+
+const (
+	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	dropSequeceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	runSequenceName    = "%sequence_name%"
+)
+
+func md5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
+}
 
 func replaceTransactionRunSequenceName(sql string, transactionID id.ID) string {
 	// postgres doesn't like uppercase chars in sequence names.

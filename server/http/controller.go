@@ -45,6 +45,8 @@ type controller struct {
 
 type transactionsRepository interface {
 	IDExists(ctx context.Context, id id.ID) (bool, error)
+	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]tests.Transaction, error)
+	Count(ctx context.Context, query string) (int, error)
 	Get(context.Context, id.ID) (tests.Transaction, error)
 	GetVersion(context.Context, id.ID, int) (tests.Transaction, error)
 	Create(context.Context, tests.Transaction) (tests.Transaction, error)
@@ -889,35 +891,37 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 
 	newTake := take + skip
 
-	// transactionList, err := c.transactions.List(ctx, newTake, 0, query, sortBy, sortDirection)
-	// if err != nil {
-	// 	return getTransactionsReponse, err
-	// }
+	transactions, err := c.transactions.ListAugmented(ctx, int(newTake), 0, query, sortBy, sortDirection)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
+	transactionCount, err := c.transactions.Count(ctx, query)
+	if err != nil {
+		return handleDBError(err), err
+	}
 
 	getTestsResponse, err := c.GetTests(ctx, newTake, 0, query, sortBy, sortDirection)
 	if err != nil {
 		return getTestsResponse, err
 	}
 
-	// transactionPaginatedResponse := getTransactionsReponse.Body.(paginated[openapi.Transaction])
-	// transactions := transactionPaginatedResponse.items
 	testPaginatedResponse := getTestsResponse.Body.(paginated[openapi.Test])
 	tests := testPaginatedResponse.items
 
-	// totalResources := transactionPaginatedResponse.count + testPaginatedResponse.count
+	totalResources := transactionCount + testPaginatedResponse.count
 
-	items := takeResources([]openapi.Transaction{}, tests, take, skip)
+	items := takeResources(transactions, tests, take, skip)
 
 	paginatedResponse := paginated[openapi.Resource]{
 		items: items,
-		// count: totalResources,
-		count: testPaginatedResponse.count,
+		count: totalResources,
 	}
 
 	return openapi.Response(http.StatusOK, paginatedResponse), nil
 }
 
-func takeResources(transactions []openapi.Transaction, tests []openapi.Test, take, skip int32) []openapi.Resource {
+func takeResources(transactions []tests.Transaction, tests []openapi.Test, take, skip int32) []openapi.Resource {
 	numItems := len(transactions) + len(tests)
 	items := make([]openapi.Resource, numItems)
 	maxNumItems := len(transactions) + len(tests)
