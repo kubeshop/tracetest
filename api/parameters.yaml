@@ -133,3 +133,11 @@ components:
       description: "ID of an environment used on Tracetest to inject values into tests and transactions"
       schema:
         type: string
+
+    linternId:
+      in: path
+      name: linternId
+      required: true
+      description: "ID of an lintern"
+      schema:
+        type: string
