@@ -1,18 +1,30 @@
-import {Badge, Col, Collapse, Row, Space, Typography} from 'antd';
+import {Col, Collapse, Row, Space, Typography} from 'antd';
+import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import LinterResult from 'models/LinterResult.model';
+import Span from 'models/Span.model';
+import Trace from 'models/Trace.model';
 import * as S from './LintResults.styled';
 
 interface IProps {
   linterResult: LinterResult;
+  trace: Trace;
 }
 
-const LintResults = ({linterResult}: IProps) => {
+function getSpanName(spans: Span[], traceId: string) {
+  const span = spans.find(s => s.id === traceId);
+  return span?.name ?? '';
+}
+
+const LintResults = ({linterResult, trace}: IProps) => {
   return (
     <S.Container>
       <S.Title level={2}>Lint results</S.Title>
 
       <S.ScoreContainer>
-        <S.Subtitle level={3}>Trace Analysis Result</S.Subtitle>
+        <S.Subtitle level={3}>
+          Trace Analysis Result
+          <TooltipQuestion title="Tracetest core system supports linter evaluation as part of the testing capabilities." />
+        </S.Subtitle>{' '}
         <Space>
           <S.Score level={1}>{linterResult.score} %</S.Score>
           <S.ScoreProgress
@@ -28,7 +40,10 @@ const LintResults = ({linterResult}: IProps) => {
         {linterResult?.plugins?.map(plugin => (
           <Col span={12} key={plugin.name}>
             <S.ScoreContainer key={plugin.name}>
-              <S.Subtitle level={3}>{plugin.name}</S.Subtitle>
+              <S.Subtitle level={3}>
+                {plugin.name}
+                <TooltipQuestion title={plugin.description} />
+              </S.Subtitle>
               <Space>
                 <S.Score level={1}>{plugin.score} %</S.Score>
                 <S.ScoreProgress
@@ -43,13 +58,14 @@ const LintResults = ({linterResult}: IProps) => {
         ))}
       </Row>
 
-      <Collapse>
+      <Collapse expandIcon={() => null}>
         {linterResult?.plugins?.map(plugin => (
-          <Collapse.Panel
+          <S.PluginPanel
             header={
-              <Space direction="vertical">
-                <Badge status={plugin.passed ? 'success' : 'error'} text={plugin.name} />
-                <Typography.Text style={{paddingLeft: 14}}>{plugin.description}</Typography.Text>
+              <Space>
+                {plugin.passed ? <S.PassedIcon /> : <S.FailedIcon />}
+                <Typography.Text strong>{plugin.name}</Typography.Text>
+                <TooltipQuestion title={plugin.description} />
               </Space>
             }
             key={plugin.name}
@@ -57,32 +73,43 @@ const LintResults = ({linterResult}: IProps) => {
             {plugin.rules.map(rule => (
               <S.RuleContainer key={rule.name}>
                 <S.Column>
-                  <Typography.Text strong>{rule.name}</Typography.Text>
-                  <Typography.Text>{rule.description}</Typography.Text>
-                  <Typography.Text>{rule.tips.join(' - ')}</Typography.Text>
+                  <S.RuleHeader>
+                    <Space>
+                      {rule.passed ? <S.PassedIcon $small /> : <S.FailedIcon $small />}
+                      <Typography.Text strong>{rule.name}</Typography.Text>
+                    </Space>
+                    <TooltipQuestion title={rule.tips.join(' - ')} />
+                  </S.RuleHeader>
+                  <Typography.Text type="secondary" style={{paddingLeft: 20}}>
+                    {rule.description}
+                  </Typography.Text>
                 </S.Column>
 
-                <S.Column>
+                <S.RuleBody>
                   {rule?.results?.map((result, resultIndex) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={`${result.spanId}-${resultIndex}`}>
                       {result.passed ? (
-                        <Typography.Text type="success">SpanId: {result.spanId}</Typography.Text>
+                        <>
+                          <S.CaretUpIcon />
+                          <Typography.Text type="success">{getSpanName(trace.spans, result.spanId)}</Typography.Text>
+                        </>
                       ) : (
                         <>
-                          <Typography.Text>Severity: {result.severity} - </Typography.Text>
-                          <Typography.Text>Error: {result.errors.join(' - ')} - </Typography.Text>
+                          <S.CaretUpIcon $error />
                           <Typography.Text type={result.severity === 'error' ? 'danger' : 'warning'}>
-                            SpanId: {result.spanId}
+                            {getSpanName(trace.spans, result.spanId)}
                           </Typography.Text>
+                          <Typography.Text> - Severity: {result.severity}</Typography.Text>
+                          <Typography.Text> - Errors: {result.errors.join(' - ')}</Typography.Text>
                         </>
                       )}
                     </div>
                   ))}
-                </S.Column>
+                </S.RuleBody>
               </S.RuleContainer>
             ))}
-          </Collapse.Panel>
+          </S.PluginPanel>
         ))}
       </Collapse>
     </S.Container>
