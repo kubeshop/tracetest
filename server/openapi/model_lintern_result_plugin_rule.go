@@ -18,7 +18,7 @@ type LinternResultPluginRule struct {
 
 	Weight int32 `json:"weight,omitempty"`
 
-	Tips string `json:"tips,omitempty"`
+	Tips []string `json:"tips,omitempty"`
 
 	Results []LinternResultPluginRuleResult `json:"results,omitempty"`
 }

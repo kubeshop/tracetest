@@ -10,7 +10,6 @@ type (
 	Lintern struct {
 		ID           id.ID           `json:"id"`
 		Name         string          `json:"name"`
-		CreatedAt    string          `json:"createdAt"`
 		Enabled      bool            `json:"enabled"`
 		MinimumScore int             `json:"minimumScore"`
 		Plugins      []LinternPlugin `json:"plugins"`

@@ -213,6 +213,7 @@ func (app *App) Start(opts ...appOption) error {
 	rf.runner.Start(5)
 	rf.transactionRunner.Start(5)
 	rf.assertionRunner.Start(5)
+	rf.linternRunner.Start(5)
 
 	app.registerStopFn(func() {
 		fmt.Println("stopping tracePoller")

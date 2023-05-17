@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
+	"github.com/kubeshop/tracetest/server/lintern"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -21,6 +22,7 @@ type runnerFacade struct {
 	transactionRunner executor.PersistentTransactionRunner
 	assertionRunner   executor.AssertionRunner
 	tracePoller       executor.PersistentTracePoller
+	linternRunner     executor.LinternRunner
 }
 
 func (rf runnerFacade) StopTest(testID id.ID, runID int) {
@@ -70,6 +72,15 @@ func newRunnerFacades(
 		eventEmitter,
 	)
 
+	lintern := lintern.NewLintern(lintern.DefaultPlugins...)
+	linternRunner := executor.NewLinternRunner(
+		execTestUpdater,
+		lintern,
+		subscriptionManager,
+		eventEmitter,
+		assertionRunner,
+	)
+
 	pollerExecutor := executor.NewPollerExecutor(
 		ppRepo,
 		tracer,
@@ -83,7 +94,7 @@ func newRunnerFacades(
 		pollerExecutor,
 		ppRepo,
 		execTestUpdater,
-		assertionRunner,
+		linternRunner,
 		subscriptionManager,
 		eventEmitter,
 	)
@@ -112,5 +123,6 @@ func newRunnerFacades(
 		transactionRunner: transactionRunner,
 		assertionRunner:   assertionRunner,
 		tracePoller:       tracePoller,
+		linternRunner:     linternRunner,
 	}
 }

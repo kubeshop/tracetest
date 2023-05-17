@@ -411,3 +411,63 @@ func TraceOtlpServerReceivedSpans(testID id.ID, runID, spanCount int, requestTyp
 		Outputs:             []model.OutputInfo{},
 	}
 }
+
+func TraceLinternStart(testID id.ID, runID int) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "TRACE_LINTERN_START",
+		Title:               "Trace lintern started",
+		Description:         "The trace lintern process has started",
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
+func TraceLinternSuccess(testID id.ID, runID int) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "TRACE_LINTERN_SUCCESS",
+		Title:               "Trace lintern succeeded",
+		Description:         "The trace lintern process was performed successfully",
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
+func TraceLinternError(testID id.ID, runID int, err error) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "TRACE_LINTERN_ERROR",
+		Title:               "Trace lintern error",
+		Description:         fmt.Sprintf("The trace lintern encountered fatal errors. Error: %s", err),
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
+func TraceLinternFailed(testID id.ID, runID int, err error) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "TRACE_LINTERN_FAILED",
+		Title:               "Trace lintern failed",
+		Description:         fmt.Sprintf("The trace lintern process failed during execution. Error: %s", err),
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}

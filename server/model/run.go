@@ -96,7 +96,7 @@ func (r Run) SuccessfullyTriggered() Run {
 }
 
 func (r Run) SuccessfullyPolledTraces(t *Trace) Run {
-	r.State = RunStateAwaitingTestResults
+	r.State = RunStateAnalyzingTrace
 	r.Trace = t
 	r.ObtainedTraceAt = time.Now()
 	return r
@@ -144,4 +144,17 @@ func (r Run) AssertionFailed(err error) Run {
 	r.State = RunStateAssertionFailed
 	r.LastError = err
 	return r.Finish()
+}
+
+func (r Run) LinternFailed(err error) Run {
+	r.State = RunStateAnalyzingError
+	r.LastError = err
+	return r.Finish()
+}
+
+func (r Run) SuccessfulLinternExecution(lintern LinternResult) Run {
+	r.State = RunStateAwaitingTestResults
+	r.Lintern = lintern
+
+	return r
 }

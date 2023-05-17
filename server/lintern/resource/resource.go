@@ -8,7 +8,6 @@ const (
 )
 
 var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationDelete,
 	resourcemanager.OperationGet,
 	resourcemanager.OperationList,
 	resourcemanager.OperationUpdate,

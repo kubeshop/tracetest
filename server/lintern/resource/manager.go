@@ -16,7 +16,7 @@ type Repository struct {
 
 var defaultLintern = Lintern{
 	ID:           id.ID("current"),
-	Name:         "Linter",
+	Name:         "Lintern",
 	Enabled:      true,
 	MinimumScore: 80,
 	Plugins: []LinternPlugin{
@@ -52,10 +52,6 @@ const (
 	deleteQuery = "DELETE FROM linterns WHERE id = $1"
 )
 
-func (*Repository) SortingFields() []string {
-	return []string{"name"}
-}
-
 func (r *Repository) SetID(linterns Lintern, id id.ID) Lintern {
 	linterns.ID = id
 	return linterns
@@ -65,7 +61,7 @@ func (r *Repository) Update(ctx context.Context, lintern Lintern) (Lintern, erro
 	// enforce ID and name
 	updated := Lintern{
 		ID:           id.ID("current"),
-		Name:         "Linter",
+		Name:         lintern.Name,
 		Enabled:      lintern.Enabled,
 		MinimumScore: lintern.MinimumScore,
 		Plugins:      lintern.Plugins,
@@ -147,6 +143,10 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 
 func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	return 1, nil
+}
+
+func (*Repository) SortingFields() []string {
+	return []string{"name"}
 }
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (Lintern, error) {

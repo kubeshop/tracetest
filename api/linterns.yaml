@@ -77,7 +77,9 @@ components:
         weight:
           type: integer
         tips:
-          type: string
+          type: array
+          items:
+            type: string
         results:
           type: array
           items:
@@ -87,8 +89,10 @@ components:
       properties:
         spanId:
           type: string
-        error:
-          type: string
+        errors:
+          type: array
+          items:
+            type: string
         passed:
           type: boolean
         severity:

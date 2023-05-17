@@ -7,6 +7,8 @@ export enum TestState {
   TRACE_FAILED = 'TRACE_FAILED',
   ASSERTION_FAILED = 'ASSERTION_FAILED',
   ANALYZING_TRACE = 'ANALYZING_TRACE',
+  ANALYZING_FAILED = 'ANALYZING_FAILED',
+  ANALYZING_ERROR = 'ANALYZING_ERROR',
   FAILED = 'FAILED',
   STOPPED = 'STOPPED',
   FINISHED = 'FINISHED',
@@ -72,6 +74,14 @@ export const TestStateMap: Record<
   [TestState.ANALYZING_TRACE]: {
     status: 'default',
     label: 'Analyzing trace',
+  },
+  [TestState.ANALYZING_FAILED]: {
+    status: 'default',
+    label: 'Analyzing trace Failed',
+  },
+  [TestState.ANALYZING_ERROR]: {
+    status: 'default',
+    label: 'Analyzing trace Error',
   }
 };
 

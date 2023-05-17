@@ -1,10 +1,10 @@
-package rules_test
+package lintern_plugins_standards_rules_test
 
 import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/lintern/rules"
+	lintern_plugins_standards_rules "github.com/kubeshop/tracetest/server/lintern/plugins/standards/rules"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
@@ -15,43 +15,45 @@ func TestRequiredAttributesRule(t *testing.T) {
 	trace := traceWithSpans(
 		spanWithAttributes("http", map[string]string{"http.method": "POST", "http.url": "http://localhost:11633"}),
 		spanWithAttributes("http", map[string]string{"http.method": "GET", "http.url": "http://localhost:11633"}),
-		spanWithAttributes("messaging", map[string]string{"messaging.target": "user.sync", "messaging.system": "kafka"}),
+		spanWithAttributes("messaging", map[string]string{"messaging.target1": "user.sync", "messaging.system1": "kafka"}),
 		spanWithAttributes("database", map[string]string{"db.statement": "INSERT INTO users (name, email) VALUES ($1, $2)"}),
 	)
 
 	t.Run("When all required attributes are found", func(t *testing.T) {
-		rule := rules.NewRequiredAttributesRule([]string{"http"}, []string{"http.method", "http.url"})
-		result := rule.Run(context.Background(), trace)
+		attrMap := lintern_plugins_standards_rules.NewRequiredAttributesMap(map[string][]string{
+			"http": {"http.method", "http.url"},
+		})
+
+		rule := lintern_plugins_standards_rules.NewRequiredAttributesRule(attrMap)
+		result, _ := rule.Evaluate(context.Background(), trace)
+
+		for _, result := range result.Results {
+			assert.True(t, result.Passed)
+		}
 
 		assert.True(t, result.Passed)
-		for _, spanResult := range result.SpansResults {
-			// expect score 50 because 2/2 attributes were found
-			assert.Equal(t, uint(100), spanResult.Score)
-		}
 	})
 
 	t.Run("When some attribute is missing", func(t *testing.T) {
-		rule := rules.NewRequiredAttributesRule([]string{"database"}, []string{"database.kind", "db.statement"})
-		result := rule.Run(context.Background(), trace)
+		attrMap := lintern_plugins_standards_rules.NewRequiredAttributesMap(map[string][]string{
+			"database": {"database.kind", "db.statement"},
+		})
+
+		rule := lintern_plugins_standards_rules.NewRequiredAttributesRule(attrMap)
+		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
-
-		for _, spanReresult := range result.SpansResults {
-			// expect score 50 because 1/2 attributes were found
-			assert.Equal(t, uint(50), spanReresult.Score)
-		}
 	})
 
 	t.Run("When all attributes are missing", func(t *testing.T) {
-		rule := rules.NewRequiredAttributesRule([]string{"http"}, []string{"http.protocol", "http.cors"})
-		result := rule.Run(context.Background(), trace)
+		attrMap := lintern_plugins_standards_rules.NewRequiredAttributesMap(map[string][]string{
+			"messaging": {"messaging.system", "messaging.target"},
+		})
+
+		rule := lintern_plugins_standards_rules.NewRequiredAttributesRule(attrMap)
+		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
-
-		for _, spanReresult := range result.SpansResults {
-			// expect score 50 because 1/2 attributes were found
-			assert.Equal(t, uint(0), spanReresult.Score)
-		}
 	})
 }
 

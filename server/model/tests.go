@@ -112,6 +112,7 @@ type (
 
 		TransactionID    string
 		TransactionRunID string
+		Lintern          LinternResult
 	}
 
 	RunResults struct {
@@ -194,6 +195,9 @@ const (
 	RunStateTriggerFailed       RunState = "TRIGGER_FAILED"
 	RunStateTraceFailed         RunState = "TRACE_FAILED"
 	RunStateAssertionFailed     RunState = "ASSERTION_FAILED"
+	RunStateAnalyzingTrace      RunState = "ANALYZING_TRACE"
+	RunStateAnalyzingFailed     RunState = "ANALYZER_FAILED"
+	RunStateAnalyzingError      RunState = "ANALYZER_ERROR"
 	RunStateFinished            RunState = "FINISHED"
 	RunStateStopped             RunState = "STOPPED"
 	RunStateAwaitingTestResults RunState = "AWAITING_TEST_RESULTS"

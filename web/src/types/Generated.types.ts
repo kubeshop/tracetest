@@ -1804,6 +1804,8 @@ export interface external {
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
             | "ANALYZING_TRACE"
+            | "ANALYZING_FAILED"
+            | "ANALYZING_ERROR"
             | "FINISHED"
             | "STOPPED"
             | "TRIGGER_FAILED"

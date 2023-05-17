@@ -12,7 +12,7 @@ package openapi
 type LinternResultPluginRuleResult struct {
 	SpanId string `json:"spanId,omitempty"`
 
-	Error string `json:"error,omitempty"`
+	Errors []string `json:"errors,omitempty"`
 
 	Passed bool `json:"passed,omitempty"`
 
