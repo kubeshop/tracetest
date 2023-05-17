@@ -427,6 +427,21 @@ func TraceLinternStart(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
+func TraceLinternSkip(testID id.ID, runID int, reason string) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "TRACE_LINTERN_SKIPPED",
+		Title:               "Trace lintern skipped",
+		Description:         fmt.Sprintf("The trace lintern process has been skipped. Reason: %s", reason),
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
 func TraceLinternSuccess(testID id.ID, runID int) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
@@ -450,21 +465,6 @@ func TraceLinternError(testID id.ID, runID int, err error) model.TestRunEvent {
 		Type:                "TRACE_LINTERN_ERROR",
 		Title:               "Trace lintern error",
 		Description:         fmt.Sprintf("The trace lintern encountered fatal errors. Error: %s", err),
-		CreatedAt:           time.Now(),
-		DataStoreConnection: model.ConnectionResult{},
-		Polling:             model.PollingInfo{},
-		Outputs:             []model.OutputInfo{},
-	}
-}
-
-func TraceLinternFailed(testID id.ID, runID int, err error) model.TestRunEvent {
-	return model.TestRunEvent{
-		TestID:              testID,
-		RunID:               runID,
-		Stage:               model.StageTrace,
-		Type:                "TRACE_LINTERN_FAILED",
-		Title:               "Trace lintern failed",
-		Description:         fmt.Sprintf("The trace lintern process failed during execution. Error: %s", err),
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
