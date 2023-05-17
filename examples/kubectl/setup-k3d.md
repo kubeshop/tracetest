@@ -19,6 +19,7 @@ docker compose up -d
 ```sh
 k3d cluster create tracingcluster \
   --image=rancher/k3s:v1.27.1-k3s1 \
+  --volume '[PATH_TO_THIS_FOLDER]/containerd/config.toml.tmpl:/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl@server:*' \
   --volume '[PATH_TO_THIS_FOLDER]/kube-tracing:/etc/kube-tracing@server:*' \
   --k3s-arg '--kube-apiserver-arg=tracing-config-file=/etc/kube-tracing/apiserver-tracing.yaml@server:*' \
   --k3s-arg '--kube-apiserver-arg=feature-gates=APIServerTracing=true@server:*' \
@@ -30,5 +31,5 @@ k3d cluster create tracingcluster \
 5. A single test that you can do is to run: 
 
 ```sh
-kubectl run -it --rm --restart=Never --image=alpine alpine -- echo hi
+kubectl -v 9 run -it --rm --restart=Never --image=alpine alpine -- echo hi
 ```
