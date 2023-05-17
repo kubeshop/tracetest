@@ -6,6 +6,7 @@ import SpanDetail from 'components/SpanDetail';
 import Switch from 'components/Visualization/components/Switch';
 import {TestState} from 'constants/TestRun.constants';
 import TestRun from 'models/TestRun.model';
+import Trace from 'models/Trace.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
@@ -72,7 +73,7 @@ const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
             </S.SectionLeft>
 
             <S.SectionRight $shouldScroll>
-              <LintResults linterResult={run.lintern} />
+              <LintResults linterResult={run.lintern} trace={run?.trace ?? Trace({})} />
             </S.SectionRight>
           </S.Container>
         }
