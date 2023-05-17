@@ -66,9 +66,17 @@ const LintResults = ({linterResult}: IProps) => {
                   {rule?.results?.map((result, resultIndex) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={`${result.spanId}-${resultIndex}`}>
-                      <Typography.Text>Severity: {result.severity} - </Typography.Text>
-                      <Typography.Text>Error: {result.errors.join(' - ')} - </Typography.Text>
-                      <Typography.Text>SpanId: {result.spanId}</Typography.Text>
+                      {result.passed ? (
+                        <Typography.Text type="success">SpanId: {result.spanId}</Typography.Text>
+                      ) : (
+                        <>
+                          <Typography.Text>Severity: {result.severity} - </Typography.Text>
+                          <Typography.Text>Error: {result.errors.join(' - ')} - </Typography.Text>
+                          <Typography.Text type={result.severity === 'error' ? 'danger' : 'warning'}>
+                            SpanId: {result.spanId}
+                          </Typography.Text>
+                        </>
+                      )}
                     </div>
                   ))}
                 </S.Column>

@@ -72,7 +72,7 @@ const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
             </S.SectionLeft>
 
             <S.SectionRight $shouldScroll>
-              {!!run?.lintern?.score && <LintResults linterResult={run.lintern} />}
+              <LintResults linterResult={run.lintern} />
             </S.SectionRight>
           </S.Container>
         }
