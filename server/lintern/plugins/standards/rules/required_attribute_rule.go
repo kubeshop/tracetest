@@ -1,4 +1,4 @@
-package lintern_plugins_standards_rules
+package rules
 
 import (
 	"context"
@@ -12,12 +12,9 @@ type requiredAttributesRule struct {
 	attrMap RequiredAttributesMap
 }
 
-var (
-	_              model.Rule = &requiredAttributesRule{}
-	DefaultAttrMap            = NewRequiredAttributesMap(map[string][]string{
-		"http": {"http.route"},
-	})
-)
+var DefaultAttrMap = NewRequiredAttributesMap(map[string][]string{
+	"http": {"http.route"},
+})
 
 func NewRequiredAttributesRule(requiredAttributesMap RequiredAttributesMap) model.Rule {
 	return requiredAttributesRule{

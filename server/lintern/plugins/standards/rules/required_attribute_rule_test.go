@@ -1,10 +1,10 @@
-package lintern_plugins_standards_rules_test
+package rules_test
 
 import (
 	"context"
 	"testing"
 
-	lintern_plugins_standards_rules "github.com/kubeshop/tracetest/server/lintern/plugins/standards/rules"
+	"github.com/kubeshop/tracetest/server/lintern/plugins/standards/rules"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
@@ -20,11 +20,11 @@ func TestRequiredAttributesRule(t *testing.T) {
 	)
 
 	t.Run("When all required attributes are found", func(t *testing.T) {
-		attrMap := lintern_plugins_standards_rules.NewRequiredAttributesMap(map[string][]string{
+		attrMap := rules.NewRequiredAttributesMap(map[string][]string{
 			"http": {"http.method", "http.url"},
 		})
 
-		rule := lintern_plugins_standards_rules.NewRequiredAttributesRule(attrMap)
+		rule := rules.NewRequiredAttributesRule(attrMap)
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		for _, result := range result.Results {
@@ -35,22 +35,22 @@ func TestRequiredAttributesRule(t *testing.T) {
 	})
 
 	t.Run("When some attribute is missing", func(t *testing.T) {
-		attrMap := lintern_plugins_standards_rules.NewRequiredAttributesMap(map[string][]string{
+		attrMap := rules.NewRequiredAttributesMap(map[string][]string{
 			"database": {"database.kind", "db.statement"},
 		})
 
-		rule := lintern_plugins_standards_rules.NewRequiredAttributesRule(attrMap)
+		rule := rules.NewRequiredAttributesRule(attrMap)
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
 	})
 
 	t.Run("When all attributes are missing", func(t *testing.T) {
-		attrMap := lintern_plugins_standards_rules.NewRequiredAttributesMap(map[string][]string{
+		attrMap := rules.NewRequiredAttributesMap(map[string][]string{
 			"messaging": {"messaging.system", "messaging.target"},
 		})
 
-		rule := lintern_plugins_standards_rules.NewRequiredAttributesRule(attrMap)
+		rule := rules.NewRequiredAttributesRule(attrMap)
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)

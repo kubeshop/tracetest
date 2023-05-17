@@ -1,4 +1,4 @@
-package lintern_plugins_standards_rules
+package rules
 
 type RequiredAttributesMap map[string][]string
 

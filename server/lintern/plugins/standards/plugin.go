@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	lintern_plugins_standards_rules "github.com/kubeshop/tracetest/server/lintern/plugins/standards/rules"
+	"github.com/kubeshop/tracetest/server/lintern/plugins/standards/rules"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -22,7 +22,7 @@ func NewStandardsPlugin() model.Plugin {
 			Name:        "Standards",
 			Description: "Standards plugin",
 			Rules: []model.Rule{
-				lintern_plugins_standards_rules.NewRequiredAttributesRule(lintern_plugins_standards_rules.DefaultAttrMap),
+				rules.NewRequiredAttributesRule(rules.DefaultAttrMap),
 			},
 		},
 	}
