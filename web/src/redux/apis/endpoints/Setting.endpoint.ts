@@ -2,6 +2,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import Config, {TRawConfig, TRawLiveConfig} from 'models/Config.model';
 import Demo, {TRawDemo} from 'models/Demo.model';
+import Linter, {TRawLinter} from 'models/Linter.model';
 import Polling, {TRawPolling} from 'models/Polling.model';
 import {ResourceType, TDraftResource, TListResponse} from 'types/Settings.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
@@ -52,6 +53,15 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.DemoType}],
     transformResponse: ({items = []}: TListResponse<TRawDemo>) => items.map(rawDemo => Demo(rawDemo)),
+  }),
+  getLinter: builder.query<Linter, unknown>({
+    query: () => ({
+      url: '/linterns/current',
+      method: HTTP_METHOD.GET,
+      headers: {'content-type': 'application/json'},
+    }),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.LinterType}],
+    transformResponse: (rawLinter: TRawLinter) => Linter(rawLinter),
   }),
   createSetting: builder.mutation<undefined, {resource: TDraftResource}>({
     query: ({resource}) => ({

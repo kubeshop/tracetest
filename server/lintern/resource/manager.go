@@ -16,7 +16,7 @@ type Repository struct {
 
 var defaultLintern = Lintern{
 	ID:           id.ID("current"),
-	Name:         "Config",
+	Name:         "Linter",
 	Enabled:      true,
 	MinimumScore: 80,
 	Plugins: []LinternPlugin{
@@ -35,7 +35,7 @@ const (
 			"id",
 			"name",
 			"enabled",
-			"minimum_score"
+			"minimum_score",
 			"plugins"
 		) VALUES ($1, $2, $3, $4, $5)`
 
@@ -65,7 +65,7 @@ func (r *Repository) Update(ctx context.Context, lintern Lintern) (Lintern, erro
 	// enforce ID and name
 	updated := Lintern{
 		ID:           id.ID("current"),
-		Name:         "Lintern",
+		Name:         "Linter",
 		Enabled:      lintern.Enabled,
 		MinimumScore: lintern.MinimumScore,
 		Plugins:      lintern.Plugins,
@@ -77,9 +77,17 @@ func (r *Repository) Update(ctx context.Context, lintern Lintern) (Lintern, erro
 		return Lintern{}, err
 	}
 
-	_, err = tx.ExecContext(ctx, deleteQuery)
+	_, err = tx.ExecContext(ctx, deleteQuery, updated.ID)
 	if err != nil {
 		return Lintern{}, fmt.Errorf("sql exec delete: %w", err)
+	}
+
+	var pluginsJSON []byte
+	if updated.Plugins != nil {
+		pluginsJSON, err = json.Marshal(updated.Plugins)
+		if err != nil {
+			return Lintern{}, fmt.Errorf("could not marshal plugins configuration: %w", err)
+		}
 	}
 
 	_, err = tx.ExecContext(
@@ -89,7 +97,7 @@ func (r *Repository) Update(ctx context.Context, lintern Lintern) (Lintern, erro
 		updated.Name,
 		updated.Enabled,
 		updated.MinimumScore,
-		updated.Plugins,
+		pluginsJSON,
 	)
 	if err != nil {
 		return Lintern{}, fmt.Errorf("sql exec insert: %w", err)
