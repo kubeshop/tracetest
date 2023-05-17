@@ -35,7 +35,7 @@ const (
 			"id",
 			"name",
 			"enabled",
-			"minimumScore"
+			"minimum_score"
 			"plugins"
 		) VALUES ($1, $2, $3, $4, $5)`
 
@@ -44,7 +44,7 @@ const (
 		l.id,
 		l.name,
 		l.enabled,
-		l.minimumScore,
+		l.minimum_score,
 		l.plugins
 	FROM linterns l
 `

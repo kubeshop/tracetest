@@ -23,6 +23,7 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
+	lintern_resource "github.com/kubeshop/tracetest/server/lintern/resource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -251,6 +252,9 @@ func (app *App) Start(opts ...appOption) error {
 
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
 
+	linternRepo := lintern_resource.NewRepository(db)
+	registerLinternResource(linternRepo, apiRouter, db, provisioner, tracer)
+
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID, isTracetestDev)
 
@@ -303,6 +307,18 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 		grpcOtlpServer.Stop()
 		httpOtlpServer.Stop()
 	})
+}
+
+func registerLinternResource(linternRepo *lintern_resource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[lintern_resource.Lintern](
+		lintern_resource.ResourceName,
+		lintern_resource.ResourceNamePlural,
+		linternRepo,
+		resourcemanager.WithOperations(lintern_resource.Operations...),
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
 }
 
 func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
