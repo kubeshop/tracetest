@@ -15,7 +15,7 @@ type requiredAttributesRule struct {
 var (
 	_              model.Rule = &requiredAttributesRule{}
 	DefaultAttrMap            = NewRequiredAttributesMap(map[string][]string{
-		"http": {"http.method"},
+		"http": {"http.route"},
 	})
 )
 

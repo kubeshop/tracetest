@@ -193,6 +193,7 @@ func (app *App) Start(opts ...appOption) error {
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastoreresource.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
+	linternRepo := lintern_resource.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
@@ -200,6 +201,7 @@ func (app *App) Start(opts ...appOption) error {
 	rf := newRunnerFacades(
 		pollingProfileRepo,
 		dataStoreRepo,
+		linternRepo,
 		testDB,
 		applicationTracer,
 		tracer,
@@ -252,8 +254,6 @@ func (app *App) Start(opts ...appOption) error {
 	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
 
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
-
-	linternRepo := lintern_resource.NewRepository(db)
 	registerLinternResource(linternRepo, apiRouter, db, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""

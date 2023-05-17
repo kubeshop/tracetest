@@ -29,6 +29,7 @@ func (pr PluginResult) CalculateResults() PluginResult {
 
 type Plugin interface {
 	Execute(context.Context, Trace) (PluginResult, error)
+	Name() string
 }
 
 type BasePlugin struct {

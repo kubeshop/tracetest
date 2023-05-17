@@ -52,6 +52,11 @@ const (
 	deleteQuery = "DELETE FROM linterns WHERE id = $1"
 )
 
+func (r *Repository) GetDefault(ctx context.Context) Lintern {
+	pp, _ := r.Get(ctx, id.ID("current"))
+	return pp
+}
+
 func (r *Repository) SetID(linterns Lintern, id id.ID) Lintern {
 	linterns.ID = id
 	return linterns

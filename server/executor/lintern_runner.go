@@ -38,7 +38,6 @@ type LinternResourceGetter interface {
 
 type defaultLinternRunner struct {
 	updater              RunUpdater
-	lintern              lintern.Lintern
 	inputChannel         chan LinternRequest
 	exitChannel          chan bool
 	subscriptionManager  *subscription.Manager
@@ -52,18 +51,18 @@ var _ LinternRunner = &defaultLinternRunner{}
 
 func NewLinternRunner(
 	updater RunUpdater,
-	lintern lintern.Lintern,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
 	assertionRunner AssertionRunner,
+	linterResourceGetter LinternResourceGetter,
 ) LinternRunner {
 	return &defaultLinternRunner{
-		updater:             updater,
-		lintern:             lintern,
-		inputChannel:        make(chan LinternRequest, 1),
-		subscriptionManager: subscriptionManager,
-		eventEmitter:        eventEmitter,
-		assertionRunner:     assertionRunner,
+		updater:              updater,
+		inputChannel:         make(chan LinternRequest, 1),
+		subscriptionManager:  subscriptionManager,
+		eventEmitter:         eventEmitter,
+		assertionRunner:      assertionRunner,
+		linterResourceGetter: linterResourceGetter,
 	}
 }
 
@@ -94,8 +93,28 @@ func (e *defaultLinternRunner) startWorker() {
 			return
 		case request := <-e.inputChannel:
 			ctx := request.Context()
-			run, err := e.runLinternAndUpdateResult(ctx, request)
+			lintResource := e.linterResourceGetter.GetDefault(ctx)
+			lintern := lintern.NewLintern(lintResource, lintern.AvailablePlugins...)
 
+			shouldSkip, reason := lintern.ShouldSkip()
+			if shouldSkip {
+				log.Printf("[LinternRunner] Skipping TraceLintern. Reason %s\n", reason)
+				err := e.eventEmitter.Emit(ctx, events.TraceLinternSkip(request.Test.ID, request.Run.ID, reason))
+				if err != nil {
+					log.Printf("[LinternRunner] Test %s Run %d: fail to emit TraceLinternSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
+				}
+
+				e.onFinish(ctx, request, request.Run)
+				return
+			}
+
+			err := lintern.IsValid()
+			if err != nil {
+				e.onError(ctx, request, request.Run, err)
+				return
+			}
+
+			run, err := e.onRun(ctx, request, lintern, lintResource)
 			log.Printf("[LinternRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
 			e.subscriptionManager.PublishUpdate(subscription.Message{
 				ResourceID: run.TransactionStepResourceID(),
@@ -109,11 +128,13 @@ func (e *defaultLinternRunner) startWorker() {
 				return
 			}
 
-			assertionRequest := AssertionRequest{
-				Test: request.Test,
-				Run:  run,
+			err = lintResource.ValidateResult(run.Lintern)
+			if err != nil {
+				e.onError(ctx, request, run, err)
+				return
 			}
-			e.assertionRunner.RunAssertions(ctx, assertionRequest)
+
+			e.onFinish(ctx, request, run)
 		}
 	}
 }
@@ -121,13 +142,20 @@ func (e *defaultLinternRunner) startWorker() {
 func (e *defaultLinternRunner) RunLintern(ctx context.Context, request LinternRequest) {
 	carrier := propagation.MapCarrier{}
 	otel.GetTextMapPropagator().Inject(ctx, carrier)
-
 	request.carrier = carrier
 
 	e.inputChannel <- request
 }
 
-func (e *defaultLinternRunner) runLinternAndUpdateResult(ctx context.Context, request LinternRequest) (model.Run, error) {
+func (e *defaultLinternRunner) onFinish(ctx context.Context, request LinternRequest, run model.Run) {
+	assertionRequest := AssertionRequest{
+		Test: request.Test,
+		Run:  run,
+	}
+	e.assertionRunner.RunAssertions(ctx, assertionRequest)
+}
+
+func (e *defaultLinternRunner) onRun(ctx context.Context, request LinternRequest, lintern lintern.Lintern, linternResource lintern_resource.Lintern) (model.Run, error) {
 	run := request.Run
 	log.Printf("[LinternRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
@@ -136,21 +164,9 @@ func (e *defaultLinternRunner) runLinternAndUpdateResult(ctx context.Context, re
 		log.Printf("[LinternRunner] Test %s Run %d: fail to emit TraceLinternStart event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 	}
 
-	result, err := e.lintern.Run(ctx, *run.Trace)
+	result, err := lintern.Run(ctx, *run.Trace)
 	if err != nil {
-		log.Printf("[LinternRunner] Test %s Run %d: error executing lintern: %s\n", request.Test.ID, request.Run.ID, err.Error())
-
-		anotherErr := e.eventEmitter.Emit(ctx, events.TraceLinternFailed(request.Test.ID, request.Run.ID, err))
-		if anotherErr != nil {
-			log.Printf("[LinternRunner] Test %s Run %d: fail to emit TraceLinternFailed event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
-		}
-
-		run = run.LinternFailed(err)
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-		})
-
-		return model.Run{}, e.updater.Update(ctx, run)
+		return e.onError(ctx, request, run, err)
 	}
 
 	run = run.SuccessfulLinternExecution(result)
@@ -166,4 +182,19 @@ func (e *defaultLinternRunner) runLinternAndUpdateResult(ctx context.Context, re
 	}
 
 	return run, nil
+}
+
+func (e *defaultLinternRunner) onError(ctx context.Context, request LinternRequest, run model.Run, err error) (model.Run, error) {
+	log.Printf("[LinternRunner] Test %s Run %d: Linter failed. Reason: %s\n", request.Test.ID, request.Run.ID, err.Error())
+	anotherErr := e.eventEmitter.Emit(ctx, events.TraceLinternError(request.Test.ID, request.Run.ID, err))
+	if anotherErr != nil {
+		log.Printf("[LinternRunner] Test %s Run %d: fail to emit TraceLinternError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+	}
+
+	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+		"finalState": string(run.State),
+	})
+
+	run = run.LinternError(err)
+	return run, e.updater.Update(ctx, run)
 }

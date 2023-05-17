@@ -146,7 +146,7 @@ func (r Run) AssertionFailed(err error) Run {
 	return r.Finish()
 }
 
-func (r Run) LinternFailed(err error) Run {
+func (r Run) LinternError(err error) Run {
 	r.State = RunStateAnalyzingError
 	r.LastError = err
 	return r.Finish()
