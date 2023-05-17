@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEnsureNamingRule(t *testing.T) {
+func TestEnsureAttributeNamingRule(t *testing.T) {
 	t.Run("compliant trace", func(t *testing.T) {
 		trace := traceWithSpans(
 			spanWithAttributes("http", map[string]string{"http.method": "POST", "http.url": "http://localhost:11633"}),
@@ -17,7 +17,7 @@ func TestEnsureNamingRule(t *testing.T) {
 			spanWithAttributes("database", map[string]string{"db.statement": "INSERT INTO users (name, email) VALUES ($1, $2)"}),
 		)
 
-		rule := rules.NewEnsureNamingRule()
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.True(t, result.Passed)
@@ -28,7 +28,7 @@ func TestEnsureNamingRule(t *testing.T) {
 			spanWithAttributes("http", map[string]string{"method": "POST"}),
 		)
 
-		rule := rules.NewEnsureNamingRule()
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
@@ -41,7 +41,7 @@ func TestEnsureNamingRule(t *testing.T) {
 			spanWithAttributes("http", map[string]string{"http.statusCode": "200"}),
 		)
 
-		rule := rules.NewEnsureNamingRule()
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
@@ -54,7 +54,7 @@ func TestEnsureNamingRule(t *testing.T) {
 			spanWithAttributes("http", map[string]string{"tracetest.span": "POST"}),
 		)
 
-		rule := rules.NewEnsureNamingRule()
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)

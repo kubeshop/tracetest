@@ -13,7 +13,7 @@ type ensureNamingRule struct {
 	model.BaseRule
 }
 
-func NewEnsureNamingRule() model.Rule {
+func NewEnsureAttributeNamingRule() model.Rule {
 	return &ensureNamingRule{
 		BaseRule: model.BaseRule{
 			Name:        "Ensure attributes naming",
