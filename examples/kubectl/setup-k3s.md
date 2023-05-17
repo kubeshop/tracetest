@@ -109,7 +109,7 @@ We need to start a k3s cluster, but we need some special configurations:
 3. we need to pass the otel-collector address to the apiserver
 
 
-First, we'll create the tracing config file, because it's required for the apiserver to start.
+First, we'll create the tracing config files, because it's required for the apiserver to start.
 
 > Make sure that the directory exists by running: `sudo mkdir -p /etc/kube-tracing/`
 
@@ -123,6 +123,18 @@ samplingRatePerMillion: 1000000 # 100%
 EOF
 ```
 
+```yaml
+# /etc/kube-tracing/kubelet-tracing.yaml
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+featureGates:
+  KubeletTracing: true
+tracing:
+  endpoint: host.k3d.internal:4317
+  samplingRatePerMillion: 1000000
+```
+
+
 This settings are documented [here](https://kubernetes.io/docs/concepts/cluster-administration/system-traces/). The only difference is that we are setting the `samplingRatePerMillion` value to 1.000.000 (meaning, 100%) so that all traces are send to the collector.
 This effectively disables sampling. Use this setting with care, and you probablly shouldn't do this in a prod environment.
 
@@ -131,7 +143,7 @@ Now we can install the k3s cluster:
 ```sh
 curl -sfL https://get.k3s.io | \
   INSTALL_K3S_VERSION="v1.27.1+k3s1" \
-  INSTALL_K3S_EXEC="--kube-apiserver-arg=feature-gates=APIServerTracing=true --kube-apiserver-arg=tracing-config-file=/etc/kube-tracing/apiserver-tracing.yaml" \
+  INSTALL_K3S_EXEC="--kube-apiserver-arg=feature-gates=APIServerTracing=true --kube-apiserver-arg=tracing-config-file=/etc/kube-tracing/apiserver-tracing.yaml --kubelet-arg=config=/etc/kube-tracing/kubelet-tracing.yaml" \
    sh -s - server --cluster-init
 ```
 
@@ -144,6 +156,27 @@ That's it! We have a k8s apiserver ready to do trace based testing. With our [sa
 You only need to set the correct jaeger UI url and the command you want to run. For example:
 
 ```sh
-JAEGER_UI_URL="http://127.0.0.1:16686" ./test-kubectl.bash "kubectl get namespaces"
+JAEGER_UI_URL="http://127.0.0.1:16686" ./test-kubectl.bash ./test.yaml "kubectl get pods -A"
 ```
 
+The `test.yaml` file can be named as you want, but it needs to look like this:
+
+```yaml
+type: Test
+spec:
+  id: ze90fyU4R # can be anything
+  name: kubectl # can be anything
+  trigger:
+    type: traceid # MUST BE traceide
+    traceid:
+      id: ${env:asd} # MUST BE in line 8
+  # the rest of the file can be modified as needed
+  specs:
+  - name: List span exists
+    selector: span[tracetest.span.type="general" name="List"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+```
+
+You also need to have the `tracetest` cli configured to talk with the correct tracetest server.
+The tracetest server also needs to be configured to use the same Jaeger instance as the k8s for its datastore
