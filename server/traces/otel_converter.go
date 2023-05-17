@@ -56,11 +56,29 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *model.Span {
 	return &model.Span{
 		ID:         spanID,
 		Name:       span.Name,
+		Kind:       spanKind(span),
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Parent:     nil,
 		Children:   make([]*model.Span, 0),
 		Attributes: attributes,
+	}
+}
+
+func spanKind(span *v1.Span) model.SpanKind {
+	switch span.Kind {
+	case v1.Span_SPAN_KIND_CLIENT:
+		return model.SpanKindClient
+	case v1.Span_SPAN_KIND_SERVER:
+		return model.SpanKindServer
+	case v1.Span_SPAN_KIND_INTERNAL:
+		return model.SpanKindInternal
+	case v1.Span_SPAN_KIND_PRODUCER:
+		return model.SpanKindProducer
+	case v1.Span_SPAN_KIND_CONSUMER:
+		return model.SpanKindConsumer
+	default:
+		return model.SpanKindUnespecified
 	}
 }
 

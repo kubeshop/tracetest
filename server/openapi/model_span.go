@@ -16,6 +16,8 @@ type Span struct {
 
 	Name string `json:"name,omitempty"`
 
+	Kind string `json:"kind,omitempty"`
+
 	// span start time in unix milli format
 	StartTime int64 `json:"startTime,omitempty"`
 

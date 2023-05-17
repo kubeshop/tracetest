@@ -9,12 +9,12 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type ensureNamingRule struct {
+type ensureAttributeNamingRule struct {
 	model.BaseRule
 }
 
 func NewEnsureAttributeNamingRule() model.Rule {
-	return &ensureNamingRule{
+	return &ensureAttributeNamingRule{
 		BaseRule: model.BaseRule{
 			Name:        "Ensure attributes naming",
 			Description: "Ensure all attributes follow the naming convention",
@@ -26,7 +26,7 @@ func NewEnsureAttributeNamingRule() model.Rule {
 	}
 }
 
-func (r ensureNamingRule) Evaluate(ctx context.Context, trace model.Trace) (model.RuleResult, error) {
+func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Trace) (model.RuleResult, error) {
 	regex := regexp.MustCompile(`^([a-z0-9_]+\.)+[a-z0-9_]+$`)
 	results := make([]model.Result, 0)
 	passed := true
