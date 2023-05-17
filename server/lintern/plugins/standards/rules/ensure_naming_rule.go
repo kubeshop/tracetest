@@ -34,7 +34,7 @@ func (r ensureNamingRule) Evaluate(ctx context.Context, trace model.Trace) (mode
 	for _, span := range trace.Flat {
 		errors := make([]string, 0)
 		namespaces := make([]string, 0)
-		for name, _ := range span.Attributes {
+		for name := range span.Attributes {
 			if !regex.MatchString(name) {
 				errors = append(errors, fmt.Sprintf(`Attribute "%s" doesnt follow naming convention`, name))
 				continue
@@ -44,7 +44,7 @@ func (r ensureNamingRule) Evaluate(ctx context.Context, trace model.Trace) (mode
 		}
 
 		// ensure no attribute is named after a namespace
-		for name, _ := range span.Attributes {
+		for name := range span.Attributes {
 			for _, namespace := range namespaces {
 				if name == namespace {
 					errors = append(errors, fmt.Sprintf(`Attribute "%s" uses the same name as an existing namespace in the same span`, name))
