@@ -10,6 +10,7 @@ import TestRunEvent from 'models/TestRunEvent.model';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import LintResults from './LintResults';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
 import Visualization from './Visualization';
@@ -43,31 +44,37 @@ const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
       <Drawer
         leftPanel={<SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />}
         rightPanel={
-          <S.Section>
-            <S.SearchContainer>
-              <Search runId={run.id} testId={testId} />
-            </S.SearchContainer>
+          <S.Container>
+            <S.SectionLeft>
+              <S.SearchContainer>
+                <Search runId={run.id} testId={testId} />
+              </S.SearchContainer>
 
-            <S.VisualizationContainer>
-              <S.SwitchContainer>
-                {run.state === TestState.FINISHED && (
-                  <Switch
-                    onChange={type => {
-                      TraceAnalyticsService.onSwitchDiagramView(type);
-                      setVisualizationType(type);
-                    }}
-                    type={visualizationType}
-                  />
-                )}
-              </S.SwitchContainer>
-              <Visualization
-                runEvents={runEvents}
-                runState={run.state}
-                spans={run?.trace?.spans ?? []}
-                type={visualizationType}
-              />
-            </S.VisualizationContainer>
-          </S.Section>
+              <S.VisualizationContainer>
+                <S.SwitchContainer>
+                  {run.state === TestState.FINISHED && (
+                    <Switch
+                      onChange={type => {
+                        TraceAnalyticsService.onSwitchDiagramView(type);
+                        setVisualizationType(type);
+                      }}
+                      type={visualizationType}
+                    />
+                  )}
+                </S.SwitchContainer>
+                <Visualization
+                  runEvents={runEvents}
+                  runState={run.state}
+                  spans={run?.trace?.spans ?? []}
+                  type={visualizationType}
+                />
+              </S.VisualizationContainer>
+            </S.SectionLeft>
+
+            <S.SectionRight $shouldScroll>
+              {!!run?.lintern?.score && <LintResults linterResult={run.lintern} />}
+            </S.SectionRight>
+          </S.Container>
         }
       />
     </S.Container>

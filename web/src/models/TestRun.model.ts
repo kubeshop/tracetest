@@ -3,6 +3,7 @@ import {Model, Modify, TTestSchemas, TTriggerSchemas} from 'types/Common.types';
 import {TTestRunState} from 'types/TestRun.types';
 import AssertionResults, {TRawAssertionResults} from './AssertionResults.model';
 import Environment from './Environment.model';
+import LinterResult from './LinterResult.model';
 import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
@@ -29,6 +30,7 @@ type TestRun = Model<
     outputs?: TestRunOutput[];
     environment?: Environment;
     state: TTestRunState;
+    lintern: LinterResult;
   }
 >;
 
@@ -102,7 +104,7 @@ const TestRun = ({
   environment = {},
   transactionId = '',
   transactionRunId = '',
-  lintern ={},
+  lintern = {},
 }: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
@@ -129,7 +131,7 @@ const TestRun = ({
     environment: Environment.fromRun(environment),
     transactionId,
     transactionRunId,
-    lintern,
+    lintern: LinterResult(lintern),
   };
 };
 
