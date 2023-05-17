@@ -19,10 +19,10 @@ var _ MappedNullable = &LinternResultPluginRuleResult{}
 
 // LinternResultPluginRuleResult struct for LinternResultPluginRuleResult
 type LinternResultPluginRuleResult struct {
-	SpanId   *string `json:"spanId,omitempty"`
-	Error    *string `json:"error,omitempty"`
-	Passed   *bool   `json:"passed,omitempty"`
-	Severity *string `json:"severity,omitempty"`
+	SpanId   *string  `json:"spanId,omitempty"`
+	Errors   []string `json:"errors,omitempty"`
+	Passed   *bool    `json:"passed,omitempty"`
+	Severity *string  `json:"severity,omitempty"`
 }
 
 // NewLinternResultPluginRuleResult instantiates a new LinternResultPluginRuleResult object
@@ -74,36 +74,36 @@ func (o *LinternResultPluginRuleResult) SetSpanId(v string) {
 	o.SpanId = &v
 }
 
-// GetError returns the Error field value if set, zero value otherwise.
-func (o *LinternResultPluginRuleResult) GetError() string {
-	if o == nil || isNil(o.Error) {
-		var ret string
+// GetErrors returns the Errors field value if set, zero value otherwise.
+func (o *LinternResultPluginRuleResult) GetErrors() []string {
+	if o == nil || isNil(o.Errors) {
+		var ret []string
 		return ret
 	}
-	return *o.Error
+	return o.Errors
 }
 
-// GetErrorOk returns a tuple with the Error field value if set, nil otherwise
+// GetErrorsOk returns a tuple with the Errors field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LinternResultPluginRuleResult) GetErrorOk() (*string, bool) {
-	if o == nil || isNil(o.Error) {
+func (o *LinternResultPluginRuleResult) GetErrorsOk() ([]string, bool) {
+	if o == nil || isNil(o.Errors) {
 		return nil, false
 	}
-	return o.Error, true
+	return o.Errors, true
 }
 
-// HasError returns a boolean if a field has been set.
-func (o *LinternResultPluginRuleResult) HasError() bool {
-	if o != nil && !isNil(o.Error) {
+// HasErrors returns a boolean if a field has been set.
+func (o *LinternResultPluginRuleResult) HasErrors() bool {
+	if o != nil && !isNil(o.Errors) {
 		return true
 	}
 
 	return false
 }
 
-// SetError gets a reference to the given string and assigns it to the Error field.
-func (o *LinternResultPluginRuleResult) SetError(v string) {
-	o.Error = &v
+// SetErrors gets a reference to the given []string and assigns it to the Errors field.
+func (o *LinternResultPluginRuleResult) SetErrors(v []string) {
+	o.Errors = v
 }
 
 // GetPassed returns the Passed field value if set, zero value otherwise.
@@ -183,8 +183,8 @@ func (o LinternResultPluginRuleResult) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.SpanId) {
 		toSerialize["spanId"] = o.SpanId
 	}
-	if !isNil(o.Error) {
-		toSerialize["error"] = o.Error
+	if !isNil(o.Errors) {
+		toSerialize["errors"] = o.Errors
 	}
 	if !isNil(o.Passed) {
 		toSerialize["passed"] = o.Passed

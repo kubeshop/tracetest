@@ -23,7 +23,7 @@ type LinternResultPluginRule struct {
 	Description *string                         `json:"description,omitempty"`
 	Passed      *bool                           `json:"passed,omitempty"`
 	Weight      *int32                          `json:"weight,omitempty"`
-	Tips        *string                         `json:"tips,omitempty"`
+	Tips        []string                        `json:"tips,omitempty"`
 	Results     []LinternResultPluginRuleResult `json:"results,omitempty"`
 }
 
@@ -173,17 +173,17 @@ func (o *LinternResultPluginRule) SetWeight(v int32) {
 }
 
 // GetTips returns the Tips field value if set, zero value otherwise.
-func (o *LinternResultPluginRule) GetTips() string {
+func (o *LinternResultPluginRule) GetTips() []string {
 	if o == nil || isNil(o.Tips) {
-		var ret string
+		var ret []string
 		return ret
 	}
-	return *o.Tips
+	return o.Tips
 }
 
 // GetTipsOk returns a tuple with the Tips field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LinternResultPluginRule) GetTipsOk() (*string, bool) {
+func (o *LinternResultPluginRule) GetTipsOk() ([]string, bool) {
 	if o == nil || isNil(o.Tips) {
 		return nil, false
 	}
@@ -199,9 +199,9 @@ func (o *LinternResultPluginRule) HasTips() bool {
 	return false
 }
 
-// SetTips gets a reference to the given string and assigns it to the Tips field.
-func (o *LinternResultPluginRule) SetTips(v string) {
-	o.Tips = &v
+// SetTips gets a reference to the given []string and assigns it to the Tips field.
+func (o *LinternResultPluginRule) SetTips(v []string) {
+	o.Tips = v
 }
 
 // GetResults returns the Results field value if set, zero value otherwise.

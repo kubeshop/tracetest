@@ -1638,12 +1638,12 @@ export interface external {
           description?: string;
           passed?: boolean;
           weight?: number;
-          tips?: string;
+          tips?: string[];
           results?: external["linterns.yaml"]["components"]["schemas"]["LinternResultPluginRuleResult"][];
         };
         LinternResultPluginRuleResult: {
           spanId?: string;
-          error?: string;
+          errors?: string[];
           passed?: boolean;
           /** @enum {string} */
           severity?: "error" | "warning";
