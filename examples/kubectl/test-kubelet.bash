@@ -1,5 +1,10 @@
 #!/bin/bash
 
+##
+## EXAMPLE USAGE
+## JAEGER_UI_URL="http://10.1.2.11:16686" ./test-kubelet.bash ./test.yaml "kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/controllers/nginx-deployment.yaml" default/nginx
+##
+
 JAEGER_UI_URL=${JAEGER_UI_URL:-"http://127.0.0.1:16686"}
 DEBUG=${DEBUG}
 TEST_FILE=$1
