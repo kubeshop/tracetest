@@ -100,4 +100,5 @@ export const FailedIcon = styled(CloseCircleFilled)<{$small?: boolean}>`
 
 export const SpanButton = styled(Button)<{$error?: boolean}>`
   color: ${({theme, $error}) => ($error ? theme.color.error : theme.color.success)};
+  padding-left: 0;
 `;

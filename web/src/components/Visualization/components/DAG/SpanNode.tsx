@@ -1,4 +1,5 @@
 import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
+import {Space} from 'antd';
 import {useMemo, useState} from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
@@ -51,18 +52,24 @@ const SpanNode = ({data, id, selected}: IProps) => {
 
         {isOpenLintErrors && (
           <S.LintContainer className="nowheel nodrag">
-            <S.ItemText strong>Lint errors</S.ItemText>
-            {lintErrors.map(lintError => (
-              <div>
-                <S.ItemText strong>{lintError.ruleName}</S.ItemText>
+            <S.LintCloseIcon onClick={() => setIsOpenLintErrors(false)} />
+            <Space>
+              <S.LintErrorIcon />
+              <S.LintTitle level={4}>Lint errors</S.LintTitle>
+            </Space>
+            <S.LintBody>
+              {lintErrors.map(lintError => (
+                <div>
+                  <S.LintText strong>{lintError.ruleName}</S.LintText>
 
-                {lintError.errors.map(error => (
-                  <div>
-                    <S.ItemText type="secondary">- {error}</S.ItemText>
-                  </div>
-                ))}
-              </div>
-            ))}
+                  {lintError.errors.map(error => (
+                    <div>
+                      <S.LintText type="secondary">- {error}</S.LintText>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </S.LintBody>
           </S.LintContainer>
         )}
 
@@ -71,7 +78,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
             <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
           </S.BadgeContainer>
           <S.HeaderText>{data.name}</S.HeaderText>
-          {!!lintErrors.length && <S.LintErrorIcon onClick={() => setIsOpenLintErrors(prev => !prev)} />}
+          {!!lintErrors.length && <S.LintErrorIcon $isAbsolute onClick={() => setIsOpenLintErrors(prev => !prev)} />}
         </S.Header>
 
         <S.Body>

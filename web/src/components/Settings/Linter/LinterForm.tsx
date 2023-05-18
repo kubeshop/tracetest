@@ -1,10 +1,11 @@
-import {Button, Checkbox, Form, Input, Switch, Typography} from 'antd';
+import {Button, Form, Input, Switch, Typography} from 'antd';
 import {useEffect} from 'react';
 
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import SettingService from 'services/Setting.service';
 import {ResourceType, TDraftLinter} from 'types/Settings.types';
+import Plugin from './Plugin';
 import * as S from '../common/Settings.styled';
 
 const FORM_ID = 'linter';
@@ -15,6 +16,8 @@ const LinterForm = () => {
   const {linter} = useSettingsValues();
   const standardsEnabled = Form.useWatch(['plugins', 0, 'enabled'], form);
   const securityEnabled = Form.useWatch(['plugins', 1, 'enabled'], form);
+  const commonEnabled = Form.useWatch(['plugins', 2, 'enabled'], form);
+  const pluginsEnabled = [standardsEnabled, securityEnabled, commonEnabled];
 
   useEffect(() => {
     form.resetFields();
@@ -55,33 +58,9 @@ const LinterForm = () => {
 
       <Typography.Title level={3}>Plugins</Typography.Title>
       <S.LinterPluginsContainer>
-        <Form.Item hidden name={['plugins', 0, 'name']} />
-        <S.SwitchContainer>
-          <label htmlFor={`${FORM_ID}_plugins_0_enabled`}>Enable Standards Plugin</label>
-          <Form.Item name={['plugins', 0, 'enabled']} valuePropName="checked">
-            <Switch />
-          </Form.Item>
-        </S.SwitchContainer>
-
-        {standardsEnabled && (
-          <Form.Item name={['plugins', 0, 'required']} valuePropName="checked" wrapperCol={{span: 8}}>
-            <Checkbox>Required</Checkbox>
-          </Form.Item>
-        )}
-
-        <Form.Item hidden name={['plugins', 1, 'name']} />
-        <S.SwitchContainer>
-          <label htmlFor={`${FORM_ID}_plugins_1_enabled`}>Enable Security Plugin</label>
-          <Form.Item name={['plugins', 1, 'enabled']} valuePropName="checked">
-            <Switch />
-          </Form.Item>
-        </S.SwitchContainer>
-
-        {securityEnabled && (
-          <Form.Item name={['plugins', 1, 'required']} valuePropName="checked" wrapperCol={{span: 8}}>
-            <Checkbox>Required</Checkbox>
-          </Form.Item>
-        )}
+        {linter.plugins.map((plugin, index) => (
+          <Plugin formId={FORM_ID} index={index} key={plugin.name} isEnabled={pluginsEnabled[index]} plugin={plugin} />
+        ))}
       </S.LinterPluginsContainer>
 
       <S.FooterContainer>

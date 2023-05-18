@@ -1,4 +1,4 @@
-import {ExclamationCircleFilled} from '@ant-design/icons';
+import {CloseOutlined, ExclamationCircleFilled} from '@ant-design/icons';
 import {Badge, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
@@ -116,6 +116,10 @@ export const ItemText = styled(Typography.Text)`
   margin-left: 5px;
 `;
 
+export const LintBody = styled.div`
+  margin-top: 5px;
+`;
+
 export const LintContainer = styled.div`
   background-color: ${({theme}) => theme.color.white};
   border: ${({theme}) => `2px solid ${theme.color.error}`};
@@ -130,11 +134,34 @@ export const LintContainer = styled.div`
   width: 200px;
 `;
 
-export const LintErrorIcon = styled(ExclamationCircleFilled)`
-  color: ${({theme}) => theme.color.error};
+export const LintCloseIcon = styled(CloseOutlined)`
+  color: ${({theme}) => theme.color.border};
+  cursor: pointer;
   position: absolute;
   right: 10px;
-  top: 5px;
+  top: 10px;
+`;
+
+export const LintErrorIcon = styled(ExclamationCircleFilled)<{$isAbsolute?: boolean}>`
+  color: ${({theme}) => theme.color.error};
+
+  ${({$isAbsolute}) =>
+    $isAbsolute &&
+    css`
+      position: absolute;
+      right: 10px;
+      top: 5px;
+    `}
+`;
+
+export const LintText = styled(Typography.Text)`
+  color: inherit;
+`;
+
+export const LintTitle = styled(Typography.Title)`
+  && {
+    margin-bottom: 0;
+  }
 `;
 
 export const TopLine = styled.div<{$type: SemanticGroupNames}>`

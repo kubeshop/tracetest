@@ -1,4 +1,5 @@
 import {SettingOutlined, ToolOutlined} from '@ant-design/icons';
+import {Space, Tooltip} from 'antd';
 import {useMemo} from 'react';
 import * as SSpanNode from 'components/Visualization/components/DAG/SpanNode.styled';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
@@ -6,6 +7,7 @@ import {SpanKindToText} from 'constants/Span.constants';
 import SpanService from 'services/Span.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import Span from 'models/Span.model';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import * as S from './SpanDetail.styled';
 import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
@@ -17,6 +19,11 @@ interface IProps {
 const Header = ({span, assertions = {}}: IProps) => {
   const {kind, name, service, system, type} = SpanService.getSpanInfo(span);
   const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
+  const {runLinterResultsBySpan} = useTestRun();
+  const lintErrors = useMemo(
+    () => SpanService.filterLintErrorsBySpan(runLinterResultsBySpan, span?.id ?? ''),
+    [runLinterResultsBySpan, span?.id]
+  );
 
   if (!span) {
     return (
@@ -29,7 +36,14 @@ const Header = ({span, assertions = {}}: IProps) => {
   return (
     <S.Header>
       <S.Column>
-        <SSpanNode.BadgeType $hasMargin count={SemanticGroupNamesToText[type]} $type={type} />
+        <Space>
+          <SSpanNode.BadgeType $hasMargin count={SemanticGroupNamesToText[type]} $type={type} />
+          {!!lintErrors.length && (
+            <Tooltip title="This span has lint errors">
+              <S.LintErrorIcon />
+            </Tooltip>
+          )}
+        </Space>
         <S.HeaderTitle level={3}>{name}</S.HeaderTitle>
       </S.Column>
       <S.Column>
