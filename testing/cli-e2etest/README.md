@@ -58,3 +58,12 @@ The main idea is to test every CLI command against Tracetest server with differe
 | `list environment --output yaml`                            | :yellow_circle:    | |
 | `list environment --skip 1 --take 2`                        | :yellow_circle:    | |
 | `list environment --sortBy name --sortDirection desc`       | :yellow_circle:    | |
+
+### Tests
+
+| CLI Command                                                 | Tested             | Test scenarios |
+| ----------------------------------------------------------- | ------------------ | -------------- |
+| `test list`                                                 | :yellow_circle:    | |
+| `test run -d [test-definition]`                             | :yellow_circle:    | |
+| `test run -d [test-definition] -e [environment-id]`         | :yellow_circle:    | |
+| `test run -d [test-definition] -e [environment-definition]` | :yellow_circle:    | |
