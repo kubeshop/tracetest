@@ -1,13 +1,13 @@
 import {CaretUpFilled} from '@ant-design/icons';
 import {Col, Collapse, Row, Space, Tooltip, Typography} from 'antd';
 import {useCallback} from 'react';
-import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import LinterResult from 'models/LinterResult.model';
 import Span from 'models/Span.model';
 import Trace from 'models/Trace.model';
 import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
 import * as S from './LintResults.styled';
+import LintScore from '../LintScore/LintScore';
 
 interface IProps {
   linterResult: LinterResult;
@@ -34,39 +34,21 @@ const LintResults = ({linterResult, trace}: IProps) => {
       <S.Title level={2}>Lint results</S.Title>
 
       <S.ScoreContainer>
-        <S.Subtitle level={3}>
-          Trace Analysis Result
-          <TooltipQuestion title="Tracetest core system supports linter evaluation as part of the testing capabilities." />
-        </S.Subtitle>{' '}
-        <Space>
-          <S.Score level={1}>{linterResult.score} %</S.Score>
-          <S.ScoreProgress
-            format={() => ''}
-            percent={linterResult.score}
-            status={linterResult.passed ? 'success' : 'exception'}
-            type="circle"
-          />
-        </Space>
+        <Tooltip title="Tracetest core system supports linter evaluation as part of the testing capabilities.">
+          <S.Subtitle level={3}>Trace Lint Result</S.Subtitle>{' '}
+          <LintScore score={linterResult.score} passed={linterResult.passed} />
+        </Tooltip>
       </S.ScoreContainer>
 
       <Row gutter={[16, 16]}>
         {linterResult?.plugins?.map(plugin => (
-          <Col span={12} key={plugin.name}>
-            <S.ScoreContainer key={plugin.name}>
-              <S.Subtitle level={3}>
-                {plugin.name}
-                <TooltipQuestion title={plugin.description} />
-              </S.Subtitle>
-              <Space>
-                <S.Score level={1}>{plugin.score} %</S.Score>
-                <S.ScoreProgress
-                  format={() => ''}
-                  percent={plugin.score}
-                  status={plugin.passed ? 'success' : 'exception'}
-                  type="circle"
-                />
-              </Space>
-            </S.ScoreContainer>
+          <Col span={8} key={plugin.name}>
+            <Tooltip title={plugin.description}>
+              <S.ScoreContainer key={plugin.name}>
+                <S.Subtitle level={3}>{plugin.name}</S.Subtitle>
+                <LintScore score={plugin.score} passed={plugin.passed} />
+              </S.ScoreContainer>
+            </Tooltip>
           </Col>
         ))}
       </Row>
@@ -76,9 +58,9 @@ const LintResults = ({linterResult, trace}: IProps) => {
           <S.PluginPanel
             header={
               <Space>
-                {plugin.passed ? <S.PassedIcon /> : <S.FailedIcon />}
+                <LintScore width="35px" height="35px" score={plugin.score} passed={plugin.passed} />
                 <Typography.Text strong>{plugin.name}</Typography.Text>
-                <TooltipQuestion title={plugin.description} />
+                <Typography.Text type="secondary">{plugin.description}</Typography.Text>
               </Space>
             }
             key={plugin.name}

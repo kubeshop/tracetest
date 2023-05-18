@@ -12,9 +12,23 @@ export const Title = styled(Typography.Title)`
   }
 `;
 
+export const ScoreWrapper = styled.div`
+  position: relative;
+`;
+
+export const ScoreTexContainer = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+
 export const Score = styled(Typography.Title)`
   && {
-    font-size: 24px;
+    font-size: 12px;
     margin-bottom: 0;
   }
 `;
@@ -22,6 +36,7 @@ export const Score = styled(Typography.Title)`
 export const ScoreContainer = styled.div`
   margin-bottom: 24px;
   text-align: center;
+  cursor: pointer;
 `;
 
 export const RuleContainer = styled.div`

@@ -21,9 +21,9 @@ func NewStandardsPlugin() model.Plugin {
 			Name:        "Global Standards",
 			Description: "Enforce standards for spans and attributes",
 			Rules: []model.Rule{
+				rules.NewEnsureSpanNamingRule(),
 				rules.NewRequiredAttributesRule(),
 				rules.NewEnsureAttributeNamingRule(),
-				rules.NewEnsureSpanNamingRule(),
 				rules.NewNotEmptyAttributesRule(),
 			},
 		},

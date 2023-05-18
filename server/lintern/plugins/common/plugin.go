@@ -19,7 +19,7 @@ func NewCommonPlugin() model.Plugin {
 	return CommonPlugin{
 		BasePlugin: model.BasePlugin{
 			Name:        "Common Issues",
-			Description: "Helps you find common problems with your application.",
+			Description: "Helps you find common problems with your application",
 			Rules: []model.Rule{
 				rules.NewEnforceDnsUsageRule(),
 			},

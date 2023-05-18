@@ -1804,7 +1804,6 @@ export interface external {
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
             | "ANALYZING_TRACE"
-            | "ANALYZING_FAILED"
             | "ANALYZING_ERROR"
             | "FINISHED"
             | "STOPPED"
@@ -1917,6 +1916,7 @@ export interface external {
           id?: string;
           parentId?: string;
           name?: string;
+          kind?: string;
           /**
            * Format: int64
            * @description span start time in unix milli format
