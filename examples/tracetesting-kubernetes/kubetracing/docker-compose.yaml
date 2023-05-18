@@ -1,0 +1,27 @@
+services:
+  jaeger:
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --spider
+        - localhost:16686
+      timeout: 3s
+      interval: 1s
+      retries: 60
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    ports:
+      - 16686:16686
+  otel-collector:
+    command:
+      - --config
+      - /otel-local-config.yaml
+    depends_on:
+      jaeger:
+        condition: service_started
+    image: otel/opentelemetry-collector:0.54.0
+    ports:
+      - 4317:4317
+    volumes:
+      - ./otel-collector.yaml:/otel-local-config.yaml
