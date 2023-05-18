@@ -20,9 +20,12 @@ func TestRequiredAttributesRule(t *testing.T) {
 	)
 
 	t.Run("When all required attributes are found", func(t *testing.T) {
-		attrMap := rules.NewRequiredAttributesMap(map[string][]string{
-			"http": {"http.method", "http.url"},
-		})
+		trace := traceWithSpans(
+			spanWithAttributes("http", map[string]string{"http.method": "POST", "http.url": "http://localhost:11633"}),
+			spanWithAttributes("http", map[string]string{"http.method": "GET", "http.url": "http://localhost:11633"}),
+			spanWithAttributes("messaging", map[string]string{"messaging.operation": "user.sync", "messaging.system": "kafka"}),
+			spanWithAttributes("database", map[string]string{"db.system": "postgres"}),
+		)
 
 		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
@@ -35,22 +38,14 @@ func TestRequiredAttributesRule(t *testing.T) {
 	})
 
 	t.Run("When some attribute is missing", func(t *testing.T) {
-		attrMap := rules.NewRequiredAttributesMap(map[string][]string{
-			"database": {"database.kind", "db.statement"},
-		})
-
-		rule := rules.NewRequiredAttributesRule(attrMap)
+		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
 	})
 
 	t.Run("When all attributes are missing", func(t *testing.T) {
-		attrMap := rules.NewRequiredAttributesMap(map[string][]string{
-			"messaging": {"messaging.system", "messaging.target"},
-		})
-
-		rule := rules.NewRequiredAttributesRule(attrMap)
+		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		assert.False(t, result.Passed)
