@@ -3,9 +3,10 @@ import {useNavigate} from 'react-router-dom';
 import {useAppSelector} from 'redux/hooks';
 import Drawer from 'components/Drawer';
 import SpanDetail from 'components/SpanDetail';
+import SkeletonResponse from 'components/RunDetailTriggerResponse/SkeletonResponse';
 import Switch from 'components/Visualization/components/Switch';
 import {TestState} from 'constants/TestRun.constants';
-import TestRun from 'models/TestRun.model';
+import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import Trace from 'models/Trace.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import SpanSelectors from 'selectors/Span.selectors';
@@ -73,7 +74,11 @@ const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
             </S.SectionLeft>
 
             <S.SectionRight $shouldScroll>
-              <LintResults linterResult={run.lintern} trace={run?.trace ?? Trace({})} />
+              {isRunStateFinished(run.state) ? (
+                <LintResults linterResult={run.lintern} trace={run?.trace ?? Trace({})} />
+              ) : (
+                <SkeletonResponse />
+              )}
             </S.SectionRight>
           </S.Container>
         }

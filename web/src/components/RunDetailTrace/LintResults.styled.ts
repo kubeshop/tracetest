@@ -58,6 +58,11 @@ export const ScoreProgress = styled(Progress)`
     height: 50px !important;
     width: 50px !important;
   }
+
+  .ant-progress-circle-trail,
+  .ant-progress-circle-path {
+    stroke-width: 20px;
+  }
 `;
 
 export const PluginPanel = styled(Collapse.Panel)`
