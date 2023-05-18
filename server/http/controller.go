@@ -533,7 +533,6 @@ func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition opena
 
 func (c *controller) executeTransaction(ctx context.Context, transaction tests.Transaction, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
 	// create or update transaction
-	transactionID := transaction.ID
 	resp, err := c.doCreateTransaction(ctx, transaction)
 	if err != nil {
 		if errors.Is(err, errTransactionExists) {
@@ -544,9 +543,9 @@ func (c *controller) executeTransaction(ctx context.Context, transaction tests.T
 		} else {
 			return resp, err
 		}
-	} else {
-		transactionID = id.ID(resp.Body.(openapi.Transaction).Id)
-	}
+	} 
+    
+    transactionID := id.ID(resp.Body.(openapi.Transaction).Id)
 
 	// transaction ready, execute it
 	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)
