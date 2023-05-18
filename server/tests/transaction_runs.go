@@ -59,8 +59,8 @@ INSERT INTO transaction_runs (
 RETURNING "id"`
 
 const (
-	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
-	dropSequeceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	createSequenceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	dropSequenceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
 	runSequenceName    = "%sequence_name%"
 )
 
