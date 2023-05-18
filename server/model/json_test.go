@@ -190,7 +190,6 @@ func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
 	var test model.Test
 	err = json.Unmarshal(oldTestJson, &test)
 	require.NoError(t, err)
-	// spew.Dump(test)
 
 	assert.Equal(t, expectedSpecs, test.Specs)
 }
