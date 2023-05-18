@@ -14,7 +14,7 @@ function LinterResultPluginRuleResult({
   spanId = '',
   errors = [],
   passed = false,
-  severity = 'warning',
+  severity = 'error',
 }: TRawLinterResultPluginRuleResult = {}): LinterResultPluginRuleResult {
   return {spanId, errors, passed, severity};
 }

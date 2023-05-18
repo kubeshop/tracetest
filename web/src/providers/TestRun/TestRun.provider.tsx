@@ -3,6 +3,7 @@ import {createContext, useCallback, useContext, useEffect, useMemo, useState} fr
 import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
+import SpanService, {TLintBySpan} from 'services/Span.service';
 import TestProvider from '../Test';
 
 interface IContext {
@@ -11,6 +12,7 @@ interface IContext {
   isLoadingStop: boolean;
   runEvents: TestRunEvent[];
   stopRun(): void;
+  runLinterResultsBySpan: TLintBySpan;
 }
 
 export const Context = createContext<IContext>({
@@ -19,6 +21,7 @@ export const Context = createContext<IContext>({
   isLoadingStop: false,
   runEvents: [],
   stopRun: noop,
+  runLinterResultsBySpan: {},
 });
 
 interface IProps {
@@ -36,14 +39,18 @@ const TestRunProvider = ({children, testId, runId = ''}: IProps) => {
   const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId, pollingInterval});
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId});
   const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
+  const runLinterResultsBySpan = useMemo(
+    () => (run?.lintern ? SpanService.getLintBySpan(run.lintern) : {}),
+    [run?.lintern]
+  );
 
   const stopRun = useCallback(async () => {
     await stopRunAction({runId, testId});
   }, [runId, stopRunAction, testId]);
 
   const value = useMemo<IContext>(
-    () => ({run: run!, isError, isLoadingStop, runEvents, stopRun}),
-    [run, isError, isLoadingStop, runEvents, stopRun]
+    () => ({run: run!, isError, isLoadingStop, runEvents, stopRun, runLinterResultsBySpan}),
+    [run, isError, isLoadingStop, runEvents, stopRun, runLinterResultsBySpan]
   );
 
   useEffect(() => {

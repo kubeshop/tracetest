@@ -1,3 +1,4 @@
+import {ExclamationCircleFilled} from '@ant-design/icons';
 import {Badge, Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
@@ -113,6 +114,13 @@ export const Item = styled.div`
 export const ItemText = styled(Typography.Text)`
   color: inherit;
   margin-left: 5px;
+`;
+
+export const LintErrorIcon = styled(ExclamationCircleFilled)`
+  color: ${({theme}) => theme.color.error};
+  position: absolute;
+  right: 10px;
+  top: 5px;
 `;
 
 export const TopLine = styled.div<{$type: SemanticGroupNames}>`

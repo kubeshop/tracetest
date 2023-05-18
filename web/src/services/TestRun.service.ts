@@ -1,12 +1,13 @@
 import {TestRunStage, TraceEventType} from 'constants/TestRunEvents.constants';
 import {filter, findLastIndex, flow} from 'lodash';
-import {isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
+import {isRunStateAnalyzingError, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {TTestRunState} from 'types/TestRun.types';
 
 const TestRunService = () => ({
   shouldDisplayTraceEvents(state: TTestRunState, numberOfSpans: number) {
-    const isStateSucceededOrStopped = isRunStateSucceeded(state) || isRunStateStopped(state);
+    const isStateSucceededOrStopped =
+      isRunStateSucceeded(state) || isRunStateStopped(state) || isRunStateAnalyzingError(state);
     return !isStateSucceededOrStopped || (!numberOfSpans && isStateSucceededOrStopped);
   },
 

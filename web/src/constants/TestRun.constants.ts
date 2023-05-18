@@ -80,9 +80,9 @@ export const TestStateMap: Record<
     label: 'Analyzing trace Failed',
   },
   [TestState.ANALYZING_ERROR]: {
-    status: 'default',
+    status: 'error',
     label: 'Analyzing trace Error',
-  }
+  },
 };
 
 export enum RunDetailModes {

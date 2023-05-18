@@ -1,5 +1,5 @@
-import {CaretUpFilled, CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
-import {Collapse, Progress, Typography} from 'antd';
+import {CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
+import {Button, Collapse, Progress, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -78,6 +78,6 @@ export const FailedIcon = styled(CloseCircleFilled)<{$small?: boolean}>`
   font-size: ${({$small}) => ($small ? '14px' : '20px')};
 `;
 
-export const CaretUpIcon = styled(CaretUpFilled)<{$error?: boolean}>`
+export const SpanButton = styled(Button)<{$error?: boolean}>`
   color: ${({theme, $error}) => ($error ? theme.color.error : theme.color.success)};
 `;

@@ -66,6 +66,7 @@ export function isRunStateFinished(state: TTestRunState) {
       TestState.TRIGGER_FAILED,
       TestState.TRACE_FAILED,
       TestState.ASSERTION_FAILED,
+      TestState.ANALYZING_ERROR,
     ] as string[]
   ).includes(state);
 }
@@ -80,6 +81,10 @@ export function isRunStateSucceeded(state: TTestRunState) {
 
 export function isRunStateStopped(state: TTestRunState) {
   return state === TestState.STOPPED;
+}
+
+export function isRunStateAnalyzingError(state: TTestRunState) {
+  return state === TestState.ANALYZING_ERROR;
 }
 
 const TestRun = ({

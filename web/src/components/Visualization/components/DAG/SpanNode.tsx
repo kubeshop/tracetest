@@ -15,6 +15,7 @@ import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import CurrentSpanSelector from 'components/CurrentSpanSelector';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
@@ -26,6 +27,11 @@ const SpanNode = ({data, id, selected}: IProps) => {
   const {isOpen: isTestSpecFormOpen} = useTestSpecForm();
   const {isOpen: isTestOutputFormOpen} = useTestOutput();
   const {matchedSpans} = useSpan();
+  const {runLinterResultsBySpan} = useTestRun();
+  const lintErrors = useMemo(
+    () => SpanService.filterLintErrorsBySpan(runLinterResultsBySpan, data.id),
+    [runLinterResultsBySpan, data.id]
+  );
   const showSelectAsCurrent =
     !data.isMatched && !!matchedSpans.length && (isTestSpecFormOpen || isTestOutputFormOpen) && selected;
   const className = `${data.isMatched ? 'matched' : ''} ${showSelectAsCurrent ? 'selectedAsCurrent' : ''}`;
@@ -47,6 +53,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
             <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
           </S.BadgeContainer>
           <S.HeaderText>{data.name}</S.HeaderText>
+          {!!lintErrors.length && <S.LintErrorIcon />}
         </S.Header>
 
         <S.Body>

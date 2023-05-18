@@ -1,8 +1,12 @@
-import {Col, Collapse, Row, Space, Typography} from 'antd';
+import {CaretUpFilled} from '@ant-design/icons';
+import {Col, Collapse, Row, Space, Tooltip, Typography} from 'antd';
+import {useCallback} from 'react';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import LinterResult from 'models/LinterResult.model';
 import Span from 'models/Span.model';
 import Trace from 'models/Trace.model';
+import {useAppDispatch} from 'redux/hooks';
+import {selectSpan} from 'redux/slices/Trace.slice';
 import * as S from './LintResults.styled';
 
 interface IProps {
@@ -16,6 +20,15 @@ function getSpanName(spans: Span[], traceId: string) {
 }
 
 const LintResults = ({linterResult, trace}: IProps) => {
+  const dispatch = useAppDispatch();
+
+  const onSpanResultClick = useCallback(
+    (spanId: string) => {
+      dispatch(selectSpan({spanId}));
+    },
+    [dispatch]
+  );
+
   return (
     <S.Container>
       <S.Title level={2}>Lint results</S.Title>
@@ -76,9 +89,10 @@ const LintResults = ({linterResult, trace}: IProps) => {
                   <S.RuleHeader>
                     <Space>
                       {rule.passed ? <S.PassedIcon $small /> : <S.FailedIcon $small />}
-                      <Typography.Text strong>{rule.name}</Typography.Text>
+                      <Tooltip title={rule.tips.join(' - ')}>
+                        <Typography.Text strong>{rule.name}</Typography.Text>
+                      </Tooltip>
                     </Space>
-                    <TooltipQuestion title={rule.tips.join(' - ')} />
                   </S.RuleHeader>
                   <Typography.Text type="secondary" style={{paddingLeft: 20}}>
                     {rule.description}
@@ -90,16 +104,23 @@ const LintResults = ({linterResult, trace}: IProps) => {
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={`${result.spanId}-${resultIndex}`}>
                       {result.passed ? (
-                        <>
-                          <S.CaretUpIcon />
-                          <Typography.Text type="success">{getSpanName(trace.spans, result.spanId)}</Typography.Text>
-                        </>
+                        <S.SpanButton
+                          icon={<CaretUpFilled />}
+                          onClick={() => onSpanResultClick(result.spanId)}
+                          type="link"
+                        >
+                          {getSpanName(trace.spans, result.spanId)}
+                        </S.SpanButton>
                       ) : (
                         <>
-                          <S.CaretUpIcon $error />
-                          <Typography.Text type={result.severity === 'error' ? 'danger' : 'warning'}>
+                          <S.SpanButton
+                            icon={<CaretUpFilled />}
+                            onClick={() => onSpanResultClick(result.spanId)}
+                            type="link"
+                            $error
+                          >
                             {getSpanName(trace.spans, result.spanId)}
-                          </Typography.Text>
+                          </S.SpanButton>
                           <Typography.Text> - Severity: {result.severity}</Typography.Text>
                           <Typography.Text> - Errors: {result.errors.join(' - ')}</Typography.Text>
                         </>
