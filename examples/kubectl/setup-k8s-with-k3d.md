@@ -8,10 +8,10 @@ brew install k3d
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 ```
 
-2. Go to `k3d-setup` folder and start Jaeger and OTel Collector with `docker compose`:
+2. Go to `kubetracing` folder and start Jaeger and OTel Collector with `docker compose`:
 
 ```sh
-cd ./k3d-setup
+cd ./kubetracing
 docker compose up -d
 ```
 
@@ -19,8 +19,8 @@ docker compose up -d
 ```sh
 k3d cluster create tracingcluster \
   --image=rancher/k3s:v1.27.1-k3s1 \
-  --volume '[PATH_TO_THIS_FOLDER]/containerd/config.toml.tmpl:/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl@server:*' \
-  --volume '[PATH_TO_THIS_FOLDER]/kube-tracing:/etc/kube-tracing@server:*' \
+  --volume '[PATH_TO_THIS_FOLDER]/config.toml.tmpl:/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl@server:*' \
+  --volume '[PATH_TO_THIS_FOLDER]/config:/etc/kube-tracing@server:*' \
   --k3s-arg '--kube-apiserver-arg=tracing-config-file=/etc/kube-tracing/apiserver-tracing.yaml@server:*' \
   --k3s-arg '--kube-apiserver-arg=feature-gates=APIServerTracing=true@server:*' \
   --k3s-arg '--kubelet-arg=config=/etc/kube-tracing/kubelet-tracing.yaml@server:*'
@@ -31,5 +31,7 @@ k3d cluster create tracingcluster \
 5. A single test that you can do is to run: 
 
 ```sh
-kubectl -v 9 run -it --rm --restart=Never --image=alpine alpine -- echo hi
+kubectl run -it --rm --image=alpine echo-command -- echo Hi
 ```
+
+6. Going to Jaeger again on `http://localhost:16686`, choosing the `kubelet` service, operation `syncPod` and adding the tag `k8s.pod=default/echo-command`, we should be able to see spans related to this pod.
