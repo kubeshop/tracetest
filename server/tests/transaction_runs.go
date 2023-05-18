@@ -61,7 +61,7 @@ RETURNING "id"`
 const (
 	createSequenceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
 	dropSequenceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
-	runSequenceName    = "%sequence_name%"
+	runSequenceName     = "%sequence_name%"
 )
 
 func md5Hash(text string) string {
@@ -94,7 +94,7 @@ func (td *TransactionsRepository) CreateRun(ctx context.Context, tr TransactionR
 		return TransactionRun{}, fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, replaceTransactionRunSequenceName(createSequeceQuery, tr.TransactionID))
+	_, err = tx.ExecContext(ctx, replaceTransactionRunSequenceName(createSequenceQuery, tr.TransactionID))
 	if err != nil {
 		tx.Rollback()
 		return TransactionRun{}, fmt.Errorf("sql exec: %w", err)
