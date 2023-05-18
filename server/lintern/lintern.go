@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	lintern_plugin_common "github.com/kubeshop/tracetest/server/lintern/plugins/common"
+	lintern_plugin_security "github.com/kubeshop/tracetest/server/lintern/plugins/security"
 	lintern_plugin_standards "github.com/kubeshop/tracetest/server/lintern/plugins/standards"
 	lintern_resource "github.com/kubeshop/tracetest/server/lintern/resource"
 	"github.com/kubeshop/tracetest/server/model"
@@ -12,6 +14,8 @@ import (
 var (
 	AvailablePlugins = []model.Plugin{
 		lintern_plugin_standards.NewStandardsPlugin(),
+		lintern_plugin_security.NewSecurityPlugin(),
+		lintern_plugin_common.NewCommonPlugin(),
 	}
 )
 

@@ -22,6 +22,7 @@ var defaultLintern = Lintern{
 	Plugins: []LinternPlugin{
 		{Name: "standards", Enabled: true, Required: true},
 		{Name: "security", Enabled: true, Required: true},
+		{Name: "common", Enabled: true, Required: true},
 	},
 }
 
