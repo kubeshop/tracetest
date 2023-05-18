@@ -30,6 +30,11 @@ var availableOperations = []Operation{
 	OperationDelete,
 }
 
+var augmentedOperations = []Operation{
+	OperationGetAugmented,
+	OperationListAugmented,
+}
+
 type SortableHandler interface {
 	SortingFields() []string
 }
