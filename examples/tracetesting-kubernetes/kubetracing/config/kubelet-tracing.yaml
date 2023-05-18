@@ -1,0 +1,7 @@
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+featureGates:
+  KubeletTracing: true
+tracing:
+  endpoint: host.k3d.internal:4317
+  samplingRatePerMillion: 1000000
