@@ -1,5 +1,5 @@
 import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
@@ -35,6 +35,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
   const showSelectAsCurrent =
     !data.isMatched && !!matchedSpans.length && (isTestSpecFormOpen || isTestOutputFormOpen) && selected;
   const className = `${data.isMatched ? 'matched' : ''} ${showSelectAsCurrent ? 'selectedAsCurrent' : ''}`;
+  const [isOpenLintErrors, setIsOpenLintErrors] = useState(false);
 
   return (
     <>
@@ -48,12 +49,29 @@ const SpanNode = ({data, id, selected}: IProps) => {
 
         <S.TopLine $type={data.type} />
 
+        {isOpenLintErrors && (
+          <S.LintContainer className="nowheel nodrag">
+            <S.ItemText strong>Lint errors</S.ItemText>
+            {lintErrors.map(lintError => (
+              <div>
+                <S.ItemText strong>{lintError.ruleName}</S.ItemText>
+
+                {lintError.errors.map(error => (
+                  <div>
+                    <S.ItemText type="secondary">- {error}</S.ItemText>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </S.LintContainer>
+        )}
+
         <S.Header>
           <S.BadgeContainer>
             <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
           </S.BadgeContainer>
           <S.HeaderText>{data.name}</S.HeaderText>
-          {!!lintErrors.length && <S.LintErrorIcon />}
+          {!!lintErrors.length && <S.LintErrorIcon onClick={() => setIsOpenLintErrors(prev => !prev)} />}
         </S.Header>
 
         <S.Body>

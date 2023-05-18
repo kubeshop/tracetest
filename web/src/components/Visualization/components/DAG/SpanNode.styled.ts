@@ -116,6 +116,20 @@ export const ItemText = styled(Typography.Text)`
   margin-left: 5px;
 `;
 
+export const LintContainer = styled.div`
+  background-color: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `2px solid ${theme.color.error}`};
+  border-radius: 10px;
+  font-size: ${({theme}) => theme.size.xs};
+  height: 100px;
+  overflow-y: scroll;
+  padding: 10px;
+  position: absolute;
+  right: -210px;
+  top: -50px;
+  width: 200px;
+`;
+
 export const LintErrorIcon = styled(ExclamationCircleFilled)`
   color: ${({theme}) => theme.color.error};
   position: absolute;

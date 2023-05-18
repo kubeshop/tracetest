@@ -83,7 +83,7 @@ const SpanService = () => ({
 
   filterLintErrorsBySpan(linterResultsBySpan: TLintBySpan, spanId: string) {
     const results = linterResultsBySpan[spanId];
-    return results.filter(result => !result.passed);
+    return results?.filter(result => !result.passed) ?? [];
   },
 });
 

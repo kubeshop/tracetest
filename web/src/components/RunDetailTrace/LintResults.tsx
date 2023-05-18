@@ -121,8 +121,13 @@ const LintResults = ({linterResult, trace}: IProps) => {
                           >
                             {getSpanName(trace.spans, result.spanId)}
                           </S.SpanButton>
-                          <Typography.Text> - Severity: {result.severity}</Typography.Text>
-                          <Typography.Text> - Errors: {result.errors.join(' - ')}</Typography.Text>
+                          <div>
+                            {result.errors.map(error => (
+                              <div>
+                                <Typography.Text>{error}</Typography.Text>
+                              </div>
+                            ))}
+                          </div>
                         </>
                       )}
                     </div>
