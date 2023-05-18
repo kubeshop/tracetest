@@ -102,3 +102,17 @@ export const SpanButton = styled(Button)<{$error?: boolean}>`
   color: ${({theme, $error}) => ($error ? theme.color.error : theme.color.success)};
   padding-left: 0;
 `;
+
+export const Footer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 50px;
+  text-align: center;
+  width: 100%;
+`;
+
+export const OctolintImg = styled.img`
+  width: 60px;
+`;
