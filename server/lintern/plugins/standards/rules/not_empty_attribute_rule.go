@@ -14,10 +14,10 @@ type notEmptyRuleAttributesRule struct {
 func NewNotEmptyAttributesRule() model.Rule {
 	return &notEmptyRuleAttributesRule{
 		BaseRule: model.BaseRule{
-			Name:        "Not empty attributes",
+			Name:        "Not Empty Attributes",
 			Description: "Does not allow empty attribute values in any span",
 			Tips:        []string{"Empty attributes don't provide any information about the operation and should be removed"},
-			Weight:      100,
+			Weight:      25,
 		},
 	}
 }

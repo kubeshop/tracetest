@@ -24,7 +24,7 @@ func TestRequiredAttributesRule(t *testing.T) {
 			"http": {"http.method", "http.url"},
 		})
 
-		rule := rules.NewRequiredAttributesRule(attrMap)
+		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace)
 
 		for _, result := range result.Results {

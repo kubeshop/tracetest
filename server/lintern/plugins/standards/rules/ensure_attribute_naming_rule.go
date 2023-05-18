@@ -16,12 +16,12 @@ type ensureAttributeNamingRule struct {
 func NewEnsureAttributeNamingRule() model.Rule {
 	return &ensureAttributeNamingRule{
 		BaseRule: model.BaseRule{
-			Name:        "Ensure attributes naming",
+			Name:        "Attribute Naming",
 			Description: "Ensure all attributes follow the naming convention",
 			Tips: []string{
 				"You should always add namespaces to your span names to ensure they will not be overwritten",
 				"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode"},
-			Weight: 100,
+			Weight: 25,
 		},
 	}
 }

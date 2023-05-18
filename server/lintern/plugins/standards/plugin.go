@@ -2,7 +2,6 @@ package lintern_plugin_standards
 
 import (
 	"context"
-	"strings"
 
 	"github.com/kubeshop/tracetest/server/lintern/plugins/standards/rules"
 	"github.com/kubeshop/tracetest/server/model"
@@ -19,17 +18,20 @@ var (
 func NewStandardsPlugin() model.Plugin {
 	return StandardsPlugin{
 		BasePlugin: model.BasePlugin{
-			Name:        "Standards",
-			Description: "Standards plugin",
+			Name:        "Global Standards",
+			Description: "Enforce standards for spans and attributes",
 			Rules: []model.Rule{
-				rules.NewRequiredAttributesRule(rules.DefaultAttrMap),
+				rules.NewRequiredAttributesRule(),
+				rules.NewEnsureAttributeNamingRule(),
+				rules.NewEnsureSpanNamingRule(),
+				rules.NewNotEmptyAttributesRule(),
 			},
 		},
 	}
 }
 
 func (p StandardsPlugin) Name() string {
-	return strings.ToLower(p.BasePlugin.Name)
+	return "standards"
 }
 
 func (p StandardsPlugin) Execute(ctx context.Context, trace model.Trace) (model.PluginResult, error) {

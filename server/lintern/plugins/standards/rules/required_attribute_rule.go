@@ -16,15 +16,15 @@ var DefaultAttrMap = NewRequiredAttributesMap(map[string][]string{
 	"http": {"http.route"},
 })
 
-func NewRequiredAttributesRule(requiredAttributesMap RequiredAttributesMap) model.Rule {
+func NewRequiredAttributesRule() model.Rule {
 	return requiredAttributesRule{
 		BaseRule: model.BaseRule{
-			Name:        "RequiredAttributes",
-			Description: "Required attributes rule",
+			Name:        "Required Attributes by Span Type",
+			Description: "Ensure all spans have required attributes",
 			Tips:        []string{"This rule checks if all required attributes are present in spans of given type"},
-			Weight:      100,
+			Weight:      25,
 		},
-		attrMap: requiredAttributesMap,
+		attrMap: DefaultAttrMap,
 	}
 }
 
