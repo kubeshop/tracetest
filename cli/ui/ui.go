@@ -2,8 +2,8 @@ package ui
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/kubeshop/tracetest/cli/cmd"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
@@ -59,7 +59,7 @@ func (ui ptermUI) Panic(err error) {
 
 func (ui ptermUI) Exit(msg string) {
 	pterm.Error.Println(msg)
-	os.Exit(1)
+	cmd.ExitCLI(1)
 }
 
 func (ui ptermUI) Error(msg string) {

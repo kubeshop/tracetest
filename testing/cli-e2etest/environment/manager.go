@@ -2,7 +2,6 @@ package environment
 
 import (
 	"fmt"
-	"os"
 	"path"
 	"runtime"
 	"sync"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/command"
+	"github.com/kubeshop/tracetest/cli-e2etest/config"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )
@@ -18,7 +18,6 @@ import (
 var (
 	mutex               = sync.Mutex{}
 	envCounter    int64 = 0
-	defaultEnv          = "jaeger"
 	supportedEnvs       = []string{"jaeger"}
 )
 
@@ -43,11 +42,7 @@ func CreateAndStart(t *testing.T) Manager {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	environmentName := os.Getenv("TEST_ENVIRONMENT")
-
-	if environmentName == "" {
-		environmentName = defaultEnv
-	}
+	environmentName := config.GetConfigAsEnvVars().TestEnvironment
 
 	if !slices.Contains(supportedEnvs, environmentName) {
 		t.Fatalf("environment %s not registered", environmentName)
