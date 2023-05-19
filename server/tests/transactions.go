@@ -239,6 +239,13 @@ func (r *TransactionsRepository) Delete(ctx context.Context, id id.ID) error {
 		return err
 	}
 
+	q := "DELETE FROM transaction_run_steps WHERE transaction_run_id IN (SELECT id FROM transaction_runs WHERE transaction_id = $1)"
+	_, err = tx.ExecContext(ctx, q, id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", id)
 	if err != nil {
 		tx.Rollback()

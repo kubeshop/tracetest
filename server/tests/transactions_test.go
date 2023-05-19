@@ -24,6 +24,42 @@ type transactionFixture struct {
 	testRun model.Run
 }
 
+func copyRun(testsDB model.RunRepository, run model.Run) model.Run {
+	return createRun(testsDB, model.Test{
+		ID:      run.TestID,
+		Version: run.TestVersion,
+	})
+}
+
+func createRun(testsDB model.RunRepository, test model.Test) model.Run {
+	run := model.Run{
+		State:   model.RunStateFinished,
+		TraceID: id.NewRandGenerator().TraceID(),
+		SpanID:  id.NewRandGenerator().SpanID(),
+	}
+	run, err := testsDB.CreateRun(context.TODO(), test, run)
+	if err != nil {
+		panic(err)
+	}
+
+	run.Results.Results = (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).
+		MustAdd("query", []model.AssertionResult{
+			{
+				Results: []model.SpanAssertionResult{
+					{CompareErr: nil},
+					{CompareErr: nil},
+					{CompareErr: fmt.Errorf("some error")},
+				},
+			},
+		})
+
+	err = testsDB.UpdateRun(context.TODO(), run)
+	if err != nil {
+		panic(err)
+	}
+	return run
+}
+
 func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 	testsDB, err := testdb.Postgres(testdb.WithDB(db))
 	require.NoError(t, err)
@@ -57,28 +93,7 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 	require.NoError(t, err)
 	fixture.t1 = test
 
-	run := model.Run{
-		State:   model.RunStateFinished,
-		TraceID: id.NewRandGenerator().TraceID(),
-		SpanID:  id.NewRandGenerator().SpanID(),
-	}
-	run, err = testsDB.CreateRun(context.TODO(), test, run)
-	require.NoError(t, err)
-
-	run.Results.Results = (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).
-		MustAdd("query", []model.AssertionResult{
-			{
-				Results: []model.SpanAssertionResult{
-					{CompareErr: nil},
-					{CompareErr: nil},
-					{CompareErr: fmt.Errorf("some error")},
-				},
-			},
-		})
-
-	err = testsDB.UpdateRun(context.TODO(), run)
-	require.NoError(t, err)
-	fixture.testRun = run
+	fixture.testRun = createRun(testsDB, test)
 
 	test = model.Test{
 		ID:          "2qOn7xPVg",
@@ -171,40 +186,32 @@ func TestTransactions(t *testing.T) {
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
 			transactionRepo := manager.Handler().(*tests.TransactionsRepository)
+			testsDB, err := testdb.Postgres(testdb.WithDB(transactionRepo.DB()))
+			if err != nil {
+				panic(err)
+			}
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
-				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				transactionRepo.Create(context.TODO(), sample)
+
+			case rmtests.OperationDeleteSuccess:
+				transactionRepo.Create(context.TODO(), sample)
+
+				// test delete with more than 1 run
+				run := setupTests(t, transactionRepo.DB())
+				createTransactionRun(transactionRepo, sample, run)
+
+				run = copyRun(testsDB, run)
+				createTransactionRun(transactionRepo, sample, run)
 
 			case rmtests.OperationListAugmentedSuccess,
 				rmtests.OperationGetAugmentedSuccess:
 
 				transactionRepo.Create(context.TODO(), sample)
-				// create a local copy of sample, with all the data
-				sample, err := transactionRepo.GetAugmented(context.TODO(), sample.ID)
-				if err != nil {
-					panic(err)
-				}
-
 				run := setupTests(t, transactionRepo.DB())
-				transactionRepo.Create(context.TODO(), sample)
-
-				tr, err := transactionRepo.CreateRun(context.TODO(), sample.NewRun())
-				if err != nil {
-					panic(err)
-				}
-
-				tr.CompletedAt = d
-				tr.CreatedAt = d
-				tr.CurrentTest = 1
-				tr.Steps = []model.Run{run}
-
-				err = transactionRepo.UpdateRun(context.TODO(), tr)
-				if err != nil {
-					panic(err)
-				}
+				createTransactionRun(transactionRepo, sample, run)
 
 				// TODO: reenable this tests when we figure out how to test it
 				// problems:
@@ -359,4 +366,22 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	actual = rmtests.RemoveFieldFromJSONResource("summary.lastRun.time", actual)
 
 	require.JSONEq(t, expected, actual)
+}
+
+func createTransactionRun(repo *tests.TransactionsRepository, tran tests.Transaction, run model.Run) {
+	updated, err := repo.GetAugmented(context.TODO(), tran.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	tr, err := repo.CreateRun(context.TODO(), updated.NewRun())
+	if err != nil {
+		panic(err)
+	}
+	tr.Steps = []model.Run{run}
+
+	err = repo.UpdateRun(context.TODO(), tr)
+	if err != nil {
+		panic(err)
+	}
 }
