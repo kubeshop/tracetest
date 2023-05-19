@@ -1,9 +1,11 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
-import Transaction, {TRawTransaction} from 'models/Transaction.model';
+import Transaction, {TRawTransaction, TRawTransactionResource} from 'models/Transaction.model';
 import TransactionService from 'services/Transaction.service';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {TDraftTransaction} from 'types/Transaction.types';
+
+const defaultHeaders = {'content-type': 'application/json', 'X-Tracetest-Augmented': 'true'};
 
 const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
   createTransaction: builder.mutation<Transaction, TDraftTransaction>({
@@ -11,9 +13,9 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
       url: '/transactions',
       method: HTTP_METHOD.POST,
       body: TransactionService.getRawFromDraft(transaction),
-      headers: {'content-type': 'application/json'},
+      headers: defaultHeaders,
     }),
-    transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
+    transformResponse: (rawTransaction: TRawTransactionResource) => Transaction(rawTransaction),
     invalidatesTags: [
       {type: TracetestApiTags.TRANSACTION, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
@@ -24,7 +26,7 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
       url: `/transactions/${transactionId}`,
       method: HTTP_METHOD.PUT,
       body: TransactionService.getRawFromDraft(transaction),
-      headers: {'content-type': 'application/json'},
+      headers: defaultHeaders,
     }),
     invalidatesTags: [{type: TracetestApiTags.TRANSACTION, id: 'LIST'}],
   }),
@@ -32,7 +34,7 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({transactionId}) => ({
       url: `/transactions/${transactionId}`,
       method: HTTP_METHOD.DELETE,
-      headers: {'content-type': 'application/json'},
+      headers: defaultHeaders,
     }),
     invalidatesTags: [
       {type: TracetestApiTags.TRANSACTION, id: 'LIST'},
@@ -42,15 +44,15 @@ const TransactionEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getTransactionById: builder.query<Transaction, {transactionId: string}>({
     query: ({transactionId}) => ({
       url: `/transactions/${transactionId}`,
-      headers: {'content-type': 'application/json'},
+      headers: defaultHeaders,
     }),
     providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: result?.id}],
-    transformResponse: (rawTransaction: TRawTransaction) => Transaction(rawTransaction),
+    transformResponse: (rawTransaction: TRawTransactionResource) => Transaction(rawTransaction),
   }),
   getTransactionVersionById: builder.query<Transaction, {transactionId: string; version: number}>({
     query: ({transactionId, version}) => `/transactions/${transactionId}/version/${version}`,
     providesTags: result => [{type: TracetestApiTags.TRANSACTION, id: `${result?.id}-${result?.version}`}],
-    transformResponse: (rawTest: TRawTransaction) => Transaction(rawTest),
+    transformResponse: (rawTest: TRawTransaction) => Transaction.FromRawTransaction(rawTest),
     keepUnusedDataFor: 10,
   }),
 });

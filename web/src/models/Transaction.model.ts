@@ -2,7 +2,8 @@ import {Model, TTransactionsSchemas} from 'types/Common.types';
 import Summary from './Summary.model';
 import Test from './Test.model';
 
-export type TRawTransaction = TTransactionsSchemas['TransactionResource'];
+export type TRawTransactionResource = TTransactionsSchemas['TransactionResource'];
+export type TRawTransaction = TTransactionsSchemas['Transaction'];
 type Transaction = Model<
   TTransactionsSchemas['Transaction'],
   {
@@ -13,17 +14,21 @@ type Transaction = Model<
 >;
 
 function Transaction({
-  spec: {
-    id = '',
-    name = '',
-    description = '',
-    version = 1,
-    steps = [],
-    fullSteps = [],
-    createdAt = '',
-    summary = {},
-  } = {},
-}: TRawTransaction): Transaction {
+  spec: rawTransaction = {},
+}: TRawTransactionResource): Transaction {
+  return Transaction.FromRawTransaction(rawTransaction);
+}
+
+Transaction.FromRawTransaction = ({
+  id = '',
+  name = '',
+  description = '',
+  version = 1,
+  createdAt = '',
+  summary = {},
+  steps = [],
+  fullSteps = [],
+}: TRawTransaction): Transaction => {
   return {
     id,
     name,
@@ -34,6 +39,6 @@ function Transaction({
     createdAt,
     summary: Summary(summary),
   };
-}
+};
 
 export default Transaction;

@@ -1867,11 +1867,9 @@ export interface external {
         Trigger: {
           /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
-          triggerSettings?: {
-            http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
-            traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
-          };
+          http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+          traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };
         TriggerResult: {
           /** @enum {string} */

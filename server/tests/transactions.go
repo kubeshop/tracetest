@@ -66,7 +66,7 @@ func (t Transaction) NewRun() TransactionRun {
 	return TransactionRun{
 		TransactionID:      t.ID,
 		TransactionVersion: t.GetVersion(),
-		CreatedAt:          time.Now(),
+		CreatedAt:          time.Now().UTC(),
 		State:              TransactionRunStateCreated,
 		Steps:              make([]model.Run, 0, len(t.StepIDs)),
 		CurrentTest:        0,

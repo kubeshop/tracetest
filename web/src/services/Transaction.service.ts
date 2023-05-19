@@ -1,8 +1,8 @@
 import {TDraftTransaction} from 'types/Transaction.types';
-import Transaction, {TRawTransaction} from 'models/Transaction.model';
+import Transaction, {TRawTransactionResource} from 'models/Transaction.model';
 
 const TransactionService = () => ({
-  getRawFromDraft(draftTransaction: TDraftTransaction): TRawTransaction {
+  getRawFromDraft(draftTransaction: TDraftTransaction): TRawTransactionResource {
     return {
       spec: {...draftTransaction, fullSteps: draftTransaction.steps?.map(step => ({id: step}))},
       type: 'Transaction',
