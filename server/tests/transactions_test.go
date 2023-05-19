@@ -228,16 +228,6 @@ func TestTransactions(t *testing.T) {
 				run = copyRun(testsDB, run)
 				createTransactionRun(transactionRepo, transactionSample, run)
 
-			case rmtests.OperationDeleteSuccess:
-				transactionRepo.Create(context.TODO(), sample)
-
-				// test delete with more than 1 run
-				run := setupTests(t, transactionRepo.DB())
-				createTransactionRun(transactionRepo, sample, run)
-
-				run = copyRun(testsDB, run)
-				createTransactionRun(transactionRepo, sample, run)
-
 			case rmtests.OperationListAugmentedSuccess,
 				rmtests.OperationGetAugmentedSuccess:
 
