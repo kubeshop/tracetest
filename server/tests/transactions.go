@@ -239,6 +239,13 @@ func (r *TransactionsRepository) Delete(ctx context.Context, id id.ID) error {
 		return err
 	}
 
+	q := "DELETE FROM transaction_run_steps WHERE transaction_run_id IN (SELECT id FROM transaction_runs WHERE transaction_id = $1)"
+	_, err = tx.ExecContext(ctx, q, id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", id)
 	if err != nil {
 		tx.Rollback()
@@ -534,7 +541,7 @@ func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augme
 
 	var (
 		lastRunTime *time.Time
-		stepIDs     string
+		stepIDs     *string
 
 		pass, fail *int
 		version    int
@@ -557,8 +564,8 @@ func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augme
 		return Transaction{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
-	if stepIDs != "" {
-		ids := strings.Split(stepIDs, ",")
+	if stepIDs != nil && *stepIDs != "" {
+		ids := strings.Split(*stepIDs, ",")
 		transaction.StepIDs = make([]id.ID, len(ids))
 		for i, sid := range ids {
 			transaction.StepIDs[i] = id.ID(sid)

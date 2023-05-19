@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/model"
@@ -14,7 +13,9 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,6 +23,42 @@ type transactionFixture struct {
 	t1      model.Test
 	t2      model.Test
 	testRun model.Run
+}
+
+func copyRun(testsDB model.RunRepository, run model.Run) model.Run {
+	return createRun(testsDB, model.Test{
+		ID:      run.TestID,
+		Version: run.TestVersion,
+	})
+}
+
+func createRun(testsDB model.RunRepository, test model.Test) model.Run {
+	run := model.Run{
+		State:   model.RunStateFinished,
+		TraceID: id.NewRandGenerator().TraceID(),
+		SpanID:  id.NewRandGenerator().SpanID(),
+	}
+	run, err := testsDB.CreateRun(context.TODO(), test, run)
+	if err != nil {
+		panic(err)
+	}
+
+	run.Results.Results = (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).
+		MustAdd("query", []model.AssertionResult{
+			{
+				Results: []model.SpanAssertionResult{
+					{CompareErr: nil},
+					{CompareErr: nil},
+					{CompareErr: fmt.Errorf("some error")},
+				},
+			},
+		})
+
+	err = testsDB.UpdateRun(context.TODO(), run)
+	if err != nil {
+		panic(err)
+	}
+	return run
 }
 
 func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
@@ -57,28 +94,7 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 	require.NoError(t, err)
 	fixture.t1 = test
 
-	run := model.Run{
-		State:   model.RunStateFinished,
-		TraceID: id.NewRandGenerator().TraceID(),
-		SpanID:  id.NewRandGenerator().SpanID(),
-	}
-	run, err = testsDB.CreateRun(context.TODO(), test, run)
-	require.NoError(t, err)
-
-	run.Results.Results = (maps.Ordered[model.SpanQuery, []model.AssertionResult]{}).
-		MustAdd("query", []model.AssertionResult{
-			{
-				Results: []model.SpanAssertionResult{
-					{CompareErr: nil},
-					{CompareErr: nil},
-					{CompareErr: fmt.Errorf("some error")},
-				},
-			},
-		})
-
-	err = testsDB.UpdateRun(context.TODO(), run)
-	require.NoError(t, err)
-	fixture.testRun = run
+	fixture.testRun = createRun(testsDB, test)
 
 	test = model.Test{
 		ID:          "2qOn7xPVg",
@@ -117,20 +133,41 @@ func setupTests(t *testing.T, db *sql.DB) model.Run {
 	return f.testRun
 }
 
-func TestTransactions(t *testing.T) {
-	d := time.Date(2022, 01, 01, 14, 54, 0, 0, time.UTC)
+func TestDeleteTestsRelatedToTransactions(t *testing.T) {
+	db := testmock.CreateMigratedDatabase()
+	defer db.Close()
 
-	sample := tests.Transaction{
-		ID:          "NiWVnxP4R",
-		CreatedAt:   &d,
-		Name:        "Verify Import",
-		Description: "check the working of the import flow",
-		StepIDs: []id.ID{
-			"ezMn7bE4g",
-			"2qOn7xPVg",
-		},
+	testsDB, err := testdb.Postgres(testdb.WithDB(db))
+	if err != nil {
+		panic(err)
 	}
+	transactionRepo := tests.NewTransactionsRepository(db, testsDB)
 
+	transactionRepo.Create(context.TODO(), transactionSample)
+
+	f := setupTransactionFixture(t, db)
+	createTransactionRun(transactionRepo, transactionSample, f.testRun)
+
+	testsDB.DeleteTest(context.TODO(), f.t1)
+	testsDB.DeleteTest(context.TODO(), f.t2)
+
+	actual, err := transactionRepo.Get(context.TODO(), transactionSample.ID)
+	assert.NoError(t, err)
+	assert.Len(t, actual.StepIDs, 0)
+
+}
+
+var transactionSample = tests.Transaction{
+	ID:          "NiWVnxP4R",
+	Name:        "Verify Import",
+	Description: "check the working of the import flow",
+	StepIDs: []id.ID{
+		"ezMn7bE4g",
+		"2qOn7xPVg",
+	},
+}
+
+func TestTransactions(t *testing.T) {
 	// sample2 := tests.Transaction{
 	// 	ID:          "sample2",
 	// 	Name:        "Some Transaction",
@@ -171,40 +208,32 @@ func TestTransactions(t *testing.T) {
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
 			transactionRepo := manager.Handler().(*tests.TransactionsRepository)
+			testsDB, err := testdb.Postgres(testdb.WithDB(transactionRepo.DB()))
+			if err != nil {
+				panic(err)
+			}
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
-				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
-				transactionRepo.Create(context.TODO(), sample)
+				transactionRepo.Create(context.TODO(), transactionSample)
+
+			case rmtests.OperationDeleteSuccess:
+				transactionRepo.Create(context.TODO(), transactionSample)
+
+				// test delete with more than 1 run
+				run := setupTests(t, transactionRepo.DB())
+				createTransactionRun(transactionRepo, transactionSample, run)
+
+				run = copyRun(testsDB, run)
+				createTransactionRun(transactionRepo, transactionSample, run)
 
 			case rmtests.OperationListAugmentedSuccess,
 				rmtests.OperationGetAugmentedSuccess:
 
-				transactionRepo.Create(context.TODO(), sample)
-				// create a local copy of sample, with all the data
-				sample, err := transactionRepo.GetAugmented(context.TODO(), sample.ID)
-				if err != nil {
-					panic(err)
-				}
-
+				transactionRepo.Create(context.TODO(), transactionSample)
 				run := setupTests(t, transactionRepo.DB())
-				transactionRepo.Create(context.TODO(), sample)
-
-				tr, err := transactionRepo.CreateRun(context.TODO(), sample.NewRun())
-				if err != nil {
-					panic(err)
-				}
-
-				tr.CompletedAt = d
-				tr.CreatedAt = d
-				tr.CurrentTest = 1
-				tr.Steps = []model.Run{run}
-
-				err = transactionRepo.UpdateRun(context.TODO(), tr)
-				if err != nil {
-					panic(err)
-				}
+				createTransactionRun(transactionRepo, transactionSample, run)
 
 				// TODO: reenable this tests when we figure out how to test it
 				// problems:
@@ -232,7 +261,7 @@ func TestTransactions(t *testing.T) {
 			"type": "Transaction",
 			"spec": {
 				"id": "NiWVnxP4R",
-				"createdAt": "` + d.Format(time.RFC3339) + `",
+				"createdAt": "REMOVEME",
 				"version": 1,
 				"name": "Verify Import",
 				"description": "check the working of the import flow",
@@ -272,7 +301,7 @@ func TestTransactions(t *testing.T) {
 						"summary": {
 							"runs": 1,
 							"lastRun": {
-								"time": "` + d.Format(time.RFC3339) + `",
+								"time": "REMOVEME",
 								"passes": 2,
 								"fails": 1
 							}
@@ -345,6 +374,7 @@ func TestTransactions(t *testing.T) {
 
 func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, secondValue string) {
 	expected := firstValue
+	expected = rmtests.RemoveFieldFromJSONResource("createdAt", expected)
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.0.createdAt", expected)
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.1.createdAt", expected)
 	expected = rmtests.RemoveFieldFromJSONResource("fullSteps.0.summary.lastRun.time", expected)
@@ -352,6 +382,7 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	expected = rmtests.RemoveFieldFromJSONResource("summary.lastRun.time", expected)
 
 	actual := secondValue
+	actual = rmtests.RemoveFieldFromJSONResource("createdAt", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.0.createdAt", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.1.createdAt", actual)
 	actual = rmtests.RemoveFieldFromJSONResource("fullSteps.0.summary.lastRun.time", actual)
@@ -359,4 +390,22 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	actual = rmtests.RemoveFieldFromJSONResource("summary.lastRun.time", actual)
 
 	require.JSONEq(t, expected, actual)
+}
+
+func createTransactionRun(repo *tests.TransactionsRepository, tran tests.Transaction, run model.Run) {
+	updated, err := repo.GetAugmented(context.TODO(), tran.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	tr, err := repo.CreateRun(context.TODO(), updated.NewRun())
+	if err != nil {
+		panic(err)
+	}
+	tr.Steps = []model.Run{run}
+
+	err = repo.UpdateRun(context.TODO(), tr)
+	if err != nil {
+		panic(err)
+	}
 }
