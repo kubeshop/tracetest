@@ -541,7 +541,7 @@ func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augme
 
 	var (
 		lastRunTime *time.Time
-		stepIDs     string
+		stepIDs     *string
 
 		pass, fail *int
 		version    int
@@ -564,8 +564,8 @@ func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augme
 		return Transaction{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
-	if stepIDs != "" {
-		ids := strings.Split(stepIDs, ",")
+	if stepIDs != nil && *stepIDs != "" {
+		ids := strings.Split(*stepIDs, ",")
 		transaction.StepIDs = make([]id.ID, len(ids))
 		for i, sid := range ids {
 			transaction.StepIDs[i] = id.ID(sid)
