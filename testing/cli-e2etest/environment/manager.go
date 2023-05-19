@@ -27,7 +27,8 @@ type Manager interface {
 	Start(t *testing.T)
 	Close(t *testing.T)
 	GetCLIConfigPath(t *testing.T) string
-	GetManisfestResourcePath(t *testing.T, manifestName string) string
+	GetEnvironmentResourcePath(t *testing.T, resourceName string) string
+	GetTestResourcePath(t *testing.T, resourceName string) string
 }
 
 type internalManager struct {
@@ -59,7 +60,7 @@ func CreateAndStart(t *testing.T) Manager {
 }
 
 func getExecutingDir() string {
-	_, filename, _, _ := runtime.Caller(0)
+	_, filename, _, _ := runtime.Caller(0) // get file of the getExecutingDir caller
 	return path.Dir(filename)
 }
 
@@ -125,7 +126,14 @@ func (m *internalManager) GetCLIConfigPath(t *testing.T) string {
 	return fmt.Sprintf("%s/%s/cli-config.yaml", currentDir, m.environmentType)
 }
 
-func (m *internalManager) GetManisfestResourcePath(t *testing.T, manifestName string) string {
+func (m *internalManager) GetEnvironmentResourcePath(t *testing.T, resourceName string) string {
 	currentDir := getExecutingDir()
-	return fmt.Sprintf("%s/%s/resources/%s.yaml", currentDir, m.environmentType, manifestName)
+	return fmt.Sprintf("%s/%s/resources/%s.yaml", currentDir, m.environmentType, resourceName)
+}
+
+func (m *internalManager) GetTestResourcePath(t *testing.T, resourceName string) string {
+	_, filename, _, _ := runtime.Caller(1) // get file of the GetTestResourcePath caller
+	testDir := path.Dir(filename)
+
+	return fmt.Sprintf("%s/resources/%s.yaml", testDir, resourceName)
 }

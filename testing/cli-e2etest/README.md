@@ -45,7 +45,8 @@ The main idea is to test every CLI command against Tracetest server with differe
 
 | CLI Command                                                 | Tested             | Test scenarios |
 | ----------------------------------------------------------- | ------------------ | -------------- |
-| `apply environment -f [environment-file]`                   | :yellow_circle:    | |
+| `apply environment -f [new-environment-file]`               | :yellow_circle:    | |
+| `apply environment -f [existing-environment-file]`          | :yellow_circle:    | |
 | `delete environment --id [existing-id]`                     | :yellow_circle:    | |
 | `delete environment --id [non-existing-id]`                 | :yellow_circle:    | |
 | `export environment --id current --file [environment-file]` | :yellow_circle:    | |
