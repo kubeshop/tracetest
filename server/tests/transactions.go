@@ -422,7 +422,8 @@ func (r *TransactionsRepository) GetVersion(ctx context.Context, id id.ID, versi
 }
 
 func listQuery(baseSQL, query string, params []any) (string, []any) {
-	condition := " AND (t.name ilike $3 OR t.description ilike $3)"
+	paramNumber := len(params) + 1
+	condition := fmt.Sprintf(" AND (t.name ilike $%d OR t.description ilike $%d)", paramNumber, paramNumber)
 
 	sql := baseSQL + transactionMaxVersionQuery
 	sql, params = sqlutil.Search(sql, condition, query, params)
