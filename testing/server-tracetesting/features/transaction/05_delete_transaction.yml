@@ -21,4 +21,4 @@ spec:
         - attr:tracetest.selected_spans.count = 1
     - selector: span[name = "exec DELETE"]
       assertions:
-        - attr:tracetest.selected_spans.count = 3
+        - attr:tracetest.selected_spans.count = 4
