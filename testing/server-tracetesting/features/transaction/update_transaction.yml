@@ -1,7 +1,7 @@
 ---
 type: Test
 spec:
-  name: Create transaction
+  name: Update transaction
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:
     type: http
