@@ -53,6 +53,9 @@ func WithCLIConfig(cliConfig string) ExecOption {
 }
 
 func runTracetestAsInternalCommand(t *testing.T, tracetestCommand string, tracetestSubCommands []string) *command.ExecResult {
+	// This code calls the CLI as a library to enable Go debugger to step into CLI statements and help a dev to debug CLI problems found on CLI tests
+	//, but emulates this call as an executable call intercepting data sent to stdout, stderr and part of the os.Exit commands
+
 	// keep backup of the real stdout
 	stdoutBackup := os.Stdout
 	stdoutRead, stdoutWriter, _ := os.Pipe()
@@ -98,8 +101,6 @@ func runTracetestAsInternalCommand(t *testing.T, tracetestCommand string, tracet
 	// back to normal state
 	stderrWriter.Close()
 	os.Stderr = stderrBackup // restoring the real stderr
-
-	// TODO: need to intercept exitCode
 
 	return &command.ExecResult{
 		CommandExecuted: fmt.Sprintf("%s %s", tracetestCommand, strings.Join(tracetestSubCommands, " ")),
