@@ -286,14 +286,14 @@ func (a runTestAction) askForMissingVariables(resp *http.Response) (map[string]s
 }
 
 func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.Transaction, error) {
-	test, _, err := a.client.ApiApi.
+	transaction, _, err := a.client.ResourceApiApi.
 		GetTransaction(ctx, id).
 		Execute()
 	if err != nil {
 		return openapi.Transaction{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return *test, nil
+	return *transaction.Spec, nil
 }
 
 func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {

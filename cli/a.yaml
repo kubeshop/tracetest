@@ -1,0 +1,7 @@
+type: Transaction
+spec:
+  id: GN5JC_84R
+  name: Transaction
+  description: ""
+  steps:
+  - ./test1.yaml

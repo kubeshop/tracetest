@@ -2,6 +2,16 @@ openapi: 3.0.0
 components:
   schemas:
 
+    TransactionResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionResource"
+
     TransactionResource:
       type: object
       description: "Represents a transaction structured into the Resources format."

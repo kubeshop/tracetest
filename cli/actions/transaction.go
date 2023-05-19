@@ -2,8 +2,10 @@ package actions
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/file"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 )
@@ -23,13 +25,22 @@ func NewTransactionsActions(options ...ResourceArgsOption) transactionActions {
 }
 
 // Apply implements ResourceActions
-func (actions transactionActions) Apply(context.Context, file.File) (*file.File, error) {
-	panic("unimplemented")
+func (actions transactionActions) Apply(ctx context.Context, file file.File) (*file.File, error) {
+	if file.HasID() {
+		if _, ok := file.Definition().Spec.(yaml.Transaction); ok {
+			return nil, fmt.Errorf("file spec is not a transaction")
+		}
+
+		transaction := file.Definition().Spec.(yaml.Transaction)
+		return actions.resourceClient.Update(ctx, file, transaction.ID)
+	}
+
+	return actions.resourceClient.Create(ctx, file)
 }
 
 // Delete implements ResourceActions
-func (actions transactionActions) Delete(context.Context, string) (string, error) {
-	panic("unimplemented")
+func (actions transactionActions) Delete(ctx context.Context, id string) (string, error) {
+	return "Environment successfully deleted", actions.resourceClient.Delete(ctx, id)
 }
 
 // FileType implements ResourceActions
@@ -38,18 +49,23 @@ func (actions transactionActions) FileType() yaml.FileType {
 }
 
 // Get implements ResourceActions
-func (actions transactionActions) Get(context.Context, string) (*file.File, error) {
-	panic("unimplemented")
+func (actions transactionActions) Get(ctx context.Context, id string) (*file.File, error) {
+	return actions.resourceClient.Get(ctx, id)
 }
 
 // GetID implements ResourceActions
 func (actions transactionActions) GetID(file *file.File) (string, error) {
-	panic("unimplemented")
+	transaction, err := actions.formatter.ToStruct(file)
+	if err != nil {
+		return "", fmt.Errorf("could not convert file into struct: %w", err)
+	}
+
+	return *transaction.(openapi.TransactionResource).Spec.Id, nil
 }
 
 // List implements ResourceActions
-func (actions transactionActions) List(context.Context, utils.ListArgs) (*file.File, error) {
-	panic("unimplemented")
+func (actions transactionActions) List(ctx context.Context, args utils.ListArgs) (*file.File, error) {
+	return actions.resourceClient.List(ctx, args)
 }
 
 // Name implements ResourceActions

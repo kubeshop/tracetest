@@ -243,8 +243,8 @@ func (s *ResourceApiApiService) GetTransactions(ctx context.Context, take int32,
 	// TODO - update GetTransactions with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, GetTransactions200Response{}) or use other options such as http.Ok ...
-	//return Response(200, GetTransactions200Response{}), nil
+	//TODO: Uncomment the next line to return response Response(200, TransactionResourceList{}) or use other options such as http.Ok ...
+	//return Response(200, TransactionResourceList{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil
