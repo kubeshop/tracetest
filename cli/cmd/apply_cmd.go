@@ -3,13 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var definitionFile string
@@ -21,11 +19,9 @@ var applyCmd = &cobra.Command{
 	Long:    "Apply (create/update) resources to your Tracetest server",
 	PreRun:  setupCommand(),
 	Args:    cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		if definitionFile == "" {
-			cliLogger.Error("file with definition must be specified")
-			os.Exit(1)
-			return
+			return "", fmt.Errorf("file with definition must be specified")
 		}
 
 		resourceType := args[0]
@@ -38,9 +34,7 @@ var applyCmd = &cobra.Command{
 		resourceActions, err := resourceRegistry.Get(resourceType)
 
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		applyArgs := actions.ApplyArgs{
@@ -49,9 +43,7 @@ var applyCmd = &cobra.Command{
 
 		resource, _, err := resourceActions.Apply(ctx, applyArgs)
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to apply definition for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
 		resourceFormatter := resourceActions.Formatter()
@@ -59,13 +51,11 @@ var applyCmd = &cobra.Command{
 
 		result, err := formatter.Format(resource)
 		if err != nil {
-			cliLogger.Error("failed to format resource", zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
-		fmt.Println(result)
-	},
+		return result, nil
+	}),
 	PostRun: teardownCommand,
 }
 

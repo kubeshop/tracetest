@@ -3,4 +3,5 @@ go 1.20
 use (
 	./cli
 	./server
+	./testing/cli-e2etest
 )

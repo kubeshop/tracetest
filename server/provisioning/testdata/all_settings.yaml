@@ -36,4 +36,4 @@ spec:
   type: otelstore
   enabled: true
   opentelemetryStore:
-    FrontendEndpoint: http://frontend:8080/
+    frontendEndpoint: http://frontend:8080/

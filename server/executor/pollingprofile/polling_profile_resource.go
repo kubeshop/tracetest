@@ -26,6 +26,7 @@ const (
 
 var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationGet,
+	resourcemanager.OperationList,
 	resourcemanager.OperationUpdate,
 }
 
@@ -41,16 +42,16 @@ var DefaultPollingProfile = PollingProfile{
 }
 
 type PollingProfile struct {
-	ID       id.ID                  `mapstructure:"id"`
-	Name     string                 `mapstructure:"name"`
-	Default  bool                   `mapstructure:"default"`
-	Strategy Strategy               `mapstructure:"strategy"`
-	Periodic *PeriodicPollingConfig `mapstructure:"periodic"`
+	ID       id.ID                  `json:"id"`
+	Name     string                 `json:"name"`
+	Default  bool                   `json:"default"`
+	Strategy Strategy               `json:"strategy"`
+	Periodic *PeriodicPollingConfig `json:"periodic"`
 }
 
 type PeriodicPollingConfig struct {
-	RetryDelay string `mapstructure:"retryDelay"`
-	Timeout    string `mapstructure:"timeout"`
+	RetryDelay string `json:"retryDelay"`
+	Timeout    string `json:"timeout"`
 }
 
 func (ppc *PeriodicPollingConfig) TimeoutDuration() time.Duration {
@@ -180,6 +181,7 @@ func (r *Repository) GetDefault(ctx context.Context) PollingProfile {
 	pp, _ := r.Get(ctx, id.ID("current"))
 	return pp
 }
+
 func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
 	profile := PollingProfile{
 		ID:      "current",
@@ -213,6 +215,23 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) 
 	}
 
 	return profile, nil
+}
+
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
+	cfg, err := r.Get(ctx, id.ID("current"))
+	if err != nil {
+		return []PollingProfile{}, err
+	}
+
+	return []PollingProfile{cfg}, nil
+}
+
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
+	return 1, nil
+}
+
+func (*Repository) SortingFields() []string {
+	return []string{}
 }
 
 func (r *Repository) Provision(ctx context.Context, profile PollingProfile) error {

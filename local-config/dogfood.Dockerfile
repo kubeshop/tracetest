@@ -21,7 +21,7 @@ RUN apk --update add bash jq curl
 
 WORKDIR /app
 COPY --from=build-cli /app/cli/dist/tracetest /app/cli/tracetest
-COPY ./tracetesting ./tracetesting
+COPY ./testing/server-tracetesting ./tracetesting
 
 WORKDIR /app/tracetesting
 CMD ["/bin/sh", "/app/tracetesting/run.bash"]

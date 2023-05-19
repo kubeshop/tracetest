@@ -4,8 +4,6 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-
-	"gopkg.in/yaml.v2"
 )
 
 type PollingFormatter struct{}
@@ -35,13 +33,30 @@ func (f PollingFormatter) ToTable(file *file.File) (*simpletable.Header, *simple
 }
 
 func (f PollingFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpletable.Body, error) {
-	return nil, nil, nil
+	rawPollingList, err := f.ToListStruct(file)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	body := simpletable.Body{}
+	for _, rawPolling := range rawPollingList {
+		pollingResource := rawPolling.(openapi.PollingProfile)
+		row, err := f.getTableRow(pollingResource)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		body.Cells = append(body.Cells, row)
+	}
+
+	return f.getTableHeader(), &body, nil
 }
 
 func (f PollingFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var pollingResource openapi.PollingProfile
+	nullablePolling := openapi.NewNullablePollingProfile(&pollingResource)
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &pollingResource)
+	err := nullablePolling.UnmarshalJSON([]byte(file.Contents()))
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +65,20 @@ func (f PollingFormatter) ToStruct(file *file.File) (interface{}, error) {
 }
 
 func (f PollingFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
-	return nil, nil
+	var pollingProfileList openapi.PollingProfileList
+	nullableList := openapi.NewNullablePollingProfileList(&pollingProfileList)
+
+	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]interface{}, len(pollingProfileList.Items))
+	for i, item := range pollingProfileList.Items {
+		items[i] = item
+	}
+
+	return items, nil
 }
 
 func (f PollingFormatter) getTableHeader() *simpletable.Header {

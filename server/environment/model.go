@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -8,20 +9,30 @@ import (
 
 type (
 	Environment struct {
-		ID          id.ID              `mapstructure:"id"`
-		Name        string             `mapstructure:"name"`
-		Description string             `mapstructure:"description"`
-		CreatedAt   string             `mapstructure:"createdAt"`
-		Values      []EnvironmentValue `mapstructure:"values"`
+		ID          id.ID              `json:"id"`
+		Name        string             `json:"name"`
+		Description string             `json:"description"`
+		CreatedAt   string             `json:"createdAt"`
+		Values      []EnvironmentValue `json:"values"`
 	}
 
 	EnvironmentValue struct {
-		Key   string `mapstructure:"key"`
-		Value string `mapstructure:"value"`
+		Key   string `json:"key"`
+		Value string `json:"value"`
 	}
 )
 
 func (e Environment) Validate() error {
+	if e.Name == "" {
+		return fmt.Errorf("environment name cannot be empty")
+	}
+
+	for _, v := range e.Values {
+		if v.Key == "" {
+			return fmt.Errorf("environment value name cannot be empty")
+		}
+	}
+
 	return nil
 }
 

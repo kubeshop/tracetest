@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -17,6 +18,7 @@ import (
 var cliConfig config.Config
 var cliLogger *zap.Logger
 var resourceRegistry = actions.NewResourceRegistry()
+var versionText string
 
 type setupConfig struct {
 	shouldValidateConfig bool
@@ -39,10 +41,11 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 	}
 
 	return func(cmd *cobra.Command, args []string) {
-		setupOutputFormat()
+		setupOutputFormat(cmd)
 		setupLogger(cmd, args)
 		loadConfig(cmd, args)
 		overrideConfig()
+		setupVersion()
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
@@ -107,7 +110,11 @@ func overrideConfig() {
 	}
 }
 
-func setupOutputFormat() {
+func setupOutputFormat(cmd *cobra.Command) {
+	if cmd.GroupID != "resources" && output == string(formatters.Empty) {
+		output = string(formatters.DefaultOutput)
+	}
+
 	o := formatters.Output(output)
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
@@ -167,4 +174,18 @@ func setupLogger(cmd *cobra.Command, args []string) {
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
 	analytics.Close()
+}
+
+func setupVersion() {
+	ctx := context.Background()
+	options := []actions.ActionArgsOption{
+		actions.ActionWithClient(utils.GetAPIClient(cliConfig)),
+		actions.ActionWithConfig(cliConfig),
+		actions.ActionWithLogger(cliLogger),
+	}
+
+	action := actions.NewGetServerVersionAction(options...)
+	version := action.GetVersionText(ctx)
+
+	versionText = version
 }

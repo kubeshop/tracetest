@@ -4,14 +4,84 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
+
+func TestDifferentInputAndOuptutEncodings(t *testing.T) {
+	// make sure to preserve indentation and spaces instead of tabs.
+	// yaml is very sensitive to that, and fails silently
+	inputYaml := `
+type: Resource
+spec:
+  name: the name
+  some_value: the value
+		`
+
+	expectedJSON := `{
+		"type": "Resource",
+		"spec": {
+			"id": "1",
+			"name": "the name",
+			"some_value": "the value"
+		}
+	}`
+
+	mockSample := sampleResource{
+		ID:        "1",
+		Name:      "the name",
+		SomeValue: "the value",
+	}
+
+	//setup
+	router := mux.NewRouter()
+	testServer := httptest.NewServer(router)
+	defer testServer.Close()
+
+	mockManager := new(sampleResourceManager)
+	mockManager.On("Create", mockSample).Return(mockSample, nil)
+	manager := rm.New[sampleResource](
+		"Resource",
+		"Resources",
+		mockManager,
+		rm.WithIDGen(func() id.ID {
+			return id.ID("1")
+		}),
+		rm.WithOperations(rm.OperationCreate),
+	)
+	manager.RegisterRoutes(router)
+
+	// prepare request
+	req, err := http.NewRequest(
+		http.MethodPost,
+		testServer.URL+"/resources",
+		strings.NewReader(inputYaml),
+	)
+	require.NoError(t, err)
+
+	req.Header.Set("Content-Type", "text/yaml")  // request content-type
+	req.Header.Set("Accept", "application/json") // expected response content-type
+
+	resp, err := testServer.Client().Do(req)
+	require.NoError(t, err)
+
+	actualBody, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	require.NoError(t, err)
+
+	assert.JSONEq(t, expectedJSON, string(actualBody))
+}
 
 func TestSampleResource(t *testing.T) {
 	sample := sampleResource{
@@ -130,7 +200,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
@@ -320,7 +390,7 @@ func TestAugmentedResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
@@ -370,11 +440,11 @@ func TestAugmentedResource(t *testing.T) {
 // test structures and mocks
 
 type sampleResource struct {
-	ID   id.ID  `mapstructure:"id"`
-	Name string `mapstructure:"name"`
+	ID   id.ID  `json:"id"`
+	Name string `json:"name"`
 
-	SomeValue              string `mapstructure:"some_value"`
-	SomeAugmentedOnlyValue string `mapstructure:"some_augmented_value,omitempty"`
+	SomeValue              string `json:"some_value"`
+	SomeAugmentedOnlyValue string `json:"some_augmented_value,omitempty"`
 }
 
 func (sr sampleResource) HasID() bool {

@@ -6,9 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -21,7 +19,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/mitchellh/mapstructure"
 )
 
 type ResourceSpec interface {
@@ -30,13 +27,13 @@ type ResourceSpec interface {
 }
 
 type ResourceList[T ResourceSpec] struct {
-	Count int              `mapstructure:"count"`
-	Items []map[string]any `mapstructure:"items"`
+	Count int   `json:"count"`
+	Items []any `json:"items"`
 }
 
 type Resource[T ResourceSpec] struct {
-	Type string `mapstructure:"type"`
-	Spec T      `mapstructure:"spec"`
+	Type string `json:"type"`
+	Spec T      `json:"spec"`
 }
 
 type Manager interface {
@@ -77,6 +74,12 @@ func WithOperations(ops ...Operation) managerOption {
 func WithTracer(tracer trace.Tracer) managerOption {
 	return func(c *config) {
 		c.tracer = tracer
+	}
+}
+
+func CanBeAugmented() managerOption {
+	return func(c *config) {
+		c.enabledOperations = append(c.enabledOperations, augmentedOperations...)
 	}
 }
 
@@ -228,6 +231,10 @@ func paginationParams(r *http.Request, sortingFields []string) (take, skip int, 
 		return
 	}
 
+	if take == 0 {
+		take = 20
+	}
+
 	skip, err = getIntFromQuery(r, "skip")
 	if err != nil {
 		err = fmt.Errorf("error reading skip param: %w", err)
@@ -248,19 +255,14 @@ func paginationParams(r *http.Request, sortingFields []string) (take, skip int, 
 }
 
 func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
-	encoder, err := encoderFromRequest(r)
-	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
-		return
-	}
-	w.Header().Set("Content-Type", encoder.ResponseContentType())
+	encoder := EncoderFromRequest(r)
 
 	ctx := r.Context()
 	take, skip,
 		query, sortBy,
 		sortDirection, err := paginationParams(r, m.rh.SortingFields())
 	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot process request: %s", err.Error()))
 		return
 	}
 
@@ -293,7 +295,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	//       of records inside "item"
 	resourceList := ResourceList[T]{
 		Count: count,
-		Items: []map[string]any{},
+		Items: []any{},
 	}
 
 	for _, item := range items {
@@ -302,23 +304,13 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 			Spec: item,
 		}
 
-		var values map[string]any
-		err := encode(resource, &values)
-		if err != nil {
-			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-			return
-		}
-
-		resourceList.Items = append(resourceList.Items, values)
+		resourceList.Items = append(resourceList.Items, resource)
 	}
 
-	bytes, err := encodeValues(resourceList, encoder)
+	err = encoder.WriteEncodedResponse(w, http.StatusOK, resourceList)
 	if err != nil {
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		return
 	}
-
-	writeResponse(w, http.StatusOK, string(bytes))
 }
 
 const HeaderAugmented = "X-Tracetest-Augmented"
@@ -328,12 +320,7 @@ func isRequestForAugmented(r *http.Request) bool {
 }
 
 func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
-	encoder, err := encoderFromRequest(r)
-	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
-		return
-	}
-	w.Header().Set("Content-Type", encoder.ResponseContentType())
+	encoder := EncoderFromRequest(r)
 
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
@@ -354,39 +341,31 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 		Spec: item,
 	}
 
-	bytes, err := encodeValues(newResource, encoder)
+	err = encoder.WriteEncodedResponse(w, http.StatusOK, newResource)
 	if err != nil {
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		return
 	}
-
-	writeResponse(w, http.StatusOK, string(bytes))
 }
 
 func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
-	encoder, err := encoderFromRequest(r)
-	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
-		return
-	}
-	w.Header().Set("Content-Type", encoder.ResponseContentType())
+	encoder := EncoderFromRequest(r)
 
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	err = m.rh.Delete(r.Context(), id)
+	err := m.rh.Delete(r.Context(), id)
 	if err != nil {
 		m.handleResourceHandlerError(w, "deleting", err, encoder)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	encoder.WriteEncodedResponse(w, http.StatusNoContent, nil)
 }
 
-func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb string, err error, encoder encoder) {
+func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb string, err error, encoder Encoder) {
 	// 404 - not found
 	if errors.Is(err, sql.ErrNoRows) {
-		w.WriteHeader(http.StatusNotFound)
+		encoder.WriteEncodedResponse(w, http.StatusNotFound, nil)
 		return
 	}
 
@@ -396,23 +375,12 @@ func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb stri
 }
 
 func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
-	encoder, err := encoderFromRequest(r)
-	if err != nil {
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("cannot process request: %s", err.Error()))
-		return
-	}
-	w.Header().Set("Content-Type", encoder.ResponseContentType())
-
-	values, err := readValues(r, encoder)
-	if err != nil {
-		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
-		return
-	}
+	encoder := EncoderFromRequest(r)
 
 	targetResource := Resource[T]{}
-	err = decode(values, &targetResource)
+	err := encoder.DecodeRequestBody(&targetResource)
 	if err != nil {
-		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot unmarshal body values: %w", err))
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
 		return
 	}
 
@@ -434,114 +402,21 @@ func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, s
 		Spec: created,
 	}
 
-	bytes, err := encodeValues(newResource, encoder)
+	err = encoder.WriteEncodedResponse(w, statusCode, newResource)
 	if err != nil {
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		return
 	}
-
-	writeResponse(w, statusCode, string(bytes))
 }
 
-func writeResponse(w http.ResponseWriter, code int, msg string) {
-	w.WriteHeader(code)
-	w.Write([]byte(msg))
-}
-
-func writeError(w http.ResponseWriter, enc encoder, code int, err error) {
-	body, err := enc.Marshal(map[string]any{
+func writeError(w http.ResponseWriter, enc Encoder, code int, err error) {
+	err = enc.WriteEncodedResponse(w, code, map[string]any{
 		"code":  code,
 		"error": err.Error(),
 	})
+
 	if err != nil {
 		// this panic is intentional. Since we have a hardcoded map to encode
 		// any errors means there's something very very wrong
 		panic(fmt.Errorf("cannot marshal error: %w", err))
-	}
-
-	writeResponse(w, code, string(body))
-}
-
-func encodeValues(resource any, enc encoder) ([]byte, error) {
-	var values map[string]any
-
-	err := encode(resource, &values)
-	if err != nil {
-		return nil, fmt.Errorf("cannot encode resource: %w", err)
-	}
-
-	return enc.Marshal(values)
-}
-
-func readValues(r *http.Request, enc encoder) (map[string]any, error) {
-	body, err := readBody(r)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read yaml body: %w", err)
-	}
-
-	var out map[string]any
-	err = enc.Unmarshal(body, &out)
-	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal request: %w", err)
-	}
-
-	return out, err
-}
-
-func readBody(r *http.Request) ([]byte, error) {
-	if r.Body == nil {
-		return nil, fmt.Errorf("cannot read nil request body")
-	}
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read request body: %w", err)
-	}
-
-	return body, nil
-}
-
-func decode(input any, output any) error {
-	return mapstructure.Decode(input, output)
-}
-
-func encode(input any, output *map[string]any) error {
-	err := mapstructure.Decode(input, output)
-	if err != nil {
-		return err
-	}
-
-	fixInternalSlicesMapping(output)
-
-	return nil
-}
-
-func fixInternalSlicesMapping(output *map[string]any) {
-	for k, v := range *output {
-		value := reflect.ValueOf(v)
-		if value.Kind() == reflect.Map {
-			if submap, ok := v.(map[string]any); ok {
-				fixInternalSlicesMapping(&submap)
-			}
-		}
-
-		if value.Kind() == reflect.Slice {
-			if value.Len() == 0 {
-				continue
-			}
-
-			firstItem := value.Index(0)
-			if firstItem.Kind() != reflect.Struct {
-				continue
-			}
-
-			newOutput := make([]map[string]any, value.Len())
-
-			for i := 0; i < value.Len(); i++ {
-				mapstructure.Decode(value.Index(i).Interface(), &newOutput[i])
-			}
-
-			deferencedOutput := *output
-			deferencedOutput[k] = newOutput
-		}
 	}
 }

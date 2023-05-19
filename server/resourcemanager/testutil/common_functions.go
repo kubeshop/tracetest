@@ -7,10 +7,10 @@ import (
 	"net/http/httputil"
 	"testing"
 
+	"github.com/Jeffail/gabs/v2"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 func dumpResponseIfNot(t *testing.T, success bool, resp *http.Response) {
@@ -31,35 +31,29 @@ func generateRandomString() string {
 }
 
 func RemoveFieldFromJSONResource(field, jsonResource string) string {
-	resourceAsMap := parseJSON(jsonResource)
-
-	clean := removeFieldFromResource(field, resourceAsMap)
-
-	out, err := json.Marshal(clean)
+	jsonParsed, err := gabs.ParseJSON([]byte(jsonResource))
 	if err != nil {
 		panic(err)
 	}
-	return string(out)
+
+	field = "spec." + field
+
+	jf := jsonParsed.Path(field)
+	if jf == nil {
+		// field not exists, do nothing
+		return jsonResource
+	}
+
+	err = jsonParsed.DeleteP(field)
+	if err != nil {
+		panic(err)
+	}
+
+	return jsonParsed.String()
 }
 
 func removeIDFromJSON(input string) string {
 	return RemoveFieldFromJSONResource("id", input)
-}
-
-func removeFieldFromResource(field string, input map[string]any) map[string]any {
-	out := map[string]any{}
-	out["type"] = input["type"]
-	newSpec := map[string]any{}
-	for k, v := range input["spec"].(map[string]any) {
-		if k == field {
-			continue
-		}
-		newSpec[k] = v
-	}
-
-	out["spec"] = newSpec
-
-	return out
 }
 
 func parseJSON(input string) map[string]any {

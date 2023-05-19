@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/modeltest"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -25,10 +26,10 @@ func TestCreateRun(t *testing.T) {
 		Metadata: model.RunMetadata{
 			"key": "Value",
 		},
-		Environment: model.Environment{
+		Environment: environment.Environment{
 			Name:        "env1",
 			Description: "env1",
-			Values: []model.EnvironmentValue{{
+			Values: []environment.EnvironmentValue{{
 				Key:   "key",
 				Value: "value",
 			}}},

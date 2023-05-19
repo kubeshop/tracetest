@@ -21,7 +21,7 @@ var testExportCmd = &cobra.Command{
 	Short:  "Exports a test into a file",
 	Long:   "Exports a test into a file",
 	PreRun: setupCommand(),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		analytics.Track("Test Export", "cmd", map[string]string{})
 
 		ctx := context.Background()
@@ -36,11 +36,8 @@ var testExportCmd = &cobra.Command{
 		}
 
 		err := exportTestAction.Run(ctx, actionArgs)
-		if err != nil {
-			cliLogger.Error("could not get tests", zap.Error(err))
-			return
-		}
-	},
+		return "", err
+	}),
 	PostRun: teardownCommand,
 }
 

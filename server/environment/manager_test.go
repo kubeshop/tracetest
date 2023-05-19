@@ -56,7 +56,7 @@ func TestEnvironment(t *testing.T) {
 			manager := resourcemanager.New[environment.Environment](
 				environment.ResourceName,
 				environment.ResourceNamePlural,
-				&environmentRepository,
+				environmentRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
 				resourcemanager.WithOperations(environment.Operations...),
 			)
@@ -72,7 +72,7 @@ func TestEnvironment(t *testing.T) {
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
 				environmentRepository.Create(context.TODO(), sampleEnvironment)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				environmentRepository.Create(context.TODO(), sampleEnvironment)
 				environmentRepository.Create(context.TODO(), secondEnvironment)
 				environmentRepository.Create(context.TODO(), thirdEnvironment)

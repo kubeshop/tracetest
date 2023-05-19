@@ -2,10 +2,9 @@ package formatters
 
 import (
 	"github.com/alexeyco/simpletable"
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-
-	"gopkg.in/yaml.v2"
 )
 
 type DatastoreFormatter struct{}
@@ -35,7 +34,23 @@ func (f DatastoreFormatter) ToTable(file *file.File) (*simpletable.Header, *simp
 }
 
 func (f DatastoreFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpletable.Body, error) {
-	return nil, nil, nil
+	rawList, err := f.ToListStruct(file)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	body := simpletable.Body{}
+	for _, raw := range rawList {
+		resource := raw.(openapi.DataStoreResource)
+		row, err := f.getTableRow(resource)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		body.Cells = append(body.Cells, row)
+	}
+
+	return f.getTableHeader(), &body, nil
 }
 
 func (f DatastoreFormatter) ToStruct(file *file.File) (interface{}, error) {
@@ -50,7 +65,20 @@ func (f DatastoreFormatter) ToStruct(file *file.File) (interface{}, error) {
 }
 
 func (f DatastoreFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
-	return nil, nil
+	var dataStoreList openapi.DataStoreList
+	nullableList := openapi.NewNullableDataStoreList(&dataStoreList)
+
+	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]interface{}, len(dataStoreList.Items))
+	for i, item := range dataStoreList.Items {
+		items[i] = item
+	}
+
+	return items, nil
 }
 
 func (f DatastoreFormatter) getTableHeader() *simpletable.Header {

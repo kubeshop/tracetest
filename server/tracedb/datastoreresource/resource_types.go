@@ -1,9 +1,11 @@
 package datastoreresource
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"golang.org/x/exp/slices"
 )
@@ -14,49 +16,49 @@ const ResourceNamePlural = "DataStores"
 type DataStoreType string
 
 type DataStore struct {
-	ID        id.ID           `mapstructure:"id"`
-	Name      string          `mapstructure:"name"`
-	Type      DataStoreType   `mapstructure:"type"`
-	Default   bool            `mapstructure:"default"`
-	Values    DataStoreValues `mapstructure:"values,squash"`
-	CreatedAt string          `mapstructure:"createdAt"`
+	ID        id.ID           `json:"id"`
+	Name      string          `json:"name"`
+	Type      DataStoreType   `json:"type"`
+	Default   bool            `json:"default"`
+	Values    DataStoreValues `json:"values"`
+	CreatedAt string          `json:"createdAt"`
 }
 
 type DataStoreValues struct {
-	AwsXRay    *AWSXRayConfig            `mapstructure:"awsxray,omitempty"`
-	ElasticApm *ElasticSearchConfig      `mapstructure:"elasticapm,omitempty"`
-	Jaeger     *GRPCClientSettings       `mapstructure:"jaeger,omitempty"`
-	OpenSearch *ElasticSearchConfig      `mapstructure:"opensearch,omitempty"`
-	SignalFx   *SignalFXConfig           `mapstructure:"signalfx,omitempty"`
-	Tempo      *MultiChannelClientConfig `mapstructure:"tempo,omitempty"`
+	AwsXRay    *AWSXRayConfig            `json:"awsxray,omitempty"`
+	ElasticApm *ElasticSearchConfig      `json:"elasticapm,omitempty"`
+	Jaeger     *GRPCClientSettings       `json:"jaeger,omitempty"`
+	OpenSearch *ElasticSearchConfig      `json:"opensearch,omitempty"`
+	SignalFx   *SignalFXConfig           `json:"signalfx,omitempty"`
+	Tempo      *MultiChannelClientConfig `json:"tempo,omitempty"`
 }
 
 type AWSXRayConfig struct {
-	Region          string `mapstructure:"region"`
-	AccessKeyID     string `mapstructure:"accessKeyId"`
-	SecretAccessKey string `mapstructure:"secretAccessKey"`
-	SessionToken    string `mapstructure:"sessionToken"`
-	UseDefaultAuth  bool   `mapstructure:"useDefaultAuth"`
+	Region          string `json:"region"`
+	AccessKeyID     string `json:"accessKeyId"`
+	SecretAccessKey string `json:"secretAccessKey"`
+	SessionToken    string `json:"sessionToken"`
+	UseDefaultAuth  bool   `json:"useDefaultAuth"`
 }
 
 type ElasticSearchConfig struct {
-	Addresses          []string `mapstructure:"addresses"`
-	Username           string   `mapstructure:"username"`
-	Password           string   `mapstructure:"password"`
-	Index              string   `mapstructure:"index"`
-	Certificate        string   `mapstructure:"certificate"`
-	InsecureSkipVerify bool     `mapstructure:"insecureSkipVerify"`
+	Addresses          []string `json:"addresses"`
+	Username           string   `json:"username"`
+	Password           string   `json:"password"`
+	Index              string   `json:"index"`
+	Certificate        string   `json:"certificate"`
+	InsecureSkipVerify bool     `json:"insecureSkipVerify"`
 }
 
 type GRPCClientSettings struct {
-	Endpoint        string            `mapstructure:"endpoint,omitempty"`
-	ReadBufferSize  int               `mapstructure:"readBufferSize,omitempty"`
-	WriteBufferSize int               `mapstructure:"writeBufferSize,omitempty"`
-	WaitForReady    bool              `mapstructure:"waitForReady,omitempty"`
-	Headers         map[string]string `mapstructure:"headers,omitempty"`
-	BalancerName    string            `mapstructure:"balancerName,omitempty"`
-	Compression     GRPCCompression   `mapstructure:"compression,omitempty"`
-	TLS             *TLS              `mapstructure:"tls,omitempty"`
+	Endpoint        string            `json:"endpoint,omitempty"`
+	ReadBufferSize  int               `json:"readBufferSize,omitempty"`
+	WriteBufferSize int               `json:"writeBufferSize,omitempty"`
+	WaitForReady    bool              `json:"waitForReady,omitempty"`
+	Headers         map[string]string `json:"headers,omitempty"`
+	BalancerName    string            `json:"balancerName,omitempty"`
+	Compression     GRPCCompression   `json:"compression,omitempty"`
+	TLS             *TLS              `json:"tls,omitempty"`
 }
 
 type GRPCCompression string
@@ -71,18 +73,18 @@ const (
 )
 
 type TLS struct {
-	Insecure           bool        `mapstructure:"insecure,omitempty"`
-	InsecureSkipVerify bool        `mapstructure:"insecureSkipVerify,omitempty"`
-	ServerName         string      `mapstructure:"serverName,omitempty"`
-	Settings           *TLSSetting `mapstructure:"settings,omitempty"`
+	Insecure           bool        `json:"insecure,omitempty"`
+	InsecureSkipVerify bool        `json:"insecureSkipVerify,omitempty"`
+	ServerName         string      `json:"serverName,omitempty"`
+	Settings           *TLSSetting `json:"settings,omitempty"`
 }
 
 type TLSSetting struct {
-	CAFile     string `mapstructure:"cAFile,omitempty"`
-	CertFile   string `mapstructure:"certFile,omitempty"`
-	KeyFile    string `mapstructure:"keyFile,omitempty"`
-	MinVersion string `mapstructure:"minVersion,omitempty"`
-	MaxVersion string `mapstructure:"maxVersion,omitempty"`
+	CAFile     string `json:"cAFile,omitempty"`
+	CertFile   string `json:"certFile,omitempty"`
+	KeyFile    string `json:"keyFile,omitempty"`
+	MinVersion string `json:"minVersion,omitempty"`
+	MaxVersion string `json:"maxVersion,omitempty"`
 }
 
 type MultiChannelClientType string
@@ -93,20 +95,20 @@ const (
 )
 
 type MultiChannelClientConfig struct {
-	Type MultiChannelClientType `mapstructure:"type"`
-	Grpc *GRPCClientSettings    `mapstructure:"grpc,omitempty"`
-	Http *HttpClientConfig      `mapstructure:"http,omitempty"`
+	Type MultiChannelClientType `json:"type"`
+	Grpc *GRPCClientSettings    `json:"grpc,omitempty"`
+	Http *HttpClientConfig      `json:"http,omitempty"`
 }
 
 type HttpClientConfig struct {
-	Url     string            `mapstructure:"url"`
-	Headers map[string]string `mapstructure:"headers,omitempty"`
-	TLS     *TLS              `mapstructure:"tls,omitempty"`
+	Url     string            `json:"url"`
+	Headers map[string]string `json:"headers,omitempty"`
+	TLS     *TLS              `json:"tls,omitempty"`
 }
 
 type SignalFXConfig struct {
-	Realm string `mapstructure:"realm"`
-	Token string `mapstructure:"token"`
+	Realm string `json:"realm"`
+	Token string `json:"token"`
 }
 
 const (
@@ -197,4 +199,88 @@ func (ds DataStore) HasID() bool {
 
 func (ds DataStore) IsOTLPBasedProvider() bool {
 	return slices.Contains(otlpBasedDataStores, ds.Type)
+}
+
+type squashedDataStore struct {
+	ID         id.ID                     `json:"id"`
+	Name       string                    `json:"name"`
+	Type       DataStoreType             `json:"type"`
+	Default    bool                      `json:"default"`
+	CreatedAt  string                    `json:"createdAt"`
+	AwsXRay    *AWSXRayConfig            `json:"awsxray,omitempty"`
+	ElasticApm *ElasticSearchConfig      `json:"elasticapm,omitempty"`
+	Jaeger     *GRPCClientSettings       `json:"jaeger,omitempty"`
+	OpenSearch *ElasticSearchConfig      `json:"opensearch,omitempty"`
+	SignalFx   *SignalFXConfig           `json:"signalfx,omitempty"`
+	Tempo      *MultiChannelClientConfig `json:"tempo,omitempty"`
+}
+
+func (d squashedDataStore) populate(dataStore *DataStore) {
+	if dataStore == nil {
+		return
+	}
+
+	dataStore.ID = d.ID
+	dataStore.Name = d.Name
+	dataStore.Type = d.Type
+	dataStore.Default = d.Default
+	dataStore.CreatedAt = d.CreatedAt
+	dataStore.Values = DataStoreValues{
+		AwsXRay:    d.AwsXRay,
+		ElasticApm: d.ElasticApm,
+		Jaeger:     d.Jaeger,
+		OpenSearch: d.OpenSearch,
+		SignalFx:   d.SignalFx,
+		Tempo:      d.Tempo,
+	}
+}
+
+func (d DataStore) MarshalJSON() ([]byte, error) {
+	squashedObject := d.squashed()
+	return json.Marshal(squashedObject)
+}
+
+func (d DataStore) MarshalYAML() ([]byte, error) {
+	squashedObject := d.squashed()
+	return yaml.Marshal(squashedObject)
+}
+
+func (d *DataStore) UnmarshalJSON(input []byte) error {
+	squashedObject := squashedDataStore{}
+	err := json.Unmarshal(input, &squashedObject)
+	if err != nil {
+		return err
+	}
+
+	squashedObject.populate(d)
+
+	return nil
+}
+
+func (d *DataStore) UnmarshalYAML(input []byte) error {
+	squashedObject := squashedDataStore{}
+	err := yaml.Unmarshal(input, &squashedObject)
+	if err != nil {
+		return err
+	}
+
+	squashedObject.populate(d)
+
+	return nil
+}
+
+func (d DataStore) squashed() squashedDataStore {
+	return squashedDataStore{
+		ID:         d.ID,
+		Name:       d.Name,
+		Type:       d.Type,
+		Default:    d.Default,
+		CreatedAt:  d.CreatedAt,
+		AwsXRay:    d.Values.AwsXRay,
+		ElasticApm: d.Values.ElasticApm,
+		Jaeger:     d.Values.Jaeger,
+		OpenSearch: d.Values.OpenSearch,
+		SignalFx:   d.Values.SignalFx,
+		Tempo:      d.Values.Tempo,
+	}
 }

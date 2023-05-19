@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type (
+	// this file yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
 		ID               id.ID
 		CreatedAt        time.Time
@@ -33,23 +35,23 @@ type (
 	}
 
 	Summary struct {
-		Runs    int
-		LastRun LastRun
+		Runs    int     `json:"runs"`
+		LastRun LastRun `json:"lastRun"`
 	}
 
 	LastRun struct {
-		Time   time.Time
-		Passes int
-		Fails  int
+		Time   time.Time `json:"time"`
+		Passes int       `json:"passes"`
+		Fails  int       `json:"fails"`
 	}
 
 	TriggerType string
 
 	Trigger struct {
-		Type    TriggerType
-		HTTP    *HTTPRequest
-		GRPC    *GRPCRequest
-		TRACEID *TRACEIDRequest
+		Type    TriggerType     `json:"triggerType"`
+		HTTP    *HTTPRequest    `json:"http,omitempty"`
+		GRPC    *GRPCRequest    `json:"grpc,omitempty"`
+		TraceID *TRACEIDRequest `json:"traceid,omitempty"`
 	}
 
 	TriggerResult struct {
@@ -105,7 +107,7 @@ type (
 		Metadata RunMetadata
 
 		// environment
-		Environment Environment
+		Environment environment.Environment
 
 		// transaction
 

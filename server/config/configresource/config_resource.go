@@ -12,15 +12,16 @@ import (
 )
 
 var Operations = []resourcemanager.Operation{
+	resourcemanager.OperationList,
 	resourcemanager.OperationGet,
 	resourcemanager.OperationUpdate,
 }
 
 type Config struct {
-	ID   id.ID  `mapstructure:"id"`
-	Name string `mapstructure:"name"`
+	ID   id.ID  `json:"id"`
+	Name string `json:"name"`
 
-	AnalyticsEnabled bool `mapstructure:"analyticsEnabled"`
+	AnalyticsEnabled bool `json:"analyticsEnabled"`
 }
 
 func (c Config) HasID() bool {
@@ -118,6 +119,23 @@ func (r *Repository) Get(ctx context.Context, i id.ID) (Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Config, error) {
+	cfg, err := r.Get(ctx, id.ID("current"))
+	if err != nil {
+		return []Config{}, err
+	}
+
+	return []Config{cfg}, nil
+}
+
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
+	return 1, nil
+}
+
+func (*Repository) SortingFields() []string {
+	return []string{"name"}
 }
 
 const (
