@@ -15,6 +15,5 @@ spec:
     - ./update_transaction.yml
     # delete transaction
     - ./delete_transaction.yml
-
     # delete transaction steps
     - ./delete_transaction_step.yml
