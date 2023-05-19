@@ -39,6 +39,10 @@ func (db *elasticsearchDB) Close() error {
 	return nil
 }
 
+func (db *elasticsearchDB) GetEndpoints() string {
+	return strings.Join(db.config.Addresses, ", ")
+}
+
 func (db *elasticsearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("ElasticSearch", elasticSearchDefaultPorts(), db.config.Addresses...)),
