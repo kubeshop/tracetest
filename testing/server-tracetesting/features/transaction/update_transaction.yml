@@ -26,7 +26,7 @@ spec:
       - attr:tracetest.selected_spans.count = 1
       - attr:tracetest.response.status = 200
       - attr:tracetest.response.body | json_path '$.spec.name' = "test-transaction-updated"
-  - selector: span[name="POST /api/transactions" tracetest.span.type="http"]
+  - selector: span[name="PUT /api/transactions/{id}" tracetest.span.type="http"]
     assertions:
       - attr:tracetest.selected_spans.count = 1
   - selector: span[name = "exec INSERT"]
