@@ -47,6 +47,10 @@ func (db *signalfxDB) Close() error {
 	return nil
 }
 
+func (db *signalfxDB) GetEndpoints() string {
+	return fmt.Sprintf("%s:%s", db.getURL(), "443")
+}
+
 func (db *signalfxDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
 	tester := connection.NewTester(
