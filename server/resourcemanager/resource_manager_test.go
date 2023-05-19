@@ -451,6 +451,10 @@ func (sr sampleResource) HasID() bool {
 	return sr.ID.String() != ""
 }
 
+func (sr sampleResource) GetID() id.ID {
+	return sr.ID
+}
+
 func (sr sampleResource) Validate() error {
 	return nil
 }

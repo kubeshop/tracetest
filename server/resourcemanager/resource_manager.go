@@ -1,7 +1,6 @@
 package resourcemanager
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -23,6 +22,7 @@ import (
 
 type ResourceSpec interface {
 	HasID() bool
+	GetID() id.ID
 	Validate() error
 }
 
@@ -203,11 +203,78 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
-	m.operationWithBody(w, r, http.StatusCreated, "creating", m.rh.Create)
+	encoder := EncoderFromRequest(r)
+
+	targetResource := Resource[T]{}
+	err := encoder.DecodeRequestBody(&targetResource)
+	if err != nil {
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
+		return
+	}
+
+	// TODO: if resourceType != values.resourceType return error
+
+	if !targetResource.Spec.HasID() {
+		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
+	}
+
+	created, err := m.rh.Create(r.Context(), targetResource.Spec)
+	if err != nil {
+		m.handleResourceHandlerError(w, "creating", err, encoder)
+		return
+	}
+
+	newResource := Resource[T]{
+		Type: m.resourceTypeSingular,
+		Spec: created,
+	}
+
+	err = encoder.WriteEncodedResponse(w, http.StatusCreated, newResource)
+	if err != nil {
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
+	}
 }
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
-	m.operationWithBody(w, r, http.StatusOK, "updating", m.rh.Update)
+	encoder := EncoderFromRequest(r)
+
+	targetResource := Resource[T]{}
+	err := encoder.DecodeRequestBody(&targetResource)
+	if err != nil {
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
+		return
+	}
+
+	// TODO: if resourceType != values.resourceType return error
+
+	vars := mux.Vars(r)
+	urlID := id.ID(vars["id"])
+	if targetResource.Spec.HasID() && targetResource.Spec.GetID() != urlID {
+		err := fmt.Errorf(
+			"ID '%s' defined in resource spec does not match ID '%s' from URL",
+			targetResource.Spec.GetID(),
+			urlID,
+		)
+		writeError(w, encoder, http.StatusBadRequest, err)
+	}
+	// enforce ID from url in targetResource
+	targetResource.Spec = m.rh.SetID(targetResource.Spec, urlID)
+
+	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
+	if err != nil {
+		m.handleResourceHandlerError(w, "updating", err, encoder)
+		return
+	}
+
+	newResource := Resource[T]{
+		Type: m.resourceTypeSingular,
+		Spec: updated,
+	}
+
+	err = encoder.WriteEncodedResponse(w, http.StatusOK, newResource)
+	if err != nil {
+		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
+	}
 }
 
 func getIntFromQuery(r *http.Request, key string) (int, error) {
@@ -372,40 +439,6 @@ func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb stri
 	// 500 - internal server error
 	err = fmt.Errorf("error %s resource %s: %w", verb, m.resourceTypeSingular, err)
 	writeError(w, encoder, http.StatusInternalServerError, err)
-}
-
-func (m *manager[T]) operationWithBody(w http.ResponseWriter, r *http.Request, statusCode int, operationVerb string, fn func(context.Context, T) (T, error)) {
-	encoder := EncoderFromRequest(r)
-
-	targetResource := Resource[T]{}
-	err := encoder.DecodeRequestBody(&targetResource)
-	if err != nil {
-		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
-		return
-	}
-
-	// TODO: if resourceType != values.resourceType return error
-
-	// TODO: check if this needs to be done per operation
-	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
-	}
-
-	created, err := fn(r.Context(), targetResource.Spec)
-	if err != nil {
-		m.handleResourceHandlerError(w, operationVerb, err, encoder)
-		return
-	}
-
-	newResource := Resource[T]{
-		Type: m.resourceTypeSingular,
-		Spec: created,
-	}
-
-	err = encoder.WriteEncodedResponse(w, statusCode, newResource)
-	if err != nil {
-		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-	}
 }
 
 func writeError(w http.ResponseWriter, enc Encoder, code int, err error) {

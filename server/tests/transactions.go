@@ -57,6 +57,10 @@ func (t Transaction) HasID() bool {
 	return t.ID != ""
 }
 
+func (t Transaction) GetID() id.ID {
+	return t.ID
+}
+
 func (t Transaction) Validate() error {
 	return nil
 }
@@ -184,20 +188,22 @@ func (r *TransactionsRepository) Create(ctx context.Context, transaction Transac
 }
 
 func (r *TransactionsRepository) Update(ctx context.Context, transaction Transaction) (Transaction, error) {
-	if transaction.GetVersion() == 0 {
-		setVersion(&transaction, 1)
-	}
-
 	oldTransaction, err := r.GetLatestVersion(ctx, transaction.ID)
 	if err != nil {
 		return Transaction{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
+	}
+
+	if transaction.GetVersion() == 0 {
+		setVersion(&transaction, oldTransaction.GetVersion())
 	}
 
 	// keep the same creation date to keep sort order
 	transaction.CreatedAt = oldTransaction.CreatedAt
 	transactionToUpdate := BumpTransactionVersionIfNeeded(oldTransaction, transaction)
 
-	if oldTransaction.Version == transactionToUpdate.Version {
+	fmt.Println("********", oldTransaction.GetVersion(), transactionToUpdate.GetVersion())
+
+	if oldTransaction.GetVersion() == transactionToUpdate.GetVersion() {
 		// No change in the version, so nothing changes and it doesn't need to persist it
 		return transactionToUpdate, nil
 	}
@@ -607,10 +613,10 @@ func removeNonAugmentedFields(t *Transaction) {
 	t.Summary = nil
 }
 
-func BumpTransactionVersionIfNeeded(in, updated Transaction) Transaction {
-	transactionHasChanged := transactionHasChanged(in, updated)
+func BumpTransactionVersionIfNeeded(original, updated Transaction) Transaction {
+	transactionHasChanged := transactionHasChanged(original, updated)
 	if transactionHasChanged {
-		setVersion(&updated, in.GetVersion()+1)
+		setVersion(&updated, original.GetVersion()+1)
 	}
 
 	return updated
