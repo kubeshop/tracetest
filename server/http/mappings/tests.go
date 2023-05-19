@@ -109,11 +109,9 @@ func (m OpenAPI) Outputs(in maps.Ordered[string, model.Output]) []openapi.TestOu
 func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
 	return openapi.Trigger{
 		TriggerType: string(in.Type),
-		TriggerSettings: openapi.TriggerTriggerSettings{
-			Http:    m.HTTPRequest(in.HTTP),
-			Grpc:    m.GRPCRequest(in.GRPC),
-			Traceid: m.TRACEIDRequest(in.TraceID),
-		},
+		Http:        m.HTTPRequest(in.HTTP),
+		Grpc:        m.GRPCRequest(in.GRPC),
+		Traceid:     m.TRACEIDRequest(in.TraceID),
 	}
 }
 
@@ -465,9 +463,9 @@ func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) maps.Ordered[string,
 func (m Model) Trigger(in openapi.Trigger) model.Trigger {
 	return model.Trigger{
 		Type:    model.TriggerType(in.TriggerType),
-		HTTP:    m.HTTPRequest(in.TriggerSettings.Http),
-		GRPC:    m.GRPCRequest(in.TriggerSettings.Grpc),
-		TraceID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
+		HTTP:    m.HTTPRequest(in.Http),
+		GRPC:    m.GRPCRequest(in.Grpc),
+		TraceID: m.TRACEIDRequest(in.Traceid),
 	}
 }
 

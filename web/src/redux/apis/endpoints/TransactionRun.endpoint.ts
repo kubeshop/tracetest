@@ -1,7 +1,7 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
-import TransactionRun, {TRawTransactionRun} from 'models/TransactionRun.model';
+import TransactionRun, {TRawTransactionResourceRun} from 'models/TransactionRun.model';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {IListenerFunction} from 'gateways/WebSocket.gateway';
 import WebSocketService from 'services/WebSocket.service';
@@ -23,7 +23,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
-    transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun),
+    transformResponse: (rawTransactionRun: TRawTransactionResourceRun) => TransactionRun(rawTransactionRun),
     transformErrorResponse: ({data: result}) => RunError(result),
   }),
 
@@ -36,7 +36,7 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
-    transformResponse: (rawTransactionRuns: TRawTransactionRun[], meta) => ({
+    transformResponse: (rawTransactionRuns: TRawTransactionResourceRun[], meta) => ({
       total: getTotalCountFromHeaders(meta),
       items: rawTransactionRuns.map(rawTransactionRun => TransactionRun(rawTransactionRun)),
     }),
@@ -45,9 +45,9 @@ const TransactionRunEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getTransactionRunById: builder.query<TransactionRun, {transactionId: string; runId: string}>({
     query: ({transactionId, runId}) => `/transactions/${transactionId}/run/${runId}`,
     providesTags: result => [{type: TracetestApiTags.TRANSACTION_RUN, id: result?.id}],
-    transformResponse: (rawTransactionRun: TRawTransactionRun) => TransactionRun(rawTransactionRun),
+    transformResponse: (rawTransactionRun: TRawTransactionResourceRun) => TransactionRun(rawTransactionRun),
     async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-      const listener: IListenerFunction<TRawTransactionRun> = data => {
+      const listener: IListenerFunction<TRawTransactionResourceRun> = data => {
         updateCachedData(() => TransactionRun(data.event));
       };
 

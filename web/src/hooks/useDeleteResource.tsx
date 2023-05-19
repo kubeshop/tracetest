@@ -34,7 +34,7 @@ const useDeleteResource = () => {
         showNotification({
           type: 'error',
           title: `Could not delete ${capitalize(type)}`,
-          description: (error as any).data,
+          description: JSON.stringify(error),
         });
       }
     },

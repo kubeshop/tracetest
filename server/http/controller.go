@@ -543,9 +543,9 @@ func (c *controller) executeTransaction(ctx context.Context, transaction tests.T
 		} else {
 			return resp, err
 		}
-	} 
-    
-    transactionID := id.ID(resp.Body.(openapi.Transaction).Id)
+	}
+
+	transactionID := id.ID(resp.Body.(openapi.Transaction).Id)
 
 	// transaction ready, execute it
 	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)
