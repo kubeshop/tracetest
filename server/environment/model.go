@@ -40,6 +40,10 @@ func (e Environment) HasID() bool {
 	return e.ID != ""
 }
 
+func (e Environment) GetID() id.ID {
+	return e.ID
+}
+
 func (e Environment) Slug() id.ID {
 	return id.ID(strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-")))
 }

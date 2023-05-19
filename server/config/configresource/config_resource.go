@@ -28,6 +28,10 @@ func (c Config) HasID() bool {
 	return c.ID.String() != ""
 }
 
+func (c Config) GetID() id.ID {
+	return c.ID
+}
+
 func (c Config) Validate() error {
 	return nil
 }
