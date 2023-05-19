@@ -12,7 +12,7 @@ func Execute() {
 	root := global.NewRoot()
 	global_register.Register(root)
 
-	if err := root.Cmd.Execute(); err != nil {
+	if err := root.Get().Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

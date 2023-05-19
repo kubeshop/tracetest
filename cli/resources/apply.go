@@ -5,45 +5,56 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/global"
+	global_decorators "github.com/kubeshop/tracetest/cli/global/decorators"
 	global_formatters "github.com/kubeshop/tracetest/cli/global/formatters"
 	resources_actions "github.com/kubeshop/tracetest/cli/resources/actions"
+	resources_decorators "github.com/kubeshop/tracetest/cli/resources/decorators"
 	resources_formatters "github.com/kubeshop/tracetest/cli/resources/formatters"
 	resources_parameters "github.com/kubeshop/tracetest/cli/resources/parameters"
 	"github.com/spf13/cobra"
 )
 
-type Apply struct {
-	args[*resources_parameters.Apply]
+type apply struct {
+	resources_decorators.Resources
+	Parameters *resources_parameters.Apply
 }
 
-func NewApply(root global.Root) Apply {
-	parameters := resources_parameters.NewApply()
-	defaults := NewDefaults("apply", root.Setup)
+type Apply interface {
+	Resource
+}
 
-	apply := Apply{
-		args: NewArgs(defaults, parameters),
+var _ Apply = &apply{}
+
+func NewApply() Apply {
+	parameters := resources_parameters.NewApply()
+	apply := &apply{
+		Parameters: parameters,
 	}
 
-	apply.Cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		GroupID: global.GroupResources.ID,
 		Use:     "apply [resource type]",
 		Short:   "Apply resources",
 		Long:    "Apply (create/update) resources to your Tracetest server",
 		Args:    cobra.MinimumNArgs(1),
-		PreRun:  defaults.PreRun,
-		Run:     defaults.Run(apply.Run),
-		PostRun: defaults.PostRun,
+		PreRun:  global_decorators.NoopRun,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("apply")
+		},
+		PostRun: global_decorators.NoopRun,
 	}
+	cmd.Flags().StringVarP(&apply.Parameters.DefinitionFile, "file", "f", "", "file path with name where to export the resource")
 
-	apply.Cmd.Flags().StringVarP(&apply.Parameters.DefinitionFile, "file", "f", "", "file path with name where to export the resource")
-	root.Cmd.AddCommand(apply.Cmd)
-
-	return apply
+	return global_decorators.Decorate[Apply](
+		apply,
+		resources_decorators.WithResources,
+	)
 }
 
-func (a Apply) Run(cmd *cobra.Command, args []string) (string, error) {
+func (a *apply) Run(cmd *cobra.Command, args []string) {
 	if a.Parameters.DefinitionFile == "" {
-		return "", fmt.Errorf("file with definition must be specified")
+		a.Error(fmt.Errorf("file with definition must be specified"))
+		return
 	}
 
 	ctx := context.Background()
@@ -52,18 +63,22 @@ func (a Apply) Run(cmd *cobra.Command, args []string) (string, error) {
 		File: a.Parameters.DefinitionFile,
 	}
 
-	resource, _, err := a.Setup.ResourceActions.Apply(ctx, applyArgs)
+	resourceActions := a.GetResourceActions()
+
+	resource, _, err := resourceActions.Apply(ctx, applyArgs)
 	if err != nil {
-		return "", err
+		a.Error(err)
+		return
 	}
 
-	resourceFormatter := a.Setup.ResourceActions.Formatter()
-	formatter := resources_formatters.BuildFormatter(a.Setup.Parameters.Output, global_formatters.YAML, resourceFormatter)
+	resourceFormatter := resourceActions.Formatter()
+	formatter := resources_formatters.BuildFormatter(a.Parameters.Output, global_formatters.YAML, resourceFormatter)
 
 	result, err := formatter.Format(resource)
 	if err != nil {
-		return "", err
+		a.Error(err)
+		return
 	}
 
-	return result, nil
+	a.Response(result)
 }
