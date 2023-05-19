@@ -1,6 +1,7 @@
 package formatters
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -57,7 +58,11 @@ func (TransactionFormatter) ToStruct(file *file.File) (interface{}, error) {
 
 	err := yaml.Unmarshal([]byte(file.Contents()), &resource)
 	if err != nil {
-		return nil, err
+		// try JSON
+		err = json.Unmarshal([]byte(file.Contents()), &resource)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return resource, nil

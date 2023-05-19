@@ -27,12 +27,13 @@ func NewTransactionsActions(options ...ResourceArgsOption) transactionActions {
 // Apply implements ResourceActions
 func (actions transactionActions) Apply(ctx context.Context, file file.File) (*file.File, error) {
 	if file.HasID() {
-		if _, ok := file.Definition().Spec.(yaml.Transaction); ok {
-			return nil, fmt.Errorf("file spec is not a transaction")
+		rawTransaction, err := actions.formatter.ToStruct(&file)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse file into transaction: %w", err)
 		}
 
-		transaction := file.Definition().Spec.(yaml.Transaction)
-		return actions.resourceClient.Update(ctx, file, transaction.ID)
+		transaction := rawTransaction.(openapi.TransactionResource)
+		return actions.resourceClient.Update(ctx, file, *transaction.Spec.Id)
 	}
 
 	return actions.resourceClient.Create(ctx, file)
@@ -40,7 +41,7 @@ func (actions transactionActions) Apply(ctx context.Context, file file.File) (*f
 
 // Delete implements ResourceActions
 func (actions transactionActions) Delete(ctx context.Context, id string) (string, error) {
-	return "Environment successfully deleted", actions.resourceClient.Delete(ctx, id)
+	return "Transaction successfully deleted", actions.resourceClient.Delete(ctx, id)
 }
 
 // FileType implements ResourceActions

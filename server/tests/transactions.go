@@ -609,7 +609,6 @@ func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augme
 
 func removeNonAugmentedFields(t *Transaction) {
 	t.CreatedAt = nil
-	t.Version = nil
 	t.Summary = nil
 }
 
