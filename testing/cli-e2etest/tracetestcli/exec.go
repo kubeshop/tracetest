@@ -66,6 +66,11 @@ func runTracetestAsInternalCommand(t *testing.T, tracetestCommand string, tracet
 	argsBackup := os.Args
 	os.Args = slices.Insert(tracetestSubCommands, 0, tracetestCommand)
 
+	exitCode := 0
+	cmd.RegisterCLIExitInterceptor(func(i int) {
+		exitCode = i
+	})
+
 	cmd.Execute()
 
 	os.Args = argsBackup
@@ -100,6 +105,6 @@ func runTracetestAsInternalCommand(t *testing.T, tracetestCommand string, tracet
 		CommandExecuted: fmt.Sprintf("%s %s", tracetestCommand, strings.Join(tracetestSubCommands, " ")),
 		StdOut:          <-stdoutChannel,
 		StdErr:          <-stderrChannel,
-		ExitCode:        0,
+		ExitCode:        exitCode,
 	}
 }

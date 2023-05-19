@@ -3,10 +3,10 @@ package installer
 import (
 	"fmt"
 	"html/template"
+	"os"
 	"os/exec"
 	"strings"
 
-	cliCmd "github.com/kubeshop/tracetest/cli/cmd"
 	"github.com/kubeshop/tracetest/cli/ui"
 )
 
@@ -73,7 +73,7 @@ func (c cmd) exec(ui ui.UI, args ...interface{}) interface{} {
 
 	if !ui.Confirm("Do you want to execute?", false) {
 		ui.Println(c.notConfirmMsg)
-		cliCmd.ExitCLI(1)
+		os.Exit(1)
 	}
 
 	execCmd(renderedCmd.String(), ui)

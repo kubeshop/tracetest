@@ -18,7 +18,8 @@ var (
 	outputFormatsString = strings.Join(outputFormats, "|")
 
 	// overrides
-	overrideEndpoint string
+	overrideEndpoint   string
+	cliExitInterceptor func(code int)
 )
 
 var rootCmd = &cobra.Command{
@@ -37,7 +38,16 @@ func Execute() {
 }
 
 func ExitCLI(errorCode int) {
+	if cliExitInterceptor != nil {
+		cliExitInterceptor(errorCode)
+		return
+	}
+
 	os.Exit(errorCode)
+}
+
+func RegisterCLIExitInterceptor(interceptor func(int)) {
+	cliExitInterceptor = interceptor
 }
 
 var (

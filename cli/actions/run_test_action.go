@@ -13,7 +13,6 @@ import (
 	"time"
 
 	cienvironment "github.com/cucumber/ci-environment/go"
-	"github.com/kubeshop/tracetest/cli/cmd"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -342,7 +341,7 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID int
 	allPassed := tro.Run.Result.GetAllPassed()
 	if params.WaitForResult && !allPassed {
 		// It failed, so we have to return an error status
-		cmd.ExitCLI(1)
+		os.Exit(1)
 	}
 
 	return nil
@@ -378,13 +377,13 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 	if params.WaitForResult {
 		if utils.RunStateIsFailed(tro.Run.GetState()) {
 			// It failed, so we have to return an error status
-			cmd.ExitCLI(1)
+			os.Exit(1)
 		}
 
 		for _, step := range tro.Run.Steps {
 			if !step.Result.GetAllPassed() {
 				// if any test doesn't pass, fail the transaction execution
-				cmd.ExitCLI(1)
+				os.Exit(1)
 			}
 		}
 	}
