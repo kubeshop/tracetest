@@ -44,6 +44,11 @@ func TestLinternResource(t *testing.T) {
 						"name": "security",
 						"enabled": true,
 						"required": true
+					},
+					{
+						"name": "common",
+						"enabled": true,
+						"required": true
 					}
 				]
 			}
@@ -63,6 +68,11 @@ func TestLinternResource(t *testing.T) {
 					},
 					{
 						"name": "security",
+						"enabled": true,
+						"required": true
+					},
+					{
+						"name": "common",
 						"enabled": true,
 						"required": true
 					}
