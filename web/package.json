@@ -40,7 +40,7 @@
     "markdown-it": "13.0.1",
     "parse-curl-js": "1.0.3",
     "path-browserify": "1.0.1",
-    "posthog-js": "1.43.0",
+    "posthog-js": "1.57.2",
     "postman-collection": "4.1.4",
     "protobufjs": "6.11.3",
     "query-string": "7.1.1",
