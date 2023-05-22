@@ -1,0 +1,87 @@
+# Kubernetes Deployment
+
+<!-- Docusaurus imports start -->
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<!-- Docusaurus imports end -->
+
+This guide walks you through using the Tracetest CLI to deploy Tracetest with Kubernetes.
+
+:::note
+This is an example of a production-ready deployment, but real-world deployments can vary significantly depending on desired performance and scale.
+:::
+
+This setup is ideal for CI/CD environments and QA teams working in shared environments. You can use a remote or local ([minikube](https://minikube.sigs.k8s.io/docs/start/), [kind](https://kind.sigs.k8s.io/), [k3d](https://k3d.io/), etc) cluster.
+
+You have two options to install Tracetest on Kubernetes, one is using the Tracetest CLI to guide your installation, another one is using directly our [Helm chart](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
+
+<Tabs groupId="kubernetes-installation">
+  <TabItem value="cli" label="Using Tracetest CLI" default>
+First, install Tracetest CLI following the instructions on [Getting Started](../getting-started/installation#install-the-tracetest-cli).
+
+After installing the CLI, run:
+
+```bash
+tracetest server install
+```
+
+```bash title="Expected output"
+How do you want to run TraceTest? [type to search]:
+  Using Docker Compose
+> Using Kubernetes
+```
+
+<!-- ![Installer using docker compose](../img/installer/1_docker-compose_0.7.0.png) -->
+
+Select `Using Kubernetes` and follow the instructions.
+
+**Tools required (installed if missing)**:
+- kubectl
+- Helm
+
+**Optionals**:
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/). A sample microservice app to test your Tracetest installation.
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/). A trace collector, that receives telemetry of other applications and sent it to Tracetest.
+
+**Result**:
+- `tracetest` Helm chart deployed in the `tracetest` (configurable) namespace.
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) deployed in the `tracetest` (configurable) namespace, if selected.
+- [PokeShop demo app](https://github.com/kubeshop/pokeshop/) deployed in the `demo` namespace, if selected.
+
+**How to start**:
+
+Once installed, you can get started by launching Tracetest:
+
+```sh
+kubectl port-forward svc/tracetest 11633
+```
+
+Then launch a browser to [http://localhost:11633/](http://localhost:11633/).
+  </TabItem>
+  <TabItem value="helm" label="Using Helm Chart">
+First, be sure that you have [Helm](https://helm.sh/) installed in your machine.
+
+The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
+
+You can install them locally on your machine with the command:
+```sh
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo update
+```
+
+After that, you can install Tracetest with `helm install`:
+```sh
+helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
+```
+
+Or, generate a manifest file and apply it manually in your Kubernetes cluster:
+```sh
+helm template tracetest kubeshop/tracetest > tracetest-kubernetes-manifests.yaml
+kubectl apply -f ./tracetest-kubernetes-manifests.yaml
+```
+  </TabItem>
+</Tabs>
+
+For more configuration options, read more in the [configuration docs](../configuration/overview.md).
