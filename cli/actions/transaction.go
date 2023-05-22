@@ -196,9 +196,6 @@ func (actions transactionActions) runTransaction(ctx context.Context, id string,
 	transactionRun, response, err := actions.openapiClient.ApiApi.RunTransaction(ctx, id).
 		RunInformation(runInformation).
 		Execute()
-	if err != nil {
-		return nil, fmt.Errorf("could not send run request to server: %w", err)
-	}
 
 	if response != nil && response.StatusCode == http.StatusUnprocessableEntity {
 		filledVariables, err := actions.askForMissingVariables(response)
@@ -211,6 +208,10 @@ func (actions transactionActions) runTransaction(ctx context.Context, id string,
 		}
 
 		return actions.runTransaction(ctx, id, args)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("could not send run request to server: %w", err)
 	}
 
 	return transactionRun, nil
