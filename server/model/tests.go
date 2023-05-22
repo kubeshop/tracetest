@@ -11,7 +11,7 @@ import (
 )
 
 type (
-	// this file yaml/json encoding is handled at ./test_json.go for custom encodings
+	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
 		ID               id.ID
 		CreatedAt        time.Time
@@ -47,11 +47,12 @@ type (
 
 	TriggerType string
 
+	// this struct yaml/json encoding is handled at ./trigger_json.go for custom encodings
 	Trigger struct {
-		Type    TriggerType     `json:"triggerType"`
-		HTTP    *HTTPRequest    `json:"http,omitempty"`
-		GRPC    *GRPCRequest    `json:"grpc,omitempty"`
-		TraceID *TRACEIDRequest `json:"traceid,omitempty"`
+		Type    TriggerType
+		HTTP    *HTTPRequest
+		GRPC    *GRPCRequest
+		TraceID *TRACEIDRequest
 	}
 
 	TriggerResult struct {
