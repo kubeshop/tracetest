@@ -32,6 +32,7 @@ Or, if you prefer using the CLI, you can use this file config.
 ```yaml
 type: DataStore
 spec:
+  name: AWS X-Ray
   type: awsxray
   default: true
   awsxray:
