@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type RunTestConfig struct {
+type RunResourceArgs struct {
 	DefinitionFile string
 	EnvID          string
 	WaitForResult  bool
@@ -37,7 +37,7 @@ type runTestAction struct {
 	environmentActions environmentsActions
 }
 
-var _ Action[RunTestConfig] = &runTestAction{}
+var _ Action[RunResourceArgs] = &runTestAction{}
 
 type runDefParams struct {
 	DefinitionFile       string
@@ -52,7 +52,7 @@ func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.
 	return runTestAction{config, logger, client, environmentActions}
 }
 
-func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
+func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	if args.DefinitionFile == "" {
 		return fmt.Errorf("you must specify a definition file to run a test")
 	}

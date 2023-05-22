@@ -13,6 +13,12 @@ import (
 
 type TransactionFormatter struct{}
 
+var _ ResourceFormatter = TransactionFormatter{}
+
+func NewTransactionsFormatter() TransactionFormatter {
+	return TransactionFormatter{}
+}
+
 // ToListStruct implements ResourceFormatter
 func (f TransactionFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var transactionResourceList openapi.TransactionResourceList
@@ -137,8 +143,7 @@ func (f TransactionFormatter) getTableRow(t openapi.TransactionResource) ([]*sim
 	}, nil
 }
 
-var _ ResourceFormatter = TransactionFormatter{}
-
-func NewTransactionsFormatter() TransactionFormatter {
-	return TransactionFormatter{}
+// FormatRunResult implements RunnableResourceFormatter
+func (f TransactionFormatter) FormatRunResult(any) (string, error) {
+	return "", nil
 }
