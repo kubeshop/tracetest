@@ -27,7 +27,8 @@ func TestApplyNewEnvironment(t *testing.T) {
 	// When I try to get an environment that doesn't exists
 	// Then it should return error message
 	result := tracetestcli.Exec(t, "get environment --id .noenv", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(1, result.ExitCode) // TODO: we should send an error message to the user telling that there is no env with this ID
+	require.Equal(0, result.ExitCode)
+	require.Contains(result.StdOut, "Resource environment with ID .noenv not found")
 
 	// When I try to set up a new environment
 	// Then it should be applied with success

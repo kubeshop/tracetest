@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +38,9 @@ var getCmd = &cobra.Command{
 		}
 
 		resource, err := resourceActions.Get(ctx, resourceID)
-		if err != nil {
+		if err != nil && errors.Is(err, utils.ResourceNotFound) {
+			return fmt.Sprintf("Resource %s with ID %s not found", resourceType, resourceID), nil
+		} else if err != nil {
 			return "", err
 		}
 
