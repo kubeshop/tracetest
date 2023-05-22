@@ -63,20 +63,20 @@ Then launch a browser to [http://localhost:11633/](http://localhost:11633/).
   <TabItem value="helm" label="Using Helm Chart">
 First, be sure that you have [Helm](https://helm.sh/) installed in your machine.
 
-The Tracetest helm charts are located on: https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest
+The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
 
-You can install them locally in your machine with the command:
+You can install them locally on your machine with the command:
 ```sh
 helm repo add kubeshop https://kubeshop.github.io/helm-charts
 helm repo update
 ```
 
-After that, you can install it with `helm install`:
+After that, you can install Tracetest with `helm install`:
 ```sh
 helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
 ```
 
-Or even generate its manifest to apply them manually on Kubernetes:
+Or, generate a manifest file and apply it manually in your Kubernetes cluster:
 ```sh
 helm template tracetest kubeshop/tracetest > tracetest-kubernetes-manifests.yaml
 kubectl apply -f ./tracetest-kubernetes-manifests.yaml
