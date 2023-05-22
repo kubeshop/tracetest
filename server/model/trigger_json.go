@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/fluidtruck/deepcopy"
 )
@@ -69,5 +68,5 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 		return deepcopy.DeepCopy(v2, t)
 	}
 
-	return fmt.Errorf("unexpected json format")
+	return nil
 }
