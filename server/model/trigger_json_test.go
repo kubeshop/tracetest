@@ -72,3 +72,24 @@ func TestTriggerFormatV2(t *testing.T) {
 
 	assert.Equal(t, expected, current)
 }
+
+func TestTriggerFormatInvalid(t *testing.T) {
+	v2 := struct {
+		Type    model.TriggerType     `json:"invalid"`
+		HTTP    *model.HTTPRequest    `json:"http,omitempty"`
+		GRPC    *model.GRPCRequest    `json:"grpc,omitempty"`
+		TraceID *model.TRACEIDRequest `json:"traceid,omitempty"`
+	}{
+		Type: model.TriggerTypeHTTP,
+	}
+
+	v2Json, err := json.Marshal(v2)
+	require.NoError(t, err)
+
+	current := model.Trigger{}
+	err = json.Unmarshal(v2Json, &current)
+
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "unexpected json format")
+
+}
