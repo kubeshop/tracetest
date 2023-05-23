@@ -2,16 +2,12 @@ package actions
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"path/filepath"
 
 	yamllib "github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/ui"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 )
@@ -23,14 +19,6 @@ type transactionActions struct {
 }
 
 var _ ResourceActions = &transactionActions{}
-
-type RunArguments struct {
-	EnvironmentID string
-	Metadata      map[string]string
-	Variables     map[string]string
-	JUnit         string
-	WaitForResult bool
-}
 
 func NewTransactionsActions(openapiClient *openapi.APIClient, options ...ResourceArgsOption) transactionActions {
 	args := NewResourceArgs(options...)
@@ -144,113 +132,4 @@ func (actions transactionActions) List(ctx context.Context, args utils.ListArgs)
 // Name implements ResourceActions
 func (actions transactionActions) Name() string {
 	return "transaction"
-}
-
-func (actions transactionActions) Run(ctx context.Context, file file.File, args RunArguments) (any, error) {
-	if args.JUnit != "" && !args.WaitForResult {
-		return nil, fmt.Errorf("--junit option requires --wait-for-result")
-	}
-
-	appliedFile, err := actions.Apply(ctx, file)
-	if err != nil {
-		return nil, fmt.Errorf("could not apply transaction: %w", err)
-	}
-
-	rawTransaction, err := actions.formatter.ToStruct(appliedFile)
-	if err != nil {
-		return nil, err
-	}
-
-	transaction := rawTransaction.(openapi.TransactionResource)
-
-	return actions.RunByID(ctx, *transaction.Spec.Id, args)
-}
-
-func (actions transactionActions) RunByID(ctx context.Context, id string, args RunArguments) (any, error) {
-	if id == "" {
-		return nil, fmt.Errorf("id must be provided")
-	}
-
-	if args.JUnit != "" && !args.WaitForResult {
-		return nil, fmt.Errorf("--junit option requires --wait-for-result")
-	}
-
-	return actions.runTransaction(ctx, id, args)
-}
-
-func (actions transactionActions) runTransaction(ctx context.Context, id string, args RunArguments) (any, error) {
-	variables := make([]openapi.EnvironmentValue, 0, len(args.Variables))
-	for varName, varValue := range args.Variables {
-		variables = append(variables, openapi.EnvironmentValue{
-			Key:   &varName,
-			Value: &varValue,
-		})
-	}
-
-	runInformation := openapi.RunInformation{
-		EnvironmentId: &args.EnvironmentID,
-		Metadata:      args.Metadata,
-		Variables:     variables,
-	}
-
-	transactionRun, response, err := actions.openapiClient.ApiApi.RunTransaction(ctx, id).
-		RunInformation(runInformation).
-		Execute()
-
-	if response != nil && response.StatusCode == http.StatusUnprocessableEntity {
-		filledVariables, err := actions.askForMissingVariables(response)
-		if err != nil {
-			return nil, err
-		}
-
-		for name, value := range filledVariables {
-			args.Variables[name] = value
-		}
-
-		return actions.runTransaction(ctx, id, args)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("could not send run request to server: %w", err)
-	}
-
-	return transactionRun, nil
-}
-
-func (actions transactionActions) askForMissingVariables(resp *http.Response) (map[string]string, error) {
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return map[string]string{}, fmt.Errorf("could not read response body: %w", err)
-	}
-
-	var missingVariablesError openapi.MissingVariablesError
-	err = json.Unmarshal(body, &missingVariablesError)
-	if err != nil {
-		return map[string]string{}, fmt.Errorf("could not unmarshal response: %w", err)
-	}
-
-	uniqueMissingVariables := map[string]string{}
-	for _, missingVariables := range missingVariablesError.MissingVariables {
-		for _, variable := range missingVariables.Variables {
-			defaultValue := ""
-			if variable.DefaultValue != nil {
-				defaultValue = *variable.DefaultValue
-			}
-			uniqueMissingVariables[*variable.Key] = defaultValue
-		}
-	}
-
-	if len(uniqueMissingVariables) > 0 {
-		ui.DefaultUI.Warning("Some variables are required by one or more tests")
-		ui.DefaultUI.Info("Fill the values for each variable:")
-	}
-
-	filledVariables := map[string]string{}
-
-	for variableName, variableDefaultValue := range uniqueMissingVariables {
-		value := ui.DefaultUI.TextInput(variableName, variableDefaultValue)
-		filledVariables[variableName] = value
-	}
-
-	return filledVariables, nil
 }

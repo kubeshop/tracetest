@@ -23,11 +23,6 @@ type ResourceActions interface {
 	Delete(context.Context, string) (string, error)
 }
 
-type RunnableResourceAction interface {
-	Run(context.Context, file.File, RunArguments) (any, error)
-	RunByID(context.Context, string, RunArguments) (any, error)
-}
-
 type resourceActions struct {
 	actions ResourceActions
 }
@@ -113,22 +108,4 @@ func (r *resourceActions) Delete(ctx context.Context, id string) (string, error)
 
 func (r *resourceActions) Formatter() formatters.ResourceFormatter {
 	return r.actions.Formatter()
-}
-
-func (r *resourceActions) Run(ctx context.Context, file file.File, args RunArguments) (any, error) {
-	runnableAction, ok := r.actions.(RunnableResourceAction)
-	if !ok {
-		return nil, fmt.Errorf("resource is not runnable")
-	}
-
-	return runnableAction.Run(ctx, file, args)
-}
-
-func (r *resourceActions) RunByID(ctx context.Context, id string, args RunArguments) (any, error) {
-	runnableAction, ok := r.actions.(RunnableResourceAction)
-	if !ok {
-		return nil, fmt.Errorf("resource is not runnable")
-	}
-
-	return runnableAction.RunByID(ctx, id, args)
 }

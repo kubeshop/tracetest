@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/alexeyco/simpletable"
 	"github.com/goccy/go-yaml"
@@ -62,13 +64,36 @@ func (f TransactionFormatter) ToListTable(file *file.File) (*simpletable.Header,
 func (TransactionFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var resource openapi.TransactionResource
 
-	err := yaml.Unmarshal([]byte(file.Contents()), &resource)
+	// this is a hack to overcome a limitation of encoding/json
+	// by converting everything to YAML, we can use the custom unmarshaller without any hacks to
+	// inject a Unmarshal() function to the openapi.TestSpecs struct.
+	file, err := convertJSONFileIntoYAMLFile(file)
 	if err != nil {
-		// try JSON
-		err = json.Unmarshal([]byte(file.Contents()), &resource)
+		return nil, fmt.Errorf("could not convert JSON file into YAML: %w", err)
+	}
+
+	fmt.Println(file.Contents())
+
+	err = yaml.UnmarshalWithOptions([]byte(file.Contents()), &resource, yaml.CustomUnmarshaler(func(t *openapi.TestSpecs, b []byte) error {
+		t.Specs = make([]openapi.TestSpecsSpecsInner, 0)
+		return yaml.Unmarshal(b, &t.Specs)
+	}), yaml.CustomUnmarshaler(func(t *openapi.NullableTime, b []byte) error {
+		var timeString string
+		err := yaml.Unmarshal(b, &timeString)
 		if err != nil {
-			return nil, err
+			return err
 		}
+
+		parsedTime, err := time.Parse(time.RFC3339Nano, timeString)
+		if err != nil {
+			return err
+		}
+
+		*t = *openapi.NewNullableTime(&parsedTime)
+		return nil
+	}))
+	if err != nil {
+		return nil, err
 	}
 
 	return resource, nil
@@ -146,4 +171,26 @@ func (f TransactionFormatter) getTableRow(t openapi.TransactionResource) ([]*sim
 // FormatRunResult implements RunnableResourceFormatter
 func (f TransactionFormatter) FormatRunResult(any) (string, error) {
 	return "", nil
+}
+
+func convertJSONFileIntoYAMLFile(f *file.File) (*file.File, error) {
+	fileContent := f.Contents()
+	if strings.HasPrefix(fileContent, "{") && strings.HasSuffix(fileContent, "}") {
+		m := make(map[string]interface{}, 0)
+		err := json.Unmarshal([]byte(fileContent), &m)
+		if err != nil {
+			return nil, fmt.Errorf("could not unmarshal JSON file: %w", err)
+		}
+
+		yamlContent, err := yaml.Marshal(m)
+		if err != nil {
+			return nil, fmt.Errorf("could not marshal file content to YAML: %w", err)
+		}
+
+		file, err := file.NewFromRaw(f.Path(), yamlContent)
+		return &file, err
+	}
+
+	// already a YAML file
+	return f, nil
 }
