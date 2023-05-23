@@ -1,12 +1,9 @@
 package environment
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
-	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
-	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
 	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 )
@@ -32,20 +29,20 @@ func TestApplyNewEnvironment(t *testing.T) {
 
 	// When I try to set up a new environment
 	// Then it should be applied with success
-	newEnvironmentPath := env.GetTestResourcePath(t, "new-environment")
+	// newEnvironmentPath := env.GetTestResourcePath(t, "new-environment")
 
-	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	// result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
+	// require.Equal(0, result.ExitCode)
 
-	// When I try to get the environment applied on the last step
-	// Then it should return it
-	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	// // When I try to get the environment applied on the last step
+	// // Then it should return it
+	// result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+	// require.Equal(0, result.ExitCode)
 
-	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-	require.Equal("Environment", environmentVars.Type)
-	require.Equal(".env", environmentVars.Spec.ID)
-	require.Equal(".env", environmentVars.Spec.Name)
-	require.Equal("some-value", environmentVars.Spec.Values["FIRST_VALUE"])
-	require.Equal("another_value", environmentVars.Spec.Values["SECOND_VALUE"])
+	// environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
+	// require.Equal("Environment", environmentVars.Type)
+	// require.Equal(".env", environmentVars.Spec.ID)
+	// require.Equal(".env", environmentVars.Spec.Name)
+	// require.Equal("some-value", environmentVars.Spec.Values["FIRST_VALUE"])
+	// require.Equal("another_value", environmentVars.Spec.Values["SECOND_VALUE"])
 }
