@@ -1,8 +1,0 @@
-type: Test
-spec:
-  name: test
-  trigger:
-    type: http
-    httpRequest:
-      url: http://localhost:11633/api/tests
-      method: GET
