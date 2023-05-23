@@ -11,6 +11,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli-e2etest/command"
 	"github.com/kubeshop/tracetest/cli-e2etest/config"
+	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )
@@ -37,8 +38,6 @@ type internalManager struct {
 }
 
 func CreateAndStart(t *testing.T) Manager {
-	t.Helper()
-
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -85,8 +84,6 @@ func (m *internalManager) Name() string {
 }
 
 func (m *internalManager) Start(t *testing.T) {
-	t.Helper()
-
 	result, err := command.Exec(
 		"docker", "compose",
 		"--file", m.dockerComposeFilePath, // choose docker compose relative to the chosen environment
@@ -94,15 +91,13 @@ func (m *internalManager) Start(t *testing.T) {
 		"up", "--detach")
 
 	require.NoError(t, err)
-	require.Equal(t, 0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// TODO: think in a better way to assure readiness for Tracetest
 	time.Sleep(1000 * time.Millisecond)
 }
 
 func (m *internalManager) Close(t *testing.T) {
-	t.Helper()
-
 	result, err := command.Exec(
 		"docker", "compose",
 		"--file", m.dockerComposeFilePath, // choose docker compose relative to the chosen environment
@@ -113,7 +108,7 @@ func (m *internalManager) Close(t *testing.T) {
 		"--stop",    // force containers to stop
 	)
 	require.NoError(t, err)
-	require.Equal(t, 0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 }
 
 func (m *internalManager) GetCLIConfigPath(t *testing.T) string {
