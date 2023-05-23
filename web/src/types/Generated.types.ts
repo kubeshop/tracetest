@@ -1643,7 +1643,7 @@ export interface external {
         };
         /** @example [object Object] */
         TestSpecs: {
-          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"][];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
         };
         TestSpec: {
           name?: string | null;

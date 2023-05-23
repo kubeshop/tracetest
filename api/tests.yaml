@@ -80,7 +80,7 @@ components:
         specs:
           type: array
           items:
-            $ref: "#/components/schemas/TestSpecs"
+            $ref: "#/components/schemas/TestSpec"
 
       example:
         specs:

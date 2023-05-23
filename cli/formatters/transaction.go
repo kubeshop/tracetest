@@ -22,7 +22,7 @@ func NewTransactionsFormatter() TransactionFormatter {
 }
 
 func testSpecUnmarshaller(t *openapi.TestSpecs, b []byte) error {
-	t.Specs = make([]openapi.TestSpecs, 0)
+	t.Specs = make([]openapi.TestSpec, 0)
 	return yaml.Unmarshal(b, &t.Specs)
 }
 

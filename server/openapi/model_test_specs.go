@@ -10,13 +10,13 @@
 package openapi
 
 type TestSpecs struct {
-	Specs []TestSpecs `json:"specs,omitempty"`
+	Specs []TestSpec `json:"specs,omitempty"`
 }
 
 // AssertTestSpecsRequired checks if the required fields are not zero-ed
 func AssertTestSpecsRequired(obj TestSpecs) error {
 	for _, el := range obj.Specs {
-		if err := AssertTestSpecsRequired(el); err != nil {
+		if err := AssertTestSpecRequired(el); err != nil {
 			return err
 		}
 	}
