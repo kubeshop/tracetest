@@ -108,6 +108,19 @@ func TestAttributeExecution(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:       "should_get_values_from_attributes_with_dashes",
+			Query:      "attr:dapr-app-id = 42",
+			ShouldPass: true,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: model.Span{
+					Attributes: model.Attributes{
+						"dapr-app-id": "42",
+					},
+				},
+			},
+		},
 	}
 
 	executeTestCases(t, testCases)
