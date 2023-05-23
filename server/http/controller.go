@@ -44,6 +44,7 @@ type controller struct {
 }
 
 type transactionsRepository interface {
+	SetID(tests.Transaction, id.ID) tests.Transaction
 	IDExists(ctx context.Context, id id.ID) (bool, error)
 	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]tests.Transaction, error)
 	GetAugmented(context.Context, id.ID) (tests.Transaction, error)
@@ -605,14 +606,20 @@ func (c *controller) doCreateTransaction(ctx context.Context, transaction tests.
 			}
 			return openapi.Response(http.StatusBadRequest, r), err
 		}
+	} else {
+		transaction = c.transactions.SetID(transaction, id.GenerateID())
 	}
 
-	createdTransaction, err := c.transactions.Create(ctx, transaction)
+	transaction, err := c.transactions.Create(ctx, transaction)
+	if err != nil {
+		return handleDBError(err), err
+	}
+	transaction, err = c.transactions.GetAugmented(ctx, transaction.ID)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, createdTransaction), nil
+	return openapi.Response(200, transaction), nil
 }
 
 func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {

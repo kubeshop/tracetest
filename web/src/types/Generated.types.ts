@@ -246,10 +246,7 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": {
-            count?: number;
-            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
-          };
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResourceList"];
           "text/yaml": {
             count?: number;
             items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
@@ -1620,7 +1617,7 @@ export interface external {
           createdAt?: string;
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
-          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
            * @description define test outputs, in a key/value format. The value is processed as an expression
            * @example [object Object],[object Object]
@@ -1631,7 +1628,8 @@ export interface external {
         };
         TestOutput: {
           name?: string;
-          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           value?: string;
         };
         TestSummary: {
@@ -1645,11 +1643,13 @@ export interface external {
         };
         /** @example [object Object] */
         TestSpecs: {
-          specs?: {
-            name?: string | null;
-            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: string[];
-          }[];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"][];
+        };
+        TestSpec: {
+          name?: string | null;
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          assertions?: string[];
         };
         TestRun: {
           id?: string;
@@ -1817,6 +1817,10 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TransactionResourceList: {
+          count?: number;
+          items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+        };
         /** @description Represents a transaction structured into the Resources format. */
         TransactionResource: {
           /**

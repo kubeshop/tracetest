@@ -48,7 +48,8 @@ components:
           type: string
         selector:
           type: string
-          # $ref: "#/components/schemas/Selector"
+        selectorParsed:
+          $ref: "#/components/schemas/Selector"
         value:
           type: string
 
@@ -106,7 +107,8 @@ components:
           nullable: true
         selector:
           type: string
-          # $ref: "#/components/schemas/Selector"
+        selectorParsed:
+          $ref: "#/components/schemas/Selector"
         assertions:
           type: array
           items:

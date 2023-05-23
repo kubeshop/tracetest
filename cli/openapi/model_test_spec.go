@@ -19,9 +19,10 @@ var _ MappedNullable = &TestSpec{}
 
 // TestSpec struct for TestSpec
 type TestSpec struct {
-	Name       NullableString `json:"name,omitempty"`
-	Selector   *string        `json:"selector,omitempty"`
-	Assertions []string       `json:"assertions,omitempty"`
+	Name           NullableString `json:"name,omitempty"`
+	Selector       *string        `json:"selector,omitempty"`
+	SelectorParsed *Selector      `json:"selectorParsed,omitempty"`
+	Assertions     []string       `json:"assertions,omitempty"`
 }
 
 // NewTestSpec instantiates a new TestSpec object
@@ -116,6 +117,38 @@ func (o *TestSpec) SetSelector(v string) {
 	o.Selector = &v
 }
 
+// GetSelectorParsed returns the SelectorParsed field value if set, zero value otherwise.
+func (o *TestSpec) GetSelectorParsed() Selector {
+	if o == nil || isNil(o.SelectorParsed) {
+		var ret Selector
+		return ret
+	}
+	return *o.SelectorParsed
+}
+
+// GetSelectorParsedOk returns a tuple with the SelectorParsed field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestSpec) GetSelectorParsedOk() (*Selector, bool) {
+	if o == nil || isNil(o.SelectorParsed) {
+		return nil, false
+	}
+	return o.SelectorParsed, true
+}
+
+// HasSelectorParsed returns a boolean if a field has been set.
+func (o *TestSpec) HasSelectorParsed() bool {
+	if o != nil && !isNil(o.SelectorParsed) {
+		return true
+	}
+
+	return false
+}
+
+// SetSelectorParsed gets a reference to the given Selector and assigns it to the SelectorParsed field.
+func (o *TestSpec) SetSelectorParsed(v Selector) {
+	o.SelectorParsed = &v
+}
+
 // GetAssertions returns the Assertions field value if set, zero value otherwise.
 func (o *TestSpec) GetAssertions() []string {
 	if o == nil || isNil(o.Assertions) {
@@ -163,6 +196,9 @@ func (o TestSpec) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Selector) {
 		toSerialize["selector"] = o.Selector
+	}
+	if !isNil(o.SelectorParsed) {
+		toSerialize["selectorParsed"] = o.SelectorParsed
 	}
 	if !isNil(o.Assertions) {
 		toSerialize["assertions"] = o.Assertions

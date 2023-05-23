@@ -12,14 +12,16 @@ package openapi
 type TestOutput struct {
 	Name string `json:"name,omitempty"`
 
-	Selector Selector `json:"selector,omitempty"`
+	Selector string `json:"selector,omitempty"`
+
+	SelectorParsed Selector `json:"selectorParsed,omitempty"`
 
 	Value string `json:"value,omitempty"`
 }
 
 // AssertTestOutputRequired checks if the required fields are not zero-ed
 func AssertTestOutputRequired(obj TestOutput) error {
-	if err := AssertSelectorRequired(obj.Selector); err != nil {
+	if err := AssertSelectorRequired(obj.SelectorParsed); err != nil {
 		return err
 	}
 	return nil
