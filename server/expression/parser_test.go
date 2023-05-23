@@ -54,6 +54,15 @@ func TestSimpleParsingRules(t *testing.T) {
 			},
 		},
 		{
+			Name:  "should_parse_dashed_attributes",
+			Query: `attr:app-id = attr:abc`,
+			ExpectedOutput: expression.Statement{
+				Left:       attrExpr("app-id"),
+				Comparator: "=",
+				Right:      attrExpr("abc"),
+			},
+		},
+		{
 			Name:  "should_parse_abc=abc",
 			Query: `"abc" = "abc"`,
 			ExpectedOutput: expression.Statement{

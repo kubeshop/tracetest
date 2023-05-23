@@ -13,16 +13,19 @@ spec:
           value: application/json
       body: |
         {
-            "name": "test-transaction",
-            "description": "a transaction",
-            "steps": [ {"id": "${env:TRANSACTION_STEP_ID}"} ]
+          "type": "Transaction",
+          "spec": {
+              "name": "test-transaction",
+              "description": "a transaction",
+              "steps": [ "${env:TRANSACTION_STEP_ID}" ]
+          }
         }
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:
       - attr:tracetest.selected_spans.count = 1
-      - attr:tracetest.response.status = 200
-      - attr:tracetest.response.body | json_path '$.id' = env:TRANSACTION_ID
+      - attr:tracetest.response.status = 201
+      - attr:tracetest.response.body | json_path '$.spec.id' = env:TRANSACTION_ID
   - selector: span[name="POST /api/transactions" tracetest.span.type="http"]
     assertions:
       - attr:tracetest.selected_spans.count = 1
@@ -36,4 +39,4 @@ spec:
   outputs:
   - name: TRANSACTION_ID
     selector: span[name = "Tracetest trigger"]
-    value: attr:tracetest.response.body | json_path '$.id'
+    value: attr:tracetest.response.body | json_path '$.spec.id'

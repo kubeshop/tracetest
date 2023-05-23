@@ -57,9 +57,7 @@ const TestService = () => ({
       description,
       serviceUnderTest: {
         triggerType: type,
-        triggerSettings: {
-          [type]: request,
-        },
+        [type]: request,
       },
       ...(original
         ? {

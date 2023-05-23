@@ -1,0 +1,42 @@
+---
+type: Test
+spec:
+  name: Update transaction
+  description: Test step of 'Transaction Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/transactions/${env:TRANSACTION_ID}
+      method: PUT
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+          "type": "Transaction",
+          "spec": {
+              "name": "test-transaction-updated",
+              "description": "a transaction",
+              "steps": [ "${env:TRANSACTION_STEP_ID}" ]
+          }
+        }
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+      - attr:tracetest.response.status = 200
+      - attr:tracetest.response.body | json_path '$.spec.name' = "test-transaction-updated"
+  - selector: span[name="PUT /api/transactions/{id}" tracetest.span.type="http"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 2
+  - selector: span[name = "exec INSERT"]:first
+    assertions:
+      - attr:sql.query contains "INSERT INTO transactions"
+
+  outputs:
+  - name: TRANSACTION_ID
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.response.body | json_path '$.spec.id'

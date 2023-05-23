@@ -88,6 +88,10 @@ func (pp PollingProfile) HasID() bool {
 	return pp.ID.String() != ""
 }
 
+func (pp PollingProfile) GetID() id.ID {
+	return pp.ID
+}
+
 func (pp PollingProfile) Validate() error {
 	if pp.Strategy == Periodic {
 		if err := pp.Periodic.Validate(); err != nil {

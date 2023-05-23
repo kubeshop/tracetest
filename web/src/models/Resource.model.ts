@@ -17,7 +17,7 @@ function Resource({item, type}: TRawResource): Resource {
 
   return {
     type: ResourceType.Transaction,
-    item: Transaction(item as TRawTransaction),
+    item: Transaction.FromRawTransaction(item as TRawTransaction),
   };
 }
 

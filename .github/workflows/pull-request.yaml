@@ -11,7 +11,7 @@ on:
       - cli/**
       - examples/**
       - server/**
-      - tracetesting/**
+      - testing/**
       - web/**
       - Dockerfile
       - k8s/**
@@ -135,7 +135,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v4
       with:
         distribution: goreleaser-pro
-        version: v1.17.2
+        version: v1.18.2
         args: build --single-target --clean --snapshot
       env:
         VERSION: pr-${{ github.event.pull_request.number }}
@@ -210,7 +210,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: v1.17.2
+          version: v1.18.2
           args: release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
         env:
           VERSION: pr-${{ github.event.pull_request.number }}
