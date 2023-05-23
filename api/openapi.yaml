@@ -77,14 +77,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      $ref: "./transactions.yaml#/components/schemas/TransactionResource"
+                $ref: "./transactions.yaml#/components/schemas/TransactionResourceList"
             text/yaml:
               schema:
                 type: object
@@ -829,7 +822,7 @@ paths:
                 $ref: "./config.yaml#/components/schemas/ConfigurationResource"
         500:
           description: "problem updating configuration"
-  
+
   /pollingprofiles:
     get:
       tags:
