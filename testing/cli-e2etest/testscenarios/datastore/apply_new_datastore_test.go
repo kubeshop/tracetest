@@ -36,7 +36,7 @@ func TestApplyNewDatastore(t *testing.T) {
 
 	// When I try to set up a new datastore
 	// Then it should be applied with success
-	dataStorePath := env.GetManisfestResourcePath(t, "data-store")
+	dataStorePath := env.GetEnvironmentResourcePath(t, "data-store")
 
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)

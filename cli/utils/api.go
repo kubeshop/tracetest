@@ -159,6 +159,10 @@ func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.
 	}
 
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, ResourceNotFound
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
