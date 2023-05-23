@@ -14,35 +14,35 @@ import (
 	"encoding/json"
 )
 
-// checks if the TestSpecsSpecsInner type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &TestSpecsSpecsInner{}
+// checks if the TestSpec type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestSpec{}
 
-// TestSpecsSpecsInner struct for TestSpecsSpecsInner
-type TestSpecsSpecsInner struct {
+// TestSpec struct for TestSpec
+type TestSpec struct {
 	Name       NullableString `json:"name,omitempty"`
-	Selector   *Selector      `json:"selector,omitempty"`
+	Selector   *string        `json:"selector,omitempty"`
 	Assertions []string       `json:"assertions,omitempty"`
 }
 
-// NewTestSpecsSpecsInner instantiates a new TestSpecsSpecsInner object
+// NewTestSpec instantiates a new TestSpec object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestSpecsSpecsInner() *TestSpecsSpecsInner {
-	this := TestSpecsSpecsInner{}
+func NewTestSpec() *TestSpec {
+	this := TestSpec{}
 	return &this
 }
 
-// NewTestSpecsSpecsInnerWithDefaults instantiates a new TestSpecsSpecsInner object
+// NewTestSpecWithDefaults instantiates a new TestSpec object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTestSpecsSpecsInnerWithDefaults() *TestSpecsSpecsInner {
-	this := TestSpecsSpecsInner{}
+func NewTestSpecWithDefaults() *TestSpec {
+	this := TestSpec{}
 	return &this
 }
 
 // GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *TestSpecsSpecsInner) GetName() string {
+func (o *TestSpec) GetName() string {
 	if o == nil || isNil(o.Name.Get()) {
 		var ret string
 		return ret
@@ -53,7 +53,7 @@ func (o *TestSpecsSpecsInner) GetName() string {
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *TestSpecsSpecsInner) GetNameOk() (*string, bool) {
+func (o *TestSpec) GetNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -61,7 +61,7 @@ func (o *TestSpecsSpecsInner) GetNameOk() (*string, bool) {
 }
 
 // HasName returns a boolean if a field has been set.
-func (o *TestSpecsSpecsInner) HasName() bool {
+func (o *TestSpec) HasName() bool {
 	if o != nil && o.Name.IsSet() {
 		return true
 	}
@@ -70,24 +70,24 @@ func (o *TestSpecsSpecsInner) HasName() bool {
 }
 
 // SetName gets a reference to the given NullableString and assigns it to the Name field.
-func (o *TestSpecsSpecsInner) SetName(v string) {
+func (o *TestSpec) SetName(v string) {
 	o.Name.Set(&v)
 }
 
 // SetNameNil sets the value for Name to be an explicit nil
-func (o *TestSpecsSpecsInner) SetNameNil() {
+func (o *TestSpec) SetNameNil() {
 	o.Name.Set(nil)
 }
 
 // UnsetName ensures that no value is present for Name, not even an explicit nil
-func (o *TestSpecsSpecsInner) UnsetName() {
+func (o *TestSpec) UnsetName() {
 	o.Name.Unset()
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
-func (o *TestSpecsSpecsInner) GetSelector() Selector {
+func (o *TestSpec) GetSelector() string {
 	if o == nil || isNil(o.Selector) {
-		var ret Selector
+		var ret string
 		return ret
 	}
 	return *o.Selector
@@ -95,7 +95,7 @@ func (o *TestSpecsSpecsInner) GetSelector() Selector {
 
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSpecsSpecsInner) GetSelectorOk() (*Selector, bool) {
+func (o *TestSpec) GetSelectorOk() (*string, bool) {
 	if o == nil || isNil(o.Selector) {
 		return nil, false
 	}
@@ -103,7 +103,7 @@ func (o *TestSpecsSpecsInner) GetSelectorOk() (*Selector, bool) {
 }
 
 // HasSelector returns a boolean if a field has been set.
-func (o *TestSpecsSpecsInner) HasSelector() bool {
+func (o *TestSpec) HasSelector() bool {
 	if o != nil && !isNil(o.Selector) {
 		return true
 	}
@@ -111,13 +111,13 @@ func (o *TestSpecsSpecsInner) HasSelector() bool {
 	return false
 }
 
-// SetSelector gets a reference to the given Selector and assigns it to the Selector field.
-func (o *TestSpecsSpecsInner) SetSelector(v Selector) {
+// SetSelector gets a reference to the given string and assigns it to the Selector field.
+func (o *TestSpec) SetSelector(v string) {
 	o.Selector = &v
 }
 
 // GetAssertions returns the Assertions field value if set, zero value otherwise.
-func (o *TestSpecsSpecsInner) GetAssertions() []string {
+func (o *TestSpec) GetAssertions() []string {
 	if o == nil || isNil(o.Assertions) {
 		var ret []string
 		return ret
@@ -127,7 +127,7 @@ func (o *TestSpecsSpecsInner) GetAssertions() []string {
 
 // GetAssertionsOk returns a tuple with the Assertions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSpecsSpecsInner) GetAssertionsOk() ([]string, bool) {
+func (o *TestSpec) GetAssertionsOk() ([]string, bool) {
 	if o == nil || isNil(o.Assertions) {
 		return nil, false
 	}
@@ -135,7 +135,7 @@ func (o *TestSpecsSpecsInner) GetAssertionsOk() ([]string, bool) {
 }
 
 // HasAssertions returns a boolean if a field has been set.
-func (o *TestSpecsSpecsInner) HasAssertions() bool {
+func (o *TestSpec) HasAssertions() bool {
 	if o != nil && !isNil(o.Assertions) {
 		return true
 	}
@@ -144,11 +144,11 @@ func (o *TestSpecsSpecsInner) HasAssertions() bool {
 }
 
 // SetAssertions gets a reference to the given []string and assigns it to the Assertions field.
-func (o *TestSpecsSpecsInner) SetAssertions(v []string) {
+func (o *TestSpec) SetAssertions(v []string) {
 	o.Assertions = v
 }
 
-func (o TestSpecsSpecsInner) MarshalJSON() ([]byte, error) {
+func (o TestSpec) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -156,7 +156,7 @@ func (o TestSpecsSpecsInner) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o TestSpecsSpecsInner) ToMap() (map[string]interface{}, error) {
+func (o TestSpec) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Name.IsSet() {
 		toSerialize["name"] = o.Name.Get()
@@ -170,38 +170,38 @@ func (o TestSpecsSpecsInner) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableTestSpecsSpecsInner struct {
-	value *TestSpecsSpecsInner
+type NullableTestSpec struct {
+	value *TestSpec
 	isSet bool
 }
 
-func (v NullableTestSpecsSpecsInner) Get() *TestSpecsSpecsInner {
+func (v NullableTestSpec) Get() *TestSpec {
 	return v.value
 }
 
-func (v *NullableTestSpecsSpecsInner) Set(val *TestSpecsSpecsInner) {
+func (v *NullableTestSpec) Set(val *TestSpec) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableTestSpecsSpecsInner) IsSet() bool {
+func (v NullableTestSpec) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableTestSpecsSpecsInner) Unset() {
+func (v *NullableTestSpec) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableTestSpecsSpecsInner(val *TestSpecsSpecsInner) *NullableTestSpecsSpecsInner {
-	return &NullableTestSpecsSpecsInner{value: val, isSet: true}
+func NewNullableTestSpec(val *TestSpec) *NullableTestSpec {
+	return &NullableTestSpec{value: val, isSet: true}
 }
 
-func (v NullableTestSpecsSpecsInner) MarshalJSON() ([]byte, error) {
+func (v NullableTestSpec) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableTestSpecsSpecsInner) UnmarshalJSON(src []byte) error {
+func (v *NullableTestSpec) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

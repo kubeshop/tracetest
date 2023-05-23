@@ -52,6 +52,7 @@ func (environment environmentsActions) Apply(ctx context.Context, fileContent fi
 
 	mapstructure.Decode(fileContent.Definition().Spec, &envResource.Spec)
 
+	fmt.Println(envResource.Spec.GetId())
 	if envResource.Spec.GetId() != "" {
 		_, err := environment.Get(ctx, envResource.Spec.GetId())
 		if err != nil {

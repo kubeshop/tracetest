@@ -19,9 +19,9 @@ var _ MappedNullable = &TestOutput{}
 
 // TestOutput struct for TestOutput
 type TestOutput struct {
-	Name     *string   `json:"name,omitempty"`
-	Selector *Selector `json:"selector,omitempty"`
-	Value    *string   `json:"value,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	Selector *string `json:"selector,omitempty"`
+	Value    *string `json:"value,omitempty"`
 }
 
 // NewTestOutput instantiates a new TestOutput object
@@ -74,9 +74,9 @@ func (o *TestOutput) SetName(v string) {
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
-func (o *TestOutput) GetSelector() Selector {
+func (o *TestOutput) GetSelector() string {
 	if o == nil || isNil(o.Selector) {
-		var ret Selector
+		var ret string
 		return ret
 	}
 	return *o.Selector
@@ -84,7 +84,7 @@ func (o *TestOutput) GetSelector() Selector {
 
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestOutput) GetSelectorOk() (*Selector, bool) {
+func (o *TestOutput) GetSelectorOk() (*string, bool) {
 	if o == nil || isNil(o.Selector) {
 		return nil, false
 	}
@@ -100,8 +100,8 @@ func (o *TestOutput) HasSelector() bool {
 	return false
 }
 
-// SetSelector gets a reference to the given Selector and assigns it to the Selector field.
-func (o *TestOutput) SetSelector(v Selector) {
+// SetSelector gets a reference to the given string and assigns it to the Selector field.
+func (o *TestOutput) SetSelector(v string) {
 	o.Selector = &v
 }
 
