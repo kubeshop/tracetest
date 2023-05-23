@@ -103,7 +103,13 @@ func TestEnvironment(t *testing.T) {
 		}`,
 	}
 
-	rmtests.TestResourceType(t, resourceTypeTest, rmtests.JSONComparer(environmentJSONComparer))
+	rmtests.TestResourceType(
+		t, resourceTypeTest,
+		rmtests.JSONComparer(environmentJSONComparer),
+		rmtests.ExcludeOperations(
+			rmtests.OperationUpdateNotFound,
+		),
+	)
 }
 
 func environmentJSONComparer(t require.TestingT, operation rmtests.Operation, firstValue, secondValue string) {

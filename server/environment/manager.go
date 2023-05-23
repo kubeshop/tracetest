@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -90,6 +91,10 @@ func (r *Repository) Create(ctx context.Context, environment Environment) (Envir
 
 func (r *Repository) Update(ctx context.Context, environment Environment) (Environment, error) {
 	oldEnvironment, err := r.Get(ctx, environment.ID)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		// this is a new environment, and we should create it
+		return r.Create(ctx, environment)
+	}
 	if err != nil {
 		return Environment{}, err
 	}
