@@ -72,8 +72,6 @@ func (TransactionFormatter) ToStruct(file *file.File) (interface{}, error) {
 		return nil, fmt.Errorf("could not convert JSON file into YAML: %w", err)
 	}
 
-	fmt.Println(file.Contents())
-
 	err = yaml.UnmarshalWithOptions([]byte(file.Contents()), &resource, yaml.CustomUnmarshaler(func(t *openapi.TestSpecs, b []byte) error {
 		t.Specs = make([]openapi.TestSpecsSpecsInner, 0)
 		return yaml.Unmarshal(b, &t.Specs)
