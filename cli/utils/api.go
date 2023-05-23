@@ -68,7 +68,7 @@ func GetResourceAPIClient(resourceType string, cliConfig config.Config) Resource
 	}
 }
 
-func (resourceClient ResourceClient) NewRequest(url, method, body, contentType string) (*http.Request, error) {
+func (resourceClient ResourceClient) NewRequest(url, method, body, contentType string, augmented bool) (*http.Request, error) {
 	var reqBody io.Reader
 	if body != "" {
 		reqBody = StringToIOReader(body)
@@ -86,13 +86,16 @@ func (resourceClient ResourceClient) NewRequest(url, method, body, contentType s
 	request.Header.Set("x-client-id", analytics.ClientID())
 	request.Header.Set("Content-Type", contentType)
 	request.Header.Set("Accept", contentType)
+	if augmented {
+		request.Header.Set("X-Tracetest-Augmented", "true")
+	}
 
 	return request, err
 }
 
 func (resourceClient ResourceClient) Update(ctx context.Context, file file.File, ID string) (*file.File, error) {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
-	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents(), file.ContentType())
+	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents(), file.ContentType(), false)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -130,7 +133,7 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 
 func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) error {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
-	request, err := resourceClient.NewRequest(url, http.MethodDelete, "", "")
+	request, err := resourceClient.NewRequest(url, http.MethodDelete, "", "", false)
 	if err != nil {
 		return fmt.Errorf("could not delete resource: %w", err)
 	}
@@ -140,7 +143,12 @@ func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) erro
 }
 
 func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.File, error) {
-	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "", "")
+	augmented := false
+	if ctx.Value("X-Tracetest-Augmented") != nil {
+		augmented = true
+	}
+
+	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "", "", augmented)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -186,8 +194,13 @@ func parseListResponse(body string) (BaseListResponse, error) {
 }
 
 func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (*file.File, error) {
+	augmented := false
+	if ctx.Value("X-Tracetest-Augmented") != nil {
+		augmented = true
+	}
+
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "")
+	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "", augmented)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -224,7 +237,7 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 }
 
 func (resourceClient ResourceClient) Create(ctx context.Context, file file.File) (*file.File, error) {
-	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents(), file.ContentType())
+	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents(), file.ContentType(), false)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}

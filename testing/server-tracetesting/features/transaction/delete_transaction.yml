@@ -1,13 +1,13 @@
 ---
 type: Test
 spec:
-  name: List Transaction
+  name: Delete Transaction
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/transactions
-      method: GET
+      url: ${env:TARGET_URL}/api/transactions/${env:TRANSACTION_ID}
+      method: DELETE
       headers:
         - key: Content-Type
           value: application/json
@@ -15,8 +15,10 @@ spec:
     - selector: span[name = "Tracetest trigger"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
-        - attr:tracetest.response.status = 200
-        - attr:tracetest.response.body | json_path '$[*].id' contains env:TRANSACTION_ID # check if the transaction is listed
-    - selector: span[name="GET /api/transactions" tracetest.span.type="http"]
+        - attr:tracetest.response.status = 204
+    - selector: span[name="DELETE /api/transactions/{id}" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec DELETE"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 4

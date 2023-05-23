@@ -4,14 +4,16 @@ spec:
   description: Sequence of tests to validate if our Transaction feature is working as expected
   steps:
     # create test that will be added to a transaction
-    - ./01_create_transaction_step.yml
+    - ./create_transaction_step.yml
     # create transaction that will group these steps
-    - ./02_create_transaction.yml
+    - ./create_transaction.yml
     # check if this transaction is listed on API
-    - ./03_list_transaction.yml
+    - ./list_transaction.yml
     # check if this transaction is listed on API as a resource
-    - ./04_list_transaction_as_resource.yml
+    - ./list_transaction_as_resource.yml
+    # udpate transaction
+    - ./update_transaction.yml
     # delete transaction
-    - ./05_delete_transaction.yml
+    - ./delete_transaction.yml
     # delete transaction steps
-    - ./06_delete_transaction_step.yml
+    - ./delete_transaction_step.yml
