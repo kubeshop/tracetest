@@ -2,6 +2,7 @@ package actions
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 
@@ -54,6 +55,10 @@ func (environment environmentsActions) Apply(ctx context.Context, fileContent fi
 	if envResource.Spec.GetId() != "" {
 		_, err := environment.Get(ctx, envResource.Spec.GetId())
 		if err != nil {
+			if !errors.Is(err, utils.ResourceNotFound) {
+				return nil, err
+			}
+
 			// doesn't exist, so create it
 			return environment.resourceClient.Create(ctx, fileContent)
 		}
