@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
+	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
 	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +25,7 @@ func TestApplyNewEnvironment(t *testing.T) {
 	// When I try to get an environment that doesn't exists
 	// Then it should return error message
 	result := tracetestcli.Exec(t, "get environment --id .noenv", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 	require.Contains(result.StdOut, "Resource environment with ID .noenv not found")
 
 	// When I try to set up a new environment
