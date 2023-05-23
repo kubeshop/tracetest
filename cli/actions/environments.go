@@ -41,7 +41,7 @@ func (action environmentsActions) GetID(file *file.File) (string, error) {
 		return "", err
 	}
 
-	return *resource.(openapi.EnvironmentResource).Spec.Id, nil
+	return resource.(openapi.EnvironmentResource).Spec.GetId(), nil
 }
 
 func (environment environmentsActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
@@ -51,12 +51,17 @@ func (environment environmentsActions) Apply(ctx context.Context, fileContent fi
 
 	mapstructure.Decode(fileContent.Definition().Spec, &envResource.Spec)
 
-	if envResource.Spec.Id == nil || *envResource.Spec.Id == "" {
-		result, err := environment.resourceClient.Create(ctx, fileContent)
-		return result, err
+	if envResource.Spec.GetId() != "" {
+		_, err := environment.Get(ctx, envResource.Spec.GetId())
+		if err != nil {
+			// doesn't exist, so create it
+			return environment.resourceClient.Create(ctx, fileContent)
+		}
+
+		return environment.resourceClient.Update(ctx, fileContent, envResource.Spec.GetId())
 	}
 
-	result, err = environment.resourceClient.Update(ctx, fileContent, *envResource.Spec.Id)
+	result, err = environment.resourceClient.Create(ctx, fileContent)
 	return result, err
 }
 
