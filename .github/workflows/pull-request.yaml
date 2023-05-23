@@ -173,6 +173,14 @@ jobs:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: cd web; npm ci
+      - run: cd web; CI= npm run build
       # release
       - uses: goreleaser/goreleaser-action@v4
         with:
@@ -224,7 +232,7 @@ jobs:
 
   smoke-test-cli:
     name: CLI smoke tests
-    needs:  [build-docker]
+    needs:  [build-docker, build-go]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -261,7 +269,7 @@ jobs:
 
   e2e-cli:
     name: CLI e2e tests
-    needs:  [build-docker]
+    needs:  [build-docker, build-go]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
