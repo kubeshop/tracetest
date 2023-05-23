@@ -114,7 +114,7 @@ func overrideConfig() {
 		if err != nil {
 			msg := fmt.Sprintf("cannot parse endpoint %s", overrideEndpoint)
 			cliLogger.Error(msg, zap.Error(err))
-			os.Exit(1)
+			ExitCLI(1)
 		}
 		cliConfig.Scheme = scheme
 		cliConfig.Endpoint = endpoint
@@ -129,7 +129,7 @@ func setupOutputFormat(cmd *cobra.Command) {
 	o := formatters.Output(output)
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
-		os.Exit(1)
+		ExitCLI(1)
 	}
 	formatters.SetOutput(o)
 }

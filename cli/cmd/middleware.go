@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -20,7 +19,7 @@ Version
 %s
 
 An error ocurred when executing the command`, versionText), zap.Error(err))
-			os.Exit(1)
+			ExitCLI(1)
 			return
 		}
 
