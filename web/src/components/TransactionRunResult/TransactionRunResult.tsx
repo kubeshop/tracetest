@@ -20,8 +20,8 @@ const TransactionRunResult = ({transactionRun: {steps, environment, state}, tran
         {steps.map((step, index) => (
           <ExecutionStep
             index={index}
-            key={`${step.id}-${transaction.steps[index]?.id}`}
-            test={transaction.steps[index]}
+            key={`${step.id}-${transaction.fullSteps[index]?.id}`}
+            test={transaction.fullSteps[index]}
             testRun={step}
             hasRunFailed={hasRunFailed}
           />

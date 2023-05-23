@@ -200,7 +200,7 @@ func TestSampleResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
@@ -390,7 +390,7 @@ func TestAugmentedResource(t *testing.T) {
 				mockManager.
 					On("List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return([]sampleResource{}, nil)
-			case rmtests.OperationListPaginatedSuccess:
+			case rmtests.OperationListSortSuccess:
 				mockManager.
 					On("Count", mock.Anything).
 					Return(3, nil)
@@ -449,6 +449,10 @@ type sampleResource struct {
 
 func (sr sampleResource) HasID() bool {
 	return sr.ID.String() != ""
+}
+
+func (sr sampleResource) GetID() id.ID {
+	return sr.ID
 }
 
 func (sr sampleResource) Validate() error {

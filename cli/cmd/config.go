@@ -49,6 +49,9 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
+		// TODO: remove this client from here when we migrate tests to the resource manager
+		openapiClient := utils.GetAPIClient(cliConfig)
+
 		configOptions := append(
 			baseOptions,
 			actions.WithClient(utils.GetResourceAPIClient("configs", cliConfig)),
@@ -88,6 +91,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		)
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
+
+		transactionOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
+			actions.WithFormatter(formatters.NewTransactionsFormatter()),
+		)
+		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
+		resourceRegistry.Register(transactionActions)
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)

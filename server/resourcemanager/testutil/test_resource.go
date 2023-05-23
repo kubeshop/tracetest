@@ -131,8 +131,6 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 }
 
 func testOperationForContentType(t *testing.T, op operationTester, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
-
 	db := testmock.CreateMigratedDatabase()
 	defer db.Close()
 
@@ -161,6 +159,7 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 	for _, step := range operationSteps {
 		req := step.buildRequest(t, testServer, ct, rt)
 		resp := doRequest(t, req, ct.contentType, testServer)
+		t.Log(resp.Header.Get("Content-Type"))
 
 		step.assertResponse(t, resp, ct, rt)
 		assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))

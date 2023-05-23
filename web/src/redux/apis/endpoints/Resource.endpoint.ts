@@ -5,13 +5,17 @@ import {ResourceType} from 'types/Resource.type';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {getTotalCountFromHeaders} from 'utils/Common';
 
+const defaultHeaders = {'content-type': 'application/json', 'X-Tracetest-Augmented': 'true'};
+
 const ResourceEndpoint = (builder: TTestApiEndpointBuilder) => ({
   getResources: builder.query<
     PaginationResponse<Resource>,
     {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
   >({
-    query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
-      `/resources?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
+    query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) => ({
+      url: `/resources?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
+      headers: defaultHeaders,
+    }),
     providesTags: () => [{type: TracetestApiTags.RESOURCE, id: 'LIST'}],
     transformResponse: (rawResources: TRawResource[], meta) => {
       return {
@@ -35,7 +39,7 @@ const ResourceEndpoint = (builder: TTestApiEndpointBuilder) => ({
       responseHandler: 'text',
       headers: {
         'content-type': 'text/yaml',
-      }
+      },
     }),
     providesTags: (result, error, {resourceId, version}) => [
       {type: TracetestApiTags.RESOURCE, id: `${resourceId}-${version}-definition`},
