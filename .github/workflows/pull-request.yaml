@@ -172,8 +172,18 @@ jobs:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Build web assets
-        run: make build-web
+      - name: Cache Build
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          path: web/build/
+          key: web-build-${{ hashFiles('web/*') }}
+      - name: Run clean install for Web Assets
+        run: cd web; npm clean-install
+        if: steps.cache-build.outputs.cache-hit != 'true'
+      - name: Build Web Assets
+        run: cd web; CI= npm run build
+        if: steps.cache-build.outputs.cache-hit != 'true'
       # release
       - uses: goreleaser/goreleaser-action@v4
         with:
