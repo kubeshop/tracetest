@@ -86,7 +86,9 @@ func (resourceClient ResourceClient) NewRequest(url, method, body, contentType s
 	request.Header.Set("x-client-id", analytics.ClientID())
 	request.Header.Set("Content-Type", contentType)
 	request.Header.Set("Accept", contentType)
-	request.Header.Set("X-Tracetest-Augmented", fmt.Sprint(augmented))
+	if augmented {
+		request.Header.Set("X-Tracetest-Augmented", "true")
+	}
 
 	return request, err
 }
