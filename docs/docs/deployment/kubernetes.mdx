@@ -7,18 +7,21 @@ import TabItem from '@theme/TabItem';
 
 <!-- Docusaurus imports end -->
 
-This guide walks you through using the Tracetest CLI to deploy Tracetest with Kubernetes.
+This guide walks you through deploying Tracetest with Kubernetes.
 
 :::note
 This is an example of a production-ready deployment, but real-world deployments can vary significantly depending on desired performance and scale.
+This setup is ideal for CI/CD environments and QA teams working in shared environments. You can use a remote or local ([minikube](https://minikube.sigs.k8s.io/docs/start/), [kind](https://kind.sigs.k8s.io/), [k3d](https://k3d.io/), etc) cluster.
 :::
 
-This setup is ideal for CI/CD environments and QA teams working in shared environments. You can use a remote or local ([minikube](https://minikube.sigs.k8s.io/docs/start/), [kind](https://kind.sigs.k8s.io/), [k3d](https://k3d.io/), etc) cluster.
+You have two options to install Tracetest on Kubernetes: 
 
-You have two options to install Tracetest on Kubernetes, one is using the Tracetest CLI to guide your installation, another one is using directly our [Helm chart](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
+- Using the [Tracetest CLI](../getting-started/installation) to guide your installation
+- Using the official [Helm chart](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest)
 
 <Tabs groupId="kubernetes-installation">
-  <TabItem value="cli" label="Using Tracetest CLI" default>
+  <TabItem value="cli" label="Tracetest CLI" default>
+
 First, install Tracetest CLI following the instructions on [Getting Started](../getting-started/installation#install-the-tracetest-cli).
 
 After installing the CLI, run:
@@ -59,8 +62,10 @@ kubectl port-forward svc/tracetest 11633
 ```
 
 Then launch a browser to [http://localhost:11633/](http://localhost:11633/).
+
   </TabItem>
-  <TabItem value="helm" label="Using Helm Chart">
+  <TabItem value="helm" label="Helm Chart">
+
 First, be sure that you have [Helm](https://helm.sh/) installed in your machine.
 
 The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
