@@ -192,8 +192,13 @@ func parseListResponse(body string) (BaseListResponse, error) {
 }
 
 func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (*file.File, error) {
+	augmented := false
+	if ctx.Value("X-Tracetest-Augmented") != nil {
+		augmented = true
+	}
+
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "", false)
+	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "", augmented)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}

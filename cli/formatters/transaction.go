@@ -21,12 +21,31 @@ func NewTransactionsFormatter() TransactionFormatter {
 	return TransactionFormatter{}
 }
 
+func testSpecUnmarshaller(t *openapi.TestSpecs, b []byte) error {
+	t.Specs = make([]openapi.TestSpecsSpecsInner, 0)
+	return yaml.Unmarshal(b, &t.Specs)
+}
+
+func nullableTimeUnmarshaller(t *openapi.NullableTime, b []byte) error {
+	var timeString string
+	err := yaml.Unmarshal(b, &timeString)
+	if err != nil {
+		return err
+	}
+
+	parsedTime, err := time.Parse(time.RFC3339Nano, timeString)
+	if err != nil {
+		return err
+	}
+
+	*t = *openapi.NewNullableTime(&parsedTime)
+	return nil
+}
+
 // ToListStruct implements ResourceFormatter
 func (f TransactionFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var transactionResourceList openapi.TransactionResourceList
-	nullableList := openapi.NewNullableTransactionResourceList(&transactionResourceList)
-
-	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.UnmarshalWithOptions([]byte(file.Contents()), &transactionResourceList, yaml.CustomUnmarshaler(testSpecUnmarshaller), yaml.CustomUnmarshaler(nullableTimeUnmarshaller))
 	if err != nil {
 		return nil, err
 	}
@@ -72,24 +91,7 @@ func (TransactionFormatter) ToStruct(file *file.File) (interface{}, error) {
 		return nil, fmt.Errorf("could not convert JSON file into YAML: %w", err)
 	}
 
-	err = yaml.UnmarshalWithOptions([]byte(file.Contents()), &resource, yaml.CustomUnmarshaler(func(t *openapi.TestSpecs, b []byte) error {
-		t.Specs = make([]openapi.TestSpecsSpecsInner, 0)
-		return yaml.Unmarshal(b, &t.Specs)
-	}), yaml.CustomUnmarshaler(func(t *openapi.NullableTime, b []byte) error {
-		var timeString string
-		err := yaml.Unmarshal(b, &timeString)
-		if err != nil {
-			return err
-		}
-
-		parsedTime, err := time.Parse(time.RFC3339Nano, timeString)
-		if err != nil {
-			return err
-		}
-
-		*t = *openapi.NewNullableTime(&parsedTime)
-		return nil
-	}))
+	err = yaml.UnmarshalWithOptions([]byte(file.Contents()), &resource, yaml.CustomUnmarshaler(testSpecUnmarshaller), yaml.CustomUnmarshaler(nullableTimeUnmarshaller))
 	if err != nil {
 		return nil, err
 	}

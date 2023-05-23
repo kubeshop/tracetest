@@ -36,14 +36,21 @@ func (actions transactionActions) Apply(ctx context.Context, file file.File) (*f
 		return nil, fmt.Errorf("could not process tests from transaction: %w", err)
 	}
 
+	rawTransaction, err := actions.formatter.ToStruct(&newFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse file into transaction: %w", err)
+	}
+
+	transaction := rawTransaction.(openapi.TransactionResource)
+
 	if newFile.HasID() {
-		rawTransaction, err := actions.formatter.ToStruct(&newFile)
+		_, err := actions.Get(ctx, transaction.Spec.GetId())
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse file into transaction: %w", err)
+			// doesn't exist, so create it
+			return actions.resourceClient.Create(ctx, newFile)
 		}
 
-		transaction := rawTransaction.(openapi.TransactionResource)
-		return actions.resourceClient.Update(ctx, newFile, *transaction.Spec.Id)
+		return actions.resourceClient.Update(ctx, newFile, transaction.Spec.GetId())
 	}
 
 	return actions.resourceClient.Create(ctx, newFile)
@@ -126,6 +133,7 @@ func (actions transactionActions) GetID(file *file.File) (string, error) {
 
 // List implements ResourceActions
 func (actions transactionActions) List(ctx context.Context, args utils.ListArgs) (*file.File, error) {
+	ctx = context.WithValue(ctx, "X-Tracetest-Augmented", true)
 	return actions.resourceClient.List(ctx, args)
 }
 
