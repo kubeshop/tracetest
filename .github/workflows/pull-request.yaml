@@ -122,77 +122,69 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
       - run: cd web; ${{ matrix.cmd }}
 
-  build-web:
-    name: Build WebUI resources
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Cache Build
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          path: web/build/
-          key: web-build-${{ hashFiles('web/*') }}
-      - run: cd web; npm ci
-        if: steps.cache-build.outputs.cache-hit != 'true'
-      - run: cd web; CI= npm run build
-        if: steps.cache-build.outputs.cache-hit != 'true'
-
-      - name: Upload assets
-        uses: actions/upload-artifact@v3
-        with:
-          name: tracetest-web
-          path: web/build/
-
   build-docker:
     name: Build docker image
     runs-on: ubuntu-latest
-    needs: [build-web]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+
+      # web
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Cache Web Build
+        id: cache-web-build
+        uses: actions/cache@v3
+        with:
+          path: web/build/
+          key: web-build-${{ hashFiles('web/*') }}
+      - run: cd web; npm ci
+        if: steps.cache-web-build.outputs.cache-hit != 'true'
+      - run: cd web; CI= npm run build
+        if: steps.cache-web-build.outputs.cache-hit != 'true'
+
+      # go+docker
       - name: Cache Build
-        id: cache-build
+        if: steps.cache-web-build.outputs.cache-hit != 'true'
+        id: cache-docker-build
         uses: actions/cache@v3
         with:
           path: dist/
-          key: dist-${{ hashFiles('web/*', 'cli/*', 'server/*', '.goreleaser.dev.yaml', 'Dockerfile') }}
+          key: dist-${{ hashFiles('cli/*', 'server/*', '.goreleaser.dev.yaml', 'Dockerfile') }}
       - name: Setup go
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         uses: actions/setup-go@v3
         with:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
       - uses: actions/download-artifact@v3
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         with:
           name: tracetest-web
           path: web/build/
       - uses: goreleaser/goreleaser-action@v4
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
           version: v1.18.2
           args: release --skip-announce --snapshot -f .goreleaser.dev.yaml
       - name: Move binaries to known location
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         run: |
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           find ./dist -name 'tracetest-server' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest ./dist/tracetest-server
       - name: Export docker image
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         run: |
           docker save --output dist/image.tar "kubeshop/tracetest:$VERSION"
       - name: Upload assets
