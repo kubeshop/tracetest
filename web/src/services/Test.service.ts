@@ -6,6 +6,7 @@ import {IPlugin} from 'types/Plugins.types';
 import {TDraftTest} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import Test, {TRawTest} from 'models/Test.model';
+import { rawTestSpecToNewFormat } from 'models/TestSpecs.model';
 import TestDefinitionService from './TestDefinition.service';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
@@ -62,9 +63,7 @@ const TestService = () => ({
       ...(original
         ? {
             outputs: toRawTestOutputs(original.outputs ?? []),
-            specs: {
-              specs: original.definition.specs.map(def => TestDefinitionService.toRaw(def)),
-            },
+            specs: original.definition.specs.map(def => rawTestSpecToNewFormat(TestDefinitionService.toRaw(def))),
           }
         : {}),
     };

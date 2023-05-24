@@ -69,7 +69,7 @@ run_test_suite_for_feature() {
   junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  $TRACETEST_CLI --config ./config.yml test run --definition $definition --environment ./.env --wait-for-result --junit $junit_output
+  $TRACETEST_CLI -v --config ./config.yml test run --definition $definition --environment ./.env --wait-for-result --junit $junit_output
   return $?
 }
 
