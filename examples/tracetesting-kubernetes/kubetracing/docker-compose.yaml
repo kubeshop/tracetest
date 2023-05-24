@@ -11,6 +11,8 @@ services:
       retries: 60
     image: jaegertracing/all-in-one:latest
     restart: unless-stopped
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
     ports:
       - 16686:16686
   otel-collector:
