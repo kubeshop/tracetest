@@ -31,7 +31,7 @@ k3d cluster create tracingcluster \
 5. A single test that you can do is to run: 
 
 ```sh
-kubectl run -it --rm --image=alpine echo-command -- echo Hi
+kubectl run -it --rm --restart=Never --image=alpine echo-command -- echo hi
 ```
 
 6. Going to Jaeger again on `http://localhost:16686`, choosing the `kubelet` service, operation `syncPod` and adding the tag `k8s.pod=default/echo-command`, we should be able to see spans related to this pod.
