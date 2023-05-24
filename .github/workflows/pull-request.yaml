@@ -179,11 +179,6 @@ jobs:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
-      - uses: actions/download-artifact@v3
-        if: steps.cache-docker-build.outputs.cache-hit != 'true'
-        with:
-          name: tracetest-web
-          path: web/build/
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         with:
