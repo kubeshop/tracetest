@@ -1646,7 +1646,7 @@ export interface external {
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
         };
         TestSpec: {
-          name?: string | null;
+          name?: string;
           selector?: string;
           selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           assertions?: string[];

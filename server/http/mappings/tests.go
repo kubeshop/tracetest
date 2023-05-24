@@ -158,7 +158,7 @@ func (m OpenAPI) Specs(in maps.Ordered[model.SpanQuery, model.NamedAssertions]) 
 		}
 
 		specs[i] = openapi.TestSpec{
-			Name:           &namedAssertions.Name,
+			Name:           namedAssertions.Name,
 			Selector:       string(spanQuery),
 			SelectorParsed: m.Selector(spanQuery),
 			Assertions:     assertions,
@@ -386,13 +386,8 @@ func (m Model) Definition(in []openapi.TestSpec) (maps.Ordered[model.SpanQuery, 
 			assertion := model.Assertion(a)
 			asserts[i] = assertion
 		}
-		name := ""
-		if spec.Name != nil {
-			name = *spec.Name
-		}
-
 		namedAssertions := model.NamedAssertions{
-			Name:       name,
+			Name:       spec.Name,
 			Assertions: asserts,
 		}
 		specs, _ = specs.Add(model.SpanQuery(spec.SelectorParsed.Query), namedAssertions)
