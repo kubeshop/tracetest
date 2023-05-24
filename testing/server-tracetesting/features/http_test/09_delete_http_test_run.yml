@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: TCzH6vQ4RQ
   name: Delete HTTP Test Run
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:

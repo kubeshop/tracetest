@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: TCzHeDw4gY
   name: Create HTTP Test
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:

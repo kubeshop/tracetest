@@ -1,5 +1,6 @@
 type: Transaction
 spec:
+  id: ILYjqDQ4g
   name: Transaction Feature
   description: Sequence of tests to validate if our Transaction feature is working as expected
   steps:

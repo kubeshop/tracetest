@@ -1,6 +1,7 @@
 ---
 type: Test
 spec:
+  id: ojzN6vwVRv
   name: Delete Environment
   description: Test step of 'Environment Feature - Test Suite'
   trigger:

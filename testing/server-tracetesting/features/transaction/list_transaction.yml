@@ -1,6 +1,7 @@
 ---
 type: Test
 spec:
+  id: TjkNeDwVgM
   name: List Transaction
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:

@@ -1,6 +1,7 @@
 ---
 type: Test
 spec:
+  id: TjkHeDw4gm
   name: Delete Transaction
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:
