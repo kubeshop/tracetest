@@ -140,14 +140,27 @@ jobs:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Cache dependencies
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        with:
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Install dependencies
+        run: cd web/; npm ci
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+
       - name: Cache Web Build
         id: cache-web-build
         uses: actions/cache@v3
         with:
           path: web/build/
           key: web-build-${{ hashFiles('web/*') }}
-      - run: cd web; npm ci
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
+
       - run: cd web; CI= npm run build
         if: steps.cache-web-build.outputs.cache-hit != 'true'
 
