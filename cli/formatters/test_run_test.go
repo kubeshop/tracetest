@@ -71,7 +71,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			Specs: []openapi.TestSpec{
 				{
 					Selector: openapi.PtrString(`span[name = "my span"]`),
-					Name:     *openapi.NewNullableString(&testSpecName),
+					Name:     openapi.PtrString(testSpecName),
 				},
 			},
 		},
@@ -126,7 +126,7 @@ func TestFailingTestOutput(t *testing.T) {
 			Specs: []openapi.TestSpec{
 				{
 					Selector: openapi.PtrString(`span[name = "my span"]`),
-					Name:     *openapi.NewNullableString(&testSpecName),
+					Name:     openapi.PtrString(testSpecName),
 				},
 				{
 					Selector: openapi.PtrString(`span[name = "my other span"]`),
@@ -220,7 +220,7 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 			Specs: []openapi.TestSpec{
 				{
 					Selector: openapi.PtrString(`span[name = "my span"]`),
-					Name:     *openapi.NewNullableString(&testSpecName),
+					Name:     openapi.PtrString(testSpecName),
 				},
 				{
 					Selector: openapi.PtrString(`span[name = "my other span"]`),
