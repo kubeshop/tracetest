@@ -27,7 +27,8 @@ type Test struct {
 
 	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
 
-	Specs TestSpecs `json:"specs,omitempty"`
+	// specification of assertions that are going to be made
+	Specs []TestSpec `json:"specs,omitempty"`
 
 	// define test outputs, in a key/value format. The value is processed as an expression
 	Outputs []TestOutput `json:"outputs,omitempty"`
@@ -40,8 +41,10 @@ func AssertTestRequired(obj Test) error {
 	if err := AssertTriggerRequired(obj.ServiceUnderTest); err != nil {
 		return err
 	}
-	if err := AssertTestSpecsRequired(obj.Specs); err != nil {
-		return err
+	for _, el := range obj.Specs {
+		if err := AssertTestSpecRequired(el); err != nil {
+			return err
+		}
 	}
 	for _, el := range obj.Outputs {
 		if err := AssertTestOutputRequired(el); err != nil {

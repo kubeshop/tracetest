@@ -17,7 +17,7 @@ func Test_OpenApiToModel_Outputs(t *testing.T) {
 		Outputs: []openapi.TestOutput{
 			{
 				Name: "OUTPUT",
-				Selector: openapi.Selector{
+				SelectorParsed: openapi.Selector{
 					Query: `span[name="root"]`,
 				},
 				Value: "attr:tracetest.selected_spans.count",

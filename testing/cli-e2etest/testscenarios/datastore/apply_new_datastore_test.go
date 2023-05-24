@@ -28,7 +28,7 @@ func TestApplyNewDatastore(t *testing.T) {
 	// Then it should return an empty datastore
 	result := tracetestcli.Exec(t, "get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
 	// TODO: we haven't defined a valid output to tell to the user that we are on `no-tracing mode`
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	dataStore := helpers.UnmarshalYAML[types.DataStoreResource](t, result.StdOut)
 	require.Equal("DataStore", dataStore.Type)
@@ -39,12 +39,12 @@ func TestApplyNewDatastore(t *testing.T) {
 	dataStorePath := env.GetEnvironmentResourcePath(t, "data-store")
 
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// When I try to get a datastore again
 	// Then it should return the datastore applied on the last step
 	result = tracetestcli.Exec(t, "get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	dataStore = helpers.UnmarshalYAML[types.DataStoreResource](t, result.StdOut)
 	require.Equal("DataStore", dataStore.Type)

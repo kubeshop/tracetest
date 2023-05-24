@@ -14,36 +14,36 @@ import (
 	"encoding/json"
 )
 
-// checks if the TestOutput type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &TestOutput{}
+// checks if the TestSpec type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestSpec{}
 
-// TestOutput struct for TestOutput
-type TestOutput struct {
+// TestSpec struct for TestSpec
+type TestSpec struct {
 	Name           *string   `json:"name,omitempty"`
 	Selector       *string   `json:"selector,omitempty"`
 	SelectorParsed *Selector `json:"selectorParsed,omitempty"`
-	Value          *string   `json:"value,omitempty"`
+	Assertions     []string  `json:"assertions,omitempty"`
 }
 
-// NewTestOutput instantiates a new TestOutput object
+// NewTestSpec instantiates a new TestSpec object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestOutput() *TestOutput {
-	this := TestOutput{}
+func NewTestSpec() *TestSpec {
+	this := TestSpec{}
 	return &this
 }
 
-// NewTestOutputWithDefaults instantiates a new TestOutput object
+// NewTestSpecWithDefaults instantiates a new TestSpec object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTestOutputWithDefaults() *TestOutput {
-	this := TestOutput{}
+func NewTestSpecWithDefaults() *TestSpec {
+	this := TestSpec{}
 	return &this
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
-func (o *TestOutput) GetName() string {
+func (o *TestSpec) GetName() string {
 	if o == nil || isNil(o.Name) {
 		var ret string
 		return ret
@@ -53,7 +53,7 @@ func (o *TestOutput) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestOutput) GetNameOk() (*string, bool) {
+func (o *TestSpec) GetNameOk() (*string, bool) {
 	if o == nil || isNil(o.Name) {
 		return nil, false
 	}
@@ -61,7 +61,7 @@ func (o *TestOutput) GetNameOk() (*string, bool) {
 }
 
 // HasName returns a boolean if a field has been set.
-func (o *TestOutput) HasName() bool {
+func (o *TestSpec) HasName() bool {
 	if o != nil && !isNil(o.Name) {
 		return true
 	}
@@ -70,12 +70,12 @@ func (o *TestOutput) HasName() bool {
 }
 
 // SetName gets a reference to the given string and assigns it to the Name field.
-func (o *TestOutput) SetName(v string) {
+func (o *TestSpec) SetName(v string) {
 	o.Name = &v
 }
 
 // GetSelector returns the Selector field value if set, zero value otherwise.
-func (o *TestOutput) GetSelector() string {
+func (o *TestSpec) GetSelector() string {
 	if o == nil || isNil(o.Selector) {
 		var ret string
 		return ret
@@ -85,7 +85,7 @@ func (o *TestOutput) GetSelector() string {
 
 // GetSelectorOk returns a tuple with the Selector field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestOutput) GetSelectorOk() (*string, bool) {
+func (o *TestSpec) GetSelectorOk() (*string, bool) {
 	if o == nil || isNil(o.Selector) {
 		return nil, false
 	}
@@ -93,7 +93,7 @@ func (o *TestOutput) GetSelectorOk() (*string, bool) {
 }
 
 // HasSelector returns a boolean if a field has been set.
-func (o *TestOutput) HasSelector() bool {
+func (o *TestSpec) HasSelector() bool {
 	if o != nil && !isNil(o.Selector) {
 		return true
 	}
@@ -102,12 +102,12 @@ func (o *TestOutput) HasSelector() bool {
 }
 
 // SetSelector gets a reference to the given string and assigns it to the Selector field.
-func (o *TestOutput) SetSelector(v string) {
+func (o *TestSpec) SetSelector(v string) {
 	o.Selector = &v
 }
 
 // GetSelectorParsed returns the SelectorParsed field value if set, zero value otherwise.
-func (o *TestOutput) GetSelectorParsed() Selector {
+func (o *TestSpec) GetSelectorParsed() Selector {
 	if o == nil || isNil(o.SelectorParsed) {
 		var ret Selector
 		return ret
@@ -117,7 +117,7 @@ func (o *TestOutput) GetSelectorParsed() Selector {
 
 // GetSelectorParsedOk returns a tuple with the SelectorParsed field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestOutput) GetSelectorParsedOk() (*Selector, bool) {
+func (o *TestSpec) GetSelectorParsedOk() (*Selector, bool) {
 	if o == nil || isNil(o.SelectorParsed) {
 		return nil, false
 	}
@@ -125,7 +125,7 @@ func (o *TestOutput) GetSelectorParsedOk() (*Selector, bool) {
 }
 
 // HasSelectorParsed returns a boolean if a field has been set.
-func (o *TestOutput) HasSelectorParsed() bool {
+func (o *TestSpec) HasSelectorParsed() bool {
 	if o != nil && !isNil(o.SelectorParsed) {
 		return true
 	}
@@ -134,43 +134,43 @@ func (o *TestOutput) HasSelectorParsed() bool {
 }
 
 // SetSelectorParsed gets a reference to the given Selector and assigns it to the SelectorParsed field.
-func (o *TestOutput) SetSelectorParsed(v Selector) {
+func (o *TestSpec) SetSelectorParsed(v Selector) {
 	o.SelectorParsed = &v
 }
 
-// GetValue returns the Value field value if set, zero value otherwise.
-func (o *TestOutput) GetValue() string {
-	if o == nil || isNil(o.Value) {
-		var ret string
+// GetAssertions returns the Assertions field value if set, zero value otherwise.
+func (o *TestSpec) GetAssertions() []string {
+	if o == nil || isNil(o.Assertions) {
+		var ret []string
 		return ret
 	}
-	return *o.Value
+	return o.Assertions
 }
 
-// GetValueOk returns a tuple with the Value field value if set, nil otherwise
+// GetAssertionsOk returns a tuple with the Assertions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestOutput) GetValueOk() (*string, bool) {
-	if o == nil || isNil(o.Value) {
+func (o *TestSpec) GetAssertionsOk() ([]string, bool) {
+	if o == nil || isNil(o.Assertions) {
 		return nil, false
 	}
-	return o.Value, true
+	return o.Assertions, true
 }
 
-// HasValue returns a boolean if a field has been set.
-func (o *TestOutput) HasValue() bool {
-	if o != nil && !isNil(o.Value) {
+// HasAssertions returns a boolean if a field has been set.
+func (o *TestSpec) HasAssertions() bool {
+	if o != nil && !isNil(o.Assertions) {
 		return true
 	}
 
 	return false
 }
 
-// SetValue gets a reference to the given string and assigns it to the Value field.
-func (o *TestOutput) SetValue(v string) {
-	o.Value = &v
+// SetAssertions gets a reference to the given []string and assigns it to the Assertions field.
+func (o *TestSpec) SetAssertions(v []string) {
+	o.Assertions = v
 }
 
-func (o TestOutput) MarshalJSON() ([]byte, error) {
+func (o TestSpec) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -178,7 +178,7 @@ func (o TestOutput) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o TestOutput) ToMap() (map[string]interface{}, error) {
+func (o TestSpec) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Name) {
 		toSerialize["name"] = o.Name
@@ -189,44 +189,44 @@ func (o TestOutput) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.SelectorParsed) {
 		toSerialize["selectorParsed"] = o.SelectorParsed
 	}
-	if !isNil(o.Value) {
-		toSerialize["value"] = o.Value
+	if !isNil(o.Assertions) {
+		toSerialize["assertions"] = o.Assertions
 	}
 	return toSerialize, nil
 }
 
-type NullableTestOutput struct {
-	value *TestOutput
+type NullableTestSpec struct {
+	value *TestSpec
 	isSet bool
 }
 
-func (v NullableTestOutput) Get() *TestOutput {
+func (v NullableTestSpec) Get() *TestSpec {
 	return v.value
 }
 
-func (v *NullableTestOutput) Set(val *TestOutput) {
+func (v *NullableTestSpec) Set(val *TestSpec) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableTestOutput) IsSet() bool {
+func (v NullableTestSpec) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableTestOutput) Unset() {
+func (v *NullableTestSpec) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableTestOutput(val *TestOutput) *NullableTestOutput {
-	return &NullableTestOutput{value: val, isSet: true}
+func NewNullableTestSpec(val *TestSpec) *NullableTestSpec {
+	return &NullableTestSpec{value: val, isSet: true}
 }
 
-func (v NullableTestOutput) MarshalJSON() ([]byte, error) {
+func (v NullableTestSpec) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableTestOutput) UnmarshalJSON(src []byte) error {
+func (v *NullableTestSpec) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
