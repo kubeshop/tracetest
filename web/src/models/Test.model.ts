@@ -35,7 +35,7 @@ const Test = ({
     version,
     description,
     createdAt,
-    definition: TestSpecs(specs || {}),
+    definition: TestSpecs({ specs: specs || [] }),
     trigger: Trigger(rawTrigger || {}),
     summary: Summary(summary),
     outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),

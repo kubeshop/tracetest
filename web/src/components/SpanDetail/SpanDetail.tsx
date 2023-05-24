@@ -65,7 +65,8 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
       const selector = SpanService.getSelectorInformation(span!);
 
       const output = TestOutput({
-        selector: {query: selector},
+        selector,
+        selectorParsed: {query: selector},
         name: key,
         value: `attr:${key}`,
       });
