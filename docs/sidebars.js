@@ -241,11 +241,11 @@ const sidebars = {
       type: "category",
       label: "Web UI",
       items: [
-        // {
-        //   type: "doc",
-        //   id: "web-ui/creating-environments",
-        //   label: "Creating environments",
-        // },
+        {
+          type: "doc",
+          id: "web-ui/creating-environments",
+          label: "Creating environments",
+        },
         {
           type: "doc",
           id: "web-ui/creating-tests",
@@ -266,11 +266,11 @@ const sidebars = {
           id: "web-ui/test-results",
           label: "Test Results",
         },
-        // {
-        //   type: "doc",
-        //   id: "web-ui/creating-transactions",
-        //   label: "Creating transactions",
-        // },
+        {
+          type: "doc",
+          id: "web-ui/creating-transactions",
+          label: "Creating transactions",
+        },
         {
           type: "doc",
           id: "web-ui/exporting-tests",
@@ -311,7 +311,7 @@ const sidebars = {
           type: "doc",
           id: "cli/running-tests",
           label: "Running Tests",
-        },        
+        },
         // {
         //   type: "doc",
         //   id: "cli/creating-transactions",
