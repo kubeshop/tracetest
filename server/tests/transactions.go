@@ -201,8 +201,6 @@ func (r *TransactionsRepository) Update(ctx context.Context, transaction Transac
 	transaction.CreatedAt = oldTransaction.CreatedAt
 	transactionToUpdate := BumpTransactionVersionIfNeeded(oldTransaction, transaction)
 
-	fmt.Println("********", oldTransaction.GetVersion(), transactionToUpdate.GetVersion())
-
 	if oldTransaction.GetVersion() == transactionToUpdate.GetVersion() {
 		// No change in the version, so nothing changes and it doesn't need to persist it
 		return transactionToUpdate, nil

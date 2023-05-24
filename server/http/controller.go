@@ -44,6 +44,7 @@ type controller struct {
 }
 
 type transactionsRepository interface {
+	SetID(tests.Transaction, id.ID) tests.Transaction
 	IDExists(ctx context.Context, id id.ID) (bool, error)
 	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]tests.Transaction, error)
 	GetAugmented(context.Context, id.ID) (tests.Transaction, error)
@@ -380,7 +381,7 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID string, runID i
 		return openapi.Response(http.StatusUnprocessableEntity, fmt.Sprintf(`run "%d" has no trace associated`, runID)), nil
 	}
 
-	definition, err := c.mappers.In.Definition(def)
+	definition, err := c.mappers.In.Definition(def.Specs)
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), nil
 	}
@@ -536,16 +537,19 @@ func (c *controller) executeTransaction(ctx context.Context, transaction tests.T
 	resp, err := c.doCreateTransaction(ctx, transaction)
 	if err != nil {
 		if errors.Is(err, errTransactionExists) {
-			resp, err := c.doUpdateTransaction(ctx, transaction.ID, transaction)
+			resp, err = c.doUpdateTransaction(ctx, transaction.ID, transaction)
 			if err != nil {
 				return resp, err
 			}
 		} else {
 			return resp, err
 		}
+	} else {
+		// the transaction was created, make sure we have the correct ID
+		transaction = resp.Body.(tests.Transaction)
 	}
 
-	transactionID := resp.Body.(tests.Transaction).ID
+	transactionID := transaction.ID
 
 	// transaction ready, execute it
 	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)
@@ -605,14 +609,20 @@ func (c *controller) doCreateTransaction(ctx context.Context, transaction tests.
 			}
 			return openapi.Response(http.StatusBadRequest, r), err
 		}
+	} else {
+		transaction = c.transactions.SetID(transaction, id.GenerateID())
 	}
 
-	createdTransaction, err := c.transactions.Create(ctx, transaction)
+	transaction, err := c.transactions.Create(ctx, transaction)
+	if err != nil {
+		return handleDBError(err), err
+	}
+	transaction, err = c.transactions.GetAugmented(ctx, transaction.ID)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	return openapi.Response(200, createdTransaction), nil
+	return openapi.Response(200, transaction), nil
 }
 
 func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {

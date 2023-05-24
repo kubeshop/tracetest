@@ -68,14 +68,10 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 		Test: openapi.Test{
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 1"),
-			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecsInner{
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my span"]`),
-						},
-						Name: *openapi.NewNullableString(&testSpecName),
-					},
+			Specs: []openapi.TestSpec{
+				{
+					Selector: openapi.PtrString(`span[name = "my span"]`),
+					Name:     openapi.PtrString(testSpecName),
 				},
 			},
 		},
@@ -127,19 +123,13 @@ func TestFailingTestOutput(t *testing.T) {
 		Test: openapi.Test{
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 2"),
-			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecsInner{
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my span"]`),
-						},
-						Name: *openapi.NewNullableString(&testSpecName),
-					},
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my other span"]`),
-						},
-					},
+			Specs: []openapi.TestSpec{
+				{
+					Selector: openapi.PtrString(`span[name = "my span"]`),
+					Name:     openapi.PtrString(testSpecName),
+				},
+				{
+					Selector: openapi.PtrString(`span[name = "my other span"]`),
 				},
 			},
 		},
@@ -227,19 +217,13 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 		Test: openapi.Test{
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 2"),
-			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecsInner{
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my span"]`),
-						},
-						Name: *openapi.NewNullableString(&testSpecName),
-					},
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my other span"]`),
-						},
-					},
+			Specs: []openapi.TestSpec{
+				{
+					Selector: openapi.PtrString(`span[name = "my span"]`),
+					Name:     openapi.PtrString(testSpecName),
+				},
+				{
+					Selector: openapi.PtrString(`span[name = "my other span"]`),
 				},
 			},
 		},

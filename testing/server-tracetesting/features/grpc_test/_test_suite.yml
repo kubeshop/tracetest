@@ -1,5 +1,6 @@
 type: Transaction
 spec:
+  id: ojkNeDwVgO
   name: gRPC Test Feature
   description: Sequence of tests to validate if our gRPC Test feature is working as expected
   steps:

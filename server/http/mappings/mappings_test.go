@@ -16,48 +16,49 @@ func strp(in string) *string {
 }
 
 func TestSpecOrder(t *testing.T) {
-	input := openapi.TestSpecs{
-		Specs: []openapi.TestSpecsSpecsInner{
-			{
-				Name: strp("name 1"),
-				Selector: openapi.Selector{
-					Query: "selector 1",
-				},
-				Assertions: []string{
-					`attr:attr1 = 1`,
-					`attr:attr2 = 2`,
-				},
+	input := []openapi.TestSpec{
+		{
+			Name:     "name 1",
+			Selector: "selector 1",
+			SelectorParsed: openapi.Selector{
+				Query: "selector 1",
 			},
-			{
-				Name: strp("name 2"),
-				Selector: openapi.Selector{
-					Query: "selector 2",
-				},
-				Assertions: []string{
-					`attr:attr3 = 3`,
-					`attr:attr4 = 4`,
-				},
+			Assertions: []string{
+				`attr:attr1 = 1`,
+				`attr:attr2 = 2`,
+			},
+		},
+		{
+			Name:     "name 2",
+			Selector: "selector 2",
+			SelectorParsed: openapi.Selector{
+				Query: "selector 2",
+			},
+			Assertions: []string{
+				`attr:attr3 = 3`,
+				`attr:attr4 = 4`,
 			},
 		},
 	}
 
-	expectedJSON := `{
-		"specs": [{
-			    "name": "name 1",
-				"selector": {
-					"query": "selector 1"
-				},
-				"assertions": ["attr:attr1 = 1", "attr:attr2 = 2"]
+	expectedJSON := `[
+		{
+			"name": "name 1",
+			"selector": "selector 1",
+			"selectorParsed": {
+				"query": "selector 1"
 			},
-			{
-				"name": "name 2",
-				"selector": {
-					"query": "selector 2"
-				},
-				"assertions": ["attr:attr3 = 3", "attr:attr4 = 4"]
-			}
-		]
-	}`
+			"assertions": ["attr:attr1 = 1", "attr:attr2 = 2"]
+		},
+		{
+			"name": "name 2",
+			"selector": "selector 2",
+			"selectorParsed": {
+				"query": "selector 2"
+			},
+			"assertions": ["attr:attr3 = 3", "attr:attr4 = 4"]
+		}
+	]`
 
 	// try multiple times to hit the map iteration randomization
 	attempts := 50

@@ -393,7 +393,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 	id := id.ID(vars["id"])
 
 	getterFn := m.rh.Get
-	if isRequestForAugmented(r) {
+	if isRequestForAugmented(r) && m.rh.GetAugmented != nil {
 		getterFn = m.rh.GetAugmented
 	}
 

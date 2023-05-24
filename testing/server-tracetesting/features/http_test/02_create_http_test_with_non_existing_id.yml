@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: oCkHevQ4R-
   name: Create HTTP Test with non-existing ID
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:

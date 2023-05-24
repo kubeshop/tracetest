@@ -18,7 +18,7 @@ const TestOutputs = ({outputs}: IProps) => {
 
   const handleOnAddTestOutput = () => {
     const query = selectedSpan ? SpanService.getSelectorInformation(selectedSpan) : '';
-    onOpen(TestOutputModel({selector: {query}}));
+    onOpen(TestOutputModel({selector: query, selectorParsed: {query}}));
   };
 
   return (

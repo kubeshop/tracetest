@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: TCzN6DQ4g0
   name: Run gRPC Test with invalid metadata
   description: ""
   trigger:
