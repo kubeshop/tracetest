@@ -24,16 +24,14 @@ spec:
               "metadata": [{}]
             }
           },
-          "specs": {
-            "specs": [
-              {
-                "selector": {
-                  "query": "span[name = \"queue.synchronizePokemon send\"]"
-                },
-                "assertions": ["attr:tracetest.selected_spans.count > 0"]
-              }
-            ]
-          }
+          "specs":  [
+            {
+              "selectorParsed": {
+                "query": "span[name = \"queue.synchronizePokemon send\"]"
+              },
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
+            }
+          ]
         }
   specs:
   - selector: span[name = "Tracetest trigger"]
