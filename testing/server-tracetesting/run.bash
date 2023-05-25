@@ -8,7 +8,7 @@ if ! command -v "$TRACETEST_CLI" &> /dev/null; then
   exit 2
 fi
 
-export TARGET_URL=${TARGET_URL:-"http://localhost:8081"}
+export TARGET_URL=${TARGET_URL:-"http://localhost:11633"}
 if [  "$TARGET_URL" = "" ]; then
   echo "\$TARGET_URL not set";
   exit 2

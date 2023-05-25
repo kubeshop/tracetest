@@ -537,16 +537,19 @@ func (c *controller) executeTransaction(ctx context.Context, transaction tests.T
 	resp, err := c.doCreateTransaction(ctx, transaction)
 	if err != nil {
 		if errors.Is(err, errTransactionExists) {
-			resp, err := c.doUpdateTransaction(ctx, transaction.ID, transaction)
+			resp, err = c.doUpdateTransaction(ctx, transaction.ID, transaction)
 			if err != nil {
 				return resp, err
 			}
 		} else {
 			return resp, err
 		}
+	} else {
+		// the transaction was created, make sure we have the correct ID
+		transaction = resp.Body.(tests.Transaction)
 	}
 
-	transactionID := resp.Body.(tests.Transaction).ID
+	transactionID := transaction.ID
 
 	// transaction ready, execute it
 	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)

@@ -64,12 +64,14 @@ func (actions transactionActions) convertTestPathToId(ctx context.Context, f fil
 
 	transaction := rawTransaction.(openapi.TransactionResource)
 	for i, testPath := range transaction.Spec.Steps {
+		// testPath is relative to to the transaction file, not to pwd
+		testPath = correctRelativePath(f.AbsDir(), testPath)
 		if !utils.StringReferencesFile(testPath) {
 			// not referencing a file, keep the value
 			continue
 		}
 
-		id, err := actions.applyTestFile(ctx, f.AbsDir(), testPath)
+		id, err := actions.applyTestFile(ctx, testPath)
 		if err != nil {
 			return file.File{}, fmt.Errorf(`could not apply test "%s": %w`, testPath, err)
 		}
@@ -85,9 +87,8 @@ func (actions transactionActions) convertTestPathToId(ctx context.Context, f fil
 	return file.NewFromRaw(f.Path(), yamlContent)
 }
 
-func (actions transactionActions) applyTestFile(ctx context.Context, workingDir string, filePath string) (string, error) {
-	path := filepath.Join(workingDir, filePath)
-	f, err := file.Read(path)
+func (actions transactionActions) applyTestFile(ctx context.Context, filePath string) (string, error) {
+	f, err := file.Read(filePath)
 	if err != nil {
 		return "", err
 	}
@@ -104,6 +105,13 @@ func (actions transactionActions) applyTestFile(ctx context.Context, workingDir 
 	}
 
 	return body.GetId(), nil
+}
+
+func correctRelativePath(base, target string) string {
+	if filepath.IsAbs(target) {
+		return target
+	}
+	return filepath.Join(base, target)
 }
 
 // Delete implements ResourceActions

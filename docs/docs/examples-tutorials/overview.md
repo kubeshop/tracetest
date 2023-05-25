@@ -12,6 +12,7 @@ Check out the following blog posts with Tracetest-related content.
 
 ### Integrations
 
+- [Honeycomb + Tracetest: Observability-driven Development](https://tracetest.io/blog/honeycomb-tracetest-observability-driven-development)
 - [Trace-based testing cloud-native apps with AWS X-Ray and Tracetest](https://tracetest.io/blog/trace-based-testing-cloud-native-apps-with-aws-x-ray-and-tracetest)
 - [Event-driven Kubernetes testing with Testkube and Tracetest](https://tracetest.io/blog/event-driven-kubernetes-testing-with-testkube-and-tracetest)
 - [Announcing the Tracetest integration with Keptn](https://tracetest.io/blog/announcing-the-tracetest-integration-with-keptn-the-control-plane-for-cloud-native-application-life-cycle-orchestration)
