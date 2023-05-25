@@ -144,7 +144,7 @@ func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) erro
 	}
 
 	if response.StatusCode == http.StatusNotFound {
-		return fmt.Errorf(`no resource with ID "%s" was found`, ID)
+		return fmt.Errorf(`Resource %s with ID %s not found" was found`, resourceClient.ResourceType, ID)
 	}
 
 	return nil
