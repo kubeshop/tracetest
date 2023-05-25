@@ -138,8 +138,16 @@ func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) erro
 		return fmt.Errorf("could not delete resource: %w", err)
 	}
 
-	_, err = resourceClient.Client.Do(request)
-	return err
+	response, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == http.StatusNotFound {
+		return fmt.Errorf(`no resource with ID "%s" was found`, ID)
+	}
+
+	return nil
 }
 
 func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.File, error) {
