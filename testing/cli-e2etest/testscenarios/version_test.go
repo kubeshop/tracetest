@@ -18,6 +18,8 @@ func TestVersionCommand(t *testing.T) {
 
 	result := tracetestcli.Exec(t, "version")
 	fmt.Println("STD OUT: ", result.StdOut)
+	fmt.Println("COMMAND: ", result.CommandExecuted)
+	fmt.Println("STD ERR: ", result.StdErr)
 
 	require.Equal(0, result.ExitCode)
 	require.Greater(len(result.StdOut), 0)
