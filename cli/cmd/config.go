@@ -20,6 +20,7 @@ var cliLogger *zap.Logger
 var resourceRegistry = actions.NewResourceRegistry()
 var validArgs = []string{"config", "datastore", "demo", "environment", "pollingprofile", "transaction"}
 var versionText string
+var isVersionMatch bool
 
 type setupConfig struct {
 	shouldValidateConfig bool
@@ -197,7 +198,13 @@ func setupVersion() {
 	}
 
 	action := actions.NewGetServerVersionAction(options...)
-	version := action.GetVersionText(ctx)
+	versionText, isVersionMatch = action.GetVersion(ctx)
 
-	versionText = version
+	if !isVersionMatch && os.Getenv("TRACETEST_DEV") != "" {
+		fmt.Fprintf(os.Stderr, versionText+`
+✖️ Version Mismatch. Ensure the Tracetest server and CLI use the same version.
+For more information. Please visit https://docs.tracetest.io/cli/version-mismatch
+`)
+		ExitCLI(1)
+	}
 }
