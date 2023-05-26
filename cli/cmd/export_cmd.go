@@ -3,8 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/spf13/cobra"
 )
 
@@ -15,12 +17,11 @@ var (
 
 var exportCmd = &cobra.Command{
 	GroupID: cmdGroupResources.ID,
-	Use:     "export [resource type]",
+	Use:     fmt.Sprintf("export %s", strings.Join(parameters.ValidResources, "|")),
 	Long:    "Export a resource from your Tracetest server",
 	Short:   "Export resource",
 	PreRun:  setupCommand(),
-	Args:    cobra.MinimumNArgs(1),
-	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
+	Run: WithResultHandler(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
