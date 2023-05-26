@@ -18,6 +18,7 @@ import (
 var cliConfig config.Config
 var cliLogger *zap.Logger
 var resourceRegistry = actions.NewResourceRegistry()
+var validArgs = []string{"config", "datastore", "demo", "environment", "pollingprofile", "transaction"}
 var versionText string
 
 type setupConfig struct {
