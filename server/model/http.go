@@ -37,7 +37,7 @@ type HTTPRequest struct {
 	Body            string             `expr_enabled:"true" json:"body,omitempty"`
 	Headers         []HTTPHeader       `json:"headers,omitempty"`
 	Auth            *HTTPAuthenticator `json:"auth,omitempty"`
-	SSLVerification bool
+	SSLVerification bool               `json:"sslVerification,omitempty"`
 }
 
 func (a HTTPRequest) Authenticate(req *http.Request) {
