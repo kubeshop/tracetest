@@ -35,6 +35,7 @@ type runTestAction struct {
 	logger             *zap.Logger
 	client             *openapi.APIClient
 	environmentActions environmentsActions
+	cliExit            func(int)
 }
 
 var _ Action[RunResourceArgs] = &runTestAction{}
@@ -48,8 +49,8 @@ type runDefParams struct {
 	EnvironmentVariables map[string]string
 }
 
-func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, environmentActions environmentsActions) runTestAction {
-	return runTestAction{config, logger, client, environmentActions}
+func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, environmentActions environmentsActions, cliExit func(int)) runTestAction {
+	return runTestAction{config, logger, client, environmentActions, cliExit}
 }
 
 func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
@@ -349,7 +350,7 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID int
 	allPassed := tro.Run.Result.GetAllPassed()
 	if params.WaitForResult && !allPassed {
 		// It failed, so we have to return an error status
-		os.Exit(1)
+		a.cliExit(1)
 	}
 
 	return nil
@@ -385,13 +386,13 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 	if params.WaitForResult {
 		if utils.RunStateIsFailed(tro.Run.GetState()) {
 			// It failed, so we have to return an error status
-			os.Exit(1)
+			a.cliExit(1)
 		}
 
 		for _, step := range tro.Run.Steps {
 			if !step.Result.GetAllPassed() {
 				// if any test doesn't pass, fail the transaction execution
-				os.Exit(1)
+				a.cliExit(1)
 			}
 		}
 	}
