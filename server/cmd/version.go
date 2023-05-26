@@ -15,5 +15,6 @@ var versionCmd = &cobra.Command{
 	Short: "Print version information of Tracetest server",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(appInstance.Version())
+		fmt.Println("This is a temporary print")
 	},
 }

@@ -31,11 +31,11 @@ echo "TRACETEST_ENDPOINT: $TRACETEST_ENDPOINT"
 echo "DEMO_APP_URL:       $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL:  $DEMO_APP_GRPC_URL"
 
-cat << EOF > .env
+cat << EOF > tracetesting-env.yaml
 type: Environment
 spec:
-  id: .env
-  name: .env
+  id: tracetesting-env
+  name: tracetesting-env
   values:
     - key: TARGET_URL
       value: $TARGET_URL
@@ -48,7 +48,7 @@ spec:
 EOF
 
 echo "Environment variables set:"
-cat .env
+cat tracetesting-env.yaml
 
 echo "Setting up tracetest CLI configuration..."
 cat << EOF > config.yml
@@ -69,7 +69,7 @@ run_test_suite_for_feature() {
   junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  $TRACETEST_CLI -v --config ./config.yml test run --definition $definition --environment ./.env --wait-for-result --junit $junit_output
+  $TRACETEST_CLI --verbose --config ./config.yml test run --definition $definition --environment ./tracetesting-env.yaml --wait-for-result --junit $junit_output
   return $?
 }
 
