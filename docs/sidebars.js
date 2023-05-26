@@ -32,7 +32,8 @@ const sidebars = {
       type: "category",
       label: "Getting Started",
       link: {
-        type: 'doc', id: 'getting-started/installation'
+        type: "doc",
+        id: "getting-started/installation",
       },
       items: [
         {
@@ -46,7 +47,8 @@ const sidebars = {
       type: "category",
       label: "Configuration",
       link: {
-        type: 'doc', id: 'configuration/overview'
+        type: "doc",
+        id: "configuration/overview",
       },
       items: [
         // {
@@ -156,7 +158,8 @@ const sidebars = {
       type: "category",
       label: "Deployment",
       link: {
-        type: 'doc', id: 'deployment/overview'
+        type: "doc",
+        id: "deployment/overview",
       },
       items: [
         // {
@@ -241,11 +244,6 @@ const sidebars = {
       type: "category",
       label: "Web UI",
       items: [
-        // {
-        //   type: "doc",
-        //   id: "web-ui/creating-environments",
-        //   label: "Creating environments",
-        // },
         {
           type: "doc",
           id: "web-ui/creating-tests",
@@ -266,11 +264,6 @@ const sidebars = {
           id: "web-ui/test-results",
           label: "Test Results",
         },
-        // {
-        //   type: "doc",
-        //   id: "web-ui/creating-transactions",
-        //   label: "Creating transactions",
-        // },
         {
           type: "doc",
           id: "web-ui/exporting-tests",
@@ -297,11 +290,11 @@ const sidebars = {
           id: "cli/creating-data-stores",
           label: "Creating Data Stores",
         },
-        // {
-        //   type: "doc",
-        //   id: "cli/creating-environments",
-        //   label: "Creating environments",
-        // },
+        {
+          type: "doc",
+          id: "cli/creating-environments",
+          label: "Creating Environments",
+        },
         {
           type: "doc",
           id: "cli/creating-tests",
@@ -311,12 +304,12 @@ const sidebars = {
           type: "doc",
           id: "cli/running-tests",
           label: "Running Tests",
-        },        
-        // {
-        //   type: "doc",
-        //   id: "cli/creating-transactions",
-        //   label: "Creating transactions",
-        // },
+        },
+        {
+          type: "doc",
+          id: "cli/creating-transactions",
+          label: "Creating Transactions",
+        },
         // {
         //   type: "doc",
         //   id: "cli/exporting-tests",
@@ -333,7 +326,8 @@ const sidebars = {
       type: "category",
       label: "CI/CD Automation",
       link: {
-        type: 'doc', id: 'ci-cd-automation/overview'
+        type: "doc",
+        id: "ci-cd-automation/overview",
       },
       items: [
         {
@@ -347,7 +341,8 @@ const sidebars = {
       type: "category",
       label: "Tools & Integrations",
       link: {
-        type: 'doc', id: 'tools-and-integrations/overview'
+        type: "doc",
+        id: "tools-and-integrations/overview",
       },
       items: [
         {
@@ -371,7 +366,8 @@ const sidebars = {
       type: "category",
       label: "Examples & Tutorials",
       link: {
-        type: 'doc', id: 'examples-tutorials/overview'
+        type: "doc",
+        id: "examples-tutorials/overview",
       },
       items: [
         {

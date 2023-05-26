@@ -1,6 +1,7 @@
 ---
 type: Test
 spec:
+  id: TCzH6vw4R
   name: Create transaction
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:

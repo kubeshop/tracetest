@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: oCkHevwVgP
   name: List HTTP Test
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:

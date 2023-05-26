@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: ojzHeDQ4gF
   name: Create gRPC Test
   description: Test step of 'gRPC Test Feature - Test Suite'
   trigger:
@@ -22,16 +23,14 @@ spec:
               "request": "{\"id\": 52}"
             }
           },
-          "specs": {
-            "specs": [
-              {
-                "selector": {
-                  "query": "span[name = \"queue.synchronizePokemon send\"]"
-                },
-                "assertions": ["attr:tracetest.selected_spans.count > 0"]
-              }
-            ]
-          }
+          "specs": [
+            {
+              "selectorParsed": {
+                "query": "span[name = \"queue.synchronizePokemon send\"]"
+              },
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
+            }
+          ]
         }
   specs:
     - selector: span[name = "Tracetest trigger"]

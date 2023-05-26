@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: hCzNevwVg
   name: Create transaction step
   description: Test step of 'Transaction Feature - Test Suite'
   trigger:
@@ -26,20 +27,18 @@ spec:
               ]
             }
           },
-          "specs": {
-            "specs": [
-              {
-                "selector": {
-                  "query": "span[name = \"pg.query:SELECT pokeshop\"]"
-                },
-                "assertions": ["attr:tracetest.selected_spans.count > 0"]
-              }
-            ]
-          },
+          "specs": [
+            {
+              "selectorParsed": {
+                "query": "span[name = \"pg.query:SELECT pokeshop\"]"
+              },
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
+            }
+          ],
           "outputs": [
             {
               "name": "TRIGGER_COUNT",
-              "selector": {
+              "selectorParsed": {
                 "query": "span[name = \"Tracetest trigger\"]"
               },
               "value": "attr:tracetest.selected_spans.count"

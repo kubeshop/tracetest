@@ -9,32 +9,32 @@
 
 package openapi
 
-type TestOutput struct {
+type TestSpec struct {
 	Name string `json:"name,omitempty"`
 
 	Selector string `json:"selector,omitempty"`
 
 	SelectorParsed Selector `json:"selectorParsed,omitempty"`
 
-	Value string `json:"value,omitempty"`
+	Assertions []string `json:"assertions,omitempty"`
 }
 
-// AssertTestOutputRequired checks if the required fields are not zero-ed
-func AssertTestOutputRequired(obj TestOutput) error {
+// AssertTestSpecRequired checks if the required fields are not zero-ed
+func AssertTestSpecRequired(obj TestSpec) error {
 	if err := AssertSelectorRequired(obj.SelectorParsed); err != nil {
 		return err
 	}
 	return nil
 }
 
-// AssertRecurseTestOutputRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of TestOutput (e.g. [][]TestOutput), otherwise ErrTypeAssertionError is thrown.
-func AssertRecurseTestOutputRequired(objSlice interface{}) error {
+// AssertRecurseTestSpecRequired recursively checks if required fields are not zero-ed in a nested slice.
+// Accepts only nested slice of TestSpec (e.g. [][]TestSpec), otherwise ErrTypeAssertionError is thrown.
+func AssertRecurseTestSpecRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aTestOutput, ok := obj.(TestOutput)
+		aTestSpec, ok := obj.(TestSpec)
 		if !ok {
 			return ErrTypeAssertionError
 		}
-		return AssertTestOutputRequired(aTestOutput)
+		return AssertTestSpecRequired(aTestSpec)
 	})
 }
