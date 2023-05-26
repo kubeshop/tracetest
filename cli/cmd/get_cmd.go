@@ -20,6 +20,7 @@ var getCmd = &cobra.Command{
 	Use:     fmt.Sprintf("get %s", strings.Join(parameters.ValidResources, "|")),
 	Short:   "Get resource",
 	Long:    "Get a resource from your Tracetest server",
+	PreRun:  setupCommand(),
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()

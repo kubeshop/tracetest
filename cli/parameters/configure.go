@@ -17,18 +17,20 @@ var _ Params = &ConfigureParams{}
 func (p *ConfigureParams) Validate(cmd *cobra.Command, args []string) []ParamError {
 	var errors []ParamError
 
-	if cmd.Flags().Lookup("endpoint").Changed && p.Endpoint == "" {
-		errors = append(errors, ParamError{
-			Parameter: "endpoint",
-			Message:   "endpoint cannot be empty",
-		})
-
-		_, err := url.Parse(p.Endpoint)
-		if err != nil {
+	if cmd.Flags().Lookup("endpoint").Changed {
+		if p.Endpoint == "" {
 			errors = append(errors, ParamError{
 				Parameter: "endpoint",
-				Message:   "endpoint is not a valid URL",
+				Message:   "endpoint cannot be empty",
 			})
+		} else {
+			_, err := url.Parse(p.Endpoint)
+			if err != nil {
+				errors = append(errors, ParamError{
+					Parameter: "endpoint",
+					Message:   "endpoint is not a valid URL",
+				})
+			}
 		}
 	}
 
