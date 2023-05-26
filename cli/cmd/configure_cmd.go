@@ -7,7 +7,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var analyticsEnabled bool
@@ -20,7 +19,7 @@ var configureCmd = &cobra.Command{
 	Short:   "Configure your tracetest CLI",
 	Long:    "Configure your tracetest CLI",
 	PreRun:  setupLogger,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, _ []string) (string, error) {
 		analytics.Track("Configure", "cmd", map[string]string{})
 
 		ctx := context.Background()
@@ -41,11 +40,8 @@ var configureCmd = &cobra.Command{
 		}
 
 		err := action.Run(ctx, actionConfig)
-		if err != nil {
-			cliLogger.Error("could not get tests", zap.Error(err))
-			return
-		}
-	},
+		return "", err
+	}),
 	PostRun: teardownCommand,
 }
 

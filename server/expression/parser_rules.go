@@ -55,7 +55,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 
 		{Name: "Duration", Pattern: `([0-9]+(\.[0-9]+)?)( )?(ns|us|ms|s|m|h)`},
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
-		{Name: "Attribute", Pattern: `attr:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
+		{Name: "Attribute", Pattern: `attr:[a-zA-Z_0-9][a-zA-Z_0-9.-]*`, Action: nil},
 		{Name: "Environment", Pattern: `env:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
 		{Name: "QuotedString", Pattern: `"(\\"|[^"])*"`, Action: nil},
 		{Name: "SingleQuotedString", Pattern: `'(\\'|[^'])*'`, Action: nil},

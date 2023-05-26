@@ -10,8 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/tests"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -495,7 +497,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		err = json.Unmarshal(jsonOutputs, &r.Outputs)
 		if err != nil {
 			// try with raw outputs
-			var rawOutputs []model.EnvironmentValue
+			var rawOutputs []environment.EnvironmentValue
 			err = json.Unmarshal(jsonOutputs, &rawOutputs)
 
 			for _, value := range rawOutputs {
@@ -549,4 +551,28 @@ func readRunRow(row scanner) (model.Run, error) {
 	default:
 		return model.Run{}, fmt.Errorf("read run row: %w", err)
 	}
+}
+
+func (td *postgresDB) GetTransactionRunSteps(ctx context.Context, tr tests.TransactionRun) ([]model.Run, error) {
+	// stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1 AND test_id = $2")
+	stmt, err := td.db.Prepare(selectRunQuery + ` INNER JOIN
+		transaction_run_steps trs ON
+			test_runs.id = trs.test_run_id AND test_runs.test_id = trs.test_run_test_id
+		WHERE trs.transaction_run_id = $1 AND trs.transaction_run_transaction_id = $2`)
+	if err != nil {
+		return []model.Run{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, tr.ID, tr.TransactionID)
+	if err != nil {
+		return []model.Run{}, fmt.Errorf("query context: %w", err)
+	}
+
+	steps, err := td.readRunRows(ctx, rows)
+	if err != nil {
+		return []model.Run{}, fmt.Errorf("read row: %w", err)
+	}
+
+	return steps, nil
 }

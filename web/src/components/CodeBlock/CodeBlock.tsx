@@ -15,7 +15,11 @@ const getInitialLang = (mimeType: string): LanguageName | undefined =>
 const formatValue = (value: string, lang: LanguageName | undefined): string => {
   switch (lang) {
     case 'json':
-      return JSON.stringify(JSON.parse(value), null, 2);
+      try {
+        return JSON.stringify(JSON.parse(value), null, 2);
+      } catch (error) {
+        return '';
+      }
 
     default:
       return value;

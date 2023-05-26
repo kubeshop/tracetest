@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -326,58 +327,11 @@ func TestTestModel(t *testing.T) {
 	}
 }
 
-func TestEnvironmentModel(t *testing.T) {
-	cases := []struct {
-		name     string
-		in       yaml.Environment
-		expected model.Environment
-	}{
-		{
-			name: "Basic",
-			in: yaml.Environment{
-				ID:          "prod",
-				Name:        "prod",
-				Description: "Production",
-				Values: []yaml.EnvironmentValue{
-					{Key: "USER_ID", Value: "1"},
-				},
-			},
-			expected: model.Environment{
-				ID:          "prod",
-				Name:        "prod",
-				Description: "Production",
-				Values: []model.EnvironmentValue{
-					{Key: "USER_ID", Value: "1"},
-				},
-			},
-		},
-	}
-
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			cl := c
-			t.Parallel()
-
-			file := yaml.File{
-				Type: yaml.FileTypeEnvironment,
-				Spec: cl.in,
-			}
-
-			env, err := file.Environment()
-			require.NoError(t, err)
-
-			actual := env.Model()
-
-			assert.Equal(t, cl.expected, actual)
-		})
-	}
-}
-
 func TestTransactionModel(t *testing.T) {
 	cases := []struct {
 		name     string
 		in       yaml.Transaction
-		expected model.Transaction
+		expected tests.Transaction
 	}{
 		{
 			name: "Basic",
@@ -387,13 +341,11 @@ func TestTransactionModel(t *testing.T) {
 				Description: "Some transaction",
 				Steps:       []string{"345"},
 			},
-			expected: model.Transaction{
+			expected: tests.Transaction{
 				ID:          id.ID("123"),
 				Name:        "Transaction",
 				Description: "Some transaction",
-				Steps: []model.Test{
-					{ID: id.ID("345")},
-				},
+				StepIDs:     []id.ID{"345"},
 			},
 		},
 	}

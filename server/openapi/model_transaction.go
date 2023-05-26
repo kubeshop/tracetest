@@ -23,7 +23,11 @@ type Transaction struct {
 	// version number of the test
 	Version int32 `json:"version,omitempty"`
 
-	Steps []Test `json:"steps,omitempty"`
+	// list of steps of the transaction containing just each test id
+	Steps []string `json:"steps,omitempty"`
+
+	// list of steps of the transaction containing the whole test object
+	FullSteps []Test `json:"fullSteps,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
@@ -32,7 +36,7 @@ type Transaction struct {
 
 // AssertTransactionRequired checks if the required fields are not zero-ed
 func AssertTransactionRequired(obj Transaction) error {
-	for _, el := range obj.Steps {
+	for _, el := range obj.FullSteps {
 		if err := AssertTestRequired(el); err != nil {
 			return err
 		}

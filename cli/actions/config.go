@@ -2,7 +2,6 @@ package actions
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -52,7 +51,7 @@ func (config configActions) Get(ctx context.Context, ID string) (*file.File, err
 }
 
 func (config configActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {
-	return nil, fmt.Errorf("Config does not support listing. Try `tracetest get config` instead")
+	return config.resourceClient.List(ctx, listArgs)
 }
 
 func (config configActions) Delete(ctx context.Context, ID string) (string, error) {

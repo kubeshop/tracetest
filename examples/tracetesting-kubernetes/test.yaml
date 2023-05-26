@@ -1,0 +1,13 @@
+type: Test
+spec:
+  id: ze90fyU4R
+  name: kubectl get ns
+  trigger:
+    type: traceid
+    traceid:
+      id: ${env:asd}
+  specs:
+  - name: List span exists
+    selector: span[tracetest.span.type="general" name="List"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1

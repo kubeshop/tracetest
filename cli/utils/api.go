@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -21,6 +22,7 @@ type ListArgs struct {
 	Skip          int32
 	SortDirection string
 	SortBy        string
+	All           bool
 }
 
 func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
@@ -42,7 +44,6 @@ func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
 type ResourceClient struct {
 	Client       http.Client
 	BaseUrl      string
-	BaseHeader   http.Header
 	ResourceType string
 }
 
@@ -59,20 +60,15 @@ func GetResourceAPIClient(resourceType string, cliConfig config.Config) Resource
 	}
 
 	baseUrl := fmt.Sprintf("%s://%s/api/%s", cliConfig.Scheme, cliConfig.Endpoint, resourceType)
-	baseHeader := http.Header{
-		"x-client-id":  []string{analytics.ClientID()},
-		"Content-Type": []string{"application/json"},
-	}
 
 	return ResourceClient{
 		Client:       client,
 		BaseUrl:      baseUrl,
-		BaseHeader:   baseHeader,
 		ResourceType: resourceType,
 	}
 }
 
-func (resourceClient ResourceClient) NewRequest(url string, method string, body string) (*http.Request, error) {
+func (resourceClient ResourceClient) NewRequest(url, method, body, contentType string, augmented bool) (*http.Request, error) {
 	var reqBody io.Reader
 	if body != "" {
 		reqBody = StringToIOReader(body)
@@ -83,13 +79,23 @@ func (resourceClient ResourceClient) NewRequest(url string, method string, body 
 		return nil, err
 	}
 
-	request.Header = resourceClient.BaseHeader
+	if contentType == "" {
+		contentType = "application/json"
+	}
+
+	request.Header.Set("x-client-id", analytics.ClientID())
+	request.Header.Set("Content-Type", contentType)
+	request.Header.Set("Accept", contentType)
+	if augmented {
+		request.Header.Set("X-Tracetest-Augmented", "true")
+	}
+
 	return request, err
 }
 
 func (resourceClient ResourceClient) Update(ctx context.Context, file file.File, ID string) (*file.File, error) {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
-	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents())
+	request, err := resourceClient.NewRequest(url, http.MethodPut, file.Contents(), file.ContentType(), false)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -115,6 +121,11 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
 	}
 
+	responseContentType := resp.Header.Get("Content-type")
+	if responseContentType == "" {
+		responseContentType = "application/json"
+	}
+
 	file = file.SaveChanges(IOReadCloserToString(resp.Body))
 
 	return &file, nil
@@ -122,17 +133,30 @@ func (resourceClient ResourceClient) Update(ctx context.Context, file file.File,
 
 func (resourceClient ResourceClient) Delete(ctx context.Context, ID string) error {
 	url := fmt.Sprintf("%s/%s", resourceClient.BaseUrl, ID)
-	request, err := resourceClient.NewRequest(url, http.MethodDelete, "")
+	request, err := resourceClient.NewRequest(url, http.MethodDelete, "", "", false)
 	if err != nil {
 		return fmt.Errorf("could not delete resource: %w", err)
 	}
 
-	_, err = resourceClient.Client.Do(request)
-	return err
+	response, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == http.StatusNotFound {
+		return fmt.Errorf(`Resource %s with ID %s not found" was found`, resourceClient.ResourceType, ID)
+	}
+
+	return nil
 }
 
 func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.File, error) {
-	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "")
+	augmented := false
+	if ctx.Value("X-Tracetest-Augmented") != nil {
+		augmented = true
+	}
+
+	request, err := resourceClient.NewRequest(fmt.Sprintf("%s/%s", resourceClient.BaseUrl, id), http.MethodGet, "", "", augmented)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -143,6 +167,10 @@ func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.
 	}
 
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, ResourceNotFound
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
@@ -161,9 +189,30 @@ func (resourceClient ResourceClient) Get(ctx context.Context, id string) (*file.
 	return &file, nil
 }
 
+type BaseListResponse struct {
+	Count int           `json:"count"`
+	Items []interface{} `json:"items"`
+}
+
+func parseListResponse(body string) (BaseListResponse, error) {
+	var response BaseListResponse
+
+	err := json.Unmarshal([]byte(body), &response)
+	if err != nil {
+		return BaseListResponse{}, fmt.Errorf("could not parse response: %w", err)
+	}
+
+	return response, nil
+}
+
 func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs) (*file.File, error) {
+	augmented := false
+	if ctx.Value("X-Tracetest-Augmented") != nil {
+		augmented = true
+	}
+
 	url := fmt.Sprintf("%s?skip=%d&take=%d&sortBy=%s&sortDirection=%s", resourceClient.BaseUrl, listArgs.Skip, listArgs.Take, listArgs.SortBy, listArgs.SortDirection)
-	request, err := resourceClient.NewRequest(url, http.MethodGet, "")
+	request, err := resourceClient.NewRequest(url, http.MethodGet, "", "", augmented)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
@@ -173,7 +222,25 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
-	file, err := file.NewFromRaw(fmt.Sprintf("%s_list.yaml", resourceClient.ResourceType), []byte(IOReadCloserToString(resp.Body)))
+	body := IOReadCloserToString(resp.Body)
+	if listArgs.All {
+		baseListResponse, err := parseListResponse(body)
+		if err != nil {
+			return nil, err
+		}
+
+		if baseListResponse.Count > len(baseListResponse.Items) {
+			return resourceClient.List(ctx, ListArgs{
+				Skip:          0,
+				Take:          int32(baseListResponse.Count) + 1,
+				SortBy:        listArgs.SortBy,
+				SortDirection: listArgs.SortDirection,
+				All:           false,
+			})
+		}
+	}
+
+	file, err := file.NewFromRaw(fmt.Sprintf("%s_list.yaml", resourceClient.ResourceType), []byte(body))
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +249,7 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 }
 
 func (resourceClient ResourceClient) Create(ctx context.Context, file file.File) (*file.File, error) {
-	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents())
+	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPost, file.Contents(), file.ContentType(), false)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}

@@ -126,11 +126,19 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
+  "/configs": {
+    /** List Tracetest configuration */
+    get: operations["listConfiguration"];
+  };
   "/configs/{configId}": {
     /** Get Tracetest configuration */
     get: operations["getConfiguration"];
     /** Update Tracetest configuration */
     put: operations["updateConfiguration"];
+  };
+  "/pollingprofiles": {
+    /** List Polling Profile configuration */
+    get: operations["listPollingProfile"];
   };
   "/pollingprofiles/{pollingProfileId}": {
     /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
@@ -151,6 +159,10 @@ export interface paths {
     put: operations["updateDemo"];
     /** Delete a demonstration used on Tracetest as quick start examples. */
     delete: operations["deleteDemo"];
+  };
+  "/datastores": {
+    /** List Data Store */
+    get: operations["listDataStore"];
   };
   "/datastores/{dataStoreId}": {
     /** Get a Data Store */
@@ -173,6 +185,10 @@ export interface paths {
     put: operations["updateEnvironment"];
     /** Delete an environment from Tracetest */
     delete: operations["deleteEnvironment"];
+  };
+  "/version": {
+    /** Get the version of the API */
+    get: operations["getVersion"];
   };
 }
 
@@ -229,14 +245,16 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"][];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResourceList"];
+          "text/yaml": {
+            count?: number;
+            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+          };
         };
       };
+      /** invalid query for transactions, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with getting transactions */
       500: unknown;
     };
@@ -245,17 +263,21 @@ export interface operations {
   createTransaction: {
     responses: {
       /** successful operation */
-      200: {
+      201: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
         };
       };
       /** trying to create a transaction with an already existing ID */
       400: unknown;
+      /** problem creating a transaction */
+      500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
       };
     };
   };
@@ -266,10 +288,13 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
         };
       };
-      /** problem with getting a transaction */
+      /** transaction not found */
+      404: unknown;
+      /** problem getting an transaction */
       500: unknown;
     };
   };
@@ -278,13 +303,23 @@ export interface operations {
     parameters: {};
     responses: {
       /** successful operation */
-      204: never;
-      /** problem with updating transaction */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        };
+      };
+      /** invalid transaction, some data was sent in incorrect format. */
+      400: unknown;
+      /** transaction not found */
+      404: unknown;
+      /** problem updating a transaction */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
       };
     };
   };
@@ -292,8 +327,12 @@ export interface operations {
   deleteTransaction: {
     parameters: {};
     responses: {
-      /** OK */
+      /** successful operation */
       204: never;
+      /** transaction not found */
+      404: unknown;
+      /** problem deleting a transaction */
+      500: unknown;
     };
   };
   /** get a transaction specific version */
@@ -696,6 +735,21 @@ export interface operations {
       };
     };
   };
+  /** List Tracetest configuration */
+  listConfiguration: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResourceList"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResourceList"];
+        };
+      };
+      /** problem getting the configuration list */
+      500: unknown;
+    };
+  };
   /** Get Tracetest configuration */
   getConfiguration: {
     parameters: {};
@@ -730,6 +784,21 @@ export interface operations {
         "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
         "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResource"];
       };
+    };
+  };
+  /** List Polling Profile configuration */
+  listPollingProfile: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfileList"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfileList"];
+        };
+      };
+      /** problem getting the polling profile list */
+      500: unknown;
     };
   };
   /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
@@ -870,6 +939,21 @@ export interface operations {
       500: unknown;
     };
   };
+  /** List Data Store */
+  listDataStore: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStoreList"];
+          "text/yaml": external["dataStores.yaml"]["components"]["schemas"]["DataStoreList"];
+        };
+      };
+      /** problem getting the data store list */
+      500: unknown;
+    };
+  };
   /** Get a Data Store */
   getDataStore: {
     parameters: {};
@@ -1007,6 +1091,19 @@ export interface operations {
       500: unknown;
     };
   };
+  /** Get the version of the API */
+  getVersion: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["version.yaml"]["components"]["schemas"]["Version"];
+        };
+      };
+      /** problem getting the version of the API */
+      500: unknown;
+    };
+  };
 }
 
 export interface external {
@@ -1031,6 +1128,10 @@ export interface external {
           message?: string;
           error?: string;
         };
+        ConfigurationResourceList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["ConfigurationResource"][];
+        };
         /** @description Represents a configuration structured into the Resources format. */
         ConfigurationResource: {
           /**
@@ -1053,6 +1154,10 @@ export interface external {
             /** @description Flag telling if a user allow Tracetest to send analytics about its usage. */
             analyticsEnabled: boolean;
           };
+        };
+        PollingProfileList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
         };
         /** @description Represents a polling profile structured into the Resources format. */
         PollingProfile: {
@@ -1136,6 +1241,10 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        DataStoreList: {
+          count?: number;
+          items?: external["dataStores.yaml"]["components"]["schemas"]["DataStoreResource"][];
+        };
         /** @description Represents a data store structured into the Resources format. */
         DataStoreResource: {
           /**
@@ -1508,7 +1617,7 @@ export interface external {
           createdAt?: string;
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
-          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
            * @description define test outputs, in a key/value format. The value is processed as an expression
            * @example [object Object],[object Object]
@@ -1519,7 +1628,8 @@ export interface external {
         };
         TestOutput: {
           name?: string;
-          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           value?: string;
         };
         TestSummary: {
@@ -1533,11 +1643,13 @@ export interface external {
         };
         /** @example [object Object] */
         TestSpecs: {
-          specs?: {
-            name?: string | null;
-            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: string[];
-          }[];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
+        };
+        TestSpec: {
+          name?: string;
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          assertions?: string[];
         };
         TestRun: {
           id?: string;
@@ -1705,13 +1817,29 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TransactionResourceList: {
+          count?: number;
+          items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+        };
+        /** @description Represents a transaction structured into the Resources format. */
+        TransactionResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Transaction'.
+           * @enum {string}
+           */
+          type?: "Transaction";
+          spec?: external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
         Transaction: {
           id?: string;
           name?: string;
           description?: string;
           /** @description version number of the test */
           version?: number;
-          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          /** @description list of steps of the transaction containing just each test id */
+          steps?: string[];
+          /** @description list of steps of the transaction containing the whole test object */
+          fullSteps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
           /** Format: date-time */
           createdAt?: string;
           /** @description summary of transaction */
@@ -1743,11 +1871,9 @@ export interface external {
         Trigger: {
           /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
-          triggerSettings?: {
-            http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
-            traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
-          };
+          http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+          traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
@@ -1776,6 +1902,18 @@ export interface external {
         Variable: {
           key?: string;
           defaultValue?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "version.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Version: {
+          /** @example 1.0.0 */
+          version?: string;
         };
       };
     };

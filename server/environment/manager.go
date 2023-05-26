@@ -9,15 +9,14 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type Repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) Repository {
-	return Repository{db}
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{db}
 }
 
 type scanner interface {
@@ -64,14 +63,6 @@ const (
 		SELECT COUNT(*) FROM environments e
 	`
 )
-
-var _ resourcemanager.Create[Environment] = &Repository{}
-var _ resourcemanager.Delete[Environment] = &Repository{}
-var _ resourcemanager.Get[Environment] = &Repository{}
-var _ resourcemanager.List[Environment] = &Repository{}
-var _ resourcemanager.Update[Environment] = &Repository{}
-var _ resourcemanager.IDSetter[Environment] = &Repository{}
-var _ resourcemanager.Provision[Environment] = &Repository{}
 
 func (*Repository) SortingFields() []string {
 	return []string{"name", "createdAt"}
@@ -218,7 +209,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (Environment, error) {
 	return environment, nil
 }
 
-func (r *Repository) EnvironmentIDExists(ctx context.Context, id string) (bool, error) {
+func (r *Repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 
 	row := r.db.QueryRowContext(ctx, idExistsQuery, id)

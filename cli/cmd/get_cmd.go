@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 var resourceID string
@@ -22,11 +22,9 @@ var getCmd = &cobra.Command{
 	PreRun:    setupCommand(),
 	Args:      cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
 	ValidArgs: validArgs,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		if resourceID == "" {
-			cliLogger.Error("id of the resource to get must be specified")
-			os.Exit(1)
-			return
+			return "", fmt.Errorf("id of the resource to get must be specified")
 		}
 
 		resourceType := args[0]
@@ -37,18 +35,19 @@ var getCmd = &cobra.Command{
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
-
 		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource instance for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
+		}
+
+		if output == string(formatters.JSON) {
+			ctx = context.WithValue(ctx, "X-Tracetest-Augmented", true)
 		}
 
 		resource, err := resourceActions.Get(ctx, resourceID)
-		if err != nil {
-			cliLogger.Error(fmt.Sprintf("failed to get resource for type: %s", resourceType), zap.Error(err))
-			os.Exit(1)
-			return
+		if err != nil && errors.Is(err, utils.ResourceNotFound) {
+			return fmt.Sprintf("Resource %s with ID %s not found", resourceType, resourceID), nil
+		} else if err != nil {
+			return "", err
 		}
 
 		resourceFormatter := resourceActions.Formatter()
@@ -56,13 +55,11 @@ var getCmd = &cobra.Command{
 
 		result, err := formatter.Format(resource)
 		if err != nil {
-			cliLogger.Error("failed to format resource", zap.Error(err))
-			os.Exit(1)
-			return
+			return "", err
 		}
 
-		fmt.Println(result)
-	},
+		return result, nil
+	}),
 	PostRun: teardownCommand,
 }
 

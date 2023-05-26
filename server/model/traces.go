@@ -23,12 +23,12 @@ func NewTrace(traceID string, spans []Span) Trace {
 		spanMap[spanID] = &spanCopy
 	}
 
-	var rootSpan *Span = nil
+	rootSpans := make([]*Span, 0)
 	for _, span := range spanMap {
 		parentID := span.Attributes["parent_id"]
 		parentSpan, found := spanMap[parentID]
 		if !found {
-			rootSpan = span
+			rootSpans = append(rootSpans, span)
 			continue
 		}
 
@@ -36,10 +36,17 @@ func NewTrace(traceID string, spans []Span) Trace {
 		span.Parent = parentSpan
 	}
 
+	var rootSpan Span
+	if len(rootSpans) == 1 {
+		rootSpan = *rootSpans[0]
+	} else {
+		rootSpan = Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: rootSpans}
+	}
+
 	id, _ := trace.TraceIDFromHex(traceID)
 	trace := Trace{
 		ID:       id,
-		RootSpan: *rootSpan,
+		RootSpan: rootSpan,
 	}
 
 	trace = trace.Sort()
@@ -89,6 +96,7 @@ func (t *Trace) Sort() Trace {
 }
 
 const TriggerSpanName = "Tracetest trigger"
+const TemporaryRootSpanName = "Temporary Tracetest root span"
 
 func (t *Trace) HasRootSpan() bool {
 	return t.RootSpan.Name == TriggerSpanName
@@ -110,6 +118,12 @@ func (t *Trace) InsertRootSpan(newRoot Span) *Trace {
 }
 
 func replaceRoot(oldRoot, newRoot Span) Span {
+	if oldRoot.Name == TemporaryRootSpanName {
+		// Replace the temporary root with the actual root
+		newRoot.Children = oldRoot.Children
+		return newRoot
+	}
+
 	if oldRoot.Attributes == nil {
 		oldRoot.Attributes = make(Attributes)
 	}

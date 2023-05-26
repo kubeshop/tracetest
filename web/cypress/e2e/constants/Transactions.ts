@@ -6,12 +6,10 @@ export const transactionTestList: TRawTest[] = [
     description: 'transaction',
     serviceUnderTest: {
       triggerType: 'http',
-      triggerSettings: {
-        http: {
-          url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import',
-          method: 'POST',
-          body: '{"id": 6}',
-        },
+      http: {
+        url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon/import',
+        method: 'POST',
+        body: '{"id": 6}',
       },
     },
   },
@@ -20,11 +18,9 @@ export const transactionTestList: TRawTest[] = [
     description: 'transaction',
     serviceUnderTest: {
       triggerType: 'http',
-      triggerSettings: {
-        http: {
-          url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon',
-          method: 'GET',
-        },
+      http: {
+        url: 'http://demo-pokemon-api.demo.svc.cluster.local/pokemon',
+        method: 'GET',
       },
     },
   },

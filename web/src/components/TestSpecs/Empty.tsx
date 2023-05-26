@@ -31,8 +31,9 @@ const Empty = () => {
       <S.EmptyTitle>There are no test specs for this test</S.EmptyTitle>
       <S.EmptyText>Add a test spec, or choose from our predefined test specs:</S.EmptyText>
       <S.SnippetsContainer>
-        {TEST_SPEC_SNIPPETS.map(snippet => (
-          <div>
+        {TEST_SPEC_SNIPPETS.map((snippet, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={`${snippet.selector}-${index}`}>
             <Button
               disabled={!isRunStateSucceeded(state)}
               icon={<AimOutlined />}

@@ -20,7 +20,9 @@ components:
         serviceUnderTest:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
         specs:
-          $ref: "#/components/schemas/TestSpecs"
+          type: array
+          items:
+            $ref: "#/components/schemas/TestSpec"
           description: specification of assertions that are going to be made
         outputs:
           description: define test outputs, in a key/value format. The value is processed as an expression
@@ -45,6 +47,8 @@ components:
         name:
           type: string
         selector:
+          type: string
+        selectorParsed:
           $ref: "#/components/schemas/Selector"
         value:
           type: string
@@ -76,17 +80,8 @@ components:
         specs:
           type: array
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                nullable: true
-              selector:
-                $ref: "#/components/schemas/Selector"
-              assertions:
-                type: array
-                items:
-                  type: string
+            $ref: "#/components/schemas/TestSpec"
+
       example:
         specs:
           - selector:
@@ -103,6 +98,20 @@ components:
               - attribute: http.status_code
                 comparator: "="
                 expected: "200"
+
+    TestSpec:
+      type: object
+      properties:
+        name:
+          type: string
+        selector:
+          type: string
+        selectorParsed:
+          $ref: "#/components/schemas/Selector"
+        assertions:
+          type: array
+          items:
+            type: string
 
     TestRun:
       type: object

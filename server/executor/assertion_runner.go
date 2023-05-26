@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -222,10 +223,10 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 	}
 }
 
-func createEnvironment(environment model.Environment, outputs maps.Ordered[string, model.RunOutput]) model.Environment {
-	outputVariables := make([]model.EnvironmentValue, 0)
+func createEnvironment(env environment.Environment, outputs maps.Ordered[string, model.RunOutput]) environment.Environment {
+	outputVariables := make([]environment.EnvironmentValue, 0)
 	outputs.ForEach(func(key string, val model.RunOutput) error {
-		outputVariables = append(outputVariables, model.EnvironmentValue{
+		outputVariables = append(outputVariables, environment.EnvironmentValue{
 			Key:   val.Name,
 			Value: val.Value,
 		})
@@ -233,9 +234,9 @@ func createEnvironment(environment model.Environment, outputs maps.Ordered[strin
 		return nil
 	})
 
-	outputEnv := model.Environment{Values: outputVariables}
+	outputEnv := environment.Environment{Values: outputVariables}
 
-	return environment.Merge(outputEnv)
+	return env.Merge(outputEnv)
 }
 
 func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {

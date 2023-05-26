@@ -15,7 +15,7 @@ var testListCmd = &cobra.Command{
 	Short:  "List all tests",
 	Long:   "List all tests",
 	PreRun: setupCommand(),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
 		analytics.Track("Test List", "cmd", map[string]string{})
 
 		ctx := context.Background()
@@ -25,11 +25,8 @@ var testListCmd = &cobra.Command{
 
 		actionArgs := actions.ListTestConfig{}
 		err := listTestsAction.Run(ctx, actionArgs)
-		if err != nil {
-			cliLogger.Error("could not get tests", zap.Error(err))
-			return
-		}
-	},
+		return "", err
+	}),
 	PostRun: teardownCommand,
 }
 

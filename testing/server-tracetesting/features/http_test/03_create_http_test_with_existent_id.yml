@@ -1,0 +1,40 @@
+type: Test
+spec:
+  id: v4QKJR4Vg
+  name: Create HTTP Test with existing ID
+  description: Test step of 'HTTP Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/tests
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: |
+        {
+          "id": "${env:EXAMPLE_TEST_ID}",
+          "name": "Pokemon - List - Get a Pokemon",
+          "serviceUnderTest": {
+            "triggerType": "http",
+            "http": {
+              "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "body": "",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        }
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 400
+  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1

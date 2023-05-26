@@ -26,6 +26,7 @@ const (
 
 var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationGet,
+	resourcemanager.OperationList,
 	resourcemanager.OperationUpdate,
 }
 
@@ -85,6 +86,10 @@ func (ppc *PeriodicPollingConfig) Validate() error {
 
 func (pp PollingProfile) HasID() bool {
 	return pp.ID.String() != ""
+}
+
+func (pp PollingProfile) GetID() id.ID {
+	return pp.ID
 }
 
 func (pp PollingProfile) Validate() error {
@@ -180,6 +185,7 @@ func (r *Repository) GetDefault(ctx context.Context) PollingProfile {
 	pp, _ := r.Get(ctx, id.ID("current"))
 	return pp
 }
+
 func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) {
 	profile := PollingProfile{
 		ID:      "current",
@@ -213,6 +219,23 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) 
 	}
 
 	return profile, nil
+}
+
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]PollingProfile, error) {
+	cfg, err := r.Get(ctx, id.ID("current"))
+	if err != nil {
+		return []PollingProfile{}, err
+	}
+
+	return []PollingProfile{cfg}, nil
+}
+
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
+	return 1, nil
+}
+
+func (*Repository) SortingFields() []string {
+	return []string{}
 }
 
 func (r *Repository) Provision(ctx context.Context, profile PollingProfile) error {

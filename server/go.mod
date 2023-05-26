@@ -5,6 +5,7 @@ go 1.20
 replace k8s.io/client-go => k8s.io/client-go v0.18.0
 
 require (
+	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/aws/aws-sdk-go v1.44.196
 	github.com/brianvoe/gofakeit/v6 v6.17.0
@@ -13,6 +14,7 @@ require (
 	github.com/fluidtruck/deepcopy v1.0.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/fullstorydev/grpcurl v1.8.6
+	github.com/goccy/go-yaml v1.11.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golang/protobuf v1.5.2
@@ -76,7 +78,6 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
-	github.com/goccy/go-yaml v1.11.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0 // indirect

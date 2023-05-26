@@ -18,6 +18,8 @@ var (
 		rmtests.OperationUpdateNotFound,
 		rmtests.OperationGetNotFound,
 		rmtests.OperationDeleteNotFound,
+		rmtests.OperationListSortSuccess,
+		rmtests.OperationListNoResults,
 	)
 	operationsWithoutPostAssert = rmtests.IgnorePostAssertForOperations(rmtests.OperationDeleteSuccess)
 	jsonComparer                = rmtests.JSONComparer(compareJSONDataStores)
@@ -55,6 +57,11 @@ func getScenarioPreparation(sample datastore.DataStore) func(t *testing.T, op rm
 		repository := manager.Handler().(*datastore.Repository)
 
 		if op == rmtests.OperationGetSuccess {
+			// on get scenario we need to have one data store registered
+			repository.Update(context.TODO(), sample)
+		}
+
+		if op == rmtests.OperationListSuccess {
 			// on get scenario we need to have one data store registered
 			repository.Update(context.TODO(), sample)
 		}

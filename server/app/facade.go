@@ -3,12 +3,14 @@ package app
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
@@ -34,11 +36,11 @@ func (rf runnerFacade) StopTest(testID id.ID, runID int) {
 	})
 }
 
-func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env model.Environment) model.Run {
+func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env environment.Environment) model.Run {
 	return rf.runner.Run(ctx, test, rm, env)
 }
 
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr model.Transaction, rm model.RunMetadata, env model.Environment) model.TransactionRun {
+func (rf runnerFacade) RunTransaction(ctx context.Context, tr tests.Transaction, rm model.RunMetadata, env environment.Environment) tests.TransactionRun {
 	return rf.transactionRunner.Run(ctx, tr, rm, env)
 }
 
@@ -50,6 +52,7 @@ func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastoreresource.Repository,
 	testDB model.Repository,
+	transactions *tests.TransactionsRepository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
@@ -102,6 +105,7 @@ func newRunnerFacades(
 	transactionRunner := executor.NewTransactionRunner(
 		runner,
 		testDB,
+		transactions,
 		subscriptionManager,
 	)
 

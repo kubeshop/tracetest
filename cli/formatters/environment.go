@@ -2,6 +2,7 @@ package formatters
 
 import (
 	"github.com/alexeyco/simpletable"
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
@@ -54,9 +55,8 @@ func (f EnvironmentsFormatter) ToListTable(file *file.File) (*simpletable.Header
 
 func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var environmentResource openapi.EnvironmentResource
-	nullableEnvironment := openapi.NewNullableEnvironmentResource(&environmentResource)
 
-	err := nullableEnvironment.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &environmentResource)
 	if err != nil {
 		return nil, err
 	}
