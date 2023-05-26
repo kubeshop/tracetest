@@ -41,6 +41,9 @@ func NewTrace(traceID string, spans []Span) Trace {
 		rootSpan = *rootSpans[0]
 	} else {
 		rootSpan = Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: rootSpans}
+		for _, child := range rootSpan.Children {
+			child.Parent = &rootSpan
+		}
 	}
 
 	id, _ := trace.TraceIDFromHex(traceID)
@@ -121,6 +124,9 @@ func replaceRoot(oldRoot, newRoot Span) Span {
 	if oldRoot.Name == TemporaryRootSpanName {
 		// Replace the temporary root with the actual root
 		newRoot.Children = oldRoot.Children
+		for _, span := range oldRoot.Children {
+			span.Parent = &newRoot
+		}
 		return newRoot
 	}
 
