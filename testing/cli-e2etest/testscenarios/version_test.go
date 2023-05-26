@@ -16,10 +16,12 @@ func TestVersionCommand(t *testing.T) {
 	env := environment.CreateAndStart(t)
 	defer env.Close(t)
 
+	cliConfig := env.GetCLIConfigPath(t)
+
 	// Given I am a Tracetest CLI user
 	// When I try to check the tracetest version
 	// Then I should receive a version string with success
-	result := tracetestcli.Exec(t, "version")
+	result := tracetestcli.Exec(t, "version", tracetestcli.WithCLIConfig(cliConfig))
 
 	require.Equal(0, result.ExitCode)
 	require.Greater(len(result.StdOut), 0)
