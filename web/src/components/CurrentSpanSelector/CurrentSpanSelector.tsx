@@ -38,7 +38,7 @@ const CurrentSpanSelector = ({spanId}: IProps) => {
           selector,
         },
       });
-    else onOpen(TestOutput({selector: {query: selector}}));
+    else onOpen(TestOutput({selector, selectorParsed: {query: selector}}));
   }, [isTestSpecFormOpen, onOpen, open, span]);
 
   return (

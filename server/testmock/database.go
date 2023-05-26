@@ -87,8 +87,11 @@ func StopTestEnvironment() {
 
 func GetTestingDatabase() model.Repository {
 	dbConnection := GetRawTestingDatabase()
+	return GetTestingDatabaseFromRawDB(dbConnection)
+}
 
-	testingDatabase, err := testdb.Postgres(testdb.WithDB(dbConnection))
+func GetTestingDatabaseFromRawDB(db *sql.DB) model.Repository {
+	testingDatabase, err := testdb.Postgres(testdb.WithDB(db))
 	if err != nil {
 		panic(err)
 	}

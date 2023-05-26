@@ -2,12 +2,14 @@ package actions
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/mitchellh/mapstructure"
 )
@@ -34,13 +36,13 @@ func (environmentsActions) Name() string {
 	return "environment"
 }
 
-func (environment environmentsActions) GetID(file *file.File) (string, error) {
-	resource, err := environment.formatter.ToStruct(file)
+func (action environmentsActions) GetID(file *file.File) (string, error) {
+	resource, err := action.formatter.ToStruct(file)
 	if err != nil {
 		return "", err
 	}
 
-	return *resource.(openapi.EnvironmentResource).Spec.Id, nil
+	return resource.(openapi.EnvironmentResource).Spec.GetId(), nil
 }
 
 func (environment environmentsActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
@@ -50,12 +52,21 @@ func (environment environmentsActions) Apply(ctx context.Context, fileContent fi
 
 	mapstructure.Decode(fileContent.Definition().Spec, &envResource.Spec)
 
-	if envResource.Spec.Id == nil || *envResource.Spec.Id == "" {
-		result, err := environment.resourceClient.Create(ctx, fileContent)
-		return result, err
+	if envResource.Spec.GetId() != "" {
+		_, err := environment.Get(ctx, envResource.Spec.GetId())
+		if err != nil {
+			if !errors.Is(err, utils.ResourceNotFound) {
+				return nil, err
+			}
+
+			// doesn't exist, so create it
+			return environment.resourceClient.Create(ctx, fileContent)
+		}
+
+		return environment.resourceClient.Update(ctx, fileContent, envResource.Spec.GetId())
 	}
 
-	result, err = environment.resourceClient.Update(ctx, fileContent, *envResource.Spec.Id)
+	result, err = environment.resourceClient.Create(ctx, fileContent)
 	return result, err
 }
 
@@ -85,7 +96,7 @@ func (environment environmentsActions) ApplyResource(ctx context.Context, resour
 	return environment.Apply(ctx, file)
 }
 
-func (environment environmentsActions) FromFile(ctx context.Context, filePath string) (openapi.EnvironmentResource, error) {
+func (action environmentsActions) FromFile(ctx context.Context, filePath string) (openapi.EnvironmentResource, error) {
 	if !utils.StringReferencesFile(filePath) {
 		return openapi.EnvironmentResource{}, fmt.Errorf(`env file "%s" does not exist`, filePath)
 	}
@@ -100,7 +111,7 @@ func (environment environmentsActions) FromFile(ctx context.Context, filePath st
 		return openapi.EnvironmentResource{}, fmt.Errorf(`cannot parse env file "%s": %w`, filePath, err)
 	}
 
-	envModel := model.Spec.(yaml.Environment)
+	envModel := model.Spec.(environment.Environment)
 
 	values := make([]openapi.EnvironmentValue, 0, len(envModel.Values))
 	for _, value := range envModel.Values {
@@ -114,7 +125,7 @@ func (environment environmentsActions) FromFile(ctx context.Context, filePath st
 	environmentResource := openapi.EnvironmentResource{
 		Type: (*string)(&model.Type),
 		Spec: &openapi.Environment{
-			Id:          &envModel.ID,
+			Id:          openapi.PtrString(envModel.ID.String()),
 			Name:        &envModel.Name,
 			Description: &envModel.Description,
 			Values:      values,

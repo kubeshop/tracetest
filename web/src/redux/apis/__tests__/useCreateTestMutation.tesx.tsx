@@ -18,7 +18,7 @@ test('useCreateTestMutation', async () => {
       name: 'New test',
       serviceUnderTest: {
         triggerType: 'http',
-        triggerSettings: {http: {url: 'https://google.com', method: HTTP_METHOD.GET}},
+        http: {url: 'https://google.com', method: HTTP_METHOD.GET},
       },
     }).unwrap();
     expect(newTest!.id).toBe(test.id);

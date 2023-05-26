@@ -28,16 +28,18 @@ const Test = ({
   summary = {},
   outputs = [],
   createdAt = '',
-}: TRawTest): Test => ({
-  id,
-  name,
-  version,
-  description,
-  createdAt,
-  definition: TestSpecs(specs || {}),
-  trigger: Trigger(rawTrigger || {}),
-  summary: Summary(summary),
-  outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
-});
+}: TRawTest): Test => {
+  return {
+    id,
+    name,
+    version,
+    description,
+    createdAt,
+    definition: TestSpecs({ specs: specs || [] }),
+    trigger: Trigger(rawTrigger || {}),
+    summary: Summary(summary),
+    outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
+  };
+};
 
 export default Test;

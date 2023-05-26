@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: oCkHevQ4R-
   name: Create HTTP Test with non-existing ID
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:
@@ -16,18 +17,16 @@ spec:
           "name": "Pokemon - List - Get a Pokemon",
           "serviceUnderTest": {
             "triggerType": "http",
-            "triggerSettings": {
-              "http": {
-                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
-                "method": "GET",
-                "body": "",
-                "headers": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ]
-              }
+            "http": {
+              "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "body": "",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
             }
           }
         }

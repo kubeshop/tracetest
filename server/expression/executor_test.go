@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/stretchr/testify/assert"
@@ -103,6 +104,19 @@ func TestAttributeExecution(t *testing.T) {
 				Span: model.Span{
 					Attributes: model.Attributes{
 						"my_attribute": "42",
+					},
+				},
+			},
+		},
+		{
+			Name:       "should_get_values_from_attributes_with_dashes",
+			Query:      "attr:dapr-app-id = 42",
+			ShouldPass: true,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: model.Span{
+					Attributes: model.Attributes{
+						"dapr-app-id": "42",
 					},
 				},
 			},
@@ -419,7 +433,7 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
-				Values: []model.EnvironmentValue{},
+				Values: []environment.EnvironmentValue{},
 			},
 		},
 		{
@@ -450,7 +464,7 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: at index 1 of array: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
-				Values: []model.EnvironmentValue{},
+				Values: []environment.EnvironmentValue{},
 			},
 		},
 	}

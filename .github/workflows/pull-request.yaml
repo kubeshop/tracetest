@@ -11,7 +11,7 @@ on:
       - cli/**
       - examples/**
       - server/**
-      - tracetesting/**
+      - testing/**
       - web/**
       - Dockerfile
       - k8s/**
@@ -68,7 +68,7 @@ jobs:
       - name: Run unit tests
         run: cd cli; make test
 
-  test-server:
+  unit-test-server:
     name: API Server unit tests
     runs-on: ubuntu-latest
 
@@ -86,16 +86,9 @@ jobs:
       - name: Run unit tests
         run: cd server; make test
 
-  test-web:
+  unit-test-web:
     name: WebUI unit tests
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        cmd:
-          - npm run lint
-          - npm test
 
     steps:
       - name: Checkout
@@ -117,11 +110,11 @@ jobs:
           restore-keys: npm-
       - run: cd web; npm ci
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-      - run: cd web; ${{ matrix.cmd }}
+      - run: cd web; npm run lint && npm test
 
   build-go:
     name: Build go binaries (API Server and CLI)
-    needs: [unit-test-cli, test-server]
+    needs: [unit-test-cli, unit-test-server]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -135,7 +128,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v4
       with:
         distribution: goreleaser-pro
-        version: v1.17.2
+        version: v1.18.2
         args: build --single-target --clean --snapshot
       env:
         VERSION: pr-${{ github.event.pull_request.number }}
@@ -149,39 +142,10 @@ jobs:
         name: tracetest-go
         path: dist/
 
-  build-web:
-    name: Build WebUI resources
-    runs-on: ubuntu-latest
-    needs: [test-web]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Cache Build
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          path: web/build/
-          key: web-build-${{ hashFiles('web/*') }}
-      - run: cd web; npm ci
-        if: steps.cache-build.outputs.cache-hit != 'true'
-      - run: cd web; CI= npm run build
-        if: steps.cache-build.outputs.cache-hit != 'true'
-      - name: Upload assets
-        uses: actions/upload-artifact@v3
-        with:
-          name: tracetest-web
-          path: web/build/
-
   build-docker:
     name: Build docker image
     runs-on: ubuntu-latest
-    needs: [build-web, build-go]
+    needs: [unit-test-web, unit-test-cli, unit-test-server]
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
       GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
@@ -202,15 +166,29 @@ jobs:
           go-version-file: 'go.work'
           cache: true
           cache-dependency-path: go.work
-      - uses: actions/download-artifact@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
         with:
-          name: tracetest-web
+          node-version: 16
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Cache Build
+        id: cache-build
+        uses: actions/cache@v3
+        with:
           path: web/build/
+          key: web-build-${{ hashFiles('web/*') }}
+      - name: Run clean install for Web Assets
+        run: cd web; npm clean-install
+        if: steps.cache-build.outputs.cache-hit != 'true'
+      - name: Build Web Assets
+        run: cd web; CI= npm run build
+        if: steps.cache-build.outputs.cache-hit != 'true'
       # release
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: v1.17.2
+          version: v1.18.2
           args: release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
         env:
           VERSION: pr-${{ github.event.pull_request.number }}
@@ -257,7 +235,7 @@ jobs:
 
   smoke-test-cli:
     name: CLI smoke tests
-    needs:  [build-docker]
+    needs:  [build-docker, build-go]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -291,6 +269,31 @@ jobs:
           TAG="pr-${{ github.event.pull_request.number }}" \
           TEST_ENV="${{ matrix.test_env }}" \
           ./run.bash
+
+  e2e-cli:
+    name: CLI e2e tests
+    needs:  [build-docker, build-go]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-go
+          path: dist/
+      - name: Run tests
+        run: |
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
+          chmod +x ./dist/tracetest
+
+          export TRACETEST_COMMAND=$PWD/dist/tracetest
+          export TEST_ENVIRONMENT=jaeger
+          export TAG=pr-${{ github.event.pull_request.number }}
+
+          cd ./testing/cli-e2etest
+          make test
 
   deploy:
     name: Deploy test infra
@@ -365,7 +368,7 @@ jobs:
           TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
           ./run.bash
 
-  e2e:
+  e2e-web:
     needs: [deploy, trace-testing]
     name: WebUI End-to-end tests
     runs-on: ubuntu-latest
@@ -428,7 +431,7 @@ jobs:
   cleanup:
     name: Cleanup test infra
     runs-on: ubuntu-latest
-    needs: [trace-testing, e2e]
+    needs: [trace-testing, e2e-web]
     steps:
       - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
         with:

@@ -1,4 +1,4 @@
-import {coordCenter, Dag, dagStratify, decrossOpt, layeringSimplex, sugiyama} from 'd3-dag';
+import {coordCenter, Dag, dagStratify, layeringSimplex, sugiyama} from 'd3-dag';
 import {MarkerType} from 'react-flow-renderer';
 
 import {theme} from 'constants/Theme.constants';
@@ -10,7 +10,6 @@ function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
 
   const dagLayout = sugiyama()
     .layering(layeringSimplex())
-    .decross(decrossOpt())
     .coord(coordCenter())
     .nodeSize(() => [220, 180]);
 

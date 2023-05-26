@@ -41,13 +41,16 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 	}
 
 	return func(cmd *cobra.Command, args []string) {
-		setupOutputFormat()
+		setupOutputFormat(cmd)
 		setupLogger(cmd, args)
 		loadConfig(cmd, args)
 		overrideConfig()
 		setupVersion()
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
+
+		// TODO: remove this client from here when we migrate tests to the resource manager
+		openapiClient := utils.GetAPIClient(cliConfig)
 
 		configOptions := append(
 			baseOptions,
@@ -89,6 +92,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
 
+		transactionOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
+			actions.WithFormatter(formatters.NewTransactionsFormatter()),
+		)
+		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
+		resourceRegistry.Register(transactionActions)
+
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
@@ -103,18 +114,22 @@ func overrideConfig() {
 		if err != nil {
 			msg := fmt.Sprintf("cannot parse endpoint %s", overrideEndpoint)
 			cliLogger.Error(msg, zap.Error(err))
-			os.Exit(1)
+			ExitCLI(1)
 		}
 		cliConfig.Scheme = scheme
 		cliConfig.Endpoint = endpoint
 	}
 }
 
-func setupOutputFormat() {
+func setupOutputFormat(cmd *cobra.Command) {
+	if cmd.GroupID != "resources" && output == string(formatters.Empty) {
+		output = string(formatters.DefaultOutput)
+	}
+
 	o := formatters.Output(output)
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
-		os.Exit(1)
+		ExitCLI(1)
 	}
 	formatters.SetOutput(o)
 }

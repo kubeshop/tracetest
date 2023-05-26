@@ -185,6 +185,7 @@ func TestOldAssertionSpecsFormatWithoutNames(t *testing.T) {
 
 	oldTestJson, err := json.Marshal(oldTest)
 	require.NoError(t, err)
+	t.Log(string(oldTestJson))
 
 	var test model.Test
 	err = json.Unmarshal(oldTestJson, &test)

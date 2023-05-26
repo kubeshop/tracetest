@@ -2,16 +2,21 @@ package executor_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -23,7 +28,7 @@ type fakeTestRunner struct {
 	uid                 int
 }
 
-func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env model.Environment) model.Run {
+func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env environment.Environment) model.Run {
 	run := model.NewRun()
 	run.Environment = env
 	run.State = model.RunStateCreated
@@ -63,8 +68,8 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 func TestTransactionRunner(t *testing.T) {
 
 	t.Run("NoErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, false, func(t *testing.T, actual model.TransactionRun) {
-			assert.Equal(t, model.TransactionRunStateFinished, actual.State)
+		runTransactionRunnerTest(t, false, func(t *testing.T, actual tests.TransactionRun) {
+			assert.Equal(t, tests.TransactionRunStateFinished, actual.State)
 			assert.Len(t, actual.Steps, 2)
 			assert.Equal(t, actual.Steps[0].State, model.RunStateFinished)
 			assert.Equal(t, actual.Steps[1].State, model.RunStateFinished)
@@ -86,8 +91,8 @@ func TestTransactionRunner(t *testing.T) {
 	})
 
 	t.Run("WithErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, true, func(t *testing.T, actual model.TransactionRun) {
-			assert.Equal(t, model.TransactionRunStateFailed, actual.State)
+		runTransactionRunnerTest(t, true, func(t *testing.T, actual tests.TransactionRun) {
+			assert.Equal(t, tests.TransactionRunStateFailed, actual.State)
 			require.Len(t, actual.Steps, 1)
 			assert.Equal(t, model.RunStateTriggerFailed, actual.Steps[0].State)
 		})
@@ -95,23 +100,16 @@ func TestTransactionRunner(t *testing.T) {
 
 }
 
-func getDB() (model.Repository, func()) {
-	db := testmock.GetTestingDatabase()
+func getDB() (model.Repository, *sql.DB) {
+	rawDB := testmock.GetRawTestingDatabase()
+	db := testmock.GetTestingDatabaseFromRawDB(rawDB)
 
-	clean := func() {
-		err := db.Drop()
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	return db, clean
+	return db, rawDB
 }
 
-func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual model.TransactionRun)) {
+func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual tests.TransactionRun)) {
 	ctx := context.Background()
-	db, clear := getDB()
-	defer clear()
+	db, rawDB := getDB()
 
 	subscriptionManager := subscription.NewManager()
 
@@ -128,10 +126,15 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	test2, err := db.CreateTest(ctx, model.Test{Name: "Test 2"})
 	require.NoError(t, err)
 
-	transaction, err := db.CreateTransaction(ctx, model.Transaction{
-		Name:  "transaction",
-		Steps: []model.Test{test1, test2},
+	testsRepo, _ := testdb.Postgres(testdb.WithDB(rawDB))
+	transactionsRepo := tests.NewTransactionsRepository(rawDB, testsRepo)
+	transaction, err := transactionsRepo.Create(ctx, tests.Transaction{
+		Name:    "transaction",
+		StepIDs: []id.ID{test1.ID, test2.ID},
 	})
+	require.NoError(t, err)
+
+	transaction, err = transactionsRepo.GetAugmented(context.TODO(), transaction.ID)
 	require.NoError(t, err)
 
 	metadata := model.RunMetadata{
@@ -139,9 +142,10 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 		"service":     "tracetest",
 	}
 
-	env, err := db.CreateEnvironment(ctx, model.Environment{
+	envRepository := environment.NewRepository(rawDB)
+	env, err := envRepository.Create(ctx, environment.Environment{
 		Name: "production",
-		Values: []model.EnvironmentValue{
+		Values: []environment.EnvironmentValue{
 			{
 				Key:   "url",
 				Value: "http://my-service.com",
@@ -150,7 +154,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager)
+	runner := executor.NewTransactionRunner(testRunner, db, transactionsRepo, subscriptionManager)
 	runner.Start(1)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
@@ -158,9 +162,9 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 
 	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
 
-	done := make(chan model.TransactionRun, 1)
+	done := make(chan tests.TransactionRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		tr := m.Content.(model.TransactionRun)
+		tr := m.Content.(tests.TransactionRun)
 		if tr.State.IsFinal() {
 			done <- tr
 		}
@@ -169,7 +173,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
 
-	var finalRun model.TransactionRun
+	var finalRun tests.TransactionRun
 	select {
 	case finalRun = <-done:
 		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions
