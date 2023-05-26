@@ -9,7 +9,14 @@ type HttpRequest = Model<
   }
 >;
 
-const HttpRequest = ({method = 'GET', url = '', headers = [], body = '', auth = {}}: TRawHTTPRequest): HttpRequest => {
+const HttpRequest = ({
+  method = 'GET',
+  url = '',
+  headers = [],
+  body = '',
+  auth = {},
+  sslVerification = false,
+}: TRawHTTPRequest): HttpRequest => {
   return {
     method,
     url,
@@ -19,6 +26,7 @@ const HttpRequest = ({method = 'GET', url = '', headers = [], body = '', auth = 
     })),
     body,
     auth,
+    sslVerification,
   };
 };
 

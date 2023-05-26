@@ -5,6 +5,7 @@ import {BodyField} from './BodyField/BodyField';
 import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from './RequestDetailsHeadersInput';
 import RequestDetailsUrlInput from './RequestDetailsUrlInput';
+import SSLVerification from './SSLVerification';
 
 export const FORM_ID = 'create-test';
 
@@ -19,6 +20,7 @@ const RequestDetailsForm = ({form}: IProps) => {
       <RequestDetailsAuthInput />
       <RequestDetailsHeadersInput />
       <BodyField setBody={body => form.setFieldsValue({body})} body={Form.useWatch('body', form)} />
+      <SSLVerification />
     </S.InputContainer>
   );
 };
