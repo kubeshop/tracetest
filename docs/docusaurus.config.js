@@ -112,6 +112,14 @@ const config = {
             from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
+            to: '/deployment/docker',
+            from: ['/deployment/overview/docker' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/deployment/kubernetes',
+            from: ['/deployment/overview/kubernetes' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
             to: '/getting-started/detailed-installation',
             from: ['/getting-started/cli' /*, '/docs/legacyDocFrom2016'*/],
           },
