@@ -200,7 +200,7 @@ func setupVersion() {
 	action := actions.NewGetServerVersionAction(options...)
 	versionText, isVersionMatch = action.GetVersion(ctx)
 
-	if !isVersionMatch && os.Getenv("TRACETEST_DEV") != "" {
+	if !isVersionMatch && os.Getenv("TRACETEST_DEV") == "" {
 		fmt.Fprintf(os.Stderr, versionText+`
 ✖️ Version Mismatch. Ensure the Tracetest server and CLI use the same version.
 For more information. Please visit https://docs.tracetest.io/cli/version-mismatch
