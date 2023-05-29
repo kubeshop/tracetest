@@ -27,7 +27,7 @@ var environmentApplyCmd = &cobra.Command{
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		// call new apply command
-		definitionFile = dataStoreApplyFile
+		applyParams.DefinitionFile = dataStoreApplyFile
 		applyCmd.Run(applyCmd, []string{"environment"})
 	},
 	PostRun: teardownCommand,

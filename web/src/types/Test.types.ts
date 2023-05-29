@@ -34,6 +34,7 @@ export interface IHttpValues {
   headers: HttpRequest['headers'];
   method: HTTP_METHOD;
   url: string;
+  sslVerification: boolean;
 }
 
 export interface RequestDefinitionExtended extends Request {

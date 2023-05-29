@@ -11,6 +11,7 @@ import (
 )
 
 type (
+	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
 		ID               id.ID
 		CreatedAt        time.Time
@@ -34,23 +35,24 @@ type (
 	}
 
 	Summary struct {
-		Runs    int
-		LastRun LastRun
+		Runs    int     `json:"runs"`
+		LastRun LastRun `json:"lastRun"`
 	}
 
 	LastRun struct {
-		Time   time.Time
-		Passes int
-		Fails  int
+		Time   time.Time `json:"time"`
+		Passes int       `json:"passes"`
+		Fails  int       `json:"fails"`
 	}
 
 	TriggerType string
 
+	// this struct yaml/json encoding is handled at ./trigger_json.go for custom encodings
 	Trigger struct {
 		Type    TriggerType
 		HTTP    *HTTPRequest
 		GRPC    *GRPCRequest
-		TRACEID *TRACEIDRequest
+		TraceID *TRACEIDRequest
 	}
 
 	TriggerResult struct {

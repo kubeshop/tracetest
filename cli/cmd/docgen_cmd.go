@@ -26,7 +26,7 @@ var docGenCmd = &cobra.Command{
 		err := os.MkdirAll(docsOutputDir, os.ModePerm)
 		if err != nil {
 			fmt.Println(fmt.Errorf("could not create output dir: %w", err).Error())
-			os.Exit(1)
+			ExitCLI(1)
 		}
 
 		err = doc.GenMarkdownTreeCustom(rootCmd, docsOutputDir, func(s string) string {
@@ -34,14 +34,14 @@ var docGenCmd = &cobra.Command{
 		}, func(s string) string { return s })
 		if err != nil {
 			fmt.Println(fmt.Errorf("could not generate documentation: %w", err).Error())
-			os.Exit(1)
+			ExitCLI(1)
 		}
 
 		if docusaurusFolder != "" {
 			err = generateDocusaurusSidebar(docsOutputDir, docusaurusFolder)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not create docusaurus sidebar file: %w", err).Error())
-				os.Exit(1)
+				ExitCLI(1)
 			}
 		}
 	},

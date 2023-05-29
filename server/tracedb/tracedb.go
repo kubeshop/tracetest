@@ -19,6 +19,7 @@ type TraceDB interface {
 	GetTraceID() trace.TraceID
 	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
 	Close() error
+	GetEndpoints() string
 }
 
 type TestableTraceDB interface {
@@ -39,6 +40,7 @@ func (db *noopTraceDB) Connect(ctx context.Context) error { return nil }
 func (db *noopTraceDB) Close() error                      { return nil }
 func (db *noopTraceDB) ShouldRetry() bool                 { return false }
 func (db *noopTraceDB) Ready() bool                       { return true }
+func (db *noopTraceDB) GetEndpoints() string              { return "" }
 func (db *noopTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	return model.ConnectionResult{}
 }

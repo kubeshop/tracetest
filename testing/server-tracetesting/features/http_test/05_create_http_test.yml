@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: TCzHeDw4gY
   name: Create HTTP Test
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:
@@ -15,33 +16,29 @@ spec:
           "name": "Pokemon - List - Get a Pokemon",
           "serviceUnderTest": {
             "triggerType": "http",
-            "triggerSettings": {
-              "http": {
-                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
-                "method": "GET",
-                "headers": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ]
-              }
+            "http": {
+              "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+              "method": "GET",
+              "headers": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
             }
           },
-          "specs": {
-            "specs": [
-              {
-                "selector": {
-                  "query": "span[name = \"pg.query:SELECT pokeshop\"]"
-                },
-                "assertions": ["attr:tracetest.selected_spans.count > 0"]
-              }
-            ]
-          },
+          "specs": [
+            {
+              "selectorParsed": {
+                "query": "span[name = \"pg.query:SELECT pokeshop\"]"
+              },
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
+            }
+          ],
           "outputs": [
             {
               "name": "TRIGGER_COUNT",
-              "selector": {
+              "selectorParsed": {
                 "query": "span[name = \"Tracetest trigger\"]"
               },
               "value": "attr:tracetest.selected_spans.count"

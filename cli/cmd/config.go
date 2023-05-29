@@ -9,16 +9,21 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var cliConfig config.Config
-var cliLogger *zap.Logger
-var resourceRegistry = actions.NewResourceRegistry()
-var versionText string
+var (
+	cliConfig        config.Config
+	cliLogger        *zap.Logger
+	versionText      string
+	isVersionMatch   bool
+	resourceRegistry = actions.NewResourceRegistry()
+	resourceParams   = &parameters.ResourceParams{}
+)
 
 type setupConfig struct {
 	shouldValidateConfig bool
@@ -48,6 +53,9 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		setupVersion()
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
+
+		// TODO: remove this client from here when we migrate tests to the resource manager
+		openapiClient := utils.GetAPIClient(cliConfig)
 
 		configOptions := append(
 			baseOptions,
@@ -89,6 +97,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
 
+		transactionOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
+			actions.WithFormatter(formatters.NewTransactionsFormatter()),
+		)
+		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
+		resourceRegistry.Register(transactionActions)
+
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
@@ -103,7 +119,7 @@ func overrideConfig() {
 		if err != nil {
 			msg := fmt.Sprintf("cannot parse endpoint %s", overrideEndpoint)
 			cliLogger.Error(msg, zap.Error(err))
-			os.Exit(1)
+			ExitCLI(1)
 		}
 		cliConfig.Scheme = scheme
 		cliConfig.Endpoint = endpoint
@@ -118,7 +134,7 @@ func setupOutputFormat(cmd *cobra.Command) {
 	o := formatters.Output(output)
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
-		os.Exit(1)
+		ExitCLI(1)
 	}
 	formatters.SetOutput(o)
 }
@@ -185,7 +201,15 @@ func setupVersion() {
 	}
 
 	action := actions.NewGetServerVersionAction(options...)
-	version := action.GetVersionText(ctx)
+	versionText, isVersionMatch = action.GetVersion(ctx)
 
-	versionText = version
+	if !isVersionMatch && os.Getenv("TRACETEST_DEV") == "" {
+		fmt.Fprintf(os.Stderr, versionText+`
+✖️ Error: Version Mismatch
+The CLI version and the server version are not compatible. To fix this, you'll need to make sure that both your CLI and server are using compatible versions.
+We recommend upgrading both of them to the latest available version. Check out our documentation https://docs.tracetest.io/configuration/upgrade for simple instructions on how to upgrade.
+Thank you for using Tracetest! We apologize for any inconvenience caused.
+`)
+		ExitCLI(1)
+	}
 }

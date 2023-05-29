@@ -1,7 +1,6 @@
 package mappings
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -31,31 +31,7 @@ func optionalTime(in time.Time) *time.Time {
 	return &in
 }
 
-func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
-	steps := make([]openapi.Test, len(in.Steps))
-	for i, step := range in.Steps {
-		steps[i] = m.Test(step)
-	}
-
-	return openapi.Transaction{
-		Id:          in.ID.String(),
-		Name:        in.Name,
-		Description: in.Description,
-		Version:     int32(in.Version),
-		Steps:       steps,
-		CreatedAt:   in.CreatedAt,
-		Summary: openapi.TestSummary{
-			Runs: int32(in.Summary.Runs),
-			LastRun: openapi.TestSummaryLastRun{
-				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: int32(in.Summary.LastRun.Fails),
-				Fails:  int32(in.Summary.LastRun.Passes),
-			},
-		},
-	}
-}
-
-func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun {
+func (m OpenAPI) TransactionRun(in tests.TransactionRun) openapi.TransactionRun {
 	steps := make([]openapi.TestRun, 0, len(in.Steps))
 
 	for _, step := range in.Steps {
@@ -120,9 +96,10 @@ func (m OpenAPI) Outputs(in maps.Ordered[string, model.Output]) []openapi.TestOu
 	res := make([]openapi.TestOutput, 0, in.Len())
 	in.ForEach(func(key string, val model.Output) error {
 		res = append(res, openapi.TestOutput{
-			Name:     key,
-			Selector: m.Selector(val.Selector),
-			Value:    val.Value,
+			Name:           key,
+			Selector:       string(val.Selector),
+			SelectorParsed: m.Selector(val.Selector),
+			Value:          val.Value,
 		})
 		return nil
 	})
@@ -133,11 +110,9 @@ func (m OpenAPI) Outputs(in maps.Ordered[string, model.Output]) []openapi.TestOu
 func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
 	return openapi.Trigger{
 		TriggerType: string(in.Type),
-		TriggerSettings: openapi.TriggerTriggerSettings{
-			Http:    m.HTTPRequest(in.HTTP),
-			Grpc:    m.GRPCRequest(in.GRPC),
-			Traceid: m.TRACEIDRequest(in.TRACEID),
-		},
+		Http:        m.HTTPRequest(in.HTTP),
+		Grpc:        m.GRPCRequest(in.GRPC),
+		Traceid:     m.TRACEIDRequest(in.TraceID),
 	}
 }
 
@@ -171,9 +146,9 @@ func (m OpenAPI) Environments(in []environment.Environment) []openapi.Environmen
 	return environments
 }
 
-func (m OpenAPI) Specs(in maps.Ordered[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
+func (m OpenAPI) Specs(in maps.Ordered[model.SpanQuery, model.NamedAssertions]) []openapi.TestSpec {
 
-	specs := make([]openapi.TestSpecsSpecsInner, in.Len())
+	specs := make([]openapi.TestSpec, in.Len())
 
 	i := 0
 	in.ForEach(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) error {
@@ -182,18 +157,17 @@ func (m OpenAPI) Specs(in maps.Ordered[model.SpanQuery, model.NamedAssertions]) 
 			assertions[j] = string(a)
 		}
 
-		specs[i] = openapi.TestSpecsSpecsInner{
-			Name:       &namedAssertions.Name,
-			Selector:   m.Selector(spanQuery),
-			Assertions: assertions,
+		specs[i] = openapi.TestSpec{
+			Name:           namedAssertions.Name,
+			Selector:       string(spanQuery),
+			SelectorParsed: m.Selector(spanQuery),
+			Assertions:     assertions,
 		}
 		i++
 		return nil
 	})
 
-	return openapi.TestSpecs{
-		Specs: specs,
-	}
+	return specs
 }
 
 func (m OpenAPI) Selector(in model.SpanQuery) openapi.Selector {
@@ -352,26 +326,6 @@ type Model struct {
 	testRepository        model.TestRepository
 }
 
-func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (model.Transaction, error) {
-	tests := make([]model.Test, len(in.Steps))
-	for i, test := range in.Steps {
-		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(test.Id))
-		if err != nil {
-			return model.Transaction{}, err
-		}
-
-		tests[i] = test
-	}
-
-	return model.Transaction{
-		ID:          id.ID(in.Id),
-		Name:        in.Name,
-		Description: in.Description,
-		Version:     int(in.Version),
-		Steps:       tests,
-	}, nil
-}
-
 func (m Model) Test(in openapi.Test) (model.Test, error) {
 	definition, err := m.Definition(in.Specs)
 	if err != nil {
@@ -400,7 +354,7 @@ func (m Model) Outputs(in []openapi.TestOutput) (maps.Ordered[string, model.Outp
 	var err error
 	for _, output := range in {
 		res, err = res.Add(output.Name, model.Output{
-			Selector: model.SpanQuery(output.Selector.Query),
+			Selector: model.SpanQuery(output.SelectorParsed.Query),
 			Value:    output.Value,
 		})
 
@@ -425,37 +379,19 @@ func (m Model) Tests(in []openapi.Test) ([]model.Test, error) {
 	return tests, nil
 }
 
-func (m Model) ValidateDefinition(in openapi.TestSpecs) error {
-	selectors := map[string]bool{}
-	for _, d := range in.Specs {
-		if _, exists := selectors[d.Selector.Query]; exists {
-			return fmt.Errorf("duplicated selector %s", d.Selector.Query)
-		}
-
-		selectors[d.Selector.Query] = true
-	}
-
-	return nil
-}
-
-func (m Model) Definition(in openapi.TestSpecs) (maps.Ordered[model.SpanQuery, model.NamedAssertions], error) {
+func (m Model) Definition(in []openapi.TestSpec) (maps.Ordered[model.SpanQuery, model.NamedAssertions], error) {
 	specs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
-	for _, spec := range in.Specs {
+	for _, spec := range in {
 		asserts := make([]model.Assertion, len(spec.Assertions))
 		for i, a := range spec.Assertions {
 			assertion := model.Assertion(a)
 			asserts[i] = assertion
 		}
-		name := ""
-		if spec.Name != nil {
-			name = *spec.Name
-		}
-
 		namedAssertions := model.NamedAssertions{
-			Name:       name,
+			Name:       spec.Name,
 			Assertions: asserts,
 		}
-		specs, _ = specs.Add(model.SpanQuery(spec.Selector.Query), namedAssertions)
+		specs, _ = specs.Add(model.SpanQuery(spec.SelectorParsed.Query), namedAssertions)
 	}
 
 	return specs, nil
@@ -510,9 +446,9 @@ func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) maps.Ordered[string,
 func (m Model) Trigger(in openapi.Trigger) model.Trigger {
 	return model.Trigger{
 		Type:    model.TriggerType(in.TriggerType),
-		HTTP:    m.HTTPRequest(in.TriggerSettings.Http),
-		GRPC:    m.GRPCRequest(in.TriggerSettings.Grpc),
-		TRACEID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
+		HTTP:    m.HTTPRequest(in.Http),
+		GRPC:    m.GRPCRequest(in.Grpc),
+		TraceID: m.TRACEIDRequest(in.Traceid),
 	}
 }
 

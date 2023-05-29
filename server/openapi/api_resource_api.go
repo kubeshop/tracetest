@@ -69,6 +69,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateLintern,
 		},
 		{
+			"CreateTransaction",
+			strings.ToUpper("Post"),
+			"/api/transactions",
+			c.CreateTransaction,
+		},
+		{
 			"DeleteDataStore",
 			strings.ToUpper("Delete"),
 			"/api/datastores/{dataStoreId}",
@@ -91,6 +97,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/linterns/{linternId}",
 			c.DeleteLintern,
+		},
+		{
+			"DeleteTransaction",
+			strings.ToUpper("Delete"),
+			"/api/transactions/{transactionId}",
+			c.DeleteTransaction,
 		},
 		{
 			"GetConfiguration",
@@ -127,6 +139,18 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/pollingprofiles/{pollingProfileId}",
 			c.GetPollingProfile,
+		},
+		{
+			"GetTransaction",
+			strings.ToUpper("Get"),
+			"/api/transactions/{transactionId}",
+			c.GetTransaction,
+		},
+		{
+			"GetTransactions",
+			strings.ToUpper("Get"),
+			"/api/transactions",
+			c.GetTransactions,
 		},
 		{
 			"ListConfiguration",
@@ -199,6 +223,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/pollingprofiles/{pollingProfileId}",
 			c.UpdatePollingProfile,
+		},
+		{
+			"UpdateTransaction",
+			strings.ToUpper("Put"),
+			"/api/transactions/{transactionId}",
+			c.UpdateTransaction,
 		},
 	}
 }
@@ -275,6 +305,30 @@ func (c *ResourceApiApiController) CreateLintern(w http.ResponseWriter, r *http.
 
 }
 
+// CreateTransaction - Create new transaction
+func (c *ResourceApiApiController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
+	transactionResourceParam := TransactionResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&transactionResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTransactionResourceRequired(transactionResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateTransaction(r.Context(), transactionResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // DeleteDataStore - Delete a Data Store
 func (c *ResourceApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -329,6 +383,22 @@ func (c *ResourceApiApiController) DeleteLintern(w http.ResponseWriter, r *http.
 	linternIdParam := params["linternId"]
 
 	result, err := c.service.DeleteLintern(r.Context(), linternIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteTransaction - delete a transaction
+func (c *ResourceApiApiController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	result, err := c.service.DeleteTransaction(r.Context(), transactionIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -425,6 +495,49 @@ func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *h
 	pollingProfileIdParam := params["pollingProfileId"]
 
 	result, err := c.service.GetPollingProfile(r.Context(), pollingProfileIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransaction - get transaction
+func (c *ResourceApiApiController) GetTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	result, err := c.service.GetTransaction(r.Context(), transactionIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTransactions - Get transactions
+func (c *ResourceApiApiController) GetTransactions(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetTransactions(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -743,6 +856,33 @@ func (c *ResourceApiApiController) UpdatePollingProfile(w http.ResponseWriter, r
 		return
 	}
 	result, err := c.service.UpdatePollingProfile(r.Context(), pollingProfileIdParam, pollingProfileParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateTransaction - update transaction
+func (c *ResourceApiApiController) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	transactionResourceParam := TransactionResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&transactionResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTransactionResourceRequired(transactionResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateTransaction(r.Context(), transactionIdParam, transactionResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

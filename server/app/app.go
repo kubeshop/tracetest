@@ -31,6 +31,7 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -149,6 +150,8 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
+	transactionsRepository := tests.NewTransactionsRepository(db, testDB)
+
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
 
@@ -203,6 +206,7 @@ func (app *App) Start(opts ...appOption) error {
 		dataStoreRepo,
 		linternRepo,
 		testDB,
+		transactionsRepository,
 		applicationTracer,
 		tracer,
 		subscriptionManager,
@@ -241,10 +245,13 @@ func (app *App) Start(opts ...appOption) error {
 
 	provisioner := provisioning.New()
 
-	router, mappers := controller(app.cfg, testDB, tracer, environmentRepo, rf, triggerRegistry)
+	router, mappers := controller(app.cfg, testDB, transactionsRepository, tracer, environmentRepo, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
+
+	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
+
 	registerConfigResource(configRepo, apiRouter, db, provisioner, tracer)
 
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner, tracer)
@@ -316,6 +323,18 @@ func registerLinternResource(linternRepo *lintern_resource.Repository, router *m
 		lintern_resource.ResourceNamePlural,
 		linternRepo,
 		resourcemanager.WithOperations(lintern_resource.Operations...),
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
+func registerTransactionResource(repo *tests.TransactionsRepository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[tests.Transaction](
+		tests.TransactionResourceName,
+		tests.TransactionResourceNamePlural,
+		repo,
+		resourcemanager.CanBeAugmented(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -410,6 +429,7 @@ func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscripti
 func controller(
 	cfg httpServerConfig,
 	testDB model.Repository,
+	transactions *tests.TransactionsRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
@@ -417,7 +437,7 @@ func controller(
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
 
-	router := openapi.NewRouter(httpRouter(cfg, testDB, tracer, environmentRepo, rf, mappers, triggerRegistry))
+	router := openapi.NewRouter(httpRouter(cfg, testDB, transactions, tracer, environmentRepo, rf, mappers, triggerRegistry))
 
 	return router, mappers
 }
@@ -425,13 +445,14 @@ func controller(
 func httpRouter(
 	cfg httpServerConfig,
 	testDB model.Repository,
+	transactions *tests.TransactionsRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
+	controller := httpServer.NewController(testDB, transactions, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

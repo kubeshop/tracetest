@@ -27,7 +27,8 @@ type Test struct {
 	Version          *int32     `json:"version,omitempty"`
 	CreatedAt        *time.Time `json:"createdAt,omitempty"`
 	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
-	Specs            *TestSpecs `json:"specs,omitempty"`
+	// specification of assertions that are going to be made
+	Specs []TestSpec `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
 	Outputs []TestOutput `json:"outputs,omitempty"`
 	Summary *TestSummary `json:"summary,omitempty"`
@@ -243,17 +244,17 @@ func (o *Test) SetServiceUnderTest(v Trigger) {
 }
 
 // GetSpecs returns the Specs field value if set, zero value otherwise.
-func (o *Test) GetSpecs() TestSpecs {
+func (o *Test) GetSpecs() []TestSpec {
 	if o == nil || isNil(o.Specs) {
-		var ret TestSpecs
+		var ret []TestSpec
 		return ret
 	}
-	return *o.Specs
+	return o.Specs
 }
 
 // GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Test) GetSpecsOk() (*TestSpecs, bool) {
+func (o *Test) GetSpecsOk() ([]TestSpec, bool) {
 	if o == nil || isNil(o.Specs) {
 		return nil, false
 	}
@@ -269,9 +270,9 @@ func (o *Test) HasSpecs() bool {
 	return false
 }
 
-// SetSpecs gets a reference to the given TestSpecs and assigns it to the Specs field.
-func (o *Test) SetSpecs(v TestSpecs) {
-	o.Specs = &v
+// SetSpecs gets a reference to the given []TestSpec and assigns it to the Specs field.
+func (o *Test) SetSpecs(v []TestSpec) {
+	o.Specs = v
 }
 
 // GetOutputs returns the Outputs field value if set, zero value otherwise.

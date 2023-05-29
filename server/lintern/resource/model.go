@@ -42,6 +42,10 @@ func (l Lintern) HasID() bool {
 	return l.ID != ""
 }
 
+func (l Lintern) GetID() id.ID {
+	return l.ID
+}
+
 func (l Lintern) ValidateResult(result model.LinternResult) error {
 	if l.MinimumScore != 0 && result.Score < l.MinimumScore {
 		return fmt.Errorf("lintern score validation failed. Minimum %d, Actual: %d", l.MinimumScore, result.Score)

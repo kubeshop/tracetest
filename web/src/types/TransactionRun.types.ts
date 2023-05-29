@@ -1,3 +1,3 @@
-import {TRawTransactionRun} from '../models/TransactionRun.model';
+import {TRawTransactionResourceRun} from '../models/TransactionRun.model';
 
-export type TTransactionRunState = TRawTransactionRun['state'];
+export type TTransactionRunState = TRawTransactionResourceRun['state'];

@@ -21,37 +21,34 @@ func NewGetServerVersionAction(options ...ActionArgsOption) versionAction {
 }
 
 func (a versionAction) Run(ctx context.Context, args VersionConfig) error {
-	versionText := a.GetVersionText(ctx)
+	versionText, _ := a.GetVersion(ctx)
 
 	fmt.Println(versionText)
 	return nil
 }
 
-func (a versionAction) GetVersionText(ctx context.Context) string {
+func (a versionAction) GetVersion(ctx context.Context) (string, bool) {
 	result := fmt.Sprintf(`CLI: %s`, config.Version)
 
 	if a.config.IsEmpty() {
 		return result + `
-Server: Not Configured`
+Server: Not Configured`, false
 	}
 
 	version, err := a.GetServerVersion(ctx)
 	if err != nil {
 		return result + fmt.Sprintf(`
-Server: Failed to get the server version - %s`, err.Error())
+Server: Failed to get the server version - %s`, err.Error()), false
 	}
 
 	isVersionMatch := version == config.Version
 	if isVersionMatch {
 		version += `
 ✔️ Version match`
-	} else {
-		version += `
-✖️ Version mismatch`
 	}
 
 	return result + fmt.Sprintf(`
-Server: %s`, version)
+Server: %s`, version), isVersionMatch
 }
 
 func (a versionAction) GetServerVersion(ctx context.Context) (string, error) {

@@ -22,11 +22,12 @@ func (m OpenAPI) HTTPRequest(in *model.HTTPRequest) openapi.HttpRequest {
 	}
 
 	return openapi.HttpRequest{
-		Url:     in.URL,
-		Method:  string(in.Method),
-		Headers: m.HTTPHeaders(in.Headers),
-		Body:    in.Body,
-		Auth:    m.Auth(in.Auth),
+		Url:             in.URL,
+		Method:          string(in.Method),
+		Headers:         m.HTTPHeaders(in.Headers),
+		Body:            in.Body,
+		Auth:            m.Auth(in.Auth),
+		SslVerification: in.SSLVerification,
 	}
 }
 
@@ -89,11 +90,12 @@ func (m Model) HTTPRequest(in openapi.HttpRequest) *model.HTTPRequest {
 	}
 
 	return &model.HTTPRequest{
-		URL:     in.Url,
-		Method:  model.HTTPMethod(in.Method),
-		Headers: m.HTTPHeaders(in.Headers),
-		Body:    in.Body,
-		Auth:    m.Auth(in.Auth),
+		URL:             in.Url,
+		Method:          model.HTTPMethod(in.Method),
+		Headers:         m.HTTPHeaders(in.Headers),
+		Body:            in.Body,
+		Auth:            m.Auth(in.Auth),
+		SSLVerification: in.SslVerification,
 	}
 }
 

@@ -7,13 +7,57 @@ You might have multiple Tracetest instances that need to be connected to the sam
 ```yaml
 type: DataStore
 spec:
-  name: development
+  name: Jaeger
   type: jaeger
   default: true
   jaeger:
-    endpoint: 127.0.0.1:16685
+    endpoint: jaeger:16685
     tls:
       insecure: true
+```
+
+### OpenSearch
+
+```yaml
+type: DataStore
+spec:
+  name: OpenSearch
+  type: opensearch
+  default: true
+  opensearch:
+    addresses:
+      - http://opensearch:9200
+    index: traces
+```
+
+### Elastic APM
+
+```yaml
+type: DataStore
+spec:
+  name: Elastic APM
+  type: elasticapm
+  default: true
+  elasticapm:
+    addresses:
+      - https://es01:9200
+    username: elastic
+    password: changeme
+    index: traces-apm-default
+    insecureSkipVerify: true
+```
+
+### SignalFX
+
+```yaml
+type: DataStore
+spec:
+  name: SignalFX
+  type: signalfx
+  default: true
+  signalfx:
+    realm: us1
+    token: mytoken
 ```
 
 ### Tempo
@@ -30,31 +74,59 @@ spec:
       insecure: true
 ```
 
-### OpenSearch
+### Lightstep
 
 ```yaml
 type: DataStore
 spec:
-  name: OpenSearch Data Store
-  type: openSearch
+  name: Lightstep pipeline
+  type: lightstep
   default: true
-  opensearch:
-    addresses:
-      - http://opensearch:9200
-    index: traces
 ```
 
-### SignalFX
+### New Relic
 
 ```yaml
 type: DataStore
 spec:
-  name: SignalFX
-  type: signalFx
+  name: New Relic pipeline
+  type: newrelic
   default: true
-  signalFx:
-    realm: us1
-    token: mytoken
+```
+
+### AWS X-Ray
+
+```yaml
+type: DataStore
+spec:
+  name: AWS X-Ray
+  type: awsxray
+  default: true
+  awsxray:
+    accessKeyId: <your-accessKeyId>
+    secretAccessKey: <your-secretAccessKey>
+    sessionToken: <your-session-token>
+    region: "us-west-2"
+```
+
+### Datadog
+
+```yaml
+type: DataStore
+spec:
+  name: Datadog pipeline
+  type: datadog
+  default: true
+```
+
+### Honeycomb
+
+```yaml
+type: DataStore
+spec:
+  name: Honeycomb pipeline
+  type: honeycomb
+  default: true
 ```
 
 ### Using the OpenTelemetry Collector

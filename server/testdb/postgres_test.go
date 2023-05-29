@@ -48,34 +48,6 @@ func createTest(t *testing.T, db model.Repository) model.Test {
 	return createTestWithName(t, db, "first test")
 }
 
-func createTransaction(t *testing.T, db model.Repository) model.Transaction {
-	t.Helper()
-	transaction := model.Transaction{
-		Name:        "first transaction",
-		Description: "description",
-	}
-
-	updated, err := db.CreateTransaction(context.TODO(), transaction)
-	if err != nil {
-		panic(err)
-	}
-	return updated
-}
-
-func createTransactionWithName(t *testing.T, db model.Repository, name string) model.Transaction {
-	t.Helper()
-	transaction := model.Transaction{
-		Name:        name,
-		Description: "description",
-	}
-
-	updated, err := db.CreateTransaction(context.TODO(), transaction)
-	if err != nil {
-		panic(err)
-	}
-	return updated
-}
-
 func createRun(t *testing.T, db model.Repository, test model.Test) model.Run {
 	t.Helper()
 	run := model.Run{

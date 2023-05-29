@@ -5,9 +5,9 @@ import HttpRequest from 'models/HttpRequest.model';
 
 const HttpTriggerService = (): ITriggerService => ({
   async getRequest(values) {
-    const {url, method, auth, headers, body} = values as IHttpValues;
+    const {url, method, auth, headers, body, sslVerification} = values as IHttpValues;
 
-    return HttpRequest({url, method, auth, headers, body});
+    return HttpRequest({url, method, auth, headers, body, sslVerification});
   },
 
   async validateDraft(draft): Promise<boolean> {
@@ -16,7 +16,7 @@ const HttpTriggerService = (): ITriggerService => ({
   },
 
   getInitialValues(request) {
-    const {url, method, headers, body, auth} = request as HttpRequest;
+    const {url, method, headers, body, auth, sslVerification} = request as HttpRequest;
 
     return {
       url,
@@ -24,6 +24,7 @@ const HttpTriggerService = (): ITriggerService => ({
       method: method as HTTP_METHOD,
       headers,
       body,
+      sslVerification,
     };
   },
 });

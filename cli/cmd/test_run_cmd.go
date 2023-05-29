@@ -32,7 +32,7 @@ var testRunCmd = &cobra.Command{
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 
 		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, environmentActions)
-		actionArgs := actions.RunTestConfig{
+		actionArgs := actions.RunResourceArgs{
 			DefinitionFile: runTestFileDefinition,
 			EnvID:          runTestEnvID,
 			WaitForResult:  runTestWaitForResult,

@@ -259,14 +259,16 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"][];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResourceList"];
+          "text/yaml": {
+            count?: number;
+            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+          };
         };
       };
+      /** invalid query for transactions, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with getting transactions */
       500: unknown;
     };
@@ -275,17 +277,21 @@ export interface operations {
   createTransaction: {
     responses: {
       /** successful operation */
-      200: {
+      201: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
         };
       };
       /** trying to create a transaction with an already existing ID */
       400: unknown;
+      /** problem creating a transaction */
+      500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
       };
     };
   };
@@ -296,10 +302,13 @@ export interface operations {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
         };
       };
-      /** problem with getting a transaction */
+      /** transaction not found */
+      404: unknown;
+      /** problem getting an transaction */
       500: unknown;
     };
   };
@@ -308,13 +317,23 @@ export interface operations {
     parameters: {};
     responses: {
       /** successful operation */
-      204: never;
-      /** problem with updating transaction */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        };
+      };
+      /** invalid transaction, some data was sent in incorrect format. */
+      400: unknown;
+      /** transaction not found */
+      404: unknown;
+      /** problem updating a transaction */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
       };
     };
   };
@@ -322,8 +341,12 @@ export interface operations {
   deleteTransaction: {
     parameters: {};
     responses: {
-      /** OK */
+      /** successful operation */
       204: never;
+      /** transaction not found */
+      404: unknown;
+      /** problem deleting a transaction */
+      500: unknown;
     };
   };
   /** get a transaction specific version */
@@ -1570,6 +1593,7 @@ export interface external {
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
           body?: string;
           auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+          sslVerification?: boolean;
         };
         HTTPResponse: {
           status?: string;
@@ -1757,7 +1781,7 @@ export interface external {
           createdAt?: string;
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
-          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
            * @description define test outputs, in a key/value format. The value is processed as an expression
            * @example [object Object],[object Object]
@@ -1768,7 +1792,8 @@ export interface external {
         };
         TestOutput: {
           name?: string;
-          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           value?: string;
         };
         TestSummary: {
@@ -1782,11 +1807,13 @@ export interface external {
         };
         /** @example [object Object] */
         TestSpecs: {
-          specs?: {
-            name?: string | null;
-            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: string[];
-          }[];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
+        };
+        TestSpec: {
+          name?: string;
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          assertions?: string[];
         };
         TestRun: {
           id?: string;
@@ -1958,13 +1985,29 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TransactionResourceList: {
+          count?: number;
+          items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+        };
+        /** @description Represents a transaction structured into the Resources format. */
+        TransactionResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Transaction'.
+           * @enum {string}
+           */
+          type?: "Transaction";
+          spec?: external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
         Transaction: {
           id?: string;
           name?: string;
           description?: string;
           /** @description version number of the test */
           version?: number;
-          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          /** @description list of steps of the transaction containing just each test id */
+          steps?: string[];
+          /** @description list of steps of the transaction containing the whole test object */
+          fullSteps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
           /** Format: date-time */
           createdAt?: string;
           /** @description summary of transaction */
@@ -1996,11 +2039,9 @@ export interface external {
         Trigger: {
           /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
-          triggerSettings?: {
-            http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
-            traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
-          };
+          http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+          traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
