@@ -92,8 +92,16 @@ var ValidResources = []string{"config", "datastore", "demo", "environment", "pol
 func (p *ResourceParams) Validate(cmd *cobra.Command, args []string) []ParamError {
 	errors := make([]ParamError, 0)
 
-	p.ResourceName = args[0]
+	if len(args) == 0 {
+		errors = append(errors, ParamError{
+			Parameter: "resource",
+			Message:   "resource name must be provided",
+		})
 
+		return errors
+	}
+
+	p.ResourceName = args[0]
 	if p.ResourceName == "" {
 		errors = append(errors, ParamError{
 			Parameter: "resource",
