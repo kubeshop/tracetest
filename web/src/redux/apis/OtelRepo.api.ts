@@ -3,7 +3,7 @@ import * as jsyaml from 'js-yaml';
 import {OtelReference} from '../../components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {CompleteAttribute, OTELYaml} from './OTELYaml';
 
-const PATH = `https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/main/`;
+const PATH = 'https://raw.githubusercontent.com/open-telemetry/semantic-conventions/main/';
 
 enum Tags {
   TAGS = 'tags',
