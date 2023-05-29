@@ -1,0 +1,81 @@
+# This example illustrates how you can use Tracetest to achieve synthetic monitoring
+# and get notified via Slack when something fails
+
+name: Synthetic monitoring with Tracetest
+
+on:
+  # allows the manual trigger
+  workflow_dispatch:
+
+  schedule:
+  # Normally, we run synthetic monitoring in a time schedule. GitHub Actions allows
+  # us to achieve that using a cron job. Read more about how cron jobs are configured in
+  # this article: https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm
+  #
+  # Here are some examples of valid cron strings:
+  #
+  #- cron: '*/30 * * * *' # every 30 minutes
+  #- cron: '*/5 * * * *' # every 5 minutes
+  #- cron: '* * * * *' # every minute
+  #- cron: '0 */1 * * *' # every hour
+  #
+  # For this example, we are going to run the job every 5 minutes
+  - cron: '*/5 * * * *'
+
+jobs:
+  run-syntehtic-monitoring:
+    name: Run syntehtic monitoring
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Start app and tracetest
+        run: docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up -d
+
+      - name: Install tracetest CLI
+        run: curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+
+      - name: Configure Tracetest CLI
+        # if you want to disable analytics, change --analytics=true to --analytics=false
+        run: tracetest configure -g --endpoint http://localhost:11633 --analytics=true
+
+      - name: Run syntethic monitoring tests
+        id: monintoring
+        run: |
+          tracetest test run -d test-api.yaml
+
+      - name: Send custom JSON data to Slack workflow
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":warning: Synthetic Monitoring Alert :warning:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\nFailed"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
