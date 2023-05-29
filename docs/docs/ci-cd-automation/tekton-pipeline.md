@@ -1,8 +1,10 @@
-# Tracetest and Tekton - Cloud-Native CI/CD Pipelines
+# Tekton Cloud-native Pipeline
 
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-tekton)
 :::
+
+## Running Event-driven Trace-based Tests
 
 [Tekton](https://tekton.dev/) is a powerful and flexible open-source framework for creating CI/CD systems, allowing developers to build, test, and deploy across cloud providers and on-premise systems.
 

@@ -335,6 +335,16 @@ const sidebars = {
           id: "ci-cd-automation/github-actions-pipeline",
           label: "GitHub Actions Pipeline",
         },
+        {
+          type: "doc",
+          id: "ci-cd-automation/testkube-pipeline",
+          label: "Testkube Kubernetes-native Test Runner Pipeline",
+        },
+        {
+          type: "doc",
+          id: "ci-cd-automation/tekton-pipeline",
+          label: "Tekton Cloud-native Pipeline",
+        },
       ],
     },
     {
@@ -449,11 +459,6 @@ const sidebars = {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-datadog",
           label: "OpenTelemetry Demo and Datadog",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-testkube",
-          label: "Tracetest and Testkube - Running Scheduled Trace-based Tests",
         },
         {
           type: "doc",

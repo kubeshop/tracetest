@@ -167,6 +167,10 @@ const config = {
             to: '/tools-and-integrations/testkube',
             from: ['/tools-and-integrations/integrations/testkube' /*, '/docs/legacyDocFrom2016'*/],
           },
+          {
+            to: '/ci-cd-automation/testkube-pipeline',
+            from: ['/examples-tutorials/recipes/running-tracetest-with-testkube' /*, '/docs/legacyDocFrom2016'*/],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {

@@ -1,4 +1,10 @@
-# Tracetest and Testkube - Running Scheduled Trace-based Tests
+# Testkube Kubernetes-native Test Runner Pipeline
+
+:::note
+[Check out how the integration works, here.](../tools-and-integrations/testkube.md)
+:::
+
+## Running Scheduled Trace-based Tests
 
 [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) is a test executor to run Tracetest tests with Testkube.
 
