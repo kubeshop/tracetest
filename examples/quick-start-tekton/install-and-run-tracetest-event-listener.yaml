@@ -1,0 +1,12 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: install-and-run-tracetest-listener
+spec:
+  serviceAccountName: tekton-robot
+  triggers:
+    - name: install-and-run-tracetest-trigger 
+      bindings:
+      - ref: install-and-run-tracetest-binding
+      template:
+        ref: install-and-run-tracetest-template
