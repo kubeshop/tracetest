@@ -55,7 +55,7 @@ export const GRPC_SPANS_STATUS_CODE: TSnippet = {
   selector: 'span[tracetest.span.type="rpc" rpc.system="grpc"]',
   assertions: [
     {
-      left: 'attr:grpc.status_code',
+      left: 'attr:rpc.grpc.status_code',
       comparator: '=',
       right: '0',
     },
