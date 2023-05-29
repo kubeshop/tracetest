@@ -33,7 +33,7 @@ var dataStoreApplyCmd = &cobra.Command{
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		// call new apply command
-		definitionFile = dataStoreApplyFile
+		applyParams.DefinitionFile = dataStoreApplyFile
 		applyCmd.Run(applyCmd, []string{"datastore"})
 	},
 	PostRun: teardownCommand,
@@ -62,7 +62,7 @@ var dataStoreListCmd = &cobra.Command{
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		// call new get command
-		resourceID = "current"
+		getParams.ResourceId = "current"
 		getCmd.Run(getCmd, []string{"datastore"})
 	},
 	PostRun: teardownCommand,

@@ -7,27 +7,20 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
 
-var (
-	listTake          int32
-	listSkip          int32
-	listSortBy        string
-	listSortDirection string
-	listAll           bool
-)
+var listParams = &parameters.ListParams{}
 
 var listCmd = &cobra.Command{
-	GroupID:   cmdGroupResources.ID,
-	Use:       fmt.Sprintf("list %s", strings.Join(validArgs, "|")),
-	Short:     "List resources",
-	Long:      "List resources from your Tracetest server",
-	PreRun:    setupCommand(),
-	Args:      cobra.MatchAll(cobra.MinimumNArgs(1), cobra.OnlyValidArgs),
-	ValidArgs: validArgs,
-	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
+	GroupID: cmdGroupResources.ID,
+	Use:     fmt.Sprintf("list %s", strings.Join(parameters.ValidResources, "|")),
+	Short:   "List resources",
+	Long:    "List resources from your Tracetest server",
+	PreRun:  setupCommand(),
+	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
@@ -41,11 +34,11 @@ var listCmd = &cobra.Command{
 		}
 
 		listArgs := utils.ListArgs{
-			Take:          listTake,
-			Skip:          listSkip,
-			SortDirection: listSortDirection,
-			SortBy:        listSortBy,
-			All:           listAll,
+			Take:          listParams.Take,
+			Skip:          listParams.Skip,
+			SortDirection: listParams.SortDirection,
+			SortBy:        listParams.SortBy,
+			All:           listParams.All,
 		}
 
 		resource, err := resourceActions.List(ctx, listArgs)
@@ -62,16 +55,16 @@ var listCmd = &cobra.Command{
 		}
 
 		return result, nil
-	}),
+	}, listParams),
 	PostRun: teardownCommand,
 }
 
 func init() {
-	listCmd.Flags().Int32Var(&listTake, "take", 20, "Take number")
-	listCmd.Flags().Int32Var(&listSkip, "skip", 0, "Skip number")
-	listCmd.Flags().StringVar(&listSortBy, "sortBy", "", "Sort by")
-	listCmd.Flags().StringVar(&listSortDirection, "sortDirection", "desc", "Sort direction")
-	listCmd.Flags().BoolVar(&listAll, "all", false, "All")
+	listCmd.Flags().Int32Var(&listParams.Take, "take", 20, "Take number")
+	listCmd.Flags().Int32Var(&listParams.Skip, "skip", 0, "Skip number")
+	listCmd.Flags().StringVar(&listParams.SortBy, "sortBy", "", "Sort by")
+	listCmd.Flags().StringVar(&listParams.SortDirection, "sortDirection", "desc", "Sort direction")
+	listCmd.Flags().BoolVar(&listParams.All, "all", false, "All")
 
 	rootCmd.AddCommand(listCmd)
 }
