@@ -17,7 +17,7 @@ func (t *traceidTriggerer) Trigger(ctx context.Context, test model.Test, opts *T
 	response := Response{
 		Result: model.TriggerResult{
 			Type:    t.Type(),
-			TRACEID: &model.TRACEIDResponse{ID: test.ServiceUnderTest.TRACEID.ID},
+			TRACEID: &model.TRACEIDResponse{ID: test.ServiceUnderTest.TraceID.ID},
 		},
 	}
 
@@ -29,7 +29,7 @@ func (t *traceidTriggerer) Type() model.TriggerType {
 }
 
 func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
-	traceid := test.ServiceUnderTest.TRACEID
+	traceid := test.ServiceUnderTest.TraceID
 	if traceid == nil {
 		return test, fmt.Errorf("no settings provided for TRACEID triggerer")
 	}
@@ -40,7 +40,7 @@ func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *T
 	}
 
 	traceid.ID = id
-	test.ServiceUnderTest.TRACEID = traceid
+	test.ServiceUnderTest.TraceID = traceid
 
 	return test, nil
 }

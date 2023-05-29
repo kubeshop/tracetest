@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type RunTestConfig struct {
+type RunResourceArgs struct {
 	DefinitionFile string
 	EnvID          string
 	WaitForResult  bool
@@ -37,7 +37,7 @@ type runTestAction struct {
 	environmentActions environmentsActions
 }
 
-var _ Action[RunTestConfig] = &runTestAction{}
+var _ Action[RunResourceArgs] = &runTestAction{}
 
 type runDefParams struct {
 	DefinitionFile       string
@@ -52,7 +52,7 @@ func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.
 	return runTestAction{config, logger, client, environmentActions}
 }
 
-func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
+func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	if args.DefinitionFile == "" {
 		return fmt.Errorf("you must specify a definition file to run a test")
 	}
@@ -72,18 +72,21 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	envID := args.EnvID
 
 	if utils.StringReferencesFile(args.EnvID) {
+		a.logger.Debug("resolve envID from file reference", zap.String("path", envID))
 		envResource, err := a.environmentActions.FromFile(ctx, args.EnvID)
 		if err != nil {
-			return fmt.Errorf("could not run definition: %w", err)
+			return fmt.Errorf("could not read environment file: %w", err)
 		}
 
 		_, err = a.environmentActions.ApplyResource(ctx, envResource)
 		if err != nil {
-			return fmt.Errorf("could not run definition: %w", err)
+			return fmt.Errorf("could not apply environmen file: %w", err)
 		}
 
-		envID = *envResource.Spec.Id
+		envID = envResource.Spec.GetId()
 	}
+
+	a.logger.Debug("resolved env", zap.String("envID", envID))
 
 	params := runDefParams{
 		DefinitionFile: args.DefinitionFile,
@@ -286,14 +289,19 @@ func (a runTestAction) askForMissingVariables(resp *http.Response) (map[string]s
 }
 
 func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.Transaction, error) {
-	test, _, err := a.client.ApiApi.
+	a.client.GetConfig().AddDefaultHeader("X-Tracetest-Augmented", "true")
+	transaction, _, err := a.client.ResourceApiApi.
 		GetTransaction(ctx, id).
 		Execute()
+
+	// reset augmented header
+	delete(a.client.GetConfig().DefaultHeader, "X-Tracetest-Augmented")
+
 	if err != nil {
 		return openapi.Transaction{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return *test, nil
+	return transaction.GetSpec(), nil
 }
 
 func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {

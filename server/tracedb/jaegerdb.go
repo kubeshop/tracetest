@@ -46,6 +46,10 @@ func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
 	return jtd.dataSource.Connect(ctx)
 }
 
+func (jtd *jaegerTraceDB) GetEndpoints() string {
+	return jtd.dataSource.Endpoint()
+}
+
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("Jaeger", jaegerDefaultPorts(), jtd.dataSource.Endpoint())),

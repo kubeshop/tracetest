@@ -25,6 +25,9 @@ components:
           type: string
         auth:
           $ref: "#/components/schemas/HTTPAuth"
+        sslVerification:
+          type: boolean
+          default: false
         # proxy:
         #   type: object
         #   description: TODO

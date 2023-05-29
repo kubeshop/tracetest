@@ -134,7 +134,7 @@ func TestConfigResource(t *testing.T) {
 		rmtests.ExcludeOperations(
 			rmtests.OperationGetNotFound,
 			rmtests.OperationUpdateNotFound,
-			rmtests.OperationListPaginatedSuccess,
+			rmtests.OperationListSortSuccess,
 			rmtests.OperationListNoResults,
 		),
 	)

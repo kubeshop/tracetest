@@ -42,9 +42,9 @@ var (
 func TestContains_Issue617(t *testing.T) {
 
 	spec := openapi.TestSpecs{
-		Specs: []openapi.TestSpecsSpecsInner{
+		Specs: []openapi.TestSpec{
 			{
-				Selector: openapi.Selector{
+				SelectorParsed: openapi.Selector{
 					Query: `span[tracetest.span.type = "http" service.name = "pokeshop"  name = "POST /pokemon/import"]`,
 				},
 				Assertions: []string{
@@ -117,6 +117,7 @@ func setupController(t *testing.T) controllerFixture {
 		db: mdb,
 		c: http.NewController(
 			mdb,
+			nil,
 			nil,
 			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb),

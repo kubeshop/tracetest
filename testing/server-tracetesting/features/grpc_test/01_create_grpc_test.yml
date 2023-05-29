@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: ojzHeDQ4gF
   name: Create gRPC Test
   description: Test step of 'gRPC Test Feature - Test Suite'
   trigger:
@@ -8,48 +9,44 @@ spec:
       url: ${env:TARGET_URL}/api/tests
       method: POST
       headers:
-      - key: Content-Type
-        value: application/json
+        - key: Content-Type
+          value: application/json
       body: |
         {
           "name": "gRPC pokemon list",
           "serviceUnderTest": {
             "triggerType": "grpc",
-            "triggerSettings": {
-              "grpc": {
-                "protobufFile": "syntax = \"proto3\";\r\n\r\noption java_multiple_files = true;\r\noption java_outer_classname = \"PokeshopProto\";\r\noption objc_class_prefix = \"PKS\";\r\n\r\npackage pokeshop;\r\n\r\nservice Pokeshop {\r\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\r\n  rpc createPokemon (Pokemon) returns (Pokemon) {}\r\n  rpc importPokemon (ImportPokemonRequest) returns (ImportPokemonRequest) {}\r\n}\r\n\r\nmessage ImportPokemonRequest {\r\n  int32 id = 1;\r\n}\r\n\r\nmessage GetPokemonRequest {\r\n  optional int32 skip = 1;\r\n  optional int32 take = 2;\r\n}\r\n\r\nmessage GetPokemonListResponse {\r\n  repeated Pokemon items = 1;\r\n  int32 totalCount = 2;\r\n}\r\n\r\nmessage Pokemon {\r\n  optional int32 id = 1;\r\n  string name = 2;\r\n  string type = 3;\r\n  bool isFeatured = 4;\r\n  optional string imageUrl = 5;\r\n}",
-                "address": "${env:DEMO_APP_GRPC_URL}",
-                "method": "pokeshop.Pokeshop.importPokemon",
-                "request": "{\"id\": 52}"
-              }
+            "grpc": {
+              "protobufFile": "syntax = \"proto3\";\r\n\r\noption java_multiple_files = true;\r\noption java_outer_classname = \"PokeshopProto\";\r\noption objc_class_prefix = \"PKS\";\r\n\r\npackage pokeshop;\r\n\r\nservice Pokeshop {\r\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\r\n  rpc createPokemon (Pokemon) returns (Pokemon) {}\r\n  rpc importPokemon (ImportPokemonRequest) returns (ImportPokemonRequest) {}\r\n}\r\n\r\nmessage ImportPokemonRequest {\r\n  int32 id = 1;\r\n}\r\n\r\nmessage GetPokemonRequest {\r\n  optional int32 skip = 1;\r\n  optional int32 take = 2;\r\n}\r\n\r\nmessage GetPokemonListResponse {\r\n  repeated Pokemon items = 1;\r\n  int32 totalCount = 2;\r\n}\r\n\r\nmessage Pokemon {\r\n  optional int32 id = 1;\r\n  string name = 2;\r\n  string type = 3;\r\n  bool isFeatured = 4;\r\n  optional string imageUrl = 5;\r\n}",
+              "address": "${env:DEMO_APP_GRPC_URL}",
+              "method": "pokeshop.Pokeshop.importPokemon",
+              "request": "{\"id\": 52}"
             }
           },
-          "specs": {
-            "specs": [
-              {
-                "selector": {
-                  "query": "span[name = \"queue.synchronizePokemon send\"]"
-                },
-                "assertions": ["attr:tracetest.selected_spans.count > 0"]
-              }
-            ]
-          }
+          "specs": [
+            {
+              "selectorParsed": {
+                "query": "span[name = \"queue.synchronizePokemon send\"]"
+              },
+              "assertions": ["attr:tracetest.selected_spans.count > 0"]
+            }
+          ]
         }
   specs:
-  - selector: span[name = "Tracetest trigger"]
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 200
-  - selector: span[name="POST /api/tests" tracetest.span.type="http"]
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
-  - selector: span[name = "exec INSERT"]
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
-  - selector: span[name = "exec INSERT"]:first
-    assertions:
-    - attr:sql.query contains "INSERT INTO tests"
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 200
+    - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]:first
+      assertions:
+        - attr:sql.query contains "INSERT INTO tests"
   outputs:
-  - name: GRPC_TEST_ID
-    selector: span[name = "Tracetest trigger"]
-    value: attr:tracetest.response.body | json_path '$.id'
+    - name: GRPC_TEST_ID
+      selector: span[name = "Tracetest trigger"]
+      value: attr:tracetest.response.body | json_path '$.id'

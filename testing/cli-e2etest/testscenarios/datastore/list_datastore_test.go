@@ -24,17 +24,23 @@ func TestListDatastore(t *testing.T) {
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
+	// When I try to list datastore on pretty mode and there is no datastore
+	// Then it should print an empty table
+	result := tracetestcli.Exec(t, "list datastore --output pretty", tracetestcli.WithCLIConfig(cliConfig))
+	helpers.RequireExitCodeEqual(t, result, 0)
+	require.NotContains(result.StdOut, "current")
+
 	// When I try to set up a new datastore
 	// Then it should be applied with success
-	dataStorePath := env.GetManisfestResourcePath(t, "data-store")
+	dataStorePath := env.GetEnvironmentResourcePath(t, "data-store")
 
-	result := tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	result = tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// When I try to list datastore again on pretty mode
 	// Then it should print a table with 4 lines printed: header, separator, data store item and empty line
 	result = tracetestcli.Exec(t, "list datastore --output pretty", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 	require.Contains(result.StdOut, "current")
 	require.Contains(result.StdOut, env.Name())
 
@@ -44,7 +50,7 @@ func TestListDatastore(t *testing.T) {
 	// When I try to list datastore again on json mode
 	// Then it should print a JSON list with one item
 	result = tracetestcli.Exec(t, "list datastore --output json", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	dataStoresJSON := helpers.UnmarshalJSON[[]types.DataStoreResource](t, result.StdOut)
 

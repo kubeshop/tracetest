@@ -1,9 +1,9 @@
 import faker from '@faker-js/faker';
-import Transaction, {TRawTransaction} from 'models/Transaction.model';
+import Transaction, {TRawTransactionResource} from 'models/Transaction.model';
 import {IMockFactory} from 'types/Common.types';
 import TestMock from './Test.mock';
 
-const TransactionMock: IMockFactory<Transaction, TRawTransaction> = () => ({
+const TransactionMock: IMockFactory<Transaction, TRawTransactionResource> = () => ({
   raw(data = {}) {
     const test = TestMock.raw();
     const test2 = TestMock.raw();

@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -330,7 +331,7 @@ func TestTransactionModel(t *testing.T) {
 	cases := []struct {
 		name     string
 		in       yaml.Transaction
-		expected model.Transaction
+		expected tests.Transaction
 	}{
 		{
 			name: "Basic",
@@ -340,13 +341,11 @@ func TestTransactionModel(t *testing.T) {
 				Description: "Some transaction",
 				Steps:       []string{"345"},
 			},
-			expected: model.Transaction{
+			expected: tests.Transaction{
 				ID:          id.ID("123"),
 				Name:        "Transaction",
 				Description: "Some transaction",
-				Steps: []model.Test{
-					{ID: id.ID("345")},
-				},
+				StepIDs:     []id.ID{"345"},
 			},
 		},
 	}

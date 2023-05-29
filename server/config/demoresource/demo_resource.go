@@ -44,6 +44,10 @@ func (d Demo) HasID() bool {
 	return d.ID != ""
 }
 
+func (d Demo) GetID() id.ID {
+	return d.ID
+}
+
 func (d Demo) Validate() error {
 	return nil
 }

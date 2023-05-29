@@ -1,0 +1,25 @@
+---
+type: Test
+spec:
+  id: TCzNeDwVgz
+  name: Delete Transaction Step
+  description: Test step of 'Transaction Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/tests/${env:TRANSACTION_STEP_ID}
+      method: DELETE
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 204
+    - selector: span[name="DELETE /api/tests/{testId}" tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec DELETE"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 4

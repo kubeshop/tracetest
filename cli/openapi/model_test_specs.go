@@ -19,7 +19,7 @@ var _ MappedNullable = &TestSpecs{}
 
 // TestSpecs struct for TestSpecs
 type TestSpecs struct {
-	Specs []TestSpecsSpecsInner `json:"specs,omitempty"`
+	Specs []TestSpec `json:"specs,omitempty"`
 }
 
 // NewTestSpecs instantiates a new TestSpecs object
@@ -40,9 +40,9 @@ func NewTestSpecsWithDefaults() *TestSpecs {
 }
 
 // GetSpecs returns the Specs field value if set, zero value otherwise.
-func (o *TestSpecs) GetSpecs() []TestSpecsSpecsInner {
+func (o *TestSpecs) GetSpecs() []TestSpec {
 	if o == nil || isNil(o.Specs) {
-		var ret []TestSpecsSpecsInner
+		var ret []TestSpec
 		return ret
 	}
 	return o.Specs
@@ -50,7 +50,7 @@ func (o *TestSpecs) GetSpecs() []TestSpecsSpecsInner {
 
 // GetSpecsOk returns a tuple with the Specs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSpecs) GetSpecsOk() ([]TestSpecsSpecsInner, bool) {
+func (o *TestSpecs) GetSpecsOk() ([]TestSpec, bool) {
 	if o == nil || isNil(o.Specs) {
 		return nil, false
 	}
@@ -66,8 +66,8 @@ func (o *TestSpecs) HasSpecs() bool {
 	return false
 }
 
-// SetSpecs gets a reference to the given []TestSpecsSpecsInner and assigns it to the Specs field.
-func (o *TestSpecs) SetSpecs(v []TestSpecsSpecsInner) {
+// SetSpecs gets a reference to the given []TestSpec and assigns it to the Specs field.
+func (o *TestSpecs) SetSpecs(v []TestSpec) {
 	o.Specs = v
 }
 

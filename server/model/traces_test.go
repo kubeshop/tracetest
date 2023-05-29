@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -110,6 +111,10 @@ func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
 	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := model.NewTrace("trace", spans)
 
+	for _, oldRoot := range trace.RootSpan.Children {
+		require.NotNil(t, oldRoot.Parent)
+	}
+
 	newRoot := newSpan("new Root", nil)
 	newTrace := trace.InsertRootSpan(newRoot)
 
@@ -119,6 +124,11 @@ func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
 	assert.Equal(t, "Root 1", newTrace.RootSpan.Children[0].Name)
 	assert.Equal(t, "Root 2", newTrace.RootSpan.Children[1].Name)
 	assert.Equal(t, "Root 3", newTrace.RootSpan.Children[2].Name)
+
+	for _, oldRoot := range trace.RootSpan.Children {
+		require.NotNil(t, oldRoot.Parent)
+		assert.Equal(t, newRoot.ID.String(), oldRoot.Parent.ID.String())
+	}
 }
 
 func newSpan(name string, parent *model.Span) model.Span {

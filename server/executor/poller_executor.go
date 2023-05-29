@@ -118,7 +118,9 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 			}
 		}
 
-		err = pe.eventEmitter.Emit(request.ctx, events.TracePollingStart(request.test.ID, request.run.ID))
+		endpoints := traceDB.GetEndpoints()
+		ds, err := pe.dsRepo.Current(request.ctx)
+		err = pe.eventEmitter.Emit(request.ctx, events.TracePollingStart(request.test.ID, request.run.ID, string(ds.Type), endpoints))
 		if err != nil {
 			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingStart event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 		}

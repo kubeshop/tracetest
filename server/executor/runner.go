@@ -226,7 +226,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	}
 
 	if job.test.ServiceUnderTest.Type == model.TriggerTypeTRACEID {
-		traceIDFromParam, err := trace.TraceIDFromHex(job.test.ServiceUnderTest.TRACEID.ID)
+		traceIDFromParam, err := trace.TraceIDFromHex(job.test.ServiceUnderTest.TraceID.ID)
 		if err == nil {
 			run.TraceID = traceIDFromParam
 		}

@@ -1,5 +1,6 @@
 type: Transaction
 spec:
+  id: TjkHeDQVg1
   name: HTTP Test Feature
   description: Sequence of tests to validate if our HTTP Test feature is working as expected
   steps:
