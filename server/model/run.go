@@ -146,15 +146,15 @@ func (r Run) AssertionFailed(err error) Run {
 	return r.Finish()
 }
 
-func (r Run) LinternError(err error) Run {
+func (r Run) LinterError(err error) Run {
 	r.State = RunStateAnalyzingError
 	r.LastError = err
 	return r.Finish()
 }
 
-func (r Run) SuccessfulLinternExecution(lintern LinternResult) Run {
+func (r Run) SuccessfullinterExecution(linter LinterResult) Run {
 	r.State = RunStateAwaitingTestResults
-	r.Lintern = lintern
+	r.Linter = linter
 
 	return r
 }

@@ -63,10 +63,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateEnvironment,
 		},
 		{
-			"CreateLintern",
+			"CreateLinter",
 			strings.ToUpper("Post"),
-			"/api/linterns",
-			c.CreateLintern,
+			"/api/linters",
+			c.CreateLinter,
 		},
 		{
 			"CreateTransaction",
@@ -93,10 +93,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.DeleteEnvironment,
 		},
 		{
-			"DeleteLintern",
+			"DeleteLinter",
 			strings.ToUpper("Delete"),
-			"/api/linterns/{linternId}",
-			c.DeleteLintern,
+			"/api/linters/{LinterId}",
+			c.DeleteLinter,
 		},
 		{
 			"DeleteTransaction",
@@ -129,10 +129,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetEnvironment,
 		},
 		{
-			"GetLintern",
+			"GetLinter",
 			strings.ToUpper("Get"),
-			"/api/linterns/{linternId}",
-			c.GetLintern,
+			"/api/linters/{LinterId}",
+			c.GetLinter,
 		},
 		{
 			"GetPollingProfile",
@@ -177,10 +177,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.ListEnvironments,
 		},
 		{
-			"ListLinterns",
+			"ListLinters",
 			strings.ToUpper("Get"),
-			"/api/linterns",
-			c.ListLinterns,
+			"/api/linters",
+			c.ListLinters,
 		},
 		{
 			"ListPollingProfile",
@@ -213,10 +213,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.UpdateEnvironment,
 		},
 		{
-			"UpdateLintern",
+			"UpdateLinter",
 			strings.ToUpper("Put"),
-			"/api/linterns/{linternId}",
-			c.UpdateLintern,
+			"/api/linters/{LinterId}",
+			c.UpdateLinter,
 		},
 		{
 			"UpdatePollingProfile",
@@ -281,20 +281,20 @@ func (c *ResourceApiApiController) CreateEnvironment(w http.ResponseWriter, r *h
 
 }
 
-// CreateLintern - Create an lintern
-func (c *ResourceApiApiController) CreateLintern(w http.ResponseWriter, r *http.Request) {
-	linternResourceParam := LinternResource{}
+// CreateLinter - Create an Linter
+func (c *ResourceApiApiController) CreateLinter(w http.ResponseWriter, r *http.Request) {
+	linterResourceParam := LinterResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&linternResourceParam); err != nil {
+	if err := d.Decode(&linterResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertLinternResourceRequired(linternResourceParam); err != nil {
+	if err := AssertLinterResourceRequired(linterResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateLintern(r.Context(), linternResourceParam)
+	result, err := c.service.CreateLinter(r.Context(), linterResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -377,12 +377,12 @@ func (c *ResourceApiApiController) DeleteEnvironment(w http.ResponseWriter, r *h
 
 }
 
-// DeleteLintern - Delete an lintern
-func (c *ResourceApiApiController) DeleteLintern(w http.ResponseWriter, r *http.Request) {
+// DeleteLinter - Delete an Linter
+func (c *ResourceApiApiController) DeleteLinter(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	linternIdParam := params["linternId"]
+	linterIdParam := params["LinterId"]
 
-	result, err := c.service.DeleteLintern(r.Context(), linternIdParam)
+	result, err := c.service.DeleteLinter(r.Context(), linterIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -473,12 +473,12 @@ func (c *ResourceApiApiController) GetEnvironment(w http.ResponseWriter, r *http
 
 }
 
-// GetLintern - Get a specific lintern
-func (c *ResourceApiApiController) GetLintern(w http.ResponseWriter, r *http.Request) {
+// GetLinter - Get a specific Linter
+func (c *ResourceApiApiController) GetLinter(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	linternIdParam := params["linternId"]
+	linterIdParam := params["LinterId"]
 
-	result, err := c.service.GetLintern(r.Context(), linternIdParam)
+	result, err := c.service.GetLinter(r.Context(), linterIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -652,8 +652,8 @@ func (c *ResourceApiApiController) ListEnvironments(w http.ResponseWriter, r *ht
 
 }
 
-// ListLinterns - List linterns
-func (c *ResourceApiApiController) ListLinterns(w http.ResponseWriter, r *http.Request) {
+// ListLinters - List Linters
+func (c *ResourceApiApiController) ListLinters(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	takeParam, err := parseInt32Parameter(query.Get("take"), false)
 	if err != nil {
@@ -667,7 +667,7 @@ func (c *ResourceApiApiController) ListLinterns(w http.ResponseWriter, r *http.R
 	}
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.ListLinterns(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	result, err := c.service.ListLinters(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -812,23 +812,23 @@ func (c *ResourceApiApiController) UpdateEnvironment(w http.ResponseWriter, r *h
 
 }
 
-// UpdateLintern - Update a lintern
-func (c *ResourceApiApiController) UpdateLintern(w http.ResponseWriter, r *http.Request) {
+// UpdateLinter - Update a Linter
+func (c *ResourceApiApiController) UpdateLinter(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	linternIdParam := params["linternId"]
+	linterIdParam := params["LinterId"]
 
-	linternResourceParam := LinternResource{}
+	linterResourceParam := LinterResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&linternResourceParam); err != nil {
+	if err := d.Decode(&linterResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertLinternResourceRequired(linternResourceParam); err != nil {
+	if err := AssertLinterResourceRequired(linterResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateLintern(r.Context(), linternIdParam, linternResourceParam)
+	result, err := c.service.UpdateLinter(r.Context(), linterIdParam, linterResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

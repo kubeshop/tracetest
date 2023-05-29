@@ -1,9 +1,9 @@
 import {Model, TLintersSchemas} from 'types/Common.types';
 
-export type TRawLinter = TLintersSchemas['LinternResource'];
+export type TRawLinter = TLintersSchemas['LinterResource'];
 type Linter = Model<Model<TRawLinter, {}>['spec'], {plugins: LinterPlugin[]}>;
 
-type TRawLinterPlugin = TLintersSchemas['LinternResourcePlugin'];
+type TRawLinterPlugin = TLintersSchemas['LinterResourcePlugin'];
 export type LinterPlugin = Model<TRawLinterPlugin, {}>;
 
 function LinterPlugin({name = '', enabled = false, required = false}: TRawLinterPlugin = {}): LinterPlugin {

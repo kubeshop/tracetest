@@ -177,8 +177,8 @@ components:
           $ref: "./trace.yaml#/components/schemas/Trace"
         result:
           $ref: "#/components/schemas/AssertionResults"
-        lintern:
-          $ref: "linterns.yaml#/components/schemas/LinternResult"
+        linter:
+          $ref: "linters.yaml#/components/schemas/LinterResult"
         outputs:
           type: array
           items:

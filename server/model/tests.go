@@ -114,7 +114,7 @@ type (
 
 		TransactionID    string
 		TransactionRunID string
-		Lintern          LinternResult
+		Linter           LinterResult
 	}
 
 	RunResults struct {

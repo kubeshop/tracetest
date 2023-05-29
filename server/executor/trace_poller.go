@@ -43,7 +43,7 @@ func NewTracePoller(
 	pe PollerExecutor,
 	ppGetter PollingProfileGetter,
 	updater RunUpdater,
-	linternRunner LinternRunner,
+	linterRunner LinterRunner,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
 ) PersistentTracePoller {
@@ -53,7 +53,7 @@ func NewTracePoller(
 		pollerExecutor:      pe,
 		executeQueue:        make(chan PollingRequest, 5),
 		exit:                make(chan bool, 1),
-		linternRunner:       linternRunner,
+		linterRunner:        linterRunner,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
 	}
@@ -63,7 +63,7 @@ type tracePoller struct {
 	updater             RunUpdater
 	ppGetter            PollingProfileGetter
 	pollerExecutor      PollerExecutor
-	linternRunner       LinternRunner
+	linterRunner        LinterRunner
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
 
@@ -191,12 +191,12 @@ func (tp tracePoller) processJob(job PollingRequest) {
 }
 
 func (tp tracePoller) runAssertions(job PollingRequest) {
-	linternRequest := LinternRequest{
+	linterRequest := LinterRequest{
 		Test: job.test,
 		Run:  job.run,
 	}
 
-	tp.linternRunner.RunLintern(job.ctx, linternRequest)
+	tp.linterRunner.Runlinter(job.ctx, linterRequest)
 }
 
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, string) {

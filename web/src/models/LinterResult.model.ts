@@ -1,9 +1,9 @@
 import {Model, TLintersSchemas} from 'types/Common.types';
 
-type TRawLinterResult = TLintersSchemas['LinternResult'];
-type TRawLinterResultPlugin = TLintersSchemas['LinternResultPlugin'];
-type TRawLinterResultPluginRule = TLintersSchemas['LinternResultPluginRule'];
-type TRawLinterResultPluginRuleResult = TLintersSchemas['LinternResultPluginRuleResult'];
+type TRawLinterResult = TLintersSchemas['LinterResult'];
+type TRawLinterResultPlugin = TLintersSchemas['LinterResultPlugin'];
+type TRawLinterResultPluginRule = TLintersSchemas['LinterResultPluginRule'];
+type TRawLinterResultPluginRuleResult = TLintersSchemas['LinterResultPluginRuleResult'];
 
 type LinterResultPluginRuleResult = Model<TRawLinterResultPluginRuleResult, {}>;
 type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: LinterResultPluginRuleResult[]}>;

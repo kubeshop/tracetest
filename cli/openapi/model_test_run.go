@@ -42,7 +42,7 @@ type TestRun struct {
 	TriggerResult             *TriggerResult        `json:"triggerResult,omitempty"`
 	Trace                     *Trace                `json:"trace,omitempty"`
 	Result                    *AssertionResults     `json:"result,omitempty"`
-	Lintern                   *LinternResult        `json:"lintern,omitempty"`
+	Linter                    *LinterResult         `json:"linter,omitempty"`
 	Outputs                   []TestRunOutputsInner `json:"outputs,omitempty"`
 	Metadata                  *map[string]string    `json:"metadata,omitempty"`
 	TransactionId             *string               `json:"transactionId,omitempty"`
@@ -610,36 +610,36 @@ func (o *TestRun) SetResult(v AssertionResults) {
 	o.Result = &v
 }
 
-// GetLintern returns the Lintern field value if set, zero value otherwise.
-func (o *TestRun) GetLintern() LinternResult {
-	if o == nil || isNil(o.Lintern) {
-		var ret LinternResult
+// GetLinter returns the Linter field value if set, zero value otherwise.
+func (o *TestRun) GetLinter() LinterResult {
+	if o == nil || isNil(o.Linter) {
+		var ret LinterResult
 		return ret
 	}
-	return *o.Lintern
+	return *o.Linter
 }
 
-// GetLinternOk returns a tuple with the Lintern field value if set, nil otherwise
+// GetLinterOk returns a tuple with the Linter field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetLinternOk() (*LinternResult, bool) {
-	if o == nil || isNil(o.Lintern) {
+func (o *TestRun) GetLinterOk() (*LinterResult, bool) {
+	if o == nil || isNil(o.Linter) {
 		return nil, false
 	}
-	return o.Lintern, true
+	return o.Linter, true
 }
 
-// HasLintern returns a boolean if a field has been set.
-func (o *TestRun) HasLintern() bool {
-	if o != nil && !isNil(o.Lintern) {
+// HasLinter returns a boolean if a field has been set.
+func (o *TestRun) HasLinter() bool {
+	if o != nil && !isNil(o.Linter) {
 		return true
 	}
 
 	return false
 }
 
-// SetLintern gets a reference to the given LinternResult and assigns it to the Lintern field.
-func (o *TestRun) SetLintern(v LinternResult) {
-	o.Lintern = &v
+// SetLinter gets a reference to the given LinterResult and assigns it to the Linter field.
+func (o *TestRun) SetLinter(v LinterResult) {
+	o.Linter = &v
 }
 
 // GetOutputs returns the Outputs field value if set, zero value otherwise.
@@ -825,8 +825,8 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.Result) {
 		toSerialize["result"] = o.Result
 	}
-	if !isNil(o.Lintern) {
-		toSerialize["lintern"] = o.Lintern
+	if !isNil(o.Linter) {
+		toSerialize["linter"] = o.Linter
 	}
 	if !isNil(o.Outputs) {
 		toSerialize["outputs"] = o.Outputs

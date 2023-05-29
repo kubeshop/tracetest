@@ -53,7 +53,7 @@ type TestRun struct {
 
 	Result AssertionResults `json:"result,omitempty"`
 
-	Lintern LinternResult `json:"lintern,omitempty"`
+	Linter LinterResult `json:"linter,omitempty"`
 
 	Outputs []TestRunOutputsInner `json:"outputs,omitempty"`
 
@@ -78,7 +78,7 @@ func AssertTestRunRequired(obj TestRun) error {
 	if err := AssertAssertionResultsRequired(obj.Result); err != nil {
 		return err
 	}
-	if err := AssertLinternResultRequired(obj.Lintern); err != nil {
+	if err := AssertLinterResultRequired(obj.Linter); err != nil {
 		return err
 	}
 	for _, el := range obj.Outputs {

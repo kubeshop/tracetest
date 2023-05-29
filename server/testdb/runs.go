@@ -51,8 +51,8 @@ INSERT INTO test_runs (
 	-- environment
 	"environment",
 
-	-- lintern
-	"lintern"
+	-- linter
+	"linter"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
@@ -81,7 +81,7 @@ INSERT INTO test_runs (
 
 	$12, -- metadata
 	$13, -- environment
-	$14 -- lintern
+	$14 -- linter
 )
 RETURNING "id"`
 
@@ -142,7 +142,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		return model.Run{}, fmt.Errorf("environment encoding error: %w", err)
 	}
 
-	jsonLintern, err := json.Marshal(run.Lintern)
+	jsonlinter, err := json.Marshal(run.Linter)
 	if err != nil {
 		return model.Run{}, fmt.Errorf("environment encoding error: %w", err)
 	}
@@ -175,7 +175,7 @@ func (td *postgresDB) CreateRun(ctx context.Context, test model.Test, run model.
 		jsonTrace,
 		jsonMetadata,
 		jsonEnvironment,
-		jsonLintern,
+		jsonlinter,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
@@ -213,8 +213,8 @@ UPDATE test_runs SET
 	"metadata" = $15,
 	"environment" = $18,
 
-	--- lintern
-	"lintern" = $19
+	--- linter
+	"linter" = $19
 
 WHERE id = $16 AND test_id = $17
 `
@@ -256,7 +256,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	jsonLintern, err := json.Marshal(r.Lintern)
+	jsonlinter, err := json.Marshal(r.Linter)
 	if err != nil {
 		return fmt.Errorf("encoding error: %w", err)
 	}
@@ -289,7 +289,7 @@ func (td *postgresDB) UpdateRun(ctx context.Context, r model.Run) error {
 		r.ID,
 		r.TestID,
 		jsonEnvironment,
-		jsonLintern,
+		jsonlinter,
 	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
@@ -355,8 +355,8 @@ SELECT
 	-- transaction run
 	transaction_run.transaction_run_id,
 	transaction_run.transaction_run_transaction_id,
-	-- lintern
-	"lintern"
+	-- linter
+	"linter"
 FROM test_runs
 LEFT OUTER JOIN
 	transaction_run_steps transaction_run
@@ -461,7 +461,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		jsonTrace,
 		jsonOutputs,
 		jsonEnvironment,
-		jsonLintern,
+		jsonlinter,
 		jsonMetadata []byte
 
 		lastError *string
@@ -493,7 +493,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		&jsonEnvironment,
 		&transactionRunID,
 		&transactionID,
-		&jsonLintern,
+		&jsonlinter,
 	)
 
 	switch err {
@@ -517,10 +517,10 @@ func readRunRow(row scanner) (model.Run, error) {
 			}
 		}
 
-		if jsonLintern != nil {
-			err = json.Unmarshal(jsonLintern, &r.Lintern)
+		if jsonlinter != nil {
+			err = json.Unmarshal(jsonlinter, &r.Linter)
 			if err != nil {
-				return model.Run{}, fmt.Errorf("cannot parse Lintern: %w", err)
+				return model.Run{}, fmt.Errorf("cannot parse linter: %w", err)
 			}
 		}
 

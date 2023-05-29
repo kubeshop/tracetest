@@ -40,8 +40,8 @@ const TestRunProvider = ({children, testId, runId = ''}: IProps) => {
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId});
   const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
   const runLinterResultsBySpan = useMemo(
-    () => (run?.lintern ? SpanService.getLintBySpan(run.lintern) : {}),
-    [run?.lintern]
+    () => (run?.linter ? SpanService.getLintBySpan(run.linter) : {}),
+    [run?.linter]
   );
 
   const stopRun = useCallback(async () => {

@@ -238,31 +238,31 @@ func (a *ResourceApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentR
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiCreateLinternRequest struct {
-	ctx             context.Context
-	ApiService      *ResourceApiApiService
-	linternResource *LinternResource
+type ApiCreateLinterRequest struct {
+	ctx            context.Context
+	ApiService     *ResourceApiApiService
+	linterResource *LinterResource
 }
 
-func (r ApiCreateLinternRequest) LinternResource(linternResource LinternResource) ApiCreateLinternRequest {
-	r.linternResource = &linternResource
+func (r ApiCreateLinterRequest) LinterResource(linterResource LinterResource) ApiCreateLinterRequest {
+	r.linterResource = &linterResource
 	return r
 }
 
-func (r ApiCreateLinternRequest) Execute() (*LinternResource, *http.Response, error) {
-	return r.ApiService.CreateLinternExecute(r)
+func (r ApiCreateLinterRequest) Execute() (*LinterResource, *http.Response, error) {
+	return r.ApiService.CreateLinterExecute(r)
 }
 
 /*
-CreateLintern Create an lintern
+CreateLinter Create an Linter
 
-Create an lintern that can be used by tests and linterns
+Create an Linter that can be used by tests and Linters
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiCreateLinternRequest
+	@return ApiCreateLinterRequest
 */
-func (a *ResourceApiApiService) CreateLintern(ctx context.Context) ApiCreateLinternRequest {
-	return ApiCreateLinternRequest{
+func (a *ResourceApiApiService) CreateLinter(ctx context.Context) ApiCreateLinterRequest {
+	return ApiCreateLinterRequest{
 		ApiService: a,
 		ctx:        ctx,
 	}
@@ -270,21 +270,21 @@ func (a *ResourceApiApiService) CreateLintern(ctx context.Context) ApiCreateLint
 
 // Execute executes the request
 //
-//	@return LinternResource
-func (a *ResourceApiApiService) CreateLinternExecute(r ApiCreateLinternRequest) (*LinternResource, *http.Response, error) {
+//	@return LinterResource
+func (a *ResourceApiApiService) CreateLinterExecute(r ApiCreateLinterRequest) (*LinterResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *LinternResource
+		localVarReturnValue *LinterResource
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.CreateLintern")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.CreateLinter")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linterns"
+	localVarPath := localBasePath + "/linters"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -308,7 +308,7 @@ func (a *ResourceApiApiService) CreateLinternExecute(r ApiCreateLinternRequest) 
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.linternResource
+	localVarPostBody = r.linterResource
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -730,48 +730,48 @@ func (a *ResourceApiApiService) DeleteEnvironmentExecute(r ApiDeleteEnvironmentR
 	return localVarHTTPResponse, nil
 }
 
-type ApiDeleteLinternRequest struct {
+type ApiDeleteLinterRequest struct {
 	ctx        context.Context
 	ApiService *ResourceApiApiService
-	linternId  string
+	linterId   string
 }
 
-func (r ApiDeleteLinternRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DeleteLinternExecute(r)
+func (r ApiDeleteLinterRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteLinterExecute(r)
 }
 
 /*
-DeleteLintern Delete an lintern
+DeleteLinter Delete an Linter
 
-Delete an lintern from Tracetest
+Delete an Linter from Tracetest
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param linternId ID of an lintern
-	@return ApiDeleteLinternRequest
+	@param linterId ID of an Linter
+	@return ApiDeleteLinterRequest
 */
-func (a *ResourceApiApiService) DeleteLintern(ctx context.Context, linternId string) ApiDeleteLinternRequest {
-	return ApiDeleteLinternRequest{
+func (a *ResourceApiApiService) DeleteLinter(ctx context.Context, linterId string) ApiDeleteLinterRequest {
+	return ApiDeleteLinterRequest{
 		ApiService: a,
 		ctx:        ctx,
-		linternId:  linternId,
+		linterId:   linterId,
 	}
 }
 
 // Execute executes the request
-func (a *ResourceApiApiService) DeleteLinternExecute(r ApiDeleteLinternRequest) (*http.Response, error) {
+func (a *ResourceApiApiService) DeleteLinterExecute(r ApiDeleteLinterRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.DeleteLintern")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.DeleteLinter")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linterns/{linternId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"linternId"+"}", url.PathEscape(parameterValueToString(r.linternId, "linternId")), -1)
+	localVarPath := localBasePath + "/linters/{LinterId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"LinterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -1330,51 +1330,51 @@ func (a *ResourceApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetLinternRequest struct {
+type ApiGetLinterRequest struct {
 	ctx        context.Context
 	ApiService *ResourceApiApiService
-	linternId  string
+	linterId   string
 }
 
-func (r ApiGetLinternRequest) Execute() (*LinternResource, *http.Response, error) {
-	return r.ApiService.GetLinternExecute(r)
+func (r ApiGetLinterRequest) Execute() (*LinterResource, *http.Response, error) {
+	return r.ApiService.GetLinterExecute(r)
 }
 
 /*
-GetLintern Get a specific lintern
+GetLinter Get a specific Linter
 
-Get one lintern by its id
+Get one Linter by its id
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param linternId ID of an lintern
-	@return ApiGetLinternRequest
+	@param linterId ID of an Linter
+	@return ApiGetLinterRequest
 */
-func (a *ResourceApiApiService) GetLintern(ctx context.Context, linternId string) ApiGetLinternRequest {
-	return ApiGetLinternRequest{
+func (a *ResourceApiApiService) GetLinter(ctx context.Context, linterId string) ApiGetLinterRequest {
+	return ApiGetLinterRequest{
 		ApiService: a,
 		ctx:        ctx,
-		linternId:  linternId,
+		linterId:   linterId,
 	}
 }
 
 // Execute executes the request
 //
-//	@return LinternResource
-func (a *ResourceApiApiService) GetLinternExecute(r ApiGetLinternRequest) (*LinternResource, *http.Response, error) {
+//	@return LinterResource
+func (a *ResourceApiApiService) GetLinterExecute(r ApiGetLinterRequest) (*LinterResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *LinternResource
+		localVarReturnValue *LinterResource
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.GetLintern")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.GetLinter")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linterns/{linternId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"linternId"+"}", url.PathEscape(parameterValueToString(r.linternId, "linternId")), -1)
+	localVarPath := localBasePath + "/linters/{LinterId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"LinterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -2352,7 +2352,7 @@ func (a *ResourceApiApiService) ListEnvironmentsExecute(r ApiListEnvironmentsReq
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiListLinternsRequest struct {
+type ApiListLintersRequest struct {
 	ctx           context.Context
 	ApiService    *ResourceApiApiService
 	take          *int32
@@ -2362,43 +2362,43 @@ type ApiListLinternsRequest struct {
 }
 
 // indicates how many resources can be returned by each page
-func (r ApiListLinternsRequest) Take(take int32) ApiListLinternsRequest {
+func (r ApiListLintersRequest) Take(take int32) ApiListLintersRequest {
 	r.take = &take
 	return r
 }
 
 // indicates how many resources will be skipped when paginating
-func (r ApiListLinternsRequest) Skip(skip int32) ApiListLinternsRequest {
+func (r ApiListLintersRequest) Skip(skip int32) ApiListLintersRequest {
 	r.skip = &skip
 	return r
 }
 
 // indicates the sort field for the resources
-func (r ApiListLinternsRequest) SortBy(sortBy string) ApiListLinternsRequest {
+func (r ApiListLintersRequest) SortBy(sortBy string) ApiListLintersRequest {
 	r.sortBy = &sortBy
 	return r
 }
 
 // indicates the sort direction for the resources
-func (r ApiListLinternsRequest) SortDirection(sortDirection string) ApiListLinternsRequest {
+func (r ApiListLintersRequest) SortDirection(sortDirection string) ApiListLintersRequest {
 	r.sortDirection = &sortDirection
 	return r
 }
 
-func (r ApiListLinternsRequest) Execute() (*LinternResourceList, *http.Response, error) {
-	return r.ApiService.ListLinternsExecute(r)
+func (r ApiListLintersRequest) Execute() (*LinterResourceList, *http.Response, error) {
+	return r.ApiService.ListLintersExecute(r)
 }
 
 /*
-ListLinterns List linterns
+ListLinters List Linters
 
-List linterns available in Tracetest.
+List Linters available in Tracetest.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiListLinternsRequest
+	@return ApiListLintersRequest
 */
-func (a *ResourceApiApiService) ListLinterns(ctx context.Context) ApiListLinternsRequest {
-	return ApiListLinternsRequest{
+func (a *ResourceApiApiService) ListLinters(ctx context.Context) ApiListLintersRequest {
+	return ApiListLintersRequest{
 		ApiService: a,
 		ctx:        ctx,
 	}
@@ -2406,21 +2406,21 @@ func (a *ResourceApiApiService) ListLinterns(ctx context.Context) ApiListLintern
 
 // Execute executes the request
 //
-//	@return LinternResourceList
-func (a *ResourceApiApiService) ListLinternsExecute(r ApiListLinternsRequest) (*LinternResourceList, *http.Response, error) {
+//	@return LinterResourceList
+func (a *ResourceApiApiService) ListLintersExecute(r ApiListLintersRequest) (*LinterResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *LinternResourceList
+		localVarReturnValue *LinterResourceList
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListLinterns")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.ListLinters")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linterns"
+	localVarPath := localBasePath + "/linters"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3068,57 +3068,57 @@ func (a *ResourceApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentR
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiUpdateLinternRequest struct {
-	ctx             context.Context
-	ApiService      *ResourceApiApiService
-	linternId       string
-	linternResource *LinternResource
+type ApiUpdateLinterRequest struct {
+	ctx            context.Context
+	ApiService     *ResourceApiApiService
+	linterId       string
+	linterResource *LinterResource
 }
 
-func (r ApiUpdateLinternRequest) LinternResource(linternResource LinternResource) ApiUpdateLinternRequest {
-	r.linternResource = &linternResource
+func (r ApiUpdateLinterRequest) LinterResource(linterResource LinterResource) ApiUpdateLinterRequest {
+	r.linterResource = &linterResource
 	return r
 }
 
-func (r ApiUpdateLinternRequest) Execute() (*LinternResource, *http.Response, error) {
-	return r.ApiService.UpdateLinternExecute(r)
+func (r ApiUpdateLinterRequest) Execute() (*LinterResource, *http.Response, error) {
+	return r.ApiService.UpdateLinterExecute(r)
 }
 
 /*
-UpdateLintern Update a lintern
+UpdateLinter Update a Linter
 
-Update a lintern used on Tracetest
+Update a Linter used on Tracetest
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param linternId ID of an lintern
-	@return ApiUpdateLinternRequest
+	@param linterId ID of an Linter
+	@return ApiUpdateLinterRequest
 */
-func (a *ResourceApiApiService) UpdateLintern(ctx context.Context, linternId string) ApiUpdateLinternRequest {
-	return ApiUpdateLinternRequest{
+func (a *ResourceApiApiService) UpdateLinter(ctx context.Context, linterId string) ApiUpdateLinterRequest {
+	return ApiUpdateLinterRequest{
 		ApiService: a,
 		ctx:        ctx,
-		linternId:  linternId,
+		linterId:   linterId,
 	}
 }
 
 // Execute executes the request
 //
-//	@return LinternResource
-func (a *ResourceApiApiService) UpdateLinternExecute(r ApiUpdateLinternRequest) (*LinternResource, *http.Response, error) {
+//	@return LinterResource
+func (a *ResourceApiApiService) UpdateLinterExecute(r ApiUpdateLinterRequest) (*LinterResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *LinternResource
+		localVarReturnValue *LinterResource
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.UpdateLintern")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ResourceApiApiService.UpdateLinter")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linterns/{linternId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"linternId"+"}", url.PathEscape(parameterValueToString(r.linternId, "linternId")), -1)
+	localVarPath := localBasePath + "/linters/{LinterId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"LinterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3142,7 +3142,7 @@ func (a *ResourceApiApiService) UpdateLinternExecute(r ApiUpdateLinternRequest) 
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.linternResource
+	localVarPostBody = r.linterResource
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

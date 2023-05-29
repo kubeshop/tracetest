@@ -34,7 +34,7 @@ export enum ResourceTypePlural {
   ConfigType = 'Configs',
   PollingProfileType = 'PollingProfiles',
   DemoType = 'Demos',
-  LinterType = 'Linterns',
+  LinterType = 'linters',
 }
 
 export type TDraftDemo = Record<Required<Demo['type']>, Partial<Demo>>;

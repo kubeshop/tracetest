@@ -23,7 +23,7 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
-	lintern_resource "github.com/kubeshop/tracetest/server/lintern/resource"
+	linter_resource "github.com/kubeshop/tracetest/server/linter/resource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -196,7 +196,7 @@ func (app *App) Start(opts ...appOption) error {
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastoreresource.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
-	linternRepo := lintern_resource.NewRepository(db)
+	linterRepo := linter_resource.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
@@ -204,7 +204,7 @@ func (app *App) Start(opts ...appOption) error {
 	rf := newRunnerFacades(
 		pollingProfileRepo,
 		dataStoreRepo,
-		linternRepo,
+		linterRepo,
 		testDB,
 		transactionsRepository,
 		applicationTracer,
@@ -219,7 +219,7 @@ func (app *App) Start(opts ...appOption) error {
 	rf.runner.Start(5)
 	rf.transactionRunner.Start(5)
 	rf.assertionRunner.Start(5)
-	rf.linternRunner.Start(5)
+	rf.linterRunner.Start(5)
 
 	app.registerStopFn(func() {
 		fmt.Println("stopping tracePoller")
@@ -261,7 +261,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
 
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
-	registerLinternResource(linternRepo, apiRouter, db, provisioner, tracer)
+	registerlinterResource(linterRepo, apiRouter, db, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID, isTracetestDev)
@@ -317,12 +317,12 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 	})
 }
 
-func registerLinternResource(linternRepo *lintern_resource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[lintern_resource.Lintern](
-		lintern_resource.ResourceName,
-		lintern_resource.ResourceNamePlural,
-		linternRepo,
-		resourcemanager.WithOperations(lintern_resource.Operations...),
+func registerlinterResource(linterRepo *linter_resource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[linter_resource.Linter](
+		linter_resource.ResourceName,
+		linter_resource.ResourceNamePlural,
+		linterRepo,
+		resourcemanager.WithOperations(linter_resource.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

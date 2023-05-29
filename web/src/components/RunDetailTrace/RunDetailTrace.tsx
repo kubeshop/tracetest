@@ -75,7 +75,7 @@ const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
 
             <S.SectionRight $shouldScroll>
               {isRunStateFinished(run.state) ? (
-                <LintResults linterResult={run.lintern} trace={run?.trace ?? Trace({})} />
+                <LintResults linterResult={run.linter} trace={run?.trace ?? Trace({})} />
               ) : (
                 <SkeletonResponse />
               )}

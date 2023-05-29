@@ -1,7 +1,6 @@
 import {CaretUpFilled} from '@ant-design/icons';
 import {Col, Collapse, Row, Space, Tooltip, Typography} from 'antd';
 import {useCallback} from 'react';
-import octoLintImage from 'assets/octolint.png';
 import LinterResult from 'models/LinterResult.model';
 import Span from 'models/Span.model';
 import Trace from 'models/Trace.model';
@@ -121,11 +120,6 @@ const LintResults = ({linterResult, trace}: IProps) => {
           </S.PluginPanel>
         ))}
       </Collapse>
-
-      <S.Footer>
-        <S.OctolintImg src={octoLintImage} />
-        <Typography.Text type="secondary">OctoLint Beta</Typography.Text>
-      </S.Footer>
     </S.Container>
   );
 };

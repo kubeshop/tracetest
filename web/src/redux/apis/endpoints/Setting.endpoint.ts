@@ -56,7 +56,7 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   getLinter: builder.query<Linter, unknown>({
     query: () => ({
-      url: '/linterns/current',
+      url: '/linters/current',
       method: HTTP_METHOD.GET,
       headers: {'content-type': 'application/json'},
     }),

@@ -30,7 +30,7 @@ type TestRun = Model<
     outputs?: TestRunOutput[];
     environment?: Environment;
     state: TTestRunState;
-    lintern: LinterResult;
+    linter: LinterResult;
   }
 >;
 
@@ -109,7 +109,7 @@ const TestRun = ({
   environment = {},
   transactionId = '',
   transactionRunId = '',
-  lintern = {},
+  linter = {},
 }: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
@@ -136,7 +136,7 @@ const TestRun = ({
     environment: Environment.fromRun(environment),
     transactionId,
     transactionRunId,
-    lintern: LinterResult(lintern),
+    linter: LinterResult(linter),
   };
 };
 
