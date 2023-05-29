@@ -10,7 +10,7 @@ import TestService from 'services/Test.service';
 import TestRun from 'models/TestRun.model';
 import Test from 'models/Test.model';
 import AssertionResults from 'models/AssertionResults.model';
-import {TTestSpecEntry, rawTestSpecToNewFormat} from 'models/TestSpecs.model';
+import {TTestSpecEntry} from 'models/TestSpecs.model';
 import {RootState} from '../store';
 
 export type TChange = {
@@ -35,10 +35,7 @@ const TestSpecsActions = () => ({
     ({definitionList, testId, runId}, {dispatch}) => {
       const specs = definitionList.map(def => TestDefinitionService.toRaw(def));
 
-      // TODO: improve type system later to deal with the new TestSpec type
-      const newSpecs = specs.map(rawTestSpecToNewFormat);
-
-      return dispatch(TestRunGateway.dryRun(testId, runId, { specs: newSpecs })).unwrap();
+      return dispatch(TestRunGateway.dryRun(testId, runId, {specs})).unwrap();
     }
   ),
 });
