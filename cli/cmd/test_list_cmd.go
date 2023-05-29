@@ -15,7 +15,7 @@ var testListCmd = &cobra.Command{
 	Short:  "List all tests",
 	Long:   "List all tests",
 	PreRun: setupCommand(),
-	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
+	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
 		analytics.Track("Test List", "cmd", map[string]string{})
 
 		ctx := context.Background()

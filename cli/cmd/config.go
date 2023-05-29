@@ -9,18 +9,21 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var cliConfig config.Config
-var cliLogger *zap.Logger
-var resourceRegistry = actions.NewResourceRegistry()
-var validArgs = []string{"config", "datastore", "demo", "environment", "pollingprofile", "transaction"}
-var versionText string
-var isVersionMatch bool
+var (
+	cliConfig        config.Config
+	cliLogger        *zap.Logger
+	versionText      string
+	isVersionMatch   bool
+	resourceRegistry = actions.NewResourceRegistry()
+	resourceParams   = &parameters.ResourceParams{}
+)
 
 type setupConfig struct {
 	shouldValidateConfig bool
