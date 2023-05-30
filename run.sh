@@ -45,10 +45,9 @@ cypress() {
 
   export CYPRESS_BASE_URL=http://localhost:11633
   export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
-  export NO_COLOR=1
 
   cd web
-  ./node_modules/.bin/cypress run
+  npm run cy:ci
 }
 
 tracetests() {
