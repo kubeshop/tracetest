@@ -111,6 +111,10 @@ func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) st
 	buffer.WriteString(message)
 
 	for i, specResult := range run.Result.Results {
+		if len(test.Specs) <= i {
+			break // guard clause: this means that the server sent more results than specs
+		}
+
 		title := f.getTestSpecTitle(test.Specs[i].GetName(), specResult)
 		message := f.formatMessage("\t%s %s\n", PASSED_TEST_ICON, title)
 		message = f.getColoredText(true, message)
@@ -145,7 +149,6 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		allPassed := true
 
 		for _, result := range specResult.Results {
-
 			for _, spanResult := range result.SpanResults {
 				// meta assertions such as tracetest.selected_spans.count don't have a spanID,
 				// so they will be treated differently. To overcome them, we will place all
@@ -180,6 +183,10 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 
 				results[spanID] = spanResults
 			}
+		}
+
+		if len(test.Specs) <= i {
+			break // guard clause: this means that the server sent more results than specs
 		}
 
 		title := f.getTestSpecTitle(test.Specs[i].GetName(), specResult)

@@ -353,14 +353,14 @@ SELECT
 	"environment",
 
 	-- transaction run
-	transaction_run.transaction_run_id,
-	transaction_run.transaction_run_transaction_id,
-	-- linter
+	transaction_run_steps.transaction_run_id,
+	transaction_run_steps.transaction_run_transaction_id,
 	"linter"
-FROM test_runs
-LEFT OUTER JOIN
-	transaction_run_steps transaction_run
-ON transaction_run.test_run_id = id AND transaction_run.test_run_test_id = test_id
+
+FROM
+	test_runs
+		LEFT OUTER JOIN transaction_run_steps
+		ON transaction_run_steps.test_run_id = test_runs.id AND transaction_run_steps.test_run_test_id = test_runs.test_id
 `
 
 func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
@@ -461,7 +461,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		jsonTrace,
 		jsonOutputs,
 		jsonEnvironment,
-		jsonlinter,
+		jsonLinter,
 		jsonMetadata []byte
 
 		lastError *string
@@ -493,7 +493,7 @@ func readRunRow(row scanner) (model.Run, error) {
 		&jsonEnvironment,
 		&transactionRunID,
 		&transactionID,
-		&jsonlinter,
+		&jsonLinter,
 	)
 
 	switch err {
@@ -517,8 +517,8 @@ func readRunRow(row scanner) (model.Run, error) {
 			}
 		}
 
-		if jsonlinter != nil {
-			err = json.Unmarshal(jsonlinter, &r.Linter)
+		if jsonLinter != nil {
+			err = json.Unmarshal(jsonLinter, &r.Linter)
 			if err != nil {
 				return model.Run{}, fmt.Errorf("cannot parse linter: %w", err)
 			}
@@ -584,11 +584,12 @@ func readRunRow(row scanner) (model.Run, error) {
 }
 
 func (td *postgresDB) GetTransactionRunSteps(ctx context.Context, tr tests.TransactionRun) ([]model.Run, error) {
-	// stmt, err := td.db.Prepare(selectRunQuery + " WHERE id = $1 AND test_id = $2")
-	stmt, err := td.db.Prepare(selectRunQuery + ` INNER JOIN
-		transaction_run_steps trs ON
-			test_runs.id = trs.test_run_id AND test_runs.test_id = trs.test_run_test_id
-		WHERE trs.transaction_run_id = $1 AND trs.transaction_run_transaction_id = $2`)
+	query := selectRunQuery + `
+WHERE transaction_run_steps.transaction_run_id = $1 AND transaction_run_steps.transaction_run_transaction_id = $2
+ORDER BY test_runs.completed_at ASC
+`
+
+	stmt, err := td.db.Prepare(query)
 	if err != nil {
 		return []model.Run{}, fmt.Errorf("prepare: %w", err)
 	}
