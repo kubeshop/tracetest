@@ -248,7 +248,7 @@ jobs:
 
   smoke-test-cli:
     name: CLI smoke tests
-    needs:  [build-docker, build-go]
+    needs:  [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -315,7 +315,7 @@ jobs:
 
   e2e-cli:
     name: CLI e2e tests
-    needs:  [build-docker, build-go]
+    needs:  [build-docker]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
