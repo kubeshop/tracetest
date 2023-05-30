@@ -119,7 +119,7 @@ describe('Environments', () => {
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
 
-    cy.get('[data-cy=run-detail-trigger-response]').within(() => {
+    cy.reload().get('[data-cy=run-detail-trigger-response]').within(() => {
       cy.contains('Environment').click();
       cy.contains(environment1.values[0].key);
       cy.contains(environment1.values[0].value);
