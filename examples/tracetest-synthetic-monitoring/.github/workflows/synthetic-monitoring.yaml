@@ -42,7 +42,7 @@ jobs:
         run: tracetest configure -g --endpoint http://localhost:11633 --analytics=true
 
       - name: Run syntethic monitoring tests
-        id: monintoring
+        id: monitoring
         run: |
           tracetest test run -d test-api.yaml
 
