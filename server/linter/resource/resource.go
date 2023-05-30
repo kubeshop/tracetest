@@ -3,8 +3,8 @@ package linter_resource
 import "github.com/kubeshop/tracetest/server/resourcemanager"
 
 const (
-	ResourceName       = "linter"
-	ResourceNamePlural = "linters"
+	ResourceName       = "Linter"
+	ResourceNamePlural = "Linters"
 )
 
 var Operations = []resourcemanager.Operation{

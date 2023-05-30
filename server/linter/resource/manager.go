@@ -18,7 +18,7 @@ var defaultlinter = Linter{
 	ID:           id.ID("current"),
 	Name:         "linter",
 	Enabled:      true,
-	MinimumScore: 60,
+	MinimumScore: 0,
 	Plugins: []LinterPlugin{
 		{Name: "standards", Enabled: true, Required: true},
 		{Name: "security", Enabled: true, Required: true},
