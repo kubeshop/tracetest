@@ -23,12 +23,12 @@ func NewSelectorBasedPoller(innerPoller PollerExecutor) PollerExecutor {
 func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
 	ready, reason, run, err := pe.pollerExecutor.ExecuteRequest(request)
 	if !ready {
-		request.SetHeader(selectorBasedPollerExecutorRetryHeader, "1")
+		request.SetHeader(selectorBasedPollerExecutorRetryHeader, "0")
 		return ready, reason, run, err
 	}
 
 	currentNumberTries := pe.getNumberTries(request)
-	if currentNumberTries > selectorBasedPollerExecutorMaxTries {
+	if currentNumberTries >= selectorBasedPollerExecutorMaxTries {
 		return true, "not all selectors matched, but trace haven't changed in a while", run, err
 	}
 

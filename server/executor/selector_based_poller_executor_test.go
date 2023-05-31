@@ -72,9 +72,14 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 
 		request := executor.NewPollingRequest(context.Background(), test, run, 0)
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(false, "trace not found", run, nil).Once()
 
 		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
+		assert.False(t, ready)
+
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
+
+		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
 		assert.False(t, ready)
 		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor::retryCount"))
 
