@@ -7,7 +7,7 @@ spec:
     type: grpc
     grpc:
       protobufFile: ./api.proto
-      address: localhost:8082
+      address: demo-rpc:8082
       method: pokeshop.Pokeshop.createPokemon
       request: |-
         {

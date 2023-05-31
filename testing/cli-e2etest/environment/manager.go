@@ -110,6 +110,7 @@ func (m *internalManager) Name() string {
 }
 
 func (m *internalManager) Start(t *testing.T) {
+	readiness := 1 * time.Second
 	args := []string{
 		"compose",
 		"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
@@ -118,6 +119,7 @@ func (m *internalManager) Start(t *testing.T) {
 	}
 
 	if m.pokeshopEnabled {
+		readiness = 10 * time.Second
 		args = []string{
 			"compose",
 			"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
@@ -133,7 +135,8 @@ func (m *internalManager) Start(t *testing.T) {
 	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// TODO: think in a better way to assure readiness for Tracetest
-	time.Sleep(1000 * time.Millisecond)
+	// like https://golang.testcontainers.org/quickstart/ "Wait for Log" method
+	time.Sleep(readiness)
 
 	if m.datastoreEnabled {
 		cliConfig := m.GetCLIConfigPath(t)
