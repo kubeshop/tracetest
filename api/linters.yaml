@@ -1,0 +1,102 @@
+openapi: 3.0.0
+components:
+  schemas:
+    LinterResourceList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResource"
+    LinterResource:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Linter
+        spec:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            enabled:
+              type: boolean
+            minimumScore:
+              type: integer
+            plugins:
+              type: array
+              items:
+                $ref: "#/components/schemas/LinterResourcePlugin"
+    LinterResourcePlugin:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        required:
+          type: boolean
+    LinterResult:
+      type: object
+      properties:
+        passed:
+          type: boolean
+        score:
+          type: integer
+        plugins:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPlugin"
+    LinterResultPlugin:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        passed:
+          type: boolean
+        score:
+          type: integer
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPluginRule"
+    LinterResultPluginRule:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        passed:
+          type: boolean
+        weight:
+          type: integer
+        tips:
+          type: array
+          items:
+            type: string
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPluginRuleResult"
+    LinterResultPluginRuleResult:
+      type: object
+      properties:
+        spanId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        passed:
+          type: boolean
+        severity:
+          type: string
+          enum:
+            - error
+            - warning

@@ -19,6 +19,18 @@ export const Section = styled.div`
   z-index: 1;
 `;
 
+export const SectionLeft = styled(Section)`
+  background-color: ${({theme}) => theme.color.background};
+  z-index: 1;
+`;
+
+export const SectionRight = styled(Section)<{$shouldScroll: boolean}>`
+  background-color: ${({theme}) => theme.color.white};
+  box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
+  overflow-y: ${({$shouldScroll}) => ($shouldScroll ? 'scroll' : 'hidden')};
+  z-index: 2;
+`;
+
 export const VisualizationContainer = styled.div`
   height: calc(100% - 52px);
   position: relative;

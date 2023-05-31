@@ -63,6 +63,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateEnvironment,
 		},
 		{
+			"CreateLinter",
+			strings.ToUpper("Post"),
+			"/api/linters",
+			c.CreateLinter,
+		},
+		{
 			"CreateTransaction",
 			strings.ToUpper("Post"),
 			"/api/transactions",
@@ -85,6 +91,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/environments/{environmentId}",
 			c.DeleteEnvironment,
+		},
+		{
+			"DeleteLinter",
+			strings.ToUpper("Delete"),
+			"/api/linters/{LinterId}",
+			c.DeleteLinter,
 		},
 		{
 			"DeleteTransaction",
@@ -115,6 +127,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/environments/{environmentId}",
 			c.GetEnvironment,
+		},
+		{
+			"GetLinter",
+			strings.ToUpper("Get"),
+			"/api/linters/{LinterId}",
+			c.GetLinter,
 		},
 		{
 			"GetPollingProfile",
@@ -159,6 +177,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.ListEnvironments,
 		},
 		{
+			"ListLinters",
+			strings.ToUpper("Get"),
+			"/api/linters",
+			c.ListLinters,
+		},
+		{
 			"ListPollingProfile",
 			strings.ToUpper("Get"),
 			"/api/pollingprofiles",
@@ -187,6 +211,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/environments/{environmentId}",
 			c.UpdateEnvironment,
+		},
+		{
+			"UpdateLinter",
+			strings.ToUpper("Put"),
+			"/api/linters/{LinterId}",
+			c.UpdateLinter,
 		},
 		{
 			"UpdatePollingProfile",
@@ -241,6 +271,30 @@ func (c *ResourceApiApiController) CreateEnvironment(w http.ResponseWriter, r *h
 		return
 	}
 	result, err := c.service.CreateEnvironment(r.Context(), environmentResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// CreateLinter - Create an Linter
+func (c *ResourceApiApiController) CreateLinter(w http.ResponseWriter, r *http.Request) {
+	linterResourceParam := LinterResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&linterResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertLinterResourceRequired(linterResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateLinter(r.Context(), linterResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -323,6 +377,22 @@ func (c *ResourceApiApiController) DeleteEnvironment(w http.ResponseWriter, r *h
 
 }
 
+// DeleteLinter - Delete an Linter
+func (c *ResourceApiApiController) DeleteLinter(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	linterIdParam := params["LinterId"]
+
+	result, err := c.service.DeleteLinter(r.Context(), linterIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // DeleteTransaction - delete a transaction
 func (c *ResourceApiApiController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -393,6 +463,22 @@ func (c *ResourceApiApiController) GetEnvironment(w http.ResponseWriter, r *http
 	environmentIdParam := params["environmentId"]
 
 	result, err := c.service.GetEnvironment(r.Context(), environmentIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetLinter - Get a specific Linter
+func (c *ResourceApiApiController) GetLinter(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	linterIdParam := params["LinterId"]
+
+	result, err := c.service.GetLinter(r.Context(), linterIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -566,6 +652,32 @@ func (c *ResourceApiApiController) ListEnvironments(w http.ResponseWriter, r *ht
 
 }
 
+// ListLinters - List Linters
+func (c *ResourceApiApiController) ListLinters(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListLinters(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // ListPollingProfile - List Polling Profile Configuration
 func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -690,6 +802,33 @@ func (c *ResourceApiApiController) UpdateEnvironment(w http.ResponseWriter, r *h
 		return
 	}
 	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateLinter - Update a Linter
+func (c *ResourceApiApiController) UpdateLinter(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	linterIdParam := params["LinterId"]
+
+	linterResourceParam := LinterResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&linterResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertLinterResourceRequired(linterResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateLinter(r.Context(), linterIdParam, linterResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

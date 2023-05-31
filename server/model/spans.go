@@ -44,12 +44,24 @@ func (s Spans) OrEmpty(fn func()) Spans {
 	return s
 }
 
+type SpanKind string
+
+var (
+	SpanKindClient       SpanKind = "client"
+	SpanKindServer       SpanKind = "server"
+	SpanKindConsumer     SpanKind = "consumer"
+	SpanKindProducer     SpanKind = "producer"
+	SpanKindInternal     SpanKind = "internal"
+	SpanKindUnespecified SpanKind = "unespecified"
+)
+
 type Span struct {
 	ID         trace.SpanID
 	Name       string
 	StartTime  time.Time
 	EndTime    time.Time
 	Attributes Attributes
+	Kind       SpanKind
 
 	Parent   *Span   `json:"-"`
 	Children []*Span `json:"-"`

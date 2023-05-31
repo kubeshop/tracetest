@@ -290,6 +290,7 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		Environment:               m.Environment(in.Environment),
 		TransactionId:             in.TransactionID,
 		TransactionRunId:          in.TransactionRunID,
+		Linter:                    m.LinterResult(in.Linter),
 	}
 }
 

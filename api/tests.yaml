@@ -136,6 +136,8 @@ components:
               EXECUTING,
               AWAITING_TRACE,
               AWAITING_TEST_RESULTS,
+              ANALYZING_TRACE,
+              ANALYZING_ERROR,
               FINISHED,
               STOPPED,
               TRIGGER_FAILED,
@@ -175,6 +177,8 @@ components:
           $ref: "./trace.yaml#/components/schemas/Trace"
         result:
           $ref: "#/components/schemas/AssertionResults"
+        linter:
+          $ref: "linters.yaml#/components/schemas/LinterResult"
         outputs:
           type: array
           items:

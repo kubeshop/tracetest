@@ -4,8 +4,15 @@ import {createContext, useCallback, useContext, useEffect, useMemo} from 'react'
 import Config from 'models/Config.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import Demo from 'models/Demo.model';
+import Linter from 'models/Linter.model';
 import Polling from 'models/Polling.model';
-import {useGetDataStoreQuery, useGetConfigQuery, useGetDemoQuery, useGetPollingQuery} from 'redux/apis/TraceTest.api';
+import {
+  useGetDataStoreQuery,
+  useGetConfigQuery,
+  useGetDemoQuery,
+  useGetPollingQuery,
+  useGetLinterQuery,
+} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import UserSelectors from 'selectors/User.selectors';
@@ -25,6 +32,7 @@ interface IContext {
   config: Config;
   pollingProfile: Polling;
   demos: Demo[];
+  linter: Linter;
 }
 
 const Context = createContext<IContext>({
@@ -39,6 +47,7 @@ const Context = createContext<IContext>({
   config: Config(),
   pollingProfile: Polling(),
   demos: [],
+  linter: Linter(),
 });
 
 interface IProps {
@@ -93,6 +102,9 @@ const SettingsValuesProvider = ({children}: IProps) => {
   // Demo
   const {data: demos = []} = useGetDemoQuery({});
 
+  // Linter
+  const {data: linter = Linter()} = useGetLinterQuery({});
+
   const value = useMemo<IContext>(
     () => ({
       dataStoreConfig,
@@ -106,6 +118,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       config,
       pollingProfile,
       demos,
+      linter,
     }),
     [
       dataStoreConfig,
@@ -119,6 +132,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       config,
       pollingProfile,
       demos,
+      linter,
     ]
   );
 

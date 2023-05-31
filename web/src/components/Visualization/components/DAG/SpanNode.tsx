@@ -1,5 +1,6 @@
 import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
-import {useMemo} from 'react';
+import {Space} from 'antd';
+import {useMemo, useState} from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
@@ -15,6 +16,7 @@ import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import CurrentSpanSelector from 'components/CurrentSpanSelector';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
@@ -26,9 +28,15 @@ const SpanNode = ({data, id, selected}: IProps) => {
   const {isOpen: isTestSpecFormOpen} = useTestSpecForm();
   const {isOpen: isTestOutputFormOpen} = useTestOutput();
   const {matchedSpans} = useSpan();
+  const {runLinterResultsBySpan} = useTestRun();
+  const lintErrors = useMemo(
+    () => SpanService.filterLintErrorsBySpan(runLinterResultsBySpan, data.id),
+    [runLinterResultsBySpan, data.id]
+  );
   const showSelectAsCurrent =
     !data.isMatched && !!matchedSpans.length && (isTestSpecFormOpen || isTestOutputFormOpen) && selected;
   const className = `${data.isMatched ? 'matched' : ''} ${showSelectAsCurrent ? 'selectedAsCurrent' : ''}`;
+  const [isOpenLintErrors, setIsOpenLintErrors] = useState(false);
 
   return (
     <>
@@ -42,11 +50,35 @@ const SpanNode = ({data, id, selected}: IProps) => {
 
         <S.TopLine $type={data.type} />
 
+        {isOpenLintErrors && (
+          <S.LintContainer className="nowheel nodrag">
+            <S.LintCloseIcon onClick={() => setIsOpenLintErrors(false)} />
+            <Space>
+              <S.LintErrorIcon />
+              <S.LintTitle level={4}>Lint errors</S.LintTitle>
+            </Space>
+            <S.LintBody>
+              {lintErrors.map(lintError => (
+                <div>
+                  <S.LintText strong>{lintError.ruleName}</S.LintText>
+
+                  {lintError.errors.map(error => (
+                    <div>
+                      <S.LintText type="secondary">- {error}</S.LintText>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </S.LintBody>
+          </S.LintContainer>
+        )}
+
         <S.Header>
           <S.BadgeContainer>
             <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
           </S.BadgeContainer>
           <S.HeaderText>{data.name}</S.HeaderText>
+          {!!lintErrors.length && <S.LintErrorIcon $isAbsolute onClick={() => setIsOpenLintErrors(prev => !prev)} />}
         </S.Header>
 
         <S.Body>

@@ -2,7 +2,9 @@ import {Tabs} from 'antd';
 import Analytics from 'components/Settings/Analytics';
 import DataStore from 'components/Settings/DataStore';
 import Demo from 'components/Settings/Demo';
+import Linter from 'components/Settings/Linter/Linter';
 import Polling from 'components/Settings/Polling';
+import BetaBadge from 'components/BetaBadge/BetaBadge';
 import * as S from './Settings.styled';
 
 const TabsKeys = {
@@ -10,6 +12,7 @@ const TabsKeys = {
   DataStore: 'dataStore',
   Demo: 'demo',
   Polling: 'polling',
+  Linter: 'linter',
 };
 
 const Content = () => (
@@ -31,6 +34,17 @@ const Content = () => (
         </Tabs.TabPane>
         <Tabs.TabPane key={TabsKeys.Demo} tab="Demo">
           <Demo />
+        </Tabs.TabPane>
+        <Tabs.TabPane
+          key={TabsKeys.Linter}
+          tab={
+            <S.TabTextContainer>
+              Linter
+              <BetaBadge />
+            </S.TabTextContainer>
+          }
+        >
+          <Linter />
         </Tabs.TabPane>
       </Tabs>
     </S.TabsContainer>

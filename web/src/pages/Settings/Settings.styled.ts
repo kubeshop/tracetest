@@ -30,3 +30,8 @@ export const Title = styled(Typography.Title)`
     margin: 0;
   }
 `;
+
+export const TabTextContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;

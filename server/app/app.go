@@ -23,6 +23,7 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
+	linterResource "github.com/kubeshop/tracetest/server/linter/resource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -195,6 +196,7 @@ func (app *App) Start(opts ...appOption) error {
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastoreresource.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
+	linterRepo := linterResource.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
@@ -202,6 +204,7 @@ func (app *App) Start(opts ...appOption) error {
 	rf := newRunnerFacades(
 		pollingProfileRepo,
 		dataStoreRepo,
+		linterRepo,
 		testDB,
 		transactionsRepository,
 		applicationTracer,
@@ -216,6 +219,7 @@ func (app *App) Start(opts ...appOption) error {
 	rf.runner.Start(5)
 	rf.transactionRunner.Start(5)
 	rf.assertionRunner.Start(5)
+	rf.linterRunner.Start(5)
 
 	app.registerStopFn(func() {
 		fmt.Println("stopping tracePoller")
@@ -257,6 +261,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
 
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
+	registerlinterResource(linterRepo, apiRouter, db, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID, isTracetestDev)
@@ -310,6 +315,18 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 		grpcOtlpServer.Stop()
 		httpOtlpServer.Stop()
 	})
+}
+
+func registerlinterResource(linterRepo *linterResource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[linterResource.Linter](
+		linterResource.ResourceName,
+		linterResource.ResourceNamePlural,
+		linterRepo,
+		resourcemanager.WithOperations(linterResource.Operations...),
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
 }
 
 func registerTransactionResource(repo *tests.TransactionsRepository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {

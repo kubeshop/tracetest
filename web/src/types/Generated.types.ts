@@ -190,6 +190,20 @@ export interface paths {
     /** Get the version of the API */
     get: operations["getVersion"];
   };
+  "/linters": {
+    /** List Linters available in Tracetest. */
+    get: operations["listLinters"];
+    /** Create an Linter that can be used by tests and Linters */
+    post: operations["createLinter"];
+  };
+  "/linters/{LinterId}": {
+    /** Get one Linter by its id */
+    get: operations["getLinter"];
+    /** Update a Linter used on Tracetest */
+    put: operations["updateLinter"];
+    /** Delete an Linter from Tracetest */
+    delete: operations["deleteLinter"];
+  };
 }
 
 export interface components {}
@@ -1104,6 +1118,99 @@ export interface operations {
       500: unknown;
     };
   };
+  /** List Linters available in Tracetest. */
+  listLinters: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResourceList"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResourceList"];
+        };
+      };
+      /** invalid query for Linters, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing Linters */
+      500: unknown;
+    };
+  };
+  /** Create an Linter that can be used by tests and Linters */
+  createLinter: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        };
+      };
+      /** problem creating an Linter */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+      };
+    };
+  };
+  /** Get one Linter by its id */
+  getLinter: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        };
+      };
+      /** Linter not found */
+      404: unknown;
+      /** problem getting a Linter */
+      500: unknown;
+    };
+  };
+  /** Update a Linter used on Tracetest */
+  updateLinter: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        };
+      };
+      /** invalid Linter, some data was sent in incorrect format. */
+      400: unknown;
+      /** Linter not found */
+      404: unknown;
+      /** problem updating an Linter */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+      };
+    };
+  };
+  /** Delete an Linter from Tracetest */
+  deleteLinter: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid Linter, some data was sent in incorrect format. */
+      400: unknown;
+      /** Linter not found */
+      404: unknown;
+      /** problem deleting an Linter */
+      500: unknown;
+    };
+  };
 }
 
 export interface external {
@@ -1515,6 +1622,60 @@ export interface external {
     };
     operations: {};
   };
+  "linters.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        LinterResourceList: {
+          items?: external["linters.yaml"]["components"]["schemas"]["LinterResource"][];
+        };
+        LinterResource: {
+          /** @enum {string} */
+          type?: "Linter";
+          spec?: {
+            id?: string;
+            name?: string;
+            enabled?: boolean;
+            minimumScore?: number;
+            plugins?: external["linters.yaml"]["components"]["schemas"]["LinterResourcePlugin"][];
+          };
+        };
+        LinterResourcePlugin: {
+          name?: string;
+          enabled?: boolean;
+          required?: boolean;
+        };
+        LinterResult: {
+          passed?: boolean;
+          score?: number;
+          plugins?: external["linters.yaml"]["components"]["schemas"]["LinterResultPlugin"][];
+        };
+        LinterResultPlugin: {
+          name?: string;
+          description?: string;
+          passed?: boolean;
+          score?: number;
+          rules?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRule"][];
+        };
+        LinterResultPluginRule: {
+          name?: string;
+          description?: string;
+          passed?: boolean;
+          weight?: number;
+          tips?: string[];
+          results?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResult"][];
+        };
+        LinterResultPluginRuleResult: {
+          spanId?: string;
+          errors?: string[];
+          passed?: boolean;
+          /** @enum {string} */
+          severity?: "error" | "warning";
+        };
+      };
+    };
+    operations: {};
+  };
   "parameters.yaml": {
     paths: {};
     components: {
@@ -1551,6 +1712,8 @@ export interface external {
         dataStoreId: string;
         /** @description ID of an environment used on Tracetest to inject values into tests and transactions */
         environmentId: string;
+        /** @description ID of an Linter */
+        LinterId: string;
       };
     };
     operations: {};
@@ -1667,6 +1830,8 @@ export interface external {
             | "EXECUTING"
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
+            | "ANALYZING_TRACE"
+            | "ANALYZING_ERROR"
             | "FINISHED"
             | "STOPPED"
             | "TRIGGER_FAILED"
@@ -1692,6 +1857,7 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          linter?: external["linters.yaml"]["components"]["schemas"]["LinterResult"];
           outputs?: {
             name?: string;
             spanId?: string;
@@ -1777,6 +1943,7 @@ export interface external {
           id?: string;
           parentId?: string;
           name?: string;
+          kind?: string;
           /**
            * Format: int64
            * @description span start time in unix milli format

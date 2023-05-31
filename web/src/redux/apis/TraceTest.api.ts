@@ -80,6 +80,7 @@ export const {
   useGetConfigQuery,
   useGetPollingQuery,
   useGetDemoQuery,
+  useGetLinterQuery,
   useCreateSettingMutation,
   useUpdateSettingMutation,
   useLazyGetResourceDefinitionV2Query,

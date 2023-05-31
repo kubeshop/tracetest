@@ -36,3 +36,15 @@ export const SwitchContainer = styled.div`
     margin-bottom: 24px;
   }
 `;
+
+export const LinterPluginsContainer = styled.div`
+  margin-top: 10px;
+  padding: 24px 24px 0;
+  border-top: 1px solid ${({theme}) => theme.color.borderLight};
+`;
+
+export const LinterPluginList = styled.ul`
+  && {
+    list-style-type: disc;
+  }
+`;
