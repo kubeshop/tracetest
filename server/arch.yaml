@@ -83,13 +83,25 @@ modules:
     type: infrastructure
     group: observability
 
-  id:
+  pkg/id:
+    type: infrastructure
+    group: central_libraries
+
+  pkg/*:
     type: infrastructure
     group: libraries
 
   resourcemanager:
     type: infrastructure
     group: libraries
+
+  tests/*:
+    type: core
+    group: test_management
+
+  environment/*:
+    type: core
+    group: test_management
 
   testdb:
     type: infrastructure
@@ -129,6 +141,9 @@ clusters:
 
   test_runner:
     color: "#976391"
+
+  test_management:
+    color: "#20BF55"
 
   startup:
     color: "#293F14"
