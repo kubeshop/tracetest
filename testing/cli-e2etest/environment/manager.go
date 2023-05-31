@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/cli-e2etest/command"
 	"github.com/kubeshop/tracetest/cli-e2etest/config"
 	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
+	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )
@@ -31,13 +32,18 @@ type Manager interface {
 	GetTestResourcePath(t *testing.T, resourceName string) string
 }
 
+type option func(*internalManager)
+
 type internalManager struct {
-	environmentType       string
-	dockerComposeFilePath string
-	dockerProjectName     string
+	environmentType               string
+	dockerComposeNoApiFilePath    string
+	dockerComposePokeshopFilePath string
+	dockerProjectName             string
+	pokeshopEnabled               bool
+	datastoreEnabled              bool
 }
 
-func CreateAndStart(t *testing.T) Manager {
+func CreateAndStart(t *testing.T, options ...option) Manager {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -47,10 +53,22 @@ func CreateAndStart(t *testing.T) Manager {
 		t.Fatalf("environment %s not registered", environmentName)
 	}
 
-	environment := GetManager(environmentName)
+	environment := GetManager(environmentName, options...)
 	environment.Start(t)
 
 	return environment
+}
+
+func WithPokeshop() option {
+	return func(im *internalManager) {
+		im.pokeshopEnabled = true
+	}
+}
+
+func WithDataStoreEnabled() option {
+	return func(im *internalManager) {
+		im.datastoreEnabled = true
+	}
 }
 
 func getExecutingDir() string {
@@ -66,17 +84,25 @@ func getExecutingDir() string {
 // to use something like github.com/testcontainers/testcontainers-go
 // (github.com/testcontainers/testcontainers-go/modules/compose in specific)
 
-func GetManager(environmentType string) Manager {
+func GetManager(environmentType string, options ...option) Manager {
 	currentDir := getExecutingDir()
-	dockerComposeFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose.yaml", currentDir, environmentType)
+	dockerComposeNoApiFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose-no-api.yaml", currentDir, environmentType)
+	dockerComposePokeshopFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose-pokeshop.yaml", currentDir, environmentType)
 
 	atomic.AddInt64(&envCounter, 1)
 
-	return &internalManager{
-		environmentType:       environmentType,
-		dockerComposeFilePath: dockerComposeFilepath,
-		dockerProjectName:     fmt.Sprintf("tracetest-env-%d", envCounter),
+	manager := &internalManager{
+		environmentType:               environmentType,
+		dockerComposeNoApiFilePath:    dockerComposeNoApiFilepath,
+		dockerComposePokeshopFilePath: dockerComposePokeshopFilepath,
+		dockerProjectName:             fmt.Sprintf("tracetest-env-%d", envCounter),
 	}
+
+	for _, option := range options {
+		option(manager)
+	}
+
+	return manager
 }
 
 func (m *internalManager) Name() string {
@@ -84,29 +110,65 @@ func (m *internalManager) Name() string {
 }
 
 func (m *internalManager) Start(t *testing.T) {
-	result, err := command.Exec(
-		"docker", "compose",
-		"--file", m.dockerComposeFilePath, // choose docker compose relative to the chosen environment
+	args := []string{
+		"compose",
+		"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
 		"--project-name", m.dockerProjectName, // create a project name to isolate this scenario
-		"up", "--detach")
+		"up", "--detach",
+	}
+
+	if m.pokeshopEnabled {
+		args = []string{
+			"compose",
+			"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
+			"--file", m.dockerComposePokeshopFilePath, // choose docker compose relative to the chosen environment
+			"--project-name", m.dockerProjectName, // create a project name to isolate this scenario
+			"up", "--detach",
+		}
+	}
+
+	result, err := command.Exec("docker", args...)
 
 	require.NoError(t, err)
 	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// TODO: think in a better way to assure readiness for Tracetest
 	time.Sleep(1000 * time.Millisecond)
+
+	if m.datastoreEnabled {
+		cliConfig := m.GetCLIConfigPath(t)
+		dataStorePath := m.GetEnvironmentResourcePath(t, "data-store")
+
+		result = tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+	}
 }
 
 func (m *internalManager) Close(t *testing.T) {
-	result, err := command.Exec(
-		"docker", "compose",
-		"--file", m.dockerComposeFilePath, // choose docker compose relative to the chosen environment
+	args := []string{
+		"compose",
+		"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
 		"--project-name", m.dockerProjectName, // choose isolated project name
 		"rm",
 		"--force",   // bypass removal question
 		"--volumes", // remove volumes attached to this project
 		"--stop",    // force containers to stop
-	)
+	}
+
+	if m.pokeshopEnabled {
+		args = []string{
+			"compose",
+			"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
+			"--file", m.dockerComposePokeshopFilePath, // choose docker compose relative to the chosen environment
+			"--project-name", m.dockerProjectName, // choose isolated project name
+			"rm",
+			"--force",   // bypass removal question
+			"--volumes", // remove volumes attached to this project
+			"--stop",    // force containers to stop
+		}
+	}
+
+	result, err := command.Exec("docker", args...)
 	require.NoError(t, err)
 	helpers.RequireExitCodeEqual(t, result, 0)
 }
