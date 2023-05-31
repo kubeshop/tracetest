@@ -5,11 +5,12 @@ import (
 )
 
 type HTTPRequest struct {
-	URL            string              `yaml:"url"`
-	Method         string              `yaml:"method"`
-	Headers        []HTTPHeader        `yaml:"headers,omitempty" dc:"headers"`
-	Authentication *HTTPAuthentication `yaml:"authentication,omitempty" dc:"auth"`
-	Body           string              `yaml:"body,omitempty"`
+	URL             string              `yaml:"url"`
+	Method          string              `yaml:"method"`
+	Headers         []HTTPHeader        `yaml:"headers,omitempty" dc:"headers"`
+	Authentication  *HTTPAuthentication `yaml:"authentication,omitempty" dc:"auth"`
+	Body            string              `yaml:"body,omitempty"`
+	SSLVerification bool                `yaml:"sslVerification,omitempty"`
 }
 
 func (r HTTPRequest) Validate() error {

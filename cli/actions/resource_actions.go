@@ -93,12 +93,23 @@ func (r *resourceActions) Get(ctx context.Context, id string) (*file.File, error
 }
 
 func (r *resourceActions) Export(ctx context.Context, id string, filePath string) error {
-	file, err := r.actions.Get(ctx, id)
+	f, err := r.actions.Get(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	_, err = file.WriteRaw()
+	formatter := formatters.BuildFormatter("", formatters.YAML, r.actions.Formatter())
+	content, err := formatter.Format(f)
+	if err != nil {
+		return err
+	}
+
+	newFile, err := file.NewFromRaw(filePath, []byte(content))
+	if err != nil {
+		return err
+	}
+
+	_, err = newFile.WriteRaw()
 	return err
 }
 

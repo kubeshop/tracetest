@@ -57,7 +57,7 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 	stepsResults := make([]stepResult, 0, len(output.Run.Steps))
 
 	for i, step := range output.Run.Steps {
-		test := output.Transaction.Steps[i]
+		test := output.Transaction.FullSteps[i]
 		stepsResults = append(stepsResults, stepResult{
 			Name:    *test.Name,
 			Results: *step.Result,
@@ -95,7 +95,7 @@ func (f transactionRun) pretty(output TransactionRunOutput) string {
 	formattedMessages = append(formattedMessages, f.getColoredText(allStepsPassed, message))
 
 	for i, testRun := range output.Run.Steps {
-		test := output.Transaction.Steps[i]
+		test := output.Transaction.FullSteps[i]
 		message := f.testRunFormatter.pretty(TestRunOutput{
 			HasResults: true,
 			Test:       test,

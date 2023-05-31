@@ -22,22 +22,24 @@ const Test = ({
   id = '',
   name = '',
   description = '',
-  specs,
+  specs = [],
   version = 1,
   serviceUnderTest: rawTrigger,
   summary = {},
   outputs = [],
   createdAt = '',
-}: TRawTest): Test => ({
-  id,
-  name,
-  version,
-  description,
-  createdAt,
-  definition: TestSpecs(specs || {}),
-  trigger: Trigger(rawTrigger || {}),
-  summary: Summary(summary),
-  outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
-});
+}: TRawTest): Test => {
+  return {
+    id,
+    name,
+    version,
+    description,
+    createdAt,
+    definition: TestSpecs({specs}),
+    trigger: Trigger(rawTrigger || {}),
+    summary: Summary(summary),
+    outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
+  };
+};
 
 export default Test;

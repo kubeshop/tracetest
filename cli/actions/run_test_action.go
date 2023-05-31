@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type RunTestConfig struct {
+type RunResourceArgs struct {
 	DefinitionFile string
 	EnvID          string
 	WaitForResult  bool
@@ -35,9 +35,10 @@ type runTestAction struct {
 	logger             *zap.Logger
 	client             *openapi.APIClient
 	environmentActions environmentsActions
+	cliExit            func(int)
 }
 
-var _ Action[RunTestConfig] = &runTestAction{}
+var _ Action[RunResourceArgs] = &runTestAction{}
 
 type runDefParams struct {
 	DefinitionFile       string
@@ -48,11 +49,11 @@ type runDefParams struct {
 	EnvironmentVariables map[string]string
 }
 
-func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, environmentActions environmentsActions) runTestAction {
-	return runTestAction{config, logger, client, environmentActions}
+func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, environmentActions environmentsActions, cliExit func(int)) runTestAction {
+	return runTestAction{config, logger, client, environmentActions, cliExit}
 }
 
-func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
+func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	if args.DefinitionFile == "" {
 		return fmt.Errorf("you must specify a definition file to run a test")
 	}
@@ -72,18 +73,21 @@ func (a runTestAction) Run(ctx context.Context, args RunTestConfig) error {
 	envID := args.EnvID
 
 	if utils.StringReferencesFile(args.EnvID) {
+		a.logger.Debug("resolve envID from file reference", zap.String("path", envID))
 		envResource, err := a.environmentActions.FromFile(ctx, args.EnvID)
 		if err != nil {
-			return fmt.Errorf("could not run definition: %w", err)
+			return fmt.Errorf("could not read environment file: %w", err)
 		}
 
 		_, err = a.environmentActions.ApplyResource(ctx, envResource)
 		if err != nil {
-			return fmt.Errorf("could not run definition: %w", err)
+			return fmt.Errorf("could not apply environmen file: %w", err)
 		}
 
-		envID = *envResource.Spec.Id
+		envID = envResource.Spec.GetId()
 	}
+
+	a.logger.Debug("resolved env", zap.String("envID", envID))
 
 	params := runDefParams{
 		DefinitionFile: args.DefinitionFile,
@@ -106,6 +110,17 @@ func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath 
 	f, err := file.Read(path)
 	if err != nil {
 		return "", err
+	}
+
+	if t, err := f.Definition().Test(); err == nil && t.Trigger.Type == "grpc" {
+		newFile, err := getUpdatedTestWithGrpcTrigger(f, t)
+		if err != nil {
+			return "", err
+		}
+
+		if newFile != nil { // has new file, update it
+			f = *newFile
+		}
 	}
 
 	body, _, err := a.client.ApiApi.
@@ -175,6 +190,17 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		f, err = file.New(f.Path(), updated)
 		if err != nil {
 			return fmt.Errorf(`cannot recreate updated file: %w`, err)
+		}
+	}
+
+	if t, err := f.Definition().Test(); err == nil && t.Trigger.Type == "grpc" {
+		newFile, err := getUpdatedTestWithGrpcTrigger(f, t)
+		if err != nil {
+			return err
+		}
+
+		if newFile != nil { // has new file, update it
+			f = *newFile
 		}
 	}
 
@@ -286,14 +312,19 @@ func (a runTestAction) askForMissingVariables(resp *http.Response) (map[string]s
 }
 
 func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.Transaction, error) {
-	test, _, err := a.client.ApiApi.
+	a.client.GetConfig().AddDefaultHeader("X-Tracetest-Augmented", "true")
+	transaction, _, err := a.client.ResourceApiApi.
 		GetTransaction(ctx, id).
 		Execute()
+
+	// reset augmented header
+	delete(a.client.GetConfig().DefaultHeader, "X-Tracetest-Augmented")
+
 	if err != nil {
 		return openapi.Transaction{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
-	return *test, nil
+	return transaction.GetSpec(), nil
 }
 
 func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {
@@ -341,7 +372,7 @@ func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID int
 	allPassed := tro.Run.Result.GetAllPassed()
 	if params.WaitForResult && !allPassed {
 		// It failed, so we have to return an error status
-		os.Exit(1)
+		a.cliExit(1)
 	}
 
 	return nil
@@ -377,13 +408,13 @@ func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.T
 	if params.WaitForResult {
 		if utils.RunStateIsFailed(tro.Run.GetState()) {
 			// It failed, so we have to return an error status
-			os.Exit(1)
+			a.cliExit(1)
 		}
 
 		for _, step := range tro.Run.Steps {
 			if !step.Result.GetAllPassed() {
 				// if any test doesn't pass, fail the transaction execution
-				os.Exit(1)
+				a.cliExit(1)
 			}
 		}
 	}
@@ -568,4 +599,37 @@ func getTestRunIDFromString(testRunIDAsString string) int32 {
 
 func getTestRunID(testRun openapi.TestRun) int32 {
 	return getTestRunIDFromString(testRun.GetId())
+}
+
+func getUpdatedTestWithGrpcTrigger(f file.File, t yaml.Test) (*file.File, error) {
+	protobufFile := filepath.Join(f.AbsDir(), t.Trigger.GRPC.ProtobufFile)
+
+	if !utils.StringReferencesFile(protobufFile) {
+		return nil, nil
+	}
+
+	// referencing a file, keep the value
+	fileContent, err := utils.ReadFileContent(protobufFile)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot read protobuf file: %w`, err)
+	}
+
+	t.Trigger.GRPC.ProtobufFile = fileContent
+
+	def := yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: t,
+	}
+
+	updated, err := def.Encode()
+	if err != nil {
+		return nil, fmt.Errorf(`cannot encode updated test: %w`, err)
+	}
+
+	f, err = file.New(f.Path(), updated)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot recreate updated file: %w`, err)
+	}
+
+	return &f, nil
 }

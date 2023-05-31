@@ -2,6 +2,8 @@ package resourcemanager
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/goccy/go-yaml"
@@ -11,7 +13,7 @@ type encoder interface {
 	Marshal(in interface{}) (out []byte, err error)
 	Unmarshal(in []byte, out interface{}) (err error)
 	Accepts(contentType string) bool
-	ResponseContentType() string
+	ContentType() string
 }
 
 var encoders = []encoder{
@@ -39,7 +41,7 @@ type basicEncoder struct {
 	unmarshalFn func([]byte, interface{}) error
 }
 
-func (e basicEncoder) ResponseContentType() string {
+func (e basicEncoder) ContentType() string {
 	return e.contentType
 }
 
@@ -53,6 +55,55 @@ func (e basicEncoder) Marshal(in interface{}) (out []byte, err error) {
 
 func (e basicEncoder) Unmarshal(in []byte, out interface{}) (err error) {
 	return e.unmarshalFn(in, out)
+}
+
+type Encoder struct {
+	req    *http.Request
+	input  encoder
+	output encoder
+}
+
+func (e Encoder) DecodeRequestBody(out interface{}) (err error) {
+	body, err := io.ReadAll(e.req.Body)
+	defer e.req.Body.Close()
+	if err != nil {
+		return fmt.Errorf("cannot read request body: %w", err)
+	}
+
+	return e.input.Unmarshal(body, out)
+}
+
+func (e Encoder) WriteEncodedResponse(w http.ResponseWriter, code int, data any) error {
+	encoded, err := e.output.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("cannot encode response data: %w", err)
+	}
+
+	w.Header().Set("Content-Type", e.output.ContentType())
+	w.WriteHeader(code)
+	if data == nil {
+		return nil
+	}
+
+	_, err = w.Write(encoded)
+
+	return err
+}
+
+func (e Encoder) RequestContentType() string {
+	return e.input.ContentType()
+}
+
+func (e Encoder) ResponseContentType() string {
+	return e.output.ContentType()
+}
+
+func EncoderFromRequest(r *http.Request) Encoder {
+	return Encoder{
+		req:    r,
+		input:  getInputEncoder(r),
+		output: getOutputEncoder(r),
+	}
 }
 
 func getInputEncoder(r *http.Request) encoder {

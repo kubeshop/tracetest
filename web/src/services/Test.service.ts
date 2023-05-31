@@ -57,16 +57,12 @@ const TestService = () => ({
       description,
       serviceUnderTest: {
         triggerType: type,
-        triggerSettings: {
-          [type]: request,
-        },
+        [type]: request,
       },
       ...(original
         ? {
             outputs: toRawTestOutputs(original.outputs ?? []),
-            specs: {
-              specs: original.definition.specs.map(def => TestDefinitionService.toRaw(def)),
-            },
+            specs: original.definition.specs.map(def => TestDefinitionService.toRaw(def)),
           }
         : {}),
     };

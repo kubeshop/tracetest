@@ -31,8 +31,8 @@ var testRunCmd = &cobra.Command{
 		environmentOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)))
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 
-		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, environmentActions)
-		actionArgs := actions.RunTestConfig{
+		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, environmentActions, ExitCLI)
+		actionArgs := actions.RunResourceArgs{
 			DefinitionFile: runTestFileDefinition,
 			EnvID:          runTestEnvID,
 			WaitForResult:  runTestWaitForResult,

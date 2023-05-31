@@ -37,6 +37,7 @@ const CurlTriggerService = (): ICurlTriggerService => ({
       method: method as HTTP_METHOD,
       headers: Object.entries(headers).map(([key, value]) => ({key, value})),
       body: body === 'data' ? '' : JSON.stringify(body),
+      sslVerification: false,
     };
   },
 

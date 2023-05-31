@@ -1,0 +1,58 @@
+type: Test
+spec:
+  id: create-pokemon
+  name: 'Create Pokemon'
+  description: Create a single pokemon on Pokeshop
+  trigger:
+    type: grpc
+    grpc:
+      protobufFile: |
+        syntax = "proto3";
+
+        option java_multiple_files = true;
+        option java_outer_classname = "PokeshopProto";
+        option objc_class_prefix = "PKS";
+
+        package pokeshop;
+
+        service Pokeshop {
+          rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}
+          rpc createPokemon (Pokemon) returns (Pokemon) {}
+          rpc importPokemon (ImportPokemonRequest) returns (ImportPokemonRequest) {}
+        }
+
+        message ImportPokemonRequest {
+          int32 id = 1;
+        }
+
+        message GetPokemonRequest {
+          optional int32 skip = 1;
+          optional int32 take = 2;
+        }
+
+        message GetPokemonListResponse {
+          repeated Pokemon items = 1;
+          int32 totalCount = 2;
+        }
+
+        message Pokemon {
+          optional int32 id = 1;
+          string name = 2;
+          string type = 3;
+          bool isFeatured = 4;
+          optional string imageUrl = 5;
+        }
+
+      address: demo-rpc:8082
+      method: pokeshop.Pokeshop.createPokemon
+      request: |-
+        {
+          "name": "Pikachu",
+          "type": "eletric",
+          "isFeatured": true
+        }
+  specs:
+  - name: It calls Pokeshop correctly
+    selector: span[tracetest.span.type="rpc" name="createPokemon" rpc.system="grpc" rpc.method="createPokemon" rpc.service="Pokeshop.createPokemon"]
+    assertions:
+    - attr:rpc.grpc.status_code  =  0

@@ -66,9 +66,8 @@ func (f DatastoreFormatter) ToStruct(file *file.File) (interface{}, error) {
 
 func (f DatastoreFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var dataStoreList openapi.DataStoreList
-	nullableList := openapi.NewNullableDataStoreList(&dataStoreList)
 
-	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &dataStoreList)
 	if err != nil {
 		return nil, err
 	}

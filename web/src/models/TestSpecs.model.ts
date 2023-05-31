@@ -10,7 +10,8 @@ export type TTestSpecEntry = {
 };
 
 export type TRawTestSpecEntry = {
-  selector: {query: string};
+  selector: string;
+  selectorParsed: {query: string};
   assertions: string[];
   name: string;
 };
@@ -18,14 +19,16 @@ export type TRawTestSpecEntry = {
 export type TRawTestSpecs = TTestSchemas['TestSpecs'];
 type TestSpecs = Model<TRawTestSpecs, {specs: TTestSpecEntry[]}>;
 
-const TestSpecs = ({specs = []}: TRawTestSpecs): TestSpecs => ({
-  specs: specs.map(({selector: {query = ''} = {}, assertions = [], name = ''}) => ({
-    assertions,
-    isDeleted: false,
-    isDraft: false,
-    selector: query,
-    name: name ?? '',
-  })),
-});
+const TestSpecs = ({specs = []}: TRawTestSpecs): TestSpecs => {
+  return {
+    specs: specs.map(({selector = '', assertions = [], name = ''}) => ({
+      assertions,
+      isDeleted: false,
+      isDraft: false,
+      selector,
+      name: name ?? '',
+    })),
+  };
+};
 
 export default TestSpecs;

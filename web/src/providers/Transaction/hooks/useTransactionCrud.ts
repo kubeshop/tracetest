@@ -26,7 +26,7 @@ const useTransactionCrud = () => {
 
   const runTransaction = useCallback(
     async (transaction: Transaction, runId?: string, environmentId = selectedEnvironment?.id) => {
-      const {steps: testList} = await getTransaction({
+      const {fullSteps: testList} = await getTransaction({
         transactionId: transaction.id,
         version: transaction.version,
       }).unwrap();

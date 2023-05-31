@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: oCzNeDQVRI
   name: Create Environment
   description: Test step of 'Environment Feature - Test Suite'
   trigger:

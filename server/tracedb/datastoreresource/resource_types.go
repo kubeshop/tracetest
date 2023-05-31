@@ -197,6 +197,10 @@ func (ds DataStore) HasID() bool {
 	return ds.ID.String() != ""
 }
 
+func (ds DataStore) GetID() id.ID {
+	return ds.ID
+}
+
 func (ds DataStore) IsOTLPBasedProvider() bool {
 	return slices.Contains(otlpBasedDataStores, ds.Type)
 }

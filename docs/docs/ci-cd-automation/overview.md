@@ -1,8 +1,12 @@
 # CI/CD Automation
 
-This section contains a general overview of running Tracetest in CI/CD pipelines. You can find guides for:
+This section contains a general overview of running Tracetest in CI/CD pipelines.
+
+You can find guides for:
 
 - [GitHub Actions](./github-actions-pipeline)
+- [Testkube](./testkube-pipeline)
+- [Tekton](./tekton-pipeline)
 
 Tracetest is designed to work with all CI/CD platforms and automation tools. To enable Tracetest to run in CI/CD environments, make sure to [install the Tracetest CLI](../getting-started/installation.mdx) and configure it to access your [Tracetest server](../configuration/server.md).
 

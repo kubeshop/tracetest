@@ -35,10 +35,7 @@ const EntryData = {
   },
 };
 
-const Trigger = ({
-  triggerType = 'http',
-  triggerSettings: {http = {}, grpc = {}, traceid = {}} = {},
-}: TRawTrigger): Trigger => {
+const Trigger = ({triggerType = 'http', http = {}, grpc = {}, traceid = {}}: TRawTrigger): Trigger => {
   const type = triggerType as TriggerTypes;
 
   let request = {} as TTriggerRequest;
@@ -50,7 +47,7 @@ const Trigger = ({
     request = TraceIDRequest(traceid);
   }
 
-  const {entryPoint, method} = EntryData[type](request);
+  const {entryPoint, method} = EntryData[type || TriggerTypes.http](request);
 
   return {
     type,

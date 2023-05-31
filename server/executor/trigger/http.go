@@ -3,6 +3,7 @@ package trigger
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net"
@@ -24,11 +25,12 @@ func HTTP() Triggerer {
 
 type httpTriggerer struct{}
 
-func httpClient() http.Client {
+func httpClient(sslVerification bool) http.Client {
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout: time.Second,
 		}).DialContext,
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: !sslVerification},
 	}
 
 	return http.Client{
@@ -71,7 +73,7 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 		return response, fmt.Errorf(`trigger type "%s" not supported by HTTP triggerer`, trigger.Type)
 	}
 
-	client := httpClient()
+	client := httpClient(trigger.HTTP.SSLVerification)
 
 	ctx = trace.ContextWithSpanContext(ctx, newSpanContext(ctx))
 	ctx, cncl := context.WithTimeout(ctx, 30*time.Second)

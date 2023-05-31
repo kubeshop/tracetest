@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/tests"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -333,12 +334,12 @@ SELECT
 	"environment",
 
 	-- transaction run
-	transaction_run.transaction_run_id,
-	transaction_run.transaction_run_transaction_id
-FROM test_runs
-LEFT OUTER JOIN
-	transaction_run_steps transaction_run
-ON transaction_run.test_run_id = id AND transaction_run.test_run_test_id = test_id
+	transaction_run_steps.transaction_run_id,
+	transaction_run_steps.transaction_run_transaction_id
+FROM
+	test_runs
+		LEFT OUTER JOIN transaction_run_steps
+		ON transaction_run_steps.test_run_id = test_runs.id AND transaction_run_steps.test_run_test_id = test_runs.test_id
 `
 
 func (td *postgresDB) GetRun(ctx context.Context, testID id.ID, runID int) (model.Run, error) {
@@ -550,4 +551,29 @@ func readRunRow(row scanner) (model.Run, error) {
 	default:
 		return model.Run{}, fmt.Errorf("read run row: %w", err)
 	}
+}
+
+func (td *postgresDB) GetTransactionRunSteps(ctx context.Context, tr tests.TransactionRun) ([]model.Run, error) {
+	query := selectRunQuery + `
+WHERE transaction_run_steps.transaction_run_id = $1 AND transaction_run_steps.transaction_run_transaction_id = $2
+ORDER BY test_runs.completed_at ASC
+`
+
+	stmt, err := td.db.Prepare(query)
+	if err != nil {
+		return []model.Run{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, tr.ID, tr.TransactionID)
+	if err != nil {
+		return []model.Run{}, fmt.Errorf("query context: %w", err)
+	}
+
+	steps, err := td.readRunRows(ctx, rows)
+	if err != nil {
+		return []model.Run{}, fmt.Errorf("read row: %w", err)
+	}
+
+	return steps, nil
 }

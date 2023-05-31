@@ -2,27 +2,26 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/parameters"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
 
-var resourceID string
+var getParams = &parameters.ResourceIdParams{}
 
 var getCmd = &cobra.Command{
 	GroupID: cmdGroupResources.ID,
-	Use:     "get [resource type]",
-	Long:    "Get a resource from your Tracetest server",
+	Use:     fmt.Sprintf("get %s", strings.Join(parameters.ValidResources, "|")),
 	Short:   "Get resource",
+	Long:    "Get a resource from your Tracetest server",
 	PreRun:  setupCommand(),
-	Args:    cobra.MinimumNArgs(1),
-	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
-		if resourceID == "" {
-			return "", fmt.Errorf("id of the resource to get must be specified")
-		}
-
+	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
@@ -35,8 +34,14 @@ var getCmd = &cobra.Command{
 			return "", err
 		}
 
-		resource, err := resourceActions.Get(ctx, resourceID)
-		if err != nil {
+		if output == string(formatters.JSON) {
+			ctx = context.WithValue(ctx, "X-Tracetest-Augmented", true)
+		}
+
+		resource, err := resourceActions.Get(ctx, getParams.ResourceId)
+		if err != nil && errors.Is(err, utils.ResourceNotFound) {
+			return fmt.Sprintf("Resource %s with ID %s not found", resourceType, getParams.ResourceId), nil
+		} else if err != nil {
 			return "", err
 		}
 
@@ -49,11 +54,11 @@ var getCmd = &cobra.Command{
 		}
 
 		return result, nil
-	}),
+	}, getParams),
 	PostRun: teardownCommand,
 }
 
 func init() {
-	getCmd.Flags().StringVar(&resourceID, "id", "", "id of the resource to get")
+	getCmd.Flags().StringVar(&getParams.ResourceId, "id", "", "id of the resource to get")
 	rootCmd.AddCommand(getCmd)
 }
