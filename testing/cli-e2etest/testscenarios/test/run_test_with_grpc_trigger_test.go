@@ -11,34 +11,45 @@ import (
 )
 
 func TestRunTestWithGrpcTrigger(t *testing.T) {
-	// instantiate require with testing helper
-	require := require.New(t)
-
 	// setup isolated e2e environment
 	env := environment.CreateAndStart(t, environment.WithDataStoreEnabled(), environment.WithPokeshop())
 	defer env.Close(t)
 
 	cliConfig := env.GetCLIConfigPath(t)
 
-	// Given I am a Tracetest CLI user
-	// And I have my server recently created
-	// And the datasource is already set
+	t.Run("should pass when using an embedded protobuf string in the test", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
 
-	// When I try to run a test with a gRPC trigger with embedded protobuf
-	// Then it should pass
-	testFile := env.GetTestResourcePath(t, "grpc-trigger-embedded-protobuf")
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
 
-	command := fmt.Sprintf("test run -w -d %s", testFile)
-	result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
-	helpers.RequireExitCodeEqual(t, result, 0)
-	require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
+		// When I try to run a test with a gRPC trigger with embedded protobuf
+		// Then it should pass
+		testFile := env.GetTestResourcePath(t, "grpc-trigger-embedded-protobuf")
 
-	// When I try to run a test with a gRPC trigger with a reference to a protobuf file
-	// Then it should pass
-	testFile = env.GetTestResourcePath(t, "grpc-trigger-reference-protobuf")
+		command := fmt.Sprintf("test run -w -d %s", testFile)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
+	})
 
-	command = fmt.Sprintf("test run -w -d %s", testFile)
-	result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
-	helpers.RequireExitCodeEqual(t, result, 0)
-	require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
+	t.Run("should pass when referencing a protobuf file in the test", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I try to run a test with a gRPC trigger with a reference to a protobuf file
+		// Then it should pass
+		testFile := env.GetTestResourcePath(t, "grpc-trigger-reference-protobuf")
+
+		command := fmt.Sprintf("test run -w -d %s", testFile)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
+	})
 }
