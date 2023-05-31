@@ -27,8 +27,13 @@ func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (b
 		return ready, reason, run, err
 	}
 
+	maxNumberRetries := 0
+	if request.pollingProfile.Periodic != nil {
+		maxNumberRetries = request.pollingProfile.Periodic.SelectorMatchRetries
+	}
+
 	currentNumberTries := pe.getNumberTries(request)
-	if currentNumberTries >= selectorBasedPollerExecutorMaxTries {
+	if currentNumberTries >= maxNumberRetries {
 		return true, "not all selectors matched, but trace haven't changed in a while", run, err
 	}
 

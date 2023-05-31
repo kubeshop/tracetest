@@ -73,10 +73,11 @@ type tracePoller struct {
 }
 
 type PollingRequest struct {
-	test    model.Test
-	run     model.Run
-	count   int
-	headers map[string]string
+	test           model.Test
+	run            model.Run
+	pollingProfile pollingprofile.PollingProfile
+	count          int
+	headers        map[string]string
 }
 
 func (r PollingRequest) Context() context.Context {
@@ -270,11 +271,12 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 
 func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
-		pp := *tp.ppGetter.GetDefault(job.Context()).Periodic
+		pp := tp.ppGetter.GetDefault(job.Context())
 		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
-		time.Sleep(pp.RetryDelayDuration())
+		time.Sleep(pp.Periodic.RetryDelayDuration())
 
 		job.SetHeader("requeued", "true")
+		job.pollingProfile = pp
 		tp.enqueueJob(job)
 	}()
 }
