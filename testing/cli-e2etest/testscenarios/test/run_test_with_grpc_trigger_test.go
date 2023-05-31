@@ -31,7 +31,7 @@ func TestRunTestWithGrpcTrigger(t *testing.T) {
 	command := fmt.Sprintf("test run -w -d %s", testFile)
 	result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
-	require.Contains(result.StdOut, "It calls Pokeshop correctly")
+	require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
 
 	// When I try to run a test with a gRPC trigger with a reference to a protobuf file
 	// Then it should pass
@@ -40,5 +40,5 @@ func TestRunTestWithGrpcTrigger(t *testing.T) {
 	command = fmt.Sprintf("test run -w -d %s", testFile)
 	result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
-	require.Contains(result.StdOut, "It calls Pokeshop correctly")
+	require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
 }
