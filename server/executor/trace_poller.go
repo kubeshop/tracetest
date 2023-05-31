@@ -103,10 +103,10 @@ func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, coun
 		test:    test,
 		run:     run,
 		headers: make(map[string]string),
+		count:   count,
 	}
 
 	propagator.Inject(ctx, propagation.MapCarrier(request.headers))
-	request.SetHeader("count", fmt.Sprintf("%d", count))
 
 	return request
 }

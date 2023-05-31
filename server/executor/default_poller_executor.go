@@ -70,7 +70,7 @@ func NewPollerExecutor(
 	eventEmitter EventEmitter,
 ) PollerExecutor {
 
-	pollerExecutor := &DefaultPollerExecutor{
+	defaultExecutor := &DefaultPollerExecutor{
 		ppGetter:     ppGetter,
 		updater:      updater,
 		newTraceDBFn: newTraceDBFn,
@@ -78,9 +78,11 @@ func NewPollerExecutor(
 		eventEmitter: eventEmitter,
 	}
 
+	selectedBasedExecutor := NewSelectorBasedPoller(defaultExecutor)
+
 	return &InstrumentedPollerExecutor{
 		tracer:         tracer,
-		pollerExecutor: pollerExecutor,
+		pollerExecutor: selectedBasedExecutor,
 	}
 }
 
