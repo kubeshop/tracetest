@@ -92,6 +92,8 @@ func newRunnerFacades(
 		eventEmitter,
 	)
 
+	pollerExecutor = executor.NewSelectorBasedPoller(pollerExecutor)
+
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
 		ppRepo,
