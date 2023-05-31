@@ -23,7 +23,7 @@ import (
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/websocket"
-	linter_resource "github.com/kubeshop/tracetest/server/linter/resource"
+	linterResource "github.com/kubeshop/tracetest/server/linter/resource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
@@ -196,7 +196,7 @@ func (app *App) Start(opts ...appOption) error {
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastoreresource.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
-	linterRepo := linter_resource.NewRepository(db)
+	linterRepo := linterResource.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
@@ -317,12 +317,12 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 	})
 }
 
-func registerlinterResource(linterRepo *linter_resource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[linter_resource.Linter](
-		linter_resource.ResourceName,
-		linter_resource.ResourceNamePlural,
+func registerlinterResource(linterRepo *linterResource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[linterResource.Linter](
+		linterResource.ResourceName,
+		linterResource.ResourceNamePlural,
 		linterRepo,
-		resourcemanager.WithOperations(linter_resource.Operations...),
+		resourcemanager.WithOperations(linterResource.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

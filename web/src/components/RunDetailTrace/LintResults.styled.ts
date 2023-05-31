@@ -9,6 +9,8 @@ export const Container = styled.div`
 export const Title = styled(Typography.Title)`
   && {
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
   }
 `;
 

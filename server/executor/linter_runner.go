@@ -8,7 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/linter"
-	linter_resource "github.com/kubeshop/tracetest/server/linter/resource"
+	linterResource "github.com/kubeshop/tracetest/server/linter/resource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -28,12 +28,12 @@ func (r LinterRequest) Context() context.Context {
 }
 
 type LinterRunner interface {
-	Runlinter(ctx context.Context, request LinterRequest)
+	RunLinter(ctx context.Context, request LinterRequest)
 	WorkerPool
 }
 
 type LinterResourceGetter interface {
-	GetDefault(ctx context.Context) linter_resource.Linter
+	GetDefault(ctx context.Context) linterResource.Linter
 }
 
 type defaultlinterRunner struct {
@@ -99,7 +99,7 @@ func (e *defaultlinterRunner) startWorker() {
 			shouldSkip, reason := linter.ShouldSkip()
 			if shouldSkip {
 				log.Printf("[linterRunner] Skipping Tracelinter. Reason %s\n", reason)
-				err := e.eventEmitter.Emit(ctx, events.TracelinterSkip(request.Test.ID, request.Run.ID, reason))
+				err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID, reason))
 				if err != nil {
 					log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 				}
@@ -124,7 +124,7 @@ func (e *defaultlinterRunner) startWorker() {
 			log.Printf("[linterRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
 
 			if err != nil {
-				log.Printf("[linterRunner] Test %s Run %d: error with runlinterAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
+				log.Printf("[linterRunner] Test %s Run %d: error with runlinterRunLinterAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
 				return
 			}
 
@@ -139,7 +139,7 @@ func (e *defaultlinterRunner) startWorker() {
 	}
 }
 
-func (e *defaultlinterRunner) Runlinter(ctx context.Context, request LinterRequest) {
+func (e *defaultlinterRunner) RunLinter(ctx context.Context, request LinterRequest) {
 	carrier := propagation.MapCarrier{}
 	otel.GetTextMapPropagator().Inject(ctx, carrier)
 	request.carrier = carrier
@@ -155,11 +155,11 @@ func (e *defaultlinterRunner) onFinish(ctx context.Context, request LinterReques
 	e.assertionRunner.RunAssertions(ctx, assertionRequest)
 }
 
-func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, linterResource linter_resource.Linter) (model.Run, error) {
+func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, linterResource linterResource.Linter) (model.Run, error) {
 	run := request.Run
 	log.Printf("[linterRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
-	err := e.eventEmitter.Emit(ctx, events.TracelinterStart(request.Test.ID, request.Run.ID))
+	err := e.eventEmitter.Emit(ctx, events.TraceLinterStart(request.Test.ID, request.Run.ID))
 	if err != nil {
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterStart event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 	}
@@ -176,7 +176,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
-	err = e.eventEmitter.Emit(ctx, events.TracelinterSuccess(request.Test.ID, request.Run.ID))
+	err = e.eventEmitter.Emit(ctx, events.TraceLinterSuccess(request.Test.ID, request.Run.ID))
 	if err != nil {
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSuccess event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 	}
@@ -186,7 +186,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 
 func (e *defaultlinterRunner) onError(ctx context.Context, request LinterRequest, run model.Run, err error) (model.Run, error) {
 	log.Printf("[linterRunner] Test %s Run %d: Linter failed. Reason: %s\n", request.Test.ID, request.Run.ID, err.Error())
-	anotherErr := e.eventEmitter.Emit(ctx, events.TracelinterError(request.Test.ID, request.Run.ID, err))
+	anotherErr := e.eventEmitter.Emit(ctx, events.TraceLinterError(request.Test.ID, request.Run.ID, err))
 	if anotherErr != nil {
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
 	}

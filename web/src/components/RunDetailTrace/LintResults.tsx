@@ -7,9 +7,11 @@ import Span from 'models/Span.model';
 import Trace from 'models/Trace.model';
 import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
+import {DISCORD_URL, OCTOLIINT_ISSUE_URL} from 'constants/Common.constants';
 import * as S from './LintResults.styled';
 import LintScore from '../LintScore/LintScore';
 import CollapseIcon from './CollapseIcon';
+import BetaBadge from '../BetaBadge/BetaBadge';
 
 interface IProps {
   linterResult: LinterResult;
@@ -33,11 +35,15 @@ const LintResults = ({linterResult, trace}: IProps) => {
 
   return (
     <S.Container>
-      <S.Title level={2}>Linter Results</S.Title>
+      <S.Title level={2}>
+        Linter Results <BetaBadge />
+      </S.Title>
       <S.Description>
         The Tracetest Linter its a plugin based framework used to analyze Open Telemetry traces to help teams improve
         their instrumentation data, find potential problems and provide tips to fix the problems. If you want to disable
-        the linter for all tests, go to the <Link to="/settings">settings page</Link>.
+        the linter for all tests, go to the <Link to="/settings">settings page</Link>. We have released this initial
+        version to get feedback from the community. Have thoughts about how to improve the Tracetest Linter? Add to this
+        <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or <a href={DISCORD_URL}>Discord</a>!
       </S.Description>
 
       <Row gutter={[16, 16]}>

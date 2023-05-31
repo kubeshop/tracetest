@@ -7,7 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
-	linter_resource "github.com/kubeshop/tracetest/server/linter/resource"
+	linterResource "github.com/kubeshop/tracetest/server/linter/resource"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -53,7 +53,7 @@ func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.Asser
 func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastoreresource.Repository,
-	lintRepo *linter_resource.Repository,
+	lintRepo *linterResource.Repository,
 	testDB model.Repository,
 	transactions *tests.TransactionsRepository,
 	appTracer trace.Tracer,

@@ -196,7 +196,7 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 		Run:  job.run,
 	}
 
-	tp.linterRunner.Runlinter(job.ctx, linterRequest)
+	tp.linterRunner.RunLinter(job.ctx, linterRequest)
 }
 
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, string) {
