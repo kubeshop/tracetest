@@ -42,3 +42,9 @@ export const LinterPluginsContainer = styled.div`
   padding: 24px 24px 0;
   border-top: 1px solid ${({theme}) => theme.color.borderLight};
 `;
+
+export const LinterPluginList = styled.ul`
+  && {
+    list-style-type: disc;
+  }
+`;

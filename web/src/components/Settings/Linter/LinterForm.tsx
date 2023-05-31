@@ -1,11 +1,11 @@
-import {Button, Form, Input, Switch, Typography} from 'antd';
+import {Button, Form, Input, Switch} from 'antd';
 import {useEffect} from 'react';
 
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import SettingService from 'services/Setting.service';
 import {ResourceType, TDraftLinter} from 'types/Settings.types';
-import Plugin from './Plugin';
+// import Plugin from './Plugin';
 import * as S from '../common/Settings.styled';
 
 const FORM_ID = 'linter';
@@ -14,10 +14,6 @@ const LinterForm = () => {
   const [form] = Form.useForm<TDraftLinter>();
   const {isLoading, onSubmit} = useSettings();
   const {linter} = useSettingsValues();
-  const standardsEnabled = Form.useWatch(['plugins', 0, 'enabled'], form);
-  const securityEnabled = Form.useWatch(['plugins', 1, 'enabled'], form);
-  const commonEnabled = Form.useWatch(['plugins', 2, 'enabled'], form);
-  const pluginsEnabled = [standardsEnabled, securityEnabled, commonEnabled];
 
   useEffect(() => {
     form.resetFields();
@@ -41,10 +37,10 @@ const LinterForm = () => {
       <Form.Item hidden name="name" />
 
       <S.SwitchContainer>
-        <label htmlFor={`${FORM_ID}_enabled`}>Enable global linter</label>
         <Form.Item name="enabled" valuePropName="checked">
           <Switch />
         </Form.Item>
+        <label htmlFor={`${FORM_ID}_enabled`}>Enable Linter for All Tests</label>
       </S.SwitchContainer>
 
       <Form.Item
@@ -53,15 +49,15 @@ const LinterForm = () => {
         rules={[{required: true, message: 'Minimum score is required'}]}
         wrapperCol={{span: 8}}
       >
-        <Input placeholder="100" type="number" />
+        <Input placeholder="0 to 100" type="number" />
       </Form.Item>
 
-      <Typography.Title level={3}>Plugins</Typography.Title>
+      {/* <Typography.Title level={3}>Plugins</Typography.Title>
       <S.LinterPluginsContainer>
         {linter.plugins.map((plugin, index) => (
-          <Plugin formId={FORM_ID} index={index} key={plugin.name} isEnabled={pluginsEnabled[index]} plugin={plugin} />
+          <Plugin formId={FORM_ID} index={index} key={plugin.name} plugin={plugin} />
         ))}
-      </S.LinterPluginsContainer>
+      </S.LinterPluginsContainer> */}
 
       <S.FooterContainer>
         <Button htmlType="submit" loading={isLoading} type="primary">

@@ -1,4 +1,4 @@
-import {CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, CloseCircleFilled, DownOutlined, UpOutlined} from '@ant-design/icons';
 import {Button, Collapse, Progress, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -7,6 +7,14 @@ export const Container = styled.div`
 `;
 
 export const Title = styled(Typography.Title)`
+  && {
+    margin-bottom: 8px;
+  }
+`;
+
+export const Description = styled(Typography.Paragraph).attrs({
+  type: 'secondary',
+})`
   && {
     margin-bottom: 30px;
   }
@@ -101,4 +109,25 @@ export const FailedIcon = styled(CloseCircleFilled)<{$small?: boolean}>`
 export const SpanButton = styled(Button)<{$error?: boolean}>`
   color: ${({theme, $error}) => ($error ? theme.color.error : theme.color.success)};
   padding-left: 0;
+`;
+
+export const CollapseIconContainer = styled.div`
+  display: flex;
+  position: absolute;
+  top: 25%;
+  right: 16px;
+  border-left: 1px solid ${({theme}) => theme.color.borderLight}};
+  padding-left: 14px;
+  height: 24px;
+  align-items: center;
+`;
+
+export const DownCollapseIcon = styled(DownOutlined)`
+  opacity: 0.5;
+  font-size: ${({theme}) => theme.size.xs};
+`;
+
+export const UpCollapseIcon = styled(UpOutlined)`
+  opacity: 0.5;
+  font-size: ${({theme}) => theme.size.xs};
 `;

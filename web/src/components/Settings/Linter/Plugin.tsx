@@ -1,15 +1,14 @@
-import {Checkbox, Form, Switch} from 'antd';
+import {Form, Switch} from 'antd';
 import {LinterPlugin} from 'models/Linter.model';
 import * as S from '../common/Settings.styled';
 
 interface IProps {
   formId: string;
   index: number;
-  isEnabled: boolean;
   plugin: LinterPlugin;
 }
 
-const Plugin = ({formId, index, isEnabled, plugin}: IProps) => {
+const Plugin = ({formId, index, plugin}: IProps) => {
   return (
     <>
       <Form.Item hidden name={['plugins', index, 'name']} />
@@ -19,12 +18,6 @@ const Plugin = ({formId, index, isEnabled, plugin}: IProps) => {
           <Switch />
         </Form.Item>
       </S.SwitchContainer>
-
-      {isEnabled && (
-        <Form.Item name={['plugins', index, 'required']} valuePropName="checked" wrapperCol={{span: 8}}>
-          <Checkbox>Required</Checkbox>
-        </Form.Item>
-      )}
     </>
   );
 };

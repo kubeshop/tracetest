@@ -1,4 +1,5 @@
 import {CaretUpFilled} from '@ant-design/icons';
+import {Link} from 'react-router-dom';
 import {Col, Collapse, Row, Space, Tooltip, Typography} from 'antd';
 import {useCallback} from 'react';
 import LinterResult from 'models/LinterResult.model';
@@ -8,6 +9,7 @@ import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
 import * as S from './LintResults.styled';
 import LintScore from '../LintScore/LintScore';
+import CollapseIcon from './CollapseIcon';
 
 interface IProps {
   linterResult: LinterResult;
@@ -31,16 +33,22 @@ const LintResults = ({linterResult, trace}: IProps) => {
 
   return (
     <S.Container>
-      <S.Title level={2}>Lint results</S.Title>
-
-      <S.ScoreContainer>
-        <Tooltip title="Tracetest core system supports linter evaluation as part of the testing capabilities.">
-          <S.Subtitle level={3}>Trace Lint Result</S.Subtitle>{' '}
-          <LintScore score={linterResult.score} passed={linterResult.passed} />
-        </Tooltip>
-      </S.ScoreContainer>
+      <S.Title level={2}>Linter Results</S.Title>
+      <S.Description>
+        The Tracetest Linter its a plugin based framework used to analyze Open Telemetry traces to help teams improve
+        their instrumentation data, find potential problems and provide tips to fix the problems. If you want to disable
+        the linter for all tests, go to the <Link to="/settings">settings page</Link>.
+      </S.Description>
 
       <Row gutter={[16, 16]}>
+        <Col span={8} key="avg_result">
+          <Tooltip title="Tracetest core system supports linter evaluation as part of the testing capabilities.">
+            <S.ScoreContainer>
+              <S.Subtitle level={3}>Trace Lint Result</S.Subtitle>{' '}
+              <LintScore score={linterResult.score} passed={linterResult.passed} />
+            </S.ScoreContainer>
+          </Tooltip>
+        </Col>
         {linterResult?.plugins?.map(plugin => (
           <Col span={8} key={plugin.name}>
             <Tooltip title={plugin.description}>
@@ -53,7 +61,7 @@ const LintResults = ({linterResult, trace}: IProps) => {
         ))}
       </Row>
 
-      <Collapse expandIcon={() => null}>
+      <Collapse expandIcon={({isActive = false}) => <CollapseIcon isCollapsed={isActive} />}>
         {linterResult?.plugins?.map(plugin => (
           <S.PluginPanel
             header={
