@@ -21,6 +21,15 @@ func IOReadCloserToString(r io.ReadCloser) string {
 	return string(b)
 }
 
+func ReadFileContent(filePath string) (string, error) {
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(fileContent), nil
+}
+
 func StringReferencesFile(path string) bool {
 	// for the current working dir, check if the file exists
 	// by finding its absolute path and executing a stat command
