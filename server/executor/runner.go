@@ -243,7 +243,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 		if isConnectionError(err) {
 			r.emitUnreachableEndpointEvent(job, err)
 
-			if isTargetLocalhost(job, err) && isServerRunningInsideContainer() {
+			if isTargetLocalhost(job) && isServerRunningInsideContainer() {
 				r.emitMismatchEndpointEvent(job, err)
 			}
 		}
@@ -331,7 +331,7 @@ func isConnectionError(err error) bool {
 	return false
 }
 
-func isTargetLocalhost(job execReq, err error) bool {
+func isTargetLocalhost(job execReq) bool {
 	var endpoint string
 	switch job.test.ServiceUnderTest.Type {
 	case model.TriggerTypeHTTP:

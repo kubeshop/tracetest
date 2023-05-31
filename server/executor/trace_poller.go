@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"go.opentelemetry.io/otel/propagation"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -72,25 +73,42 @@ type tracePoller struct {
 }
 
 type PollingRequest struct {
-	ctx        context.Context
-	test       model.Test
-	run        model.Run
-	count      int
-	hadRequeue bool
+	test    model.Test
+	run     model.Run
+	count   int
+	headers map[string]string
+}
+
+func (r PollingRequest) Context() context.Context {
+	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+	return propagator.Extract(context.Background(), propagation.MapCarrier(r.headers))
+}
+
+func (pr *PollingRequest) SetHeader(name, value string) {
+	pr.headers[name] = value
+}
+
+func (pr *PollingRequest) Header(name string) string {
+	return pr.headers[name]
 }
 
 func (pr PollingRequest) IsFirstRequest() bool {
-	return !pr.hadRequeue
+	return pr.Header("requeued") != "true"
 }
 
 func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
-	return &PollingRequest{
-		ctx:        ctx,
-		test:       test,
-		run:        run,
-		count:      count,
-		hadRequeue: false,
+	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+
+	request := &PollingRequest{
+		test:    test,
+		run:     run,
+		headers: make(map[string]string),
 	}
+
+	propagator.Inject(ctx, propagation.MapCarrier(request.headers))
+	request.SetHeader("count", fmt.Sprintf("%d", count))
+
+	return request
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -135,15 +153,16 @@ func (tp tracePoller) enqueueJob(job PollingRequest) {
 }
 
 func (tp tracePoller) processJob(job PollingRequest) {
+	ctx := job.Context()
 	select {
 	default:
-	case <-job.ctx.Done():
+	case <-ctx.Done():
 		log.Printf("[TracePoller] Context cancelled.")
 		return
 	}
 
 	if job.IsFirstRequest() {
-		err := tp.eventEmitter.Emit(job.ctx, events.TraceFetchingStart(job.test.ID, job.run.ID))
+		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.test.ID, job.run.ID))
 		if err != nil {
 			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.test.ID, job.run.ID, err.Error())
 		}
@@ -157,12 +176,12 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		jobFailed, reason := tp.handleTraceDBError(job, err)
 
 		if jobFailed {
-			anotherErr := tp.eventEmitter.Emit(job.ctx, events.TracePollingError(job.test.ID, job.run.ID, reason, err))
+			anotherErr := tp.eventEmitter.Emit(ctx, events.TracePollingError(job.test.ID, job.run.ID, reason, err))
 			if anotherErr != nil {
 				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
 			}
 
-			anotherErr = tp.eventEmitter.Emit(job.ctx, events.TraceFetchingError(job.test.ID, job.run.ID, err))
+			anotherErr = tp.eventEmitter.Emit(ctx, events.TraceFetchingError(job.test.ID, job.run.ID, err))
 			if anotherErr != nil {
 				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
 			}
@@ -179,12 +198,12 @@ func (tp tracePoller) processJob(job PollingRequest) {
 
 	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, finishReason, job.count+1, len(run.Trace.Flat))
 
-	err = tp.eventEmitter.Emit(job.ctx, events.TraceFetchingSuccess(job.test.ID, job.run.ID))
+	err = tp.eventEmitter.Emit(ctx, events.TraceFetchingSuccess(job.test.ID, job.run.ID))
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingSuccess event: %s \n", job.test.ID, job.run.ID, err.Error())
 	}
 
-	tp.handleDBError(tp.updater.Update(job.ctx, run))
+	tp.handleDBError(tp.updater.Update(ctx, run))
 
 	job.run = run
 	tp.runAssertions(job)
@@ -196,13 +215,14 @@ func (tp tracePoller) runAssertions(job PollingRequest) {
 		Run:  job.run,
 	}
 
-	tp.linterRunner.RunLinter(job.ctx, linterRequest)
+	tp.linterRunner.RunLinter(job.Context(), linterRequest)
 }
 
 func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, string) {
 	run := job.run
+	ctx := job.Context()
 
-	profile := tp.ppGetter.GetDefault(job.ctx)
+	profile := tp.ppGetter.GetDefault(ctx)
 	if profile.Periodic == nil {
 		log.Println("[TracePoller] cannot get polling profile.")
 		return true, "Cannot get polling profile"
@@ -237,7 +257,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 		"finalState": string(run.State),
 	})
 
-	tp.handleDBError(tp.updater.Update(job.ctx, run))
+	tp.handleDBError(tp.updater.Update(ctx, run))
 
 	tp.subscriptionManager.PublishUpdate(subscription.Message{
 		ResourceID: run.TransactionStepResourceID(),
@@ -250,11 +270,11 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 
 func (tp tracePoller) requeue(job PollingRequest) {
 	go func() {
-		pp := *tp.ppGetter.GetDefault(job.ctx).Periodic
+		pp := *tp.ppGetter.GetDefault(job.Context()).Periodic
 		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
 		time.Sleep(pp.RetryDelayDuration())
 
-		job.hadRequeue = true
+		job.SetHeader("requeued", "true")
 		tp.enqueueJob(job)
 	}()
 }

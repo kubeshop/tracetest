@@ -30,7 +30,7 @@ type InstrumentedPollerExecutor struct {
 }
 
 func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
-	_, span := pe.tracer.Start(request.ctx, "Fetch trace")
+	_, span := pe.tracer.Start(request.Context(), "Fetch trace")
 	defer span.End()
 
 	finished, finishReason, run, err := pe.pollerExecutor.ExecuteRequest(request)
@@ -101,8 +101,9 @@ func (pe DefaultPollerExecutor) traceDB(ctx context.Context) (tracedb.TraceDB, e
 func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
 	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
 	run := request.run
+	ctx := request.Context()
 
-	traceDB, err := pe.traceDB(request.ctx)
+	traceDB, err := pe.traceDB(ctx)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s\n", request.test.ID, request.run.ID, err.Error())
 		return false, "", model.Run{}, err
@@ -110,26 +111,30 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 
 	if request.IsFirstRequest() {
 		if testableTraceDB, ok := traceDB.(tracedb.TestableTraceDB); ok {
-			connectionResult := testableTraceDB.TestConnection(request.ctx)
+			connectionResult := testableTraceDB.TestConnection(ctx)
 
-			err = pe.eventEmitter.Emit(request.ctx, events.TraceDataStoreConnectionInfo(request.test.ID, request.run.ID, connectionResult))
+			err = pe.eventEmitter.Emit(ctx, events.TraceDataStoreConnectionInfo(request.test.ID, request.run.ID, connectionResult))
 			if err != nil {
 				log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 			}
 		}
 
 		endpoints := traceDB.GetEndpoints()
-		ds, err := pe.dsRepo.Current(request.ctx)
-		err = pe.eventEmitter.Emit(request.ctx, events.TracePollingStart(request.test.ID, request.run.ID, string(ds.Type), endpoints))
+		ds, err := pe.dsRepo.Current(ctx)
+		if err != nil {
+			return false, "", model.Run{}, fmt.Errorf("could not get current datastore: %w", err)
+		}
+
+		err = pe.eventEmitter.Emit(ctx, events.TracePollingStart(request.test.ID, request.run.ID, string(ds.Type), endpoints))
 		if err != nil {
 			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingStart event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 		}
 	}
 
 	traceID := run.TraceID.String()
-	trace, err := traceDB.GetTraceByID(request.ctx, traceID)
+	trace, err := traceDB.GetTraceByID(ctx, traceID)
 	if err != nil {
-		anotherErr := pe.eventEmitter.Emit(request.ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, 0, request.count, false, err.Error()))
+		anotherErr := pe.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, 0, request.count, false, err.Error()))
 		if anotherErr != nil {
 			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, anotherErr.Error())
 		}
@@ -141,7 +146,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 	trace.ID = run.TraceID
 	done, reason := pe.donePollingTraces(request, traceDB, trace)
 	if !done {
-		err := pe.eventEmitter.Emit(request.ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, len(trace.Flat), request.count, false, reason))
+		err := pe.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, len(trace.Flat), request.count, false, reason))
 		if err != nil {
 			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 		}
@@ -152,7 +157,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 		return false, "", run, nil
 	}
 
-	err = pe.eventEmitter.Emit(request.ctx, events.TracePollingSuccess(request.test.ID, request.run.ID, reason))
+	err = pe.eventEmitter.Emit(ctx, events.TracePollingSuccess(request.test.ID, request.run.ID, reason))
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", request.test.ID, request.run.ID, err.Error())
 	}
@@ -176,7 +181,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 	fmt.Printf("[PollerExecutor] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d \n", run.ID, request.count+1, len(run.Trace.Flat))
 
 	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", request.test.ID, request.run.ID)
-	err = pe.updater.Update(request.ctx, run)
+	err = pe.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s\n", request.test.ID, request.run.ID, err.Error())
 		return false, "", model.Run{}, err
@@ -189,7 +194,7 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
-	pp := *pe.ppGetter.GetDefault(job.ctx).Periodic
+	pp := *pe.ppGetter.GetDefault(job.Context()).Periodic
 	maxTracePollRetry := pp.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == maxTracePollRetry {
