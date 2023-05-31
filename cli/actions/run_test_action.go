@@ -112,6 +112,17 @@ func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath 
 		return "", err
 	}
 
+	if t, err := f.Definition().Test(); err == nil && t.Trigger.Type == "grpc" {
+		newFile, err := getUpdatedTestWithGrpcTrigger(f, t)
+		if err != nil {
+			return "", err
+		}
+
+		if newFile != nil { // has new file, update it
+			f = *newFile
+		}
+	}
+
 	body, _, err := a.client.ApiApi.
 		UpsertDefinition(ctx).
 		TextDefinition(openapi.TextDefinition{
@@ -179,6 +190,17 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		f, err = file.New(f.Path(), updated)
 		if err != nil {
 			return fmt.Errorf(`cannot recreate updated file: %w`, err)
+		}
+	}
+
+	if t, err := f.Definition().Test(); err == nil && t.Trigger.Type == "grpc" {
+		newFile, err := getUpdatedTestWithGrpcTrigger(f, t)
+		if err != nil {
+			return err
+		}
+
+		if newFile != nil { // has new file, update it
+			f = *newFile
 		}
 	}
 
@@ -577,4 +599,37 @@ func getTestRunIDFromString(testRunIDAsString string) int32 {
 
 func getTestRunID(testRun openapi.TestRun) int32 {
 	return getTestRunIDFromString(testRun.GetId())
+}
+
+func getUpdatedTestWithGrpcTrigger(f file.File, t yaml.Test) (*file.File, error) {
+	protobufFile := filepath.Join(f.AbsDir(), t.Trigger.GRPC.ProtobufFile)
+
+	if !utils.StringReferencesFile(protobufFile) {
+		return nil, nil
+	}
+
+	// referencing a file, keep the value
+	fileContent, err := utils.ReadFileContent(protobufFile)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot read protobuf file: %w`, err)
+	}
+
+	t.Trigger.GRPC.ProtobufFile = fileContent
+
+	def := yaml.File{
+		Type: yaml.FileTypeTest,
+		Spec: t,
+	}
+
+	updated, err := def.Encode()
+	if err != nil {
+		return nil, fmt.Errorf(`cannot encode updated test: %w`, err)
+	}
+
+	f, err = file.New(f.Path(), updated)
+	if err != nil {
+		return nil, fmt.Errorf(`cannot recreate updated file: %w`, err)
+	}
+
+	return &f, nil
 }

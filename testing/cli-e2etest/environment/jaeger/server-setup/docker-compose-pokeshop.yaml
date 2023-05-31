@@ -1,0 +1,112 @@
+services:
+  cache:
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      timeout: 3s
+      interval: 1s
+      retries: 60
+    image: redis:6
+    restart: unless-stopped
+
+  demo-api:
+    depends_on:
+      cache:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+    environment:
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      NPM_RUN_COMMAND: api
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      RABBITMQ_HOST: queue
+      REDIS_URL: cache
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --spider
+        - localhost:8081
+      timeout: 3s
+      interval: 1s
+      retries: 60
+    image: kubeshop/demo-pokemon-api:latest
+    ports:
+      - mode: ingress
+        target: 8081
+        published: 8081
+        protocol: tcp
+    pull_policy: always
+    restart: unless-stopped
+
+  demo-rpc:
+    depends_on:
+      cache:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+    environment:
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      NPM_RUN_COMMAND: rpc
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      RABBITMQ_HOST: queue
+      REDIS_URL: cache
+    healthcheck:
+      test:
+          - CMD
+          - lsof
+          - -i
+          - "8082"
+      timeout: 3s
+      interval: 1s
+      retries: 60
+    image: kubeshop/demo-pokemon-api:latest
+    ports:
+      - mode: ingress
+        target: 8082
+        published: 8082
+        protocol: tcp
+    pull_policy: always
+    restart: unless-stopped
+
+  demo-worker:
+    depends_on:
+      cache:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+    environment:
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      NPM_RUN_COMMAND: worker
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      RABBITMQ_HOST: queue
+      REDIS_URL: cache
+    image: kubeshop/demo-pokemon-api:latest
+    pull_policy: always
+    restart: unless-stopped
+
+  queue:
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - rabbitmq-diagnostics -q check_running
+      timeout: 5s
+      interval: 1s
+      retries: 60
+    image: rabbitmq:3.8-management
+    restart: unless-stopped
+
+networks:
+  default:
+    name: _default
