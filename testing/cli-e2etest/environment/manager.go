@@ -135,7 +135,6 @@ func (m *internalManager) Start(t *testing.T) {
 	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// give the system 1s to get everything ready
-	// time.Sleep(1 * time.Second)
 	time.Sleep(500 * time.Millisecond)
 
 	// wait until tracetest port is ready
@@ -144,6 +143,8 @@ func (m *internalManager) Start(t *testing.T) {
 	if m.pokeshopEnabled {
 		// wait for pokeshp services
 		waitForPort("8081")
+
+		time.Sleep(500 * time.Millisecond)
 		waitForPort("8082")
 	}
 
