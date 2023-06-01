@@ -43,6 +43,18 @@ up() {
   docker compose $opts up -d --remove-orphans
 }
 
+cypress-ci() {
+
+  echo "Running cypress"
+
+
+  export CYPRESS_BASE_URL=http://localhost:11633
+  export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
+
+  cd web
+  npm run cy:ci
+}
+
 cypress() {
 
   echo "Running cypress"
@@ -77,6 +89,10 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     cypress)
       CMD+=("cypress")
+      shift
+      ;;
+    cypress-ci)
+      CMD+=("cypress-ci")
       shift
       ;;
     tracetests)

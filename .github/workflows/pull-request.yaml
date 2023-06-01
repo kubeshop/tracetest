@@ -391,4 +391,4 @@ jobs:
 
       - name: Run integration tests
         run: |
-          ./run.sh cypress || (cat /tmp/docker-log; exit 1)
+          ./run.sh cypress-ci || (cat /tmp/docker-log; exit 1)
