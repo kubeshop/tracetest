@@ -24,7 +24,7 @@ on:
 
 jobs:
   run-syntehtic-monitoring:
-    name: Run syntehtic monitoring
+    name: Run synthetic monitoring
     runs-on: ubuntu-latest
     steps:
 
