@@ -38,7 +38,8 @@ func TestPollingProfileResource(t *testing.T) {
 				"strategy": "periodic",
 				"periodic": {
 					"timeout": "1m",
-					"retryDelay": "5s"
+					"retryDelay": "5s",
+					"selectorMatchRetries": 0
 				}
 			}
 		}`,
@@ -51,7 +52,8 @@ func TestPollingProfileResource(t *testing.T) {
 				"strategy": "periodic",
 				"periodic": {
 					"timeout": "1h",
-					"retryDelay": "25s"
+					"retryDelay": "25s",
+					"selectorMatchRetries": 0
 				}
 			}
 		}`,
