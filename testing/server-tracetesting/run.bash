@@ -68,7 +68,9 @@ run_test_suite_for_feature() {
   junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  $TRACETEST_CLI --verbose --config ./config.yml test run --definition $definition --environment ./tracetesting-env.yaml --wait-for-result --junit $junit_output
+  testCMD="$TRACETEST_CLI  --config ./config.yml test run --definition $definition --environment ./tracetesting-env.yaml --wait-for-result --junit $junit_output"
+  echo $testCMD
+  $testCMD
   return $?
 }
 
@@ -87,6 +89,8 @@ run_test_suite_for_feature 'transaction' || EXIT_STATUS=$?
 
 echo ""
 echo "Tests done! Exit code: $EXIT_STATUS"
+
+rm tracetesting-env.yaml
 
 exit $EXIT_STATUS
 

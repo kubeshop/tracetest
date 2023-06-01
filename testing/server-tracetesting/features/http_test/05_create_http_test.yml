@@ -30,7 +30,7 @@ spec:
           "specs": [
             {
               "selectorParsed": {
-                "query": "span[name = \"pg.query:SELECT pokeshop\"]"
+                "query": "span[name = \"pg.query:SELECT postgres\"]"
               },
               "assertions": ["attr:tracetest.selected_spans.count > 0"]
             }
