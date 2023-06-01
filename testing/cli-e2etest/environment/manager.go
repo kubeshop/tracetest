@@ -144,6 +144,7 @@ func (m *internalManager) Start(t *testing.T) {
 	if m.pokeshopEnabled {
 		// wait for pokeshp services
 		waitForPort("8081")
+		waitForPort("8082")
 	}
 
 	if m.datastoreEnabled {
