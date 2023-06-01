@@ -27,7 +27,7 @@ dist/tracetest-server: goreleaser-version generate-server $(SERVER_SRC_FILES)
 	find ./dist -name 'tracetest-server' -exec cp {} ./dist \;
 
 web/node_modules: web/package.json web/package-lock.json
-	cd web; npm ci
+	cd web; npm install
 
 WEB_SRC_FILES := $(shell find web -type f -not -path "*node_modules*" -not -path "*build*" -not -path "*cypress/videos*" -not -path "*cypress/screenshots*")
 web/build: web/node_modules $(WEB_SRC_FILES)
