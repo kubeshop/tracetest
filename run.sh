@@ -2,6 +2,8 @@
 
 set -e
 
+export TAG=${TAG:-dev}
+
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
 
 help_message() {
@@ -9,7 +11,7 @@ help_message() {
 }
 
 restart() {
-  make build-docker
+  build
   docker compose $opts kill tracetest
   docker compose $opts up -d tracetest
 }
@@ -32,6 +34,9 @@ down() {
 
 build() {
   make build-docker
+  # the previous commands builds the cli binary for linux (because its the os in docker)
+  # if the script is run on another os, like macos, we need to rebuild for the binary to match the os
+  make dist/tracetest
 }
 
 up() {

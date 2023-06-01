@@ -1,6 +1,8 @@
+VERSION=dev
+GORELEASER_VERSION=1.18.2-pro
+
 PROJECT_ROOT=${PWD}
 
-GORELEASER_VERSION=1.18.2-pro
 CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 9 | tail -n 1 |  tr -s ' ' | cut -d' ' -f2-)
 goreleaser-version:
 ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
@@ -9,6 +11,10 @@ ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
 	@printf "\033[0;33m See https://goreleaser.com/install/ \033[0m\n\n"
 	@exit 1
 endif
+
+dist/docker-image.tar:
+	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+	docker save --output dist/docker-image.tar "kubeshop/tracetest:$(VERSION)"
 
 CLI_SRC_FILES := $(shell find cli -type f)
 dist/tracetest: goreleaser-version generate-cli $(CLI_SRC_FILES)
@@ -43,8 +49,7 @@ run: build-docker ## build and run tracetest using docker compose
 	docker compose up
 build-go: dist/tracetest dist/tracetest-server ## build all go code
 build-web: web/build ## build web
-build-docker: goreleaser-version build-go build-web .goreleaser.dev.yaml ## build and tag docker image as defined in .goreleaser.dev.yaml
-	VERSION=latest goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+build-docker: goreleaser-version web/build .goreleaser.dev.yaml dist/docker-image.tar ## build and tag docker image as defined in .goreleaser.dev.yaml
 
 .PHONY: generate generate-server generate-cli generate-web
 generate: generate-server generate-cli generate-web ## generate code entities from openapi definitions for all parts of the code
@@ -94,3 +99,10 @@ server/openapi: $(OPENAPI_SRC_FILES)
 	rm -rf $(BASE)/tmp
 
 	cd $(BASE); go fmt ./...
+
+
+.PHONY: clean
+clean:
+	rm -rf dist
+	rm -rf web/build
+	rm -rf web/node_modules
