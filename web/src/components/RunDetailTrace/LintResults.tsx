@@ -36,21 +36,21 @@ const LintResults = ({linterResult, trace}: IProps) => {
   return (
     <S.Container>
       <S.Title level={2}>
-        Linter Results <BetaBadge />
+        Analyzer Results <BetaBadge />
       </S.Title>
       <S.Description>
-        The Tracetest Linter its a plugin based framework used to analyze Open Telemetry traces to help teams improve
+        The Tracetest Analyzer its a plugin based framework used to analyze OpenTelemetry traces to help teams improve
         their instrumentation data, find potential problems and provide tips to fix the problems. If you want to disable
-        the linter for all tests, go to the <Link to="/settings">settings page</Link>. We have released this initial
-        version to get feedback from the community. Have thoughts about how to improve the Tracetest Linter? Add to this
-        <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or <a href={DISCORD_URL}>Discord</a>!
+        the analyzer for all tests, go to the <Link to="/settings?tab=analyzer">settings page</Link>. We have released
+        this initial version to get feedback from the community. Have thoughts about how to improve the Tracetest
+        Analyzer? Add to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or <a href={DISCORD_URL}>Discord</a>!
       </S.Description>
 
       <Row gutter={[16, 16]}>
         <Col span={8} key="avg_result">
-          <Tooltip title="Tracetest core system supports linter evaluation as part of the testing capabilities.">
+          <Tooltip title="Tracetest core system supports analyzer evaluation as part of the testing capabilities.">
             <S.ScoreContainer>
-              <S.Subtitle level={3}>Trace Lint Result</S.Subtitle>{' '}
+              <S.Subtitle level={3}>Trace Analyzer Result</S.Subtitle>{' '}
               <LintScore score={linterResult.score} passed={linterResult.passed} />
             </S.ScoreContainer>
           </Tooltip>

@@ -39,7 +39,7 @@ const Header = ({span, assertions = {}}: IProps) => {
         <Space>
           <SSpanNode.BadgeType $hasMargin count={SemanticGroupNamesToText[type]} $type={type} />
           {!!lintErrors.length && (
-            <Tooltip title="This span has lint errors">
+            <Tooltip title="The analyzer found errors in this span">
               <S.LintErrorIcon />
             </Tooltip>
           )}

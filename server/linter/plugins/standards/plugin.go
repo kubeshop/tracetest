@@ -18,7 +18,7 @@ var (
 func NewStandardsPlugin() model.Plugin {
 	return StandardsPlugin{
 		BasePlugin: model.BasePlugin{
-			Name:        "Global Standards",
+			Name:        "OTel Semantic Conventions",
 			Description: "Enforce standards for spans and attributes",
 			Rules: []model.Rule{
 				rules.NewEnsureSpanNamingRule(),

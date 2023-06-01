@@ -16,7 +16,7 @@ type Repository struct {
 
 var defaultlinter = Linter{
 	ID:           id.ID("current"),
-	Name:         "linter",
+	Name:         "analyzer",
 	Enabled:      true,
 	MinimumScore: 0,
 	Plugins: []LinterPlugin{

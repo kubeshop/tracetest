@@ -56,11 +56,11 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
   }),
   getLinter: builder.query<Linter, unknown>({
     query: () => ({
-      url: '/linters/current',
+      url: '/analyzers/current',
       method: HTTP_METHOD.GET,
       headers: {'content-type': 'application/json'},
     }),
-    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.LinterType}],
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.AnalyzerType}],
     transformResponse: (rawLinter: TRawLinter) => Linter(rawLinter),
   }),
   createSetting: builder.mutation<undefined, {resource: TDraftResource}>({
