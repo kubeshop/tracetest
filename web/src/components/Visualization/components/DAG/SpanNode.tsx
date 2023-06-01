@@ -55,7 +55,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
             <S.LintCloseIcon onClick={() => setIsOpenLintErrors(false)} />
             <Space>
               <S.LintErrorIcon />
-              <S.LintTitle level={4}>Lint errors</S.LintTitle>
+              <S.LintTitle level={4}>Analyzer errors</S.LintTitle>
             </Space>
             <S.LintBody>
               {lintErrors.map(lintError => (

@@ -20,8 +20,13 @@ const LinterForm = () => {
   }, [form, linter]);
 
   const handleOnSubmit = (values: TDraftLinter) => {
-    values.minimumScore = parseInt(String(values?.minimumScore ?? 0), 10);
-    onSubmit([SettingService.getDraftResource(ResourceType.LinterType, values)]);
+    onSubmit([
+      SettingService.getDraftResource(ResourceType.AnalyzerType, {
+        ...values,
+        minimumScore: parseInt(String(values?.minimumScore ?? 0), 10),
+        plugins: linter.plugins,
+      }),
+    ]);
   };
 
   return (
