@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -157,7 +158,9 @@ func runnerSetup(t *testing.T) runnerFixture {
 		subscription.NewManager(),
 		tracedb.Factory(&testDB),
 		getDataStoreRepositoryMock(t),
-		eventEmitter)
+		eventEmitter,
+		defaultProfileGetter{5 * time.Second, 30 * time.Second},
+	)
 
 	mtp.Test(t)
 	return runnerFixture{
@@ -244,7 +247,7 @@ type mockTracePoller struct {
 	t *testing.T
 }
 
-func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run) {
+func (m *mockTracePoller) Poll(_ context.Context, test model.Test, run model.Run, pollingProfile pollingprofile.PollingProfile) {
 	m.Called(test.ID)
 }
 

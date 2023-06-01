@@ -92,6 +92,8 @@ func newRunnerFacades(
 		eventEmitter,
 	)
 
+	pollerExecutor = executor.NewSelectorBasedPoller(pollerExecutor, eventEmitter)
+
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
 		ppRepo,
@@ -111,6 +113,7 @@ func newRunnerFacades(
 		tracedb.Factory(testDB),
 		dsRepo,
 		eventEmitter,
+		ppRepo,
 	)
 
 	transactionRunner := executor.NewTransactionRunner(

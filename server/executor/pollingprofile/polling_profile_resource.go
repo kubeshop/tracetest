@@ -50,8 +50,9 @@ type PollingProfile struct {
 }
 
 type PeriodicPollingConfig struct {
-	RetryDelay string `json:"retryDelay"`
-	Timeout    string `json:"timeout"`
+	RetryDelay           string `json:"retryDelay"`
+	Timeout              string `json:"timeout"`
+	SelectorMatchRetries int    `json:"selectorMatchRetries"`
 }
 
 func (ppc *PeriodicPollingConfig) TimeoutDuration() time.Duration {

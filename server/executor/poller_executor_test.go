@@ -456,7 +456,7 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	}
 
 	for i, value := range expectedValues {
-		request := executor.NewPollingRequest(ctx, test, run, i)
+		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
 
 		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(request)
 		run = anotherRun // should store a run to use in another iteration
