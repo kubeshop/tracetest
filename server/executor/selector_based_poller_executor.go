@@ -1,9 +1,11 @@
 package executor
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/model/events"
 )
 
 const (
@@ -34,15 +36,41 @@ func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (b
 
 	currentNumberTries := pe.getNumberTries(request)
 	if currentNumberTries >= maxNumberRetries {
-		return true, "not all selectors matched, but trace haven't changed in a while", run, err
+		pe.eventEmitter.Emit(request.Context(), events.TracePollingIterationInfo(
+			request.test.ID,
+			request.run.ID,
+			len(request.run.Trace.Flat),
+			request.count,
+			true,
+			fmt.Sprintf("Some selectors did not match any spans in the current trace, but after %d tries, the trace probably won't change", currentNumberTries),
+		))
+		return true, "", run, err
 	}
 
 	allSelectorsMatchSpans := pe.allSelectorsMatchSpans(request)
 	if allSelectorsMatchSpans {
-		return true, "all selectors have matched one or more spans", run, err
+		pe.eventEmitter.Emit(request.Context(), events.TracePollingIterationInfo(
+			request.test.ID,
+			request.run.ID,
+			len(request.run.Trace.Flat),
+			request.count,
+			true,
+			"All selectors from the test matched at least one span in the current trace",
+		))
+		return true, "", run, err
 	}
 
 	request.SetHeaderInt(selectorBasedPollerExecutorRetryHeader, currentNumberTries+1)
+
+	pe.eventEmitter.Emit(request.Context(), events.TracePollingIterationInfo(
+		request.test.ID,
+		request.run.ID,
+		len(request.run.Trace.Flat),
+		request.count,
+		false,
+		"All selectors from your test must match at least one span in the trace, some of them did not match any",
+	))
+
 	return false, "not all selectors got matching spans in the trace", run, err
 }
 
