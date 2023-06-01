@@ -6,7 +6,7 @@ const Linter = () => (
   <S.Container>
     <S.Description>
       <p>
-        This beta release of the Tracetest Analyzer its a plugin based framework used to audit Open Telemetry traces to
+        This beta release of the Tracetest Analyzer its a plugin based framework used to audit OpenTelemetry traces to
         help teams improve their instrumentation data, find potential problems and provide tips to fix the problems. We
         have released this initial version to get feedback from the community. Have thoughts about how to improve the
         Tracetest Analyzer? Add to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or <a href={DISCORD_URL}>Discord</a>!
@@ -14,7 +14,7 @@ const Linter = () => (
       </p>
       <S.LinterPluginList>
         <li>
-          <b>Open Telemetry Semantic Conventions.</b> Enforce standards for spans and attributes
+          <b>OpenTelemetry Semantic Conventions.</b> Enforce standards for spans and attributes
         </li>
         <li>
           <b>Security.</b> Enforce security for spans and attributes

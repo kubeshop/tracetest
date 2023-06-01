@@ -39,11 +39,11 @@ const LintResults = ({linterResult, trace}: IProps) => {
         Analyzer Results <BetaBadge />
       </S.Title>
       <S.Description>
-        The Tracetest Analyzer its a plugin based framework used to analyze Open Telemetry traces to help teams improve
+        The Tracetest Analyzer its a plugin based framework used to analyze OpenTelemetry traces to help teams improve
         their instrumentation data, find potential problems and provide tips to fix the problems. If you want to disable
-        the analyzer for all tests, go to the <Link to="/settings?tab=analyzer">settings page</Link>. We have released this initial
-        version to get feedback from the community. Have thoughts about how to improve the Tracetest Analyzer? Add to
-        this <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or <a href={DISCORD_URL}>Discord</a>!
+        the analyzer for all tests, go to the <Link to="/settings?tab=analyzer">settings page</Link>. We have released
+        this initial version to get feedback from the community. Have thoughts about how to improve the Tracetest
+        Analyzer? Add to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or <a href={DISCORD_URL}>Discord</a>!
       </S.Description>
 
       <Row gutter={[16, 16]}>
