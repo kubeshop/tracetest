@@ -555,21 +555,6 @@ func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {
 	return &dataStoreRepositoryMock{}
 }
 
-// PollingProfileGetter
-type pollingProfileGetterMock struct {
-	mock.Mock
-}
-
-func (m *pollingProfileGetterMock) GetDefault(ctx context.Context) pollingprofile.PollingProfile {
-	args := m.Called(ctx)
-	return args.Get(0).(pollingprofile.PollingProfile)
-}
-
-func getPollingProfileGetterMock(t *testing.T) executor.PollingProfileGetter {
-	t.Helper()
-	return new(pollingProfileGetterMock)
-}
-
 // EventEmitter
 func getEventEmitterMock(t *testing.T, db model.Repository) executor.EventEmitter {
 	t.Helper()

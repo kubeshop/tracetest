@@ -159,7 +159,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 		tracedb.Factory(&testDB),
 		getDataStoreRepositoryMock(t),
 		eventEmitter,
-		getPollingProfileGetterMock(t),
+		defaultProfileGetter{5 * time.Second, 30 * time.Second},
 	)
 
 	mtp.Test(t)
