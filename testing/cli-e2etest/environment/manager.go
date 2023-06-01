@@ -134,17 +134,12 @@ func (m *internalManager) Start(t *testing.T) {
 	require.NoError(t, err)
 	helpers.RequireExitCodeEqual(t, result, 0)
 
-	// give the system 1s to get everything ready
-	time.Sleep(500 * time.Millisecond)
-
 	// wait until tracetest port is ready
 	waitForPort("11633")
 
 	if m.pokeshopEnabled {
 		// wait for pokeshp services
 		waitForPort("8081")
-
-		time.Sleep(500 * time.Millisecond)
 		waitForPort("8082")
 	}
 
@@ -156,8 +151,16 @@ func (m *internalManager) Start(t *testing.T) {
 		helpers.RequireExitCodeEqual(t, result, 0)
 	}
 }
-
 func waitForPort(port string) {
+	// sometimes the containers restart after the check
+	// so by checking 3 times with a delay we increase the chances of stable success
+	for i := 0; i < 3; i++ {
+		checkPortConnection(port)
+		time.Sleep(500 * time.Millisecond)
+	}
+}
+
+func checkPortConnection(port string) {
 	// get this source file absolute path
 	// cwd changes to the dir of the test being executed
 	// we need a fixed reference to calculate path to script
