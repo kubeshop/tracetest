@@ -248,7 +248,10 @@ func (app *App) Start(opts ...appOption) error {
 	router, mappers := controller(app.cfg, testDB, transactionsRepository, tracer, environmentRepo, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
-	apiRouter := router.PathPrefix("/api").Subrouter()
+	apiRouter := router.
+		PathPrefix(app.cfg.ServerPathPrefix()).
+		PathPrefix("/api").
+		Subrouter()
 
 	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
 
