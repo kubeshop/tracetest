@@ -172,7 +172,6 @@ jobs:
 
       # go+docker
       - name: Cache Build
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
         id: cache-docker-build
         uses: actions/cache@v3
         with:
