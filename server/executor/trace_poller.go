@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/analytics"
@@ -89,12 +90,36 @@ func (pr *PollingRequest) SetHeader(name, value string) {
 	pr.headers[name] = value
 }
 
+func (pr *PollingRequest) SetHeaderInt(name string, value int) {
+	pr.headers[name] = strconv.Itoa(value)
+}
+
+func (pr *PollingRequest) SetHeaderBool(name string, value bool) {
+	pr.headers[name] = fmt.Sprintf("%t", value)
+}
+
 func (pr *PollingRequest) Header(name string) string {
 	return pr.headers[name]
 }
 
+func (pr *PollingRequest) HeaderInt(name string) int {
+	if value, err := strconv.Atoi(pr.headers[name]); err == nil {
+		return value
+	}
+
+	return 0
+}
+
+func (pr *PollingRequest) HeaderBool(name string) bool {
+	if value, err := strconv.ParseBool(pr.headers[name]); err == nil {
+		return value
+	}
+
+	return false
+}
+
 func (pr PollingRequest) IsFirstRequest() bool {
-	return pr.Header("requeued") != "true"
+	return pr.HeaderBool("requeued")
 }
 
 func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
@@ -275,7 +300,7 @@ func (tp tracePoller) requeue(job PollingRequest) {
 		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
 		time.Sleep(pp.Periodic.RetryDelayDuration())
 
-		job.SetHeader("requeued", "true")
+		job.SetHeaderBool("requeued", true)
 		job.pollingProfile = pp
 		tp.enqueueJob(job)
 	}()

@@ -1,14 +1,13 @@
 package executor
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 const (
-	selectorBasedPollerExecutorRetryHeader = "SelectorBasedPollerExecutor::retryCount"
+	selectorBasedPollerExecutorRetryHeader = "SelectorBasedPollerExecutor.retryCount"
 	selectorBasedPollerExecutorMaxTries    = 3
 )
 
@@ -23,7 +22,7 @@ func NewSelectorBasedPoller(innerPoller PollerExecutor) PollerExecutor {
 func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
 	ready, reason, run, err := pe.pollerExecutor.ExecuteRequest(request)
 	if !ready {
-		request.SetHeader(selectorBasedPollerExecutorRetryHeader, "0")
+		request.SetHeaderInt(selectorBasedPollerExecutorRetryHeader, 0)
 		return ready, reason, run, err
 	}
 
@@ -42,7 +41,7 @@ func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (b
 		return true, "all selectors have matched one or more spans", run, err
 	}
 
-	request.SetHeader(selectorBasedPollerExecutorRetryHeader, fmt.Sprintf("%d", currentNumberTries+1))
+	request.SetHeaderInt(selectorBasedPollerExecutorRetryHeader, currentNumberTries+1)
 	return false, "not all selectors got matching spans in the trace", run, err
 }
 

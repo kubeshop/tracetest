@@ -55,7 +55,7 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
 
 		assert.False(t, ready)
-		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor::retryCount"))
+		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor.retryCount"))
 	})
 
 	t.Run("should return true if default poller returns true and selectors don't match spans 3 times in a row", func(t *testing.T) {
@@ -81,15 +81,15 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 
 		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
 		assert.False(t, ready)
-		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor::retryCount"))
+		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor.retryCount"))
 
 		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
 		assert.False(t, ready)
-		assert.Equal(t, "2", request.Header("SelectorBasedPollerExecutor::retryCount"))
+		assert.Equal(t, "2", request.Header("SelectorBasedPollerExecutor.retryCount"))
 
 		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
 		assert.False(t, ready)
-		assert.Equal(t, "3", request.Header("SelectorBasedPollerExecutor::retryCount"))
+		assert.Equal(t, "3", request.Header("SelectorBasedPollerExecutor.retryCount"))
 
 		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
 		assert.True(t, ready)

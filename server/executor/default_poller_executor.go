@@ -194,8 +194,12 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
-	pp := *pe.ppGetter.GetDefault(job.Context()).Periodic
-	maxTracePollRetry := pp.MaxTracePollRetry()
+	pp := pe.ppGetter.GetDefault(job.Context())
+	if pp.Periodic == nil {
+		return false, "Polling profile not configured"
+	}
+
+	maxTracePollRetry := pp.Periodic.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == maxTracePollRetry {
 		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
