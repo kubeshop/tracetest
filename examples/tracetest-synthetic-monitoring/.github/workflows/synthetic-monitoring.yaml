@@ -23,7 +23,7 @@ on:
   - cron: '*/5 * * * *'
 
 jobs:
-  run-syntehtic-monitoring:
+  run-synthetic-monitoring:
     name: Run synthetic monitoring
     runs-on: ubuntu-latest
     steps:
