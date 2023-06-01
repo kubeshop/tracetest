@@ -138,3 +138,8 @@ THis will run the server e2e trace based testing suite, also known as [dogfoodin
 ```
 
 This resets the state, build, starts the test environment, runs the trace based test suit, and resets everything agian.
+
+**Run the web UI e2e trace based tests**
+```sh
+./run.sh down build up cypress down
+```

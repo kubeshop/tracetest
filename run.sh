@@ -52,7 +52,7 @@ cypress() {
   export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
 
   cd web
-  npm run cy:ci
+  npm run cy:run
 }
 
 tracetests() {
