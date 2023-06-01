@@ -1,4 +1,4 @@
-TRACETEST_COMMAND?="../../dist/tracetest"
+TRACETEST_CLI?="../../dist/tracetest"
 TEST_ENVIRONMENT?="jaeger"
 TAG?="dev"
 

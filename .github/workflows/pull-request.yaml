@@ -329,7 +329,7 @@ jobs:
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
-          export TRACETEST_COMMAND=$PWD/dist/tracetest
+          export TRACETEST_CLI=$PWD/dist/tracetest
           export TEST_ENVIRONMENT=jaeger
           export TAG=pr-${{ github.event.pull_request.number }}
 
