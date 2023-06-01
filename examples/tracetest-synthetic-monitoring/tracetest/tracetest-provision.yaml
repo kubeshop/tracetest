@@ -1,0 +1,6 @@
+---
+type: DataStore
+spec:
+  name: OpenTelemetry Collector
+  type: otlp
+  default: true

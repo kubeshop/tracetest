@@ -1,0 +1,12 @@
+type: Test
+spec:
+  id: K68RahA4g
+  name: Golang
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080/
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
