@@ -1,3 +1,7 @@
+TRACETEST_COMMAND?="../../dist/tracetest"
+TEST_ENVIRONMENT?="jaeger"
+TAG?="dev"
+
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"
 	@echo ""
@@ -5,4 +9,4 @@ help: Makefile ## show list of commands
 
 test: # run tests for this application
 	go clean -testcache
-	go test -timeout 150s -p 1 ./...
+	go test -v -timeout 150s -p 1 ./...
