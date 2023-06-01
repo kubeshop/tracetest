@@ -157,11 +157,6 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 		return false, "", run, nil
 	}
 
-	err = pe.eventEmitter.Emit(ctx, events.TracePollingSuccess(request.test.ID, request.run.ID, reason))
-	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", request.test.ID, request.run.ID, err.Error())
-	}
-
 	log.Printf("[PollerExecutor] Test %s Run %d: Done polling. (%s)\n", request.test.ID, request.run.ID, reason)
 
 	log.Printf("[PollerExecutor] Test %s Run %d: Start Sorting\n", request.test.ID, request.run.ID)

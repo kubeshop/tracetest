@@ -21,7 +21,7 @@ import (
 const PollingRequestStartIteration = 1
 
 type TracePoller interface {
-	Poll(context.Context, model.Test, model.Run)
+	Poll(context.Context, model.Test, model.Run, pollingprofile.PollingProfile)
 }
 
 type PersistentTracePoller interface {
@@ -122,14 +122,15 @@ func (pr PollingRequest) IsFirstRequest() bool {
 	return pr.HeaderBool("requeued")
 }
 
-func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int) *PollingRequest {
+func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int, pollingProfile pollingprofile.PollingProfile) *PollingRequest {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
 
 	request := &PollingRequest{
-		test:    test,
-		run:     run,
-		headers: make(map[string]string),
-		count:   count,
+		test:           test,
+		run:            run,
+		headers:        make(map[string]string),
+		pollingProfile: pollingProfile,
+		count:          count,
 	}
 
 	propagator.Inject(ctx, propagation.MapCarrier(request.headers))
@@ -166,10 +167,10 @@ func (tp tracePoller) Stop() {
 	tp.exit <- true
 }
 
-func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run) {
+func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run, pollingProfile pollingprofile.PollingProfile) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 
-	job := NewPollingRequest(ctx, test, run, PollingRequestStartIteration)
+	job := NewPollingRequest(ctx, test, run, PollingRequestStartIteration, pollingProfile)
 
 	tp.enqueueJob(*job)
 }
@@ -220,6 +221,11 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		job.count += 1
 		tp.requeue(job)
 		return
+	}
+
+	err = tp.eventEmitter.Emit(ctx, events.TracePollingSuccess(job.test.ID, job.run.ID, finishReason))
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", job.test.ID, job.run.ID, err.Error())
 	}
 
 	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, finishReason, job.count+1, len(run.Trace.Flat))

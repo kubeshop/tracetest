@@ -47,6 +47,7 @@ func NewPersistentRunner(
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo resourcemanager.Current[datastoreresource.DataStore],
 	eventEmitter EventEmitter,
+	ppGetter PollingProfileGetter,
 ) PersistentRunner {
 	return persistentRunner{
 		triggers:            triggers,
@@ -58,6 +59,7 @@ func NewPersistentRunner(
 		dsRepo:              dsRepo,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
+		ppGetter:            ppGetter,
 		executeQueue:        make(chan execReq, 5),
 		exit:                make(chan bool, 1),
 	}
@@ -73,6 +75,7 @@ type persistentRunner struct {
 	newTraceDBFn        traceDBFactoryFn
 	dsRepo              resourcemanager.Current[datastoreresource.DataStore]
 	eventEmitter        EventEmitter
+	ppGetter            PollingProfileGetter
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -272,7 +275,7 @@ func (r persistentRunner) processExecQueue(job execReq) {
 	if run.State == model.RunStateAwaitingTrace {
 		ctx, pollingSpan := r.tracer.Start(job.ctx, "Start Polling trace")
 		defer pollingSpan.End()
-		r.tp.Poll(ctx, job.test, run)
+		r.tp.Poll(ctx, job.test, run, r.ppGetter.GetDefault(ctx))
 	}
 }
 

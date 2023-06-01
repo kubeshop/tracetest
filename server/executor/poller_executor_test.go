@@ -456,7 +456,7 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	}
 
 	for i, value := range expectedValues {
-		request := executor.NewPollingRequest(ctx, test, run, i)
+		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
 
 		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(request)
 		run = anotherRun // should store a run to use in another iteration
@@ -553,6 +553,21 @@ func (m *dataStoreRepositoryMock) Current(ctx context.Context) (datastoreresourc
 
 func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {
 	return &dataStoreRepositoryMock{}
+}
+
+// PollingProfileGetter
+type pollingProfileGetterMock struct {
+	mock.Mock
+}
+
+func (m *pollingProfileGetterMock) GetDefault(ctx context.Context) pollingprofile.PollingProfile {
+	args := m.Called(ctx)
+	return args.Get(0).(pollingprofile.PollingProfile)
+}
+
+func getPollingProfileGetterMock(t *testing.T) executor.PollingProfileGetter {
+	t.Helper()
+	return new(pollingProfileGetterMock)
 }
 
 // EventEmitter

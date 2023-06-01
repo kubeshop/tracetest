@@ -13,10 +13,11 @@ const (
 
 type selectorBasedPollerExecutor struct {
 	pollerExecutor PollerExecutor
+	eventEmitter   EventEmitter
 }
 
-func NewSelectorBasedPoller(innerPoller PollerExecutor) PollerExecutor {
-	return selectorBasedPollerExecutor{innerPoller}
+func NewSelectorBasedPoller(innerPoller PollerExecutor, eventEmitter EventEmitter) PollerExecutor {
+	return selectorBasedPollerExecutor{innerPoller, eventEmitter}
 }
 
 func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
