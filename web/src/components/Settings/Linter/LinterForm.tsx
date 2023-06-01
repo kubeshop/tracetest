@@ -45,7 +45,7 @@ const LinterForm = () => {
         <Form.Item name="enabled" valuePropName="checked">
           <Switch />
         </Form.Item>
-        <label htmlFor={`${FORM_ID}_enabled`}>Enable Linter for All Tests</label>
+        <label htmlFor={`${FORM_ID}_enabled`}>Enable Analyzer for All Tests</label>
       </S.SwitchContainer>
 
       <Form.Item
