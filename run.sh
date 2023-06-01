@@ -7,7 +7,7 @@ export TAG=${TAG:-dev}
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
 
 help_message() {
-  echo "usage: ./run.sh [cypress|tracetests|up|build|down|logstt|logs|ps|restart]"
+  echo "usage: ./run.sh [cypress|tracetests|up|build|down|tracetest-logs|logs|ps|restart]"
 }
 
 restart() {
@@ -20,7 +20,7 @@ logs() {
   docker compose $opts logs -f
 }
 
-logstt() {
+tracetest-logs() {
   docker compose $opts logs -f tracetest
 }
 
@@ -95,8 +95,8 @@ while [[ $# -gt 0 ]]; do
       CMD+=("down")
       shift
       ;;
-    logstt)
-      CMD+=("logstt")
+    tracetest-logs)
+      CMD+=("tracetest-logs")
       shift
       ;;
     logs)

@@ -72,3 +72,69 @@ If you have any doubts about coding standards you can follow [Effective Go](http
 
 Many thanks,
 Kubeshop
+
+
+## Building, running, and e2e testing
+
+As described, the project consists of 3 main components: CLI, server, and web. Each components' directory provides a standard language way to build and test:
+
+- **Web**: uses npm. Commands such as `npm start build`, `npn ci`, etc are available.
+- **CLI**: it is a go module. It can be built with `go build .`, tests are run with `go test ./...` etc
+- **Server**: it is a go module. It can be built with `go build .`, tests are run with `go test ./...` etc
+
+**CLI** and **Server** are mainly built from the project root using [GoReleaser](https://goreleaser.com/) to simplify packaging and distribution.
+
+The server is responsible for serving both the API and the web UI. The easiest way to mix those 2 things for distribution is with docker. We rely on GoReleaser again for packaging all those things together.
+
+We also use a few environment variables to configure the build.
+
+It becomes evident that it's not very practical during development to keep all this things in mind. We provide 2 main ways to build, run and test Tracetest:
+
+### Makefile
+
+We provide a [Makefile](./Makefile) with a few targets that helps build all the parts in a development configuration without a lot of intervention. The more common used targets are:
+
+1. **make help**: shows a list of commands with a description.
+2. **make build-docker**: builds the current code (web, cli, server) and packages it all in a tagged docker image. The default image will be "kubeshop/tracetest:ev"
+3. **make build-go**: build the cli and server only
+4. **make build-go**: build the web UI only
+5. **make run**: depends on the **build-docker** target. It build the image and starts a [docker compose stack](./docker-compose.yaml). The web UI will be available at `http://localhost:111633`
+6. **make clean**: removes all built artifacts
+
+
+> **A note on go builds:**
+> When running **make build-docker**, the go binaries are built to be run inside a docker container.
+> Docker containers are always Linux, regardless of the host OS. 
+> This means that if you run **make build-docker** on a mac, the targets `dist/tracetest` and `dist/tracetest-server` won't run on the mac host.
+> You need to rebuild the go binaries (using **make build-go**)after building the docker image if you want to run them directly on the host MacOS.
+
+### run.sh script
+
+For unit tests, we rely on each languages main unit test approach (`cracto test` for web, `go test` for go). For more complex end-to-end test, it's not that simple.
+You need to have a more or less complete deployment available, with a known initial state. This can be cumbersome to setup manually, so we have the [run.sh](./run.sh) script.
+
+This script provides a few commands to help manage this test target deployment. It relies on the `Makefile` and on `docker-compose.yaml` to build and create it.
+
+#### Exmaple usage:
+
+**Build everything, and start clean**
+
+```sh
+./run.sh down build up tracetest-logs
+```
+
+This command firt resets the environment (`down` == `docker compose down`), build the docker image (`build` == `make docker-build`), starts the environment (`up` == `docker compose up -d`) and finally starts following the tracetest logs (`tracetest-logs` == `docker compose -f tracetest`)
+
+**Run the server e2e trace based tests**
+```sh
+./run.sh tracetests
+```
+
+THis will run the server e2e trace based testing suite, also known as [dogfooding](https://es.wikipedia.org/wiki/Dogfooding). This assumes the test environment is already started.
+
+**Clean, start, run tests, and reset**
+```sh
+./run.sh down build up tracetests down
+```
+
+This resets the state, build, starts the test environment, runs the trace based test suit, and resets everything agian.

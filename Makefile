@@ -102,7 +102,7 @@ server/openapi: $(OPENAPI_SRC_FILES)
 
 
 .PHONY: clean
-clean:
+clean: ## cleans the build artifacts
 	rm -rf dist
 	rm -rf web/build
 	rm -rf web/node_modules
