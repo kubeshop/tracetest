@@ -13,9 +13,6 @@ ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
 	@exit 1
 endif
 
-dist/docker-image-$(TAG).tar:
-	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
-	docker save --output dist/docker-image-$(TAG).tar "kubeshop/tracetest:$(TAG)"
 
 CLI_SRC_FILES := $(shell find cli -type f)
 dist/tracetest: goreleaser-version generate-cli $(CLI_SRC_FILES)
@@ -33,6 +30,10 @@ web/node_modules: web/package.json web/package-lock.json
 WEB_SRC_FILES := $(shell find web -type f -not -path "*node_modules*" -not -path "*build*" -not -path "*cypress/videos*" -not -path "*cypress/screenshots*")
 web/build: web/node_modules $(WEB_SRC_FILES)
 	cd web; npm run build
+
+dist/docker-image-$(TAG).tar: $(CLI_SRC_FILES) $(SERVER_SRC_FILES) $(WEB_SRC_FILES)
+	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+	docker save --output dist/docker-image-$(TAG).tar "kubeshop/tracetest:$(TAG)"
 
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"

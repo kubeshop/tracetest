@@ -44,11 +44,13 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-        - "55679:55679"
-        - "4317:4317"
-        - "8888:8888"
+      - "55679:55679"
+      - "4317:4317"
+      - "8888:8888"
     command:
-        - "--config"
-        - "/otel-local-config.yaml"
+      - "--config"
+      - "/otel-local-config.yaml"
     volumes:
-        - ./local-config/collector.config.yaml:/otel-local-config.yaml
+      - ./local-config/collector.config.yaml:/otel-local-config.yaml
+    depends_on:
+      - tracetest
