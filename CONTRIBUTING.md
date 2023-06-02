@@ -97,7 +97,7 @@ We provide a [Makefile](./Makefile) with a few targets that helps build all the 
 1. **make help**: shows a list of commands with a description.
 2. **make build-docker**: builds the current code (web, cli, server) and packages it all in a tagged docker image. The default image will be "kubeshop/tracetest:ev"
 3. **make build-go**: build the cli and server only
-4. **make build-go**: build the web UI only
+4. **make build-web**: build the web UI only
 5. **make run**: depends on the **build-docker** target. It build the image and starts a [docker compose stack](./docker-compose.yaml). The web UI will be available at `http://localhost:111633`
 6. **make clean**: removes all built artifacts
 
