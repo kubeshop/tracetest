@@ -9,9 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -46,6 +49,10 @@ func TestServerPrefix(t *testing.T) {
 	expectedEndpoint := "http://localhost:8000/tracetest"
 	tests := getTests(t, expectedEndpoint)
 	assert.NotNil(t, tests)
+
+	dataStores := getDatastores(t, expectedEndpoint)
+	assert.NotNil(t, dataStores)
+	assert.GreaterOrEqual(t, dataStores.Count, 1)
 }
 
 func getTests(t *testing.T, endpoint string) []openapi.Test {
@@ -62,4 +69,20 @@ func getTests(t *testing.T, endpoint string) []openapi.Test {
 	require.NoError(t, err)
 
 	return tests
+}
+
+func getDatastores(t *testing.T, endpoint string) resourcemanager.ResourceList[datastoreresource.DataStore] {
+	url := fmt.Sprintf("%s/api/datastores", endpoint)
+	resp, err := http.Get(url)
+	require.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
+
+	bodyJsonBytes, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	var dataStores resourcemanager.ResourceList[datastoreresource.DataStore]
+	err = yaml.Unmarshal(bodyJsonBytes, &dataStores)
+	require.NoError(t, err)
+
+	return dataStores
 }
