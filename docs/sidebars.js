@@ -149,6 +149,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "configuration/upgrade",
+          label: "Upgrade Tracetest Version",
+        },
+        {
+          type: "doc",
           id: "configuration/opentelemetry-collector-configuration-file-reference",
           label: "OpenTelemetry Collector Configuration File Reference",
         },
