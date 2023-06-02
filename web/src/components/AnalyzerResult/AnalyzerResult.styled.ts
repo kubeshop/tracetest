@@ -1,6 +1,7 @@
 import {CheckCircleFilled, CloseCircleFilled, DownOutlined, UpOutlined} from '@ant-design/icons';
 import {Button, Collapse, Progress, Typography} from 'antd';
 import styled from 'styled-components';
+import noResultsIcon from 'assets/SpanAssertionsEmptyState.svg';
 
 export const Container = styled.div`
   padding: 24px;
@@ -132,4 +133,31 @@ export const DownCollapseIcon = styled(DownOutlined)`
 export const UpCollapseIcon = styled(UpOutlined)`
   opacity: 0.5;
   font-size: ${({theme}) => theme.size.xs};
+`;
+
+export const EmptyContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 70px);
+  justify-content: center;
+  margin-top: 50px;
+`;
+
+export const EmptyIcon = styled.img.attrs({
+  src: noResultsIcon,
+})`
+  height: auto;
+  margin-bottom: 16px;
+  width: 90px;
+`;
+
+export const EmptyText = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.textSecondary};
+`;
+
+export const EmptyTitle = styled(Typography.Title).attrs({level: 3})``;
+
+export const ConfigureButtonContainer = styled.div`
+  margin-top: 6px;
 `;

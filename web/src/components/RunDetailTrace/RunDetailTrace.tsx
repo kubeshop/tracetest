@@ -12,7 +12,7 @@ import TestRunEvent from 'models/TestRunEvent.model';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import LintResults from './LintResults';
+import AnalyzerResult from '../AnalyzerResult';
 import * as S from './RunDetailTrace.styled';
 import Search from './Search';
 import Visualization from './Visualization';
@@ -75,7 +75,7 @@ const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
 
             <S.SectionRight $shouldScroll>
               {isRunStateFinished(run.state) ? (
-                <LintResults linterResult={run.linter} trace={run?.trace ?? Trace({})} />
+                <AnalyzerResult result={run.linter} trace={run?.trace ?? Trace({})} />
               ) : (
                 <SkeletonResponse />
               )}

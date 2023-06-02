@@ -1,4 +1,4 @@
-import * as S from './LintResults.styled';
+import * as S from './AnalyzerResult.styled';
 
 interface IProps {
   isCollapsed: boolean;
