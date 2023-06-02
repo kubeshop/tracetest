@@ -119,7 +119,7 @@ func (pr *PollingRequest) HeaderBool(name string) bool {
 }
 
 func (pr PollingRequest) IsFirstRequest() bool {
-	return pr.HeaderBool("requeued")
+	return !pr.HeaderBool("requeued")
 }
 
 func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int, pollingProfile pollingprofile.PollingProfile) *PollingRequest {
