@@ -1,5 +1,5 @@
 VERSION?="dev"
-TAG?="dev"
+TAG?=$(VERSION)
 GORELEASER_VERSION=1.18.2-pro
 
 PROJECT_ROOT=${PWD}
@@ -15,7 +15,7 @@ endif
 
 dist/docker-image-$(TAG).tar:
 	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
-	docker save --output dist/docker-image-$(TAG).tar "kubeshop/tracetest:$(VERSION)"
+	docker save --output dist/docker-image-$(TAG).tar "kubeshop/tracetest:$(TAG)"
 
 CLI_SRC_FILES := $(shell find cli -type f)
 dist/tracetest: goreleaser-version generate-cli $(CLI_SRC_FILES)
@@ -107,3 +107,4 @@ clean: ## cleans the build artifacts
 	rm -rf dist
 	rm -rf web/build
 	rm -rf web/node_modules
+	docker rm image "kubeshop/tracetest:$(TAG)"
