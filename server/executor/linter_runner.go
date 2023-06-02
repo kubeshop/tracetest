@@ -92,51 +92,55 @@ func (e *defaultlinterRunner) startWorker() {
 			fmt.Println("Exiting linter executor worker")
 			return
 		case request := <-e.inputChannel:
-			ctx := request.Context()
-			lintResource := e.linterResourceGetter.GetDefault(ctx)
-			linter := linter.Newlinter(lintResource, linter.AvailablePlugins...)
-
-			shouldSkip, reason := linter.ShouldSkip()
-			if shouldSkip {
-				log.Printf("[linterRunner] Skipping Tracelinter. Reason %s\n", reason)
-				err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID, reason))
-				if err != nil {
-					log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
-				}
-
-				e.onFinish(ctx, request, request.Run)
-				return
-			}
-
-			err := linter.IsValid()
-			if err != nil {
-				e.onError(ctx, request, request.Run, err)
-				return
-			}
-
-			run, err := e.onRun(ctx, request, linter, lintResource)
-			log.Printf("[linterRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
-			e.subscriptionManager.PublishUpdate(subscription.Message{
-				ResourceID: run.TransactionStepResourceID(),
-				Type:       "run_update",
-				Content:    RunResult{Run: run, Err: err},
-			})
-			log.Printf("[linterRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
-
-			if err != nil {
-				log.Printf("[linterRunner] Test %s Run %d: error with runlinterRunLinterAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
-				return
-			}
-
-			err = lintResource.ValidateResult(run.Linter)
-			if err != nil {
-				e.onError(ctx, request, run, err)
-				return
-			}
-
-			e.onFinish(ctx, request, run)
+			e.onRequest(request)
 		}
 	}
+}
+
+func (e *defaultlinterRunner) onRequest(request LinterRequest) {
+	ctx := request.Context()
+	lintResource := e.linterResourceGetter.GetDefault(ctx)
+	linter := linter.Newlinter(lintResource, linter.AvailablePlugins...)
+
+	shouldSkip, reason := linter.ShouldSkip()
+	if shouldSkip {
+		log.Printf("[linterRunner] Skipping Tracelinter. Reason %s\n", reason)
+		err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID, reason))
+		if err != nil {
+			log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		}
+
+		e.onFinish(ctx, request, request.Run)
+		return
+	}
+
+	err := linter.IsValid()
+	if err != nil {
+		e.onError(ctx, request, request.Run, err)
+		return
+	}
+
+	run, err := e.onRun(ctx, request, linter, lintResource)
+	log.Printf("[linterRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
+	e.subscriptionManager.PublishUpdate(subscription.Message{
+		ResourceID: run.TransactionStepResourceID(),
+		Type:       "run_update",
+		Content:    RunResult{Run: run, Err: err},
+	})
+	log.Printf("[linterRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
+
+	if err != nil {
+		log.Printf("[linterRunner] Test %s Run %d: error with runlinterRunLinterAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		return
+	}
+
+	err = lintResource.ValidateResult(run.Linter)
+	if err != nil {
+		e.onError(ctx, request, run, err)
+		return
+	}
+
+	e.onFinish(ctx, request, run)
 }
 
 func (e *defaultlinterRunner) RunLinter(ctx context.Context, request LinterRequest) {
