@@ -82,8 +82,9 @@ const Plugins = ({plugins, trace}: IProps) => {
                           {getSpanName(trace.spans, result.spanId)}
                         </S.SpanButton>
                         <div>
-                          {result.errors.map(error => (
-                            <div>
+                          {result.errors.map((error, index) => (
+                            // eslint-disable-next-line react/no-array-index-key
+                            <div key={index}>
                               <Typography.Text>{error}</Typography.Text>
                             </div>
                           ))}
