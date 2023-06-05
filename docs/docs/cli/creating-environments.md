@@ -24,7 +24,7 @@ spec:
 
 In order to apply this configuration to your Tracetest instance, make sure to have your [CLI configured](./configuring-your-cli.md) and run:
 
-```
+```sh
 tracetest apply environment -f <environment.yaml>
 ```
 
