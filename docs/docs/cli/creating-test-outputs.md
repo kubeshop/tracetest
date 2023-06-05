@@ -20,7 +20,7 @@ The `value` attribute is an `expression` and is a very powerful tool.
 
 ## Examples
 
-### Basic expression
+### Basic Expression
 
 You can output basic expressions:
 
