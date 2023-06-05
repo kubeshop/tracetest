@@ -13,3 +13,11 @@ spec:
   pokeshop:
     grpcEndpoint: demo-api:8082
     httpEndpoint: http://demo-api:8081
+---
+type: PollingProfile
+spec:
+  strategy: periodic
+  default: true
+  periodic:
+    timeout: 30s
+    retryDelay: 1s

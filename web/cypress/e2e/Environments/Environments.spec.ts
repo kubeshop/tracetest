@@ -1,3 +1,5 @@
+import {POKEMON_HTTP_ENDPOINT} from '../constants/Test';
+
 interface IEnvironment {
   name: string;
   description: string;
@@ -40,7 +42,7 @@ describe('Environments', () => {
   const environment1: IEnvironment = {
     name: 'Environment One',
     description: 'Description Environment One',
-    values: [{key: 'host', value: 'http://demo-pokemon-api.demo.svc.cluster.local'}],
+    values: [{key: 'host', value: POKEMON_HTTP_ENDPOINT}],
   };
   const environment2: IEnvironment = {
     name: 'Environment Two',
@@ -117,7 +119,7 @@ describe('Environments', () => {
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
 
-    cy.get('[data-cy=run-detail-trigger-response]').within(() => {
+    cy.reload().get('[data-cy=run-detail-trigger-response]').within(() => {
       cy.contains('Environment').click();
       cy.contains(environment1.values[0].key);
       cy.contains(environment1.values[0].value);

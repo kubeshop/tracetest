@@ -1,8 +1,10 @@
 package environment
 
 import (
+	"errors"
 	"fmt"
 	"path"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -110,7 +112,6 @@ func (m *internalManager) Name() string {
 }
 
 func (m *internalManager) Start(t *testing.T) {
-	readiness := 1 * time.Second
 	args := []string{
 		"compose",
 		"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
@@ -119,7 +120,6 @@ func (m *internalManager) Start(t *testing.T) {
 	}
 
 	if m.pokeshopEnabled {
-		readiness = 10 * time.Second
 		args = []string{
 			"compose",
 			"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
@@ -134,9 +134,15 @@ func (m *internalManager) Start(t *testing.T) {
 	require.NoError(t, err)
 	helpers.RequireExitCodeEqual(t, result, 0)
 
-	// TODO: think in a better way to assure readiness for Tracetest
-	// like https://golang.testcontainers.org/quickstart/ "Wait for Log" method
-	time.Sleep(readiness)
+	// wait until tracetest port is ready
+	waitForPort("11633")
+
+	if m.pokeshopEnabled {
+		// wait for pokeshop services
+		waitForPort("8081")
+		waitForPort("8082")
+		time.Sleep(10 * time.Second)
+	}
 
 	if m.datastoreEnabled {
 		cliConfig := m.GetCLIConfigPath(t)
@@ -144,6 +150,39 @@ func (m *internalManager) Start(t *testing.T) {
 
 		result = tracetestcli.Exec(t, fmt.Sprintf("apply datastore --file %s", dataStorePath), tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
+	}
+}
+func waitForPort(port string) {
+	// sometimes the containers restart after the check
+	// so by checking 3 times with a delay we increase the chances of stable success
+	for i := 0; i < 3; i++ {
+		checkPortConnection(port)
+		time.Sleep(500 * time.Millisecond)
+	}
+}
+
+func checkPortConnection(port string) {
+	// get this source file absolute path
+	// cwd changes to the dir of the test being executed
+	// we need a fixed reference to calculate path to script
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		panic(errors.New("unable to get the current filename"))
+	}
+	thisDir := filepath.Dir(filename)
+
+	script := filepath.Join(thisDir, "../../../scripts/wait-for-port.sh")
+	result, err := command.Exec(script, port)
+
+	if err != nil {
+		panic(fmt.Errorf("cannot execute script: %w", err))
+	}
+
+	if result.ExitCode != 0 {
+		fmt.Println("ERROR!!")
+		fmt.Println("exit code: ", result.ExitCode)
+		fmt.Println("output: ", result.StdOut)
+		panic("script error")
 	}
 }
 

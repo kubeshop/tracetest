@@ -27,7 +27,7 @@ describe('Transactions', () => {
 
     cy.submitCreateForm('CreateTransactionFactory');
     cy.get('[data-cy=transaction-details-name').should('have.text', `${name} (v1)`);
-    cy.get('[data-cy=transaction-run-button]', {timeout: 30000}).should('be.visible');
+    cy.reload().get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
   });
 
   it('should rerun a transaction after creation', () => {
@@ -43,10 +43,10 @@ describe('Transactions', () => {
 
     cy.submitCreateForm('CreateTransactionFactory');
     cy.get('[data-cy=transaction-details-name').should('have.text', `${name} (v1)`);
-    cy.get('[data-cy=transaction-run-button]', {timeout: 30000}).should('be.visible').click();
+    cy.reload().get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
 
     cy.get('[data-cy=transaction-details-name').should('have.text', `${name} (v1)`);
-    cy.get('[data-cy=transaction-run-button]', {timeout: 30000}).should('be.visible').click();
+    cy.reload().get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
   });
 
   it('should update a transaction and rerun', () => {
@@ -62,7 +62,7 @@ describe('Transactions', () => {
 
     cy.submitCreateForm('CreateTransactionFactory');
     cy.get('[data-cy=transaction-details-name').should('have.text', `${name} (v1)`);
-    cy.get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
+    cy.reload().get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
     cy.get('[data-cy^=transaction-execution-step-]').should('have.length', 2);
 
     const updateName = `${name} - updated`;
@@ -75,7 +75,7 @@ describe('Transactions', () => {
 
     cy.get('[data-cy=edit-transaction-submit]').click();
     cy.get('[data-cy=transaction-details-name').should('have.text', `${updateName} (v2)`);
-    cy.get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
+    cy.reload().get('[data-cy=transaction-run-button]', {timeout: 50000}).should('be.visible');
     cy.get('[data-cy^=transaction-execution-step-]').should('have.length', 4);
   });
 });

@@ -1,6 +1,6 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
-import {PokeshopDemo} from '../e2e/constants/Test';
+import {POKEMON_HTTP_ENDPOINT, PokeshopDemo} from '../e2e/constants/Test';
 import {getTestId, getTransactionId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
@@ -263,7 +263,7 @@ Cypress.Commands.add('enableDemo', () => {
 
     if (isChecked === 'false') {
       cy.get('#demo_pokeshop_enabled').click();
-      cy.get('#demo_pokeshop_pokeshop_httpEndpoint').type('http://demo-pokemon-api.demo.svc.cluster.local');
+      cy.get('#demo_pokeshop_pokeshop_httpEndpoint').type(POKEMON_HTTP_ENDPOINT);
       cy.get('[data-cy=demo-form-save-button]').click();
     }
 

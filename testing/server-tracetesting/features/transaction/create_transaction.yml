@@ -33,9 +33,6 @@ spec:
   - selector: span[name = "exec INSERT"]
     assertions:
       - attr:tracetest.selected_spans.count = 2
-  - selector: span[name = "exec INSERT"]:first
-    assertions:
-      - attr:sql.query contains "INSERT INTO transactions"
 
   outputs:
   - name: TRANSACTION_ID

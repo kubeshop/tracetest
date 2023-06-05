@@ -1,6 +1,9 @@
+VERSION?="dev"
+TAG?=$(VERSION)
+GORELEASER_VERSION=1.18.2-pro
+
 PROJECT_ROOT=${PWD}
 
-GORELEASER_VERSION=1.18.2-pro
 CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 9 | tail -n 1 |  tr -s ' ' | cut -d' ' -f2-)
 goreleaser-version:
 ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
@@ -9,6 +12,7 @@ ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
 	@printf "\033[0;33m See https://goreleaser.com/install/ \033[0m\n\n"
 	@exit 1
 endif
+
 
 CLI_SRC_FILES := $(shell find cli -type f)
 dist/tracetest: goreleaser-version generate-cli $(CLI_SRC_FILES)
@@ -21,11 +25,15 @@ dist/tracetest-server: goreleaser-version generate-server $(SERVER_SRC_FILES)
 	find ./dist -name 'tracetest-server' -exec cp {} ./dist \;
 
 web/node_modules: web/package.json web/package-lock.json
-	cd web; npm ci
+	cd web; npm install
 
 WEB_SRC_FILES := $(shell find web -type f -not -path "*node_modules*" -not -path "*build*" -not -path "*cypress/videos*" -not -path "*cypress/screenshots*")
 web/build: web/node_modules $(WEB_SRC_FILES)
 	cd web; npm run build
+
+dist/docker-image-$(TAG).tar: $(CLI_SRC_FILES) $(SERVER_SRC_FILES) $(WEB_SRC_FILES)
+	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+	docker save --output dist/docker-image-$(TAG).tar "kubeshop/tracetest:$(TAG)"
 
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"
@@ -43,8 +51,7 @@ run: build-docker ## build and run tracetest using docker compose
 	docker compose up
 build-go: dist/tracetest dist/tracetest-server ## build all go code
 build-web: web/build ## build web
-build-docker: goreleaser-version build-go build-web .goreleaser.dev.yaml ## build and tag docker image as defined in .goreleaser.dev.yaml
-	VERSION=latest goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+build-docker: goreleaser-version web/build .goreleaser.dev.yaml dist/docker-image-$(TAG).tar ## build and tag docker image as defined in .goreleaser.dev.yaml
 
 .PHONY: generate generate-server generate-cli generate-web
 generate: generate-server generate-cli generate-web ## generate code entities from openapi definitions for all parts of the code
@@ -94,3 +101,11 @@ server/openapi: $(OPENAPI_SRC_FILES)
 	rm -rf $(BASE)/tmp
 
 	cd $(BASE); go fmt ./...
+
+
+.PHONY: clean
+clean: ## cleans the build artifacts
+	rm -rf dist
+	rm -rf web/build
+	rm -rf web/node_modules
+	docker rm image "kubeshop/tracetest:$(TAG)"
