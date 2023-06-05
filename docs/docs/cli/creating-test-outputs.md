@@ -48,7 +48,7 @@ outputs:
   value: attr:http.response.body | json_path '.id'
 ```
 
-### Multiple values
+### Multiple Values
 
 Using the same hypotethical user creation endpoint, a user creation might result on multiple sql queries, for example:
 
