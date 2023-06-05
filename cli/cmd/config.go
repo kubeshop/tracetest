@@ -26,7 +26,8 @@ var (
 )
 
 type setupConfig struct {
-	shouldValidateConfig bool
+	shouldValidateConfig          bool
+	shouldValidateVersionMismatch bool
 }
 
 type setupOption func(*setupConfig)
@@ -37,9 +38,16 @@ func SkipConfigValidation() setupOption {
 	}
 }
 
+func SkipVersionMismatchCheck() setupOption {
+	return func(sc *setupConfig) {
+		sc.shouldValidateVersionMismatch = false
+	}
+}
+
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
-		shouldValidateConfig: true,
+		shouldValidateConfig:          true,
+		shouldValidateVersionMismatch: true,
 	}
 	for _, option := range options {
 		option(&config)
@@ -107,6 +115,10 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
+		}
+
+		if config.shouldValidateVersionMismatch {
+			validateVersionMismatch()
 		}
 
 		analytics.Init(cliConfig)
@@ -202,7 +214,9 @@ func setupVersion() {
 
 	action := actions.NewGetServerVersionAction(options...)
 	versionText, isVersionMatch = action.GetVersion(ctx)
+}
 
+func validateVersionMismatch() {
 	if !isVersionMatch && os.Getenv("TRACETEST_DEV") == "" {
 		fmt.Fprintf(os.Stderr, versionText+`
 ✖️ Error: Version Mismatch

@@ -9,7 +9,7 @@ var serverCmd = &cobra.Command{
 	Use:     "server",
 	Short:   "Manage your tracetest server",
 	Long:    "Manage your tracetest server",
-	PreRun:  setupCommand(),
+	PreRun:  setupCommand(SkipVersionMismatchCheck()),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
