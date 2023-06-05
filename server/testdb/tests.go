@@ -10,7 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transactions"
 )
 
 var _ model.TestRepository = &postgresDB{}
@@ -372,7 +372,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	}
 }
 
-func (td *postgresDB) GetTransactionSteps(ctx context.Context, transaction tests.Transaction) ([]model.Test, error) {
+func (td *postgresDB) GetTransactionSteps(ctx context.Context, transaction transactions.Transaction) ([]model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
 	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
 	if err != nil {
