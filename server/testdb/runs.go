@@ -13,7 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transactions"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -583,7 +583,7 @@ func readRunRow(row scanner) (model.Run, error) {
 	}
 }
 
-func (td *postgresDB) GetTransactionRunSteps(ctx context.Context, tr tests.TransactionRun) ([]model.Run, error) {
+func (td *postgresDB) GetTransactionRunSteps(ctx context.Context, tr transactions.TransactionRun) ([]model.Run, error) {
 	query := selectRunQuery + `
 WHERE transaction_run_steps.transaction_run_id = $1 AND transaction_run_steps.transaction_run_transaction_id = $2
 ORDER BY test_runs.completed_at ASC

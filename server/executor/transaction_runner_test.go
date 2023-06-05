@@ -16,7 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/tests"
+	tests "github.com/kubeshop/tracetest/server/transactions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -1,4 +1,4 @@
-package tests_test
+package transactions_test
 
 import (
 	"context"
@@ -14,7 +14,8 @@ import (
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transactions"
+	tests "github.com/kubeshop/tracetest/server/transactions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -141,7 +142,7 @@ func TestDeleteTestsRelatedToTransactions(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	transactionRepo := tests.NewTransactionsRepository(db, testsDB)
+	transactionRepo := transactions.NewTransactionsRepository(db, testsDB)
 
 	transactionRepo.Create(context.TODO(), transactionSample)
 
@@ -157,7 +158,7 @@ func TestDeleteTestsRelatedToTransactions(t *testing.T) {
 
 }
 
-var transactionSample = tests.Transaction{
+var transactionSample = transactions.Transaction{
 	ID:          "NiWVnxP4R",
 	Name:        "Verify Import",
 	Description: "check the working of the import flow",
@@ -168,7 +169,7 @@ var transactionSample = tests.Transaction{
 }
 
 func TestTransactions(t *testing.T) {
-	// sample2 := tests.Transaction{
+	// sample2 := transactions.Transaction{
 	// 	ID:          "sample2",
 	// 	Name:        "Some Transaction",
 	// 	Description: "Do important stuff",
@@ -177,7 +178,7 @@ func TestTransactions(t *testing.T) {
 	// 	},
 	// }
 
-	// sample3 := tests.Transaction{
+	// sample3 := transactions.Transaction{
 	// 	ID:          "sample3",
 	// 	Name:        "Some Transaction",
 	// 	Description: "Do important stuff",
@@ -187,8 +188,8 @@ func TestTransactions(t *testing.T) {
 	// }
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: tests.TransactionResourceName,
-		ResourceTypePlural:   tests.TransactionResourceNamePlural,
+		ResourceTypeSingular: transactions.TransactionResourceName,
+		ResourceTypePlural:   transactions.TransactionResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			testsDB, err := testdb.Postgres(testdb.WithDB(db))
 			if err != nil {
@@ -196,9 +197,9 @@ func TestTransactions(t *testing.T) {
 			}
 			transactionsRepo := tests.NewTransactionsRepository(db, testsDB)
 
-			manager := resourcemanager.New[tests.Transaction](
-				tests.TransactionResourceName,
-				tests.TransactionResourceNamePlural,
+			manager := resourcemanager.New[transactions.Transaction](
+				transactions.TransactionResourceName,
+				transactions.TransactionResourceNamePlural,
 				transactionsRepo,
 				resourcemanager.CanBeAugmented(),
 			)
@@ -207,7 +208,7 @@ func TestTransactions(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			transactionRepo := manager.Handler().(*tests.TransactionsRepository)
+			transactionRepo := manager.Handler().(*transactions.TransactionsRepository)
 			testsDB, err := testdb.Postgres(testdb.WithDB(transactionRepo.DB()))
 			if err != nil {
 				panic(err)
@@ -392,7 +393,7 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	require.JSONEq(t, expected, actual)
 }
 
-func createTransactionRun(repo *tests.TransactionsRepository, tran tests.Transaction, run model.Run) {
+func createTransactionRun(repo *transactions.TransactionsRepository, tran transactions.Transaction, run model.Run) {
 	updated, err := repo.GetAugmented(context.TODO(), tran.ID)
 	if err != nil {
 		panic(err)
