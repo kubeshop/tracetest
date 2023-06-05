@@ -3,7 +3,7 @@
 `ResourceManager` provides reusable shared operations among resources. This includes the CRUD operations via HTTP, support for different output encodings (yaml or JSON), and Provisioning.
 
 
-## What is a Resouce?
+## What is a Resource?
 
 A `Resource` is, conceptually, any entity that can be created, read, updated and/or deleted.
 Some examples in Tracetest includes `Test`, `Transaction`, `PollingProfile`, etc.
