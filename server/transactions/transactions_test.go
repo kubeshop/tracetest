@@ -15,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/transactions"
-	tests "github.com/kubeshop/tracetest/server/transactions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -195,7 +194,7 @@ func TestTransactions(t *testing.T) {
 			if err != nil {
 				panic(err)
 			}
-			transactionsRepo := tests.NewTransactionsRepository(db, testsDB)
+			transactionsRepo := transactions.NewTransactionsRepository(db, testsDB)
 
 			manager := resourcemanager.New[transactions.Transaction](
 				transactions.TransactionResourceName,

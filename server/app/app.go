@@ -36,7 +36,6 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/kubeshop/tracetest/server/transactions"
-	tests "github.com/kubeshop/tracetest/server/transactions"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -151,7 +150,7 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	transactionsRepository := tests.NewTransactionsRepository(db, testDB)
+	transactionsRepository := transactions.NewTransactionsRepository(db, testDB)
 
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
