@@ -8,7 +8,7 @@ The documentation for running a test via the CLI can be found here:
 
 ## Running Your First Test
 
-To run a test, give the path to the test definition file with the `'-d'` option. This will launch a test, providing us with a link to the created test run.
+To run a test, give the path to the test definition file with the `'-d'` option. This will launch a test and provide with link to the created test run.
 
 ```sh
 tracetest test run -d path/to/test.yaml
