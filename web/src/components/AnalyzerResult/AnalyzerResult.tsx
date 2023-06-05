@@ -24,7 +24,7 @@ const AnalyzerResult = ({result: {score, passed, plugins = []}, trace}: IProps) 
         Analyzer Results <BetaBadge />
       </S.Title>
       <S.Description>
-        The Tracetest Analyzer its a plugin based framework used to analyze OpenTelemetry traces to help teams improve
+        The Tracetest Analyzer is a plugin based framework used to analyze OpenTelemetry traces to help teams improve
         their instrumentation data, find potential problems and provide tips to fix the problems.{' '}
         {linter.enabled ? (
           <>
