@@ -16,7 +16,7 @@ outputs:
     value: attr:myapp.users.created_id
 ```
 
-The `value` attribute is an `expression`, and is a very powerful tool.
+The `value` attribute is an `expression` and is a very powerful tool.
 
 ## Examples
 
