@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:server/transaction/transaction_run_repository.go
 package transaction
+========
+package transactions
+>>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transaction_runs.go
 
 import (
 	"context"
