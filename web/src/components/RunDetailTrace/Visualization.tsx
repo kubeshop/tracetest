@@ -11,7 +11,6 @@ import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalyti
 import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
 import Span from 'models/Span.model';
-import {useDrawer} from '../Drawer/Drawer';
 import DAG from '../Visualization/components/DAG';
 import Timeline from '../Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
@@ -30,7 +29,6 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const nodes = useAppSelector(TraceSelectors.selectNodes);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const isMatchedMode = Boolean(matchedSpans.length);
-  const {openDrawer} = useDrawer();
 
   useEffect(() => {
     dispatch(initNodes({spans}));
@@ -48,18 +46,16 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     (event, {id}: Node) => {
       TraceDiagramAnalyticsService.onClickSpan(id);
       dispatch(selectSpan({spanId: id}));
-      openDrawer();
     },
-    [dispatch, openDrawer]
+    [dispatch]
   );
 
   const onNodeClickTimeline = useCallback(
     (spanId: string) => {
       TraceAnalyticsService.onTimelineSpanClick(spanId);
       dispatch(selectSpan({spanId}));
-      openDrawer();
     },
-    [dispatch, openDrawer]
+    [dispatch]
   );
 
   const onNavigateToSpan = useCallback(

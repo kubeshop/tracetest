@@ -9,6 +9,8 @@ export const Container = styled.div`
 
 export const SearchContainer = styled.div`
   padding: 24px 24px 0;
+  position: relative;
+  z-index: 9;
 `;
 
 export const Section = styled.div`
