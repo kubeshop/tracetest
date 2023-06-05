@@ -1,4 +1,4 @@
-# Creating Transactions
+# Defining Transactions as Text Files
 
 This page showcases how to create and edit Transactions with the CLI.
 

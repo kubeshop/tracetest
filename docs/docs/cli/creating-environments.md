@@ -1,4 +1,4 @@
-# Creating Environments
+# Defining Environments as Text Files
 
 This page showcases how to create and edit environments with the CLI.
 

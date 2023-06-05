@@ -276,6 +276,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "web-ui/creating-data-stores",
+          label: "Configuring Data Stores",
+        },
+        {
+          type: "doc",
           id: "web-ui/creating-transactions",
           label: "Creating Transactions",
         },
@@ -298,7 +303,7 @@ const sidebars = {
         {
           type: "doc",
           id: "cli/creating-data-stores",
-          label: "Creating Data Stores",
+          label: "Configuring Data Stores",
         },
         {
           type: "doc",
@@ -319,6 +324,11 @@ const sidebars = {
           type: "doc",
           id: "cli/creating-transactions",
           label: "Creating Transactions",
+        },
+        {
+          type: "doc",
+          id: "cli/running-transactions",
+          label: "Running Transactions",
         },
         // {
         //   type: "doc",
