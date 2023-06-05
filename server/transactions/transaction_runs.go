@@ -1,4 +1,4 @@
-package tests
+package transactions
 
 import (
 	"context"
