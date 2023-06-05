@@ -31,11 +31,11 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/kubeshop/tracetest/server/transactions"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -150,7 +150,7 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	transactionsRepository := tests.NewTransactionsRepository(db, testDB)
+	transactionsRepository := transactions.NewTransactionsRepository(db, testDB)
 
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
@@ -332,10 +332,10 @@ func registerlinterResource(linterRepo *linterResource.Repository, router *mux.R
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerTransactionResource(repo *tests.TransactionsRepository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[tests.Transaction](
-		tests.TransactionResourceName,
-		tests.TransactionResourceNamePlural,
+func registerTransactionResource(repo *transactions.TransactionsRepository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[transactions.Transaction](
+		transactions.TransactionResourceName,
+		transactions.TransactionResourceNamePlural,
 		repo,
 		resourcemanager.CanBeAugmented(),
 		resourcemanager.WithTracer(tracer),
@@ -432,7 +432,7 @@ func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscripti
 func controller(
 	cfg httpServerConfig,
 	testDB model.Repository,
-	transactions *tests.TransactionsRepository,
+	transactions *transactions.TransactionsRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
@@ -448,7 +448,7 @@ func controller(
 func httpRouter(
 	cfg httpServerConfig,
 	testDB model.Repository,
-	transactions *tests.TransactionsRepository,
+	transactions *transactions.TransactionsRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,

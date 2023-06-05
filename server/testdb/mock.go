@@ -6,7 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transactions"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -129,24 +129,24 @@ func (m *MockRepository) Drop() error {
 	return args.Error(0)
 }
 
-func (m *MockRepository) CreateTransaction(_ context.Context, transaction tests.Transaction) (tests.Transaction, error) {
+func (m *MockRepository) CreateTransaction(_ context.Context, transaction transactions.Transaction) (transactions.Transaction, error) {
 	args := m.Called(transaction)
-	return args.Get(0).(tests.Transaction), args.Error(1)
+	return args.Get(0).(transactions.Transaction), args.Error(1)
 }
 
-func (m *MockRepository) UpdateTransaction(_ context.Context, transaction tests.Transaction) (tests.Transaction, error) {
+func (m *MockRepository) UpdateTransaction(_ context.Context, transaction transactions.Transaction) (transactions.Transaction, error) {
 	args := m.Called(transaction)
-	return args.Get(0).(tests.Transaction), args.Error(1)
+	return args.Get(0).(transactions.Transaction), args.Error(1)
 }
 
-func (m *MockRepository) DeleteTransaction(_ context.Context, transaction tests.Transaction) error {
+func (m *MockRepository) DeleteTransaction(_ context.Context, transaction transactions.Transaction) error {
 	args := m.Called(transaction)
 	return args.Error(1)
 }
 
-func (m *MockRepository) GetLatestTransactionVersion(_ context.Context, id id.ID) (tests.Transaction, error) {
+func (m *MockRepository) GetLatestTransactionVersion(_ context.Context, id id.ID) (transactions.Transaction, error) {
 	args := m.Called(id)
-	return args.Get(0).(tests.Transaction), args.Error(1)
+	return args.Get(0).(transactions.Transaction), args.Error(1)
 }
 
 func (m *MockRepository) TransactionIDExists(_ context.Context, id id.ID) (bool, error) {
@@ -154,51 +154,51 @@ func (m *MockRepository) TransactionIDExists(_ context.Context, id id.ID) (bool,
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *MockRepository) GetTransactionVersion(_ context.Context, id id.ID, version int) (tests.Transaction, error) {
+func (m *MockRepository) GetTransactionVersion(_ context.Context, id id.ID, version int) (transactions.Transaction, error) {
 	args := m.Called(id, version)
-	return args.Get(0).(tests.Transaction), args.Error(1)
+	return args.Get(0).(transactions.Transaction), args.Error(1)
 }
 
-func (m *MockRepository) GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[tests.Transaction], error) {
+func (m *MockRepository) GetTransactions(_ context.Context, take, skip int32, query, sortBy, sortDirection string) (model.List[transactions.Transaction], error) {
 	args := m.Called(take, skip, query, sortBy, sortDirection)
-	transactions := args.Get(0).([]tests.Transaction)
-	list := model.List[tests.Transaction]{
-		Items:      transactions,
-		TotalCount: len(transactions),
+	transactionsArray := args.Get(0).([]transactions.Transaction)
+	list := model.List[transactions.Transaction]{
+		Items:      transactionsArray,
+		TotalCount: len(transactionsArray),
 	}
 	return list, args.Error(1)
 }
 
 // DeleteTransactionRun implements model.Repository
-func (m *MockRepository) DeleteTransactionRun(ctx context.Context, run tests.TransactionRun) error {
+func (m *MockRepository) DeleteTransactionRun(ctx context.Context, run transactions.TransactionRun) error {
 	args := m.Called(ctx, run)
 	return args.Error(0)
 }
 
 // GetTransactionRun implements model.Repository
-func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (tests.TransactionRun, error) {
+func (m *MockRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (transactions.TransactionRun, error) {
 	args := m.Called(ctx, transactionID, runID)
-	return args.Get(0).(tests.TransactionRun), args.Error(1)
+	return args.Get(0).(transactions.TransactionRun), args.Error(1)
 }
 
-func (m *MockRepository) GetLatestRunByTransactionVersion(_ context.Context, transactionID id.ID, version int) (tests.TransactionRun, error) {
+func (m *MockRepository) GetLatestRunByTransactionVersion(_ context.Context, transactionID id.ID, version int) (transactions.TransactionRun, error) {
 	args := m.Called(transactionID, version)
-	return args.Get(0).(tests.TransactionRun), args.Error(1)
+	return args.Get(0).(transactions.TransactionRun), args.Error(1)
 }
 
 // GetTransactionsRuns implements model.Repository
-func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]tests.TransactionRun, error) {
+func (m *MockRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]transactions.TransactionRun, error) {
 	args := m.Called(ctx, transactionID, take, skip)
-	return args.Get(0).([]tests.TransactionRun), args.Error(1)
+	return args.Get(0).([]transactions.TransactionRun), args.Error(1)
 }
 
 // UpdateTransactionRun implements model.Repository
-func (m *MockRepository) UpdateTransactionRun(ctx context.Context, run tests.TransactionRun) error {
+func (m *MockRepository) UpdateTransactionRun(ctx context.Context, run transactions.TransactionRun) error {
 	args := m.Called(ctx, run)
 	return args.Error(0)
 }
 
-func (m *MockRepository) CreateTransactionRun(ctx context.Context, run tests.TransactionRun) error {
+func (m *MockRepository) CreateTransactionRun(ctx context.Context, run transactions.TransactionRun) error {
 	args := m.Called(ctx, run)
 	return args.Error(0)
 }
