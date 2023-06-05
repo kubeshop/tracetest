@@ -56,8 +56,14 @@ func getRootSpan(allRoots []*Span) *Span {
 
 	var root *Span
 	for _, span := range allRoots {
-		if span.Name == TriggerSpanName {
-			// This is the Tracetest trigger span, use it as the root of all root spans
+		if span.Name == TriggerSpanName || span.Name == TemporaryRootSpanName {
+			// This span should be promoted because it's either a temporary root or the definitive root
+			if root != nil && root.Name == TriggerSpanName {
+				// We cannot override the root because we already have the definitive root, otherwise,
+				// we will replace the definitive root with the temporary root.
+				continue
+			}
+
 			root = span
 		}
 	}
