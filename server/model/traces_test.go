@@ -131,6 +131,34 @@ func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
 	}
 }
 
+func TestNoTemporaryRootIfTracetestRootExists(t *testing.T) {
+	root1 := newSpan("Root 1", nil)
+	root1Child := newSpan("Child from root 1", &root1)
+	root2 := newSpan(model.TriggerSpanName, nil)
+	root2Child := newSpan("Child from root 2", &root2)
+	root3 := newSpan("Root 3", nil)
+	root3Child := newSpan("Child from root 3", &root3)
+
+	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
+	trace := model.NewTrace("trace", spans)
+
+	assert.Equal(t, root2.Name, trace.RootSpan.Name)
+}
+
+func TestNoTemporaryRootIfATemporaryRootExists(t *testing.T) {
+	root1 := newSpan("Root 1", nil)
+	root1Child := newSpan("Child from root 1", &root1)
+	root2 := newSpan(model.TemporaryRootSpanName, nil)
+	root2Child := newSpan("Child from root 2", &root2)
+	root3 := newSpan("Root 3", nil)
+	root3Child := newSpan("Child from root 3", &root3)
+
+	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
+	trace := model.NewTrace("trace", spans)
+
+	assert.Equal(t, root2.Name, trace.RootSpan.Name)
+}
+
 func newSpan(name string, parent *model.Span) model.Span {
 	span := model.Span{
 		ID:         model.IDGen.SpanID(),

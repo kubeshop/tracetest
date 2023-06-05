@@ -36,25 +36,44 @@ func NewTrace(traceID string, spans []Span) Trace {
 		span.Parent = parentSpan
 	}
 
-	var rootSpan Span
-	if len(rootSpans) == 1 {
-		rootSpan = *rootSpans[0]
-	} else {
-		rootSpan = Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: rootSpans}
-		for _, child := range rootSpan.Children {
-			child.Parent = &rootSpan
-		}
-	}
+	rootSpan := getRootSpan(rootSpans)
 
 	id, _ := trace.TraceIDFromHex(traceID)
 	trace := Trace{
 		ID:       id,
-		RootSpan: rootSpan,
+		RootSpan: *rootSpan,
 	}
 
 	trace = trace.Sort()
 
 	return trace
+}
+
+func getRootSpan(allRoots []*Span) *Span {
+	if len(allRoots) == 1 {
+		return allRoots[0]
+	}
+
+	var root *Span
+	for _, span := range allRoots {
+		if span.Name == TriggerSpanName {
+			// This is the Tracetest trigger span, use it as the root of all root spans
+			root = span
+		}
+	}
+
+	if root == nil {
+		root = &Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: []*Span{}}
+	}
+
+	for _, span := range allRoots {
+		if root != span {
+			root.Children = append(root.Children, span)
+			span.Parent = root
+		}
+	}
+
+	return root
 }
 
 func spanType(attrs Attributes) string {
