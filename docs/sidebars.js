@@ -274,6 +274,16 @@ const sidebars = {
           id: "web-ui/undefined-variables",
           label: "Using Undefined Variables",
         },
+        {
+          type: "doc",
+          id: "web-ui/creating-transactions",
+          label: "Creating Transactions",
+        },
+        {
+          type: "doc",
+          id: "web-ui/creating-environments",
+          label: "Creating Environments",
+        },
       ],
     },
     {

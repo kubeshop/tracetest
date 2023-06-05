@@ -1,5 +1,11 @@
 # Creating Transactions
 
+This page showcases how to create and edit Transactions with the CLI.
+
+:::tip
+[To read more about transactions check out transactions concepts.](../concepts/transactions.md)
+:::
+
 Just like other structures of Tracetest, you can also manage your transactions using the CLI and definition files.
 
 A definition file for a transaction looks like the following:

@@ -1,5 +1,11 @@
 # Creating Environments
 
+This page showcases how to create and edit environments with the CLI.
+
+:::tip
+[To read more about environments check out environment concepts.](../concepts/environments.md)
+:::
+
 Just like Data Stores, you can also manage your environments using the CLI and definition files.
 
 A definition  file looks like the following:
