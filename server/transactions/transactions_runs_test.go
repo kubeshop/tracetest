@@ -1,4 +1,4 @@
-package tests_test
+package transactions_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transactions"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,7 +33,7 @@ func createTestWithName(t *testing.T, db model.TestRepository, name string) mode
 	return updated
 }
 
-func getRepos() (*tests.TransactionsRepository, model.Repository) {
+func getRepos() (*transactions.TransactionsRepository, model.Repository) {
 	db := testmock.GetRawTestingDatabase()
 
 	testsRepo, err := testdb.Postgres(testdb.WithDB(db))
@@ -41,15 +41,15 @@ func getRepos() (*tests.TransactionsRepository, model.Repository) {
 		panic(err)
 	}
 
-	transactionRepo := tests.NewTransactionsRepository(db, testsRepo)
+	transactionRepo := transactions.NewTransactionsRepository(db, testsRepo)
 
 	return transactionRepo, testsRepo
 }
 
-func getTransaction(t *testing.T, transactionRepo *tests.TransactionsRepository, testsRepo model.TestRepository) (tests.Transaction, transactionFixture) {
+func getTransaction(t *testing.T, transactionRepo *transactions.TransactionsRepository, testsRepo model.TestRepository) (transactions.Transaction, transactionFixture) {
 	f := setupTransactionFixture(t, transactionRepo.DB())
 
-	transaction := tests.Transaction{
+	transaction := transactions.Transaction{
 		ID:          id.NewRandGenerator().ID(),
 		Name:        "first test",
 		Description: "description",
@@ -76,7 +76,7 @@ func TestCreateTransactionRun(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, tr.TransactionID, transaction.ID)
-	assert.Equal(t, tr.State, tests.TransactionRunStateCreated)
+	assert.Equal(t, tr.State, transactions.TransactionRunStateCreated)
 	assert.Len(t, tr.Steps, 0)
 }
 
@@ -87,7 +87,7 @@ func TestUpdateTransactionRun(t *testing.T) {
 	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
 	require.NoError(t, err)
 
-	tr.State = tests.TransactionRunStateExecuting
+	tr.State = transactions.TransactionRunStateExecuting
 	tr.Steps = []model.Run{fixture.testRun}
 	err = transactionRepo.UpdateRun(context.TODO(), tr)
 	require.NoError(t, err)
@@ -96,7 +96,7 @@ func TestUpdateTransactionRun(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, tr.TransactionID, transaction.ID)
-	assert.Equal(t, tests.TransactionRunStateExecuting, updatedRun.State)
+	assert.Equal(t, transactions.TransactionRunStateExecuting, updatedRun.State)
 	assert.Len(t, tr.Steps, 1)
 }
 
@@ -114,7 +114,7 @@ func TestDeleteTransactionRun(t *testing.T) {
 	require.ErrorContains(t, err, "no rows in result set")
 }
 
-func createTransaction(t *testing.T, repo *tests.TransactionsRepository, tran tests.Transaction) tests.Transaction {
+func createTransaction(t *testing.T, repo *transactions.TransactionsRepository, tran transactions.Transaction) transactions.Transaction {
 	one := 1
 	tran.ID = id.GenerateID()
 	tran.Version = &one
@@ -133,7 +133,7 @@ func createTransaction(t *testing.T, repo *tests.TransactionsRepository, tran te
 func TestListTransactionRun(t *testing.T) {
 	transactionRepo, testsRepo := getRepos()
 
-	t1 := createTransaction(t, transactionRepo, tests.Transaction{
+	t1 := createTransaction(t, transactionRepo, transactions.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
@@ -142,7 +142,7 @@ func TestListTransactionRun(t *testing.T) {
 		},
 	})
 
-	t2 := createTransaction(t, transactionRepo, tests.Transaction{
+	t2 := createTransaction(t, transactionRepo, transactions.Transaction{
 		Name:        "second transaction",
 		Description: "description",
 		Steps: []model.Test{
@@ -173,7 +173,7 @@ func TestBug(t *testing.T) {
 
 	ctx := context.TODO()
 
-	transaction := createTransaction(t, transactionRepo, tests.Transaction{
+	transaction := createTransaction(t, transactionRepo, transactions.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
