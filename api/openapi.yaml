@@ -305,7 +305,7 @@ paths:
   /tests:
     get:
       tags:
-        - api
+        - resource-api
       summary: "Get tests"
       description: "get tests"
       operationId: getTests
@@ -318,17 +318,15 @@ paths:
       responses:
         200:
           description: successful operation
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-              description: Total records count
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "./tests.yaml#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/TestResourceList"
+            text/yaml:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/TestResourceList"
+        400:
+          description: "invalid query for test, some data was sent in incorrect format."
         500:
           description: "problem with getting tests"
     post:
