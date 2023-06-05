@@ -8,7 +8,7 @@ The documentation for running a test via the CLI can be found here:
 
 - [tracetest test run](./reference/tracetest_test_run.md): This page provides examples of using this command.
 
-## Running Your First Teansaction
+## Running Your First Transaction
 
 To run a transaction, give the path to the transaction definition file with the `'-d'` option. This will launch a transaction, providing us with a link to the created transaction run.
 
