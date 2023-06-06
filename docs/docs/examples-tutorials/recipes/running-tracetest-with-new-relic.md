@@ -222,7 +222,7 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/tracetest]
-    traces/lightstep:
+    traces/newrelic:
       receivers: [otlp]
       processors: [batch]
       exporters: [logging, otlp/newrelic]
