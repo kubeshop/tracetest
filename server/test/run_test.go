@@ -1,23 +1,23 @@
-package tests_test
+package test_test
 
 import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRunExecutionTime(t *testing.T) {
 	cases := []struct {
 		name     string
-		run      tests.Run
+		run      test.Run
 		now      time.Time
 		expected int
 	}{
 		{
 			name: "CompletedOk",
-			run: tests.Run{
+			run: test.Run{
 				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				CompletedAt: time.Date(2022, 01, 25, 12, 45, 36, int(400*time.Millisecond), time.UTC),
 			},
@@ -25,7 +25,7 @@ func TestRunExecutionTime(t *testing.T) {
 		},
 		{
 			name: "LessThan1Sec",
-			run: tests.Run{
+			run: test.Run{
 				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				CompletedAt: time.Date(2022, 01, 25, 12, 45, 33, int(400*time.Millisecond), time.UTC),
 			},
@@ -33,7 +33,7 @@ func TestRunExecutionTime(t *testing.T) {
 		},
 		{
 			name: "StillRunning",
-			run: tests.Run{
+			run: test.Run{
 				CreatedAt: time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 			},
 			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
@@ -41,7 +41,7 @@ func TestRunExecutionTime(t *testing.T) {
 		},
 		{
 			name: "ZeroedDate",
-			run: tests.Run{
+			run: test.Run{
 				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				CompletedAt: time.Unix(0, 0),
 			},
@@ -52,15 +52,15 @@ func TestRunExecutionTime(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			now := tests.Now
+			now := test.Now
 			if c.now.Unix() > 0 {
-				tests.Now = func() time.Time {
+				test.Now = func() time.Time {
 					return c.now
 				}
 			}
 
 			assert.Equal(t, c.expected, c.run.ExecutionTime())
-			tests.Now = now
+			test.Now = now
 		})
 	}
 }
@@ -68,13 +68,13 @@ func TestRunExecutionTime(t *testing.T) {
 func TestRunTriggerTime(t *testing.T) {
 	cases := []struct {
 		name     string
-		run      tests.Run
+		run      test.Run
 		now      time.Time
 		expected int
 	}{
 		{
 			name: "CompletedOk",
-			run: tests.Run{
+			run: test.Run{
 				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				ServiceTriggerCompletedAt: time.Date(2022, 01, 25, 12, 45, 36, int(400*time.Millisecond), time.UTC),
 			},
@@ -82,7 +82,7 @@ func TestRunTriggerTime(t *testing.T) {
 		},
 		{
 			name: "LessThan1Sec",
-			run: tests.Run{
+			run: test.Run{
 				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				ServiceTriggerCompletedAt: time.Date(2022, 01, 25, 12, 45, 33, int(400*time.Millisecond), time.UTC),
 			},
@@ -90,7 +90,7 @@ func TestRunTriggerTime(t *testing.T) {
 		},
 		{
 			name: "StillRunning",
-			run: tests.Run{
+			run: test.Run{
 				ServiceTriggeredAt: time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 			},
 			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
@@ -98,7 +98,7 @@ func TestRunTriggerTime(t *testing.T) {
 		},
 		{
 			name: "ZeroedDate",
-			run: tests.Run{
+			run: test.Run{
 				ServiceTriggeredAt:        time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
 				ServiceTriggerCompletedAt: time.Unix(0, 0),
 			},
@@ -109,15 +109,15 @@ func TestRunTriggerTime(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			now := tests.Now
+			now := test.Now
 			if c.now.Unix() > 0 {
-				tests.Now = func() time.Time {
+				test.Now = func() time.Time {
 					return c.now
 				}
 			}
 
 			assert.Equal(t, c.expected, c.run.TriggerTime())
-			tests.Now = now
+			test.Now = now
 		})
 	}
 }

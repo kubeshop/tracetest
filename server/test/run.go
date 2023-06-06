@@ -1,4 +1,4 @@
-package tests
+package test
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
-	"github.com/kubeshop/tracetest/server/tests/trigger"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 var (
