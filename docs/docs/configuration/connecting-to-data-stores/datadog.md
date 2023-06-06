@@ -10,7 +10,7 @@ Examples of configuring Tracetest with Datadog can be found in the [`examples` f
 
 In your OpenTelemetry Collector config file:
 
-- Set the `exporter` to `otlp/tt`
+- Set the `exporter` to `otlp/tracetest`
 - Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
@@ -46,7 +46,7 @@ exporters:
   # OTLP for Tracetest
   # Send traces to Tracetest.
   # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317
     tls:
       insecure: true
@@ -61,11 +61,11 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt] # exporter sending traces to your Tracetest instance
-    traces/dd:
+      exporters: [otlp/tracetest] # exporter sending traces to your Tracetest instance
+    traces/datadog:
       receivers: [otlp]
       processors: [batch]
       exporters: [datadog] # exporter sending traces to directly to Datadog

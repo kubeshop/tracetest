@@ -216,7 +216,7 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317
     # Send traces to Tracetest.
     # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
@@ -232,11 +232,11 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/dd:
+      exporters: [otlp/tracetest]
+    traces/datadog:
       receivers: [otlp]
       processors: [batch]
       exporters: [datadog]
