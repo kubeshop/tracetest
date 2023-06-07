@@ -76,7 +76,7 @@ func TestListEnvironments(t *testing.T) {
 	environmentVarsList := helpers.UnmarshalYAMLSequence[types.EnvironmentResource](t, result.StdOut)
 	require.Len(environmentVarsList, 3)
 
-	// due the our database sorting algorthm, "another-env" comes in the front of ".env"
+	// due the our database sorting algorithm, "another-env" comes in the front of ".env"
 	// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
 	anotherEnvironmentVars := environmentVarsList[0]
 	require.Equal("Environment", anotherEnvironmentVars.Type)
