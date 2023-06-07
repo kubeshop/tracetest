@@ -1,0 +1,11 @@
+type: Environment
+spec:
+  id: another-env
+  name: another-env
+  description: ""
+  createdAt: 2023-06-07T20:16:16.826035658Z
+  values:
+  - key: Here
+    value: We
+  - key: Come
+    value: Again
