@@ -89,10 +89,10 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `apply environment -f [existing-environment-file]`          | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
 | `delete environment --id [existing-id]`                     | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
 | `delete environment --id [non-existing-id]`                 | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `get environment --id [non-existing-id]`                    | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `get environment --id [existing-id] --output pretty`        | |
-| `get environment --id [existing-id] --output json`          | |
-| `get environment --id [existing-id] --output yaml`          | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
+| `get environment --id [non-existing-id]`                    | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
+| `get environment --id [existing-id] --output pretty`        | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
+| `get environment --id [existing-id] --output json`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go)|
+| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
 | `list environment --output pretty`                          | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output json`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output yaml`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |

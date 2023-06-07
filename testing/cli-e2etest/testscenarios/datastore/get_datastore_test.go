@@ -89,7 +89,7 @@ func TestGetDatastore(t *testing.T) {
 		// And I have my server recently created
 		// And I have a Datastore already set
 
-		// When I try to list datastore again on pretty mode
+		// When I try to get a datastore on pretty mode
 		// Then it should print a table with 4 lines printed: header, separator, data store item and empty line
 		result := tracetestcli.Exec(t, "get datastore --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
