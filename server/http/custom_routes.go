@@ -239,7 +239,10 @@ func toWords(str string) string {
 func (c *customController) analytics(name string, f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		machineID := r.Header.Get("x-client-id")
-		analytics.SendEvent(toWords(name), "test", machineID, nil)
+		source := r.Header.Get("x-source")
+		analytics.DefaultAnalyticsTracker.SendEvent(toWords(name), "test", machineID, &map[string]string{
+			"source": source,
+		})
 
 		f(w, r)
 	}

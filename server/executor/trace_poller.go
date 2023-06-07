@@ -285,7 +285,7 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 	}
 
 	run = run.TraceFailed(err)
-	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+	analytics.DefaultAnalyticsTracker.SendEvent("test_run_finished", "error", "", &map[string]string{
 		"finalState": string(run.State),
 	})
 

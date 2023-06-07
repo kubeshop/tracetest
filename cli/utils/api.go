@@ -28,6 +28,7 @@ type ListArgs struct {
 func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
 	config := openapi.NewConfiguration()
 	config.AddDefaultHeader("x-client-id", analytics.ClientID())
+	config.AddDefaultHeader("x-source", "cli")
 	config.Scheme = cliConfig.Scheme
 	config.Host = strings.TrimSuffix(cliConfig.Endpoint, "/")
 	if cliConfig.ServerPath != nil {
@@ -84,6 +85,7 @@ func (resourceClient ResourceClient) NewRequest(url, method, body, contentType s
 	}
 
 	request.Header.Set("x-client-id", analytics.ClientID())
+	request.Header.Set("x-source", "cli")
 	request.Header.Set("Content-Type", contentType)
 	request.Header.Set("Accept", contentType)
 	if augmented {

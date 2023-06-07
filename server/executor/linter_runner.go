@@ -195,7 +195,7 @@ func (e *defaultlinterRunner) onError(ctx context.Context, request LinterRequest
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
 	}
 
-	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+	analytics.DefaultAnalyticsTracker.SendEvent("test_run_finished", "error", "", &map[string]string{
 		"finalState": string(run.State),
 	})
 

@@ -17,6 +17,9 @@ const TraceTestAPI = createApi({
   reducerPath: 'tests',
   baseQuery: fetchBaseQuery({
     baseUrl: PATH,
+    prepareHeaders: headers => {
+      headers.set('x-source', 'web');
+    },
   }),
   tagTypes: Object.values(TracetestApiTags),
   endpoints(builder: TTestApiEndpointBuilder) {

@@ -126,7 +126,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		}
 
 		run = run.AssertionFailed(err)
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+		analytics.DefaultAnalyticsTracker.SendEvent("test_run_finished", "error", "", &map[string]string{
 			"finalState": string(run.State),
 		})
 
@@ -185,7 +185,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 		allPassed,
 	)
 
-	analytics.SendEvent("test_run_finished", "successful", "", &map[string]string{
+	analytics.DefaultAnalyticsTracker.SendEvent("test_run_finished", "successful", "", &map[string]string{
 		"finalState": string(run.State),
 	})
 

@@ -17,6 +17,7 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
+	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
@@ -55,6 +56,7 @@ type config struct {
 	enabledOperations []Operation
 	idgen             func() id.ID
 	tracer            trace.Tracer
+	analyticsTracker  *analytics.AnalyticsTracker
 }
 
 type managerOption func(*config)
@@ -74,6 +76,12 @@ func WithOperations(ops ...Operation) managerOption {
 func WithTracer(tracer trace.Tracer) managerOption {
 	return func(c *config) {
 		c.tracer = tracer
+	}
+}
+
+func WithAnalyticsTracker(analyticsTracker *analytics.AnalyticsTracker) managerOption {
+	return func(c *config) {
+		c.analyticsTracker = analyticsTracker
 	}
 }
 
@@ -130,23 +138,23 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	enabledOps := m.EnabledOperations()
 
 	if slices.Contains(enabledOps, OperationList) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list"))
+		m.instrumentRoute(m.trackRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceTypePlural))))
 	}
 
 	if slices.Contains(enabledOps, OperationCreate) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
+		m.instrumentRoute(m.trackRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural))))
 	}
 
 	if slices.Contains(enabledOps, OperationUpdate) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
+		m.instrumentRoute(m.trackRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural))))
 	}
 
 	if slices.Contains(enabledOps, OperationGet) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
+		m.instrumentRoute(m.trackRoute(subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural))))
 	}
 
 	if slices.Contains(enabledOps, OperationDelete) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
+		m.instrumentRoute(m.trackRoute(subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural))))
 	}
 
 	return subrouter
@@ -200,6 +208,28 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 	})
 
 	route.Handler(newHandler)
+}
+
+func (m *manager[T]) trackRoute(route *mux.Route) *mux.Route {
+	originalHandler := route.GetHandler()
+	name := route.GetName()
+
+	newHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if m.config.analyticsTracker == nil {
+			originalHandler.ServeHTTP(w, r)
+			return
+		}
+
+		machineID := r.Header.Get("x-client-id")
+		source := r.Header.Get("x-source")
+		m.config.analyticsTracker.SendEvent(name, "test", machineID, &map[string]string{
+			"source": source,
+		})
+
+		originalHandler.ServeHTTP(w, r)
+	})
+
+	return route.Handler(newHandler)
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {

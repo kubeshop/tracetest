@@ -284,7 +284,7 @@ func (r persistentRunner) handleExecutionResult(run model.Run, response trigger.
 	if err != nil {
 		run = run.TriggerFailed(err)
 
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+		analytics.DefaultAnalyticsTracker.SendEvent("test_run_finished", "error", "", &map[string]string{
 			"finalState": string(run.State),
 		})
 

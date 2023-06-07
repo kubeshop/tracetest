@@ -15,34 +15,30 @@ type noopTracker struct{}
 func (t noopTracker) Track(event string, props map[string]string) error { return nil }
 func (t noopTracker) Ready() bool                                       { return true }
 
-func Init(enabled bool, serverID, appVersion, env string) error {
-	// ga not enabled, use dumb settings
-	if !enabled {
-		defaultClient = noopTracker{}
-		return nil
+var DefaultAnalyticsTracker *AnalyticsTracker
+
+func NewAnalyticsTracker(enabled bool, serverID, appVersion, env string) (*AnalyticsTracker, error) {
+	client, error := getClient(enabled, serverID, appVersion, env)
+	if error != nil {
+		return nil, error
 	}
 
-	// setup an actual client
-	hostname, err := os.Hostname()
-	if err != nil {
-		return fmt.Errorf("could not get hostname: %w", err)
-	}
-
-	defaultClient = newSegmentTracker(hostname, serverID, appVersion, env)
-
-	return nil
+	DefaultAnalyticsTracker = &AnalyticsTracker{client: client}
+	return DefaultAnalyticsTracker, nil
 }
 
-var defaultClient Tracker
-
-func Ready() bool {
-	return defaultClient != nil && defaultClient.Ready()
+type AnalyticsTracker struct {
+	client Tracker
 }
 
-func SendEvent(name, category, clientID string, data *map[string]string) error {
+func (at *AnalyticsTracker) Ready() bool {
+	return at.client != nil && at.client.Ready()
+}
+
+func (at *AnalyticsTracker) SendEvent(name, category, clientID string, data *map[string]string) error {
 	fmt.Printf(`sending event "%s" (%s)%s`, name, category, "\n")
-	if !Ready() {
-		err := fmt.Errorf("uninitalized client. Call analytics.Init")
+	if !at.Ready() {
+		err := fmt.Errorf("uninitialized client. Call analytics.Init")
 		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
 		return err
 	}
@@ -58,7 +54,7 @@ func SendEvent(name, category, clientID string, data *map[string]string) error {
 		}
 	}
 
-	err := defaultClient.Track(name, eventData)
+	err := at.client.Track(name, eventData)
 	if err != nil {
 		fmt.Printf(`could not send event "%s" (%s): %s%s`, name, category, err.Error(), "\n")
 	} else {
@@ -66,4 +62,21 @@ func SendEvent(name, category, clientID string, data *map[string]string) error {
 	}
 
 	return err
+}
+
+func getClient(enabled bool, serverID, appVersion, env string) (Tracker, error) {
+	// ga not enabled, use dumb settings
+	if !enabled {
+		defaultClient := noopTracker{}
+		return defaultClient, nil
+	}
+
+	// setup an actual client
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, fmt.Errorf("could not get hostname: %w", err)
+	}
+
+	defaultClient := newSegmentTracker(hostname, serverID, appVersion, env)
+	return defaultClient, nil
 }
