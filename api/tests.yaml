@@ -40,7 +40,7 @@ components:
         createdAt:
           type: string
           format: date-time
-        serviceUnderTest:
+        trigger:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
         specs:
           type: array

@@ -56,10 +56,10 @@ type HTTPResponse struct {
 }
 
 type HTTPAuthenticator struct {
-	Type   string `expr_enabled:"true"`
-	APIKey APIKeyAuthenticator
-	Basic  BasicAuthenticator
-	Bearer BearerAuthenticator
+	Type   string              `json:"type,omitempty" expr_enabled:"true"`
+	APIKey APIKeyAuthenticator `json:"apiKey,omitempty"`
+	Basic  BasicAuthenticator  `json:"basic,omitempty"`
+	Bearer BearerAuthenticator `json:"bearer,omitempty"`
 }
 
 func (a HTTPAuthenticator) Map(mapFn func(current string) (string, error)) (HTTPAuthenticator, error) {
@@ -128,9 +128,9 @@ type authenticator interface {
 }
 
 type APIKeyAuthenticator struct {
-	Key   string         `expr_enabled:"true"`
-	Value string         `expr_enabled:"true"`
-	In    APIKeyPosition `expr_enabled:"true"`
+	Key   string         `json:"key,omitempty" expr_enabled:"true"`
+	Value string         `json:"value,omitempty" expr_enabled:"true"`
+	In    APIKeyPosition `json:"in,omitempty" expr_enabled:"true"`
 }
 
 func (a APIKeyAuthenticator) AuthenticateGRPC() {}
@@ -146,8 +146,8 @@ func (a APIKeyAuthenticator) AuthenticateHTTP(req *http.Request) {
 }
 
 type BasicAuthenticator struct {
-	Username string `expr_enabled:"true"`
-	Password string `expr_enabled:"true"`
+	Username string `json:"username,omitempty" expr_enabled:"true"`
+	Password string `json:"password,omitempty" expr_enabled:"true"`
 }
 
 func (a BasicAuthenticator) AuthenticateGRPC() {}
@@ -156,7 +156,7 @@ func (a BasicAuthenticator) AuthenticateHTTP(req *http.Request) {
 }
 
 type BearerAuthenticator struct {
-	Bearer string `expr_enabled:"true"`
+	Bearer string `json:"bearer,omitempty" expr_enabled:"true"`
 }
 
 func (a BearerAuthenticator) AuthenticateGRPC() {}

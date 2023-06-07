@@ -10,7 +10,7 @@
 package openapi
 
 type Trigger struct {
-	TriggerType string `json:"triggerType,omitempty"`
+	Type string `json:"type,omitempty"`
 
 	Http HttpRequest `json:"http,omitempty"`
 

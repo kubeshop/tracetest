@@ -12,28 +12,56 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+const (
+	ResourceName       string = "test"
+	ResourceNamePlural string = "tests"
+)
+
 type (
 	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
-		ID               id.ID
-		CreatedAt        time.Time
-		Name             string
-		Description      string
-		Version          int
-		ServiceUnderTest trigger.Trigger
-		Specs            maps.Ordered[SpanQuery, NamedAssertions]
-		Outputs          maps.Ordered[string, Output]
-		Summary          Summary
+		ID          id.ID                        `json:"id"`
+		CreatedAt   time.Time                    `json:"createdAt"`
+		Name        string                       `json:"name"`
+		Description string                       `json:"description"`
+		Version     int                          `json:"version"`
+		Trigger     trigger.Trigger              `json:"trigger"`
+		Specs       []TestSpec                   `json:"specs"`
+		Outputs     maps.Ordered[string, Output] `json:"outputs"`
+		Summary     Summary                      `json:"summary"`
 	}
 
 	Output struct {
-		Selector SpanQuery
-		Value    string `expr_enabled:"true"`
+		Selector SpanQuery `json:"selector"`
+		Value    string    `json:"value" expr_enabled:"true"`
 	}
 
-	NamedAssertions struct {
-		Name       string      `expr_enabled:"true"`
-		Assertions []Assertion `stmt_enabled:"true"`
+	TestSpec struct {
+		Selector   Selector    `json:"selector"`
+		Name       string      `json:"name,omitempty"`
+		Assertions []Assertion `json:"assertions"`
+	}
+
+	Selector struct {
+		Query          SpanQuery    `json:"query"`
+		ParsedSelector SpanSelector `json:"parsedSelector"`
+	}
+
+	SpanSelector struct {
+		Filters       []SelectorFilter     `json:"filters"`
+		PseudoClass   *SelectorPseudoClass `json:"pseudoClass,omitempty"`
+		ChildSelector *SpanSelector        `json:"childSelector,omitempty"`
+	}
+
+	SelectorFilter struct {
+		Property string `json:"property"`
+		Operator string `json:"operator"`
+		Value    string `json:"value"`
+	}
+
+	SelectorPseudoClass struct {
+		Name     string `json:"name"`
+		Argument *int32 `json:"argument,omitempty"`
 	}
 
 	Summary struct {
@@ -127,6 +155,14 @@ type (
 		CompareErr    error
 	}
 )
+
+func (t Test) GetID() id.ID {
+	return t.ID
+}
+
+func (t Test) Validate() error {
+	return nil
+}
 
 func (sar SpanAssertionResult) SafeSpanIDString() string {
 	if sar.SpanID == nil {
