@@ -6,11 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"go.opentelemetry.io/otel"
@@ -51,7 +49,6 @@ func (c *customController) Routes() openapi.Routes {
 		hf := route.HandlerFunc
 
 		hf = c.instrumentRoute(routeName, route.Pattern, hf)
-		hf = c.analytics(route.Name, hf)
 
 		route.HandlerFunc = hf
 
@@ -223,26 +220,6 @@ func parseInt32Parameter(param string, required bool) (int32, error) {
 	}
 
 	return int32(val), nil
-}
-
-var (
-	matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
-)
-
-func toWords(str string) string {
-	words := matchFirstCap.ReplaceAllString(str, "${1} ${2}")
-	words = matchAllCap.ReplaceAllString(words, "${1} ${2}")
-	return words
-}
-
-func (c *customController) analytics(name string, f http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		machineID := r.Header.Get("x-client-id")
-		analytics.SendEvent(toWords(name), "test", machineID, nil)
-
-		f(w, r)
-	}
 }
 
 func (c *customController) instrumentRoute(name string, route string, f http.HandlerFunc) http.HandlerFunc {

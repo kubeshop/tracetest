@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -248,6 +249,9 @@ func (app *App) Start(opts ...appOption) error {
 	router, mappers := controller(app.cfg, testDB, transactionsRepository, tracer, environmentRepo, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
+	// use the analytics middleware on complete router
+	router.Use(analyticsMW)
+
 	apiRouter := router.
 		PathPrefix(app.cfg.ServerPathPrefix()).
 		PathPrefix("/api").
@@ -287,6 +291,23 @@ func (app *App) Start(opts ...appOption) error {
 	log.Printf("HTTP Server started on %s", httpServer.Addr)
 
 	return nil
+}
+
+// Analytics global middleware
+func analyticsMW(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := strings.ReplaceAll(r.URL.Path, "/", "_")
+		name := strings.ToLower(fmt.Sprintf("%s%s", r.Method, path))
+
+		machineID := r.Header.Get("x-client-id")
+		source := r.Header.Get("x-source")
+
+		analytics.SendEvent(name, "test", machineID, &map[string]string{
+			"source": source,
+		})
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabled bool, serverID string, isTracetestDev bool) {

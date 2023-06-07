@@ -33,7 +33,7 @@ func Init(conf config.Config) {
 	if err == nil {
 		// only use id if available.
 		mid = id
-	} // ignore errors and continue with an empty ID if neccesary
+	} // ignore errors and continue with an empty ID if necessary
 
 	client.Enqueue(segment.Identify{
 		UserId: mid,
