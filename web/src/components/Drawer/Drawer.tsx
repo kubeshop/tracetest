@@ -66,6 +66,7 @@ const Drawer = ({leftPanel, rightPanel}: IProps) => {
         <ReflexSplitter>
           <S.ButtonContainer>
             <Button
+              data-cy="toggle-drawer"
               data-tour={StepsID.SpanDetails}
               icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
               onClick={event => {
