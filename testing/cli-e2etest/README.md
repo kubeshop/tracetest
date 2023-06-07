@@ -56,9 +56,9 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | -------------------------------------------------------- | -------------- |
 | `apply datastore -f [data-store-file]`                   | [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go) |
 | `delete datastore --id current`                          | [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
-| `get datastore --id current --output pretty`             | [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go), [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
-| `get datastore --id current --output json`               | |
-| `get datastore --id current --output yaml`               | |
+| `get datastore --id current --output pretty`             | [GetDatastore](./testscenarios/datastore/get_datastore_test.go), [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go), [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
+| `get datastore --id current --output json`               | [GetDatastore](./testscenarios/datastore/get_datastore_test.go) |
+| `get datastore --id current --output yaml`               | [GetDatastore](./testscenarios/datastore/get_datastore_test.go) |
 | `list datastore --output pretty`                         | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
 | `list datastore --output json`                           | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
 | `list datastore --output yaml`                           | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
