@@ -1,4 +1,10 @@
-# Creating Transactions
+# Defining Transactions as Text Files
+
+This page showcases how to create and edit Transactions with the CLI.
+
+:::tip
+[To read more about transactions check out transactions concepts.](../concepts/transactions.md)
+:::
 
 Just like other structures of Tracetest, you can also manage your transactions using the CLI and definition files.
 
@@ -18,7 +24,7 @@ spec:
 
 In order to apply this transaction to your Tracetest instance, make sure to have your [CLI configured](./configuring-your-cli.md) and run:
 
-```
+```sh
 tracetest apply transaction -f <transaction.yaml>
 ```
 

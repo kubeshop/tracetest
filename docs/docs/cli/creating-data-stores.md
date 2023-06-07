@@ -2,6 +2,8 @@
 
 You might have multiple Tracetest instances that need to be connected to the same data stores. An easy way of sharing the configuration is by using a configuration file that can be applied to your Tracetest instance.
 
+## Supported Trace Data Stores
+
 ### Jaeger
 
 ```yaml
