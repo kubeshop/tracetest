@@ -11,6 +11,7 @@ export interface ITraceState {
   nodes: Node[];
   searchText: string;
   selectedSpan: string;
+  selectedAnalyzerResults: string;
 }
 
 const initialState: ITraceState = {
@@ -19,6 +20,7 @@ const initialState: ITraceState = {
   nodes: [],
   searchText: '',
   selectedSpan: '',
+  selectedAnalyzerResults: '',
 };
 
 const traceSlice = createSlice({
@@ -66,8 +68,12 @@ const traceSlice = createSlice({
     setSearchText(state, {payload}: PayloadAction<{searchText: string}>) {
       state.searchText = payload.searchText.toLowerCase();
     },
+    selectAnalyzerResults(state, {payload}: PayloadAction<{spanId: string}>) {
+      state.selectedAnalyzerResults = payload.spanId;
+    },
   },
 });
 
-export const {initNodes, changeNodes, selectSpan, matchSpans, setSearchText} = traceSlice.actions;
+export const {initNodes, changeNodes, selectSpan, matchSpans, setSearchText, selectAnalyzerResults} =
+  traceSlice.actions;
 export default traceSlice.reducer;

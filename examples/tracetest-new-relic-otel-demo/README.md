@@ -158,7 +158,7 @@ dataStore:
 
 The `otelcol-config-extras.yml` explains that. But first, check the `otelcol-config.yml`. It receives traces via either `grpc` or `http`. Then, in the `otelcol-config-extras.yml` you see a `exporters` that exports traces to Tracetest's OTLP endpoint `tracetest:4317` in one pipeline, and to New Relic in another.
 
-Make sure to add your New Relic access token in the headers of the `otlp/nr` exporter.
+Make sure to add your New Relic access token in the headers of the `otlp/newrelic` exporter.
 
 ```yaml
 # otelcol-config-extras.yml
@@ -172,11 +172,11 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
-  otlp/nr:
+  otlp/newrelic:
     endpoint: otlp.nr-data.net:443
     headers:
       api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
@@ -185,14 +185,14 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/nr:
+      exporters: [otlp/tracetest]
+    traces/newrelic:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/nr]
+      exporters: [logging, otlp/newrelic]
 ```
 
 ## Run the OpenTelemetry Demo with Tracetest and New Relic

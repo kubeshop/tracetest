@@ -240,6 +240,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/ad-hoc-testing",
+          label: "Ad-hoc Testing",
+        },
+        {
+          type: "doc",
           id: "concepts/versioning",
           label: "Versioning",
         },
@@ -251,33 +256,54 @@ const sidebars = {
       items: [
         {
           type: "doc",
-          id: "web-ui/creating-tests",
-          label: "Creating Tests",
+          id: "web-ui/creating-data-stores",
+          label: "Configuring Data Stores",
+        },
+        {
+          type: "category",
+          label: "Configuring Tests",
+          items: [
+            {
+              type: "doc",
+              id: "web-ui/creating-tests",
+              label: "Creating Tests",
+            },
+            {
+              type: "doc",
+              id: "web-ui/creating-test-specifications",
+              label: "Creating Test Specifications",
+            },
+            {
+              type: "doc",
+              id: "web-ui/creating-test-outputs",
+              label: "Creating Test Outputs",
+            },
+            {
+              type: "doc",
+              id: "web-ui/test-results",
+              label: "Test Results",
+            },
+            {
+              type: "doc",
+              id: "web-ui/exporting-tests",
+              label: "Exporting Tests",
+            },
+            {
+              type: "doc",
+              id: "web-ui/undefined-variables",
+              label: "Using Undefined Variables",
+            },
+          ],
         },
         {
           type: "doc",
-          id: "web-ui/creating-test-specifications",
-          label: "Creating Test Specifications",
+          id: "web-ui/creating-transactions",
+          label: "Creating Transactions",
         },
         {
           type: "doc",
-          id: "web-ui/creating-test-outputs",
-          label: "Creating Test Outputs",
-        },
-        {
-          type: "doc",
-          id: "web-ui/test-results",
-          label: "Test Results",
-        },
-        {
-          type: "doc",
-          id: "web-ui/exporting-tests",
-          label: "Exporting Tests",
-        },
-        {
-          type: "doc",
-          id: "web-ui/undefined-variables",
-          label: "Using Undefined Variables",
+          id: "web-ui/creating-environments",
+          label: "Creating Environments",
         },
       ],
     },
@@ -293,33 +319,65 @@ const sidebars = {
         {
           type: "doc",
           id: "cli/creating-data-stores",
-          label: "Creating Data Stores",
+          label: "Configuring Data Stores",
+        },
+        {
+          type: "category",
+          label: "Configuring Tests",
+          items: [
+            {
+              type: "doc",
+              id: "cli/creating-tests",
+              label: "Creating Tests",
+            },
+            {
+              type: "doc",
+              id: "cli/creating-test-specifications",
+              label: "Creating Test Specifications",
+            },
+            {
+              type: "doc",
+              id: "cli/creating-test-outputs",
+              label: "Creating Test Outputs",
+            },
+            {
+              type: "doc",
+              id: "cli/running-tests",
+              label: "Running Tests",
+            },
+            {
+              type: "doc",
+              id: "cli/undefined-variables",
+              label: "Using Undefined Variables",
+            },
+            // {
+            //   type: "doc",
+            //   id: "cli/exporting-tests",
+            //   label: "Exporting tests",
+            // },
+          ],
+        },
+        {
+          type: "category",
+          label: "Configuring Transactions",
+          items: [
+            {
+              type: "doc",
+              id: "cli/creating-transactions",
+              label: "Creating Transactions",
+            },
+            {
+              type: "doc",
+              id: "cli/running-transactions",
+              label: "Running Transactions",
+            },
+          ]
         },
         {
           type: "doc",
           id: "cli/creating-environments",
           label: "Creating Environments",
         },
-        {
-          type: "doc",
-          id: "cli/creating-tests",
-          label: "Creating Tests",
-        },
-        {
-          type: "doc",
-          id: "cli/running-tests",
-          label: "Running Tests",
-        },
-        {
-          type: "doc",
-          id: "cli/creating-transactions",
-          label: "Creating Transactions",
-        },
-        // {
-        //   type: "doc",
-        //   id: "cli/exporting-tests",
-        //   label: "Exporting tests",
-        // },
         {
           type: "category",
           label: "Reference",

@@ -1,27 +1,31 @@
 import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/icons';
-import {Space} from 'antd';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {Handle, NodeProps, Position} from 'react-flow-renderer';
 
-import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
-import {SpanKindToText} from 'constants/Span.constants';
-import {useAppSelector} from 'redux/hooks';
-import SpanService from 'services/Span.service';
-import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
-import {INodeDataSpan} from 'types/DAG.types';
 import AssertionResultChecks from 'components/AssertionResultChecks/AssertionResultChecks';
-import {selectOutputsBySpanId} from 'redux/testOutputs/selectors';
+import CurrentSpanSelector from 'components/CurrentSpanSelector';
 import TestOutputMark from 'components/TestOutputMark';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
-import CurrentSpanSelector from 'components/CurrentSpanSelector';
+import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
+import {SpanKindToText} from 'constants/Span.constants';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {selectAnalyzerResults} from 'redux/slices/Trace.slice';
+import {selectOutputsBySpanId} from 'redux/testOutputs/selectors';
+import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
+import TraceSelectors from 'selectors/Trace.selectors';
+import SpanService from 'services/Span.service';
+import {INodeDataSpan} from 'types/DAG.types';
+import AnalyzerResults from './AnalyzerResults';
+import * as SA from './AnalyzerResults.styled';
 import * as S from './SpanNode.styled';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const SpanNode = ({data, id, selected}: IProps) => {
+  const dispatch = useAppDispatch();
   const assertions = useAppSelector(state => TestSpecsSelectors.selectAssertionResultsBySpan(state, data?.id || ''));
   const outputs = useAppSelector(state => selectOutputsBySpanId(state, data?.id || ''));
   const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
@@ -36,7 +40,11 @@ const SpanNode = ({data, id, selected}: IProps) => {
   const showSelectAsCurrent =
     !data.isMatched && !!matchedSpans.length && (isTestSpecFormOpen || isTestOutputFormOpen) && selected;
   const className = `${data.isMatched ? 'matched' : ''} ${showSelectAsCurrent ? 'selectedAsCurrent' : ''}`;
-  const [isOpenLintErrors, setIsOpenLintErrors] = useState(false);
+  const selectedAnalyzerResults = useAppSelector(TraceSelectors.selectSelectedAnalyzerResults);
+
+  const handleSelectAnalyzerResults = (spanId: string = '') => {
+    dispatch(selectAnalyzerResults({spanId}));
+  };
 
   return (
     <>
@@ -50,27 +58,8 @@ const SpanNode = ({data, id, selected}: IProps) => {
 
         <S.TopLine $type={data.type} />
 
-        {isOpenLintErrors && (
-          <S.LintContainer className="nowheel nodrag">
-            <S.LintCloseIcon onClick={() => setIsOpenLintErrors(false)} />
-            <Space>
-              <S.LintErrorIcon />
-              <S.LintTitle level={4}>Analyzer errors</S.LintTitle>
-            </Space>
-            <S.LintBody>
-              {lintErrors.map(lintError => (
-                <div>
-                  <S.LintText strong>{lintError.ruleName}</S.LintText>
-
-                  {lintError.errors.map(error => (
-                    <div>
-                      <S.LintText type="secondary">- {error}</S.LintText>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </S.LintBody>
-          </S.LintContainer>
+        {selectedAnalyzerResults === data.id && (
+          <AnalyzerResults lintErrors={lintErrors} onClose={() => handleSelectAnalyzerResults()} />
         )}
 
         <S.Header>
@@ -78,7 +67,7 @@ const SpanNode = ({data, id, selected}: IProps) => {
             <S.BadgeType count={SemanticGroupNamesToText[data.type]} $hasMargin $type={data.type} />
           </S.BadgeContainer>
           <S.HeaderText>{data.name}</S.HeaderText>
-          {!!lintErrors.length && <S.LintErrorIcon $isAbsolute onClick={() => setIsOpenLintErrors(prev => !prev)} />}
+          {!!lintErrors.length && <SA.ErrorIcon $isAbsolute onClick={() => handleSelectAnalyzerResults(data.id)} />}
         </S.Header>
 
         <S.Body>

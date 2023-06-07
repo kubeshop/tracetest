@@ -87,16 +87,15 @@ const SpanService = () => ({
   },
 });
 
-export type TLintBySpan = Record<
-  string,
-  {
-    ruleName: string;
-    pluginName: string;
-    passed: boolean;
-    spanId: string;
-    errors: string[];
-    severity: 'error' | 'warning';
-  }[]
->;
+export type TLintBySpanContent = {
+  ruleName: string;
+  pluginName: string;
+  passed: boolean;
+  spanId: string;
+  errors: string[];
+  severity: 'error' | 'warning';
+};
+
+export type TLintBySpan = Record<string, TLintBySpanContent[]>;
 
 export default SpanService();

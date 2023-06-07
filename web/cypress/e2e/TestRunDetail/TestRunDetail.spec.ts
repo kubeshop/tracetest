@@ -7,6 +7,7 @@ describe('Test Run Detail Views', () => {
   it('Trace view -> show the attribute list for a specific span', () => {
     cy.selectRunDetailMode(2);
     cy.get('[data-cy=trace-node-http]').click();
+    cy.get('[data-cy=toggle-drawer]').click();
 
     cy.get('[data-cy=attribute-list]').should('be.visible');
     cy.get('[data-cy=attribute-row-http-method]').should('be.visible');
@@ -15,6 +16,7 @@ describe('Test Run Detail Views', () => {
   it('Trace view -> attribute list', () => {
     cy.selectRunDetailMode(2);
     cy.get('[data-cy=trace-node-http]').click();
+    cy.get('[data-cy=toggle-drawer]').click();
 
     cy.get('[data-cy=attribute-list]').should('be.visible');
   });
