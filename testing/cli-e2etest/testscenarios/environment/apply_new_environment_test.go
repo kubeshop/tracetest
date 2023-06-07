@@ -37,13 +37,23 @@ func TestApplyNewEnvironment(t *testing.T) {
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)
 
+	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
+
+	require.Equal("Environment", environmentVars.Type)
+	require.Equal(".env", environmentVars.Spec.ID)
+	require.Equal(".env", environmentVars.Spec.Name)
+	require.Len(environmentVars.Spec.Values, 2)
+	require.Equal("FIRST_VAR", environmentVars.Spec.Values[0].Key)
+	require.Equal("some-value", environmentVars.Spec.Values[0].Value)
+	require.Equal("SECOND_VAR", environmentVars.Spec.Values[1].Key)
+	require.Equal("another_value", environmentVars.Spec.Values[1].Value)
+
 	// When I try to get the environment applied on the last step
 	// Then it should return it
 	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)
 
-	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-
+	environmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
 	require.Equal("Environment", environmentVars.Type)
 	require.Equal(".env", environmentVars.Spec.ID)
 	require.Equal(".env", environmentVars.Spec.Name)
@@ -60,13 +70,7 @@ func TestApplyNewEnvironment(t *testing.T) {
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", updatedNewEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)
 
-	// When I try to get the environment applied on the last step
-	// Then it should return it
-	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
-
 	updatedEnvironmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-
 	require.Equal("Environment", updatedEnvironmentVars.Type)
 	require.Equal(".env", updatedEnvironmentVars.Spec.ID)
 	require.Equal(".env", updatedEnvironmentVars.Spec.Name)
@@ -78,4 +82,20 @@ func TestApplyNewEnvironment(t *testing.T) {
 	require.Equal("THIRD_VAR", updatedEnvironmentVars.Spec.Values[2].Key)
 	require.Equal("hello", updatedEnvironmentVars.Spec.Values[2].Value) // this value was added
 
+	// When I try to get the environment applied on the last step
+	// Then it should return it
+	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+	require.Equal(0, result.ExitCode)
+
+	updatedEnvironmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
+	require.Equal("Environment", updatedEnvironmentVars.Type)
+	require.Equal(".env", updatedEnvironmentVars.Spec.ID)
+	require.Equal(".env", updatedEnvironmentVars.Spec.Name)
+	require.Len(updatedEnvironmentVars.Spec.Values, 3)
+	require.Equal("FIRST_VAR", updatedEnvironmentVars.Spec.Values[0].Key)
+	require.Equal("some-value", updatedEnvironmentVars.Spec.Values[0].Value)
+	require.Equal("SECOND_VAR", updatedEnvironmentVars.Spec.Values[1].Key)
+	require.Equal("updated_value", updatedEnvironmentVars.Spec.Values[1].Value) // this value has been updated
+	require.Equal("THIRD_VAR", updatedEnvironmentVars.Spec.Values[2].Key)
+	require.Equal("hello", updatedEnvironmentVars.Spec.Values[2].Value) // this value was added
 }

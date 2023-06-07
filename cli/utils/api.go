@@ -222,6 +222,22 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 		return nil, fmt.Errorf("could not send request: %w", err)
 	}
 
+	if resp.StatusCode == http.StatusBadRequest {
+		body := IOReadCloserToString(resp.Body)
+
+		var parsedError struct {
+			Code  int    `json:"code"`
+			Error string `json:"error"`
+		}
+		err = json.Unmarshal([]byte(body), &parsedError)
+		if err != nil {
+			return nil, fmt.Errorf("could not list resource: %w", err)
+		}
+
+		// parse error message
+		return nil, fmt.Errorf("could not list resource: %s", parsedError.Error)
+	}
+
 	body := IOReadCloserToString(resp.Body)
 	if listArgs.All {
 		baseListResponse, err := parseListResponse(body)
