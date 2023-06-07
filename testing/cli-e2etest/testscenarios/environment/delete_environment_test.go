@@ -43,7 +43,7 @@ func TestDeleteEnvironment(t *testing.T) {
 
 	// When I try to get an environment again
 	// Then it should return a message saying that the environment was not found
-	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+	result = tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 	require.Contains(result.StdOut, "Resource environment with ID .env not found")
 }

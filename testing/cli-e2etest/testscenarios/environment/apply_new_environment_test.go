@@ -26,7 +26,7 @@ func TestApplyNewEnvironment(t *testing.T) {
 
 	// When I try to get an environment that doesn't exists
 	// Then it should return error message
-	result := tracetestcli.Exec(t, "get environment --id .noenv", tracetestcli.WithCLIConfig(cliConfig))
+	result := tracetestcli.Exec(t, "get environment --id .noenv --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 	require.Contains(result.StdOut, "Resource environment with ID .noenv not found")
 
@@ -50,7 +50,7 @@ func TestApplyNewEnvironment(t *testing.T) {
 
 	// When I try to get the environment applied on the last step
 	// Then it should return it
-	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+	result = tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)
 
 	environmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
@@ -84,7 +84,7 @@ func TestApplyNewEnvironment(t *testing.T) {
 
 	// When I try to get the environment applied on the last step
 	// Then it should return it
-	result = tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+	result = tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)
 
 	updatedEnvironmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
