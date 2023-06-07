@@ -2,6 +2,7 @@ package environment
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -95,7 +96,7 @@ func TestListEnvironments(t *testing.T) {
 		environmentVarsList := helpers.UnmarshalYAMLSequence[types.EnvironmentResource](t, result.StdOut)
 		require.Len(environmentVarsList, 3)
 
-		// due the our database sorting algorithm, "another-env" comes in the front of ".env"
+		// due our database sorting algorithm, "another-env" comes in the front of ".env"
 		// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
 		anotherEnvironmentVars := environmentVarsList[0]
 		require.Equal("Environment", anotherEnvironmentVars.Type)
@@ -143,7 +144,7 @@ func TestListEnvironments(t *testing.T) {
 		environmentVarsList := helpers.UnmarshalJSON[[]types.EnvironmentResource](t, result.StdOut)
 		require.Len(environmentVarsList, 3)
 
-		// due the our database sorting algorithm, "another-env" comes in the front of ".env"
+		// due our database sorting algorithm, "another-env" comes in the front of ".env"
 		// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
 		anotherEnvironmentVars := environmentVarsList[0]
 		require.Equal("Environment", anotherEnvironmentVars.Type)
@@ -174,5 +175,27 @@ func TestListEnvironments(t *testing.T) {
 		require.Equal("Is", oneMoreEnvironmentVars.Spec.Values[0].Value)
 		require.Equal("The", oneMoreEnvironmentVars.Spec.Values[1].Key)
 		require.Equal("Third", oneMoreEnvironmentVars.Spec.Values[1].Value)
+	})
+
+	t.Run("list with pretty format", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+
+		// When I try to list these environments by a valid field and in pretty format
+		// Then it should print a table with 6 lines printed: header, separator, three envs and empty line
+		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --output pretty", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		lines := strings.Split(result.StdOut, "\n")
+		require.Len(lines, 6)
+
+		// due our database sorting algorithm, "another-env" comes in the front of ".env"
+		// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
+		require.Contains(lines[2], "another-env")
+		require.Contains(lines[3], ".env")
+		require.Contains(lines[4], "one-more-env")
 	})
 }
