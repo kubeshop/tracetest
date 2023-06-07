@@ -93,10 +93,10 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `get environment --id [existing-id] --output pretty`        | |
 | `get environment --id [existing-id] --output json`          | |
 | `get environment --id [existing-id] --output yaml`          | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
-| `list environment --output pretty`                          | |
+| `list environment --output pretty`                          | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output json`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output yaml`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
-| `list environment --skip 1 --take 2`                        | |
+| `list environment --skip 1 --take 2`                        | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --sortBy name --sortDirection asc`        | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 
 ### Resources: PollingProfile

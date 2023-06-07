@@ -198,4 +198,42 @@ func TestListEnvironments(t *testing.T) {
 		require.Contains(lines[3], ".env")
 		require.Contains(lines[4], "one-more-env")
 	})
+
+	t.Run("list with YAML format skipping the first and taking two items", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+
+		// When I try to list these environments by a valid field and in YAML format
+		// Then I should receive three environments
+		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --skip 1 --take 2 --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		environmentVarsList := helpers.UnmarshalYAMLSequence[types.EnvironmentResource](t, result.StdOut)
+		require.Len(environmentVarsList, 2)
+
+		// due our database sorting algorithm, "another-env" comes in the front of ".env"
+		// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
+		environmentVars := environmentVarsList[0]
+		require.Equal("Environment", environmentVars.Type)
+		require.Equal(".env", environmentVars.Spec.ID)
+		require.Equal(".env", environmentVars.Spec.Name)
+		require.Len(environmentVars.Spec.Values, 2)
+		require.Equal("FIRST_VAR", environmentVars.Spec.Values[0].Key)
+		require.Equal("some-value", environmentVars.Spec.Values[0].Value)
+		require.Equal("SECOND_VAR", environmentVars.Spec.Values[1].Key)
+		require.Equal("another_value", environmentVars.Spec.Values[1].Value)
+
+		oneMoreEnvironmentVars := environmentVarsList[1]
+		require.Equal("Environment", oneMoreEnvironmentVars.Type)
+		require.Equal("one-more-env", oneMoreEnvironmentVars.Spec.ID)
+		require.Equal("one-more-env", oneMoreEnvironmentVars.Spec.Name)
+		require.Len(oneMoreEnvironmentVars.Spec.Values, 2)
+		require.Equal("This", oneMoreEnvironmentVars.Spec.Values[0].Key)
+		require.Equal("Is", oneMoreEnvironmentVars.Spec.Values[0].Value)
+		require.Equal("The", oneMoreEnvironmentVars.Spec.Values[1].Key)
+		require.Equal("Third", oneMoreEnvironmentVars.Spec.Values[1].Value)
+	})
 }
