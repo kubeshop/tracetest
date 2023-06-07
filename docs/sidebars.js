@@ -235,6 +235,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/ad-hoc-testing",
+          label: "Ad-hoc Testing",
+        },
+        {
+          type: "doc",
           id: "concepts/versioning",
           label: "Versioning",
         },
@@ -334,6 +339,11 @@ const sidebars = {
               type: "doc",
               id: "cli/running-tests",
               label: "Running Tests",
+            },
+            {
+              type: "doc",
+              id: "cli/undefined-variables",
+              label: "Using Undefined Variables",
             },
             // {
             //   type: "doc",
