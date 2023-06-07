@@ -2,8 +2,10 @@ type: Environment
 spec:
   id: .env
   name: .env
+  description: ""
+  createdAt: 2023-06-07T14:52:44.215823742Z
   values:
-    - key: FIRST_VAR
-      value: some-value
-    - key: SECOND_VAR
-      value: another_value
+  - key: FIRST_VAR
+    value: some-value
+  - key: SECOND_VAR
+    value: another_value

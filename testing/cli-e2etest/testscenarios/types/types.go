@@ -14,10 +14,15 @@ type DataStoreResource struct {
 
 // Environment
 
+type EnvironmentKeyValue struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type Environment struct {
-	ID     string            `json:"id"`
-	Name   string            `json:"name"`
-	Values map[string]string `json:"values"`
+	ID     string                `json:"id"`
+	Name   string                `json:"name"`
+	Values []EnvironmentKeyValue `json:"values"`
 }
 
 type EnvironmentResource struct {

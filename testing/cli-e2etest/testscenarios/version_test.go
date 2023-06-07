@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
+	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
 	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 )
@@ -23,6 +24,6 @@ func TestVersionCommand(t *testing.T) {
 	// Then I should receive a version string with success
 	result := tracetestcli.Exec(t, "version", tracetestcli.WithCLIConfig(cliConfig))
 
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 	require.Greater(len(result.StdOut), 0)
 }
