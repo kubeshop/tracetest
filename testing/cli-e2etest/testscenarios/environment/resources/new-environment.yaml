@@ -3,7 +3,7 @@ spec:
   id: .env
   name: .env
   description: ""
-  createdAt: 2023-06-07T17:48:12.255458995Z
+  createdAt: 2023-06-07T19:44:44.926474054Z
   values:
   - key: FIRST_VAR
     value: some-value
