@@ -40,6 +40,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        # TODO: remove serviceUnderTest after test migration
+        serviceUnderTest:
+          $ref: "./triggers.yaml#/components/schemas/Trigger"
         trigger:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
         specs:

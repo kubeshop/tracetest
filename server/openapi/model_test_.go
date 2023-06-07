@@ -25,6 +25,8 @@ type Test struct {
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
+	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
+
 	Trigger Trigger `json:"trigger,omitempty"`
 
 	// specification of assertions that are going to be made
@@ -38,6 +40,9 @@ type Test struct {
 
 // AssertTestRequired checks if the required fields are not zero-ed
 func AssertTestRequired(obj Test) error {
+	if err := AssertTriggerRequired(obj.ServiceUnderTest); err != nil {
+		return err
+	}
 	if err := AssertTriggerRequired(obj.Trigger); err != nil {
 		return err
 	}

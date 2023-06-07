@@ -17,7 +17,11 @@ components:
     TriggerResult:
       type: object
       properties:
+        # TODO: remove after test migration
         triggerType:
+          type: string
+          enum: ["http", "grpc", "traceid"]
+        type:
           type: string
           enum: ["http", "grpc", "traceid"]
         triggerResult:
