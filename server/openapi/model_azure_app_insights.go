@@ -10,6 +10,12 @@
 package openapi
 
 type AzureAppInsights struct {
+	UseAzureActiveDirectoryAuth bool `json:"useAzureActiveDirectoryAuth,omitempty"`
+
+	AccessToken string `json:"accessToken,omitempty"`
+
+	ConnectionType SupportedConnectionTypes `json:"connectionType,omitempty"`
+
 	ResourceArmId string `json:"resourceArmId,omitempty"`
 }
 

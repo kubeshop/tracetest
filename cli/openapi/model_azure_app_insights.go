@@ -19,7 +19,10 @@ var _ MappedNullable = &AzureAppInsights{}
 
 // AzureAppInsights struct for AzureAppInsights
 type AzureAppInsights struct {
-	ResourceArmId *string `json:"resourceArmId,omitempty"`
+	UseAzureActiveDirectoryAuth *bool                     `json:"useAzureActiveDirectoryAuth,omitempty"`
+	AccessToken                 *string                   `json:"accessToken,omitempty"`
+	ConnectionType              *SupportedConnectionTypes `json:"connectionType,omitempty"`
+	ResourceArmId               *string                   `json:"resourceArmId,omitempty"`
 }
 
 // NewAzureAppInsights instantiates a new AzureAppInsights object
@@ -37,6 +40,102 @@ func NewAzureAppInsights() *AzureAppInsights {
 func NewAzureAppInsightsWithDefaults() *AzureAppInsights {
 	this := AzureAppInsights{}
 	return &this
+}
+
+// GetUseAzureActiveDirectoryAuth returns the UseAzureActiveDirectoryAuth field value if set, zero value otherwise.
+func (o *AzureAppInsights) GetUseAzureActiveDirectoryAuth() bool {
+	if o == nil || isNil(o.UseAzureActiveDirectoryAuth) {
+		var ret bool
+		return ret
+	}
+	return *o.UseAzureActiveDirectoryAuth
+}
+
+// GetUseAzureActiveDirectoryAuthOk returns a tuple with the UseAzureActiveDirectoryAuth field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AzureAppInsights) GetUseAzureActiveDirectoryAuthOk() (*bool, bool) {
+	if o == nil || isNil(o.UseAzureActiveDirectoryAuth) {
+		return nil, false
+	}
+	return o.UseAzureActiveDirectoryAuth, true
+}
+
+// HasUseAzureActiveDirectoryAuth returns a boolean if a field has been set.
+func (o *AzureAppInsights) HasUseAzureActiveDirectoryAuth() bool {
+	if o != nil && !isNil(o.UseAzureActiveDirectoryAuth) {
+		return true
+	}
+
+	return false
+}
+
+// SetUseAzureActiveDirectoryAuth gets a reference to the given bool and assigns it to the UseAzureActiveDirectoryAuth field.
+func (o *AzureAppInsights) SetUseAzureActiveDirectoryAuth(v bool) {
+	o.UseAzureActiveDirectoryAuth = &v
+}
+
+// GetAccessToken returns the AccessToken field value if set, zero value otherwise.
+func (o *AzureAppInsights) GetAccessToken() string {
+	if o == nil || isNil(o.AccessToken) {
+		var ret string
+		return ret
+	}
+	return *o.AccessToken
+}
+
+// GetAccessTokenOk returns a tuple with the AccessToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AzureAppInsights) GetAccessTokenOk() (*string, bool) {
+	if o == nil || isNil(o.AccessToken) {
+		return nil, false
+	}
+	return o.AccessToken, true
+}
+
+// HasAccessToken returns a boolean if a field has been set.
+func (o *AzureAppInsights) HasAccessToken() bool {
+	if o != nil && !isNil(o.AccessToken) {
+		return true
+	}
+
+	return false
+}
+
+// SetAccessToken gets a reference to the given string and assigns it to the AccessToken field.
+func (o *AzureAppInsights) SetAccessToken(v string) {
+	o.AccessToken = &v
+}
+
+// GetConnectionType returns the ConnectionType field value if set, zero value otherwise.
+func (o *AzureAppInsights) GetConnectionType() SupportedConnectionTypes {
+	if o == nil || isNil(o.ConnectionType) {
+		var ret SupportedConnectionTypes
+		return ret
+	}
+	return *o.ConnectionType
+}
+
+// GetConnectionTypeOk returns a tuple with the ConnectionType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AzureAppInsights) GetConnectionTypeOk() (*SupportedConnectionTypes, bool) {
+	if o == nil || isNil(o.ConnectionType) {
+		return nil, false
+	}
+	return o.ConnectionType, true
+}
+
+// HasConnectionType returns a boolean if a field has been set.
+func (o *AzureAppInsights) HasConnectionType() bool {
+	if o != nil && !isNil(o.ConnectionType) {
+		return true
+	}
+
+	return false
+}
+
+// SetConnectionType gets a reference to the given SupportedConnectionTypes and assigns it to the ConnectionType field.
+func (o *AzureAppInsights) SetConnectionType(v SupportedConnectionTypes) {
+	o.ConnectionType = &v
 }
 
 // GetResourceArmId returns the ResourceArmId field value if set, zero value otherwise.
@@ -81,6 +180,15 @@ func (o AzureAppInsights) MarshalJSON() ([]byte, error) {
 
 func (o AzureAppInsights) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.UseAzureActiveDirectoryAuth) {
+		toSerialize["useAzureActiveDirectoryAuth"] = o.UseAzureActiveDirectoryAuth
+	}
+	if !isNil(o.AccessToken) {
+		toSerialize["accessToken"] = o.AccessToken
+	}
+	if !isNil(o.ConnectionType) {
+		toSerialize["connectionType"] = o.ConnectionType
+	}
 	if !isNil(o.ResourceArmId) {
 		toSerialize["resourceArmId"] = o.ResourceArmId
 	}

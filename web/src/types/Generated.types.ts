@@ -1394,6 +1394,9 @@ export interface external {
           token?: string;
         };
         AzureAppInsights: {
+          useAzureActiveDirectoryAuth?: boolean;
+          accessToken?: string;
+          connectionType?: external["dataStores.yaml"]["components"]["schemas"]["SupportedConnectionTypes"];
           resourceArmId?: string;
         };
         AwsXRay: {
@@ -1457,6 +1460,8 @@ export interface external {
           | "azureappinsights";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
+        /** @enum {string} */
+        SupportedConnectionTypes: "direct" | "collector";
       };
     };
     operations: {};

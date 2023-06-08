@@ -5,6 +5,7 @@ go 1.20
 replace k8s.io/client-go => k8s.io/client-go v0.18.0
 
 require (
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery v1.1.0
 	github.com/Jeffail/gabs/v2 v2.7.0
@@ -64,7 +65,6 @@ require (
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.0.0 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 	"github.com/kubeshop/tracetest/server/model"
@@ -23,16 +25,29 @@ type azureAppInsightsDB struct {
 	realTraceDB
 
 	resourceArmId string
-	credentials   *azidentity.DefaultAzureCredential
+	credentials   azcore.TokenCredential
 	client        *azquery.LogsClient
 }
 
 var _ TraceDB = &azureAppInsightsDB{}
 
 func NewAzureAppInsightsDB(config *datastoreresource.AzureAppInsightsConfig) (TraceDB, error) {
-	credentials, err := azidentity.NewDefaultAzureCredential(nil)
-	if err != nil {
-		return nil, err
+	var credentials azcore.TokenCredential
+	var err error
+	if config.UseAzureActiveDirectoryAuth {
+		credentials, err = azidentity.NewDefaultAzureCredential(nil)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		creds := []azcore.TokenCredential{
+			&tokenCredentials{accessToken: config.AccessToken},
+		}
+
+		credentials, err = azidentity.NewChainedTokenCredential(creds, nil)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &azureAppInsightsDB{
@@ -289,4 +304,12 @@ func findColumnByName(columns []*azquery.Column, name string) int {
 	}
 
 	return -1
+}
+
+type tokenCredentials struct {
+	accessToken string
+}
+
+func (c *tokenCredentials) GetToken(ctx context.Context, opts policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	return azcore.AccessToken{Token: c.accessToken}, nil
 }

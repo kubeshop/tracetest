@@ -112,8 +112,18 @@ type SignalFXConfig struct {
 	Token string `json:"token"`
 }
 
+type ConnectionTypes string
+
+const (
+	ConnectionTypesDirect    ConnectionTypes = "direct"
+	ConnectionTypesCollector ConnectionTypes = "collector"
+)
+
 type AzureAppInsightsConfig struct {
-	ResourceArmId string `json:"resourceArmId"`
+	UseAzureActiveDirectoryAuth bool            `json:"useAzureActiveDirectoryAuth"`
+	AccessToken                 string          `json:"accessToken"`
+	ResourceArmId               string          `json:"resourceArmId"`
+	ConnectionType              ConnectionTypes `json:"connectionType"`
 }
 
 const (
@@ -213,6 +223,10 @@ func (ds DataStore) GetID() id.ID {
 }
 
 func (ds DataStore) IsOTLPBasedProvider() bool {
+	if ds.Type == DatastoreTypeAzureAppInsights {
+		return ds.Values.AzureAppInsights.ConnectionType == ConnectionTypesCollector
+	}
+
 	return slices.Contains(otlpBasedDataStores, ds.Type)
 }
 

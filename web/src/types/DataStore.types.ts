@@ -10,6 +10,11 @@ export enum ConfigMode {
   READY = 'READY',
 }
 
+export enum ConnectionTypes {
+  Collector = 'collector',
+  Direct = 'direct',
+}
+
 export enum SupportedDataStores {
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
@@ -101,6 +106,7 @@ export type TDataStoreService = {
   getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<DataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
   getInitialValues(draft: DataStoreConfig, dataStoreType?: SupportedDataStores): TDraftDataStore;
+  shouldTestConnection(draft: TDraftDataStore): boolean;
 };
 
 export interface IDataStorePluginProps {}

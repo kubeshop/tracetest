@@ -1,31 +1,62 @@
-import {SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
+import {ConnectionTypes, SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
 
 const AzureAppInsightsService = (): TDataStoreService => ({
-  getRequest({dataStore: {azureappinsights: {resourceArmId = ''} = {}} = {}}) {
+  getRequest({
+    dataStore: {
+      azureappinsights: {
+        resourceArmId = '',
+        connectionType = ConnectionTypes.Direct,
+        useAzureActiveDirectoryAuth = true,
+        accessToken = '',
+      } = {},
+    } = {},
+  }) {
     return Promise.resolve({
       type: SupportedDataStores.AzureAppInsights,
       name: SupportedDataStores.AzureAppInsights,
       azureappinsights: {
         resourceArmId,
+        connectionType,
+        useAzureActiveDirectoryAuth,
+        accessToken,
       },
     });
   },
-  validateDraft({dataStore: {azureappinsights: {resourceArmId = ''} = {}} = {}}) {
-    if (!resourceArmId) return Promise.resolve(false);
+  validateDraft({
+    dataStore: {
+      azureappinsights: {
+        resourceArmId = '',
+        connectionType = ConnectionTypes.Direct,
+        accessToken = '',
+        useAzureActiveDirectoryAuth = true,
+      } = {},
+    } = {},
+  }) {
+    if (connectionType === ConnectionTypes.Direct && !resourceArmId) return Promise.resolve(false);
+    if (connectionType === ConnectionTypes.Direct && !useAzureActiveDirectoryAuth && !accessToken)
+      return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
   getInitialValues({defaultDataStore: {azureappinsights = {}} = {}}) {
-    const {resourceArmId = ''} = azureappinsights;
+    const {
+      resourceArmId = '',
+      connectionType = ConnectionTypes.Direct,
+      accessToken = '',
+      useAzureActiveDirectoryAuth = true,
+    } = azureappinsights;
 
     return {
       dataStore: {
         name: SupportedDataStores.AzureAppInsights,
         type: SupportedDataStores.AzureAppInsights,
-        azureappinsights: {resourceArmId},
+        azureappinsights: {resourceArmId, connectionType, accessToken, useAzureActiveDirectoryAuth},
       },
       dataStoreType: SupportedDataStores.AzureAppInsights,
     };
+  },
+  shouldTestConnection({dataStore: {azureappinsights: {connectionType = ConnectionTypes.Direct} = {}} = {}}) {
+    return connectionType === ConnectionTypes.Direct;
   },
 });
 

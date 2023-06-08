@@ -89,6 +89,12 @@ components:
     AzureAppInsights:
       type: object
       properties:
+        useAzureActiveDirectoryAuth:
+          type: boolean
+        accessToken:
+          type: string
+        connectionType:
+          $ref: "#/components/schemas/SupportedConnectionTypes"
         resourceArmId:
           type: string
     AwsXRay:
@@ -192,3 +198,6 @@ components:
     SupportedClients:
       type: string
       enum: [http, grpc]
+    SupportedConnectionTypes:
+      type: string
+      enum: [direct, collector]

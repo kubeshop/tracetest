@@ -24,6 +24,9 @@ const SignalFxService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.SignalFX,
     };
   },
+  shouldTestConnection() {
+    return true;
+  },
 });
 
 export default SignalFxService();
