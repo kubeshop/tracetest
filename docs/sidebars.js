@@ -248,6 +248,27 @@ const sidebars = {
           id: "concepts/versioning",
           label: "Versioning",
         },
+        {
+          type: "category",
+          label: "Analyzer",
+          items: [
+            {
+              type: "doc",
+              id: "concepts/tracetest-analyzer-concepts",
+              label: "Tracetest Analyzer",
+            },
+            {
+              type: "doc",
+              id: "concepts/tracetest-analyzer-use",
+              label: "Using Tracetest Analyzer in the UI",
+            },
+            {
+              type: "doc",
+              id: "concepts/tracetest-analyzer-use-cli",
+              label: "Using Tracetest Analyzer in the CLI",
+            },
+          ]
+        },
       ],
     },
     {
