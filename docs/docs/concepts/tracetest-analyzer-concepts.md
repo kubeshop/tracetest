@@ -14,29 +14,29 @@ Another problem is that adding instrumentation is the very first step to achievi
 
 Having a linting rule that is fully plugin-based to evaluate Tracetest to find problems. Allowing simple ways for users to understand the quality of their instrumentation data across the whole framework, catching possible security breaches, and providing tips and guidance on how to fix them.
 
-### Concepts
+## Concepts
 
-**Plugin**
+### Plugin
 
 Is the encapsulation of an `N` number of rules, with a name and a category that defines its specific goal.
 
-**Rule**
+### Rule
 
 Contains the set of validations to be evaluated using one or multiple traces depending on the rule type. The result when applying a rule should be if it passed or failed, displaying extra information using tips for user guidance.
 
 Each rule has a name, description, and logic to evaluate the whole trace or a specific span.
 
-**Rule Types**
+### Rule Types
 
 There are two main rule types:
 
-- Multi trace. Requires a historic number of traces to identify and evaluate the rule.
+- Multi Trace. Requires a historic number of traces to identify and evaluate the rule.
 - Single Trace. Encapsulated to the current trace, no external data is required.
 
-NOTE: This documentation will be focused on single trace rules for timing purposes.
+:::note
+[This documentation will be focused on single trace rules for timing purposes.](../configuration/tracetest-analyzer.md)
+:::
 
-**Linter Resource**
+### Linter Resource
 
 Allows the user to configure the linter framework, a global on/off switch, an opt-in/out for specific plugins or rules, setting up required and optional rules, etc.
-
-

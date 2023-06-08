@@ -134,6 +134,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "configuration/tracetest-analyzer",
+          label: "Tracetest Analyzer",
+        },
+        {
+          type: "doc",
           id: "configuration/demo",
           label: "Demo Applications",
         },
@@ -245,29 +250,13 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "concepts/versioning",
-          label: "Versioning",
+          id: "concepts/tracetest-analyzer-concepts",
+          label: "Tracetest Analyzer",
         },
         {
-          type: "category",
-          label: "Analyzer",
-          items: [
-            {
-              type: "doc",
-              id: "concepts/tracetest-analyzer-concepts",
-              label: "Tracetest Analyzer",
-            },
-            {
-              type: "doc",
-              id: "concepts/tracetest-analyzer-use",
-              label: "Using Tracetest Analyzer in the UI",
-            },
-            {
-              type: "doc",
-              id: "concepts/tracetest-analyzer-use-cli",
-              label: "Using Tracetest Analyzer in the CLI",
-            },
-          ]
+          type: "doc",
+          id: "concepts/versioning",
+          label: "Versioning",
         },
       ],
     },
