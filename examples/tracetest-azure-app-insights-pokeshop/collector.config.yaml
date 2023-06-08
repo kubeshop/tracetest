@@ -1,0 +1,15 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  azuremonitor:
+    instrumentation_key: ${INSTRUMENTATION_KEY}
+
+service:
+  pipelines:
+    traces/appinsights:
+      receivers: [otlp]
+      exporters: [azuremonitor]
