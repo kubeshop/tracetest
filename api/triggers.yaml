@@ -7,6 +7,10 @@ components:
         type:
           type: string
           enum: ["http", "grpc", "traceid"]
+        # TODO: remove after test migration
+        triggerType:
+          type: string
+          enum: ["http", "grpc", "traceid"]
         http:
           $ref: "./http.yaml#/components/schemas/HTTPRequest"
         grpc:
