@@ -130,7 +130,7 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 	enabledOps := m.EnabledOperations()
 
 	if slices.Contains(enabledOps, OperationList) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name("list"))
+		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceTypePlural)))
 	}
 
 	if slices.Contains(enabledOps, OperationCreate) {
