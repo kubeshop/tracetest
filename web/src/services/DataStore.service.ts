@@ -7,6 +7,7 @@ import SignalFxService from './DataStores/SignalFx.service';
 import BaseClientService from './DataStores/BaseClient.service';
 import JaegerService from './DataStores/Jaeger.service';
 import AwsXRayService from './DataStores/AwsXRay.service';
+import AzureAppInsightsService from './DataStores/AzureAppInsights.service';
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
@@ -26,6 +27,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.Datadog]: OtelCollectorService,
   [SupportedDataStores.Honeycomb]: OtelCollectorService,
   [SupportedDataStores.AWSXRay]: AwsXRayService,
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsightsService,
 } as const;
 
 const DataStoreService = (): IDataStoreService => ({

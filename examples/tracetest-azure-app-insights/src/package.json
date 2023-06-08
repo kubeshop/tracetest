@@ -1,0 +1,23 @@
+{
+  "name": "azure-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node -r ./tracing.js app.js",
+    "start-with-otlp": "node -r ./tracing2.js app.js"
+  },
+  "dependencies": {
+    "@azure/core-tracing": "^1.0.1",
+    "@opentelemetry/api": "^1.4.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.37.0",
+    "@opentelemetry/instrumentation-express": "^0.32.3",
+    "@opentelemetry/sdk-node": "^0.40.0",
+    "@opentelemetry/sdk-trace-node": "^1.14.0",
+    "@opentelemetry/tracing": "^0.24.0",
+    "applicationinsights": "^3.0.0-beta.5",
+    "express": "^4.18.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

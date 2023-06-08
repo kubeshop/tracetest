@@ -22,6 +22,7 @@ export enum SupportedDataStores {
   Datadog = 'datadog',
   AWSXRay = 'awsxray',
   Honeycomb = 'honeycomb',
+  AzureAppInsights = 'azureappinsights',
 }
 
 export enum SupportedClientTypes {

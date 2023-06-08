@@ -12,6 +12,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.Datadog]: 'Datadog',
   [SupportedDataStores.AWSXRay]: 'AWS X-Ray',
   [SupportedDataStores.Honeycomb]: 'Honeycomb',
+  [SupportedDataStores.AzureAppInsights]: 'Azure Application Insights',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -27,6 +28,7 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.OtelCollector]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector',
   [SupportedDataStores.Honeycomb]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/honeycomb',
+  [SupportedDataStores.AzureAppInsights]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
@@ -41,6 +43,7 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.Datadog]: '',
   [SupportedDataStores.AWSXRay]: '',
   [SupportedDataStores.Honeycomb]: '',
+  [SupportedDataStores.AzureAppInsights]: '',
 } as const;
 
 const collectorExplanation = (

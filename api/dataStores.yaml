@@ -48,6 +48,8 @@ components:
           $ref: "#/components/schemas/SignalFX"
         awsxray:
           $ref: "#/components/schemas/AwsXRay"
+        azureappinsights:
+          $ref: "#/components/schemas/AzureAppInsights"
         createdAt:
           type: string
           format: date-time
@@ -83,6 +85,11 @@ components:
         realm:
           type: string
         token:
+          type: string
+    AzureAppInsights:
+      type: object
+      properties:
+        resourceArmId:
           type: string
     AwsXRay:
       type: object
@@ -180,6 +187,7 @@ components:
           datadog,
           awsxray,
           honeycomb,
+          azureappinsights,
         ]
     SupportedClients:
       type: string

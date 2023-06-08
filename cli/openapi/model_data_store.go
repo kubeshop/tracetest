@@ -20,17 +20,18 @@ var _ MappedNullable = &DataStore{}
 
 // DataStore struct for DataStore
 type DataStore struct {
-	Id         *string             `json:"id,omitempty"`
-	Name       string              `json:"name"`
-	Type       SupportedDataStores `json:"type"`
-	Default    *bool               `json:"default,omitempty"`
-	Jaeger     *GRPCClientSettings `json:"jaeger,omitempty"`
-	Tempo      *BaseClient         `json:"tempo,omitempty"`
-	Opensearch *ElasticSearch      `json:"opensearch,omitempty"`
-	Elasticapm *ElasticSearch      `json:"elasticapm,omitempty"`
-	Signalfx   *SignalFX           `json:"signalfx,omitempty"`
-	Awsxray    *AwsXRay            `json:"awsxray,omitempty"`
-	CreatedAt  *time.Time          `json:"createdAt,omitempty"`
+	Id               *string             `json:"id,omitempty"`
+	Name             string              `json:"name"`
+	Type             SupportedDataStores `json:"type"`
+	Default          *bool               `json:"default,omitempty"`
+	Jaeger           *GRPCClientSettings `json:"jaeger,omitempty"`
+	Tempo            *BaseClient         `json:"tempo,omitempty"`
+	Opensearch       *ElasticSearch      `json:"opensearch,omitempty"`
+	Elasticapm       *ElasticSearch      `json:"elasticapm,omitempty"`
+	Signalfx         *SignalFX           `json:"signalfx,omitempty"`
+	Awsxray          *AwsXRay            `json:"awsxray,omitempty"`
+	Azureappinsights *AzureAppInsights   `json:"azureappinsights,omitempty"`
+	CreatedAt        *time.Time          `json:"createdAt,omitempty"`
 }
 
 // NewDataStore instantiates a new DataStore object
@@ -356,6 +357,38 @@ func (o *DataStore) SetAwsxray(v AwsXRay) {
 	o.Awsxray = &v
 }
 
+// GetAzureappinsights returns the Azureappinsights field value if set, zero value otherwise.
+func (o *DataStore) GetAzureappinsights() AzureAppInsights {
+	if o == nil || isNil(o.Azureappinsights) {
+		var ret AzureAppInsights
+		return ret
+	}
+	return *o.Azureappinsights
+}
+
+// GetAzureappinsightsOk returns a tuple with the Azureappinsights field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetAzureappinsightsOk() (*AzureAppInsights, bool) {
+	if o == nil || isNil(o.Azureappinsights) {
+		return nil, false
+	}
+	return o.Azureappinsights, true
+}
+
+// HasAzureappinsights returns a boolean if a field has been set.
+func (o *DataStore) HasAzureappinsights() bool {
+	if o != nil && !isNil(o.Azureappinsights) {
+		return true
+	}
+
+	return false
+}
+
+// SetAzureappinsights gets a reference to the given AzureAppInsights and assigns it to the Azureappinsights field.
+func (o *DataStore) SetAzureappinsights(v AzureAppInsights) {
+	o.Azureappinsights = &v
+}
+
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *DataStore) GetCreatedAt() time.Time {
 	if o == nil || isNil(o.CreatedAt) {
@@ -421,6 +454,9 @@ func (o DataStore) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Awsxray) {
 		toSerialize["awsxray"] = o.Awsxray
+	}
+	if !isNil(o.Azureappinsights) {
+		toSerialize["azureappinsights"] = o.Azureappinsights
 	}
 	if !isNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt

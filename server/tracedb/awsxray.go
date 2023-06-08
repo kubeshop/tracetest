@@ -133,9 +133,7 @@ func (db *awsxrayDB) GetTraceByID(ctx context.Context, traceID string) (model.Tr
 		return model.Trace{}, connection.ErrTraceNotFound
 	}
 
-	trace, err := parseXRayTrace(traceID, res.Traces[0])
-
-	return trace, err
+	return parseXRayTrace(traceID, res.Traces[0])
 }
 
 func parseXRayTrace(traceID string, rawTrace *xray.Trace) (model.Trace, error) {

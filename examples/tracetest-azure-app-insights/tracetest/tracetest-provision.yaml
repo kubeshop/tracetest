@@ -1,0 +1,20 @@
+---
+type: Config
+spec:
+  analyticsEnabled: true
+---
+type: PollingProfile
+spec:
+  name: Custom Profile
+  strategy: periodic
+  default: true
+  periodic:
+    timeout: 2m
+    retryDelay: 3s
+---
+type: DataStore
+spec:
+  name: azureappinsights
+  type: azureappinsights
+  azureappinsights:
+    resourceArmId: /subscriptions/0f2d0d7d-26cc-4e6b-8059-e17c70a371bc/resourceGroups/tracetest/providers/microsoft.insights/components/tracetest

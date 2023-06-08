@@ -25,12 +25,13 @@ type DataStore struct {
 }
 
 type DataStoreValues struct {
-	AwsXRay    *AWSXRayConfig            `json:"awsxray,omitempty"`
-	ElasticApm *ElasticSearchConfig      `json:"elasticapm,omitempty"`
-	Jaeger     *GRPCClientSettings       `json:"jaeger,omitempty"`
-	OpenSearch *ElasticSearchConfig      `json:"opensearch,omitempty"`
-	SignalFx   *SignalFXConfig           `json:"signalfx,omitempty"`
-	Tempo      *MultiChannelClientConfig `json:"tempo,omitempty"`
+	AwsXRay          *AWSXRayConfig            `json:"awsxray,omitempty"`
+	ElasticApm       *ElasticSearchConfig      `json:"elasticapm,omitempty"`
+	Jaeger           *GRPCClientSettings       `json:"jaeger,omitempty"`
+	OpenSearch       *ElasticSearchConfig      `json:"opensearch,omitempty"`
+	SignalFx         *SignalFXConfig           `json:"signalfx,omitempty"`
+	Tempo            *MultiChannelClientConfig `json:"tempo,omitempty"`
+	AzureAppInsights *AzureAppInsightsConfig   `json:"azureappinsights,omitempty"`
 }
 
 type AWSXRayConfig struct {
@@ -111,18 +112,23 @@ type SignalFXConfig struct {
 	Token string `json:"token"`
 }
 
+type AzureAppInsightsConfig struct {
+	ResourceArmId string `json:"resourceArmId"`
+}
+
 const (
-	DataStoreTypeJaeger     DataStoreType = "jaeger"
-	DataStoreTypeTempo      DataStoreType = "tempo"
-	DataStoreTypeOpenSearch DataStoreType = "opensearch"
-	DataStoreTypeSignalFX   DataStoreType = "signalfx"
-	DataStoreTypeOTLP       DataStoreType = "otlp"
-	DataStoreTypeNewRelic   DataStoreType = "newrelic"
-	DataStoreTypeLighStep   DataStoreType = "lightstep"
-	DataStoreTypeElasticAPM DataStoreType = "elasticapm"
-	DataStoreTypeDataDog    DataStoreType = "datadog"
-	DataStoreTypeAwsXRay    DataStoreType = "awsxray"
-	DataStoreTypeHoneycomb  DataStoreType = "honeycomb"
+	DataStoreTypeJaeger           DataStoreType = "jaeger"
+	DataStoreTypeTempo            DataStoreType = "tempo"
+	DataStoreTypeOpenSearch       DataStoreType = "opensearch"
+	DataStoreTypeSignalFX         DataStoreType = "signalfx"
+	DataStoreTypeOTLP             DataStoreType = "otlp"
+	DataStoreTypeNewRelic         DataStoreType = "newrelic"
+	DataStoreTypeLighStep         DataStoreType = "lightstep"
+	DataStoreTypeElasticAPM       DataStoreType = "elasticapm"
+	DataStoreTypeDataDog          DataStoreType = "datadog"
+	DataStoreTypeAwsXRay          DataStoreType = "awsxray"
+	DataStoreTypeHoneycomb        DataStoreType = "honeycomb"
+	DatastoreTypeAzureAppInsights DataStoreType = "azureappinsights"
 )
 
 var validTypes = []DataStoreType{
@@ -137,6 +143,7 @@ var validTypes = []DataStoreType{
 	DataStoreTypeDataDog,
 	DataStoreTypeAwsXRay,
 	DataStoreTypeHoneycomb,
+	DatastoreTypeAzureAppInsights,
 }
 
 var otlpBasedDataStores = []DataStoreType{
@@ -190,6 +197,10 @@ func (ds DataStore) Validate() error {
 		return fmt.Errorf("data store should have Tempo config values set up")
 	}
 
+	if ds.Type == DatastoreTypeAzureAppInsights && ds.Values.AzureAppInsights == nil {
+		return fmt.Errorf("data store should have Azure Application Insights config values set up")
+	}
+
 	return nil
 }
 
@@ -206,17 +217,18 @@ func (ds DataStore) IsOTLPBasedProvider() bool {
 }
 
 type squashedDataStore struct {
-	ID         id.ID                     `json:"id"`
-	Name       string                    `json:"name"`
-	Type       DataStoreType             `json:"type"`
-	Default    bool                      `json:"default"`
-	CreatedAt  string                    `json:"createdAt"`
-	AwsXRay    *AWSXRayConfig            `json:"awsxray,omitempty"`
-	ElasticApm *ElasticSearchConfig      `json:"elasticapm,omitempty"`
-	Jaeger     *GRPCClientSettings       `json:"jaeger,omitempty"`
-	OpenSearch *ElasticSearchConfig      `json:"opensearch,omitempty"`
-	SignalFx   *SignalFXConfig           `json:"signalfx,omitempty"`
-	Tempo      *MultiChannelClientConfig `json:"tempo,omitempty"`
+	ID                     id.ID                     `json:"id"`
+	Name                   string                    `json:"name"`
+	Type                   DataStoreType             `json:"type"`
+	Default                bool                      `json:"default"`
+	CreatedAt              string                    `json:"createdAt"`
+	AwsXRay                *AWSXRayConfig            `json:"awsxray,omitempty"`
+	ElasticApm             *ElasticSearchConfig      `json:"elasticapm,omitempty"`
+	Jaeger                 *GRPCClientSettings       `json:"jaeger,omitempty"`
+	OpenSearch             *ElasticSearchConfig      `json:"opensearch,omitempty"`
+	SignalFx               *SignalFXConfig           `json:"signalfx,omitempty"`
+	Tempo                  *MultiChannelClientConfig `json:"tempo,omitempty"`
+	AzureAppInsightsConfig *AzureAppInsightsConfig   `json:"azureappinsights,omitempty"`
 }
 
 func (d squashedDataStore) populate(dataStore *DataStore) {
@@ -230,12 +242,13 @@ func (d squashedDataStore) populate(dataStore *DataStore) {
 	dataStore.Default = d.Default
 	dataStore.CreatedAt = d.CreatedAt
 	dataStore.Values = DataStoreValues{
-		AwsXRay:    d.AwsXRay,
-		ElasticApm: d.ElasticApm,
-		Jaeger:     d.Jaeger,
-		OpenSearch: d.OpenSearch,
-		SignalFx:   d.SignalFx,
-		Tempo:      d.Tempo,
+		AwsXRay:          d.AwsXRay,
+		ElasticApm:       d.ElasticApm,
+		Jaeger:           d.Jaeger,
+		OpenSearch:       d.OpenSearch,
+		SignalFx:         d.SignalFx,
+		Tempo:            d.Tempo,
+		AzureAppInsights: d.AzureAppInsightsConfig,
 	}
 }
 
@@ -275,16 +288,17 @@ func (d *DataStore) UnmarshalYAML(input []byte) error {
 
 func (d DataStore) squashed() squashedDataStore {
 	return squashedDataStore{
-		ID:         d.ID,
-		Name:       d.Name,
-		Type:       d.Type,
-		Default:    d.Default,
-		CreatedAt:  d.CreatedAt,
-		AwsXRay:    d.Values.AwsXRay,
-		ElasticApm: d.Values.ElasticApm,
-		Jaeger:     d.Values.Jaeger,
-		OpenSearch: d.Values.OpenSearch,
-		SignalFx:   d.Values.SignalFx,
-		Tempo:      d.Values.Tempo,
+		ID:                     d.ID,
+		Name:                   d.Name,
+		Type:                   d.Type,
+		Default:                d.Default,
+		CreatedAt:              d.CreatedAt,
+		AwsXRay:                d.Values.AwsXRay,
+		ElasticApm:             d.Values.ElasticApm,
+		Jaeger:                 d.Values.Jaeger,
+		OpenSearch:             d.Values.OpenSearch,
+		SignalFx:               d.Values.SignalFx,
+		Tempo:                  d.Values.Tempo,
+		AzureAppInsightsConfig: d.Values.AzureAppInsights,
 	}
 }
