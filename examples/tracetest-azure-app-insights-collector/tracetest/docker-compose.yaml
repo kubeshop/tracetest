@@ -37,7 +37,7 @@ services:
       timeout: 3s
       interval: 1s
       retries: 60
-    image: kubeshop/tracetest:dev
+    image: kubeshop/tracetest:${TAG:-latest}
     networks:
       default: null
     ports:

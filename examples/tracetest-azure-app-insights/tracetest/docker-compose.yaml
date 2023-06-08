@@ -13,11 +13,6 @@ services:
     image: postgres:14
     networks:
       default: null
-    ports:
-      - mode: ingress
-        target: 5432
-        published: 5432
-        protocol: tcp
   tracetest:
     command: --provisioning-file /app/provision.yaml
     platform: linux/amd64
@@ -37,7 +32,7 @@ services:
       timeout: 3s
       interval: 1s
       retries: 60
-    image: kubeshop/tracetest:dev
+    image: kubeshop/tracetest:${TAG:-latest}
     networks:
       default: null
     ports:
