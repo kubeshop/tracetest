@@ -113,7 +113,7 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 		return []Test{}, err
 	}
 
-	tests, err := r.readTestRows(ctx, rows)
+	tests, err := r.readRows(ctx, rows)
 	if err != nil {
 		return []Test{}, err
 	}
@@ -164,7 +164,7 @@ func (r *repository) readRows(ctx context.Context, rows *sql.Rows) ([]Test, erro
 	tests := []Test{}
 
 	for rows.Next() {
-		test, err := r.readTestRow(ctx, rows)
+		test, err := r.readRow(ctx, rows)
 		if err != nil {
 			return []Test{}, err
 		}
