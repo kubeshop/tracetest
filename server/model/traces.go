@@ -36,25 +36,50 @@ func NewTrace(traceID string, spans []Span) Trace {
 		span.Parent = parentSpan
 	}
 
-	var rootSpan Span
-	if len(rootSpans) == 1 {
-		rootSpan = *rootSpans[0]
-	} else {
-		rootSpan = Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: rootSpans}
-		for _, child := range rootSpan.Children {
-			child.Parent = &rootSpan
-		}
-	}
+	rootSpan := getRootSpan(rootSpans)
 
 	id, _ := trace.TraceIDFromHex(traceID)
 	trace := Trace{
 		ID:       id,
-		RootSpan: rootSpan,
+		RootSpan: *rootSpan,
 	}
 
 	trace = trace.Sort()
 
 	return trace
+}
+
+func getRootSpan(allRoots []*Span) *Span {
+	if len(allRoots) == 1 {
+		return allRoots[0]
+	}
+
+	var root *Span
+	for _, span := range allRoots {
+		if span.Name == TriggerSpanName || span.Name == TemporaryRootSpanName {
+			// This span should be promoted because it's either a temporary root or the definitive root
+			if root != nil && root.Name == TriggerSpanName {
+				// We cannot override the root because we already have the definitive root, otherwise,
+				// we will replace the definitive root with the temporary root.
+				continue
+			}
+
+			root = span
+		}
+	}
+
+	if root == nil {
+		root = &Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: []*Span{}}
+	}
+
+	for _, span := range allRoots {
+		if root != span {
+			root.Children = append(root.Children, span)
+			span.Parent = root
+		}
+	}
+
+	return root
 }
 
 func spanType(attrs Attributes) string {
