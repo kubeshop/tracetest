@@ -1,16 +1,15 @@
-import {Dropdown, Menu, Popover} from 'antd';
+import {Popover} from 'antd';
 import parse from 'html-react-parser';
 import MarkdownIt from 'markdown-it';
 import {useMemo} from 'react';
 
+import AttributeActions from 'components/AttributeActions/AttributeActions';
 import AttributeValue from 'components/AttributeValue';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TResultAssertions} from 'types/Assertion.types';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import TestOutput from 'models/TestOutput.model';
-import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import useCopy from 'hooks/useCopy';
 import * as S from './AttributeRow.styled';
 import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
@@ -24,12 +23,6 @@ interface IProps {
   outputs: TestOutput[];
 }
 
-enum Action {
-  Copy = '0',
-  Create_Spec = '1',
-  Create_Output = '2',
-}
-
 const AttributeRow = ({
   assertions = {},
   attribute: {key, value},
@@ -40,7 +33,6 @@ const AttributeRow = ({
   onCreateOutput,
   outputs,
 }: IProps) => {
-  const copy = useCopy();
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
   const note = useMemo(() => parse(MarkdownIt().render(semanticConvention.note)), [semanticConvention]);
@@ -53,42 +45,7 @@ const AttributeRow = ({
     [key, outputs]
   );
 
-  const handleOnClick = ({key: option}: {key: string}) => {
-    if (option === Action.Copy) {
-      TraceAnalyticsService.onAttributeCopy();
-      copy(value);
-    }
-
-    if (option === Action.Create_Spec) {
-      return onCreateTestSpec(attribute);
-    }
-
-    if (option === Action.Create_Output) {
-      return onCreateOutput(attribute);
-    }
-  };
-
   const cypressKey = key.toLowerCase().replace('.', '-');
-
-  const menu = (
-    <Menu
-      items={[
-        {
-          label: 'Copy value',
-          key: Action.Copy,
-        },
-        {
-          label: 'Create output',
-          key: Action.Create_Output,
-        },
-        {
-          label: 'Create test spec',
-          key: Action.Create_Spec,
-        },
-      ]}
-      onClick={handleOnClick}
-    />
-  );
 
   const content = (
     <S.DetailContainer>
@@ -123,11 +80,11 @@ const AttributeRow = ({
         <AssertionResultChecks failed={failed} passed={passed} />
       </S.Header>
 
-      <Dropdown overlay={menu}>
+      <AttributeActions attribute={attribute} onCreateTestOutput={onCreateOutput} onCreateTestSpec={onCreateTestSpec}>
         <a onClick={e => e.preventDefault()} style={{height: 'fit-content'}}>
           <S.MoreIcon />
         </a>
-      </Dropdown>
+      </AttributeActions>
     </S.Container>
   );
 };
