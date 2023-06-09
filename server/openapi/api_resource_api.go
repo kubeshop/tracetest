@@ -141,6 +141,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetPollingProfile,
 		},
 		{
+			"GetTests",
+			strings.ToUpper("Get"),
+			"/api/tests",
+			c.GetTests,
+		},
+		{
 			"GetTransaction",
 			strings.ToUpper("Get"),
 			"/api/transactions/{transactionId}",
@@ -495,6 +501,33 @@ func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *h
 	pollingProfileIdParam := params["pollingProfileId"]
 
 	result, err := c.service.GetPollingProfile(r.Context(), pollingProfileIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTests - Get tests
+func (c *ResourceApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetTests(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
