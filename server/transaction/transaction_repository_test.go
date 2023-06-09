@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 package transaction_test
-========
-package transactions_test
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 
 import (
 	"context"
@@ -18,11 +14,7 @@ import (
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 	"github.com/kubeshop/tracetest/server/transaction"
-========
-	"github.com/kubeshop/tracetest/server/transactions"
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -149,12 +141,8 @@ func TestDeleteTestsRelatedToTransactions(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 	transactionRepo := transaction.NewRepository(db, testsDB)
 	transactionRunRepo := transaction.NewRunRepository(db, testsDB)
-========
-	transactionRepo := transactions.NewTransactionsRepository(db, testsDB)
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 
 	transactionRepo.Create(context.TODO(), transactionSample)
 
@@ -170,11 +158,7 @@ func TestDeleteTestsRelatedToTransactions(t *testing.T) {
 
 }
 
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 var transactionSample = transaction.Transaction{
-========
-var transactionSample = transactions.Transaction{
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 	ID:          "NiWVnxP4R",
 	Name:        "Verify Import",
 	Description: "check the working of the import flow",
@@ -185,11 +169,7 @@ var transactionSample = transactions.Transaction{
 }
 
 func TestTransactions(t *testing.T) {
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 	// sample2 := transaction.Transaction{
-========
-	// sample2 := transactions.Transaction{
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 	// 	ID:          "sample2",
 	// 	Name:        "Some Transaction",
 	// 	Description: "Do important stuff",
@@ -198,11 +178,7 @@ func TestTransactions(t *testing.T) {
 	// 	},
 	// }
 
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 	// sample3 := transaction.Transaction{
-========
-	// sample3 := transactions.Transaction{
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 	// 	ID:          "sample3",
 	// 	Name:        "Some Transaction",
 	// 	Description: "Do important stuff",
@@ -212,31 +188,18 @@ func TestTransactions(t *testing.T) {
 	// }
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 		ResourceTypeSingular: transaction.TransactionResourceName,
 		ResourceTypePlural:   transaction.TransactionResourceNamePlural,
-========
-		ResourceTypeSingular: transactions.TransactionResourceName,
-		ResourceTypePlural:   transactions.TransactionResourceNamePlural,
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			testsDB, err := testdb.Postgres(testdb.WithDB(db))
 			if err != nil {
 				panic(err)
 			}
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 			transactionsRepo := transaction.NewRepository(db, testsDB)
 
 			manager := resourcemanager.New[transaction.Transaction](
 				transaction.TransactionResourceName,
 				transaction.TransactionResourceNamePlural,
-========
-			transactionsRepo := transactions.NewTransactionsRepository(db, testsDB)
-
-			manager := resourcemanager.New[transactions.Transaction](
-				transactions.TransactionResourceName,
-				transactions.TransactionResourceNamePlural,
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 				transactionsRepo,
 				resourcemanager.CanBeAugmented(),
 			)
@@ -245,11 +208,7 @@ func TestTransactions(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 			transactionRepo := manager.Handler().(*transaction.Repository)
-========
-			transactionRepo := manager.Handler().(*transactions.TransactionsRepository)
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 			testsDB, err := testdb.Postgres(testdb.WithDB(transactionRepo.DB()))
 			runRepo := transaction.NewRunRepository(transactionRepo.DB(), testsDB)
 
@@ -439,13 +398,8 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	require.JSONEq(t, expected, actual)
 }
 
-<<<<<<<< HEAD:server/transaction/transaction_repository_test.go
 func createTransactionRun(transactionRepo *transaction.Repository, runRepo *transaction.RunRepository, tran transaction.Transaction, run model.Run) {
 	updated, err := transactionRepo.GetAugmented(context.TODO(), tran.ID)
-========
-func createTransactionRun(repo *transactions.TransactionsRepository, tran transactions.Transaction, run model.Run) {
-	updated, err := repo.GetAugmented(context.TODO(), tran.ID)
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/transactions_test.go
 	if err != nil {
 		panic(err)
 	}

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:server/config/demo/main_test.go
 package demo_test
-========
-package transactions_test
->>>>>>>> 7fb86839 (fix: move transactions to it's own module (#2664)):server/transactions/main_test.go
 
 import (
 	"os"

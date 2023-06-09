@@ -1,6 +1,7 @@
 package testmock
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"math/rand"
@@ -169,4 +170,38 @@ func randomInt() int {
 	min := 1
 	max := 1000000
 	return rand.Intn(max-min) + min
+}
+
+func DropDatabase(db *sql.DB) error {
+	return dropTables(
+		db,
+		"transaction_run_steps",
+		"transaction_runs",
+		"transaction_steps",
+		"transactions",
+		"test_runs",
+		"tests",
+		"environments",
+		"data_stores",
+		"server",
+		"schema_migrations",
+	)
+}
+
+func dropTables(db *sql.DB, tables ...string) error {
+	tx, err := db.BeginTx(context.Background(), &sql.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("could not start transaction: %w", err)
+	}
+
+	defer tx.Rollback()
+
+	for _, table := range tables {
+		_, err := tx.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s;", table))
+		if err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
 }

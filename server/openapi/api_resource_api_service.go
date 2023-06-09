@@ -272,6 +272,23 @@ func (s *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 	return Response(http.StatusNotImplemented, nil), errors.New("GetPollingProfile method not implemented")
 }
 
+// GetTests - Get tests
+func (s *ResourceApiApiService) GetTests(ctx context.Context, take int32, skip int32, query string, sortBy string, sortDirection string) (ImplResponse, error) {
+	// TODO - update GetTests with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, TestResourceList{}) or use other options such as http.Ok ...
+	//return Response(200, TestResourceList{}), nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetTests method not implemented")
+}
+
 // GetTransaction - get transaction
 func (s *ResourceApiApiService) GetTransaction(ctx context.Context, transactionId string) (ImplResponse, error) {
 	// TODO - update GetTransaction with the required logic for this service method.
