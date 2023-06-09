@@ -13,9 +13,7 @@ type Transaction = Model<
   }
 >;
 
-function Transaction({
-  spec: rawTransaction = {},
-}: TRawTransactionResource): Transaction {
+function Transaction({spec: rawTransaction = {}}: TRawTransactionResource): Transaction {
   return Transaction.FromRawTransaction(rawTransaction);
 }
 
@@ -35,7 +33,7 @@ Transaction.FromRawTransaction = ({
     description,
     version,
     steps,
-    fullSteps: fullSteps.map(step => Test(step)),
+    fullSteps: fullSteps.map(step => Test.FromRawTest(step)),
     createdAt,
     summary: Summary(summary),
   };
