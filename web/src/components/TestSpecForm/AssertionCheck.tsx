@@ -115,14 +115,12 @@ export const AssertionCheck = ({
         />
       </S.FieldsContainer>
       <S.ActionContainer>
-        {index !== 0 && (
-          <S.DeleteCheckIcon
-            onClick={() => {
-              CreateAssertionModalAnalyticsService.onRemoveCheck();
-              remove(name);
-            }}
-          />
-        )}
+        <S.DeleteCheckIcon
+          onClick={() => {
+            CreateAssertionModalAnalyticsService.onRemoveCheck();
+            remove(name);
+          }}
+        />
       </S.ActionContainer>
     </S.Container>
   );
