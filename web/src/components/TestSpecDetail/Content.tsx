@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
@@ -7,6 +7,7 @@ import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
 import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import {useTest} from 'providers/Test/Test.provider';
+import useScrollTo from 'hooks/useScrollTo';
 import Assertion from './Assertion';
 import Header from './Header';
 import SpanHeader from './SpanHeader';
@@ -46,6 +47,11 @@ const Content = ({
   } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
   const results = useMemo(() => AssertionService.getResultsHashedBySpanId(resultList), [resultList]);
+  const scrollTo = useScrollTo();
+
+  useEffect(() => {
+    scrollTo(`assertion-result-${selectedSpan}`);
+  }, [scrollTo, selectedSpan]);
 
   return (
     <>
@@ -81,6 +87,7 @@ const Content = ({
             type="inner"
             $isSelected={spanId === selectedSpan}
             $type={span?.type ?? SemanticGroupNames.General}
+            id={`assertion-result-${spanId}`}
           >
             <S.AssertionsContainer onClick={() => onSelectSpan(span?.id ?? '')}>
               {checkResults.map(checkResult => (
