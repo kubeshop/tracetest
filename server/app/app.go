@@ -457,6 +457,22 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 	provisioner.AddResourceProvisioner(manager)
 }
 
+func registerTestResource(repository test.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	operations := []resourcemanager.Operation{
+		resourcemanager.OperationList,
+	}
+
+	manager := resourcemanager.New[test.Test](
+		test.ResourceName,
+		test.ResourceNamePlural,
+		repository,
+		resourcemanager.WithOperations(operations...),
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
 func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
 	triggerReg := trigger.NewRegsitry(tracer, appTracer)
 	triggerReg.Add(trigger.HTTP())
