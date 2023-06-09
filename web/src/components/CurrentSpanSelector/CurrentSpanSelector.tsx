@@ -29,7 +29,6 @@ const CurrentSpanSelector = ({spanId}: IProps) => {
 
   const handleOnClick = useCallback(() => {
     const selector = SpanService.getSelectorInformation(span!);
-
     if (isTestSpecFormOpen)
       open({
         isEditing: false,
@@ -42,8 +41,8 @@ const CurrentSpanSelector = ({spanId}: IProps) => {
   }, [isTestSpecFormOpen, onOpen, open, span]);
 
   return (
-    <S.Container className="matched">
-      <S.FloatingText onClick={() => !isTriggerSelectorLoading && handleOnClick()}>
+    <S.Container className="matched" onClick={() => !isTriggerSelectorLoading && handleOnClick()}>
+      <S.FloatingText>
         {isTriggerSelectorLoading ? (
           <>
             Updating selected span <LoadingOutlined />
