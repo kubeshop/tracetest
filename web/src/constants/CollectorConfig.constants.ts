@@ -171,10 +171,39 @@ service:
       exporters: [logging, otlp/honeycomb]
 `;
 
+export const AzureAppInsights = `receivers:
+otlp:
+  protocols:
+    grpc:
+    http:
+
+processors:
+batch:
+
+exporters:
+azuremonitor:
+  instrumentation_key: <your-instrumentation-key>
+otlp/tracetest:
+  endpoint: tracetest:4317
+  tls:
+    insecure: true
+
+service:
+pipelines:
+  traces/tracetest:
+    receivers: [otlp]
+    processors: [batch]
+    exporters: [otlp/tracetest]
+  traces/appinsights:
+    receivers: [otlp]
+    exporters: [azuremonitor]
+`;
+
 export const CollectorConfigMap = {
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.OtelCollector]: OtelCollector,
   [SupportedDataStores.Honeycomb]: Honeycomb,
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
 } as const;

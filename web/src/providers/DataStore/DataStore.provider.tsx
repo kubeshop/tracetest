@@ -1,7 +1,7 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 
-import {NoTestConnectionDataStoreList, SupportedDataStoresToName} from 'constants/DataStore.constants';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import ConnectionResult from 'models/ConnectionResult.model';
 import {
   useTestConnectionMutation,
@@ -98,8 +98,8 @@ const DataStoreProvider = ({children}: IProps) => {
     async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
 
-      if (NoTestConnectionDataStoreList.includes(draft.dataStoreType!)) {
-        return showTestConnectionNotification(ConnectionResult({}), draft.dataStoreType!);
+      if (!DataStoreService.shouldTestConnection(draft)) {
+        return showTestConnectionNotification(ConnectionResult({}), draft.dataStoreType!, false);
       }
 
       try {

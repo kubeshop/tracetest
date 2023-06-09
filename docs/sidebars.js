@@ -134,6 +134,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "configuration/tracetest-analyzer",
+          label: "Tracetest Analyzer",
+        },
+        {
+          type: "doc",
           id: "configuration/demo",
           label: "Demo Applications",
         },
@@ -242,6 +247,11 @@ const sidebars = {
           type: "doc",
           id: "concepts/ad-hoc-testing",
           label: "Ad-hoc Testing",
+        },
+        {
+          type: "doc",
+          id: "concepts/tracetest-analyzer-concepts",
+          label: "Tracetest Analyzer",
         },
         {
           type: "doc",

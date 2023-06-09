@@ -1,4 +1,5 @@
 import {CloseCircleFilled} from '@ant-design/icons';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -51,4 +52,14 @@ export const ClearSearchIcon = styled(CloseCircleFilled)`
   top: 8px;
   color: ${({theme}) => theme.color.textLight};
   cursor: pointer;
+`;
+
+export const NoMatchesContainer = styled.div`
+  color: ${({theme}) => theme.color.textSecondary};
+  margin-top: 8px;
+  margin-left: 8px;
+`;
+
+export const NoMatchesText = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.textSecondary};
 `;

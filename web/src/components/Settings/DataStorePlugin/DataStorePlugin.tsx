@@ -5,6 +5,7 @@ import OpenTelemetryCollector from './forms/OpenTelemetryCollector';
 import SignalFx from './forms/SignalFx/SignalFx';
 import BaseClient from './forms/BaseClient';
 import AwsXRay from './forms/AwsXRay';
+import AzureAppInsights from './forms/AzureAppInsights/AzureAppInsights';
 
 export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.JAEGER]: GrpcClient,
@@ -18,6 +19,7 @@ export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.NewRelic]: OpenTelemetryCollector,
   [SupportedDataStores.Honeycomb]: OpenTelemetryCollector,
   [SupportedDataStores.AWSXRay]: AwsXRay,
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
 };
 
 export default DataStoreComponentMap;

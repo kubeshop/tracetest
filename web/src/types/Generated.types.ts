@@ -1372,6 +1372,7 @@ export interface external {
           elasticapm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
           signalfx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
           awsxray?: external["dataStores.yaml"]["components"]["schemas"]["AwsXRay"];
+          azureappinsights?: external["dataStores.yaml"]["components"]["schemas"]["AzureAppInsights"];
           /** Format: date-time */
           createdAt?: string;
         };
@@ -1391,6 +1392,12 @@ export interface external {
         SignalFX: {
           realm?: string;
           token?: string;
+        };
+        AzureAppInsights: {
+          useAzureActiveDirectoryAuth?: boolean;
+          accessToken?: string;
+          connectionType?: external["dataStores.yaml"]["components"]["schemas"]["SupportedConnectionTypes"];
+          resourceArmId?: string;
         };
         AwsXRay: {
           region?: string;
@@ -1449,9 +1456,12 @@ export interface external {
           | "lightstep"
           | "datadog"
           | "awsxray"
-          | "honeycomb";
+          | "honeycomb"
+          | "azureappinsights";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
+        /** @enum {string} */
+        SupportedConnectionTypes: "direct" | "collector";
       };
     };
     operations: {};

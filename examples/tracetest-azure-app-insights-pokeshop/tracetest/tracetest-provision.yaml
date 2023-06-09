@@ -1,0 +1,23 @@
+---
+type: Config
+spec:
+  analyticsEnabled: true
+---
+type: PollingProfile
+spec:
+  name: Custom Profile
+  strategy: periodic
+  default: true
+  periodic:
+    timeout: 5m
+    retryDelay: 5s
+---
+type: DataStore
+spec:
+  name: azureappinsights
+  type: azureappinsights
+  azureappinsights:
+    connectionType: direct
+    resourceArmId: <your-arm-id>
+    accessToken: <your-aceess-token>
+    useAzureActiveDirectoryAuth: false

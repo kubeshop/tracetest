@@ -47,17 +47,18 @@ func (m *OpenAPI) ConnectionTestStep(in model.ConnectionTestStep) openapi.Connec
 }
 
 var dataStoreTypesMapping = map[datastoreresource.DataStoreType]openapi.SupportedDataStores{
-	datastoreresource.DataStoreTypeJaeger:     openapi.JAEGER,
-	datastoreresource.DataStoreTypeTempo:      openapi.TEMPO,
-	datastoreresource.DataStoreTypeOpenSearch: openapi.OPENSEARCH,
-	datastoreresource.DataStoreTypeSignalFX:   openapi.SIGNALFX,
-	datastoreresource.DataStoreTypeOTLP:       openapi.OTLP,
-	datastoreresource.DataStoreTypeNewRelic:   openapi.NEWRELIC,
-	datastoreresource.DataStoreTypeLighStep:   openapi.LIGHTSTEP,
-	datastoreresource.DataStoreTypeElasticAPM: openapi.ELASTICAPM,
-	datastoreresource.DataStoreTypeDataDog:    openapi.DATADOG,
-	datastoreresource.DataStoreTypeAwsXRay:    openapi.AWSXRAY,
-	datastoreresource.DataStoreTypeHoneycomb:  openapi.HONEYCOMB,
+	datastoreresource.DataStoreTypeJaeger:           openapi.JAEGER,
+	datastoreresource.DataStoreTypeTempo:            openapi.TEMPO,
+	datastoreresource.DataStoreTypeOpenSearch:       openapi.OPENSEARCH,
+	datastoreresource.DataStoreTypeSignalFX:         openapi.SIGNALFX,
+	datastoreresource.DataStoreTypeOTLP:             openapi.OTLP,
+	datastoreresource.DataStoreTypeNewRelic:         openapi.NEWRELIC,
+	datastoreresource.DataStoreTypeLighStep:         openapi.LIGHTSTEP,
+	datastoreresource.DataStoreTypeElasticAPM:       openapi.ELASTICAPM,
+	datastoreresource.DataStoreTypeDataDog:          openapi.DATADOG,
+	datastoreresource.DataStoreTypeAwsXRay:          openapi.AWSXRAY,
+	datastoreresource.DataStoreTypeHoneycomb:        openapi.HONEYCOMB,
+	datastoreresource.DatastoreTypeAzureAppInsights: openapi.AZUREAPPINSIGHTS,
 }
 
 func (m OpenAPI) DataStoreType(in datastoreresource.DataStoreType) openapi.SupportedDataStores {
@@ -141,6 +142,12 @@ func (m Model) DataStore(in openapi.DataStore) datastoreresource.DataStore {
 	if dataStore.Type == datastoreresource.DataStoreTypeSignalFX {
 		dataStore.Values.SignalFx = &datastoreresource.SignalFXConfig{}
 		deepcopy.DeepCopy(in.Signalfx, &dataStore.Values.SignalFx)
+	}
+
+	// Azure App Insights
+	if dataStore.Type == datastoreresource.DatastoreTypeAzureAppInsights {
+		dataStore.Values.AzureAppInsights = &datastoreresource.AzureAppInsightsConfig{}
+		deepcopy.DeepCopy(in.Azureappinsights, &dataStore.Values.AzureAppInsights)
 	}
 
 	return dataStore

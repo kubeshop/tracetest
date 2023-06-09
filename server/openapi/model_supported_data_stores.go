@@ -13,17 +13,18 @@ type SupportedDataStores string
 
 // List of SupportedDataStores
 const (
-	JAEGER     SupportedDataStores = "jaeger"
-	OPENSEARCH SupportedDataStores = "opensearch"
-	TEMPO      SupportedDataStores = "tempo"
-	SIGNALFX   SupportedDataStores = "signalfx"
-	OTLP       SupportedDataStores = "otlp"
-	ELASTICAPM SupportedDataStores = "elasticapm"
-	NEWRELIC   SupportedDataStores = "newrelic"
-	LIGHTSTEP  SupportedDataStores = "lightstep"
-	DATADOG    SupportedDataStores = "datadog"
-	AWSXRAY    SupportedDataStores = "awsxray"
-	HONEYCOMB  SupportedDataStores = "honeycomb"
+	JAEGER           SupportedDataStores = "jaeger"
+	OPENSEARCH       SupportedDataStores = "opensearch"
+	TEMPO            SupportedDataStores = "tempo"
+	SIGNALFX         SupportedDataStores = "signalfx"
+	OTLP             SupportedDataStores = "otlp"
+	ELASTICAPM       SupportedDataStores = "elasticapm"
+	NEWRELIC         SupportedDataStores = "newrelic"
+	LIGHTSTEP        SupportedDataStores = "lightstep"
+	DATADOG          SupportedDataStores = "datadog"
+	AWSXRAY          SupportedDataStores = "awsxray"
+	HONEYCOMB        SupportedDataStores = "honeycomb"
+	AZUREAPPINSIGHTS SupportedDataStores = "azureappinsights"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

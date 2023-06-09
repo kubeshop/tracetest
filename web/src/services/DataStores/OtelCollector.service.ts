@@ -19,6 +19,9 @@ const OtelCollectorService = (): TDataStoreService => ({
       dataStoreType,
     };
   },
+  shouldTestConnection() {
+    return false;
+  },
 });
 
 export default OtelCollectorService();

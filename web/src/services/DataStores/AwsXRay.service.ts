@@ -37,6 +37,9 @@ const AwsXRayService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.AWSXRay,
     };
   },
+  shouldTestConnection() {
+    return true;
+  },
 });
 
 export default AwsXRayService();
