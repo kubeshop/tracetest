@@ -1,8 +1,9 @@
-import {BulbOutlined, GithubOutlined, ReadOutlined, SmileOutlined} from '@ant-design/icons';
+import {BulbOutlined, GithubOutlined, ReadOutlined} from '@ant-design/icons';
 import {Dropdown, Menu, MenuProps, Space} from 'antd';
 import {useMemo} from 'react';
 import {useLocation} from 'react-router-dom';
 
+import discordIcon from 'assets/discord.svg';
 import {DISCORD_URL, DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import GuidedTourService from 'services/GuidedTour.service';
@@ -44,7 +45,7 @@ function getMenuItems({
           Join our Discord community
         </a>
       ),
-      icon: <SmileOutlined />,
+      icon: <img src={discordIcon} width={12} />,
     },
     {
       key: '4',
