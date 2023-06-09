@@ -5,10 +5,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 type Repository interface {
@@ -81,17 +81,11 @@ const (
 )
 
 func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
-	hasSearchQuery := query != ""
-	cleanSearchQuery := "%" + strings.ReplaceAll(query, " ", "%") + "%"
+	sql := getTestSQL + testMaxVersionQuery
 	params := []any{take, skip}
 
-	sql := getTestSQL + testMaxVersionQuery
-
 	const condition = " AND (t.name ilike $3 OR t.description ilike $3)"
-	if hasSearchQuery {
-		params = append(params, cleanSearchQuery)
-		sql += condition
-	}
+	q, params := sqlutil.Search(sql, condition, query, params)
 
 	sortingFields := map[string]string{
 		"created":  "t.created_at",
@@ -99,10 +93,10 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 		"last_run": "last_test_run_time",
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
-	sql += ` LIMIT $1 OFFSET $2 `
+	q = sqlutil.Sort(q, sortBy, sortDirection, "created", sortingFields)
+	q += ` LIMIT $1 OFFSET $2 `
 
-	stmt, err := r.db.Prepare(sql)
+	stmt, err := r.db.Prepare(q)
 	if err != nil {
 		return []Test{}, err
 	}
@@ -119,21 +113,6 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	}
 
 	return tests, nil
-}
-
-func sortQuery(sql, sortBy, sortDirection string, sortingFields map[string]string) string {
-	sortField, ok := sortingFields[sortBy]
-
-	if !ok {
-		sortField = sortingFields["created"]
-	}
-
-	dir := "DESC"
-	if strings.ToLower(sortDirection) == "asc" {
-		dir = "ASC"
-	}
-
-	return fmt.Sprintf("%s ORDER BY %s %s", sql, sortField, dir)
 }
 
 func (r *repository) Count(ctx context.Context, query string) (int, error) {
