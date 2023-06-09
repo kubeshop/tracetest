@@ -5,7 +5,7 @@ import Logo from 'assets/Logo.svg';
 import EnvironmentSelector from 'components/EnvironmentSelector';
 import NoTracingPopover from 'components/NoTracingPopover';
 import * as S from './Header.styled';
-import Menu from './Menu';
+import HelpMenu from './HelpMenu';
 
 interface IProps {
   hasLogo?: boolean;
@@ -25,7 +25,7 @@ const Header = ({hasLogo = false, isNoTracingMode}: IProps) => (
     <Space>
       {isNoTracingMode && <NoTracingPopover />}
       <EnvironmentSelector />
-      <Menu />
+      <HelpMenu />
     </Space>
   </S.Header>
 );
