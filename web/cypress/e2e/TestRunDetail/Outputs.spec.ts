@@ -10,7 +10,7 @@ describe('Outputs', () => {
     cy.get('[data-cy=toggle-drawer]', {timeout: 25000}).click({force: true});
     cy.get('[data-cy=attributes-search-container] input').type('db.name');
     cy.get('[data-cy=attribute-row-db-name] .ant-dropdown-trigger').click();
-    cy.contains('Create output').click();
+    cy.contains('Create test output').click();
 
     // Save output
     cy.wait('@getSelect');
@@ -49,7 +49,7 @@ describe('Outputs', () => {
     cy.get('[data-cy=toggle-drawer]', {timeout: 25000}).click({force: true});
     cy.get('[data-cy=attributes-search-container] input').type('db.name');
     cy.get('[data-cy=attribute-row-db-name] .ant-dropdown-trigger').click();
-    cy.contains('Create output').click();
+    cy.contains('Create test output').click();
 
     // Save output
     cy.wait('@getSelect');
@@ -92,7 +92,7 @@ describe('Outputs', () => {
     cy.get('[data-cy=toggle-drawer]', {timeout: 25000}).click({force: true});
     cy.get('[data-cy=attributes-search-container] input').type('db.name');
     cy.get('[data-cy=attribute-row-db-name] .ant-dropdown-trigger').click();
-    cy.contains('Create output').click();
+    cy.contains('Create test output').click();
 
     // Save output
     cy.wait('@getSelect');
