@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSpecRetrocompability(t *testing.T) {
+func TestSpecV1(t *testing.T) {
 	oldSpecFormat := `
 	[
 		{
@@ -50,7 +50,7 @@ func TestSpecRetrocompability(t *testing.T) {
 	assert.Equal(t, test.Assertion("attr:http.status = 200"), testObject.Specs[1].Assertions[0])
 }
 
-func TestSpecNewFormat(t *testing.T) {
+func TestSpecV2(t *testing.T) {
 	specFormat := `
 	[
 		{
