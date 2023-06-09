@@ -261,7 +261,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerEnvironmentResource(environmentRepo, apiRouter, provisioner, tracer)
 	registerDemosResource(demoRepo, apiRouter, provisioner, tracer)
 	registerDataStoreResource(dataStoreRepo, apiRouter, provisioner, tracer)
-	registerlinterResource(linterRepo, apiRouter, provisioner, tracer)
+	registerLinterResource(linterRepo, apiRouter, provisioner, tracer)
 	registerTestResource(testRepo, apiRouter, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
@@ -318,7 +318,7 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 	})
 }
 
-func registerlinterResource(linterRepo *linterResource.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerLinterResource(linterRepo *linterResource.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[linterResource.Linter](
 		linterResource.ResourceName,
 		linterResource.ResourceNamePlural,

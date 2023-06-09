@@ -164,7 +164,7 @@ func (t Test) Validate() error {
 	return nil
 }
 
-func (sar SpanAssertionResult) SafeSpanIDString() string {
+func (sar SpanAssertionResult) SpanIDString() string {
 	if sar.SpanID == nil {
 		return ""
 	}
@@ -181,15 +181,15 @@ func (e *AssertionExpression) String() string {
 		return ""
 	}
 
-	if e.Expression == nil {
-		if e.LiteralValue.Type == "attribute" {
-			return fmt.Sprintf("attr:%s", e.LiteralValue.Value)
-		}
-
-		return e.LiteralValue.Value
+	if e.Expression != nil {
+		return fmt.Sprintf("%s %s %s", e.LiteralValue.Value, e.Operation, e.Expression.String())
+	}
+	
+	if e.LiteralValue.Type == "attribute" {
+		return fmt.Sprintf("attr:%s", e.LiteralValue.Value)
 	}
 
-	return fmt.Sprintf("%s %s %s", e.LiteralValue.Value, e.Operation, e.Expression.String())
+	return e.LiteralValue.Value
 }
 
 func (e *AssertionExpression) Type() string {

@@ -1,6 +1,6 @@
 package trigger
 
-const TriggerTypeTRACEID TriggerType = "traceid"
+const TriggerTypeTraceID TriggerType = "traceid"
 
 type TraceIDRequest struct {
 	ID string `expr_enabled:"true"`

@@ -160,7 +160,7 @@ type scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-func (r *repository) readTestRows(ctx context.Context, rows *sql.Rows) ([]Test, error) {
+func (r *repository) readRows(ctx context.Context, rows *sql.Rows) ([]Test, error) {
 	tests := []Test{}
 
 	for rows.Next() {
@@ -175,7 +175,7 @@ func (r *repository) readTestRows(ctx context.Context, rows *sql.Rows) ([]Test, 
 	return tests, nil
 }
 
-func (r *repository) readTestRow(ctx context.Context, row scanner) (Test, error) {
+func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	test := Test{}
 
 	var (
@@ -202,35 +202,34 @@ func (r *repository) readTestRow(ctx context.Context, row scanner) (Test, error)
 		&fail,
 	)
 
-	switch err {
-	case nil:
-		err = json.Unmarshal(jsonServiceUnderTest, &test.Trigger)
-		if err != nil {
-			return Test{}, fmt.Errorf("cannot parse trigger: %w", err)
-		}
-
-		err = json.Unmarshal(jsonSpecs, &test.Specs)
-		if err != nil {
-			return Test{}, fmt.Errorf("cannot parse specs: %w", err)
-		}
-
-		err = json.Unmarshal(jsonOutputs, &test.Outputs)
-		if err != nil {
-			return Test{}, fmt.Errorf("cannot parse outputs: %w", err)
-		}
-
-		if lastRunTime != nil {
-			test.Summary.LastRun.Time = *lastRunTime
-		}
-		if pass != nil {
-			test.Summary.LastRun.Passes = *pass
-		}
-		if fail != nil {
-			test.Summary.LastRun.Fails = *fail
-		}
-
-		return test, nil
-	default:
-		return Test{}, err
+	if err != nil {
+		return Test{}, fmt.Errorf("cannot read row: %w", err)
 	}
+
+	err = json.Unmarshal(jsonServiceUnderTest, &test.Trigger)
+	if err != nil {
+		return Test{}, fmt.Errorf("cannot parse trigger: %w", err)
+	}
+
+	err = json.Unmarshal(jsonSpecs, &test.Specs)
+	if err != nil {
+		return Test{}, fmt.Errorf("cannot parse specs: %w", err)
+	}
+
+	err = json.Unmarshal(jsonOutputs, &test.Outputs)
+	if err != nil {
+		return Test{}, fmt.Errorf("cannot parse outputs: %w", err)
+	}
+
+	if lastRunTime != nil {
+		test.Summary.LastRun.Time = *lastRunTime
+	}
+	if pass != nil {
+		test.Summary.LastRun.Passes = *pass
+	}
+	if fail != nil {
+		test.Summary.LastRun.Fails = *fail
+	}
+
+	return test, nil
 }
