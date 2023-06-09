@@ -66,6 +66,9 @@ const ElasticSearchService = (): TDataStoreService => ({
       dataStoreType,
     };
   },
+  shouldTestConnection() {
+    return true;
+  },
 });
 
 export default ElasticSearchService();

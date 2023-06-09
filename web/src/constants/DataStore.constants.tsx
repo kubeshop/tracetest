@@ -12,6 +12,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.Datadog]: 'Datadog',
   [SupportedDataStores.AWSXRay]: 'AWS X-Ray',
   [SupportedDataStores.Honeycomb]: 'Honeycomb',
+  [SupportedDataStores.AzureAppInsights]: 'Azure App Insights',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -27,6 +28,7 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.OtelCollector]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector',
   [SupportedDataStores.Honeycomb]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/honeycomb',
+  [SupportedDataStores.AzureAppInsights]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
@@ -41,9 +43,10 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.Datadog]: '',
   [SupportedDataStores.AWSXRay]: '',
   [SupportedDataStores.Honeycomb]: '',
+  [SupportedDataStores.AzureAppInsights]: '',
 } as const;
 
-const collectorExplanation = (
+export const collectorExplanation = (
   <>
     Tracetest can work with any distributed tracing solution that is utilizing the{' '}
     <a href="https://opentelemetry.io/docs/collector/" target="_blank">
@@ -60,11 +63,3 @@ export const SupportedDataStoresToExplanation: Record<string, React.ReactElement
   [SupportedDataStores.Lightstep]: collectorExplanation,
   [SupportedDataStores.Datadog]: collectorExplanation,
 };
-
-export const NoTestConnectionDataStoreList = [
-  SupportedDataStores.OtelCollector,
-  SupportedDataStores.Lightstep,
-  SupportedDataStores.Datadog,
-  SupportedDataStores.NewRelic,
-  SupportedDataStores.Honeycomb,
-];
