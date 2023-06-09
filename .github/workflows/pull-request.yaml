@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 env:
   VERSION: ${{ github.sha }}
@@ -88,7 +87,7 @@ jobs:
           cache: true
           cache-dependency-path: go.work
       - name: Run unit tests
-        run: cd server; make test
+        run: cd server; make test -B
 
   unit-test-web:
     name: WebUI unit tests

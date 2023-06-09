@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -31,6 +30,7 @@ import (
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -194,10 +194,12 @@ func (app *App) Start(opts ...appOption) error {
 
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
+	demoRepo := demo.NewRepository(db)
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastore.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
+	testRepo := test.NewRepository(db)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
@@ -258,17 +260,13 @@ func (app *App) Start(opts ...appOption) error {
 		Subrouter()
 
 	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
-
-	registerConfigResource(configRepo, apiRouter, db, provisioner, tracer)
-
-	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner, tracer)
-	registerEnvironmentResource(environmentRepo, apiRouter, db, provisioner, tracer)
-
-	demoRepo := demo.NewRepository(db)
-	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
-
-	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
-	registerAnalyzerResource(linterRepo, apiRouter, db, provisioner, tracer)
+	registerConfigResource(configRepo, apiRouter, provisioner, tracer)
+	registerPollingProfilesResource(pollingProfileRepo, apiRouter, provisioner, tracer)
+	registerEnvironmentResource(environmentRepo, apiRouter, provisioner, tracer)
+	registerDemosResource(demoRepo, apiRouter, provisioner, tracer)
+	registerDataStoreResource(dataStoreRepo, apiRouter, provisioner, tracer)
+	registerAnalyzer(linterRepo, apiRouter, provisioner, tracer)
+	registerTestResource(testRepo, apiRouter, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
 	registerSPAHandler(router, app.cfg, configFromDB.IsAnalyticsEnabled(), serverID, isTracetestDev)
@@ -356,7 +354,7 @@ func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor
 	})
 }
 
-func registerAnalyzerResource(linterRepo *analyzer.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerAnalyzer(linterRepo *analyzer.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[analyzer.Linter](
 		analyzer.ResourceName,
 		analyzer.ResourceNamePlural,
@@ -380,7 +378,7 @@ func registerTransactionResource(repo *transaction.Repository, router *mux.Route
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerConfigResource(configRepo *config.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerConfigResource(configRepo *config.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[config.Config](
 		config.ResourceName,
 		config.ResourceNamePlural,
@@ -392,7 +390,7 @@ func registerConfigResource(configRepo *config.Repository, router *mux.Router, d
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerPollingProfilesResource(repository *pollingprofile.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[pollingprofile.PollingProfile](
 		pollingprofile.ResourceName,
 		pollingprofile.ResourceNamePlural,
@@ -404,7 +402,7 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerEnvironmentResource(repository *environment.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerEnvironmentResource(repository *environment.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[environment.Environment](
 		environment.ResourceName,
 		environment.ResourceNamePlural,
@@ -415,7 +413,7 @@ func registerEnvironmentResource(repository *environment.Repository, router *mux
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerDemosResource(repository *demo.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerDemosResource(repository *demo.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[demo.Demo](
 		demo.ResourceName,
 		demo.ResourceNamePlural,
@@ -426,11 +424,27 @@ func registerDemosResource(repository *demo.Repository, router *mux.Router, db *
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerDataStoreResource(repository *datastore.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerDataStoreResource(repository *datastore.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[datastore.DataStore](
 		datastore.ResourceName,
 		datastore.ResourceNamePlural,
 		repository,
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
+func registerTestResource(repository test.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	operations := []resourcemanager.Operation{
+		resourcemanager.OperationList,
+	}
+
+	manager := resourcemanager.New[test.Test](
+		test.ResourceName,
+		test.ResourceNamePlural,
+		repository,
+		resourcemanager.WithOperations(operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

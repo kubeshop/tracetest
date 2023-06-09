@@ -12,8 +12,8 @@ import (
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -55,7 +55,7 @@ func TestServerPrefix(t *testing.T) {
 	assert.GreaterOrEqual(t, dataStores.Count, 1)
 }
 
-func getTests(t *testing.T, endpoint string) []openapi.Test {
+func getTests(t *testing.T, endpoint string) resourcemanager.ResourceList[test.Test] {
 	url := fmt.Sprintf("%s/api/tests", endpoint)
 	resp, err := http.Get(url)
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func getTests(t *testing.T, endpoint string) []openapi.Test {
 	bodyJsonBytes, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
 
-	var tests []openapi.Test
+	var tests resourcemanager.ResourceList[test.Test]
 	err = json.Unmarshal(bodyJsonBytes, &tests)
 	require.NoError(t, err)
 
