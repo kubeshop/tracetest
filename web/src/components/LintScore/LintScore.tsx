@@ -2,12 +2,11 @@ import * as S from './LintScore.styled';
 
 interface IProps {
   score: number;
-  passed: boolean;
   height?: string;
   width?: string;
 }
 
-const LintScore = ({score, passed, height, width}: IProps) => {
+const LintScore = ({score, height, width}: IProps) => {
   return (
     <S.ScoreWrapper>
       <S.ScoreTexContainer>
@@ -17,8 +16,8 @@ const LintScore = ({score, passed, height, width}: IProps) => {
         $height={height}
         $width={width}
         format={() => ''}
-        percent={score}
-        status={passed ? 'success' : 'exception'}
+        percent={score || 100}
+        $score={score}
         type="circle"
       />
     </S.ScoreWrapper>

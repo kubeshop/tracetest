@@ -36,7 +36,7 @@ const Plugins = ({plugins, trace}: IProps) => {
         <S.PluginPanel
           header={
             <Space>
-              <LintScore width="35px" height="35px" score={plugin.score} passed={plugin.passed} />
+              <LintScore width="35px" height="35px" score={plugin.score} />
               <Typography.Text strong>{plugin.name}</Typography.Text>
               <Typography.Text type="secondary">{plugin.description}</Typography.Text>
             </Space>

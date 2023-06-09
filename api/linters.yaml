@@ -42,6 +42,8 @@ components:
     LinterResult:
       type: object
       properties:
+        minimumScore:
+          type: integer
         passed:
           type: boolean
         score:

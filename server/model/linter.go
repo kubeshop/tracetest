@@ -43,9 +43,10 @@ type Rule interface {
 }
 
 type LinterResult struct {
-	Plugins []PluginResult `json:"plugins"`
-	Score   int            `json:"score"`
-	Passed  bool           `json:"passed"`
+	Plugins      []PluginResult `json:"plugins"`
+	Score        int            `json:"score"`
+	MinimumScore int            `json:"minimumScore"`
+	Passed       bool           `json:"passed"`
 }
 
 type BaseRule struct {

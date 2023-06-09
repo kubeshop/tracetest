@@ -1656,6 +1656,7 @@ export interface external {
           required?: boolean;
         };
         LinterResult: {
+          minimumScore?: number;
           passed?: boolean;
           score?: number;
           plugins?: external["linters.yaml"]["components"]["schemas"]["LinterResultPlugin"][];

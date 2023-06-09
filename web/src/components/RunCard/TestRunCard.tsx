@@ -12,14 +12,14 @@ interface IProps {
   linkTo: string;
 }
 
-function getIcon(state: TestRun['state'], failedAssertions: number) {
+function getIcon(state: TestRun['state'], failedAssertions: number, isFailedAnalyzer: boolean) {
   if (!isRunStateFinished(state)) {
     return null;
   }
   if (isRunStateStopped(state)) {
     return <S.IconInfo />;
   }
-  if (isRunStateFailed(state) || failedAssertions > 0) {
+  if (isRunStateFailed(state) || failedAssertions > 0 || isFailedAnalyzer) {
     return <S.IconFail />;
   }
   return <S.IconSuccess />;
@@ -37,6 +37,7 @@ const TestRunCard = ({
     metadata,
     transactionId,
     transactionRunId,
+    linter,
   },
   testId,
   linkTo,
@@ -49,7 +50,7 @@ const TestRunCard = ({
   return (
     <Link to={linkTo}>
       <S.Container $isWhite data-cy={`run-card-${runId}`}>
-        <S.IconContainer>{getIcon(state, failedAssertionCount)}</S.IconContainer>
+        <S.IconContainer>{getIcon(state, failedAssertionCount, linter.isFailed)}</S.IconContainer>
 
         <S.Info>
           <div>

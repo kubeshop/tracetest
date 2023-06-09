@@ -10,6 +10,8 @@
 package openapi
 
 type LinterResult struct {
+	MinimumScore int32 `json:"minimumScore,omitempty"`
+
 	Passed bool `json:"passed,omitempty"`
 
 	Score int32 `json:"score,omitempty"`

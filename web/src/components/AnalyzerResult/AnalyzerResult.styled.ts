@@ -23,31 +23,27 @@ export const Description = styled(Typography.Paragraph).attrs({
   }
 `;
 
-export const ScoreWrapper = styled.div`
-  position: relative;
+export const GlobalResultWrapper = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin-bottom: 28px;
+  gap: 45px;
 `;
 
-export const ScoreTexContainer = styled.div`
-  position: absolute;
+export const GlobalScoreWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
 `;
 
-export const Score = styled(Typography.Title)`
-  && {
-    font-size: 12px;
-    margin-bottom: 0;
-  }
+export const ScoreResultWrapper = styled(GlobalScoreWrapper)`
+  align-items: flex-start;
 `;
 
-export const ScoreContainer = styled.div`
-  margin-bottom: 24px;
-  text-align: center;
-  cursor: pointer;
+export const GlobalScoreContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 `;
 
 export const RuleContainer = styled.div`
@@ -76,6 +72,12 @@ export const RuleBody = styled(Column)`
 export const Subtitle = styled(Typography.Title)`
   && {
     margin-bottom: 8px;
+  }
+`;
+
+export const ResultText = styled(Typography.Text)<{$passed: boolean}>`
+  && {
+    color: ${({theme, $passed}) => ($passed ? theme.color.success : theme.color.error)};
   }
 `;
 

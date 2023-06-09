@@ -36,6 +36,7 @@ declare module 'styled-components' {
       md: string;
       lg: string;
       xl: string;
+      xxxl: string;
     };
     /** Font defaults */
     font: {
