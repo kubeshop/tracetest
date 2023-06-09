@@ -1,5 +1,5 @@
 import {Progress, Typography} from 'antd';
-import styled from 'styled-components';
+import styled, {DefaultTheme} from 'styled-components';
 
 export const ScoreWrapper = styled.div`
   position: relative;
@@ -22,15 +22,49 @@ export const Score = styled(Typography.Title)`
   }
 `;
 
+export const PercentageScoreWrapper = styled.div`
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
+export const PercentageScore = styled(Typography.Title)`
+  && {
+    font-size: ${({theme}) => theme.size.xxxl};
+    margin-bottom: 0;
+  }
+`;
+
 export const ScoreContainer = styled.div`
   margin-bottom: 24px;
   text-align: center;
 `;
 
-export const ScoreProgress = styled(Progress)<{$height?: string, $width?: string }>`
+const getScoreColor = (score: number, theme: DefaultTheme) => {
+  if (score >= 90) {
+    return theme.color.success;
+  }
+
+  if (score >= 60) {
+    return theme.color.warningYellow;
+  }
+
+  return theme.color.error;
+};
+
+interface IScoreProgressProps {
+  $height?: string;
+  $width?: string;
+  $score: number;
+}
+
+export const ScoreProgress = styled(Progress).attrs<IScoreProgressProps>(({$score, theme}) => ({
+  strokeColor: getScoreColor($score, theme),
+}))<IScoreProgressProps>`
   .ant-progress-inner {
-    height: ${({$height = "50px"}) => $height} !important;
-    width: ${({$width = "50px"}) => $width} !important;
+    height: ${({$height = '50px'}) => $height} !important;
+    width: ${({$width = '50px'}) => $width} !important;
   }
 
   .ant-progress-circle-trail,

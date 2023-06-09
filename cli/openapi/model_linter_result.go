@@ -19,9 +19,10 @@ var _ MappedNullable = &LinterResult{}
 
 // LinterResult struct for LinterResult
 type LinterResult struct {
-	Passed  *bool                `json:"passed,omitempty"`
-	Score   *int32               `json:"score,omitempty"`
-	Plugins []LinterResultPlugin `json:"plugins,omitempty"`
+	MinimumScore *int32               `json:"minimumScore,omitempty"`
+	Passed       *bool                `json:"passed,omitempty"`
+	Score        *int32               `json:"score,omitempty"`
+	Plugins      []LinterResultPlugin `json:"plugins,omitempty"`
 }
 
 // NewLinterResult instantiates a new LinterResult object
@@ -39,6 +40,38 @@ func NewLinterResult() *LinterResult {
 func NewLinterResultWithDefaults() *LinterResult {
 	this := LinterResult{}
 	return &this
+}
+
+// GetMinimumScore returns the MinimumScore field value if set, zero value otherwise.
+func (o *LinterResult) GetMinimumScore() int32 {
+	if o == nil || isNil(o.MinimumScore) {
+		var ret int32
+		return ret
+	}
+	return *o.MinimumScore
+}
+
+// GetMinimumScoreOk returns a tuple with the MinimumScore field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinterResult) GetMinimumScoreOk() (*int32, bool) {
+	if o == nil || isNil(o.MinimumScore) {
+		return nil, false
+	}
+	return o.MinimumScore, true
+}
+
+// HasMinimumScore returns a boolean if a field has been set.
+func (o *LinterResult) HasMinimumScore() bool {
+	if o != nil && !isNil(o.MinimumScore) {
+		return true
+	}
+
+	return false
+}
+
+// SetMinimumScore gets a reference to the given int32 and assigns it to the MinimumScore field.
+func (o *LinterResult) SetMinimumScore(v int32) {
+	o.MinimumScore = &v
 }
 
 // GetPassed returns the Passed field value if set, zero value otherwise.
@@ -147,6 +180,9 @@ func (o LinterResult) MarshalJSON() ([]byte, error) {
 
 func (o LinterResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.MinimumScore) {
+		toSerialize["minimumScore"] = o.MinimumScore
+	}
 	if !isNil(o.Passed) {
 		toSerialize["passed"] = o.Passed
 	}

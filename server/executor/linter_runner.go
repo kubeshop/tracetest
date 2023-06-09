@@ -134,12 +134,6 @@ func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 		return
 	}
 
-	err = lintResource.ValidateResult(run.Linter)
-	if err != nil {
-		e.onError(ctx, request, run, err)
-		return
-	}
-
 	e.onFinish(ctx, request, run)
 }
 
@@ -173,7 +167,8 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 		return e.onError(ctx, request, run, err)
 	}
 
-	run = run.SuccessfullinterExecution(result)
+	result.MinimumScore = linterResource.MinimumScore
+	run = run.SuccessfulLinterExecution(result)
 	err = e.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[linterRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())

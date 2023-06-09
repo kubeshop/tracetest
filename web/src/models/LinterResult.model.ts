@@ -8,7 +8,7 @@ type TRawLinterResultPluginRuleResult = TLintersSchemas['LinterResultPluginRuleR
 type LinterResultPluginRuleResult = Model<TRawLinterResultPluginRuleResult, {}>;
 type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: LinterResultPluginRuleResult[]}>;
 type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
-type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]}>;
+type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]; isFailed: boolean}>;
 
 function LinterResultPluginRuleResult({
   spanId = '',
@@ -47,11 +47,18 @@ function LinterResultPlugin({
   return {name, description, passed, score, rules: rules.map(rule => LinterResultPluginRule(rule))};
 }
 
-function LinterResult({passed = false, score = 0, plugins = []}: TRawLinterResult = {}): LinterResult {
+function LinterResult({
+  passed = false,
+  score = 0,
+  plugins = [],
+  minimumScore = 0,
+}: TRawLinterResult = {}): LinterResult {
   return {
     passed,
     score,
+    minimumScore,
     plugins: plugins.map(plugin => LinterResultPlugin(plugin)),
+    isFailed: score < minimumScore,
   };
 }
 

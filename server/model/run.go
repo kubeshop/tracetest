@@ -152,7 +152,7 @@ func (r Run) LinterError(err error) Run {
 	return r.Finish()
 }
 
-func (r Run) SuccessfullinterExecution(linter LinterResult) Run {
+func (r Run) SuccessfulLinterExecution(linter LinterResult) Run {
 	r.State = RunStateAwaitingTestResults
 	r.Linter = linter
 

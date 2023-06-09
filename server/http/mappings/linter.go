@@ -12,9 +12,10 @@ func (m OpenAPI) LinterResult(in model.LinterResult) openapi.LinterResult {
 	}
 
 	return openapi.LinterResult{
-		Passed:  in.Passed,
-		Score:   int32(in.Score),
-		Plugins: plugins,
+		Passed:       in.Passed,
+		Score:        int32(in.Score),
+		Plugins:      plugins,
+		MinimumScore: int32(in.MinimumScore),
 	}
 }
 
