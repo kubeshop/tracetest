@@ -26,10 +26,12 @@ type (
 		Description string                       `json:"description"`
 		Version     int                          `json:"version"`
 		Trigger     trigger.Trigger              `json:"trigger"`
-		Specs       []TestSpec                   `json:"specs"`
+		Specs       Specs                        `json:"specs"`
 		Outputs     maps.Ordered[string, Output] `json:"outputs"`
 		Summary     Summary                      `json:"summary"`
 	}
+
+	Specs []TestSpec
 
 	Output struct {
 		Selector SpanQuery `json:"selector"`
@@ -184,7 +186,7 @@ func (e *AssertionExpression) String() string {
 	if e.Expression != nil {
 		return fmt.Sprintf("%s %s %s", e.LiteralValue.Value, e.Operation, e.Expression.String())
 	}
-	
+
 	if e.LiteralValue.Type == "attribute" {
 		return fmt.Sprintf("attr:%s", e.LiteralValue.Value)
 	}
