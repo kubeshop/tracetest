@@ -159,12 +159,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestVersionDefinitionFile,
 		},
 		{
-			"GetTests",
-			strings.ToUpper("Get"),
-			"/api/tests",
-			c.GetTests,
-		},
-		{
 			"GetTransactionRun",
 			strings.ToUpper("Get"),
 			"/api/transactions/{transactionId}/run/{runId}",
@@ -642,33 +636,6 @@ func (c *ApiApiController) GetTestVersionDefinitionFile(w http.ResponseWriter, r
 	}
 
 	result, err := c.service.GetTestVersionDefinitionFile(r.Context(), testIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTests - Get tests
-func (c *ApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	queryParam := query.Get("query")
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.GetTests(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
