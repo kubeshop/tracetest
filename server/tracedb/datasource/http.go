@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 
+	"github.com/goware/urlx"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
@@ -25,7 +25,7 @@ type HttpClient struct {
 }
 
 func NewHttpClient(name string, config *datastoreresource.HttpClientConfig, callback HttpCallback) DataSource {
-	endpoint, _ := url.Parse(config.Url)
+	endpoint, _ := urlx.Parse(config.Url)
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: getTlsConfig(config.TLS),
@@ -63,7 +63,7 @@ func (client *HttpClient) GetTraceByID(ctx context.Context, traceID string) (mod
 }
 
 func (client *HttpClient) Endpoint() string {
-	return client.config.Host
+	return client.config.URL.String()
 }
 
 func (client *HttpClient) Connect(ctx context.Context) error {

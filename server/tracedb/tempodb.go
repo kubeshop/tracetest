@@ -23,7 +23,7 @@ import (
 )
 
 func tempoDefaultPorts() []string {
-	return []string{"9095"}
+	return []string{"9095", ""}
 }
 
 type tempoTraceDB struct {
