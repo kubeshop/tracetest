@@ -7,9 +7,8 @@ import (
 )
 
 type ConfigureParams struct {
-	AnalyticsEnabled bool
-	Endpoint         string
-	Global           bool
+	Endpoint string
+	Global   bool
 }
 
 var _ Params = &ConfigureParams{}

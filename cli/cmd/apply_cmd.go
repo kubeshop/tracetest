@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/actions"
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/spf13/cobra"
@@ -23,10 +22,6 @@ var applyCmd = &cobra.Command{
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
-
-		analytics.Track("Resource Apply", "cmd", map[string]string{
-			resourceType: resourceType,
-		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
 

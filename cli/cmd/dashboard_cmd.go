@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
@@ -15,8 +14,6 @@ var dashboardCmd = &cobra.Command{
 	Long:    "Opens the Tracetest Dashboard URL",
 	PreRun:  setupCommand(),
 	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
-		analytics.Track("Dashboard", "cmd", map[string]string{})
-
 		if cliConfig.IsEmpty() {
 			return "", fmt.Errorf("missing Tracetest endpoint configuration")
 		}

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/cli/actions"
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
@@ -22,8 +21,6 @@ var testRunCmd = &cobra.Command{
 	Long:   "Run a test on your Tracetest server",
 	PreRun: setupCommand(),
 	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
-		analytics.Track("Test Run", "cmd", map[string]string{})
-
 		ctx := context.Background()
 		client := utils.GetAPIClient(cliConfig)
 
