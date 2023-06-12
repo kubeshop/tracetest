@@ -42,7 +42,6 @@ export const TabsContainer = styled.div`
 
 export const StatusText = styled(Typography.Text)`
   && {
-    margin-left: 14px;
     font-size: ${({theme}) => theme.size.md};
   }
 `;

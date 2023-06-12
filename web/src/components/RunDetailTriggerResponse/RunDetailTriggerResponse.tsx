@@ -1,4 +1,4 @@
-import {Tabs} from 'antd';
+import {Divider, Space, Tabs} from 'antd';
 import {useCallback} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -90,29 +90,31 @@ const RunDetailTriggerResponse = ({
     <S.Container>
       <S.TitleContainer>
         <S.Title>Response Data</S.Title>
-        <div>
-          <AttributeActions
-            attribute={{key: 'tracetest.response.status', value: `${statusCode}`}}
-            onCreateTestOutput={handleCreateTestOutput}
-            onCreateTestSpec={handleCreateTestSpec}
-          >
+        <Space split={<Divider type="vertical" />}>
+          <Space align="center">
             <S.StatusText>
               Status: <S.StatusSpan $isError={statusCode >= 400}>{statusCode}</S.StatusSpan>
             </S.StatusText>
-          </AttributeActions>
-          <AttributeActions
-            attribute={{key: 'tracetest.span.duration', value: `${triggerTime}ms`}}
-            onCreateTestOutput={handleCreateTestOutput}
-            onCreateTestSpec={handleCreateTestSpec}
-          >
+            <AttributeActions
+              attribute={{key: 'tracetest.response.status', value: `${statusCode}`}}
+              onCreateTestOutput={handleCreateTestOutput}
+              onCreateTestSpec={handleCreateTestSpec}
+            />
+          </Space>
+          <Space align="center">
             <S.StatusText>
               Time:{' '}
               <S.StatusSpan $isError={triggerTime > 1000}>
                 {state === TestState.CREATED || state === TestState.EXECUTING ? '-' : `${triggerTime}ms`}
               </S.StatusSpan>
             </S.StatusText>
-          </AttributeActions>
-        </div>
+            <AttributeActions
+              attribute={{key: 'tracetest.span.duration', value: `${triggerTime}ms`}}
+              onCreateTestOutput={handleCreateTestOutput}
+              onCreateTestSpec={handleCreateTestSpec}
+            />
+          </Space>
+        </Space>
       </S.TitleContainer>
       <S.TabsContainer data-tour={StepsID.Response}>
         <Tabs
