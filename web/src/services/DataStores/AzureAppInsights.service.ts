@@ -24,12 +24,12 @@ const AzureAppInsightsService = (): TDataStoreService => ({
   },
   validateDraft({
     dataStore: {
-      isIngestorEnabled = false,
       azureappinsights: {
         resourceArmId = '',
         connectionType = ConnectionTypes.Direct,
         accessToken = '',
         useAzureActiveDirectoryAuth = true,
+        isIngestorEnabled = false,
       } = {},
     } = {},
   }) {
@@ -52,9 +52,15 @@ const AzureAppInsightsService = (): TDataStoreService => ({
       dataStore: {
         name: SupportedDataStores.AzureAppInsights,
         type: SupportedDataStores.AzureAppInsights,
-        azureappinsights: {resourceArmId, connectionType, accessToken, useAzureActiveDirectoryAuth},
-        isIngestorEnabled:
-          configuredDataStore === SupportedDataStores.AzureAppInsights && connectionType === ConnectionTypes.Collector,
+        azureappinsights: {
+          resourceArmId,
+          connectionType,
+          accessToken,
+          useAzureActiveDirectoryAuth,
+          isIngestorEnabled:
+            configuredDataStore === SupportedDataStores.AzureAppInsights &&
+            connectionType === ConnectionTypes.Collector,
+        },
       },
       dataStoreType: SupportedDataStores.AzureAppInsights,
     };

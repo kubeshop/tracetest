@@ -44,7 +44,7 @@ const DataStoreForm = ({
 
   useEffect(() => {
     form.setFieldsValue({
-      dataStore: {name: '', type: SupportedDataStores.JAEGER, isIngestorEnabled: false, ...initialValues.dataStore},
+      dataStore: {name: '', type: SupportedDataStores.JAEGER, ...initialValues.dataStore},
     });
   }, [dataStoreType, form, initialValues.dataStore]);
 

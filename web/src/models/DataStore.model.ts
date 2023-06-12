@@ -2,13 +2,16 @@ import {SupportedDataStores} from 'types/DataStore.types';
 import {Model, TDataStoreSchemas} from 'types/Common.types';
 
 export type TRawDataStore = TDataStoreSchemas['DataStoreResource'];
+export type TRawAzureAppInsightsDataStore = TDataStoreSchemas['AzureAppInsights'];
+
+export type TRawOtlpDataStore = {isIngestorEnabled?: boolean};
 type DataStore = Model<TRawDataStore, {}>['spec'] & {
-  isIngestorEnabled?: boolean;
-  otlp?: {};
-  newrelic?: {};
-  lightstep?: {};
-  datadog?: {};
-  honeycomb?: {};
+  otlp?: TRawOtlpDataStore;
+  newrelic?: TRawOtlpDataStore;
+  lightstep?: TRawOtlpDataStore;
+  datadog?: TRawOtlpDataStore;
+  honeycomb?: TRawOtlpDataStore;
+  azureappinsights?: TRawAzureAppInsightsDataStore & TRawOtlpDataStore;
 };
 
 const DataStore = ({
@@ -39,7 +42,6 @@ const DataStore = ({
   tempo,
   awsxray,
   azureappinsights,
-  isIngestorEnabled: false,
 });
 
 export default DataStore;

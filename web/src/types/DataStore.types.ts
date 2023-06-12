@@ -1,7 +1,7 @@
 import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
 import ConnectionTestStep from 'models/ConnectionResultStep.model';
-import DataStore from 'models/DataStore.model';
+import DataStore, { TRawOtlpDataStore } from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {THeader} from './Test.types';
 
@@ -83,16 +83,16 @@ export interface IElasticSearch extends TRawElasticSearch {
   certificateFile?: File;
 }
 
-type IDataStore = DataStore & {
+export type IDataStore = DataStore & {
   jaeger?: IBaseClientSettings;
   tempo?: IBaseClientSettings;
   opensearch?: IElasticSearch;
   elasticapm?: IElasticSearch;
-  otlp?: {};
-  lightstep?: {};
-  newrelic?: {};
-  datadog?: {};
-  honeycomb?: {};
+  otlp?: TRawOtlpDataStore;
+  lightstep?: TRawOtlpDataStore;
+  newrelic?: TRawOtlpDataStore;
+  datadog?: TRawOtlpDataStore;
+  honeycomb?: TRawOtlpDataStore;
 };
 
 export type TDraftDataStore = {

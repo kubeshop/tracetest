@@ -1,9 +1,14 @@
 import {Form, Switch} from 'antd';
 import DocsBanner from 'components/DocsBanner/DocsBanner';
 import {INGESTOR_ENDPOINT_URL} from 'constants/Common.constants';
+import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from './OpenTelemetryCollector.styled';
 
 const Ingestor = () => {
+  const form = Form.useFormInstance<TDraftDataStore>();
+  const dataStoreType = Form.useWatch('dataStoreType', form) as TCollectorDataStores;
+  const baseName = ['dataStore', dataStoreType];
+
   return (
     <S.Container>
       <S.Description>
@@ -17,7 +22,7 @@ const Ingestor = () => {
         with Docker use tracetest:4317 for gRPC.
       </S.Description>
       <S.SwitchContainer>
-        <Form.Item name={['dataStore', 'isIngestorEnabled']} valuePropName="checked">
+        <Form.Item name={[...baseName, 'isIngestorEnabled']} valuePropName="checked">
           <Switch />
         </Form.Item>
         Enable Tracetest ingestion endpoint

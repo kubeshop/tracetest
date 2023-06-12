@@ -1,4 +1,5 @@
-import {SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
+import {IDataStore, SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
+import {TRawOtlpDataStore} from 'models/DataStore.model';
 
 const OtelCollectorService = (): TDataStoreService => ({
   getRequest(draft, dataStoreType = SupportedDataStores.OtelCollector) {
@@ -7,7 +8,10 @@ const OtelCollectorService = (): TDataStoreService => ({
       name: dataStoreType,
     });
   },
-  validateDraft({dataStore: {isIngestorEnabled = false} = {}}) {
+  validateDraft({dataStore = {} as IDataStore, dataStoreType = SupportedDataStores.OtelCollector}) {
+    const {isIngestorEnabled = false} =
+      (dataStore[dataStoreType || SupportedDataStores.OtelCollector] as TRawOtlpDataStore) ?? {};
+
     return Promise.resolve(isIngestorEnabled);
   },
   getInitialValues(
@@ -19,7 +23,9 @@ const OtelCollectorService = (): TDataStoreService => ({
       dataStore: {
         name: dataStoreType,
         type: dataStoreType,
-        isIngestorEnabled: configuredDataStore === dataStoreType,
+        [dataStoreType]: {
+          isIngestorEnabled: configuredDataStore === dataStoreType,
+        },
       },
       dataStoreType,
     };
