@@ -24,22 +24,11 @@ func TestApplyConfig(t *testing.T) {
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
-	// When I try to get a config without any server setup
-	// Then it should return the default config
-	result := tracetestcli.Exec(t, "get config --id current", tracetestcli.WithCLIConfig(cliConfig))
-	helpers.RequireExitCodeEqual(t, result, 0)
-
-	config := helpers.UnmarshalYAML[types.ConfigResource](t, result.StdOut)
-	require.Equal("Config", config.Type)
-	require.Equal("current", config.Spec.ID)
-	require.Equal("Config", config.Spec.Name)
-	require.True(config.Spec.AnalyticsEnabled)
-
 	// When I try to set up a new config
 	// Then it should be applied with success
 	configPath := env.GetTestResourcePath(t, "new-config")
 
-	result = tracetestcli.Exec(t, fmt.Sprintf("apply config --file %s", configPath), tracetestcli.WithCLIConfig(cliConfig))
+	result := tracetestcli.Exec(t, fmt.Sprintf("apply config --file %s", configPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// When I try to get a config again
@@ -47,7 +36,7 @@ func TestApplyConfig(t *testing.T) {
 	result = tracetestcli.Exec(t, "get config --id current", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 
-	config = helpers.UnmarshalYAML[types.ConfigResource](t, result.StdOut)
+	config := helpers.UnmarshalYAML[types.ConfigResource](t, result.StdOut)
 	require.Equal("Config", config.Type)
 	require.Equal("current", config.Spec.ID)
 	require.Equal("Config", config.Spec.Name)

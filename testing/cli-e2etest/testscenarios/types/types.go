@@ -46,3 +46,25 @@ type ConfigResource struct {
 	Type string `json:"type"`
 	Spec Config `json:"spec"`
 }
+
+// PollingProfile
+
+type PollingProfilePeriodicStrategy struct {
+	Timeout              string `json:"timeout"`
+	RetryDelay           string `json:"retryDelay"`
+	SelectorMatchRetries string `json:"selectorMatchRetries"`
+}
+
+type PollingProfile struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Default bool   `json:"default"`
+
+	Strategy string                         `json:"strategy"`
+	Periodic PollingProfilePeriodicStrategy `json:"periodic"`
+}
+
+type PollingProfileResource struct {
+	Type string         `json:"type"`
+	Spec PollingProfile `json:"spec"`
+}

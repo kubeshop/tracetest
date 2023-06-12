@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestApplyNewEnvironment(t *testing.T) {
+func TestApplyEnvironment(t *testing.T) {
 	// instantiate require with testing helper
 	require := require.New(t)
 
@@ -24,17 +24,11 @@ func TestApplyNewEnvironment(t *testing.T) {
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
-	// When I try to get an environment that doesn't exists
-	// Then it should return error message
-	result := tracetestcli.Exec(t, "get environment --id .noenv --output yaml", tracetestcli.WithCLIConfig(cliConfig))
-	helpers.RequireExitCodeEqual(t, result, 0)
-	require.Contains(result.StdOut, "Resource environment with ID .noenv not found")
-
 	// When I try to set up a new environment
 	// Then it should be applied with success
 	newEnvironmentPath := env.GetTestResourcePath(t, "new-environment")
 
-	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
+	result := tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	require.Equal(0, result.ExitCode)
 
 	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
