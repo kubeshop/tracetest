@@ -25,7 +25,7 @@ var listCmd = &cobra.Command{
 		ctx := context.Background()
 
 		analytics.Track("Resource List", "cmd", map[string]string{
-			resourceType: resourceType,
+			"resourceType": resourceType,
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)

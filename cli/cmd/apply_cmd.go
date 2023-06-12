@@ -25,7 +25,7 @@ var applyCmd = &cobra.Command{
 		ctx := context.Background()
 
 		analytics.Track("Resource Apply", "cmd", map[string]string{
-			resourceType: resourceType,
+			"resourceType": resourceType,
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)

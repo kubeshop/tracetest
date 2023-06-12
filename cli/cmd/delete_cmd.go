@@ -23,7 +23,7 @@ var deleteCmd = &cobra.Command{
 		ctx := context.Background()
 
 		analytics.Track("Resource Delete", "cmd", map[string]string{
-			resourceType: resourceType,
+			"resourceType": resourceType,
 		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
