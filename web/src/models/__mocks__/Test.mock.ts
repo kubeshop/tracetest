@@ -21,7 +21,7 @@ const TestMock: IMockFactory<Test, TRawTest> = () => ({
     };
   },
   model(data = {}) {
-    return Test(this.raw(data));
+    return Test.FromRawTest(this.raw(data));
   },
 });
 
