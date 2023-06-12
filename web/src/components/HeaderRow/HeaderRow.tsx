@@ -6,12 +6,11 @@ import * as S from './HeaderRow.styled';
 
 interface IProps {
   header: THeader;
-  index: number;
   onCreateTestOutput(attribute: TSpanFlatAttribute): void;
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
 }
 
-const HeaderRow = ({header: {key = '', value = ''}, index, onCreateTestOutput, onCreateTestSpec}: IProps) => {
+const HeaderRow = ({header: {key = '', value = ''}, onCreateTestOutput, onCreateTestSpec}: IProps) => {
   return (
     <S.HeaderContainer>
       <S.Header>
@@ -21,7 +20,7 @@ const HeaderRow = ({header: {key = '', value = ''}, index, onCreateTestOutput, o
         </S.HeaderValue>
       </S.Header>
       <AttributeActions
-        attribute={{key: `tracetest.response.headers | json_path '$[${index}].Value'`, value}}
+        attribute={{key: `tracetest.response.headers | json_path '$[?(@.Key=="${key}")].Value'`, value}}
         onCreateTestOutput={onCreateTestOutput}
         onCreateTestSpec={onCreateTestSpec}
       />

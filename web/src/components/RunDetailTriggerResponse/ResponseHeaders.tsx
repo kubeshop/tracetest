@@ -17,10 +17,9 @@ const ResponseHeaders = ({headers, state, onCreateTestOutput, onCreateTestSpec}:
   isRunStateFinished(state) || !!headers ? (
     <S.HeadersList>
       {headers &&
-        headers.map((header, index) => (
+        headers.map(header => (
           <HeaderRow
             header={header}
-            index={index}
             key={header.key}
             onCreateTestOutput={onCreateTestOutput}
             onCreateTestSpec={onCreateTestSpec}
