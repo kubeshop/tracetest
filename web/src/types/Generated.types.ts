@@ -434,14 +434,13 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"][];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestResourceList"];
+          "text/yaml": external["tests.yaml"]["components"]["schemas"]["TestResourceList"];
         };
       };
+      /** invalid query for test, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with getting tests */
       500: unknown;
     };
@@ -1790,6 +1789,19 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TestResourceList: {
+          count?: number;
+          items?: external["tests.yaml"]["components"]["schemas"]["TestResource"][];
+        };
+        /** @description Represents a test structured into the Resources format. */
+        TestResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Test'.
+           * @enum {string}
+           */
+          type?: "Test";
+          spec?: external["tests.yaml"]["components"]["schemas"]["Test"];
+        };
         Test: {
           id?: string;
           name?: string;
@@ -1799,6 +1811,7 @@ export interface external {
           /** Format: date-time */
           createdAt?: string;
           serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
+          trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
@@ -2058,6 +2071,8 @@ export interface external {
       schemas: {
         Trigger: {
           /** @enum {string} */
+          type?: "http" | "grpc" | "traceid";
+          /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
           http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
@@ -2066,6 +2081,8 @@ export interface external {
         TriggerResult: {
           /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
+          /** @enum {string} */
+          type?: "http" | "grpc" | "traceid";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
