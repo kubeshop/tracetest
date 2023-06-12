@@ -148,8 +148,8 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": firstSpan.ID.String(),
+			"testSpan": "true",
+			string(model.TracetestMetadataFieldParentID): firstSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -264,8 +264,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
 			Attributes: map[string]string{
-				"testSpan":  "true",
-				"parent_id": rootSpanID.String(),
+				"testSpan": "true",
+				string(model.TracetestMetadataFieldParentID): rootSpanID.String(),
 			},
 			Children: []*model.Span{},
 		},
@@ -325,8 +325,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": rootSpan.ID.String(),
+			"testSpan": "true",
+			string(model.TracetestMetadataFieldParentID): rootSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -394,8 +394,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": rootSpan.ID.String(),
+			"testSpan": "true",
+			string(model.TracetestMetadataFieldParentID): rootSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -406,8 +406,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": firstSpan.ID.String(),
+			"testSpan": "true",
+			string(model.TracetestMetadataFieldParentID): firstSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}

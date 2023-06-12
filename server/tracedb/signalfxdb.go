@@ -177,8 +177,8 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 		attributes[name] = value
 	}
 
-	attributes["parent_id"] = in.ParentID
-	attributes["kind"] = attributes["span.kind"]
+	attributes[string(model.TracetestMetadataFieldParentID)] = in.ParentID
+	attributes[string(model.TracetestMetadataFieldKind)] = attributes["span.kind"]
 	delete(attributes, "span.kind")
 
 	spanID, _ := trace.SpanIDFromHex(in.SpanID)

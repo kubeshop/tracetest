@@ -205,9 +205,9 @@ func generateSpan(seg *segment, parent *model.Span) (model.Span, error) {
 			return span, err
 		}
 
-		attributes["parent_id"] = parentID.String()
+		attributes[string(model.TracetestMetadataFieldParentID)] = parentID.String()
 	} else if parent != nil {
-		attributes["parent_id"] = parent.ID.String()
+		attributes[string(model.TracetestMetadataFieldParentID)] = parent.ID.String()
 	}
 
 	// decode span id

@@ -160,8 +160,8 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) model.Span {
 		attributes[name] = fmt.Sprintf("%v", attrValue)
 	}
 
-	attributes["kind"] = input["kind"].(string)
-	attributes["parent_id"] = input["parentSpanId"].(string)
+	attributes[string(model.TracetestMetadataFieldKind)] = input["kind"].(string)
+	attributes[string(model.TracetestMetadataFieldKind)] = input["parentSpanId"].(string)
 
 	return model.Span{
 		ID:         spanId,
