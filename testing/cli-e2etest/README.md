@@ -55,9 +55,9 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                              | Test scenarios |
 | -------------------------------------------------------- | -------------- |
-| `apply datastore -f [data-store-file]`                   | [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go) |
+| `apply datastore -f [data-store-file]`                   | [ApplyDatastore](./testscenarios/datastore/apply_datastore_test.go) |
 | `delete datastore --id current`                          | [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
-| `get datastore --id current --output pretty`             | [GetDatastore](./testscenarios/datastore/get_datastore_test.go), [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go), [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
+| `get datastore --id current --output pretty`             | [GetDatastore](./testscenarios/datastore/get_datastore_test.go), [ApplyDatastore](./testscenarios/datastore/apply_datastore_test.go), [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
 | `get datastore --id current --output json`               | [GetDatastore](./testscenarios/datastore/get_datastore_test.go) |
 | `get datastore --id current --output yaml`               | [GetDatastore](./testscenarios/datastore/get_datastore_test.go) |
 | `list datastore --output pretty`                         | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
@@ -86,14 +86,14 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply environment -f [new-environment-file]`               | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
-| `apply environment -f [existing-environment-file]`          | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
+| `apply environment -f [new-environment-file]`               | [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
+| `apply environment -f [existing-environment-file]`          | [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
 | `delete environment --id [existing-id]`                     | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
 | `delete environment --id [non-existing-id]`                 | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
 | `get environment --id [non-existing-id]`                    | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
 | `get environment --id [existing-id] --output pretty`        | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
-| `get environment --id [existing-id] --output json`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go)|
-| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
+| `get environment --id [existing-id] --output json`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
+| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
 | `list environment --output pretty`                          | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output json`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output yaml`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
