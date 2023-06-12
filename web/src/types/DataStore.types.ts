@@ -105,7 +105,11 @@ export type TDataStoreForm = FormInstance<TDraftDataStore>;
 export type TDataStoreService = {
   getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<DataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
-  getInitialValues(draft: DataStoreConfig, dataStoreType?: SupportedDataStores): TDraftDataStore;
+  getInitialValues(
+    draft: DataStoreConfig,
+    dataStoreType?: SupportedDataStores,
+    configuredDataStore?: SupportedDataStores
+  ): TDraftDataStore;
   shouldTestConnection(draft: TDraftDataStore): boolean;
 };
 

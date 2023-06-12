@@ -3,6 +3,7 @@ import {Model, TDataStoreSchemas} from 'types/Common.types';
 
 export type TRawDataStore = TDataStoreSchemas['DataStoreResource'];
 type DataStore = Model<TRawDataStore, {}>['spec'] & {
+  isIngestorEnabled?: boolean;
   otlp?: {};
   newrelic?: {};
   lightstep?: {};
@@ -38,6 +39,7 @@ const DataStore = ({
   tempo,
   awsxray,
   azureappinsights,
+  isIngestorEnabled: false,
 });
 
 export default DataStore;

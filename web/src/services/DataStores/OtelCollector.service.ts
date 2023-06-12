@@ -7,14 +7,19 @@ const OtelCollectorService = (): TDataStoreService => ({
       name: dataStoreType,
     });
   },
-  validateDraft() {
-    return Promise.resolve(true);
+  validateDraft({dataStore: {isIngestorEnabled = false} = {}}) {
+    return Promise.resolve(isIngestorEnabled);
   },
-  getInitialValues(draft, dataStoreType = SupportedDataStores.OtelCollector) {
+  getInitialValues(
+    draft,
+    dataStoreType = SupportedDataStores.OtelCollector,
+    configuredDataStore = SupportedDataStores.OtelCollector
+  ) {
     return {
       dataStore: {
         name: dataStoreType,
         type: dataStoreType,
+        isIngestorEnabled: configuredDataStore === dataStoreType,
       },
       dataStoreType,
     };
