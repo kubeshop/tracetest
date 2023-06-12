@@ -50,6 +50,7 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `list config --output pretty`                         | |
 | `list config --output json`                           | |
 | `list config --output yaml`                           | |
+
 ### Resources: Data Store
 
 | CLI Command                                              | Test scenarios |

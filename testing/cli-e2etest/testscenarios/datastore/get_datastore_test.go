@@ -39,7 +39,7 @@ func TestGetDatastore(t *testing.T) {
 
 		// When I try to get a datastore on yaml mode
 		// Then it should print a YAML list with one item
-		result := tracetestcli.Exec(t, "list datastore --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		result := tracetestcli.Exec(t, "get datastore --id current --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		require.Equal(0, result.ExitCode)
 
 		dataStoresYAML := helpers.UnmarshalYAMLSequence[types.DataStoreResource](t, result.StdOut)
@@ -57,8 +57,8 @@ func TestGetDatastore(t *testing.T) {
 
 		// When I try to get a datastore on yaml mode
 		// Then it should print a YAML
-		result := tracetestcli.Exec(t, "get datastore --output yaml", tracetestcli.WithCLIConfig(cliConfig))
-		require.Equal(0, result.ExitCode)
+		result := tracetestcli.Exec(t, "get datastore --id current --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
 
 		dataStore := helpers.UnmarshalYAML[types.DataStoreResource](t, result.StdOut)
 
@@ -74,7 +74,7 @@ func TestGetDatastore(t *testing.T) {
 
 		// When I try to get a datastore on json mode
 		// Then it should print a json
-		result := tracetestcli.Exec(t, "get datastore --output json", tracetestcli.WithCLIConfig(cliConfig))
+		result := tracetestcli.Exec(t, "get datastore --id current --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
 		dataStores := helpers.UnmarshalJSON[types.DataStoreResource](t, result.StdOut)
@@ -91,7 +91,7 @@ func TestGetDatastore(t *testing.T) {
 
 		// When I try to get a datastore on pretty mode
 		// Then it should print a table with 4 lines printed: header, separator, data store item and empty line
-		result := tracetestcli.Exec(t, "get datastore --output pretty", tracetestcli.WithCLIConfig(cliConfig))
+		result := tracetestcli.Exec(t, "get datastore --id current --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "current")
 		require.Contains(result.StdOut, env.Name())
