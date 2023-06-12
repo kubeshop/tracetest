@@ -236,7 +236,7 @@ func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 }
 
 func (*Repository) SortingFields() []string {
-	return []string{}
+	return []string{"name"}
 }
 
 func (r *Repository) Provision(ctx context.Context, profile PollingProfile) error {

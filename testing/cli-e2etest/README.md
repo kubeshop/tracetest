@@ -104,14 +104,14 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                           | Test scenarios |
 | --------------------------------------------------------------------- | -------------- |
-| `apply pollingprofile -f [pollingprofile-file]`                       | |
-| `delete pollingprofile --id current`                                  | |
-| `get pollingprofile --id current --output pretty`                     | |
-| `get pollingprofile --id current --output json`                       | |
-| `get pollingprofile --id current --output yaml`                       | |
-| `list pollingprofile --output pretty`                                 | |
-| `list pollingprofile --output json`                                   | |
-| `list pollingprofile --output yaml`                                   | |
+| `apply pollingprofile -f [pollingprofile-file]`                       | [ApplyPollingProfile](./testscenarios/pollingprofile/apply_pollingprofile_test.go) |
+| `delete pollingprofile --id current`                                  | [DeletePollingProfile](./testscenarios/pollingprofile/delete_pollingprofile_test.go) |
+| `get pollingprofile --id current --output pretty`                     | [GetPollingProfile](./testscenarios/pollingprofile/get_pollingprofile_test.go), [ApplyPollingProfile](./testscenarios/pollingprofile/apply_pollingprofile_test.go), [DeletePollingProfile](./testscenarios/pollingprofile/delete_pollingprofile_test.go) |
+| `get pollingprofile --id current --output json`                       | [GetPollingProfile](./testscenarios/pollingprofile/get_pollingprofile_test.go) |
+| `get pollingprofile --id current --output yaml`                       | [GetPollingProfile](./testscenarios/pollingprofile/get_pollingprofile_test.go) |
+| `list pollingprofile --output pretty`                                 | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
+| `list pollingprofile --output json`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
+| `list pollingprofile --output yaml`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
 
 ### Resources: Transactions
 

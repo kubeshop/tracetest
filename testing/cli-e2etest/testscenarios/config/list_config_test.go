@@ -105,7 +105,7 @@ func TestListConfig(t *testing.T) {
 		// And I already have a config created
 
 		// When I try to list config again on pretty mode
-		// Then it should print a table with 4 lines printed: header, separator, data store item and empty line
+		// Then it should print a table with 4 lines printed: header, separator, config item and empty line
 		result := tracetestcli.Exec(t, "list config --sortBy name --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "current")
