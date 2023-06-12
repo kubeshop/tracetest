@@ -55,5 +55,5 @@ func (config configActions) List(ctx context.Context, listArgs utils.ListArgs) (
 }
 
 func (config configActions) Delete(ctx context.Context, ID string) (string, error) {
-	return "Config successfully reset to default", ErrNotSupportedResourceAction
+	return "", ErrNotSupportedResourceAction // we don't have support to delete config today
 }

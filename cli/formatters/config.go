@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alexeyco/simpletable"
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
@@ -55,28 +56,26 @@ func (f ConfigFormatter) ToListTable(file *file.File) (*simpletable.Header, *sim
 }
 
 func (f ConfigFormatter) ToStruct(file *file.File) (interface{}, error) {
-	var ConfigResource openapi.ConfigurationResource
-	nullableConfig := openapi.NewNullableConfigurationResource(&ConfigResource)
+	var configResource openapi.ConfigurationResource
 
-	err := nullableConfig.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &configResource)
 	if err != nil {
 		return nil, err
 	}
 
-	return ConfigResource, nil
+	return configResource, nil
 }
 
 func (f ConfigFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
-	var ConfigResourceList openapi.ConfigurationResourceList
-	nullableList := openapi.NewNullableConfigurationResourceList(&ConfigResourceList)
+	var configList openapi.ConfigurationResourceList
 
-	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &configList)
 	if err != nil {
 		return nil, err
 	}
 
-	items := make([]interface{}, len(ConfigResourceList.Items))
-	for i, item := range ConfigResourceList.Items {
+	items := make([]interface{}, len(configList.Items))
+	for i, item := range configList.Items {
 		items[i] = item
 	}
 

@@ -42,14 +42,14 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                           | Test scenarios |
 | ----------------------------------------------------- | -------------- |
-| `apply config -f [config-file]`                       | |
-| `delete config --id current`                          | |
-| `get config --id current --output pretty`             | |
-| `get config --id current --output json`               | |
-| `get config --id current --output yaml`               | |
-| `list config --output pretty`                         | |
-| `list config --output json`                           | |
-| `list config --output yaml`                           | |
+| `apply config -f [config-file]`                       | [ApplyConfig](./testscenarios/config/apply_config_test.go) |
+| `delete config --id current`                          | [DeleteConfig](./testscenarios/config/delete_config_test.go) |
+| `get config --id current --output pretty`             | [GetConfig](./testscenarios/config/get_config_test.go), [ApplyConfig](./testscenarios/config/apply_config_test.go), [DeleteConfig](./testscenarios/config/delete_config_test.go) |
+| `get config --id current --output json`               | [GetConfig](./testscenarios/config/get_config_test.go) |
+| `get config --id current --output yaml`               | [GetConfig](./testscenarios/config/get_config_test.go) |
+| `list config --output pretty`                         | [ListConfig](./testscenarios/config/list_config_test.go) |
+| `list config --output json`                           | [ListConfig](./testscenarios/config/list_config_test.go) |
+| `list config --output yaml`                           | [ListConfig](./testscenarios/config/list_config_test.go) |
 
 ### Resources: Data Store
 
@@ -106,7 +106,6 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | --------------------------------------------------------------------- | -------------- |
 | `apply pollingprofile -f [pollingprofile-file]`                       | |
 | `delete pollingprofile --id current`                                  | |
-| `export pollingprofile --id current --file [pollingprofile-file]`     | |
 | `get pollingprofile --id current --output pretty`                     | |
 | `get pollingprofile --id current --output json`                       | |
 | `get pollingprofile --id current --output yaml`                       | |
@@ -122,7 +121,6 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `apply transaction -f [existing-transaction-file]`          | |
 | `delete transaction --id [existing-id]`                     | |
 | `delete transaction --id [non-existing-id]`                 | |
-| `export transaction --id current --file [transaction-file]` | |
 | `get transaction --id [non-existing-id]`                    | |
 | `get transaction --id [existing-id] --output pretty`        | |
 | `get transaction --id [existing-id] --output json`          | |

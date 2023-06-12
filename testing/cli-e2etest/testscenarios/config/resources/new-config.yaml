@@ -1,0 +1,5 @@
+type: Config
+spec:
+  id: current
+  name: Config
+  analyticsEnabled: false

@@ -48,7 +48,7 @@ func TestListDatastore(t *testing.T) {
 	t.Run("list with invalid sortBy field", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have environments created
+		// And I already have a datastore created
 
 		// When I try to list a datastore by an invalid field
 		// Then I should receive an error
@@ -60,7 +60,7 @@ func TestListDatastore(t *testing.T) {
 	t.Run("list with YAML format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have environments created
+		// And I already have a datastore created
 
 		// When I try to list datastore again on yaml mode
 		// Then it should print a YAML list with one item
@@ -78,7 +78,7 @@ func TestListDatastore(t *testing.T) {
 	t.Run("list with JSON format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have environments created
+		// And I already have a datastore created
 
 		// When I try to list datastore again on json mode
 		// Then it should print a JSON list with one item
@@ -96,7 +96,7 @@ func TestListDatastore(t *testing.T) {
 	t.Run("list with pretty format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have environments created
+		// And I already have a datastore created
 
 		// When I try to list datastore again on pretty mode
 		// Then it should print a table with 4 lines printed: header, separator, data store item and empty line

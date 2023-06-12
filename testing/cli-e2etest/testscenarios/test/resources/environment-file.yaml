@@ -3,7 +3,7 @@ spec:
   id: pokeapi-env
   name: pokeapi-env
   description: ""
-  createdAt: 2023-06-12T16:58:05.110073Z
+  createdAt: 2023-06-12T18:28:28.799362Z
   values:
   - key: POKEMON_NAME
     value: snorlax
