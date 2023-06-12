@@ -1,9 +1,8 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants';
-import Test, {TRawTest} from 'models/Test.model';
+import Test, {TRawTest, TRawTestResourceList} from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
-import {getTotalCountFromHeaders} from 'utils/Common';
 
 const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
   createTest: builder.mutation<Test, TRawTest>({
@@ -12,7 +11,7 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
       method: HTTP_METHOD.POST,
       body: newTest,
     }),
-    transformResponse: (rawTest: TRawTest) => Test(rawTest),
+    transformResponse: (rawTest: TRawTest) => Test.FromRawTest(rawTest),
     invalidatesTags: [
       {type: TracetestApiTags.TEST, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
@@ -37,22 +36,22 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
     query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
       `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
     providesTags: () => [{type: TracetestApiTags.TEST, id: 'LIST'}],
-    transformResponse: (rawTestList: TRawTest[], meta) => {
+    transformResponse: ({items = [], count = 0}: TRawTestResourceList) => {
       return {
-        items: rawTestList.map(rawTest => Test(rawTest)),
-        total: getTotalCountFromHeaders(meta),
+        items: items.map(rawTest => Test(rawTest)),
+        total: count,
       };
     },
   }),
   getTestById: builder.query<Test, {testId: string}>({
     query: ({testId}) => `/tests/${testId}`,
     providesTags: result => [{type: TracetestApiTags.TEST, id: result?.id}],
-    transformResponse: (rawTest: TRawTest) => Test(rawTest),
+    transformResponse: (rawTest: TRawTest) => Test.FromRawTest(rawTest),
   }),
   getTestVersionById: builder.query<Test, {testId: string; version: number}>({
     query: ({testId, version}) => `/tests/${testId}/version/${version}`,
     providesTags: result => [{type: TracetestApiTags.TEST, id: result?.id}],
-    transformResponse: (rawTest: TRawTest) => Test(rawTest),
+    transformResponse: (rawTest: TRawTest) => Test.FromRawTest(rawTest),
     keepUnusedDataFor: 10,
   }),
   deleteTestById: builder.mutation<Test, {testId: string}>({
