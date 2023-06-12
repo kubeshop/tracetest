@@ -4,9 +4,9 @@ import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import useCopy from 'hooks/useCopy';
 import {CollectorConfigMap} from 'constants/CollectorConfig.constants';
 import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
-import DocsBanner from 'components/DocsBanner/DocsBanner';
 import * as S from '../../DataStorePluginForm.styled';
 import * as OtelCollectorStyles from './OpenTelemetryCollector.styled';
+import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
 
 const Configuration = () => {
   const copy = useCopy();
@@ -36,9 +36,7 @@ const Configuration = () => {
           </OtelCollectorStyles.CodeContainer>
         </S.FormColumn>
       </S.FormContainer>
-      <DocsBanner>
-        Need more information about setting up OpenTelemetry Collector? <a href="">Go to our docs</a>
-      </DocsBanner>
+      <DataStoreDocsBanner dataStoreType={dataStoreType} />
     </>
   );
 };

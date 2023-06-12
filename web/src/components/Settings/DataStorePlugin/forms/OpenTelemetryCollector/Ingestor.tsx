@@ -1,5 +1,6 @@
 import {Form, Switch} from 'antd';
 import DocsBanner from 'components/DocsBanner/DocsBanner';
+import {INGESTOR_ENDPOINT_URL} from 'constants/Common.constants';
 import * as S from './OpenTelemetryCollector.styled';
 
 const Ingestor = () => {
@@ -22,7 +23,10 @@ const Ingestor = () => {
         Enable Tracetest ingestion endpoint
       </S.SwitchContainer>
       <DocsBanner>
-        Need more information about setting up ingestion endpoint? <a href="">Go to our docs</a>
+        Need more information about setting up ingestion endpoint?{' '}
+        <a target="_blank" href={INGESTOR_ENDPOINT_URL}>
+          Go to our docs
+        </a>
       </DocsBanner>
     </S.Container>
   );
