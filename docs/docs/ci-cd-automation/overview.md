@@ -14,7 +14,7 @@ If you want to see more examples with other CI/CD tools, let us know by [opening
 
 Tracetest is designed to work with all CI/CD platforms and automation tools. To enable Tracetest to run in CI/CD environments, make sure to [install the Tracetest CLI](../getting-started/installation.mdx) and configure it to access your [Tracetest server](../configuration/server.md).
 
-You can also directly execute the Tracetest CLI from a docker image rather than installing the CLI on your local machine. This is sometimes convienent when you wish to execute the CLI in a CI/CD environment.
+You can also directly execute the Tracetest CLI from a Docker image rather than installing the CLI on your local machine. This can be convenient when you wish to execute the CLI in a CI/CD environment.
 
 **How to Use**:
 
