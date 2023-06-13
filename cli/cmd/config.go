@@ -73,6 +73,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		configActions := actions.NewConfigActions(configOptions...)
 		resourceRegistry.Register(configActions)
 
+		analyzerOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("analyzers", cliConfig)),
+			actions.WithFormatter(formatters.NewAnalyzerFormatter()),
+		)
+		analyzerActions := actions.NewAnalyzerActions(analyzerOptions...)
+		resourceRegistry.Register(analyzerActions)
+
 		pollingOptions := append(
 			baseOptions,
 			actions.WithClient(utils.GetResourceAPIClient("pollingprofiles", cliConfig)),
