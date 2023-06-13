@@ -19,6 +19,7 @@ env:
   - TRACETEST_ENV={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
   - ANALYTICS_BE_KEY={{ if index .Env "ANALYTICS_BE_KEY"  }}{{ .Env.ANALYTICS_BE_KEY }}{{ else }}{{ end }}
   - ANALYTICS_FE_KEY={{ if index .Env "ANALYTICS_FE_KEY"  }}{{ .Env.ANALYTICS_FE_KEY }}{{ else }}{{ end }}
+  - PUBLISH_DOCKER={{ if index .Env "PUBLISH_DOCKER"  }}{{ .Env.PUBLISH_DOCKER }}{{ else }}false{{ end }}
 builds:
   - id: server
     binary: tracetest-server
@@ -49,7 +50,7 @@ builds:
     - amd64
 
 dockers:
-- skip_push: true
+- skip_push: '{{ .Env.PUBLISH_DOCKER }}'
   image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}'
   extra_files:
