@@ -1,10 +1,14 @@
-# Detailed Instructions on Installing Tracetest Using the CLI
+# Detailed CLI Installation Reference
 
-Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
+This page contains a reference of all options how to install Tracetest CLI, and how to use it to install Tracetest Server.
 
 :::note
 To read about deploying Tracetest with Helm, view the [Kubernetes Deployment docs](../deployment/kubernetes.mdx).
 :::
+
+## Detailed Instructions on Installing Tracetest Using the CLI
+
+Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
 
 ## Installing the Tracetest Server via the CLI
 
@@ -66,11 +70,19 @@ sudo yum install tracetest --refresh
 
 ### Windows
 
-Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)
+#### Chocolatey
+
+```bash
+choco source add --name=kubeshop_repo --source=https://chocolatey.kubeshop.io/chocolatey ; choco install tracetest
+```
+
+#### From source
+
+Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179).
 
 ## Install a Tracetest Server for Development with the CLI
 
-This guide will help you get Tracetest running using the Tracetest CLI.
+This reference will provide a step-by-step guide to install Tracetest using the Tracetest CLI.
 
 ### Prerequisites
 
@@ -152,8 +164,8 @@ In this step, you can choose to install just Tracetest alone or install it with 
 
 ```text title="Expected output:"
 Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
-> I have a tracing environment already. Just install Tracetest
-  Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
+  I have a tracing environment already. Just install Tracetest
+> Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
 By choosing any option, this installer will create a `tracetest` directory in the current directory and will add a `docker-compose.yaml` file to it.

@@ -24,22 +24,33 @@ const sidebars = {
 
   tutorialSidebar: [
     {
-      type: "doc",
-      id: "index",
-      label: "Introduction",
-    },
-    {
       type: "category",
       label: "Getting Started",
-      link: {
-        type: "doc",
-        id: "getting-started/installation",
-      },
       items: [
         {
           type: "doc",
+          id: "index",
+          label: "Introduction",
+        },
+        {
+          type: "doc",
+          id: "getting-started/installation",
+          label: "Installing Tracetest",
+        },
+        {
+          type: "doc",
+          id: "getting-started/open",
+          label: "Opening Tracetest",
+        },
+        {
+          type: "doc",
+          id: "getting-started/no-otel",
+          label: "What if I don't have OpenTelemetry installed?",
+        },
+        {
+          type: "doc",
           id: "getting-started/detailed-installation",
-          label: "Detailed Installation",
+          label: "Detailed CLI Installation Reference",
         },
       ],
     },
