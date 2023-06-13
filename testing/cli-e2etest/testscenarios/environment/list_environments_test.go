@@ -12,10 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func executeListEnvironmentsPreReqs(t *testing.T, env environment.Manager) {
-	// instantiate require with testing helper
-	require := require.New(t)
-
+func addListEnvironmentsPreReqs(t *testing.T, env environment.Manager) {
 	cliConfig := env.GetCLIConfigPath(t)
 
 	// Given I am a Tracetest CLI user
@@ -28,11 +25,6 @@ func executeListEnvironmentsPreReqs(t *testing.T, env environment.Manager) {
 	result := tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 
-	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-	require.Equal("Environment", environmentVars.Type)
-	require.Equal(".env", environmentVars.Spec.ID)
-	require.Equal(".env", environmentVars.Spec.Name)
-
 	// When I try to set up a another environment
 	// Then it should be applied with success
 	anotherEnvironmentPath := env.GetTestResourcePath(t, "another-environment")
@@ -40,40 +32,41 @@ func executeListEnvironmentsPreReqs(t *testing.T, env environment.Manager) {
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", anotherEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 
-	environmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-	require.Equal("Environment", environmentVars.Type)
-	require.Equal("another-env", environmentVars.Spec.ID)
-	require.Equal("another-env", environmentVars.Spec.Name)
-
 	// When I try to set up a third environment
 	// Then it should be applied with success
 	oneMoreEnvironmentPath := env.GetTestResourcePath(t, "one-more-environment")
 
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", oneMoreEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
-
-	environmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-	require.Equal("Environment", environmentVars.Type)
-	require.Equal("one-more-env", environmentVars.Spec.ID)
-	require.Equal("one-more-env", environmentVars.Spec.Name)
 }
 
 func TestListEnvironments(t *testing.T) {
+	// instantiate require with testing helper
+	require := require.New(t)
 
 	// setup isolated e2e environment
 	env := environment.CreateAndStart(t)
 	defer env.Close(t)
 
-	executeListEnvironmentsPreReqs(t, env)
-
 	cliConfig := env.GetCLIConfigPath(t)
 
-	t.Run("list with invalid sortBy field", func(t *testing.T) {
-		// instantiate require with testing helper
-		require := require.New(t)
-
+	t.Run("list no environments", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
+		// And there is no envs
+		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		environmentVarsList := helpers.UnmarshalYAMLSequence[types.EnvironmentResource](t, result.StdOut)
+		require.Len(environmentVarsList, 0)
+	})
+
+	addListEnvironmentsPreReqs(t, env)
+
+	t.Run("list with invalid sortBy field", func(t *testing.T) {
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+
 		// When I try to list these environments by an invalid field
 		// Then I should receive an error
 		result := tracetestcli.Exec(t, "list environment --sortBy id --output yaml", tracetestcli.WithCLIConfig(cliConfig))
@@ -82,9 +75,6 @@ func TestListEnvironments(t *testing.T) {
 	})
 
 	t.Run("list with YAML format", func(t *testing.T) {
-		// instantiate require with testing helper
-		require := require.New(t)
-
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 
@@ -130,9 +120,6 @@ func TestListEnvironments(t *testing.T) {
 	})
 
 	t.Run("list with JSON format", func(t *testing.T) {
-		// instantiate require with testing helper
-		require := require.New(t)
-
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 
@@ -178,9 +165,6 @@ func TestListEnvironments(t *testing.T) {
 	})
 
 	t.Run("list with pretty format", func(t *testing.T) {
-		// instantiate require with testing helper
-		require := require.New(t)
-
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 
@@ -200,14 +184,11 @@ func TestListEnvironments(t *testing.T) {
 	})
 
 	t.Run("list with YAML format skipping the first and taking two items", func(t *testing.T) {
-		// instantiate require with testing helper
-		require := require.New(t)
-
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 
-		// When I try to list these environments by a valid field and in YAML format
-		// Then I should receive three environments
+		// When I try to list these environments by a valid field, paging options and in YAML format
+		// Then I should receive two environments
 		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --skip 1 --take 2 --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 

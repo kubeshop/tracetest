@@ -2,6 +2,7 @@ package formatters
 
 import (
 	"github.com/alexeyco/simpletable"
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
@@ -54,9 +55,8 @@ func (f PollingFormatter) ToListTable(file *file.File) (*simpletable.Header, *si
 
 func (f PollingFormatter) ToStruct(file *file.File) (interface{}, error) {
 	var pollingResource openapi.PollingProfile
-	nullablePolling := openapi.NewNullablePollingProfile(&pollingResource)
 
-	err := nullablePolling.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &pollingResource)
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +66,8 @@ func (f PollingFormatter) ToStruct(file *file.File) (interface{}, error) {
 
 func (f PollingFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var pollingProfileList openapi.PollingProfileList
-	nullableList := openapi.NewNullablePollingProfileList(&pollingProfileList)
 
-	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &pollingProfileList)
 	if err != nil {
 		return nil, err
 	}

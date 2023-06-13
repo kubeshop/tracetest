@@ -1,0 +1,12 @@
+type: Demo
+spec:
+  id: z_GsWrlVR
+  name: dev
+  type: otelstore
+  enabled: true
+  pokeshop: {}
+  opentelemetryStore:
+    frontendEndpoint: http://dev-frontend:9000
+    productCatalogEndpoint: http://dev-product:8081
+    cartEndpoint: http://dev-cart:8082
+    checkoutEndpoint: http://dev-checkout:8083

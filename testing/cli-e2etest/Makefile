@@ -1,6 +1,7 @@
 TRACETEST_CLI?="../../dist/tracetest"
 TEST_ENVIRONMENT?="jaeger"
 TAG?="dev"
+ENABLE_CLI_DEBUG?="false"
 
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"
@@ -9,4 +10,8 @@ help: Makefile ## show list of commands
 
 test: # run tests for this application
 	go clean -testcache
-	go test -v -timeout 300s -p 1 ./...
+	go test -timeout 300s -p 1 ./...
+
+test/debug: # run tests for this application with debug mode enabled
+	ENABLE_CLI_DEBUG="true"
+	make test

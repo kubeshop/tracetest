@@ -66,9 +66,8 @@ func (f EnvironmentsFormatter) ToStruct(file *file.File) (interface{}, error) {
 
 func (f EnvironmentsFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
 	var environmentResourceList openapi.EnvironmentResourceList
-	nullableList := openapi.NewNullableEnvironmentResourceList(&environmentResourceList)
 
-	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &environmentResourceList)
 	if err != nil {
 		return nil, err
 	}
