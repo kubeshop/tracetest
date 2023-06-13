@@ -12,7 +12,6 @@ env:
 
   TRACETEST_ENV: pr
   TRACETEST_DEV: true
-  PUBLISH_DOCKER: false
   CYPRESS_BASE_URL: http://localhost:11633
   POKEMON_HTTP_ENDPOINT: http://demo-api:8081
 

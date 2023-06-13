@@ -16,10 +16,6 @@ on:
     tags:
       # this pipeline is only for final releases
       - "v[0-9]+.[0-9]+.[0-9]+"
-
-env:
-  PUBLISH_DOCKER: false
-
 jobs:
   build-web:
     name: build web
@@ -84,7 +80,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: v1.18.2
-          args: release --clean --skip-announce -f .goreleaser.dev.yaml
+          args: release --clean --skip-announce -f .goreleaser.demo.yaml
         env:
           VERSION: ${{ github.ref_name}}-demo
           TRACETEST_ENV: demo
