@@ -29,12 +29,12 @@ func (ds AttributeDataStore) getFromAlias(name string) (string, error) {
 	alias, found := attributeAlias[name]
 
 	if !found {
-		return "", fmt.Errorf(`attribute "%s" not found`, alias)
+		return "", fmt.Errorf(`attribute "%s" not found`, name)
 	}
 
 	value := ds.Span.Attributes.Get(alias)
 	if value == "" {
-		return "", fmt.Errorf(`attribute "%s" not found`, alias)
+		return "", fmt.Errorf(`attribute "%s" not found`, name)
 	}
 
 	return value, nil
