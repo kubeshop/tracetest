@@ -42,7 +42,10 @@ func (demo demoActions) GetID(file *file.File) (string, error) {
 }
 
 func (demo demoActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
-	var demoResource openapi.Demo
+	demoResource := openapi.Demo{
+		Spec: &openapi.DemoSpec{},
+	}
+
 	mapstructure.Decode(fileContent.Definition().Spec, &demoResource.Spec)
 
 	if demoResource.Spec.Id == nil || *demoResource.Spec.Id == "" {

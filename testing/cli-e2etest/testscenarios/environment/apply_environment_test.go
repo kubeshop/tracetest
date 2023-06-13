@@ -29,7 +29,7 @@ func TestApplyEnvironment(t *testing.T) {
 	newEnvironmentPath := env.GetTestResourcePath(t, "new-environment")
 
 	result := tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
 
@@ -45,7 +45,7 @@ func TestApplyEnvironment(t *testing.T) {
 	// When I try to get the environment applied on the last step
 	// Then it should return it
 	result = tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	environmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
 	require.Equal("Environment", environmentVars.Type)
@@ -62,7 +62,7 @@ func TestApplyEnvironment(t *testing.T) {
 	updatedNewEnvironmentPath := env.GetTestResourcePath(t, "updated-new-environment")
 
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", updatedNewEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	updatedEnvironmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
 	require.Equal("Environment", updatedEnvironmentVars.Type)
@@ -79,7 +79,7 @@ func TestApplyEnvironment(t *testing.T) {
 	// When I try to get the environment applied on the last step
 	// Then it should return it
 	result = tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
-	require.Equal(0, result.ExitCode)
+	helpers.RequireExitCodeEqual(t, result, 0)
 
 	updatedEnvironmentVars = helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
 	require.Equal("Environment", updatedEnvironmentVars.Type)

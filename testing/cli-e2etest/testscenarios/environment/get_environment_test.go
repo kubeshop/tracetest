@@ -13,9 +13,6 @@ import (
 )
 
 func addGetEnvironmentPreReqs(t *testing.T, env environment.Manager) {
-	// instantiate require with testing helper
-	require := require.New(t)
-
 	cliConfig := env.GetCLIConfigPath(t)
 
 	// Given I am a Tracetest CLI user
@@ -27,11 +24,6 @@ func addGetEnvironmentPreReqs(t *testing.T, env environment.Manager) {
 
 	result := tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
-
-	environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
-	require.Equal("Environment", environmentVars.Type)
-	require.Equal(".env", environmentVars.Spec.ID)
-	require.Equal(".env", environmentVars.Spec.Name)
 }
 
 func TestGetEnvironment(t *testing.T) {
@@ -60,12 +52,12 @@ func TestGetEnvironment(t *testing.T) {
 	t.Run("get with YAML format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have a environment already set
+		// And I have an environment already set
 
 		// When I try to get an environment on yaml mode
 		// Then it should print a YAML
 		result := tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
-		require.Equal(0, result.ExitCode)
+		helpers.RequireExitCodeEqual(t, result, 0)
 
 		environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
 
@@ -82,7 +74,7 @@ func TestGetEnvironment(t *testing.T) {
 	t.Run("get with JSON format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have a environment already set
+		// And I have an environment already set
 
 		// When I try to get an environment on json mode
 		// Then it should print a json
@@ -104,7 +96,7 @@ func TestGetEnvironment(t *testing.T) {
 	t.Run("get with pretty format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have a environment already set
+		// And I have an environment already set
 
 		// When I try to get an environment on pretty mode
 		// Then it should print a table with 4 lines printed: header, separator, environment item and empty line

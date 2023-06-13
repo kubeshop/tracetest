@@ -1,0 +1,10 @@
+type: Demo
+spec:
+  id: 1BcmWr_4g
+  name: another-dev
+  type: pokeshop
+  enabled: true
+  pokeshop:
+    httpEndpoint: http://new-dev-endpoint:1234
+    grpcEndpoint: new-dev-grpc:9091
+  opentelemetryStore: {}

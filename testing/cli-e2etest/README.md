@@ -68,19 +68,19 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                          | Test scenarios |
 | ---------------------------------------------------- | -------------- |
-| `apply demo -f [new-demo-file]`                      | |
-| `apply demo -f [existing-demo-file]`                 | |
-| `delete demo --id [existing-id]`                     | |
-| `delete demo --id [non-existing-id]`                 | |
-| `get demo --id [non-existing-id]`                    | |
-| `get demo --id [existing-id] --output pretty`        | |
-| `get demo --id [existing-id] --output json`          | |
-| `get demo --id [existing-id] --output yaml`          | |
-| `list demo --output pretty`                          | |
-| `list demo --output json`                            | |
-| `list demo --output yaml`                            | |
-| `list demo --skip 1 --take 2`                        | |
-| `list demo --sortBy name --sortDirection asc`        | |
+| `apply demo -f [new-demo-file]`                      | [ApplyDemo](./testscenarios/demo/apply_demo_test.go) |
+| `apply demo -f [existing-demo-file]`                 | [ApplyDemo](./testscenarios/demo/apply_demo_test.go) |
+| `delete demo --id [existing-id]`                     | [DeleteDemo](./testscenarios/demo/delete_demo_test.go) |
+| `delete demo --id [non-existing-id]`                 | [DeleteDemo](./testscenarios/demo/delete_demo_test.go) |
+| `get demo --id [non-existing-id]`                    | [GetDemo](./testscenarios/demo/get_demo_test.go), [DeleteDemo](./testscenarios/demo/delete_demo_test.go) |
+| `get demo --id [existing-id] --output pretty`        | [GetDemo](./testscenarios/demo/get_demo_test.go) |
+| `get demo --id [existing-id] --output json`          | [GetDemo](./testscenarios/demo/get_demo_test.go) |
+| `get demo --id [existing-id] --output yaml`          | [GetDemo](./testscenarios/demo/get_demo_test.go) |
+| `list demo --output pretty`                          | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --output json`                            | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --output yaml`                            | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --skip 1 --take 1`                        | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --sortBy name --sortDirection asc`        | [ListDemo](./testscenarios/demo/list_demos_test.go) |
 
 ### Resources: Environment
 
@@ -93,7 +93,7 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `get environment --id [non-existing-id]`                    | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
 | `get environment --id [existing-id] --output pretty`        | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
 | `get environment --id [existing-id] --output json`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
-| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
+| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
 | `list environment --output pretty`                          | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output json`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output yaml`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
@@ -130,3 +130,21 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `list transaction --output yaml`                            | |
 | `list transaction --skip 1 --take 2`                        | |
 | `list transaction --sortBy name --sortDirection asc`        | |
+
+### Resources: Tests
+
+| CLI Command                                                 | Test scenarios |
+| ----------------------------------------------------------- | -------------- |
+| `apply test -f [new-test-file]`                             | |
+| `apply test -f [existing-test-file]`                        | |
+| `delete test --id [existing-id]`                            | |
+| `delete test --id [non-existing-id]`                        | |
+| `get test --id [non-existing-id]`                           | |
+| `get test --id [existing-id] --output pretty`               | |
+| `get test --id [existing-id] --output json`                 | |
+| `get test --id [existing-id] --output yaml`                 | |
+| `list test --output pretty`                                 | |
+| `list test --output json`                                   | |
+| `list test --output yaml`                                   | |
+| `list test --skip 1 --take 2`                               | |
+| `list test --sortBy name --sortDirection asc`               | |

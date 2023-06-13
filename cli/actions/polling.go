@@ -7,7 +7,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
-	"github.com/mitchellh/mapstructure"
 )
 
 type pollingActions struct {
@@ -42,9 +41,6 @@ func (polling pollingActions) GetID(file *file.File) (string, error) {
 }
 
 func (polling pollingActions) Apply(ctx context.Context, fileContent file.File) (result *file.File, err error) {
-	var pollingProfile openapi.PollingProfile
-	mapstructure.Decode(fileContent.Definition().Spec, &pollingProfile.Spec)
-
 	result, err = polling.resourceClient.Update(ctx, fileContent, currentConfigID)
 	return result, err
 }
