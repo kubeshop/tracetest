@@ -25,7 +25,7 @@ func NewTrace(traceID string, spans []Span) Trace {
 
 	rootSpans := make([]*Span, 0)
 	for _, span := range spanMap {
-		parentID := span.Attributes["parent_id"]
+		parentID := span.Attributes[TracetestMetadataFieldParentID]
 		parentSpan, found := spanMap[parentID]
 		if !found {
 			rootSpans = append(rootSpans, span)
@@ -159,7 +159,7 @@ func replaceRoot(oldRoot, newRoot Span) Span {
 		oldRoot.Attributes = make(Attributes)
 	}
 	oldRoot.Parent = &newRoot
-	oldRoot.Attributes["parent_id"] = newRoot.ID.String()
+	oldRoot.Attributes[TracetestMetadataFieldParentID] = newRoot.ID.String()
 
 	newRoot.Children = append(newRoot.Children, &oldRoot)
 

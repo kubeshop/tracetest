@@ -231,9 +231,9 @@ func parseParentId(span *model.Span, row azquery.Row, index int) error {
 
 	rawParentId, ok := row[index].(string)
 	if ok {
-		span.Attributes["parent_id"] = rawParentId
+		span.Attributes[model.TracetestMetadataFieldParentID] = rawParentId
 	} else {
-		span.Attributes["parent_id"] = ""
+		span.Attributes[model.TracetestMetadataFieldParentID] = ""
 	}
 	return nil
 }
