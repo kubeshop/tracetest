@@ -49,7 +49,7 @@ spec:
   - selector: span[name = "Tracetest trigger"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 200
+    - attr:tracetest.response.status = 201
     # ensure we can reference outputs declared in the same test
     - attr:tracetest.response.body | json_path '$.id' = env:TRANSACTION_STEP_ID
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
