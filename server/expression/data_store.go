@@ -13,7 +13,7 @@ type DataStore interface {
 	Get(name string) (string, error)
 }
 
-var AttributeAlias = map[string]string{
+var attributeAlias = map[string]string{
 	"name": "tracetest.span.name",
 }
 
@@ -26,17 +26,18 @@ func (ds AttributeDataStore) Source() string {
 }
 
 func (ds AttributeDataStore) getFromAlias(name string) (string, error) {
-	alias, found := AttributeAlias[name]
-	if found {
-		value := ds.Span.Attributes.Get(alias)
-		if value == "" {
-			return "", fmt.Errorf(`attribute "%s" not found`, alias)
-		}
+	alias, found := attributeAlias[name]
 
-		return value, nil
+	if !found {
+		return "", fmt.Errorf(`attribute "%s" not found`, alias)
 	}
 
-	return "", fmt.Errorf(`attribute "%s" not found`, name)
+	value := ds.Span.Attributes.Get(alias)
+	if value == "" {
+		return "", fmt.Errorf(`attribute "%s" not found`, alias)
+	}
+
+	return value, nil
 }
 
 func (ds AttributeDataStore) Get(name string) (string, error) {
