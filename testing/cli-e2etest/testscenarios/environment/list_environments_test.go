@@ -13,9 +13,6 @@ import (
 )
 
 func addListEnvironmentsPreReqs(t *testing.T, env environment.Manager) {
-	// instantiate require with testing helper
-	require := require.New(t)
-
 	cliConfig := env.GetCLIConfigPath(t)
 
 	// Given I am a Tracetest CLI user
