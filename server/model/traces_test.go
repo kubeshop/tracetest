@@ -187,7 +187,7 @@ func newSpan(name string, parent *model.Span) model.Span {
 	}
 
 	if parent != nil {
-		span.Attributes[string(model.TracetestMetadataFieldParentID)] = parent.ID.String()
+		span.Attributes[model.TracetestMetadataFieldParentID] = parent.ID.String()
 	}
 
 	return span

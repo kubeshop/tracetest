@@ -1,7 +1,7 @@
 import {SemanticAttributes, SemanticResourceAttributes} from '@opentelemetry/semantic-conventions';
 
 export const TraceTestAttributes = {
-  NAME: 'tracetest.span.name',
+  NAME: 'name',
   KIND: 'tracetest.span.kind',
   TRACETEST_SPAN_TYPE: 'tracetest.span.type',
   TRACETEST_SPAN_DURATION: 'tracetest.span.duration',

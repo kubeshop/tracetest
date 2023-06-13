@@ -216,7 +216,7 @@ func convertElasticSearchSpanIntoSpan(input map[string]interface{}) model.Span {
 	// ParentId
 	parentId := flatInput["parent.id"]
 	if parentId != nil {
-		attributes[string(model.TracetestMetadataFieldParentID)] = flatInput["parent.id"].(string)
+		attributes[model.TracetestMetadataFieldParentID] = flatInput["parent.id"].(string)
 	}
 
 	return model.Span{

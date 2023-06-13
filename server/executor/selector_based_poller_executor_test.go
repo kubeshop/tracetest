@@ -131,7 +131,7 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		rootSpan := model.Span{ID: randomIDGenerator.SpanID(), Name: "Tracetest trigger", Attributes: make(model.Attributes)}
 		trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
 			rootSpan,
-			{ID: randomIDGenerator.SpanID(), Name: "GET /api/tests", Attributes: model.Attributes{string(model.TracetestMetadataFieldParentID): rootSpan.ID.String()}},
+			{ID: randomIDGenerator.SpanID(), Name: "GET /api/tests", Attributes: model.Attributes{model.TracetestMetadataFieldParentID: rootSpan.ID.String()}},
 		})
 		run := model.Run{Trace: &trace}
 

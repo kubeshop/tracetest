@@ -9,16 +9,14 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type TracetestMetadataField string
-
 const (
-	TracetestMetadataFieldStartTime TracetestMetadataField = "tracetest.span.start_time"
-	TracetestMetadataFieldEndTime   TracetestMetadataField = "tracetest.span.end_time"
-	TracetestMetadataFieldDuration  TracetestMetadataField = "tracetest.span.duration"
-	TracetestMetadataFieldType      TracetestMetadataField = "tracetest.span.type"
-	TracetestMetadataFieldName      TracetestMetadataField = "tracetest.span.name"
-	TracetestMetadataFieldParentID  TracetestMetadataField = "tracetest.span.parent_uid"
-	TracetestMetadataFieldKind      TracetestMetadataField = "tracetest.span.kind"
+	TracetestMetadataFieldStartTime string = "tracetest.span.start_time"
+	TracetestMetadataFieldEndTime   string = "tracetest.span.end_time"
+	TracetestMetadataFieldDuration  string = "tracetest.span.duration"
+	TracetestMetadataFieldType      string = "tracetest.span.type"
+	TracetestMetadataFieldName      string = "tracetest.span.name"
+	TracetestMetadataFieldParentID  string = "tracetest.span.parent_id"
+	TracetestMetadataFieldKind      string = "tracetest.span.kind"
 )
 
 type Attributes map[string]string
@@ -196,11 +194,11 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 }
 
 func (span Span) setMetadataAttributes() Span {
-	span.Attributes[string(TracetestMetadataFieldName)] = span.Name
-	span.Attributes[string(TracetestMetadataFieldType)] = spanType(span.Attributes)
-	span.Attributes[string(TracetestMetadataFieldDuration)] = spanDuration(span)
-	span.Attributes[string(TracetestMetadataFieldStartTime)] = fmt.Sprintf("%d", span.StartTime.UnixNano())
-	span.Attributes[string(TracetestMetadataFieldEndTime)] = fmt.Sprintf("%d", span.EndTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldName] = span.Name
+	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
+	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
+	span.Attributes[TracetestMetadataFieldStartTime] = fmt.Sprintf("%d", span.StartTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldEndTime] = fmt.Sprintf("%d", span.EndTime.UnixNano())
 
 	return span
 }
