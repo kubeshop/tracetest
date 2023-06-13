@@ -66,16 +66,15 @@ func (f AnalyzerFormatter) ToStruct(file *file.File) (interface{}, error) {
 }
 
 func (f AnalyzerFormatter) ToListStruct(file *file.File) ([]interface{}, error) {
-	var linterResourceList openapi.LinterResourceList
-	nullableList := openapi.NewNullableLinterResourceList(&linterResourceList)
+	var analyzerList openapi.LinterResourceList
 
-	err := nullableList.UnmarshalJSON([]byte(file.Contents()))
+	err := yaml.Unmarshal([]byte(file.Contents()), &analyzerList)
 	if err != nil {
 		return nil, err
 	}
 
-	items := make([]interface{}, len(linterResourceList.Items))
-	for i, item := range linterResourceList.Items {
+	items := make([]interface{}, len(analyzerList.Items))
+	for i, item := range analyzerList.Items {
 		items[i] = item
 	}
 
