@@ -1,7 +1,7 @@
 import { Typography } from 'antd';
 import styled from 'styled-components';
 
-export const DataStoreDocsBannerContainer = styled.div`
+export const DocsBannerContainer = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;

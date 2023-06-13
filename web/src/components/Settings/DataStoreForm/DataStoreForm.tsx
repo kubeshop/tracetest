@@ -2,9 +2,8 @@ import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
-import {SupportedDataStoresToExplanation, SupportedDataStoresToName} from 'constants/DataStore.constants';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreConfig from 'models/DataStoreConfig.model';
-import DataStoreDocsBanner from '../DataStoreDocsBanner/DataStoreDocsBanner';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 import DataStoreSelectionInput from './DataStoreSelectionInput';
@@ -36,11 +35,17 @@ const DataStoreForm = ({
   isLoading,
   isFormValid,
 }: IProps) => {
-  const initialValues = useMemo(() => DataStoreService.getInitialValues(dataStoreConfig), [dataStoreConfig]);
+  const configuredDataStoreType = dataStoreConfig.defaultDataStore.type as SupportedDataStores;
+  const initialValues = useMemo(
+    () => DataStoreService.getInitialValues(dataStoreConfig, configuredDataStoreType),
+    [configuredDataStoreType, dataStoreConfig]
+  );
   const dataStoreType = Form.useWatch('dataStoreType', form);
 
   useEffect(() => {
-    form.setFieldsValue({dataStore: {name: '', type: SupportedDataStores.JAEGER, ...initialValues.dataStore}});
+    form.setFieldsValue({
+      dataStore: {name: '', type: SupportedDataStores.JAEGER, ...initialValues.dataStore},
+    });
   }, [dataStoreType, form, initialValues.dataStore]);
 
   const onValidation = useCallback(
@@ -50,7 +55,6 @@ const DataStoreForm = ({
     },
     [onIsFormValid]
   );
-  const explanation = SupportedDataStoresToExplanation[dataStoreType!];
 
   return (
     <Form<TDraftDataStore>
@@ -72,12 +76,6 @@ const DataStoreForm = ({
               Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
               solution. Select your tracing data store and enter the configuration info.
             </S.Description>
-            {explanation ? (
-              <S.Explanation>{explanation}</S.Explanation>
-            ) : (
-              <S.Title>Provide the connection info for {SupportedDataStoresToName[dataStoreType!]}</S.Title>
-            )}
-            <DataStoreDocsBanner dataStoreType={dataStoreType!} />
             {dataStoreType && <DataStoreComponentFactory dataStoreType={dataStoreType} />}
           </S.TopContainer>
           <S.ButtonsContainer>
@@ -93,7 +91,7 @@ const DataStoreForm = ({
                 Test Connection
               </Button>
               <Button disabled={!isFormValid} loading={isLoading} type="primary" onClick={() => form.submit()}>
-                Save
+                Save and Set as DataStore
               </Button>
             </S.SaveContainer>
           </S.ButtonsContainer>
