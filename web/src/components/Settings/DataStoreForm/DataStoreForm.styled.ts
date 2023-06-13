@@ -78,13 +78,6 @@ export const Title = styled(Typography.Title)`
   }
 `;
 
-export const Explanation = styled(Typography.Text)`
-  && {
-    color: ${({theme}) => theme.color.textSecondary};
-    font-size: ${({theme}) => theme.size.md};
-  }
-`;
-
 export const Description = styled(Typography.Text)`
   && {
     color: ${({theme}) => theme.color.textSecondary};

@@ -1,12 +1,13 @@
 import {Checkbox, Col, Form, Input, Row, Select, Space, Switch} from 'antd';
 import {useCallback} from 'react';
-import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
+import {SupportedDataStoresToDefaultEndpoint, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {useDataStore} from 'providers/DataStore/DataStore.provider';
 import DataStoreService from 'services/DataStore.service';
 import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as FS from '../../DataStorePluginForm.styled';
 import * as S from './GrcpClient.styled';
 import GrpcClientSecure from './GrpcClientSecure';
+import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
 
 const COMPRESSION_LIST = [
   {name: 'none', value: 'none'},
@@ -36,6 +37,8 @@ const GrpcClient = () => {
 
   return (
     <>
+      <FS.Title>Provide the connection info for {SupportedDataStoresToName[dataStoreType]}</FS.Title>
+      <DataStoreDocsBanner dataStoreType={dataStoreType} />
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item

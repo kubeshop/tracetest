@@ -1,18 +1,22 @@
 import {Checkbox, Col, Form, Input, Row, Space, Switch} from 'antd';
-import {TDraftDataStore} from 'types/DataStore.types';
+import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import GrpcClientSecure from '../GrpcClient/GrpcClientSecure';
 import * as S from '../../DataStorePluginForm.styled';
+import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
 
 const HEADER_DEFAULT_VALUES = [{key: '', value: ''}];
 
 const HttpClient = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
-  const dataStoreType = form.getFieldValue('dataStoreType');
+  const dataStoreType = form.getFieldValue('dataStoreType') as SupportedDataStores;
   const baseName = ['dataStore', dataStoreType, 'http'];
   const insecureValue = Form.useWatch([...baseName, 'tls', 'insecure'], form) ?? true;
 
   return (
     <>
+      <S.Title>Provide the connection info for {SupportedDataStoresToName[dataStoreType]}</S.Title>
+      <DataStoreDocsBanner dataStoreType={dataStoreType} />
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item label="URL" name={[...baseName, 'url']} rules={[{required: true, message: 'URL is required'}]}>

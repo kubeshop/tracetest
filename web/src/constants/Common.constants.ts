@@ -9,6 +9,8 @@ export const GITHUB_ISSUES_URL = 'https://github.com/kubeshop/tracetest/issues/n
 export const DISCORD_URL = 'https://discord.gg/6zupCZFQbe';
 export const OCTOLIINT_ISSUE_URL = 'https://github.com/kubeshop/tracetest/issues/2615';
 
+export const INGESTOR_ENDPOINT_URL = 'https://docs.tracetest.io/configuration/ingestor-endpoint';
+
 export const TRACE_SEMANTIC_CONVENTIONS_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions';
 export const RESOURCE_SEMANTIC_CONVENTIONS_URL =

@@ -50,7 +50,7 @@ export const RuleContainer = styled.div`
   border-bottom: ${({theme}) => `1px dashed ${theme.color.borderLight}`};
   padding-bottom: 16px;
   margin-bottom: 16px;
-  margin-left: 32px;
+  margin-left: 43px;
 `;
 
 export const RuleHeader = styled.div`
