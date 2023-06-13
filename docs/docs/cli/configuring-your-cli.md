@@ -67,7 +67,8 @@ tracetest test run --definition <file-path>
 
 ### Running Tracetest CLI From Docker
 
-There are times where it is easier to directly execute the Tracetest CLI from a docker image rather than installing the CLI on your local machine. This is sometimes convienent when you wish to execute the CLI in a CI/CD environment.
+There are times when it is easier to directly execute the Tracetest CLI from a Docker image rather than installing the CLI on your local machine. This can be convenient when you wish to execute the CLI in a CI/CD environment.
+
 
 **How to Use**:
 
