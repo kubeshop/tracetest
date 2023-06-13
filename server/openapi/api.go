@@ -18,7 +18,6 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
-	CreateTest(http.ResponseWriter, *http.Request)
 	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DeleteTransactionRun(http.ResponseWriter, *http.Request)
@@ -58,6 +57,7 @@ type ResourceApiApiRouter interface {
 	CreateDemo(http.ResponseWriter, *http.Request)
 	CreateEnvironment(http.ResponseWriter, *http.Request)
 	CreateLinter(http.ResponseWriter, *http.Request)
+	CreateTest(http.ResponseWriter, *http.Request)
 	CreateTransaction(http.ResponseWriter, *http.Request)
 	DeleteDataStore(http.ResponseWriter, *http.Request)
 	DeleteDemo(http.ResponseWriter, *http.Request)
@@ -93,7 +93,6 @@ type ResourceApiApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
-	CreateTest(context.Context, Test) (ImplResponse, error)
 	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, int32) (ImplResponse, error)
 	DeleteTransactionRun(context.Context, string, int32) (ImplResponse, error)
@@ -134,6 +133,7 @@ type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
 	CreateEnvironment(context.Context, EnvironmentResource) (ImplResponse, error)
 	CreateLinter(context.Context, LinterResource) (ImplResponse, error)
+	CreateTest(context.Context, Test) (ImplResponse, error)
 	CreateTransaction(context.Context, TransactionResource) (ImplResponse, error)
 	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)

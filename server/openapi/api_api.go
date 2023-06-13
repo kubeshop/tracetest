@@ -51,12 +51,6 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
-			"CreateTest",
-			strings.ToUpper("Post"),
-			"/api/tests",
-			c.CreateTest,
-		},
-		{
 			"DeleteTest",
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}",
@@ -237,30 +231,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.UpsertDefinition,
 		},
 	}
-}
-
-// CreateTest - Create new test
-func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
-	testParam := Test{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTestRequired(testParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreateTest(r.Context(), testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
 }
 
 // DeleteTest - delete a test

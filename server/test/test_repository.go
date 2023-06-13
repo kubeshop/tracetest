@@ -18,10 +18,10 @@ type Repository interface {
 	SortingFields() []string
 	Provision(context.Context, Test) error
 	SetID(test Test, id id.ID) Test
+	Create(context.Context, Test) (Test, error)
 
 	// TODO: uncomment as we add new functionality
 	// Get(context.Context, id.ID) (Test, error)
-	// Create(context.Context, Test) (Test, error)
 	// Update(context.Context, Test) (Test, error)
 	// Delete(context.Context, Test) error
 	// Exists(context.Context, id.ID) (bool, error)
@@ -157,6 +157,65 @@ func (r *repository) Count(ctx context.Context, query string) (int, error) {
 	return count, nil
 }
 
+const insertQuery = `
+INSERT INTO tests (
+	"id",
+	"version",
+	"name",
+	"description",
+	"service_under_test",
+	"specs",
+	"outputs",
+	"created_at"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
+func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
+	if !test.HasID() {
+		test.ID = IDGen.ID()
+	}
+
+	test.Version = 1
+	test.CreatedAt = time.Now()
+
+	stmt, err := r.db.Prepare(insertQuery)
+	if err != nil {
+		return Test{}, fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	triggerJson, err := json.Marshal(test.Trigger)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	specsJson, err := json.Marshal(test.Specs)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	outputsJson, err := json.Marshal(test.Outputs)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	_, err = stmt.ExecContext(
+		ctx,
+		test.ID,
+		test.Version,
+		test.Name,
+		test.Description,
+		triggerJson,
+		specsJson,
+		outputsJson,
+		test.CreatedAt,
+	)
+	if err != nil {
+		return Test{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	return test, nil
+}
+
 type scanner interface {
 	Scan(dest ...interface{}) error
 }
@@ -187,7 +246,7 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	}
 
 	var (
-		jsonServiceUnderTest,
+		jsonTrigger,
 		jsonSpecs,
 		jsonOutputs []byte
 
@@ -200,7 +259,7 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 		&test.Version,
 		&test.Name,
 		&test.Description,
-		&jsonServiceUnderTest,
+		&jsonTrigger,
 		&jsonSpecs,
 		&jsonOutputs,
 		&test.CreatedAt,
@@ -214,7 +273,7 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 		return Test{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
-	err = json.Unmarshal(jsonServiceUnderTest, &test.Trigger)
+	err = json.Unmarshal(jsonTrigger, &test.Trigger)
 	if err != nil {
 		return Test{}, fmt.Errorf("cannot parse trigger: %w", err)
 	}

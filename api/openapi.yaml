@@ -331,15 +331,18 @@ paths:
           description: "problem with getting tests"
     post:
       tags:
-        - api
+        - resource-api
       summary: "Create new test"
       description: "Create new test action"
       operationId: createTest
       requestBody:
         content:
           application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/TestResource"
+          text/yaml:
             schema:
-              $ref: "./tests.yaml#/components/schemas/Test"
+              $ref: "./config.yaml#/components/schemas/TestResource"
       responses:
         200:
           description: successful operation
