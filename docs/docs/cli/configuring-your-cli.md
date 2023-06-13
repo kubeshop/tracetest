@@ -64,3 +64,15 @@ tracetest test run --definition <file-path>
 **Options**:
 
 `--wait-for-result`: The CLI will only exit after the test run has completed (the trace was retrieved and assertions were executed).
+
+### Running Tracetest CLI From Docker
+
+There are times where it is easier to directly execute the Tracetest CLI from a docker image rather than installing the CLI on your local machine. This is sometimes convienent when you wish to execute the CLI in a CI/CD environment.
+
+**How to Use**:
+
+```sh
+docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --entrypoint tracetest kubeshop/tracetest:latest -s http://host.docker.internal:11633/ test run  --definition <file-path> --wait-for-result
+```
+
+
