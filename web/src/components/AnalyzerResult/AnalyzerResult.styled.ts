@@ -3,6 +3,11 @@ import {Button, Collapse, Progress, Typography} from 'antd';
 import styled from 'styled-components';
 import noResultsIcon from 'assets/SpanAssertionsEmptyState.svg';
 
+export const StyledCollapse = styled(Collapse)`
+  background-color: ${({theme}) => theme.color.white};
+  border: 0;
+`;
+
 export const Container = styled.div`
   padding: 24px;
 `;
@@ -95,6 +100,8 @@ export const ScoreProgress = styled(Progress)`
 
 export const PluginPanel = styled(Collapse.Panel)`
   background-color: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `1px solid ${theme.color.border}`};
+  margin-bottom: 12px;
 
   .ant-collapse-content {
     background-color: ${({theme}) => theme.color.background};
@@ -121,7 +128,7 @@ export const CollapseIconContainer = styled.div`
   position: absolute;
   top: 25%;
   right: 16px;
-  border-left: 1px solid ${({theme}) => theme.color.borderLight}};
+  border-left: 1px solid ${({theme}) => theme.color.borderLight};
   padding-left: 14px;
   height: 24px;
   align-items: center;
@@ -162,4 +169,12 @@ export const EmptyTitle = styled(Typography.Title).attrs({level: 3})``;
 
 export const ConfigureButtonContainer = styled.div`
   margin-top: 6px;
+`;
+
+export const SwitchContainer = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
 `;

@@ -1,6 +1,7 @@
+import Percentage from 'components/AnalyzerScore/Percentage';
+import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
+import {ANALYZER_DOCUMENTATION_URL} from 'constants/Common.constants';
 import * as S from './AnalyzerResult.styled';
-import PercentageScore from '../LintScore/PercentageScore';
-import {TooltipQuestion} from '../TooltipQuestion/TooltipQuestion';
 
 interface IProps {
   score: number;
@@ -15,10 +16,20 @@ const GlobalResult = ({score, minimumScore}: IProps) => {
       <S.GlobalScoreWrapper>
         <S.Subtitle level={3}>
           Overall Trace Analyzer Score
-          <TooltipQuestion title="Tracetest core system supports analyzer evaluation as part of the testing capabilities." />
+          <TooltipQuestion
+            title={
+              <>
+                Tracetest core system supports analyzer evaluation as part of the testing capabilities.{' '}
+                <a href={ANALYZER_DOCUMENTATION_URL} target="_blank">
+                  Learn more
+                </a>{' '}
+                about the Analyzer.
+              </>
+            }
+          />
         </S.Subtitle>
         <S.GlobalScoreContainer>
-          <PercentageScore score={score} />
+          <Percentage score={score} />
         </S.GlobalScoreContainer>
       </S.GlobalScoreWrapper>
       {!!minimumScore && (

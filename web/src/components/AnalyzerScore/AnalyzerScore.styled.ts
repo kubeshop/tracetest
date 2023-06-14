@@ -15,9 +15,9 @@ export const ScoreTexContainer = styled.div`
   height: 100%;
 `;
 
-export const Score = styled(Typography.Title)`
+export const Score = styled(Typography.Title)<{$isLarge?: boolean}>`
   && {
-    font-size: 12px;
+    font-size: ${({$isLarge}) => ($isLarge ? '24px' : '12px')};
     margin-bottom: 0;
   }
 `;
