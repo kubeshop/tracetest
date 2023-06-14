@@ -24,15 +24,15 @@ func TestApplyAnalyzer(t *testing.T) {
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
-	// When I try to set up a new config
+	// When I try to set up a new analyzer
 	// Then it should be applied with success
 	configPath := env.GetTestResourcePath(t, "new-analyzer")
 
 	result := tracetestcli.Exec(t, fmt.Sprintf("apply analyzer --file %s", configPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 
-	// When I try to get a config again
-	// Then it should return the config applied on the last step, with analytics disabled
+	// When I try to get a analyzer again
+	// Then it should return the analyzer applied on the last step, with analytics disabled
 	result = tracetestcli.Exec(t, "get analyzer --id current", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 

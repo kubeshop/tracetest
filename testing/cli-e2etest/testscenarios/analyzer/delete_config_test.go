@@ -23,7 +23,7 @@ func TestDeleteAnalyzer(t *testing.T) {
 	// And I have my server recently created
 
 	// When I try to delete the analyzer
-	// Then it should return a error message, showing that we cannot delete a config
+	// Then it should return a error message, showing that we cannot delete a analyzer
 	result := tracetestcli.Exec(t, "delete analyzer --id current", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
 	require.Contains(result.StdErr, "the specified resource type doesn't support the action")

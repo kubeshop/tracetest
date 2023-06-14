@@ -15,7 +15,7 @@ import (
 func addListAnalyzerPreReqs(t *testing.T, env environment.Manager) {
 	cliConfig := env.GetCLIConfigPath(t)
 
-	// When I try to set up a new config
+	// When I try to set up a new analyzer
 	// Then it should be applied with success
 	configPath := env.GetTestResourcePath(t, "new-analyzer")
 
@@ -36,9 +36,9 @@ func TestListAnalyzer(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 
-		// When I try to list config on pretty mode and there is no config previously registered
+		// When I try to list analyzer on pretty mode and there is no analyzer previously registered
 		// Then it should print an empty table
-		// Then it should print a table with 4 lines printed: header, separator, the default config item and empty line
+		// Then it should print a table with 4 lines printed: header, separator, the default analyzer item and empty line
 		result := tracetestcli.Exec(t, "list analyzer --sortBy name --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "current")
@@ -52,9 +52,9 @@ func TestListAnalyzer(t *testing.T) {
 	t.Run("list with invalid sortBy field", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have a config created
+		// And I already have a analyzer created
 
-		// When I try to list a config by an invalid field
+		// When I try to list a analyzer by an invalid field
 		// Then I should receive an error
 		result := tracetestcli.Exec(t, "list analyzer --sortBy id --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 1)
@@ -64,52 +64,52 @@ func TestListAnalyzer(t *testing.T) {
 	t.Run("list with YAML format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have a config created
+		// And I already have a analyzer created
 
-		// When I try to list config again on yaml mode
+		// When I try to list analyzer again on yaml mode
 		// Then it should print a YAML list with one item
 		result := tracetestcli.Exec(t, "list analyzer --sortBy name --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		configYAML := helpers.UnmarshalYAMLSequence[types.AnalyzerResource](t, result.StdOut)
+		analyzerYAML := helpers.UnmarshalYAMLSequence[types.AnalyzerResource](t, result.StdOut)
 
-		require.Len(configYAML, 1)
-		require.Equal("Analyzer", configYAML[0].Type)
-		require.Equal("current", configYAML[0].Spec.Id)
-		require.Equal("analyzer", configYAML[0].Spec.Name)
-		require.True(configYAML[0].Spec.Enabled)
-		require.Equal(configYAML[0].Spec.MinimumScore, 95)
-		require.Len(configYAML[0].Spec.Plugins, 3)
+		require.Len(analyzerYAML, 1)
+		require.Equal("Analyzer", analyzerYAML[0].Type)
+		require.Equal("current", analyzerYAML[0].Spec.Id)
+		require.Equal("analyzer", analyzerYAML[0].Spec.Name)
+		require.True(analyzerYAML[0].Spec.Enabled)
+		require.Equal(analyzerYAML[0].Spec.MinimumScore, 95)
+		require.Len(analyzerYAML[0].Spec.Plugins, 3)
 	})
 
 	t.Run("list with JSON format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have a config created
+		// And I already have a analyzer created
 
-		// When I try to list config again on json mode
+		// When I try to list analyzer again on json mode
 		// Then it should print a JSON list with one item
 		result := tracetestcli.Exec(t, "list analyzer --sortBy name --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		configYAML := helpers.UnmarshalJSON[[]types.AnalyzerResource](t, result.StdOut)
+		analyzerYAML := helpers.UnmarshalJSON[[]types.AnalyzerResource](t, result.StdOut)
 
-		require.Len(configYAML, 1)
-		require.Equal("Analyzer", configYAML[0].Type)
-		require.Equal("current", configYAML[0].Spec.Id)
-		require.Equal("analyzer", configYAML[0].Spec.Name)
-		require.True(configYAML[0].Spec.Enabled)
-		require.Equal(configYAML[0].Spec.MinimumScore, 95)
-		require.Len(configYAML[0].Spec.Plugins, 3)
+		require.Len(analyzerYAML, 1)
+		require.Equal("Analyzer", analyzerYAML[0].Type)
+		require.Equal("current", analyzerYAML[0].Spec.Id)
+		require.Equal("analyzer", analyzerYAML[0].Spec.Name)
+		require.True(analyzerYAML[0].Spec.Enabled)
+		require.Equal(analyzerYAML[0].Spec.MinimumScore, 95)
+		require.Len(analyzerYAML[0].Spec.Plugins, 3)
 	})
 
 	t.Run("list with pretty format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I already have a config created
+		// And I already have a analyzer created
 
-		// When I try to list config again on pretty mode
-		// Then it should print a table with 4 lines printed: header, separator, config item and empty line
+		// When I try to list analyzer again on pretty mode
+		// Then it should print a table with 4 lines printed: header, separator, analyzer item and empty line
 		result := tracetestcli.Exec(t, "list analyzer --sortBy name --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "current")
