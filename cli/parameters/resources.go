@@ -87,7 +87,7 @@ type ResourceParams struct {
 }
 
 var _ Params = &ResourceParams{}
-var ValidResources = []string{"config", "datastore", "demo", "environment", "pollingprofile", "transaction", "analyzer"}
+var ValidResources = []string{"config", "datastore", "demo", "environment", "pollingprofile", "transaction", "analyzer", "test"}
 
 func (p *ResourceParams) Validate(cmd *cobra.Command, args []string) []ParamError {
 	errors := make([]ParamError, 0)

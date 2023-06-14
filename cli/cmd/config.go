@@ -121,6 +121,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
 		resourceRegistry.Register(transactionActions)
 
+		testOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("tests", cliConfig)),
+			actions.WithFormatter(formatters.NewTestsFormatter(cliConfig.URL())),
+		)
+		testActions := actions.NewTestActions(openapiClient, testOptions...)
+		resourceRegistry.Register(testActions)
+
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
