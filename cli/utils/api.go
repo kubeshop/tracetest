@@ -225,6 +225,7 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 	}
 
 	if resp.StatusCode == http.StatusBadRequest {
+		// TODO: this function is masking potential errors, add correct error handling
 		body := IOReadCloserToString(resp.Body)
 
 		var parsedError struct {
@@ -240,6 +241,7 @@ func (resourceClient ResourceClient) List(ctx context.Context, listArgs ListArgs
 		return nil, fmt.Errorf("could not list resource: %s", parsedError.Error)
 	}
 
+	// TODO: this function is masking potential errors, add correct error handling
 	body := IOReadCloserToString(resp.Body)
 	if listArgs.All {
 		baseListResponse, err := parseListResponse(body)
