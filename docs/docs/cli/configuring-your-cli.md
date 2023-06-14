@@ -73,7 +73,7 @@ There are times when it is easier to directly execute the Tracetest CLI from a D
 **How to Use**:
 
 ```sh
-docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --entrypoint tracetest kubeshop/tracetest:latest -s http://host.docker.internal:11633/ test run  --definition <file-path> --wait-for-result
+docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s http://localhost:11633/ test run  --definition <file-path> --wait-for-result
 ```
 
 
