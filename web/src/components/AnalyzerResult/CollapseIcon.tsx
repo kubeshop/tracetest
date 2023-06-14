@@ -6,7 +6,7 @@ interface IProps {
 
 const CollapseIcon = ({isCollapsed}: IProps) => {
   return (
-    <S.CollapseIconContainer>{isCollapsed ? <S.DownCollapseIcon /> : <S.UpCollapseIcon />}</S.CollapseIconContainer>
+    <S.CollapseIconContainer>{isCollapsed ? <S.UpCollapseIcon /> : <S.DownCollapseIcon />}</S.CollapseIconContainer>
   );
 };
 

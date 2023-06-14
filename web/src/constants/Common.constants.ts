@@ -20,6 +20,7 @@ export const TRACE_DOCUMENTATION_URL =
 
 export const ADD_TEST_URL = 'https://docs.tracetest.io/web-ui/creating-tests';
 export const ADD_TEST_OUTPUTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/web-ui/creating-test-outputs';
+export const ANALYZER_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/tracetest-analyzer-concepts';
 export const EXPRESSIONS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/expressions';
 export const ENVIRONMENTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/environments';
 
