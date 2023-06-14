@@ -340,7 +340,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	listFn := m.rh.List
-	if isRequestForAugmented(r) {
+	if isRequestForAugmented(r) && m.rh.ListAugmented != nil {
 		listFn = m.rh.ListAugmented
 	}
 
