@@ -7,10 +7,10 @@ on:
     branches: [main]
 
 env:
-  VERSION: pr-${{ github.event.pull_request.number }}
-  TAG: pr-${{ github.event.pull_request.number }}
+  VERSION: ${{ github.sha }}
+  TAG: latest
 
-  TRACETEST_ENV: pr
+  TRACETEST_ENV: ci
   TRACETEST_DEV: true
   CYPRESS_BASE_URL: http://localhost:11633
   POKEMON_HTTP_ENDPOINT: http://demo-api:8081
@@ -199,7 +199,7 @@ jobs:
       - name: Export docker image
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         run: |
-          docker save --output dist/image.tar "kubeshop/tracetest:$VERSION"
+          docker save --output dist/image.tar "kubeshop/tracetest:$TAG"
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
@@ -333,7 +333,6 @@ jobs:
 
           export TRACETEST_CLI=$PWD/dist/tracetest
           export TEST_ENVIRONMENT=jaeger
-          export TAG=pr-${{ github.event.pull_request.number }}
 
           cd ./testing/cli-e2etest
           make test
