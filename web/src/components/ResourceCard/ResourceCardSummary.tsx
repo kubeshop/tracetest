@@ -1,6 +1,7 @@
 import {Tooltip} from 'antd';
-import Date from 'utils/Date';
+import AnalyzerScore from 'components/AnalyzerScore';
 import Summary from 'models/Summary.model';
+import Date from 'utils/Date';
 import * as S from './ResourceCard.styled';
 
 interface IProps {
@@ -9,10 +10,19 @@ interface IProps {
 
 const ResourceCardSummary = ({
   summary: {
-    lastRun: {time, passes, fails},
+    lastRun: {time, passes, fails, analyzerScore},
   },
 }: IProps) => (
   <>
+    <div>
+      {!!analyzerScore && (
+        <Tooltip title="Trace Analyzer score">
+          <div>
+            <AnalyzerScore width="28px" height="28px" score={analyzerScore} />
+          </div>
+        </Tooltip>
+      )}
+    </div>
     <div>
       <S.Text>Last run result:</S.Text>
       <S.Row>

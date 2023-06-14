@@ -130,7 +130,7 @@ export const RunsListContainer = styled.div`
 export const TestContainer = styled.div`
   cursor: pointer;
   display: grid;
-  grid-template-columns: auto auto 1fr 100px auto auto;
+  grid-template-columns: auto auto 1fr 28px 100px auto auto;
   align-items: center;
   gap: 18px;
   padding: 15px 24px;

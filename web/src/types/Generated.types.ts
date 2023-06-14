@@ -1814,6 +1814,7 @@ export interface external {
             time?: string | null;
             passes?: number;
             fails?: number;
+            analyzerScore?: number;
           };
         };
         /** @example [object Object] */

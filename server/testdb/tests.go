@@ -163,7 +163,8 @@ const (
 		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs,
 		last_test_run.created_at as last_test_run_time,
 		last_test_run.pass as last_test_run_pass,
-		last_test_run.fail as last_test_run_fail
+		last_test_run.fail as last_test_run_fail,
+		last_test_run.linter as last_test_run_linter
 	FROM tests t
 	LEFT OUTER JOIN (
 		SELECT MAX(id) as id, test_id FROM test_runs GROUP BY test_id
@@ -316,7 +317,8 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	var (
 		jsonServiceUnderTest,
 		jsonSpecs,
-		jsonOutputs []byte
+		jsonOutputs,
+		jsonLinter []byte
 
 		lastRunTime *time.Time
 
@@ -335,6 +337,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		&lastRunTime,
 		&pass,
 		&fail,
+		&jsonLinter,
 	)
 
 	switch err {
@@ -362,6 +365,12 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		}
 		if fail != nil {
 			test.Summary.LastRun.Fails = *fail
+		}
+
+		var linter model.LinterResult
+		err = json.Unmarshal(jsonLinter, &linter)
+		if err == nil {
+			test.Summary.LastRun.AnalyzerScore = linter.Score
 		}
 
 		return test, nil
