@@ -38,19 +38,20 @@ func (a listTestsAction) Run(ctx context.Context, args ListTestConfig) error {
 }
 
 func (a listTestsAction) executeRequest(ctx context.Context) ([]openapi.Test, error) {
-	request := a.client.ApiApi.GetTests(ctx)
-	tests, response, err := a.client.ApiApi.GetTestsExecute(request)
-	if err != nil {
-		return []openapi.Test{}, fmt.Errorf("could not get tests: %w", err)
-	}
+	return []openapi.Test{}, fmt.Errorf("deprecated")
+	// request := a.client.ApiApi.GetTests(ctx)
+	// tests, response, err := a.client.ApiApi.GetTestsExecute(request)
+	// if err != nil {
+	// 	return []openapi.Test{}, fmt.Errorf("could not get tests: %w", err)
+	// }
 
-	if response.StatusCode != 200 {
-		return []openapi.Test{}, fmt.Errorf("get tests request failed. Expected 200, got %d", response.StatusCode)
-	}
+	// if response.StatusCode != 200 {
+	// 	return []openapi.Test{}, fmt.Errorf("get tests request failed. Expected 200, got %d", response.StatusCode)
+	// }
 
-	if tests == nil {
-		return []openapi.Test{}, nil
-	}
+	// if tests == nil {
+	// 	return []openapi.Test{}, nil
+	// }
 
-	return tests, nil
+	// return tests, nil
 }
