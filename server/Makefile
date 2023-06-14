@@ -18,6 +18,7 @@ init-submodule:
 	git submodule init
 	git submodule update
 
+.PHONY: test vet run
 test: # run go tests for this application
 	go test -timeout 150s -coverprofile=coverage.out ./...
 
