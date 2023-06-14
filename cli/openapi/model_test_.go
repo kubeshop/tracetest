@@ -27,6 +27,7 @@ type Test struct {
 	Version          *int32     `json:"version,omitempty"`
 	CreatedAt        *time.Time `json:"createdAt,omitempty"`
 	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
+	Trigger          *Trigger   `json:"trigger,omitempty"`
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
@@ -243,6 +244,38 @@ func (o *Test) SetServiceUnderTest(v Trigger) {
 	o.ServiceUnderTest = &v
 }
 
+// GetTrigger returns the Trigger field value if set, zero value otherwise.
+func (o *Test) GetTrigger() Trigger {
+	if o == nil || isNil(o.Trigger) {
+		var ret Trigger
+		return ret
+	}
+	return *o.Trigger
+}
+
+// GetTriggerOk returns a tuple with the Trigger field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetTriggerOk() (*Trigger, bool) {
+	if o == nil || isNil(o.Trigger) {
+		return nil, false
+	}
+	return o.Trigger, true
+}
+
+// HasTrigger returns a boolean if a field has been set.
+func (o *Test) HasTrigger() bool {
+	if o != nil && !isNil(o.Trigger) {
+		return true
+	}
+
+	return false
+}
+
+// SetTrigger gets a reference to the given Trigger and assigns it to the Trigger field.
+func (o *Test) SetTrigger(v Trigger) {
+	o.Trigger = &v
+}
+
 // GetSpecs returns the Specs field value if set, zero value otherwise.
 func (o *Test) GetSpecs() []TestSpec {
 	if o == nil || isNil(o.Specs) {
@@ -364,6 +397,9 @@ func (o Test) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.ServiceUnderTest) {
 		toSerialize["serviceUnderTest"] = o.ServiceUnderTest
+	}
+	if !isNil(o.Trigger) {
+		toSerialize["trigger"] = o.Trigger
 	}
 	if !isNil(o.Specs) {
 		toSerialize["specs"] = o.Specs
