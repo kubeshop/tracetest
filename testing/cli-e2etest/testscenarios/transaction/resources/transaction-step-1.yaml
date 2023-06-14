@@ -1,0 +1,25 @@
+type: Test
+spec:
+  id: 9wtAH2_Vg
+  name: Pokeshop - Add
+  description: Add a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon/
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"name":"snorlax","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png","isFeatured":true}'
+  specs:
+  - name: It should add a Pokemon correctly
+    selector: span[tracetest.span.type="http" name="POST /pokemon" http.method="POST"]
+    assertions:
+    - attr:http.status_code = 201
+  - name: It should save the correct data
+    selector: span[tracetest.span.type="database" name="create pokeshop.pokemon" db.system="postgres"
+      db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]
+    assertions:
+    - attr:db.result  contains '"imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png"'
+    - attr:db.result contains '"name":"snorlax"'
