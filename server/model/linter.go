@@ -63,7 +63,13 @@ type RuleResult struct {
 }
 
 type Result struct {
-	SpanID string   `json:"span_id"`
-	Passed bool     `json:"passed"`
-	Errors []string `json:"error"`
+	SpanID        string         `json:"span_id"`
+	Passed        bool           `json:"passed"`
+	Errors        []string       `json:"error"`
+	GroupedErrors []GroupedError `json:"grouped_errors"`
+}
+
+type GroupedError struct {
+	Error  string   `json:"error"`
+	Values []string `json:"values"`
 }

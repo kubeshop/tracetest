@@ -19,10 +19,11 @@ var _ MappedNullable = &LinterResultPluginRuleResult{}
 
 // LinterResultPluginRuleResult struct for LinterResultPluginRuleResult
 type LinterResultPluginRuleResult struct {
-	SpanId   *string  `json:"spanId,omitempty"`
-	Errors   []string `json:"errors,omitempty"`
-	Passed   *bool    `json:"passed,omitempty"`
-	Severity *string  `json:"severity,omitempty"`
+	SpanId        *string                                    `json:"spanId,omitempty"`
+	Errors        []string                                   `json:"errors,omitempty"`
+	GroupedErrors []LinterResultPluginRuleResultGroupedError `json:"groupedErrors,omitempty"`
+	Passed        *bool                                      `json:"passed,omitempty"`
+	Severity      *string                                    `json:"severity,omitempty"`
 }
 
 // NewLinterResultPluginRuleResult instantiates a new LinterResultPluginRuleResult object
@@ -106,6 +107,38 @@ func (o *LinterResultPluginRuleResult) SetErrors(v []string) {
 	o.Errors = v
 }
 
+// GetGroupedErrors returns the GroupedErrors field value if set, zero value otherwise.
+func (o *LinterResultPluginRuleResult) GetGroupedErrors() []LinterResultPluginRuleResultGroupedError {
+	if o == nil || isNil(o.GroupedErrors) {
+		var ret []LinterResultPluginRuleResultGroupedError
+		return ret
+	}
+	return o.GroupedErrors
+}
+
+// GetGroupedErrorsOk returns a tuple with the GroupedErrors field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinterResultPluginRuleResult) GetGroupedErrorsOk() ([]LinterResultPluginRuleResultGroupedError, bool) {
+	if o == nil || isNil(o.GroupedErrors) {
+		return nil, false
+	}
+	return o.GroupedErrors, true
+}
+
+// HasGroupedErrors returns a boolean if a field has been set.
+func (o *LinterResultPluginRuleResult) HasGroupedErrors() bool {
+	if o != nil && !isNil(o.GroupedErrors) {
+		return true
+	}
+
+	return false
+}
+
+// SetGroupedErrors gets a reference to the given []LinterResultPluginRuleResultGroupedError and assigns it to the GroupedErrors field.
+func (o *LinterResultPluginRuleResult) SetGroupedErrors(v []LinterResultPluginRuleResultGroupedError) {
+	o.GroupedErrors = v
+}
+
 // GetPassed returns the Passed field value if set, zero value otherwise.
 func (o *LinterResultPluginRuleResult) GetPassed() bool {
 	if o == nil || isNil(o.Passed) {
@@ -185,6 +218,9 @@ func (o LinterResultPluginRuleResult) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Errors) {
 		toSerialize["errors"] = o.Errors
+	}
+	if !isNil(o.GroupedErrors) {
+		toSerialize["groupedErrors"] = o.GroupedErrors
 	}
 	if !isNil(o.Passed) {
 		toSerialize["passed"] = o.Passed

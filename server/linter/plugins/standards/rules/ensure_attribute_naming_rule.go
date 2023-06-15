@@ -34,22 +34,41 @@ func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Tra
 	for _, span := range trace.Flat {
 		errors := make([]string, 0)
 		namespaces := make([]string, 0)
+		groupedErrors := make([]model.GroupedError, 0)
+		values := make([]string, 0)
 		for name := range span.Attributes {
 			if !regex.MatchString(name) {
 				errors = append(errors, fmt.Sprintf(`Attribute "%s" doesnt follow naming convention`, name))
+				values = append(values, name)
 				continue
 			}
 
 			namespaces = append(namespaces, name[0:strings.LastIndex(name, ".")])
 		}
 
+		if len(values) > 1 {
+			groupedErrors = append(groupedErrors, model.GroupedError{
+				Error:  "The following attributes do not adhere to the naming convention:",
+				Values: values,
+			})
+		}
+
+		values = make([]string, 0)
 		// ensure no attribute is named after a namespace
 		for name := range span.Attributes {
 			for _, namespace := range namespaces {
 				if name == namespace {
 					errors = append(errors, fmt.Sprintf(`Attribute "%s" uses the same name as an existing namespace in the same span`, name))
+					values = append(values, name)
 				}
 			}
+		}
+
+		if len(values) > 1 {
+			groupedErrors = append(groupedErrors, model.GroupedError{
+				Error:  "The following attributes use the same name as an existing namespace in the same span:",
+				Values: values,
+			})
 		}
 
 		if len(errors) > 0 {
@@ -57,9 +76,10 @@ func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Tra
 		}
 
 		results = append(results, model.Result{
-			SpanID: span.ID.String(),
-			Passed: len(errors) == 0,
-			Errors: errors,
+			SpanID:        span.ID.String(),
+			Passed:        len(errors) == 0,
+			Errors:        errors,
+			GroupedErrors: groupedErrors,
 		})
 	}
 

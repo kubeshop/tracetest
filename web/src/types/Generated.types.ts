@@ -1679,9 +1679,14 @@ export interface external {
         LinterResultPluginRuleResult: {
           spanId?: string;
           errors?: string[];
+          groupedErrors?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResultGroupedError"][];
           passed?: boolean;
           /** @enum {string} */
           severity?: "error" | "warning";
+        };
+        LinterResultPluginRuleResultGroupedError: {
+          error?: string;
+          values?: string[];
         };
       };
     };

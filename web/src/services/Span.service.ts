@@ -93,6 +93,7 @@ export type TLintBySpanContent = {
   passed: boolean;
   spanId: string;
   errors: string[];
+  groupedErrors: {error?: string; values?: string[]}[];
   severity: 'error' | 'warning';
 };
 

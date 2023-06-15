@@ -14,6 +14,8 @@ type LinterResultPluginRuleResult struct {
 
 	Errors []string `json:"errors,omitempty"`
 
+	GroupedErrors []LinterResultPluginRuleResultGroupedError `json:"groupedErrors,omitempty"`
+
 	Passed bool `json:"passed,omitempty"`
 
 	Severity string `json:"severity,omitempty"`
@@ -21,6 +23,11 @@ type LinterResultPluginRuleResult struct {
 
 // AssertLinterResultPluginRuleResultRequired checks if the required fields are not zero-ed
 func AssertLinterResultPluginRuleResultRequired(obj LinterResultPluginRuleResult) error {
+	for _, el := range obj.GroupedErrors {
+		if err := AssertLinterResultPluginRuleResultGroupedErrorRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

@@ -91,12 +91,29 @@ const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
                             {getSpanName(trace.spans, result.spanId)}
                           </S.SpanButton>
                           <div>
-                            {result.errors.map((error, index) => (
+                            {result.groupedErrors.map((groupedError, index) => (
                               // eslint-disable-next-line react/no-array-index-key
                               <div key={index}>
-                                <Typography.Text>{error}</Typography.Text>
+                                <div>
+                                  <Typography.Text>{groupedError.error}</Typography.Text>
+                                </div>
+                                <S.List>
+                                  {groupedError.values?.map(value => (
+                                    <li key={value}>
+                                      <Typography.Text>{value}</Typography.Text>
+                                    </li>
+                                  ))}
+                                </S.List>
                               </div>
                             ))}
+
+                            {!result.groupedErrors.length &&
+                              result.errors.map((error, index) => (
+                                // eslint-disable-next-line react/no-array-index-key
+                                <div key={index}>
+                                  <Typography.Text>{error}</Typography.Text>
+                                </div>
+                              ))}
                           </div>
                         </>
                       )}

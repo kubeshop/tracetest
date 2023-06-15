@@ -178,3 +178,7 @@ export const SwitchContainer = styled.div`
   justify-content: flex-end;
   margin-bottom: 16px;
 `;
+
+export const List = styled.ul`
+  padding-inline-start: 20px;
+`;

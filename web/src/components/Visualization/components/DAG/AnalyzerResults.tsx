@@ -27,12 +27,32 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
             <div key={lintError.ruleName}>
               <S.Text strong>{lintError.ruleName}</S.Text>
 
-              {lintError.errors.map((error, index) => (
+              {lintError.groupedErrors.map((groupedError, index) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <div key={index}>
-                  <S.Text type="secondary">- {error}</S.Text>
+                  <div>
+                    <S.Text type="secondary">{groupedError.error}</S.Text>
+                  </div>
+                  <S.List>
+                    {groupedError.values?.map(value => (
+                      <li key={value}>
+                        <S.Text type="secondary">{value}</S.Text>
+                      </li>
+                    ))}
+                  </S.List>
                 </div>
               ))}
+
+              {!lintError.groupedErrors.length && (
+                <S.List>
+                  {lintError.errors.map((error, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <li key={index}>
+                      <S.Text type="secondary">{error}</S.Text>
+                    </li>
+                  ))}
+                </S.List>
+              )}
             </div>
           ))}
         </S.Body>
