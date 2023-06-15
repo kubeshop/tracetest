@@ -1,7 +1,7 @@
 type: Test
 spec:
   id: create-pokemon
-  name: 'Create Pokemon'
+  name: "Create Pokemon"
   description: Create a single pokemon on Pokeshop
   trigger:
     type: grpc
@@ -54,7 +54,7 @@ spec:
           "isFeatured": true
         }
   specs:
-  - name: It calls Pokeshop correctly
-    selector: span[tracetest.span.type="rpc" name="createPokemon" rpc.system="grpc" rpc.method="createPokemon" rpc.service="Pokeshop.createPokemon"]
-    assertions:
-    - attr:rpc.grpc.status_code  =  0
+    - name: It calls Pokeshop correctly
+      selector: span[tracetest.span.type="rpc" name="createPokemon" rpc.system="grpc" rpc.method="createPokemon" rpc.service="pokeshop.Pokeshop"]
+      assertions:
+        - attr:rpc.grpc.status_code  =  0
