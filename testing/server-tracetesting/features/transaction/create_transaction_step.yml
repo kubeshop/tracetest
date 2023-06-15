@@ -31,14 +31,14 @@ spec:
             },
             "specs": [
               {
-                "selector": "span[name = \"pg.query:SELECT pokeshop\"]"
+                "selector": "span[name = \"pg.query:SELECT pokeshop\"]",
                 "assertions": ["attr:tracetest.selected_spans.count > 0"]
               }
             ],
             "outputs": [
               {
                 "name": "TRIGGER_COUNT",
-                "selector": "span[name = \"Tracetest trigger\"]"
+                "selector": "span[name = \"Tracetest trigger\"]",
                 "value": "attr:tracetest.selected_spans.count"
               }
             ]
