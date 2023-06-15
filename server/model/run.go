@@ -70,6 +70,10 @@ func durationInMillieconds(d time.Duration) int {
 	return int(d.Milliseconds())
 }
 
+func durationInNanoseconds(d time.Duration) int {
+	return int(d.Nanoseconds())
+}
+
 func durationInSeconds(d time.Duration) int {
 	return int(math.Ceil(d.Seconds()))
 }
