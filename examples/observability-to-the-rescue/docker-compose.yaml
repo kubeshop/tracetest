@@ -1,6 +1,23 @@
 version: '3'
 
 services:
+  your-api:
+    build: ./your-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - YOUR_API_PORT=10013
+      - OTEL_SERVICE_NAME=your-api
+      - OTEL_EXPORTER_GRPC_URL=http://otel-collector:4317
+      - WALLET_API_ENDPOINT=http://wallet:10010/wallet
+      - PAYMENT_EXECUTOR_API_ENDPOINT=http://payment-executor:10012/payment/execute
+    ports:
+      - "10013:10013"
+    depends_on:
+      - otel-collector
+      - payment-executor
+      - wallet
+
   payment-executor:
     build: ./payment-executor-api
     extra_hosts:
@@ -13,10 +30,8 @@ services:
     ports:
       - "10012:10012"
     depends_on:
-      otel-collector:
-        condition: service_started
-      risk-analysis:
-        condition: service_started
+      - otel-collector
+      - risk-analysis
 
   risk-analysis:
     build: ./risk-analysis-api
@@ -29,8 +44,7 @@ services:
     ports:
       - "10011:10011"
     depends_on:
-      otel-collector:
-        condition: service_started
+      - otel-collector
 
   wallet:
     build: ./wallet-api
@@ -43,8 +57,7 @@ services:
     ports:
       - "10010:10010"
     depends_on:
-      otel-collector:
-        condition: service_started
+      - otel-collector
 
   # tracetest:
   #   image: kubeshop/tracetest:latest
@@ -91,8 +104,7 @@ services:
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
     depends_on:
-      jaeger:
-        condition: service_started
+      - jaeger
 
   jaeger:
     image: jaegertracing/all-in-one:latest
