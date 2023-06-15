@@ -23,11 +23,13 @@ spec:
 
         message ImportPokemonRequest {
           int32 id = 1;
+          optional bool isFixed = 2;
         }
 
         message GetPokemonRequest {
           optional int32 skip = 1;
           optional int32 take = 2;
+          optional bool isFixed = 3;
         }
 
         message GetPokemonListResponse {
