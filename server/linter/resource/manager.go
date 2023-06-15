@@ -84,7 +84,7 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		return Linter{}, fmt.Errorf("sql exec delete: %w", err)
 	}
 
-	var pluginsJSON []byte
+	pluginsJSON := []byte("[]")
 	if updated.Plugins != nil {
 		pluginsJSON, err = json.Marshal(updated.Plugins)
 		if err != nil {
