@@ -20,6 +20,7 @@ const (
 	FileTypeConfig         FileType = "Config"
 	FileTypeDemo           FileType = "Demo"
 	FileTypePollingProfile FileType = "PollingProfile"
+	FileTypeAnalyzer       FileType = "Analyzer"
 )
 
 type File struct {

@@ -1,0 +1,16 @@
+type: Analyzer
+spec:
+  id: current
+  name: analyzer
+  enabled: true
+  minimumScore: 95
+  plugins:
+  - name: standards
+    enabled: true
+    required: true
+  - name: security
+    enabled: true
+    required: true
+  - name: common
+    enabled: true
+    required: true

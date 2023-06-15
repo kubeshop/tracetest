@@ -96,3 +96,22 @@ type DemoResource struct {
 	Type string `json:"type"`
 	Spec Demo   `json:"spec"`
 }
+
+type AnalyzerResource struct {
+	Type string   `json:"type"`
+	Spec Analyzer `json:"spec"`
+}
+
+type Analyzer struct {
+	Id           string           `json:"id"`
+	Name         string           `json:"name"`
+	Enabled      bool             `json:"enabled"`
+	MinimumScore int              `json:"minimumScore"`
+	Plugins      []AnalyzerPlugin `json:"plugins"`
+}
+
+type AnalyzerPlugin struct {
+	Name     string `json:"name"`
+	Enabled  bool   `json:"enabled"`
+	Required bool   `json:"required"`
+}
