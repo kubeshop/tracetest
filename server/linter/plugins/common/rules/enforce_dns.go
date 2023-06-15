@@ -13,7 +13,8 @@ type ensuresDnsUsage struct {
 }
 
 var (
-	dnsFields = []string{"net.peer.name", "http.url", "db.connection_string", "net.sock.peer.addr", "net.host.name"}
+	clientDnsFields = []string{"net.peer.name"}
+	dnsFields       = []string{"http.url", "db.connection_string"}
 )
 
 func NewEnforceDnsUsageRule() model.Rule {
@@ -51,6 +52,12 @@ func (r ensuresDnsUsage) validate(span *model.Span) model.Result {
 
 	for _, field := range dnsFields {
 		if span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
+			ipFields = append(ipFields, fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)))
+		}
+	}
+
+	for _, field := range clientDnsFields {
+		if span.Kind == model.SpanKindClient && span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
 			ipFields = append(ipFields, fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)))
 		}
 	}

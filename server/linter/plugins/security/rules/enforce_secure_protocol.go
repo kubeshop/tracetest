@@ -22,7 +22,7 @@ func NewEnforceHttpsProtocolRule() model.Rule {
 			Name:        "Enforce HTTPS Protocol",
 			Description: "Ensure all request use https",
 			Tips:        []string{},
-			Weight:      40,
+			Weight:      20,
 		},
 	}
 }
