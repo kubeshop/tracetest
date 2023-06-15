@@ -303,7 +303,8 @@ func TestTransactions(t *testing.T) {
 							"lastRun": {
 								"time": "REMOVEME",
 								"passes": 2,
-								"fails": 1
+								"fails": 1,
+								"analyzerScore": 0
 							}
 						}
 					},
@@ -340,7 +341,8 @@ func TestTransactions(t *testing.T) {
 							"lastRun": {
 								"fails": 0,
 								"passes": 0,
-								"time": "REMOVEME"
+								"time": "REMOVEME",
+								"analyzerScore": 0
 							}
 						}
 					}
@@ -350,7 +352,8 @@ func TestTransactions(t *testing.T) {
 					"lastRun": {
 						"fails": 1,
 						"passes": 2,
-						"time": "REMOVEME"
+						"time": "REMOVEME",
+						"analyzerScore": 0
 					}
 				}
 			}
