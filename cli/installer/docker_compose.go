@@ -57,7 +57,6 @@ const (
 )
 
 func dockerComposeInstaller(config configuration, ui cliUI.UI) {
-	trackInstall("docker-compose", config, nil)
 	dir := config.String("output.dir")
 
 	err := os.RemoveAll(dir)

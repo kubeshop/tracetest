@@ -20,8 +20,7 @@ type ConfigureConfig struct {
 }
 
 type ConfigureConfigSetValues struct {
-	Endpoint         *string
-	AnalyticsEnabled *bool
+	Endpoint *string
 }
 
 type configureAction struct {
@@ -55,23 +54,14 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 		return err
 	}
 
-	var analyticsEnabled bool
-
-	if args.SetValues.AnalyticsEnabled != nil {
-		analyticsEnabled = *args.SetValues.AnalyticsEnabled
-	} else {
-		analyticsEnabled = ui.Confirm("Enable analytics?", true)
-	}
-
 	scheme, endpoint, err := config.ParseServerURL(serverURL)
 	if err != nil {
 		return err
 	}
 
 	config := config.Config{
-		Scheme:           scheme,
-		Endpoint:         endpoint,
-		AnalyticsEnabled: analyticsEnabled,
+		Scheme:   scheme,
+		Endpoint: endpoint,
 	}
 
 	err = a.saveConfiguration(ctx, config, args)

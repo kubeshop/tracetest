@@ -129,7 +129,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 			validateVersionMismatch()
 		}
 
-		analytics.Init(cliConfig)
+		analytics.Init()
 	}
 }
 
@@ -209,7 +209,6 @@ func setupLogger(cmd *cobra.Command, args []string) {
 
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
-	analytics.Close()
 }
 
 func setupVersion() {

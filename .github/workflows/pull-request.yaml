@@ -30,7 +30,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - name: install graph tool
@@ -65,7 +65,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - name: Run unit tests
@@ -75,7 +75,7 @@ jobs:
     name: API Server unit tests
     runs-on: ubuntu-latest
 
-# git log --pretty=tformat:"%H" -n1 web
+    # git log --pretty=tformat:"%H" -n1 web
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -84,7 +84,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - name: Run unit tests
@@ -181,7 +181,7 @@ jobs:
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - uses: goreleaser/goreleaser-action@v4
@@ -208,7 +208,7 @@ jobs:
 
   test-examples:
     name: Test examples
-    needs:  [build-docker]
+    needs: [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -242,12 +242,12 @@ jobs:
 
           ./scripts/wait-for-port.sh 11633
 
-          ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
+          ./dist/tracetest configure -g --endpoint http://localhost:11633
           ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || (cat /tmp/docker-log; exit 1)
 
   smoke-test-cli:
     name: CLI smoke tests
-    needs:  [build-docker]
+    needs: [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -314,7 +314,7 @@ jobs:
 
   e2e-cli:
     name: CLI e2e tests
-    needs:  [build-docker]
+    needs: [build-docker]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

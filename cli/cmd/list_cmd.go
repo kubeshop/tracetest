@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/utils"
@@ -23,10 +22,6 @@ var listCmd = &cobra.Command{
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
-
-		analytics.Track("Resource List", "cmd", map[string]string{
-			resourceType: resourceType,
-		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
 		if err != nil {

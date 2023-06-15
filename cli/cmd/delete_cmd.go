@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/spf13/cobra"
 )
@@ -21,10 +20,6 @@ var deleteCmd = &cobra.Command{
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
-
-		analytics.Track("Resource Delete", "cmd", map[string]string{
-			resourceType: resourceType,
-		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
 		if err != nil {

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/cli/actions"
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
@@ -19,8 +18,6 @@ var configureCmd = &cobra.Command{
 	Long:    "Configure your tracetest CLI",
 	PreRun:  setupLogger,
 	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
-		analytics.Track("Configure", "cmd", map[string]string{})
-
 		ctx := context.Background()
 		client := utils.GetAPIClient(cliConfig)
 		action := actions.NewConfigureAction(cliConfig, cliLogger, client)
@@ -32,10 +29,6 @@ var configureCmd = &cobra.Command{
 
 		if flagProvided(cmd, "endpoint") {
 			actionConfig.SetValues.Endpoint = &configParams.Endpoint
-		}
-
-		if flagProvided(cmd, "analytics") {
-			actionConfig.SetValues.AnalyticsEnabled = &configParams.AnalyticsEnabled
 		}
 
 		err := action.Run(ctx, actionConfig)
@@ -51,6 +44,5 @@ func flagProvided(cmd *cobra.Command, name string) bool {
 func init() {
 	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
 	configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
-	configureCmd.PersistentFlags().BoolVarP(&configParams.AnalyticsEnabled, "analytics", "a", true, "configure the analytic state, so the CLI won't ask for this value")
 	rootCmd.AddCommand(configureCmd)
 }

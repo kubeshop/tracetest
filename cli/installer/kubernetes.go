@@ -65,8 +65,6 @@ func installSed(ui cliUI.UI) {
 }
 
 func kubernetesInstaller(config configuration, ui cliUI.UI) {
-	trackInstall("kubernetes", config, nil)
-
 	execCmdIgnoreErrors(kubectlCmd(config, "create namespace "+config.String("k8s.namespace")))
 
 	if !config.Bool("installer.only_tracetest") {

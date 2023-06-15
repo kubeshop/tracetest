@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/cli/actions"
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -22,8 +21,6 @@ var testExportCmd = &cobra.Command{
 	Long:   "Exports a test into a file",
 	PreRun: setupCommand(),
 	Run: WithResultHandler(func(cmd *cobra.Command, args []string) (string, error) {
-		analytics.Track("Test Export", "cmd", map[string]string{})
-
 		ctx := context.Background()
 		cliLogger.Debug("Exporting test", zap.String("testID", exportTestId))
 		client := utils.GetAPIClient(cliConfig)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/spf13/cobra"
 )
@@ -24,10 +23,6 @@ var exportCmd = &cobra.Command{
 	Run: WithResultHandler(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
-
-		analytics.Track("Resource Export", "cmd", map[string]string{
-			resourceType: resourceType,
-		})
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
 		if err != nil {
