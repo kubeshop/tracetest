@@ -29,14 +29,31 @@ error do
 end
 
 post '/payment/execute' do
+  content_type :json # should return json
+
   payment_data = JSON.parse(request.body.read)
 
   amount = payment_data["amount"]
   age = payment_data["age"]
 
+  if amount < 10000
+    # don't need to analyze risk
+    execute_payment(amount)
+    return { status: "executed" }.to_json
+  end
+
   score = call_risk_api(amount, age)
 
-  "score #{score}"
+  if score < 0
+    raise "This case should not be happening"
+  end
+
+  if score > 50000
+    return { status: "denied" }.to_json
+  end
+
+  execute_payment(amount)
+  return { status: "executed" }.to_json
 end
 
 def call_risk_api(amount, age)
@@ -55,4 +72,13 @@ def call_risk_api(amount, age)
   output = JSON.parse(response.read_body)
 
   output["score"]
+end
+
+def execute_payment(amount)
+  tracer = OpenTelemetry.tracer_provider.tracer('tracer')
+
+  tracer.in_span("execute_payment", attributes: { "amount" => amount }) do |span|
+    # simulate payment being execuded
+    sleep(0.05) # 50 milliseconds
+  end
 end
