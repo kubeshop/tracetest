@@ -23,7 +23,7 @@ func NewEnsuresNoApiKeyLeakRule() model.Rule {
 			Name:        "No API Key Leak",
 			Description: "Ensure no API keys are leaked in http headers",
 			Tips:        []string{},
-			Weight:      60,
+			Weight:      80,
 		},
 	}
 }

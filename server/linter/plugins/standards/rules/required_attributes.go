@@ -12,7 +12,7 @@ var (
 	httpAttrServer = []string{"http.target", "http.scheme", "net.host.name"}
 
 	databaseAttr   = []string{"db.system"}
-	rpcAttr        = []string{"rpc.system", "neet.peer.name"}
+	rpcAttr        = []string{"rpc.system", "net.peer.name"}
 	messagingAttr  = []string{"messaging.system", "messaging.operation"}
 	faasAttrServer = []string{"faas.trigger"}
 	faasAttrClient = []string{"faas.invoked_name", "faas.invoked_provider"}
