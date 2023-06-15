@@ -1,11 +1,15 @@
 # Observability to the Rescue! support material
 
+This is a support material for the presentation "Observability to the Rescue! Monitoring and testing APIs with OpenTelemetry".
+
 To run this example just run:
 ```sh
 docker compose up
 ```
 
-Example of request that runs correctly (valid payment, without risk analysis):
+### Requests that you can do this example
+
+Valid payment without risk analysis scenario:
 ```sh
 curl --location 'http://localhost:10013/executePaymentOrder' \
 --header 'Content-Type: application/json' \
@@ -20,7 +24,7 @@ curl --location 'http://localhost:10013/executePaymentOrder' \
 # }
 ```
 
-Example of request that runs correctly (valid payment, risk analysis):
+Valid payment with risk analysis scenario:
 ```sh
 curl --location 'http://localhost:10013/executePaymentOrder' \
 --header 'Content-Type: application/json' \
@@ -35,7 +39,7 @@ curl --location 'http://localhost:10013/executePaymentOrder' \
 # }
 ```
 
-Example of request that runs correctly (denied payment):
+Denied payment scenario:
 ```sh
 curl --location 'http://localhost:10013/executePaymentOrder' \
 --header 'Content-Type: application/json' \
@@ -50,7 +54,7 @@ curl --location 'http://localhost:10013/executePaymentOrder' \
 # }
 ```
 
-Example of request that has error:
+Request with error scenario
 ```sh
 curl --location 'http://localhost:10013/executePaymentOrder' \
 --header 'Content-Type: application/json' \
@@ -61,4 +65,14 @@ curl --location 'http://localhost:10013/executePaymentOrder' \
 
 # Output
 # internal error!
+```
+
+## Trace-based tests that you can run
+
+```sh
+tracetest test run -w -d ./tracetest/tests/test-with-error.yaml
+```
+
+```sh
+tracetest test run -w -d ./tracetest/tests/test-with-success.yaml
 ```
