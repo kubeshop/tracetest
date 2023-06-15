@@ -12,7 +12,7 @@ services:
       - WALLET_API_ENDPOINT=http://wallet:10010/wallet
       - PAYMENT_EXECUTOR_API_ENDPOINT=http://payment-executor:10012/payment/execute
     ports:
-      - "10013:10013"
+      - 10013:10013
     depends_on:
       - otel-collector
       - payment-executor
@@ -28,7 +28,7 @@ services:
       - OTEL_EXPORTER_HTTP_URL=http://otel-collector:4318/v1/traces
       - RISK_ANALYSIS_URL=http://risk-analysis:10011/computeRisk
     ports:
-      - "10012:10012"
+      - 10012:10012
     depends_on:
       - otel-collector
       - risk-analysis
@@ -42,7 +42,7 @@ services:
       - OTEL_SERVICE_NAME=risk-analysis-api
       - OTEL_EXPORTER_GRPC_URL=otel-collector:4317
     ports:
-      - "10011:10011"
+      - 10011:10011
     depends_on:
       - otel-collector
 
@@ -55,46 +55,48 @@ services:
       - OTEL_SERVICE_NAME=wallet-api
       - OTEL_EXPORTER_GRPC_URL=http://otel-collector:4317
     ports:
-      - "10010:10010"
+      - 10010:10010
     depends_on:
       - otel-collector
 
-  # tracetest:
-  #   image: kubeshop/tracetest:latest
-  #   platform: linux/amd64
-  #   volumes:
-  #     - type: bind
-  #       source: ./tracetest/tracetest-config.yaml
-  #       target: /app/tracetest.yaml
-  #     - type: bind
-  #       source: ./tracetest/tracetest-provision.yaml
-  #       target: /app/provisioning.yaml
-  #   ports:
-  #     - 11633:11633
-  #   command: --provisioning-file /app/provisioning.yaml
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     otel-collector:
-  #       condition: service_started
-  #   healthcheck:
-  #     test: ["CMD", "wget", "--spider", "localhost:11633"]
-  #     interval: 1s
-  #     timeout: 3s
-  #     retries: 60
-  #   environment:
-  #     TRACETEST_DEV: ${TRACETEST_DEV}
+  tracetest:
+    image: kubeshop/tracetest:latest
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./tracetest/tracetest-config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest/tracetest-provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+      your-api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
-  # postgres:
-  #   image: postgres:14
-  #   environment:
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_USER: postgres
-  #   healthcheck:
-  #     test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-  #     interval: 1s
-  #     timeout: 5s
-  #     retries: 60
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.59.0
@@ -110,8 +112,9 @@ services:
     image: jaegertracing/all-in-one:latest
     restart: unless-stopped
     ports:
-      - "16686:16686"
-      - "16685:16685"
+      - 16686:16686
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s

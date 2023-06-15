@@ -1,0 +1,32 @@
+type: Test
+spec:
+  id: ouhSlFj
+  name: Your API call with success
+  trigger:
+    type: http
+    httpRequest:
+      url: http://your-api:10013/executePaymentOrder
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: |-
+        {
+            "walletId": 4,
+            "yearsAsACustomer": 1
+        }
+  specs:
+  - name: Your-API is OK
+    selector: span[name="POST /executePaymentOrder" http.target="/executePaymentOrder" http.method="POST"]
+    assertions:
+    - attr:http.status_code = 200
+  - name: Payment-Executor is OK
+    selector: span[tracetest.span.type="http" name="POST" http.target="/payment/execute" http.method="POST"]
+    assertions:
+    - attr:http.status_code = 200
+  - name: Risk-Analysis API calculation is returning OK
+    selector: span[name="/computeRisk" http.target="/computeRisk" http.method="POST"]
+    assertions:
+    - attr:http.status_code = 200
+
+

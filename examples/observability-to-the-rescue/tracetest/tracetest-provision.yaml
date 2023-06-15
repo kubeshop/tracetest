@@ -18,3 +18,11 @@ spec:
     endpoint: jaeger:16685
     tls:
       insecure: true
+
+# ---
+# type: Analyzer
+# spec:
+#   id: current
+#   name: Analyzer
+#   enabled: false
+#   minimumScore: 0
