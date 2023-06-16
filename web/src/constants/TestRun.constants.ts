@@ -84,4 +84,5 @@ export enum RunDetailModes {
   TRIGGER = 'trigger',
   TRACE = 'trace',
   TEST = 'test',
+  AUTOMATE = 'automate',
 }

@@ -16,6 +16,7 @@ import {ConfigMode} from 'types/DataStore.types';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
+import RunDetailAutomate from '../RunDetailAutomate/RunDetailAutomate';
 
 interface IProps {
   test: Test;
@@ -84,6 +85,9 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Test', id, run.id, mode)} key={RunDetailModes.TEST}>
           <RunDetailTest run={run} runEvents={runEvents} testId={id} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={renderTab('Automate', id, run.id, mode)} key={RunDetailModes.AUTOMATE}>
+          <RunDetailAutomate run={run} runEvents={runEvents} testId={id} />
         </Tabs.TabPane>
       </Tabs>
     </S.Container>
