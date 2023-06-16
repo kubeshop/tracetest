@@ -13,43 +13,43 @@ spec:
         value: application/json
       body: |
         {
-          "name": "Pokemon - List - Get a Pokemon",
-          "serviceUnderTest": {
-            "triggerType": "http",
-            "http": {
-              "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
-              "method": "GET",
-              "headers": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ]
-            }
-          },
-          "specs": [
-            {
-              "selectorParsed": {
-                "query": "span[name = \"findMany postgres.pokemon\"]"
-              },
-              "assertions": ["attr:tracetest.selected_spans.count > 0"]
-            }
-          ],
-          "outputs": [
-            {
-              "name": "TRIGGER_COUNT",
-              "selectorParsed": {
-                "query": "span[name = \"Tracetest trigger\"]"
-              },
-              "value": "attr:tracetest.selected_spans.count"
-            }
-          ]
+          "type": "Test",
+          "spec": {
+            "name": "Pokemon - List - Get a Pokemon",
+            "trigger": {
+              "type": "http",
+              "httpRequest": {
+                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
+            },
+            "specs": [
+              {
+                "selector": "span[name = \"findMany postgres.pokemon\"]",
+                "assertions": ["attr:tracetest.selected_spans.count > 0"]
+              }
+            ],
+            "outputs": [
+              {
+                "name": "TRIGGER_COUNT",
+                "selector": "span[name = \"Tracetest trigger\"]",
+                "value": "attr:tracetest.selected_spans.count"
+              }
+            ]
+          }
         }
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
     - attr:tracetest.response.status = 200
+    - attr:tracetest.response.body | json_path '$.id' = env:HTTP_TEST_ID
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
@@ -59,12 +59,6 @@ spec:
   - selector: span[name = "exec INSERT"]:first
     assertions:
     - attr:sql.query contains "INSERT INTO tests"
-
-  # ensure we can reference outputs declared in the same test
-  - selector: span[name = "Tracetest trigger"]
-    assertions:
-    - attr:tracetest.response.body | json_path '$.id' = env:HTTP_TEST_ID
-
   outputs:
   - name: HTTP_TEST_ID
     selector: span[name = "Tracetest trigger"]

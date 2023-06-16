@@ -459,7 +459,8 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+        "text/yaml": external["tests.yaml"]["components"]["schemas"]["TestResource"];
       };
     };
   };

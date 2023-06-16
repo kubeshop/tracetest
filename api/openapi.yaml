@@ -339,10 +339,10 @@ paths:
         content:
           application/json:
               schema:
-                $ref: "./config.yaml#/components/schemas/TestResource"
+                $ref: "./tests.yaml#/components/schemas/TestResource"
           text/yaml:
             schema:
-              $ref: "./config.yaml#/components/schemas/TestResource"
+              $ref: "./tests.yaml#/components/schemas/TestResource"
       responses:
         200:
           description: successful operation

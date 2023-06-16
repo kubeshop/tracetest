@@ -319,18 +319,18 @@ func (c *ResourceApiApiController) CreateLinter(w http.ResponseWriter, r *http.R
 
 // CreateTest - Create new test
 func (c *ResourceApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
-	testParam := Test{}
+	testResourceParam := TestResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testParam); err != nil {
+	if err := d.Decode(&testResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestRequired(testParam); err != nil {
+	if err := AssertTestResourceRequired(testResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateTest(r.Context(), testParam)
+	result, err := c.service.CreateTest(r.Context(), testResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

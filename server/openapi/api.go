@@ -133,7 +133,7 @@ type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
 	CreateEnvironment(context.Context, EnvironmentResource) (ImplResponse, error)
 	CreateLinter(context.Context, LinterResource) (ImplResponse, error)
-	CreateTest(context.Context, Test) (ImplResponse, error)
+	CreateTest(context.Context, TestResource) (ImplResponse, error)
 	CreateTransaction(context.Context, TransactionResource) (ImplResponse, error)
 	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)

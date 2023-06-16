@@ -13,20 +13,23 @@ spec:
         value: application/json
       body: |
         {
-          "id": "${env:EXAMPLE_TEST_ID}",
-          "name": "Pokemon - List - Get a Pokemon",
-          "trigger": {
-            "type": "http",
-            "http": {
-              "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
-              "method": "GET",
-              "body": "",
-              "headers": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ]
+          "type": "Test",
+          "spec": {
+            "id": "${env:EXAMPLE_TEST_ID}",
+            "name": "Pokemon - List - Get a Pokemon",
+            "trigger": {
+              "type": "http",
+              "httpRequest": {
+                "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
+                "method": "GET",
+                "body": "",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
             }
           }
         }
@@ -35,7 +38,7 @@ spec:
     assertions:
     - attr:tracetest.selected_spans.count = 1
     - attr:tracetest.response.status = 201
-    - attr:tracetest.response.body | json_path '$.spec.id' = env:EXAMPLE_TEST_ID
+    - attr:tracetest.response.body | json_path '$.spec.id' = "${env:EXAMPLE_TEST_ID}"
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1

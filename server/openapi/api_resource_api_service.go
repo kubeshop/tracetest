@@ -69,7 +69,7 @@ func (s *ResourceApiApiService) CreateLinter(ctx context.Context, linterResource
 }
 
 // CreateTest - Create new test
-func (s *ResourceApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse, error) {
+func (s *ResourceApiApiService) CreateTest(ctx context.Context, testResource TestResource) (ImplResponse, error) {
 	// TODO - update CreateTest with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 

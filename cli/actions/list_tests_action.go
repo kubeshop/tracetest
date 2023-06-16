@@ -38,8 +38,8 @@ func (a listTestsAction) Run(ctx context.Context, args ListTestConfig) error {
 }
 
 func (a listTestsAction) executeRequest(ctx context.Context) ([]openapi.Test, error) {
-	request := a.client.ApiApi.GetTests(ctx)
-	tests, response, err := a.client.ApiApi.GetTestsExecute(request)
+	request := a.client.ResourceApiApi.GetTests(ctx)
+	tests, response, err := a.client.ResourceApiApi.GetTestsExecute(request)
 	if err != nil {
 		return []openapi.Test{}, fmt.Errorf("could not get tests: %w", err)
 	}
@@ -52,5 +52,10 @@ func (a listTestsAction) executeRequest(ctx context.Context) ([]openapi.Test, er
 		return []openapi.Test{}, nil
 	}
 
-	return tests, nil
+	specs := []openapi.Test{}
+	for _, test := range tests.Items {
+		specs = append(specs, *test.Spec)
+	}
+
+	return specs, nil
 }

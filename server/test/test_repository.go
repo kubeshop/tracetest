@@ -19,10 +19,10 @@ type Repository interface {
 	Provision(context.Context, Test) error
 	SetID(test Test, id id.ID) Test
 	Create(context.Context, Test) (Test, error)
+	Get(context.Context, id.ID) (Test, error)
+	Update(context.Context, Test) (Test, error)
 
 	// TODO: uncomment as we add new functionality
-	// Get(context.Context, id.ID) (Test, error)
-	// Update(context.Context, Test) (Test, error)
 	// Delete(context.Context, Test) error
 	// Exists(context.Context, id.ID) (bool, error)
 	// GetTestVersion(_ context.Context, _ id.ID, version int) (Test, error)
@@ -174,9 +174,22 @@ func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
 		test.ID = IDGen.ID()
 	}
 
-	test.Version = 1
-	test.CreatedAt = time.Now()
+	_, err := r.Get(ctx, test.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			test.Version = 1
+			test.CreatedAt = time.Now()
 
+			return r.insertTest(ctx, test)
+		}
+
+		return Test{}, err
+	}
+
+	return r.Update(ctx, test)
+}
+
+func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 	stmt, err := r.db.Prepare(insertQuery)
 	if err != nil {
 		return Test{}, fmt.Errorf("sql prepare: %w", err)
@@ -299,4 +312,94 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	}
 
 	return test, nil
+}
+
+func (r *repository) Get(ctx context.Context, id id.ID) (Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
+	if err != nil {
+		return Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id))
+	if err != nil {
+		return Test{}, err
+	}
+
+	return test, nil
+}
+
+func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
+	if test.Version == 0 {
+		test.Version = 1
+	}
+
+	oldTest, err := r.Get(ctx, test.ID)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
+	}
+
+	// keep the same creation date to keep sort order
+	test.CreatedAt = oldTest.CreatedAt
+
+	testToUpdate, err := bumpTestVersionIfNeeded(oldTest, test)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not bump test version: %w", err)
+	}
+
+	if oldTest.Version == testToUpdate.Version {
+		// No change in the version. Nothing changed so no need to persist it
+		return testToUpdate, nil
+	}
+
+	return r.insertTest(ctx, testToUpdate)
+}
+
+func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
+	testHasChanged, err := testHasChanged(in, updated)
+	if err != nil {
+		return Test{}, err
+	}
+
+	if testHasChanged {
+		updated.Version = in.Version + 1
+	}
+
+	return updated, nil
+}
+
+func testHasChanged(oldTest Test, newTest Test) (bool, error) {
+	outputsHaveChanged, err := testFieldHasChanged(oldTest.Outputs, newTest.Outputs)
+	if err != nil {
+		return false, err
+	}
+
+	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
+	if err != nil {
+		return false, err
+	}
+
+	serviceUnderTestHasChanged, err := testFieldHasChanged(oldTest.Trigger, newTest.Trigger)
+	if err != nil {
+		return false, err
+	}
+
+	nameHasChanged := oldTest.Name != newTest.Name
+	descriptionHasChanged := oldTest.Description != newTest.Description
+
+	return outputsHaveChanged || definitionHasChanged || serviceUnderTestHasChanged || nameHasChanged || descriptionHasChanged, nil
+}
+
+func testFieldHasChanged(oldField interface{}, newField interface{}) (bool, error) {
+	oldFieldJSON, err := json.Marshal(oldField)
+	if err != nil {
+		return false, err
+	}
+
+	newFieldJSON, err := json.Marshal(newField)
+	if err != nil {
+		return false, err
+	}
+
+	return string(oldFieldJSON) != string(newFieldJSON), nil
 }
