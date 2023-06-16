@@ -20,15 +20,15 @@ const (
 type (
 	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
-		ID          id.ID                        `json:"id"`
-		CreatedAt   time.Time                    `json:"createdAt"`
-		Name        string                       `json:"name"`
-		Description string                       `json:"description"`
-		Version     int                          `json:"version"`
-		Trigger     trigger.Trigger              `json:"trigger"`
-		Specs       Specs                        `json:"specs"`
-		Outputs     maps.Ordered[string, Output] `json:"outputs"`
-		Summary     Summary                      `json:"summary"`
+		ID          id.ID                        `json:"id,omitempty"`
+		CreatedAt   *time.Time                   `json:"createdAt,omitempty"`
+		Name        string                       `json:"name,omitempty"`
+		Description string                       `json:"description,omitempty"`
+		Version     *int                         `json:"version,omitempty"`
+		Trigger     trigger.Trigger              `json:"trigger,omitempty"`
+		Specs       Specs                        `json:"specs,omitempty"`
+		Outputs     maps.Ordered[string, Output] `json:"outputs,omitempty"`
+		Summary     *Summary                     `json:"summary,omitempty"`
 	}
 
 	Specs []TestSpec
