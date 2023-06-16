@@ -65,9 +65,10 @@ func (m OpenAPI) Test(in model.Test) openapi.Test {
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
-				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: int32(in.Summary.LastRun.Passes),
-				Fails:  int32(in.Summary.LastRun.Fails),
+				Time:          optionalTime(in.Summary.LastRun.Time),
+				Passes:        int32(in.Summary.LastRun.Passes),
+				Fails:         int32(in.Summary.LastRun.Fails),
+				AnalyzerScore: int32(in.Summary.LastRun.AnalyzerScore),
 			},
 		},
 	}
