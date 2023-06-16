@@ -71,7 +71,7 @@ const CreateTestProvider = ({children}: IProps) => {
     async (draft: TDraftTest) => {
       const rawTest = await TestService.getRequest(plugin, draft);
       const test = await createTest(rawTest).unwrap();
-      runTest(test);
+      runTest({test});
     },
     [createTest, plugin, runTest]
   );

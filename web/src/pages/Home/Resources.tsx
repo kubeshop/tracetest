@@ -40,7 +40,7 @@ const Resources = () => {
 
   const handleOnRun = useCallback(
     (resource: Transaction | Test, type: ResourceType) => {
-      if (type === ResourceType.Test) runTest(resource as Test);
+      if (type === ResourceType.Test) runTest({test: resource as Test});
       else if (type === ResourceType.Transaction) runTransaction(resource as Transaction);
     },
     [runTest, runTransaction]
