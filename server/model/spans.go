@@ -232,7 +232,7 @@ func NewTracetestRootSpan(run Run) Span {
 	return AugmentRootSpan(Span{
 		ID:         IDGen.SpanID(),
 		Name:       TriggerSpanName,
-		StartTime:  run.CreatedAt,
+		StartTime:  run.ServiceTriggeredAt,
 		EndTime:    run.ServiceTriggerCompletedAt,
 		Attributes: Attributes{},
 		Children:   []*Span{},
