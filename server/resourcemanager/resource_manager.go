@@ -276,6 +276,9 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 
 			writeResponse(http.StatusCreated, created)
 			return
+		} else {
+			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("could not get entity: %w", err))
+			return
 		}
 	}
 
