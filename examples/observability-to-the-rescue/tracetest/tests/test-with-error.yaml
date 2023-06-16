@@ -2,6 +2,7 @@ type: Test
 spec:
   id: yWoVaiuVR
   name: Your API call with error
+  description: Test call that will fail on purpose, showing the error propagation problem in the Payment System
   trigger:
     type: http
     httpRequest:

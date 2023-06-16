@@ -2,6 +2,7 @@ type: Test
 spec:
   id: ouhSlFj
   name: Your API call with success
+  description: Test call that will work, showing the internal calls made on the Payment System
   trigger:
     type: http
     httpRequest:
