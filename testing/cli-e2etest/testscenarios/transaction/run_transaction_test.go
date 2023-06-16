@@ -36,7 +36,6 @@ func TestRunTransaction(t *testing.T) {
 		require.Contains(result.StdOut, "Pokeshop - Add")  // first test
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
 		require.Contains(result.StdOut, "✔ It should save the correct data")
-
 		require.Contains(result.StdOut, "Pokeshop - Get") // second test
 		require.Contains(result.StdOut, "✔ It should Get Pokemons correctly")
 	})
