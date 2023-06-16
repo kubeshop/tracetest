@@ -35,11 +35,10 @@ const (
 
 	updateQuery = `
 		UPDATE environments SET
-			"id" = $2,
-			"name" = $3,
-			"description" = $4,
-			"created_at" = $5,
-			"values" = $6
+			"name" = $2,
+			"description" = $3,
+			"created_at" = $4,
+			"values" = $5
 		WHERE id = $1
 	`
 
@@ -74,18 +73,12 @@ func (r *Repository) SetID(environment Environment, id id.ID) Environment {
 }
 
 func (r *Repository) Create(ctx context.Context, environment Environment) (Environment, error) {
-	environment.ID = environment.Slug()
-	_, err := r.Get(ctx, environment.ID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			environment.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
-			return r.insertIntoEnvironments(ctx, environment)
-		}
-
-		return Environment{}, err
+	if !environment.HasID() {
+		environment.ID = environment.Slug()
 	}
 
-	return r.Update(ctx, environment)
+	environment.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+	return r.insertIntoEnvironments(ctx, environment)
 }
 
 func (r *Repository) Update(ctx context.Context, environment Environment) (Environment, error) {
@@ -309,7 +302,6 @@ func (r *Repository) updateIntoEnvironments(ctx context.Context, environment Env
 	_, err = stmt.ExecContext(
 		ctx,
 		oldId,
-		environment.Slug(),
 		environment.Name,
 		environment.Description,
 		environment.CreatedAt,
