@@ -48,7 +48,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
         </S.StateContainer>
       )}
       {!isDraftMode && state && isRunStateFinished(state) && (
-        <Button data-cy="run-test-button" ghost onClick={() => onRun(run.id)} type="primary">
+        <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
           Run Test
         </Button>
       )}
