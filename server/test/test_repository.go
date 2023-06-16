@@ -13,6 +13,7 @@ import (
 
 type Repository interface {
 	List(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error)
+	ListAugmented(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error)
 	Count(context.Context, string) (int, error)
 	SortingFields() []string
 	Provision(context.Context, Test) error
@@ -81,6 +82,27 @@ const (
 )
 
 func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
+	tests, err := r.list(ctx, take, skip, query, sortBy, sortDirection)
+	if err != nil {
+		return []Test{}, err
+	}
+
+	for i, test := range tests {
+		test.CreatedAt = nil
+		test.Summary = nil
+		test.Version = nil
+		tests[i] = test
+	}
+
+	return tests, err
+
+}
+
+func (r *repository) ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
+	return r.list(ctx, take, skip, query, sortBy, sortDirection)
+}
+
+func (r *repository) list(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
 	sql := getTestSQL + testMaxVersionQuery
 	params := []any{take, skip}
 
@@ -155,7 +177,14 @@ func (r *repository) readRows(ctx context.Context, rows *sql.Rows) ([]Test, erro
 }
 
 func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
-	test := Test{}
+	version := 0
+	createdAt := time.Now()
+
+	test := Test{
+		CreatedAt: &createdAt,
+		Version:   &version,
+		Summary:   &Summary{},
+	}
 
 	var (
 		jsonServiceUnderTest,
