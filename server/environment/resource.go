@@ -9,6 +9,7 @@ const (
 
 var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationCreate,
+	resourcemanager.OperationUpsert,
 	resourcemanager.OperationDelete,
 	resourcemanager.OperationGet,
 	resourcemanager.OperationList,

@@ -137,6 +137,10 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 		m.instrumentRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
 	}
 
+	if slices.Contains(enabledOps, OperationUpsert) {
+		m.instrumentRoute(subrouter.HandleFunc("", m.upsert).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Upsert", m.resourceTypePlural)))
+	}
+
 	if slices.Contains(enabledOps, OperationUpdate) {
 		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
 	}
@@ -233,6 +237,58 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 	}
+}
+
+func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
+	encoder := EncoderFromRequest(r)
+
+	targetResource := Resource[T]{}
+	err := encoder.DecodeRequestBody(&targetResource)
+	if err != nil {
+		writeError(w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
+		return
+	}
+
+	if !targetResource.Spec.HasID() {
+		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
+	}
+
+	writeResponse := func(status int, spec T) {
+		newResource := Resource[T]{
+			Type: m.resourceTypeSingular,
+			Spec: spec,
+		}
+
+		err = encoder.WriteEncodedResponse(w, status, newResource)
+		if err != nil {
+			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
+		}
+	}
+
+	_, err = m.rh.Get(r.Context(), targetResource.Spec.GetID())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			created, err := m.rh.Create(r.Context(), targetResource.Spec)
+			if err != nil {
+				writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot create entity: %w", err))
+				return
+			}
+
+			writeResponse(http.StatusCreated, created)
+			return
+		} else {
+			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("could not get entity: %w", err))
+			return
+		}
+	}
+
+	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
+	if err != nil {
+		writeError(w, encoder, http.StatusInternalServerError, err)
+		return
+	}
+
+	writeResponse(http.StatusOK, updated)
 }
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
