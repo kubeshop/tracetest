@@ -21,7 +21,7 @@ const BaseClient = () => {
         <Col span={12}>
           Connection type:
           <Form.Item name={[...baseName, 'type']}>
-            <Radio.Group>
+            <Radio.Group defaultValue={type}>
               <Radio value={SupportedClientTypes.GRPC}>gRPC</Radio>
               <Radio value={SupportedClientTypes.HTTP}>Http</Radio>
             </Radio.Group>

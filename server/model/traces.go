@@ -105,8 +105,8 @@ func spanType(attrs Attributes) string {
 }
 
 func spanDuration(span Span) string {
-	timeDifference := span.EndTime.Sub(span.StartTime)
-	return fmt.Sprintf("%d", int64(timeDifference))
+	timeDifference := timeDiff(span.StartTime, span.EndTime)
+	return fmt.Sprintf("%d", durationInNanoseconds(timeDifference))
 }
 
 func (t *Trace) Sort() Trace {

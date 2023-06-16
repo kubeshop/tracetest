@@ -8,7 +8,7 @@ import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanne
 const AzureAppInsights = () => {
   const baseName = ['dataStore', SupportedDataStores.AzureAppInsights];
   const form = Form.useFormInstance<TDraftDataStore>();
-  const connectionType = Form.useWatch([...baseName, 'connectionType'], form);
+  const connectionType = Form.useWatch([...baseName, 'connectionType'], form) || ConnectionTypes.Direct;
   const useAzureActiveDirectoryAuth = Form.useWatch([...baseName, 'useAzureActiveDirectoryAuth'], form);
 
   return (
@@ -17,7 +17,7 @@ const AzureAppInsights = () => {
         <Col span={12}>
           Connection type:
           <Form.Item name={[...baseName, 'connectionType']}>
-            <Radio.Group>
+            <Radio.Group defaultValue={connectionType}>
               <Radio value={ConnectionTypes.Direct}>Direct Connection</Radio>
               <Radio value={ConnectionTypes.Collector}>Open Telemetry Collector</Radio>
             </Radio.Group>

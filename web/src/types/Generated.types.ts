@@ -1565,7 +1565,7 @@ export interface external {
           request?: string;
         };
         GRPCResponse: {
-          statusCode?: number;
+          statusCode: number;
           metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
           body?: string;
         };

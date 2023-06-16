@@ -31,9 +31,12 @@ components:
 
     GRPCResponse:
       type: object
+      required:
+        - statusCode
       properties:
         statusCode:
           type: integer
+          default: 0
         metadata:
           type: array
           items:
