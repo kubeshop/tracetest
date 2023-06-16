@@ -1,13 +1,13 @@
-# Observability to the Rescue! support material
+# Observability to the Rescue! - Conference talk at DeveloperWeek Latin America 2023 by [Daniel Dias](https://github.com/danielbdias)
 
-This is a support material for the presentation "Observability to the Rescue! Monitoring and testing APIs with OpenTelemetry".
+This repo contains the sample app for the presentation "Observability to the Rescue! Monitoring and testing APIs with OpenTelemetry" at DeveloperWeek Latin America 2023.
 
-To run this example just run:
+Run this example with:
 ```sh
 docker compose up
 ```
 
-### Requests that you can do this example
+### Requests that you can run this example
 
 Valid payment without risk analysis scenario:
 ```sh
