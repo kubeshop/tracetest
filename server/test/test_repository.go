@@ -174,19 +174,10 @@ func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
 		test.ID = IDGen.ID()
 	}
 
-	_, err := r.Get(ctx, test.ID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			test.Version = 1
-			test.CreatedAt = time.Now()
+	test.Version = 1
+	test.CreatedAt = time.Now()
 
-			return r.insertTest(ctx, test)
-		}
-
-		return Test{}, err
-	}
-
-	return r.Update(ctx, test)
+	return r.insertTest(ctx, test)
 }
 
 func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
