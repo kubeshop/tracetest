@@ -10,7 +10,8 @@ export const Header = styled(Layout.Header)`
   justify-content: space-between;
   height: 48px;
   line-height: 48px;
-  padding: 0 24px;
+  padding: 0;
+  padding-left: 24px;
 
   .ant-dropdown-trigger {
     display: block;
