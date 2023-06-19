@@ -14,12 +14,11 @@ spec:
       body: '{"name":"snorlax","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png","isFeatured":true}'
   specs:
   - name: It should add a Pokemon correctly
-    selector: span[tracetest.span.type="http" name="POST /pokemon" http.method="POST"]
+    selector: span[tracetest.span.type="http" name="POST /pokemon/" http.method="POST"]
     assertions:
     - attr:http.status_code = 201
   - name: It should save the correct data
-    selector: span[tracetest.span.type="database" name="create pokeshop.pokemon" db.system="postgres"
-      db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]
+    selector: span[tracetest.span.type="database" name="create postgres.pokemon" db.system="postgres" db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]
     assertions:
-    - attr:db.result  contains '"imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png"'
+    - attr:db.result contains '"imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png"'
     - attr:db.result contains '"name":"snorlax"'

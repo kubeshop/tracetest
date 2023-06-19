@@ -27,7 +27,7 @@ func TestRunTransaction(t *testing.T) {
 
 		// When I try to run a transaction
 		// Then it should pass
-		transactionFile := env.GetTestResourcePath(t, "new-transaction")
+		transactionFile := env.GetTestResourcePath(t, "transaction-to-run")
 
 		command := fmt.Sprintf("test run -w -d %s", transactionFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))

@@ -13,6 +13,6 @@ spec:
         value: application/json
   specs:
   - name: It should Get Pokemons correctly
-    selector: span[tracetest.span.type="http" name="GET /pokemon" http.method="POST"]
+    selector: span[tracetest.span.type="http" name="GET /pokemon" http.method="GET"]
     assertions:
     - attr:http.status_code = 200
