@@ -118,6 +118,23 @@ func (rh *resourceHandler[T]) bindOperations(enabledOperations []Operation, hand
 		}
 	}
 
+	if slices.Contains(enabledOperations, OperationUpsert) {
+		err := rh.bindCreateOperation(handler)
+		if err != nil {
+			return err
+		}
+
+		err = rh.bindUpdateOperation(handler)
+		if err != nil {
+			return err
+		}
+
+		err = rh.bindGetOperation(handler)
+		if err != nil {
+			return err
+		}
+	}
+
 	if slices.Contains(enabledOperations, OperationUpdate) {
 		err := rh.bindUpdateOperation(handler)
 		if err != nil {
