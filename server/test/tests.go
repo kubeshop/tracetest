@@ -19,15 +19,15 @@ const (
 
 type (
 	Test struct {
-		ID          id.ID           `json:"id"`
-		CreatedAt   time.Time       `json:"createdAt"`
-		Name        string          `json:"name"`
-		Description string          `json:"description"`
-		Version     int             `json:"version"`
-		Trigger     trigger.Trigger `json:"trigger"`
-		Specs       Specs           `json:"specs"`
-		Outputs     Outputs         `json:"outputs"`
-		Summary     Summary         `json:"summary"`
+		ID          id.ID           `json:"id,omitempty"`
+		CreatedAt   *time.Time      `json:"createdAt,omitempty"`
+		Name        string          `json:"name,omitempty"`
+		Description string          `json:"description,omitempty"`
+		Version     *int            `json:"version,omitempty"`
+		Trigger     trigger.Trigger `json:"trigger,omitempty"`
+		Specs       Specs           `json:"specs,omitempty"`
+		Summary     *Summary        `json:"summary,omitempty"`
+		Outputs     Outputs         `json:"outputs,omitempty"`
 	}
 
 	Specs []TestSpec
