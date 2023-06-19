@@ -33,7 +33,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)
-		assert.Equal(t, `Attribute "method" doesnt follow naming convention`, result.Results[0].Errors[0])
+		assert.Equal(t, `Attribute "method" does not follow the naming convention`, result.Results[0].Errors[0].Description)
 	})
 
 	t.Run("span name with camel case", func(t *testing.T) {
@@ -46,7 +46,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)
-		assert.Equal(t, `Attribute "http.statusCode" doesnt follow naming convention`, result.Results[0].Errors[0])
+		assert.Equal(t, `Attribute "http.statusCode" does not follow the naming convention`, result.Results[0].Errors[0].Description)
 	})
 
 	t.Run("attribute named after namespace", func(t *testing.T) {
@@ -59,6 +59,6 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)
-		assert.Equal(t, `Attribute "tracetest.span" uses the same name as an existing namespace in the same span`, result.Results[0].Errors[0])
+		assert.Equal(t, `Attribute "tracetest.span" uses the same name as an existing namespace in the same span`, result.Results[0].Errors[0].Description)
 	})
 }
