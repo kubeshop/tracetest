@@ -1,0 +1,29 @@
+type: Test
+spec:
+  id: -ao9stJVg
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"id":6}'
+  specs:
+  - name: Import Pokemon Span Exists
+    selector: span[tracetest.span.type="general" name="import pokemon"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - name: Matching db result with the Pokemon Name
+    selector: span[tracetest.span.type="database" name="create postgres.pokemon" db.system="postgres"
+      db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]
+    assertions:
+    - attr:db.result  contains      "charizard"
+  - name: Uses correct Pokemon ID
+    selector: span[tracetest.span.type="database" name="get pokemon_6" db.system="redis"
+      db.operation="get" db.redis.database_index="0"]
+    assertions:
+    - attr:db.payload  =  '{"key":"pokemon_6"}'
