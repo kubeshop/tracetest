@@ -7,7 +7,7 @@ spec:
     type: http
     httpRequest:
       url: ${env:TARGET_URL}/api/tests
-      method: POST
+      method: PUT
       headers:
       - key: Content-Type
         value: application/json
