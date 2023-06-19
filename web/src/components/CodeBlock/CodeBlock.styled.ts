@@ -1,13 +1,15 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  > div {
-    padding: 7px 14px;
-    border: 1px solid rgba(3, 24, 73, 0.1);
-    margin-top: 16px;
+export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string}>`
+  position: relative;
+  border: ${({theme}) => `1px solid ${theme.color.border}`};
+  min-height: ${({$minHeight}) => $minHeight || '370px'};
+  cursor: pointer;
 
-    .ͼ1.cm-editor.cm-focused {
-      outline: none;
-    }
+  pre {
+    margin: 0;
+    min-height: inherit;
+    max-height: ${({$maxHeight}) => $maxHeight || '340px'};
+    background: ${({theme}) => theme.color.background} !important;
   }
 `;

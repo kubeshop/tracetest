@@ -1,28 +1,23 @@
 import {useCallback, useEffect} from 'react';
-import {snakeCase} from 'lodash';
 import {DownloadOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import {downloadFile} from 'utils/Common';
-import useCopy from 'hooks/useCopy';
 import useDefinitionFile from 'hooks/useDefinitionFile';
 import {ResourceType} from 'types/Resource.type';
 import Test from 'models/Test.model';
-import * as S from './TestDefinition.styled';
+import * as S from './RunDetailAutomateDefinition.styled';
+import CodeBlock from '../CodeBlock/CodeBlock';
 
 interface IProps {
   test: Test;
 }
 
-const TestDefinition = ({test: {id, version, name}}: IProps) => {
+const RunDetailAutomateDefinition = ({test: {id, version}}: IProps) => {
   const {definition, loadDefinition} = useDefinitionFile();
 
   const onDownload = useCallback(() => {
-    downloadFile(definition, `${snakeCase(`${name} ${version} definition`)}.yaml`);
-  }, [definition, name, version]);
-
-  const copy = useCopy();
+    downloadFile(definition, 'test_definition.yaml');
+  }, [definition]);
 
   useEffect(() => {
     loadDefinition(ResourceType.Test, id, version);
@@ -34,16 +29,7 @@ const TestDefinition = ({test: {id, version, name}}: IProps) => {
       <S.SubtitleContainer>
         <Typography.Text>Preview your YAML file</Typography.Text>
       </S.SubtitleContainer>
-      <S.CodeContainer data-cy="test-definition-code-container">
-        <S.CopyIconContainer>
-          <S.CopyButton onClick={() => copy(definition)} ghost type="primary">
-            Copy
-          </S.CopyButton>
-        </S.CopyIconContainer>
-        <SyntaxHighlighter language="yaml" style={arduinoLight}>
-          {definition}
-        </SyntaxHighlighter>
-      </S.CodeContainer>
+      <CodeBlock value={definition} language="yaml" />
       <S.Footer>
         <Button data-cy="file-viewer-download" icon={<DownloadOutlined />} onClick={onDownload} type="primary">
           Download File
@@ -53,4 +39,4 @@ const TestDefinition = ({test: {id, version, name}}: IProps) => {
   );
 };
 
-export default TestDefinition;
+export default RunDetailAutomateDefinition;
