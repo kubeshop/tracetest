@@ -82,7 +82,6 @@ func TestTests(t *testing.T) {
 				"id": "NiWVnxP4R",
 				"name": "Verify Import",
 				"description": "check the working of the import flow",
-				"version": 1,
 				"trigger": {
 					"type": "http",
 					"httpRequest": {

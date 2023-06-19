@@ -88,14 +88,18 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	}
 
 	for i, test := range tests {
-		test.CreatedAt = nil
-		test.Summary = nil
-		test.Version = nil
+		r.removeNonAugmentedFields(&test)
 		tests[i] = test
 	}
 
 	return tests, err
 
+}
+
+func (r *repository) removeNonAugmentedFields(test *Test) {
+	test.CreatedAt = nil
+	test.Summary = nil
+	test.Version = nil
 }
 
 func (r *repository) ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
@@ -174,10 +178,19 @@ func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
 		test.ID = IDGen.ID()
 	}
 
-	test.Version = 1
-	test.CreatedAt = time.Now()
+	version := 1
+	now := time.Now()
+	test.Version = &version
+	test.CreatedAt = &now
 
-	return r.insertTest(ctx, test)
+	insertedTest, err := r.insertTest(ctx, test)
+	if err != nil {
+		return Test{}, err
+	}
+
+	r.removeNonAugmentedFields(&insertedTest)
+
+	return insertedTest, nil
 }
 
 func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
@@ -321,8 +334,9 @@ func (r *repository) Get(ctx context.Context, id id.ID) (Test, error) {
 }
 
 func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
-	if test.Version == 0 {
-		test.Version = 1
+	if test.Version == nil || *test.Version == 0 {
+		version := 1
+		test.Version = &version
 	}
 
 	oldTest, err := r.Get(ctx, test.ID)
@@ -353,7 +367,8 @@ func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 	}
 
 	if testHasChanged {
-		updated.Version = in.Version + 1
+		newVersion := *in.Version + 1
+		updated.Version = &newVersion
 	}
 
 	return updated, nil
