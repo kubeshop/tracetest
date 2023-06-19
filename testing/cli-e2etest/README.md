@@ -31,10 +31,10 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
 | `test list`                                                        | |
-| `test run -d [test-definition]`                                    | [TestRunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
-| `test run -d [test-definition] -e [environment-id]`                | [TestRunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `test run -d [test-definition] -e [environment-definition]`        | [TestRunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `test run -d [transaction-definition]`                             | |
+| `test run -d [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
+| `test run -d [test-definition] -e [environment-id]`                | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `test run -d [test-definition] -e [environment-definition]`        | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `test run -d [transaction-definition]`                             | [RunTransaction](./testscenarios/transaction//run_transaction_test.go) |
 | `test run -d [transaction-definition] -e [environment-id]`         | |
 | `test run -d [transaction-definition] -e [environment-definition]` | |
 
@@ -117,19 +117,19 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply transaction -f [new-transaction-file]`               | |
-| `apply transaction -f [existing-transaction-file]`          | |
-| `delete transaction --id [existing-id]`                     | |
-| `delete transaction --id [non-existing-id]`                 | |
-| `get transaction --id [non-existing-id]`                    | |
-| `get transaction --id [existing-id] --output pretty`        | |
-| `get transaction --id [existing-id] --output json`          | |
-| `get transaction --id [existing-id] --output yaml`          | |
-| `list transaction --output pretty`                          | |
-| `list transaction --output json`                            | |
-| `list transaction --output yaml`                            | |
-| `list transaction --skip 1 --take 2`                        | |
-| `list transaction --sortBy name --sortDirection asc`        | |
+| `apply transaction -f [new-transaction-file]`               | [ApplyTransaction](./testscenarios/transaction/apply_transaction_test.go) |
+| `apply transaction -f [existing-transaction-file]`          | [ApplyTransaction](./testscenarios/transaction/apply_transaction_test.go) |
+| `delete transaction --id [existing-id]`                     | [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
+| `delete transaction --id [non-existing-id]`                 | [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
+| `get transaction --id [non-existing-id]`                    | [GetTransaction](./testscenarios/transaction/get_transaction_test.go), [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
+| `get transaction --id [existing-id] --output pretty`        | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
+| `get transaction --id [existing-id] --output json`          | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
+| `get transaction --id [existing-id] --output yaml`          | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
+| `list transaction --output pretty`                          | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --output json`                            | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --output yaml`                            | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --skip 1 --take 2`                        | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --sortBy name --sortDirection asc`        | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
 
 ### Resources: Tests
 

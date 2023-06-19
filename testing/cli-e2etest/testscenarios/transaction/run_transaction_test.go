@@ -32,8 +32,8 @@ func TestRunTransaction(t *testing.T) {
 		command := fmt.Sprintf("test run -w -d %s", transactionFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "New Transaction") // transaction name
-		require.Contains(result.StdOut, "Pokeshop - Add")  // first test
+		require.Contains(result.StdOut, "Transaction To Run") // transaction name
+		require.Contains(result.StdOut, "Pokeshop - Add")     // first test
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
 		require.Contains(result.StdOut, "✔ It should save the correct data")
 		require.Contains(result.StdOut, "Pokeshop - Get") // second test
