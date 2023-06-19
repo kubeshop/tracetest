@@ -71,6 +71,7 @@ export const Title = styled(Typography.Title).attrs({level: 3})`
   }
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{$minWidth?: number}>`
   display: flex;
+  min-width: ${({$minWidth}) => $minWidth && `${$minWidth}px`};
 `;

@@ -1,10 +1,14 @@
 import {Tooltip} from 'antd';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import AnalyzerScore from 'components/AnalyzerScore';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
 import TestRun, {isRunStateFailed, isRunStateFinished, isRunStateStopped} from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
+
+const TEST_RUN_TRACE_TAB = 'trace';
+const TEST_RUN_TEST_TAB = 'test';
 
 interface IProps {
   run: TestRun;
@@ -42,10 +46,19 @@ const TestRunCard = ({
   testId,
   linkTo,
 }: IProps) => {
+  const navigate = useNavigate();
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
   const metadataBranch = metadata?.branch;
   const metadataUrl = metadata?.url;
+
+  const handleResultClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    type: typeof TEST_RUN_TRACE_TAB | typeof TEST_RUN_TEST_TAB
+  ) => {
+    event.preventDefault();
+    navigate(`${linkTo}/${type}`);
+  };
 
   return (
     <Link to={linkTo}>
@@ -80,8 +93,16 @@ const TestRunCard = ({
           </div>
         )}
 
+        {isRunStateFinished(state) && !!linter.plugins.length && (
+          <Tooltip title="Trace Analyzer score">
+            <div onClick={event => handleResultClick(event, TEST_RUN_TRACE_TAB)}>
+              <AnalyzerScore width="28px" height="28px" score={linter.score} />
+            </div>
+          </Tooltip>
+        )}
+
         {isRunStateFinished(state) && (
-          <S.Row>
+          <S.Row $minWidth={70} onClick={event => handleResultClick(event, TEST_RUN_TEST_TAB)}>
             <Tooltip title="Passed assertions">
               <S.HeaderDetail>
                 <S.HeaderDot $passed />

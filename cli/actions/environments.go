@@ -2,7 +2,6 @@ package actions
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 
@@ -52,22 +51,7 @@ func (environment environmentsActions) Apply(ctx context.Context, fileContent fi
 
 	mapstructure.Decode(fileContent.Definition().Spec, &envResource.Spec)
 
-	if envResource.Spec.GetId() != "" {
-		_, err := environment.Get(ctx, envResource.Spec.GetId())
-		if err != nil {
-			if !errors.Is(err, utils.ResourceNotFound) {
-				return nil, err
-			}
-
-			// doesn't exist, so create it
-			return environment.resourceClient.Create(ctx, fileContent)
-		}
-
-		return environment.resourceClient.Update(ctx, fileContent, envResource.Spec.GetId())
-	}
-
-	result, err = environment.resourceClient.Create(ctx, fileContent)
-	return result, err
+	return environment.resourceClient.Upsert(ctx, fileContent)
 }
 
 func (environment environmentsActions) List(ctx context.Context, listArgs utils.ListArgs) (*file.File, error) {

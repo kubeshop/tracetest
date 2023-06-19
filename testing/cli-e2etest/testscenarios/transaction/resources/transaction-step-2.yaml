@@ -1,0 +1,18 @@
+type: Test
+spec:
+  id: ajksdkasjbd
+  name: Pokeshop - Get
+  description: Get a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - name: It should Get Pokemons correctly
+    selector: span[tracetest.span.type="http" name="GET /pokemon" http.method="GET"]
+    assertions:
+    - attr:http.status_code = 200

@@ -40,9 +40,10 @@ type (
 	}
 
 	LastRun struct {
-		Time   time.Time `json:"time"`
-		Passes int       `json:"passes"`
-		Fails  int       `json:"fails"`
+		Time          time.Time `json:"time"`
+		Passes        int       `json:"passes"`
+		Fails         int       `json:"fails"`
+		AnalyzerScore int       `json:"analyzerScore"`
 	}
 
 	TriggerType string

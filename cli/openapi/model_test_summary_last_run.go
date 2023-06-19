@@ -20,9 +20,10 @@ var _ MappedNullable = &TestSummaryLastRun{}
 
 // TestSummaryLastRun struct for TestSummaryLastRun
 type TestSummaryLastRun struct {
-	Time   NullableTime `json:"time,omitempty"`
-	Passes *int32       `json:"passes,omitempty"`
-	Fails  *int32       `json:"fails,omitempty"`
+	Time          NullableTime `json:"time,omitempty"`
+	Passes        *int32       `json:"passes,omitempty"`
+	Fails         *int32       `json:"fails,omitempty"`
+	AnalyzerScore *int32       `json:"analyzerScore,omitempty"`
 }
 
 // NewTestSummaryLastRun instantiates a new TestSummaryLastRun object
@@ -149,6 +150,38 @@ func (o *TestSummaryLastRun) SetFails(v int32) {
 	o.Fails = &v
 }
 
+// GetAnalyzerScore returns the AnalyzerScore field value if set, zero value otherwise.
+func (o *TestSummaryLastRun) GetAnalyzerScore() int32 {
+	if o == nil || isNil(o.AnalyzerScore) {
+		var ret int32
+		return ret
+	}
+	return *o.AnalyzerScore
+}
+
+// GetAnalyzerScoreOk returns a tuple with the AnalyzerScore field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestSummaryLastRun) GetAnalyzerScoreOk() (*int32, bool) {
+	if o == nil || isNil(o.AnalyzerScore) {
+		return nil, false
+	}
+	return o.AnalyzerScore, true
+}
+
+// HasAnalyzerScore returns a boolean if a field has been set.
+func (o *TestSummaryLastRun) HasAnalyzerScore() bool {
+	if o != nil && !isNil(o.AnalyzerScore) {
+		return true
+	}
+
+	return false
+}
+
+// SetAnalyzerScore gets a reference to the given int32 and assigns it to the AnalyzerScore field.
+func (o *TestSummaryLastRun) SetAnalyzerScore(v int32) {
+	o.AnalyzerScore = &v
+}
+
 func (o TestSummaryLastRun) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -164,6 +197,7 @@ func (o TestSummaryLastRun) ToMap() (map[string]interface{}, error) {
 	}
 	// skip: passes is readOnly
 	// skip: fails is readOnly
+	// skip: analyzerScore is readOnly
 	return toSerialize, nil
 }
 

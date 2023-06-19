@@ -295,3 +295,33 @@ func (resourceClient ResourceClient) Create(ctx context.Context, file file.File)
 	file = file.SaveChanges(IOReadCloserToString(resp.Body))
 	return &file, nil
 }
+
+func (resourceClient ResourceClient) Upsert(ctx context.Context, file file.File) (*file.File, error) {
+	request, err := resourceClient.NewRequest(resourceClient.BaseUrl, http.MethodPut, file.Contents(), file.ContentType(), false)
+	if err != nil {
+		return nil, fmt.Errorf("could not create request: %w", err)
+	}
+
+	resp, err := resourceClient.Client.Do(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not send request: %w", err)
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		// validation error
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("could not send request: %w", err)
+		}
+
+		validationError := string(body)
+		return nil, fmt.Errorf("invalid %s: %s", resourceClient.ResourceType, validationError)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("could not create %s: %w", resourceClient.ResourceType, err)
+	}
+
+	file = file.SaveChanges(IOReadCloserToString(resp.Body))
+	return &file, nil
+}
