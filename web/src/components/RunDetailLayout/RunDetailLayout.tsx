@@ -87,7 +87,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
           <RunDetailTest run={run} runEvents={runEvents} testId={id} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Automate', id, run.id, mode)} key={RunDetailModes.AUTOMATE}>
-          <RunDetailAutomate run={run} runEvents={runEvents} testId={id} />
+          <RunDetailAutomate />
         </Tabs.TabPane>
       </Tabs>
     </S.Container>
