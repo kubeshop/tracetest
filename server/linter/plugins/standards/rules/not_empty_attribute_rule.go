@@ -33,9 +33,14 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 			}
 		}
 
-		errors := make([]string, 0, len(emptyAttributes))
+		errors := make([]model.Error, 0, len(emptyAttributes))
 		for _, emptyAttribute := range emptyAttributes {
-			errors = append(errors, fmt.Sprintf(`Attribute "%s" is empty`, emptyAttribute))
+			errors = append(errors, model.Error{
+				Error:       "empty_attribute_error",
+				Value:       emptyAttribute,
+				Description: fmt.Sprintf(`Attribute "%s" is empty`, emptyAttribute),
+			},
+			)
 		}
 
 		if len(errors) > 0 {

@@ -2,6 +2,7 @@ import {CaretUpFilled} from '@ant-design/icons';
 import {Space, Switch, Tooltip, Typography} from 'antd';
 import {useCallback, useState} from 'react';
 import AnalyzerScore from 'components/AnalyzerScore/AnalyzerScore';
+import {ERROR_HEADER} from 'constants/Analyzer.constants';
 import LinterResult from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';
 import Span from 'models/Span.model';
@@ -72,50 +73,36 @@ const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
                   {rule?.results?.map((result, resultIndex) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={`${result.spanId}-${resultIndex}`}>
-                      {result.passed ? (
-                        <S.SpanButton
-                          icon={<CaretUpFilled />}
-                          onClick={() => onSpanResultClick(result.spanId)}
-                          type="link"
-                        >
-                          {getSpanName(trace.spans, result.spanId)}
-                        </S.SpanButton>
-                      ) : (
-                        <>
-                          <S.SpanButton
-                            icon={<CaretUpFilled />}
-                            onClick={() => onSpanResultClick(result.spanId)}
-                            type="link"
-                            $error
-                          >
-                            {getSpanName(trace.spans, result.spanId)}
-                          </S.SpanButton>
-                          <div>
-                            {result.groupedErrors.map((groupedError, index) => (
-                              // eslint-disable-next-line react/no-array-index-key
-                              <div key={index}>
-                                <div>
-                                  <Typography.Text>{groupedError.error}</Typography.Text>
-                                </div>
-                                <S.List>
-                                  {groupedError.values?.map(value => (
-                                    <li key={value}>
-                                      <Typography.Text>{value}</Typography.Text>
-                                    </li>
-                                  ))}
-                                </S.List>
-                              </div>
-                            ))}
+                      <S.SpanButton
+                        icon={<CaretUpFilled />}
+                        onClick={() => onSpanResultClick(result.spanId)}
+                        type="link"
+                        $error={!result.passed}
+                      >
+                        {getSpanName(trace.spans, result.spanId)}
+                      </S.SpanButton>
 
-                            {!result.groupedErrors.length &&
-                              result.errors.map((error, index) => (
-                                // eslint-disable-next-line react/no-array-index-key
-                                <div key={index}>
-                                  <Typography.Text>{error}</Typography.Text>
-                                </div>
-                              ))}
+                      {!result.passed && result.errors.length > 1 && (
+                        <>
+                          <div>
+                            <Typography.Text>{ERROR_HEADER[result.errors[0].error ?? '']}</Typography.Text>
                           </div>
+                          <S.List>
+                            {result.errors.map(error => (
+                              <li key={error.value}>
+                                <Tooltip title={error.description}>
+                                  <Typography.Text>{error.value}</Typography.Text>
+                                </Tooltip>
+                              </li>
+                            ))}
+                          </S.List>
                         </>
+                      )}
+
+                      {!result.passed && result.errors.length === 1 && (
+                        <div>
+                          <Typography.Text>{result.errors[0].description}</Typography.Text>
+                        </div>
                       )}
                     </div>
                   ))}

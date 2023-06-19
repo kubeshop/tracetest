@@ -1,6 +1,7 @@
 import {Space} from 'antd';
 import {useRef} from 'react';
 
+import {ERROR_HEADER} from 'constants/Analyzer.constants';
 import useOnClickOutside from 'hooks/useOnClickOutside';
 import {TLintBySpanContent} from 'services/Span.service';
 import * as S from './AnalyzerResults.styled';
@@ -24,36 +25,30 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
         </Space>
         <S.Body>
           {lintErrors.map(lintError => (
-            <div key={lintError.ruleName}>
+            <S.RuleContainer key={lintError.ruleName}>
               <S.Text strong>{lintError.ruleName}</S.Text>
 
-              {lintError.groupedErrors.map((groupedError, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <div key={index}>
+              {lintError.errors.length > 1 && (
+                <>
                   <div>
-                    <S.Text type="secondary">{groupedError.error}</S.Text>
+                    <S.Text type="secondary">{ERROR_HEADER[lintError.errors[0].error ?? '']}</S.Text>
                   </div>
                   <S.List>
-                    {groupedError.values?.map(value => (
-                      <li key={value}>
-                        <S.Text type="secondary">{value}</S.Text>
+                    {lintError.errors.map(error => (
+                      <li key={error.value}>
+                        <S.Text type="secondary">{error.value}</S.Text>
                       </li>
                     ))}
                   </S.List>
-                </div>
-              ))}
-
-              {!lintError.groupedErrors.length && (
-                <S.List>
-                  {lintError.errors.map((error, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <li key={index}>
-                      <S.Text type="secondary">{error}</S.Text>
-                    </li>
-                  ))}
-                </S.List>
+                </>
               )}
-            </div>
+
+              {lintError.errors.length === 1 && (
+                <div>
+                  <S.Text type="secondary">{lintError.errors[0].description}</S.Text>
+                </div>
+              )}
+            </S.RuleContainer>
           ))}
         </S.Body>
       </S.Content>

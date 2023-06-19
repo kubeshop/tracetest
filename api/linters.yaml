@@ -94,11 +94,7 @@ components:
         errors:
           type: array
           items:
-            type: string
-        groupedErrors:
-          type: array
-          items:
-            $ref: "#/components/schemas/LinterResultPluginRuleResultGroupedError"
+            $ref: "#/components/schemas/LinterResultPluginRuleResultError"
         passed:
           type: boolean
         severity:
@@ -106,12 +102,20 @@ components:
           enum:
             - error
             - warning
-    LinterResultPluginRuleResultGroupedError:
+    LinterResultPluginRuleResultError:
       type: object
       properties:
         error:
           type: string
-        values:
+        value:
+          type: string
+        expected:
+          type: string
+        level:
+          type: string
+        description:
+          type: string
+        suggestions:
           type: array
           items:
             type: string

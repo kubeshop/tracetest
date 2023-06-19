@@ -4,32 +4,34 @@ type TRawLinterResult = TLintersSchemas['LinterResult'];
 type TRawLinterResultPlugin = TLintersSchemas['LinterResultPlugin'];
 type TRawLinterResultPluginRule = TLintersSchemas['LinterResultPluginRule'];
 type TRawLinterResultPluginRuleResult = TLintersSchemas['LinterResultPluginRuleResult'];
-type TRawLinterResultPluginRuleResultGroupedError = TLintersSchemas['LinterResultPluginRuleResultGroupedError'];
+type TRawLinterResultPluginRuleResultError = TLintersSchemas['LinterResultPluginRuleResultError'];
 
-type LinterResultPluginRuleResultGroupedError = Model<TRawLinterResultPluginRuleResultGroupedError, {}>;
+type LinterResultPluginRuleResultError = Model<TRawLinterResultPluginRuleResultError, {}>;
 type LinterResultPluginRuleResult = Model<TRawLinterResultPluginRuleResult, {}>;
 type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: LinterResultPluginRuleResult[]}>;
 type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
 type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]; isFailed: boolean}>;
 
-function LinterResultPluginRuleResultGroupedError({
+function LinterResultPluginRuleResultError({
   error = '',
-  values = [],
-}: TRawLinterResultPluginRuleResultGroupedError = {}): LinterResultPluginRuleResultGroupedError {
-  return {error, values};
+  value = '',
+  expected = '',
+  level = '',
+  description = '',
+  suggestions = [],
+}: TRawLinterResultPluginRuleResultError = {}): LinterResultPluginRuleResultError {
+  return {error, value, expected, level, description, suggestions};
 }
 
 function LinterResultPluginRuleResult({
   spanId = '',
   errors = [],
-  groupedErrors = [],
   passed = false,
   severity = 'error',
 }: TRawLinterResultPluginRuleResult = {}): LinterResultPluginRuleResult {
   return {
     spanId,
-    errors,
-    groupedErrors: groupedErrors.map(groupedError => LinterResultPluginRuleResultGroupedError(groupedError)),
+    errors: errors.map(error => LinterResultPluginRuleResultError(error)),
     passed,
     severity,
   };

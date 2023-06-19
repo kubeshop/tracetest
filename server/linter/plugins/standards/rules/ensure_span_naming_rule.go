@@ -72,7 +72,14 @@ func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *mo
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Error:       "span_naming_error",
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 
@@ -102,7 +109,14 @@ func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Error:       "span_naming_error",
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 
@@ -122,7 +136,14 @@ func (r ensureSpanNamingRule) validateRPCSpanName(ctx context.Context, span *mod
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Error:       "span_naming_error",
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 
@@ -142,7 +163,14 @@ func (r ensureSpanNamingRule) validateMessagingSpanName(ctx context.Context, spa
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Error:       "span_naming_error",
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 

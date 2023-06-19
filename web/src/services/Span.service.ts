@@ -92,8 +92,14 @@ export type TLintBySpanContent = {
   pluginName: string;
   passed: boolean;
   spanId: string;
-  errors: string[];
-  groupedErrors: {error?: string; values?: string[]}[];
+  errors: {
+    error?: string;
+    value?: string;
+    expected?: string;
+    level?: string;
+    description?: string;
+    suggestions?: string[];
+  }[];
   severity: 'error' | 'warning';
 };
 

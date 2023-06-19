@@ -51,23 +51,26 @@ func (m OpenAPI) LinterResultPluginRule(in model.RuleResult) openapi.LinterResul
 }
 
 func (m OpenAPI) LinterResultPluginRuleResult(in model.Result) openapi.LinterResultPluginRuleResult {
-	groupedErrors := make([]openapi.LinterResultPluginRuleResultGroupedError, len(in.GroupedErrors))
-	for i, groupedError := range in.GroupedErrors {
-		groupedErrors[i] = m.LinterResultPluginRuleResultGroupedError(groupedError)
+	errors := make([]openapi.LinterResultPluginRuleResultError, len(in.Errors))
+	for i, error := range in.Errors {
+		errors[i] = m.LinterResultPluginRuleResultError(error)
 	}
 
 	return openapi.LinterResultPluginRuleResult{
-		SpanId:        in.SpanID,
-		Passed:        in.Passed,
-		Severity:      "",
-		Errors:        in.Errors,
-		GroupedErrors: groupedErrors,
+		SpanId:   in.SpanID,
+		Passed:   in.Passed,
+		Severity: "",
+		Errors:   errors,
 	}
 }
 
-func (m OpenAPI) LinterResultPluginRuleResultGroupedError(in model.GroupedError) openapi.LinterResultPluginRuleResultGroupedError {
-	return openapi.LinterResultPluginRuleResultGroupedError{
-		Error:  in.Error,
-		Values: in.Values,
+func (m OpenAPI) LinterResultPluginRuleResultError(in model.Error) openapi.LinterResultPluginRuleResultError {
+	return openapi.LinterResultPluginRuleResultError{
+		Error:       in.Error,
+		Value:       in.Value,
+		Expected:    in.Expected,
+		Level:       in.Level,
+		Description: in.Description,
+		Suggestions: in.Suggestions,
 	}
 }

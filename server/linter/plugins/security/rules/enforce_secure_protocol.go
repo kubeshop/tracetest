@@ -48,10 +48,14 @@ func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trac
 }
 
 func (r enforceHttpsProtocolRule) validate(span *model.Span) model.Result {
-	insecureFields := make([]string, 0)
+	insecureFields := make([]model.Error, 0)
 	for _, field := range httpFields {
 		if span.Attributes.Get(field) != "" && !strings.Contains(span.Attributes.Get(field), "https") {
-			insecureFields = append(insecureFields, fmt.Sprintf("Insecure http schema found for attribute: %s. Value: %s", field, span.Attributes.Get(field)))
+			insecureFields = append(insecureFields, model.Error{
+				Error:       "insecure_protocol_error",
+				Value:       field,
+				Description: fmt.Sprintf("Insecure http schema found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
+			})
 		}
 	}
 

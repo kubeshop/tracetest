@@ -1678,15 +1678,18 @@ export interface external {
         };
         LinterResultPluginRuleResult: {
           spanId?: string;
-          errors?: string[];
-          groupedErrors?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResultGroupedError"][];
+          errors?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResultError"][];
           passed?: boolean;
           /** @enum {string} */
           severity?: "error" | "warning";
         };
-        LinterResultPluginRuleResultGroupedError: {
+        LinterResultPluginRuleResultError: {
           error?: string;
-          values?: string[];
+          value?: string;
+          expected?: string;
+          level?: string;
+          description?: string;
+          suggestions?: string[];
         };
       };
     };
