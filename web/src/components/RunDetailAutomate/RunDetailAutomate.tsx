@@ -1,9 +1,17 @@
+import Test from 'models/Test.model';
 import * as S from './RunDetailAutomate.styled';
+import TestDefinition from '../TestDefinition/TestDefinition';
 
-const RunDetailAutomate = () => {
+interface IProps {
+  test: Test;
+}
+
+const RunDetailAutomate = ({test}: IProps) => {
   return (
     <S.Container>
-      <S.SectionLeft>Test Definition</S.SectionLeft>
+      <S.SectionLeft>
+        <TestDefinition test={test} />
+      </S.SectionLeft>
       <S.SectionRight>Test run Techniques</S.SectionRight>
     </S.Container>
   );

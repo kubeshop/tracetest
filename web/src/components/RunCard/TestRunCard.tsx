@@ -122,7 +122,6 @@ const TestRunCard = ({
           <RunActionsMenu
             resultId={runId}
             testId={testId}
-            testVersion={testVersion}
             transactionRunId={transactionRunId}
             transactionId={transactionId}
           />

@@ -34,7 +34,7 @@ const renderTab = (title: string, testId: string, runId: string, mode: string) =
   </S.TabLink>
 );
 
-const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps) => {
+const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {showNotification} = useNotification();
   const {isError, run, runEvents} = useTestRun();
@@ -60,9 +60,9 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
   const tabBarExtraContent = useMemo(
     () => ({
       left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} />,
-      right: <HeaderRight testId={id} testVersion={version} />,
+      right: <HeaderRight testId={id} />,
     }),
-    [id, name, trigger.type, version]
+    [id, name, trigger.type]
   );
 
   return (
@@ -75,7 +75,6 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
         }}
         renderTabBar={renderTabBar}
         tabBarExtraContent={tabBarExtraContent}
-        destroyInactiveTabPane
       >
         <Tabs.TabPane tab={renderTab('Trigger', id, run.id, mode)} key={RunDetailModes.TRIGGER}>
           <RunDetailTrigger test={test} run={run} runEvents={runEvents} isError={isError} />
@@ -87,7 +86,7 @@ const RunDetailLayout = ({test: {id, name, trigger, version = 1}, test}: IProps)
           <RunDetailTest run={run} runEvents={runEvents} testId={id} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Automate', id, run.id, mode)} key={RunDetailModes.AUTOMATE}>
-          <RunDetailAutomate />
+          <RunDetailAutomate test={test} />
         </Tabs.TabPane>
       </Tabs>
     </S.Container>
