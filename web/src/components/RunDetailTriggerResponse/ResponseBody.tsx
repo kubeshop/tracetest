@@ -18,7 +18,7 @@ const ResponseBody = ({body = '', bodyMimeType = '', state, onCreateTestOutput, 
   isRunStateFinished(state) || !!body ? (
     <S.ResponseBodyContainer>
       <S.ResponseBodyContent>
-        <CodeBlock value={body} mimeType={bodyMimeType} />
+        <CodeBlock value={body} mimeType={bodyMimeType} maxHeight="540px" />
       </S.ResponseBodyContent>
       <S.ResponseBodyActions>
         <AttributeActions
