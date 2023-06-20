@@ -14,10 +14,8 @@ interface IProps {
 }
 
 const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, transactionVersion}: IProps) => {
-  const {loadDefinition} = useFileViewerModal();
-
+  const {onDefinition} = useFileViewerModal();
   const navigate = useNavigate();
-
   const onDelete = useDeleteResourceRun({id: transactionId, isRunView, type: ResourceType.Transaction});
 
   return (
@@ -28,7 +26,7 @@ const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, tra
             <Menu.Item
               data-cy="view-transaction-definition-button"
               key="view-transaction-definition"
-              onClick={() => loadDefinition(ResourceType.Transaction, transactionId, transactionVersion)}
+              onClick={() => onDefinition(ResourceType.Transaction, transactionId, transactionVersion)}
             >
               Transaction Definition
             </Menu.Item>

@@ -8,6 +8,7 @@ export const GITHUB_URL = 'https://github.com/kubeshop/tracetest';
 export const GITHUB_ISSUES_URL = 'https://github.com/kubeshop/tracetest/issues/new/choose';
 export const DISCORD_URL = 'https://discord.gg/6zupCZFQbe';
 export const OCTOLIINT_ISSUE_URL = 'https://github.com/kubeshop/tracetest/issues/2615';
+export const CLI_RUNNING_TESTS_URL = 'https://docs.tracetest.io/cli/running-tests';
 
 export const INGESTOR_ENDPOINT_URL = 'https://docs.tracetest.io/configuration/ingestor-endpoint';
 
