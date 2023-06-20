@@ -49,6 +49,15 @@ const RunActionsMenu = ({resultId, testId, transactionId, transactionRunId, isRu
               JUnit Results
             </Menu.Item>
             <Menu.Item
+              data-cy="automate-test-button"
+              key="automate-test"
+              onClick={() => {
+                navigate(`/test/${testId}/run/${resultId}/automate`);
+              }}
+            >
+              Automate
+            </Menu.Item>
+            <Menu.Item
               data-cy="test-edit-button"
               onClick={({domEvent}) => {
                 domEvent.stopPropagation();
