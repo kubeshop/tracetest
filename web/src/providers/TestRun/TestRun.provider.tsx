@@ -1,9 +1,10 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
+import {TLintBySpan} from 'models/LinterResult.model';
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
-import SpanService, {TLintBySpan} from 'services/Span.service';
+import SpanService from 'services/Span.service';
 import TestProvider from '../Test';
 
 interface IContext {

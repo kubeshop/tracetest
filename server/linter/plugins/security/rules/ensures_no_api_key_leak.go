@@ -20,10 +20,11 @@ var (
 func NewEnsuresNoApiKeyLeakRule() model.Rule {
 	return &ensuresNoApiKeyLeakRule{
 		BaseRule: model.BaseRule{
-			Name:        "No API Key Leak",
-			Description: "Ensure no API keys are leaked in http headers",
-			Tips:        []string{},
-			Weight:      80,
+			Name:             "No API Key Leak",
+			Description:      "Ensure no API keys are leaked in http headers",
+			ErrorDescription: "The following attributes are exposing API keys:",
+			Tips:             []string{},
+			Weight:           80,
 		},
 	}
 }
@@ -54,7 +55,6 @@ func (r ensuresNoApiKeyLeakRule) validate(span *model.Span) model.Result {
 		requestHeader := fmt.Sprintf("%s%s", httpRequestHeader, field)
 		if span.Attributes.Get(requestHeader) != "" {
 			leakedFields = append(leakedFields, model.Error{
-				Error:       "api_key_leak_error",
 				Value:       field,
 				Description: fmt.Sprintf("Leaked request API Key found for attribute: %s. Value: %s", field, span.Attributes.Get(requestHeader)),
 			})
@@ -63,7 +63,6 @@ func (r ensuresNoApiKeyLeakRule) validate(span *model.Span) model.Result {
 		responseHeader := fmt.Sprintf("%s%s", httpResponseHeader, field)
 		if span.Attributes.Get(responseHeader) != "" {
 			leakedFields = append(leakedFields, model.Error{
-				Error:       "api_key_leak_error",
 				Value:       field,
 				Description: fmt.Sprintf("Leaked response API Key found for attribute: %s. Value: %s", field, span.Attributes.Get(responseHeader)),
 			})

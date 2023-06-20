@@ -10,8 +10,6 @@
 package openapi
 
 type LinterResultPluginRuleResultError struct {
-	Error string `json:"error,omitempty"`
-
 	Value string `json:"value,omitempty"`
 
 	Expected string `json:"expected,omitempty"`

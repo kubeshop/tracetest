@@ -1671,6 +1671,7 @@ export interface external {
         LinterResultPluginRule: {
           name?: string;
           description?: string;
+          errorDescription?: string;
           passed?: boolean;
           weight?: number;
           tips?: string[];
@@ -1684,7 +1685,6 @@ export interface external {
           severity?: "error" | "warning";
         };
         LinterResultPluginRuleResultError: {
-          error?: string;
           value?: string;
           expected?: string;
           level?: string;

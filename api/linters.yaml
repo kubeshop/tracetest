@@ -74,6 +74,8 @@ components:
           type: string
         description:
           type: string
+        errorDescription:
+          type: string
         passed:
           type: boolean
         weight:
@@ -105,8 +107,6 @@ components:
     LinterResultPluginRuleResultError:
       type: object
       properties:
-        error:
-          type: string
         value:
           type: string
         expected:

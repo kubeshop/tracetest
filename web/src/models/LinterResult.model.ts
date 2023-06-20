@@ -12,15 +12,26 @@ type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: Linter
 type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
 type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]; isFailed: boolean}>;
 
+export type TLintBySpanContent = {
+  ruleName: string;
+  ruleErrorDescription: string;
+  pluginName: string;
+  passed: boolean;
+  spanId: string;
+  errors: TRawLinterResultPluginRuleResultError[];
+  severity: 'error' | 'warning';
+};
+
+export type TLintBySpan = Record<string, TLintBySpanContent[]>;
+
 function LinterResultPluginRuleResultError({
-  error = '',
   value = '',
   expected = '',
   level = '',
   description = '',
   suggestions = [],
 }: TRawLinterResultPluginRuleResultError = {}): LinterResultPluginRuleResultError {
-  return {error, value, expected, level, description, suggestions};
+  return {value, expected, level, description, suggestions};
 }
 
 function LinterResultPluginRuleResult({
@@ -40,6 +51,7 @@ function LinterResultPluginRuleResult({
 function LinterResultPluginRule({
   name = '',
   description = '',
+  errorDescription = '',
   passed = false,
   weight = 0,
   tips = [],
@@ -48,6 +60,7 @@ function LinterResultPluginRule({
   return {
     name,
     description,
+    errorDescription,
     passed,
     weight,
     tips,

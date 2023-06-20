@@ -50,10 +50,11 @@ type LinterResult struct {
 }
 
 type BaseRule struct {
-	Name        string
-	Description string
-	Tips        []string
-	Weight      int
+	Name             string
+	Description      string
+	ErrorDescription string
+	Tips             []string
+	Weight           int
 }
 
 type RuleResult struct {
@@ -69,7 +70,6 @@ type Result struct {
 }
 
 type Error struct {
-	Error       string   `json:"error"`
 	Value       string   `json:"value"`
 	Expected    string   `json:"expected"`
 	Level       string   `json:"level"`

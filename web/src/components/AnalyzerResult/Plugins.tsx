@@ -2,7 +2,6 @@ import {CaretUpFilled} from '@ant-design/icons';
 import {Space, Switch, Tooltip, Typography} from 'antd';
 import {useCallback, useState} from 'react';
 import AnalyzerScore from 'components/AnalyzerScore/AnalyzerScore';
-import {ERROR_HEADER} from 'constants/Analyzer.constants';
 import LinterResult from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';
 import Span from 'models/Span.model';
@@ -85,7 +84,7 @@ const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
                       {!result.passed && result.errors.length > 1 && (
                         <>
                           <div>
-                            <Typography.Text>{ERROR_HEADER[result.errors[0].error ?? '']}</Typography.Text>
+                            <Typography.Text>{rule.errorDescription}</Typography.Text>
                           </div>
                           <S.List>
                             {result.errors.map(error => (

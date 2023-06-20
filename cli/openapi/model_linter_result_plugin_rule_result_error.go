@@ -19,7 +19,6 @@ var _ MappedNullable = &LinterResultPluginRuleResultError{}
 
 // LinterResultPluginRuleResultError struct for LinterResultPluginRuleResultError
 type LinterResultPluginRuleResultError struct {
-	Error       *string  `json:"error,omitempty"`
 	Value       *string  `json:"value,omitempty"`
 	Expected    *string  `json:"expected,omitempty"`
 	Level       *string  `json:"level,omitempty"`
@@ -42,38 +41,6 @@ func NewLinterResultPluginRuleResultError() *LinterResultPluginRuleResultError {
 func NewLinterResultPluginRuleResultErrorWithDefaults() *LinterResultPluginRuleResultError {
 	this := LinterResultPluginRuleResultError{}
 	return &this
-}
-
-// GetError returns the Error field value if set, zero value otherwise.
-func (o *LinterResultPluginRuleResultError) GetError() string {
-	if o == nil || isNil(o.Error) {
-		var ret string
-		return ret
-	}
-	return *o.Error
-}
-
-// GetErrorOk returns a tuple with the Error field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *LinterResultPluginRuleResultError) GetErrorOk() (*string, bool) {
-	if o == nil || isNil(o.Error) {
-		return nil, false
-	}
-	return o.Error, true
-}
-
-// HasError returns a boolean if a field has been set.
-func (o *LinterResultPluginRuleResultError) HasError() bool {
-	if o != nil && !isNil(o.Error) {
-		return true
-	}
-
-	return false
-}
-
-// SetError gets a reference to the given string and assigns it to the Error field.
-func (o *LinterResultPluginRuleResultError) SetError(v string) {
-	o.Error = &v
 }
 
 // GetValue returns the Value field value if set, zero value otherwise.
@@ -246,9 +213,6 @@ func (o LinterResultPluginRuleResultError) MarshalJSON() ([]byte, error) {
 
 func (o LinterResultPluginRuleResultError) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.Error) {
-		toSerialize["error"] = o.Error
-	}
 	if !isNil(o.Value) {
 		toSerialize["value"] = o.Value
 	}

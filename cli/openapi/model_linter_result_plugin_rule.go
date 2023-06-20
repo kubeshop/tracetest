@@ -19,12 +19,13 @@ var _ MappedNullable = &LinterResultPluginRule{}
 
 // LinterResultPluginRule struct for LinterResultPluginRule
 type LinterResultPluginRule struct {
-	Name        *string                        `json:"name,omitempty"`
-	Description *string                        `json:"description,omitempty"`
-	Passed      *bool                          `json:"passed,omitempty"`
-	Weight      *int32                         `json:"weight,omitempty"`
-	Tips        []string                       `json:"tips,omitempty"`
-	Results     []LinterResultPluginRuleResult `json:"results,omitempty"`
+	Name             *string                        `json:"name,omitempty"`
+	Description      *string                        `json:"description,omitempty"`
+	ErrorDescription *string                        `json:"errorDescription,omitempty"`
+	Passed           *bool                          `json:"passed,omitempty"`
+	Weight           *int32                         `json:"weight,omitempty"`
+	Tips             []string                       `json:"tips,omitempty"`
+	Results          []LinterResultPluginRuleResult `json:"results,omitempty"`
 }
 
 // NewLinterResultPluginRule instantiates a new LinterResultPluginRule object
@@ -106,6 +107,38 @@ func (o *LinterResultPluginRule) HasDescription() bool {
 // SetDescription gets a reference to the given string and assigns it to the Description field.
 func (o *LinterResultPluginRule) SetDescription(v string) {
 	o.Description = &v
+}
+
+// GetErrorDescription returns the ErrorDescription field value if set, zero value otherwise.
+func (o *LinterResultPluginRule) GetErrorDescription() string {
+	if o == nil || isNil(o.ErrorDescription) {
+		var ret string
+		return ret
+	}
+	return *o.ErrorDescription
+}
+
+// GetErrorDescriptionOk returns a tuple with the ErrorDescription field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinterResultPluginRule) GetErrorDescriptionOk() (*string, bool) {
+	if o == nil || isNil(o.ErrorDescription) {
+		return nil, false
+	}
+	return o.ErrorDescription, true
+}
+
+// HasErrorDescription returns a boolean if a field has been set.
+func (o *LinterResultPluginRule) HasErrorDescription() bool {
+	if o != nil && !isNil(o.ErrorDescription) {
+		return true
+	}
+
+	return false
+}
+
+// SetErrorDescription gets a reference to the given string and assigns it to the ErrorDescription field.
+func (o *LinterResultPluginRule) SetErrorDescription(v string) {
+	o.ErrorDescription = &v
 }
 
 // GetPassed returns the Passed field value if set, zero value otherwise.
@@ -251,6 +284,9 @@ func (o LinterResultPluginRule) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Description) {
 		toSerialize["description"] = o.Description
+	}
+	if !isNil(o.ErrorDescription) {
+		toSerialize["errorDescription"] = o.ErrorDescription
 	}
 	if !isNil(o.Passed) {
 		toSerialize["passed"] = o.Passed

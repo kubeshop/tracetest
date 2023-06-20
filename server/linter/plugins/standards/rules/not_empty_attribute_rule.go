@@ -14,10 +14,11 @@ type notEmptyRuleAttributesRule struct {
 func NewNotEmptyAttributesRule() model.Rule {
 	return &notEmptyRuleAttributesRule{
 		BaseRule: model.BaseRule{
-			Name:        "Not Empty Attributes",
-			Description: "Does not allow empty attribute values in any span",
-			Tips:        []string{"Empty attributes don't provide any information about the operation and should be removed"},
-			Weight:      25,
+			Name:             "Not Empty Attributes",
+			Description:      "Does not allow empty attribute values in any span",
+			ErrorDescription: "The following attributes have empty values:",
+			Tips:             []string{"Empty attributes don't provide any information about the operation and should be removed"},
+			Weight:           25,
 		},
 	}
 }
@@ -36,7 +37,6 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 		errors := make([]model.Error, 0, len(emptyAttributes))
 		for _, emptyAttribute := range emptyAttributes {
 			errors = append(errors, model.Error{
-				Error:       "empty_attribute_error",
 				Value:       emptyAttribute,
 				Description: fmt.Sprintf(`Attribute "%s" is empty`, emptyAttribute),
 			},

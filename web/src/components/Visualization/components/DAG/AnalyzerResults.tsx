@@ -1,9 +1,8 @@
 import {Space} from 'antd';
 import {useRef} from 'react';
 
-import {ERROR_HEADER} from 'constants/Analyzer.constants';
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import {TLintBySpanContent} from 'services/Span.service';
+import {TLintBySpanContent} from 'models/LinterResult.model';
 import * as S from './AnalyzerResults.styled';
 
 interface IProps {
@@ -31,7 +30,7 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
               {lintError.errors.length > 1 && (
                 <>
                   <div>
-                    <S.Text type="secondary">{ERROR_HEADER[lintError.errors[0].error ?? '']}</S.Text>
+                    <S.Text type="secondary">{lintError.ruleErrorDescription}</S.Text>
                   </div>
                   <S.List>
                     {lintError.errors.map(error => (
