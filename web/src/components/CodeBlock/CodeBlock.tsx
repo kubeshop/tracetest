@@ -15,6 +15,20 @@ interface IProps {
 
 const getLang = (mimeType: string): LanguageName | undefined => langNames.find(lang => mimeType.includes(`/${lang}`));
 
+const formatValue = (value: string, lang?: string): string => {
+  switch (lang) {
+    case 'json':
+      try {
+        return JSON.stringify(JSON.parse(value), null, 2);
+      } catch (error) {
+        return '';
+      }
+
+    default:
+      return value;
+  }
+};
+
 const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = ''}: IProps) => {
   const copy = useCopy();
   const lang = useMemo(() => language || getLang(mimeType), [language, mimeType]);
@@ -22,7 +36,7 @@ const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = 
   return (
     <S.CodeContainer data-cy="code-block" $maxHeight={maxHeight} $minHeight={minHeight} onClick={() => copy(value)}>
       <SyntaxHighlighter language={lang} style={arduinoLight} wrapLongLines>
-        {value}
+        {formatValue(value, lang)}
       </SyntaxHighlighter>
     </S.CodeContainer>
   );

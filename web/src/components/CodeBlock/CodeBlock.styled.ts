@@ -11,5 +11,9 @@ export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string}
     min-height: inherit;
     max-height: ${({$maxHeight}) => $maxHeight || '340px'};
     background: ${({theme}) => theme.color.background} !important;
+
+    &:hover {
+      background: ${({theme}) => theme.color.backgroundInteractive} !important;
+    }
   }
 `;
