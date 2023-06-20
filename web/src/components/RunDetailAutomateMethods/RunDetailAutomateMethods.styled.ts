@@ -11,9 +11,9 @@ export const Container = styled.div`
 
 export const TitleContainer = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  gap: 8px;
+  margin-bottom: 24px;
 `;
 
 export const Title = styled(Typography.Title)`
@@ -21,6 +21,12 @@ export const Title = styled(Typography.Title)`
     font-size: ${({theme}) => theme.size.lg};
     margin: 0;
     font-weight: 700;
+  }
+`;
+
+export const Subtitle = styled(Typography.Text)`
+  && {
+    color: ${({theme}) => theme.color.textLight};
   }
 `;
 
@@ -129,14 +135,12 @@ export const EmptyText = styled(Typography.Text)`
 export const EmptyTitle = styled(Typography.Title).attrs({level: 3})``;
 
 export const ResponseBodyContainer = styled.div`
-  display: grid;
-  grid-template-columns: 95% 5%;
+  display: flex;
   width: 100%;
 `;
 
 export const ResponseBodyContent = styled.div`
   flex: 1;
-  margin-top: 16px;
 `;
 
 export const ResponseBodyActions = styled.div`
