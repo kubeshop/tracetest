@@ -64,9 +64,8 @@ func (r requiredAttributesRule) getMissingAttrs(span *model.Span, matchingAttrLi
 	for _, requiredAttribute := range matchingAttrList {
 		if _, attributeExists := span.Attributes[requiredAttribute]; !attributeExists {
 			missingAttributes = append(missingAttributes, model.Error{
-				Error: "missing_attribute_error",
-				Value: requiredAttribute,
-				// Expected:    requiredAttribute,
+				Error:       "missing_attribute_error",
+				Value:       requiredAttribute,
 				Description: fmt.Sprintf(`Attribute "%s" is missing from span of type "%s"`, requiredAttribute, spanType),
 			})
 		}
