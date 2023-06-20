@@ -49,6 +49,7 @@ const Controls = ({onChange}: IProps) => {
       <S.OptionsContainer>
         {Object.entries(optionToText).map(([name, text]) => (
           <SwitchControl
+            id={name}
             text={text}
             key={name}
             onChange={isEnabled => onSwitchChange(name as CliCommandOption, isEnabled)}

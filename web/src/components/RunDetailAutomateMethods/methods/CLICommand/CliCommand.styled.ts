@@ -34,6 +34,10 @@ export const SwitchContainer = styled.div`
   margin-bottom: 12px;
 `;
 
+export const SwitchLabel = styled.label`
+  cursor: pointer;
+`;
+
 export const ControlsContainer = styled.div`
   margin-top: 16px;
 `;

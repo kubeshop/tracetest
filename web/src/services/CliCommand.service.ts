@@ -12,7 +12,6 @@ export enum CliCommandOption {
 
 export enum CliCommandFormat {
   Pretty = 'pretty',
-  Yaml = 'yaml',
   Json = 'json',
 }
 
