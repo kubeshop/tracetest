@@ -195,6 +195,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.ListPollingProfile,
 		},
 		{
+			"TestsTestIdGet",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}",
+			c.TestsTestIdGet,
+		},
+		{
 			"UpdateConfiguration",
 			strings.ToUpper("Put"),
 			"/api/configs/{configId}",
@@ -727,6 +733,22 @@ func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.ListPollingProfile(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// TestsTestIdGet - get test
+func (c *ResourceApiApiController) TestsTestIdGet(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	result, err := c.service.TestsTestIdGet(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

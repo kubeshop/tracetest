@@ -159,15 +159,6 @@ func (c *controller) DeleteTest(ctx context.Context, testID string) (openapi.Imp
 	return openapi.Response(204, nil), nil
 }
 
-func (c *controller) GetTest(ctx context.Context, testID string) (openapi.ImplResponse, error) {
-	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(200, c.mappers.Out.Test(test)), nil
-}
-
 func (c *controller) GetTestSpecs(ctx context.Context, testID string) (openapi.ImplResponse, error) {
 	test, err := c.testDB.GetLatestTestVersion(ctx, id.ID(testID))
 	if err != nil {

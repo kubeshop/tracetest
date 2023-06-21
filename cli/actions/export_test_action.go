@@ -81,11 +81,12 @@ func (a exportTestAction) getDefinitionFromServer(ctx context.Context, args Expo
 }
 
 func (a exportTestAction) getTestFromServer(ctx context.Context, testID string) (openapi.Test, error) {
-	req := a.client.ApiApi.GetTest(ctx, testID)
-	openapiTest, _, err := a.client.ApiApi.GetTestExecute(req)
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not execute getTest request: %w", err)
-	}
+	// req := a.client.ApiApi.GetTest(ctx, testID)
+	// openapiTest, _, err := a.client.ApiApi.GetTestExecute(req)
+	// if err != nil {
+	// 	return openapi.Test{}, fmt.Errorf("could not execute getTest request: %w", err)
+	// }
 
-	return *openapiTest, nil
+	// return *openapiTest, nil
+	return openapi.Test{}, nil
 }

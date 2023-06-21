@@ -20,61 +20,64 @@ const (
 type (
 	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
-		ID          id.ID                        `json:"id,omitempty"`
-		CreatedAt   *time.Time                   `json:"createdAt,omitempty"`
-		Name        string                       `json:"name,omitempty"`
-		Description string                       `json:"description,omitempty"`
-		Version     *int                         `json:"version,omitempty"`
-		Trigger     trigger.Trigger              `json:"trigger,omitempty"`
-		Specs       Specs                        `json:"specs,omitempty"`
-		Outputs     maps.Ordered[string, Output] `json:"outputs,omitempty"`
-		Summary     *Summary                     `json:"summary,omitempty"`
+		ID          id.ID           `json:"id,omitempty"`
+		CreatedAt   *time.Time      `json:"createdAt,omitempty"`
+		Name        string          `json:"name,omitempty"`
+		Description string          `json:"description,omitempty"`
+		Version     *int            `json:"version,omitempty"`
+		Trigger     trigger.Trigger `json:"trigger,omitempty"`
+		Specs       Specs           `json:"specs,omitempty"`
+		Outputs     Outputs         `json:"outputs,omitempty"`
+		Summary     *Summary        `json:"summary,omitempty"`
 	}
 
 	Specs []TestSpec
 
+	Outputs []Output
+
 	Output struct {
-		Selector SpanQuery `json:"selector"`
-		Value    string    `json:"value" expr_enabled:"true"`
+		Name     string    `json:"name,omitempty"`
+		Selector SpanQuery `json:"selector,omitempty"`
+		Value    string    `json:"value,omitempty" expr_enabled:"true"`
 	}
 
 	TestSpec struct {
-		Selector   Selector    `json:"selector"`
+		Selector   Selector    `json:"selector,omitempty"`
 		Name       string      `json:"name,omitempty"`
-		Assertions []Assertion `json:"assertions"`
+		Assertions []Assertion `json:"assertions,omitempty"`
 	}
 
 	Selector struct {
-		Query          SpanQuery    `json:"query"`
-		ParsedSelector SpanSelector `json:"parsedSelector"`
+		Query          SpanQuery    `json:"query,omitempty"`
+		ParsedSelector SpanSelector `json:"parsedSelector,omitempty"`
 	}
 
 	SpanSelector struct {
-		Filters       []SelectorFilter     `json:"filters"`
+		Filters       []SelectorFilter     `json:"filters,omitempty"`
 		PseudoClass   *SelectorPseudoClass `json:"pseudoClass,omitempty"`
 		ChildSelector *SpanSelector        `json:"childSelector,omitempty"`
 	}
 
 	SelectorFilter struct {
-		Property string `json:"property"`
-		Operator string `json:"operator"`
-		Value    string `json:"value"`
+		Property string `json:"property,omitempty"`
+		Operator string `json:"operator,omitempty"`
+		Value    string `json:"value,omitempty"`
 	}
 
 	SelectorPseudoClass struct {
-		Name     string `json:"name"`
+		Name     string `json:"name,omitempty"`
 		Argument *int32 `json:"argument,omitempty"`
 	}
 
 	Summary struct {
-		Runs    int     `json:"runs"`
-		LastRun LastRun `json:"lastRun"`
+		Runs    int     `json:"runs,omitempty"`
+		LastRun LastRun `json:"lastRun,omitempty"`
 	}
 
 	LastRun struct {
-		Time   time.Time `json:"time"`
-		Passes int       `json:"passes"`
-		Fails  int       `json:"fails"`
+		Time   time.Time `json:"time,omitempty"`
+		Passes int       `json:"passes,omitempty"`
+		Fails  int       `json:"fails,omitempty"`
 	}
 
 	SpanQuery string

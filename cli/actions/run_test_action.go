@@ -328,14 +328,15 @@ func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.T
 }
 
 func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {
-	test, _, err := a.client.ApiApi.
-		GetTest(ctx, id).
-		Execute()
-	if err != nil {
-		return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
-	}
+	// test, _, err := a.client.ApiApi.
+	// 	GetTest(ctx, id).
+	// 	Execute()
+	// if err != nil {
+	// 	return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
+	// }
 
-	return *test, nil
+	// return *test, nil
+	return openapi.Test{}, nil
 }
 
 func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID int32, params runDefParams) error {
