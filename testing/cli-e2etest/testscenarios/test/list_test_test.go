@@ -75,11 +75,11 @@ func TestListTests(t *testing.T) {
 
 	t.Run("list with YAML format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
-		// And I have my server recently created
+		// And I have 2 existing tests
 
 		// When I try to list these tests by a valid field and in YAML format
-		// Then I should receive three tests
-		result := tracetestcli.Exec(t, "list test --sortBy name --sortDirection asc --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		// Then I should receive 2 tests
+		result := tracetestcli.Exec(t, "list test --sortBy name --sortDirection desc --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
 		testVarsList := helpers.UnmarshalYAMLSequence[types.TestResource](t, result.StdOut)
@@ -87,7 +87,7 @@ func TestListTests(t *testing.T) {
 		importTest := testVarsList[0]
 		spew.Dump(importTest)
 		assert.Equal("Test", importTest.Type)
-		assert.Equal("fH_8AulVRenv", importTest.Spec.ID)
+		assert.Equal("fH_8AulVR", importTest.Spec.ID)
 		assert.Equal("Pokeshop - Import", importTest.Spec.Name)
 		assert.Equal("Import a Pokemon", importTest.Spec.Description)
 		assert.Equal("http", importTest.Spec.Trigger.Type)
