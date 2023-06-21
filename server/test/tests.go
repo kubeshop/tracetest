@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	ResourceName       string = "test"
-	ResourceNamePlural string = "tests"
+	ResourceName       string = "Test"
+	ResourceNamePlural string = "Tests"
 )
 
 type (
