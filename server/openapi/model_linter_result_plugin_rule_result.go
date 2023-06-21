@@ -12,7 +12,7 @@ package openapi
 type LinterResultPluginRuleResult struct {
 	SpanId string `json:"spanId,omitempty"`
 
-	Errors []string `json:"errors,omitempty"`
+	Errors []LinterResultPluginRuleResultError `json:"errors,omitempty"`
 
 	Passed bool `json:"passed,omitempty"`
 
@@ -21,6 +21,11 @@ type LinterResultPluginRuleResult struct {
 
 // AssertLinterResultPluginRuleResultRequired checks if the required fields are not zero-ed
 func AssertLinterResultPluginRuleResultRequired(obj LinterResultPluginRuleResult) error {
+	for _, el := range obj.Errors {
+		if err := AssertLinterResultPluginRuleResultErrorRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

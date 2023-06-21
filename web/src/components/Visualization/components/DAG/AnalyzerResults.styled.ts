@@ -51,6 +51,14 @@ export const ErrorIcon = styled(ExclamationCircleFilled)<{$isAbsolute?: boolean}
     `}
 `;
 
+export const List = styled.ul`
+  padding-inline-start: 20px;
+`;
+
+export const RuleContainer = styled.div`
+  margin-bottom: 8px;
+`;
+
 export const Text = styled(Typography.Text)`
   color: inherit;
 `;

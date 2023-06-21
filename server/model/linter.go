@@ -50,10 +50,11 @@ type LinterResult struct {
 }
 
 type BaseRule struct {
-	Name        string
-	Description string
-	Tips        []string
-	Weight      int
+	Name             string
+	Description      string
+	ErrorDescription string
+	Tips             []string
+	Weight           int
 }
 
 type RuleResult struct {
@@ -63,7 +64,15 @@ type RuleResult struct {
 }
 
 type Result struct {
-	SpanID string   `json:"span_id"`
-	Passed bool     `json:"passed"`
-	Errors []string `json:"error"`
+	SpanID string  `json:"span_id"`
+	Passed bool    `json:"passed"`
+	Errors []Error `json:"errors"`
+}
+
+type Error struct {
+	Value       string   `json:"value"`
+	Expected    string   `json:"expected"`
+	Level       string   `json:"level"`
+	Description string   `json:"description"`
+	Suggestions []string `json:"suggestions"`
 }

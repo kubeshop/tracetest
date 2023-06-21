@@ -20,10 +20,11 @@ var (
 func NewEnforceDnsUsageRule() model.Rule {
 	return &ensuresDnsUsage{
 		BaseRule: model.BaseRule{
-			Name:        "DNS Over IP",
-			Description: "Enforce DNS usage over IP addresses",
-			Tips:        []string{},
-			Weight:      100,
+			Name:             "DNS Over IP",
+			Description:      "Enforce DNS usage over IP addresses",
+			ErrorDescription: "The following attributes are using IP addresses instead of DNS:",
+			Tips:             []string{},
+			Weight:           100,
 		},
 	}
 }
@@ -47,18 +48,24 @@ func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace) (model
 }
 
 func (r ensuresDnsUsage) validate(span *model.Span) model.Result {
-	ipFields := make([]string, 0)
+	ipFields := make([]model.Error, 0)
 	ipRegexp := regexp.MustCompile(`(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`)
 
 	for _, field := range dnsFields {
 		if span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
-			ipFields = append(ipFields, fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)))
+			ipFields = append(ipFields, model.Error{
+				Value:       field,
+				Description: fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
+			})
 		}
 	}
 
 	for _, field := range clientDnsFields {
 		if span.Kind == model.SpanKindClient && span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
-			ipFields = append(ipFields, fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)))
+			ipFields = append(ipFields, model.Error{
+				Value:       field,
+				Description: fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
+			})
 		}
 	}
 

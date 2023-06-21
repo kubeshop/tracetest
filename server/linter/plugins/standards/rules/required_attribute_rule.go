@@ -13,10 +13,11 @@ type requiredAttributesRule struct {
 func NewRequiredAttributesRule() model.Rule {
 	return requiredAttributesRule{
 		BaseRule: model.BaseRule{
-			Name:        "Required Attributes by Span Type",
-			Description: "Ensure all spans have required attributes",
-			Tips:        []string{"This rule checks if all required attributes are present in spans of given type"},
-			Weight:      25,
+			Name:             "Required Attributes by Span Type",
+			Description:      "Ensure all spans have required attributes",
+			ErrorDescription: "This span is missing the following required attributes:",
+			Tips:             []string{"This rule checks if all required attributes are present in spans of given type"},
+			Weight:           25,
 		},
 	}
 }

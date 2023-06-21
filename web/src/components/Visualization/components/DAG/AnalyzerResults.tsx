@@ -2,7 +2,7 @@ import {Space} from 'antd';
 import {useRef} from 'react';
 
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import {TLintBySpanContent} from 'services/Span.service';
+import {TLintBySpanContent} from 'models/LinterResult.model';
 import * as S from './AnalyzerResults.styled';
 
 interface IProps {
@@ -24,16 +24,30 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
         </Space>
         <S.Body>
           {lintErrors.map(lintError => (
-            <div key={lintError.ruleName}>
+            <S.RuleContainer key={lintError.ruleName}>
               <S.Text strong>{lintError.ruleName}</S.Text>
 
-              {lintError.errors.map((error, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <div key={index}>
-                  <S.Text type="secondary">- {error}</S.Text>
+              {lintError.errors.length > 1 && (
+                <>
+                  <div>
+                    <S.Text type="secondary">{lintError.ruleErrorDescription}</S.Text>
+                  </div>
+                  <S.List>
+                    {lintError.errors.map(error => (
+                      <li key={error.value}>
+                        <S.Text type="secondary">{error.value}</S.Text>
+                      </li>
+                    ))}
+                  </S.List>
+                </>
+              )}
+
+              {lintError.errors.length === 1 && (
+                <div>
+                  <S.Text type="secondary">{lintError.errors[0].description}</S.Text>
                 </div>
-              ))}
-            </div>
+              )}
+            </S.RuleContainer>
           ))}
         </S.Body>
       </S.Content>

@@ -13,17 +13,18 @@ type ensuresNoApiKeyLeakRule struct {
 
 var (
 	httpHeadersFields  = []string{"authorization", "x-api-key"}
-	httpResponseHeader = "http.request.header."
-	httpRequestHeader  = "http.response.header."
+	httpResponseHeader = "http.response.header."
+	httpRequestHeader  = "http.request.header."
 )
 
 func NewEnsuresNoApiKeyLeakRule() model.Rule {
 	return &ensuresNoApiKeyLeakRule{
 		BaseRule: model.BaseRule{
-			Name:        "No API Key Leak",
-			Description: "Ensure no API keys are leaked in http headers",
-			Tips:        []string{},
-			Weight:      80,
+			Name:             "No API Key Leak",
+			Description:      "Ensure no API keys are leaked in http headers",
+			ErrorDescription: "The following attributes are exposing API keys:",
+			Tips:             []string{},
+			Weight:           80,
 		},
 	}
 }
@@ -49,16 +50,22 @@ func (r ensuresNoApiKeyLeakRule) Evaluate(ctx context.Context, trace model.Trace
 }
 
 func (r ensuresNoApiKeyLeakRule) validate(span *model.Span) model.Result {
-	leakedFields := make([]string, 0)
+	leakedFields := make([]model.Error, 0)
 	for _, field := range httpHeadersFields {
 		requestHeader := fmt.Sprintf("%s%s", httpRequestHeader, field)
 		if span.Attributes.Get(requestHeader) != "" {
-			leakedFields = append(leakedFields, fmt.Sprintf("Leaked Request API Key found for attribute: %s. Value: %s", field, span.Attributes.Get(requestHeader)))
+			leakedFields = append(leakedFields, model.Error{
+				Value:       field,
+				Description: fmt.Sprintf("Leaked request API Key found for attribute: %s. Value: %s", field, span.Attributes.Get(requestHeader)),
+			})
 		}
 
 		responseHeader := fmt.Sprintf("%s%s", httpResponseHeader, field)
 		if span.Attributes.Get(responseHeader) != "" {
-			leakedFields = append(leakedFields, fmt.Sprintf("Leaked Response API Key found for attribute: %s. Value: %s", field, span.Attributes.Get(responseHeader)))
+			leakedFields = append(leakedFields, model.Error{
+				Value:       field,
+				Description: fmt.Sprintf("Leaked response API Key found for attribute: %s. Value: %s", field, span.Attributes.Get(responseHeader)),
+			})
 		}
 	}
 

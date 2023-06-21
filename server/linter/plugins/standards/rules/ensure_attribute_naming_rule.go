@@ -16,8 +16,9 @@ type ensureAttributeNamingRule struct {
 func NewEnsureAttributeNamingRule() model.Rule {
 	return &ensureAttributeNamingRule{
 		BaseRule: model.BaseRule{
-			Name:        "Attribute Naming",
-			Description: "Ensure all attributes follow the naming convention",
+			Name:             "Attribute Naming",
+			Description:      "Ensure all attributes follow the naming convention",
+			ErrorDescription: "The following attributes do not adhere to the naming convention:",
 			Tips: []string{
 				"You should always add namespaces to your span names to ensure they will not be overwritten",
 				"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode"},
@@ -32,11 +33,14 @@ func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Tra
 	passed := true
 
 	for _, span := range trace.Flat {
-		errors := make([]string, 0)
+		errors := make([]model.Error, 0)
 		namespaces := make([]string, 0)
 		for name := range span.Attributes {
 			if !regex.MatchString(name) {
-				errors = append(errors, fmt.Sprintf(`Attribute "%s" doesnt follow naming convention`, name))
+				errors = append(errors, model.Error{
+					Value:       name,
+					Description: fmt.Sprintf(`Attribute "%s" does not follow the naming convention`, name),
+				})
 				continue
 			}
 
@@ -47,7 +51,10 @@ func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Tra
 		for name := range span.Attributes {
 			for _, namespace := range namespaces {
 				if name == namespace {
-					errors = append(errors, fmt.Sprintf(`Attribute "%s" uses the same name as an existing namespace in the same span`, name))
+					errors = append(errors, model.Error{
+						Value:       name,
+						Description: fmt.Sprintf(`Attribute "%s" uses the same name as an existing namespace in the same span`, name),
+					})
 				}
 			}
 		}

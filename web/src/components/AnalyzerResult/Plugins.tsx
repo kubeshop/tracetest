@@ -72,33 +72,36 @@ const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
                   {rule?.results?.map((result, resultIndex) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={`${result.spanId}-${resultIndex}`}>
-                      {result.passed ? (
-                        <S.SpanButton
-                          icon={<CaretUpFilled />}
-                          onClick={() => onSpanResultClick(result.spanId)}
-                          type="link"
-                        >
-                          {getSpanName(trace.spans, result.spanId)}
-                        </S.SpanButton>
-                      ) : (
+                      <S.SpanButton
+                        icon={<CaretUpFilled />}
+                        onClick={() => onSpanResultClick(result.spanId)}
+                        type="link"
+                        $error={!result.passed}
+                      >
+                        {getSpanName(trace.spans, result.spanId)}
+                      </S.SpanButton>
+
+                      {!result.passed && result.errors.length > 1 && (
                         <>
-                          <S.SpanButton
-                            icon={<CaretUpFilled />}
-                            onClick={() => onSpanResultClick(result.spanId)}
-                            type="link"
-                            $error
-                          >
-                            {getSpanName(trace.spans, result.spanId)}
-                          </S.SpanButton>
                           <div>
-                            {result.errors.map((error, index) => (
-                              // eslint-disable-next-line react/no-array-index-key
-                              <div key={index}>
-                                <Typography.Text>{error}</Typography.Text>
-                              </div>
-                            ))}
+                            <Typography.Text>{rule.errorDescription}</Typography.Text>
                           </div>
+                          <S.List>
+                            {result.errors.map(error => (
+                              <li key={error.value}>
+                                <Tooltip title={error.description}>
+                                  <Typography.Text>{error.value}</Typography.Text>
+                                </Tooltip>
+                              </li>
+                            ))}
+                          </S.List>
                         </>
+                      )}
+
+                      {!result.passed && result.errors.length === 1 && (
+                        <div>
+                          <Typography.Text>{result.errors[0].description}</Typography.Text>
+                        </div>
                       )}
                     </div>
                   ))}

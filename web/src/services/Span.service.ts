@@ -5,7 +5,7 @@ import {SpanKind} from 'constants/Span.constants';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
 import {TResultAssertions, TResultAssertionsSummary} from 'types/Assertion.types';
-import LinterResult from 'models/LinterResult.model';
+import LinterResult, {TLintBySpan} from 'models/LinterResult.model';
 import Span from 'models/Span.model';
 import OperatorService from './Operator.service';
 
@@ -74,7 +74,14 @@ const SpanService = () => ({
   getLintBySpan(linterResult: LinterResult): TLintBySpan {
     return linterResult.plugins
       .flatMap(plugin => plugin.rules.map(rule => ({...rule, pluginName: plugin.name})))
-      .flatMap(rule => rule.results.map(result => ({...result, ruleName: rule.name, pluginName: rule.pluginName})))
+      .flatMap(rule =>
+        rule.results.map(result => ({
+          ...result,
+          ruleName: rule.name,
+          ruleErrorDescription: rule.errorDescription,
+          pluginName: rule.pluginName,
+        }))
+      )
       .reduce((prev: TLintBySpan, curr) => {
         const value = prev[curr.spanId] || [];
         return {...prev, [curr.spanId]: [...value, curr]};
@@ -86,16 +93,5 @@ const SpanService = () => ({
     return results?.filter(result => !result.passed) ?? [];
   },
 });
-
-export type TLintBySpanContent = {
-  ruleName: string;
-  pluginName: string;
-  passed: boolean;
-  spanId: string;
-  errors: string[];
-  severity: 'error' | 'warning';
-};
-
-export type TLintBySpan = Record<string, TLintBySpanContent[]>;
 
 export default SpanService();

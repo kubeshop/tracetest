@@ -1671,6 +1671,7 @@ export interface external {
         LinterResultPluginRule: {
           name?: string;
           description?: string;
+          errorDescription?: string;
           passed?: boolean;
           weight?: number;
           tips?: string[];
@@ -1678,10 +1679,17 @@ export interface external {
         };
         LinterResultPluginRuleResult: {
           spanId?: string;
-          errors?: string[];
+          errors?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResultError"][];
           passed?: boolean;
           /** @enum {string} */
           severity?: "error" | "warning";
+        };
+        LinterResultPluginRuleResultError: {
+          value?: string;
+          expected?: string;
+          level?: string;
+          description?: string;
+          suggestions?: string[];
         };
       };
     };

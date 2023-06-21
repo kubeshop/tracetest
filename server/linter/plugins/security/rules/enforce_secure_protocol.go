@@ -19,10 +19,11 @@ var (
 func NewEnforceHttpsProtocolRule() model.Rule {
 	return &enforceHttpsProtocolRule{
 		BaseRule: model.BaseRule{
-			Name:        "Enforce HTTPS Protocol",
-			Description: "Ensure all request use https",
-			Tips:        []string{},
-			Weight:      20,
+			Name:             "Enforce HTTPS Protocol",
+			Description:      "Ensure all request use https",
+			ErrorDescription: "The following attributes are using insecure protocols:",
+			Tips:             []string{},
+			Weight:           20,
 		},
 	}
 }
@@ -48,10 +49,13 @@ func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trac
 }
 
 func (r enforceHttpsProtocolRule) validate(span *model.Span) model.Result {
-	insecureFields := make([]string, 0)
+	insecureFields := make([]model.Error, 0)
 	for _, field := range httpFields {
 		if span.Attributes.Get(field) != "" && !strings.Contains(span.Attributes.Get(field), "https") {
-			insecureFields = append(insecureFields, fmt.Sprintf("Insecure http schema found for attribute: %s. Value: %s", field, span.Attributes.Get(field)))
+			insecureFields = append(insecureFields, model.Error{
+				Value:       field,
+				Description: fmt.Sprintf("Insecure http schema found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
+			})
 		}
 	}
 

@@ -14,6 +14,8 @@ type LinterResultPluginRule struct {
 
 	Description string `json:"description,omitempty"`
 
+	ErrorDescription string `json:"errorDescription,omitempty"`
+
 	Passed bool `json:"passed,omitempty"`
 
 	Weight int32 `json:"weight,omitempty"`
