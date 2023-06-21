@@ -65,8 +65,12 @@ There are times when it is easier to directly execute the Tracetest CLI from a D
 
 **How to Use**:
 
+Use the command below, substituting the following placeholders:
+- <your-tracetest-server-url> - the url to the running Tracetest server you wish to execute the test on. Example: http://localhost:11633/
+- <file-path> - the path to the saved Tracetest test. Example: ./mytest.yaml
+
 ```sh
-docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s http://localhost:11633/ test run  --definition <file-path> --wait-for-result
+docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s <your-tracetest-server-url> test run  --definition <file-path> --wait-for-result
 ```
 
 
