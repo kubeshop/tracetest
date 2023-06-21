@@ -106,6 +106,7 @@ func (s *Selector) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+
 type testOutputV1 maps.Ordered[string, Output]
 
 func (v1 testOutputV1) valid() bool {

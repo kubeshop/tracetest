@@ -444,8 +444,6 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 		// TODO: replace it with the option `resourcemanager.CanBeAugmented()`
 		// once we have the `resourcemanager.OperationGet` operation.
 		resourcemanager.OperationListAugmented,
-		// resourcemanager.OperationCreate,
-		// resourcemanager.OperationUpsert,
 	}
 
 	manager := resourcemanager.New[test.Test](
