@@ -46,8 +46,8 @@ func (f TestFormatter) ToListTable(file *file.File) (*simpletable.Header, *simpl
 	}
 
 	body := simpletable.Body{}
-	for _, rawDemo := range rawTestList {
-		testResource := rawDemo.(openapi.TestResource)
+	for _, rawTest := range rawTestList {
+		testResource := rawTest.(openapi.TestResource)
 		row, err := f.getTableRow(testResource)
 		if err != nil {
 			return nil, nil, err
@@ -138,7 +138,7 @@ func (f TestFormatter) getTableRow(t openapi.TestResource) ([]*simpletable.Cell,
 
 	triggerType := ""
 	if trigger, ok := t.Spec.GetTriggerOk(); ok {
-		triggerType = trigger.GetTriggerType()
+		triggerType = trigger.GetType()
 	}
 
 	url := fmt.Sprintf("%s/test/%s", f.serverBaseURL, t.Spec.GetId())

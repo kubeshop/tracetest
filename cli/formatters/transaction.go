@@ -1,7 +1,6 @@
 package formatters
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -176,15 +175,9 @@ func (f TransactionFormatter) FormatRunResult(any) (string, error) {
 func convertJSONFileIntoYAMLFile(f *file.File) (*file.File, error) {
 	fileContent := f.Contents()
 	if strings.HasPrefix(fileContent, "{") && strings.HasSuffix(fileContent, "}") {
-		m := make(map[string]interface{}, 0)
-		err := json.Unmarshal([]byte(fileContent), &m)
+		yamlContent, err := yaml.JSONToYAML([]byte(fileContent))
 		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal JSON file: %w", err)
-		}
-
-		yamlContent, err := yaml.Marshal(m)
-		if err != nil {
-			return nil, fmt.Errorf("could not marshal file content to YAML: %w", err)
+			return nil, fmt.Errorf("could not convert file content to YAML: %w", err)
 		}
 
 		file, err := file.NewFromRaw(f.Path(), yamlContent)
