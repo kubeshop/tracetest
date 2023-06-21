@@ -34,7 +34,7 @@ var getCmd = &cobra.Command{
 		}
 
 		resource, err := resourceActions.Get(ctx, getParams.ResourceId)
-		if err != nil && errors.Is(err, utils.ResourceNotFound) {
+		if err != nil && errors.Is(err, utils.ErrResourceNotFound) {
 			return fmt.Sprintf("Resource %s with ID %s not found", resourceType, getParams.ResourceId), nil
 		} else if err != nil {
 			return "", err
