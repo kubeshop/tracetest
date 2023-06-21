@@ -14,14 +14,14 @@ If you want to see more examples with other CI/CD tools, let us know by [opening
 
 Tracetest is designed to work with all CI/CD platforms and automation tools. To enable Tracetest to run in CI/CD environments, make sure to [install the Tracetest CLI](../getting-started/installation.mdx) and configure it to access your [Tracetest server](../configuration/server.md).
 
-### Running Tracetest CLI From Docker
+### Running Tracetest CLI from Docker
 
 Many integrations with CI/CD tools can be accomplished by running the [Tracetest CLI](../cli/configuring-your-cli) to execute a test against a remote Tracetest server. If you do not want to install the Tracetest CLI in your environment, you can choose to directly execute it from a Docker image. 
 
 **How to Use**:
 
 Use the command below, substituting the following placeholders:
-- <your-tracetest-server-url> - the url to the running Tracetest server you wish to execute the test on. Example: http://localhost:11633/
+- <your-tracetest-server-url> - the URL to the running Tracetest server you wish to execute the test on. Example: http://localhost:11633/
 - <file-path> - the path to the saved Tracetest test. Example: ./mytest.yaml
 
 ```sh
