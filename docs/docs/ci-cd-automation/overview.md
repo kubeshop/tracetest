@@ -22,7 +22,7 @@ Many integrations with CI/CD tools can be accomplished by running the [Tracetest
 
 Use the command below, substituting the following placeholders:
 - <your-tracetest-server-url> - the URL to the running Tracetest server you wish to execute the test on. Example: http://localhost:11633/
-- <file-path> - the path to the saved Tracetest test. Example: ./mytest.yaml
+- <file-path> - The path to the saved Tracetest test. Example: ./mytest.yaml
 
 ```sh
 docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s <your-tracetest-server-url> test run  --definition <file-path> --wait-for-result
