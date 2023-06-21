@@ -1,11 +1,12 @@
-import CodeBlock from 'components/CodeBlock/CodeBlock';
+import {FramedCodeBlock} from 'components/CodeBlock';
 import {ReadOutlined} from '@ant-design/icons';
 import {CLI_RUNNING_TESTS_URL} from 'constants/Common.constants';
 import * as S from './CliCommand.styled';
 import Controls from './Controls';
 import useCliCommand from './hooks/useCliCommand';
+import {IMethodProps} from '../../RunDetailAutomateMethods';
 
-const CLiCommand = () => {
+const CLiCommand = ({test, environmentId}: IMethodProps) => {
   const {command, onGetCommand} = useCliCommand();
 
   return (
@@ -16,9 +17,14 @@ const CLiCommand = () => {
           <ReadOutlined />
         </a>
       </S.TitleContainer>
-      <S.Subtitle>Tracetest CLI command:</S.Subtitle>
-      <CodeBlock language="bash" value={command} minHeight="80px" maxHeight="80px" />
-      <Controls onChange={onGetCommand} />
+      <FramedCodeBlock
+        title="Tracetest CLI command:"
+        language="bash"
+        value={command}
+        minHeight="100px"
+        maxHeight="100px"
+      />
+      <Controls onChange={onGetCommand} test={test} environmentId={environmentId} />
     </S.Container>
   );
 };

@@ -1,14 +1,26 @@
 import {Tabs} from 'antd';
 import {useSearchParams} from 'react-router-dom';
+import Test from 'models/Test.model';
+import TestRun from 'models/TestRun.model';
+import {useEnvironment} from 'providers/Environment/Environment.provider';
 import CliCommand from './methods/CLICommand';
 import * as S from './RunDetailAutomateMethods.styled';
+import DeepLink from './methods/DeepLink/DeepLink';
 
 const TabsKeys = {
   CLI: 'cli',
+  DeepLink: 'deeplink',
 };
 
-const RunDetailAutomateMethods = () => {
+export interface IMethodProps {
+  environmentId?: string;
+  test: Test;
+  run: TestRun;
+}
+
+const RunDetailAutomateMethods = ({test, run}: IMethodProps) => {
   const [query, updateQuery] = useSearchParams();
+  const {selectedEnvironment: {id: environmentId} = {}} = useEnvironment();
 
   return (
     <S.Container>
@@ -25,7 +37,10 @@ const RunDetailAutomateMethods = () => {
           }}
         >
           <Tabs.TabPane key={TabsKeys.CLI} tab="CLI">
-            <CliCommand />
+            <CliCommand test={test} environmentId={environmentId} run={run} />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={TabsKeys.DeepLink} tab="Deep Link">
+            <DeepLink test={test} environmentId={environmentId} run={run} />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>
