@@ -111,12 +111,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetRunResultJUnit,
 		},
 		{
-			"GetTest",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}",
-			c.GetTest,
-		},
-		{
 			"GetTestResultSelectedSpans",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/select",
@@ -465,22 +459,6 @@ func (c *ApiApiController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	}
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTest - get test
-func (c *ApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	result, err := c.service.GetTest(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

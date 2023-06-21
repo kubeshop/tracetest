@@ -5,6 +5,8 @@ services:
     image: kubeshop/tracetest:${TAG:-latest}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    build:
+      context: .
     volumes:
       - type: bind
         source: ./local-config/tracetest.config.yaml

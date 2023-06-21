@@ -18,9 +18,10 @@ type Repository interface {
 	SortingFields() []string
 	Provision(context.Context, Test) error
 	SetID(test Test, id id.ID) Test
+	Get(context.Context, id.ID) (Test, error)
+	GetAugmented(ctx context.Context, id id.ID) (Test, error)
 
 	// TODO: uncomment as we add new functionality
-	// Get(context.Context, id.ID) (Test, error)
 	// Create(context.Context, Test) (Test, error)
 	// Update(context.Context, Test) (Test, error)
 	// Delete(context.Context, Test) error
@@ -88,14 +89,17 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	}
 
 	for i, test := range tests {
-		test.CreatedAt = nil
-		test.Summary = nil
-		test.Version = nil
+		r.removeNonAugmentedFields(&test)
 		tests[i] = test
 	}
 
 	return tests, err
+}
 
+func (r *repository) removeNonAugmentedFields(test *Test) {
+	test.CreatedAt = nil
+	test.Summary = nil
+	test.Version = nil
 }
 
 func (r *repository) ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
@@ -155,6 +159,35 @@ func (r *repository) Count(ctx context.Context, query string) (int, error) {
 	}
 
 	return count, nil
+}
+
+func (r *repository) Get(ctx context.Context, id id.ID) (Test, error) {
+	test, err := r.get(ctx, id)
+	if err != nil {
+		return test, err
+	}
+
+	r.removeNonAugmentedFields(&test)
+	return test, err
+}
+
+func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
+	return r.get(ctx, id)
+}
+
+func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
+	if err != nil {
+		return Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id))
+	if err != nil {
+		return Test{}, err
+	}
+
+	return test, nil
 }
 
 type scanner interface {

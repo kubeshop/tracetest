@@ -20,6 +20,7 @@ var _ MappedNullable = &TriggerResult{}
 // TriggerResult struct for TriggerResult
 type TriggerResult struct {
 	TriggerType   *string                     `json:"triggerType,omitempty"`
+	Type          *string                     `json:"type,omitempty"`
 	TriggerResult *TriggerResultTriggerResult `json:"triggerResult,omitempty"`
 }
 
@@ -72,6 +73,38 @@ func (o *TriggerResult) SetTriggerType(v string) {
 	o.TriggerType = &v
 }
 
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *TriggerResult) GetType() string {
+	if o == nil || isNil(o.Type) {
+		var ret string
+		return ret
+	}
+	return *o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TriggerResult) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
+		return nil, false
+	}
+	return o.Type, true
+}
+
+// HasType returns a boolean if a field has been set.
+func (o *TriggerResult) HasType() bool {
+	if o != nil && !isNil(o.Type) {
+		return true
+	}
+
+	return false
+}
+
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *TriggerResult) SetType(v string) {
+	o.Type = &v
+}
+
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
 func (o *TriggerResult) GetTriggerResult() TriggerResultTriggerResult {
 	if o == nil || isNil(o.TriggerResult) {
@@ -116,6 +149,9 @@ func (o TriggerResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.TriggerType) {
 		toSerialize["triggerType"] = o.TriggerType
+	}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
 	if !isNil(o.TriggerResult) {
 		toSerialize["triggerResult"] = o.TriggerResult
