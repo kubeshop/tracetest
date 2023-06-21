@@ -29,15 +29,11 @@ describe('Show test details', () => {
       cy.visit(`/test/${testId}`);
 
       cy.get('[data-cy^=result-actions-button]').first().click();
-      cy.get('[data-cy=view-test-definition-button]').click();
+      cy.get('[data-cy=automate-test-button]').click();
 
-      cy.get('[data-cy=file-viewer-code-container]').should('be.visible');
-      cy.get('[data-cy=file-viewer-close]').click();
-
-      cy.get('[data-cy=file-viewer-code-container]').should('not.be.visible');
-
-      cy.get(`[data-cy=test-details-run-test-button]`).click();
-      cy.matchTestRunPageUrl();
+      cy.get('[data-cy=code-block]').should('be.visible');
+      cy.contains('div', 'Test Definition').should('be.visible');
+      cy.contains('div', 'Running Techniques').should('be.visible');
     });
   });
 
