@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
 	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
 	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
 	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,6 +41,7 @@ func addListTestsPreReqs(t *testing.T, env environment.Manager) {
 func TestListTests(t *testing.T) {
 	// instantiate require with testing helper
 	require := require.New(t)
+	assert := assert.New(t)
 
 	// setup isolated e2e test
 	env := environment.CreateAndStart(t)
@@ -82,30 +85,31 @@ func TestListTests(t *testing.T) {
 		testVarsList := helpers.UnmarshalYAMLSequence[types.TestResource](t, result.StdOut)
 		require.Len(testVarsList, 2)
 		importTest := testVarsList[0]
-		require.Equal("Test", importTest.Type)
-		require.Equal("fH_8AulVRenv", importTest.Spec.ID)
-		require.Equal("Pokeshop - Import", importTest.Spec.Name)
-		require.Equal("Import a Pokemon", importTest.Spec.Description)
-		require.Equal("http", importTest.Spec.Trigger.Type)
-		require.Equal("http://demo-api:8081/pokemon/import", importTest.Spec.Trigger.HTTPRequest.URL)
-		require.Equal("POST", importTest.Spec.Trigger.HTTPRequest.Method)
-		require.Equal(`'{"id":52}'`, importTest.Spec.Trigger.HTTPRequest.Body)
+		spew.Dump(importTest)
+		assert.Equal("Test", importTest.Type)
+		assert.Equal("fH_8AulVRenv", importTest.Spec.ID)
+		assert.Equal("Pokeshop - Import", importTest.Spec.Name)
+		assert.Equal("Import a Pokemon", importTest.Spec.Description)
+		assert.Equal("http", importTest.Spec.Trigger.Type)
+		assert.Equal("http://demo-api:8081/pokemon/import", importTest.Spec.Trigger.HTTPRequest.URL)
+		assert.Equal("POST", importTest.Spec.Trigger.HTTPRequest.Method)
+		assert.Equal(`'{"id":52}'`, importTest.Spec.Trigger.HTTPRequest.Body)
 		require.Len(importTest.Spec.Trigger.HTTPRequest.Headers, 1)
-		require.Equal("Content-Type", importTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
-		require.Equal("application/json", importTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
+		assert.Equal("Content-Type", importTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
+		assert.Equal("application/json", importTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
 
 		listTest := testVarsList[1]
-		require.Equal("Test", listTest.Type)
-		require.Equal("fH_8AulVRenv", listTest.Spec.ID)
-		require.Equal("Pokeshop - Import", listTest.Spec.Name)
-		require.Equal("Import a Pokemon", listTest.Spec.Description)
-		require.Equal("http", listTest.Spec.Trigger.Type)
-		require.Equal("http://demo-api:8081/pokemon/import", listTest.Spec.Trigger.HTTPRequest.URL)
-		require.Equal("POST", listTest.Spec.Trigger.HTTPRequest.Method)
-		require.Equal(`'{"id":52}'`, listTest.Spec.Trigger.HTTPRequest.Body)
+		assert.Equal("Test", listTest.Type)
+		assert.Equal("fH_8AulVR", listTest.Spec.ID)
+		assert.Equal("Pokeshop - List", listTest.Spec.Name)
+		assert.Equal("List Pokemon", listTest.Spec.Description)
+		assert.Equal("http", listTest.Spec.Trigger.Type)
+		assert.Equal("http://demo-api:8081/pokemon?take=20&skip=0", listTest.Spec.Trigger.HTTPRequest.URL)
+		assert.Equal("GET", listTest.Spec.Trigger.HTTPRequest.Method)
+		assert.Equal("", listTest.Spec.Trigger.HTTPRequest.Body)
 		require.Len(listTest.Spec.Trigger.HTTPRequest.Headers, 1)
-		require.Equal("Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
-		require.Equal("application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
+		assert.Equal("Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
+		assert.Equal("application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
 	})
 
 	// 	t.Run("list with JSON format", func(t *testing.T) {
