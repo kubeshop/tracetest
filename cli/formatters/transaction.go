@@ -125,6 +125,7 @@ func (f TransactionFormatter) getTableHeader() *simpletable.Header {
 			{Text: "NAME"},
 			{Text: "VERSION"},
 			{Text: "STEPS"},
+			{Text: "RUNS"},
 			{Text: "LAST RUN TIME"},
 			{Text: "LAST RUN SUCCESSES"},
 			{Text: "LAST RUN FAILURES"},
@@ -134,10 +135,14 @@ func (f TransactionFormatter) getTableHeader() *simpletable.Header {
 
 func (f TransactionFormatter) getTableRow(t openapi.TransactionResource) ([]*simpletable.Cell, error) {
 	version := 1
+
 	runs := 0
 	lastRunTime := ""
 	passes := 0
 	fails := 0
+
+	steps := len(t.Spec.Steps)
+
 	if t.Spec.Version != nil {
 		version = int(*t.Spec.Version)
 	}
@@ -147,7 +152,7 @@ func (f TransactionFormatter) getTableRow(t openapi.TransactionResource) ([]*sim
 			runs = int(*t.Spec.Summary.Runs)
 		}
 
-		if t.Spec.Summary.LastRun != nil {
+		if t.Spec.Summary.LastRun != nil && !t.Spec.Summary.LastRun.GetTime().IsZero() {
 			lastRunTime = t.Spec.Summary.LastRun.GetTime().String()
 		}
 
@@ -161,6 +166,7 @@ func (f TransactionFormatter) getTableRow(t openapi.TransactionResource) ([]*sim
 		{Text: *t.Spec.Id},
 		{Text: *t.Spec.Name},
 		{Text: strconv.Itoa(version)},
+		{Text: fmt.Sprint(steps)},
 		{Text: fmt.Sprint(runs)},
 		{Text: lastRunTime},
 		{Text: fmt.Sprint(passes)},
