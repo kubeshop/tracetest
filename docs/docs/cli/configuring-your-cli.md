@@ -66,7 +66,8 @@ There are times when it is easier to directly execute the Tracetest CLI from a D
 **How to Use**:
 
 Use the command below, substituting the following placeholders:
-- <your-tracetest-server-url> - the url to the running Tracetest server you wish to execute the test on. Example: http://localhost:11633/
+- <your-tracetest-server-url> - The URL to the running Tracetest server you wish to execute the test on. Example: http://localhost:11633/
+
 - <file-path> - the path to the saved Tracetest test. Example: ./mytest.yaml
 
 ```sh
