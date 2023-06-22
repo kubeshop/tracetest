@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"

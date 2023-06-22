@@ -14,9 +14,9 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"go.opentelemetry.io/otel/trace"
 )
 

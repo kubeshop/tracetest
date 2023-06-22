@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"go.opentelemetry.io/otel/trace"
 )
 

@@ -3,8 +3,8 @@ package datasource
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"google.golang.org/grpc"
 )
 

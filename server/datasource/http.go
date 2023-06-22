@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/goware/urlx"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 )
 
 type HttpClient struct {

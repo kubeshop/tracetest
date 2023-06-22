@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
@@ -14,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/fluidtruck/deepcopy"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
-	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 )
 
 func (m *OpenAPI) ConnectionTestResult(in model.ConnectionResult) openapi.ConnectionResult {
