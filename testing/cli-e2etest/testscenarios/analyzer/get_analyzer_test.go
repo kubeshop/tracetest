@@ -2,7 +2,6 @@ package analyzer
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -102,7 +101,18 @@ func TestGetAnalyzer(t *testing.T) {
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "current")
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal("Qti5R3_VR", singleLine["ID"])
+		require.Equal("New Transaction", singleLine["NAME"])
+		require.Equal("1", singleLine["VERSION"])
+		require.Equal("2", singleLine["STEPS"])
+		require.Equal("0", singleLine["RUNS"])
+		require.Equal("", singleLine["LAST RUN TIME"])
+		require.Equal("0", singleLine["LAST RUN SUCCESSES"])
+		require.Equal("0", singleLine["LAST RUN FAILURES"])
 	})
 }
