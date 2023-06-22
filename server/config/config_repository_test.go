@@ -5,23 +5,23 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/kubeshop/tracetest/server/config/configresource"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 )
 
 func TestConfigResource(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: configresource.ResourceName,
-		ResourceTypePlural:   configresource.ResourceNamePlural,
+		ResourceTypeSingular: config.ResourceName,
+		ResourceTypePlural:   config.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
-			configRepo := configresource.NewRepository(db)
+			configRepo := config.NewRepository(db)
 
-			manager := resourcemanager.New[configresource.Config](
-				configresource.ResourceName,
-				configresource.ResourceNamePlural,
+			manager := resourcemanager.New[config.Config](
+				config.ResourceName,
+				config.ResourceNamePlural,
 				configRepo,
-				resourcemanager.WithOperations(configresource.Operations...),
+				resourcemanager.WithOperations(config.Operations...),
 			)
 			manager.RegisterRoutes(router)
 

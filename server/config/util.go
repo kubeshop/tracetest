@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Must(c *Config, err error) *Config {
+func Must(c *AppConfig, err error) *AppConfig {
 	if err != nil {
 		panic(err)
 	}
@@ -15,16 +15,16 @@ func Must(c *Config, err error) *Config {
 	return c
 }
 
-type option struct {
+type appConfigOption struct {
 	key                string
 	defaultValue       any
 	description        string
-	validate           func(*Config) error
+	validate           func(*AppConfig) error
 	deprecated         bool
 	deprecationMessage string
 }
 
-type options []option
+type options []appConfigOption
 
 func (opts options) registerDefaults(vp *viper.Viper) {
 	for _, opt := range opts {

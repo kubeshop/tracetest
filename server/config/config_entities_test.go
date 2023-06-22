@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config/configresource"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -24,7 +24,7 @@ func TestPublishing(t *testing.T) {
 	restore := cleanEnv()
 	defer restore()
 
-	updated := configresource.Config{
+	updated := config.Config{
 		ID:               "current",
 		Name:             "Config",
 		AnalyticsEnabled: true,
@@ -33,11 +33,11 @@ func TestPublishing(t *testing.T) {
 	publisher := new(mockPublisher)
 	publisher.Test(t)
 
-	publisher.On("Publish", configresource.ResourceID, updated)
+	publisher.On("Publish", config.ResourceID, updated)
 
-	repo := configresource.NewRepository(
+	repo := config.NewRepository(
 		testmock.CreateMigratedDatabase(),
-		configresource.WithPublisher(publisher),
+		config.WithPublisher(publisher),
 	)
 
 	_, err := repo.Update(context.TODO(), updated)
@@ -52,7 +52,7 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
 
-		repo := configresource.NewRepository(
+		repo := config.NewRepository(
 			testmock.CreateMigratedDatabase(),
 		)
 
@@ -64,10 +64,10 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 	t.Run("FromRepo", func(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
-		repo := configresource.NewRepository(
+		repo := config.NewRepository(
 			testmock.CreateMigratedDatabase(),
 		)
-		repo.Update(context.TODO(), configresource.Config{
+		repo.Update(context.TODO(), config.Config{
 			AnalyticsEnabled: false,
 		})
 
@@ -78,10 +78,10 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 	t.Run("EnvOverride", func(t *testing.T) {
 		restore := cleanEnv()
 		defer restore()
-		repo := configresource.NewRepository(
+		repo := config.NewRepository(
 			testmock.CreateMigratedDatabase(),
 		)
-		repo.Update(context.TODO(), configresource.Config{
+		repo.Update(context.TODO(), config.Config{
 			AnalyticsEnabled: true,
 		})
 

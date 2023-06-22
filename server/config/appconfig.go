@@ -16,8 +16,8 @@ func SetupFlags(flags *pflag.FlagSet) {
 	configOptions.registerFlags(flags)
 }
 
-func New(confOpts ...Option) (*Config, error) {
-	cfg := Config{
+func New(confOpts ...Option) (*AppConfig, error) {
+	cfg := AppConfig{
 		vp: viper.New(),
 	}
 
@@ -58,15 +58,14 @@ type logger interface {
 	Println(...any)
 }
 
-type Config struct {
-	config    *oldConfig
-	vp        *viper.Viper
-	mu        sync.Mutex
-	logger    logger
-	resources resources
+type AppConfig struct {
+	config *oldConfig
+	vp     *viper.Viper
+	mu     sync.Mutex
+	logger logger
 }
 
-func (c *Config) Watch(updateFn func(c *Config)) {
+func (c *AppConfig) Watch(updateFn func(c *AppConfig)) {
 	c.vp.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("Config file changed:", e.Name)
 		updateFn(c)
@@ -74,14 +73,14 @@ func (c *Config) Watch(updateFn func(c *Config)) {
 	c.vp.WatchConfig()
 }
 
-func (c *Config) Set(key string, value any) {
+func (c *AppConfig) Set(key string, value any) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	c.vp.Set(key, value)
 }
 
-func (cfg *Config) loadConfig() error {
+func (cfg *AppConfig) loadConfig() error {
 	if confFile := cfg.vp.GetString("config"); confFile != "" {
 		// if --config is passed, and the file does not exists
 		// it will trigger a "no such file or directory" error
@@ -107,7 +106,7 @@ func (cfg *Config) loadConfig() error {
 	return fmt.Errorf("cannot read config file: %w", err)
 }
 
-func (cfg *Config) configureConfigFile() {
+func (cfg *AppConfig) configureConfigFile() {
 	cfg.vp.SetConfigName("tracetest")
 	// intentionally removed this line, because it allows to have config files without extensions
 	// cfg.vp.SetConfigType("yaml")
@@ -116,13 +115,13 @@ func (cfg *Config) configureConfigFile() {
 	cfg.vp.AddConfigPath(".")
 }
 
-func (c *Config) defaults() {
+func (c *AppConfig) defaults() {
 	if c.logger == nil {
 		c.logger = log.Default()
 	}
 }
 
-func (cfg *Config) warnAboutDeprecatedFields() error {
+func (cfg *AppConfig) warnAboutDeprecatedFields() error {
 	for _, opt := range configOptions {
 		if !opt.deprecated {
 			continue

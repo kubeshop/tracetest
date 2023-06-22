@@ -12,14 +12,14 @@ type demo struct {
 	} `yaml:",omitempty" mapstructure:"endpoints"`
 }
 
-func (c *Config) DemoEnabled() []string {
+func (c *AppConfig) DemoEnabled() []string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.config.Demo.Enabled
 }
 
-func (c *Config) DemoEndpoints() map[string]string {
+func (c *AppConfig) DemoEndpoints() map[string]string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

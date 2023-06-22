@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	cfg         *config.Config
+	cfg         *config.AppConfig
 	appInstance *app.App
 
 	rootCmd = &cobra.Command{

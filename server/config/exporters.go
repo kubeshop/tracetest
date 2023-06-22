@@ -35,21 +35,21 @@ type (
 	}
 )
 
-func (c *Config) Exporter() (*TelemetryExporterOption, error) {
+func (c *AppConfig) Exporter() (*TelemetryExporterOption, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.getExporter(c.config.Server.Telemetry.Exporter)
 }
 
-func (c *Config) ApplicationExporter() (*TelemetryExporterOption, error) {
+func (c *AppConfig) ApplicationExporter() (*TelemetryExporterOption, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.getExporter(c.config.Server.Telemetry.ApplicationExporter)
 }
 
-func (c *Config) getExporter(name string) (*TelemetryExporterOption, error) {
+func (c *AppConfig) getExporter(name string) (*TelemetryExporterOption, error) {
 	// Exporters are optional: if no name was provided we consider that the user don't want to have them enabled
 	if name == "" {
 		return nil, nil

@@ -15,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/config/configresource"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -48,14 +47,14 @@ var (
 var EmptyDemoEnabled []string
 
 type App struct {
-	cfg              *config.Config
+	cfg              *config.AppConfig
 	provisioningFile string
 	stopFns          []func()
 
 	serverID string
 }
 
-func New(config *config.Config) (*App, error) {
+func New(config *config.AppConfig) (*App, error) {
 	app := &App{
 		cfg: config,
 	}
@@ -115,9 +114,9 @@ func provision(provisioner *provisioning.Provisioner, file string) {
 }
 
 func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
-	sm.Subscribe(configresource.ResourceID, subscription.NewSubscriberFunction(
+	sm.Subscribe(config.ResourceID, subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
-			configFromDB, ok := m.Content.(configresource.Config)
+			configFromDB, ok := m.Content.(config.Config)
 			if !ok {
 				return fmt.Errorf("cannot read update to configFromDB. unexpected type %T", m.Content)
 			}
@@ -127,7 +126,7 @@ func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
 	)
 }
 
-func (app *App) initAnalytics(configFromDB configresource.Config) error {
+func (app *App) initAnalytics(configFromDB config.Config) error {
 	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env)
 }
 
@@ -156,7 +155,7 @@ func (app *App) Start(opts ...appOption) error {
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
 
-	configRepo := configresource.NewRepository(db, configresource.WithPublisher(subscriptionManager))
+	configRepo := config.NewRepository(db, config.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
 
 	tracer, err := tracing.NewTracer(ctx, app.cfg)
@@ -380,12 +379,12 @@ func registerTransactionResource(repo *tests.TransactionsRepository, router *mux
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerConfigResource(configRepo *configresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[configresource.Config](
-		configresource.ResourceName,
-		configresource.ResourceNamePlural,
+func registerConfigResource(configRepo *config.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[config.Config](
+		config.ResourceName,
+		config.ResourceNamePlural,
 		configRepo,
-		resourcemanager.WithOperations(configresource.Operations...),
+		resourcemanager.WithOperations(config.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

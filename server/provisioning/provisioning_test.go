@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/config/configresource"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/provisioning"
@@ -92,14 +92,14 @@ func TestFromEnv(t *testing.T) {
 
 type expectations struct {
 	dataStore      *datastoreresource.DataStore
-	config         *configresource.Config
+	config         *config.Config
 	pollingprofile *pollingprofile.PollingProfile
 	demos          []demoresource.Demo
 }
 
 type provisioningFixture struct {
 	provisioner     *provisioning.Provisioner
-	configs         *configresource.Repository
+	configs         *config.Repository
 	pollingProfiles *pollingprofile.Repository
 	demos           *demoresource.Repository
 	dataStores      *datastoreresource.Repository
@@ -162,17 +162,17 @@ func (f provisioningFixture) assert(t *testing.T, expected expectations) {
 
 func setup(db *sql.DB) provisioningFixture {
 	f := provisioningFixture{
-		configs:         configresource.NewRepository(db),
+		configs:         config.NewRepository(db),
 		pollingProfiles: pollingprofile.NewRepository(db),
 		demos:           demoresource.NewRepository(db),
 		dataStores:      datastoreresource.NewRepository(db),
 	}
 
-	configManager := resourcemanager.New[configresource.Config](
-		configresource.ResourceName,
-		configresource.ResourceNamePlural,
+	configManager := resourcemanager.New[config.Config](
+		config.ResourceName,
+		config.ResourceNamePlural,
 		f.configs,
-		resourcemanager.WithOperations(configresource.Operations...),
+		resourcemanager.WithOperations(config.Operations...),
 	)
 
 	pollingProfilesManager := resourcemanager.New[pollingprofile.PollingProfile](
@@ -226,7 +226,7 @@ var cases = []struct {
 					},
 				},
 			},
-			config: &configresource.Config{
+			config: &config.Config{
 				AnalyticsEnabled: true,
 			},
 			pollingprofile: &pollingprofile.PollingProfile{
