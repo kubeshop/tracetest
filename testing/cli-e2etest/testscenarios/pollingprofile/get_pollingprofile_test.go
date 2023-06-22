@@ -2,7 +2,6 @@ package pollingprofile
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -103,10 +102,14 @@ func TestGetPollingProfile(t *testing.T) {
 		// Then it should print a table with 4 lines printed: header, separator, a polling profile item and empty line
 		result := tracetestcli.Exec(t, "get pollingprofile --id current --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "current")
-		require.Contains(result.StdOut, "periodic")
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal("current", singleLine["ID"])
+		require.Equal("current", singleLine["NAME"])
+		require.Equal("periodic", singleLine["STRATEGY"])
 	})
 }

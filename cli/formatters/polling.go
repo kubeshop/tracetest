@@ -85,7 +85,7 @@ func (f PollingFormatter) getTableHeader() *simpletable.Header {
 		Cells: []*simpletable.Cell{
 			{Text: "ID"},
 			{Text: "NAME"},
-			{Text: "STRAGETY"},
+			{Text: "STRATEGY"},
 		},
 	}
 }
