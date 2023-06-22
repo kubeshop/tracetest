@@ -1,4 +1,4 @@
-package linter_resource_test
+package analyzer_test
 
 import (
 	"os"

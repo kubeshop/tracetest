@@ -8,7 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/linter"
-	linterResource "github.com/kubeshop/tracetest/server/linter/resource"
+	analyzerResource "github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -32,18 +32,18 @@ type LinterRunner interface {
 	WorkerPool
 }
 
-type LinterResourceGetter interface {
-	GetDefault(ctx context.Context) linterResource.Linter
+type AnalyzerGetter interface {
+	GetDefault(ctx context.Context) analyzerResource.Linter
 }
 
 type defaultlinterRunner struct {
-	updater              RunUpdater
-	inputChannel         chan LinterRequest
-	exitChannel          chan bool
-	subscriptionManager  *subscription.Manager
-	eventEmitter         EventEmitter
-	linterResourceGetter LinterResourceGetter
-	assertionRunner      AssertionRunner
+	updater             RunUpdater
+	inputChannel        chan LinterRequest
+	exitChannel         chan bool
+	subscriptionManager *subscription.Manager
+	eventEmitter        EventEmitter
+	analyzerGetter      AnalyzerGetter
+	assertionRunner     AssertionRunner
 }
 
 var _ WorkerPool = &defaultlinterRunner{}
@@ -54,15 +54,15 @@ func NewlinterRunner(
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
 	assertionRunner AssertionRunner,
-	linterResourceGetter LinterResourceGetter,
+	analyzerGetter AnalyzerGetter,
 ) LinterRunner {
 	return &defaultlinterRunner{
-		updater:              updater,
-		inputChannel:         make(chan LinterRequest, 1),
-		subscriptionManager:  subscriptionManager,
-		eventEmitter:         eventEmitter,
-		assertionRunner:      assertionRunner,
-		linterResourceGetter: linterResourceGetter,
+		updater:             updater,
+		inputChannel:        make(chan LinterRequest, 1),
+		subscriptionManager: subscriptionManager,
+		eventEmitter:        eventEmitter,
+		assertionRunner:     assertionRunner,
+		analyzerGetter:      analyzerGetter,
 	}
 }
 
@@ -99,8 +99,8 @@ func (e *defaultlinterRunner) startWorker() {
 
 func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 	ctx := request.Context()
-	lintResource := e.linterResourceGetter.GetDefault(ctx)
-	linter := linter.Newlinter(lintResource, linter.AvailablePlugins...)
+	lintResource := e.analyzerGetter.GetDefault(ctx)
+	linter := linter.NewLinter(lintResource, linter.AvailablePlugins...)
 
 	shouldSkip, reason := linter.ShouldSkip()
 	if shouldSkip {
@@ -153,7 +153,7 @@ func (e *defaultlinterRunner) onFinish(ctx context.Context, request LinterReques
 	e.assertionRunner.RunAssertions(ctx, assertionRequest)
 }
 
-func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, linterResource linterResource.Linter) (model.Run, error) {
+func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, analyzerResource analyzerResource.Linter) (model.Run, error) {
 	run := request.Run
 	log.Printf("[linterRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
@@ -167,7 +167,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 		return e.onError(ctx, request, run, err)
 	}
 
-	result.MinimumScore = linterResource.MinimumScore
+	result.MinimumScore = analyzerResource.MinimumScore
 	run = run.SuccessfulLinterExecution(result)
 	err = e.updater.Update(ctx, run)
 	if err != nil {
