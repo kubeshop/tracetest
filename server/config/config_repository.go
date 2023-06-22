@@ -1,4 +1,4 @@
-package configresource
+package config
 
 import (
 	"context"

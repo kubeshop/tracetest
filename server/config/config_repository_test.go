@@ -1,4 +1,4 @@
-package configresource_test
+package config_test
 
 import (
 	"database/sql"
