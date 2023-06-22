@@ -9,7 +9,8 @@ import (
 
 type triggerJSONV3 struct {
 	Type    TriggerType     `json:"type"`
-	HTTP    *HTTPRequest    `json:"http,omitempty"`
+	OldHTTP *HTTPRequest    `json:"http,omitempty"`
+	HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
 	GRPC    *GRPCRequest    `json:"grpc,omitempty"`
 	TraceID *TraceIDRequest `json:"traceid,omitempty"`
 }
@@ -17,7 +18,7 @@ type triggerJSONV3 struct {
 func (v3 triggerJSONV3) valid() bool {
 	// has a valid type and at least one not nil trigger type settings
 	return v3.Type != "" &&
-		(v3.HTTP != nil ||
+		(v3.HTTP != nil || v3.OldHTTP != nil ||
 			v3.GRPC != nil ||
 			v3.TraceID != nil)
 }
@@ -99,7 +100,14 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if v3.valid() {
-		return deepcopy.DeepCopy(v3, t)
+		err := deepcopy.DeepCopy(v3, t)
+		if err != nil {
+			return err
+		}
+
+		if v3.OldHTTP != nil {
+			t.HTTP = v3.OldHTTP
+		}
 	}
 
 	return nil

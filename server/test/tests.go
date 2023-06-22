@@ -20,20 +20,23 @@ const (
 type (
 	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
-		ID          id.ID                        `json:"id,omitempty"`
-		CreatedAt   *time.Time                   `json:"createdAt,omitempty"`
-		Name        string                       `json:"name,omitempty"`
-		Description string                       `json:"description,omitempty"`
-		Version     *int                         `json:"version,omitempty"`
-		Trigger     trigger.Trigger              `json:"trigger,omitempty"`
-		Specs       Specs                        `json:"specs,omitempty"`
-		Outputs     maps.Ordered[string, Output] `json:"outputs,omitempty"`
-		Summary     *Summary                     `json:"summary,omitempty"`
+		ID          id.ID           `json:"id,omitempty"`
+		CreatedAt   *time.Time      `json:"createdAt,omitempty"`
+		Name        string          `json:"name,omitempty"`
+		Description string          `json:"description,omitempty"`
+		Version     *int            `json:"version,omitempty"`
+		Trigger     trigger.Trigger `json:"trigger,omitempty"`
+		Specs       Specs           `json:"specs,omitempty"`
+		Outputs     Outputs         `json:"outputs,omitempty"`
+		Summary     *Summary        `json:"summary,omitempty"`
 	}
 
 	Specs []TestSpec
 
+	Outputs []Output
+
 	Output struct {
+		Name     string    `json:"name"`
 		Selector SpanQuery `json:"selector"`
 		Value    string    `json:"value" expr_enabled:"true"`
 	}

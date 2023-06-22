@@ -19,9 +19,10 @@ type Repository interface {
 	Provision(context.Context, Test) error
 	SetID(test Test, id id.ID) Test
 
+	Create(context.Context, Test) (Test, error)
+
 	// TODO: uncomment as we add new functionality
 	// Get(context.Context, id.ID) (Test, error)
-	// Create(context.Context, Test) (Test, error)
 	// Update(context.Context, Test) (Test, error)
 	// Delete(context.Context, Test) error
 	// Exists(context.Context, id.ID) (bool, error)
@@ -88,9 +89,7 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	}
 
 	for i, test := range tests {
-		test.CreatedAt = nil
-		test.Summary = nil
-		test.Version = nil
+		r.removeNonAugmentedFields(&test)
 		tests[i] = test
 	}
 
@@ -240,4 +239,82 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	}
 
 	return test, nil
+}
+
+const insertQuery = `
+INSERT INTO tests (
+	"id",
+	"version",
+	"name",
+	"description",
+	"service_under_test",
+	"specs",
+	"outputs",
+	"created_at"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
+func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
+	if !test.HasID() {
+		test.ID = IDGen.ID()
+	}
+
+	version := 1
+	now := time.Now()
+	test.Version = &version
+	test.CreatedAt = &now
+
+	insertedTest, err := r.insertTest(ctx, test)
+	if err != nil {
+		return Test{}, err
+	}
+
+	r.removeNonAugmentedFields(&insertedTest)
+
+	return insertedTest, nil
+}
+
+func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
+	stmt, err := r.db.Prepare(insertQuery)
+	if err != nil {
+		return Test{}, fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	triggerJson, err := json.Marshal(test.Trigger)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	specsJson, err := json.Marshal(test.Specs)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	outputsJson, err := json.Marshal(test.Outputs)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	_, err = stmt.ExecContext(
+		ctx,
+		test.ID,
+		test.Version,
+		test.Name,
+		test.Description,
+		triggerJson,
+		specsJson,
+		outputsJson,
+		test.CreatedAt,
+	)
+	if err != nil {
+		return Test{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	return test, nil
+}
+
+func (r *repository) removeNonAugmentedFields(test *Test) {
+	test.CreatedAt = nil
+	test.Summary = nil
+	test.Version = nil
 }
