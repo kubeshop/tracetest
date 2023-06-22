@@ -1,27 +1,27 @@
-package linter_resource_test
+package analyzer_test
 
 import (
 	"database/sql"
 	"testing"
 
 	"github.com/gorilla/mux"
-	linter_resource "github.com/kubeshop/tracetest/server/linter/resource"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 )
 
 func TestlinterResource(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: linter_resource.ResourceName,
-		ResourceTypePlural:   linter_resource.ResourceNamePlural,
+		ResourceTypeSingular: analyzer.ResourceName,
+		ResourceTypePlural:   analyzer.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
-			repo := linter_resource.NewRepository(db)
+			repo := analyzer.NewRepository(db)
 
-			manager := resourcemanager.New[linter_resource.Linter](
-				linter_resource.ResourceName,
-				linter_resource.ResourceNamePlural,
+			manager := resourcemanager.New[analyzer.Linter](
+				analyzer.ResourceName,
+				analyzer.ResourceNamePlural,
 				repo,
-				resourcemanager.WithOperations(linter_resource.Operations...),
+				resourcemanager.WithOperations(analyzer.Operations...),
 			)
 			manager.RegisterRoutes(router)
 

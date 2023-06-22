@@ -1,4 +1,4 @@
-package linter_resource
+package analyzer
 
 import (
 	"context"
