@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestEnvironment(t *testing.T) {
+func TestEnvironmentRepository(t *testing.T) {
 	sampleEnvironment := environment.Environment{
 		ID:          "dev",
 		Name:        "dev",
