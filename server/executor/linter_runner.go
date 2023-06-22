@@ -8,7 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/linter"
-	analyzerResource "github.com/kubeshop/tracetest/server/linter/analyzer"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -33,7 +33,7 @@ type LinterRunner interface {
 }
 
 type AnalyzerGetter interface {
-	GetDefault(ctx context.Context) analyzerResource.Linter
+	GetDefault(ctx context.Context) analyzer.Linter
 }
 
 type defaultlinterRunner struct {
@@ -153,7 +153,7 @@ func (e *defaultlinterRunner) onFinish(ctx context.Context, request LinterReques
 	e.assertionRunner.RunAssertions(ctx, assertionRequest)
 }
 
-func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, analyzerResource analyzerResource.Linter) (model.Run, error) {
+func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, analyzer analyzer.Linter) (model.Run, error) {
 	run := request.Run
 	log.Printf("[linterRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
@@ -167,7 +167,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 		return e.onError(ctx, request, run, err)
 	}
 
-	result.MinimumScore = analyzerResource.MinimumScore
+	result.MinimumScore = analyzer.MinimumScore
 	run = run.SuccessfulLinterExecution(result)
 	err = e.updater.Update(ctx, run)
 	if err != nil {
