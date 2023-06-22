@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 
 	"github.com/fluidtruck/deepcopy"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type triggerJSONV3 struct {
-	Type    TriggerType     `json:"trigger"`
+	Type    TriggerType     `json:"type"`
 	HTTP    *HTTPRequest    `json:"http,omitempty"`
 	GRPC    *GRPCRequest    `json:"grpc,omitempty"`
 	TraceID *TraceIDRequest `json:"traceid,omitempty"`
@@ -65,6 +66,14 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 	var err error
 	// start with older versions and move up to the latest
 	v1 := triggerJSONV1{}
+
+	// DO NOT USE encoding/json here. the match is case insensitive, and can lead to unexpected results.
+	// see https://stackoverflow.com/a/49006601
+	var json = jsoniter.Config{
+		EscapeHTML:    true,
+		CaseSensitive: true,
+	}.Froze()
+
 	err = json.Unmarshal(data, &v1)
 	if err != nil {
 		return err
@@ -83,7 +92,7 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 		return deepcopy.DeepCopy(v2, t)
 	}
 
-	// v2
+	// v3
 	v3 := triggerJSONV3{}
 	err = json.Unmarshal(data, &v3)
 	if err != nil {
