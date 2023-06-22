@@ -5,7 +5,7 @@ import (
 
 	dc "github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 type Transaction struct {
@@ -16,8 +16,8 @@ type Transaction struct {
 	Steps       []string          `mapstructure:"steps"`
 }
 
-func (t Transaction) Model() tests.Transaction {
-	mt := tests.Transaction{}
+func (t Transaction) Model() transaction.Transaction {
+	mt := transaction.Transaction{}
 	dc.DeepCopy(t, &mt)
 	mt.StepIDs = make([]id.ID, 0, len(t.Steps))
 	for _, stepID := range t.Steps {

@@ -1,4 +1,4 @@
-package tests
+package transaction
 
 import (
 	"context"
@@ -11,6 +11,18 @@ import (
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
+
+func NewRunRepository(db *sql.DB, stepsRepository stepsRepository) *RunRepository {
+	return &RunRepository{
+		db:              db,
+		stepsRepository: stepsRepository,
+	}
+}
+
+type RunRepository struct {
+	db              *sql.DB
+	stepsRepository stepsRepository
+}
 
 const createTransactionRunQuery = `
 INSERT INTO transaction_runs (
@@ -78,7 +90,7 @@ func replaceTransactionRunSequenceName(sql string, transactionID id.ID) string {
 	return strings.ReplaceAll(sql, runSequenceName, seqName)
 }
 
-func (td *TransactionsRepository) CreateRun(ctx context.Context, tr TransactionRun) (TransactionRun, error) {
+func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (TransactionRun, error) {
 	jsonMetadata, err := json.Marshal(tr.Metadata)
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run metadata: %w", err)
@@ -150,7 +162,7 @@ UPDATE transaction_runs SET
 WHERE id = $9 AND transaction_id = $10
 `
 
-func (td *TransactionsRepository) UpdateRun(ctx context.Context, tr TransactionRun) error {
+func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error {
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
@@ -201,7 +213,7 @@ func (td *TransactionsRepository) UpdateRun(ctx context.Context, tr TransactionR
 	return td.setTransactionRunSteps(ctx, tx, tr)
 }
 
-func (td *TransactionsRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
+func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
 	// delete existing steps
 	stmt, err := tx.Prepare("DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2")
 	if err != nil {
@@ -237,7 +249,7 @@ func (td *TransactionsRepository) setTransactionRunSteps(ctx context.Context, tx
 	return tx.Commit()
 }
 
-func (td *TransactionsRepository) DeleteTransactionRun(ctx context.Context, tr TransactionRun) error {
+func (td *RunRepository) DeleteTransactionRun(ctx context.Context, tr TransactionRun) error {
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
@@ -286,7 +298,7 @@ SELECT
 FROM transaction_runs
 `
 
-func (td *TransactionsRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
+func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE id = $1 AND transaction_id = $2")
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
@@ -303,7 +315,7 @@ func (td *TransactionsRepository) GetTransactionRun(ctx context.Context, transac
 	return run, nil
 }
 
-func (td *TransactionsRepository) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (TransactionRun, error) {
+func (td *RunRepository) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 AND transaction_version = $2 ORDER BY created_at DESC LIMIT 1")
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
@@ -320,7 +332,7 @@ func (td *TransactionsRepository) GetLatestRunByTransactionVersion(ctx context.C
 	return run, nil
 }
 
-func (td *TransactionsRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]TransactionRun, error) {
+func (td *RunRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]TransactionRun, error) {
 	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return []TransactionRun{}, fmt.Errorf("prepare: %w", err)
@@ -343,7 +355,7 @@ func (td *TransactionsRepository) GetTransactionsRuns(ctx context.Context, trans
 	return runs, nil
 }
 
-func (td *TransactionsRepository) readRunRow(row scanner) (TransactionRun, error) {
+func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 	r := TransactionRun{}
 
 	var (
