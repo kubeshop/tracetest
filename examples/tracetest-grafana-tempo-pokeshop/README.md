@@ -1,6 +1,6 @@
 # Tracetest + Grafana Tempo + Pokeshop
 
-> [Read the detailed recipe for setting up Tracetest + Grafana Tempo + Pokeshop in our documentation.]()
+<!-- > [Read the detailed recipe for setting up Tracetest + Grafana Tempo + Pokeshop in our documentation.]() -->
 
 This examples' objective is to show how you can:
 
