@@ -15,7 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/config/demoresource"
+	"github.com/kubeshop/tracetest/server/config/demo"
 	datastore "github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -263,7 +263,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, db, provisioner, tracer)
 	registerEnvironmentResource(environmentRepo, apiRouter, db, provisioner, tracer)
 
-	demoRepo := demoresource.NewRepository(db)
+	demoRepo := demo.NewRepository(db)
 	registerDemosResource(demoRepo, apiRouter, db, provisioner, tracer)
 
 	registerDataStoreResource(dataStoreRepo, apiRouter, db, provisioner, tracer)
@@ -415,12 +415,12 @@ func registerEnvironmentResource(repository *environment.Repository, router *mux
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerDemosResource(repository *demoresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[demoresource.Demo](
-		demoresource.ResourceName,
-		demoresource.ResourceNamePlural,
+func registerDemosResource(repository *demo.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[demo.Demo](
+		demo.ResourceName,
+		demo.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(demoresource.Operations...),
+		resourcemanager.WithOperations(demo.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

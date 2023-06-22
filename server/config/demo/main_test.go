@@ -1,4 +1,4 @@
-package demoresource_test
+package demo_test
 
 import (
 	"os"

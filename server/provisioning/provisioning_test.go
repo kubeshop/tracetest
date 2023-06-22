@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/config"
-	"github.com/kubeshop/tracetest/server/config/demoresource"
+	"github.com/kubeshop/tracetest/server/config/demo"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/provisioning"
@@ -94,14 +94,14 @@ type expectations struct {
 	dataStore      *datastore.DataStore
 	config         *config.Config
 	pollingprofile *pollingprofile.PollingProfile
-	demos          []demoresource.Demo
+	demos          []demo.Demo
 }
 
 type provisioningFixture struct {
 	provisioner     *provisioning.Provisioner
 	configs         *config.Repository
 	pollingProfiles *pollingprofile.Repository
-	demos           *demoresource.Repository
+	demos           *demo.Repository
 	dataStores      *datastore.Repository
 }
 
@@ -164,7 +164,7 @@ func setup(db *sql.DB) provisioningFixture {
 	f := provisioningFixture{
 		configs:         config.NewRepository(db),
 		pollingProfiles: pollingprofile.NewRepository(db),
-		demos:           demoresource.NewRepository(db),
+		demos:           demo.NewRepository(db),
 		dataStores:      datastore.NewRepository(db),
 	}
 
@@ -182,11 +182,11 @@ func setup(db *sql.DB) provisioningFixture {
 		resourcemanager.WithOperations(pollingprofile.Operations...),
 	)
 
-	demoManager := resourcemanager.New[demoresource.Demo](
-		demoresource.ResourceName,
-		demoresource.ResourceNamePlural,
+	demoManager := resourcemanager.New[demo.Demo](
+		demo.ResourceName,
+		demo.ResourceNamePlural,
 		f.demos,
-		resourcemanager.WithOperations(demoresource.Operations...),
+		resourcemanager.WithOperations(demo.Operations...),
 	)
 
 	dataStoreManager := resourcemanager.New[datastore.DataStore](
@@ -238,21 +238,21 @@ var cases = []struct {
 					RetryDelay: "30m",
 				},
 			},
-			demos: []demoresource.Demo{
+			demos: []demo.Demo{
 				{
 					Name:    "pokeshop",
-					Type:    demoresource.DemoTypePokeshop,
+					Type:    demo.DemoTypePokeshop,
 					Enabled: true,
-					Pokeshop: &demoresource.PokeshopDemo{
+					Pokeshop: &demo.PokeshopDemo{
 						HTTPEndpoint: "http://localhost/api",
 						GRPCEndpoint: "localhost:8080",
 					},
 				},
 				{
 					Name:    "otel",
-					Type:    demoresource.DemoTypeOpentelemetryStore,
+					Type:    demo.DemoTypeOpentelemetryStore,
 					Enabled: true,
-					OpenTelemetryStore: &demoresource.OpenTelemetryStoreDemo{
+					OpenTelemetryStore: &demo.OpenTelemetryStoreDemo{
 						FrontendEndpoint: "http://frontend:8080/",
 					},
 				},
