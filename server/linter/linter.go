@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	analyzer "github.com/kubeshop/tracetest/server/linter/analyzer"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	linter_plugin_common "github.com/kubeshop/tracetest/server/linter/plugins/common"
 	linter_plugin_security "github.com/kubeshop/tracetest/server/linter/plugins/security"
 	linter_plugin_standards "github.com/kubeshop/tracetest/server/linter/plugins/standards"
