@@ -1,4 +1,4 @@
-package datastoreresource_test
+package datastore_test
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	datastore "github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
-	datastore "github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/stretchr/testify/require"
 )
 

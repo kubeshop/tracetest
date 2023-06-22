@@ -11,7 +11,6 @@ require (
 	github.com/kubeshop/tracetest/server v0.0.0-20230512142545-cb5e526e06f9
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pterm/pterm v0.12.55
-	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.15.0
@@ -25,7 +24,6 @@ require (
 	atomicgo.dev/cursor v0.1.1 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

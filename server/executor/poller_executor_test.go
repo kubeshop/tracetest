@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
@@ -14,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -547,8 +547,8 @@ func getRunRepositoryMock(t *testing.T) model.Repository {
 // DataStoreRepository
 type dataStoreRepositoryMock struct{}
 
-func (m *dataStoreRepositoryMock) Current(ctx context.Context) (datastoreresource.DataStore, error) {
-	return datastoreresource.DataStore{Type: datastoreresource.DataStoreTypeOTLP}, nil
+func (m *dataStoreRepositoryMock) Current(ctx context.Context) (datastore.DataStore, error) {
+	return datastore.DataStore{Type: datastore.DataStoreTypeOTLP}, nil
 }
 
 func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {
@@ -610,10 +610,10 @@ type traceDBState struct {
 	currentIteration int
 }
 
-func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(datastoreresource.DataStore) (tracedb.TraceDB, error) {
+func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(datastore.DataStore) (tracedb.TraceDB, error) {
 	t.Helper()
 
-	return func(ds datastoreresource.DataStore) (tracedb.TraceDB, error) {
+	return func(ds datastore.DataStore) (tracedb.TraceDB, error) {
 		return &traceDBMock{
 			tracePerIteration: tracePerIteration,
 			state:             state,

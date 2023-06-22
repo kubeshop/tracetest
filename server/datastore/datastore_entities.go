@@ -1,4 +1,4 @@
-package datastoreresource
+package datastore
 
 import (
 	"encoding/json"

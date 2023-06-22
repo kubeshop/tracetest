@@ -14,9 +14,9 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -26,7 +26,7 @@ func elasticSearchDefaultPorts() []string {
 
 type elasticsearchDB struct {
 	realTraceDB
-	config *datastoreresource.ElasticSearchConfig
+	config *datastore.ElasticSearchConfig
 	client *elasticsearch.Client
 }
 
@@ -103,7 +103,7 @@ func (db *elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mo
 	return convertElasticSearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newElasticSearchDB(cfg *datastoreresource.ElasticSearchConfig) (TraceDB, error) {
+func newElasticSearchDB(cfg *datastore.ElasticSearchConfig) (TraceDB, error) {
 	var caCert []byte
 	if cfg.Certificate != "" {
 		caCert = []byte(cfg.Certificate)

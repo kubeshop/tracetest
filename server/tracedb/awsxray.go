@@ -17,9 +17,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/xray"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	conventions "go.opentelemetry.io/collector/semconv/v1.6.1"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -34,7 +34,7 @@ type awsxrayDB struct {
 	useDefaultAuth bool
 }
 
-func NewAwsXRayDB(cfg *datastoreresource.AWSXRayConfig) (TraceDB, error) {
+func NewAwsXRayDB(cfg *datastore.AWSXRayConfig) (TraceDB, error) {
 	sessionCredentials := credentials.NewStaticCredentials(cfg.AccessKeyID, cfg.SecretAccessKey, cfg.SessionToken)
 
 	return &awsxrayDB{

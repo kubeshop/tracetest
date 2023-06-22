@@ -16,6 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/demoresource"
+	datastore "github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -33,7 +34,6 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"go.opentelemetry.io/otel/trace"
@@ -194,7 +194,7 @@ func (app *App) Start(opts ...appOption) error {
 	triggerRegistry := getTriggerRegistry(tracer, applicationTracer)
 
 	pollingProfileRepo := pollingprofile.NewRepository(db)
-	dataStoreRepo := datastoreresource.NewRepository(db)
+	dataStoreRepo := datastore.NewRepository(db)
 	environmentRepo := environment.NewRepository(db)
 	linterRepo := linterResource.NewRepository(db)
 
@@ -339,7 +339,7 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastoreresource.Repository) {
+func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) {
 	ingester := otlp.NewIngester(testDB, eventEmitter, dsRepo)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
@@ -427,12 +427,12 @@ func registerDemosResource(repository *demoresource.Repository, router *mux.Rout
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerDataStoreResource(repository *datastoreresource.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[datastoreresource.DataStore](
-		datastoreresource.ResourceName,
-		datastoreresource.ResourceNamePlural,
+func registerDataStoreResource(repository *datastore.Repository, router *mux.Router, db *sql.DB, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[datastore.DataStore](
+		datastore.ResourceName,
+		datastore.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(datastoreresource.Operations...),
+		resourcemanager.WithOperations(datastore.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

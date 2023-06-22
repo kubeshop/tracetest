@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -24,7 +25,6 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -33,7 +33,7 @@ var IDGen = id.NewRandGenerator()
 type controller struct {
 	tracer          trace.Tracer
 	runner          runner
-	newTraceDBFn    func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
+	newTraceDBFn    func(ds datastore.DataStore) (tracedb.TraceDB, error)
 	mappers         mappings.Mappings
 	triggerRegistry *trigger.Registry
 	version         string
@@ -73,7 +73,7 @@ type environmentGetter interface {
 func NewController(
 	testDB model.Repository,
 	transactions transactionsRepository,
-	newTraceDBFn func(ds datastoreresource.DataStore) (tracedb.TraceDB, error),
+	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
 	envGetter environmentGetter,
