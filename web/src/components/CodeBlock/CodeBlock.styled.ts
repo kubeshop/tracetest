@@ -42,8 +42,16 @@ export const CopyButton = styled(Button)`
     background: ${({theme}) => theme.color.white};
     font-weight: 600;
 
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       background: ${({theme}) => theme.color.white};
     }
   }
+`;
+
+export const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
 `;

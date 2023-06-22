@@ -45,7 +45,7 @@ const Controls = ({onChange, test, environmentId}: IProps) => {
         format: CliCommandFormat.Pretty,
       }}
       layout="horizontal"
-      name="DEEP_LINK"
+      name="CLI_COMMAND"
     >
       <S.ControlsContainer>
         <S.OptionsContainer>

@@ -45,13 +45,7 @@ export const ControlsContainer = styled.div`
 
 export const OptionsContainer = styled.div``;
 
-export const EntryContainer = styled.div`
-  // align-items: center;
-  // display: grid;
-  // justify-content: center;
-  // grid-template-columns: 1fr auto;
-  // margin-bottom: 8px;
-`;
+export const EntryContainer = styled.div``;
 
 export const ValuesContainer = styled.div`
   align-items: center;
@@ -77,4 +71,18 @@ export const DeleteVariableButton = styled(Button)``;
 
 export const VariablesContainer = styled.div`
   margin: 16px 0;
+`;
+
+export const TryItButton = styled(Button)`
+  && {
+    padding: 0 8px;
+    background: ${({theme}) => theme.color.white};
+    font-weight: 600;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: ${({theme}) => theme.color.white};
+    }
+  }
 `;

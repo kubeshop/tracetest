@@ -22,7 +22,7 @@ const Controls = ({onChange, environment: {values} = Environment({}), test, envi
   const defaultValues = useMemo(
     () => ({
       variables: values,
-      useEnvironmentId: false,
+      useEnvironmentId: true,
     }),
     [values]
   );
@@ -30,7 +30,7 @@ const Controls = ({onChange, environment: {values} = Environment({}), test, envi
   useEffect(() => {
     onChange({
       variables: variables ?? [],
-      useEnvironmentId: useEnvironmentId ?? false,
+      useEnvironmentId: useEnvironmentId ?? true,
       environmentId,
       test,
     });
