@@ -1,14 +1,15 @@
 import {Switch} from 'antd';
+import {noop} from 'lodash';
 import * as S from './CliCommand.styled';
 
 interface IProps {
   text: string;
-  value: boolean;
+  value?: boolean;
   id: string;
-  onChange(value: boolean): void;
+  onChange?(value: boolean): void;
 }
 
-const SwitchControl = ({value, onChange, text, id}: IProps) => {
+const SwitchControl = ({value = false, onChange = noop, text, id}: IProps) => {
   return (
     <S.SwitchContainer>
       <Switch onChange={onChange} checked={value} id={id} />

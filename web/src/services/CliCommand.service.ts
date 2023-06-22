@@ -1,5 +1,5 @@
-import Test from '../models/Test.model';
-import Env from '../utils/Env';
+import Test from 'models/Test.model';
+import {getServerBaseUrl} from 'utils/Common';
 
 export enum CliCommandOption {
   Wait = 'wait',
@@ -20,6 +20,8 @@ export type TCliCommandEnabledOptions = Record<CliCommandOption, boolean>;
 export type TCliCommandConfig = {
   options: TCliCommandEnabledOptions;
   format: CliCommandFormat;
+  environmentId?: string;
+  test: Test;
 };
 
 type TApplyProps = {
@@ -34,9 +36,8 @@ const CliCommandService = () => ({
   applyOptions: {
     [CliCommandOption.Wait]: ({command, enabled}) => (enabled ? `${command} --wait-for-result` : command),
     [CliCommandOption.UseHostname]: ({command, enabled}) => {
-      const {host, protocol} = window.location;
-      const prefix = Env.get('serverPathPrefix');
-      return enabled ? `${command} -s ${protocol}//${host}${prefix || ''}` : command;
+      const baseUrl = getServerBaseUrl();
+      return enabled ? `${command} -s ${baseUrl}` : command;
     },
     [CliCommandOption.UseCurrentEnvironment]: ({command, enabled, environmentId}) =>
       enabled && environmentId ? `${command} -e ${environmentId}` : command,
@@ -49,7 +50,7 @@ const CliCommandService = () => ({
           : 'tracetest'
       } ${command}`,
   } as Record<CliCommandOption, TApplyOption>,
-  getCommand({options, format}: TCliCommandConfig, test: Test, environmentId?: string) {
+  getCommand({options, format, test, environmentId}: TCliCommandConfig) {
     const command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
         this.applyOptions[option as CliCommandOption]({command: acc, enabled, test, environmentId}),

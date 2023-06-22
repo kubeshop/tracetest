@@ -1,14 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
 import {toUpper} from 'lodash';
-import {Radio, Typography} from 'antd';
-import {
-  CliCommandFormat,
-  CliCommandOption,
-  TCliCommandConfig,
-  TCliCommandEnabledOptions,
-} from 'services/CliCommand.service';
+import {useEffect} from 'react';
+import {Form, Radio, Typography} from 'antd';
+import {CliCommandFormat, CliCommandOption, TCliCommandConfig} from 'services/CliCommand.service';
 import * as S from './CliCommand.styled';
 import SwitchControl from './SwitchControl';
+import {defaultOptions} from './hooks/useCliCommand';
+import Test from '../../../../models/Test.model';
 
 const optionToText: Record<CliCommandOption, string> = {
   [CliCommandOption.Wait]: 'Wait for test to complete',
@@ -19,55 +16,59 @@ const optionToText: Record<CliCommandOption, string> = {
   [CliCommandOption.useDocker]: 'Run CLI via Docker image',
 };
 
-const defaultOptions: TCliCommandEnabledOptions = {
-  [CliCommandOption.Wait]: false,
-  [CliCommandOption.UseHostname]: false,
-  [CliCommandOption.UseCurrentEnvironment]: true,
-  // [CliCommandOption.UseId]: true,
-  [CliCommandOption.GeneratesJUnit]: false,
-  [CliCommandOption.useDocker]: false,
-};
-
 interface IProps {
   onChange(cmdConfig: TCliCommandConfig): void;
+  test: Test;
+  environmentId?: string;
 }
 
-const Controls = ({onChange}: IProps) => {
-  const [enabledOptions, setEnabledOptions] = useState<Record<CliCommandOption, boolean>>(defaultOptions);
-  const [format, setFormat] = useState<CliCommandFormat>(CliCommandFormat.Pretty);
-
-  const onSwitchChange = useCallback((name: CliCommandOption, isEnabled: boolean) => {
-    setEnabledOptions(prev => ({...prev, [name]: isEnabled}));
-  }, []);
+const Controls = ({onChange, test, environmentId}: IProps) => {
+  const [form] = Form.useForm<TCliCommandConfig>();
+  const options = Form.useWatch('options', form);
+  const format = Form.useWatch('format', form);
 
   useEffect(() => {
-    onChange({options: enabledOptions, format});
-  }, [format, enabledOptions, onChange]);
+    onChange({
+      options: options ?? defaultOptions,
+      format: format ?? CliCommandFormat.Pretty,
+      test,
+      environmentId,
+    });
+  }, [environmentId, format, onChange, options, test]);
 
   return (
-    <S.ControlsContainer>
-      <S.OptionsContainer>
-        {Object.entries(optionToText).map(([name, text]) => (
-          <SwitchControl
-            id={name}
-            text={text}
-            key={name}
-            onChange={isEnabled => onSwitchChange(name as CliCommandOption, isEnabled)}
-            value={enabledOptions[name as CliCommandOption]}
-          />
-        ))}
-      </S.OptionsContainer>
-      <S.FormatContainer>
-        <Typography.Paragraph>Output Format:</Typography.Paragraph>
-        <Radio.Group defaultValue={format} value={format}>
-          {Object.values(CliCommandFormat).map(cmdFormat => (
-            <Radio key={cmdFormat} value={cmdFormat} onChange={() => setFormat(cmdFormat)}>
-              {toUpper(cmdFormat)}
-            </Radio>
+    <Form<TCliCommandConfig>
+      form={form}
+      autoComplete="off"
+      initialValues={{
+        options: defaultOptions,
+        format: CliCommandFormat.Pretty,
+      }}
+      layout="horizontal"
+      name="DEEP_LINK"
+    >
+      <S.ControlsContainer>
+        <S.OptionsContainer>
+          {Object.entries(optionToText).map(([name, text]) => (
+            <Form.Item name={['options', name]} noStyle>
+              <SwitchControl id={name} text={text} key={name} />
+            </Form.Item>
           ))}
-        </Radio.Group>
-      </S.FormatContainer>
-    </S.ControlsContainer>
+        </S.OptionsContainer>
+        <S.FormatContainer>
+          <Typography.Paragraph>Output Format:</Typography.Paragraph>
+          <Form.Item name="format" noStyle>
+            <Radio.Group>
+              {Object.values(CliCommandFormat).map(cmdFormat => (
+                <Radio key={cmdFormat} value={cmdFormat}>
+                  {toUpper(cmdFormat)}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>
+        </S.FormatContainer>
+      </S.ControlsContainer>
+    </Form>
   );
 };
 

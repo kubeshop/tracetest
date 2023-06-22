@@ -3,17 +3,7 @@ import {Modal, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const CodeContainer = styled.div`
-  position: relative;
-  border: ${({theme}) => `1px solid ${theme.color.border}`};
-  max-height: 215px;
-  width: 470px;
-  overflow-y: scroll;
   margin-bottom: 18px;
-
-  pre {
-    margin: 0;
-    min-height: inherit;
-  }
 `;
 
 export const FileViewerModal = styled(Modal)`

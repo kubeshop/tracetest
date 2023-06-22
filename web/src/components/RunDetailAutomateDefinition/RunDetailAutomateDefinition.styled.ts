@@ -13,10 +13,6 @@ export const Title = styled(Typography.Title)`
   }
 `;
 
-export const SubtitleContainer = styled.div`
-  margin-bottom: 8px;
-`;
-
 export const Footer = styled.div`
   display: flex;
   justify-content: flex-end;

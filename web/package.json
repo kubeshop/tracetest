@@ -97,7 +97,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "/node_modules/(?!antd|@ant-design|d3-array|d3|internmap|delaunator|robust-predicates|rc-.+?|@babel/runtime).+(js|jsx)$"
+      "/node_modules/(?!antd|@ant-design|d3-array|d3|internmap|delaunator|@codemirror|robust-predicates|rc-.+?|@babel/runtime).+(js|jsx)$"
     ],
     "collectCoverageFrom": [
       "src/**/*.(ts|tsx)",
