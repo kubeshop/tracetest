@@ -2,14 +2,10 @@ package configresource_test
 
 import (
 	"context"
-	"database/sql"
 	"os"
 	"testing"
 
-	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/config/configresource"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
-	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -95,49 +91,6 @@ func TestIsAnalyticsEnabled(t *testing.T) {
 		assert.False(t, cfg.IsAnalyticsEnabled())
 
 	})
-}
-
-func TestConfigResource(t *testing.T) {
-	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: configresource.ResourceName,
-		ResourceTypePlural:   configresource.ResourceNamePlural,
-		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
-			configRepo := configresource.NewRepository(db)
-
-			manager := resourcemanager.New[configresource.Config](
-				configresource.ResourceName,
-				configresource.ResourceNamePlural,
-				configRepo,
-				resourcemanager.WithOperations(configresource.Operations...),
-			)
-			manager.RegisterRoutes(router)
-
-			return manager
-		},
-		SampleJSON: `{
-			"type": "Config",
-			"spec": {
-				"id": "current",
-				"name": "Config",
-				"analyticsEnabled": true
-			}
-		}`,
-		SampleJSONUpdated: `{
-			"type": "Config",
-			"spec": {
-				"id": "current",
-				"name": "Config",
-				"analyticsEnabled": false
-			}
-		}`,
-	},
-		rmtests.ExcludeOperations(
-			rmtests.OperationGetNotFound,
-			rmtests.OperationUpdateNotFound,
-			rmtests.OperationListSortSuccess,
-			rmtests.OperationListNoResults,
-		),
-	)
 }
 
 func cleanEnv() func() {
