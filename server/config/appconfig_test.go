@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func configWithFlagsE(t *testing.T, inputFlags []string, opts ...config.Option) (*config.Config, error) {
+func configWithFlagsE(t *testing.T, inputFlags []string, opts ...config.Option) (*config.AppConfig, error) {
 	flags := pflag.NewFlagSet("fake", pflag.ExitOnError)
 	config.SetupFlags(flags)
 
@@ -20,18 +20,18 @@ func configWithFlagsE(t *testing.T, inputFlags []string, opts ...config.Option) 
 	return config.New(append(opts, config.WithFlagSet(flags))...)
 }
 
-func configWithFlags(t *testing.T, inputFlags []string, opts ...config.Option) *config.Config {
+func configWithFlags(t *testing.T, inputFlags []string, opts ...config.Option) *config.AppConfig {
 	cfg, err := configWithFlagsE(t, inputFlags, opts...)
 	require.NoError(t, err)
 
 	return cfg
 }
 
-func configFromFile(t *testing.T, path string, opts ...config.Option) *config.Config {
+func configFromFile(t *testing.T, path string, opts ...config.Option) *config.AppConfig {
 	return configWithFlags(t, []string{"--config", path}, opts...)
 }
 
-func configWithEnv(t *testing.T, env map[string]string) *config.Config {
+func configWithEnv(t *testing.T, env map[string]string) *config.AppConfig {
 	for k, v := range env {
 		os.Setenv(k, v)
 	}
