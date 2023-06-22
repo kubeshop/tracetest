@@ -27,7 +27,7 @@ func AssertDataStoreResourceRequired(obj DataStoreResource) error {
 }
 
 // AssertRecurseDataStoreResourceRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of datastore (e.g. [][]DataStoreResource), otherwise ErrTypeAssertionError is thrown.
+// Accepts only nested slice of DataStoreResource (e.g. [][]DataStoreResource), otherwise ErrTypeAssertionError is thrown.
 func AssertRecurseDataStoreResourceRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
 		aDataStoreResource, ok := obj.(DataStoreResource)
