@@ -1,4 +1,4 @@
-package datastoreresource_test
+package datastore_test
 
 import (
 	"context"
