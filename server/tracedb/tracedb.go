@@ -6,7 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -49,7 +49,7 @@ type traceDBFactory struct {
 	runRepository model.RunRepository
 }
 
-func Factory(runRepository model.RunRepository) func(ds datastoreresource.DataStore) (TraceDB, error) {
+func Factory(runRepository model.RunRepository) func(ds datastore.DataStore) (TraceDB, error) {
 	f := traceDBFactory{
 		runRepository: runRepository,
 	}
@@ -57,7 +57,7 @@ func Factory(runRepository model.RunRepository) func(ds datastoreresource.DataSt
 	return f.New
 }
 
-func (f *traceDBFactory) getTraceDBInstance(ds datastoreresource.DataStore) (TraceDB, error) {
+func (f *traceDBFactory) getTraceDBInstance(ds datastore.DataStore) (TraceDB, error) {
 	var tdb TraceDB
 	var err error
 
@@ -67,19 +67,19 @@ func (f *traceDBFactory) getTraceDBInstance(ds datastoreresource.DataStore) (Tra
 	}
 
 	switch ds.Type {
-	case datastoreresource.DataStoreTypeJaeger:
+	case datastore.DataStoreTypeJaeger:
 		tdb, err = newJaegerDB(ds.Values.Jaeger)
-	case datastoreresource.DataStoreTypeTempo:
+	case datastore.DataStoreTypeTempo:
 		tdb, err = newTempoDB(ds.Values.Tempo)
-	case datastoreresource.DataStoreTypeElasticAPM:
+	case datastore.DataStoreTypeElasticAPM:
 		tdb, err = newElasticSearchDB(ds.Values.ElasticApm)
-	case datastoreresource.DataStoreTypeOpenSearch:
+	case datastore.DataStoreTypeOpenSearch:
 		tdb, err = newOpenSearchDB(ds.Values.OpenSearch)
-	case datastoreresource.DataStoreTypeSignalFX:
+	case datastore.DataStoreTypeSignalFX:
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
-	case datastoreresource.DataStoreTypeAwsXRay:
+	case datastore.DataStoreTypeAwsXRay:
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
-	case datastoreresource.DatastoreTypeAzureAppInsights:
+	case datastore.DatastoreTypeAzureAppInsights:
 		tdb, err = NewAzureAppInsightsDB(ds.Values.AzureAppInsights)
 	default:
 		return &noopTraceDB{}, nil
@@ -96,7 +96,7 @@ func (f *traceDBFactory) getTraceDBInstance(ds datastoreresource.DataStore) (Tra
 	return tdb, err
 }
 
-func (f *traceDBFactory) New(ds datastoreresource.DataStore) (TraceDB, error) {
+func (f *traceDBFactory) New(ds datastore.DataStore) (TraceDB, error) {
 	tdb, err := f.getTraceDBInstance(ds)
 
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -52,7 +52,7 @@ func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.Asser
 
 func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
-	dsRepo *datastoreresource.Repository,
+	dsRepo *datastore.Repository,
 	lintRepo *linterResource.Repository,
 	testDB model.Repository,
 	transactions *tests.TransactionsRepository,

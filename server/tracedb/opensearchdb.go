@@ -12,7 +12,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/opensearch-project/opensearch-go"
 	"github.com/opensearch-project/opensearch-go/opensearchapi"
 	"go.opentelemetry.io/otel/trace"
@@ -24,7 +24,7 @@ func opensearchDefaultPorts() []string {
 
 type opensearchDB struct {
 	realTraceDB
-	config *datastoreresource.ElasticSearchConfig
+	config *datastore.ElasticSearchConfig
 	client *opensearch.Client
 }
 
@@ -99,7 +99,7 @@ func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newOpenSearchDB(cfg *datastoreresource.ElasticSearchConfig) (TraceDB, error) {
+func newOpenSearchDB(cfg *datastore.ElasticSearchConfig) (TraceDB, error) {
 	var caCert []byte
 	if cfg.Certificate != "" {
 		caCert = []byte(cfg.Certificate)

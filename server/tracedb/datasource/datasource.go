@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"google.golang.org/grpc"
 )
 
@@ -45,7 +45,7 @@ func (db *noopDataSource) TestConnection(ctx context.Context) model.ConnectionTe
 	return model.ConnectionTestStep{}
 }
 
-func New(name string, cfg *datastoreresource.MultiChannelClientConfig, callbacks Callbacks) DataSource {
+func New(name string, cfg *datastore.MultiChannelClientConfig, callbacks Callbacks) DataSource {
 	sourceType := SupportedDataSource(cfg.Type)
 
 	switch sourceType {

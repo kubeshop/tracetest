@@ -8,7 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -18,10 +18,10 @@ import (
 type ingester struct {
 	db           model.Repository
 	eventEmitter executor.EventEmitter
-	dsRepo       *datastoreresource.Repository
+	dsRepo       *datastore.Repository
 }
 
-func NewIngester(db model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastoreresource.Repository) ingester {
+func NewIngester(db model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
 	return ingester{
 		db:           db,
 		eventEmitter: eventEmitter,

@@ -11,7 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datasource"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/kubeshop/tracetest/server/traces"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
@@ -27,9 +27,9 @@ type jaegerTraceDB struct {
 	dataSource datasource.DataSource
 }
 
-func newJaegerDB(grpcConfig *datastoreresource.GRPCClientSettings) (TraceDB, error) {
-	baseConfig := &datastoreresource.MultiChannelClientConfig{
-		Type: datastoreresource.MultiChannelClientTypeGRPC,
+func newJaegerDB(grpcConfig *datastore.GRPCClientSettings) (TraceDB, error) {
+	baseConfig := &datastore.MultiChannelClientConfig{
+		Type: datastore.MultiChannelClientTypeGRPC,
 		Grpc: grpcConfig,
 	}
 

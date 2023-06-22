@@ -9,7 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
-	datastore "github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	datastore "github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/stretchr/testify/require"
 )
 

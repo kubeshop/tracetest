@@ -9,8 +9,8 @@
 
 package openapi
 
-// DataStoreResource - Represents a data store structured into the Resources format.
-type DataStoreResource struct {
+// datastore - Represents a data store structured into the Resources format.
+type datastore struct {
 
 	// Represents the type of this resource. It should always be set as 'DataStore'.
 	Type string `json:"type,omitempty"`
@@ -19,7 +19,7 @@ type DataStoreResource struct {
 }
 
 // AssertDataStoreResourceRequired checks if the required fields are not zero-ed
-func AssertDataStoreResourceRequired(obj DataStoreResource) error {
+func AssertDataStoreResourceRequired(obj datastore) error {
 	if err := AssertDataStoreRequired(obj.Spec); err != nil {
 		return err
 	}
@@ -27,10 +27,10 @@ func AssertDataStoreResourceRequired(obj DataStoreResource) error {
 }
 
 // AssertRecurseDataStoreResourceRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of DataStoreResource (e.g. [][]DataStoreResource), otherwise ErrTypeAssertionError is thrown.
+// Accepts only nested slice of datastore (e.g. [][]datastore), otherwise ErrTypeAssertionError is thrown.
 func AssertRecurseDataStoreResourceRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aDataStoreResource, ok := obj.(DataStoreResource)
+		aDataStoreResource, ok := obj.(datastore)
 		if !ok {
 			return ErrTypeAssertionError
 		}

@@ -14,7 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/tracedb/datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -71,7 +71,7 @@ func getTests(t *testing.T, endpoint string) []openapi.Test {
 	return tests
 }
 
-func getDatastores(t *testing.T, endpoint string) resourcemanager.ResourceList[datastoreresource.DataStore] {
+func getDatastores(t *testing.T, endpoint string) resourcemanager.ResourceList[datastore.DataStore] {
 	url := fmt.Sprintf("%s/api/datastores", endpoint)
 	resp, err := http.Get(url)
 	require.NoError(t, err)
@@ -80,7 +80,7 @@ func getDatastores(t *testing.T, endpoint string) resourcemanager.ResourceList[d
 	bodyJsonBytes, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
 
-	var dataStores resourcemanager.ResourceList[datastoreresource.DataStore]
+	var dataStores resourcemanager.ResourceList[datastore.DataStore]
 	err = yaml.Unmarshal(bodyJsonBytes, &dataStores)
 	require.NoError(t, err)
 

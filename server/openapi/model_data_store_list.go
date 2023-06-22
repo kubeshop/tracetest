@@ -12,7 +12,7 @@ package openapi
 type DataStoreList struct {
 	Count int32 `json:"count,omitempty"`
 
-	Items []DataStoreResource `json:"items,omitempty"`
+	Items []datastore `json:"items,omitempty"`
 }
 
 // AssertDataStoreListRequired checks if the required fields are not zero-ed
