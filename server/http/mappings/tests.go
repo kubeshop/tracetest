@@ -12,8 +12,8 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
-	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -31,7 +31,7 @@ func optionalTime(in time.Time) *time.Time {
 	return &in
 }
 
-func (m OpenAPI) TransactionRun(in tests.TransactionRun) openapi.TransactionRun {
+func (m OpenAPI) TransactionRun(in transaction.TransactionRun) openapi.TransactionRun {
 	steps := make([]openapi.TestRun, 0, len(in.Steps))
 
 	for _, step := range in.Steps {

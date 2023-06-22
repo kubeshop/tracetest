@@ -16,7 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -68,8 +68,8 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 func TestTransactionRunner(t *testing.T) {
 
 	t.Run("NoErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, false, func(t *testing.T, actual tests.TransactionRun) {
-			assert.Equal(t, tests.TransactionRunStateFinished, actual.State)
+		runTransactionRunnerTest(t, false, func(t *testing.T, actual transaction.TransactionRun) {
+			assert.Equal(t, transaction.TransactionRunStateFinished, actual.State)
 			assert.Len(t, actual.Steps, 2)
 			assert.Equal(t, actual.Steps[0].State, model.RunStateFinished)
 			assert.Equal(t, actual.Steps[1].State, model.RunStateFinished)
@@ -91,8 +91,8 @@ func TestTransactionRunner(t *testing.T) {
 	})
 
 	t.Run("WithErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, true, func(t *testing.T, actual tests.TransactionRun) {
-			assert.Equal(t, tests.TransactionRunStateFailed, actual.State)
+		runTransactionRunnerTest(t, true, func(t *testing.T, actual transaction.TransactionRun) {
+			assert.Equal(t, transaction.TransactionRunStateFailed, actual.State)
 			require.Len(t, actual.Steps, 1)
 			assert.Equal(t, model.RunStateTriggerFailed, actual.Steps[0].State)
 		})
@@ -107,7 +107,7 @@ func getDB() (model.Repository, *sql.DB) {
 	return db, rawDB
 }
 
-func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual tests.TransactionRun)) {
+func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual transaction.TransactionRun)) {
 	ctx := context.Background()
 	db, rawDB := getDB()
 
@@ -127,14 +127,15 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	require.NoError(t, err)
 
 	testsRepo, _ := testdb.Postgres(testdb.WithDB(rawDB))
-	transactionsRepo := tests.NewTransactionsRepository(rawDB, testsRepo)
-	transaction, err := transactionsRepo.Create(ctx, tests.Transaction{
+	transactionsRepo := transaction.NewRepository(rawDB, testsRepo)
+	transactionRunRepo := transaction.NewRunRepository(rawDB, testsRepo)
+	tran, err := transactionsRepo.Create(ctx, transaction.Transaction{
 		Name:    "transaction",
 		StepIDs: []id.ID{test1.ID, test2.ID},
 	})
 	require.NoError(t, err)
 
-	transaction, err = transactionsRepo.GetAugmented(context.TODO(), transaction.ID)
+	tran, err = transactionsRepo.GetAugmented(context.TODO(), tran.ID)
 	require.NoError(t, err)
 
 	metadata := model.RunMetadata{
@@ -154,17 +155,17 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner, db, transactionsRepo, subscriptionManager)
+	runner := executor.NewTransactionRunner(testRunner, db, transactionRunRepo, subscriptionManager)
 	runner.Start(1)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
+	transactionRun := runner.Run(ctxWithTimeout, tran, metadata, env)
 
-	done := make(chan tests.TransactionRun, 1)
+	done := make(chan transaction.TransactionRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		tr := m.Content.(tests.TransactionRun)
+		tr := m.Content.(transaction.TransactionRun)
 		if tr.State.IsFinal() {
 			done <- tr
 		}
@@ -173,7 +174,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
 
-	var finalRun tests.TransactionRun
+	var finalRun transaction.TransactionRun
 	select {
 	case finalRun = <-done:
 		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions

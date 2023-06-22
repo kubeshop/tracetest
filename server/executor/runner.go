@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
@@ -17,7 +18,6 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -45,7 +45,7 @@ func NewPersistentRunner(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
-	dsRepo resourcemanager.Current[datastoreresource.DataStore],
+	dsRepo resourcemanager.Current[datastore.DataStore],
 	eventEmitter EventEmitter,
 	ppGetter PollingProfileGetter,
 ) PersistentRunner {
@@ -73,7 +73,7 @@ type persistentRunner struct {
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
 	newTraceDBFn        traceDBFactoryFn
-	dsRepo              resourcemanager.Current[datastoreresource.DataStore]
+	dsRepo              resourcemanager.Current[datastore.DataStore]
 	eventEmitter        EventEmitter
 	ppGetter            PollingProfileGetter
 

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -11,9 +12,8 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
-	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -42,7 +42,7 @@ func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.Ru
 	return rf.runner.Run(ctx, test, rm, env)
 }
 
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr tests.Transaction, rm model.RunMetadata, env environment.Environment) tests.TransactionRun {
+func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm model.RunMetadata, env environment.Environment) transaction.TransactionRun {
 	return rf.transactionRunner.Run(ctx, tr, rm, env)
 }
 
@@ -52,10 +52,10 @@ func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.Asser
 
 func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
-	dsRepo *datastoreresource.Repository,
+	dsRepo *datastore.Repository,
 	lintRepo *linterResource.Repository,
 	testDB model.Repository,
-	transactions *tests.TransactionsRepository,
+	transactionRunRepository *transaction.RunRepository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
@@ -119,7 +119,7 @@ func newRunnerFacades(
 	transactionRunner := executor.NewTransactionRunner(
 		runner,
 		testDB,
-		transactions,
+		transactionRunRepository,
 		subscriptionManager,
 	)
 

@@ -44,7 +44,7 @@ tracetest test run -d path/to/test.yaml -w
 Running the same command with the '-o json' option would change the output from the default of human readable 'pretty' to 'json'. This can be useful when you wish to extract particular data from the response. This would look like:
 
 ```sh
-tracetest test run -d path/to/test.yaml -w - o json
+tracetest test run -d path/to/test.yaml -w -o json
 ```
 
 ```json title="Output:"

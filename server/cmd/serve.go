@@ -22,7 +22,7 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start Tracetest server",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfg.Watch(func(updated *config.Config) {
+		cfg.Watch(func(updated *config.AppConfig) {
 			appInstance.HotReload()
 		})
 

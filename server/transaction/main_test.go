@@ -1,4 +1,4 @@
-package demoresource_test
+package transaction_test
 
 import (
 	"os"

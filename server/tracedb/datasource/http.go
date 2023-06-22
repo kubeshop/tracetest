@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/goware/urlx"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 )
 
 type HttpClient struct {
@@ -24,7 +24,7 @@ type HttpClient struct {
 	callback HttpCallback
 }
 
-func NewHttpClient(name string, config *datastoreresource.HttpClientConfig, callback HttpCallback) DataSource {
+func NewHttpClient(name string, config *datastore.HttpClientConfig, callback HttpCallback) DataSource {
 	endpoint, _ := urlx.Parse(config.Url)
 	client := &http.Client{
 		Transport: &http.Transport{
@@ -118,7 +118,7 @@ func (client *HttpClient) Request(ctx context.Context, path, method, body string
 	return response, nil
 }
 
-func getTlsConfig(dataStoreTls *datastoreresource.TLS) *tls.Config {
+func getTlsConfig(dataStoreTls *datastore.TLS) *tls.Config {
 	tlsConfig := tls.Config{}
 
 	if dataStoreTls == nil {

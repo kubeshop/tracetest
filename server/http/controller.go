@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
@@ -22,9 +23,8 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -33,36 +33,39 @@ var IDGen = id.NewRandGenerator()
 type controller struct {
 	tracer          trace.Tracer
 	runner          runner
-	newTraceDBFn    func(ds datastoreresource.DataStore) (tracedb.TraceDB, error)
+	newTraceDBFn    func(ds datastore.DataStore) (tracedb.TraceDB, error)
 	mappers         mappings.Mappings
 	triggerRegistry *trigger.Registry
 	version         string
 
-	testDB            model.Repository
-	transactions      transactionsRepository
-	environmentGetter environmentGetter
+	testDB                   model.Repository
+	transactionRepository    transactionsRepository
+	transactionRunRepository transactionRunRepository
+	environmentGetter        environmentGetter
 }
 
 type transactionsRepository interface {
-	SetID(tests.Transaction, id.ID) tests.Transaction
+	SetID(transaction.Transaction, id.ID) transaction.Transaction
 	IDExists(ctx context.Context, id id.ID) (bool, error)
-	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]tests.Transaction, error)
-	GetAugmented(context.Context, id.ID) (tests.Transaction, error)
+	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]transaction.Transaction, error)
+	GetAugmented(context.Context, id.ID) (transaction.Transaction, error)
 	Count(ctx context.Context, query string) (int, error)
-	Get(context.Context, id.ID) (tests.Transaction, error)
-	GetVersion(context.Context, id.ID, int) (tests.Transaction, error)
-	Create(context.Context, tests.Transaction) (tests.Transaction, error)
-	Update(context.Context, tests.Transaction) (tests.Transaction, error)
+	Get(context.Context, id.ID) (transaction.Transaction, error)
+	GetVersion(context.Context, id.ID, int) (transaction.Transaction, error)
+	Create(context.Context, transaction.Transaction) (transaction.Transaction, error)
+	Update(context.Context, transaction.Transaction) (transaction.Transaction, error)
+}
 
-	GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (tests.TransactionRun, error)
-	GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]tests.TransactionRun, error)
-	DeleteTransactionRun(ctx context.Context, tr tests.TransactionRun) error
+type transactionRunRepository interface {
+	GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (transaction.TransactionRun, error)
+	GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]transaction.TransactionRun, error)
+	DeleteTransactionRun(ctx context.Context, tr transaction.TransactionRun) error
 }
 
 type runner interface {
 	StopTest(testID id.ID, runID int)
 	RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env environment.Environment) model.Run
-	RunTransaction(ctx context.Context, tr tests.Transaction, rm model.RunMetadata, env environment.Environment) tests.TransactionRun
+	RunTransaction(ctx context.Context, tr transaction.Transaction, rm model.RunMetadata, env environment.Environment) transaction.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 
@@ -72,8 +75,9 @@ type environmentGetter interface {
 
 func NewController(
 	testDB model.Repository,
-	transactions transactionsRepository,
-	newTraceDBFn func(ds datastoreresource.DataStore) (tracedb.TraceDB, error),
+	transactionRepository transactionsRepository,
+	transactionRunRepository transactionRunRepository,
+	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
 	envGetter environmentGetter,
@@ -82,15 +86,16 @@ func NewController(
 	version string,
 ) openapi.ApiApiServicer {
 	return &controller{
-		tracer:            tracer,
-		testDB:            testDB,
-		transactions:      transactions,
-		environmentGetter: envGetter,
-		runner:            runner,
-		newTraceDBFn:      newTraceDBFn,
-		mappers:           mappers,
-		triggerRegistry:   triggerRegistry,
-		version:           version,
+		tracer:                   tracer,
+		testDB:                   testDB,
+		transactionRepository:    transactionRepository,
+		transactionRunRepository: transactionRunRepository,
+		environmentGetter:        envGetter,
+		runner:                   runner,
+		newTraceDBFn:             newTraceDBFn,
+		mappers:                  mappers,
+		triggerRegistry:          triggerRegistry,
+		version:                  version,
 	}
 }
 
@@ -532,12 +537,12 @@ func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition opena
 	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
 }
 
-func (c *controller) executeTransaction(ctx context.Context, transaction tests.Transaction, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
+func (c *controller) executeTransaction(ctx context.Context, tran transaction.Transaction, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
 	// create or update transaction
-	resp, err := c.doCreateTransaction(ctx, transaction)
+	resp, err := c.doCreateTransaction(ctx, tran)
 	if err != nil {
 		if errors.Is(err, errTransactionExists) {
-			resp, err = c.doUpdateTransaction(ctx, transaction.ID, transaction)
+			resp, err = c.doUpdateTransaction(ctx, tran.ID, tran)
 			if err != nil {
 				return resp, err
 			}
@@ -546,10 +551,10 @@ func (c *controller) executeTransaction(ctx context.Context, transaction tests.T
 		}
 	} else {
 		// the transaction was created, make sure we have the correct ID
-		transaction = resp.Body.(tests.Transaction)
+		tran = resp.Body.(transaction.Transaction)
 	}
 
-	transactionID := transaction.ID
+	transactionID := tran.ID
 
 	// transaction ready, execute it
 	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)
@@ -565,7 +570,7 @@ func (c *controller) executeTransaction(ctx context.Context, transaction tests.T
 	return openapi.Response(200, res), nil
 }
 
-func (c *controller) upsertTransaction(ctx context.Context, transaction tests.Transaction) (openapi.ImplResponse, error) {
+func (c *controller) upsertTransaction(ctx context.Context, transaction transaction.Transaction) (openapi.ImplResponse, error) {
 	resp, err := c.doCreateTransaction(ctx, transaction)
 	var status int
 	if err != nil {
@@ -594,10 +599,10 @@ func (c *controller) upsertTransaction(ctx context.Context, transaction tests.Tr
 
 var errTransactionExists = errors.New("transaction already exists")
 
-func (c *controller) doCreateTransaction(ctx context.Context, transaction tests.Transaction) (openapi.ImplResponse, error) {
+func (c *controller) doCreateTransaction(ctx context.Context, transaction transaction.Transaction) (openapi.ImplResponse, error) {
 	// if they try to create a transaction with preset ID, we need to make sure that ID doesn't exists already
 	if transaction.HasID() {
-		exists, err := c.transactions.IDExists(ctx, transaction.ID)
+		exists, err := c.transactionRepository.IDExists(ctx, transaction.ID)
 		if err != nil {
 			return handleDBError(err), err
 		}
@@ -610,14 +615,14 @@ func (c *controller) doCreateTransaction(ctx context.Context, transaction tests.
 			return openapi.Response(http.StatusBadRequest, r), err
 		}
 	} else {
-		transaction = c.transactions.SetID(transaction, id.GenerateID())
+		transaction = c.transactionRepository.SetID(transaction, id.GenerateID())
 	}
 
-	transaction, err := c.transactions.Create(ctx, transaction)
+	transaction, err := c.transactionRepository.Create(ctx, transaction)
 	if err != nil {
 		return handleDBError(err), err
 	}
-	transaction, err = c.transactions.GetAugmented(ctx, transaction.ID)
+	transaction, err = c.transactionRepository.GetAugmented(ctx, transaction.ID)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -626,7 +631,7 @@ func (c *controller) doCreateTransaction(ctx context.Context, transaction tests.
 }
 
 func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {
-	transaction, err := c.transactions.GetVersion(ctx, id.ID(transactionId), int(version))
+	transaction, err := c.transactionRepository.GetVersion(ctx, id.ID(transactionId), int(version))
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
@@ -634,8 +639,8 @@ func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, tr
 	return openapi.Response(200, transaction), nil
 }
 
-func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.ID, updated tests.Transaction) (openapi.ImplResponse, error) {
-	transaction, err := c.transactions.Get(ctx, transactionID)
+func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.ID, updated transaction.Transaction) (openapi.ImplResponse, error) {
+	transaction, err := c.transactionRepository.Get(ctx, transactionID)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -643,7 +648,7 @@ func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.I
 	updated.Version = transaction.Version
 	updated.ID = transaction.ID
 
-	_, err = c.transactions.Update(ctx, updated)
+	_, err = c.transactionRepository.Update(ctx, updated)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -812,7 +817,7 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 }
 
 func (c *controller) GetTransactionVersion(ctx context.Context, tID string, version int32) (openapi.ImplResponse, error) {
-	transaction, err := c.transactions.GetVersion(ctx, id.ID(tID), int(version))
+	transaction, err := c.transactionRepository.GetVersion(ctx, id.ID(tID), int(version))
 
 	if err != nil {
 		return handleDBError(err), err
@@ -823,7 +828,7 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 
 // RunTransaction implements openapi.ApiApiServicer
 func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
-	transaction, err := c.transactions.GetAugmented(ctx, id.ID(transactionID))
+	transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -853,7 +858,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 }
 
 func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.transactions.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
+	run, err := c.transactionRunRepository.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -863,7 +868,7 @@ func (c *controller) GetTransactionRun(ctx context.Context, transactionId string
 }
 
 func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string, take, skip int32) (openapi.ImplResponse, error) {
-	runs, err := c.transactions.GetTransactionsRuns(ctx, id.ID(transactionId), take, skip)
+	runs, err := c.transactionRunRepository.GetTransactionsRuns(ctx, id.ID(transactionId), take, skip)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -877,12 +882,12 @@ func (c *controller) GetTransactionRuns(ctx context.Context, transactionId strin
 }
 
 func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.transactions.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
+	run, err := c.transactionRunRepository.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	err = c.transactions.DeleteTransactionRun(ctx, run)
+	err = c.transactionRunRepository.DeleteTransactionRun(ctx, run)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -893,7 +898,7 @@ func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId str
 func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	// TODO: this is endpoint is a hack to unblock the team quickly.
 	// This is not production ready because it might take too long to respond if there are numerous
-	// transactions and tests.
+	// transactions and transaction.
 
 	if take == 0 {
 		take = 20
@@ -901,12 +906,12 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 
 	newTake := take + skip
 
-	transactions, err := c.transactions.ListAugmented(ctx, int(newTake), 0, query, sortBy, sortDirection)
+	transactions, err := c.transactionRepository.ListAugmented(ctx, int(newTake), 0, query, sortBy, sortDirection)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	transactionCount, err := c.transactions.Count(ctx, query)
+	transactionCount, err := c.transactionRepository.Count(ctx, query)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -931,7 +936,7 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 	return openapi.Response(http.StatusOK, paginatedResponse), nil
 }
 
-func takeResources(transactions []tests.Transaction, tests []openapi.Test, take, skip int32) []openapi.Resource {
+func takeResources(transactions []transaction.Transaction, tests []openapi.Test, take, skip int32) []openapi.Resource {
 	numItems := len(transactions) + len(tests)
 	items := make([]openapi.Resource, numItems)
 	maxNumItems := len(transactions) + len(tests)

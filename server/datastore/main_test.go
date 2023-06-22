@@ -1,4 +1,4 @@
-package tests_test
+package datastore_test
 
 import (
 	"os"

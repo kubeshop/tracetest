@@ -18,7 +18,7 @@ spec:
   steps:
     - ./tests/create-product.yaml
     - ./tests/add-product-to-cart.yaml
-    - ./tests/complete-purschase.yaml
+    - ./tests/complete-purchase.yaml
     - testID # you can also reference tests by their ids instead of referencing the definition file
 ```
 

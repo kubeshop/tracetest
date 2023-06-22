@@ -1,4 +1,4 @@
-package demoresource_test
+package demo_test
 
 import (
 	"context"
@@ -6,55 +6,55 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/kubeshop/tracetest/server/config/demoresource"
+	"github.com/kubeshop/tracetest/server/config/demo"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 )
 
 func TestPokeshopDemoResource(t *testing.T) {
-	sampleDemo := demoresource.Demo{
+	sampleDemo := demo.Demo{
 		ID:      "1",
 		Name:    "dev",
-		Type:    demoresource.DemoTypePokeshop,
+		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
-		Pokeshop: &demoresource.PokeshopDemo{
+		Pokeshop: &demo.PokeshopDemo{
 			HTTPEndpoint: "http://dev-endpoint:1234",
 			GRPCEndpoint: "dev-grpc:9091",
 		},
 	}
 
-	secondSampleDemo := demoresource.Demo{
+	secondSampleDemo := demo.Demo{
 		ID:      "2",
 		Name:    "staging",
-		Type:    demoresource.DemoTypePokeshop,
+		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
-		Pokeshop: &demoresource.PokeshopDemo{
+		Pokeshop: &demo.PokeshopDemo{
 			HTTPEndpoint: "http://stg-endpoint:1234",
 			GRPCEndpoint: "stg-grpc:9091",
 		},
 	}
 
-	thirdSampleDemo := demoresource.Demo{
+	thirdSampleDemo := demo.Demo{
 		ID:      "3",
 		Name:    "production",
-		Type:    demoresource.DemoTypePokeshop,
+		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
-		Pokeshop: &demoresource.PokeshopDemo{
+		Pokeshop: &demo.PokeshopDemo{
 			HTTPEndpoint: "http://prod-endpoint:1234",
 			GRPCEndpoint: "prod-grpc:9091",
 		},
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: demoresource.ResourceName,
-		ResourceTypePlural:   demoresource.ResourceNamePlural,
+		ResourceTypeSingular: demo.ResourceName,
+		ResourceTypePlural:   demo.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
-			demoRepository := demoresource.NewRepository(db)
+			demoRepository := demo.NewRepository(db)
 
-			manager := resourcemanager.New[demoresource.Demo](
-				demoresource.ResourceName,
-				demoresource.ResourceNamePlural,
+			manager := resourcemanager.New[demo.Demo](
+				demo.ResourceName,
+				demo.ResourceNamePlural,
 				demoRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
 			)
@@ -63,7 +63,7 @@ func TestPokeshopDemoResource(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			demoRepository := manager.Handler().(*demoresource.Repository)
+			demoRepository := manager.Handler().(*demo.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
@@ -106,12 +106,12 @@ func TestPokeshopDemoResource(t *testing.T) {
 }
 
 func TestOpenTelemetryStoreDemoResource(t *testing.T) {
-	sampleDemo := demoresource.Demo{
+	sampleDemo := demo.Demo{
 		ID:      "1",
 		Name:    "dev",
-		Type:    demoresource.DemoTypeOpentelemetryStore,
+		Type:    demo.DemoTypeOpentelemetryStore,
 		Enabled: true,
-		OpenTelemetryStore: &demoresource.OpenTelemetryStoreDemo{
+		OpenTelemetryStore: &demo.OpenTelemetryStoreDemo{
 			FrontendEndpoint:       "http://dev-frontend:9000",
 			ProductCatalogEndpoint: "http://dev-product:8081",
 			CartEndpoint:           "http://dev-cart:8082",
@@ -119,12 +119,12 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 		},
 	}
 
-	secondSampleDemo := demoresource.Demo{
+	secondSampleDemo := demo.Demo{
 		ID:      "2",
 		Name:    "staging",
-		Type:    demoresource.DemoTypePokeshop,
+		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
-		OpenTelemetryStore: &demoresource.OpenTelemetryStoreDemo{
+		OpenTelemetryStore: &demo.OpenTelemetryStoreDemo{
 			FrontendEndpoint:       "http://stg-frontend:9000",
 			ProductCatalogEndpoint: "http://stg-product:8081",
 			CartEndpoint:           "http://stg-cart:8082",
@@ -132,12 +132,12 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 		},
 	}
 
-	thirdSampleDemo := demoresource.Demo{
+	thirdSampleDemo := demo.Demo{
 		ID:      "3",
 		Name:    "production",
-		Type:    demoresource.DemoTypePokeshop,
+		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
-		OpenTelemetryStore: &demoresource.OpenTelemetryStoreDemo{
+		OpenTelemetryStore: &demo.OpenTelemetryStoreDemo{
 			FrontendEndpoint:       "http://prod-frontend:9000",
 			ProductCatalogEndpoint: "http://prod-product:8081",
 			CartEndpoint:           "http://prod-cart:8082",
@@ -146,14 +146,14 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 	}
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: demoresource.ResourceName,
-		ResourceTypePlural:   demoresource.ResourceNamePlural,
+		ResourceTypeSingular: demo.ResourceName,
+		ResourceTypePlural:   demo.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
-			demoRepository := demoresource.NewRepository(db)
+			demoRepository := demo.NewRepository(db)
 
-			manager := resourcemanager.New[demoresource.Demo](
-				demoresource.ResourceName,
-				demoresource.ResourceNamePlural,
+			manager := resourcemanager.New[demo.Demo](
+				demo.ResourceName,
+				demo.ResourceNamePlural,
 				demoRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
 			)
@@ -162,7 +162,7 @@ func TestOpenTelemetryStoreDemoResource(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			demoRepository := manager.Handler().(*demoresource.Repository)
+			demoRepository := manager.Handler().(*demo.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,

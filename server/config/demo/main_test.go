@@ -1,4 +1,4 @@
-package datastoreresource_test
+package demo_test
 
 import (
 	"os"
