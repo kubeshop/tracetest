@@ -29,7 +29,7 @@ var getCmd = &cobra.Command{
 			return "", err
 		}
 
-		if output == string(formatters.JSON) {
+		if output == string(formatters.JSON) || output == string(formatters.Pretty) {
 			ctx = context.WithValue(ctx, "X-Tracetest-Augmented", true)
 		}
 

@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -187,12 +186,38 @@ func TestListTransactions(t *testing.T) {
 		result := tracetestcli.Exec(t, "list transaction --sortBy name --sortDirection asc --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 6)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 3)
 
-		require.Contains(lines[2], "Another Transaction")
-		require.Contains(lines[3], "New Transaction")
-		require.Contains(lines[4], "One More Transaction")
+		firstLine := parsedTable[0]
+		require.Equal("asuhfdkj", firstLine["ID"])
+		require.Equal("Another Transaction", firstLine["NAME"])
+		require.Equal("1", firstLine["VERSION"])
+		require.Equal("4", firstLine["STEPS"])
+		require.Equal("0", firstLine["RUNS"])
+		require.Equal("", firstLine["LAST RUN TIME"])
+		require.Equal("0", firstLine["LAST RUN SUCCESSES"])
+		require.Equal("0", firstLine["LAST RUN FAILURES"])
+
+		secondLine := parsedTable[1]
+		require.Equal("Qti5R3_VR", secondLine["ID"])
+		require.Equal("New Transaction", secondLine["NAME"])
+		require.Equal("1", secondLine["VERSION"])
+		require.Equal("2", secondLine["STEPS"])
+		require.Equal("0", secondLine["RUNS"])
+		require.Equal("", secondLine["LAST RUN TIME"])
+		require.Equal("0", secondLine["LAST RUN SUCCESSES"])
+		require.Equal("0", secondLine["LAST RUN FAILURES"])
+
+		thirdLine := parsedTable[2]
+		require.Equal("i2ug34j", thirdLine["ID"])
+		require.Equal("One More Transaction", thirdLine["NAME"])
+		require.Equal("1", thirdLine["VERSION"])
+		require.Equal("3", thirdLine["STEPS"])
+		require.Equal("0", thirdLine["RUNS"])
+		require.Equal("", thirdLine["LAST RUN TIME"])
+		require.Equal("0", thirdLine["LAST RUN SUCCESSES"])
+		require.Equal("0", thirdLine["LAST RUN FAILURES"])
 	})
 
 	t.Run("list with YAML format skipping the first and taking two items", func(t *testing.T) {

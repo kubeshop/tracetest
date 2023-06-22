@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -80,7 +79,8 @@ func TestGetTransaction(t *testing.T) {
 		result := tracetestcli.Exec(t, "get transaction --id Qti5R3_VR --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		transaction := helpers.UnmarshalJSON[types.TransactionResource](t, result.StdOut)
+		// it should return an augmented resource on get
+		transaction := helpers.UnmarshalJSON[types.AugmentedTransactionResource](t, result.StdOut)
 
 		require.Equal("Transaction", transaction.Type)
 		require.Equal("Qti5R3_VR", transaction.Spec.ID)
@@ -89,6 +89,9 @@ func TestGetTransaction(t *testing.T) {
 		require.Len(transaction.Spec.Steps, 2)
 		require.Equal("9wtAH2_Vg", transaction.Spec.Steps[0])
 		require.Equal("ajksdkasjbd", transaction.Spec.Steps[1])
+		require.Equal(0, transaction.Spec.Summary.Runs)
+		require.Equal(0, transaction.Spec.Summary.LastRun.Fails)
+		require.Equal(0, transaction.Spec.Summary.LastRun.Passes)
 	})
 
 	t.Run("get with pretty format", func(t *testing.T) {
@@ -100,9 +103,19 @@ func TestGetTransaction(t *testing.T) {
 		// Then it should print a table with 4 lines printed: header, separator, transaction item and empty line
 		result := tracetestcli.Exec(t, "get transaction --id Qti5R3_VR --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "New Transaction")
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal("Qti5R3_VR", singleLine["ID"])
+		require.Equal("New Transaction", singleLine["NAME"])
+		require.Equal("1", singleLine["VERSION"])
+		require.Equal("2", singleLine["STEPS"])
+		require.Equal("0", singleLine["RUNS"])
+		require.Equal("", singleLine["LAST RUN TIME"])
+		require.Equal("0", singleLine["LAST RUN SUCCESSES"])
+		require.Equal("0", singleLine["LAST RUN FAILURES"])
 	})
 }
