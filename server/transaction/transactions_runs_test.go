@@ -1,4 +1,4 @@
-package tests_test
+package transaction_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,7 +33,7 @@ func createTestWithName(t *testing.T, db model.TestRepository, name string) mode
 	return updated
 }
 
-func getRepos() (*tests.TransactionsRepository, model.Repository) {
+func getRepos() (*transaction.Repository, *transaction.RunRepository, model.Repository) {
 	db := testmock.GetRawTestingDatabase()
 
 	testsRepo, err := testdb.Postgres(testdb.WithDB(db))
@@ -41,15 +41,17 @@ func getRepos() (*tests.TransactionsRepository, model.Repository) {
 		panic(err)
 	}
 
-	transactionRepo := tests.NewTransactionsRepository(db, testsRepo)
+	transactionRepo := transaction.NewRepository(db, testsRepo)
 
-	return transactionRepo, testsRepo
+	runRepo := transaction.NewRunRepository(db, testsRepo)
+
+	return transactionRepo, runRepo, testsRepo
 }
 
-func getTransaction(t *testing.T, transactionRepo *tests.TransactionsRepository, testsRepo model.TestRepository) (tests.Transaction, transactionFixture) {
+func getTransaction(t *testing.T, transactionRepo *transaction.Repository, testsRepo model.TestRepository) (transaction.Transaction, transactionFixture) {
 	f := setupTransactionFixture(t, transactionRepo.DB())
 
-	transaction := tests.Transaction{
+	transaction := transaction.Transaction{
 		ID:          id.NewRandGenerator().ID(),
 		Name:        "first test",
 		Description: "description",
@@ -69,52 +71,52 @@ func getTransaction(t *testing.T, transactionRepo *tests.TransactionsRepository,
 }
 
 func TestCreateTransactionRun(t *testing.T) {
-	transactionRepo, testsRepo := getRepos()
-	transaction, _ := getTransaction(t, transactionRepo, testsRepo)
+	transactionRepo, transactionRunRepo, testsRepo := getRepos()
+	transactionObject, _ := getTransaction(t, transactionRepo, testsRepo)
 
-	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
+	tr, err := transactionRunRepo.CreateRun(context.TODO(), transactionObject.NewRun())
 	require.NoError(t, err)
 
-	assert.Equal(t, tr.TransactionID, transaction.ID)
-	assert.Equal(t, tr.State, tests.TransactionRunStateCreated)
+	assert.Equal(t, tr.TransactionID, transactionObject.ID)
+	assert.Equal(t, tr.State, transaction.TransactionRunStateCreated)
 	assert.Len(t, tr.Steps, 0)
 }
 
 func TestUpdateTransactionRun(t *testing.T) {
-	transactionRepo, testsRepo := getRepos()
-	transaction, fixture := getTransaction(t, transactionRepo, testsRepo)
+	transactionRepo, transactionRunRepo, testsRepo := getRepos()
+	transactionObject, fixture := getTransaction(t, transactionRepo, testsRepo)
 
-	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
+	tr, err := transactionRunRepo.CreateRun(context.TODO(), transactionObject.NewRun())
 	require.NoError(t, err)
 
-	tr.State = tests.TransactionRunStateExecuting
+	tr.State = transaction.TransactionRunStateExecuting
 	tr.Steps = []model.Run{fixture.testRun}
-	err = transactionRepo.UpdateRun(context.TODO(), tr)
+	err = transactionRunRepo.UpdateRun(context.TODO(), tr)
 	require.NoError(t, err)
 
-	updatedRun, err := transactionRepo.GetTransactionRun(context.TODO(), transaction.ID, tr.ID)
+	updatedRun, err := transactionRunRepo.GetTransactionRun(context.TODO(), transactionObject.ID, tr.ID)
 	require.NoError(t, err)
 
-	assert.Equal(t, tr.TransactionID, transaction.ID)
-	assert.Equal(t, tests.TransactionRunStateExecuting, updatedRun.State)
+	assert.Equal(t, tr.TransactionID, transactionObject.ID)
+	assert.Equal(t, transaction.TransactionRunStateExecuting, updatedRun.State)
 	assert.Len(t, tr.Steps, 1)
 }
 
 func TestDeleteTransactionRun(t *testing.T) {
-	transactionRepo, testsRepo := getRepos()
+	transactionRepo, transactionRunRepo, testsRepo := getRepos()
 	transaction, _ := getTransaction(t, transactionRepo, testsRepo)
 
-	tr, err := transactionRepo.CreateRun(context.TODO(), transaction.NewRun())
+	tr, err := transactionRunRepo.CreateRun(context.TODO(), transaction.NewRun())
 	require.NoError(t, err)
 
-	err = transactionRepo.DeleteTransactionRun(context.TODO(), tr)
+	err = transactionRunRepo.DeleteTransactionRun(context.TODO(), tr)
 	require.NoError(t, err)
 
-	_, err = transactionRepo.GetTransactionRun(context.TODO(), transaction.ID, tr.ID)
+	_, err = transactionRunRepo.GetTransactionRun(context.TODO(), transaction.ID, tr.ID)
 	require.ErrorContains(t, err, "no rows in result set")
 }
 
-func createTransaction(t *testing.T, repo *tests.TransactionsRepository, tran tests.Transaction) tests.Transaction {
+func createTransaction(t *testing.T, repo *transaction.Repository, tran transaction.Transaction) transaction.Transaction {
 	one := 1
 	tran.ID = id.GenerateID()
 	tran.Version = &one
@@ -131,9 +133,9 @@ func createTransaction(t *testing.T, repo *tests.TransactionsRepository, tran te
 }
 
 func TestListTransactionRun(t *testing.T) {
-	transactionRepo, testsRepo := getRepos()
+	transactionRepo, transactionRunRepo, testsRepo := getRepos()
 
-	t1 := createTransaction(t, transactionRepo, tests.Transaction{
+	t1 := createTransaction(t, transactionRepo, transaction.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
@@ -142,7 +144,7 @@ func TestListTransactionRun(t *testing.T) {
 		},
 	})
 
-	t2 := createTransaction(t, transactionRepo, tests.Transaction{
+	t2 := createTransaction(t, transactionRepo, transaction.Transaction{
 		Name:        "second transaction",
 		Description: "description",
 		Steps: []model.Test{
@@ -151,16 +153,16 @@ func TestListTransactionRun(t *testing.T) {
 		},
 	})
 
-	run1, err := transactionRepo.CreateRun(context.TODO(), t1.NewRun())
+	run1, err := transactionRunRepo.CreateRun(context.TODO(), t1.NewRun())
 	require.NoError(t, err)
 
-	run2, err := transactionRepo.CreateRun(context.TODO(), t1.NewRun())
+	run2, err := transactionRunRepo.CreateRun(context.TODO(), t1.NewRun())
 	require.NoError(t, err)
 
-	_, err = transactionRepo.CreateRun(context.TODO(), t2.NewRun())
+	_, err = transactionRunRepo.CreateRun(context.TODO(), t2.NewRun())
 	require.NoError(t, err)
 
-	runs, err := transactionRepo.GetTransactionsRuns(context.TODO(), t1.ID, 20, 0)
+	runs, err := transactionRunRepo.GetTransactionsRuns(context.TODO(), t1.ID, 20, 0)
 	require.NoError(t, err)
 
 	assert.Len(t, runs, 2)
@@ -169,11 +171,11 @@ func TestListTransactionRun(t *testing.T) {
 }
 
 func TestBug(t *testing.T) {
-	transactionRepo, testsRepo := getRepos()
+	transactionRepo, transactionRunRepo, testsRepo := getRepos()
 
 	ctx := context.TODO()
 
-	transaction := createTransaction(t, transactionRepo, tests.Transaction{
+	transaction := createTransaction(t, transactionRepo, transaction.Transaction{
 		Name:        "first test",
 		Description: "description",
 		Steps: []model.Test{
@@ -182,13 +184,13 @@ func TestBug(t *testing.T) {
 		},
 	})
 
-	run1, err := transactionRepo.CreateRun(ctx, transaction.NewRun())
+	run1, err := transactionRunRepo.CreateRun(ctx, transaction.NewRun())
 	require.NoError(t, err)
 
-	run2, err := transactionRepo.CreateRun(ctx, transaction.NewRun())
+	run2, err := transactionRunRepo.CreateRun(ctx, transaction.NewRun())
 	require.NoError(t, err)
 
-	runs, err := transactionRepo.GetTransactionsRuns(ctx, transaction.ID, 20, 0)
+	runs, err := transactionRunRepo.GetTransactionsRuns(ctx, transaction.ID, 20, 0)
 	require.NoError(t, err)
 	assert.Equal(t, runs[0].ID, run2.ID)
 	assert.Equal(t, runs[1].ID, run1.ID)
@@ -200,10 +202,10 @@ func TestBug(t *testing.T) {
 	newTransaction, err := transactionRepo.GetAugmented(context.TODO(), transaction.ID)
 	require.NoError(t, err)
 
-	run3, err := transactionRepo.CreateRun(ctx, newTransaction.NewRun())
+	run3, err := transactionRunRepo.CreateRun(ctx, newTransaction.NewRun())
 	require.NoError(t, err)
 
-	runs, err = transactionRepo.GetTransactionsRuns(ctx, newTransaction.ID, 20, 0)
+	runs, err = transactionRunRepo.GetTransactionsRuns(ctx, newTransaction.ID, 20, 0)
 	require.NoError(t, err)
 
 	assert.Len(t, runs, 3)

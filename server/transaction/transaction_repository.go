@@ -1,4 +1,4 @@
-package tests
+package transaction
 
 import (
 	"context"
@@ -9,141 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
-const (
-	TransactionResourceName       = "Transaction"
-	TransactionResourceNamePlural = "Transactions"
-)
-
-type Transaction struct {
-	ID          id.ID          `json:"id"`
-	CreatedAt   *time.Time     `json:"createdAt,omitempty"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Version     *int           `json:"version,omitempty"`
-	StepIDs     []id.ID        `json:"steps"`
-	Steps       []model.Test   `json:"fullSteps,omitempty"`
-	Summary     *model.Summary `json:"summary,omitempty"`
-}
-
-func setVersion(t *Transaction, v int) {
-	t.Version = &v
-}
-
-func (t Transaction) GetVersion() int {
-	if t.Version == nil {
-		return 0
-	}
-	return *t.Version
-}
-
-func setCreatedAt(t *Transaction, d time.Time) {
-	t.CreatedAt = &d
-}
-
-func (t Transaction) GetCreatedAt() time.Time {
-	if t.CreatedAt == nil {
-		return time.Time{}
-	}
-	return *t.CreatedAt
-}
-
-func (t Transaction) HasID() bool {
-	return t.ID != ""
-}
-
-func (t Transaction) GetID() id.ID {
-	return t.ID
-}
-
-func (t Transaction) Validate() error {
-	return nil
-}
-
-func (t Transaction) NewRun() TransactionRun {
-
-	return TransactionRun{
-		TransactionID:      t.ID,
-		TransactionVersion: t.GetVersion(),
-		CreatedAt:          time.Now().UTC(),
-		State:              TransactionRunStateCreated,
-		Steps:              make([]model.Run, 0, len(t.StepIDs)),
-		CurrentTest:        0,
-	}
-}
-
-type TransactionRunState string
-
-const (
-	TransactionRunStateCreated   TransactionRunState = "CREATED"
-	TransactionRunStateExecuting TransactionRunState = "EXECUTING"
-	TransactionRunStateFailed    TransactionRunState = "FAILED"
-	TransactionRunStateFinished  TransactionRunState = "FINISHED"
-)
-
-func (rs TransactionRunState) IsFinal() bool {
-	return rs == TransactionRunStateFailed || rs == TransactionRunStateFinished
-}
-
-type TransactionRun struct {
-	ID                 int
-	TransactionID      id.ID
-	TransactionVersion int
-
-	// Timestamps
-	CreatedAt   time.Time
-	CompletedAt time.Time
-
-	// steps
-	StepIDs []int
-	Steps   []model.Run
-
-	// trigger params
-	State       TransactionRunState
-	CurrentTest int
-
-	// result info
-	LastError error
-	Pass      int
-	Fail      int
-
-	Metadata model.RunMetadata
-
-	// environment
-	Environment environment.Environment
-}
-
-func (tr TransactionRun) ResourceID() string {
-	return fmt.Sprintf("transaction/%s/run/%d", tr.TransactionID, tr.ID)
-}
-
-func (tr TransactionRun) ResultsCount() (pass, fail int) {
-	if tr.Steps == nil {
-		return
-	}
-
-	for _, step := range tr.Steps {
-		stepPass, stepFail := step.ResultsCount()
-
-		pass += stepPass
-		fail += stepFail
-	}
-
-	return
-}
-
-type stepsRepository interface {
-	GetTransactionSteps(context.Context, Transaction) ([]model.Test, error)
-	GetTransactionRunSteps(context.Context, TransactionRun) ([]model.Run, error)
-}
-
-func NewTransactionsRepository(db *sql.DB, stepsRepository stepsRepository) *TransactionsRepository {
-	repo := &TransactionsRepository{
+func NewRepository(db *sql.DB, stepsRepository stepsRepository) *Repository {
+	repo := &Repository{
 		db:              db,
 		stepsRepository: stepsRepository,
 	}
@@ -151,28 +23,33 @@ func NewTransactionsRepository(db *sql.DB, stepsRepository stepsRepository) *Tra
 	return repo
 }
 
-type TransactionsRepository struct {
+type stepsRepository interface {
+	GetTransactionSteps(context.Context, Transaction) ([]model.Test, error)
+	GetTransactionRunSteps(context.Context, TransactionRun) ([]model.Run, error)
+}
+
+type Repository struct {
 	db              *sql.DB
 	stepsRepository stepsRepository
 }
 
 // needed for test
-func (r *TransactionsRepository) DB() *sql.DB {
+func (r *Repository) DB() *sql.DB {
 	return r.db
 }
 
-func (r *TransactionsRepository) SetID(t Transaction, id id.ID) Transaction {
+func (r *Repository) SetID(t Transaction, id id.ID) Transaction {
 	t.ID = id
 	return t
 }
 
-func (r *TransactionsRepository) Provision(ctx context.Context, transaction Transaction) error {
+func (r *Repository) Provision(ctx context.Context, transaction Transaction) error {
 	_, err := r.Create(ctx, transaction)
 
 	return err
 }
 
-func (r *TransactionsRepository) Create(ctx context.Context, transaction Transaction) (Transaction, error) {
+func (r *Repository) Create(ctx context.Context, transaction Transaction) (Transaction, error) {
 	setVersion(&transaction, 1)
 	if transaction.CreatedAt == nil {
 		setCreatedAt(&transaction, time.Now())
@@ -187,7 +64,7 @@ func (r *TransactionsRepository) Create(ctx context.Context, transaction Transac
 	return t, nil
 }
 
-func (r *TransactionsRepository) Update(ctx context.Context, transaction Transaction) (Transaction, error) {
+func (r *Repository) Update(ctx context.Context, transaction Transaction) (Transaction, error) {
 	oldTransaction, err := r.GetLatestVersion(ctx, transaction.ID)
 	if err != nil {
 		return Transaction{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
@@ -215,7 +92,7 @@ func (r *TransactionsRepository) Update(ctx context.Context, transaction Transac
 	return t, nil
 }
 
-func (r *TransactionsRepository) checkIDExists(ctx context.Context, id id.ID) error {
+func (r *Repository) checkIDExists(ctx context.Context, id id.ID) error {
 	exists, err := r.IDExists(ctx, id)
 	if err != nil {
 		return err
@@ -227,7 +104,7 @@ func (r *TransactionsRepository) checkIDExists(ctx context.Context, id id.ID) er
 	return nil
 }
 
-func (r *TransactionsRepository) Delete(ctx context.Context, id id.ID) error {
+func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	if err := r.checkIDExists(ctx, id); err != nil {
 		return err
 	}
@@ -265,7 +142,7 @@ func (r *TransactionsRepository) Delete(ctx context.Context, id id.ID) error {
 	return tx.Commit()
 }
 
-func (r *TransactionsRepository) IDExists(ctx context.Context, id id.ID) (bool, error) {
+func (r *Repository) IDExists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 	row := r.db.QueryRowContext(
 		ctx,
@@ -300,7 +177,7 @@ const transactionMaxVersionQuery = `
 
 	WHERE t.version = latest_transactions.latest_version `
 
-func (r *TransactionsRepository) SortingFields() []string {
+func (r *Repository) SortingFields() []string {
 	return []string{
 		"name",
 		"created",
@@ -308,15 +185,15 @@ func (r *TransactionsRepository) SortingFields() []string {
 	}
 }
 
-func (r *TransactionsRepository) ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Transaction, error) {
+func (r *Repository) ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Transaction, error) {
 	return r.list(ctx, take, skip, query, sortBy, sortDirection, true)
 }
 
-func (r *TransactionsRepository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Transaction, error) {
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Transaction, error) {
 	return r.list(ctx, take, skip, query, sortBy, sortDirection, false)
 }
 
-func (r *TransactionsRepository) list(ctx context.Context, take, skip int, query, sortBy, sortDirection string, augmented bool) ([]Transaction, error) {
+func (r *Repository) list(ctx context.Context, take, skip int, query, sortBy, sortDirection string, augmented bool) ([]Transaction, error) {
 	q, params := listQuery(querySelect(), query, []any{take, skip})
 
 	sortingFields := map[string]string{
@@ -372,7 +249,7 @@ func querySelect() string {
 	`)
 }
 
-func (r *TransactionsRepository) Count(ctx context.Context, query string) (int, error) {
+func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	sql, params := listQuery(queryCount(), query, []any{})
 
 	count := 0
@@ -387,15 +264,15 @@ func (r *TransactionsRepository) Count(ctx context.Context, query string) (int, 
 	return count, nil
 }
 
-func (r *TransactionsRepository) GetAugmented(ctx context.Context, id id.ID) (Transaction, error) {
+func (r *Repository) GetAugmented(ctx context.Context, id id.ID) (Transaction, error) {
 	return r.get(ctx, id, true)
 }
 
-func (r *TransactionsRepository) Get(ctx context.Context, id id.ID) (Transaction, error) {
+func (r *Repository) Get(ctx context.Context, id id.ID) (Transaction, error) {
 	return r.get(ctx, id, false)
 }
 
-func (r *TransactionsRepository) get(ctx context.Context, id id.ID, augmented bool) (Transaction, error) {
+func (r *Repository) get(ctx context.Context, id id.ID, augmented bool) (Transaction, error) {
 	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return Transaction{}, fmt.Errorf("prepare: %w", err)
@@ -410,7 +287,7 @@ func (r *TransactionsRepository) get(ctx context.Context, id id.ID, augmented bo
 	return transaction, nil
 }
 
-func (r *TransactionsRepository) GetVersion(ctx context.Context, id id.ID, version int) (Transaction, error) {
+func (r *Repository) GetVersion(ctx context.Context, id id.ID, version int) (Transaction, error) {
 	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 AND t.version = $2")
 	if err != nil {
 		return Transaction{}, fmt.Errorf("prepare 1: %w", err)
@@ -435,7 +312,7 @@ func listQuery(baseSQL, query string, params []any) (string, []any) {
 	return sql, params
 }
 
-func (r *TransactionsRepository) GetLatestVersion(ctx context.Context, id id.ID) (Transaction, error) {
+func (r *Repository) GetLatestVersion(ctx context.Context, id id.ID) (Transaction, error) {
 	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return Transaction{}, fmt.Errorf("prepare: %w", err)
@@ -459,7 +336,7 @@ INSERT INTO transactions (
 	"created_at"
 ) VALUES ($1, $2, $3, $4, $5)`
 
-func (r *TransactionsRepository) insertIntoTransactions(ctx context.Context, transaction Transaction) (Transaction, error) {
+func (r *Repository) insertIntoTransactions(ctx context.Context, transaction Transaction) (Transaction, error) {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{})
 	defer tx.Rollback()
 	if err != nil {
@@ -487,7 +364,7 @@ func (r *TransactionsRepository) insertIntoTransactions(ctx context.Context, tra
 	return r.setTransactionSteps(ctx, tx, transaction)
 }
 
-func (r *TransactionsRepository) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction Transaction) (Transaction, error) {
+func (r *Repository) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction Transaction) (Transaction, error) {
 	// delete existing steps
 	stmt, err := tx.Prepare("DELETE FROM transaction_steps WHERE transaction_id = $1 AND transaction_version = $2")
 	if err != nil {
@@ -520,7 +397,7 @@ func (r *TransactionsRepository) setTransactionSteps(ctx context.Context, tx *sq
 	return transaction, tx.Commit()
 }
 
-func (r *TransactionsRepository) readRows(ctx context.Context, rows *sql.Rows, augmented bool) ([]Transaction, error) {
+func (r *Repository) readRows(ctx context.Context, rows *sql.Rows, augmented bool) ([]Transaction, error) {
 	transactions := []Transaction{}
 
 	for rows.Next() {
@@ -539,7 +416,7 @@ type scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-func (r *TransactionsRepository) readRow(ctx context.Context, row scanner, augmented bool) (Transaction, error) {
+func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (Transaction, error) {
 	transaction := Transaction{
 		Summary: &model.Summary{},
 	}

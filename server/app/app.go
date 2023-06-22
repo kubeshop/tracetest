@@ -32,10 +32,10 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tests"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -150,7 +150,8 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	transactionsRepository := tests.NewTransactionsRepository(db, testDB)
+	transactionsRepository := transaction.NewRepository(db, testDB)
+	transactionRunRepository := transaction.NewRunRepository(db, testDB)
 
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
@@ -206,7 +207,7 @@ func (app *App) Start(opts ...appOption) error {
 		dataStoreRepo,
 		linterRepo,
 		testDB,
-		transactionsRepository,
+		transactionRunRepository,
 		applicationTracer,
 		tracer,
 		subscriptionManager,
@@ -245,7 +246,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	provisioner := provisioning.New()
 
-	router, mappers := controller(app.cfg, testDB, transactionsRepository, tracer, environmentRepo, rf, triggerRegistry)
+	router, mappers := controller(app.cfg, testDB, transactionsRepository, transactionRunRepository, tracer, environmentRepo, rf, triggerRegistry)
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	// use the analytics middleware on complete router
@@ -367,10 +368,10 @@ func registerlinterResource(linterRepo *linterResource.Repository, router *mux.R
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerTransactionResource(repo *tests.TransactionsRepository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[tests.Transaction](
-		tests.TransactionResourceName,
-		tests.TransactionResourceNamePlural,
+func registerTransactionResource(repo *transaction.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[transaction.Transaction](
+		transaction.TransactionResourceName,
+		transaction.TransactionResourceNamePlural,
 		repo,
 		resourcemanager.CanBeAugmented(),
 		resourcemanager.WithTracer(tracer),
@@ -467,7 +468,8 @@ func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscripti
 func controller(
 	cfg httpServerConfig,
 	testDB model.Repository,
-	transactions *tests.TransactionsRepository,
+	transactionRepository *transaction.Repository,
+	transactionRunRepository *transaction.RunRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
@@ -475,7 +477,7 @@ func controller(
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
 
-	router := openapi.NewRouter(httpRouter(cfg, testDB, transactions, tracer, environmentRepo, rf, mappers, triggerRegistry))
+	router := openapi.NewRouter(httpRouter(cfg, testDB, transactionRepository, transactionRunRepository, tracer, environmentRepo, rf, mappers, triggerRegistry))
 
 	return router, mappers
 }
@@ -483,14 +485,15 @@ func controller(
 func httpRouter(
 	cfg httpServerConfig,
 	testDB model.Repository,
-	transactions *tests.TransactionsRepository,
+	transactionRepo *transaction.Repository,
+	transactionRunRepo *transaction.RunRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, transactions, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
+	controller := httpServer.NewController(testDB, transactionRepo, transactionRunRepo, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController
