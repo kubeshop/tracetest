@@ -27,3 +27,7 @@ spec:
       db.operation="get" db.redis.database_index="0"]
     assertions:
     - attr:db.payload  =  '{"key":"pokemon_6"}'
+  - name: 'All HTTP Spans: Status  code is 200'
+    selector: span[tracetest.span.type="http"]
+    assertions:
+    - attr:http.status_code = 200
