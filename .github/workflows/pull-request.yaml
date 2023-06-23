@@ -390,8 +390,12 @@ jobs:
       - name: Run integration tests
         run: |
           # if CYPRESS_RECORD_KEY is empty, we cannot paralelize, so only run one container
-          if [ "${{env.CYPRESS_RECORD_KEY}}" = "" && "${{ matrix.containers }}" != "1" ]; then
-            echo "skipping container ${{ matrix.containers }}"
-            exit 0
+          if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then
+            if ["${{ matrix.containers }}" != "1"]; then
+              echo "skipping container ${{ matrix.containers }}"
+              exit 0
+            fi
+            ./run.sh cypress
+          else
+            ./run.sh cypress-ci
           fi
-          ./run.sh cypress
