@@ -27,8 +27,8 @@ type ResourceSpec interface {
 }
 
 type ResourceList[T ResourceSpec] struct {
-	Count int   `json:"count"`
-	Items []any `json:"items"`
+	Count int           `json:"count" yamlstream:"count"`
+	Items []Resource[T] `json:"items" yamlstream:"items"`
 }
 
 type Resource[T ResourceSpec] struct {
@@ -418,7 +418,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	//       of records inside "item"
 	resourceList := ResourceList[T]{
 		Count: count,
-		Items: []any{},
+		Items: []Resource[T]{},
 	}
 
 	for _, item := range items {
@@ -431,6 +431,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = encoder.WriteEncodedResponse(w, http.StatusOK, resourceList)
+
 	if err != nil {
 		writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 	}

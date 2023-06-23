@@ -149,3 +149,64 @@ name: example
 	})
 
 }
+
+func TestYamlstreamEncoding(t *testing.T) {
+	list := resourcemanager.ResourceList[sampleResource]{
+		Count: 2,
+		Items: []resourcemanager.Resource[sampleResource]{
+			{
+				Type: "sample",
+				Spec: sampleResource{
+					ID:        "1",
+					Name:      "the name",
+					SomeValue: "the value",
+				},
+			},
+			{
+				Type: "sample",
+				Spec: sampleResource{
+					ID:        "2",
+					Name:      "other name",
+					SomeValue: "other value",
+				},
+			},
+		},
+	}
+
+	yamlEncoded := `---
+type: sample
+spec:
+  id: "1"
+  name: the name
+  some_value: the value
+---
+type: sample
+spec:
+  id: "2"
+  name: other name
+  some_value: other value
+`
+
+	req, _ := http.NewRequest(http.MethodGet, "/", strings.NewReader(yamlEncoded))
+	req.Header.Set("Accept", "text/yaml-stream")
+
+	enc := resourcemanager.EncoderFromRequest(req)
+
+	// assert that yaml is correctly marshaled into ResourceList
+	actualRequestDecoded := resourcemanager.ResourceList[sampleResource]{}
+	err := enc.DecodeRequestBody(&actualRequestDecoded)
+	require.NoError(t, err)
+
+	assert.Equal(t, list, actualRequestDecoded)
+
+	// assert that ResourceList is correctly unmarshaled into yaml multidoc
+	rec := httptest.NewRecorder()
+	err = enc.WriteEncodedResponse(rec, 200, list)
+	require.NoError(t, err)
+	resp := rec.Result()
+	response, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, yamlEncoded, string(response))
+
+}
