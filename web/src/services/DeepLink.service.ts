@@ -10,14 +10,14 @@ export type TDeepLinkConfig = {
 };
 
 const DeepLinkService = () => ({
-  getLink({variables, useEnvironmentId, test: {id: testId, version}, environmentId}: TDeepLinkConfig) {
+  getLink({variables, useEnvironmentId, test: {id: testId}, environmentId}: TDeepLinkConfig) {
     const baseUrl = getServerBaseUrl();
     const filteredVariables = variables.filter(variable => !!variable && variable.key);
     const stringVariables = encodeURI(JSON.stringify(filteredVariables));
 
-    const url = `${baseUrl}test/${testId}/version/${version}/run?${
-      filteredVariables.length ? `variables=${stringVariables}` : ''
-    }${useEnvironmentId && environmentId ? `&environmentId=${environmentId}` : ''}`;
+    const url = `${baseUrl}test/${testId}/run?${filteredVariables.length ? `variables=${stringVariables}` : ''}${
+      useEnvironmentId && environmentId ? `&environmentId=${environmentId}` : ''
+    }`;
 
     return url;
   },
