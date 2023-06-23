@@ -2,6 +2,7 @@ import {AxisScale} from '@visx/axis';
 import {Group} from '@visx/group';
 
 import {AxisOffset, BaseLeftPadding, NodeHeight, NodeOverlayHeight} from 'constants/Timeline.constants';
+import useSpanData from 'hooks/useSpanData';
 import {TNode} from 'types/Timeline.types';
 import Collapse from './Collapse';
 import Connector from './Connector';
@@ -18,8 +19,6 @@ interface IProps {
   node: TNode;
   onClick(id: string): void;
   onCollapse(id: string): void;
-  totalFailedChecks?: number;
-  totalPassedChecks?: number;
   xScale: AxisScale;
 }
 
@@ -33,10 +32,9 @@ const SpanNode = ({
   node,
   onClick,
   onCollapse,
-  totalFailedChecks,
-  totalPassedChecks,
   xScale,
 }: IProps) => {
+  const {testSpecs} = useSpanData(node.data.id);
   const isParent = Boolean(node.children);
   const hasParent = indexParent !== -1;
   const positionTop = index * NodeHeight;
@@ -60,8 +58,8 @@ const SpanNode = ({
           name={node.data.name}
           service={node.data.service}
           system={node.data.system}
-          totalFailedChecks={totalFailedChecks}
-          totalPassedChecks={totalPassedChecks}
+          totalFailedChecks={testSpecs?.failed?.length}
+          totalPassedChecks={testSpecs?.passed?.length}
           type={node.data.type}
         />
 

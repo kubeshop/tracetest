@@ -1,6 +1,6 @@
 import {ExclamationCircleFilled} from '@ant-design/icons';
 import {Typography} from 'antd';
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 
 export const Body = styled.div`
   margin-top: 5px;
@@ -21,12 +21,12 @@ export const Container = styled.div`
   background-color: ${({theme}) => theme.color.white};
   border: ${({theme}) => `2px solid ${theme.color.error}`};
   border-radius: 10px;
+  bottom: -40px;
   font-size: ${({theme}) => theme.size.xs};
   height: 100px;
   padding: 10px;
   position: absolute;
-  right: -210px;
-  top: -32px;
+  right: -220px;
   width: 200px;
 `;
 
@@ -39,16 +39,9 @@ export const Content = styled.div`
   }
 `;
 
-export const ErrorIcon = styled(ExclamationCircleFilled)<{$isAbsolute?: boolean}>`
+export const ErrorIcon = styled(ExclamationCircleFilled)<{$isClickable?: boolean}>`
   color: ${({theme}) => theme.color.error};
-
-  ${({$isAbsolute}) =>
-    $isAbsolute &&
-    css`
-      position: absolute;
-      right: 10px;
-      top: 5px;
-    `}
+  cursor: ${({$isClickable}) => $isClickable && 'pointer'};
 `;
 
 export const List = styled.ul`

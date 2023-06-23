@@ -16,10 +16,9 @@ describe('AttributeList', () => {
     const {getByTestId} = render(
       <AttributeList
         attributeList={attributeList}
+        semanticConventions={{}}
         onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
-        semanticConventions={{}}
-        outputs={[]}
       />
     );
 
@@ -30,10 +29,9 @@ describe('AttributeList', () => {
     const {getByTestId} = render(
       <AttributeList
         attributeList={[]}
+        semanticConventions={{}}
         onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
-        semanticConventions={{}}
-        outputs={[]}
       />
     );
 

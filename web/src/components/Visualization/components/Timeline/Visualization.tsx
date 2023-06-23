@@ -7,8 +7,6 @@ import {useTheme} from 'styled-components';
 
 import {AxisHeight, AxisOffset, NodeHeight} from 'constants/Timeline.constants';
 import TimelineModel from 'models/Timeline.model';
-import {useAppSelector} from 'redux/hooks';
-import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import TimelineService from 'services/Timeline.service';
 import SpanNode from './SpanNode';
 import {IProps} from './Timeline';
@@ -24,7 +22,6 @@ function tickLabelProps() {
 const Visualization = ({matchedSpans, onNodeClick, selectedSpan, spans, width = 600}: IProps) => {
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState<string[]>([]);
-  const spansResult = useAppSelector(TestSpecsSelectors.selectSpansResult);
 
   const nodes = useMemo(() => TimelineModel(spans), [spans]);
   const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsed), [collapsed, nodes]);
@@ -78,8 +75,6 @@ const Visualization = ({matchedSpans, onNodeClick, selectedSpan, spans, width = 
             node={node}
             onClick={onNodeClick}
             onCollapse={handleOnCollapse}
-            totalFailedChecks={spansResult[node.data.id]?.failed}
-            totalPassedChecks={spansResult[node.data.id]?.passed}
             xScale={xScale}
           />
         ))}
