@@ -1,5 +1,5 @@
 import {Badge} from 'antd';
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -45,4 +45,26 @@ export const CountBadge = styled(Badge)`
     background-color: ${({theme}) => theme.color.backgroundDark};
     color: ${({theme}) => theme.color.text};
   }
+`;
+
+export const SpanDetailContainer = styled.div<{$isOpen: boolean}>`
+  background-color: ${({theme}) => theme.color.white};
+  box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
+  height: 100%;
+  overflow: visible;
+  position: relative;
+
+  > div {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  ${({$isOpen}) =>
+    $isOpen &&
+    css`
+      > div {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    `}
 `;

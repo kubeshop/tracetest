@@ -18,7 +18,6 @@ export const Connector = styled.div`
 `;
 
 export const Container = styled.div`
-  background-color: ${({theme}) => theme.color.white};
   border: ${({theme}) => `2px solid ${theme.color.error}`};
   border-radius: 10px;
   font-size: ${({theme}) => theme.size.xs};
