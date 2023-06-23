@@ -2,7 +2,6 @@ package environment
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -173,14 +172,28 @@ func TestListEnvironments(t *testing.T) {
 		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 6)
-
 		// due our database sorting algorithm, "another-env" comes in the front of ".env"
 		// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
-		require.Contains(lines[2], "another-env")
-		require.Contains(lines[3], ".env")
-		require.Contains(lines[4], "one-more-env")
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 3)
+
+		firstLine := parsedTable[0]
+
+		require.Equal("another-env", firstLine["ID"])
+		require.Equal("another-env", firstLine["NAME"])
+		require.Equal("", firstLine["DESCRIPTION"])
+
+		secondLine := parsedTable[1]
+
+		require.Equal(".env", secondLine["ID"])
+		require.Equal(".env", secondLine["NAME"])
+		require.Equal("", secondLine["DESCRIPTION"])
+
+		thirdLine := parsedTable[2]
+
+		require.Equal("one-more-env", thirdLine["ID"])
+		require.Equal("one-more-env", thirdLine["NAME"])
+		require.Equal("", thirdLine["DESCRIPTION"])
 	})
 
 	t.Run("list with YAML format skipping the first and taking two items", func(t *testing.T) {

@@ -2,7 +2,6 @@ package environment
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -102,9 +101,14 @@ func TestGetEnvironment(t *testing.T) {
 		// Then it should print a table with 4 lines printed: header, separator, environment item and empty line
 		result := tracetestcli.Exec(t, "get environment --id .env --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, ".env")
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal(".env", singleLine["ID"])
+		require.Equal(".env", singleLine["NAME"])
+		require.Equal("", singleLine["DESCRIPTION"])
 	})
 }

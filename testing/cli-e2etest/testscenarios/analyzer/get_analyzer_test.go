@@ -2,7 +2,6 @@ package analyzer
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -100,9 +99,15 @@ func TestGetAnalyzer(t *testing.T) {
 		// Then it should print a table with 4 lines printed: header, separator, a analyzer item and empty line
 		result := tracetestcli.Exec(t, "get analyzer --id current --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "current")
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal("current", singleLine["ID"])
+		require.Equal("analyzer", singleLine["NAME"])
+		require.Equal("true", singleLine["ENABLED"])
+		require.Equal("95", singleLine["MINIMUM SCORE"])
 	})
 }

@@ -2,7 +2,6 @@ package demo
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -140,11 +139,22 @@ func TestListDemos(t *testing.T) {
 		result := tracetestcli.Exec(t, "list demo --sortBy name --sortDirection asc --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 5)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 2)
 
-		require.Contains(lines[2], "another-dev")
-		require.Contains(lines[3], "dev")
+		firstLine := parsedTable[0]
+
+		require.NotEmpty(firstLine["ID"]) // demo resource generates a random ID each time
+		require.Equal("another-dev", firstLine["NAME"])
+		require.Equal("pokeshop", firstLine["TYPE"])
+		require.Equal("true", firstLine["ENABLED"])
+
+		secondLine := parsedTable[1]
+
+		require.NotEmpty(secondLine["ID"]) // demo resource generates a random ID each time
+		require.Equal("dev", secondLine["NAME"])
+		require.Equal("otelstore", secondLine["TYPE"])
+		require.Equal("true", secondLine["ENABLED"])
 	})
 
 	t.Run("list with YAML format skipping the first and taking one item", func(t *testing.T) {

@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -102,10 +101,14 @@ func TestListDatastore(t *testing.T) {
 		// Then it should print a table with 4 lines printed: header, separator, data store item and empty line
 		result := tracetestcli.Exec(t, "list datastore --sortBy name --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "current")
-		require.Contains(result.StdOut, env.Name())
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal("current", singleLine["ID"])
+		require.Equal(env.Name(), singleLine["NAME"])
+		require.Equal("*", singleLine["DEFAULT"])
 	})
 }

@@ -2,7 +2,6 @@ package demo
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -109,9 +108,15 @@ func TestGetDemo(t *testing.T) {
 		command := fmt.Sprintf("get demo --id %s --output pretty", registeredDemoId)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "dev")
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 4)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.NotEmpty(singleLine["ID"]) // demo resource generates a random ID each time
+		require.Equal("dev", singleLine["NAME"])
+		require.Equal("otelstore", singleLine["TYPE"])
+		require.Equal("true", singleLine["ENABLED"])
 	})
 }
