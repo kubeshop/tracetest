@@ -381,20 +381,20 @@ jobs:
         run: |
           docker load --input dist/image.tar
 
-      - name: Start services
+      - name: Run integration tests
         run: |
+          # if CYPRESS_RECORD_KEY is empty, we cannot paralelize, so only run one container
+          if [ "${{env.CYPRESS_RECORD_KEY}}" = "" && "${{ matrix.containers }}" != "1" ]; then
+            echo "skipping container ${{ matrix.containers }}"
+            exit 0
+          fi
+
           ./run.sh down up
           ./run.sh logstt > /tmp/docker-log &
           ./scripts/wait-for-port.sh 11633
 
-      - name: Run integration tests
-        run: |
-          # if CYPRESS_RECORD_KEY is empty, we cannot paralelize, so only run one container
           if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then
-            if ["${{ matrix.containers }}" != "1"]; then
-              echo "skipping container ${{ matrix.containers }}"
-              exit 0
-            fi
+            # if this is not container #1, the script won't get here, so don't need for additional checks
             ./run.sh cypress
           else
             ./run.sh cypress-ci
