@@ -1,5 +1,5 @@
-import PanelLayout from 'components/ResizablePanels';
 import {useMemo} from 'react';
+import ResizablePanels from 'components/ResizablePanels';
 import TestRun from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import * as S from './RunDetailTrace.styled';
@@ -21,14 +21,18 @@ export enum VisualizationType {
 
 const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
   const panels = useMemo(
-    () => [getSpanDetailsPanel(testId, run), geTracePanel(testId, run, runEvents), getAnalyzerPanel(run)],
+    () => [
+      getSpanDetailsPanel(testId, run),
+      geTracePanel(testId, run, runEvents),
+      getAnalyzerPanel(run),
+    ],
     [run, runEvents, testId]
   );
 
   return (
     <S.Container>
       <SetupAlert />
-      <PanelLayout panels={panels} />
+      <ResizablePanels panels={panels} />
     </S.Container>
   );
 };

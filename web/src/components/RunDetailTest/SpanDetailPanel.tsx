@@ -17,7 +17,7 @@ export const getSpanDetailsPanel = (): TPanel => ({
   name: 'SPAN_DETAILS',
   minSize: 15,
   maxSize: 320,
-  splitterPosition: 'after',
+  position: 'left',
   component: props => <SpanDetailsPanel {...props} />,
 });
 

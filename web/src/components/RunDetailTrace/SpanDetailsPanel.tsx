@@ -30,11 +30,11 @@ const SpanDetailsPanel = ({size: {isOpen}, run, testId}: TProps) => {
   );
 };
 
-export const getSpanDetailsPanel = (testId: string, run: TestRun): TPanel => ({
-  name: 'SPAN_DETAILS',
+export const getSpanDetailsPanel = (testId: string, run: TestRun, order = 1): TPanel => ({
+  name: `SPAN_DETAILS_${order}`,
   minSize: 15,
   maxSize: 320,
-  splitterPosition: 'after',
+  position: 'left',
   component: props => <SpanDetailsPanel {...props} testId={testId} run={run} />,
 });
 

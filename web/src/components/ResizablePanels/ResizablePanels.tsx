@@ -11,7 +11,7 @@ export type TPanel = {
   isDefaultOpen?: boolean;
   minSize?: number;
   maxSize?: number;
-  splitterPosition?: 'before' | 'after' | undefined;
+  position?: 'left' | 'right' | undefined;
   component(props: TPanelComponentProps): React.ReactElement;
 };
 
@@ -26,24 +26,11 @@ const ResizablePanels = ({panels}: IProps) => {
 
   const elements = useMemo(
     () =>
-      Object.values(sizes).reduce<React.ReactNode[]>((acc, size) => {
-        const {component: Component, splitterPosition} = getPanel(size.name)!;
+      Object.values(sizes).reduce<React.ReactNode[]>((acc, size, index) => {
+        const {component: Component, position} = getPanel(size.name)!;
 
-        if (splitterPosition === 'before') {
-          acc.push(
-            <Spaces.RightResizable
-              onResizeEnd={newSize => onStopResize(size, newSize)}
-              minimumSize={size.minSize}
-              maximumSize={size.maxSize}
-              size={size.size}
-              key={size.name}
-              handleRender={props => <Splitter {...props} isOpen={!size.isOpen} onClick={() => toggle(size)} />}
-            >
-              <Component size={size} />
-            </Spaces.RightResizable>
-          );
-        } else if (splitterPosition === 'after') {
-          acc.push(
+        if (position === 'left') {
+          return acc.concat([
             <Spaces.LeftResizable
               onResizeEnd={newSize => onStopResize(size, newSize)}
               minimumSize={size.minSize}
@@ -51,19 +38,34 @@ const ResizablePanels = ({panels}: IProps) => {
               size={size.size}
               key={size.name}
               handleRender={props => <Splitter {...props} isOpen={size.isOpen} onClick={() => toggle(size)} />}
+              order={index + 1}
             >
               <Component size={size} />
-            </Spaces.LeftResizable>
-          );
-        } else {
-          acc.push(
-            <Spaces.Fill>
-              <Component size={size} />
-            </Spaces.Fill>
-          );
+            </Spaces.LeftResizable>,
+          ]);
         }
 
-        return acc;
+        if (position === 'right') {
+          return acc.concat([
+            <Spaces.RightResizable
+              onResizeEnd={newSize => onStopResize(size, newSize)}
+              minimumSize={size.minSize}
+              maximumSize={size.maxSize}
+              size={size.size}
+              key={size.name}
+              handleRender={props => <Splitter {...props} isOpen={!size.isOpen} onClick={() => toggle(size)} />}
+              order={index + 1}
+            >
+              <Component size={size} />
+            </Spaces.RightResizable>,
+          ]);
+        }
+
+        return acc.concat(
+          <Spaces.Fill>
+            <Component size={size} />
+          </Spaces.Fill>
+        );
       }, []),
     [getPanel, onStopResize, sizes, toggle]
   );
