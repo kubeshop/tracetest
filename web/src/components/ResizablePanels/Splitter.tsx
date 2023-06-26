@@ -9,16 +9,17 @@ interface IProps {
   id?: string;
   key: string | number;
   className?: string;
+  name: string;
   onMouseDown: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onTouchStart: (e: React.TouchEvent<HTMLElement>) => void;
 }
 
-const Splitter = ({isOpen, onClick, id, key, className, onMouseDown, onTouchStart}: IProps) => {
+const Splitter = ({isOpen, name, onClick, id, key, className, onMouseDown, onTouchStart}: IProps) => {
   return (
     <S.SplitterContainer id={id} key={key} className={className} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
       <S.ButtonContainer>
         <Button
-          data-cy="toggle-drawer"
+          data-cy={`toggle-drawer-${name}`}
           icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
           onClick={event => {
             event.stopPropagation();

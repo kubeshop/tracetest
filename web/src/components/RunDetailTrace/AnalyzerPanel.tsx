@@ -19,8 +19,8 @@ const AnalyzerPanel = ({run, size: {isOpen}}: TProps) => {
   );
 };
 
-export const getAnalyzerPanel = (run: TestRun, order = 1): TPanel => ({
-  name: `ANALYZER_${order}`,
+export const getAnalyzerPanel = (run: TestRun): TPanel => ({
+  name: 'ANALYZER',
   maxSize: 720,
   minSize: 15,
   isDefaultOpen: true,

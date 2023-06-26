@@ -37,7 +37,9 @@ const ResizablePanels = ({panels}: IProps) => {
               maximumSize={size.maxSize}
               size={size.size}
               key={size.name}
-              handleRender={props => <Splitter {...props} isOpen={size.isOpen} onClick={() => toggle(size)} />}
+              handleRender={props => (
+                <Splitter {...props} name={size.name} isOpen={size.isOpen} onClick={() => toggle(size)} />
+              )}
               order={index + 1}
             >
               <Component size={size} />
@@ -53,7 +55,9 @@ const ResizablePanels = ({panels}: IProps) => {
               maximumSize={size.maxSize}
               size={size.size}
               key={size.name}
-              handleRender={props => <Splitter {...props} isOpen={!size.isOpen} onClick={() => toggle(size)} />}
+              handleRender={props => (
+                <Splitter {...props} name={size.name} isOpen={!size.isOpen} onClick={() => toggle(size)} />
+              )}
               order={index + 1}
             >
               <Component size={size} />

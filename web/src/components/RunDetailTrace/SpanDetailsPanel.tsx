@@ -30,8 +30,8 @@ const SpanDetailsPanel = ({size: {isOpen}, run, testId}: TProps) => {
   );
 };
 
-export const getSpanDetailsPanel = (testId: string, run: TestRun, order = 1): TPanel => ({
-  name: `SPAN_DETAILS_${order}`,
+export const getSpanDetailsPanel = (testId: string, run: TestRun): TPanel => ({
+  name: 'SPAN_DETAILS',
   minSize: 15,
   maxSize: 320,
   position: 'left',
