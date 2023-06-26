@@ -50,7 +50,7 @@ func (e yamlStreamEncoder) Accepts(contentType string) bool {
 }
 
 func (e yamlStreamEncoder) Marshal(in interface{}) (out []byte, err error) {
-	targetField, err := getYamlstreamField(in, "items", reflect.Slice)
+	targetField, err := getYamlStreamField(in, "items", reflect.Slice)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (e yamlStreamEncoder) Marshal(in interface{}) (out []byte, err error) {
 }
 
 func (e yamlStreamEncoder) Unmarshal(in []byte, out interface{}) (err error) {
-	targetField, err := getYamlstreamField(out, "items", reflect.Slice)
+	targetField, err := getYamlStreamField(out, "items", reflect.Slice)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (e yamlStreamEncoder) Unmarshal(in []byte, out interface{}) (err error) {
 	}
 
 	// if there's an error, ignore the count.
-	countField, _ := getYamlstreamField(out, "count", reflect.Int)
+	countField, _ := getYamlStreamField(out, "count", reflect.Int)
 	if countField.IsValid() {
 		countField.SetInt(int64(targetField.Len()))
 	}
@@ -116,9 +116,9 @@ func (e yamlStreamEncoder) Unmarshal(in []byte, out interface{}) (err error) {
 	return nil
 }
 
-// getYamlstreamField returns the field in `target` with the name as the value of its yamlstream tag.
+// getYamlStreamField returns the field in `target` with the name as the value of its yamlstream tag.
 // it returns an error if the field is not found or if the field is not of the specified kind.
-func getYamlstreamField(target interface{}, name string, kind reflect.Kind) (reflect.Value, error) {
+func getYamlStreamField(target interface{}, name string, kind reflect.Kind) (reflect.Value, error) {
 	v := reflect.ValueOf(target)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()

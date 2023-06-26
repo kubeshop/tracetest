@@ -150,7 +150,7 @@ name: example
 
 }
 
-func TestYamlstreamEncoding(t *testing.T) {
+func TestYamlStreamEncoding(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		t.Parallel()
 
