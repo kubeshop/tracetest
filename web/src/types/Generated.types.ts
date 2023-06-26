@@ -1817,7 +1817,6 @@ export interface external {
         };
         TestSummary: {
           runs?: number;
-          steps?: number;
           lastRun?: {
             /** Format: date-time */
             time?: string | null;

@@ -20,7 +20,6 @@ var _ MappedNullable = &TestSummary{}
 // TestSummary struct for TestSummary
 type TestSummary struct {
 	Runs    *int32              `json:"runs,omitempty"`
-	Steps   *int32              `json:"steps,omitempty"`
 	LastRun *TestSummaryLastRun `json:"lastRun,omitempty"`
 }
 
@@ -73,38 +72,6 @@ func (o *TestSummary) SetRuns(v int32) {
 	o.Runs = &v
 }
 
-// GetSteps returns the Steps field value if set, zero value otherwise.
-func (o *TestSummary) GetSteps() int32 {
-	if o == nil || isNil(o.Steps) {
-		var ret int32
-		return ret
-	}
-	return *o.Steps
-}
-
-// GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *TestSummary) GetStepsOk() (*int32, bool) {
-	if o == nil || isNil(o.Steps) {
-		return nil, false
-	}
-	return o.Steps, true
-}
-
-// HasSteps returns a boolean if a field has been set.
-func (o *TestSummary) HasSteps() bool {
-	if o != nil && !isNil(o.Steps) {
-		return true
-	}
-
-	return false
-}
-
-// SetSteps gets a reference to the given int32 and assigns it to the Steps field.
-func (o *TestSummary) SetSteps(v int32) {
-	o.Steps = &v
-}
-
 // GetLastRun returns the LastRun field value if set, zero value otherwise.
 func (o *TestSummary) GetLastRun() TestSummaryLastRun {
 	if o == nil || isNil(o.LastRun) {
@@ -148,7 +115,6 @@ func (o TestSummary) MarshalJSON() ([]byte, error) {
 func (o TestSummary) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	// skip: runs is readOnly
-	// skip: steps is readOnly
 	if !isNil(o.LastRun) {
 		toSerialize["lastRun"] = o.LastRun
 	}
