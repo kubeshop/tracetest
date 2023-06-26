@@ -59,6 +59,9 @@ components:
         runs:
           type: integer
           readOnly: true
+        steps:
+          type: integer
+          readOnly: true
         lastRun:
           type: object
           readOnly: true
