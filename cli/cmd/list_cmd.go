@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
-	"github.com/kubeshop/tracetest/cli/utils"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
-var listParams = &parameters.ListParams{}
+var listParams = resourcemanager.ListOption{}
 
 var listCmd = &cobra.Command{
 	GroupID: cmdGroupResources.ID,
@@ -19,38 +18,27 @@ var listCmd = &cobra.Command{
 	Short:   "List resources",
 	Long:    "List resources from your Tracetest server",
 	PreRun:  setupCommand(),
-	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
+	Run: func(cmd *cobra.Command, args []string) {
 		resourceType := args[0]
 		ctx := context.Background()
 
-		resourceActions, err := resourceRegistry.Get(resourceType)
+		resourceClient, err := resources.Get(resourceType)
 		if err != nil {
-			return "", err
+			panic(err)
 		}
 
-		listArgs := utils.ListArgs{
-			Take:          listParams.Take,
-			Skip:          listParams.Skip,
-			SortDirection: listParams.SortDirection,
-			SortBy:        listParams.SortBy,
-			All:           listParams.All,
-		}
-
-		resource, err := resourceActions.List(ctx, listArgs)
+		resultFormat, err := resourcemanager.Formats.Get(output)
 		if err != nil {
-			return "", err
+			panic(err)
 		}
-
-		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, formatters.Pretty, resourceFormatter)
-
-		result, err := formatter.FormatList(resource)
+		result, err := resourceClient.List(ctx, listParams, resultFormat)
 		if err != nil {
-			return "", err
+			panic(err)
 		}
 
-		return result, nil
-	}, listParams),
+		fmt.Println(result)
+
+	},
 	PostRun: teardownCommand,
 }
 
