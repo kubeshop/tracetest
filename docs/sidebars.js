@@ -543,6 +543,21 @@ const sidebars = {
           id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
           label: "Node.js and Honeycomb",
         },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights",
+          label: "Azure App Insights",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
+          label: "Azure App Insights and The OpenTelemetry Collector",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
+          label: "Azure App Insights, The OpenTelemetry Collector & Pokeshop API",
+        },
       ],
     },
     {
