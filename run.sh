@@ -7,7 +7,7 @@ export TAG=${TAG:-dev}
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
 
 help_message() {
-  echo "usage: ./run.sh [cypress|tracetests|up|build|down|tracetest-logs|logs|ps|restart]"
+  echo "usage: ./run.sh [cypress|tracetests|up|stop|build|down|tracetest-logs|logs|ps|restart]"
 }
 
 restart() {
@@ -41,6 +41,10 @@ build() {
 
 up() {
   docker compose $opts up -d --remove-orphans
+}
+
+stop() {
+  docker compose $opts stop
 }
 
 cypress-ci() {
@@ -101,6 +105,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     up)
       CMD+=("up")
+      shift
+      ;;
+    stop)
+      CMD+=("stop")
       shift
       ;;
     build)
