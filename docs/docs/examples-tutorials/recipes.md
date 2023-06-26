@@ -45,7 +45,7 @@ This integration point uses the OpenTelemetry Collector as a router to send trac
 ### Azure App Insights
 
 - [Running Tracetest with Azure App Insights (AppInsights Otel Node.js SDK)](./recipes/running-tracetest-with-azure-app-insights.md)
-- [Running Tracetest with Azure App Insights (Otel Node.js SDK & OpenTelemetryCollector)](./recipes/running-tracetest-with-azure-app-insights-collector.md)
+- [Running Tracetest with Azure App Insights (Otel Node.js SDK & OpenTelemetry Collector)](./recipes/running-tracetest-with-azure-app-insights-collector.md)
 - [Running Tracetest with Azure App Insights (OpenTelemetry Collector & Pokeshop API)](./recipes/running-tracetest-with-azure-app-insights-pokeshop.md)
 
 ## CI/CD Automation

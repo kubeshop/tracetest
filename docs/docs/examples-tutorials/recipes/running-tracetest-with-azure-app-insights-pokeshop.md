@@ -1,4 +1,4 @@
-# Running Tracetest with Azure App Insights (OpenTelemetryCollector & Pokeshop API)
+# Running Tracetest with Azure App Insights (OpenTelemetry Collector & Pokeshop API)
 
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-azure-app-insights-pokeshop)
