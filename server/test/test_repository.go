@@ -2,9 +2,12 @@ package test
 
 import (
 	"context"
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -22,14 +25,12 @@ type Repository interface {
 
 	Get(context.Context, id.ID) (Test, error)
 	GetAugmented(ctx context.Context, id id.ID) (Test, error)
+	Exists(context.Context, id.ID) (bool, error)
+	GetVersion(_ context.Context, _ id.ID, version int) (Test, error)
 
 	Create(context.Context, Test) (Test, error)
-
-	// TODO: uncomment as we add new functionality
-	// Update(context.Context, Test) (Test, error)
-	// Delete(context.Context, Test) error
-	// Exists(context.Context, id.ID) (bool, error)
-	// GetTestVersion(_ context.Context, _ id.ID, version int) (Test, error)
+	Update(context.Context, Test) (Test, error)
+	Delete(context.Context, Test) error
 }
 
 type repository struct {
@@ -246,6 +247,10 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return Test{}, err
+		}
+
 		return Test{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
@@ -344,6 +349,173 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 	)
 	if err != nil {
 		return Test{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	return test, nil
+}
+
+func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
+	if test.Version == nil || *test.Version == 0 {
+		test.Version = intPtr(1)
+	}
+
+	oldTest, err := r.get(ctx, test.ID)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
+	}
+
+	// keep the same creation date to keep sort order
+	test.CreatedAt = oldTest.CreatedAt
+
+	testToUpdate, err := bumpTestVersionIfNeeded(oldTest, test)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not bump test version: %w", err)
+	}
+
+	if oldTest.Version == testToUpdate.Version {
+		// No change in the version. Nothing changed so no need to persist it
+		return testToUpdate, nil
+	}
+
+	return r.insertTest(ctx, testToUpdate)
+}
+
+func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
+	testHasChanged, err := testHasChanged(in, updated)
+	if err != nil {
+		return Test{}, err
+	}
+
+	if testHasChanged {
+		updated.Version = intPtr(*in.Version + 1)
+	}
+
+	return updated, nil
+}
+
+func testHasChanged(oldTest Test, newTest Test) (bool, error) {
+	outputsHaveChanged, err := testFieldHasChanged(oldTest.Outputs, newTest.Outputs)
+	if err != nil {
+		return false, err
+	}
+
+	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
+	if err != nil {
+		return false, err
+	}
+
+	triggerHasChanged, err := testFieldHasChanged(oldTest.Trigger, newTest.Trigger)
+	if err != nil {
+		return false, err
+	}
+
+	nameHasChanged := oldTest.Name != newTest.Name
+	descriptionHasChanged := oldTest.Description != newTest.Description
+
+	return outputsHaveChanged || definitionHasChanged || triggerHasChanged || nameHasChanged || descriptionHasChanged, nil
+}
+
+func testFieldHasChanged(oldField interface{}, newField interface{}) (bool, error) {
+	oldFieldJSON, err := json.Marshal(oldField)
+	if err != nil {
+		return false, err
+	}
+
+	newFieldJSON, err := json.Marshal(newField)
+	if err != nil {
+		return false, err
+	}
+
+	return string(oldFieldJSON) != string(newFieldJSON), nil
+}
+
+func intPtr(in int) *int {
+	return &in
+}
+
+func (r *repository) Delete(ctx context.Context, test Test) error {
+	queries := []string{
+		"DELETE FROM transaction_run_steps WHERE test_run_test_id = $1",
+		"DELETE FROM transaction_steps WHERE test_id = $1",
+		"DELETE FROM test_runs WHERE test_id = $1",
+		"DELETE FROM tests WHERE id = $1",
+	}
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("sql BeginTx: %w", err)
+	}
+	defer tx.Rollback()
+
+	for _, sql := range queries {
+		_, err := tx.ExecContext(ctx, sql, test.ID)
+		if err != nil {
+			return fmt.Errorf("sql error: %w", err)
+		}
+	}
+
+	dropSequence(ctx, tx, test.ID)
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("sql Commit: %w", err)
+	}
+
+	return nil
+}
+
+const (
+	createSequenceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	dropSequenceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	runSequenceName     = "%sequence_name%"
+)
+
+func dropSequence(ctx context.Context, tx *sql.Tx, testID id.ID) error {
+	_, err := tx.ExecContext(
+		ctx,
+		replaceRunSequenceName(dropSequenceQuery, testID),
+	)
+
+	return err
+}
+
+func md5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
+}
+
+func replaceRunSequenceName(sql string, testID id.ID) string {
+	// postgres doesn't like uppercase chars in sequence names.
+	// testID might contain uppercase chars, and we cannot lowercase them
+	// because they might lose their uniqueness.
+	// md5 creates a unique, lowercase hash.
+	seqName := "runs_test_" + md5Hash(testID.String()) + "_seq"
+	return strings.ReplaceAll(sql, runSequenceName, seqName)
+}
+
+func (r *repository) Exists(ctx context.Context, id id.ID) (bool, error) {
+	_, err := r.get(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *repository) GetVersion(ctx context.Context, id id.ID, version int) (Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
+	if err != nil {
+		return Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id, version))
+	if err != nil {
+		return Test{}, err
 	}
 
 	return test, nil
