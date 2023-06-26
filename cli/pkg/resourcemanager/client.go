@@ -56,24 +56,6 @@ type ListOption struct {
 	All           bool
 }
 
-func (p *ListOption) Validate(args []string) []error {
-	errors := make([]error, 0)
-
-	if p.Take < 0 {
-		errors = append(errors, fmt.Errorf("[take] must be greater than 0"))
-	}
-
-	if p.Skip < 0 {
-		errors = append(errors, fmt.Errorf("[skip] must be greater than 0"))
-	}
-
-	if p.SortDirection != "asc" && p.SortDirection != "desc" {
-		errors = append(errors, fmt.Errorf("[sortDirection] must be either asc or desc"))
-	}
-
-	return errors
-}
-
 func (c client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
 	url := c.url()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

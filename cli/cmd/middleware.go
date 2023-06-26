@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +19,7 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 			fmt.Fprintf(os.Stderr, `
 Version
 %s
-		
+
 An error ocurred when executing the command
 
 %s
@@ -35,16 +34,19 @@ An error ocurred when executing the command
 	}
 }
 
-func WithParamsHandler(params ...parameters.Params) MiddlewareWrapper {
+func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
 	return func(runFn RunFn) RunFn {
 		return func(cmd *cobra.Command, args []string) (string, error) {
-			errors := parameters.ValidateParams(cmd, args, params...)
+			errors := make([]error, 0)
+
+			for _, validator := range validators {
+				errors = append(errors, validator.Validate(cmd, args)...)
+			}
 
 			if len(errors) > 0 {
-				errorText := `The following errors occurred when validating the flags:`
+				errorText := "The following errors occurred when validating the flags:\n"
 				for _, err := range errors {
-					errorText += fmt.Sprintf(`
-[%s] %s`, err.Parameter, err.Message)
+					errorText += err.Error() + "\n"
 				}
 
 				return "", fmt.Errorf(errorText)
@@ -55,7 +57,11 @@ func WithParamsHandler(params ...parameters.Params) MiddlewareWrapper {
 	}
 }
 
-func WithResourceMiddleware(runFn RunFn, params ...parameters.Params) CobraRunFn {
+type Validator interface {
+	Validate(cmd *cobra.Command, args []string) []error
+}
+
+func WithResourceMiddleware(runFn RunFn, params ...Validator) CobraRunFn {
 	params = append(params, resourceParams)
 	return WithResultHandler(WithParamsHandler(params...)(runFn))
 }

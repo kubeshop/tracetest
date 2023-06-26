@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listParams = resourcemanager.ListOption{}
+var listParams = parameters.ListParams{}
 
 var listCmd = &cobra.Command{
 	GroupID: cmdGroupResources.ID,
@@ -18,27 +18,35 @@ var listCmd = &cobra.Command{
 	Short:   "List resources",
 	Long:    "List resources from your Tracetest server",
 	PreRun:  setupCommand(),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
 		resourceClient, err := resources.Get(resourceType)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 
 		resultFormat, err := resourcemanager.Formats.Get(output)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
-		result, err := resourceClient.List(ctx, listParams, resultFormat)
+
+		lp := resourcemanager.ListOption{
+			Take:          listParams.Take,
+			Skip:          listParams.Skip,
+			SortBy:        listParams.SortBy,
+			SortDirection: listParams.SortDirection,
+			All:           listParams.All,
+		}
+
+		result, err := resourceClient.List(ctx, lp, resultFormat)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 
-		fmt.Println(result)
-
-	},
+		return result, nil
+	}, listParams),
 	PostRun: teardownCommand,
 }
 

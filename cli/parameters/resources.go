@@ -15,27 +15,25 @@ type ListParams struct {
 	All           bool
 }
 
-var _ Params = &ListParams{}
-
-func (p *ListParams) Validate(cmd *cobra.Command, args []string) []ParamError {
-	errors := make([]ParamError, 0)
+func (p ListParams) Validate(cmd *cobra.Command, args []string) []error {
+	errors := make([]error, 0)
 
 	if p.Take < 0 {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "take",
 			Message:   "take parameter must be greater than 0",
 		})
 	}
 
 	if p.Skip < 0 {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "skip",
 			Message:   "skip parameter must be greater than 0",
 		})
 	}
 
 	if p.SortDirection != "" && p.SortDirection != "asc" && p.SortDirection != "desc" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "sortDirection",
 			Message:   "sortDirection parameter must be either asc or desc",
 		})
@@ -48,13 +46,11 @@ type ResourceIdParams struct {
 	ResourceId string
 }
 
-var _ Params = &ResourceIdParams{}
-
-func (p *ResourceIdParams) Validate(cmd *cobra.Command, args []string) []ParamError {
-	errors := make([]ParamError, 0)
+func (p *ResourceIdParams) Validate(cmd *cobra.Command, args []string) []error {
+	errors := make([]error, 0)
 
 	if p.ResourceId == "" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "id",
 			Message:   "resource id must be provided",
 		})
@@ -67,13 +63,11 @@ type ApplyParams struct {
 	DefinitionFile string
 }
 
-var _ Params = &ApplyParams{}
-
-func (p *ApplyParams) Validate(cmd *cobra.Command, args []string) []ParamError {
-	errors := make([]ParamError, 0)
+func (p *ApplyParams) Validate(cmd *cobra.Command, args []string) []error {
+	errors := make([]error, 0)
 
 	if p.DefinitionFile == "" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "file",
 			Message:   "Definition file must be provided",
 		})
@@ -86,14 +80,13 @@ type ResourceParams struct {
 	ResourceName string
 }
 
-var _ Params = &ResourceParams{}
 var ValidResources = []string{"config", "datastore", "demo", "environment", "pollingprofile", "transaction", "analyzer"}
 
-func (p *ResourceParams) Validate(cmd *cobra.Command, args []string) []ParamError {
-	errors := make([]ParamError, 0)
+func (p *ResourceParams) Validate(cmd *cobra.Command, args []string) []error {
+	errors := make([]error, 0)
 
 	if len(args) == 0 {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "resource",
 			Message:   "resource name must be provided",
 		})
@@ -103,7 +96,7 @@ func (p *ResourceParams) Validate(cmd *cobra.Command, args []string) []ParamErro
 
 	p.ResourceName = args[0]
 	if p.ResourceName == "" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "resource",
 			Message:   "resource name must be provided",
 		})
@@ -118,7 +111,7 @@ func (p *ResourceParams) Validate(cmd *cobra.Command, args []string) []ParamErro
 	}
 
 	if !exists {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "resource",
 			Message:   fmt.Sprintf("resource must be one of %s", strings.Join(ValidResources, ", ")),
 		})
