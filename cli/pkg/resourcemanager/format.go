@@ -84,15 +84,15 @@ func (p prettyFormat) String() string {
 }
 
 // Format formats data into table using given mappings.
-// mappings is required to be a []TableCellConfig, where key is a column name and value is a path to the value in data.
+// mappings is required to be a TableConfig.
 // The path is a dot-separated list of keys, e.g. "metadata.name". See github.com/Jeffail/gabs.
 func (p prettyFormat) Format(data string, opts ...any) (string, error) {
-	// we expect only one option - []TableCellConfig
+	// we expect only one option - TableConfig
 	if len(opts) != 1 {
 		return "", fmt.Errorf("expected 1 option, got %d", len(opts))
 	}
 
-	mappings, ok := opts[0].([]TableCellConfig)
+	tableConfig, ok := opts[0].(TableConfig)
 	if !ok {
 		return "", fmt.Errorf("expected option to be a []TableCellConfig, got %T", opts[0])
 	}
@@ -103,8 +103,8 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	}
 
 	// iterate over given mappings and build table headers
-	headers := make([]*simpletable.Cell, 0, len(mappings))
-	for _, mapping := range mappings {
+	headers := make([]*simpletable.Cell, 0, len(tableConfig.Cells))
+	for _, mapping := range tableConfig.Cells {
 		headers = append(headers, &simpletable.Cell{
 			Text: mapping.Header,
 		})
@@ -116,9 +116,13 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	// iterate over parsed data and build table body
 	body := make([][]*simpletable.Cell, 0, len(items.Children()))
 	for _, child := range items.Children() {
-		row := make([]*simpletable.Cell, 0, len(mappings))
+		row := make([]*simpletable.Cell, 0, len(tableConfig.Cells))
 
-		for _, mapping := range mappings {
+		if tableConfig.ItemModifier != nil {
+			tableConfig.ItemModifier(child)
+		}
+
+		for _, mapping := range tableConfig.Cells {
 			value := ""
 			if v := child.Path(mapping.Path).Data(); v != nil {
 				value = fmt.Sprintf("%v", v)
@@ -139,6 +143,14 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	table.Body.Cells = body
 
 	return table.String(), nil
+}
+
+// TableConfig is a configuration for prettyFormat
+// Cells is a list of mappings from JSON keys to table headers. See github.com/Jeffail/gabs.
+// ItemModifier is an optional function that can modify each item before it's added to the table.
+type TableConfig struct {
+	Cells        []TableCellConfig
+	ItemModifier func(item *gabs.Container)
 }
 
 type TableCellConfig struct {

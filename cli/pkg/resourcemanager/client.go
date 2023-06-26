@@ -18,7 +18,7 @@ type client struct {
 	client             HTTPClient
 	resourceName       string
 	resourceNamePlural string
-	mappings           []TableCellConfig
+	tableConfig        TableConfig
 }
 
 type HTTPClient struct {
@@ -49,24 +49,14 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 }
 
 // NewClient creates a new client for a resource managed by the resourceamanger.
-// The mappings parameter is a list of column names to the json path of the value.
-// The path is relative to the Resource root, so the client does not need to consider the ResourceList wrapper struct.
-// Example:
-//
-//	mappings := []TableCellConfig{
-//		{Header: "ID", Path: "id"},
-//		{Header: "Name", Path: "metadata.name"},
-//		{Header: "Namespace", Path: "metadata.namespace"},
-//		{Header: "Age", Path: "metadata.creationTimestamp"},
-//	}
-//
-// this example would work both for a single resource from a Get, or a ResourceList from a List
-func NewClient(httpClient HTTPClient, resourceName, resourceNamePlural string, mappings []TableCellConfig) client {
+// The tableConfig parameter configures how the table view should be rendered.
+// This configuration work both for a single resource from a Get, or a ResourceList from a List
+func NewClient(httpClient HTTPClient, resourceName, resourceNamePlural string, tableConfig TableConfig) client {
 	return client{
 		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
-		mappings:           mappings,
+		tableConfig:        tableConfig,
 	}
 }
 
@@ -105,5 +95,5 @@ func (c client) List(ctx context.Context, opt ListOption, format Format) (string
 		return "", fmt.Errorf("cannot read List response: %w", err)
 	}
 
-	return format.Format(string(body), c.mappings)
+	return format.Format(string(body), c.tableConfig)
 }
