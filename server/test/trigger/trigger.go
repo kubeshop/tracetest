@@ -5,14 +5,14 @@ type (
 
 	Trigger struct {
 		Type    TriggerType     `json:"type"`
-		HTTP    *HTTPRequest    `json:"http,omitempty"`
+		HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
 		GRPC    *GRPCRequest    `json:"grpc,omitempty"`
 		TraceID *TraceIDRequest `json:"traceid,omitempty"`
 	}
 
 	TriggerResult struct {
 		Type    TriggerType      `json:"type"`
-		HTTP    *HTTPResponse    `json:"http,omitempty"`
+		HTTP    *HTTPResponse    `json:"httpRequest,omitempty"`
 		GRPC    *GRPCResponse    `json:"grpc,omitempty"`
 		TraceID *TraceIDResponse `json:"traceid,omitempty"`
 	}
