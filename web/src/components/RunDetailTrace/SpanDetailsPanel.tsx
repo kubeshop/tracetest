@@ -14,7 +14,7 @@ interface IProps {
 
 const panel = {
   name: 'SPAN_DETAILS',
-  minSize: 15,
+  minSize: 25,
   maxSize: 320,
 };
 
@@ -29,7 +29,10 @@ const SpanDetailsPanel = ({run, testId}: IProps) => {
   }, [navigate, run.id, testId]);
 
   return (
-    <LeftPanel panel={panel}>
+    <LeftPanel
+      panel={panel}
+      tooltip="A certain span contains an attribute and this attribute has a specific value. You can check it here."
+    >
       {size => (
         <PanelContainer $isOpen={size.isOpen}>
           <SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />

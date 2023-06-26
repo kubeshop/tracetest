@@ -6,9 +6,10 @@ interface IProps {
   panel: TPanel;
   order?: number;
   children(size: TSize): React.ReactNode;
+  tooltip?: string;
 }
 
-const RightPanel = ({panel, order = 1, children}: IProps) => {
+const RightPanel = ({panel, order = 1, children, tooltip}: IProps) => {
   const {size, toggle, onStopResize} = useResizablePanel({panel});
 
   return (
@@ -19,7 +20,16 @@ const RightPanel = ({panel, order = 1, children}: IProps) => {
       size={size.size}
       key={size.name}
       order={order}
-      handleRender={props => <Splitter {...props} name={size.name} isOpen={!size.isOpen} onClick={() => toggle()} />}
+      handleRender={props => (
+        <Splitter
+          {...props}
+          name={size.name}
+          isOpen={!size.isOpen}
+          onClick={() => toggle()}
+          tooltip={!size.isOpen ? tooltip : ''}
+          tooltipPlacement="left"
+        />
+      )}
     >
       {children(size)}
     </Spaces.RightResizable>
