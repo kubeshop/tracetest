@@ -12,8 +12,6 @@ package openapi
 type TestSummary struct {
 	Runs int32 `json:"runs,omitempty"`
 
-	Steps int32 `json:"steps,omitempty"`
-
 	LastRun TestSummaryLastRun `json:"lastRun,omitempty"`
 }
 
