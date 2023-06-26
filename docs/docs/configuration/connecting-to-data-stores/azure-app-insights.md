@@ -45,10 +45,9 @@ Run this command in the terminal and specify the file above.
 tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
-<!-- Add back once the examples are ready -->
-<!-- :::tip
-To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-aws-x-ray.md).
-::: -->
+:::tip
+To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-azure-app-insights).
+:::
 
 ## OpenTelemetry Collector
 
@@ -87,7 +86,6 @@ Run this command in the terminal and specify the file above.
 tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
-<!-- Add back once the examples are ready -->
-<!-- :::tip
-To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-aws-x-ray.md).
-::: -->
+:::tip
+To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector.md).
+:::
