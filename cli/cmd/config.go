@@ -87,6 +87,80 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 			),
 		)
 
+		resources.Register(
+			resourcemanager.NewClient(
+				httpClient,
+				"config", "configs",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "ANALYTICS ENABLED", Path: "spec.analyticsEnabled"},
+				},
+			),
+		)
+
+		resources.Register(
+			resourcemanager.NewClient(
+				httpClient,
+				"analyzer", "analyzers",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "ENABLED", Path: "spec.enabled"},
+					{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
+				},
+			),
+		)
+
+		resources.Register(
+			resourcemanager.NewClient(
+				httpClient,
+				"pollingprofile", "pollingprofiles",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "STRATEGY", Path: "spec.strategy"},
+				},
+			),
+		)
+
+		resources.Register(
+			resourcemanager.NewClient(
+				httpClient,
+				"demo", "demos",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "TYPE", Path: "spec.type"},
+					{Header: "ENABLED", Path: "spec.enabled"},
+				},
+			),
+		)
+
+		resources.Register(
+			resourcemanager.NewClient(
+				httpClient,
+				"datastore", "datastores",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "DEFAULT", Path: "spec.default"},
+				},
+			),
+		)
+
+		resources.Register(
+			resourcemanager.NewClient(
+				httpClient,
+				"environment", "environments",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "DESCRIPTION", Path: "spec.description"},
+				},
+			),
+		)
+
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
 		configOptions := append(
@@ -136,6 +210,15 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		)
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
+
+		openapiClient := utils.GetAPIClient(cliConfig)
+		transactionOptions := append(
+			baseOptions,
+			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
+			actions.WithFormatter(formatters.NewTransactionsFormatter()),
+		)
+		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
+		resourceRegistry.Register(transactionActions)
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
