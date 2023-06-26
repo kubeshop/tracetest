@@ -18,13 +18,13 @@ var listCmd = &cobra.Command{
 	Short:   "List resources",
 	Long:    "List resources from your Tracetest server",
 	PreRun:  setupCommand(),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
 		resourceType := args[0]
 		ctx := context.Background()
 
 		resourceClient, err := resources.Get(resourceType)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 
 		resultFormat, err := resourcemanager.Formats.Get(output)
@@ -42,12 +42,11 @@ var listCmd = &cobra.Command{
 
 		result, err := resourceClient.List(ctx, lp, resultFormat)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 
-		fmt.Println(result)
-
-	},
+		return result, nil
+	}, listParams),
 	PostRun: teardownCommand,
 }
 
