@@ -33,7 +33,7 @@ describe('Outputs', () => {
     // Publish and run
     cy.get('[data-cy=trace-actions-publish]').click();
     cy.wait('@testRuns', {timeout: 30000});
-    cy.get('[data-cy=output-item-container]').should('have.length', 2);
+    cy.get('[data-cy=output-count-badge]').should('contain.text', 2);
 
     cy.deleteTest(true);
   });
@@ -76,7 +76,7 @@ describe('Outputs', () => {
     // Publish and run
     cy.get('[data-cy=trace-actions-publish]').click();
     cy.wait('@testRuns', {timeout: 30000});
-    cy.get('[data-cy=output-item-container]').should('have.length', 1);
+    cy.get('[data-cy=output-count-badge]').should('contain.text', 1);
 
     cy.deleteTest(true);
   });
@@ -101,7 +101,7 @@ describe('Outputs', () => {
 
     // Revert
     cy.get('[data-cy=trace-actions-revert-all]').click();
-    cy.get('[data-cy=output-item-container]').should('have.length', 0);
+    cy.get('[data-cy=output-count-badge]').should('contain.text', '');
 
     cy.deleteTest(true);
   });

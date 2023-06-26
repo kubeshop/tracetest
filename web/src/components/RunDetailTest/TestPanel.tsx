@@ -203,7 +203,7 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
                 key={TABS.OUTPUTS}
                 tab={
                   <>
-                    Test Outputs <S.CountBadge count={outputs.length} />
+                    Test Outputs <S.CountBadge data-cy="output-count-badge" count={outputs.length} />
                   </>
                 }
               >
