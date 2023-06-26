@@ -418,7 +418,7 @@ type scanner interface {
 
 func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (Transaction, error) {
 	transaction := Transaction{
-		Summary: &model.Summary{},
+		Summary: &Summary{},
 	}
 
 	var (
@@ -453,6 +453,8 @@ func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (
 			transaction.StepIDs[i] = id.ID(sid)
 		}
 	}
+
+	transaction.Summary.Steps = len(transaction.StepIDs)
 
 	if version != 0 {
 		transaction.Version = &version

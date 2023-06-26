@@ -13,14 +13,20 @@ const (
 )
 
 type Transaction struct {
-	ID          id.ID          `json:"id"`
-	CreatedAt   *time.Time     `json:"createdAt,omitempty"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Version     *int           `json:"version,omitempty"`
-	StepIDs     []id.ID        `json:"steps"`
-	Steps       []model.Test   `json:"fullSteps,omitempty"`
-	Summary     *model.Summary `json:"summary,omitempty"`
+	ID          id.ID        `json:"id"`
+	CreatedAt   *time.Time   `json:"createdAt,omitempty"`
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Version     *int         `json:"version,omitempty"`
+	StepIDs     []id.ID      `json:"steps"`
+	Steps       []model.Test `json:"fullSteps,omitempty"`
+	Summary     *Summary     `json:"summary,omitempty"`
+}
+
+type Summary struct {
+	Runs    int           `json:"runs"`
+	Steps   int           `json:"steps"`
+	LastRun model.LastRun `json:"lastRun"`
 }
 
 func setVersion(t *Transaction, v int) {
