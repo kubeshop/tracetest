@@ -15,11 +15,37 @@ const (
 )
 
 type client struct {
-	client             http.Client
-	baseURL            string
+	client             HTTPClient
 	resourceName       string
 	resourceNamePlural string
 	mappings           []TableCellConfig
+}
+
+type HTTPClient struct {
+	client http.Client
+
+	baseURL      string
+	extraHeaders http.Header
+}
+
+func NewHTTPClient(baseURL string, extraHeaders http.Header) HTTPClient {
+	return HTTPClient{
+		client:       http.Client{},
+		baseURL:      baseURL,
+		extraHeaders: extraHeaders,
+	}
+}
+
+func (c HTTPClient) url(resourceName string, extra ...string) string {
+	return fmt.Sprintf("%s/api/%s/%s", c.baseURL, resourceName, strings.Join(extra, "/"))
+}
+
+func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
+	for k, v := range c.extraHeaders {
+		req.Header[k] = v
+	}
+
+	return c.client.Do(req)
 }
 
 // NewClient creates a new client for a resource managed by the resourceamanger.
@@ -35,17 +61,13 @@ type client struct {
 //	}
 //
 // this example would work both for a single resource from a Get, or a ResourceList from a List
-func NewClient(baseURL, resourceName, resourceNamePlural string, mappings []TableCellConfig) client {
+func NewClient(httpClient HTTPClient, resourceName, resourceNamePlural string, mappings []TableCellConfig) client {
 	return client{
-		baseURL:            baseURL,
+		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
 		mappings:           mappings,
 	}
-}
-
-func (c client) url(extra ...string) string {
-	return fmt.Sprintf("%s/api/%s/%s", c.baseURL, c.resourceNamePlural, strings.Join(extra, "/"))
 }
 
 type ListOption struct {
@@ -57,7 +79,7 @@ type ListOption struct {
 }
 
 func (c client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
-	url := c.url()
+	url := c.client.url(c.resourceNamePlural)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return "", fmt.Errorf("cannot build List request: %w", err)
@@ -68,7 +90,7 @@ func (c client) List(ctx context.Context, opt ListOption, format Format) (string
 		return "", fmt.Errorf("cannot build List request: %w", err)
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := c.client.do(req)
 	if err != nil {
 		return "", fmt.Errorf("cannot execute List request: %w", err)
 	}

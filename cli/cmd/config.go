@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/kubeshop/tracetest/cli/actions"
@@ -63,9 +64,15 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		overrideConfig()
 		setupVersion()
 
+		extraHeaders := http.Header{}
+		extraHeaders.Set("x-client-id", analytics.ClientID())
+		extraHeaders.Set("x-source", "cli")
+
+		httpClient := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
+
 		resources.Register(
 			resourcemanager.NewClient(
-				cliConfig.URL(),
+				httpClient,
 				"transaction", "transactions",
 				[]resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
