@@ -46,7 +46,7 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-azure-app-insights).
+To learn more, [read the recipe on running a sample app with Azure App Insights and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-azure-app-insights).
 :::
 
 ## OpenTelemetry Collector
@@ -87,5 +87,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector.md).
+To learn more, [read the recipe on running a sample app with Azure App Insights, The OpenTelemetry Collector and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector.md).
 :::
