@@ -315,6 +315,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 						{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
 					},
 					ItemModifier: func(item *gabs.Container) {
+						item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
 						lastRunTime := item.Path("spec.summary.lastRun.time").Data().(string)
 						if lastRunTime != "" {
 							date, err := time.Parse(time.RFC3339, lastRunTime)
