@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -44,6 +45,8 @@ func SkipVersionMismatchCheck() setupOption {
 	}
 }
 
+var resources = resourcemanager.NewRegistry()
+
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
 		shouldValidateConfig:          true,
@@ -60,10 +63,24 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		overrideConfig()
 		setupVersion()
 
-		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
+		resources.Register(
+			resourcemanager.NewClient(
+				cliConfig.URL(),
+				"transaction", "transactions",
+				[]resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "VERSION", Path: "spec.version"},
+					{Header: "STEPS", Path: "spec.summary.steps"},
+					{Header: "RUNS", Path: "spec.summary.runs"},
+					{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
+					{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
+					{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
+				},
+			),
+		)
 
-		// TODO: remove this client from here when we migrate tests to the resource manager
-		openapiClient := utils.GetAPIClient(cliConfig)
+		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
 		configOptions := append(
 			baseOptions,
@@ -112,14 +129,6 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		)
 		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
 		resourceRegistry.Register(environmentActions)
-
-		transactionOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
-			actions.WithFormatter(formatters.NewTransactionsFormatter()),
-		)
-		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
-		resourceRegistry.Register(transactionActions)
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)

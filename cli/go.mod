@@ -3,6 +3,7 @@ module github.com/kubeshop/tracetest/cli
 go 1.20
 
 require (
+	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f

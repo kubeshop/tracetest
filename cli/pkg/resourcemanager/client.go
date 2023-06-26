@@ -19,13 +19,28 @@ type client struct {
 	baseURL            string
 	resourceName       string
 	resourceNamePlural string
+	mappings           []TableCellConfig
 }
 
-func NewClient(baseURL, resourceName, resourceNamePlural string) client {
+// NewClient creates a new client for a resource managed by the resourceamanger.
+// The mappings parameter is a list of column names to the json path of the value.
+// The path is relative to the Resource root, so the client does not need to consider the ResourceList wrapper struct.
+// Example:
+//
+//	mappings := []TableCellConfig{
+//		{Header: "ID", Path: "id"},
+//		{Header: "Name", Path: "metadata.name"},
+//		{Header: "Namespace", Path: "metadata.namespace"},
+//		{Header: "Age", Path: "metadata.creationTimestamp"},
+//	}
+//
+// this example would work both for a single resource from a Get, or a ResourceList from a List
+func NewClient(baseURL, resourceName, resourceNamePlural string, mappings []TableCellConfig) client {
 	return client{
 		baseURL:            baseURL,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
+		mappings:           mappings,
 	}
 }
 
@@ -86,6 +101,5 @@ func (c client) List(ctx context.Context, opt ListOption, format Format) (string
 		return "", fmt.Errorf("cannot read List response: %w", err)
 	}
 
-	return string(body), nil
-
+	return format.Format(string(body), c.mappings)
 }
