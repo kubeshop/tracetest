@@ -16,9 +16,10 @@ export interface IMethodProps {
   environmentId?: string;
   test: Test;
   run: TestRun;
+  fileName?: string;
 }
 
-const RunDetailAutomateMethods = ({test, run}: IMethodProps) => {
+const RunDetailAutomateMethods = ({test, run, fileName}: IMethodProps) => {
   const [query, updateQuery] = useSearchParams();
   const {selectedEnvironment: {id: environmentId} = {}} = useEnvironment();
 
@@ -37,7 +38,7 @@ const RunDetailAutomateMethods = ({test, run}: IMethodProps) => {
           }}
         >
           <Tabs.TabPane key={TabsKeys.CLI} tab="CLI">
-            <CliCommand test={test} environmentId={environmentId} run={run} />
+            <CliCommand test={test} environmentId={environmentId} run={run} fileName={fileName} />
           </Tabs.TabPane>
           <Tabs.TabPane key={TabsKeys.DeepLink} tab="Deep Link">
             <DeepLink test={test} environmentId={environmentId} run={run} />

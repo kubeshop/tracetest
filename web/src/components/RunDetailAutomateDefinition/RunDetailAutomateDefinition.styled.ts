@@ -18,3 +18,7 @@ export const Footer = styled.div`
   justify-content: flex-end;
   margin-top: 16px;
 `;
+
+export const FileName = styled.div`
+  margin-bottom: 14px;
+`;

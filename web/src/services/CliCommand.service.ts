@@ -22,6 +22,7 @@ export type TCliCommandConfig = {
   format: CliCommandFormat;
   environmentId?: string;
   test: Test;
+  fileName: string;
 };
 
 type TApplyProps = {
@@ -50,11 +51,11 @@ const CliCommandService = () => ({
           : 'tracetest'
       } ${command}`,
   } as Record<CliCommandOption, TApplyOption>,
-  getCommand({options, format, test, environmentId}: TCliCommandConfig) {
+  getCommand({options, format, test, environmentId, fileName}: TCliCommandConfig) {
     const command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
         this.applyOptions[option as CliCommandOption]({command: acc, enabled, test, environmentId}),
-      'test run -d test_definition.yaml'
+      `test run -d ${fileName}`
     );
 
     return `${command} -o ${format}`;

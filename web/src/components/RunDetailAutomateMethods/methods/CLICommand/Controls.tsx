@@ -20,9 +20,10 @@ interface IProps {
   onChange(cmdConfig: TCliCommandConfig): void;
   test: Test;
   environmentId?: string;
+  fileName: string;
 }
 
-const Controls = ({onChange, test, environmentId}: IProps) => {
+const Controls = ({onChange, test, environmentId, fileName}: IProps) => {
   const [form] = Form.useForm<TCliCommandConfig>();
   const options = Form.useWatch('options', form);
   const format = Form.useWatch('format', form);
@@ -33,8 +34,9 @@ const Controls = ({onChange, test, environmentId}: IProps) => {
       format: format ?? CliCommandFormat.Pretty,
       test,
       environmentId,
+      fileName,
     });
-  }, [environmentId, format, onChange, options, test]);
+  }, [environmentId, fileName, format, onChange, options, test]);
 
   return (
     <Form<TCliCommandConfig>
