@@ -192,7 +192,11 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 							if err != nil {
 								panic(err)
 							}
-							item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
+							if date.IsZero() {
+								item.SetP("", "spec.summary.lastRun.time")
+							} else {
+								item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
+							}
 						}
 					},
 				},
