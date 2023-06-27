@@ -115,6 +115,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/honeycomb",
               label: "Honeycomb",
             },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/azure-app-insights",
+              label: "Azure App Insights",
+            },
           ],
         },
         {
@@ -381,7 +386,7 @@ const sidebars = {
               id: "cli/running-transactions",
               label: "Running Transactions",
             },
-          ]
+          ],
         },
         {
           type: "doc",
