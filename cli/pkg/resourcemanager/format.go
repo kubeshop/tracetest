@@ -8,11 +8,13 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/alexeyco/simpletable"
+	"github.com/goccy/go-yaml"
 )
 
 type Format interface {
 	BuildRequest(req *http.Request, verb Verb) error
 	Format(data string, opts ...any) (string, error)
+	Unmarshal(data []byte, v interface{}) error
 	String() string
 }
 
@@ -60,7 +62,10 @@ func (j jsonFormat) Format(data string, _ ...any) (string, error) {
 	}
 
 	return indented.String(), nil
+}
 
+func (j jsonFormat) Unmarshal(data []byte, v interface{}) error {
+	return json.Unmarshal(data, v)
 }
 
 type yamlFormat struct{}
@@ -79,6 +84,10 @@ func (y yamlFormat) BuildRequest(req *http.Request, verb Verb) error {
 
 func (y yamlFormat) Format(data string, _ ...any) (string, error) {
 	return data, nil
+}
+
+func (y yamlFormat) Unmarshal(data []byte, v interface{}) error {
+	return yaml.Unmarshal(data, v)
 }
 
 type prettyFormat struct {

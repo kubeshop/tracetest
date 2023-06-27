@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -98,7 +99,9 @@ func (c client) List(ctx context.Context, opt ListOption, format Format) (string
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		err := parseRequestError(resp, format)
+
+		return "", fmt.Errorf("could not list resource: %w", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -107,4 +110,30 @@ func (c client) List(ctx context.Context, opt ListOption, format Format) (string
 	}
 
 	return format.Format(string(body), c.tableConfig)
+}
+
+type requestError struct {
+	Code    int    `json:"code"`
+	Message string `json:"error"`
+}
+
+func (e requestError) Error() string {
+	return e.Message
+}
+
+func parseRequestError(resp *http.Response, format Format) error {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("cannot read response body: %w", err)
+	}
+
+	fmt.Println(string(body))
+
+	var reqErr requestError
+	err = format.Unmarshal(body, &reqErr)
+	if err != nil {
+		return fmt.Errorf("cannot parse response body: %w", err)
+	}
+
+	return reqErr
 }
