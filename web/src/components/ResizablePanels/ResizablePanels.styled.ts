@@ -1,17 +1,37 @@
+import {Button} from 'antd';
 import styled, {createGlobalStyle, css} from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   .spaces-resize-handle {
     background-color: ${({theme}) => theme.color.borderLight};
     width: 3px !important;
+    z-index: 10;
+  }
+
+  .splitter {
+    .ant-tooltip-arrow-content:before,
+    .ant-tooltip-inner {
+      background: ${({theme}) => theme.color.primary};
+      color: ${({theme}) => theme.color.white};
+    }
   }
 `;
 
 export const ButtonContainer = styled.div`
   position: absolute;
-  right: -12px;
+  right: -15px;
   top: 48px;
   z-index: 100;
+`;
+
+export const SplitterButton = styled(Button)`
+  && {
+    border: 3px solid ${({theme}) => theme.color.primaryLight};
+    background-clip: padding-box;
+    > span {
+      font-size: ${({theme}) => theme.size.md};
+    }
+  }
 `;
 
 export const SplitterContainer = styled.div``;
