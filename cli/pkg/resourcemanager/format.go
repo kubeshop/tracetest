@@ -18,7 +18,13 @@ type Format interface {
 
 type formatRegistry []Format
 
+const DefaultFormat = "pretty"
+
 func (f formatRegistry) Get(format string) (Format, error) {
+	if format == "" {
+		format = DefaultFormat
+	}
+
 	for _, fr := range f {
 		if fr.String() == format {
 			return fr, nil
