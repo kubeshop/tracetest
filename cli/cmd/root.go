@@ -73,7 +73,7 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "pretty", fmt.Sprintf("output format [%s]", outputFormatsString))
+	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
 
