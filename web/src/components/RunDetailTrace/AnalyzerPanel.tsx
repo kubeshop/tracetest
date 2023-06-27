@@ -12,7 +12,6 @@ const panel = {
   name: 'ANALYZER',
   maxSize: 650,
   minSize: 25,
-  isDefaultOpen: false,
 };
 
 const AnalyzerPanel = ({run}: IProps) => {
