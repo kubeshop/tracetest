@@ -134,10 +134,11 @@ func TestListTransactions(t *testing.T) {
 		result := tracetestcli.Exec(t, "list transaction --sortBy name --sortDirection asc --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		transactions := helpers.UnmarshalJSON[[]types.AugmentedTransactionResource](t, result.StdOut)
-		require.Len(transactions, 3)
+		transactions := helpers.UnmarshalJSON[types.ResourceList[types.AugmentedTransactionResource]](t, result.StdOut)
+		require.Len(transactions.Items, 3)
+		require.Equal(len(transactions.Items), transactions.Count)
 
-		anotherTransaction := transactions[0]
+		anotherTransaction := transactions.Items[0]
 		require.Equal("Transaction", anotherTransaction.Type)
 		require.Equal("asuhfdkj", anotherTransaction.Spec.ID)
 		require.Equal("Another Transaction", anotherTransaction.Spec.Name)
@@ -151,7 +152,7 @@ func TestListTransactions(t *testing.T) {
 		require.Equal("ajksdkasjbd", anotherTransaction.Spec.Steps[2])
 		require.Equal("ajksdkasjbd", anotherTransaction.Spec.Steps[3])
 
-		newTransaction := transactions[1]
+		newTransaction := transactions.Items[1]
 		require.Equal("Transaction", newTransaction.Type)
 		require.Equal("Qti5R3_VR", newTransaction.Spec.ID)
 		require.Equal("New Transaction", newTransaction.Spec.Name)
@@ -163,7 +164,7 @@ func TestListTransactions(t *testing.T) {
 		require.Equal("9wtAH2_Vg", newTransaction.Spec.Steps[0])
 		require.Equal("ajksdkasjbd", newTransaction.Spec.Steps[1])
 
-		oneMoreTransaction := transactions[2]
+		oneMoreTransaction := transactions.Items[2]
 		require.Equal("Transaction", oneMoreTransaction.Type)
 		require.Equal("i2ug34j", oneMoreTransaction.Spec.ID)
 		require.Equal("One More Transaction", oneMoreTransaction.Spec.Name)

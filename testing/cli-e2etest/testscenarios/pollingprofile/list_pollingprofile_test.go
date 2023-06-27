@@ -95,16 +95,17 @@ func TestListPollingProfile(t *testing.T) {
 		result := tracetestcli.Exec(t, "list pollingprofile --sortBy name --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		pollingProfileYAML := helpers.UnmarshalJSON[[]types.PollingProfileResource](t, result.StdOut)
+		pollingProfilesList := helpers.UnmarshalJSON[types.ResourceList[types.PollingProfileResource]](t, result.StdOut)
+		require.Len(pollingProfilesList.Items, 1)
+		require.Equal(len(pollingProfilesList.Items), pollingProfilesList.Count)
 
-		require.Len(pollingProfileYAML, 1)
-		require.Equal("PollingProfile", pollingProfileYAML[0].Type)
-		require.Equal("current", pollingProfileYAML[0].Spec.ID)
-		require.Equal("current", pollingProfileYAML[0].Spec.Name)
-		require.True(pollingProfileYAML[0].Spec.Default)
-		require.Equal("periodic", pollingProfileYAML[0].Spec.Strategy)
-		require.Equal("50s", pollingProfileYAML[0].Spec.Periodic.RetryDelay)
-		require.Equal("10m", pollingProfileYAML[0].Spec.Periodic.Timeout)
+		require.Equal("PollingProfile", pollingProfilesList.Items[0].Type)
+		require.Equal("current", pollingProfilesList.Items[0].Spec.ID)
+		require.Equal("current", pollingProfilesList.Items[0].Spec.Name)
+		require.True(pollingProfilesList.Items[0].Spec.Default)
+		require.Equal("periodic", pollingProfilesList.Items[0].Spec.Strategy)
+		require.Equal("50s", pollingProfilesList.Items[0].Spec.Periodic.RetryDelay)
+		require.Equal("10m", pollingProfilesList.Items[0].Spec.Periodic.Timeout)
 	})
 
 	t.Run("list with pretty format", func(t *testing.T) {

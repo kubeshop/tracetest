@@ -127,12 +127,13 @@ func TestListEnvironments(t *testing.T) {
 		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		environmentVarsList := helpers.UnmarshalJSON[[]types.EnvironmentResource](t, result.StdOut)
-		require.Len(environmentVarsList, 3)
+		environmentVarsList := helpers.UnmarshalJSON[types.ResourceList[types.EnvironmentResource]](t, result.StdOut)
+		require.Equal(3, environmentVarsList.Count)
+		require.Len(environmentVarsList.Items, 3)
 
 		// due our database sorting algorithm, "another-env" comes in the front of ".env"
 		// ref https://wiki.postgresql.org/wiki/FAQ#Why_do_my_strings_sort_incorrectly.3F
-		anotherEnvironmentVars := environmentVarsList[0]
+		anotherEnvironmentVars := environmentVarsList.Items[0]
 		require.Equal("Environment", anotherEnvironmentVars.Type)
 		require.Equal("another-env", anotherEnvironmentVars.Spec.ID)
 		require.Equal("another-env", anotherEnvironmentVars.Spec.Name)
@@ -142,7 +143,7 @@ func TestListEnvironments(t *testing.T) {
 		require.Equal("Come", anotherEnvironmentVars.Spec.Values[1].Key)
 		require.Equal("Again", anotherEnvironmentVars.Spec.Values[1].Value)
 
-		environmentVars := environmentVarsList[1]
+		environmentVars := environmentVarsList.Items[1]
 		require.Equal("Environment", environmentVars.Type)
 		require.Equal(".env", environmentVars.Spec.ID)
 		require.Equal(".env", environmentVars.Spec.Name)
@@ -152,7 +153,7 @@ func TestListEnvironments(t *testing.T) {
 		require.Equal("SECOND_VAR", environmentVars.Spec.Values[1].Key)
 		require.Equal("another_value", environmentVars.Spec.Values[1].Value)
 
-		oneMoreEnvironmentVars := environmentVarsList[2]
+		oneMoreEnvironmentVars := environmentVarsList.Items[2]
 		require.Equal("Environment", oneMoreEnvironmentVars.Type)
 		require.Equal("one-more-env", oneMoreEnvironmentVars.Spec.ID)
 		require.Equal("one-more-env", oneMoreEnvironmentVars.Spec.Name)
