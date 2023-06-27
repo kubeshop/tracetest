@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -36,8 +37,9 @@ func NewHTTPClient(baseURL string, extraHeaders http.Header) HTTPClient {
 	}
 }
 
-func (c HTTPClient) url(resourceName string, extra ...string) string {
-	return fmt.Sprintf("%s/api/%s/%s", c.baseURL, resourceName, strings.Join(extra, "/"))
+func (c HTTPClient) url(resourceName string, extra ...string) *url.URL {
+	url, _ := url.Parse(fmt.Sprintf("%s/api/%s/%s", c.baseURL, resourceName, strings.Join(extra, "/")))
+	return url
 }
 
 func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
@@ -70,7 +72,16 @@ type ListOption struct {
 
 func (c client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
 	url := c.client.url(c.resourceNamePlural)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+
+	q := url.Query()
+	q.Add("skip", fmt.Sprintf("%d", opt.Skip))
+	q.Add("take", fmt.Sprintf("%d", opt.Take))
+	q.Add("sortBy", opt.SortBy)
+	q.Add("sortDirection", opt.SortDirection)
+
+	url.RawQuery = q.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
 		return "", fmt.Errorf("cannot build List request: %w", err)
 	}
