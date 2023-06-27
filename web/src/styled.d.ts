@@ -20,6 +20,7 @@ declare module 'styled-components' {
       error: string;
       interactive: string;
       primary: string;
+      primaryLight: string;
       success: string;
       text: string;
       textHighlight: string;

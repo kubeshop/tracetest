@@ -26,7 +26,7 @@ export const ButtonContainer = styled.div`
 
 export const SplitterButton = styled(Button)`
   && {
-    border: 3px solid #61175e33;
+    border: 3px solid ${({theme}) => theme.color.primaryLight};
     background-clip: padding-box;
     > span {
       font-size: ${({theme}) => theme.size.md};
