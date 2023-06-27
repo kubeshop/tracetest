@@ -126,10 +126,6 @@ var errNotAStruct = errors.New("target is not a struct")
 // it returns an error if the field is not found or if the field is not of the specified kind.
 func getYamlStreamField(target interface{}, name string, kind reflect.Kind) (reflect.Value, error) {
 	v := reflect.ValueOf(target)
-	if v.Kind() != reflect.Struct {
-		return reflect.Value{}, errNotAStruct
-	}
-
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
