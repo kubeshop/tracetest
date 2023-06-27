@@ -29,11 +29,11 @@ The project is built with Docker Compose.
 
 ### 1. Node.js App
 
-The `Dockerfile` in the root directory is for the Node.js app.
+The `Dockerfile` and the `docker-compose.yaml` in the root directory is for the Node.js app.
 
 ### 2. Tracetest
 
-The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest-config.yaml` in the `root` directory are for the setting up the Node.js App and Tracetest.
+The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for the setting up the Node.js App and Tracetest.
 
 ### Docker Compose Network
 
@@ -45,7 +45,7 @@ The Node.js app is a simple Express app, contained in the `src/index.js` file.
 
 It is instrumented using the [Official OpenTelemetry Node.js SDK](https://www.npmjs.com/package/@opentelemetry/sdk-node) wrapping the application code to send telemetry data to the OpenTelemetry Collector.
 
-The key following is the instrumentation section from the `src/tracing.js` file.
+The following is the instrumentation code from the `src/tracing.js` file.
 
 ```js
 const opentelemetry = require('@opentelemetry/sdk-node')

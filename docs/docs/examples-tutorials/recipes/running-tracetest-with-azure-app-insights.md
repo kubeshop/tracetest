@@ -43,7 +43,7 @@ The Node.js app is a simple Express app, contained in the `src/index.js` file.
 
 It is instrumented using the [applicationinsights SDK](https://www.npmjs.com/package/applicationinsights) wrapping the application code to send telemetry data directly to the Azure cloud.
 
-The key following is the instrumentation section from the `src/tracing.js` file.
+The following is the code instrumentation section from the `src/tracing.js` file.
 
 ```js
 const {
@@ -88,7 +88,7 @@ CMD [ "npm", "start" ]
 
 ## Tracetest
 
-The `docker-compose.yaml` includes three other services.
+The `docker-compose.yaml` includes two other services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.

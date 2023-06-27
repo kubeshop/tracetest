@@ -54,7 +54,7 @@ To learn more, [read the recipe on running a sample app with Azure App Insights 
 You can configure Tracetest to listen for incoming telemetry data from ports `4317` and `4318` for gRPC and REST accordingly, giving you the option to stream the information to both Azure App Insights and Tracetest at the same time.
 
 :::tip
-Need help configuring the [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) so send trace data from your application to Azure App Insights? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
+Need help configuring the [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) to send trace data from your application to Azure App Insights? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
 :::
 
 ### Tracetest OpenTelemetry Collector connection to Azure App Insights with the Web UI

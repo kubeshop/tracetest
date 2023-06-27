@@ -31,7 +31,7 @@ The project is built with Docker Compose.
 
 ### 1. Tracetest
 
-The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest.config.yaml` in the `root` directory are for the setting up the Pokeshop API, Tracetest and OpenTelemetry Collector.
+The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up the Pokeshop API, Tracetest and OpenTelemetry Collector.
 
 ### Docker Compose Network
 
@@ -107,7 +107,7 @@ async function createTracer(): Promise<opentelemetry.Tracer> {
 The `docker-compose.yaml` file includes the definitions for all of the required services by the Pokeshop API, which includes:
 
 - **Postgres** - To save Pokemon information.
-- **Redis** - For in memory strage.
+- **Redis** - For in memory storage.
 - **RabbitMQ** - For async processing use cases.
 - **API** - The Pokeshop API main container.
 - **Worker** - The Pokeshop worker instance.
