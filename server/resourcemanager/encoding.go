@@ -51,6 +51,10 @@ func (e yamlStreamEncoder) Accepts(contentType string) bool {
 
 func (e yamlStreamEncoder) Marshal(in interface{}) (out []byte, err error) {
 	targetField, err := getYamlStreamField(in, "items", reflect.Slice)
+	if errors.Is(err, errNotAStruct) {
+		// if the target is not a struct, marshal it as a single document
+		return yaml.Marshal(in)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -116,13 +120,20 @@ func (e yamlStreamEncoder) Unmarshal(in []byte, out interface{}) (err error) {
 	return nil
 }
 
+var errNotAStruct = errors.New("target is not a struct")
+
 // getYamlStreamField returns the field in `target` with the name as the value of its yamlstream tag.
 // it returns an error if the field is not found or if the field is not of the specified kind.
 func getYamlStreamField(target interface{}, name string, kind reflect.Kind) (reflect.Value, error) {
 	v := reflect.ValueOf(target)
+	if v.Kind() != reflect.Struct {
+		return reflect.Value{}, errNotAStruct
+	}
+
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
+
 	t := v.Type()
 	var yamlStreamField reflect.Value
 	for i := 0; i < t.NumField(); i++ {
