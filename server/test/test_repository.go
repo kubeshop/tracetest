@@ -30,7 +30,7 @@ type Repository interface {
 
 	Create(context.Context, Test) (Test, error)
 	Update(context.Context, Test) (Test, error)
-	Delete(context.Context, Test) error
+	Delete(context.Context, id.ID) error
 }
 
 type repository struct {
@@ -433,7 +433,7 @@ func intPtr(in int) *int {
 	return &in
 }
 
-func (r *repository) Delete(ctx context.Context, test Test) error {
+func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	queries := []string{
 		"DELETE FROM transaction_run_steps WHERE test_run_test_id = $1",
 		"DELETE FROM transaction_steps WHERE test_id = $1",
@@ -448,13 +448,13 @@ func (r *repository) Delete(ctx context.Context, test Test) error {
 	defer tx.Rollback()
 
 	for _, sql := range queries {
-		_, err := tx.ExecContext(ctx, sql, test.ID)
+		_, err := tx.ExecContext(ctx, sql, id)
 		if err != nil {
 			return fmt.Errorf("sql error: %w", err)
 		}
 	}
 
-	dropSequence(ctx, tx, test.ID)
+	dropSequence(ctx, tx, id)
 
 	err = tx.Commit()
 	if err != nil {
