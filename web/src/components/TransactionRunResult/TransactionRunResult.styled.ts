@@ -98,7 +98,7 @@ export const EntryPointTag = styled(TextTag)`
 
 export const ExecutionStepStatus = styled.div`
   color: ${({theme}) => theme.color.textLight};
-  font-weight: 700;
+  font-weight: 600;
 `;
 
 export const ExecutionStepRunLink = styled(Link)`
