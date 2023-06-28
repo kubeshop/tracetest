@@ -115,6 +115,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/honeycomb",
               label: "Honeycomb",
             },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/azure-app-insights",
+              label: "Azure App Insights",
+            },
           ],
         },
         {
@@ -381,7 +386,7 @@ const sidebars = {
               id: "cli/running-transactions",
               label: "Running Transactions",
             },
-          ]
+          ],
         },
         {
           type: "doc",
@@ -537,6 +542,21 @@ const sidebars = {
           type: "doc",
           id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
           label: "Node.js and Honeycomb",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights",
+          label: "Azure App Insights",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
+          label: "Azure App Insights and The OpenTelemetry Collector",
+        },
+        {
+          type: "doc",
+          id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
+          label: "Azure App Insights, The OpenTelemetry Collector & Pokeshop API",
         },
       ],
     },

@@ -2,15 +2,15 @@ import {Space} from 'antd';
 import {useRef} from 'react';
 
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import {TLintBySpanContent} from 'models/LinterResult.model';
-import * as S from './AnalyzerResults.styled';
+import {TAnalyzerError} from 'types/TestRun.types';
+import * as S from './AnalyzerErrors.styled';
 
 interface IProps {
-  lintErrors: TLintBySpanContent[];
+  errors: TAnalyzerError[];
   onClose(): void;
 }
 
-const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
+const AnalyzerErrorsPopover = ({errors, onClose}: IProps) => {
   const ref = useRef(null);
   useOnClickOutside(ref, onClose);
 
@@ -23,17 +23,17 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
           <S.Title level={4}>Analyzer errors</S.Title>
         </Space>
         <S.Body>
-          {lintErrors.map(lintError => (
-            <S.RuleContainer key={lintError.ruleName}>
-              <S.Text strong>{lintError.ruleName}</S.Text>
+          {errors.map(analyzerError => (
+            <S.RuleContainer key={analyzerError.ruleName}>
+              <S.Text strong>{analyzerError.ruleName}</S.Text>
 
-              {lintError.errors.length > 1 && (
+              {analyzerError.errors.length > 1 && (
                 <>
                   <div>
-                    <S.Text type="secondary">{lintError.ruleErrorDescription}</S.Text>
+                    <S.Text type="secondary">{analyzerError.ruleErrorDescription}</S.Text>
                   </div>
                   <S.List>
-                    {lintError.errors.map(error => (
+                    {analyzerError.errors.map(error => (
                       <li key={error.value}>
                         <S.Text type="secondary">{error.value}</S.Text>
                       </li>
@@ -42,9 +42,9 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
                 </>
               )}
 
-              {lintError.errors.length === 1 && (
+              {analyzerError.errors.length === 1 && (
                 <div>
-                  <S.Text type="secondary">{lintError.errors[0].description}</S.Text>
+                  <S.Text type="secondary">{analyzerError.errors[0].description}</S.Text>
                 </div>
               )}
             </S.RuleContainer>
@@ -55,4 +55,4 @@ const AnalyzerResults = ({lintErrors, onClose}: IProps) => {
   );
 };
 
-export default AnalyzerResults;
+export default AnalyzerErrorsPopover;

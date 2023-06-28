@@ -10,6 +10,7 @@ export const theme: DefaultTheme = {
     error: '#FF4D4F',
     interactive: '#2D62FF',
     primary: '#61175E',
+    primaryLight: '#61175e33',
     success: '#52C41A',
     text: '#031849',
     textHighlight: '#61175e29',

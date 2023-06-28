@@ -10,10 +10,6 @@ const TraceSelectors = () => ({
   selectNodes: createSelector(traceStateSelector, ({nodes}) => nodes),
   selectSelectedSpan: createSelector(traceStateSelector, ({selectedSpan}) => selectedSpan),
   selectSearchText: createSelector(traceStateSelector, ({searchText}) => searchText),
-  selectSelectedAnalyzerResults: createSelector(
-    traceStateSelector,
-    ({selectedAnalyzerResults}) => selectedAnalyzerResults
-  ),
 });
 
 export default TraceSelectors();

@@ -42,6 +42,12 @@ This integration point uses the OpenTelemetry Collector as a router to send trac
 - [Running Tracetest with AWS X-Ray (AWS Distro for OpenTelemetry & Pokeshop API)](./recipes/running-tracetest-with-aws-x-ray-pokeshop.md)
 - [Running Tracetest with AWS Step Functions, AWS X-Ray and Terraform](./recipes/running-tracetest-with-step-functions-terraform.md)
 
+### Azure App Insights
+
+- [Running Tracetest with Azure App Insights (AppInsights Otel Node.js SDK)](./recipes/running-tracetest-with-azure-app-insights.md)
+- [Running Tracetest with Azure App Insights (Otel Node.js SDK & OpenTelemetry Collector)](./recipes/running-tracetest-with-azure-app-insights-collector.md)
+- [Running Tracetest with Azure App Insights (OpenTelemetry Collector & Pokeshop API)](./recipes/running-tracetest-with-azure-app-insights-pokeshop.md)
+
 ## CI/CD Automation
 
 These guides show integrations with CI/CD tools.

@@ -1,7 +1,8 @@
 import {INodeDatum} from 'types/DAG.types';
 
 export enum NodeTypesEnum {
-  Span = 'span',
+  TraceSpan = 'traceSpan',
+  TestSpan = 'testSpan',
   Skeleton = 'skeleton',
 }
 

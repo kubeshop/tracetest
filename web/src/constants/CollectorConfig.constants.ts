@@ -178,25 +178,25 @@ otlp:
     http:
 
 processors:
-batch:
+  batch:
 
 exporters:
-azuremonitor:
-  instrumentation_key: <your-instrumentation-key>
-otlp/tracetest:
-  endpoint: tracetest:4317
-  tls:
-    insecure: true
+  azuremonitor:
+    instrumentation_key: <your-instrumentation-key>
+  otlp/tracetest:
+    endpoint: tracetest:4317
+    tls:
+      insecure: true
 
 service:
-pipelines:
-  traces/tracetest:
-    receivers: [otlp]
-    processors: [batch]
-    exporters: [otlp/tracetest]
-  traces/appinsights:
-    receivers: [otlp]
-    exporters: [azuremonitor]
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tracetest]
+    traces/appinsights:
+      receivers: [otlp]
+      exporters: [azuremonitor]
 `;
 
 export const CollectorConfigMap = {

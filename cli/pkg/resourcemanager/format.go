@@ -182,7 +182,7 @@ func addRowToTableBody(body [][]*simpletable.Cell, tableConfig TableConfig, item
 // ItemModifier is an optional function that can modify each item before it's added to the table.
 type TableConfig struct {
 	Cells        []TableCellConfig
-	ItemModifier func(item *gabs.Container)
+	ItemModifier func(item *gabs.Container) error
 }
 
 type TableCellConfig struct {

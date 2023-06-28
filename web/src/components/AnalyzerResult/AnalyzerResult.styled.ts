@@ -10,6 +10,7 @@ export const StyledCollapse = styled(Collapse)`
 
 export const Container = styled.div`
   padding: 24px;
+  background: ${({theme}) => theme.color.white};
 `;
 
 export const Title = styled(Typography.Title)`

@@ -6,7 +6,7 @@ import Controls from './Controls';
 import useCliCommand from './hooks/useCliCommand';
 import {IMethodProps} from '../../RunDetailAutomateMethods';
 
-const CLiCommand = ({test, environmentId}: IMethodProps) => {
+const CLiCommand = ({test, environmentId, fileName = ''}: IMethodProps) => {
   const {command, onGetCommand} = useCliCommand();
 
   return (
@@ -24,7 +24,7 @@ const CLiCommand = ({test, environmentId}: IMethodProps) => {
         minHeight="100px"
         maxHeight="100px"
       />
-      <Controls onChange={onGetCommand} test={test} environmentId={environmentId} />
+      <Controls onChange={onGetCommand} test={test} fileName={fileName} environmentId={environmentId} />
     </S.Container>
   );
 };

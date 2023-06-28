@@ -1,6 +1,6 @@
 import {SettingOutlined, ToolOutlined} from '@ant-design/icons';
 
-import * as SSpanNode from 'components/Visualization/components/DAG/SpanNode.styled';
+import * as SSpanNode from 'components/Visualization/components/DAG/BaseSpanNode/BaseSpanNode.styled';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
 import SpanService from 'services/Span.service';

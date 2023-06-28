@@ -3,10 +3,11 @@ import ReactFlow, {Edge, MiniMap, Node, NodeChange, ReactFlowProvider} from 'rea
 
 import Actions from './Actions';
 import * as S from './DAG.styled';
-import SpanNode from './SpanNode';
+import TestSpanNode from './TestSpanNode/TestSpanNode';
+import TraceSpanNode from './TraceSpanNode/TraceSpanNode';
 
 /** Important to define the nodeTypes outside the component to prevent re-renderings */
-const nodeTypes = {span: SpanNode};
+const nodeTypes = {traceSpan: TraceSpanNode, testSpan: TestSpanNode};
 
 interface IProps {
   edges: Edge[];

@@ -1,4 +1,4 @@
-import { Typography } from 'antd';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const DocsBannerContainer = styled.div`
@@ -8,11 +8,11 @@ export const DocsBannerContainer = styled.div`
   padding: 12px 18px;
   border-radius: 2px;
   width: max-content;
-  background: ${({ theme }) => theme.color.backgroundInteractive};
+  background: ${({theme}) => theme.color.backgroundInteractive};
 `;
 
 export const Text = styled(Typography.Text)`
   a {
-    font-weight: 700;
+    font-weight: 600;
   }
 `;
