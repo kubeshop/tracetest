@@ -43,13 +43,13 @@ func (p ListParams) Validate(cmd *cobra.Command, args []string) []error {
 }
 
 type ResourceIdParams struct {
-	ResourceId string
+	ResourceID string
 }
 
 func (p *ResourceIdParams) Validate(cmd *cobra.Command, args []string) []error {
 	errors := make([]error, 0)
 
-	if p.ResourceId == "" {
+	if p.ResourceID == "" {
 		errors = append(errors, paramError{
 			Parameter: "id",
 			Message:   "resource id must be provided",

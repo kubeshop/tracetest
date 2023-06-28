@@ -26,7 +26,7 @@ var deleteCmd = &cobra.Command{
 			return "", err
 		}
 
-		message, err := resourceActions.Delete(ctx, deleteParams.ResourceId)
+		message, err := resourceActions.Delete(ctx, deleteParams.ResourceID)
 		if err != nil {
 			return "", err
 		}
@@ -37,6 +37,6 @@ var deleteCmd = &cobra.Command{
 }
 
 func init() {
-	deleteCmd.Flags().StringVar(&deleteParams.ResourceId, "id", "", "id of the resource to delete")
+	deleteCmd.Flags().StringVar(&deleteParams.ResourceID, "id", "", "id of the resource to delete")
 	rootCmd.AddCommand(deleteCmd)
 }

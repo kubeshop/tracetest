@@ -75,7 +75,7 @@ func (y yamlFormat) String() string {
 }
 
 func (y yamlFormat) BuildRequest(req *http.Request, verb Verb) error {
-	req.Header.Set("Content-Type", "application/x-yaml")
+	req.Header.Set("Content-Type", "text/yaml")
 	if verb == VerbList {
 		req.Header.Set("Accept", "text/yaml-stream")
 	}
@@ -125,34 +125,8 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 		})
 	}
 
-	items := parsed.Path("items")
-	// TODO: if items is nil, it means this is not a ResourceList. handle that case specifically
-
 	// iterate over parsed data and build table body
-	body := make([][]*simpletable.Cell, 0, len(items.Children()))
-	for _, child := range items.Children() {
-		row := make([]*simpletable.Cell, 0, len(tableConfig.Cells))
-
-		if tableConfig.ItemModifier != nil {
-			err := tableConfig.ItemModifier(child)
-			if err != nil {
-				return "", err
-			}
-		}
-
-		for _, mapping := range tableConfig.Cells {
-			value := ""
-			if v := child.Path(mapping.Path).Data(); v != nil {
-				value = fmt.Sprintf("%v", v)
-			}
-
-			row = append(row, &simpletable.Cell{
-				Text: value,
-			})
-		}
-
-		body = append(body, row)
-	}
+	body := buildTableBody(parsed, tableConfig)
 
 	// configure output table
 	table := simpletable.New()
@@ -161,6 +135,44 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	table.Body.Cells = body
 
 	return table.String(), nil
+}
+
+func buildTableBody(parsed *gabs.Container, tableConfig TableConfig) [][]*simpletable.Cell {
+	items := parsed.Path("items")
+	// if items is nil, we assume that the parsed data is a single item
+	if items == nil {
+		body := make([][]*simpletable.Cell, 0, 1)
+		body = addRowToTableBody(body, tableConfig, parsed)
+		return body
+	}
+
+	body := make([][]*simpletable.Cell, 0, len(items.Children()))
+	for _, item := range items.Children() {
+		body = addRowToTableBody(body, tableConfig, item)
+	}
+	return body
+}
+
+func addRowToTableBody(body [][]*simpletable.Cell, tableConfig TableConfig, item *gabs.Container) [][]*simpletable.Cell {
+	row := make([]*simpletable.Cell, 0, len(tableConfig.Cells))
+
+	if tableConfig.ItemModifier != nil {
+		tableConfig.ItemModifier(item)
+	}
+
+	for _, mapping := range tableConfig.Cells {
+		value := ""
+		if v := item.Path(mapping.Path).Data(); v != nil {
+			value = fmt.Sprintf("%v", v)
+		}
+
+		row = append(row, &simpletable.Cell{
+			Text: value,
+		})
+	}
+
+	body = append(body, row)
+	return body
 }
 
 // TableConfig is a configuration for prettyFormat

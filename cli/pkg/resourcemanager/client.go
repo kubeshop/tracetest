@@ -1,9 +1,7 @@
 package resourcemanager
 
 import (
-	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -11,10 +9,6 @@ import (
 )
 
 type Verb string
-
-const (
-	VerbList Verb = "list"
-)
 
 type client struct {
 	client             HTTPClient
@@ -61,55 +55,6 @@ func NewClient(httpClient HTTPClient, resourceName, resourceNamePlural string, t
 		resourceNamePlural: resourceNamePlural,
 		tableConfig:        tableConfig,
 	}
-}
-
-type ListOption struct {
-	Take          int32
-	Skip          int32
-	SortDirection string
-	SortBy        string
-	All           bool
-}
-
-func (c client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
-	url := c.client.url(c.resourceNamePlural)
-
-	q := url.Query()
-	q.Add("skip", fmt.Sprintf("%d", opt.Skip))
-	q.Add("take", fmt.Sprintf("%d", opt.Take))
-	q.Add("sortBy", opt.SortBy)
-	q.Add("sortDirection", opt.SortDirection)
-
-	url.RawQuery = q.Encode()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
-	if err != nil {
-		return "", fmt.Errorf("cannot build List request: %w", err)
-	}
-
-	err = format.BuildRequest(req, VerbList)
-	if err != nil {
-		return "", fmt.Errorf("cannot build List request: %w", err)
-	}
-
-	resp, err := c.client.do(req)
-	if err != nil {
-		return "", fmt.Errorf("cannot execute List request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		err := parseRequestError(resp, format)
-
-		return "", fmt.Errorf("could not list resource: %w", err)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("cannot read List response: %w", err)
-	}
-
-	return format.Format(string(body), c.tableConfig)
 }
 
 type requestError struct {

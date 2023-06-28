@@ -2,13 +2,11 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
-	"github.com/kubeshop/tracetest/cli/utils"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
@@ -24,26 +22,17 @@ var getCmd = &cobra.Command{
 		resourceType := args[0]
 		ctx := context.Background()
 
-		resourceActions, err := resourceRegistry.Get(resourceType)
+		resourceClient, err := resources.Get(resourceType)
 		if err != nil {
 			return "", err
 		}
 
-		if output == string(formatters.JSON) || output == string(formatters.Pretty) {
-			ctx = context.WithValue(ctx, "X-Tracetest-Augmented", true)
-		}
-
-		resource, err := resourceActions.Get(ctx, getParams.ResourceId)
-		if err != nil && errors.Is(err, utils.ResourceNotFound) {
-			return fmt.Sprintf("Resource %s with ID %s not found", resourceType, getParams.ResourceId), nil
-		} else if err != nil {
+		resultFormat, err := resourcemanager.Formats.Get(output)
+		if err != nil {
 			return "", err
 		}
 
-		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, formatters.YAML, resourceFormatter)
-
-		result, err := formatter.Format(resource)
+		result, err := resourceClient.Get(ctx, getParams.ResourceID, resultFormat)
 		if err != nil {
 			return "", err
 		}
@@ -54,6 +43,6 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	getCmd.Flags().StringVar(&getParams.ResourceId, "id", "", "id of the resource to get")
+	getCmd.Flags().StringVar(&getParams.ResourceID, "id", "", "id of the resource to get")
 	rootCmd.AddCommand(getCmd)
 }
