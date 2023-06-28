@@ -49,7 +49,7 @@ func SkipVersionMismatchCheck() setupOption {
 	}
 }
 
-var httpClient *resourcemanager.HTTPClient
+var httpClient = &resourcemanager.HTTPClient{}
 var resources = resourcemanager.NewRegistry().
 	Register(
 		resourcemanager.NewClient(
@@ -200,7 +200,8 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		extraHeaders.Set("x-client-id", analytics.ClientID())
 		extraHeaders.Set("x-source", "cli")
 
-		httpClient = resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
+		hc := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
+		*httpClient = *hc
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 
