@@ -10,11 +10,3 @@ export interface ISpanState {
   matchedSpans: string[];
   selectedSpan?: Span;
 }
-
-export type TSpansResult = Record<
-  string,
-  {
-    failed: number;
-    passed: number;
-  }
->;

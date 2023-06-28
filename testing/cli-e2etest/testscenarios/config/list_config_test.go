@@ -90,13 +90,14 @@ func TestListConfig(t *testing.T) {
 		result := tracetestcli.Exec(t, "list config --sortBy name --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		configYAML := helpers.UnmarshalJSON[[]types.ConfigResource](t, result.StdOut)
+		configList := helpers.UnmarshalJSON[types.ResourceList[types.ConfigResource]](t, result.StdOut)
+		require.Len(configList.Items, 1)
+		require.Equal(len(configList.Items), configList.Count)
 
-		require.Len(configYAML, 1)
-		require.Equal("Config", configYAML[0].Type)
-		require.Equal("current", configYAML[0].Spec.ID)
-		require.Equal("Config", configYAML[0].Spec.Name)
-		require.False(configYAML[0].Spec.AnalyticsEnabled)
+		require.Equal("Config", configList.Items[0].Type)
+		require.Equal("current", configList.Items[0].Spec.ID)
+		require.Equal("Config", configList.Items[0].Spec.Name)
+		require.False(configList.Items[0].Spec.AnalyticsEnabled)
 	})
 
 	t.Run("list with pretty format", func(t *testing.T) {

@@ -1,4 +1,5 @@
-TRACETEST_CLI?="../../dist/tracetest"
+PROJECT_ROOT=${PWD}
+TRACETEST_CLI?="${PROJECT_ROOT}/../../dist/tracetest"
 TEST_ENVIRONMENT?="jaeger"
 TAG?="dev"
 ENABLE_CLI_DEBUG?="false"

@@ -14,11 +14,6 @@ export const selectIsSelectedOutput = createSelector(
   (selectedOutputs, outputId) => !!selectedOutputs.find(selectedOutput => selectedOutput.id === outputId)
 );
 
-export const spanIdSelector = (state: RootState, spanId: string) => spanId;
-export const selectOutputsBySpanId = createSelector(selectTestOutputs, spanIdSelector, (outputs, spanId) => {
-  return outputs.filter(output => output.spanId === spanId);
-});
-
 export const selectIsPending = createSelector(testOutputsStateSelector, ({outputs}) =>
   outputs.some(output => output.isDraft)
 );

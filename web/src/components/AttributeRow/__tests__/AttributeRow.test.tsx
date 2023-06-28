@@ -14,12 +14,11 @@ describe('AttributeRow', () => {
   it('should render correctly', () => {
     const {getByText} = render(
       <AttributeRow
-        searchText=""
         attribute={attribute}
+        searchText=""
+        semanticConventions={{}}
         onCreateOutput={onCreateOutput}
         onCreateTestSpec={onCreateTestSpec}
-        semanticConventions={{}}
-        outputs={[]}
       />
     );
 

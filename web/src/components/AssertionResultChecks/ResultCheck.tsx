@@ -3,11 +3,11 @@ import {uniqBy} from 'lodash';
 
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {IResult} from 'types/Assertion.types';
+import {TTestSpec} from 'types/TestRun.types';
 import * as S from './AssertionResultChecks.styled';
 
 interface IProps {
-  items: IResult[];
+  items: TTestSpec[];
   type: 'error' | 'success';
   styleType?: 'node' | 'summary' | 'default';
 }
@@ -15,17 +15,16 @@ interface IProps {
 const ResultCheck = ({items, type, styleType = 'default'}: IProps) => {
   const {setSelectedSpec} = useTestSpecs();
 
-  const handleOnClick = (id: string) => {
+  const handleOnClick = (selector: string) => {
     TraceAnalyticsService.onAttributeCheckClick();
-    const {assertionResult} = items.find(item => item.id === id)!;
-    setSelectedSpec(assertionResult.selector);
+    setSelectedSpec(selector);
   };
 
   const menuLayout = (
     <Menu
-      items={uniqBy(items, 'id').map(item => ({
-        key: item.id,
-        label: item.label,
+      items={uniqBy(items, 'selector').map(item => ({
+        key: item.selector,
+        label: item.selector,
       }))}
       onClick={({key}) => handleOnClick(key)}
     />
@@ -33,7 +32,7 @@ const ResultCheck = ({items, type, styleType = 'default'}: IProps) => {
 
   if (items.length === 1) {
     return (
-      <div onClick={() => handleOnClick(items[0].id)}>
+      <div onClick={() => handleOnClick(items[0].selector)}>
         <S.CustomBadge status={type} text={items.length} $styleType={styleType} />
       </div>
     );

@@ -213,7 +213,7 @@ spec:
 		assert.Equal(t, yamlEncoded, string(response))
 	})
 
-	t.Run("Unsupported entity", func(t *testing.T) {
+	t.Run("UnsupportedEntity", func(t *testing.T) {
 		t.Parallel()
 
 		yamlEncoded := `type: sample

@@ -4,25 +4,13 @@ type TRawLinterResult = TLintersSchemas['LinterResult'];
 type TRawLinterResultPlugin = TLintersSchemas['LinterResultPlugin'];
 type TRawLinterResultPluginRule = TLintersSchemas['LinterResultPluginRule'];
 type TRawLinterResultPluginRuleResult = TLintersSchemas['LinterResultPluginRuleResult'];
-type TRawLinterResultPluginRuleResultError = TLintersSchemas['LinterResultPluginRuleResultError'];
+export type TRawLinterResultPluginRuleResultError = TLintersSchemas['LinterResultPluginRuleResultError'];
 
 type LinterResultPluginRuleResultError = Model<TRawLinterResultPluginRuleResultError, {}>;
 type LinterResultPluginRuleResult = Model<TRawLinterResultPluginRuleResult, {}>;
 type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: LinterResultPluginRuleResult[]}>;
 type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
 type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]; isFailed: boolean}>;
-
-export type TLintBySpanContent = {
-  ruleName: string;
-  ruleErrorDescription: string;
-  pluginName: string;
-  passed: boolean;
-  spanId: string;
-  errors: TRawLinterResultPluginRuleResultError[];
-  severity: 'error' | 'warning';
-};
-
-export type TLintBySpan = Record<string, TLintBySpanContent[]>;
 
 function LinterResultPluginRuleResultError({
   value = '',
