@@ -103,6 +103,7 @@ var resources = resourcemanager.NewRegistry().
 					{Header: "ENABLED", Path: "spec.enabled"},
 				},
 			}),
+			resourcemanager.WithDeleteEnabled("Demo successfully deleted"),
 		),
 	).
 	Register(
@@ -125,6 +126,7 @@ var resources = resourcemanager.NewRegistry().
 					return nil
 				},
 			}),
+			resourcemanager.WithDeleteEnabled("DataStore removed. Defaulting back to no-tracing mode"),
 		),
 	).
 	Register(
@@ -138,6 +140,7 @@ var resources = resourcemanager.NewRegistry().
 					{Header: "DESCRIPTION", Path: "spec.description"},
 				},
 			}),
+			resourcemanager.WithDeleteEnabled("Environment successfully deleted"),
 		),
 	).
 	Register(
@@ -175,6 +178,7 @@ var resources = resourcemanager.NewRegistry().
 					return nil
 				},
 			}),
+			resourcemanager.WithDeleteEnabled("Transaction successfully deleted"),
 		),
 	)
 
