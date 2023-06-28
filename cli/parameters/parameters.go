@@ -1,22 +1,12 @@
 package parameters
 
-import "github.com/spf13/cobra"
+import "fmt"
 
-type ParamError struct {
+type paramError struct {
 	Parameter string
 	Message   string
 }
 
-type Params interface {
-	Validate(cmd *cobra.Command, args []string) []ParamError
-}
-
-func ValidateParams(cmd *cobra.Command, args []string, params ...Params) []ParamError {
-	errors := make([]ParamError, 0)
-
-	for _, param := range params {
-		errors = append(errors, param.Validate(cmd, args)...)
-	}
-
-	return errors
+func (pe paramError) Error() string {
+	return fmt.Sprintf(`[%s] %s`, pe.Parameter, pe.Message)
 }

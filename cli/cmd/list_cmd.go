@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
-	"github.com/kubeshop/tracetest/cli/utils"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
-var listParams = &parameters.ListParams{}
+var listParams = parameters.ListParams{}
 
 var listCmd = &cobra.Command{
 	GroupID: cmdGroupResources.ID,
@@ -23,28 +22,25 @@ var listCmd = &cobra.Command{
 		resourceType := args[0]
 		ctx := context.Background()
 
-		resourceActions, err := resourceRegistry.Get(resourceType)
+		resourceClient, err := resources.Get(resourceType)
 		if err != nil {
 			return "", err
 		}
 
-		listArgs := utils.ListArgs{
+		resultFormat, err := resourcemanager.Formats.Get(output)
+		if err != nil {
+			return "", err
+		}
+
+		lp := resourcemanager.ListOption{
 			Take:          listParams.Take,
 			Skip:          listParams.Skip,
-			SortDirection: listParams.SortDirection,
 			SortBy:        listParams.SortBy,
+			SortDirection: listParams.SortDirection,
 			All:           listParams.All,
 		}
 
-		resource, err := resourceActions.List(ctx, listArgs)
-		if err != nil {
-			return "", err
-		}
-
-		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, formatters.Pretty, resourceFormatter)
-
-		result, err := formatter.FormatList(resource)
+		result, err := resourceClient.List(ctx, lp, resultFormat)
 		if err != nil {
 			return "", err
 		}

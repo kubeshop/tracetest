@@ -108,10 +108,11 @@ func TestListDemos(t *testing.T) {
 		result := tracetestcli.Exec(t, "list demo --sortBy name --sortDirection asc --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		demos := helpers.UnmarshalJSON[[]types.DemoResource](t, result.StdOut)
-		require.Len(demos, 2)
+		demos := helpers.UnmarshalJSON[types.ResourceList[types.DemoResource]](t, result.StdOut)
+		require.Len(demos.Items, 2)
+		require.Equal(len(demos.Items), demos.Count)
 
-		anotherDemo := demos[0]
+		anotherDemo := demos.Items[0]
 		require.Equal("Demo", anotherDemo.Type)
 		require.Equal("another-dev", anotherDemo.Spec.Name)
 		require.Equal("pokeshop", anotherDemo.Spec.Type)
@@ -119,7 +120,7 @@ func TestListDemos(t *testing.T) {
 		require.Equal("new-dev-grpc:9091", anotherDemo.Spec.Pokeshop.GrpcEndpoint)
 		require.Equal("http://new-dev-endpoint:1234", anotherDemo.Spec.Pokeshop.HttpEndpoint)
 
-		demo := demos[1]
+		demo := demos.Items[1]
 		require.Equal("Demo", demo.Type)
 		require.Equal("dev", demo.Spec.Name)
 		require.Equal("otelstore", demo.Spec.Type)

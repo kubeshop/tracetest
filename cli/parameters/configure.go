@@ -11,21 +11,19 @@ type ConfigureParams struct {
 	Global   bool
 }
 
-var _ Params = &ConfigureParams{}
-
-func (p *ConfigureParams) Validate(cmd *cobra.Command, args []string) []ParamError {
-	var errors []ParamError
+func (p *ConfigureParams) Validate(cmd *cobra.Command, args []string) []error {
+	var errors []error
 
 	if cmd.Flags().Lookup("endpoint").Changed {
 		if p.Endpoint == "" {
-			errors = append(errors, ParamError{
+			errors = append(errors, paramError{
 				Parameter: "endpoint",
 				Message:   "endpoint cannot be empty",
 			})
 		} else {
 			_, err := url.Parse(p.Endpoint)
 			if err != nil {
-				errors = append(errors, ParamError{
+				errors = append(errors, paramError{
 					Parameter: "endpoint",
 					Message:   "endpoint is not a valid URL",
 				})

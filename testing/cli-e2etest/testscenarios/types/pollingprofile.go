@@ -6,7 +6,7 @@ package types
 type PollingProfilePeriodicStrategy struct {
 	Timeout              string `json:"timeout"`
 	RetryDelay           string `json:"retryDelay"`
-	SelectorMatchRetries string `json:"selectorMatchRetries"`
+	SelectorMatchRetries int    `json:"selectorMatchRetries"`
 }
 
 type PollingProfile struct {
