@@ -9,6 +9,7 @@ import {
   useDeleteDataStoreMutation,
 } from 'redux/apis/TraceTest.api';
 import DataStoreService from 'services/DataStore.service';
+import {useContactUsModal} from 'components/ContactUs';
 import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
@@ -49,6 +50,8 @@ const DataStoreProvider = ({children}: IProps) => {
   const [isFormValid, setIsFormValid] = useState(false);
   const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
+  const [connectionTries, setConnectionTries] = useState(0);
+  const {onOpen: onContactUsOpen} = useContactUsModal();
 
   const onSaveConfig = useCallback(
     async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
@@ -105,11 +108,16 @@ const DataStoreProvider = ({children}: IProps) => {
       try {
         const result = await testConnection(dataStore.spec!).unwrap();
         showTestConnectionNotification(result, draft.dataStoreType!);
+        setConnectionTries(0);
       } catch (err) {
+        setConnectionTries(prev => prev + 1);
         showTestConnectionNotification(err as TConnectionResult, draft.dataStoreType!);
+        if (connectionTries + 1 === 3) {
+          onContactUsOpen();
+        }
       }
     },
-    [showTestConnectionNotification, testConnection]
+    [connectionTries, onContactUsOpen, showTestConnectionNotification, testConnection]
   );
 
   const value = useMemo<IContext>(
