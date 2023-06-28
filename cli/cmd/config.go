@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Jeffail/gabs/v2"
@@ -48,7 +49,136 @@ func SkipVersionMismatchCheck() setupOption {
 	}
 }
 
-var resources = resourcemanager.NewRegistry()
+var httpClient *resourcemanager.HTTPClient
+var resources = resourcemanager.NewRegistry().
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"config", "configs",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "ANALYTICS ENABLED", Path: "spec.analyticsEnabled"},
+				},
+			},
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"analyzer", "analyzers",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "ENABLED", Path: "spec.enabled"},
+					{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
+				},
+			},
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"pollingprofile", "pollingprofiles",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "STRATEGY", Path: "spec.strategy"},
+				},
+			},
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"demo", "demos",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "TYPE", Path: "spec.type"},
+					{Header: "ENABLED", Path: "spec.enabled"},
+				},
+			},
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"datastore", "datastores",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "DEFAULT", Path: "spec.default"},
+				},
+				ItemModifier: func(item *gabs.Container) {
+					isDefault := item.Path("spec.default").Data().(bool)
+					if !isDefault {
+						item.SetP("", "spec.default")
+					} else {
+						item.SetP("*", "spec.default")
+					}
+				},
+			},
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"environment", "environments",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "DESCRIPTION", Path: "spec.description"},
+				},
+			},
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"transaction", "transactions",
+			resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "VERSION", Path: "spec.version"},
+					{Header: "STEPS", Path: "spec.summary.steps"},
+					{Header: "RUNS", Path: "spec.summary.runs"},
+					{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
+					{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
+					{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
+				},
+				ItemModifier: func(item *gabs.Container) {
+					// set spec.summary.steps to the number of steps in the transaction
+					item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
+
+					// if lastRun.time is not empty, show it in a nicer format
+					lastRunTime := item.Path("spec.summary.lastRun.time").Data().(string)
+					if lastRunTime != "" {
+						date, err := time.Parse(time.RFC3339, lastRunTime)
+						if err != nil {
+							panic(err)
+						}
+						if date.IsZero() {
+							item.SetP("", "spec.summary.lastRun.time")
+						} else {
+							item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
+						}
+					}
+				},
+			},
+		),
+	)
+
+func resourceList() string {
+	return strings.Join(resources.List(), "|")
+}
 
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
@@ -70,138 +200,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		extraHeaders.Set("x-client-id", analytics.ClientID())
 		extraHeaders.Set("x-source", "cli")
 
-		httpClient := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"config", "configs",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "ANALYTICS ENABLED", Path: "spec.analyticsEnabled"},
-					},
-				},
-			),
-		)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"analyzer", "analyzers",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "ENABLED", Path: "spec.enabled"},
-						{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
-					},
-				},
-			),
-		)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"pollingprofile", "pollingprofiles",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "STRATEGY", Path: "spec.strategy"},
-					},
-				},
-			),
-		)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"demo", "demos",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "TYPE", Path: "spec.type"},
-						{Header: "ENABLED", Path: "spec.enabled"},
-					},
-				},
-			),
-		)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"datastore", "datastores",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "DEFAULT", Path: "spec.default"},
-					},
-					ItemModifier: func(item *gabs.Container) {
-						isDefault := item.Path("spec.default").Data().(bool)
-						if !isDefault {
-							item.SetP("", "spec.default")
-						} else {
-							item.SetP("*", "spec.default")
-						}
-					},
-				},
-			),
-		)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"environment", "environments",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "DESCRIPTION", Path: "spec.description"},
-					},
-				},
-			),
-		)
-
-		resources.Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"transaction", "transactions",
-				resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "VERSION", Path: "spec.version"},
-						{Header: "STEPS", Path: "spec.summary.steps"},
-						{Header: "RUNS", Path: "spec.summary.runs"},
-						{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
-						{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
-						{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
-					},
-					ItemModifier: func(item *gabs.Container) {
-						// set spec.summary.steps to the number of steps in the transaction
-						item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
-
-						// if lastRun.time is not empty, show it in a nicer format
-						lastRunTime := item.Path("spec.summary.lastRun.time").Data().(string)
-						if lastRunTime != "" {
-							date, err := time.Parse(time.RFC3339, lastRunTime)
-							if err != nil {
-								panic(err)
-							}
-							if date.IsZero() {
-								item.SetP("", "spec.summary.lastRun.time")
-							} else {
-								item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
-							}
-						}
-					},
-				},
-			),
-		)
+		httpClient = resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
 
 		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
 

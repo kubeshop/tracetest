@@ -11,7 +11,7 @@ import (
 type Verb string
 
 type client struct {
-	client             HTTPClient
+	client             *HTTPClient
 	resourceName       string
 	resourceNamePlural string
 	tableConfig        TableConfig
@@ -24,8 +24,8 @@ type HTTPClient struct {
 	extraHeaders http.Header
 }
 
-func NewHTTPClient(baseURL string, extraHeaders http.Header) HTTPClient {
-	return HTTPClient{
+func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
+	return &HTTPClient{
 		client:       http.Client{},
 		baseURL:      baseURL,
 		extraHeaders: extraHeaders,
@@ -48,7 +48,7 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 // NewClient creates a new client for a resource managed by the resourceamanger.
 // The tableConfig parameter configures how the table view should be rendered.
 // This configuration work both for a single resource from a Get, or a ResourceList from a List
-func NewClient(httpClient HTTPClient, resourceName, resourceNamePlural string, tableConfig TableConfig) client {
+func NewClient(httpClient *HTTPClient, resourceName, resourceNamePlural string, tableConfig TableConfig) client {
 	return client{
 		client:             httpClient,
 		resourceName:       resourceName,
