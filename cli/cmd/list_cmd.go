@@ -27,7 +27,7 @@ var listCmd = &cobra.Command{
 			return "", err
 		}
 
-		resultFormat, err := resourcemanager.Formats.Get(output)
+		resultFormat, err := resourcemanager.Formats.Get(output, "pretty")
 		if err != nil {
 			return "", err
 		}

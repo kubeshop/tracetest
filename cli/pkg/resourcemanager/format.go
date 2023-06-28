@@ -20,11 +20,13 @@ type Format interface {
 
 type formatRegistry []Format
 
-const DefaultFormat = "pretty"
+func (f formatRegistry) Get(format, fallback string) (Format, error) {
+	if format == "" && fallback == "" {
+		return nil, fmt.Errorf("format and fallback cannot be empty at the same time")
+	}
 
-func (f formatRegistry) Get(format string) (Format, error) {
 	if format == "" {
-		format = DefaultFormat
+		return f.Get(fallback, "")
 	}
 
 	for _, fr := range f {

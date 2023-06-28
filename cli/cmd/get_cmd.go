@@ -27,7 +27,7 @@ var getCmd = &cobra.Command{
 			return "", err
 		}
 
-		resultFormat, err := resourcemanager.Formats.Get(output)
+		resultFormat, err := resourcemanager.Formats.Get(output, "yaml")
 		if err != nil {
 			return "", err
 		}
