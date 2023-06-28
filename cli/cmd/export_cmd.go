@@ -21,7 +21,7 @@ var exportCmd = &cobra.Command{
 	Short:   "Export resource",
 	PreRun:  setupCommand(),
 	Run: WithResultHandler(func(_ *cobra.Command, args []string) (string, error) {
-		resourceType := args[0]
+		resourceType := resourceParams.ResourceName
 		ctx := context.Background()
 
 		resourceActions, err := resourceRegistry.Get(resourceType)

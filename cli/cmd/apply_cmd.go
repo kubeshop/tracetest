@@ -20,7 +20,7 @@ var applyCmd = &cobra.Command{
 	Long:    "Apply (create/update) resources to your Tracetest server",
 	PreRun:  setupCommand(),
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
-		resourceType := args[0]
+		resourceType := resourceParams.ResourceName
 		ctx := context.Background()
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
