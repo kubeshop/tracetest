@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {Typography} from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import {CheckCircleOutlined} from '@ant-design/icons';
 
 export const FormContainer = styled.div`
   display: grid;
@@ -73,7 +73,6 @@ export const DataStoreName = styled(Typography.Text)<{$isSelected: boolean}>`
 export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.md};
-    font-weight: 700;
     margin: 0 !important;
   }
 `;

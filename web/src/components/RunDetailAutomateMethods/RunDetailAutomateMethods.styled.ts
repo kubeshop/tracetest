@@ -20,7 +20,6 @@ export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.lg};
     margin: 0;
-    font-weight: 700;
   }
 `;
 
@@ -85,11 +84,6 @@ export const TextContainer = styled.div`
 
 export const Text = styled(Typography.Text)`
   font-size: ${({theme}) => theme.size.sm};
-`;
-
-export const StatusSpan = styled.span<{$isError: boolean}>`
-  color: ${({$isError, theme}) => ($isError ? theme.color.error : theme.color.success)};
-  font-weight: 700;
 `;
 
 export const HeadersList = styled.div`

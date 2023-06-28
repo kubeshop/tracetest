@@ -9,7 +9,6 @@ export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.lg};
     margin-bottom: 16px;
-    font-weight: 700;
   }
 `;
 
