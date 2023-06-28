@@ -90,7 +90,7 @@ export const EnvironmentCard = ({
           <E.VariablesMainContainer>
             <E.HeaderContainer>
               <E.HeaderText>Key</E.HeaderText>
-              <E.HeaderTextRight>Value</E.HeaderTextRight>
+              <E.HeaderText>Value</E.HeaderText>
             </E.HeaderContainer>
             <E.VariablesContainer>
               {values.map(value => (

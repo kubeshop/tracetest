@@ -72,7 +72,7 @@ export const InfoIcon = styled(InfoCircleFilled)<{$isLarge?: boolean}>`
 `;
 
 export const Link = styled(Typography.Link)`
-  font-weight: bold;
+  font-weight: 600;
 `;
 
 export const ListContainer = styled.div`
