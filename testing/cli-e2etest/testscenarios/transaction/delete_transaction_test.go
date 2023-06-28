@@ -46,5 +46,5 @@ func TestDeleteTransaction(t *testing.T) {
 	// Then it should return a message saying that the transaction was not found
 	result = tracetestcli.Exec(t, "delete transaction --id Qti5R3_VR", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "Resource transactions with ID Qti5R3_VR not found")
+	require.Contains(result.StdErr, "Resource transaction with ID Qti5R3_VR not found")
 }
