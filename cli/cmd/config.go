@@ -202,6 +202,13 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		extraHeaders.Set("x-client-id", analytics.ClientID())
 		extraHeaders.Set("x-source", "cli")
 
+		// To avoid a ciruclar reference initialization when setting up the registry and its resources,
+		// we create the resources with a pointer to an unconfigured HTTPClient.
+		// When each command is run, this function is run in the PreRun stage, before any of the actual `Run` code is executed
+		// We take this chance to configure the HTTPClient with the correct URL and headers.
+		// To make this configuration propagate to all the resources, we need to replace the pointer to the HTTPClient.
+		// For more details, see https://github.com/kubeshop/tracetest/pull/2832#discussion_r1245616804
+
 		hc := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
 		*httpClient = *hc
 
