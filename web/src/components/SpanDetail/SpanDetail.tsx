@@ -2,29 +2,52 @@ import {noop} from 'lodash';
 import {useCallback, useMemo, useState} from 'react';
 
 import SearchInput from 'components/SearchInput';
-import {useGetOTELSemanticConventionAttributesInfo} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
+import {
+  OtelReference,
+  useGetOTELSemanticConventionAttributesInfo,
+} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {CompareOperatorSymbolMap} from 'constants/Operator.constants';
 import useSpanData from 'hooks/useSpanData';
 import Span from 'models/Span.model';
 import TestOutput from 'models/TestOutput.model';
+import TestRunOutput from 'models/TestRunOutput.model';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
 import SpanService from 'services/Span.service';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import {TAnalyzerError, TTestSpecSummary} from 'types/TestRun.types';
 import Attributes from './Attributes';
 import Header from './Header';
 import * as S from './SpanDetail.styled';
+
+export interface IPropsAttributeRow {
+  attribute: TSpanFlatAttribute;
+  searchText?: string;
+  semanticConventions: OtelReference;
+  testSpecs?: TTestSpecSummary;
+  testOutputs?: TestRunOutput[];
+  onCreateTestSpec(attribute: TSpanFlatAttribute): void;
+  onCreateOutput(attribute: TSpanFlatAttribute): void;
+}
+
+export interface IPropsSubHeader {
+  analyzerErrors?: TAnalyzerError[];
+  testSpecs?: TTestSpecSummary;
+  testOutputs?: TestRunOutput[];
+}
 
 interface IProps {
   onCreateTestSpec?(): void;
   searchText?: string;
   span?: Span;
+  AttributeRowComponent: React.ComponentType<IPropsAttributeRow>;
+  SubHeaderComponent: React.ComponentType<IPropsSubHeader>;
 }
 
-const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
+const SpanDetail = ({onCreateTestSpec = noop, searchText, span, AttributeRowComponent, SubHeaderComponent}: IProps) => {
   const {analyzerErrors, testSpecs, testOutputs} = useSpanData(span?.id ?? '');
   const {open} = useTestSpecForm();
   const {onNavigateAndOpen} = useTestOutput();
@@ -84,7 +107,8 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
 
   return (
     <>
-      <Header span={span} analyzerErrors={analyzerErrors} testSpecs={testSpecs} />
+      <Header span={span} />
+      <SubHeaderComponent analyzerErrors={analyzerErrors} testSpecs={testSpecs} testOutputs={testOutputs} />
       <S.HeaderDivider />
 
       <S.SearchContainer data-cy="attributes-search-container">
@@ -99,6 +123,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span}: IProps) => {
         testOutputs={testOutputs}
         onCreateTestSpec={handleCreateTestSpec}
         onCreateOutput={handleCreateOutput}
+        AttributeRowComponent={AttributeRowComponent}
       />
     </>
   );

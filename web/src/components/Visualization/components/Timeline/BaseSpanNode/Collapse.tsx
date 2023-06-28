@@ -1,4 +1,4 @@
-import * as S from './Timeline.styled';
+import * as S from '../Timeline.styled';
 
 interface IProps {
   id: string;

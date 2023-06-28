@@ -1,8 +1,8 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
-import {NodeTypesEnum} from 'constants/DAG.constants';
 import {theme} from 'constants/Theme.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import DAGModel from 'models/DAG.model';
 import Span from 'models/Span.model';
 import {clearMatchedSpans, setMatchedSpans, setSelectedSpan} from './Span.slice';

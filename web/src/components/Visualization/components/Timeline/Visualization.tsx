@@ -8,7 +8,7 @@ import {useTheme} from 'styled-components';
 import {AxisHeight, AxisOffset, NodeHeight} from 'constants/Timeline.constants';
 import TimelineModel from 'models/Timeline.model';
 import TimelineService from 'services/Timeline.service';
-import SpanNode from './SpanNode';
+import SpanNodeFactory from './SpanNodeFactory';
 import {IProps} from './Timeline';
 
 function tickLabelProps() {
@@ -19,11 +19,11 @@ function tickLabelProps() {
   } as const;
 }
 
-const Visualization = ({matchedSpans, onNodeClick, selectedSpan, spans, width = 600}: IProps) => {
+const Visualization = ({matchedSpans, nodeType, onNodeClick, selectedSpan, spans, width = 600}: IProps) => {
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState<string[]>([]);
 
-  const nodes = useMemo(() => TimelineModel(spans), [spans]);
+  const nodes = useMemo(() => TimelineModel(spans, nodeType), [spans, nodeType]);
   const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsed), [collapsed, nodes]);
   const [min, max] = useMemo(() => TimelineService.getMinMax(nodes), [nodes]);
 
@@ -64,7 +64,7 @@ const Visualization = ({matchedSpans, onNodeClick, selectedSpan, spans, width = 
 
       <Group className="node-span-list" left={0} top={AxisHeight}>
         {filteredNodes.map((node, index) => (
-          <SpanNode
+          <SpanNodeFactory
             index={index}
             indexParent={filteredNodes.findIndex(filteredNode => filteredNode.data.id === node.data.parentId)}
             isCollapsed={collapsed.includes(node.data.id)}
@@ -76,6 +76,7 @@ const Visualization = ({matchedSpans, onNodeClick, selectedSpan, spans, width = 
             onClick={onNodeClick}
             onCollapse={handleOnCollapse}
             xScale={xScale}
+            type={node.type}
           />
         ))}
       </Group>
