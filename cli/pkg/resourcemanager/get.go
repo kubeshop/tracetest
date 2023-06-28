@@ -30,10 +30,8 @@ func (c client) Get(ctx context.Context, id string, format Format) (string, erro
 	if resp.StatusCode != http.StatusOK {
 		err := parseRequestError(resp, format)
 		reqErr, ok := err.(requestError)
-		if ok {
-			if reqErr.Code == http.StatusNotFound {
-				return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), nil
-			}
+		if ok && reqErr.Code == http.StatusNotFound {
+			return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), nil
 		}
 
 		return "", fmt.Errorf("could not Get resource: %w", err)
