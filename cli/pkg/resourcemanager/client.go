@@ -2,7 +2,7 @@ package resourcemanager
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -67,13 +67,17 @@ func (e requestError) Error() string {
 }
 
 func parseRequestError(resp *http.Response, format Format) error {
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("cannot read response body: %w", err)
 	}
 
-	fmt.Println(string(body))
-
+	if len(body) == 0 {
+		return requestError{
+			Code:    resp.StatusCode,
+			Message: resp.Status,
+		}
+	}
 	var reqErr requestError
 	err = format.Unmarshal(body, &reqErr)
 	if err != nil {
