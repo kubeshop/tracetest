@@ -62,7 +62,7 @@ var dataStoreListCmd = &cobra.Command{
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		// call new get command
-		getParams.ResourceId = "current"
+		getParams.ResourceID = "current"
 		getCmd.Run(getCmd, []string{"datastore"})
 	},
 	PostRun: teardownCommand,
