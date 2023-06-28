@@ -55,61 +55,61 @@ var resources = resourcemanager.NewRegistry().
 		resourcemanager.NewClient(
 			httpClient,
 			"config", "configs",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
 					{Header: "ANALYTICS ENABLED", Path: "spec.analyticsEnabled"},
 				},
-			},
+			}),
 		),
 	).
 	Register(
 		resourcemanager.NewClient(
 			httpClient,
 			"analyzer", "analyzers",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
 					{Header: "ENABLED", Path: "spec.enabled"},
 					{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
 				},
-			},
+			}),
 		),
 	).
 	Register(
 		resourcemanager.NewClient(
 			httpClient,
 			"pollingprofile", "pollingprofiles",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
 					{Header: "STRATEGY", Path: "spec.strategy"},
 				},
-			},
+			}),
 		),
 	).
 	Register(
 		resourcemanager.NewClient(
 			httpClient,
 			"demo", "demos",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
 					{Header: "TYPE", Path: "spec.type"},
 					{Header: "ENABLED", Path: "spec.enabled"},
 				},
-			},
+			}),
 		),
 	).
 	Register(
 		resourcemanager.NewClient(
 			httpClient,
 			"datastore", "datastores",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
@@ -124,27 +124,27 @@ var resources = resourcemanager.NewRegistry().
 					}
 					return nil
 				},
-			},
+			}),
 		),
 	).
 	Register(
 		resourcemanager.NewClient(
 			httpClient,
 			"environment", "environments",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
 					{Header: "DESCRIPTION", Path: "spec.description"},
 				},
-			},
+			}),
 		),
 	).
 	Register(
 		resourcemanager.NewClient(
 			httpClient,
 			"transaction", "transactions",
-			resourcemanager.TableConfig{
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 				Cells: []resourcemanager.TableCellConfig{
 					{Header: "ID", Path: "spec.id"},
 					{Header: "NAME", Path: "spec.name"},
@@ -174,7 +174,7 @@ var resources = resourcemanager.NewRegistry().
 					}
 					return nil
 				},
-			},
+			}),
 		),
 	)
 
