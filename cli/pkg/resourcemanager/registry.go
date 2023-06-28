@@ -1,6 +1,9 @@
 package resourcemanager
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type Registry struct {
 	resources map[string]client
@@ -12,8 +15,9 @@ func NewRegistry() *Registry {
 	}
 }
 
-func (r *Registry) Register(c client) {
+func (r *Registry) Register(c client) *Registry {
 	r.resources[c.resourceName] = c
+	return r
 }
 
 func (r *Registry) Get(resourceName string) (client, error) {
@@ -23,4 +27,15 @@ func (r *Registry) Get(resourceName string) (client, error) {
 	}
 
 	return c, nil
+}
+
+func (r *Registry) List() []string {
+	var resources []string
+	for k := range r.resources {
+		resources = append(resources, k)
+	}
+
+	sort.Strings(resources)
+
+	return resources
 }

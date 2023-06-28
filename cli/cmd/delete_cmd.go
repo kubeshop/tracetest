@@ -18,7 +18,7 @@ var deleteCmd = &cobra.Command{
 	Long:    "Delete resources from your Tracetest server",
 	PreRun:  setupCommand(),
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
-		resourceType := args[0]
+		resourceType := resourceParams.ResourceName
 		ctx := context.Background()
 
 		resourceActions, err := resourceRegistry.Get(resourceType)
