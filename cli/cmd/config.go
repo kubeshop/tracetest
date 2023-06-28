@@ -273,13 +273,14 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 						{Header: "NAME", Path: "spec.name"},
 						{Header: "DEFAULT", Path: "spec.default"},
 					},
-					ItemModifier: func(item *gabs.Container) {
+					ItemModifier: func(item *gabs.Container) error {
 						isDefault := item.Path("spec.default").Data().(bool)
 						if !isDefault {
 							item.SetP("", "spec.default")
 						} else {
 							item.SetP("*", "spec.default")
 						}
+						return nil
 					},
 				},
 			),
@@ -314,7 +315,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 						{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
 						{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
 					},
-					ItemModifier: func(item *gabs.Container) {
+					ItemModifier: func(item *gabs.Container) error {
 						// set spec.summary.steps to the number of steps in the transaction
 						item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
 
@@ -323,7 +324,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 						if lastRunTime != "" {
 							date, err := time.Parse(time.RFC3339, lastRunTime)
 							if err != nil {
-								panic(err)
+								return fmt.Errorf("error parsing last run time: %s", err)
 							}
 							if date.IsZero() {
 								item.SetP("", "spec.summary.lastRun.time")
@@ -331,6 +332,8 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 								item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
 							}
 						}
+
+						return nil
 					},
 				},
 			),
