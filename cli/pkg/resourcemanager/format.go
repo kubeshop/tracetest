@@ -134,7 +134,10 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 		row := make([]*simpletable.Cell, 0, len(tableConfig.Cells))
 
 		if tableConfig.ItemModifier != nil {
-			tableConfig.ItemModifier(child)
+			err := tableConfig.ItemModifier(child)
+			if err != nil {
+				return "", err
+			}
 		}
 
 		for _, mapping := range tableConfig.Cells {
@@ -165,7 +168,7 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 // ItemModifier is an optional function that can modify each item before it's added to the table.
 type TableConfig struct {
 	Cells        []TableCellConfig
-	ItemModifier func(item *gabs.Container)
+	ItemModifier func(item *gabs.Container) error
 }
 
 type TableCellConfig struct {
