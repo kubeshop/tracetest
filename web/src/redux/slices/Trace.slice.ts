@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
+import {NodeTypesEnum} from 'constants/DAG.constants';
 import {theme} from 'constants/Theme.constants';
 import DAGModel from 'models/DAG.model';
 import Span from 'models/Span.model';
@@ -11,7 +12,6 @@ export interface ITraceState {
   nodes: Node[];
   searchText: string;
   selectedSpan: string;
-  selectedAnalyzerResults: string;
 }
 
 const initialState: ITraceState = {
@@ -20,7 +20,6 @@ const initialState: ITraceState = {
   nodes: [],
   searchText: '',
   selectedSpan: '',
-  selectedAnalyzerResults: '',
 };
 
 const traceSlice = createSlice({
@@ -28,7 +27,7 @@ const traceSlice = createSlice({
   initialState,
   reducers: {
     initNodes(state, {payload}: PayloadAction<{spans: Span[]}>) {
-      const {edges, nodes} = DAGModel(payload.spans);
+      const {edges, nodes} = DAGModel(payload.spans, NodeTypesEnum.TraceSpan);
       state.edges = edges;
       state.nodes = nodes;
       // Clear state
@@ -68,12 +67,8 @@ const traceSlice = createSlice({
     setSearchText(state, {payload}: PayloadAction<{searchText: string}>) {
       state.searchText = payload.searchText.toLowerCase();
     },
-    selectAnalyzerResults(state, {payload}: PayloadAction<{spanId: string}>) {
-      state.selectedAnalyzerResults = payload.spanId;
-    },
   },
 });
 
-export const {initNodes, changeNodes, selectSpan, matchSpans, setSearchText, selectAnalyzerResults} =
-  traceSlice.actions;
+export const {initNodes, changeNodes, selectSpan, matchSpans, setSearchText} = traceSlice.actions;
 export default traceSlice.reducer;

@@ -3,46 +3,47 @@ import parse from 'html-react-parser';
 import MarkdownIt from 'markdown-it';
 import {useMemo} from 'react';
 
+import AssertionResultChecks from 'components/AssertionResultChecks';
 import AttributeActions from 'components/AttributeActions/AttributeActions';
 import AttributeValue from 'components/AttributeValue';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
-import SpanAttributeService from 'services/SpanAttribute.service';
-import {TResultAssertions} from 'types/Assertion.types';
-import {TSpanFlatAttribute} from 'types/Span.types';
 import TestOutput from 'models/TestOutput.model';
+import TestRunOutput from 'models/TestRunOutput.model';
+import SpanAttributeService from 'services/SpanAttribute.service';
+import {TSpanFlatAttribute} from 'types/Span.types';
+import {TTestSpecSummary} from 'types/TestRun.types';
 import * as S from './AttributeRow.styled';
-import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps {
-  assertions?: TResultAssertions;
   attribute: TSpanFlatAttribute;
   searchText?: string;
+  semanticConventions: OtelReference;
+  testSpecs?: TTestSpecSummary;
+  testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
-  semanticConventions: OtelReference;
-  outputs: TestOutput[];
 }
 
 const AttributeRow = ({
-  assertions = {},
   attribute: {key, value},
   attribute,
-  onCreateTestSpec,
   searchText,
   semanticConventions,
+  testSpecs,
+  testOutputs,
+  onCreateTestSpec,
   onCreateOutput,
-  outputs,
 }: IProps) => {
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
   const note = useMemo(() => parse(MarkdownIt().render(semanticConvention.note)), [semanticConvention]);
-  const {failed, passed} = useMemo(
-    () => SpanAttributeService.getAttributeAssertionResults(key, assertions),
-    [assertions, key]
+  const attributeTestSpecs = useMemo(
+    () => SpanAttributeService.getAttributeTestSpecs(key, testSpecs),
+    [key, testSpecs]
   );
-  const attributeOutputs = useMemo(
-    () => SpanAttributeService.getOutputsFromAttributeName(key, outputs),
-    [key, outputs]
+  const attributeTestOutputs = useMemo(
+    () => SpanAttributeService.getAttributeTestOutputs(key, testOutputs),
+    [key, testOutputs]
   );
 
   const cypressKey = key.toLowerCase().replace('.', '-');
@@ -71,13 +72,13 @@ const AttributeRow = ({
             </Popover>
           )}
 
-          {!!attributeOutputs.length && <S.OutputsMark outputs={attributeOutputs} />}
+          {!!attributeTestOutputs.length && <S.OutputsMark outputs={attributeTestOutputs as TestOutput[]} />}
         </S.SectionTitle>
 
         <S.AttributeValueRow>
           <AttributeValue value={value} searchText={searchText} />
         </S.AttributeValueRow>
-        <AssertionResultChecks failed={failed} passed={passed} />
+        <AssertionResultChecks failed={attributeTestSpecs.failed} passed={attributeTestSpecs.passed} />
       </S.Header>
 
       <AttributeActions attribute={attribute} onCreateTestOutput={onCreateOutput} onCreateTestSpec={onCreateTestSpec}>

@@ -2,11 +2,9 @@ import {differenceBy, intersectionBy} from 'lodash';
 import {CompareOperator} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
 import {SpanKind} from 'constants/Span.constants';
+import Span from 'models/Span.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
-import {TResultAssertions, TResultAssertionsSummary} from 'types/Assertion.types';
-import LinterResult, {TLintBySpan} from 'models/LinterResult.model';
-import Span from 'models/Span.model';
 import OperatorService from './Operator.service';
 
 const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes);
@@ -54,43 +52,6 @@ const SpanService = () => ({
       (matchList, span) => (getObjectIncludesText(span.attributes, searchText) ? [...matchList, span.id] : matchList),
       []
     );
-  },
-
-  getAssertionResultSummary(assertions: TResultAssertions): TResultAssertionsSummary {
-    const resultSummary = Object.values(assertions).reduce<TResultAssertionsSummary>(
-      ({failed: prevFailed, passed: prevPassed}, {failed, passed}) => ({
-        failed: prevFailed.concat(failed),
-        passed: prevPassed.concat(passed),
-      }),
-      {
-        failed: [],
-        passed: [],
-      }
-    );
-
-    return resultSummary;
-  },
-
-  getLintBySpan(linterResult: LinterResult): TLintBySpan {
-    return linterResult.plugins
-      .flatMap(plugin => plugin.rules.map(rule => ({...rule, pluginName: plugin.name})))
-      .flatMap(rule =>
-        rule.results.map(result => ({
-          ...result,
-          ruleName: rule.name,
-          ruleErrorDescription: rule.errorDescription,
-          pluginName: rule.pluginName,
-        }))
-      )
-      .reduce((prev: TLintBySpan, curr) => {
-        const value = prev[curr.spanId] || [];
-        return {...prev, [curr.spanId]: [...value, curr]};
-      }, {});
-  },
-
-  filterLintErrorsBySpan(linterResultsBySpan: TLintBySpan, spanId: string) {
-    const results = linterResultsBySpan[spanId];
-    return results?.filter(result => !result.passed) ?? [];
   },
 });
 
