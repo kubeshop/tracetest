@@ -19,7 +19,7 @@ func (ts TestSpecs) Model() test.Specs {
 
 		specs = append(specs, test.TestSpec{
 			Name:       spec.Name,
-			Selector:   test.Selector{Query: test.SpanQuery(spec.Selector)},
+			Selector:   test.SpanQuery(spec.Selector),
 			Assertions: assertions,
 		})
 	}

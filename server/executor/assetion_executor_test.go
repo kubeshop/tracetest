@@ -30,7 +30,7 @@ func TestAssertion(t *testing.T) {
 			name: "CanAssert",
 			testDef: test.Specs{
 				{
-					Selector: test.Selector{Query: test.SpanQuery(`span[service.name="Pokeshop"]`)},
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
 					Assertions: []test.Assertion{
 						`attr:tracetest.span.duration = 2000ns`,
 					},
@@ -63,13 +63,13 @@ func TestAssertion(t *testing.T) {
 			name: "CanAssertOnSpanMatchCount",
 			testDef: test.Specs{
 				{
-					Selector: test.Selector{Query: test.SpanQuery(`span[service.name="Pokeshop"]`)},
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
 					Assertions: []test.Assertion{
 						`attr:tracetest.selected_spans.count = 1`,
 					},
 				},
 				{
-					Selector: test.Selector{Query: test.SpanQuery(`span[service.name="NotExists"]`)},
+					Selector: test.SpanQuery(`span[service.name="NotExists"]`),
 					Assertions: []test.Assertion{
 						`attr:tracetest.selected_spans.count = 0`,
 					},
@@ -114,7 +114,7 @@ func TestAssertion(t *testing.T) {
 			name: "ContainsWithJSON",
 			testDef: test.Specs{
 				{
-					Selector: test.Selector{Query: test.SpanQuery(`span[service.name="Pokeshop"]`)},
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
 					Assertions: []test.Assertion{
 						`attr:http.response.body contains 52`,
 						`attr:tracetest.span.duration <= 21ms`,
@@ -160,7 +160,7 @@ func TestAssertion(t *testing.T) {
 			name: "DurationComparison",
 			testDef: test.Specs{
 				{
-					Selector: test.Selector{Query: test.SpanQuery(`span[service.name="Pokeshop"]`)},
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
 					Assertions: []test.Assertion{
 						`attr:tracetest.span.duration <= 25ms`,
 					},
@@ -195,7 +195,7 @@ func TestAssertion(t *testing.T) {
 			name: "FailedAssertionsConvertDurationFieldsIntoDurationFormat",
 			testDef: test.Specs{
 				{
-					Selector: test.Selector{Query: test.SpanQuery(`span[service.name="Pokeshop"]`)},
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
 					Assertions: []test.Assertion{
 						`attr:tracetest.span.duration <= 25ms`,
 					},

@@ -22,7 +22,7 @@ func (e defaultAssertionExecutor) Assert(_ context.Context, specs test.Specs, tr
 	testResult := maps.Ordered[test.SpanQuery, []test.AssertionResult]{}
 	allPassed := true
 	for _, spec := range specs {
-		spans := selector(spec.Selector.Query).Filter(trace)
+		spans := selector(spec.Selector).Filter(trace)
 		assertionResults := make([]test.AssertionResult, 0)
 		for _, assertion := range spec.Assertions {
 			res := e.assert(assertion, spans, ds)
@@ -31,7 +31,7 @@ func (e defaultAssertionExecutor) Assert(_ context.Context, specs test.Specs, tr
 			}
 			assertionResults = append(assertionResults, res)
 		}
-		testResult, _ = testResult.Add(spec.Selector.Query, assertionResults)
+		testResult, _ = testResult.Add(spec.Selector, assertionResults)
 	}
 
 	return testResult, allPassed

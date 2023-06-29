@@ -150,7 +150,7 @@ func (m OpenAPI) Environments(in []environment.Environment) []openapi.Environmen
 func (m OpenAPI) Specs(in test.Specs) []openapi.TestSpec {
 	specs := make([]openapi.TestSpec, len(in))
 
-	for i, spec := range specs {
+	for i, spec := range in {
 		assertions := make([]string, len(spec.Assertions))
 		for j, a := range spec.Assertions {
 			assertions[j] = string(a)
@@ -162,7 +162,6 @@ func (m OpenAPI) Specs(in test.Specs) []openapi.TestSpec {
 			SelectorParsed: m.Selector(test.SpanQuery(spec.Selector)),
 			Assertions:     assertions,
 		}
-		i++
 	}
 
 	return specs
@@ -345,7 +344,7 @@ func (m Model) Outputs(in []openapi.TestOutput) test.Outputs {
 	for _, output := range in {
 		res = append(res, test.Output{
 			Name:     output.Name,
-			Selector: test.SpanQuery(output.Selector),
+			Selector: test.SpanQuery(output.SelectorParsed.Query),
 			Value:    output.Value,
 		})
 	}
@@ -375,7 +374,7 @@ func (m Model) Definition(in []openapi.TestSpec) test.Specs {
 			asserts[i] = assertion
 		}
 		specs = append(specs, test.TestSpec{
-			Selector:   test.Selector{Query: test.SpanQuery(spec.SelectorParsed.Query)},
+			Selector:   test.SpanQuery(spec.SelectorParsed.Query),
 			Name:       spec.Name,
 			Assertions: asserts,
 		})

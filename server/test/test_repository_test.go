@@ -91,7 +91,7 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -118,7 +118,7 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -139,7 +139,7 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -167,7 +167,7 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 				"specs": [
 					{
 						"name": "check user id exists",
-						"selector": { "query": "span[name = \"span name\"]" },
+						"selector": "span[name = \"span name\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				],
@@ -196,7 +196,7 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 				"specs": [
 					{
 						"name": "check user id exists",
-						"selector": { "query": "span[name = \"span name\"]" },
+						"selector": "span[name = \"span name\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				],
@@ -233,7 +233,7 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 				"specs": [
 					{
 						"name": "check user id exists updated",
-						"selector": { "query": "span[name = \"span name updated\"]" },
+						"selector": "span[name = \"span name updated\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				]
@@ -284,7 +284,7 @@ message GetPokemonListResponse {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -313,7 +313,7 @@ message GetPokemonListResponse {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -336,7 +336,7 @@ message GetPokemonListResponse {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -366,7 +366,7 @@ message GetPokemonListResponse {
 				"specs": [
 					{
 						"name": "check user id exists",
-						"selector": { "query": "span[name = \"span name\"]" },
+						"selector": "span[name = \"span name\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				],
@@ -397,7 +397,7 @@ message GetPokemonListResponse {
 				"specs": [
 					{
 						"name": "check user id exists",
-						"selector": { "query": "span[name = \"span name\"]" },
+						"selector": "span[name = \"span name\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				],
@@ -436,7 +436,7 @@ message GetPokemonListResponse {
 				"specs": [
 					{
 						"name": "check user id exists updated",
-						"selector": { "query": "span[name = \"span name updated\"]" },
+						"selector": "span[name = \"span name updated\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				]
@@ -461,7 +461,7 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -487,7 +487,7 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -507,7 +507,7 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 		Specs: test.Specs{
 			{
 				Name:       "check user id exists",
-				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Selector:   `span[name = "span name"]`,
 				Assertions: []test.Assertion{`attr:user_id != ""`},
 			},
 		},
@@ -534,7 +534,7 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 				"specs": [
 					{
 						"name": "check user id exists",
-						"selector": { "query": "span[name = \"span name\"]" },
+						"selector": "span[name = \"span name\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				],
@@ -562,7 +562,7 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 				"specs": [
 					{
 						"name": "check user id exists",
-						"selector": { "query": "span[name = \"span name\"]" },
+						"selector": "span[name = \"span name\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				],
@@ -598,7 +598,7 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 				"specs": [
 					{
 						"name": "check user id exists updated",
-						"selector": { "query": "span[name = \"span name updated\"]" },
+						"selector": "span[name = \"span name updated\"]",
 						"assertions": [ "attr:user_id != \"\"" ]
 					}
 				]

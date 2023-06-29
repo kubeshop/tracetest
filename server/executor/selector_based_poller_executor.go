@@ -86,7 +86,7 @@ func (pe selectorBasedPollerExecutor) getNumberTries(request *PollingRequest) in
 func (pe selectorBasedPollerExecutor) allSelectorsMatchSpans(request *PollingRequest) bool {
 	allSelectorsHaveMatch := true
 	for _, spec := range request.test.Specs {
-		spans := selector(spec.Selector.Query).Filter(*request.run.Trace)
+		spans := selector(spec.Selector).Filter(*request.run.Trace)
 		if len(spans) == 0 {
 			allSelectorsHaveMatch = false
 		}

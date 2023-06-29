@@ -80,7 +80,7 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 		Specs: test.Specs{
 			{
 				Name:     "some assertion",
-				Selector: test.Selector{Query: "query"},
+				Selector: "query",
 				Assertions: []test.Assertion{
 					"attr:some_attr = 1",
 				},
@@ -109,7 +109,7 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 		Specs: test.Specs{
 			{
 				Name:     "some assertion",
-				Selector: test.Selector{Query: "query"},
+				Selector: "query",
 				Assertions: []test.Assertion{
 					"attr:some_attr = 1",
 				},
@@ -151,8 +151,8 @@ func TestDeleteTestsRelatedToTransactions(t *testing.T) {
 	f := setupTransactionFixture(t, db)
 	createTransactionRun(transactionRepo, transactionRunRepo, transactionSample, f.testRun)
 
-	testRepository.Delete(context.TODO(), f.t1)
-	testRepository.Delete(context.TODO(), f.t2)
+	testRepository.Delete(context.TODO(), f.t1.ID)
+	testRepository.Delete(context.TODO(), f.t2.ID)
 
 	actual, err := transactionRepo.Get(context.TODO(), transactionSample.ID)
 	assert.NoError(t, err)
@@ -275,9 +275,9 @@ func TestTransactions(t *testing.T) {
 						"description": "description",
 						"version": 1,
 						"createdAt": "REMOVEME",
-						"serviceUnderTest": {
-							"triggerType": "http",
-							"http": {
+						"trigger": {
+							"type": "http",
+							"httpRequest": {
 								"url": "http://localhost:3030/hello-instrumented"
 							}
 						},
@@ -313,9 +313,9 @@ func TestTransactions(t *testing.T) {
 						"description": "description",
 						"version": 1,
 						"createdAt": "REMOVEME",
-						"serviceUnderTest": {
-							"triggerType": "http",
-							"http": {
+						"trigger": {
+							"type": "http",
+							"httpRequest": {
 								"url": "http://localhost:3030/hello-instrumented"
 							}
 						},

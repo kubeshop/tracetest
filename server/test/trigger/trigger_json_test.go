@@ -76,7 +76,7 @@ func TestTriggerFormatV2(t *testing.T) {
 func TestTriggerFormatV3(t *testing.T) {
 	v3 := struct {
 		Type    trigger.TriggerType     `json:"type"`
-		HTTP    *trigger.HTTPRequest    `json:"http,omitempty"`
+		HTTP    *trigger.HTTPRequest    `json:"httpRequest,omitempty"`
 		GRPC    *trigger.GRPCRequest    `json:"grpc,omitempty"`
 		TraceID *trigger.TraceIDRequest `json:"traceid,omitempty"`
 	}{

@@ -66,8 +66,8 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
 		specs := test.Specs{
-			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "Tracetest trigger"]`)}, Assertions: []test.Assertion{}},
-			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "GET /api/tests"]`)}, Assertions: []test.Assertion{}},
+			{Selector: test.SpanQuery(`span[name = "Tracetest trigger"]`), Assertions: []test.Assertion{}},
+			{Selector: test.SpanQuery(`span[name = "GET /api/tests"]`), Assertions: []test.Assertion{}},
 		}
 		testObj := test.Test{Specs: specs}
 
@@ -88,8 +88,8 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
 		specs := test.Specs{
-			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "Tracetest trigger"]`)}, Assertions: []test.Assertion{}},
-			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "GET /api/tests"]`)}, Assertions: []test.Assertion{}},
+			{Selector: test.SpanQuery(`span[name = "Tracetest trigger"]`), Assertions: []test.Assertion{}},
+			{Selector: test.SpanQuery(`span[name = "GET /api/tests"]`), Assertions: []test.Assertion{}},
 		}
 		testObj := test.Test{Specs: specs}
 
@@ -126,8 +126,8 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
 		specs := test.Specs{
-			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "Tracetest trigger"]`)}, Assertions: []test.Assertion{}},
-			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "GET /api/tests"]`)}, Assertions: []test.Assertion{}},
+			{Selector: test.SpanQuery(`span[name = "Tracetest trigger"]`), Assertions: []test.Assertion{}},
+			{Selector: test.SpanQuery(`span[name = "GET /api/tests"]`), Assertions: []test.Assertion{}},
 		}
 		testObj := test.Test{Specs: specs}
 

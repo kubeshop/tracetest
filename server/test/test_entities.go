@@ -42,14 +42,9 @@ type (
 	}
 
 	TestSpec struct {
-		Selector   Selector    `json:"selector,omitempty"`
+		Selector   SpanQuery   `json:"selector,omitempty"`
 		Name       string      `json:"name,omitempty"`
 		Assertions []Assertion `json:"assertions,omitempty"`
-	}
-
-	Selector struct {
-		Query          SpanQuery    `json:"query,omitempty"`
-		ParsedSelector SpanSelector `json:"parsedSelector,omitempty"`
 	}
 
 	SpanSelector struct {
@@ -70,14 +65,14 @@ type (
 	}
 
 	Summary struct {
-		Runs    int     `json:"runs,omitempty"`
-		LastRun LastRun `json:"lastRun,omitempty"`
+		Runs    int     `json:"runs"`
+		LastRun LastRun `json:"lastRun"`
 	}
 
 	LastRun struct {
 		Time          time.Time `json:"time,omitempty"`
-		Passes        int       `json:"passes,omitempty"`
-		Fails         int       `json:"fails,omitempty"`
+		Passes        int       `json:"passes"`
+		Fails         int       `json:"fails"`
 		AnalyzerScore int       `json:"analyzerScore"`
 	}
 

@@ -40,12 +40,12 @@ func TestSpecV1(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, testObject.Specs, 2)
 
-	assert.Equal(t, test.SpanQuery("span[tracetest.span.type=\"general\" name=\"Tracetest trigger\"]"), testObject.Specs[0].Selector.Query)
+	assert.Equal(t, test.SpanQuery("span[tracetest.span.type=\"general\" name=\"Tracetest trigger\"]"), testObject.Specs[0].Selector)
 	assert.Equal(t, "my check", testObject.Specs[0].Name)
 	assert.Len(t, testObject.Specs[0].Assertions, 1)
 	assert.Equal(t, test.Assertion("attr:name = \"Tracetest trigger\""), testObject.Specs[0].Assertions[0])
 
-	assert.Equal(t, test.SpanQuery("span[name=\"GET /api/tests\"]"), testObject.Specs[1].Selector.Query)
+	assert.Equal(t, test.SpanQuery("span[name=\"GET /api/tests\"]"), testObject.Specs[1].Selector)
 	assert.Equal(t, "validate status", testObject.Specs[1].Name)
 	assert.Len(t, testObject.Specs[1].Assertions, 1)
 	assert.Equal(t, test.Assertion("attr:http.status = 200"), testObject.Specs[1].Assertions[0])
@@ -77,12 +77,12 @@ func TestSpecV2(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, testObject.Specs, 2)
 
-	assert.Equal(t, test.SpanQuery("span[tracetest.span.type=\"general\" name=\"Tracetest trigger\"]"), testObject.Specs[0].Selector.Query)
+	assert.Equal(t, test.SpanQuery("span[tracetest.span.type=\"general\" name=\"Tracetest trigger\"]"), testObject.Specs[0].Selector)
 	assert.Equal(t, "my check", testObject.Specs[0].Name)
 	assert.Len(t, testObject.Specs[0].Assertions, 1)
 	assert.Equal(t, test.Assertion("attr:name = \"Tracetest trigger\""), testObject.Specs[0].Assertions[0])
 
-	assert.Equal(t, test.SpanQuery("span[name=\"GET /api/tests\"]"), testObject.Specs[1].Selector.Query)
+	assert.Equal(t, test.SpanQuery("span[name=\"GET /api/tests\"]"), testObject.Specs[1].Selector)
 	assert.Equal(t, "validate status", testObject.Specs[1].Name)
 	assert.Len(t, testObject.Specs[1].Assertions, 1)
 	assert.Equal(t, test.Assertion("attr:http.status = 200"), testObject.Specs[1].Assertions[0])
