@@ -28,7 +28,7 @@ func TestDeleteDemo(t *testing.T) {
 	// Then it should return an error and say that this resource does not exist
 	result := tracetestcli.Exec(t, "delete demo --id some-demo", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "Resource demos with ID some-demo not found") // TODO: update this message to singular
+	require.Contains(result.StdErr, "Resource demo with ID some-demo not found") 
 
 	// When I try to set up a new demo
 	// Then it should be applied with success
