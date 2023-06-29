@@ -441,6 +441,14 @@ func intPtr(in int) *int {
 }
 
 func (r *repository) Delete(ctx context.Context, id id.ID) error {
+	exists, err := r.Exists(ctx, id)
+	if err != nil {
+		return fmt.Errorf("error checking if a test exists: %w", err)
+	}
+	if !exists {
+		return sql.ErrNoRows // propagate no row error to the API, to emit a 404
+	}
+
 	queries := []string{
 		"DELETE FROM transaction_run_steps WHERE test_run_test_id = $1",
 		"DELETE FROM transaction_steps WHERE test_id = $1",

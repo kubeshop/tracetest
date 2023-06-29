@@ -16,11 +16,6 @@ import (
 
 var (
 	excludedOperations = rmtest.ExcludeOperations(
-		// Delete
-		rmtest.OperationDeleteInternalError,
-		rmtest.OperationDeleteNotFound,
-		rmtest.OperationDeleteSuccess,
-
 		// List
 		rmtest.OperationListSortSuccess, // we need to think how to deal with augmented fields on sorting
 	)
