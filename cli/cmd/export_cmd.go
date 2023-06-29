@@ -31,6 +31,7 @@ func init() {
 				return "", err
 			}
 
+			// export is ALWAYS yaml, so we can hardcode it here
 			resultFormat, err := resourcemanager.Formats.Get("yaml")
 			if err != nil {
 				return "", err
