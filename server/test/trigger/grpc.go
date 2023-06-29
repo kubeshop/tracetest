@@ -10,13 +10,13 @@ type GRPCHeader struct {
 }
 
 type GRPCRequest struct {
-	ProtobufFile string `expr_enabled:"true"`
-	Address      string `expr_enabled:"true"`
-	Service      string `expr_enabled:"true"`
-	Method       string `expr_enabled:"true"`
-	Request      string `expr_enabled:"true"`
-	Metadata     []GRPCHeader
-	Auth         *HTTPAuthenticator
+	ProtobufFile string             `json:"protobufFile,omitempty" expr_enabled:"true"`
+	Address      string             `json:"address,omitempty" expr_enabled:"true"`
+	Service      string             `json:"service,omitempty" expr_enabled:"true"`
+	Method       string             `json:"method,omitempty" expr_enabled:"true"`
+	Request      string             `json:"request,omitempty" expr_enabled:"true"`
+	Metadata     []GRPCHeader       `json:"metadata,omitempty"`
+	Auth         *HTTPAuthenticator `json:"auth,omitempty"`
 }
 
 func (a GRPCRequest) Headers() []string {

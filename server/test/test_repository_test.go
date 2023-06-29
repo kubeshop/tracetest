@@ -10,7 +10,6 @@ import (
 	rmtest "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
-	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -71,6 +70,9 @@ func getScenarioPreparation(sample, secondSample, thirdSample test.Test) func(t 
 			testRepo.Create(context.TODO(), secondSample)
 			testRepo.Create(context.TODO(), thirdSample)
 		}
+
+		// TODO: improve scenarios that need a test run to validate the summary
+		// TODO: improve delete scenario to consider transaction steps
 	}
 }
 
@@ -239,6 +241,208 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 		}`,
 	}
 
-	testmock.StartTestEnvironment() //TODO: remove it later
+	rmtest.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
+}
+
+func TestTestResourceWithGRPCTrigger(t *testing.T) {
+	protobufFile := `syntax = "proto3";
+
+option java_multiple_files = true;
+option java_outer_classname = "PokeshopProto";
+option objc_class_prefix = "PKS";
+
+package pokeshop;
+
+service Pokeshop {
+  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}
+}
+
+message GetPokemonRequest {
+  optional int32 skip = 1;
+  optional int32 take = 2;
+  optional bool isFixed = 3;
+}
+
+message GetPokemonListResponse {
+  repeated Pokemon items = 1;
+  int32 totalCount = 2;
+}`
+
+	var testSample = test.Test{
+		ID:          "NiWVnxP4R",
+		Name:        "Verify Import",
+		Description: "check the working of the import flow",
+		Trigger: trigger.Trigger{
+			Type: "grpc",
+			GRPC: &trigger.GRPCRequest{
+				Address:      "someadress:8080",
+				Method:       "service.method",
+				Request:      `{"hello":"world"}`,
+				ProtobufFile: protobufFile,
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{
+			{
+				Name:     "USER_ID",
+				Selector: test.SpanQuery(`span[name = "span name"]`),
+				Value:    `attr:user_id`,
+			},
+		},
+	}
+
+	var secondTestSample = test.Test{
+		ID:          "NiWVnjahsdvR",
+		Name:        "Another Test",
+		Description: "another test description",
+		Trigger: trigger.Trigger{
+			Type: "grpc",
+			GRPC: &trigger.GRPCRequest{
+				Address:      "someadress:8080",
+				Method:       "service.method",
+				Request:      `{"hello":"world"}`,
+				ProtobufFile: protobufFile,
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
+	var thirdTestSample = test.Test{
+		ID:          "oau3si2y6d",
+		Name:        "One More Test",
+		Description: "one more test description",
+		Trigger: trigger.Trigger{
+			Type: "grpc",
+			GRPC: &trigger.GRPCRequest{
+				Address:      "someadress:8080",
+				Method:       "service.method",
+				Request:      `{"hello":"world"}`,
+				ProtobufFile: protobufFile,
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
+	testSpec := rmtest.ResourceTypeTest{
+		ResourceTypeSingular: test.ResourceName,
+		ResourceTypePlural:   test.ResourceNamePlural,
+		RegisterManagerFn:    registerManagerFn,
+		Prepare:              getScenarioPreparation(testSample, secondTestSample, thirdTestSample),
+		SampleJSON: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import",
+				"description": "check the working of the import flow",
+				"trigger": {
+					"type": "grpc",
+					"grpc": {
+						"address": "someadress:8080",
+						"method": "service.method",
+						"request": "{\"hello\":\"world\"}",
+						"protobufFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_outer_classname = \"PokeshopProto\";\noption objc_class_prefix = \"PKS\";\n\npackage pokeshop;\n\nservice Pokeshop {\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\n}\n\nmessage GetPokemonRequest {\n  optional int32 skip = 1;\n  optional int32 take = 2;\n  optional bool isFixed = 3;\n}\n\nmessage GetPokemonListResponse {\n  repeated Pokemon items = 1;\n  int32 totalCount = 2;\n}"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists",
+						"selector": { "query": "span[name = \"span name\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				],
+				"outputs": [
+					{
+						"name": "USER_ID",
+						"selector": "span[name = \"span name\"]",
+						"value": "attr:user_id"
+					}
+				]
+			}
+		}`,
+		SampleJSONAugmented: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import",
+				"description": "check the working of the import flow",
+				"trigger": {
+					"type": "grpc",
+					"grpc": {
+						"address": "someadress:8080",
+						"method": "service.method",
+						"request": "{\"hello\":\"world\"}",
+						"protobufFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_outer_classname = \"PokeshopProto\";\noption objc_class_prefix = \"PKS\";\n\npackage pokeshop;\n\nservice Pokeshop {\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\n}\n\nmessage GetPokemonRequest {\n  optional int32 skip = 1;\n  optional int32 take = 2;\n  optional bool isFixed = 3;\n}\n\nmessage GetPokemonListResponse {\n  repeated Pokemon items = 1;\n  int32 totalCount = 2;\n}"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists",
+						"selector": { "query": "span[name = \"span name\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				],
+				"outputs": [
+					{
+						"name": "USER_ID",
+						"selector": "span[name = \"span name\"]",
+						"value": "attr:user_id"
+					}
+				],
+				"version": 1,
+				"summary": {
+					"runs": 0,
+					"lastRun": {
+						"fails": 0,
+						"passes": 0
+					}
+				}
+			}
+		}`,
+		SampleJSONUpdated: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import Updated",
+				"description": "check the working of the import flow updated",
+				"trigger": {
+					"type": "grpc",
+					"grpc": {
+						"address": "someadress:8080",
+						"method": "service.method",
+						"request": "{\"hello\":\"world\"}",
+						"protobufFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_outer_classname = \"PokeshopProto\";\noption objc_class_prefix = \"PKS\";\n\npackage pokeshop;\n\nservice Pokeshop {\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\n}\n\nmessage GetPokemonRequest {\n  optional int32 skip = 1;\n  optional int32 take = 2;\n  optional bool isFixed = 3;\n}\n\nmessage GetPokemonListResponse {\n  repeated Pokemon items = 1;\n  int32 totalCount = 2;\n}"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists updated",
+						"selector": { "query": "span[name = \"span name updated\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				]
+			}
+		}`,
+	}
+
 	rmtest.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
 }
