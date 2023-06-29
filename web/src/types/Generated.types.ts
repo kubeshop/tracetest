@@ -1651,9 +1651,16 @@ export interface external {
           };
         };
         LinterResourcePlugin: {
+          slug?: string;
           name?: string;
           enabled?: boolean;
-          required?: boolean;
+          rules?: external["linters.yaml"]["components"]["schemas"]["LinterResourceRule"][];
+        };
+        LinterResourceRule: {
+          slug?: string;
+          weight?: number;
+          /** @enum {string} */
+          errorLevel?: "error" | "warning" | "disabled";
         };
         LinterResult: {
           minimumScore?: number;
@@ -1676,6 +1683,8 @@ export interface external {
           weight?: number;
           tips?: string[];
           results?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResult"][];
+          /** @enum {string} */
+          level?: "error" | "warning" | "disabled";
         };
         LinterResultPluginRuleResult: {
           spanId?: string;
@@ -1687,7 +1696,6 @@ export interface external {
         LinterResultPluginRuleResultError: {
           value?: string;
           expected?: string;
-          level?: string;
           description?: string;
           suggestions?: string[];
         };

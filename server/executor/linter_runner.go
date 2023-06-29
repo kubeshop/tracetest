@@ -100,23 +100,17 @@ func (e *defaultlinterRunner) startWorker() {
 func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 	ctx := request.Context()
 	lintResource := e.analyzerGetter.GetDefault(ctx)
-	linter := linter.NewLinter(lintResource, linter.AvailablePlugins...)
+	linter := linter.NewLinter(lintResource, linter.DefaultPluginRegistry)
 
-	shouldSkip, reason := linter.ShouldSkip()
+	shouldSkip := lintResource.ShouldSkip()
 	if shouldSkip {
-		log.Printf("[linterRunner] Skipping Tracelinter. Reason %s\n", reason)
-		err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID, reason))
+		log.Printf("[linterRunner] Skipping Trace Analyzer")
+		err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID))
 		if err != nil {
 			log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		}
 
 		e.onFinish(ctx, request, request.Run)
-		return
-	}
-
-	err := linter.IsValid()
-	if err != nil {
-		e.onError(ctx, request, request.Run, err)
 		return
 	}
 

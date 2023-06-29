@@ -19,9 +19,10 @@ var _ MappedNullable = &LinterResourcePlugin{}
 
 // LinterResourcePlugin struct for LinterResourcePlugin
 type LinterResourcePlugin struct {
-	Name     *string `json:"name,omitempty"`
-	Enabled  *bool   `json:"enabled,omitempty"`
-	Required *bool   `json:"required,omitempty"`
+	Slug    *string              `json:"slug,omitempty"`
+	Name    *string              `json:"name,omitempty"`
+	Enabled *bool                `json:"enabled,omitempty"`
+	Rules   []LinterResourceRule `json:"rules,omitempty"`
 }
 
 // NewLinterResourcePlugin instantiates a new LinterResourcePlugin object
@@ -39,6 +40,38 @@ func NewLinterResourcePlugin() *LinterResourcePlugin {
 func NewLinterResourcePluginWithDefaults() *LinterResourcePlugin {
 	this := LinterResourcePlugin{}
 	return &this
+}
+
+// GetSlug returns the Slug field value if set, zero value otherwise.
+func (o *LinterResourcePlugin) GetSlug() string {
+	if o == nil || isNil(o.Slug) {
+		var ret string
+		return ret
+	}
+	return *o.Slug
+}
+
+// GetSlugOk returns a tuple with the Slug field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinterResourcePlugin) GetSlugOk() (*string, bool) {
+	if o == nil || isNil(o.Slug) {
+		return nil, false
+	}
+	return o.Slug, true
+}
+
+// HasSlug returns a boolean if a field has been set.
+func (o *LinterResourcePlugin) HasSlug() bool {
+	if o != nil && !isNil(o.Slug) {
+		return true
+	}
+
+	return false
+}
+
+// SetSlug gets a reference to the given string and assigns it to the Slug field.
+func (o *LinterResourcePlugin) SetSlug(v string) {
+	o.Slug = &v
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
@@ -105,36 +138,36 @@ func (o *LinterResourcePlugin) SetEnabled(v bool) {
 	o.Enabled = &v
 }
 
-// GetRequired returns the Required field value if set, zero value otherwise.
-func (o *LinterResourcePlugin) GetRequired() bool {
-	if o == nil || isNil(o.Required) {
-		var ret bool
+// GetRules returns the Rules field value if set, zero value otherwise.
+func (o *LinterResourcePlugin) GetRules() []LinterResourceRule {
+	if o == nil || isNil(o.Rules) {
+		var ret []LinterResourceRule
 		return ret
 	}
-	return *o.Required
+	return o.Rules
 }
 
-// GetRequiredOk returns a tuple with the Required field value if set, nil otherwise
+// GetRulesOk returns a tuple with the Rules field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LinterResourcePlugin) GetRequiredOk() (*bool, bool) {
-	if o == nil || isNil(o.Required) {
+func (o *LinterResourcePlugin) GetRulesOk() ([]LinterResourceRule, bool) {
+	if o == nil || isNil(o.Rules) {
 		return nil, false
 	}
-	return o.Required, true
+	return o.Rules, true
 }
 
-// HasRequired returns a boolean if a field has been set.
-func (o *LinterResourcePlugin) HasRequired() bool {
-	if o != nil && !isNil(o.Required) {
+// HasRules returns a boolean if a field has been set.
+func (o *LinterResourcePlugin) HasRules() bool {
+	if o != nil && !isNil(o.Rules) {
 		return true
 	}
 
 	return false
 }
 
-// SetRequired gets a reference to the given bool and assigns it to the Required field.
-func (o *LinterResourcePlugin) SetRequired(v bool) {
-	o.Required = &v
+// SetRules gets a reference to the given []LinterResourceRule and assigns it to the Rules field.
+func (o *LinterResourcePlugin) SetRules(v []LinterResourceRule) {
+	o.Rules = v
 }
 
 func (o LinterResourcePlugin) MarshalJSON() ([]byte, error) {
@@ -147,14 +180,17 @@ func (o LinterResourcePlugin) MarshalJSON() ([]byte, error) {
 
 func (o LinterResourcePlugin) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.Slug) {
+		toSerialize["slug"] = o.Slug
+	}
 	if !isNil(o.Name) {
 		toSerialize["name"] = o.Name
 	}
 	if !isNil(o.Enabled) {
 		toSerialize["enabled"] = o.Enabled
 	}
-	if !isNil(o.Required) {
-		toSerialize["required"] = o.Required
+	if !isNil(o.Rules) {
+		toSerialize["rules"] = o.Rules
 	}
 	return toSerialize, nil
 }
