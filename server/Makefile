@@ -18,7 +18,7 @@ init-submodule:
 	git submodule init
 	git submodule update
 
-test: # run go tests for this application
+test: ## run go tests for this application
 	go test -timeout 150s -coverprofile=coverage.out ./...
 
 vet: ## run vet tool to analyze the code for suspicious, abnormal, or useless code
