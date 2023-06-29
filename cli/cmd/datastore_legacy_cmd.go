@@ -47,8 +47,8 @@ var dataStoreExportCmd = &cobra.Command{
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		// call new export command
-		exportResourceID = "current"
-		exportResourceFile = exportOutputFile
+		exportParams.ResourceID = "current"
+		exportParams.OutputFile = exportOutputFile
 		exportCmd.Run(exportCmd, []string{"datastore"})
 	},
 	PostRun: teardownCommand,

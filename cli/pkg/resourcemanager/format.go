@@ -20,15 +20,19 @@ type Format interface {
 
 type formatRegistry []Format
 
-func (f formatRegistry) Get(format, fallback string) (Format, error) {
+func (f formatRegistry) GetWithFallback(format, fallback string) (Format, error) {
 	if format == "" && fallback == "" {
 		return nil, fmt.Errorf("format and fallback cannot be empty at the same time")
 	}
 
 	if format == "" {
-		return f.Get(fallback, "")
+		return f.Get(fallback)
 	}
 
+	return f.Get(format)
+}
+
+func (f formatRegistry) Get(format string) (Format, error) {
 	for _, fr := range f {
 		if fr.String() == format {
 			return fr, nil

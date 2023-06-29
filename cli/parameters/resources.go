@@ -59,6 +59,24 @@ func (p *ResourceIdParams) Validate(cmd *cobra.Command, args []string) []error {
 	return errors
 }
 
+type ExportParams struct {
+	ResourceIdParams
+	OutputFile string
+}
+
+func (p *ExportParams) Validate(cmd *cobra.Command, args []string) []error {
+	errors := p.ResourceIdParams.Validate(cmd, args)
+
+	if p.OutputFile == "" {
+		errors = append(errors, paramError{
+			Parameter: "file",
+			Message:   "output file must be provided",
+		})
+	}
+
+	return errors
+}
+
 type ApplyParams struct {
 	DefinitionFile string
 }

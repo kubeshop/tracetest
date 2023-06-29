@@ -29,7 +29,7 @@ func init() {
 				return "", err
 			}
 
-			resultFormat, err := resourcemanager.Formats.Get(output, "pretty")
+			resultFormat, err := resourcemanager.Formats.GetWithFallback(output, "pretty")
 			if err != nil {
 				return "", err
 			}
