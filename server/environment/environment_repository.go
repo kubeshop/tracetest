@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 type Repository struct {
@@ -119,27 +120,28 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	return nil
 }
 
+func listQuery(baseSQL, query string, params []any) (string, []any) {
+	paramNumber := len(params) + 1
+	condition := fmt.Sprintf(" AND (t.name ilike $%d OR e.description ilike $%d)", paramNumber, paramNumber)
+
+	sql, params := sqlutil.Search(baseSQL, condition, query, params)
+
+	return sql, params
+}
+
 func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Environment, error) {
 	if take == 0 {
 		take = 20
 	}
 
-	params := []any{take, skip}
-
-	sql := getQuery
-
-	const condition = "WHERE (e.name ilike $3 OR e.description ilike $3) "
-	if query != "" {
-		sql += condition
-		params = append(params, query)
-	}
+	sql, params := listQuery(getQuery, query, []any{take, skip})
 
 	sortingFields := map[string]string{
 		"created": "e.created_at",
 		"name":    "e.name",
 	}
 
-	sql = sortQuery(sql, sortBy, sortDirection, sortingFields)
+	sql = sqlutil.Sort(sql, sortBy, sortDirection, "created", sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
 	stmt, err := r.db.Prepare(sql)
