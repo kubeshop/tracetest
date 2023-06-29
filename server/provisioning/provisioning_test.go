@@ -240,20 +240,20 @@ var cases = []struct {
 			},
 			demos: []demo.Demo{
 				{
-					Name:    "otel",
-					Type:    demo.DemoTypeOpentelemetryStore,
-					Enabled: true,
-					OpenTelemetryStore: &demo.OpenTelemetryStoreDemo{
-						FrontendEndpoint: "http://frontend:8080/",
-					},
-				},
-				{
 					Name:    "pokeshop",
 					Type:    demo.DemoTypePokeshop,
 					Enabled: true,
 					Pokeshop: &demo.PokeshopDemo{
 						HTTPEndpoint: "http://localhost/api",
 						GRPCEndpoint: "localhost:8080",
+					},
+				},
+				{
+					Name:    "otel",
+					Type:    demo.DemoTypeOpentelemetryStore,
+					Enabled: true,
+					OpenTelemetryStore: &demo.OpenTelemetryStoreDemo{
+						FrontendEndpoint: "http://frontend:8080/",
 					},
 				},
 			},
