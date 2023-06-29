@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 )
 
 const VerbDelete Verb = "delete"
 
 func (c client) Delete(ctx context.Context, id string, format Format) (string, error) {
-	fmt.Println(c.deleteSuccessMsg)
 	if c.deleteSuccessMsg == "" {
 		return "", ErrNotSupportedResourceAction
 	}
@@ -20,9 +18,6 @@ func (c client) Delete(ctx context.Context, id string, format Format) (string, e
 	if err != nil {
 		return "", fmt.Errorf("cannot build Delete request: %w", err)
 	}
-
-	d, _ := httputil.DumpRequestOut(req, true)
-	fmt.Println(string(d))
 
 	err = format.BuildRequest(req, VerbDelete)
 	if err != nil {
