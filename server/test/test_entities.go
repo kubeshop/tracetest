@@ -75,9 +75,10 @@ type (
 	}
 
 	LastRun struct {
-		Time   time.Time `json:"time,omitempty"`
-		Passes int       `json:"passes,omitempty"`
-		Fails  int       `json:"fails,omitempty"`
+		Time          time.Time `json:"time,omitempty"`
+		Passes        int       `json:"passes,omitempty"`
+		Fails         int       `json:"fails,omitempty"`
+		AnalyzerScore int       `json:"analyzerScore"`
 	}
 
 	SpanQuery string
@@ -163,6 +164,14 @@ type (
 
 func (t Test) GetID() id.ID {
 	return t.ID
+}
+
+func (t Test) SafeVersion() int {
+	if t.Version != nil {
+		return *t.Version
+	}
+
+	return 1
 }
 
 func (t Test) Validate() error {

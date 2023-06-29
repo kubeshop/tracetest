@@ -4,39 +4,40 @@ import (
 	"fmt"
 
 	dc "github.com/fluidtruck/deepcopy"
-	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
 type TestSpecs []TestSpec
 
-func (ts TestSpecs) Model() maps.Ordered[model.SpanQuery, model.NamedAssertions] {
-	mts := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}
+func (ts TestSpecs) Model() test.Specs {
+	specs := make(test.Specs, 0, len(ts))
 	for _, spec := range ts {
-		assertions := make([]model.Assertion, 0, len(spec.Assertions))
+		assertions := make([]test.Assertion, 0, len(spec.Assertions))
 		for _, a := range spec.Assertions {
-			assertions = append(assertions, model.Assertion(a))
+			assertions = append(assertions, test.Assertion(a))
 		}
 
-		mts, _ = mts.Add(model.SpanQuery(spec.Selector), model.NamedAssertions{
+		specs = append(specs, test.TestSpec{
 			Name:       spec.Name,
+			Selector:   test.Selector{Query: test.SpanQuery(spec.Selector)},
 			Assertions: assertions,
 		})
 	}
-	return mts
+	return specs
 }
 
 type Outputs []Output
 
-func (outs Outputs) Model() maps.Ordered[string, model.Output] {
-	mos := maps.Ordered[string, model.Output]{}
+func (outs Outputs) Model() test.Outputs {
+	outputs := make(test.Outputs, 0, len(outs))
 	for _, output := range outs {
-		mos, _ = mos.Add(output.Name, model.Output{
-			Selector: model.SpanQuery(output.Selector),
+		outputs = append(outputs, test.Output{
+			Name:     output.Name,
+			Selector: test.SpanQuery(output.Selector),
 			Value:    output.Value,
 		})
 	}
-	return mos
+	return outputs
 }
 
 type Test struct {
@@ -102,8 +103,8 @@ type TestSpec struct {
 	Assertions []string `mapstructure:"assertions"`
 }
 
-func (t Test) Model() model.Test {
-	mt := model.Test{}
+func (t Test) Model() test.Test {
+	mt := test.Test{}
 	dc.DeepCopy(t, &mt)
 	mt.Specs = t.Specs.Model()
 	mt.Outputs = t.Outputs.Model()

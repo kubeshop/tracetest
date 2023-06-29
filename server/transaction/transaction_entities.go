@@ -3,8 +3,8 @@ package transaction
 import (
 	"time"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
 const (
@@ -13,14 +13,14 @@ const (
 )
 
 type Transaction struct {
-	ID          id.ID          `json:"id"`
-	CreatedAt   *time.Time     `json:"createdAt,omitempty"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Version     *int           `json:"version,omitempty"`
-	StepIDs     []id.ID        `json:"steps"`
-	Steps       []model.Test   `json:"fullSteps,omitempty"`
-	Summary     *model.Summary `json:"summary,omitempty"`
+	ID          id.ID         `json:"id"`
+	CreatedAt   *time.Time    `json:"createdAt,omitempty"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Version     *int          `json:"version,omitempty"`
+	StepIDs     []id.ID       `json:"steps"`
+	Steps       []test.Test   `json:"fullSteps,omitempty"`
+	Summary     *test.Summary `json:"summary,omitempty"`
 }
 
 func setVersion(t *Transaction, v int) {
@@ -64,7 +64,7 @@ func (t Transaction) NewRun() TransactionRun {
 		TransactionVersion: t.GetVersion(),
 		CreatedAt:          time.Now().UTC(),
 		State:              TransactionRunStateCreated,
-		Steps:              make([]model.Run, 0, len(t.StepIDs)),
+		Steps:              make([]test.Run, 0, len(t.StepIDs)),
 		CurrentTest:        0,
 	}
 }

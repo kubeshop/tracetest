@@ -12,6 +12,8 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
@@ -446,12 +448,12 @@ type iterationExpectedValues struct {
 
 func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
 	ctx := context.Background()
-	run := model.NewRun()
+	run := test.NewRun()
 
-	test := model.Test{
+	test := test.Test{
 		ID: id.ID("some-test"),
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
 		},
 	}
 
@@ -528,7 +530,7 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 // RunUpdater
 type runUpdaterMock struct{}
 
-func (m runUpdaterMock) Update(context.Context, model.Run) error { return nil }
+func (m runUpdaterMock) Update(context.Context, test.Run) error { return nil }
 
 func getRunUpdaterMock(t *testing.T) executor.RunUpdater {
 	return runUpdaterMock{}

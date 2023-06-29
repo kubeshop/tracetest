@@ -5,9 +5,10 @@ import (
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
-func FromSpanQuery(sq model.SpanQuery) Selector {
+func FromSpanQuery(sq test.SpanQuery) Selector {
 	sel, _ := New(string(sq))
 	return sel
 }

@@ -9,17 +9,17 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/linter"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
 
 type LinterRequest struct {
 	carrier propagation.MapCarrier
-	Test    model.Test
-	Run     model.Run
+	Test    test.Test
+	Run     test.Run
 }
 
 func (r LinterRequest) Context() context.Context {
@@ -145,7 +145,7 @@ func (e *defaultlinterRunner) RunLinter(ctx context.Context, request LinterReque
 	e.inputChannel <- request
 }
 
-func (e *defaultlinterRunner) onFinish(ctx context.Context, request LinterRequest, run model.Run) {
+func (e *defaultlinterRunner) onFinish(ctx context.Context, request LinterRequest, run test.Run) {
 	assertionRequest := AssertionRequest{
 		Test: request.Test,
 		Run:  run,
@@ -153,7 +153,7 @@ func (e *defaultlinterRunner) onFinish(ctx context.Context, request LinterReques
 	e.assertionRunner.RunAssertions(ctx, assertionRequest)
 }
 
-func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, analyzer analyzer.Linter) (model.Run, error) {
+func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, linter linter.Linter, analyzer analyzer.Linter) (test.Run, error) {
 	run := request.Run
 	log.Printf("[linterRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
@@ -172,7 +172,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 	err = e.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[linterRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
-		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
+		return test.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
 	err = e.eventEmitter.Emit(ctx, events.TraceLinterSuccess(request.Test.ID, request.Run.ID))
@@ -183,7 +183,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 	return run, nil
 }
 
-func (e *defaultlinterRunner) onError(ctx context.Context, request LinterRequest, run model.Run, err error) (model.Run, error) {
+func (e *defaultlinterRunner) onError(ctx context.Context, request LinterRequest, run test.Run, err error) (test.Run, error) {
 	log.Printf("[linterRunner] Test %s Run %d: Linter failed. Reason: %s\n", request.Test.ID, request.Run.ID, err.Error())
 	anotherErr := e.eventEmitter.Emit(ctx, events.TraceLinterError(request.Test.ID, request.Run.ID, err))
 	if anotherErr != nil {

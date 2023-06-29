@@ -7,7 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -17,9 +17,9 @@ type defaultPollerMock struct {
 }
 
 // ExecuteRequest implements executor.PollerExecutor
-func (m *defaultPollerMock) ExecuteRequest(request *executor.PollingRequest) (bool, string, model.Run, error) {
+func (m *defaultPollerMock) ExecuteRequest(request *executor.PollingRequest) (bool, string, test.Run, error) {
 	args := m.Called(request)
-	return args.Bool(0), args.String(1), args.Get(2).(model.Run), args.Error(3)
+	return args.Bool(0), args.String(1), args.Get(2).(test.Run), args.Error(3)
 }
 
 var _ executor.PollerExecutor = &defaultPollerMock{}
@@ -41,7 +41,7 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 	eventEmitter := new(eventEmitterMock)
 	eventEmitter.On("Emit", mock.Anything, mock.Anything).Return(nil)
 
-	createRequest := func(test model.Test, run model.Run) *executor.PollingRequest {
+	createRequest := func(test test.Test, run test.Run) *executor.PollingRequest {
 		pollingProfile := pollingprofile.DefaultPollingProfile
 		pollingProfile.Periodic.SelectorMatchRetries = 3
 
@@ -53,9 +53,9 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		defaultPoller := new(defaultPollerMock)
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
-		request := createRequest(model.Test{}, model.Run{})
+		request := createRequest(test.Test{}, test.Run{})
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(false, "", model.Run{}, nil)
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(false, "", test.Run{}, nil)
 		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
 
 		assert.False(t, ready)
@@ -65,15 +65,16 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		defaultPoller := new(defaultPollerMock)
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
-		specs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}.
-			MustAdd(`span[name = "Tracetest trigger"]`, model.NamedAssertions{}).
-			MustAdd(`span[name = "GET /api/tests"]`, model.NamedAssertions{})
-		test := model.Test{Specs: specs}
+		specs := test.Specs{
+			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "Tracetest trigger"]`)}, Assertions: []test.Assertion{}},
+			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "GET /api/tests"]`)}, Assertions: []test.Assertion{}},
+		}
+		testObj := test.Test{Specs: specs}
 
 		trace := model.NewTrace(randomIDGenerator.TraceID().String(), make([]model.Span, 0))
-		run := model.Run{Trace: &trace}
+		run := test.Run{Trace: &trace}
 
-		request := createRequest(test, run)
+		request := createRequest(testObj, run)
 
 		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
 		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
@@ -86,15 +87,16 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		defaultPoller := new(defaultPollerMock)
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
-		specs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}.
-			MustAdd(`span[name = "Tracetest trigger"]`, model.NamedAssertions{}).
-			MustAdd(`span[name = "GET /api/tests"]`, model.NamedAssertions{})
-		test := model.Test{Specs: specs}
+		specs := test.Specs{
+			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "Tracetest trigger"]`)}, Assertions: []test.Assertion{}},
+			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "GET /api/tests"]`)}, Assertions: []test.Assertion{}},
+		}
+		testObj := test.Test{Specs: specs}
 
 		trace := model.NewTrace(randomIDGenerator.TraceID().String(), make([]model.Span, 0))
-		run := model.Run{Trace: &trace}
+		run := test.Run{Trace: &trace}
 
-		request := createRequest(test, run)
+		request := createRequest(testObj, run)
 
 		defaultPoller.On("ExecuteRequest", mock.Anything).Return(false, "trace not found", run, nil).Once()
 
@@ -123,19 +125,20 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		defaultPoller := new(defaultPollerMock)
 		selectorBasedPoller := executor.NewSelectorBasedPoller(defaultPoller, eventEmitter)
 
-		specs := maps.Ordered[model.SpanQuery, model.NamedAssertions]{}.
-			MustAdd(`span[name = "Tracetest trigger"]`, model.NamedAssertions{}).
-			MustAdd(`span[name = "GET /api/tests"]`, model.NamedAssertions{})
-		test := model.Test{Specs: specs}
+		specs := test.Specs{
+			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "Tracetest trigger"]`)}, Assertions: []test.Assertion{}},
+			{Selector: test.Selector{Query: test.SpanQuery(`span[name = "GET /api/tests"]`)}, Assertions: []test.Assertion{}},
+		}
+		testObj := test.Test{Specs: specs}
 
 		rootSpan := model.Span{ID: randomIDGenerator.SpanID(), Name: "Tracetest trigger", Attributes: make(model.Attributes)}
 		trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
 			rootSpan,
 			{ID: randomIDGenerator.SpanID(), Name: "GET /api/tests", Attributes: model.Attributes{model.TracetestMetadataFieldParentID: rootSpan.ID.String()}},
 		})
-		run := model.Run{Trace: &trace}
+		run := test.Run{Trace: &trace}
 
-		request := createRequest(test, run)
+		request := createRequest(testObj, run)
 
 		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
 

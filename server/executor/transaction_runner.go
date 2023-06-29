@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 type TransactionRunner interface {
-	Run(context.Context, transaction.Transaction, model.RunMetadata, environment.Environment) transaction.TransactionRun
+	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment) transaction.TransactionRun
 }
 
 type PersistentTransactionRunner interface {
@@ -27,7 +27,7 @@ type transactionRunRepository interface {
 
 func NewTransactionRunner(
 	runner Runner,
-	db model.Repository,
+	db test.Repository,
 	transactionRuns transactionRunRepository,
 	subscriptionManager *subscription.Manager,
 ) persistentTransactionRunner {
@@ -54,7 +54,7 @@ type transactionRunJob struct {
 
 type persistentTransactionRunner struct {
 	testRunner          Runner
-	db                  model.Repository
+	db                  test.Repository
 	transactionRuns     transactionRunRepository
 	updater             TransactionRunUpdater
 	subscriptionManager *subscription.Manager
@@ -62,7 +62,7 @@ type persistentTransactionRunner struct {
 	exit                chan bool
 }
 
-func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata model.RunMetadata, environment environment.Environment) transaction.TransactionRun {
+func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata test.RunMetadata, environment environment.Environment) transaction.TransactionRun {
 	run := transaction.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
@@ -133,8 +133,8 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran tr
 	return r.updater.Update(ctx, run)
 }
 
-func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, test model.Test) (transaction.TransactionRun, error) {
-	testRun := r.testRunner.Run(ctx, test, tr.Metadata, tr.Environment)
+func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, testObj test.Test) (transaction.TransactionRun, error) {
+	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.Environment)
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
 		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
@@ -144,7 +144,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 	// listen for updates and propagate them as if they were transaction updates
 	r.subscriptionManager.Subscribe(testRun.ResourceID(), subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
-			testRun := m.Content.(model.Run)
+			testRun := m.Content.(test.Run)
 			if testRun.LastError != nil {
 				tr.State = transaction.TransactionRunStateFailed
 				tr.LastError = testRun.LastError
@@ -175,9 +175,9 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 	return tr, err
 }
 
-func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr transaction.TransactionRun, step int, run model.Run) (transaction.TransactionRun, error) {
+func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr transaction.TransactionRun, step int, run test.Run) (transaction.TransactionRun, error) {
 	if len(tr.Steps) <= step {
-		tr.Steps = append(tr.Steps, model.Run{})
+		tr.Steps = append(tr.Steps, test.Run{})
 	}
 
 	tr.Steps[step] = run
@@ -189,9 +189,9 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr trans
 	return tr, nil
 }
 
-func mergeOutputsIntoEnv(env environment.Environment, outputs maps.Ordered[string, model.RunOutput]) environment.Environment {
+func mergeOutputsIntoEnv(env environment.Environment, outputs maps.Ordered[string, test.RunOutput]) environment.Environment {
 	newEnv := make([]environment.EnvironmentValue, 0, outputs.Len())
-	outputs.ForEach(func(key string, val model.RunOutput) error {
+	outputs.ForEach(func(key string, val test.RunOutput) error {
 		newEnv = append(newEnv, environment.EnvironmentValue{
 			Key:   key,
 			Value: val.Value,

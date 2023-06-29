@@ -3,10 +3,10 @@ package yaml_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,7 +16,7 @@ func TestTestModel(t *testing.T) {
 	cases := []struct {
 		name     string
 		in       yaml.Test
-		expected model.Test
+		expected test.Test
 	}{
 		{
 			name: "HTTP",
@@ -35,15 +35,15 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []trigger.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
@@ -75,21 +75,21 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []trigger.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Auth: &model.HTTPAuthenticator{
+						Auth: &trigger.HTTPAuthenticator{
 							Type: "basic",
-							Basic: model.BasicAuthenticator{
+							Basic: &trigger.BasicAuthenticator{
 								Username: "matheus",
 								Password: "pikachu",
 							},
@@ -123,21 +123,21 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []trigger.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Auth: &model.HTTPAuthenticator{
+						Auth: &trigger.HTTPAuthenticator{
 							Type: "apiKey",
-							APIKey: model.APIKeyAuthenticator{
+							APIKey: &trigger.APIKeyAuthenticator{
 								Key:   "X-Key",
 								Value: "my-api-key",
 								In:    "header",
@@ -170,21 +170,21 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []trigger.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: "",
-						Auth: &model.HTTPAuthenticator{
+						Auth: &trigger.HTTPAuthenticator{
 							Type: "bearer",
-							Bearer: model.BearerAuthenticator{
+							Bearer: &trigger.BearerAuthenticator{
 								Bearer: "my-token",
 							},
 						},
@@ -209,15 +209,15 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
-						Headers: []model.HTTPHeader{
+						Headers: []trigger.HTTPHeader{
 							{Key: "Content-Type", Value: "application/json"},
 						},
 						Body: `{ "message": "hello" }`,
@@ -248,24 +248,25 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
 					},
 				},
-				Specs: (maps.Ordered[model.SpanQuery, model.NamedAssertions]{}).
-					MustAdd(model.SpanQuery(`span[tracetest.span.type="http"]`), model.NamedAssertions{
+				Specs: test.Specs{
+					{
 						Name: "",
-						Assertions: []model.Assertion{
+						Assertions: []test.Assertion{
 							`attr:tracetest.span.duration <= 200ms`,
 							`attr:http.status_code = 200`,
 						},
-					}),
+					},
+				},
 			},
 		},
 		{
@@ -288,21 +289,23 @@ func TestTestModel(t *testing.T) {
 					},
 				},
 			},
-			expected: model.Test{
+			expected: test.Test{
 				Name:        "A test",
 				Description: "A test description",
-				ServiceUnderTest: model.Trigger{
+				Trigger: trigger.Trigger{
 					Type: "http",
-					HTTP: &model.HTTPRequest{
+					HTTP: &trigger.HTTPRequest{
 						URL:    "http://localhost:1234",
 						Method: "POST",
 					},
 				},
-				Outputs: (maps.Ordered[string, model.Output]{}).
-					MustAdd("USER_ID", model.Output{
-						Selector: `span[name = "create user"]`,
+				Outputs: test.Outputs{
+					{
+						Name:     "USER_ID",
+						Selector: test.SpanQuery(`span[name = "create user"]`),
 						Value:    `attr:myapp.user_id`,
-					}),
+					},
+				},
 			},
 		},
 	}

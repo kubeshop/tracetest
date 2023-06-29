@@ -1,11 +1,11 @@
 package mappings
 
 import (
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
-func (m OpenAPI) TRACEIDRequest(in *model.TRACEIDRequest) openapi.TraceidRequest {
+func (m OpenAPI) TraceIDRequest(in *trigger.TraceIDRequest) openapi.TraceidRequest {
 	if in == nil {
 		return openapi.TraceidRequest{}
 	}
@@ -15,7 +15,7 @@ func (m OpenAPI) TRACEIDRequest(in *model.TRACEIDRequest) openapi.TraceidRequest
 	}
 }
 
-func (m OpenAPI) TRACEIDResponse(in *model.TRACEIDResponse) openapi.TraceidResponse {
+func (m OpenAPI) TraceIDResponse(in *trigger.TraceIDResponse) openapi.TraceidResponse {
 	if in == nil {
 		return openapi.TraceidResponse{}
 	}
@@ -24,22 +24,22 @@ func (m OpenAPI) TRACEIDResponse(in *model.TRACEIDResponse) openapi.TraceidRespo
 	}
 }
 
-func (m Model) TRACEIDRequest(in openapi.TraceidRequest) *model.TRACEIDRequest {
+func (m Model) TraceIDRequest(in openapi.TraceidRequest) *trigger.TraceIDRequest {
 	if in.Id == "" {
 		return nil
 	}
 
-	return &model.TRACEIDRequest{
+	return &trigger.TraceIDRequest{
 		ID: in.Id,
 	}
 }
 
-func (m Model) TRACEIDResponse(in openapi.TraceidResponse) *model.TRACEIDResponse {
+func (m Model) TraceIDResponse(in openapi.TraceidResponse) *trigger.TraceIDResponse {
 	if in.Id == "" {
 		return nil
 	}
 
-	return &model.TRACEIDResponse{
+	return &trigger.TraceIDResponse{
 		ID: in.Id,
 	}
 }

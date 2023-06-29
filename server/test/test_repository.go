@@ -31,6 +31,8 @@ type Repository interface {
 	Create(context.Context, Test) (Test, error)
 	Update(context.Context, Test) (Test, error)
 	Delete(context.Context, id.ID) error
+
+	GetTransactionSteps(_ context.Context, _ id.ID, version int) ([]Test, error)
 }
 
 type repository struct {
@@ -191,6 +193,27 @@ func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
 	}
 
 	return test, nil
+}
+
+func (r *repository) GetTransactionSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
+	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
+	if err != nil {
+		return []Test{}, fmt.Errorf("prepare 2: %w", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, id, version)
+	if err != nil {
+		return []Test{}, fmt.Errorf("query context: %w", err)
+	}
+
+	steps, err := r.readRows(ctx, rows)
+	if err != nil {
+		return []Test{}, fmt.Errorf("read row: %w", err)
+	}
+
+	return steps, nil
 }
 
 type scanner interface {

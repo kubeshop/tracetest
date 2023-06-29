@@ -11,15 +11,18 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/mocks"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var (
-	exampleRun = model.Run{
+	exampleRun = test.Run{
 		ID:      1,
 		TestID:  id.ID("abc123"),
 		TraceID: http.IDGen.TraceID(),
@@ -113,15 +116,22 @@ func TestContains_Issue617(t *testing.T) {
 func setupController(t *testing.T) controllerFixture {
 	mdb := new(testdb.MockRepository)
 	mdb.Test(t)
+
+	runRepo := new(mocks.RunRepository)
+	runRepo.Test(t)
+
 	return controllerFixture{
-		db: mdb,
+		db:          mdb,
+		testRunRepo: runRepo,
 		c: http.NewController(
 			mdb,
 			nil,
 			nil,
 			nil,
+			runRepo,
 			nil,
-			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb),
+			nil,
+			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry()),
 			nil,
 			&trigger.Registry{},
 			trace.NewNoopTracerProvider().Tracer("tracer"),
@@ -131,12 +141,13 @@ func setupController(t *testing.T) controllerFixture {
 }
 
 type controllerFixture struct {
-	db *testdb.MockRepository
-	c  openapi.ApiApiServicer
+	db          *testdb.MockRepository
+	testRunRepo *mocks.RunRepository
+	c           openapi.ApiApiServicer
 }
 
-func (f controllerFixture) expectGetRun(r model.Run) {
-	f.db.
-		On("GetRun", r.TestID, r.ID).
+func (f controllerFixture) expectGetRun(r test.Run) {
+	f.testRunRepo.
+		On("GetRun", mock.Anything, r.TestID, r.ID).
 		Return(r, nil)
 }
