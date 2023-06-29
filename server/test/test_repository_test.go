@@ -10,39 +10,19 @@ import (
 	rmtest "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/require"
 )
 
 var (
 	excludedOperations = rmtest.ExcludeOperations(
-		// Update
-		rmtest.OperationUpdateInternalError,
-		rmtest.OperationUpdateNotFound,
-		rmtest.OperationUpdateSuccess,
-
-		// Provisioning (Update)
-		rmtest.OperationProvisioningTypeNotSupported,
-		rmtest.OperationProvisioningError,
-		rmtest.OperationProvisioningSuccess,
-
 		// Delete
 		rmtest.OperationDeleteInternalError,
 		rmtest.OperationDeleteNotFound,
 		rmtest.OperationDeleteSuccess,
 
-		// Get
-		rmtest.OperationGetAugmentedSuccess,
-		rmtest.OperationGetInternalError,
-		rmtest.OperationGetNotFound,
-		rmtest.OperationGetSuccess,
-
 		// List
-		rmtest.OperationListAugmentedSuccess,
-		rmtest.OperationListInternalError,
-		rmtest.OperationListNoResults,
-		rmtest.OperationListSortSuccess,
-		rmtest.OperationListSuccess,
-		rmtest.OperationListWithInvalidSortField,
+		rmtest.OperationListSortSuccess, // we need to think how to deal with augmented fields on sorting
 	)
 	jsonComparer = rmtest.JSONComparer(testJsonComparer)
 )
@@ -75,7 +55,7 @@ func registerManagerFn(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 	return manager
 }
 
-func getScenarioPreparation(sample test.Test) func(t *testing.T, op rmtest.Operation, manager resourcemanager.Manager) {
+func getScenarioPreparation(sample, secondSample, thirdSample test.Test) func(t *testing.T, op rmtest.Operation, manager resourcemanager.Manager) {
 	return func(t *testing.T, op rmtest.Operation, manager resourcemanager.Manager) {
 		testRepo := manager.Handler().(test.Repository)
 		switch op {
@@ -90,11 +70,16 @@ func getScenarioPreparation(sample test.Test) func(t *testing.T, op rmtest.Opera
 		case rmtest.OperationListAugmentedSuccess,
 			rmtest.OperationGetAugmentedSuccess:
 			testRepo.Create(context.TODO(), sample)
+
+		case rmtest.OperationListSortSuccess:
+			testRepo.Create(context.TODO(), sample)
+			testRepo.Create(context.TODO(), secondSample)
+			testRepo.Create(context.TODO(), thirdSample)
 		}
 	}
 }
 
-func Test_TestResourceWithHTTPTrigger(t *testing.T) {
+func TestTestResourceWithHTTPTrigger(t *testing.T) {
 	var testSample = test.Test{
 		ID:          "NiWVnxP4R",
 		Name:        "Verify Import",
@@ -122,13 +107,84 @@ func Test_TestResourceWithHTTPTrigger(t *testing.T) {
 		},
 	}
 
+	var secondTestSample = test.Test{
+		ID:          "NiWVnjahsdvR",
+		Name:        "Another Test",
+		Description: "another test description",
+		Trigger: trigger.Trigger{
+			Type: "http",
+			HTTP: &trigger.HTTPRequest{
+				Method: "GET",
+				URL:    "http://localhost:11633/api/tests",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
+	var thirdTestSample = test.Test{
+		ID:          "oau3si2y6d",
+		Name:        "One More Test",
+		Description: "one more test description",
+		Trigger: trigger.Trigger{
+			Type: "http",
+			HTTP: &trigger.HTTPRequest{
+				Method: "GET",
+				URL:    "http://localhost:11633/api/tests",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
 	testSpec := rmtest.ResourceTypeTest{
 		ResourceTypeSingular: test.ResourceName,
 		ResourceTypePlural:   test.ResourceNamePlural,
 		RegisterManagerFn:    registerManagerFn,
-		Prepare:              getScenarioPreparation(testSample),
+		Prepare:              getScenarioPreparation(testSample, secondTestSample, thirdTestSample),
 		SampleJSON: `{
-			"type": "test",
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import",
+				"description": "check the working of the import flow",
+				"trigger": {
+					"type": "http",
+					"httpRequest": {
+						"method": "GET",
+						"url": "http://localhost:11633/api/tests"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists",
+						"selector": { "query": "span[name = \"span name\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				],
+				"outputs": [
+					{
+						"name": "USER_ID",
+						"selector": "span[name = \"span name\"]",
+						"value": "attr:user_id"
+					}
+				]
+			}
+		}`,
+		SampleJSONAugmented: `{
+			"type": "Test",
 			"spec": {
 				"id": "NiWVnxP4R",
 				"name": "Verify Import",
@@ -154,16 +210,40 @@ func Test_TestResourceWithHTTPTrigger(t *testing.T) {
 						"value": "attr:user_id"
 					}
 				],
+				"version": 1,
 				"summary": {
-					"runs": 1,
+					"runs": 0,
 					"lastRun": {
-						"fails": 1,
-						"passes": 2
+						"fails": 0,
+						"passes": 0
 					}
 				}
 			}
 		}`,
+		SampleJSONUpdated: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import Updated",
+				"description": "check the working of the import flow updated",
+				"trigger": {
+					"type": "http",
+					"httpRequest": {
+						"method": "GET",
+						"url": "http://localhost:11633/api/tests"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists updated",
+						"selector": { "query": "span[name = \"span name updated\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				]
+			}
+		}`,
 	}
 
+	testmock.StartTestEnvironment() //TODO: remove it later
 	rmtest.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
 }

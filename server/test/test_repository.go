@@ -171,7 +171,7 @@ func (r *repository) Get(ctx context.Context, id id.ID) (Test, error) {
 	}
 
 	r.removeNonAugmentedFields(&test)
-	return test, err
+	return test, nil
 }
 
 func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
@@ -377,7 +377,14 @@ func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
 		return testToUpdate, nil
 	}
 
-	return r.insertTest(ctx, testToUpdate)
+	updatedTest, err := r.insertTest(ctx, testToUpdate)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not create test with new version while updating test: %w", err)
+	}
+
+	r.removeNonAugmentedFields(&updatedTest)
+
+	return updatedTest, nil
 }
 
 func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
