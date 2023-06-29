@@ -446,3 +446,165 @@ message GetPokemonListResponse {
 
 	rmtest.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
 }
+
+func TestTestResourceWithTraceIDTrigger(t *testing.T) {
+	var testSample = test.Test{
+		ID:          "NiWVnxP4R",
+		Name:        "Verify Import",
+		Description: "check the working of the import flow",
+		Trigger: trigger.Trigger{
+			Type: "traceid",
+			TraceID: &trigger.TraceIDRequest{
+				ID: "some-trace-id",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{
+			{
+				Name:     "USER_ID",
+				Selector: test.SpanQuery(`span[name = "span name"]`),
+				Value:    `attr:user_id`,
+			},
+		},
+	}
+
+	var secondTestSample = test.Test{
+		ID:          "NiWVnjahsdvR",
+		Name:        "Another Test",
+		Description: "another test description",
+		Trigger: trigger.Trigger{
+			Type: "traceid",
+			TraceID: &trigger.TraceIDRequest{
+				ID: "some-trace-id",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
+	var thirdTestSample = test.Test{
+		ID:          "oau3si2y6d",
+		Name:        "One More Test",
+		Description: "one more test description",
+		Trigger: trigger.Trigger{
+			Type: "traceid",
+			TraceID: &trigger.TraceIDRequest{
+				ID: "some-trace-id",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   test.Selector{Query: `span[name = "span name"]`},
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
+	testSpec := rmtest.ResourceTypeTest{
+		ResourceTypeSingular: test.ResourceName,
+		ResourceTypePlural:   test.ResourceNamePlural,
+		RegisterManagerFn:    registerManagerFn,
+		Prepare:              getScenarioPreparation(testSample, secondTestSample, thirdTestSample),
+		SampleJSON: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import",
+				"description": "check the working of the import flow",
+				"trigger": {
+					"type": "traceid",
+					"traceid": {
+						"id": "some-trace-id"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists",
+						"selector": { "query": "span[name = \"span name\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				],
+				"outputs": [
+					{
+						"name": "USER_ID",
+						"selector": "span[name = \"span name\"]",
+						"value": "attr:user_id"
+					}
+				]
+			}
+		}`,
+		SampleJSONAugmented: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import",
+				"description": "check the working of the import flow",
+				"trigger": {
+					"type": "traceid",
+					"traceid": {
+						"id": "some-trace-id"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists",
+						"selector": { "query": "span[name = \"span name\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				],
+				"outputs": [
+					{
+						"name": "USER_ID",
+						"selector": "span[name = \"span name\"]",
+						"value": "attr:user_id"
+					}
+				],
+				"version": 1,
+				"summary": {
+					"runs": 0,
+					"lastRun": {
+						"fails": 0,
+						"passes": 0
+					}
+				}
+			}
+		}`,
+		SampleJSONUpdated: `{
+			"type": "Test",
+			"spec": {
+				"id": "NiWVnxP4R",
+				"name": "Verify Import Updated",
+				"description": "check the working of the import flow updated",
+				"trigger": {
+					"type": "traceid",
+					"traceid": {
+						"id": "some-trace-id"
+					}
+				},
+				"specs": [
+					{
+						"name": "check user id exists updated",
+						"selector": { "query": "span[name = \"span name updated\"]" },
+						"assertions": [ "attr:user_id != \"\"" ]
+					}
+				]
+			}
+		}`,
+	}
+
+	rmtest.TestResourceType(t, testSpec, excludedOperations, jsonComparer)
+}
