@@ -201,7 +201,7 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 		"type": "type",
 	}
 
-	q = sqlutil.Sort(q, sortBy, sortDirection, "id", sortingFields)
+	q = sqlutil.Sort(q, sortBy, sortDirection, "name", sortingFields)
 	q += " LIMIT $1 OFFSET $2"
 
 	stmt, err := r.db.Prepare(q)
