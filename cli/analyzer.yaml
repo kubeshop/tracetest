@@ -1,0 +1,40 @@
+type: Analyzer
+spec:
+  id: current
+  name: analyzer
+  enabled: true
+  minimumScore: 0
+  plugins:
+  - slug: standards
+    name: OTel Semantic Conventions
+    enabled: true
+    rules:
+    - slug: span_attribute_naming
+      weight: 25
+      errorLevel: error
+    - slug: required_attributes
+      weight: 25
+      errorLevel: error
+    - slug: not_empty_attributes
+      weight: 25
+      errorLevel: error
+    - slug: span_naming
+      weight: 25
+      errorLevel: error
+  - slug: security
+    name: Security
+    enabled: true
+    rules:
+    - slug: no_api_key_leak
+      weight: 70
+      errorLevel: error
+    - slug: enforce_https_protocol
+      weight: 30
+      errorLevel: error
+  - slug: common
+    name: Common problems
+    enabled: true
+    rules:
+    - slug: enforce_dns
+      weight: 100
+      errorLevel: error

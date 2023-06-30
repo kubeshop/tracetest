@@ -41,18 +41,20 @@ type (
 	}
 )
 
-// var (
-// 	pluginMap        = plugins_registry.DefaultPluginRegistry.PluginMap()
-// 	availablePlugins = strings.Join(plugins_registry.DefaultPluginRegistry.List(), "|")
-// )
-
 func (l Linter) Validate() error {
 	if l.Name == "" {
 		return fmt.Errorf("linter name cannot be empty")
 	}
 
 	// for _, p := range l.Plugins {
-	// 	rules, ok := pluginMap[p.Slug]
+	// 	plugin, ok := slices.BinarySearchFunc(metadata.Plugins, func(plugin metadata.PluginMetadata) (int, bool) {
+	// 		if plugin.Slug == p.Slug {
+	// 			return 0, true
+	// 		}
+
+	// 		return 1, false
+	// 	})
+
 	// 	if !ok {
 	// 		return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Slug, availablePlugins, "|")
 	// 	}
