@@ -26,7 +26,6 @@ type LinterResultPluginRule struct {
 	Weight           *int32                         `json:"weight,omitempty"`
 	Tips             []string                       `json:"tips,omitempty"`
 	Results          []LinterResultPluginRuleResult `json:"results,omitempty"`
-	Level            *string                        `json:"level,omitempty"`
 }
 
 // NewLinterResultPluginRule instantiates a new LinterResultPluginRule object
@@ -270,38 +269,6 @@ func (o *LinterResultPluginRule) SetResults(v []LinterResultPluginRuleResult) {
 	o.Results = v
 }
 
-// GetLevel returns the Level field value if set, zero value otherwise.
-func (o *LinterResultPluginRule) GetLevel() string {
-	if o == nil || isNil(o.Level) {
-		var ret string
-		return ret
-	}
-	return *o.Level
-}
-
-// GetLevelOk returns a tuple with the Level field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *LinterResultPluginRule) GetLevelOk() (*string, bool) {
-	if o == nil || isNil(o.Level) {
-		return nil, false
-	}
-	return o.Level, true
-}
-
-// HasLevel returns a boolean if a field has been set.
-func (o *LinterResultPluginRule) HasLevel() bool {
-	if o != nil && !isNil(o.Level) {
-		return true
-	}
-
-	return false
-}
-
-// SetLevel gets a reference to the given string and assigns it to the Level field.
-func (o *LinterResultPluginRule) SetLevel(v string) {
-	o.Level = &v
-}
-
 func (o LinterResultPluginRule) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -332,9 +299,6 @@ func (o LinterResultPluginRule) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Results) {
 		toSerialize["results"] = o.Results
-	}
-	if !isNil(o.Level) {
-		toSerialize["level"] = o.Level
 	}
 	return toSerialize, nil
 }

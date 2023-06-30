@@ -12,11 +12,11 @@ import (
 )
 
 var (
-	CommonPlugin = plugins.NewPlugin(
+	commonPlugin = plugins.NewPlugin(
 		metadata.CommonPlugin,
 		rules.NewRegistry().Register(rules.NewEnforceDnsUsageRule(metadata.EnforceDnsRule)),
 	)
-	StandardsPlugin = plugins.NewPlugin(
+	standardsPlugin = plugins.NewPlugin(
 		metadata.StandardsPlugin,
 		rules.NewRegistry().
 			Register(rules.NewEnsureSpanNamingRule(metadata.EnsureSpanNamingRule)).
@@ -24,16 +24,16 @@ var (
 			Register(rules.NewEnsureAttributeNamingRule(metadata.EnsureAttributeNamingRule)).
 			Register(rules.NewNotEmptyAttributesRule(metadata.NotEmptyAttributesRule)),
 	)
-	SecurityPlugin = plugins.NewPlugin(
+	securityPlugin = plugins.NewPlugin(
 		metadata.SecurityPlugin,
 		rules.NewRegistry().
 			Register(rules.NewEnforceHttpsProtocolRule(metadata.EnforceHttpsProtocolRule)).
 			Register(rules.NewEnsuresNoApiKeyLeakRule(metadata.EnsuresNoApiKeyLeakRule)),
 	)
 	DefaultPluginRegistry = plugins.NewRegistry().
-				Register(StandardsPlugin).
-				Register(SecurityPlugin).
-				Register(CommonPlugin)
+				Register(standardsPlugin).
+				Register(securityPlugin).
+				Register(commonPlugin)
 )
 
 type Linter interface {

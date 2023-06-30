@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/linter/metadata"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
@@ -15,56 +14,7 @@ type Repository struct {
 	db *sql.DB
 }
 
-var defaultLinter = Linter{
-	ID:           id.ID("current"),
-	Name:         "analyzer",
-	Enabled:      true,
-	MinimumScore: 0,
-	Plugins: []LinterPlugin{{
-		Slug:    metadata.StandardsPlugin.Slug,
-		Name:    metadata.StandardsPlugin.Name,
-		Enabled: metadata.StandardsPlugin.DefaultEnabled,
-		Rules: []LinterRule{{
-			Slug:       metadata.EnsureAttributeNamingRule.Slug,
-			Weight:     metadata.EnsureAttributeNamingRule.DefaultWeight,
-			ErrorLevel: metadata.EnsureAttributeNamingRule.DefaultErrorLevel,
-		}, {
-			Slug:       metadata.RequiredAttributesRule.Slug,
-			Weight:     metadata.RequiredAttributesRule.DefaultWeight,
-			ErrorLevel: metadata.RequiredAttributesRule.DefaultErrorLevel,
-		}, {
-			Slug:       metadata.NotEmptyAttributesRule.Slug,
-			Weight:     metadata.NotEmptyAttributesRule.DefaultWeight,
-			ErrorLevel: metadata.NotEmptyAttributesRule.DefaultErrorLevel,
-		}, {
-			Slug:       metadata.EnsureSpanNamingRule.Slug,
-			Weight:     metadata.EnsureSpanNamingRule.DefaultWeight,
-			ErrorLevel: metadata.EnsureSpanNamingRule.DefaultErrorLevel,
-		}},
-	}, {
-		Slug:    metadata.SecurityPlugin.Slug,
-		Name:    metadata.SecurityPlugin.Name,
-		Enabled: metadata.SecurityPlugin.DefaultEnabled,
-		Rules: []LinterRule{{
-			Slug:       metadata.EnsuresNoApiKeyLeakRule.Slug,
-			Weight:     metadata.EnsuresNoApiKeyLeakRule.DefaultWeight,
-			ErrorLevel: metadata.EnsuresNoApiKeyLeakRule.DefaultErrorLevel,
-		}, {
-			Slug:       metadata.EnforceHttpsProtocolRule.Slug,
-			Weight:     metadata.EnforceHttpsProtocolRule.DefaultWeight,
-			ErrorLevel: metadata.EnforceHttpsProtocolRule.DefaultErrorLevel,
-		}},
-	}, {
-		Slug:    metadata.CommonPlugin.Slug,
-		Name:    metadata.CommonPlugin.Name,
-		Enabled: metadata.CommonPlugin.DefaultEnabled,
-		Rules: []LinterRule{{
-			Slug:       metadata.EnforceDnsRule.Slug,
-			Weight:     metadata.EnforceDnsRule.DefaultWeight,
-			ErrorLevel: metadata.EnforceDnsRule.DefaultErrorLevel,
-		}},
-	}},
-}
+var defaultLinter = getDefaultLinter()
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}

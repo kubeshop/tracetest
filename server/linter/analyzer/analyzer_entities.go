@@ -2,9 +2,12 @@ package analyzer
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/kubeshop/tracetest/server/linter/metadata"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
+	"golang.org/x/exp/slices"
 )
 
 const (
@@ -46,30 +49,74 @@ func (l Linter) Validate() error {
 		return fmt.Errorf("linter name cannot be empty")
 	}
 
-	// for _, p := range l.Plugins {
-	// 	plugin, ok := slices.BinarySearchFunc(metadata.Plugins, func(plugin metadata.PluginMetadata) (int, bool) {
-	// 		if plugin.Slug == p.Slug {
-	// 			return 0, true
-	// 		}
+	for _, p := range l.Plugins {
+		plugin, ok := findPlugin(p.Slug, metadata.Plugins)
+		if !ok {
+			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Slug, metadata.AvailablePlugins)
+		}
 
-	// 		return 1, false
-	// 	})
+		for _, r := range p.Rules {
+			index := slices.IndexFunc(plugin.Rules, func(rule metadata.RuleMetadata) bool { return rule.Slug == r.Slug })
 
-	// 	if !ok {
-	// 		return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Slug, availablePlugins, "|")
-	// 	}
-
-	// 	for _, r := range p.Rules {
-	// 		index := slices.IndexFunc(rules, func(rule string) bool { return rule == r.Slug })
-
-	// 		if index == -1 {
-	// 			availableRules := strings.Join(rules, "|")
-	// 			return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Slug, p.Slug, availableRules)
-	// 		}
-	// 	}
-	// }
+			if index == -1 {
+				availableRules := strings.Join(getAvailableRules(plugin), "|")
+				return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Slug, p.Slug, availableRules)
+			}
+		}
+	}
 
 	return nil
+}
+
+func findPlugin(slug string, plugins []metadata.PluginMetadata) (metadata.PluginMetadata, bool) {
+	for _, p := range plugins {
+		if p.Slug == slug {
+			return p, true
+		}
+	}
+
+	return metadata.PluginMetadata{}, false
+}
+
+func getAvailableRules(plugin metadata.PluginMetadata) []string {
+	rules := make([]string, 0)
+
+	for _, r := range plugin.Rules {
+		rules = append(rules, r.Slug)
+	}
+
+	return rules
+}
+
+func getDefaultLinter() Linter {
+	plugins := []LinterPlugin{}
+
+	for _, plugin := range metadata.Plugins {
+		rules := []LinterRule{}
+
+		for _, rule := range plugin.Rules {
+			rules = append(rules, LinterRule{
+				Slug:       rule.Slug,
+				Weight:     rule.DefaultWeight,
+				ErrorLevel: rule.DefaultErrorLevel,
+			})
+		}
+
+		plugins = append(plugins, LinterPlugin{
+			Slug:    plugin.Slug,
+			Name:    plugin.Name,
+			Enabled: plugin.DefaultEnabled,
+			Rules:   rules,
+		})
+	}
+
+	return Linter{
+		ID:           id.ID("current"),
+		Name:         "analyzer",
+		Enabled:      true,
+		Plugins:      plugins,
+		MinimumScore: 0,
+	}
 }
 
 func (l Linter) HasID() bool {

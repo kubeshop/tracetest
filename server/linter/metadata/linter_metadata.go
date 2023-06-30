@@ -29,6 +29,8 @@ var (
 		SecurityPlugin,
 	}
 
+	AvailablePlugins = []string{StandardsPlugin.Slug, CommonPlugin.Slug, SecurityPlugin.Slug}
+
 	StandardsPlugin = PluginMetadata{
 		Slug:           "standards",
 		Name:           "OTel Semantic Conventions",
