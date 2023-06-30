@@ -1,5 +1,5 @@
 import {NodeHeight} from 'constants/Timeline.constants';
-import * as S from './Timeline.styled';
+import * as S from '../Timeline.styled';
 
 interface IProps {
   distance: number;

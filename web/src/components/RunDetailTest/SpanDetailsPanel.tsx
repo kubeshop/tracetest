@@ -1,5 +1,5 @@
+import SpanDetail, {TestAttributeRow, TestSubHeader} from 'components/SpanDetail';
 import {useSpan} from 'providers/Span/Span.provider';
-import SpanDetail from '../SpanDetail/SpanDetail';
 import {LeftPanel, PanelContainer} from '../ResizablePanels';
 
 const panel = {
@@ -18,7 +18,7 @@ const SpanDetailsPanel = () => {
     >
       {size => (
         <PanelContainer $isOpen={size.isOpen}>
-          <SpanDetail span={selectedSpan} />
+          <SpanDetail span={selectedSpan} AttributeRowComponent={TestAttributeRow} SubHeaderComponent={TestSubHeader} />
         </PanelContainer>
       )}
     </LeftPanel>

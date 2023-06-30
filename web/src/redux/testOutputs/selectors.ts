@@ -7,11 +7,11 @@ export const selectTestOutputs = createSelector(testOutputsStateSelector, ({outp
 
 export const selectSelectedOutputs = createSelector(testOutputsStateSelector, ({selectedOutputs}) => selectedOutputs);
 
-export const outputIdSelector = (state: RootState, outputId: number) => outputId;
+export const outputNameSelector = (state: RootState, outputName: string) => outputName;
 export const selectIsSelectedOutput = createSelector(
   selectSelectedOutputs,
-  outputIdSelector,
-  (selectedOutputs, outputId) => !!selectedOutputs.find(selectedOutput => selectedOutput.id === outputId)
+  outputNameSelector,
+  (selectedOutputs, outputName) => !!selectedOutputs.find(selectedOutput => selectedOutput.name === outputName)
 );
 
 export const selectIsPending = createSelector(testOutputsStateSelector, ({outputs}) =>

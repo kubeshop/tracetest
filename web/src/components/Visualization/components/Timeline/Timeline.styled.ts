@@ -38,9 +38,9 @@ export const GroupCollapse = styled(Group)`
   cursor: pointer;
 `;
 
-export const Image = styled.image`
-  height: 8px;
-  width: 8px;
+export const Image = styled.image<{$width?: number; $height?: number}>`
+  height: ${({$height}) => $height ?? 8}px;
+  width: ${({$width}) => $width ?? 8}px;
 `;
 
 export const LineConnector = styled.line`

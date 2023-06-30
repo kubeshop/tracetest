@@ -7,6 +7,7 @@ import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import DAG from 'components/Visualization/components/DAG';
 import Timeline from 'components/Visualization/components/Timeline';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import Span from 'models/Span.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useSpan} from 'providers/Span/Span.provider';
@@ -88,6 +89,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     <Timeline
       isMatchedMode={matchedSpans.length > 0 || isOpen}
       matchedSpans={matchedSpans}
+      nodeType={NodeTypesEnum.TestSpan}
       onNavigateToSpan={onNavigateToSpan}
       onNodeClick={onNodeClickTimeline}
       selectedSpan={selectedSpan?.id ?? ''}
