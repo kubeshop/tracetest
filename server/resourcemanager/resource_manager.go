@@ -328,6 +328,8 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 		writeError(w, encoder, http.StatusBadRequest, err)
 		return
 	}
+	targetResource.Spec = m.rh.SetID(targetResource.Spec, urlID)
+
 	m.doUpdate(w, r, encoder, targetResource.Spec)
 }
 

@@ -16,7 +16,6 @@ spec:
         {
           "type": "Transaction",
           "spec": {
-              "id": "${env:TRANSACTION_ID}",
               "name": "test-transaction-updated",
               "description": "a transaction",
               "steps": [ "${env:TRANSACTION_STEP_ID}" ]
