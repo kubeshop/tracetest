@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
 var (
-	deleteParams = &parameters.ResourceIdParams{}
+	deleteParams = &ResourceIDParameters{}
 	deleteCmd    *cobra.Command
 )
 

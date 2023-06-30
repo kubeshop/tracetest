@@ -11,7 +11,7 @@ import (
 
 type Verb string
 
-type client struct {
+type Client struct {
 	client             *HTTPClient
 	resourceName       string
 	resourceNamePlural string
@@ -56,16 +56,16 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 	return c.client.Do(req)
 }
 
-type options func(c *client)
+type options func(c *Client)
 
 func WithDeleteEnabled(deleteSuccessMssg string) options {
-	return func(c *client) {
+	return func(c *Client) {
 		c.deleteSuccessMsg = deleteSuccessMssg
 	}
 }
 
 func WithTableConfig(tableConfig TableConfig) options {
-	return func(c *client) {
+	return func(c *Client) {
 		c.tableConfig = tableConfig
 	}
 }
@@ -76,8 +76,8 @@ func WithTableConfig(tableConfig TableConfig) options {
 func NewClient(
 	httpClient *HTTPClient,
 	resourceName, resourceNamePlural string,
-	opts ...options) client {
-	c := client{
+	opts ...options) Client {
+	c := Client{
 		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,

@@ -3,13 +3,12 @@ package cmd
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
 var (
-	getParams = &parameters.ResourceIdParams{}
+	getParams = ResourceIDParameters{}
 	getCmd    *cobra.Command
 )
 
@@ -46,4 +45,21 @@ func init() {
 
 	getCmd.Flags().StringVar(&getParams.ResourceID, "id", "", "id of the resource to get")
 	rootCmd.AddCommand(getCmd)
+}
+
+type ResourceIDParameters struct {
+	ResourceID string
+}
+
+func (p ResourceIDParameters) Validate(cmd *cobra.Command, args []string) []error {
+	errors := make([]error, 0)
+
+	if p.ResourceID == "" {
+		errors = append(errors, ParamError{
+			Parameter: "id",
+			Message:   "resource id must be provided",
+		})
+	}
+
+	return errors
 }

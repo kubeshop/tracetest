@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/utils"
@@ -24,11 +25,12 @@ var testRunCmd = &cobra.Command{
 		ctx := context.Background()
 		client := utils.GetAPIClient(cliConfig)
 
-		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
-		environmentOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)))
-		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
+		envClient, err := resources.Get("environment")
+		if err != nil {
+			return "", fmt.Errorf("failed to get environment client: %w", err)
+		}
 
-		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, environmentActions, ExitCLI)
+		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, envClient, ExitCLI)
 		actionArgs := actions.RunResourceArgs{
 			DefinitionFile: runTestFileDefinition,
 			EnvID:          runTestEnvID,
@@ -36,7 +38,7 @@ var testRunCmd = &cobra.Command{
 			JUnit:          runTestJUnit,
 		}
 
-		err := runTestAction.Run(ctx, actionArgs)
+		err = runTestAction.Run(ctx, actionArgs)
 		return "", err
 	}),
 	PostRun: teardownCommand,
