@@ -1,10 +1,9 @@
 type: Demo
 spec:
-  id: DXc4OWXVR
+  id: ""
   name: dev-updated
-  type: otelstore
   enabled: true
-  pokeshop: {}
+  type: otelstore
   opentelemetryStore:
     frontendEndpoint: http://dev-updated-frontend:9000
     productCatalogEndpoint: http://dev-updated-product:8081

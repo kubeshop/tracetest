@@ -21,7 +21,7 @@ func TestConfigResource(t *testing.T) {
 				config.ResourceName,
 				config.ResourceNamePlural,
 				configRepo,
-				resourcemanager.WithOperations(config.Operations...),
+				resourcemanager.DisableDelete(),
 			)
 			manager.RegisterRoutes(router)
 

@@ -190,6 +190,10 @@ func (e Encoder) DecodeRequestBody(out interface{}) (err error) {
 		return fmt.Errorf("cannot read request body: %w", err)
 	}
 
+	if len(body) == 0 {
+		return fmt.Errorf("request body is empty")
+	}
+
 	return e.input.Unmarshal(body, out)
 }
 

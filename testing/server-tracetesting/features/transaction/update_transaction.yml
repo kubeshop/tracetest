@@ -37,7 +37,3 @@ spec:
     assertions:
       - attr:sql.query contains "INSERT INTO transactions"
 
-  outputs:
-  - name: TRANSACTION_ID
-    selector: span[name = "Tracetest trigger"]
-    value: attr:tracetest.response.body | json_path '$.spec.id'

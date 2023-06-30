@@ -1,11 +1,11 @@
 package resourcemanager
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 )
 
@@ -28,14 +28,23 @@ type HTTPClient struct {
 
 func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
 	return &HTTPClient{
-		client:       http.Client{},
+		client: http.Client{
+			// this function avoids blindly followin redirects.
+			// the problem with redirects is that they don't guarantee to preserve the method, body, headers, etc.
+			// This can hide issues when developing, because the client will follow the redirect and the request
+			// will succeed, but the server will not receive the request that the user intended to send.
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		},
 		baseURL:      baseURL,
 		extraHeaders: extraHeaders,
 	}
 }
 
 func (c HTTPClient) url(resourceName string, extra ...string) *url.URL {
-	url, _ := url.Parse(fmt.Sprintf("%s/api/%s/%s", c.baseURL, resourceName, strings.Join(extra, "/")))
+	urlStr := c.baseURL + path.Join("/api", resourceName, strings.Join(extra, "/"))
+	url, _ := url.Parse(urlStr)
 	return url
 }
 
@@ -60,8 +69,6 @@ func WithTableConfig(tableConfig TableConfig) options {
 		c.tableConfig = tableConfig
 	}
 }
-
-var ErrNotSupportedResourceAction = errors.New("the specified resource type doesn't support the action")
 
 // NewClient creates a new client for a resource managed by the resourceamanger.
 // The tableConfig parameter configures how the table view should be rendered.

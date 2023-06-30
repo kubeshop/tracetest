@@ -22,7 +22,7 @@ func TestPollingProfileResource(t *testing.T) {
 				pollingprofile.ResourceName,
 				pollingprofile.ResourceNamePlural,
 				pollingProfileRepo,
-				resourcemanager.WithOperations(pollingprofile.Operations...),
+				resourcemanager.DisableDelete(),
 				resourcemanager.WithIDGen(id.GenerateID),
 			)
 			manager.RegisterRoutes(router)

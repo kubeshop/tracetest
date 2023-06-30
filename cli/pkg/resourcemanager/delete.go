@@ -4,15 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 const VerbDelete Verb = "delete"
 
 func (c client) Delete(ctx context.Context, id string, format Format) (string, error) {
-	if c.deleteSuccessMsg == "" {
-		return "", ErrNotSupportedResourceAction
-	}
-
 	url := c.client.url(c.resourceNamePlural, id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url.String(), nil)
 	if err != nil {
@@ -40,5 +37,13 @@ func (c client) Delete(ctx context.Context, id string, format Format) (string, e
 		return "", fmt.Errorf("could not Delete resource: %w", err)
 	}
 
-	return c.deleteSuccessMsg, nil
+	msg := ""
+	if c.deleteSuccessMsg != "" {
+		msg = c.deleteSuccessMsg
+	} else {
+		ucfirst := strings.ToUpper(string(c.resourceName[0])) + c.resourceName[1:]
+		msg = fmt.Sprintf("%s successfully deleted", ucfirst)
+	}
+
+	return msg, nil
 }

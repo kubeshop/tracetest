@@ -1,10 +1,14 @@
 type: Demo
 spec:
-  id: ik_4OWuVg
+  id: ""
   name: another-dev
-  type: pokeshop
   enabled: true
+  type: pokeshop
+  opentelemetryStore:
+    frontendEndpoint: ""
+    productCatalogEndpoint: ""
+    cartEndpoint: ""
+    checkoutEndpoint: ""
   pokeshop:
     httpEndpoint: http://new-dev-endpoint:1234
     grpcEndpoint: new-dev-grpc:9091
-  opentelemetryStore: {}

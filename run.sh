@@ -11,7 +11,6 @@ help_message() {
 }
 
 restart() {
-  build
   docker compose $opts kill tracetest
   docker compose $opts up -d tracetest
 }

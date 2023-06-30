@@ -23,6 +23,11 @@ func (r *Repository) SetID(profile PollingProfile, id id.ID) PollingProfile {
 	return profile
 }
 
+func (r *Repository) Create(ctx context.Context, updated PollingProfile) (PollingProfile, error) {
+	updated.ID = id.ID("current")
+	return r.Update(ctx, updated)
+}
+
 const (
 	insertQuery = `
 	INSERT INTO polling_profiles(
