@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 const VerbDelete Verb = "delete"
@@ -36,5 +37,12 @@ func (c client) Delete(ctx context.Context, id string, format Format) (string, e
 		return "", fmt.Errorf("could not Delete resource: %w", err)
 	}
 
-	return c.deleteSuccessMsg, nil
+	msg := ""
+	if c.deleteSuccessMsg != "" {
+		msg = c.deleteSuccessMsg
+	} else {
+		msg = fmt.Sprintf("%s successfully deleted", strings.ToTitle(c.deleteSuccessMsg))
+	}
+
+	return msg, nil
 }
