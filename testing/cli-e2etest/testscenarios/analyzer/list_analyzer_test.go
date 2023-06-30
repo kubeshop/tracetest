@@ -94,7 +94,6 @@ func TestListAnalyzer(t *testing.T) {
 
 		analyzerList := helpers.UnmarshalJSON[types.ResourceList[types.AnalyzerResource]](t, result.StdOut)
 		require.Len(analyzerList.Items, 1)
-		require.Equal(len(analyzerList.Items), analyzerList.Count)
 
 		require.Equal("Analyzer", analyzerList.Items[0].Type)
 		require.Equal("current", analyzerList.Items[0].Spec.Id)

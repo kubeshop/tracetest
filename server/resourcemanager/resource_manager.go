@@ -129,29 +129,41 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 
 	enabledOps := m.EnabledOperations()
 
+	listHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationList) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceTypePlural)))
+		listHandler = m.list
 	}
+	m.instrumentRoute(subrouter.HandleFunc("", listHandler).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceTypePlural)))
 
+	createHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationCreate) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
+		createHandler = m.create
 	}
+	m.instrumentRoute(subrouter.HandleFunc("", createHandler).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
 
-	if slices.Contains(enabledOps, OperationUpsert) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.upsert).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Upsert", m.resourceTypePlural)))
+	upsertHandler := m.methodNotAllowed
+	if slices.Contains(enabledOps, OperationCreate) && slices.Contains(enabledOps, OperationUpdate) {
+		upsertHandler = m.upsert
 	}
+	m.instrumentRoute(subrouter.HandleFunc("", upsertHandler).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Upsert", m.resourceTypePlural)))
 
+	updateHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationUpdate) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
+		updateHandler = m.update
 	}
+	m.instrumentRoute(subrouter.HandleFunc("/{id}", updateHandler).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
 
+	getHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationGet) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
+		getHandler = m.get
 	}
+	m.instrumentRoute(subrouter.HandleFunc("/{id}", getHandler).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
 
+	deleteHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationDelete) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
+		deleteHandler = m.delete
 	}
+	m.instrumentRoute(subrouter.HandleFunc("/{id}", deleteHandler).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
 
 	return subrouter
 }
@@ -204,6 +216,9 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 	})
 
 	route.Handler(newHandler)
+}
+func (m *manager[T]) methodNotAllowed(w http.ResponseWriter, r *http.Request) {
+	writeError(w, EncoderFromRequest(r), http.StatusMethodNotAllowed, fmt.Errorf("resource %s does not support the action", m.resourceTypeSingular))
 }
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {

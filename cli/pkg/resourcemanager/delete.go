@@ -9,10 +9,6 @@ import (
 const VerbDelete Verb = "delete"
 
 func (c client) Delete(ctx context.Context, id string, format Format) (string, error) {
-	if c.deleteSuccessMsg == "" {
-		return "", ErrNotSupportedResourceAction
-	}
-
 	url := c.client.url(c.resourceNamePlural, id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url.String(), nil)
 	if err != nil {

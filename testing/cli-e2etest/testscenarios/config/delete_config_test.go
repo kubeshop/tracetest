@@ -26,5 +26,5 @@ func TestDeleteConfig(t *testing.T) {
 	// Then it should return a error message, showing that we cannot delete a config
 	result := tracetestcli.Exec(t, "delete config --id current", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "the specified resource type doesn't support the action")
+	require.Contains(result.StdErr, "resource Config does not support the action")
 }

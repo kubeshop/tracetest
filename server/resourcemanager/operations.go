@@ -14,7 +14,6 @@ const (
 	OperationNoop   Operation = ""
 	OperationList   Operation = "list"
 	OperationCreate Operation = "create"
-	OperationUpsert Operation = "upsert"
 	OperationUpdate Operation = "update"
 	OperationGet    Operation = "get"
 	OperationDelete Operation = "delete"

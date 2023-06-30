@@ -1,7 +1,6 @@
 package resourcemanager
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -70,8 +69,6 @@ func WithTableConfig(tableConfig TableConfig) options {
 		c.tableConfig = tableConfig
 	}
 }
-
-var ErrNotSupportedResourceAction = errors.New("the specified resource type doesn't support the action")
 
 // NewClient creates a new client for a resource managed by the resourceamanger.
 // The tableConfig parameter configures how the table view should be rendered.

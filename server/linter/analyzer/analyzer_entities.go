@@ -16,6 +16,7 @@ var Operations = []resourcemanager.Operation{
 	resourcemanager.OperationGet,
 	resourcemanager.OperationList,
 	resourcemanager.OperationUpdate,
+	resourcemanager.OperationCreate,
 }
 
 type (
