@@ -218,11 +218,15 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: if resourceType != values.resourceType return error
 
-	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
+	m.doCreate(w, r, encoder, targetResource.Spec)
+}
+
+func (m *manager[T]) doCreate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
+	if !specs.HasID() {
+		specs = m.rh.SetID(specs, m.config.idgen())
 	}
 
-	created, err := m.rh.Create(r.Context(), targetResource.Spec)
+	created, err := m.rh.Create(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "creating", err, encoder)
 		return
@@ -251,7 +255,7 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 
 	// if there's no ID given, create the resource
 	if !targetResource.Spec.HasID() {
-		m.create(w, r)
+		m.doCreate(w, r, encoder, targetResource.Spec)
 		return
 	}
 
@@ -259,7 +263,7 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// if the given ID is not found, create the resource
 		if errors.Is(err, sql.ErrNoRows) {
-			m.create(w, r)
+			m.doCreate(w, r, encoder, targetResource.Spec)
 			return
 		} else {
 			// some actual error, return it
