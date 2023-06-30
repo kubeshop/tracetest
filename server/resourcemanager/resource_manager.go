@@ -249,46 +249,27 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// if there's no ID given, create the resource
 	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
-	}
-
-	writeResponse := func(status int, spec T) {
-		newResource := Resource[T]{
-			Type: m.resourceTypeSingular,
-			Spec: spec,
-		}
-
-		err = encoder.WriteEncodedResponse(w, status, newResource)
-		if err != nil {
-			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		}
+		m.create(w, r)
+		return
 	}
 
 	_, err = m.rh.Get(r.Context(), targetResource.Spec.GetID())
 	if err != nil {
-		if err == sql.ErrNoRows {
-			created, err := m.rh.Create(r.Context(), targetResource.Spec)
-			if err != nil {
-				writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot create entity: %w", err))
-				return
-			}
-
-			writeResponse(http.StatusCreated, created)
+		// if the given ID is not found, create the resource
+		if errors.Is(err, sql.ErrNoRows) {
+			m.create(w, r)
 			return
 		} else {
+			// some actual error, return it
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("could not get entity: %w", err))
 			return
 		}
 	}
 
-	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
-	if err != nil {
-		writeError(w, encoder, http.StatusInternalServerError, err)
-		return
-	}
-
-	writeResponse(http.StatusOK, updated)
+	// the resurce exists, update it
+	m.doUpdate(w, r, encoder, targetResource.Spec)
 }
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
@@ -312,11 +293,13 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 			urlID,
 		)
 		writeError(w, encoder, http.StatusBadRequest, err)
+		return
 	}
-	// enforce ID from url in targetResource
-	targetResource.Spec = m.rh.SetID(targetResource.Spec, urlID)
+	m.doUpdate(w, r, encoder, targetResource.Spec)
+}
 
-	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
+func (m *manager[T]) doUpdate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
+	updated, err := m.rh.Update(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "updating", err, encoder)
 		return
