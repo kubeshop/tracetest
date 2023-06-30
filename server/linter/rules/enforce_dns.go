@@ -6,8 +6,6 @@ import (
 	"regexp"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -20,17 +18,17 @@ var (
 	dnsFields       = []string{"http.url", "db.connection_string"}
 )
 
-func NewEnforceDnsUsageRule(metadata metadata.RuleMetadata) Rule {
+func NewEnforceDnsUsageRule() Rule {
 	return &ensuresDnsUsage{
-		BaseRule: NewRule(metadata),
+		BaseRule: NewRule(analyzer.EnforceDnsRuleSlug),
 	}
 }
 
-func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (results.RuleResult, error) {
+func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	passed := true
-	res := make([]results.Result, 0)
+	res := make([]analyzer.Result, 0)
 
-	if config.ErrorLevel == metadata.ErrorLevelDisabled {
+	if config.ErrorLevel == analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
 			result := r.validate(span)
 			if !result.Passed {
@@ -40,16 +38,16 @@ func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config
 		}
 	}
 
-	return results.NewRuleResult(r.metadata, config, results.EvalRuleResult{Passed: passed, Results: res}), nil
+	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: passed, Results: res}), nil
 }
 
-func (r ensuresDnsUsage) validate(span *model.Span) results.Result {
-	ipFields := make([]results.Error, 0)
+func (r ensuresDnsUsage) validate(span *model.Span) analyzer.Result {
+	ipFields := make([]analyzer.Error, 0)
 	ipRegexp := regexp.MustCompile(`(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`)
 
 	for _, field := range dnsFields {
 		if span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
-			ipFields = append(ipFields, results.Error{
+			ipFields = append(ipFields, analyzer.Error{
 				Value:       field,
 				Description: fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
 			})
@@ -58,14 +56,14 @@ func (r ensuresDnsUsage) validate(span *model.Span) results.Result {
 
 	for _, field := range clientDnsFields {
 		if span.Kind == model.SpanKindClient && span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
-			ipFields = append(ipFields, results.Error{
+			ipFields = append(ipFields, analyzer.Error{
 				Value:       field,
 				Description: fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
 			})
 		}
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: len(ipFields) == 0,
 		SpanID: span.ID.String(),
 		Errors: ipFields,

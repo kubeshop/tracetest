@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/linter/results"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/transaction"
@@ -368,7 +368,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 			test.Summary.LastRun.Fails = *fail
 		}
 
-		var linter results.LinterResult
+		var linter analyzer.LinterResult
 		err = json.Unmarshal(jsonLinter, &linter)
 		if err == nil {
 			test.Summary.LastRun.AnalyzerScore = linter.Score

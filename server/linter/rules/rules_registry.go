@@ -5,13 +5,12 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 type Rule interface {
 	Slug() string
-	Evaluate(context.Context, model.Trace, analyzer.LinterRule) (results.RuleResult, error)
+	Evaluate(context.Context, model.Trace, analyzer.LinterRule) (analyzer.RuleResult, error)
 }
 
 type RuleRegistry interface {

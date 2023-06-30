@@ -1,9 +1,4 @@
-package results
-
-import (
-	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
-)
+package analyzer
 
 type Result struct {
 	SpanID string  `json:"span_id"`
@@ -24,33 +19,34 @@ type EvalRuleResult struct {
 }
 
 type RuleResult struct {
-	// metadata
+	// config
 	Slug             string   `json:"slug"`
 	Name             string   `json:"name"`
 	Description      string   `json:"description"`
 	ErrorDescription string   `json:"errorDescription"`
 	Tips             []string `json:"tips"`
-
-	// config
-	Weight int    `json:"weight"`
-	Level  string `json:"level"`
+	Weight           int      `json:"weight"`
+	Level            string   `json:"level"`
 
 	// results
 	Passed  bool     `json:"passed"`
 	Results []Result `json:"results"`
 }
 
-func NewRuleResult(metadata metadata.RuleMetadata, config analyzer.LinterRule, results EvalRuleResult) RuleResult {
+func NewRuleResult(config LinterRule, results EvalRuleResult) RuleResult {
 	return RuleResult{
-		Slug:             metadata.Slug,
-		Name:             metadata.Name,
-		Description:      metadata.Description,
-		ErrorDescription: metadata.ErrorDescription,
-		Tips:             metadata.Tips,
+		// config
+		Slug:             config.Slug,
+		Name:             config.Name,
+		Description:      config.Description,
+		ErrorDescription: config.ErrorDescription,
+		Tips:             config.Tips,
 		Weight:           config.Weight,
 		Level:            config.ErrorLevel,
-		Passed:           results.Passed,
-		Results:          results.Results,
+
+		// results
+		Passed:  results.Passed,
+		Results: results.Results,
 	}
 }
 

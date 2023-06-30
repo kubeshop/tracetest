@@ -1,11 +1,11 @@
 package mappings
 
 import (
-	"github.com/kubeshop/tracetest/server/linter/results"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/openapi"
 )
 
-func (m OpenAPI) LinterResult(in results.LinterResult) openapi.LinterResult {
+func (m OpenAPI) LinterResult(in analyzer.LinterResult) openapi.LinterResult {
 	plugins := make([]openapi.LinterResultPlugin, len(in.Plugins))
 	for i, plugin := range in.Plugins {
 		plugins[i] = m.LinterResultPlugin(plugin)
@@ -19,7 +19,7 @@ func (m OpenAPI) LinterResult(in results.LinterResult) openapi.LinterResult {
 	}
 }
 
-func (m OpenAPI) LinterResultPlugin(in results.PluginResult) openapi.LinterResultPlugin {
+func (m OpenAPI) LinterResultPlugin(in analyzer.PluginResult) openapi.LinterResultPlugin {
 	rules := make([]openapi.LinterResultPluginRule, len(in.Rules))
 	for i, rule := range in.Rules {
 		rules[i] = m.LinterResultPluginRule(rule)
@@ -34,7 +34,7 @@ func (m OpenAPI) LinterResultPlugin(in results.PluginResult) openapi.LinterResul
 	}
 }
 
-func (m OpenAPI) LinterResultPluginRule(in results.RuleResult) openapi.LinterResultPluginRule {
+func (m OpenAPI) LinterResultPluginRule(in analyzer.RuleResult) openapi.LinterResultPluginRule {
 	results := make([]openapi.LinterResultPluginRuleResult, len(in.Results))
 	for i, result := range in.Results {
 		results[i] = m.LinterResultPluginRuleResult(result)
@@ -52,7 +52,7 @@ func (m OpenAPI) LinterResultPluginRule(in results.RuleResult) openapi.LinterRes
 	}
 }
 
-func (m OpenAPI) LinterResultPluginRuleResult(in results.Result) openapi.LinterResultPluginRuleResult {
+func (m OpenAPI) LinterResultPluginRuleResult(in analyzer.Result) openapi.LinterResultPluginRuleResult {
 	errors := make([]openapi.LinterResultPluginRuleResultError, len(in.Errors))
 	for i, error := range in.Errors {
 		errors[i] = m.LinterResultPluginRuleResultError(error)
@@ -66,7 +66,7 @@ func (m OpenAPI) LinterResultPluginRuleResult(in results.Result) openapi.LinterR
 	}
 }
 
-func (m OpenAPI) LinterResultPluginRuleResultError(in results.Error) openapi.LinterResultPluginRuleResultError {
+func (m OpenAPI) LinterResultPluginRuleResultError(in analyzer.Error) openapi.LinterResultPluginRuleResultError {
 	return openapi.LinterResultPluginRuleResultError{
 		Value:       in.Value,
 		Expected:    in.Expected,

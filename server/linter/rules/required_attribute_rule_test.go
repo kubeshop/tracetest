@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
 	"github.com/kubeshop/tracetest/server/linter/rules"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -29,7 +28,7 @@ func TestRequiredAttributesRule(t *testing.T) {
 			spanWithAttributes("database", map[string]string{"db.system": "postgres"}),
 		)
 
-		rule := rules.NewRequiredAttributesRule(metadata.RequiredAttributesRule)
+		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		for _, result := range result.Results {
@@ -40,14 +39,14 @@ func TestRequiredAttributesRule(t *testing.T) {
 	})
 
 	t.Run("When some attribute is missing", func(t *testing.T) {
-		rule := rules.NewRequiredAttributesRule(metadata.RequiredAttributesRule)
+		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
 	})
 
 	t.Run("When all attributes are missing", func(t *testing.T) {
-		rule := rules.NewRequiredAttributesRule(metadata.RequiredAttributesRule)
+		rule := rules.NewRequiredAttributesRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)

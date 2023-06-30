@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -19,17 +17,17 @@ var (
 	httpFields = []string{"http.scheme", "http.url"}
 )
 
-func NewEnforceHttpsProtocolRule(metadata metadata.RuleMetadata) Rule {
+func NewEnforceHttpsProtocolRule() Rule {
 	return &enforceHttpsProtocolRule{
-		BaseRule: NewRule(metadata),
+		BaseRule: NewRule(analyzer.EnforceHttpsProtocolRuleSlug),
 	}
 }
 
-func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (results.RuleResult, error) {
+func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	passed := true
-	res := make([]results.Result, 0)
+	res := make([]analyzer.Result, 0)
 
-	if config.ErrorLevel != metadata.ErrorLevelDisabled {
+	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
 			if span.Attributes.Get("tracetest.span.type") == "http" {
 				result := r.validate(span)
@@ -41,21 +39,21 @@ func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trac
 		}
 	}
 
-	return results.NewRuleResult(r.metadata, config, results.EvalRuleResult{Passed: passed, Results: res}), nil
+	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: passed, Results: res}), nil
 }
 
-func (r enforceHttpsProtocolRule) validate(span *model.Span) results.Result {
-	insecureFields := make([]results.Error, 0)
+func (r enforceHttpsProtocolRule) validate(span *model.Span) analyzer.Result {
+	insecureFields := make([]analyzer.Error, 0)
 	for _, field := range httpFields {
 		if span.Attributes.Get(field) != "" && !strings.Contains(span.Attributes.Get(field), "https") {
-			insecureFields = append(insecureFields, results.Error{
+			insecureFields = append(insecureFields, analyzer.Error{
 				Value:       field,
 				Description: fmt.Sprintf("Insecure http schema found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),
 			})
 		}
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: len(insecureFields) == 0,
 		SpanID: span.ID.String(),
 		Errors: insecureFields,

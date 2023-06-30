@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/linter/metadata"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"golang.org/x/exp/slices"
@@ -32,15 +31,24 @@ type (
 
 	LinterPlugin struct {
 		Slug    string       `json:"slug"`
-		Name    string       `json:"name"`
 		Enabled bool         `json:"enabled"`
 		Rules   []LinterRule `json:"rules"`
+
+		// not exported
+		Name        string
+		Description string
 	}
 
 	LinterRule struct {
 		Slug       string `json:"slug"`
 		Weight     int    `json:"weight"`
 		ErrorLevel string `json:"errorLevel"`
+
+		// not exported
+		Name             string
+		ErrorDescription string
+		Description      string
+		Tips             []string
 	}
 )
 
@@ -50,13 +58,13 @@ func (l Linter) Validate() error {
 	}
 
 	for _, p := range l.Plugins {
-		plugin, ok := findPlugin(p.Slug, metadata.Plugins)
+		plugin, ok := findPlugin(p.Slug, DefaultPlugins)
 		if !ok {
-			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Slug, metadata.AvailablePlugins)
+			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Slug, AvailablePlugins)
 		}
 
 		for _, r := range p.Rules {
-			index := slices.IndexFunc(plugin.Rules, func(rule metadata.RuleMetadata) bool { return rule.Slug == r.Slug })
+			index := slices.IndexFunc(plugin.Rules, func(rule LinterRule) bool { return rule.Slug == r.Slug })
 
 			if index == -1 {
 				availableRules := strings.Join(getAvailableRules(plugin), "|")
@@ -68,17 +76,17 @@ func (l Linter) Validate() error {
 	return nil
 }
 
-func findPlugin(slug string, plugins []metadata.PluginMetadata) (metadata.PluginMetadata, bool) {
+func findPlugin(slug string, plugins []LinterPlugin) (LinterPlugin, bool) {
 	for _, p := range plugins {
 		if p.Slug == slug {
 			return p, true
 		}
 	}
 
-	return metadata.PluginMetadata{}, false
+	return LinterPlugin{}, false
 }
 
-func getAvailableRules(plugin metadata.PluginMetadata) []string {
+func getAvailableRules(plugin LinterPlugin) []string {
 	rules := make([]string, 0)
 
 	for _, r := range plugin.Rules {
@@ -89,32 +97,11 @@ func getAvailableRules(plugin metadata.PluginMetadata) []string {
 }
 
 func getDefaultLinter() Linter {
-	plugins := []LinterPlugin{}
-
-	for _, plugin := range metadata.Plugins {
-		rules := []LinterRule{}
-
-		for _, rule := range plugin.Rules {
-			rules = append(rules, LinterRule{
-				Slug:       rule.Slug,
-				Weight:     rule.DefaultWeight,
-				ErrorLevel: rule.DefaultErrorLevel,
-			})
-		}
-
-		plugins = append(plugins, LinterPlugin{
-			Slug:    plugin.Slug,
-			Name:    plugin.Name,
-			Enabled: plugin.DefaultEnabled,
-			Rules:   rules,
-		})
-	}
-
 	return Linter{
 		ID:           id.ID("current"),
 		Name:         "analyzer",
 		Enabled:      true,
-		Plugins:      plugins,
+		Plugins:      DefaultPlugins,
 		MinimumScore: 0,
 	}
 }

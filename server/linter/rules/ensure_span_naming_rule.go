@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -15,17 +13,17 @@ type ensureSpanNamingRule struct {
 	BaseRule
 }
 
-func NewEnsureSpanNamingRule(metadata metadata.RuleMetadata) Rule {
+func NewEnsureSpanNamingRule() Rule {
 	return &ensureSpanNamingRule{
-		BaseRule: NewRule(metadata),
+		BaseRule: NewRule(analyzer.EnsureSpanNamingRuleSlug),
 	}
 }
 
-func (r ensureSpanNamingRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (results.RuleResult, error) {
-	res := make([]results.Result, 0)
+func (r ensureSpanNamingRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+	res := make([]analyzer.Result, 0)
 	hasErrors := false
 
-	if config.ErrorLevel != metadata.ErrorLevelDisabled {
+	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
 			result := r.validateSpanName(ctx, span)
 			res = append(res, result)
@@ -34,10 +32,10 @@ func (r ensureSpanNamingRule) Evaluate(ctx context.Context, trace model.Trace, c
 		}
 	}
 
-	return results.NewRuleResult(r.metadata, config, results.EvalRuleResult{Passed: !hasErrors, Results: res}), nil
+	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: !hasErrors, Results: res}), nil
 }
 
-func (r ensureSpanNamingRule) validateSpanName(ctx context.Context, span *model.Span) results.Result {
+func (r ensureSpanNamingRule) validateSpanName(ctx context.Context, span *model.Span) analyzer.Result {
 	switch span.Attributes.Get("tracetest.span.type") {
 	case "http":
 		return r.validateHTTPSpanName(ctx, span)
@@ -49,13 +47,13 @@ func (r ensureSpanNamingRule) validateSpanName(ctx context.Context, span *model.
 		return r.validateMessagingSpanName(ctx, span)
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
 }
 
-func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *model.Span) results.Result {
+func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *model.Span) analyzer.Result {
 	expectedName := ""
 	if span.Kind == model.SpanKindServer {
 		expectedName = fmt.Sprintf("%s %s", span.Attributes.Get("http.method"), span.Attributes.Get("http.route"))
@@ -66,10 +64,10 @@ func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *mo
 	}
 
 	if span.Name != expectedName {
-		return results.Result{
+		return analyzer.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []results.Error{
+			Errors: []analyzer.Error{
 				{
 					Value:       span.Name,
 					Expected:    expectedName,
@@ -79,13 +77,13 @@ func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *mo
 		}
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
 }
 
-func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span *model.Span) results.Result {
+func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span *model.Span) analyzer.Result {
 	dbOperation := span.Attributes.Get("db.operation")
 	dbName := span.Attributes.Get("db.name")
 	tableName := span.Attributes.Get("db.sql.table")
@@ -95,17 +93,17 @@ func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span
 	dbSystem := span.Attributes.Get("db.system")
 	if dbSystem == "redis" {
 		dbStatement := strings.ToLower(span.Attributes.Get("db.statement"))
-		return results.Result{
+		return analyzer.Result{
 			Passed: dbStatement != "" && strings.HasPrefix(dbStatement, strings.ToLower(span.Name)),
 			SpanID: span.ID.String(),
 		}
 	}
 
 	if strings.Trim(span.Name, "") != strings.Trim(expectedName, "") {
-		return results.Result{
+		return analyzer.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []results.Error{
+			Errors: []analyzer.Error{
 				{
 					Value:       span.Name,
 					Expected:    expectedName,
@@ -115,23 +113,23 @@ func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span
 		}
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
 }
 
-func (r ensureSpanNamingRule) validateRPCSpanName(ctx context.Context, span *model.Span) results.Result {
+func (r ensureSpanNamingRule) validateRPCSpanName(ctx context.Context, span *model.Span) analyzer.Result {
 	rpcService := span.Attributes.Get("rpc.service")
 	rpcMethod := span.Attributes.Get("rpc.method")
 
 	expectedName := fmt.Sprintf("%s/%s", rpcService, rpcMethod)
 
 	if span.Name != expectedName {
-		return results.Result{
+		return analyzer.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []results.Error{
+			Errors: []analyzer.Error{
 				{
 					Value:       span.Name,
 					Expected:    expectedName,
@@ -141,23 +139,23 @@ func (r ensureSpanNamingRule) validateRPCSpanName(ctx context.Context, span *mod
 		}
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
 }
 
-func (r ensureSpanNamingRule) validateMessagingSpanName(ctx context.Context, span *model.Span) results.Result {
+func (r ensureSpanNamingRule) validateMessagingSpanName(ctx context.Context, span *model.Span) analyzer.Result {
 	destination := span.Attributes.Get("messaging.destination")
 	operation := span.Attributes.Get("messaging.operation")
 
 	expectedName := fmt.Sprintf("%s %s", destination, operation)
 
 	if span.Name != expectedName {
-		return results.Result{
+		return analyzer.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []results.Error{
+			Errors: []analyzer.Error{
 				{
 					Value:       span.Name,
 					Expected:    expectedName,
@@ -167,7 +165,7 @@ func (r ensureSpanNamingRule) validateMessagingSpanName(ctx context.Context, spa
 		}
 	}
 
-	return results.Result{
+	return analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}

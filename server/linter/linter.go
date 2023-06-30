@@ -4,32 +4,34 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
 	"github.com/kubeshop/tracetest/server/linter/plugins"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/linter/rules"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 var (
 	commonPlugin = plugins.NewPlugin(
-		metadata.CommonPlugin,
-		rules.NewRegistry().Register(rules.NewEnforceDnsUsageRule(metadata.EnforceDnsRule)),
-	)
-	standardsPlugin = plugins.NewPlugin(
-		metadata.StandardsPlugin,
+		analyzer.CommonSlug,
 		rules.NewRegistry().
-			Register(rules.NewEnsureSpanNamingRule(metadata.EnsureSpanNamingRule)).
-			Register(rules.NewRequiredAttributesRule(metadata.RequiredAttributesRule)).
-			Register(rules.NewEnsureAttributeNamingRule(metadata.EnsureAttributeNamingRule)).
-			Register(rules.NewNotEmptyAttributesRule(metadata.NotEmptyAttributesRule)),
+			Register(rules.NewEnforceDnsUsageRule()),
 	)
+
 	securityPlugin = plugins.NewPlugin(
-		metadata.SecurityPlugin,
+		analyzer.SecuritySlug,
 		rules.NewRegistry().
-			Register(rules.NewEnforceHttpsProtocolRule(metadata.EnforceHttpsProtocolRule)).
-			Register(rules.NewEnsuresNoApiKeyLeakRule(metadata.EnsuresNoApiKeyLeakRule)),
+			Register(rules.NewEnsuresNoApiKeyLeakRule()).
+			Register(rules.NewEnforceHttpsProtocolRule()),
 	)
+
+	standardsPlugin = plugins.NewPlugin(
+		analyzer.StandardsSlug,
+		rules.NewRegistry().
+			Register(rules.NewEnsureSpanNamingRule()).
+			Register(rules.NewRequiredAttributesRule()).
+			Register(rules.NewEnsureAttributeNamingRule()).
+			Register(rules.NewNotEmptyAttributesRule()),
+	)
+
 	DefaultPluginRegistry = plugins.NewRegistry().
 				Register(standardsPlugin).
 				Register(securityPlugin).
@@ -37,38 +39,38 @@ var (
 )
 
 type Linter interface {
-	Run(context.Context, model.Trace) (results.LinterResult, error)
+	Run(context.Context, model.Trace) (analyzer.LinterResult, error)
 }
 
 type linter struct {
 	pluginsRegistry *plugins.Registry
-	linterResource  analyzer.Linter
+	config          analyzer.Linter
 }
 
-func NewLinter(linterResource analyzer.Linter, registry *plugins.Registry) Linter {
+func NewLinter(config analyzer.Linter, registry *plugins.Registry) Linter {
 	return linter{
 		pluginsRegistry: registry,
-		linterResource:  linterResource,
+		config:          config,
 	}
 }
 
 var _ Linter = &linter{}
 
-func (l linter) Run(ctx context.Context, trace model.Trace) (results.LinterResult, error) {
-	cfgPlugins := l.linterResource.EnabledPlugins()
-	pluginResults := make([]results.PluginResult, len(cfgPlugins))
+func (l linter) Run(ctx context.Context, trace model.Trace) (analyzer.LinterResult, error) {
+	cfgPlugins := l.config.EnabledPlugins()
+	pluginResults := make([]analyzer.PluginResult, len(cfgPlugins))
 
 	totalScore := 0
 	passed := true
 	for i, cfgPlugin := range cfgPlugins {
 		plugin, err := l.pluginsRegistry.Get(cfgPlugin.Slug)
 		if err != nil {
-			return results.LinterResult{}, err
+			return analyzer.LinterResult{}, err
 		}
 
 		pluginResult, err := plugin.Execute(ctx, trace, cfgPlugin)
 		if err != nil {
-			return results.LinterResult{}, err
+			return analyzer.LinterResult{}, err
 		}
 
 		passed = passed && pluginResult.Passed
@@ -76,5 +78,5 @@ func (l linter) Run(ctx context.Context, trace model.Trace) (results.LinterResul
 		pluginResults[i] = pluginResult
 	}
 
-	return results.NewLinterResult(pluginResults, totalScore, passed), nil
+	return analyzer.NewLinterResult(pluginResults, totalScore, passed), nil
 }

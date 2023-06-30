@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -13,24 +11,27 @@ type requiredAttributesRule struct {
 	BaseRule
 }
 
-func NewRequiredAttributesRule(metadata metadata.RuleMetadata) Rule {
+func NewRequiredAttributesRule() Rule {
 	return requiredAttributesRule{
-		BaseRule: NewRule(metadata),
+		BaseRule: NewRule(analyzer.RequiredAttributesRuleSlug),
 	}
 }
 
-func (r requiredAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (results.RuleResult, error) {
-	res := make([]results.Result, 0)
-	for _, span := range trace.Flat {
-		res = append(res, r.validateSpan(span))
-	}
-
+func (r requiredAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+	res := make([]analyzer.Result, 0)
 	var allPassed bool = true
-	for _, result := range res {
-		if !result.Passed {
-			allPassed = false
+
+	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
+		for _, span := range trace.Flat {
+			res = append(res, r.validateSpan(span))
+		}
+
+		for _, result := range res {
+			if !result.Passed {
+				allPassed = false
+			}
 		}
 	}
 
-	return results.NewRuleResult(r.metadata, config, results.EvalRuleResult{Passed: allPassed, Results: res}), nil
+	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: allPassed, Results: res}), nil
 }

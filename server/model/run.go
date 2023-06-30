@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/linter/results"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 )
@@ -157,7 +157,7 @@ func (r Run) LinterError(err error) Run {
 	return r.Finish()
 }
 
-func (r Run) SuccessfulLinterExecution(linter results.LinterResult) Run {
+func (r Run) SuccessfulLinterExecution(linter analyzer.LinterResult) Run {
 	r.State = RunStateAwaitingTestResults
 	r.Linter = linter
 

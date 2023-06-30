@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
 	"github.com/kubeshop/tracetest/server/linter/rules"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +18,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 			spanWithAttributes("database", map[string]string{"db.statement": "INSERT INTO users (name, email) VALUES ($1, $2)"}),
 		)
 
-		rule := rules.NewEnsureAttributeNamingRule(metadata.EnsureAttributeNamingRule)
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.True(t, result.Passed)
@@ -30,7 +29,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 			spanWithAttributes("http", map[string]string{"method": "POST"}),
 		)
 
-		rule := rules.NewEnsureAttributeNamingRule(metadata.EnsureAttributeNamingRule)
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
@@ -43,7 +42,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 			spanWithAttributes("http", map[string]string{"http.statusCode": "200"}),
 		)
 
-		rule := rules.NewEnsureAttributeNamingRule(metadata.EnsureAttributeNamingRule)
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
@@ -56,7 +55,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 			spanWithAttributes("http", map[string]string{"tracetest.span": "POST"}),
 		)
 
-		rule := rules.NewEnsureAttributeNamingRule(metadata.EnsureAttributeNamingRule)
+		rule := rules.NewEnsureAttributeNamingRule()
 		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)

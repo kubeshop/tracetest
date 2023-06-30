@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/linter/results"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"go.opentelemetry.io/otel/trace"
@@ -116,7 +116,7 @@ type (
 
 		TransactionID    string
 		TransactionRunID string
-		Linter           results.LinterResult
+		Linter           analyzer.LinterResult
 	}
 
 	RunResults struct {

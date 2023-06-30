@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/linter/metadata"
-	"github.com/kubeshop/tracetest/server/linter/results"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -14,17 +12,17 @@ type notEmptyRuleAttributesRule struct {
 	BaseRule
 }
 
-func NewNotEmptyAttributesRule(metadata metadata.RuleMetadata) Rule {
+func NewNotEmptyAttributesRule() Rule {
 	return &notEmptyRuleAttributesRule{
-		BaseRule: NewRule(metadata),
+		BaseRule: NewRule(analyzer.NotEmptyAttributesRuleSlug),
 	}
 }
 
-func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (results.RuleResult, error) {
-	res := make([]results.Result, 0, len(trace.Flat))
+func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+	res := make([]analyzer.Result, 0, len(trace.Flat))
 	passed := true
 
-	if config.ErrorLevel != metadata.ErrorLevelDisabled {
+	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
 			emptyAttributes := make([]string, 0)
 			for name, value := range span.Attributes {
@@ -33,9 +31,9 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 				}
 			}
 
-			errors := make([]results.Error, 0, len(emptyAttributes))
+			errors := make([]analyzer.Error, 0, len(emptyAttributes))
 			for _, emptyAttribute := range emptyAttributes {
-				errors = append(errors, results.Error{
+				errors = append(errors, analyzer.Error{
 					Value:       emptyAttribute,
 					Description: fmt.Sprintf(`Attribute "%s" is empty`, emptyAttribute),
 				},
@@ -46,7 +44,7 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 				passed = false
 			}
 
-			res = append(res, results.Result{
+			res = append(res, analyzer.Result{
 				SpanID: span.ID.String(),
 				Passed: len(emptyAttributes) == 0,
 				Errors: errors,
@@ -54,5 +52,5 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 		}
 	}
 
-	return results.NewRuleResult(r.metadata, config, results.EvalRuleResult{Passed: passed, Results: res}), nil
+	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: passed, Results: res}), nil
 }
