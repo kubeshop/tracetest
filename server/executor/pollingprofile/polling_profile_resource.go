@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type Strategy string
@@ -23,12 +22,6 @@ const (
 	ResourceName       = "PollingProfile"
 	ResourceNamePlural = "PollingProfiles"
 )
-
-var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationGet,
-	resourcemanager.OperationList,
-	resourcemanager.OperationUpdate,
-}
 
 var DefaultPollingProfile = PollingProfile{
 	ID:       id.ID("current"),
@@ -114,6 +107,11 @@ type Repository struct {
 func (r *Repository) SetID(profile PollingProfile, id id.ID) PollingProfile {
 	profile.ID = id
 	return profile
+}
+
+func (r *Repository) Create(ctx context.Context, updated PollingProfile) (PollingProfile, error) {
+	updated.ID = id.ID("current")
+	return r.Update(ctx, updated)
 }
 
 const (

@@ -21,7 +21,7 @@ func TestlinterResource(t *testing.T) {
 				analyzer.ResourceName,
 				analyzer.ResourceNamePlural,
 				repo,
-				resourcemanager.WithOperations(analyzer.Operations...),
+				resourcemanager.DisableDelete(),
 			)
 			manager.RegisterRoutes(router)
 

@@ -7,14 +7,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
-
-var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationList,
-	resourcemanager.OperationGet,
-	resourcemanager.OperationUpdate,
-}
 
 type option func(*Repository)
 
@@ -112,6 +105,11 @@ func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 
 func (*Repository) SortingFields() []string {
 	return []string{"name"}
+}
+
+func (r *Repository) Create(ctx context.Context, updated Config) (Config, error) {
+	updated.ID = id.ID("current")
+	return r.Update(ctx, updated)
 }
 
 const (

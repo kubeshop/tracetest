@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type Repository struct {
@@ -18,8 +17,6 @@ type Repository struct {
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}
 }
-
-var _ resourcemanager.List[Demo] = &Repository{}
 
 func (r *Repository) SetID(demo Demo, id id.ID) Demo {
 	demo.ID = id

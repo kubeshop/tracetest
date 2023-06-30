@@ -71,6 +71,20 @@ func WithOperations(ops ...Operation) managerOption {
 	}
 }
 
+func DisableDelete() managerOption {
+	return func(c *config) {
+		ops := []Operation{}
+		for _, op := range availableOperations {
+			if op == OperationDelete {
+				continue
+			}
+			ops = append(ops, op)
+		}
+
+		c.enabledOperations = ops
+	}
+}
+
 func WithTracer(tracer trace.Tracer) managerOption {
 	return func(c *config) {
 		c.tracer = tracer

@@ -2,7 +2,6 @@ package demo
 
 import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
 
 type DemoType string
@@ -16,14 +15,6 @@ const (
 	ResourceName       = "Demo"
 	ResourceNamePlural = "Demos"
 )
-
-var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationCreate,
-	resourcemanager.OperationDelete,
-	resourcemanager.OperationGet,
-	resourcemanager.OperationList,
-	resourcemanager.OperationUpdate,
-}
 
 type Demo struct {
 	ID                 id.ID                   `json:"id"`

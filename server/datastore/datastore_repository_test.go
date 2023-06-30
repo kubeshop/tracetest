@@ -44,7 +44,6 @@ func registerManagerFn(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 		datastore.ResourceName,
 		datastore.ResourceNamePlural,
 		dataStoreRepository,
-		resourcemanager.WithOperations(datastore.Operations...),
 		resourcemanager.WithIDGen(id.GenerateID),
 	)
 	manager.RegisterRoutes(router)
