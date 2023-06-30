@@ -79,6 +79,7 @@ func InjectIdIntoDemoFile(t *testing.T, filePath, id string) {
 }
 
 func Copy(source, dst string) {
+	os.Remove(dst)
 	sourceFile, err := os.Open(source)
 	if err != nil {
 		panic(err)

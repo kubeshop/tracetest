@@ -27,7 +27,6 @@ func TestApplyDemo(t *testing.T) {
 	// When I try to set up a new demo
 	// Then it should be applied with success
 	newDemoPath := env.GetTestResourcePath(t, "new-demo")
-	helpers.InjectIdIntoDemoFile(t, newDemoPath, "")
 
 	result := tracetestcli.Exec(t, fmt.Sprintf("apply demo --file %s", newDemoPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)

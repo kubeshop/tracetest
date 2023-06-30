@@ -9,3 +9,6 @@ spec:
     productCatalogEndpoint: http://dev-product:8081
     cartEndpoint: http://dev-cart:8082
     checkoutEndpoint: http://dev-checkout:8083
+  pokeshop:
+    httpEndpoint: ""
+    grpcEndpoint: ""
