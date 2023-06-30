@@ -63,6 +63,7 @@ func TestApplyDemo(t *testing.T) {
 	// When I try to update the last demo
 	// Then it should be applied with success
 	updatedNewDemoPath := env.GetTestResourcePath(t, "updated-new-demo")
+	helpers.Copy(updatedNewDemoPath+".tpl", updatedNewDemoPath)
 	helpers.InjectIdIntoDemoFile(t, updatedNewDemoPath, demo.Spec.Id)
 
 	result = tracetestcli.Exec(t, fmt.Sprintf("apply demo --file %s", updatedNewDemoPath), tracetestcli.WithCLIConfig(cliConfig))
