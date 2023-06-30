@@ -16,6 +16,7 @@ spec:
         {
           "type": "Transaction",
           "spec": {
+              "id": "${env:TRANSACTION_ID}",
               "name": "test-transaction-updated",
               "description": "a transaction",
               "steps": [ "${env:TRANSACTION_STEP_ID}" ]
@@ -37,7 +38,3 @@ spec:
     assertions:
       - attr:sql.query contains "INSERT INTO transactions"
 
-  outputs:
-  - name: TRANSACTION_ID
-    selector: span[name = "Tracetest trigger"]
-    value: attr:tracetest.response.body | json_path '$.spec.id'
