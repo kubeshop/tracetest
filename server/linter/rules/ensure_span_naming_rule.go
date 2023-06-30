@@ -15,7 +15,7 @@ type ensureSpanNamingRule struct {
 
 func NewEnsureSpanNamingRule() Rule {
 	return &ensureSpanNamingRule{
-		BaseRule: NewRule(analyzer.EnsureSpanNamingRuleSlug),
+		BaseRule: NewRule(analyzer.EnsureSpanNamingRuleId),
 	}
 }
 

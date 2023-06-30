@@ -20,7 +20,7 @@ var (
 
 func NewEnsuresNoApiKeyLeakRule() Rule {
 	return &ensuresNoApiKeyLeakRule{
-		BaseRule: NewRule(analyzer.EnsuresNoApiKeyLeakRuleSlug),
+		BaseRule: NewRule(analyzer.EnsuresNoApiKeyLeakRuleId),
 	}
 }
 

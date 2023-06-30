@@ -14,7 +14,7 @@ type notEmptyRuleAttributesRule struct {
 
 func NewNotEmptyAttributesRule() Rule {
 	return &notEmptyRuleAttributesRule{
-		BaseRule: NewRule(analyzer.NotEmptyAttributesRuleSlug),
+		BaseRule: NewRule(analyzer.NotEmptyAttributesRuleId),
 	}
 }
 

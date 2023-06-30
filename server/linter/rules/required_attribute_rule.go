@@ -13,7 +13,7 @@ type requiredAttributesRule struct {
 
 func NewRequiredAttributesRule() Rule {
 	return requiredAttributesRule{
-		BaseRule: NewRule(analyzer.RequiredAttributesRuleSlug),
+		BaseRule: NewRule(analyzer.RequiredAttributesRuleId),
 	}
 }
 

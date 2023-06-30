@@ -100,7 +100,6 @@ func (e *defaultlinterRunner) startWorker() {
 func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 	ctx := request.Context()
 	lintResource := e.analyzerGetter.GetDefault(ctx)
-	linter := linter.NewLinter(lintResource, linter.DefaultPluginRegistry)
 
 	shouldSkip := lintResource.ShouldSkip()
 	if shouldSkip {
@@ -110,6 +109,14 @@ func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 			log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		}
 
+		e.onFinish(ctx, request, request.Run)
+		return
+	}
+
+	lintResource, err := lintResource.WithMetadata()
+	linter := linter.NewLinter(lintResource, linter.DefaultPluginRegistry)
+	if err != nil {
+		log.Printf("[linterRunner] Test %s Run %d: error with WithMetadata: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		e.onFinish(ctx, request, request.Run)
 		return
 	}

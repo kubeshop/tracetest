@@ -20,7 +20,7 @@ var (
 
 func NewEnforceDnsUsageRule() Rule {
 	return &ensuresDnsUsage{
-		BaseRule: NewRule(analyzer.EnforceDnsRuleSlug),
+		BaseRule: NewRule(analyzer.EnforceDnsRuleId),
 	}
 }
 

@@ -11,7 +11,7 @@ import (
 
 type Plugin interface {
 	Execute(context.Context, model.Trace, analyzer.LinterPlugin) (analyzer.PluginResult, error)
-	Slug() string
+	Id() string
 	RuleRegistry() rules.RuleRegistry
 }
 
@@ -26,7 +26,7 @@ func NewRegistry() *Registry {
 }
 
 func (r *Registry) Register(p Plugin) *Registry {
-	r.plugins[p.Slug()] = p
+	r.plugins[p.Id()] = p
 	return r
 }
 

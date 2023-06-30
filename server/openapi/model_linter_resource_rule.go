@@ -10,7 +10,7 @@
 package openapi
 
 type LinterResourceRule struct {
-	Slug string `json:"slug,omitempty"`
+	Id string `json:"id,omitempty"`
 
 	Weight int32 `json:"weight,omitempty"`
 

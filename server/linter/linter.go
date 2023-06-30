@@ -11,20 +11,20 @@ import (
 
 var (
 	commonPlugin = plugins.NewPlugin(
-		analyzer.CommonSlug,
+		analyzer.CommonId,
 		rules.NewRegistry().
 			Register(rules.NewEnforceDnsUsageRule()),
 	)
 
 	securityPlugin = plugins.NewPlugin(
-		analyzer.SecuritySlug,
+		analyzer.SecurityId,
 		rules.NewRegistry().
 			Register(rules.NewEnsuresNoApiKeyLeakRule()).
 			Register(rules.NewEnforceHttpsProtocolRule()),
 	)
 
 	standardsPlugin = plugins.NewPlugin(
-		analyzer.StandardsSlug,
+		analyzer.StandardsId,
 		rules.NewRegistry().
 			Register(rules.NewEnsureSpanNamingRule()).
 			Register(rules.NewRequiredAttributesRule()).
@@ -63,7 +63,7 @@ func (l linter) Run(ctx context.Context, trace model.Trace) (analyzer.LinterResu
 	totalScore := 0
 	passed := true
 	for i, cfgPlugin := range cfgPlugins {
-		plugin, err := l.pluginsRegistry.Get(cfgPlugin.Slug)
+		plugin, err := l.pluginsRegistry.Get(cfgPlugin.Id)
 		if err != nil {
 			return analyzer.LinterResult{}, err
 		}

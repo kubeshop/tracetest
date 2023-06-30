@@ -30,25 +30,25 @@ type (
 	}
 
 	LinterPlugin struct {
-		Slug    string       `json:"slug"`
+		Id      string       `json:"id"`
 		Enabled bool         `json:"enabled"`
 		Rules   []LinterRule `json:"rules"`
 
-		// not exported
-		Name        string
-		Description string
+		// internal fields
+		Name        string `json:"-"`
+		Description string `json:"-"`
 	}
 
 	LinterRule struct {
-		Slug       string `json:"slug"`
+		Id         string `json:"id"`
 		Weight     int    `json:"weight"`
 		ErrorLevel string `json:"errorLevel"`
 
-		// not exported
-		Name             string
-		ErrorDescription string
-		Description      string
-		Tips             []string
+		// internal fields
+		Name             string   `json:"-"`
+		ErrorDescription string   `json:"-"`
+		Description      string   `json:"-"`
+		Tips             []string `json:"-"`
 	}
 )
 
@@ -58,17 +58,17 @@ func (l Linter) Validate() error {
 	}
 
 	for _, p := range l.Plugins {
-		plugin, ok := findPlugin(p.Slug, DefaultPlugins)
+		plugin, ok := findPlugin(p.Id, DefaultPlugins)
 		if !ok {
-			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Slug, AvailablePlugins)
+			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Id, strings.Join(AvailablePlugins, " | "))
 		}
 
 		for _, r := range p.Rules {
-			index := slices.IndexFunc(plugin.Rules, func(rule LinterRule) bool { return rule.Slug == r.Slug })
+			index := slices.IndexFunc(plugin.Rules, func(rule LinterRule) bool { return rule.Id == r.Id })
 
 			if index == -1 {
-				availableRules := strings.Join(getAvailableRules(plugin), "|")
-				return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Slug, p.Slug, availableRules)
+				availableRules := strings.Join(getAvailableRules(plugin), " | ")
+				return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Id, p.Id, availableRules)
 			}
 		}
 	}
@@ -76,9 +76,9 @@ func (l Linter) Validate() error {
 	return nil
 }
 
-func findPlugin(slug string, plugins []LinterPlugin) (LinterPlugin, bool) {
+func findPlugin(Id string, plugins []LinterPlugin) (LinterPlugin, bool) {
 	for _, p := range plugins {
-		if p.Slug == slug {
+		if p.Id == Id {
 			return p, true
 		}
 	}
@@ -86,11 +86,21 @@ func findPlugin(slug string, plugins []LinterPlugin) (LinterPlugin, bool) {
 	return LinterPlugin{}, false
 }
 
+func findRule(Id string, rules []LinterRule) (LinterRule, bool) {
+	for _, r := range rules {
+		if r.Id == Id {
+			return r, true
+		}
+	}
+
+	return LinterRule{}, false
+}
+
 func getAvailableRules(plugin LinterPlugin) []string {
 	rules := make([]string, 0)
 
 	for _, r := range plugin.Rules {
-		rules = append(rules, r.Slug)
+		rules = append(rules, r.Id)
 	}
 
 	return rules
@@ -127,4 +137,51 @@ func (l Linter) EnabledPlugins() []LinterPlugin {
 
 func (l Linter) ShouldSkip() bool {
 	return !l.Enabled
+}
+
+func (l Linter) WithMetadata() (Linter, error) {
+	plugins := make([]LinterPlugin, 0)
+
+	for _, p := range l.Plugins {
+		metadataPlugin, ok := findPlugin(p.Id, DefaultPlugins)
+		if !ok {
+			return l, fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Id, strings.Join(AvailablePlugins, " | "))
+		}
+
+		rules := make([]LinterRule, 0)
+		for _, r := range p.Rules {
+			metadataRule, ok := findRule(r.Id, metadataPlugin.Rules)
+			if !ok {
+				return l, fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Id, p.Id, strings.Join(getAvailableRules(metadataPlugin), " | "))
+			}
+
+			rules = append(rules, LinterRule{
+				// config
+				Id:         r.Id,
+				ErrorLevel: r.ErrorLevel,
+				Weight:     r.Weight,
+
+				// metadata
+				Description:      metadataRule.Description,
+				Name:             metadataRule.Name,
+				ErrorDescription: metadataRule.ErrorDescription,
+				Tips:             metadataRule.Tips,
+			})
+		}
+
+		plugins = append(plugins, LinterPlugin{
+			Rules: rules,
+
+			// config
+			Id:      p.Id,
+			Enabled: p.Enabled,
+
+			// metadata
+			Name:        metadataPlugin.Name,
+			Description: metadataPlugin.Description,
+		})
+	}
+
+	l.Plugins = plugins
+	return l, nil
 }

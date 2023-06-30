@@ -10,7 +10,7 @@
 package openapi
 
 type LinterResourcePlugin struct {
-	Slug string `json:"slug,omitempty"`
+	Id string `json:"id,omitempty"`
 
 	Name string `json:"name,omitempty"`
 

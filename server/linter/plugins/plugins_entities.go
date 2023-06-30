@@ -9,19 +9,16 @@ import (
 )
 
 type BasePlugin struct {
-	slug         string
+	id           string
 	ruleRegistry rules.RuleRegistry
 }
 
-func NewPlugin(slug string, ruleRegistry rules.RuleRegistry) Plugin {
-	return BasePlugin{
-
-		ruleRegistry: ruleRegistry,
-	}
+func NewPlugin(id string, ruleRegistry rules.RuleRegistry) Plugin {
+	return BasePlugin{id, ruleRegistry}
 }
 
-func (p BasePlugin) Slug() string {
-	return p.slug
+func (p BasePlugin) Id() string {
+	return p.id
 }
 
 func (p BasePlugin) RuleRegistry() rules.RuleRegistry {
@@ -31,8 +28,8 @@ func (p BasePlugin) RuleRegistry() rules.RuleRegistry {
 func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analyzer.LinterPlugin) (analyzer.PluginResult, error) {
 	res := make([]analyzer.RuleResult, len(config.Rules))
 
-	for _, cfgRule := range config.Rules {
-		rule, err := p.ruleRegistry.Get(cfgRule.Slug)
+	for i, cfgRule := range config.Rules {
+		rule, err := p.ruleRegistry.Get(cfgRule.Id)
 		if err != nil {
 			return analyzer.PluginResult{}, err
 		}
@@ -42,7 +39,7 @@ func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analy
 			return analyzer.PluginResult{}, err
 		}
 
-		res = append(res, result)
+		res[i] = result
 	}
 
 	var allPassed bool = true
@@ -54,7 +51,7 @@ func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analy
 
 	return analyzer.PluginResult{
 		//config
-		Slug:        config.Slug,
+		Id:          config.Id,
 		Name:        config.Name,
 		Description: config.Description,
 

@@ -222,6 +222,15 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
 	}
 
+	if err := targetResource.Spec.Validate(); err != nil {
+		err := fmt.Errorf(
+			"an error occurred while validating the resource: %s. error: %s",
+			targetResource.Spec.GetID(),
+			err.Error(),
+		)
+		writeError(w, encoder, http.StatusBadRequest, err)
+	}
+
 	created, err := m.rh.Create(r.Context(), targetResource.Spec)
 	if err != nil {
 		m.handleResourceHandlerError(w, "creating", err, encoder)
@@ -263,6 +272,15 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
 		}
+	}
+
+	if err := targetResource.Spec.Validate(); err != nil {
+		err := fmt.Errorf(
+			"an error occurred while validating the resource: %s. error: %s",
+			targetResource.Spec.GetID(),
+			err.Error(),
+		)
+		writeError(w, encoder, http.StatusBadRequest, err)
 	}
 
 	_, err = m.rh.Get(r.Context(), targetResource.Spec.GetID())
@@ -315,6 +333,15 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 	}
 	// enforce ID from url in targetResource
 	targetResource.Spec = m.rh.SetID(targetResource.Spec, urlID)
+
+	if err := targetResource.Spec.Validate(); err != nil {
+		err := fmt.Errorf(
+			"an error occurred while validating the resource: %s. error: %s",
+			targetResource.Spec.GetID(),
+			err.Error(),
+		)
+		writeError(w, encoder, http.StatusBadRequest, err)
+	}
 
 	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
 	if err != nil {

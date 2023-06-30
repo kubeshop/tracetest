@@ -19,7 +19,7 @@ var (
 
 func NewEnforceHttpsProtocolRule() Rule {
 	return &enforceHttpsProtocolRule{
-		BaseRule: NewRule(analyzer.EnforceHttpsProtocolRuleSlug),
+		BaseRule: NewRule(analyzer.EnforceHttpsProtocolRuleId),
 	}
 }
 

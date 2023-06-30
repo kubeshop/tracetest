@@ -33,7 +33,7 @@ components:
     LinterResourcePlugin:
       type: object
       properties:
-        slug:
+        id:
           type: string
         name:
           type: string
@@ -46,7 +46,7 @@ components:
     LinterResourceRule:
       type: object
       properties:
-        slug:
+        id:
           type: string
         weight:
           type: integer

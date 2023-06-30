@@ -9,7 +9,7 @@ import (
 )
 
 type Rule interface {
-	Slug() string
+	Id() string
 	Evaluate(context.Context, model.Trace, analyzer.LinterRule) (analyzer.RuleResult, error)
 }
 
@@ -47,6 +47,6 @@ func (r *ruleRegistry) Get(ruleName string) (Rule, error) {
 }
 
 func (r *ruleRegistry) Register(rule Rule) RuleRegistry {
-	r.rules[rule.Slug()] = rule
+	r.rules[rule.Id()] = rule
 	return r
 }

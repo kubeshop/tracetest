@@ -2,18 +2,18 @@ package analyzer
 
 var (
 	// plugins
-	StandardsSlug = "standards"
-	CommonSlug    = "common"
-	SecuritySlug  = "security"
+	StandardsId = "standards"
+	CommonId    = "common"
+	SecurityId  = "security"
 
 	// rules
-	EnsureSpanNamingRuleSlug      string = "span_naming"
-	RequiredAttributesRuleSlug    string = "required_attributes"
-	EnsureAttributeNamingRuleSlug string = "attribute_naming"
-	NotEmptyAttributesRuleSlug    string = "not_empty_attributes"
-	EnforceDnsRuleSlug            string = "enforce_dns"
-	EnforceHttpsProtocolRuleSlug  string = "enforce_https_protocol"
-	EnsuresNoApiKeyLeakRuleSlug   string = "ensures_no_api_key_leak"
+	EnsureSpanNamingRuleId      string = "span_naming"
+	RequiredAttributesRuleId    string = "required_attributes"
+	EnsureAttributeNamingRuleId string = "attribute_naming"
+	NotEmptyAttributesRuleId    string = "not_empty_attributes"
+	EnforceDnsRuleId            string = "enforce_dns"
+	EnforceHttpsProtocolRuleId  string = "enforce_https_protocol"
+	EnsuresNoApiKeyLeakRuleId   string = "ensures_no_api_key_leak"
 
 	ErrorLevelWarning  string = "warning"
 	ErrorLevelError    string = "error"
@@ -25,11 +25,11 @@ var (
 		SecurityPlugin,
 	}
 
-	AvailablePlugins = []string{StandardsPlugin.Slug, CommonPlugin.Slug, SecurityPlugin.Slug}
+	AvailablePlugins = []string{StandardsPlugin.Id, CommonPlugin.Id, SecurityPlugin.Id}
 
 	// standards
 	StandardsPlugin = LinterPlugin{
-		Slug:        StandardsSlug,
+		Id:          StandardsId,
 		Name:        "OTel Semantic Conventions",
 		Description: "Enforce standards for spans and attributes",
 		Enabled:     true,
@@ -42,7 +42,7 @@ var (
 	}
 
 	EnsureSpanNamingRule = LinterRule{
-		Slug:             EnsureSpanNamingRuleSlug,
+		Id:               EnsureSpanNamingRuleId,
 		Name:             "Span Name Convention",
 		Description:      "Ensure all spans follow the naming convention",
 		ErrorDescription: "",
@@ -52,7 +52,7 @@ var (
 	}
 
 	RequiredAttributesRule = LinterRule{
-		Slug:             RequiredAttributesRuleSlug,
+		Id:               RequiredAttributesRuleId,
 		Name:             "Required Attributes By Span Type",
 		Description:      "Ensure all required attributes are present",
 		ErrorDescription: "This span is missing the following required attributes:",
@@ -62,7 +62,7 @@ var (
 	}
 
 	EnsureAttributeNamingRule = LinterRule{
-		Slug:             EnsureAttributeNamingRuleSlug,
+		Id:               EnsureAttributeNamingRuleId,
 		Name:             "Attribute Naming",
 		Description:      "Ensure all attributes follow the naming convention",
 		ErrorDescription: "The following attributes do not follow the naming convention:",
@@ -75,7 +75,7 @@ var (
 	}
 
 	NotEmptyAttributesRule = LinterRule{
-		Slug:             NotEmptyAttributesRuleSlug,
+		Id:               NotEmptyAttributesRuleId,
 		Name:             "Not Empty Attributes",
 		Description:      "Does not allow empty attribute values in any span",
 		ErrorDescription: "The following attributes are empty:",
@@ -86,7 +86,7 @@ var (
 
 	// common
 	CommonPlugin = LinterPlugin{
-		Slug:        CommonSlug,
+		Id:          CommonId,
 		Name:        "Common problems",
 		Description: "Helps you find common problems with your application",
 		Enabled:     true,
@@ -96,7 +96,7 @@ var (
 	}
 
 	EnforceDnsRule = LinterRule{
-		Slug:             EnforceDnsRuleSlug,
+		Id:               EnforceDnsRuleId,
 		Name:             "Enforce DNS Over IP usage",
 		Description:      "Enforce DNS usage over IP addresses",
 		ErrorDescription: "The following attributes are using IP addresses instead of DNS:",
@@ -107,7 +107,7 @@ var (
 
 	// security
 	SecurityPlugin = LinterPlugin{
-		Slug:        SecuritySlug,
+		Id:          SecurityId,
 		Name:        "Security",
 		Description: "Enforce security for spans and attributes",
 		Enabled:     true,
@@ -118,7 +118,7 @@ var (
 	}
 
 	EnforceHttpsProtocolRule = LinterRule{
-		Slug:             EnforceHttpsProtocolRuleSlug,
+		Id:               EnforceHttpsProtocolRuleId,
 		Name:             "Enforce HTTPS protocol",
 		Description:      "Ensure all request use https",
 		ErrorDescription: "The following spans are using http protocol:",
@@ -128,7 +128,7 @@ var (
 	}
 
 	EnsuresNoApiKeyLeakRule = LinterRule{
-		Slug:             EnsuresNoApiKeyLeakRuleSlug,
+		Id:               EnsuresNoApiKeyLeakRuleId,
 		Name:             "No API Key Leak",
 		Description:      "Ensure no API keys are leaked in http headers",
 		ErrorDescription: "The following attributes are exposing API keys:",

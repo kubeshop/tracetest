@@ -16,7 +16,7 @@ type ensureAttributeNamingRule struct {
 
 func NewEnsureAttributeNamingRule() Rule {
 	return &ensureAttributeNamingRule{
-		BaseRule: NewRule(analyzer.EnsureAttributeNamingRuleSlug),
+		BaseRule: NewRule(analyzer.EnsureAttributeNamingRuleId),
 	}
 }
 

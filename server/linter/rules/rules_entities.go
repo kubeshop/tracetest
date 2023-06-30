@@ -9,19 +9,19 @@ import (
 )
 
 type BaseRule struct {
-	slug string
+	id string
 }
 
 var _ Rule = &BaseRule{}
 
-func NewRule(slug string) BaseRule {
-	return BaseRule{}
+func NewRule(id string) BaseRule {
+	return BaseRule{id}
 }
 
-func (r BaseRule) Slug() string {
-	return r.slug
+func (r BaseRule) Id() string {
+	return r.id
 }
 
 func (r BaseRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
-	return analyzer.RuleResult{}, fmt.Errorf("Rule Evaluation for %s is not implemented", r.slug)
+	return analyzer.RuleResult{}, fmt.Errorf("Rule Evaluation for %s is not implemented", r.id)
 }
