@@ -41,7 +41,7 @@ func (c client) Delete(ctx context.Context, id string, format Format) (string, e
 	if c.deleteSuccessMsg != "" {
 		msg = c.deleteSuccessMsg
 	} else {
-		msg = fmt.Sprintf("%s successfully deleted", strings.ToTitle(c.deleteSuccessMsg))
+		msg = fmt.Sprintf("%s successfully deleted", strings.ToTitle(c.resourceName))
 	}
 
 	return msg, nil
