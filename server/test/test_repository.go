@@ -33,6 +33,7 @@ type Repository interface {
 	Delete(context.Context, id.ID) error
 
 	GetTransactionSteps(_ context.Context, _ id.ID, version int) ([]Test, error)
+	DB() *sql.DB
 }
 
 type repository struct {
@@ -41,6 +42,11 @@ type repository struct {
 
 func NewRepository(db *sql.DB) Repository {
 	return &repository{db}
+}
+
+// needed for test
+func (r *repository) DB() *sql.DB {
+	return r.db
 }
 
 func (r *repository) SetID(test Test, id id.ID) Test {

@@ -3,13 +3,19 @@ package test_test
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtest "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,14 +31,44 @@ func testJsonComparer(t require.TestingT, operation rmtest.Operation, firstValue
 	expected := firstValue
 	expected = rmtest.RemoveFieldFromJSONResource("createdAt", expected)
 	expected = rmtest.RemoveFieldFromJSONResource("specs.0.selector.parsedSelector", expected)
-	expected = rmtest.RemoveFieldFromJSONResource("summary", expected)
+	expected = rmtest.RemoveFieldFromJSONResource("summary.lastRun.time", expected)
 
 	actual := secondValue
 	actual = rmtest.RemoveFieldFromJSONResource("createdAt", actual)
 	actual = rmtest.RemoveFieldFromJSONResource("specs.0.selector.parsedSelector", actual)
-	actual = rmtest.RemoveFieldFromJSONResource("summary", actual)
+	actual = rmtest.RemoveFieldFromJSONResource("summary.lastRun.time", actual)
 
 	require.JSONEq(t, expected, actual)
+}
+
+func createRun(runRepository test.RunRepository, t test.Test) (test.Run, error) {
+	run := test.Run{
+		State:   test.RunStateFinished,
+		TraceID: id.NewRandGenerator().TraceID(),
+		SpanID:  id.NewRandGenerator().SpanID(),
+	}
+	run, err := runRepository.CreateRun(context.TODO(), t, run)
+	if err != nil {
+		return test.NewRun(), err
+	}
+
+	run.Results.Results = (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).
+		MustAdd("query", []test.AssertionResult{
+			{
+				Results: []test.SpanAssertionResult{
+					{CompareErr: nil},
+					{CompareErr: nil},
+					{CompareErr: fmt.Errorf("some error")},
+				},
+			},
+		})
+
+	err = runRepository.UpdateRun(context.TODO(), run)
+	if err != nil {
+		return test.NewRun(), err
+	}
+
+	return run, nil
 }
 
 func registerManagerFn(router *mux.Router, db *sql.DB) resourcemanager.Manager {
@@ -52,11 +88,15 @@ func registerManagerFn(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 func getScenarioPreparation(sample, secondSample, thirdSample test.Test) func(t *testing.T, op rmtest.Operation, manager resourcemanager.Manager) {
 	return func(t *testing.T, op rmtest.Operation, manager resourcemanager.Manager) {
 		testRepo := manager.Handler().(test.Repository)
+		testRunRepo := test.NewRunRepository(testRepo.DB())
+
 		switch op {
 		case rmtest.OperationGetSuccess,
 			rmtest.OperationUpdateSuccess,
 			rmtest.OperationListSuccess:
 			testRepo.Create(context.TODO(), sample)
+			_, err := createRun(testRunRepo, sample)
+			require.NoError(t, err)
 
 		case rmtest.OperationDeleteSuccess:
 			testRepo.Create(context.TODO(), sample)
@@ -64,16 +104,128 @@ func getScenarioPreparation(sample, secondSample, thirdSample test.Test) func(t 
 		case rmtest.OperationListAugmentedSuccess,
 			rmtest.OperationGetAugmentedSuccess:
 			testRepo.Create(context.TODO(), sample)
+			_, err := createRun(testRunRepo, sample)
+			require.NoError(t, err)
 
 		case rmtest.OperationListSortSuccess:
 			testRepo.Create(context.TODO(), sample)
 			testRepo.Create(context.TODO(), secondSample)
 			testRepo.Create(context.TODO(), thirdSample)
 		}
-
-		// TODO: improve scenarios that need a test run to validate the summary
-		// TODO: improve delete scenario to consider transaction steps
 	}
+}
+
+func TestIfDeleteTestsCascadeDeletes(t *testing.T) {
+	testmock.StartTestEnvironment()
+
+	var testSample = test.Test{
+		ID:          "NiWVnxP4R",
+		Name:        "Verify Import",
+		Description: "check the working of the import flow",
+		Trigger: trigger.Trigger{
+			Type: "http",
+			HTTP: &trigger.HTTPRequest{
+				Method: "GET",
+				URL:    "http://localhost:11633/api/tests",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   `span[name = "span name"]`,
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{
+			{
+				Name:     "USER_ID",
+				Selector: test.SpanQuery(`span[name = "span name"]`),
+				Value:    `attr:user_id`,
+			},
+		},
+	}
+
+	var secondTestSample = test.Test{
+		ID:          "NiWVnjahsdvR",
+		Name:        "Another Test",
+		Description: "another test description",
+		Trigger: trigger.Trigger{
+			Type: "http",
+			HTTP: &trigger.HTTPRequest{
+				Method: "GET",
+				URL:    "http://localhost:11633/api/tests",
+			},
+		},
+		Specs: test.Specs{
+			{
+				Name:       "check user id exists",
+				Selector:   `span[name = "span name"]`,
+				Assertions: []test.Assertion{`attr:user_id != ""`},
+			},
+		},
+		Outputs: test.Outputs{},
+	}
+
+	var transactionSample = transaction.Transaction{
+		ID:          "a98s76de",
+		Name:        "Verify Import",
+		Description: "check the working of the import flow",
+		StepIDs: []id.ID{
+			testSample.ID,
+			secondTestSample.ID,
+		},
+	}
+
+	db := testmock.CreateMigratedDatabase()
+	defer db.Close()
+
+	testRepository := test.NewRepository(db)
+	runRepository := test.NewRunRepository(db)
+	transactionRepository := transaction.NewRepository(db, testRepository)
+	transactionRunRepository := transaction.NewRunRepository(db, runRepository)
+
+	_, err := testRepository.Create(context.TODO(), testSample)
+	require.NoError(t, err)
+
+	run, err := createRun(runRepository, testSample)
+	require.NoError(t, err)
+
+	_, err = testRepository.Create(context.TODO(), secondTestSample)
+	require.NoError(t, err)
+
+	secondRun, err := createRun(runRepository, secondTestSample)
+	require.NoError(t, err)
+
+	_, err = transactionRepository.Create(context.TODO(), transactionSample)
+	require.NoError(t, err)
+
+	updatedTransactionSample, err := transactionRepository.GetAugmented(context.TODO(), transactionSample.ID)
+	require.NoError(t, err)
+
+	transactionRun, err := transactionRunRepository.CreateRun(context.TODO(), updatedTransactionSample.NewRun())
+	require.NoError(t, err)
+
+	transactionRun.Steps = []test.Run{run, secondRun}
+
+	err = transactionRunRepository.UpdateRun(context.TODO(), transactionRun)
+	require.NoError(t, err)
+
+	err = testRepository.Delete(context.TODO(), testSample.ID)
+	require.NoError(t, err)
+
+	recentTransactionRun, err := transactionRunRepository.GetTransactionRun(context.TODO(), transactionSample.ID, transactionRun.ID)
+	require.NoError(t, err)
+	assert.Len(t, recentTransactionRun.Steps, 1)
+
+	recentTransaction, err := transactionRepository.Get(context.TODO(), transactionSample.ID)
+	require.NoError(t, err)
+	assert.Len(t, recentTransaction.StepIDs, 1)
+
+	_, err = runRepository.GetRun(context.TODO(), run.TestID, run.ID)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
+
+	_, err = testRepository.Get(context.TODO(), testSample.ID)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 func TestTestResourceWithHTTPTrigger(t *testing.T) {
@@ -209,10 +361,11 @@ func TestTestResourceWithHTTPTrigger(t *testing.T) {
 				],
 				"version": 1,
 				"summary": {
-					"runs": 0,
+					"runs": 1,
 					"lastRun": {
-						"fails": 0,
-						"passes": 0
+						"analyzerScore": 0,
+						"fails": 1,
+						"passes": 2
 					}
 				}
 			}
@@ -410,10 +563,11 @@ message GetPokemonListResponse {
 				],
 				"version": 1,
 				"summary": {
-					"runs": 0,
+					"runs": 1,
 					"lastRun": {
-						"fails": 0,
-						"passes": 0
+						"analyzerScore": 0,
+						"fails": 1,
+						"passes": 2
 					}
 				}
 			}
@@ -575,10 +729,11 @@ func TestTestResourceWithTraceIDTrigger(t *testing.T) {
 				],
 				"version": 1,
 				"summary": {
-					"runs": 0,
+					"runs": 1,
 					"lastRun": {
-						"fails": 0,
-						"passes": 0
+						"analyzerScore": 0,
+						"fails": 1,
+						"passes": 2
 					}
 				}
 			}
