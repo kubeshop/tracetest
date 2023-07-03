@@ -69,6 +69,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateLinter,
 		},
 		{
+			"CreateTest",
+			strings.ToUpper("Post"),
+			"/api/tests",
+			c.CreateTest,
+		},
+		{
 			"CreateTransaction",
 			strings.ToUpper("Post"),
 			"/api/transactions",
@@ -97,6 +103,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/linters/{LinterId}",
 			c.DeleteLinter,
+		},
+		{
+			"DeleteTest",
+			strings.ToUpper("Delete"),
+			"/api/tests/{testId}",
+			c.DeleteTest,
 		},
 		{
 			"DeleteTransaction",
@@ -237,6 +249,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.UpdatePollingProfile,
 		},
 		{
+			"UpdateTest",
+			strings.ToUpper("Put"),
+			"/api/tests/{testId}",
+			c.UpdateTest,
+		},
+		{
 			"UpdateTransaction",
 			strings.ToUpper("Put"),
 			"/api/transactions/{transactionId}",
@@ -307,6 +325,30 @@ func (c *ResourceApiApiController) CreateLinter(w http.ResponseWriter, r *http.R
 		return
 	}
 	result, err := c.service.CreateLinter(r.Context(), linterResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// CreateTest - Create new test
+func (c *ResourceApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
+	testParam := Test{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestRequired(testParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateTest(r.Context(), testParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -395,6 +437,22 @@ func (c *ResourceApiApiController) DeleteLinter(w http.ResponseWriter, r *http.R
 	linterIdParam := params["LinterId"]
 
 	result, err := c.service.DeleteLinter(r.Context(), linterIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteTest - delete a test
+func (c *ResourceApiApiController) DeleteTest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	result, err := c.service.DeleteTest(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -911,6 +969,33 @@ func (c *ResourceApiApiController) UpdatePollingProfile(w http.ResponseWriter, r
 		return
 	}
 	result, err := c.service.UpdatePollingProfile(r.Context(), pollingProfileIdParam, pollingProfileParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateTest - update test
+func (c *ResourceApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	testParam := Test{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestRequired(testParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

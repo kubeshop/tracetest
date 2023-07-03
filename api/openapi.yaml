@@ -31,32 +31,6 @@ paths:
             application/json:
               schema:
                 $ref: "./definition.yaml#/components/schemas/ExecuteDefinitionResponse"
-
-    put:
-      tags:
-        - api
-      summary: "Upsert a definition"
-      description: "Upsert a definition"
-      operationId: upsertDefinition
-      requestBody:
-        content:
-          text/json:
-            schema:
-              $ref: "./definition.yaml#/components/schemas/TextDefinition"
-      responses:
-        201:
-          description: Definition created
-          content:
-            application/json:
-              schema:
-                $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
-        200:
-          description: Definition updated
-          content:
-            application/json:
-              schema:
-                $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
-
   # Transactions
   /transactions:
     get:
@@ -331,7 +305,7 @@ paths:
           description: "problem with getting tests"
     post:
       tags:
-        - api
+        - resource-api
       summary: "Create new test"
       description: "Create new test action"
       operationId: createTest
@@ -368,7 +342,7 @@ paths:
           description: "problem with getting a test"
     put:
       tags:
-        - api
+        - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "update test"
@@ -386,7 +360,7 @@ paths:
           description: "problem with updating test"
     delete:
       tags:
-        - api
+        - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "delete a test"

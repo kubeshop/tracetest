@@ -18,8 +18,6 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
-	CreateTest(http.ResponseWriter, *http.Request)
-	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DeleteTransactionRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
@@ -46,8 +44,6 @@ type ApiApiRouter interface {
 	RunTransaction(http.ResponseWriter, *http.Request)
 	StopTestRun(http.ResponseWriter, *http.Request)
 	TestConnection(http.ResponseWriter, *http.Request)
-	UpdateTest(http.ResponseWriter, *http.Request)
-	UpsertDefinition(http.ResponseWriter, *http.Request)
 }
 
 // ResourceApiApiRouter defines the required methods for binding the api requests to a responses for the ResourceApiApi
@@ -57,11 +53,13 @@ type ResourceApiApiRouter interface {
 	CreateDemo(http.ResponseWriter, *http.Request)
 	CreateEnvironment(http.ResponseWriter, *http.Request)
 	CreateLinter(http.ResponseWriter, *http.Request)
+	CreateTest(http.ResponseWriter, *http.Request)
 	CreateTransaction(http.ResponseWriter, *http.Request)
 	DeleteDataStore(http.ResponseWriter, *http.Request)
 	DeleteDemo(http.ResponseWriter, *http.Request)
 	DeleteEnvironment(http.ResponseWriter, *http.Request)
 	DeleteLinter(http.ResponseWriter, *http.Request)
+	DeleteTest(http.ResponseWriter, *http.Request)
 	DeleteTransaction(http.ResponseWriter, *http.Request)
 	GetConfiguration(http.ResponseWriter, *http.Request)
 	GetDataStore(http.ResponseWriter, *http.Request)
@@ -85,6 +83,7 @@ type ResourceApiApiRouter interface {
 	UpdateEnvironment(http.ResponseWriter, *http.Request)
 	UpdateLinter(http.ResponseWriter, *http.Request)
 	UpdatePollingProfile(http.ResponseWriter, *http.Request)
+	UpdateTest(http.ResponseWriter, *http.Request)
 	UpdateTransaction(http.ResponseWriter, *http.Request)
 }
 
@@ -93,8 +92,6 @@ type ResourceApiApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
-	CreateTest(context.Context, Test) (ImplResponse, error)
-	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, int32) (ImplResponse, error)
 	DeleteTransactionRun(context.Context, string, int32) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, int32, TestSpecs) (ImplResponse, error)
@@ -121,8 +118,6 @@ type ApiApiServicer interface {
 	RunTransaction(context.Context, string, RunInformation) (ImplResponse, error)
 	StopTestRun(context.Context, string, int32) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
-	UpdateTest(context.Context, string, Test) (ImplResponse, error)
-	UpsertDefinition(context.Context, TextDefinition) (ImplResponse, error)
 }
 
 // ResourceApiApiServicer defines the api actions for the ResourceApiApi service
@@ -133,11 +128,13 @@ type ResourceApiApiServicer interface {
 	CreateDemo(context.Context, Demo) (ImplResponse, error)
 	CreateEnvironment(context.Context, EnvironmentResource) (ImplResponse, error)
 	CreateLinter(context.Context, LinterResource) (ImplResponse, error)
+	CreateTest(context.Context, Test) (ImplResponse, error)
 	CreateTransaction(context.Context, TransactionResource) (ImplResponse, error)
 	DeleteDataStore(context.Context, string) (ImplResponse, error)
 	DeleteDemo(context.Context, string) (ImplResponse, error)
 	DeleteEnvironment(context.Context, string) (ImplResponse, error)
 	DeleteLinter(context.Context, string) (ImplResponse, error)
+	DeleteTest(context.Context, string) (ImplResponse, error)
 	DeleteTransaction(context.Context, string) (ImplResponse, error)
 	GetConfiguration(context.Context, string) (ImplResponse, error)
 	GetDataStore(context.Context, string) (ImplResponse, error)
@@ -161,5 +158,6 @@ type ResourceApiApiServicer interface {
 	UpdateEnvironment(context.Context, string, EnvironmentResource) (ImplResponse, error)
 	UpdateLinter(context.Context, string, LinterResource) (ImplResponse, error)
 	UpdatePollingProfile(context.Context, string, PollingProfile) (ImplResponse, error)
+	UpdateTest(context.Context, string, Test) (ImplResponse, error)
 	UpdateTransaction(context.Context, string, TransactionResource) (ImplResponse, error)
 }

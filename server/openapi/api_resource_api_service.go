@@ -68,6 +68,20 @@ func (s *ResourceApiApiService) CreateLinter(ctx context.Context, linterResource
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateLinter method not implemented")
 }
 
+// CreateTest - Create new test
+func (s *ResourceApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse, error) {
+	// TODO - update CreateTest with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, Test{}) or use other options such as http.Ok ...
+	//return Response(200, Test{}), nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("CreateTest method not implemented")
+}
+
 // CreateTransaction - Create new transaction
 func (s *ResourceApiApiService) CreateTransaction(ctx context.Context, transactionResource TransactionResource) (ImplResponse, error) {
 	// TODO - update CreateTransaction with the required logic for this service method.
@@ -154,6 +168,17 @@ func (s *ResourceApiApiService) DeleteLinter(ctx context.Context, linterId strin
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteLinter method not implemented")
+}
+
+// DeleteTest - delete a test
+func (s *ResourceApiApiService) DeleteTest(ctx context.Context, testId string) (ImplResponse, error) {
+	// TODO - update DeleteTest with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteTest method not implemented")
 }
 
 // DeleteTransaction - delete a transaction
@@ -539,6 +564,20 @@ func (s *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollin
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePollingProfile method not implemented")
+}
+
+// UpdateTest - update test
+func (s *ResourceApiApiService) UpdateTest(ctx context.Context, testId string, test Test) (ImplResponse, error) {
+	// TODO - update UpdateTest with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateTest method not implemented")
 }
 
 // UpdateTransaction - update transaction

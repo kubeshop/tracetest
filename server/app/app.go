@@ -449,21 +449,10 @@ func registerDataStoreResource(repository *datastore.Repository, router *mux.Rou
 }
 
 func registerTestResource(repository test.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	operations := []resourcemanager.Operation{
-		resourcemanager.OperationList,
-		// TODO: replace it with the option `resourcemanager.CanBeAugmented()`
-		// once we have the `resourcemanager.OperationGet` operation.
-		resourcemanager.OperationListAugmented,
-		resourcemanager.OperationGet,
-		resourcemanager.OperationGetAugmented,
-	}
-
 	manager := resourcemanager.New[test.Test](
 		test.ResourceName,
 		test.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(operations...),
-
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

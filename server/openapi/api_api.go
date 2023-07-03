@@ -51,18 +51,6 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
-			"CreateTest",
-			strings.ToUpper("Post"),
-			"/api/tests",
-			c.CreateTest,
-		},
-		{
-			"DeleteTest",
-			strings.ToUpper("Delete"),
-			"/api/tests/{testId}",
-			c.DeleteTest,
-		},
-		{
 			"DeleteTestRun",
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}/run/{runId}",
@@ -218,59 +206,7 @@ func (c *ApiApiController) Routes() Routes {
 			"/api/config/connection",
 			c.TestConnection,
 		},
-		{
-			"UpdateTest",
-			strings.ToUpper("Put"),
-			"/api/tests/{testId}",
-			c.UpdateTest,
-		},
-		{
-			"UpsertDefinition",
-			strings.ToUpper("Put"),
-			"/api/definition.yaml",
-			c.UpsertDefinition,
-		},
 	}
-}
-
-// CreateTest - Create new test
-func (c *ApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
-	testParam := Test{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTestRequired(testParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreateTest(r.Context(), testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// DeleteTest - delete a test
-func (c *ApiApiController) DeleteTest(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	result, err := c.service.DeleteTest(r.Context(), testIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
 }
 
 // DeleteTestRun - delete a test run
@@ -866,57 +802,6 @@ func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.TestConnection(r.Context(), dataStoreParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpdateTest - update test
-func (c *ApiApiController) UpdateTest(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	testParam := Test{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&testParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTestRequired(testParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpsertDefinition - Upsert a definition
-func (c *ApiApiController) UpsertDefinition(w http.ResponseWriter, r *http.Request) {
-	textDefinitionParam := TextDefinition{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&textDefinitionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTextDefinitionRequired(textDefinitionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpsertDefinition(r.Context(), textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

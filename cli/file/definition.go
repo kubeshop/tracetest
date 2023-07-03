@@ -23,10 +23,10 @@ type File struct {
 	file     tracetestYaml.File
 }
 
-func Read(path string) (File, error) {
+func Read(path string) (*File, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
-		return File{}, fmt.Errorf("could not read definition file %s: %w", path, err)
+		return nil, fmt.Errorf("could not read definition file %s: %w", path, err)
 	}
 
 	return New(path, b)
@@ -41,13 +41,13 @@ func ReadRaw(path string) (File, error) {
 	return NewFromRaw(path, b)
 }
 
-func New(path string, b []byte) (File, error) {
+func New(path string, b []byte) (*File, error) {
 	yf, err := tracetestYaml.Decode(b)
 	if err != nil {
-		return File{}, fmt.Errorf("could not parse definition file: %w", err)
+		return nil, fmt.Errorf("could not parse definition file: %w", err)
 	}
 
-	file := File{
+	file := &File{
 		contents: b,
 		file:     yf,
 		path:     path,
@@ -72,7 +72,7 @@ func NewFromRaw(path string, b []byte) (File, error) {
 	return file, nil
 }
 
-func (f File) Path() string {
+func (f *File) Path() string {
 	return f.path
 }
 
@@ -85,19 +85,19 @@ func (f File) AbsDir() string {
 	return filepath.Dir(abs)
 }
 
-func (f File) ResolveVariables() (File, error) {
+func (f *File) ResolveVariables() (*File, error) {
 	variableInjector := variable.NewInjector(variable.WithVariableProvider(
 		variable.EnvironmentVariableProvider{},
 	))
 
 	err := variableInjector.Inject(&f.file)
 	if err != nil {
-		return File{}, err
+		return nil, err
 	}
 
 	bytes, err := tracetestYaml.Encode(f.file)
 	if err != nil {
-		return File{}, err
+		return nil, err
 	}
 
 	f.contents = bytes
@@ -129,7 +129,7 @@ func (f File) HasID() bool {
 	return fileID != nil
 }
 
-func (f File) SetID(id string) (File, error) {
+func (f *File) SetID(id string) (*File, error) {
 	if f.HasID() {
 		return f, ErrFileHasID
 	}
@@ -155,10 +155,10 @@ func (f File) SetID(id string) (File, error) {
 	return New(f.path, newContents)
 }
 
-func (f File) Write() (File, error) {
+func (f File) Write() (*File, error) {
 	err := os.WriteFile(f.path, f.contents, 0644)
 	if err != nil {
-		return f, fmt.Errorf("could not write file: %w", err)
+		return nil, fmt.Errorf("could not write file: %w", err)
 	}
 
 	return Read(f.path)

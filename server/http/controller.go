@@ -46,28 +46,8 @@ type controller struct {
 	environmentGetter        environmentGetter
 }
 
-// CreateTest implements openapi.ApiApiServicer
-func (*controller) CreateTest(context.Context, openapi.Test) (openapi.ImplResponse, error) {
-	panic("unimplemented")
-}
-
-// DeleteTest implements openapi.ApiApiServicer
-func (*controller) DeleteTest(context.Context, string) (openapi.ImplResponse, error) {
-	panic("unimplemented")
-}
-
 // GetTestVersionDefinitionFile implements openapi.ApiApiServicer
 func (*controller) GetTestVersionDefinitionFile(context.Context, string, int32) (openapi.ImplResponse, error) {
-	panic("unimplemented")
-}
-
-// UpdateTest implements openapi.ApiApiServicer
-func (*controller) UpdateTest(context.Context, string, openapi.Test) (openapi.ImplResponse, error) {
-	panic("unimplemented")
-}
-
-// UpsertDefinition implements openapi.ApiApiServicer
-func (*controller) UpsertDefinition(context.Context, openapi.TextDefinition) (openapi.ImplResponse, error) {
 	panic("unimplemented")
 }
 
@@ -463,33 +443,6 @@ func (c *controller) executeTransaction(ctx context.Context, tran transaction.Tr
 		Type:  yaml.FileTypeTransaction.String(),
 	}
 	return openapi.Response(200, res), nil
-}
-
-func (c *controller) upsertTransaction(ctx context.Context, transaction transaction.Transaction) (openapi.ImplResponse, error) {
-	resp, err := c.doCreateTransaction(ctx, transaction)
-	var status int
-	if err != nil {
-		if errors.Is(err, errTransactionExists) {
-			resp, err := c.doUpdateTransaction(ctx, transaction.ID, transaction)
-			if err != nil {
-				return resp, err
-			}
-			status = http.StatusOK
-		} else {
-			return resp, err
-		}
-	} else {
-		status = http.StatusCreated
-		transaction.ID = id.ID(resp.Body.(openapi.Transaction).Id)
-	}
-
-	return openapi.ImplResponse{
-		Code: status,
-		Body: openapi.UpsertDefinitionResponse{
-			Id:   transaction.ID.String(),
-			Type: yaml.FileTypeTransaction.String(),
-		},
-	}, nil
 }
 
 var errTransactionExists = errors.New("transaction already exists")

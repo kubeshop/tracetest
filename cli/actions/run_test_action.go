@@ -34,11 +34,12 @@ type RunResourceArgs struct {
 }
 
 type runTestAction struct {
-	config       config.Config
-	logger       *zap.Logger
-	client       *openapi.APIClient
-	environments resourcemanager.Client
-	cliExit      func(int)
+	config             config.Config
+	logger             *zap.Logger
+	client             *openapi.APIClient
+	testActions        resourcemanager.Client
+	environmentActions resourcemanager.Client
+	cliExit            func(int)
 }
 
 type runDefParams struct {
@@ -50,8 +51,22 @@ type runDefParams struct {
 	EnvironmentVariables map[string]string
 }
 
-func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, envs resourcemanager.Client, cliExit func(int)) runTestAction {
-	return runTestAction{config, logger, client, envs, cliExit}
+func NewRunTestAction(
+	config config.Config,
+	logger *zap.Logger,
+	client *openapi.APIClient,
+	testActions resourcemanager.Client,
+	environmentActions resourcemanager.Client,
+	cliExit func(int),
+) runTestAction {
+	return runTestAction{
+		config,
+		logger,
+		client,
+		testActions,
+		environmentActions,
+		cliExit,
+	}
 }
 
 func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
@@ -129,22 +144,20 @@ func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath 
 		}
 
 		if newFile != nil { // has new file, update it
-			f = *newFile
+			f = newFile
 		}
 	}
 
-	body, _, err := a.client.ApiApi.
-		UpsertDefinition(ctx).
-		TextDefinition(openapi.TextDefinition{
-			Content: openapi.PtrString(f.Contents()),
-		}).
-		Execute()
-
+	newFile, err := a.testActions.Apply(ctx, *f)
 	if err != nil {
-		return "", fmt.Errorf("could not upsert definition: %w", err)
+		return "", fmt.Errorf("could not apply test: %w", err)
 	}
 
-	return body.GetId(), nil
+	if t, err := newFile.Definition().Test(); err == nil {
+		return t.ID, nil
+	}
+
+	return "", fmt.Errorf("obtained definition is not a test")
 }
 
 func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) error {
@@ -153,15 +166,15 @@ func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) e
 		return err
 	}
 
-	defFile := f.Definition()
-	if err = defFile.Validate(); err != nil {
-		return fmt.Errorf("invalid definition file: %w", err)
+	newFile, err := a.testActions.Apply(ctx, *f)
+	if err != nil {
+		return fmt.Errorf("could not apply test: %w", err)
 	}
 
-	return a.runDefinitionFile(ctx, f, params)
+	return a.runDefinitionFile(ctx, newFile, params)
 }
 
-func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, params runDefParams) error {
+func (a runTestAction) runDefinitionFile(ctx context.Context, f *file.File, params runDefParams) error {
 	f, err := f.ResolveVariables()
 	if err != nil {
 		return err
@@ -210,7 +223,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 		}
 
 		if newFile != nil { // has new file, update it
-			f = *newFile
+			f = newFile
 		}
 	}
 
@@ -612,7 +625,7 @@ func getTestRunID(testRun openapi.TestRun) int32 {
 	return getTestRunIDFromString(testRun.GetId())
 }
 
-func getUpdatedTestWithGrpcTrigger(f file.File, t yaml.Test) (*file.File, error) {
+func getUpdatedTestWithGrpcTrigger(f *file.File, t yaml.Test) (*file.File, error) {
 	protobufFile := filepath.Join(f.AbsDir(), t.Trigger.GRPC.ProtobufFile)
 
 	if !fileutil.IsFilePath(protobufFile) {
@@ -642,5 +655,5 @@ func getUpdatedTestWithGrpcTrigger(f file.File, t yaml.Test) (*file.File, error)
 		return nil, fmt.Errorf(`cannot recreate updated file: %w`, err)
 	}
 
-	return &f, nil
+	return f, nil
 }

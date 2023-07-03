@@ -5,8 +5,6 @@
 
 export interface paths {
   "/definition.yaml": {
-    /** Upsert a definition */
-    put: operations["upsertDefinition"];
     /** Execute a definition */
     post: operations["executeDefinition"];
   };
@@ -221,28 +219,6 @@ export interface paths {
 export interface components {}
 
 export interface operations {
-  /** Upsert a definition */
-  upsertDefinition: {
-    responses: {
-      /** Definition updated */
-      200: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
-        };
-      };
-      /** Definition created */
-      201: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
-      };
-    };
-  };
   /** Execute a definition */
   executeDefinition: {
     responses: {

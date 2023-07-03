@@ -62,7 +62,7 @@ func getAvailableVariables(test test.Test, environment environment.Environment) 
 }
 
 func getPreviousEnvironmentValues(ctx context.Context, testRepo test.Repository, runRepo test.RunRepository, test test.Test) (map[string]environment.EnvironmentValue, error) {
-	latestTestVersion, err := testRepo.Get(ctx, test.ID)
+	latestTestVersion, err := testRepo.GetAugmented(ctx, test.ID)
 	if err != nil {
 		return map[string]environment.EnvironmentValue{}, err
 	}
