@@ -12,11 +12,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Jeffail/gabs/v2"
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/file"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/ui"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/server/model/yaml"
@@ -31,14 +34,12 @@ type RunResourceArgs struct {
 }
 
 type runTestAction struct {
-	config             config.Config
-	logger             *zap.Logger
-	client             *openapi.APIClient
-	environmentActions environmentsActions
-	cliExit            func(int)
+	config       config.Config
+	logger       *zap.Logger
+	client       *openapi.APIClient
+	environments resourcemanager.Client
+	cliExit      func(int)
 }
-
-var _ Action[RunResourceArgs] = &runTestAction{}
 
 type runDefParams struct {
 	DefinitionFile       string
@@ -49,8 +50,8 @@ type runDefParams struct {
 	EnvironmentVariables map[string]string
 }
 
-func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, environmentActions environmentsActions, cliExit func(int)) runTestAction {
-	return runTestAction{config, logger, client, environmentActions, cliExit}
+func NewRunTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient, envs resourcemanager.Client, cliExit func(int)) runTestAction {
+	return runTestAction{config, logger, client, envs, cliExit}
 }
 
 func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
@@ -72,19 +73,28 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 
 	envID := args.EnvID
 
-	if utils.StringReferencesFile(args.EnvID) {
+	if fileutil.IsFilePath(args.EnvID) {
 		a.logger.Debug("resolve envID from file reference", zap.String("path", envID))
-		envResource, err := a.environmentActions.FromFile(ctx, args.EnvID)
+		jsonFormat, err := resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+		if err != nil {
+			return fmt.Errorf("could not get json format: %w", err)
+		}
+
+		envJson, err := a.environments.Apply(ctx, args.EnvID, jsonFormat)
 		if err != nil {
 			return fmt.Errorf("could not read environment file: %w", err)
 		}
 
-		_, err = a.environmentActions.ApplyResource(ctx, envResource)
+		parsed, err := gabs.ParseJSON([]byte(envJson))
 		if err != nil {
-			return fmt.Errorf("could not apply environmen file: %w", err)
+			return fmt.Errorf("could not parse environment json: %w", err)
 		}
 
-		envID = envResource.Spec.GetId()
+		ok := true
+		envID, ok = parsed.Path("spec.id").Data().(string)
+		if !ok {
+			return fmt.Errorf("could not parse environment id from json")
+		}
 	}
 
 	a.logger.Debug("resolved env", zap.String("envID", envID))
@@ -163,7 +173,7 @@ func (a runTestAction) runDefinitionFile(ctx context.Context, f file.File, param
 			// to check it properly we need to convert it to an absolute path
 			stepPath := filepath.Join(f.AbsDir(), step)
 
-			if !utils.StringReferencesFile(stepPath) {
+			if !fileutil.IsFilePath(stepPath) {
 				// not referencing a file, keep the value
 				continue
 			}
@@ -605,17 +615,17 @@ func getTestRunID(testRun openapi.TestRun) int32 {
 func getUpdatedTestWithGrpcTrigger(f file.File, t yaml.Test) (*file.File, error) {
 	protobufFile := filepath.Join(f.AbsDir(), t.Trigger.GRPC.ProtobufFile)
 
-	if !utils.StringReferencesFile(protobufFile) {
+	if !fileutil.IsFilePath(protobufFile) {
 		return nil, nil
 	}
 
 	// referencing a file, keep the value
-	fileContent, err := utils.ReadFileContent(protobufFile)
+	fileContent, err := os.ReadFile(protobufFile)
 	if err != nil {
 		return nil, fmt.Errorf(`cannot read protobuf file: %w`, err)
 	}
 
-	t.Trigger.GRPC.ProtobufFile = fileContent
+	t.Trigger.GRPC.ProtobufFile = string(fileContent)
 
 	def := yaml.File{
 		Type: yaml.FileTypeTest,

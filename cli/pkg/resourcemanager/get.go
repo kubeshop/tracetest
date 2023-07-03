@@ -9,7 +9,7 @@ import (
 
 const VerbGet Verb = "get"
 
-func (c client) Get(ctx context.Context, id string, format Format) (string, error) {
+func (c Client) Get(ctx context.Context, id string, format Format) (string, error) {
 	url := c.client.url(c.resourceNamePlural, id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {

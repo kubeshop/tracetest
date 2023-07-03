@@ -8,9 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/ui"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,32 +18,26 @@ type ConfigureConfig struct {
 }
 
 type ConfigureConfigSetValues struct {
-	Endpoint *string
+	Endpoint string
 }
 
 type configureAction struct {
 	config config.Config
-	logger *zap.Logger
-	client *openapi.APIClient
 }
 
-var _ Action[ConfigureConfig] = &configureAction{}
-
-func NewConfigureAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) configureAction {
+func NewConfigureAction(config config.Config) configureAction {
 	return configureAction{
 		config: config,
-		logger: logger,
-		client: client,
 	}
 }
 
 func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 	ui := ui.DefaultUI
 	existingConfig := a.loadExistingConfig(args)
-	var serverURL string
 
-	if args.SetValues.Endpoint != nil {
-		serverURL = *args.SetValues.Endpoint
+	var serverURL string
+	if args.SetValues.Endpoint != "" {
+		serverURL = args.SetValues.Endpoint
 	} else {
 		serverURL = ui.TextInput("Enter your Tracetest server URL", existingConfig.URL())
 	}

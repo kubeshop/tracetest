@@ -1,29 +1,31 @@
 package resourcemanager
 
 import (
-	"fmt"
+	"errors"
 	"sort"
 )
 
 type Registry struct {
-	resources map[string]client
+	resources map[string]Client
 }
 
 func NewRegistry() *Registry {
 	return &Registry{
-		resources: make(map[string]client),
+		resources: make(map[string]Client),
 	}
 }
 
-func (r *Registry) Register(c client) *Registry {
+func (r *Registry) Register(c Client) *Registry {
 	r.resources[c.resourceName] = c
 	return r
 }
 
-func (r *Registry) Get(resourceName string) (client, error) {
+var ErrResourceNotFound = errors.New("resource not found")
+
+func (r *Registry) Get(resourceName string) (Client, error) {
 	c, ok := r.resources[resourceName]
 	if !ok {
-		return client{}, fmt.Errorf("resource %s not found", resourceName)
+		return Client{}, ErrResourceNotFound
 	}
 
 	return c, nil
