@@ -154,9 +154,20 @@ func (r Run) LinterError(err error) Run {
 	return r.Finish()
 }
 
-func (r Run) SuccessfullinterExecution(linter model.LinterResult) Run {
+func (r Run) SuccessfulLinterExecution(linter model.LinterResult) Run {
 	r.State = RunStateAwaitingTestResults
 	r.Linter = linter
 
 	return r
+}
+
+func NewTracetestRootSpan(run Run) model.Span {
+	return model.AugmentRootSpan(model.Span{
+		ID:         id.NewRandGenerator().SpanID(),
+		Name:       model.TriggerSpanName,
+		StartTime:  run.ServiceTriggeredAt,
+		EndTime:    run.ServiceTriggerCompletedAt,
+		Attributes: model.Attributes{},
+		Children:   []*model.Span{},
+	}, run.TriggerResult)
 }
