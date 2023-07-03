@@ -27,6 +27,7 @@ export interface IPropsAttributeRow {
   attribute: TSpanFlatAttribute;
   searchText?: string;
   semanticConventions: OtelReference;
+  analyzerErrors?: TAnalyzerError[];
   testSpecs?: TTestSpecSummary;
   testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
@@ -119,6 +120,7 @@ const SpanDetail = ({onCreateTestSpec = noop, searchText, span, AttributeRowComp
         attributeList={filteredAttributes}
         searchText={searchText}
         semanticConventions={semanticConventions}
+        analyzerErrors={analyzerErrors}
         testSpecs={testSpecs}
         testOutputs={testOutputs}
         onCreateTestSpec={handleCreateTestSpec}
