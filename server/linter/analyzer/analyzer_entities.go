@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"golang.org/x/exp/slices"
 )
 
@@ -13,12 +12,6 @@ const (
 	ResourceName       = "Analyzer"
 	ResourceNamePlural = "Analyzers"
 )
-
-var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationGet,
-	resourcemanager.OperationList,
-	resourcemanager.OperationUpdate,
-}
 
 type (
 	Linter struct {

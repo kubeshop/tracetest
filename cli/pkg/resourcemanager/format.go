@@ -13,22 +13,28 @@ import (
 
 type Format interface {
 	BuildRequest(req *http.Request, verb Verb) error
+	ContentType() string
 	Format(data string, opts ...any) (string, error)
 	Unmarshal(data []byte, v interface{}) error
+	ToJSON([]byte) ([]byte, error)
 	String() string
 }
 
 type formatRegistry []Format
 
-func (f formatRegistry) Get(format, fallback string) (Format, error) {
+func (f formatRegistry) GetWithFallback(format, fallback string) (Format, error) {
 	if format == "" && fallback == "" {
 		return nil, fmt.Errorf("format and fallback cannot be empty at the same time")
 	}
 
 	if format == "" {
-		return f.Get(fallback, "")
+		return f.Get(fallback)
 	}
 
+	return f.Get(format)
+}
+
+func (f formatRegistry) Get(format string) (Format, error) {
 	for _, fr := range f {
 		if fr.String() == format {
 			return fr, nil
@@ -44,16 +50,22 @@ var Formats = formatRegistry{
 	prettyFormat{},
 }
 
+const FormatJSON = "json"
+
 type jsonFormat struct{}
 
 func (j jsonFormat) String() string {
-	return "json"
+	return FormatJSON
 }
 
 func (j jsonFormat) BuildRequest(req *http.Request, _ Verb) error {
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", j.ContentType())
 	req.Header.Set("X-Tracetest-Augmented", "true")
 	return nil
+}
+
+func (j jsonFormat) ContentType() string {
+	return "application/json"
 }
 
 func (j jsonFormat) Format(data string, _ ...any) (string, error) {
@@ -70,18 +82,28 @@ func (j jsonFormat) Unmarshal(data []byte, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
+func (j jsonFormat) ToJSON(in []byte) ([]byte, error) {
+	return in, nil
+}
+
+const FormatYAML = "yaml"
+
 type yamlFormat struct{}
 
 func (y yamlFormat) String() string {
-	return "yaml"
+	return FormatYAML
 }
 
 func (y yamlFormat) BuildRequest(req *http.Request, verb Verb) error {
-	req.Header.Set("Content-Type", "text/yaml")
+	req.Header.Set("Accept", y.ContentType())
 	if verb == VerbList {
 		req.Header.Set("Accept", "text/yaml-stream")
 	}
 	return nil
+}
+
+func (y yamlFormat) ContentType() string {
+	return "text/yaml"
 }
 
 func (y yamlFormat) Format(data string, _ ...any) (string, error) {
@@ -92,12 +114,18 @@ func (y yamlFormat) Unmarshal(data []byte, v interface{}) error {
 	return yaml.Unmarshal(data, v)
 }
 
+func (j yamlFormat) ToJSON(in []byte) ([]byte, error) {
+	return yaml.YAMLToJSON(in)
+}
+
+const FormatPretty = "pretty"
+
 type prettyFormat struct {
 	jsonFormat
 }
 
 func (p prettyFormat) String() string {
-	return "pretty"
+	return FormatPretty
 }
 
 // Format formats data into table using given mappings.

@@ -27,7 +27,7 @@ func (c client) Get(ctx context.Context, id string, format Format) (string, erro
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
 		reqErr, ok := err.(requestError)
 		if ok && reqErr.Code == http.StatusNotFound {

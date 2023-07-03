@@ -1,4 +1,4 @@
-import {NodeTypesEnum} from 'constants/DAG.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 
 export interface INodeDatum<T> {
   data: T;

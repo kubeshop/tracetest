@@ -100,7 +100,7 @@ const SpanAttributeService = () => ({
 
   getAttributeTestOutputs(attributeName: string, testOutputs: TestRunOutput[] = []): TestRunOutput[] {
     const lowerCaseAttributeName = attributeName.toLowerCase();
-    return testOutputs.filter(({value}) => value.toLowerCase().includes(lowerCaseAttributeName));
+    return testOutputs.filter(({name}) => name.toLowerCase().includes(lowerCaseAttributeName));
   },
 });
 

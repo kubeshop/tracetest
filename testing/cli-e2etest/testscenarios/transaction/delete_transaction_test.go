@@ -27,7 +27,7 @@ func TestDeleteTransaction(t *testing.T) {
 	// Then it should return an error and say that this resource does not exist
 	result := tracetestcli.Exec(t, "delete transaction --id dont-exist", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "Resource transactions with ID dont-exist not found") // TODO: update this message to singular
+	require.Contains(result.StdErr, "Resource transaction with ID dont-exist not found") 
 
 	// When I try to set up a new transaction
 	// Then it should be applied with success
@@ -46,5 +46,5 @@ func TestDeleteTransaction(t *testing.T) {
 	// Then it should return a message saying that the transaction was not found
 	result = tracetestcli.Exec(t, "delete transaction --id Qti5R3_VR", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "Resource transactions with ID Qti5R3_VR not found")
+	require.Contains(result.StdErr, "Resource transaction with ID Qti5R3_VR not found")
 }

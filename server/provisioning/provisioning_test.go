@@ -172,28 +172,26 @@ func setup(db *sql.DB) provisioningFixture {
 		config.ResourceName,
 		config.ResourceNamePlural,
 		f.configs,
-		resourcemanager.WithOperations(config.Operations...),
+		resourcemanager.DisableDelete(),
 	)
 
 	pollingProfilesManager := resourcemanager.New[pollingprofile.PollingProfile](
 		pollingprofile.ResourceName,
 		pollingprofile.ResourceNamePlural,
 		f.pollingProfiles,
-		resourcemanager.WithOperations(pollingprofile.Operations...),
+		resourcemanager.DisableDelete(),
 	)
 
 	demoManager := resourcemanager.New[demo.Demo](
 		demo.ResourceName,
 		demo.ResourceNamePlural,
 		f.demos,
-		resourcemanager.WithOperations(demo.Operations...),
 	)
 
 	dataStoreManager := resourcemanager.New[datastore.DataStore](
 		datastore.ResourceName,
 		datastore.ResourceNamePlural,
 		f.dataStores,
-		resourcemanager.WithOperations(datastore.Operations...),
 	)
 
 	f.provisioner = provisioning.New(provisioning.WithResourceProvisioners(

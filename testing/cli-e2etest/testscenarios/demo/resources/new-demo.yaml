@@ -1,12 +1,14 @@
 type: Demo
 spec:
-  id: DglVOWu4g
+  id: ""
   name: dev
-  type: otelstore
   enabled: true
-  pokeshop: {}
+  type: otelstore
   opentelemetryStore:
     frontendEndpoint: http://dev-frontend:9000
     productCatalogEndpoint: http://dev-product:8081
     cartEndpoint: http://dev-cart:8082
     checkoutEndpoint: http://dev-checkout:8083
+  pokeshop:
+    httpEndpoint: ""
+    grpcEndpoint: ""

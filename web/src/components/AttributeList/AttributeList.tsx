@@ -1,4 +1,4 @@
-import AttributeRow from 'components/AttributeRow';
+import {IPropsAttributeRow} from 'components/SpanDetail/SpanDetail';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
@@ -14,6 +14,7 @@ interface IProps {
   testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
+  AttributeRowComponent: React.ComponentType<IPropsAttributeRow>;
 }
 
 const AttributeList = ({
@@ -24,11 +25,12 @@ const AttributeList = ({
   testOutputs,
   onCreateTestSpec,
   onCreateOutput,
+  AttributeRowComponent,
 }: IProps) => {
   return attributeList.length ? (
     <S.AttributeList data-cy="attribute-list">
       {attributeList.map(attribute => (
-        <AttributeRow
+        <AttributeRowComponent
           key={attribute.key}
           attribute={attribute}
           searchText={searchText}

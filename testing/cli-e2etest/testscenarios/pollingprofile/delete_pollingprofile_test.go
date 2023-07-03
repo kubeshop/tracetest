@@ -26,5 +26,5 @@ func TestDeletePollingProfile(t *testing.T) {
 	// Then it should return a error message, showing that we cannot delete a prolling profile
 	result := tracetestcli.Exec(t, "delete pollingprofile --id current", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "the specified resource type doesn't support the action")
+	require.Contains(result.StdErr, "resource PollingProfile does not support the action")
 }

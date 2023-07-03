@@ -29,7 +29,7 @@ func init() {
 				return "", err
 			}
 
-			resultFormat, err := resourcemanager.Formats.Get(output, "yaml")
+			resultFormat, err := resourcemanager.Formats.GetWithFallback(output, "yaml")
 			if err != nil {
 				return "", err
 			}

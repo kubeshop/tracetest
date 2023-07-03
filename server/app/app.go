@@ -361,7 +361,7 @@ func registerAnalyzerResource(linterRepo *analyzer.Repository, router *mux.Route
 		analyzer.ResourceName,
 		analyzer.ResourceNamePlural,
 		linterRepo,
-		resourcemanager.WithOperations(analyzer.Operations...),
+		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -385,7 +385,7 @@ func registerConfigResource(configRepo *config.Repository, router *mux.Router, d
 		config.ResourceName,
 		config.ResourceNamePlural,
 		configRepo,
-		resourcemanager.WithOperations(config.Operations...),
+		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -397,7 +397,7 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 		pollingprofile.ResourceName,
 		pollingprofile.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(pollingprofile.Operations...),
+		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -409,7 +409,6 @@ func registerEnvironmentResource(repository *environment.Repository, router *mux
 		environment.ResourceName,
 		environment.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(environment.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -421,7 +420,6 @@ func registerDemosResource(repository *demo.Repository, router *mux.Router, db *
 		demo.ResourceName,
 		demo.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(demo.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -433,7 +431,6 @@ func registerDataStoreResource(repository *datastore.Repository, router *mux.Rou
 		datastore.ResourceName,
 		datastore.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(datastore.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)

@@ -15,20 +15,18 @@ const panel = {
   isDefaultOpen: true,
 };
 
-const AnalyzerPanel = ({run}: IProps) => {
-  return (
-    <RightPanel panel={panel}>
-      {size => (
-        <PanelContainer $isOpen={size.isOpen}>
-          {isRunStateFinished(run.state) ? (
-            <AnalyzerResult result={run.linter} trace={run?.trace ?? Trace({})} />
-          ) : (
-            <SkeletonResponse />
-          )}
-        </PanelContainer>
-      )}
-    </RightPanel>
-  );
-};
+const AnalyzerPanel = ({run}: IProps) => (
+  <RightPanel panel={panel}>
+    {size => (
+      <PanelContainer $isOpen={size.isOpen}>
+        {isRunStateFinished(run.state) ? (
+          <AnalyzerResult result={run.linter} trace={run?.trace ?? Trace({})} />
+        ) : (
+          <SkeletonResponse />
+        )}
+      </PanelContainer>
+    )}
+  </RightPanel>
+);
 
 export default AnalyzerPanel;

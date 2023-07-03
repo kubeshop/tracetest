@@ -44,7 +44,7 @@ func (c client) List(ctx context.Context, opt ListOption, format Format) (string
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
 
 		return "", fmt.Errorf("could not list resource: %w", err)

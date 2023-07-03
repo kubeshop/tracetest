@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ type client struct {
 	client             *HTTPClient
 	resourceName       string
 	resourceNamePlural string
+	deleteSuccessMsg   string
 	tableConfig        TableConfig
 }
 
@@ -26,14 +28,23 @@ type HTTPClient struct {
 
 func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
 	return &HTTPClient{
-		client:       http.Client{},
+		client: http.Client{
+			// this function avoids blindly followin redirects.
+			// the problem with redirects is that they don't guarantee to preserve the method, body, headers, etc.
+			// This can hide issues when developing, because the client will follow the redirect and the request
+			// will succeed, but the server will not receive the request that the user intended to send.
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		},
 		baseURL:      baseURL,
 		extraHeaders: extraHeaders,
 	}
 }
 
 func (c HTTPClient) url(resourceName string, extra ...string) *url.URL {
-	url, _ := url.Parse(fmt.Sprintf("%s/api/%s/%s", c.baseURL, resourceName, strings.Join(extra, "/")))
+	urlStr := c.baseURL + path.Join("/api", resourceName, strings.Join(extra, "/"))
+	url, _ := url.Parse(urlStr)
 	return url
 }
 
@@ -45,16 +56,39 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 	return c.client.Do(req)
 }
 
+type options func(c *client)
+
+func WithDeleteEnabled(deleteSuccessMssg string) options {
+	return func(c *client) {
+		c.deleteSuccessMsg = deleteSuccessMssg
+	}
+}
+
+func WithTableConfig(tableConfig TableConfig) options {
+	return func(c *client) {
+		c.tableConfig = tableConfig
+	}
+}
+
 // NewClient creates a new client for a resource managed by the resourceamanger.
 // The tableConfig parameter configures how the table view should be rendered.
 // This configuration work both for a single resource from a Get, or a ResourceList from a List
-func NewClient(httpClient *HTTPClient, resourceName, resourceNamePlural string, tableConfig TableConfig) client {
-	return client{
+func NewClient(
+	httpClient *HTTPClient,
+	resourceName, resourceNamePlural string,
+	opts ...options) client {
+	c := client{
 		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
-		tableConfig:        tableConfig,
 	}
+
+	for _, opt := range opts {
+		opt(&c)
+	}
+
+	return c
+
 }
 
 type requestError struct {
@@ -64,6 +98,11 @@ type requestError struct {
 
 func (e requestError) Error() string {
 	return e.Message
+}
+
+func isSuccessResponse(resp *http.Response) bool {
+	// successfull http status codes are 2xx
+	return resp.StatusCode >= 200 && resp.StatusCode < 300
 }
 
 func parseRequestError(resp *http.Response, format Format) error {

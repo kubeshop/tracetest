@@ -1,4 +1,5 @@
 import {stratify} from '@visx/hierarchy';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import {INodeDataSpan, TNode} from 'types/Timeline.types';
 
 function getHierarchyNodes(nodesData: INodeDataSpan[]) {
@@ -9,7 +10,7 @@ function getHierarchyNodes(nodesData: INodeDataSpan[]) {
 }
 
 const TimelineService = () => ({
-  getNodes(nodesData: INodeDataSpan[]) {
+  getNodes(nodesData: INodeDataSpan[], type: NodeTypesEnum) {
     const nodes: TNode[] = [];
     const hierarchyNodes = getHierarchyNodes(nodesData);
 
@@ -18,6 +19,7 @@ const TimelineService = () => ({
         children: hierarchyNode.children?.length ?? 0,
         data: {...hierarchyNode.data},
         depth: hierarchyNode.depth,
+        type,
       });
     });
 
