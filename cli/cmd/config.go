@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/actions"
@@ -158,19 +157,45 @@ var resources = resourcemanager.NewRegistry().
 					// set spec.summary.steps to the number of steps in the transaction
 					item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
 
-					// if lastRun.time is not empty, show it in a nicer format
-					lastRunTime := item.Path("spec.summary.lastRun.time").Data().(string)
-					if lastRunTime != "" {
-						date, err := time.Parse(time.RFC3339, lastRunTime)
-						if err != nil {
-							return fmt.Errorf("failed to parse last run time: %s", err)
-						}
-						if date.IsZero() {
-							item.SetP("", "spec.summary.lastRun.time")
-						} else {
-							item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
-						}
+					if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
+						return err
 					}
+
+					return nil
+				},
+			}),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"test", "tests",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "VERSION", Path: "spec.version"},
+					{Header: "TRIGGER TYPE", Path: "spec.trigger.type"},
+					{Header: "RUNS", Path: "spec.summary.runs"},
+					{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
+					{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
+					{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
+					{Header: "URL", Path: "spec.url"},
+				},
+				ItemModifier: func(item *gabs.Container) error {
+					// set spec.summary.steps to the number of steps in the transaction
+					id, ok := item.Path("spec.id").Data().(string)
+					if !ok {
+						return fmt.Errorf("test id '%s' is not a string", id)
+					}
+
+					url := cliConfig.URL() + "/test/" + id
+					item.SetP(url, "spec.url")
+
+					if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
+						return err
+					}
+
 					return nil
 				},
 			}),
