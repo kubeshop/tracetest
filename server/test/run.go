@@ -2,13 +2,13 @@ package test
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
-	"github.com/kubeshop/tracetest/server/pkg/timing"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
@@ -47,15 +47,37 @@ func (r Run) Copy() Run {
 }
 
 func (r Run) ExecutionTime() int {
-	return timing.DurationInSeconds(
-		timing.TimeDiff(r.CreatedAt, r.CompletedAt),
+	return durationInSeconds(
+		timeDiff(r.CreatedAt, r.CompletedAt),
 	)
 }
 
 func (r Run) TriggerTime() int {
-	return timing.DurationInMillieconds(
-		timing.TimeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt),
+	return durationInMillieconds(
+		timeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt),
 	)
+}
+
+func timeDiff(start, end time.Time) time.Duration {
+	var endDate time.Time
+	if !dateIsZero(end) {
+		endDate = end
+	} else {
+		endDate = Now()
+	}
+	return endDate.Sub(start)
+}
+
+func durationInMillieconds(d time.Duration) int {
+	return int(d.Milliseconds())
+}
+
+func durationInSeconds(d time.Duration) int {
+	return int(math.Ceil(d.Seconds()))
+}
+
+func dateIsZero(in time.Time) bool {
+	return in.IsZero() || in.Unix() == 0
 }
 
 func (r Run) Start() Run {
@@ -132,20 +154,9 @@ func (r Run) LinterError(err error) Run {
 	return r.Finish()
 }
 
-func (r Run) SuccessfulLinterExecution(linter model.LinterResult) Run {
+func (r Run) SuccessfullinterExecution(linter model.LinterResult) Run {
 	r.State = RunStateAwaitingTestResults
 	r.Linter = linter
 
 	return r
-}
-
-func NewTracetestRootSpan(run Run) model.Span {
-	return model.AugmentRootSpan(model.Span{
-		ID:         id.NewRandGenerator().SpanID(),
-		Name:       model.TriggerSpanName,
-		StartTime:  run.ServiceTriggeredAt,
-		EndTime:    run.ServiceTriggerCompletedAt,
-		Attributes: model.Attributes{},
-		Children:   []*model.Span{},
-	}, run.TriggerResult)
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/pkg/timing"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -55,7 +54,7 @@ func TestRunExecutionTime(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			now := test.Now
 			if c.now.Unix() > 0 {
-				timing.Now = func() time.Time {
+				test.Now = func() time.Time {
 					return c.now
 				}
 			}
@@ -112,7 +111,7 @@ func TestRunTriggerTime(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			now := test.Now
 			if c.now.Unix() > 0 {
-				timing.Now = func() time.Time {
+				test.Now = func() time.Time {
 					return c.now
 				}
 			}
