@@ -463,6 +463,7 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 		test.ResourceNamePlural,
 		repository,
 		resourcemanager.WithOperations(operations...),
+
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
