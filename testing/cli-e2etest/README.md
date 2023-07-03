@@ -113,6 +113,19 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `list pollingprofile --output json`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
 | `list pollingprofile --output yaml`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
 
+### Resources: Analyzer
+
+| CLI Command                                           | Test scenarios |
+| ----------------------------------------------------- | -------------- |
+| `apply analyzer -f [analyzer-file]`                     | [ApplyAnalyzer](./testscenarios/analyzer/apply_analyzer_test.go) |
+| `delete analyzer --id current`                          | [DeleteAnalyzer](./testscenarios/analyzer/delete_analyzer_test.go) |
+| `get analyzer --id current --output pretty`             | [GetAnalyzer](./testscenarios/analyzer/get_analyzer_test.go) |
+| `get analyzer --id current --output json`               | [GetAnalyzer](./testscenarios/analyzer/get_analyzer_test.go) |
+| `get analyzer --id current --output yaml`               | [GetAnalyzer](./testscenarios/analyzer/get_analyzer_test.go) |
+| `list analyzer --output pretty`                         | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
+| `list analyzer --output json`                           | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
+| `list analyzer --output yaml`                           | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
+
 ### Resources: Transactions
 
 | CLI Command                                                 | Test scenarios |

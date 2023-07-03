@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 type Repository struct {
@@ -18,8 +18,6 @@ type Repository struct {
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}
 }
-
-var _ resourcemanager.List[Demo] = &Repository{}
 
 func (r *Repository) SetID(demo Demo, id id.ID) Demo {
 	demo.ID = id
@@ -182,30 +180,34 @@ func (r Repository) SortingFields() []string {
 	return []string{"id", "name", "type"}
 }
 
+func listQuery(baseSQL, query string, params []any) (string, []any) {
+	paramNumber := len(params) + 1
+	condition := fmt.Sprintf(" AND (t.name ilike $%d)", paramNumber)
+
+	sql, params := sqlutil.Search(baseSQL, condition, query, params)
+
+	return sql, params
+}
+
 func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Demo, error) {
-	listQuery := baseSelect
+	q, params := listQuery(baseSelect, query, []any{take, skip})
 
-	if sortDirection == "" {
-		sortDirection = "ASC"
+	sortingFields := map[string]string{
+		"id":   "id",
+		"name": "name",
+		"type": "type",
 	}
 
-	if query != "" {
-		listQuery = fmt.Sprintf("%s WHERE %s", listQuery, query)
-	}
+	q = sqlutil.Sort(q, sortBy, sortDirection, "name", sortingFields)
+	q += " LIMIT $1 OFFSET $2"
 
-	if sortBy != "" {
-		listQuery = fmt.Sprintf("%s ORDER BY %s %s", listQuery, sortBy, sortDirection)
+	stmt, err := r.db.Prepare(q)
+	if err != nil {
+		return nil, err
 	}
+	defer stmt.Close()
 
-	if take > 0 {
-		listQuery = fmt.Sprintf("%s LIMIT %d", listQuery, take)
-	}
-
-	if skip > 0 {
-		listQuery = fmt.Sprintf("%s OFFSET %d", listQuery, skip)
-	}
-
-	rows, err := r.db.QueryContext(ctx, listQuery)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return nil, fmt.Errorf("sql query: %w", err)
 	}

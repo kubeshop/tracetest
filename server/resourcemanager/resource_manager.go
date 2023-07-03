@@ -71,6 +71,20 @@ func WithOperations(ops ...Operation) managerOption {
 	}
 }
 
+func DisableDelete() managerOption {
+	return func(c *config) {
+		ops := []Operation{}
+		for _, op := range availableOperations {
+			if op == OperationDelete {
+				continue
+			}
+			ops = append(ops, op)
+		}
+
+		c.enabledOperations = ops
+	}
+}
+
 func WithTracer(tracer trace.Tracer) managerOption {
 	return func(c *config) {
 		c.tracer = tracer
@@ -129,29 +143,41 @@ func (m *manager[T]) RegisterRoutes(r *mux.Router) *mux.Router {
 
 	enabledOps := m.EnabledOperations()
 
+	listHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationList) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.list).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceTypePlural)))
+		listHandler = m.list
 	}
+	m.instrumentRoute(subrouter.HandleFunc("", listHandler).Methods(http.MethodGet).Name(fmt.Sprintf("%s.List", m.resourceTypePlural)))
 
+	createHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationCreate) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.create).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
+		createHandler = m.create
 	}
+	m.instrumentRoute(subrouter.HandleFunc("", createHandler).Methods(http.MethodPost).Name(fmt.Sprintf("%s.Create", m.resourceTypePlural)))
 
-	if slices.Contains(enabledOps, OperationUpsert) {
-		m.instrumentRoute(subrouter.HandleFunc("", m.upsert).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Upsert", m.resourceTypePlural)))
+	upsertHandler := m.methodNotAllowed
+	if slices.Contains(enabledOps, OperationCreate) && slices.Contains(enabledOps, OperationUpdate) {
+		upsertHandler = m.upsert
 	}
+	m.instrumentRoute(subrouter.HandleFunc("", upsertHandler).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Upsert", m.resourceTypePlural)))
 
+	updateHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationUpdate) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.update).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
+		updateHandler = m.update
 	}
+	m.instrumentRoute(subrouter.HandleFunc("/{id}", updateHandler).Methods(http.MethodPut).Name(fmt.Sprintf("%s.Update", m.resourceTypePlural)))
 
+	getHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationGet) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.get).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
+		getHandler = m.get
 	}
+	m.instrumentRoute(subrouter.HandleFunc("/{id}", getHandler).Methods(http.MethodGet).Name(fmt.Sprintf("%s.Get", m.resourceTypePlural)))
 
+	deleteHandler := m.methodNotAllowed
 	if slices.Contains(enabledOps, OperationDelete) {
-		m.instrumentRoute(subrouter.HandleFunc("/{id}", m.delete).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
+		deleteHandler = m.delete
 	}
+	m.instrumentRoute(subrouter.HandleFunc("/{id}", deleteHandler).Methods(http.MethodDelete).Name(fmt.Sprintf("%s.Delete", m.resourceTypePlural)))
 
 	return subrouter
 }
@@ -205,6 +231,9 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 
 	route.Handler(newHandler)
 }
+func (m *manager[T]) methodNotAllowed(w http.ResponseWriter, r *http.Request) {
+	writeError(w, EncoderFromRequest(r), http.StatusMethodNotAllowed, fmt.Errorf("resource %s does not support the action", m.resourceTypeSingular))
+}
 
 func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 	encoder := EncoderFromRequest(r)
@@ -218,11 +247,15 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: if resourceType != values.resourceType return error
 
-	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
+	m.doCreate(w, r, encoder, targetResource.Spec)
+}
+
+func (m *manager[T]) doCreate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
+	if !specs.HasID() {
+		specs = m.rh.SetID(specs, m.config.idgen())
 	}
 
-	created, err := m.rh.Create(r.Context(), targetResource.Spec)
+	created, err := m.rh.Create(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "creating", err, encoder)
 		return
@@ -249,46 +282,27 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// if there's no ID given, create the resource
 	if !targetResource.Spec.HasID() {
-		targetResource.Spec = m.rh.SetID(targetResource.Spec, m.config.idgen())
-	}
-
-	writeResponse := func(status int, spec T) {
-		newResource := Resource[T]{
-			Type: m.resourceTypeSingular,
-			Spec: spec,
-		}
-
-		err = encoder.WriteEncodedResponse(w, status, newResource)
-		if err != nil {
-			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot marshal entity: %w", err))
-		}
+		m.doCreate(w, r, encoder, targetResource.Spec)
+		return
 	}
 
 	_, err = m.rh.Get(r.Context(), targetResource.Spec.GetID())
 	if err != nil {
-		if err == sql.ErrNoRows {
-			created, err := m.rh.Create(r.Context(), targetResource.Spec)
-			if err != nil {
-				writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("cannot create entity: %w", err))
-				return
-			}
-
-			writeResponse(http.StatusCreated, created)
+		// if the given ID is not found, create the resource
+		if errors.Is(err, sql.ErrNoRows) {
+			m.doCreate(w, r, encoder, targetResource.Spec)
 			return
 		} else {
+			// some actual error, return it
 			writeError(w, encoder, http.StatusInternalServerError, fmt.Errorf("could not get entity: %w", err))
 			return
 		}
 	}
 
-	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
-	if err != nil {
-		writeError(w, encoder, http.StatusInternalServerError, err)
-		return
-	}
-
-	writeResponse(http.StatusOK, updated)
+	// the resurce exists, update it
+	m.doUpdate(w, r, encoder, targetResource.Spec)
 }
 
 func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
@@ -312,11 +326,15 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 			urlID,
 		)
 		writeError(w, encoder, http.StatusBadRequest, err)
+		return
 	}
-	// enforce ID from url in targetResource
 	targetResource.Spec = m.rh.SetID(targetResource.Spec, urlID)
 
-	updated, err := m.rh.Update(r.Context(), targetResource.Spec)
+	m.doUpdate(w, r, encoder, targetResource.Spec)
+}
+
+func (m *manager[T]) doUpdate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
+	updated, err := m.rh.Update(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "updating", err, encoder)
 		return
@@ -396,7 +414,7 @@ func (m *manager[T]) list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	listFn := m.rh.List
-	if isRequestForAugmented(r) {
+	if isRequestForAugmented(r) && m.rh.ListAugmented != nil {
 		listFn = m.rh.ListAugmented
 	}
 

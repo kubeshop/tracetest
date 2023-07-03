@@ -12,7 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
-func NewRunRepository(db *sql.DB, stepsRepository stepsRepository) *RunRepository {
+func NewRunRepository(db *sql.DB, stepsRepository transactionStepRunRepository) *RunRepository {
 	return &RunRepository{
 		db:              db,
 		stepsRepository: stepsRepository,
@@ -21,7 +21,7 @@ func NewRunRepository(db *sql.DB, stepsRepository stepsRepository) *RunRepositor
 
 type RunRepository struct {
 	db              *sql.DB
-	stepsRepository stepsRepository
+	stepsRepository transactionStepRunRepository
 }
 
 const createTransactionRunQuery = `
@@ -308,7 +308,7 @@ func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id
 	if err != nil {
 		return TransactionRun{}, err
 	}
-	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run)
+	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run.TransactionID, run.ID)
 	if err != nil {
 		return TransactionRun{}, err
 	}
@@ -325,7 +325,7 @@ func (td *RunRepository) GetLatestRunByTransactionVersion(ctx context.Context, t
 	if err != nil {
 		return TransactionRun{}, err
 	}
-	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run)
+	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run.TransactionID, run.ID)
 	if err != nil {
 		return TransactionRun{}, err
 	}

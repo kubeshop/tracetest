@@ -84,12 +84,13 @@ func TestListDatastore(t *testing.T) {
 		result := tracetestcli.Exec(t, "list datastore --sortBy name --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		dataStoresJSON := helpers.UnmarshalJSON[[]types.DataStoreResource](t, result.StdOut)
+		dataStoresList := helpers.UnmarshalJSON[types.ResourceList[types.DataStoreResource]](t, result.StdOut)
+		require.Len(dataStoresList.Items, 1)
+		require.Equal(len(dataStoresList.Items), dataStoresList.Count)
 
-		require.Len(dataStoresJSON, 1)
-		require.Equal("DataStore", dataStoresJSON[0].Type)
-		require.Equal(env.Name(), dataStoresJSON[0].Spec.Name)
-		require.True(dataStoresJSON[0].Spec.Default)
+		require.Equal("DataStore", dataStoresList.Items[0].Type)
+		require.Equal(env.Name(), dataStoresList.Items[0].Spec.Name)
+		require.True(dataStoresList.Items[0].Spec.Default)
 	})
 
 	t.Run("list with pretty format", func(t *testing.T) {

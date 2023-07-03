@@ -1,4 +1,3 @@
-import {ExclamationCircleFilled} from '@ant-design/icons';
 import {Divider, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -67,10 +66,4 @@ export const AttributesContainer = styled.div<{$top: number}>`
 
 export const SearchContainer = styled.div`
   padding: 0 12px;
-`;
-
-export const LintErrorIcon = styled(ExclamationCircleFilled)`
-  color: ${({theme}) => theme.color.error};
-  position: relative;
-  top: -2px;
 `;

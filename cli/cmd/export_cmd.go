@@ -3,44 +3,56 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/kubeshop/tracetest/cli/parameters"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
 var (
-	exportResourceID   string
-	exportResourceFile string
+	exportParams = &parameters.ExportParams{}
+	exportCmd    *cobra.Command
 )
 
-var exportCmd = &cobra.Command{
-	GroupID: cmdGroupResources.ID,
-	Use:     fmt.Sprintf("export %s", strings.Join(parameters.ValidResources, "|")),
-	Long:    "Export a resource from your Tracetest server",
-	Short:   "Export resource",
-	PreRun:  setupCommand(),
-	Run: WithResultHandler(func(_ *cobra.Command, args []string) (string, error) {
-		resourceType := args[0]
-		ctx := context.Background()
-
-		resourceActions, err := resourceRegistry.Get(resourceType)
-		if err != nil {
-			return "", err
-		}
-
-		err = resourceActions.Export(ctx, exportResourceID, exportResourceFile)
-		if err != nil {
-			return "", err
-		}
-
-		return fmt.Sprintf("✔  Definition exported successfully for resource type: %s", resourceType), nil
-	}),
-	PostRun: teardownCommand,
-}
-
 func init() {
-	exportCmd.Flags().StringVar(&exportResourceID, "id", "", "id of the resource to export")
-	exportCmd.Flags().StringVarP(&exportResourceFile, "file", "f", "resource.yaml", "file path with name where to export the resource")
+	exportCmd = &cobra.Command{
+		GroupID: cmdGroupResources.ID,
+		Use:     "export " + resourceList(),
+		Long:    "Export a resource from your Tracetest server",
+		Short:   "Export resource",
+		PreRun:  setupCommand(),
+		Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
+			resourceType := resourceParams.ResourceName
+			ctx := context.Background()
+
+			resourceClient, err := resources.Get(resourceType)
+			if err != nil {
+				return "", err
+			}
+
+			// export is ALWAYS yaml, so we can hardcode it here
+			resultFormat, err := resourcemanager.Formats.Get("yaml")
+			if err != nil {
+				return "", err
+			}
+
+			result, err := resourceClient.Get(ctx, exportParams.ResourceID, resultFormat)
+			if err != nil {
+				return "", err
+			}
+
+			err = os.WriteFile(exportParams.OutputFile, []byte(result), 0644)
+			if err != nil {
+				return "", fmt.Errorf("could not write file: %w", err)
+			}
+
+			return fmt.Sprintf("✔  Definition exported successfully for resource type: %s", resourceType), nil
+		}, exportParams),
+		PostRun: teardownCommand,
+	}
+
+	exportCmd.Flags().StringVar(&exportParams.ResourceID, "id", "", "id of the resource to export")
+	exportCmd.Flags().StringVarP(&exportParams.OutputFile, "file", "f", "resource.yaml", "file path with name where to export the resource")
 	rootCmd.AddCommand(exportCmd)
 }

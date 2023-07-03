@@ -1,6 +1,6 @@
 # Tracetest + Otel Collector + Azure Application Insights (using Tracetest App Insights direct integration) + Pokeshop
 
-> [Read the detailed recipe for setting up Tracetest + Otel Collector + Azure Application Insights (using Tracetest App Insights direct integration) + Pokeshop in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-with-azure-app-insights-okeshpo)
+> [Read the detailed recipe for setting up Tracetest + Otel Collector + Azure Application Insights (using Tracetest App Insights direct integration) + Pokeshop in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop)
 
 This repository objective is to show how you can configure your Tracetest instance to connect to Azure App Insights and use it as its tracing backend.
 

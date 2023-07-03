@@ -1,13 +1,13 @@
 package mappings
 
 import (
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 // out
 
-func (m OpenAPI) GRPCRequest(in *model.GRPCRequest) openapi.GrpcRequest {
+func (m OpenAPI) GRPCRequest(in *trigger.GRPCRequest) openapi.GrpcRequest {
 	if in == nil {
 		return openapi.GrpcRequest{}
 	}
@@ -23,7 +23,7 @@ func (m OpenAPI) GRPCRequest(in *model.GRPCRequest) openapi.GrpcRequest {
 	}
 }
 
-func (m OpenAPI) GRPCResponse(in *model.GRPCResponse) openapi.GrpcResponse {
+func (m OpenAPI) GRPCResponse(in *trigger.GRPCResponse) openapi.GrpcResponse {
 	if in == nil {
 		return openapi.GrpcResponse{}
 	}
@@ -34,7 +34,7 @@ func (m OpenAPI) GRPCResponse(in *model.GRPCResponse) openapi.GrpcResponse {
 	}
 }
 
-func (m OpenAPI) GRPCMetadata(in []model.GRPCHeader) []openapi.GrpcHeader {
+func (m OpenAPI) GRPCMetadata(in []trigger.GRPCHeader) []openapi.GrpcHeader {
 	headers := make([]openapi.GrpcHeader, len(in))
 	for i, h := range in {
 		headers[i] = openapi.GrpcHeader{Key: h.Key, Value: h.Value}
@@ -45,22 +45,22 @@ func (m OpenAPI) GRPCMetadata(in []model.GRPCHeader) []openapi.GrpcHeader {
 
 //in
 
-func (m Model) GRPCHeaders(in []openapi.GrpcHeader) []model.GRPCHeader {
-	headers := make([]model.GRPCHeader, len(in))
+func (m Model) GRPCHeaders(in []openapi.GrpcHeader) []trigger.GRPCHeader {
+	headers := make([]trigger.GRPCHeader, len(in))
 	for i, h := range in {
-		headers[i] = model.GRPCHeader{Key: h.Key, Value: h.Value}
+		headers[i] = trigger.GRPCHeader{Key: h.Key, Value: h.Value}
 	}
 
 	return headers
 }
 
-func (m Model) GRPCRequest(in openapi.GrpcRequest) *model.GRPCRequest {
+func (m Model) GRPCRequest(in openapi.GrpcRequest) *trigger.GRPCRequest {
 	// ignore unset grpc requests
 	if in.Address == "" {
 		return nil
 	}
 
-	return &model.GRPCRequest{
+	return &trigger.GRPCRequest{
 		ProtobufFile: in.ProtobufFile,
 		Address:      in.Address,
 		Method:       in.Method,
@@ -70,13 +70,13 @@ func (m Model) GRPCRequest(in openapi.GrpcRequest) *model.GRPCRequest {
 	}
 }
 
-func (m Model) GRPCResponse(in openapi.GrpcResponse) *model.GRPCResponse {
+func (m Model) GRPCResponse(in openapi.GrpcResponse) *trigger.GRPCResponse {
 	// ignore unset grcp responses
 	if in.StatusCode == 0 {
 		return nil
 	}
 
-	return &model.GRPCResponse{
+	return &trigger.GRPCResponse{
 		StatusCode: int(in.StatusCode),
 		Metadata:   m.GRPCHeaders(in.Metadata),
 		Body:       in.Body,

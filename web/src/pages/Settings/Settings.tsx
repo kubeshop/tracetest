@@ -3,14 +3,17 @@ import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import DataStoreProvider from 'providers/DataStore';
 import SettingsProvider from 'providers/Settings';
 import Content from './Content';
+import ContactUs from '../../components/ContactUs/ContactUs';
 
 const Settings = () => (
   <Layout hasMenu>
-    <DataStoreProvider>
-      <SettingsProvider>
-        <Content />
-      </SettingsProvider>
-    </DataStoreProvider>
+    <ContactUs>
+      <DataStoreProvider>
+        <SettingsProvider>
+          <Content />
+        </SettingsProvider>
+      </DataStoreProvider>
+    </ContactUs>
   </Layout>
 );
 

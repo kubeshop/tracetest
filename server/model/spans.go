@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -203,15 +204,15 @@ func (span Span) setMetadataAttributes() Span {
 	return span
 }
 
-func (span Span) setTriggerResultAttributes(result TriggerResult) Span {
+func (span Span) setTriggerResultAttributes(result trigger.TriggerResult) Span {
 	switch result.Type {
-	case TriggerTypeHTTP:
+	case trigger.TriggerTypeHTTP:
 		resp := result.HTTP
 		jsonheaders, _ := json.Marshal(resp.Headers)
 		span.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
 		span.Attributes["tracetest.response.body"] = resp.Body
 		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
-	case TriggerTypeGRPC:
+	case trigger.TriggerTypeGRPC:
 		resp := result.GRPC
 		jsonheaders, _ := json.Marshal(resp.Metadata)
 		span.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
@@ -220,21 +221,4 @@ func (span Span) setTriggerResultAttributes(result TriggerResult) Span {
 	}
 
 	return span
-}
-
-func AugmentRootSpan(span Span, result TriggerResult) Span {
-	return span.
-		setMetadataAttributes().
-		setTriggerResultAttributes(result)
-}
-
-func NewTracetestRootSpan(run Run) Span {
-	return AugmentRootSpan(Span{
-		ID:         IDGen.SpanID(),
-		Name:       TriggerSpanName,
-		StartTime:  run.ServiceTriggeredAt,
-		EndTime:    run.ServiceTriggerCompletedAt,
-		Attributes: Attributes{},
-		Children:   []*Span{},
-	}, run.TriggerResult)
 }

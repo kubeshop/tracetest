@@ -58,7 +58,6 @@ func TestEnvironmentRepository(t *testing.T) {
 				environment.ResourceNamePlural,
 				environmentRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
-				resourcemanager.WithOperations(environment.Operations...),
 			)
 			manager.RegisterRoutes(router)
 

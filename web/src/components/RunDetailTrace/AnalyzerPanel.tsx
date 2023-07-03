@@ -1,31 +1,32 @@
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import Trace from 'models/Trace.model';
-import {TPanel, TPanelComponentProps} from '../ResizablePanels/ResizablePanels';
 import AnalyzerResult from '../AnalyzerResult/AnalyzerResult';
 import SkeletonResponse from '../RunDetailTriggerResponse/SkeletonResponse';
-import * as S from './RunDetailTrace.styled';
+import {RightPanel, PanelContainer} from '../ResizablePanels';
 
-type TProps = TPanelComponentProps & {
+interface IProps {
   run: TestRun;
-};
+}
 
-const AnalyzerPanel = ({run, size: {isOpen}}: TProps) => {
-  return isRunStateFinished(run.state) ? (
-    <S.PanelContainer $isOpen={isOpen}>
-      <AnalyzerResult result={run.linter} trace={run?.trace ?? Trace({})} />
-    </S.PanelContainer>
-  ) : (
-    <SkeletonResponse />
-  );
-};
-
-export const getAnalyzerPanel = (run: TestRun): TPanel => ({
+const panel = {
   name: 'ANALYZER',
-  maxSize: 720,
-  minSize: 15,
+  maxSize: 650,
+  minSize: 25,
   isDefaultOpen: true,
-  position: 'right',
-  component: ({size}) => <AnalyzerPanel size={size} run={run} />,
-});
+};
+
+const AnalyzerPanel = ({run}: IProps) => (
+  <RightPanel panel={panel}>
+    {size => (
+      <PanelContainer $isOpen={size.isOpen}>
+        {isRunStateFinished(run.state) ? (
+          <AnalyzerResult result={run.linter} trace={run?.trace ?? Trace({})} />
+        ) : (
+          <SkeletonResponse />
+        )}
+      </PanelContainer>
+    )}
+  </RightPanel>
+);
 
 export default AnalyzerPanel;

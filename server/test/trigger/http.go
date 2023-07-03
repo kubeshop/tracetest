@@ -1,6 +1,7 @@
 package trigger
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
@@ -27,17 +28,45 @@ var (
 )
 
 type HTTPHeader struct {
-	Key   string `expr_enabled:"true"`
-	Value string `expr_enabled:"true"`
+	Key   string `expr_enabled:"true" json:"key,omitempty"`
+	Value string `expr_enabled:"true" json:"value,omitempty"`
 }
 
 type HTTPRequest struct {
 	Method          HTTPMethod         `expr_enabled:"true" json:"method,omitempty"`
-	URL             string             `expr_enabled:"true" json:"url"`
+	URL             string             `expr_enabled:"true" json:"url,omitempty"`
 	Body            string             `expr_enabled:"true" json:"body,omitempty"`
 	Headers         []HTTPHeader       `json:"headers,omitempty"`
 	Auth            *HTTPAuthenticator `json:"auth,omitempty"`
 	SSLVerification bool               `json:"sslVerification,omitempty"`
+}
+
+type request struct {
+	Method          HTTPMethod         `expr_enabled:"true" json:"method,omitempty"`
+	URL             string             `expr_enabled:"true" json:"url,omitempty"`
+	Body            string             `expr_enabled:"true" json:"body,omitempty"`
+	Headers         []HTTPHeader       `json:"headers,omitempty"`
+	Auth            *HTTPAuthenticator `json:"auth,omitempty"`
+	SSLVerification bool               `json:"sslVerification,omitempty"`
+}
+
+func (r *HTTPRequest) UnmarshalJSON(data []byte) error {
+	request := request{}
+	err := json.Unmarshal(data, &request)
+	if err != nil {
+		return err
+	}
+
+	r.Method = request.Method
+	r.URL = request.URL
+	r.Body = request.Body
+	r.Headers = request.Headers
+	r.SSLVerification = request.SSLVerification
+	if request.Auth != nil && request.Auth.Type != "" {
+		r.Auth = request.Auth
+	}
+
+	return nil
 }
 
 func (a HTTPRequest) Authenticate(req *http.Request) {
@@ -56,10 +85,40 @@ type HTTPResponse struct {
 }
 
 type HTTPAuthenticator struct {
-	Type   string              `json:"type,omitempty" expr_enabled:"true"`
-	APIKey APIKeyAuthenticator `json:"apiKey,omitempty"`
-	Basic  BasicAuthenticator  `json:"basic,omitempty"`
-	Bearer BearerAuthenticator `json:"bearer,omitempty"`
+	Type   string               `json:"type,omitempty" expr_enabled:"true"`
+	APIKey *APIKeyAuthenticator `json:"apiKey,omitempty"`
+	Basic  *BasicAuthenticator  `json:"basic,omitempty"`
+	Bearer *BearerAuthenticator `json:"bearer,omitempty"`
+}
+
+type auth struct {
+	Type   string               `json:"type,omitempty" expr_enabled:"true"`
+	APIKey *APIKeyAuthenticator `json:"apiKey,omitempty"`
+	Basic  *BasicAuthenticator  `json:"basic,omitempty"`
+	Bearer *BearerAuthenticator `json:"bearer,omitempty"`
+}
+
+func (a *HTTPAuthenticator) UnmarshalJSON(data []byte) error {
+	auth := auth{}
+	err := json.Unmarshal(data, &auth)
+	if err != nil {
+		return err
+	}
+
+	a.Type = auth.Type
+	if auth.Type == "apiKey" {
+		a.APIKey = auth.APIKey
+	}
+
+	if auth.Type == "basic" {
+		a.Basic = auth.Basic
+	}
+
+	if auth.Type == "bearer" {
+		a.Bearer = auth.Bearer
+	}
+
+	return nil
 }
 
 func (a HTTPAuthenticator) Map(mapFn func(current string) (string, error)) (HTTPAuthenticator, error) {

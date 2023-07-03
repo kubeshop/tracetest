@@ -9,15 +9,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 )
-
-var Operations = []resourcemanager.Operation{
-	resourcemanager.OperationGet,
-	resourcemanager.OperationUpdate,
-	resourcemanager.OperationDelete,
-	resourcemanager.OperationList,
-}
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}
@@ -69,6 +61,11 @@ func (r *Repository) getCreatedAt(ctx context.Context, dataStore DataStore) (str
 
 	// record found, return old date
 	return oldDataStore.CreatedAt, nil
+}
+
+func (r *Repository) Create(ctx context.Context, updated DataStore) (DataStore, error) {
+	updated.ID = dataStoreSingleID
+	return r.Update(ctx, updated)
 }
 
 func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore, error) {

@@ -150,9 +150,6 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	transactionsRepository := transaction.NewRepository(db, testDB)
-	transactionRunRepository := transaction.NewRunRepository(db, testDB)
-
 	subscriptionManager := subscription.NewManager()
 	app.subscribeToConfigChanges(subscriptionManager)
 
@@ -200,15 +197,21 @@ func (app *App) Start(opts ...appOption) error {
 	environmentRepo := environment.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
+	runRepo := test.NewRunRepository(db)
+
+	transactionsRepository := transaction.NewRepository(db, testRepo)
+	transactionRunRepository := transaction.NewRunRepository(db, runRepo)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
-	registerOtlpServer(app, testDB, eventEmitter, dataStoreRepo)
+	registerOtlpServer(app, runRepo, eventEmitter, dataStoreRepo)
 
 	rf := newRunnerFacades(
 		pollingProfileRepo,
 		dataStoreRepo,
 		linterRepo,
 		testDB,
+		testRepo,
+		runRepo,
 		transactionRunRepository,
 		applicationTracer,
 		tracer,
@@ -248,7 +251,17 @@ func (app *App) Start(opts ...appOption) error {
 
 	provisioner := provisioning.New()
 
-	router, mappers := controller(app.cfg, testDB, transactionsRepository, transactionRunRepository, tracer, environmentRepo, rf, triggerRegistry)
+	router, mappers := controller(app.cfg,
+		testDB,
+		transactionsRepository,
+		transactionRunRepository,
+		testRepo,
+		runRepo,
+		tracer,
+		environmentRepo,
+		rf,
+		triggerRegistry,
+	)
 	registerWSHandler(router, mappers, subscriptionManager)
 
 	// use the analytics middleware on complete router
@@ -338,8 +351,8 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, testDB model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) {
-	ingester := otlp.NewIngester(testDB, eventEmitter, dsRepo)
+func registerOtlpServer(app *App, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) {
+	ingester := otlp.NewIngester(runRepository, eventEmitter, dsRepo)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
@@ -359,7 +372,7 @@ func registerAnalyzer(linterRepo *analyzer.Repository, router *mux.Router, provi
 		analyzer.ResourceName,
 		analyzer.ResourceNamePlural,
 		linterRepo,
-		resourcemanager.WithOperations(analyzer.Operations...),
+		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -383,7 +396,7 @@ func registerConfigResource(configRepo *config.Repository, router *mux.Router, p
 		config.ResourceName,
 		config.ResourceNamePlural,
 		configRepo,
-		resourcemanager.WithOperations(config.Operations...),
+		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -395,7 +408,7 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 		pollingprofile.ResourceName,
 		pollingprofile.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(pollingprofile.Operations...),
+		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -407,7 +420,6 @@ func registerEnvironmentResource(repository *environment.Repository, router *mux
 		environment.ResourceName,
 		environment.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(environment.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -419,7 +431,6 @@ func registerDemosResource(repository *demo.Repository, router *mux.Router, prov
 		demo.ResourceName,
 		demo.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(demo.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -431,7 +442,6 @@ func registerDataStoreResource(repository *datastore.Repository, router *mux.Rou
 		datastore.ResourceName,
 		datastore.ResourceNamePlural,
 		repository,
-		resourcemanager.WithOperations(datastore.Operations...),
 		resourcemanager.WithTracer(tracer),
 	)
 	manager.RegisterRoutes(router)
@@ -444,6 +454,8 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 		// TODO: replace it with the option `resourcemanager.CanBeAugmented()`
 		// once we have the `resourcemanager.OperationGet` operation.
 		resourcemanager.OperationListAugmented,
+		resourcemanager.OperationGet,
+		resourcemanager.OperationGetAugmented,
 	}
 
 	manager := resourcemanager.New[test.Test](
@@ -487,14 +499,28 @@ func controller(
 	testDB model.Repository,
 	transactionRepository *transaction.Repository,
 	transactionRunRepository *transaction.RunRepository,
+	testRepository test.Repository,
+	runRepository test.RunRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	triggerRegistry *trigger.Registry,
 ) (*mux.Router, mappings.Mappings) {
-	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry(), testDB)
+	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry())
 
-	router := openapi.NewRouter(httpRouter(cfg, testDB, transactionRepository, transactionRunRepository, tracer, environmentRepo, rf, mappers, triggerRegistry))
+	router := openapi.NewRouter(httpRouter(
+		cfg,
+		testDB,
+		transactionRepository,
+		transactionRunRepository,
+		testRepository,
+		runRepository,
+		tracer,
+		environmentRepo,
+		rf,
+		mappers,
+		triggerRegistry,
+	))
 
 	return router, mappers
 }
@@ -504,13 +530,28 @@ func httpRouter(
 	testDB model.Repository,
 	transactionRepo *transaction.Repository,
 	transactionRunRepo *transaction.RunRepository,
+	testRepo test.Repository,
+	testRunRepo test.RunRepository,
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
 	triggerRegistry *trigger.Registry,
 ) openapi.Router {
-	controller := httpServer.NewController(testDB, transactionRepo, transactionRunRepo, tracedb.Factory(testDB), rf, mappers, environmentRepo, triggerRegistry, tracer, Version)
+	controller := httpServer.NewController(
+		testDB,
+		transactionRepo,
+		transactionRunRepo,
+		testRepo,
+		testRunRepo,
+		tracedb.Factory(testRunRepo),
+		rf,
+		mappers,
+		environmentRepo,
+		triggerRegistry,
+		tracer,
+		Version,
+	)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
 	httpRouter := customController

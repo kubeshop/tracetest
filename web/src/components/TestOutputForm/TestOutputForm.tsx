@@ -70,7 +70,7 @@ const TestOutputForm = ({
         onFinish={values => onSubmit(values, spanIdList[0])}
         onValuesChange={onValidate}
       >
-        <Form.Item name="spanId" />
+        <Form.Item hidden name="spanId" />
         <S.FormSection>
           <S.FormSectionHeaderSelector>
             <S.FormSectionRow1>

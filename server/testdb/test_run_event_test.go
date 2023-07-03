@@ -5,18 +5,24 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRunEvents(t *testing.T) {
-	db, clean := getDB()
-	defer clean()
+	rawDB := testmock.GetRawTestingDatabase()
+	db := testmock.GetTestingDatabaseFromRawDB(rawDB)
+	defer rawDB.Close()
 
-	test1 := createTestWithName(t, db, "test 1")
+	testRepo := test.NewRepository(rawDB)
+	testRunRepo := test.NewRunRepository(rawDB)
 
-	run1 := createRun(t, db, test1)
-	run2 := createRun(t, db, test1)
+	test1 := createTestWithName(t, testRepo, "test 1")
+
+	run1 := createRun(t, testRunRepo, test1)
+	run2 := createRun(t, testRunRepo, test1)
 
 	events := []model.TestRunEvent{
 		{TestID: test1.ID, RunID: run1.ID, Type: "EVENT_1", Stage: model.StageTrigger, Title: "OP 1", Description: "This happened"},

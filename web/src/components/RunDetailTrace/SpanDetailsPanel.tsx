@@ -1,19 +1,24 @@
 import {useNavigate} from 'react-router-dom';
 import {useCallback} from 'react';
 import {useAppSelector} from 'redux/hooks';
-import TraceSelectors from 'selectors/Trace.selectors';
+import SpanDetail, {TraceAttributeRow, TraceSubHeader} from 'components/SpanDetail';
 import TestRun from 'models/TestRun.model';
 import SpanSelectors from 'selectors/Span.selectors';
-import {TPanel, TPanelComponentProps} from '../ResizablePanels/ResizablePanels';
-import SpanDetail from '../SpanDetail/SpanDetail';
-import * as S from './RunDetailTrace.styled';
+import TraceSelectors from 'selectors/Trace.selectors';
+import {LeftPanel, PanelContainer} from '../ResizablePanels';
 
-type TProps = TPanelComponentProps & {
+interface IProps {
   run: TestRun;
   testId: string;
+}
+
+const panel = {
+  name: 'SPAN_DETAILS',
+  minSize: 25,
+  maxSize: 320,
 };
 
-const SpanDetailsPanel = ({size: {isOpen}, run, testId}: TProps) => {
+const SpanDetailsPanel = ({run, testId}: IProps) => {
   const searchText = useAppSelector(TraceSelectors.selectSearchText);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const navigate = useNavigate();
@@ -24,18 +29,23 @@ const SpanDetailsPanel = ({size: {isOpen}, run, testId}: TProps) => {
   }, [navigate, run.id, testId]);
 
   return (
-    <S.PanelContainer $isOpen={isOpen}>
-      <SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />
-    </S.PanelContainer>
+    <LeftPanel
+      panel={panel}
+      tooltip="A certain span contains an attribute and this attribute has a specific value. You can check it here."
+    >
+      {size => (
+        <PanelContainer $isOpen={size.isOpen}>
+          <SpanDetail
+            onCreateTestSpec={handleOnCreateSpec}
+            searchText={searchText}
+            span={span}
+            AttributeRowComponent={TraceAttributeRow}
+            SubHeaderComponent={TraceSubHeader}
+          />
+        </PanelContainer>
+      )}
+    </LeftPanel>
   );
 };
-
-export const getSpanDetailsPanel = (testId: string, run: TestRun): TPanel => ({
-  name: 'SPAN_DETAILS',
-  minSize: 15,
-  maxSize: 320,
-  position: 'left',
-  component: props => <SpanDetailsPanel {...props} testId={testId} run={run} />,
-});
 
 export default SpanDetailsPanel;

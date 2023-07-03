@@ -19,9 +19,10 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [Grafana Tempo](./connecting-to-data-stores/tempo)
 - [Lightstep](./connecting-to-data-stores/lightstep)
 - [New Relic](./connecting-to-data-stores/new-relic)
-- [AWS X-Ray](./connecting-to-data-stores/awsxray.md)
+- [AWS X-Ray](./connecting-to-data-stores/awsxray.md)3
 - [Datadog](./connecting-to-data-stores/datadog)
 - [Honeycomb](./connecting-to-data-stores/honeycomb.md)
+- [Azure App Insights](./connecting-to-data-stores/azure-app-insights.md)
 
 Continue reading below to learn how to configure the OpenTelemetry Collector to send trace data from your application to any of the trace data stores above.
 
@@ -217,4 +218,32 @@ service:
       receivers: [otlp] # your receiver
       processors: [batch] # make sure to have the probabilistic_sampler before your batch processor
       exporters: [otlp/2] # your exporter pointing to your Tempo instance
+```
+
+## Configure OpenTelemetry Collector to Send Traces to Azure App Insights
+
+You'll configure the OpenTelemetry Collector to receive traces from your system and then send them to Azure App Insights. And, you don't have to change your existing pipelines to do so.
+
+In your OpenTelemetry Collector config file, make sure to set the `exporter` to `azuremonitor`, with the `endpoint` instrumentation key of your Azure App Insights instance.
+
+```yaml
+# collector.config.yaml
+
+# If you already have receivers declared, you can just ignore
+# this one and still use yours instead.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  azuremonitor:
+    instrumentation_key: <your-instrumentation-key>
+
+service:
+  pipelines:
+    traces/appinsights:
+      receivers: [otlp] # your receiver
+      exporters: [azuremonitor] # your exporter pointing to your Azure App Insights instance
 ```

@@ -352,19 +352,18 @@ paths:
   /tests/{testId}:
     get:
       tags:
-        - api
+        - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "get test"
       description: "get test"
-      operationId: getTest
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/TestResource"
         500:
           description: "problem with getting a test"
     put:

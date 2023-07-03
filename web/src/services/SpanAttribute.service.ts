@@ -1,14 +1,14 @@
+import {isEmpty, remove} from 'lodash';
 import {
   OtelReference,
   OtelReferenceModel,
 } from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {SelectorAttributesBlackList, SelectorAttributesWhiteList} from 'constants/Span.constants';
 import {Attributes, TraceTestAttributes} from 'constants/SpanAttribute.constants';
-import {isEmpty, remove} from 'lodash';
+import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
+import {TTestSpecSummary} from 'types/TestRun.types';
 import {getObjectIncludesText, isJson} from 'utils/Common';
-import {TResultAssertions, TResultAssertionsSummary} from 'types/Assertion.types';
-import TestOutput from 'models/TestOutput.model';
 
 const flatAttributes = Object.values(Attributes);
 const flatTraceTestAttributes = Object.values(TraceTestAttributes);
@@ -85,29 +85,22 @@ const SpanAttributeService = () => ({
     });
   },
 
-  getAttributeAssertionResults(attrName: string, assertions: TResultAssertions): TResultAssertionsSummary {
-    const resultList = Object.entries(assertions).reduce<TResultAssertionsSummary>(
-      ({failed: prevFailed, passed: prevPassed}, [assertionString, {failed, passed}]) => {
-        const itMatches = assertionString.toLowerCase().includes(attrName.toLowerCase());
+  getAttributeTestSpecs(
+    attributeName: string,
+    testSpecs: TTestSpecSummary = {failed: [], passed: []}
+  ): TTestSpecSummary {
+    const {failed, passed} = testSpecs;
+    const lowerCaseAttributeName = attributeName.toLowerCase();
 
-        return itMatches
-          ? {
-              failed: prevFailed.concat(failed),
-              passed: prevPassed.concat(passed),
-            }
-          : {failed: prevFailed, passed: prevPassed};
-      },
-      {
-        failed: [],
-        passed: [],
-      }
-    );
-
-    return resultList;
+    return {
+      failed: failed.filter(({assertion}) => assertion.toLowerCase().includes(lowerCaseAttributeName)),
+      passed: passed.filter(({assertion}) => assertion.toLowerCase().includes(lowerCaseAttributeName)),
+    };
   },
 
-  getOutputsFromAttributeName(attributeName: string, outputs: TestOutput[]): TestOutput[] {
-    return outputs.filter(({value}) => value.toLowerCase().includes(attributeName.toLowerCase()));
+  getAttributeTestOutputs(attributeName: string, testOutputs: TestRunOutput[] = []): TestRunOutput[] {
+    const lowerCaseAttributeName = attributeName.toLowerCase();
+    return testOutputs.filter(({name}) => name.toLowerCase().includes(lowerCaseAttributeName));
   },
 });
 

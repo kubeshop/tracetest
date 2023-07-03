@@ -416,6 +416,20 @@ func (s *ResourceApiApiService) ListPollingProfile(ctx context.Context, take int
 	return Response(http.StatusNotImplemented, nil), errors.New("ListPollingProfile method not implemented")
 }
 
+// TestsTestIdGet - get test
+func (s *ResourceApiApiService) TestsTestIdGet(ctx context.Context, testId string) (ImplResponse, error) {
+	// TODO - update TestsTestIdGet with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, TestResource{}) or use other options such as http.Ok ...
+	//return Response(200, TestResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestIdGet method not implemented")
+}
+
 // UpdateConfiguration - Update Tracetest configuration
 func (s *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configId string, configurationResource ConfigurationResource) (ImplResponse, error) {
 	// TODO - update UpdateConfiguration with the required logic for this service method.

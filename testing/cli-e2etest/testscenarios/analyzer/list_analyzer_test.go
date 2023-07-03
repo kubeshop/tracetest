@@ -92,15 +92,15 @@ func TestListAnalyzer(t *testing.T) {
 		result := tracetestcli.Exec(t, "list analyzer --sortBy name --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		analyzerYAML := helpers.UnmarshalJSON[[]types.AnalyzerResource](t, result.StdOut)
+		analyzerList := helpers.UnmarshalJSON[types.ResourceList[types.AnalyzerResource]](t, result.StdOut)
+		require.Len(analyzerList.Items, 1)
 
-		require.Len(analyzerYAML, 1)
-		require.Equal("Analyzer", analyzerYAML[0].Type)
-		require.Equal("current", analyzerYAML[0].Spec.Id)
-		require.Equal("analyzer", analyzerYAML[0].Spec.Name)
-		require.True(analyzerYAML[0].Spec.Enabled)
-		require.Equal(analyzerYAML[0].Spec.MinimumScore, 95)
-		require.Len(analyzerYAML[0].Spec.Plugins, 3)
+		require.Equal("Analyzer", analyzerList.Items[0].Type)
+		require.Equal("current", analyzerList.Items[0].Spec.Id)
+		require.Equal("analyzer", analyzerList.Items[0].Spec.Name)
+		require.True(analyzerList.Items[0].Spec.Enabled)
+		require.Equal(analyzerList.Items[0].Spec.MinimumScore, 95)
+		require.Len(analyzerList.Items[0].Spec.Plugins, 3)
 	})
 
 	t.Run("list with pretty format", func(t *testing.T) {

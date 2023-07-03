@@ -12,7 +12,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -27,23 +28,23 @@ func GRPC() Triggerer {
 
 type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
+func (te *grpcTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
-		Result: model.TriggerResult{
+		Result: trigger.TriggerResult{
 			Type: te.Type(),
 		},
 	}
 
-	trigger := test.ServiceUnderTest
-	if trigger.Type != model.TriggerTypeGRPC {
-		return response, fmt.Errorf(`trigger type "%s" not supported by GRPC triggerer`, trigger.Type)
+	triggerObj := test.Trigger
+	if triggerObj.Type != trigger.TriggerTypeGRPC {
+		return response, fmt.Errorf(`trigger type "%s" not supported by GRPC triggerer`, triggerObj.Type)
 	}
 
-	if trigger.GRPC == nil {
+	if triggerObj.GRPC == nil {
 		return response, fmt.Errorf("no settings provided for GRPC triggerer")
 	}
 
-	tReq := trigger.GRPC
+	tReq := triggerObj.GRPC
 
 	conn, err := te.dial(ctx, tReq.Address)
 	if err != nil {
@@ -85,7 +86,7 @@ func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 		return response, err
 	}
 
-	response.Result.GRPC = &model.GRPCResponse{
+	response.Result.GRPC = &trigger.GRPCResponse{
 		Metadata:   mapHeaders(h.respMD),
 		StatusCode: int(h.respCode),
 		Status:     h.respCode.String(),
@@ -100,12 +101,12 @@ func (te *grpcTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 	return response, nil
 }
 
-func (t *grpcTriggerer) Type() model.TriggerType {
-	return model.TriggerTypeGRPC
+func (t *grpcTriggerer) Type() trigger.TriggerType {
+	return trigger.TriggerTypeGRPC
 }
 
-func (t *grpcTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
-	grpc := test.ServiceUnderTest.GRPC
+func (t *grpcTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+	grpc := test.Trigger.GRPC
 
 	if grpc == nil {
 		return test, fmt.Errorf("no settings provided for GRPC triggerer")
@@ -178,11 +179,11 @@ func protoDescription(content string) (grpcurl.DescriptorSource, error) {
 
 }
 
-func mapHeaders(md metadata.MD) []model.GRPCHeader {
-	var mappedHeaders []model.GRPCHeader
+func mapHeaders(md metadata.MD) []trigger.GRPCHeader {
+	var mappedHeaders []trigger.GRPCHeader
 	for key, headers := range md {
 		for _, val := range headers {
-			val := model.GRPCHeader{
+			val := trigger.GRPCHeader{
 				Key:   key,
 				Value: val,
 			}

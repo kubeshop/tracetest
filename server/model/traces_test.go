@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -178,7 +179,7 @@ func TestTriggerSpanShouldBeRootWhenTemporaryRootExistsToo(t *testing.T) {
 
 func newSpan(name string, parent *model.Span) model.Span {
 	span := model.Span{
-		ID:         model.IDGen.SpanID(),
+		ID:         id.NewRandGenerator().SpanID(),
 		Name:       name,
 		Parent:     parent,
 		Attributes: make(model.Attributes),
@@ -194,7 +195,7 @@ func newSpan(name string, parent *model.Span) model.Span {
 }
 
 func newOtelSpan(name string, parent *v1.Span) *v1.Span {
-	id := model.IDGen.SpanID()
+	id := id.NewRandGenerator().SpanID()
 	var parentId []byte = nil
 	if parent != nil {
 		parentId = parent.SpanId

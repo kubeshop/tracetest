@@ -10,9 +10,9 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/propagation"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -21,7 +21,7 @@ import (
 const PollingRequestStartIteration = 1
 
 type TracePoller interface {
-	Poll(context.Context, model.Test, model.Run, pollingprofile.PollingProfile)
+	Poll(context.Context, test.Test, test.Run, pollingprofile.PollingProfile)
 }
 
 type PersistentTracePoller interface {
@@ -30,7 +30,7 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(*PollingRequest) (bool, string, model.Run, error)
+	ExecuteRequest(*PollingRequest) (bool, string, test.Run, error)
 }
 
 type TraceFetcher interface {
@@ -74,8 +74,8 @@ type tracePoller struct {
 }
 
 type PollingRequest struct {
-	test           model.Test
-	run            model.Run
+	test           test.Test
+	run            test.Run
 	pollingProfile pollingprofile.PollingProfile
 	count          int
 	headers        map[string]string
@@ -122,7 +122,7 @@ func (pr PollingRequest) IsFirstRequest() bool {
 	return !pr.HeaderBool("requeued")
 }
 
-func NewPollingRequest(ctx context.Context, test model.Test, run model.Run, count int, pollingProfile pollingprofile.PollingProfile) *PollingRequest {
+func NewPollingRequest(ctx context.Context, test test.Test, run test.Run, count int, pollingProfile pollingprofile.PollingProfile) *PollingRequest {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
 
 	request := &PollingRequest{
@@ -167,7 +167,7 @@ func (tp tracePoller) Stop() {
 	tp.exit <- true
 }
 
-func (tp tracePoller) Poll(ctx context.Context, test model.Test, run model.Run, pollingProfile pollingprofile.PollingProfile) {
+func (tp tracePoller) Poll(ctx context.Context, test test.Test, run test.Run, pollingProfile pollingprofile.PollingProfile) {
 	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
 
 	job := NewPollingRequest(ctx, test, run, PollingRequestStartIteration, pollingProfile)

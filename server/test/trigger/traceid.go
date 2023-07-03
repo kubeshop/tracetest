@@ -3,7 +3,7 @@ package trigger
 const TriggerTypeTraceID TriggerType = "traceid"
 
 type TraceIDRequest struct {
-	ID string `expr_enabled:"true"`
+	ID string `json:"id,omitempty" expr_enabled:"true"`
 }
 
 type TraceIDResponse struct {

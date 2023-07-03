@@ -4,7 +4,6 @@ spec:
   name: jaeger
   type: jaeger
   default: true
-  createdAt: 2023-05-09T18:22:34.840021Z
   jaeger:
     endpoint: jaeger:16685
     tls:

@@ -52,7 +52,19 @@ export interface paths {
   };
   "/tests/{testId}": {
     /** get test */
-    get: operations["getTest"];
+    get: {
+      parameters: {};
+      responses: {
+        /** successful operation */
+        200: {
+          content: {
+            "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+          };
+        };
+        /** problem with getting a test */
+        500: unknown;
+      };
+    };
     /** update test action */
     put: operations["updateTest"];
     /** delete a test */
@@ -461,20 +473,6 @@ export interface operations {
       content: {
         "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
       };
-    };
-  };
-  /** get test */
-  getTest: {
-    parameters: {};
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-      /** problem with getting a test */
-      500: unknown;
     };
   };
   /** update test action */

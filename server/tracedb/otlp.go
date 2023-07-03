@@ -5,16 +5,17 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type OTLPTraceDB struct {
 	realTraceDB
-	db model.RunRepository
+	db test.RunRepository
 }
 
-func newCollectorDB(repository model.RunRepository) (TraceDB, error) {
+func newCollectorDB(repository test.RunRepository) (TraceDB, error) {
 	return &OTLPTraceDB{
 		db: repository,
 	}, nil

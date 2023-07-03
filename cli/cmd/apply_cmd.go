@@ -2,12 +2,9 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
-	"github.com/kubeshop/tracetest/cli/actions"
-	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/parameters"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
@@ -15,33 +12,25 @@ var applyParams = &parameters.ApplyParams{}
 
 var applyCmd = &cobra.Command{
 	GroupID: cmdGroupResources.ID,
-	Use:     fmt.Sprintf("apply %s", strings.Join(parameters.ValidResources, "|")),
+	Use:     "apply " + resourceList(),
 	Short:   "Apply resources",
 	Long:    "Apply (create/update) resources to your Tracetest server",
 	PreRun:  setupCommand(),
 	Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
-		resourceType := args[0]
+		resourceType := resourceParams.ResourceName
 		ctx := context.Background()
 
-		resourceActions, err := resourceRegistry.Get(resourceType)
-
+		resourceClient, err := resources.Get(resourceType)
 		if err != nil {
 			return "", err
 		}
 
-		applyArgs := actions.ApplyArgs{
-			File: applyParams.DefinitionFile,
-		}
-
-		resource, _, err := resourceActions.Apply(ctx, applyArgs)
+		resultFormat, err := resourcemanager.Formats.GetWithFallback(output, "yaml")
 		if err != nil {
 			return "", err
 		}
 
-		resourceFormatter := resourceActions.Formatter()
-		formatter := formatters.BuildFormatter(output, formatters.YAML, resourceFormatter)
-
-		result, err := formatter.Format(resource)
+		result, err := resourceClient.Apply(ctx, applyParams.DefinitionFile, resultFormat)
 		if err != nil {
 			return "", err
 		}
@@ -52,6 +41,6 @@ var applyCmd = &cobra.Command{
 }
 
 func init() {
-	applyCmd.Flags().StringVarP(&applyParams.DefinitionFile, "file", "f", "", "file path with name where to export the resource")
+	applyCmd.Flags().StringVarP(&applyParams.DefinitionFile, "file", "f", "", "path to the definition file")
 	rootCmd.AddCommand(applyCmd)
 }

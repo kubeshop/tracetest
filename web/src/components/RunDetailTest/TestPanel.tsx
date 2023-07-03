@@ -23,7 +23,7 @@ import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
-import {TPanel} from '../ResizablePanels/ResizablePanels';
+import {FillPanel} from '../ResizablePanels';
 
 const TABS = {
   SPECS: 'specs',
@@ -109,130 +109,125 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
   );
 
   return (
-    <S.Container>
-      <S.SectionLeft>
-        <S.SwitchContainer>
-          {run.state === TestState.FINISHED && (
-            <Switch
-              onChange={type => {
-                TestRunAnalytics.onSwitchDiagramView(type);
-                setVisualizationType(type);
+    <FillPanel>
+      <S.Container>
+        <S.SectionLeft>
+          <S.SwitchContainer>
+            {run.state === TestState.FINISHED && (
+              <Switch
+                onChange={type => {
+                  TestRunAnalytics.onSwitchDiagramView(type);
+                  setVisualizationType(type);
+                }}
+                type={visualizationType}
+              />
+            )}
+          </S.SwitchContainer>
+
+          <Visualization
+            runEvents={runEvents}
+            runState={run.state}
+            spans={run?.trace?.spans ?? []}
+            type={visualizationType}
+          />
+        </S.SectionLeft>
+
+        <S.SectionRight $shouldScroll={!selectedTestSpec}>
+          {isTestSpecFormOpen && (
+            <TestSpecForm
+              onSubmit={values => {
+                setSelectorSuggestions([]);
+                setPrevSelector('');
+                onSubmit(values);
               }}
-              type={visualizationType}
+              isValid={isValid}
+              onIsValid={onIsValid}
+              runId={run.id}
+              testId={testId}
+              {...formProps}
+              onCancel={() => {
+                setSelectorSuggestions([]);
+                setPrevSelector('');
+                close();
+              }}
+              onClearSelectorSuggestions={() => {
+                setSelectorSuggestions([]);
+              }}
+              onClickPrevSelector={prevSelector => {
+                setPrevSelector(prevSelector);
+              }}
             />
           )}
-        </S.SwitchContainer>
 
-        <Visualization
-          runEvents={runEvents}
-          runState={run.state}
-          spans={run?.trace?.spans ?? []}
-          type={visualizationType}
-        />
-      </S.SectionLeft>
-
-      <S.SectionRight $shouldScroll={!selectedTestSpec}>
-        {isTestSpecFormOpen && (
-          <TestSpecForm
-            onSubmit={values => {
-              setSelectorSuggestions([]);
-              setPrevSelector('');
-              onSubmit(values);
-            }}
-            isValid={isValid}
-            onIsValid={onIsValid}
-            runId={run.id}
-            testId={testId}
-            {...formProps}
-            onCancel={() => {
-              setSelectorSuggestions([]);
-              setPrevSelector('');
-              close();
-            }}
-            onClearSelectorSuggestions={() => {
-              setSelectorSuggestions([]);
-            }}
-            onClickPrevSelector={prevSelector => {
-              setPrevSelector(prevSelector);
-            }}
-          />
-        )}
-
-        {isTestOutputFormOpen && (
-          <TestOutputForm
-            isEditing={isEditing}
-            isLoading={isLoading}
-            onCancel={onClose}
-            onSubmit={onSubmitTestOutput}
-            output={output}
-            runId={run.id}
-            testId={testId}
-            isValid={isOutputFormValid}
-            onValidate={onValidate}
-          />
-        )}
-
-        {!isTestSpecFormOpen && !isTestOutputFormOpen && (
-          <S.TabsContainer>
-            <Tabs
-              activeKey={query.get('tab') || TABS.SPECS}
-              defaultActiveKey={query.get('tab') || TABS.SPECS}
-              onChange={tab =>
-                updateQuery(
-                  selectedSpan
-                    ? [
-                        ['selectedSpan', selectedSpan.id],
-                        ['tab', tab],
-                      ]
-                    : [['tab', tab]]
-                )
-              }
-              size="small"
-            >
-              <Tabs.TabPane
-                key={TABS.SPECS}
-                tab={
-                  <>
-                    Test Specs <S.CountBadge count={specs.length} />
-                  </>
-                }
-              >
-                <TestResults onDelete={handleDelete} onEdit={handleEdit} onRevert={handleRevert} />
-              </Tabs.TabPane>
-              <Tabs.TabPane
-                key={TABS.OUTPUTS}
-                tab={
-                  <>
-                    Test Outputs <S.CountBadge data-cy="output-count-badge" count={outputs.length} />
-                  </>
-                }
-              >
-                <TestOutputs outputs={outputs} />
-              </Tabs.TabPane>
-            </Tabs>
-
-            <TestSpecDetail
-              isOpen={Boolean(selectedTestSpec)}
-              onClose={handleClose}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-              onRevert={handleRevert}
-              onSelectSpan={handleSelectSpan}
-              selectedSpan={selectedSpan?.id}
-              testSpec={selectedTestSpec}
+          {isTestOutputFormOpen && (
+            <TestOutputForm
+              isEditing={isEditing}
+              isLoading={isLoading}
+              onCancel={onClose}
+              onSubmit={onSubmitTestOutput}
+              output={output}
+              runId={run.id}
+              testId={testId}
+              isValid={isOutputFormValid}
+              onValidate={onValidate}
             />
-          </S.TabsContainer>
-        )}
-      </S.SectionRight>
-    </S.Container>
+          )}
+
+          {!isTestSpecFormOpen && !isTestOutputFormOpen && (
+            <S.TabsContainer>
+              <Tabs
+                activeKey={query.get('tab') || TABS.SPECS}
+                defaultActiveKey={query.get('tab') || TABS.SPECS}
+                onChange={tab =>
+                  updateQuery(
+                    selectedSpan
+                      ? [
+                          ['selectedSpan', selectedSpan.id],
+                          ['tab', tab],
+                        ]
+                      : [['tab', tab]]
+                  )
+                }
+                size="small"
+              >
+                <Tabs.TabPane
+                  key={TABS.SPECS}
+                  tab={
+                    <>
+                      Test Specs <S.CountBadge count={specs.length} />
+                    </>
+                  }
+                >
+                  <TestResults onDelete={handleDelete} onEdit={handleEdit} onRevert={handleRevert} />
+                </Tabs.TabPane>
+                <Tabs.TabPane
+                  key={TABS.OUTPUTS}
+                  tab={
+                    <>
+                      Test Outputs <S.CountBadge data-cy="output-count-badge" count={outputs.length} />
+                    </>
+                  }
+                >
+                  <TestOutputs outputs={outputs} />
+                </Tabs.TabPane>
+              </Tabs>
+
+              <TestSpecDetail
+                isOpen={Boolean(selectedTestSpec)}
+                onClose={handleClose}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+                onRevert={handleRevert}
+                onSelectSpan={handleSelectSpan}
+                selectedSpan={selectedSpan?.id}
+                testSpec={selectedTestSpec}
+              />
+            </S.TabsContainer>
+          )}
+        </S.SectionRight>
+      </S.Container>
+    </FillPanel>
   );
 };
-
-export const getTestPanel = (testId: string, run: TestRun, runEvents: TestRunEvent[]): TPanel => ({
-  name: 'TEST',
-  component: () => {
-    return <TestPanel testId={testId} run={run} runEvents={runEvents} />;
-  },
-});
 
 export default TestPanel;

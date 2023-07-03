@@ -1,42 +1,44 @@
-import AttributeRow from 'components/AttributeRow';
+import {IPropsAttributeRow} from 'components/SpanDetail/SpanDetail';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
-import {TResultAssertions} from 'types/Assertion.types';
+import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import TestOutput from 'models/TestOutput.model';
+import {TTestSpecSummary} from 'types/TestRun.types';
 import * as S from './AttributeList.styled';
 import EmptyAttributeList from './EmptyAttributeList';
 
 interface IProps {
-  assertions?: TResultAssertions;
   attributeList: TSpanFlatAttribute[];
-  onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   searchText?: string;
   semanticConventions: OtelReference;
+  testSpecs?: TTestSpecSummary;
+  testOutputs?: TestRunOutput[];
+  onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
-  outputs: TestOutput[];
+  AttributeRowComponent: React.ComponentType<IPropsAttributeRow>;
 }
 
 const AttributeList = ({
-  assertions,
   attributeList,
-  onCreateTestSpec,
-  onCreateOutput,
   searchText,
   semanticConventions,
-  outputs,
+  testSpecs,
+  testOutputs,
+  onCreateTestSpec,
+  onCreateOutput,
+  AttributeRowComponent,
 }: IProps) => {
   return attributeList.length ? (
     <S.AttributeList data-cy="attribute-list">
       {attributeList.map(attribute => (
-        <AttributeRow
-          searchText={searchText}
-          assertions={assertions}
-          attribute={attribute}
+        <AttributeRowComponent
           key={attribute.key}
+          attribute={attribute}
+          searchText={searchText}
+          semanticConventions={semanticConventions}
+          testSpecs={testSpecs}
+          testOutputs={testOutputs}
           onCreateTestSpec={onCreateTestSpec}
           onCreateOutput={onCreateOutput}
-          semanticConventions={semanticConventions}
-          outputs={outputs}
         />
       ))}
     </S.AttributeList>

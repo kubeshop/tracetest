@@ -2,9 +2,12 @@ package test
 
 import (
 	"context"
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -16,17 +19,21 @@ type Repository interface {
 	ListAugmented(_ context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error)
 	Count(context.Context, string) (int, error)
 	SortingFields() []string
+
 	Provision(context.Context, Test) error
 	SetID(test Test, id id.ID) Test
 
-	// TODO: uncomment as we add new functionality
-	// Get(context.Context, id.ID) (Test, error)
-	// Create(context.Context, Test) (Test, error)
-	// Update(context.Context, Test) (Test, error)
-	// Delete(context.Context, Test) error
-	// Exists(context.Context, id.ID) (bool, error)
-	// GetTestVersion(_ context.Context, _ id.ID, version int) (Test, error)
-	// List(_ context.Context, take, skip int32, query, sortBy, sortDirection string) ([]Test, error)
+	Get(context.Context, id.ID) (Test, error)
+	GetAugmented(ctx context.Context, id id.ID) (Test, error)
+	Exists(context.Context, id.ID) (bool, error)
+	GetVersion(_ context.Context, _ id.ID, version int) (Test, error)
+
+	Create(context.Context, Test) (Test, error)
+	Update(context.Context, Test) (Test, error)
+	Delete(context.Context, id.ID) error
+
+	GetTransactionSteps(_ context.Context, _ id.ID, version int) ([]Test, error)
+	DB() *sql.DB
 }
 
 type repository struct {
@@ -35,6 +42,11 @@ type repository struct {
 
 func NewRepository(db *sql.DB) Repository {
 	return &repository{db}
+}
+
+// needed for test
+func (r *repository) DB() *sql.DB {
+	return r.db
 }
 
 func (r *repository) SetID(test Test, id id.ID) Test {
@@ -88,14 +100,17 @@ func (r *repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	}
 
 	for i, test := range tests {
-		test.CreatedAt = nil
-		test.Summary = nil
-		test.Version = nil
+		r.removeNonAugmentedFields(&test)
 		tests[i] = test
 	}
 
 	return tests, err
+}
 
+func (r *repository) removeNonAugmentedFields(test *Test) {
+	test.CreatedAt = nil
+	test.Summary = nil
+	test.Version = nil
 }
 
 func (r *repository) ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
@@ -157,6 +172,56 @@ func (r *repository) Count(ctx context.Context, query string) (int, error) {
 	return count, nil
 }
 
+func (r *repository) Get(ctx context.Context, id id.ID) (Test, error) {
+	test, err := r.get(ctx, id)
+	if err != nil {
+		return test, err
+	}
+
+	r.removeNonAugmentedFields(&test)
+	return test, nil
+}
+
+func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
+	return r.get(ctx, id)
+}
+
+func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
+	if err != nil {
+		return Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id))
+	if err != nil {
+		return Test{}, err
+	}
+
+	return test, nil
+}
+
+func (r *repository) GetTransactionSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
+	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
+	if err != nil {
+		return []Test{}, fmt.Errorf("prepare 2: %w", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.QueryContext(ctx, id, version)
+	if err != nil {
+		return []Test{}, fmt.Errorf("query context: %w", err)
+	}
+
+	steps, err := r.readRows(ctx, rows)
+	if err != nil {
+		return []Test{}, fmt.Errorf("read row: %w", err)
+	}
+
+	return steps, nil
+}
+
 type scanner interface {
 	Scan(dest ...interface{}) error
 }
@@ -211,6 +276,10 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return Test{}, err
+		}
+
 		return Test{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
@@ -237,6 +306,260 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	}
 	if fail != nil {
 		test.Summary.LastRun.Fails = *fail
+	}
+
+	return test, nil
+}
+
+const insertQuery = `
+INSERT INTO tests (
+	"id",
+	"version",
+	"name",
+	"description",
+	"service_under_test",
+	"specs",
+	"outputs",
+	"created_at"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
+func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
+	if !test.HasID() {
+		test.ID = IDGen.ID()
+	}
+
+	version := 1
+	now := time.Now()
+	test.Version = &version
+	test.CreatedAt = &now
+
+	insertedTest, err := r.insertTest(ctx, test)
+	if err != nil {
+		return Test{}, err
+	}
+
+	r.removeNonAugmentedFields(&insertedTest)
+
+	return insertedTest, nil
+}
+
+func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
+	stmt, err := r.db.Prepare(insertQuery)
+	if err != nil {
+		return Test{}, fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	triggerJson, err := json.Marshal(test.Trigger)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	specsJson, err := json.Marshal(test.Specs)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	outputsJson, err := json.Marshal(test.Outputs)
+	if err != nil {
+		return Test{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	_, err = stmt.ExecContext(
+		ctx,
+		test.ID,
+		test.Version,
+		test.Name,
+		test.Description,
+		triggerJson,
+		specsJson,
+		outputsJson,
+		test.CreatedAt,
+	)
+	if err != nil {
+		return Test{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	return test, nil
+}
+
+func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
+	if test.Version == nil || *test.Version == 0 {
+		test.Version = intPtr(1)
+	}
+
+	oldTest, err := r.get(ctx, test.ID)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
+	}
+
+	// keep the same creation date to keep sort order
+	test.CreatedAt = oldTest.CreatedAt
+
+	testToUpdate, err := bumpTestVersionIfNeeded(oldTest, test)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not bump test version: %w", err)
+	}
+
+	if oldTest.Version == testToUpdate.Version {
+		// No change in the version. Nothing changed so no need to persist it
+		return testToUpdate, nil
+	}
+
+	updatedTest, err := r.insertTest(ctx, testToUpdate)
+	if err != nil {
+		return Test{}, fmt.Errorf("could not create test with new version while updating test: %w", err)
+	}
+
+	r.removeNonAugmentedFields(&updatedTest)
+
+	return updatedTest, nil
+}
+
+func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
+	testHasChanged, err := testHasChanged(in, updated)
+	if err != nil {
+		return Test{}, err
+	}
+
+	if testHasChanged {
+		updated.Version = intPtr(*in.Version + 1)
+	}
+
+	return updated, nil
+}
+
+func testHasChanged(oldTest Test, newTest Test) (bool, error) {
+	outputsHaveChanged, err := testFieldHasChanged(oldTest.Outputs, newTest.Outputs)
+	if err != nil {
+		return false, err
+	}
+
+	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
+	if err != nil {
+		return false, err
+	}
+
+	triggerHasChanged, err := testFieldHasChanged(oldTest.Trigger, newTest.Trigger)
+	if err != nil {
+		return false, err
+	}
+
+	nameHasChanged := oldTest.Name != newTest.Name
+	descriptionHasChanged := oldTest.Description != newTest.Description
+
+	return outputsHaveChanged || definitionHasChanged || triggerHasChanged || nameHasChanged || descriptionHasChanged, nil
+}
+
+func testFieldHasChanged(oldField interface{}, newField interface{}) (bool, error) {
+	oldFieldJSON, err := json.Marshal(oldField)
+	if err != nil {
+		return false, err
+	}
+
+	newFieldJSON, err := json.Marshal(newField)
+	if err != nil {
+		return false, err
+	}
+
+	return string(oldFieldJSON) != string(newFieldJSON), nil
+}
+
+func intPtr(in int) *int {
+	return &in
+}
+
+func (r *repository) Delete(ctx context.Context, id id.ID) error {
+	exists, err := r.Exists(ctx, id)
+	if err != nil {
+		return fmt.Errorf("error checking if a test exists: %w", err)
+	}
+	if !exists {
+		return sql.ErrNoRows // propagate no row error to the API, to emit a 404
+	}
+
+	queries := []string{
+		"DELETE FROM transaction_run_steps WHERE test_run_test_id = $1",
+		"DELETE FROM transaction_steps WHERE test_id = $1",
+		"DELETE FROM test_runs WHERE test_id = $1",
+		"DELETE FROM tests WHERE id = $1",
+	}
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("sql BeginTx: %w", err)
+	}
+	defer tx.Rollback()
+
+	for _, sql := range queries {
+		_, err := tx.ExecContext(ctx, sql, id)
+		if err != nil {
+			return fmt.Errorf("sql error: %w", err)
+		}
+	}
+
+	dropSequence(ctx, tx, id)
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("sql Commit: %w", err)
+	}
+
+	return nil
+}
+
+const (
+	createSequenceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
+	dropSequenceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	runSequenceName     = "%sequence_name%"
+)
+
+func dropSequence(ctx context.Context, tx *sql.Tx, testID id.ID) error {
+	_, err := tx.ExecContext(
+		ctx,
+		replaceRunSequenceName(dropSequenceQuery, testID),
+	)
+
+	return err
+}
+
+func md5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
+}
+
+func replaceRunSequenceName(sql string, testID id.ID) string {
+	// postgres doesn't like uppercase chars in sequence names.
+	// testID might contain uppercase chars, and we cannot lowercase them
+	// because they might lose their uniqueness.
+	// md5 creates a unique, lowercase hash.
+	seqName := "runs_test_" + md5Hash(testID.String()) + "_seq"
+	return strings.ReplaceAll(sql, runSequenceName, seqName)
+}
+
+func (r *repository) Exists(ctx context.Context, id id.ID) (bool, error) {
+	_, err := r.get(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *repository) GetVersion(ctx context.Context, id id.ID, version int) (Test, error) {
+	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
+	if err != nil {
+		return Test{}, fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id, version))
+	if err != nil {
+		return Test{}, err
 	}
 
 	return test, nil

@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -29,7 +30,7 @@ type InstrumentedPollerExecutor struct {
 	pollerExecutor PollerExecutor
 }
 
-func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
+func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, test.Run, error) {
 	_, span := pe.tracer.Start(request.Context(), "Fetch trace")
 	defer span.End()
 
@@ -98,7 +99,7 @@ func (pe DefaultPollerExecutor) traceDB(ctx context.Context) (tracedb.TraceDB, e
 	return tdb, nil
 }
 
-func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
+func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, test.Run, error) {
 	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
 	run := request.run
 	ctx := request.Context()
@@ -106,7 +107,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 	traceDB, err := pe.traceDB(ctx)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s\n", request.test.ID, request.run.ID, err.Error())
-		return false, "", model.Run{}, err
+		return false, "", test.Run{}, err
 	}
 
 	if request.IsFirstRequest() {
@@ -122,7 +123,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 		endpoints := traceDB.GetEndpoints()
 		ds, err := pe.dsRepo.Current(ctx)
 		if err != nil {
-			return false, "", model.Run{}, fmt.Errorf("could not get current datastore: %w", err)
+			return false, "", test.Run{}, fmt.Errorf("could not get current datastore: %w", err)
 		}
 
 		err = pe.eventEmitter.Emit(ctx, events.TracePollingStart(request.test.ID, request.run.ID, string(ds.Type), endpoints))
@@ -140,7 +141,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 		}
 
 		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
-		return false, "", model.Run{}, err
+		return false, "", test.Run{}, err
 	}
 
 	trace.ID = run.TraceID
@@ -166,7 +167,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 	request.run = run
 
 	if !trace.HasRootSpan() {
-		newRoot := model.NewTracetestRootSpan(run)
+		newRoot := test.NewTracetestRootSpan(run)
 		run.Trace = run.Trace.InsertRootSpan(newRoot)
 	} else {
 		run.Trace.RootSpan = model.AugmentRootSpan(run.Trace.RootSpan, run.TriggerResult)
@@ -179,7 +180,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, s
 	err = pe.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s\n", request.test.ID, request.run.ID, err.Error())
-		return false, "", model.Run{}, err
+		return false, "", test.Run{}, err
 	}
 
 	return true, reason, run, nil

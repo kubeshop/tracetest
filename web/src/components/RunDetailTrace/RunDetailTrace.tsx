@@ -1,12 +1,11 @@
-import {useMemo} from 'react';
 import ResizablePanels from 'components/ResizablePanels';
 import TestRun from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import * as S from './RunDetailTrace.styled';
 import SetupAlert from '../SetupAlert';
-import {getAnalyzerPanel} from './AnalyzerPanel';
-import {getSpanDetailsPanel} from './SpanDetailsPanel';
-import {geTracePanel} from './TracePanel';
+import AnalyzerPanel from './AnalyzerPanel';
+import SpanDetailsPanel from './SpanDetailsPanel';
+import TracePanel from './TracePanel';
 
 interface IProps {
   run: TestRun;
@@ -20,19 +19,14 @@ export enum VisualizationType {
 }
 
 const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
-  const panels = useMemo(
-    () => [
-      getSpanDetailsPanel(testId, run),
-      geTracePanel(testId, run, runEvents),
-      getAnalyzerPanel(run),
-    ],
-    [run, runEvents, testId]
-  );
-
   return (
     <S.Container>
       <SetupAlert />
-      <ResizablePanels panels={panels} />
+      <ResizablePanels>
+        <SpanDetailsPanel run={run} testId={testId} />
+        <TracePanel run={run} runEvents={runEvents} testId={testId} />
+        <AnalyzerPanel run={run} />
+      </ResizablePanels>
     </S.Container>
   );
 };

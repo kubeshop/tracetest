@@ -63,6 +63,11 @@ func (r *Repository) SetID(linters Linter, id id.ID) Linter {
 	return linters
 }
 
+func (r *Repository) Create(ctx context.Context, linter Linter) (Linter, error) {
+	linter.ID = id.ID("current")
+	return r.Update(ctx, linter)
+}
+
 func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) {
 	// enforce ID and name
 	updated := Linter{

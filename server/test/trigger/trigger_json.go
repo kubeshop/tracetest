@@ -9,7 +9,7 @@ import (
 
 type triggerJSONV3 struct {
 	Type    TriggerType     `json:"type"`
-	HTTP    *HTTPRequest    `json:"http,omitempty"`
+	HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
 	GRPC    *GRPCRequest    `json:"grpc,omitempty"`
 	TraceID *TraceIDRequest `json:"traceid,omitempty"`
 }

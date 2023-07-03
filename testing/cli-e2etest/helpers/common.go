@@ -77,3 +77,23 @@ func InjectIdIntoDemoFile(t *testing.T, filePath, id string) {
 	err = os.WriteFile(filePath, newFileContent, os.ModeAppend)
 	require.NoError(t, err)
 }
+
+func Copy(source, dst string) {
+	os.Remove(dst)
+	sourceFile, err := os.Open(source)
+	if err != nil {
+		panic(err)
+	}
+	defer sourceFile.Close()
+
+	newFile, err := os.Create(dst)
+	if err != nil {
+		panic(err)
+	}
+	defer newFile.Close()
+
+	_, err = io.Copy(newFile, sourceFile)
+	if err != nil {
+		panic(err)
+	}
+}

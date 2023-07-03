@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 )
 
 var resetTime = time.Date(2022, 06, 07, 13, 03, 24, 100, time.UTC)
 
-func AssertRunEqual(t *testing.T, expected, actual model.Run) bool {
+func AssertRunEqual(t *testing.T, expected, actual test.Run) bool {
 	t.Helper()
 
 	// assert.Equal doesn't work on time.Time vars (see https://stackoverflow.com/a/69362528)
