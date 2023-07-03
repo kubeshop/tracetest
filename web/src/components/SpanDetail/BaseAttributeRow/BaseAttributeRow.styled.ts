@@ -1,21 +1,10 @@
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {Tag as AntdTag, Typography} from 'antd';
 import styled from 'styled-components';
-import TestOutputMark from 'components/TestOutputMark';
 import moreIcon from 'assets/more.svg';
 
-export {default as AttributeTitle} from './AttributeTitle';
-
 export const Container = styled.div`
-  background-color: ${({theme}) => theme.color.white};
   display: flex;
-  margin-bottom: 4px;
-  padding: 12px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: ${({theme}) => theme.color.background};
-  }
 `;
 
 export const Header = styled.div`
@@ -66,13 +55,6 @@ export const InfoIcon = styled(InfoCircleOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
   cursor: pointer;
   margin: 4px;
-`;
-
-export const OutputsMark = styled(TestOutputMark)`
-  && {
-    color: ${({theme}) => theme.color.textSecondary};
-    margin: 4px;
-  }
 `;
 
 export const MoreIcon = styled.img.attrs({

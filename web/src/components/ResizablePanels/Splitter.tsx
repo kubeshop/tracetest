@@ -6,7 +6,6 @@ interface IProps {
   isOpen: boolean;
   onClick(): void;
   id?: string;
-  key: string | number;
   className?: string;
   name: string;
   tooltip?: string;
@@ -20,32 +19,29 @@ const Splitter = ({
   name,
   onClick,
   id,
-  key,
   className,
   onMouseDown,
   onTouchStart,
   tooltip,
   tooltipPlacement = 'right',
-}: IProps) => {
-  return (
-    <S.SplitterContainer id={id} key={key} className={className} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
-      <S.ButtonContainer>
-        <Tooltip title={tooltip} trigger="hover" placement={tooltipPlacement} overlayClassName="splitter">
-          <S.SplitterButton
-            data-cy={`toggle-drawer-${name}`}
-            icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
-            onClick={event => {
-              event.stopPropagation();
-              onClick();
-            }}
-            onMouseDown={event => event.stopPropagation()}
-            shape="circle"
-            type="primary"
-          />
-        </Tooltip>
-      </S.ButtonContainer>
-    </S.SplitterContainer>
-  );
-};
+}: IProps) => (
+  <S.SplitterContainer id={id} key={id} className={className} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
+    <S.ButtonContainer>
+      <Tooltip title={tooltip} trigger="hover" placement={tooltipPlacement} overlayClassName="splitter">
+        <S.SplitterButton
+          data-cy={`toggle-drawer-${name}`}
+          icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
+          onClick={event => {
+            event.stopPropagation();
+            onClick();
+          }}
+          onMouseDown={event => event.stopPropagation()}
+          shape="circle"
+          type="primary"
+        />
+      </Tooltip>
+    </S.ButtonContainer>
+  </S.SplitterContainer>
+);
 
 export default Splitter;

@@ -18,19 +18,24 @@ interface IProps {
 
 const TestOutput = ({
   index,
-  output: {id, name, isDeleted, isDraft, spanId, selector, value, valueRun, valueRunDraft, error},
+  output: {name, isDeleted, isDraft, spanId, selector, value, valueRun, valueRunDraft, error},
   output,
   onEdit,
   onDelete,
 }: IProps) => {
   const {onSelectedOutputs} = useTestOutput();
   const {onSelectSpan} = useSpan();
-  const isSelected = useAppSelector(state => selectIsSelectedOutput(state, id));
+  const isSelected = useAppSelector(state => selectIsSelectedOutput(state, name));
 
   const handleOutputClick = useCallback(() => {
+    if (isSelected) {
+      onSelectedOutputs([]);
+      onSelectSpan('');
+      return;
+    }
     onSelectedOutputs([output]);
     onSelectSpan(spanId);
-  }, [onSelectSpan, onSelectedOutputs, output, spanId]);
+  }, [onSelectSpan, onSelectedOutputs, output, spanId, isSelected]);
 
   return (
     <S.Container

@@ -1,4 +1,5 @@
 import {ParentSize} from '@visx/responsive';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import Span from 'models/Span.model';
 import * as S from './Timeline.styled';
 import Visualization from './Visualization';
@@ -7,6 +8,7 @@ import Navigation from '../Navigation';
 export interface IProps {
   isMatchedMode: boolean;
   matchedSpans: string[];
+  nodeType: NodeTypesEnum;
   onNavigateToSpan(spanId: string): void;
   onNodeClick(spanId: string): void;
   selectedSpan: string;

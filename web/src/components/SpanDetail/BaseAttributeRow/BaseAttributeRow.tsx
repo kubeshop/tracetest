@@ -3,49 +3,33 @@ import parse from 'html-react-parser';
 import MarkdownIt from 'markdown-it';
 import {useMemo} from 'react';
 
-import AssertionResultChecks from 'components/AssertionResultChecks';
 import AttributeActions from 'components/AttributeActions/AttributeActions';
 import AttributeValue from 'components/AttributeValue';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
-import TestOutput from 'models/TestOutput.model';
-import TestRunOutput from 'models/TestRunOutput.model';
 import SpanAttributeService from 'services/SpanAttribute.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {TTestSpecSummary} from 'types/TestRun.types';
-import * as S from './AttributeRow.styled';
+import AttributeTitle from './AttributeTitle';
+import * as S from './BaseAttributeRow.styled';
 
 interface IProps {
   attribute: TSpanFlatAttribute;
   searchText?: string;
   semanticConventions: OtelReference;
-  testSpecs?: TTestSpecSummary;
-  testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
 }
 
-const AttributeRow = ({
+const BaseAttributeRow = ({
   attribute: {key, value},
   attribute,
   searchText,
   semanticConventions,
-  testSpecs,
-  testOutputs,
   onCreateTestSpec,
   onCreateOutput,
 }: IProps) => {
   const semanticConvention = SpanAttributeService.getReferencePicker(semanticConventions, key);
   const description = useMemo(() => parse(MarkdownIt().render(semanticConvention.description)), [semanticConvention]);
   const note = useMemo(() => parse(MarkdownIt().render(semanticConvention.note)), [semanticConvention]);
-  const attributeTestSpecs = useMemo(
-    () => SpanAttributeService.getAttributeTestSpecs(key, testSpecs),
-    [key, testSpecs]
-  );
-  const attributeTestOutputs = useMemo(
-    () => SpanAttributeService.getAttributeTestOutputs(key, testOutputs),
-    [key, testOutputs]
-  );
-
   const cypressKey = key.toLowerCase().replace('.', '-');
 
   const content = (
@@ -64,21 +48,18 @@ const AttributeRow = ({
     <S.Container data-cy={`attribute-row-${cypressKey}`}>
       <S.Header>
         <S.SectionTitle>
-          <S.AttributeTitle title={key} searchText={searchText} />
+          <AttributeTitle title={key} searchText={searchText} />
 
           {semanticConvention.description !== '' && (
             <Popover content={content} placement="right" title={<S.Title level={3}>{key}</S.Title>}>
               <S.InfoIcon />
             </Popover>
           )}
-
-          {!!attributeTestOutputs.length && <S.OutputsMark outputs={attributeTestOutputs as TestOutput[]} />}
         </S.SectionTitle>
 
         <S.AttributeValueRow>
           <AttributeValue value={value} searchText={searchText} />
         </S.AttributeValueRow>
-        <AssertionResultChecks failed={attributeTestSpecs.failed} passed={attributeTestSpecs.passed} />
       </S.Header>
 
       <AttributeActions attribute={attribute} onCreateTestOutput={onCreateOutput} onCreateTestSpec={onCreateTestSpec}>
@@ -90,4 +71,4 @@ const AttributeRow = ({
   );
 };
 
-export default AttributeRow;
+export default BaseAttributeRow;

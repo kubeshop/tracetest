@@ -1,4 +1,4 @@
-import {NodeTypesEnum} from 'constants/DAG.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import DAGService from 'services/DAG.service';
 import {INodeDataSpan, INodeDatum} from 'types/DAG.types';
 import Span from './Span.model';

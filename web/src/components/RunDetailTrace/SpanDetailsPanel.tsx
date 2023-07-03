@@ -1,10 +1,10 @@
 import {useNavigate} from 'react-router-dom';
 import {useCallback} from 'react';
 import {useAppSelector} from 'redux/hooks';
-import TraceSelectors from 'selectors/Trace.selectors';
+import SpanDetail, {TraceAttributeRow, TraceSubHeader} from 'components/SpanDetail';
 import TestRun from 'models/TestRun.model';
 import SpanSelectors from 'selectors/Span.selectors';
-import SpanDetail from '../SpanDetail/SpanDetail';
+import TraceSelectors from 'selectors/Trace.selectors';
 import {LeftPanel, PanelContainer} from '../ResizablePanels';
 
 interface IProps {
@@ -35,7 +35,13 @@ const SpanDetailsPanel = ({run, testId}: IProps) => {
     >
       {size => (
         <PanelContainer $isOpen={size.isOpen}>
-          <SpanDetail onCreateTestSpec={handleOnCreateSpec} searchText={searchText} span={span} />
+          <SpanDetail
+            onCreateTestSpec={handleOnCreateSpec}
+            searchText={searchText}
+            span={span}
+            AttributeRowComponent={TraceAttributeRow}
+            SubHeaderComponent={TraceSubHeader}
+          />
         </PanelContainer>
       )}
     </LeftPanel>

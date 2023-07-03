@@ -1,28 +1,20 @@
-import {AxisScale} from '@visx/axis';
 import {Group} from '@visx/group';
 
 import {AxisOffset, BaseLeftPadding, NodeHeight, NodeOverlayHeight} from 'constants/Timeline.constants';
-import useSpanData from 'hooks/useSpanData';
-import {TNode} from 'types/Timeline.types';
+import Span from 'models/Span.model';
 import Collapse from './Collapse';
 import Connector from './Connector';
 import Label from './Label';
-import * as S from './Timeline.styled';
+import {IPropsComponent} from '../SpanNodeFactory';
+import * as S from '../Timeline.styled';
 
-interface IProps {
-  index: number;
-  indexParent: number;
-  isCollapsed?: boolean;
-  isMatched?: boolean;
-  isSelected?: boolean;
-  minStartTime: number;
-  node: TNode;
-  onClick(id: string): void;
-  onCollapse(id: string): void;
-  xScale: AxisScale;
+interface IProps extends IPropsComponent {
+  header?: React.ReactNode;
+  span: Span;
 }
 
-const SpanNode = ({
+const BaseSpanNode = ({
+  header,
   index,
   indexParent,
   isCollapsed = false,
@@ -32,14 +24,14 @@ const SpanNode = ({
   node,
   onClick,
   onCollapse,
+  span,
   xScale,
 }: IProps) => {
-  const {testSpecs} = useSpanData(node.data.id);
   const isParent = Boolean(node.children);
   const hasParent = indexParent !== -1;
   const positionTop = index * NodeHeight;
-  const durationWidth = node.data.endTime - node.data.startTime;
-  const durationX = node.data.startTime - minStartTime;
+  const durationWidth = span.endTime - span.startTime;
+  const durationX = span.startTime - minStartTime;
   const leftPadding = node.depth * BaseLeftPadding;
   const className = isMatched ? 'matched' : '';
 
@@ -53,14 +45,13 @@ const SpanNode = ({
 
       <Group left={leftPadding} top={8}>
         <Label
-          duration={node.data.duration}
-          kind={node.data.kind}
-          name={node.data.name}
-          service={node.data.service}
-          system={node.data.system}
-          totalFailedChecks={testSpecs?.failed?.length}
-          totalPassedChecks={testSpecs?.passed?.length}
-          type={node.data.type}
+          duration={span.duration}
+          header={header}
+          kind={span.kind}
+          name={span.name}
+          service={span.service}
+          system={span.system}
+          type={span.type}
         />
 
         {isParent && (
@@ -75,10 +66,10 @@ const SpanNode = ({
         width={Math.ceil(xScale(durationWidth)?.valueOf() ?? 0)}
         x={Math.ceil(xScale(durationX)?.valueOf() ?? 0) + AxisOffset}
         y={52}
-        $type={node.data.type}
+        $type={span.type}
       />
     </Group>
   );
 };
 
-export default SpanNode;
+export default BaseSpanNode;

@@ -4,6 +4,7 @@ import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticCon
 import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {TTestSpecSummary} from 'types/TestRun.types';
+import {IPropsAttributeRow} from './SpanDetail';
 import * as S from './SpanDetail.styled';
 
 interface IProps {
@@ -14,6 +15,7 @@ interface IProps {
   testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
+  AttributeRowComponent: React.ComponentType<IPropsAttributeRow>;
 }
 
 const Attributes = ({
@@ -24,6 +26,7 @@ const Attributes = ({
   testOutputs,
   onCreateTestSpec,
   onCreateOutput,
+  AttributeRowComponent,
 }: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [topPosition, setTopPosition] = useState(0);
@@ -42,6 +45,7 @@ const Attributes = ({
         testOutputs={testOutputs}
         onCreateTestSpec={onCreateTestSpec}
         onCreateOutput={onCreateOutput}
+        AttributeRowComponent={AttributeRowComponent}
       />
     </S.AttributesContainer>
   );

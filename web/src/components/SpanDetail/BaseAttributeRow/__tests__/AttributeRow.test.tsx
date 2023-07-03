@@ -1,6 +1,6 @@
-import {render} from '../../../test-utils';
-import {TSpanFlatAttribute} from '../../../types/Span.types';
-import AttributeRow from '../AttributeRow';
+import {render} from '../../../../test-utils';
+import {TSpanFlatAttribute} from '../../../../types/Span.types';
+import BaseAttributeRow from '../BaseAttributeRow';
 
 const attribute: TSpanFlatAttribute = {
   key: 'key',
@@ -13,7 +13,7 @@ const onCreateTestSpec = jest.fn();
 describe('AttributeRow', () => {
   it('should render correctly', () => {
     const {getByText} = render(
-      <AttributeRow
+      <BaseAttributeRow
         attribute={attribute}
         searchText=""
         semanticConventions={{}}
