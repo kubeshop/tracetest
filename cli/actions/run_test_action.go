@@ -95,7 +95,7 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 			return fmt.Errorf("could not get json format: %w", err)
 		}
 
-		envJson, err := a.environments.Apply(ctx, args.EnvID, jsonFormat)
+		envJson, err := a.environmentActions.Apply(ctx, args.EnvID, jsonFormat)
 		if err != nil {
 			return fmt.Errorf("could not read environment file: %w", err)
 		}
