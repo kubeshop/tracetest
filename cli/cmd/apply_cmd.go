@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	applyParams = applyParameters{}
+	applyParams = &applyParameters{}
 	applyCmd    *cobra.Command
 )
 

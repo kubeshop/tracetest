@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	listParams = listParameters{}
+	listParams = &listParameters{}
 	listCmd    *cobra.Command
 )
 

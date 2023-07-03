@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	deleteParams = &ResourceIDParameters{}
+	deleteParams = &resourceIDParameters{}
 	deleteCmd    *cobra.Command
 )
 

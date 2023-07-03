@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	getParams = ResourceIDParameters{}
+	getParams = &resourceIDParameters{}
 	getCmd    *cobra.Command
 )
 
@@ -47,11 +47,11 @@ func init() {
 	rootCmd.AddCommand(getCmd)
 }
 
-type ResourceIDParameters struct {
+type resourceIDParameters struct {
 	ResourceID string
 }
 
-func (p ResourceIDParameters) Validate(cmd *cobra.Command, args []string) []error {
+func (p resourceIDParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := make([]error, 0)
 
 	if p.ResourceID == "" {

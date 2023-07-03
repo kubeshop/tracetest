@@ -6,7 +6,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var installerParams = installerParameters{
+var installerParams = &installerParameters{
 	Force:             false,
 	RunEnvironment:    installer.NoneRunEnvironmentType,
 	InstallationMode:  installer.NotChosenInstallationModeType,

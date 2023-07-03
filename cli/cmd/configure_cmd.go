@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var configParams = configureParams{}
+var configParams = &configureParameters{}
 
 var configureCmd = &cobra.Command{
 	GroupID: cmdGroupConfig.ID,
@@ -44,12 +44,12 @@ func init() {
 	rootCmd.AddCommand(configureCmd)
 }
 
-type configureParams struct {
+type configureParameters struct {
 	Endpoint string
 	Global   bool
 }
 
-func (p configureParams) Validate(cmd *cobra.Command, args []string) []error {
+func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error {
 	var errors []error
 
 	if cmd.Flags().Lookup("endpoint").Changed {

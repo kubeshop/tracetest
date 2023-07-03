@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	exportParams = ExportParameters{}
+	exportParams = &exportParameters{}
 	exportCmd    *cobra.Command
 )
 
@@ -56,13 +56,13 @@ func init() {
 	rootCmd.AddCommand(exportCmd)
 }
 
-type ExportParameters struct {
-	ResourceIDParameters
+type exportParameters struct {
+	resourceIDParameters
 	OutputFile string
 }
 
-func (p ExportParameters) Validate(cmd *cobra.Command, args []string) []error {
-	errors := p.ResourceIDParameters.Validate(cmd, args)
+func (p exportParameters) Validate(cmd *cobra.Command, args []string) []error {
+	errors := p.resourceIDParameters.Validate(cmd, args)
 
 	if p.OutputFile == "" {
 		errors = append(errors, ParamError{
