@@ -22,8 +22,6 @@ type exportTestAction struct {
 	client *openapi.APIClient
 }
 
-var _ Action[ExportTestConfig] = &exportTestAction{}
-
 func NewExportTestAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) exportTestAction {
 	return exportTestAction{
 		config: config,

@@ -1,12 +1,12 @@
-package parameters
+package cmd
 
 import "fmt"
 
-type paramError struct {
+type ParamError struct {
 	Parameter string
 	Message   string
 }
 
-func (pe paramError) Error() string {
+func (pe ParamError) Error() string {
 	return fmt.Sprintf(`[%s] %s`, pe.Parameter, pe.Message)
 }

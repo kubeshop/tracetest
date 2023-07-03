@@ -9,7 +9,7 @@ import (
 
 const VerbDelete Verb = "delete"
 
-func (c client) Delete(ctx context.Context, id string, format Format) (string, error) {
+func (c Client) Delete(ctx context.Context, id string, format Format) (string, error) {
 	url := c.client.url(c.resourceNamePlural, id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url.String(), nil)
 	if err != nil {
