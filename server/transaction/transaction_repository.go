@@ -446,6 +446,10 @@ func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return transaction, err
+		}
+
 		return Transaction{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
