@@ -22,10 +22,186 @@ const sidebars = {
 
   // But you can create a sidebar manually
 
+  liveExamplesSidebar: [
+    {
+      type: "category",
+      label: "Pokemon API Demo",
+      items: [
+        {
+          type: "doc",
+          id: "live-examples/pokeshop/overview",
+          label: "Overview",
+        },
+        {
+          type: "category",
+          label: "Use Cases",
+          items: [
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/add-pokemon",
+              label: "Add Pokemon",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/list-pokemon",
+              label: "List Pokemon",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/get-pokemon-by-id",
+              label: "Get Pokemon by ID",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/import-pokemon",
+              label: "Import Pokemon",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "OpenTelemetry Store Demo",
+      items: [
+        {
+          type: "doc",
+          id: "live-examples/opentelemetry-store/overview",
+          label: "Overview",
+        },
+        {
+          type: "category",
+          label: "Use Cases",
+          items: [
+            {
+              type: "doc",
+              id: "live-examples/opentelemetry-store/use-cases/add-item-into-shopping-cart",
+              label: "Add Item into Shopping Cart",
+            },
+            {
+              type: "doc",
+              id: "live-examples/opentelemetry-store/use-cases/check-shopping-cart-contents",
+              label: "Check Shopping Cart Contents",
+            },
+            {
+              type: "doc",
+              id: "live-examples/opentelemetry-store/use-cases/checkout",
+              label: "Checkout",
+            },
+            {
+              type: "doc",
+              id: "live-examples/opentelemetry-store/use-cases/get-recommended-products",
+              label: "Get Recommended Products",
+            },
+            {
+              type: "doc",
+              id: "live-examples/opentelemetry-store/use-cases/user-purchasing-products",
+              label: "User Purchasing Products",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+
+  examplesTutorialsSidebar: [
+    {
+      type: "doc",
+      id: "examples-tutorials/overview",
+      label: "Overview",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes",
+      label: "Recipes",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
+      label: "Node.js and OpenTelemetry Collector",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
+      label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
+      label: "Python with Manual Instrumentation and OpenTelemetry Collector",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
+      label: "Node.js and Jaeger",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
+      label: "Node.js and OpenSearch",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-tempo",
+      label: "Node.js and Tempo",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
+      label: "OpenTelemetry Demo and Lightstep",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
+      label: "OpenTelemetry Demo and New Relic",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
+      label: "Node.js and Elastic APM",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray",
+      label: "X-Ray",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-adot",
+      label: "X-Ray and AWS Distro for OpenTelemetry",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
+      label: "X-Ray, AWS Distro for OpenTelemetry & Pokeshop API",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
+      label: "AWS Fargate and Terraform",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
+      label: "AWS Step Functions, AWS X-Ray and Terraform",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+      label: "OpenTelemetry Demo and Datadog",
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
+      label: "Node.js and Honeycomb",
+    },
+  ],
+
   tutorialSidebar: [
     {
       type: "category",
       label: "Getting Started",
+      collapsed: false,
       items: [
         {
           type: "doc",
@@ -49,8 +225,13 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "getting-started/cli-installation-reference",
+          label: "CLI Installation Reference",
+        },
+        {
+          type: "doc",
           id: "getting-started/detailed-installation",
-          label: "Detailed CLI Installation Reference",
+          label: "Detailed Server Installation",
         },
       ],
     },
@@ -453,186 +634,6 @@ const sidebars = {
           type: "doc",
           id: "tools-and-integrations/testkube",
           label: "Testkube",
-        },
-      ],
-    },
-    {
-      type: "category",
-      label: "Examples & Tutorials",
-      link: {
-        type: "doc",
-        id: "examples-tutorials/overview",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes",
-          label: "Recipes",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
-          label: "Node.js and OpenTelemetry Collector",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
-          label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
-          label: "Python with Manual Instrumentation and OpenTelemetry Collector",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
-          label: "Node.js and Jaeger",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
-          label: "Node.js and OpenSearch",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-tempo",
-          label: "Node.js and Tempo",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
-          label: "OpenTelemetry Demo and Lightstep",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
-          label: "OpenTelemetry Demo and New Relic",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
-          label: "Node.js and Elastic APM",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray",
-          label: "X-Ray",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-adot",
-          label: "X-Ray and AWS Distro for OpenTelemetry",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
-          label: "X-Ray, AWS Distro for OpenTelemetry & Pokeshop API",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
-          label: "AWS Fargate and Terraform",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
-          label: "AWS Step Functions, AWS X-Ray and Terraform",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-datadog",
-          label: "OpenTelemetry Demo and Datadog",
-        },
-        {
-          type: "doc",
-          id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
-          label: "Node.js and Honeycomb",
-        },
-      ],
-    },
-    {
-      type: "category",
-      label: "Live Examples",
-      items: [
-        {
-          type: "category",
-          label: "Pokemon API Demo",
-          items: [
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/overview",
-              label: "Overview",
-            },
-            {
-              type: "category",
-              label: "Use Cases",
-              items: [
-                {
-                  type: "doc",
-                  id: "live-examples/pokeshop/use-cases/add-pokemon",
-                  label: "Add Pokemon",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/pokeshop/use-cases/list-pokemon",
-                  label: "List Pokemon",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/pokeshop/use-cases/get-pokemon-by-id",
-                  label: "Get Pokemon by ID",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/pokeshop/use-cases/import-pokemon",
-                  label: "Import Pokemon",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "OpenTelemetry Store Demo",
-          items: [
-            {
-              type: "doc",
-              id: "live-examples/opentelemetry-store/overview",
-              label: "Overview",
-            },
-            {
-              type: "category",
-              label: "Use Cases",
-              items: [
-                {
-                  type: "doc",
-                  id: "live-examples/opentelemetry-store/use-cases/add-item-into-shopping-cart",
-                  label: "Add Item into Shopping Cart",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/opentelemetry-store/use-cases/check-shopping-cart-contents",
-                  label: "Check Shopping Cart Contents",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/opentelemetry-store/use-cases/checkout",
-                  label: "Checkout",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/opentelemetry-store/use-cases/get-recommended-products",
-                  label: "Get Recommended Products",
-                },
-                {
-                  type: "doc",
-                  id: "live-examples/opentelemetry-store/use-cases/user-purchasing-products",
-                  label: "User Purchasing Products",
-                },
-              ],
-            },
-          ],
         },
       ],
     },

@@ -204,22 +204,31 @@ const config = {
         logo: {
           alt: 'Tracetest Logo',
           src: 'img/logo.svg',
+          href: '/',
+          target: '_self',
         },
         items: [
-          // {
-          //   to: "/quick-start",
-          //   label: "Quick Start",
-          //   position: "left",
-          // },
           {
-            href: "https://discord.gg/6zupCZFQbe",
-            label: "Join Discord Community",
+            type: 'docSidebar',
+            position: 'left',
+            sidebarId: 'examplesTutorialsSidebar',
+            label: 'Examples & Tutorials'
+          },
+          {
+            type: 'docSidebar',
+            position: 'left',
+            sidebarId: 'liveExamplesSidebar',
+            label: 'Live Examples'
+          },
+          {
+            href: "https://tracetest.io/community",
+            label: "Community",
             position: "left",
           },
           {
             type: "html",
             position: "left",
-            value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=medium" style='margin-top: 6px' frameborder="0" scrolling="0" width="170" height="20" title="GitHub"></iframe>`,
+            value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=medium" style='margin-top: 6px' frameborder="0" scrolling="0" width="90" height="20" title="GitHub"></iframe>`,
           },
           {
             type: "search",
