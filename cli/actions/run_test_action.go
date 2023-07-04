@@ -10,6 +10,7 @@ import (
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
@@ -108,7 +109,7 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 
 	a.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
 
-	var run *openapi.ExecuteDefinitionResponse
+	var run runResult
 	var envVars []envVar
 
 	// iterate until we have all env vars,
@@ -129,8 +130,8 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	}
 
 	if !args.WaitForResult {
-		// TODO: show url?
-		return nil
+		fmt.Println(a.formatResult(run, false))
+		a.cliExit(0)
 	}
 
 	result, err := a.waitForResult(ctx, run)
@@ -389,17 +390,17 @@ func getTypeFromFile(df defFile) (string, error) {
 }
 
 type envVar struct {
-	name         string
-	defaultValue string
-	userValue    string
+	Name         string
+	DefaultValue string
+	UserValue    string
 }
 
 func (ev envVar) value() string {
-	if ev.userValue != "" {
-		return ev.userValue
+	if ev.UserValue != "" {
+		return ev.UserValue
 	}
 
-	return ev.defaultValue
+	return ev.DefaultValue
 }
 
 type envVars []envVar
@@ -408,7 +409,7 @@ func (evs envVars) toOpenapi() []openapi.EnvironmentValue {
 	vars := make([]openapi.EnvironmentValue, len(evs))
 	for i, ev := range evs {
 		vars[i] = openapi.EnvironmentValue{
-			Key:   openapi.PtrString(ev.name),
+			Key:   openapi.PtrString(ev.Name),
 			Value: openapi.PtrString(ev.value()),
 		}
 	}
@@ -420,11 +421,11 @@ func (evs envVars) unique() envVars {
 	seen := make(map[string]bool)
 	vars := make(envVars, 0, len(evs))
 	for _, ev := range evs {
-		if seen[ev.name] {
+		if seen[ev.Name] {
 			continue
 		}
 
-		seen[ev.name] = true
+		seen[ev.Name] = true
 		vars = append(vars, ev)
 	}
 
@@ -437,14 +438,21 @@ func (e missingEnvVarsError) Error() string {
 	return fmt.Sprintf("missing env vars: %v", []envVar(e))
 }
 
-func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev envVars) (*openapi.ExecuteDefinitionResponse, error) {
-	wrapperResp := &openapi.ExecuteDefinitionResponse{}
+type runResult struct {
+	ResourceType string
+	URL          string
+	Resource     any
+	Run          any
+}
+
+func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev envVars) (runResult, error) {
+	res := runResult{}
 
 	defType, err := getTypeFromFile(df)
 	if err != nil {
-		return wrapperResp, fmt.Errorf("cannot get type from file: %w", err)
+		return res, fmt.Errorf("cannot get type from file: %w", err)
 	}
-	wrapperResp.SetType(defType)
+	res.ResourceType = defType
 
 	a.logger.Debug("running definition",
 		zap.String("type", defType),
@@ -464,7 +472,7 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 		err = yaml.Unmarshal(df.Contents(), &test)
 		if err != nil {
 			a.logger.Error("error parsing test", zap.String("content", string(df.Contents())), zap.Error(err))
-			return wrapperResp, fmt.Errorf("could not unmarshal test yaml: %w", err)
+			return res, fmt.Errorf("could not unmarshal test yaml: %w", err)
 		}
 
 		req := a.openapiClient.ApiApi.
@@ -476,19 +484,19 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 		run, resp, err := a.openapiClient.ApiApi.RunTestExecute(req)
 		err = a.handleRunError(resp, err)
 		if err != nil {
-			return wrapperResp, err
+			return res, err
 		}
 
-		wrapperResp.SetId(test.Spec.GetId())
-		wrapperResp.SetRunId(run.GetId())
-		wrapperResp.SetUrl(a.config.URL() + "/test/" + test.Spec.GetId() + "/run/" + run.GetId())
+		res.Resource = test
+		res.Run = *run
+		res.URL = a.config.URL() + "/test/" + test.Spec.GetId() + "/run/" + run.GetId()
 
 	case "Transaction":
 		var tran openapi.TransactionResource
 		err = yaml.Unmarshal(df.Contents(), &tran)
 		if err != nil {
 			a.logger.Error("error parsing transaction", zap.String("content", string(df.Contents())), zap.Error(err))
-			return wrapperResp, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
+			return res, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
 		}
 
 		req := a.openapiClient.ApiApi.
@@ -500,24 +508,24 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 		run, resp, err := a.openapiClient.ApiApi.RunTransactionExecute(req)
 		err = a.handleRunError(resp, err)
 		if err != nil {
-			return wrapperResp, err
+			return res, err
 		}
 
-		wrapperResp.SetId(tran.Spec.GetId())
-		wrapperResp.SetRunId(run.GetId())
-		wrapperResp.SetUrl(a.config.URL() + "/transaction/" + tran.Spec.GetId() + "/run/" + run.GetId())
+		res.Resource = tran
+		res.Run = *run
+		res.URL = a.config.URL() + "/transaction/" + tran.Spec.GetId() + "/run/" + run.GetId()
 	default:
-		return wrapperResp, fmt.Errorf("unknown type: %s", defType)
+		return res, fmt.Errorf("unknown type: %s", defType)
 	}
 
 	a.logger.Debug("definition run",
 		zap.String("type", defType),
 		zap.String("envID", envID),
 		zap.Any("envVars", ev),
-		zap.Any("response", wrapperResp),
+		zap.Any("response", res),
 	)
 
-	return wrapperResp, nil
+	return res, nil
 }
 
 func (a runTestAction) handleRunError(resp *http.Response, reqErr error) error {
@@ -555,8 +563,8 @@ func buildMissingEnvVarsError(body []byte) error {
 	for _, missingVarErr := range missingVarsErrResp.MissingVariables {
 		for _, missingVar := range missingVarErr.Variables {
 			missingVars = append(missingVars, envVar{
-				name:         missingVar.GetKey(),
-				defaultValue: missingVar.GetDefaultValue(),
+				Name:         missingVar.GetKey(),
+				DefaultValue: missingVar.GetDefaultValue(),
 			})
 		}
 	}
@@ -572,7 +580,7 @@ func (a runTestAction) askForMissingVars(missingVars []envVar) []envVar {
 
 	for _, missingVar := range missingVars {
 		answer := missingVar
-		answer.userValue = ui.DefaultUI.TextInput(missingVar.name, missingVar.defaultValue)
+		answer.UserValue = ui.DefaultUI.TextInput(missingVar.Name, missingVar.DefaultValue)
 		filledVariables = append(filledVariables, answer)
 	}
 
@@ -581,7 +589,46 @@ func (a runTestAction) askForMissingVars(missingVars []envVar) []envVar {
 	return filledVariables
 }
 
-func (a runTestAction) waitForResult(ctx context.Context, run *openapi.ExecuteDefinitionResponse) (*openapi.TestRun, error) {
+func (a runTestAction) formatResult(result runResult, hasResults bool) string {
+	a.logger.Debug("formatting result", zap.Any("result", result))
+	switch result.ResourceType {
+	case "Test":
+		return a.formatTestResult(result, hasResults)
+	case "Transaction":
+		return a.formatTransactionResult(result, hasResults)
+	}
+	return ""
+}
+
+func (a runTestAction) formatTestResult(result runResult, hasResults bool) string {
+	test := result.Resource.(openapi.TestResource)
+	run := result.Run.(openapi.TestRun)
+
+	tro := formatters.TestRunOutput{
+		HasResults: hasResults,
+		Test:       test.GetSpec(),
+		Run:        run,
+	}
+
+	formatter := formatters.TestRun(a.config, true)
+	return formatter.Format(tro)
+}
+func (a runTestAction) formatTransactionResult(result runResult, hasResults bool) string {
+	tran := result.Resource.(openapi.TransactionResource)
+	run := result.Run.(openapi.TransactionRun)
+
+	tro := formatters.TransactionRunOutput{
+		HasResults:  hasResults,
+		Transaction: tran.GetSpec(),
+		Run:         run,
+	}
+
+	return formatters.
+		TransactionRun(a.config, true).
+		Format(tro)
+}
+
+func (a runTestAction) waitForResult(ctx context.Context, run runResult) (*openapi.TestRun, error) {
 	return openapi.NewTestRun(), fmt.Errorf("not implemented")
 }
 
