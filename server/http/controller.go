@@ -245,7 +245,7 @@ func (c *controller) RerunTestRun(ctx context.Context, testID string, runID int3
 }
 
 func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
-	test, err := c.testRepository.Get(ctx, id.ID(testID))
+	test, err := c.testRepository.GetAugmented(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
