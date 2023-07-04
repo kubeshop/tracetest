@@ -2,27 +2,12 @@ package actions
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strconv"
-	"sync"
-	"time"
 
-	"github.com/Jeffail/gabs/v2"
-	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/file"
-	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
-	"github.com/kubeshop/tracetest/cli/ui"
-	"github.com/kubeshop/tracetest/cli/utils"
-	"github.com/kubeshop/tracetest/server/model/yaml"
 	"go.uber.org/zap"
 )
 
@@ -33,49 +18,54 @@ type RunResourceArgs struct {
 	JUnit          string
 }
 
-type runTestAction struct {
-	config             config.Config
-	logger             *zap.Logger
-	client             *openapi.APIClient
-	testActions        resourcemanager.Client
-	environmentActions resourcemanager.Client
-	cliExit            func(int)
-}
-
-type runDefParams struct {
-	DefinitionFile       string
-	EnvID                string
-	WaitForResult        bool
-	JunitFile            string
-	Metadata             map[string]string
-	EnvironmentVariables map[string]string
-}
-
-func NewRunTestAction(
-	config config.Config,
-	logger *zap.Logger,
-	client *openapi.APIClient,
-	testActions resourcemanager.Client,
-	environmentActions resourcemanager.Client,
-	cliExit func(int),
-) runTestAction {
-	return runTestAction{
-		config,
-		logger,
-		client,
-		testActions,
-		environmentActions,
-		cliExit,
-	}
-}
-
-func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
+func (args RunResourceArgs) Validate() error {
 	if args.DefinitionFile == "" {
 		return fmt.Errorf("you must specify a definition file to run a test")
 	}
 
 	if args.JUnit != "" && !args.WaitForResult {
 		return fmt.Errorf("--junit option requires --wait-for-result")
+	}
+
+	return nil
+}
+
+type runTestAction struct {
+	config        config.Config
+	logger        *zap.Logger
+	openapiClient *openapi.APIClient
+	environments  resourcemanager.Client
+	tests         resourcemanager.Client
+	jsonFormat    resourcemanager.Format
+	cliExit       func(int)
+}
+
+func NewRunTestAction(
+	config config.Config,
+	logger *zap.Logger,
+	openapiClient *openapi.APIClient,
+	tests resourcemanager.Client,
+	environments resourcemanager.Client,
+	cliExit func(int),
+) runTestAction {
+	jsonFormat, err := resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+	if err != nil {
+		panic(fmt.Errorf("could not get json format: %w", err))
+	}
+	return runTestAction{
+		config,
+		logger,
+		openapiClient,
+		tests,
+		environments,
+		jsonFormat,
+		cliExit,
+	}
+}
+
+func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
+	if err := args.Validate(); err != nil {
+		return err
 	}
 
 	a.logger.Debug(
@@ -86,574 +76,109 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 		zap.String("junit", args.JUnit),
 	)
 
-	envID := args.EnvID
+	f, err := fileutil.Read(args.DefinitionFile)
+	if err != nil {
+		return fmt.Errorf("cannot read definition file %s: %w", args.DefinitionFile, err)
+	}
+	defFile := defFile{f}
+	a.logger.Debug("Definition file read", zap.String("absolutePath", defFile.AbsPath()))
 
-	if fileutil.IsFilePath(args.EnvID) {
-		a.logger.Debug("resolve envID from file reference", zap.String("path", envID))
-		jsonFormat, err := resourcemanager.Formats.Get(resourcemanager.FormatJSON)
-		if err != nil {
-			return fmt.Errorf("could not get json format: %w", err)
+	envID, err := a.resolveEnvID(ctx, args.EnvID)
+	if err != nil {
+		return fmt.Errorf("cannot resolve environment id: %w", err)
+	}
+	a.logger.Debug("env resolved", zap.String("ID", envID))
+
+	defFile, err = a.apply(ctx, defFile)
+	if err != nil {
+		return fmt.Errorf("cannot apply definition file: %w", err)
+	}
+
+	var run *openapi.TestRun
+	var envVars []envVar
+
+	// iterate until we have all env vars,
+	// or the server returns an actual error
+	for {
+		run, err = a.run(ctx, defFile, envID, envVars)
+		if err == nil {
+			break
 		}
-
-		envJson, err := a.environmentActions.Apply(ctx, args.EnvID, jsonFormat)
-		if err != nil {
-			return fmt.Errorf("could not read environment file: %w", err)
-		}
-
-		parsed, err := gabs.ParseJSON([]byte(envJson))
-		if err != nil {
-			return fmt.Errorf("could not parse environment json: %w", err)
-		}
-
-		ok := true
-		envID, ok = parsed.Path("spec.id").Data().(string)
+		missingEnvVarsErr, ok := err.(missingEnvVarsError)
 		if !ok {
-			return fmt.Errorf("could not parse environment id from json")
-		}
-	}
-
-	a.logger.Debug("resolved env", zap.String("envID", envID))
-
-	params := runDefParams{
-		DefinitionFile: args.DefinitionFile,
-		EnvID:          envID,
-		WaitForResult:  args.WaitForResult,
-		JunitFile:      args.JUnit,
-		Metadata:       a.getMetadata(),
-	}
-
-	err := a.runDefinition(ctx, params)
-	if err != nil {
-		return fmt.Errorf("could not run definition: %w", err)
-	}
-
-	return nil
-}
-
-func (a runTestAction) testFileToID(ctx context.Context, originalPath, filePath string) (string, error) {
-	path := filepath.Join(originalPath, filePath)
-	f, err := file.Read(path)
-	if err != nil {
-		return "", err
-	}
-
-	if t, err := f.Definition().Test(); err == nil && t.Trigger.Type == "grpc" {
-		newFile, err := getUpdatedTestWithGrpcTrigger(f, t)
-		if err != nil {
-			return "", err
+			// actual error, return
+			return fmt.Errorf("cannot run test: %w", err)
 		}
 
-		if newFile != nil { // has new file, update it
-			f = newFile
-		}
+		// missing vars error
+		envVars = a.askForMissingVars([]envVar(missingEnvVarsErr))
 	}
 
-	newFile, err := a.testActions.Apply(ctx, *f)
-	if err != nil {
-		return "", fmt.Errorf("could not apply test: %w", err)
-	}
-
-	if t, err := newFile.Definition().Test(); err == nil {
-		return t.ID, nil
-	}
-
-	return "", fmt.Errorf("obtained definition is not a test")
-}
-
-func (a runTestAction) runDefinition(ctx context.Context, params runDefParams) error {
-	f, err := file.Read(params.DefinitionFile)
-	if err != nil {
-		return err
-	}
-
-	newFile, err := a.testActions.Apply(ctx, *f)
-	if err != nil {
-		return fmt.Errorf("could not apply test: %w", err)
-	}
-
-	return a.runDefinitionFile(ctx, newFile, params)
-}
-
-func (a runTestAction) runDefinitionFile(ctx context.Context, f *file.File, params runDefParams) error {
-	f, err := f.ResolveVariables()
-	if err != nil {
-		return err
-	}
-
-	if t, err := f.Definition().Transaction(); err == nil {
-		for i, step := range t.Steps {
-			// since step could be a relative path in relation of the definition file,
-			// to check it properly we need to convert it to an absolute path
-			stepPath := filepath.Join(f.AbsDir(), step)
-
-			if !fileutil.IsFilePath(stepPath) {
-				// not referencing a file, keep the value
-				continue
-			}
-
-			// references a file, resolve to its ID
-			id, err := a.testFileToID(ctx, f.AbsDir(), step)
-			if err != nil {
-				return fmt.Errorf(`cannot translate path "%s" to an ID: %w`, step, err)
-			}
-
-			t.Steps[i] = id
-		}
-
-		def := yaml.File{
-			Type: yaml.FileTypeTransaction,
-			Spec: t,
-		}
-
-		updated, err := def.Encode()
-		if err != nil {
-			return fmt.Errorf(`cannot encode updated transaction: %w`, err)
-		}
-
-		f, err = file.New(f.Path(), updated)
-		if err != nil {
-			return fmt.Errorf(`cannot recreate updated file: %w`, err)
-		}
-	}
-
-	if t, err := f.Definition().Test(); err == nil && t.Trigger.Type == "grpc" {
-		newFile, err := getUpdatedTestWithGrpcTrigger(f, t)
-		if err != nil {
-			return err
-		}
-
-		if newFile != nil { // has new file, update it
-			f = newFile
-		}
-	}
-
-	variables := make([]openapi.EnvironmentValue, 0)
-	for name, value := range params.EnvironmentVariables {
-		variables = append(variables, openapi.EnvironmentValue{Key: openapi.PtrString(name), Value: openapi.PtrString(value)})
-	}
-
-	body, resp, err := a.client.ApiApi.
-		ExecuteDefinition(ctx).
-		TextDefinition(openapi.TextDefinition{
-			Content: openapi.PtrString(f.Contents()),
-			RunInformation: &openapi.RunInformation{
-				Metadata:      params.Metadata,
-				EnvironmentId: &params.EnvID,
-				Variables:     variables,
-			},
-		}).
-		Execute()
-
-	if resp != nil && resp.StatusCode == http.StatusUnprocessableEntity {
-		filledVariables, err := a.askForMissingVariables(resp)
-		if err != nil {
-			return err
-		}
-
-		params.EnvironmentVariables = filledVariables
-
-		return a.runDefinitionFile(ctx, f, params)
-	}
-
-	if err != nil {
-		return fmt.Errorf("could not execute definition: %w", err)
-	}
-
-	if resp.StatusCode == http.StatusCreated && !f.HasID() {
-		f, err = f.SetID(body.GetId())
-		if err != nil {
-			return fmt.Errorf("could not update definition file: %w", err)
-		}
-
-		_, err = f.Write()
-		if err != nil {
-			return fmt.Errorf("could not update definition file: %w", err)
-		}
-	}
-
-	runID := getTestRunIDFromString(body.GetRunId())
-	a.logger.Debug(
-		"executed",
-		zap.Int32("runID", runID),
-		zap.String("runType", body.GetType()),
-	)
-
-	switch body.GetType() {
-	case "Test":
-		test, err := a.getTest(ctx, body.GetId())
-		if err != nil {
-			return fmt.Errorf("could not get test info: %w", err)
-		}
-		return a.testRun(ctx, test, runID, params)
-	case "Transaction":
-		test, err := a.getTransaction(ctx, body.GetId())
-		if err != nil {
-			return fmt.Errorf("could not get test info: %w", err)
-		}
-		return a.transactionRun(ctx, test, runID, params)
-	}
-
-	return fmt.Errorf(`unsuported run type "%s"`, body.GetType())
-}
-
-func (a runTestAction) askForMissingVariables(resp *http.Response) (map[string]string, error) {
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return map[string]string{}, fmt.Errorf("could not read response body: %w", err)
-	}
-
-	var missingVariablesError openapi.MissingVariablesError
-	err = json.Unmarshal(body, &missingVariablesError)
-	if err != nil {
-		return map[string]string{}, fmt.Errorf("could not unmarshal response: %w", err)
-	}
-
-	uniqueMissingVariables := map[string]string{}
-	for _, missingVariables := range missingVariablesError.MissingVariables {
-		for _, variable := range missingVariables.Variables {
-			defaultValue := ""
-			if variable.DefaultValue != nil {
-				defaultValue = *variable.DefaultValue
-			}
-			uniqueMissingVariables[*variable.Key] = defaultValue
-		}
-	}
-
-	if len(uniqueMissingVariables) > 0 {
-		ui.DefaultUI.Warning("Some variables are required by one or more tests")
-		ui.DefaultUI.Info("Fill the values for each variable:")
-	}
-
-	filledVariables := map[string]string{}
-
-	for variableName, variableDefaultValue := range uniqueMissingVariables {
-		value := ui.DefaultUI.TextInput(variableName, variableDefaultValue)
-		filledVariables[variableName] = value
-	}
-
-	return filledVariables, nil
-}
-
-func (a runTestAction) getTransaction(ctx context.Context, id string) (openapi.Transaction, error) {
-	a.client.GetConfig().AddDefaultHeader("X-Tracetest-Augmented", "true")
-	transaction, _, err := a.client.ResourceApiApi.
-		GetTransaction(ctx, id).
-		Execute()
-
-	// reset augmented header
-	delete(a.client.GetConfig().DefaultHeader, "X-Tracetest-Augmented")
-
-	if err != nil {
-		return openapi.Transaction{}, fmt.Errorf("could not execute request: %w", err)
-	}
-
-	return transaction.GetSpec(), nil
-}
-
-func (a runTestAction) getTest(ctx context.Context, id string) (openapi.Test, error) {
-	// test, _, err := a.client.ApiApi.
-	// 	GetTest(ctx, id).
-	// 	Execute()
-	// if err != nil {
-	// 	return openapi.Test{}, fmt.Errorf("could not execute request: %w", err)
-	// }
-
-	// return *test, nil
-	return openapi.Test{}, nil
-}
-
-func (a runTestAction) testRun(ctx context.Context, test openapi.Test, runID int32, params runDefParams) error {
-	a.logger.Debug("run test", zap.Bool("wait-for-results", params.WaitForResult))
-	testID := test.GetId()
-	testRun, err := a.getTestRun(ctx, testID, runID)
-	if err != nil {
-		return fmt.Errorf("could not run test: %w", err)
-	}
-
-	if params.WaitForResult {
-		updatedTestRun, err := a.waitForTestResult(ctx, testID, getTestRunID(testRun))
-		if err != nil {
-			return fmt.Errorf("could not wait for result: %w", err)
-		}
-
-		testRun = updatedTestRun
-
-		if err := a.saveJUnitFile(ctx, testID, getTestRunID(testRun), params.JunitFile); err != nil {
-			return fmt.Errorf("could not save junit file: %w", err)
-		}
-	}
-
-	tro := formatters.TestRunOutput{
-		HasResults: params.WaitForResult,
-		Test:       test,
-		Run:        testRun,
-	}
-
-	formatter := formatters.TestRun(a.config, true)
-	formattedOutput := formatter.Format(tro)
-	fmt.Print(formattedOutput)
-
-	allPassed := tro.Run.Result.GetAllPassed()
-	if params.WaitForResult && !allPassed {
-		// It failed, so we have to return an error status
-		a.cliExit(1)
-	}
-
-	return nil
-}
-
-func (a runTestAction) transactionRun(ctx context.Context, transaction openapi.Transaction, rid int32, params runDefParams) error {
-	a.logger.Debug("run transaction", zap.Bool("wait-for-results", params.WaitForResult))
-	transactionID := transaction.GetId()
-	transactionRun, err := a.getTransactionRun(ctx, transactionID, int32(rid))
-	if err != nil {
-		return fmt.Errorf("could not run transaction: %w", err)
-	}
-
-	if params.WaitForResult {
-		updatedTestRun, err := a.waitForTransactionResult(ctx, transactionID, transactionRun.GetId())
-		if err != nil {
-			return fmt.Errorf("could not wait for result: %w", err)
-		}
-
-		transactionRun = updatedTestRun
-	}
-
-	tro := formatters.TransactionRunOutput{
-		HasResults:  params.WaitForResult,
-		Transaction: transaction,
-		Run:         transactionRun,
-	}
-
-	formatter := formatters.TransactionRun(a.config, true)
-	formattedOutput := formatter.Format(tro)
-	fmt.Print(formattedOutput)
-
-	if params.WaitForResult {
-		if utils.RunStateIsFailed(tro.Run.GetState()) {
-			// It failed, so we have to return an error status
-			a.cliExit(1)
-		}
-
-		for _, step := range tro.Run.Steps {
-			if !step.Result.GetAllPassed() {
-				// if any test doesn't pass, fail the transaction execution
-				a.cliExit(1)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (a runTestAction) saveJUnitFile(ctx context.Context, testId string, testRunId int32, outputFile string) error {
-	if outputFile == "" {
+	if !args.WaitForResult {
+		// TODO: show url?
 		return nil
 	}
 
-	req := a.client.ApiApi.GetRunResultJUnit(ctx, testId, testRunId)
-	junit, _, err := a.client.ApiApi.GetRunResultJUnitExecute(req)
+	result, err := a.waitForResult(ctx, run)
 	if err != nil {
-		return fmt.Errorf("could not execute request: %w", err)
+		return fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
-	f, err := os.Create(outputFile)
-	if err != nil {
-		return fmt.Errorf("could not create junit output file: %w", err)
-	}
-
-	_, err = f.WriteString(junit)
-
-	return err
-
-}
-
-func (a runTestAction) getTestRun(ctx context.Context, testID string, runID int32) (openapi.TestRun, error) {
-	run, _, err := a.client.ApiApi.
-		GetTestRun(ctx, testID, runID).
-		Execute()
-	if err != nil {
-		return openapi.TestRun{}, fmt.Errorf("could not execute request: %w", err)
-	}
-
-	return *run, nil
-}
-
-func (a runTestAction) getTransactionRun(ctx context.Context, transactionID string, runID int32) (openapi.TransactionRun, error) {
-	run, _, err := a.client.ApiApi.
-		GetTransactionRun(ctx, transactionID, runID).
-		Execute()
-	if err != nil {
-		return openapi.TransactionRun{}, fmt.Errorf("could not execute request: %w", err)
-	}
-
-	return *run, nil
-}
-
-func (a runTestAction) waitForTestResult(ctx context.Context, testID string, testRunID int32) (openapi.TestRun, error) {
-	var (
-		testRun   openapi.TestRun
-		lastError error
-		wg        sync.WaitGroup
-	)
-	wg.Add(1)
-	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				readyTestRun, err := a.isTestReady(ctx, testID, testRunID)
-				if err != nil {
-					lastError = err
-					wg.Done()
-					return
-				}
-
-				if readyTestRun != nil {
-					testRun = *readyTestRun
-					wg.Done()
-					return
-				}
-			}
+	if args.JUnit != "" {
+		err := a.writeJUnitReport(ctx, result, args.JUnit)
+		if err != nil {
+			return fmt.Errorf("cannot write junit report: %w", err)
 		}
-	}()
-	wg.Wait()
-
-	if lastError != nil {
-		return openapi.TestRun{}, lastError
 	}
 
-	return testRun, nil
+	return nil
 }
 
-func (a runTestAction) waitForTransactionResult(ctx context.Context, transactionID, transactionRunID string) (openapi.TransactionRun, error) {
-	var (
-		transactionRun openapi.TransactionRun
-		lastError      error
-		wg             sync.WaitGroup
-	)
-	wg.Add(1)
-	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				readyTransactionRun, err := a.isTransactionReady(ctx, transactionID, transactionRunID)
-				if err != nil {
-					lastError = err
-					wg.Done()
-					return
-				}
-
-				if readyTransactionRun != nil {
-					transactionRun = *readyTransactionRun
-					wg.Done()
-					return
-				}
-			}
-		}
-	}()
-	wg.Wait()
-
-	if lastError != nil {
-		return openapi.TransactionRun{}, lastError
-	}
-
-	return transactionRun, nil
+func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, error) {
+	return "", fmt.Errorf("not implemented")
 }
 
-func (a runTestAction) isTestReady(ctx context.Context, testID string, testRunId int32) (*openapi.TestRun, error) {
-	req := a.client.ApiApi.GetTestRun(ctx, testID, testRunId)
-	run, _, err := a.client.ApiApi.GetTestRunExecute(req)
-	if err != nil {
-		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
-	}
-
-	if utils.RunStateIsFinished(run.GetState()) {
-		return run, nil
-	}
-
-	return nil, nil
+func (a runTestAction) apply(ctx context.Context, defFile defFile) (defFile, error) {
+	return defFile, nil
 }
 
-func (a runTestAction) isTransactionReady(ctx context.Context, transactionID, transactionRunId string) (*openapi.TransactionRun, error) {
-	runId, err := strconv.Atoi(transactionRunId)
-	if err != nil {
-		return nil, fmt.Errorf("invalid transaction run id format: %w", err)
-	}
-
-	req := a.client.ApiApi.GetTransactionRun(ctx, transactionID, int32(runId))
-	run, _, err := a.client.ApiApi.GetTransactionRunExecute(req)
-	if err != nil {
-		return nil, fmt.Errorf("could not execute GetTestRun request: %w", err)
-	}
-
-	if utils.RunStateIsFinished(run.GetState()) {
-		return run, nil
-	}
-
-	return nil, nil
+type envVar struct {
+	name         string
+	defaultValue string
+	userValue    string
 }
 
-func (a runTestAction) getMetadata() map[string]string {
-	ci := cienvironment.DetectCIEnvironment()
-	if ci == nil {
-		return map[string]string{}
+func (ev envVar) value() string {
+	if ev.userValue != "" {
+		return ev.userValue
 	}
 
-	metadata := map[string]string{
-		"name":        ci.Name,
-		"url":         ci.URL,
-		"buildNumber": ci.BuildNumber,
-	}
+	return ev.defaultValue
 
-	if ci.Git != nil {
-		metadata["branch"] = ci.Git.Branch
-		metadata["tag"] = ci.Git.Tag
-		metadata["revision"] = ci.Git.Revision
-	}
-
-	return metadata
 }
 
-func getTestRunIDFromString(testRunIDAsString string) int32 {
-	testRunID, _ := strconv.Atoi(testRunIDAsString)
-	return int32(testRunID)
+type missingEnvVarsError []envVar
+
+func (e missingEnvVarsError) Error() string {
+	return fmt.Sprintf("missing env vars: %v", []envVar(e))
 }
 
-func getTestRunID(testRun openapi.TestRun) int32 {
-	return getTestRunIDFromString(testRun.GetId())
+func (a runTestAction) run(ctx context.Context, defFile defFile, envID string, envVars []envVar) (*openapi.TestRun, error) {
+	return openapi.NewTestRun(), fmt.Errorf("not implemented")
 }
 
-func getUpdatedTestWithGrpcTrigger(f *file.File, t yaml.Test) (*file.File, error) {
-	protobufFile := filepath.Join(f.AbsDir(), t.Trigger.GRPC.ProtobufFile)
+func (a runTestAction) askForMissingVars(missingVars []envVar) []envVar {
+	return []envVar{}
+}
 
-	if !fileutil.IsFilePath(protobufFile) {
-		return nil, nil
-	}
+func (a runTestAction) waitForResult(ctx context.Context, run *openapi.TestRun) (*openapi.TestRun, error) {
+	return openapi.NewTestRun(), fmt.Errorf("not implemented")
+}
 
-	// referencing a file, keep the value
-	fileContent, err := os.ReadFile(protobufFile)
-	if err != nil {
-		return nil, fmt.Errorf(`cannot read protobuf file: %w`, err)
-	}
+func (a runTestAction) writeJUnitReport(ctx context.Context, result *openapi.TestRun, junit string) error {
+	return fmt.Errorf("not implemented")
+}
 
-	t.Trigger.GRPC.ProtobufFile = string(fileContent)
-
-	def := yaml.File{
-		Type: yaml.FileTypeTest,
-		Spec: t,
-	}
-
-	updated, err := def.Encode()
-	if err != nil {
-		return nil, fmt.Errorf(`cannot encode updated test: %w`, err)
-	}
-
-	f, err = file.New(f.Path(), updated)
-	if err != nil {
-		return nil, fmt.Errorf(`cannot recreate updated file: %w`, err)
-	}
-
-	return f, nil
+type defFile struct {
+	fileutil.File
 }
