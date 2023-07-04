@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
 
@@ -95,6 +96,11 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	}
 	a.logger.Debug("env resolved", zap.String("ID", envID))
 
+	defFile, err = a.injectLocalEnvVars(ctx, defFile)
+	if err != nil {
+		return fmt.Errorf("cannot inject local env vars: %w", err)
+	}
+
 	defFile, err = a.apply(ctx, defFile)
 	if err != nil {
 		return fmt.Errorf("cannot apply definition file: %w", err)
@@ -162,6 +168,21 @@ func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, 
 	}
 
 	return env.Spec.GetId(), nil
+}
+
+func (a runTestAction) injectLocalEnvVars(ctx context.Context, df defFile) (defFile, error) {
+	variableInjector := variable.NewInjector(variable.WithVariableProvider(
+		variable.EnvironmentVariableProvider{},
+	))
+
+	injected, err := variableInjector.ReplaceInString(string(df.Contents()))
+	if err != nil {
+		return df, fmt.Errorf("cannot inject local environment variables: %w", err)
+	}
+
+	df = defFile{fileutil.New(df.AbsPath(), []byte(injected))}
+
+	return df, nil
 }
 
 func (a runTestAction) apply(ctx context.Context, df defFile) (defFile, error) {
