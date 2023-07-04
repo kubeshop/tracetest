@@ -15,7 +15,7 @@ You can create tests in two ways:
 - Visually, in the Web UI
 - Programmatically, in YAML
 
-## Creating Visual Trace-based Tests
+## Creating Trace-based Tests Visually
 
 This guide will show how to create end-to-end and integration tests in less than 5 minutes via the Web UI.
 
@@ -84,5 +84,6 @@ The **Automate** tab shows how to automate the test run with the Tracetest CLI a
 
 ![automate](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476810/docs/screely-1688476801601_f4s0iy.png)
 
+## Creating Trace-based Tests Programatically
 
-
+todo...

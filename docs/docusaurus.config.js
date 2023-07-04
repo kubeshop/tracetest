@@ -200,7 +200,7 @@ const config = {
         respectPrefersColorScheme: false,
       },
       navbar: {
-        title: 'Tracetest',
+        title: 'Tracetest Docs',
         logo: {
           alt: 'Tracetest Logo',
           src: 'img/logo.svg',
@@ -219,6 +219,16 @@ const config = {
             position: 'left',
             sidebarId: 'liveExamplesSidebar',
             label: 'Live Examples'
+          },
+          {
+            href: '/openapi',
+            // Only one of "to" or "href" should be used
+            // href: 'https://www.facebook.com',
+            label: 'Open API',
+            // Only one of "label" or "html" should be used
+            // html: '<b>Introduction</b>'
+            position: 'left',
+            target: '_self',
           },
           {
             href: "https://tracetest.io/community",

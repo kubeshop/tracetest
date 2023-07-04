@@ -659,6 +659,16 @@ const sidebars = {
     },
     {
       type: "link",
+      label: "Examples & Tutorials",
+      href: "/examples-tutorials/overview",
+    },
+    {
+      type: "link",
+      label: "Live Examples",
+      href: "/live-examples/pokeshop/overview",
+    },
+    {
+      type: "link",
       label: "Tracetest Open API Definition",
       href: "/openapi",
     },
