@@ -1,17 +1,21 @@
 import {NodeProps} from 'react-flow-renderer';
 
-import CurrentSpanSelector from 'components/CurrentSpanSelector';
 import useSpanData from 'hooks/useSpanData';
 import {INodeDataSpan} from 'types/DAG.types';
 import Footer from './Footer';
+import SelectAsCurrent from './SelectAsCurrent';
 import BaseSpanNode from '../BaseSpanNode/BaseSpanNode';
-import useShowSelectAsCurrent from '../../../hooks/useShowSelectAsCurrent';
+import useSelectAsCurrent from '../../../hooks/useSelectAsCurrent';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
 const TestSpanNode = ({data, id, selected}: IProps) => {
   const {span, testSpecs, testOutputs} = useSpanData(id);
-  const showSelectAsCurrent = useShowSelectAsCurrent({selected, matched: data.isMatched});
+  const {isLoading, onSelectAsCurrent, showSelectAsCurrent} = useSelectAsCurrent({
+    selected,
+    matched: data.isMatched,
+    span,
+  });
 
   return (
     <>
@@ -23,7 +27,7 @@ const TestSpanNode = ({data, id, selected}: IProps) => {
         isSelected={selected}
         span={span}
       />
-      {showSelectAsCurrent && <CurrentSpanSelector spanId={id} />}
+      {showSelectAsCurrent && <SelectAsCurrent isLoading={isLoading} onSelectAsCurrent={onSelectAsCurrent} />}
     </>
   );
 };
