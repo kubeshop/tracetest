@@ -30,7 +30,9 @@ type testSpecV2 []TestSpec
 
 func (v2 testSpecV2) valid() bool {
 	for _, spec := range v2 {
-		if spec.Selector == "" {
+		// since we can have an empty selector, to check if go
+		// sent an empty struct we need to see if we have an empty selector and no assertions
+		if spec.Selector == "" && len(spec.Assertions) == 0 {
 			return false
 		}
 	}
