@@ -101,7 +101,7 @@ func (pr PluginResult) CalculateResults() PluginResult {
 		}
 	}
 
-	pr.Score = 0
+	pr.Score = 100
 	if totalScore > 0 {
 		pr.Score = (100 * passScore) / totalScore
 	}

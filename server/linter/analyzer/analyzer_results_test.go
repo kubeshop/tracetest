@@ -68,7 +68,7 @@ func TestAnalyzerResults(t *testing.T) {
 			Rules: []analyzer.RuleResult{},
 		}.CalculateResults()
 
-		assert.Equal(t, 0, pluginResult.Score)
+		assert.Equal(t, 100, pluginResult.Score)
 		assert.Equal(t, true, pluginResult.Passed)
 	})
 
@@ -83,7 +83,7 @@ func TestAnalyzerResults(t *testing.T) {
 			},
 		}.CalculateResults()
 
-		assert.Equal(t, 0, pluginResult.Score)
+		assert.Equal(t, 100, pluginResult.Score)
 		assert.Equal(t, true, pluginResult.Passed)
 	})
 
@@ -97,7 +97,7 @@ func TestAnalyzerResults(t *testing.T) {
 			},
 		}.CalculateResults()
 
-		assert.Equal(t, 0, pluginResult.Score)
+		assert.Equal(t, 100, pluginResult.Score)
 		assert.Equal(t, true, pluginResult.Passed)
 	})
 }
