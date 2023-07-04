@@ -96,11 +96,6 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	}
 	a.logger.Debug("env resolved", zap.String("ID", envID))
 
-	defFile, err = a.injectLocalEnvVars(ctx, defFile)
-	if err != nil {
-		return fmt.Errorf("cannot inject local env vars: %w", err)
-	}
-
 	defFile, err = a.apply(ctx, defFile)
 	if err != nil {
 		return fmt.Errorf("cannot apply definition file: %w", err)
@@ -203,8 +198,13 @@ func (a runTestAction) apply(ctx context.Context, df defFile) (defFile, error) {
 }
 
 func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, error) {
+	df, err := a.injectLocalEnvVars(ctx, df)
+	if err != nil {
+		return df, fmt.Errorf("cannot inject local env vars: %w", err)
+	}
+
 	var test openapi.TestResource
-	err := yaml.Unmarshal(df.Contents(), &test)
+	err = yaml.Unmarshal(df.Contents(), &test)
 	if err != nil {
 		a.logger.Error("error parsing test", zap.String("content", string(df.Contents())), zap.Error(err))
 		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
@@ -258,8 +258,13 @@ func consolidateGRPCFile(df defFile, test openapi.TestResource) (openapi.TestRes
 }
 
 func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFile, error) {
+	df, err := a.injectLocalEnvVars(ctx, df)
+	if err != nil {
+		return df, fmt.Errorf("cannot inject local env vars: %w", err)
+	}
+
 	var tran openapi.TransactionResource
-	err := yaml.Unmarshal(df.Contents(), &tran)
+	err = yaml.Unmarshal(df.Contents(), &tran)
 	if err != nil {
 		a.logger.Error("error parsing transaction", zap.String("content", string(df.Contents())), zap.Error(err))
 		return df, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
