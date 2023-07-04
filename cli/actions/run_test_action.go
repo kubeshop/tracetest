@@ -2,6 +2,7 @@ package actions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
@@ -135,7 +136,27 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 }
 
 func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, error) {
-	return "", fmt.Errorf("not implemented")
+	if !fileutil.IsFilePath(envID) {
+		a.logger.Debug("envID is not a file path", zap.String("envID", envID))
+		return envID, nil
+	}
+
+	filePath := envID
+
+	a.logger.Debug("envID is a file path", zap.String("filePath", filePath))
+	envJson, err := a.environments.Apply(ctx, filePath, a.jsonFormat)
+	if err != nil {
+		return "", fmt.Errorf("could not read environment file: %w", err)
+	}
+
+	var env openapi.EnvironmentResource
+	err = json.Unmarshal([]byte(envJson), &env)
+	if err != nil {
+		a.logger.Error("error parsing json", zap.String("content", envJson), zap.Error(err))
+		return "", fmt.Errorf("could not unmarshal environment json: %w", err)
+	}
+
+	return env.Spec.GetId(), nil
 }
 
 func (a runTestAction) apply(ctx context.Context, defFile defFile) (defFile, error) {
