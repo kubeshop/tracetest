@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
 	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
 	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
@@ -85,7 +84,7 @@ func TestListTests(t *testing.T) {
 		testVarsList := helpers.UnmarshalYAMLSequence[types.TestResource](t, result.StdOut)
 		require.Len(testVarsList, 2)
 		importTest := testVarsList[0]
-		spew.Dump(importTest)
+
 		assert.Equal("Test", importTest.Type)
 		assert.Equal("fH_8AulVR", importTest.Spec.ID)
 		assert.Equal("Pokeshop - Import", importTest.Spec.Name)

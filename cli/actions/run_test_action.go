@@ -252,7 +252,7 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
 	}
 
-	test, err = consolidateGRPCFile(df, test)
+	test, err = a.consolidateGRPCFile(df, test)
 	if err != nil {
 		return df, fmt.Errorf("could not consolidate grpc file: %w", err)
 	}
@@ -290,17 +290,26 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 	return df, nil
 }
 
-func consolidateGRPCFile(df defFile, test openapi.TestResource) (openapi.TestResource, error) {
-	if test.Spec.ServiceUnderTest.GetTriggerType() != "grpc" {
+func (a runTestAction) consolidateGRPCFile(df defFile, test openapi.TestResource) (openapi.TestResource, error) {
+	if test.Spec.Trigger.GetType() != "grpc" {
+		a.logger.Debug("test does not use grpc", zap.String("triggerType", test.Spec.Trigger.GetType()))
 		return test, nil
 	}
 
-	pbFilePath := df.RelativeFile(test.Spec.ServiceUnderTest.Grpc.GetProtobufFile())
+	definedPBFile := test.Spec.Trigger.Grpc.GetProtobufFile()
+	if !fileutil.LooksLikeFilePath(definedPBFile) {
+		a.logger.Debug("protobuf file is not a file path", zap.String("protobufFile", definedPBFile))
+		return test, nil
+	}
+
+	pbFilePath := df.RelativeFile(definedPBFile)
+	a.logger.Debug("protobuf file", zap.String("path", pbFilePath))
 
 	pbFile, err := fileutil.Read(pbFilePath)
 	if err != nil {
 		return test, fmt.Errorf(`cannot read protobuf file: %w`, err)
 	}
+	a.logger.Debug("protobuf file contents", zap.String("contents", string(pbFile.Contents())))
 
 	test.Spec.Trigger.Grpc.SetProtobufFile(string(pbFile.Contents()))
 
