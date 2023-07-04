@@ -28,7 +28,7 @@ Test.FromRawTest = ({
   description = '',
   specs = [],
   version = 1,
-  serviceUnderTest: rawTrigger,
+  trigger: rawTrigger,
   summary = {},
   outputs = [],
   createdAt = '',

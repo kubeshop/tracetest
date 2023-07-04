@@ -1,27 +1,31 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants';
-import Test, {TRawTest, TRawTestResourceList} from 'models/Test.model';
+import Test, {TRawTest, TRawTestResource, TRawTestResourceList} from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 
+const defaultHeaders = {'content-type': 'application/json', 'X-Tracetest-Augmented': 'true'};
+
 const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
-  createTest: builder.mutation<Test, TRawTest>({
+  createTest: builder.mutation<Test, TRawTestResource>({
     query: newTest => ({
       url: '/tests',
       method: HTTP_METHOD.POST,
       body: newTest,
+      headers: defaultHeaders,
     }),
-    transformResponse: (rawTest: TRawTest) => Test.FromRawTest(rawTest),
+    transformResponse: (rawTest: TRawTestResource) => Test(rawTest),
     invalidatesTags: [
       {type: TracetestApiTags.TEST, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
-  editTest: builder.mutation<Test, {test: TRawTest; testId: string}>({
+  editTest: builder.mutation<Test, {test: TRawTestResource; testId: string}>({
     query: ({test, testId}) => ({
       url: `/tests/${testId}`,
       method: HTTP_METHOD.PUT,
       body: test,
+      headers: defaultHeaders,
     }),
     invalidatesTags: test => [
       {type: TracetestApiTags.TEST, id: 'LIST'},
@@ -33,8 +37,10 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
     PaginationResponse<Test>,
     {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
   >({
-    query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) =>
-      `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
+    query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) => ({
+      url: `/tests?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
+      headers: defaultHeaders,
+    }),
     providesTags: () => [{type: TracetestApiTags.TEST, id: 'LIST'}],
     transformResponse: ({items = [], count = 0}: TRawTestResourceList) => {
       return {
@@ -44,12 +50,12 @@ const TestEndpoint = (builder: TTestApiEndpointBuilder) => ({
     },
   }),
   getTestById: builder.query<Test, {testId: string}>({
-    query: ({testId}) => `/tests/${testId}`,
+    query: ({testId}) => ({url: `/tests/${testId}`, headers: defaultHeaders}),
     providesTags: result => [{type: TracetestApiTags.TEST, id: result?.id}],
-    transformResponse: (rawTest: TRawTest) => Test.FromRawTest(rawTest),
+    transformResponse: (rawTest: TRawTestResource) => Test(rawTest),
   }),
   getTestVersionById: builder.query<Test, {testId: string; version: number}>({
-    query: ({testId, version}) => `/tests/${testId}/version/${version}`,
+    query: ({testId, version}) => ({url: `/tests/${testId}/version/${version}`, headers: defaultHeaders}),
     providesTags: result => [{type: TracetestApiTags.TEST, id: result?.id}],
     transformResponse: (rawTest: TRawTest) => Test.FromRawTest(rawTest),
     keepUnusedDataFor: 10,
