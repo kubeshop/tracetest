@@ -69,13 +69,14 @@ func (a exportTestAction) getDefinitionFromServer(ctx context.Context, args Expo
 		expectedVersion = *test.Version
 	}
 
-	request := a.client.ApiApi.GetTestVersionDefinitionFile(ctx, args.TestId, expectedVersion)
-	definitionString, _, err := a.client.ApiApi.GetTestVersionDefinitionFileExecute(request)
-	if err != nil {
-		return "", fmt.Errorf("could not get test definition: %w", err)
-	}
+	// request := a.client.ApiApi.GetTestVersionDefinitionFile(ctx, args.TestId, expectedVersion)
+	// definitionString, _, err := a.client.ApiApi.GetTestVersionDefinitionFileExecute(request)
+	// if err != nil {
+	// 	return "", fmt.Errorf("could not get test definition: %w", err)
+	// }
 
-	return definitionString, nil
+	// return definitionString, nil
+	return "", fmt.Errorf("deprecated")
 }
 
 func (a exportTestAction) getTestFromServer(ctx context.Context, testID string) (openapi.Test, error) {
