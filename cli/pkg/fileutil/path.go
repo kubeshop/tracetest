@@ -3,6 +3,7 @@ package fileutil
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func ToAbsDir(filePath string) (string, error) {
@@ -20,6 +21,13 @@ func RelativeTo(path, relativeTo string) string {
 	}
 
 	return filepath.Join(relativeTo, path)
+}
+
+func LooksLikeFilePath(path string) bool {
+	return strings.HasPrefix(path, "./") ||
+		strings.HasPrefix(path, "../") ||
+		strings.HasPrefix(path, "/")
+
 }
 
 func IsFilePath(path string) bool {

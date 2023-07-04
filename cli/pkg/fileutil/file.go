@@ -89,6 +89,14 @@ func (f File) AbsDir() string {
 	return filepath.Dir(f.AbsPath())
 }
 
+func (f File) RelativeFile(path string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+
+	return filepath.Join(f.AbsDir(), path)
+}
+
 func (f File) Write() (File, error) {
 	err := os.WriteFile(f.path, f.contents, 0644)
 	if err != nil {

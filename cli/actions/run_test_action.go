@@ -61,8 +61,8 @@ func NewRunTestAction(
 		config,
 		logger,
 		openapiClient,
-		tests,
 		environments,
+		tests,
 		transactions,
 		yamlFormat,
 		cliExit,
@@ -189,6 +189,11 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
 	}
 
+	test, err = consolidateGRPCFile(df, test)
+	if err != nil {
+		return df, fmt.Errorf("could not consolidate grpc file: %w", err)
+	}
+
 	a.logger.Debug("applying test",
 		zap.String("absolutePath", df.AbsPath()),
 		zap.String("id", test.Spec.GetId()),
@@ -214,6 +219,23 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 	return df, nil
 }
 
+func consolidateGRPCFile(df defFile, test openapi.TestResource) (openapi.TestResource, error) {
+	if test.Spec.ServiceUnderTest.GetTriggerType() != "grpc" {
+		return test, nil
+	}
+
+	pbFilePath := df.RelativeFile(test.Spec.ServiceUnderTest.Grpc.GetProtobufFile())
+
+	pbFile, err := fileutil.Read(pbFilePath)
+	if err != nil {
+		return test, fmt.Errorf(`cannot read protobuf file: %w`, err)
+	}
+
+	test.Spec.Trigger.Grpc.SetProtobufFile(string(pbFile.Contents()))
+
+	return test, nil
+}
+
 func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFile, error) {
 	var tran openapi.TransactionResource
 	err := yaml.Unmarshal(df.Contents(), &tran)
@@ -226,6 +248,12 @@ func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFil
 		zap.String("absolutePath", df.AbsPath()),
 		zap.String("id", tran.Spec.GetId()),
 	)
+
+	tran, err = a.mapTransactionSteps(ctx, df, tran)
+	if err != nil {
+		return df, fmt.Errorf("could not map transaction steps: %w", err)
+	}
+
 	updated, err := a.transactions.Apply(ctx, df.AbsPath(), a.yamlFormat)
 	if err != nil {
 		return df, fmt.Errorf("could not read transaction file: %w", err)
@@ -245,6 +273,48 @@ func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFil
 	)
 
 	return df, nil
+}
+
+func (a runTestAction) mapTransactionSteps(ctx context.Context, df defFile, tran openapi.TransactionResource) (openapi.TransactionResource, error) {
+	for i, step := range tran.Spec.GetSteps() {
+		a.logger.Debug("mapping transaction step",
+			zap.Int("index", i),
+			zap.String("step", step),
+		)
+		if !fileutil.LooksLikeFilePath(step) {
+			a.logger.Debug("does not look like a file path",
+				zap.Int("index", i),
+				zap.String("step", step),
+			)
+			continue
+		}
+
+		f, err := fileutil.Read(df.RelativeFile(step))
+		if err != nil {
+			return openapi.TransactionResource{}, fmt.Errorf("cannot read test file: %w", err)
+		}
+
+		testDF, err := a.applyTest(ctx, defFile{f})
+		if err != nil {
+			return openapi.TransactionResource{}, fmt.Errorf("cannot apply test '%s': %w", step, err)
+		}
+
+		var test openapi.TestResource
+		err = yaml.Unmarshal(testDF.Contents(), &test)
+		if err != nil {
+			return openapi.TransactionResource{}, fmt.Errorf("cannot unmarshal updated test '%s': %w", step, err)
+		}
+
+		a.logger.Debug("mapped transaction step",
+			zap.Int("index", i),
+			zap.String("step", step),
+			zap.String("mapped step", test.Spec.GetId()),
+		)
+
+		tran.Spec.Steps[i] = test.Spec.GetId()
+	}
+
+	return tran, nil
 }
 
 func getTypeFromFile(df defFile) (string, error) {
