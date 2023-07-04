@@ -46,11 +46,6 @@ type controller struct {
 	environmentGetter        environmentGetter
 }
 
-// GetTestVersionDefinitionFile implements openapi.ApiApiServicer
-func (*controller) GetTestVersionDefinitionFile(context.Context, string, int32) (openapi.ImplResponse, error) {
-	panic("unimplemented")
-}
-
 type transactionsRepository interface {
 	SetID(transaction.Transaction, id.ID) transaction.Transaction
 	IDExists(ctx context.Context, id id.ID) (bool, error)

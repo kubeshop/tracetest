@@ -112,10 +112,6 @@ export interface paths {
     /** get a test specific version */
     get: operations["getTestVersion"];
   };
-  "/tests/{testId}/version/{version}/definition.yaml": {
-    /** Get the test definition as an YAML file */
-    get: operations["getTestVersionDefinitionFile"];
-  };
   "/tests/{testId}/run/{runId}/stop": {
     /** stops the execution of a test run */
     post: operations["stopTestRun"];
@@ -638,18 +634,6 @@ export interface operations {
       };
       /** problem with getting a test */
       500: unknown;
-    };
-  };
-  /** Get the test definition as an YAML file */
-  getTestVersionDefinitionFile: {
-    parameters: {};
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
-        };
-      };
     };
   };
   /** stops the execution of a test run */

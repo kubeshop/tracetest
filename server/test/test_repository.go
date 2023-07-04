@@ -12,6 +12,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
+	"github.com/kubeshop/tracetest/server/pkg/validation"
 )
 
 type Repository interface {
@@ -324,6 +325,16 @@ INSERT INTO tests (
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
+	if test.HasID() {
+		exists, err := r.Exists(ctx, test.ID)
+		if err != nil {
+			return Test{}, fmt.Errorf("error checking if a test exists: %w", err)
+		}
+
+		if exists {
+			return Test{}, fmt.Errorf("%w: test with same ID already exists", validation.ErrValidation)
+		}
+	}
 	if !test.HasID() {
 		test.ID = IDGen.ID()
 	}
@@ -384,10 +395,6 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 }
 
 func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
-	if test.Version == nil || *test.Version == 0 {
-		test.Version = intPtr(1)
-	}
-
 	oldTest, err := r.get(ctx, test.ID)
 	if err != nil {
 		return Test{}, fmt.Errorf("could not get latest test version while updating test: %w", err)
@@ -395,14 +402,16 @@ func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
 
 	// keep the same creation date to keep sort order
 	test.CreatedAt = oldTest.CreatedAt
+	test.Version = oldTest.Version
 
 	testToUpdate, err := bumpTestVersionIfNeeded(oldTest, test)
 	if err != nil {
 		return Test{}, fmt.Errorf("could not bump test version: %w", err)
 	}
 
-	if oldTest.Version == testToUpdate.Version {
+	if *oldTest.Version == *testToUpdate.Version {
 		// No change in the version. Nothing changed so no need to persist it
+		r.removeNonAugmentedFields(&testToUpdate)
 		return testToUpdate, nil
 	}
 

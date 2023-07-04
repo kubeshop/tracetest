@@ -596,23 +596,6 @@ paths:
                 $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting a test"
-  /tests/{testId}/version/{version}/definition.yaml:
-    get:
-      tags:
-        - api
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testId"
-        - $ref: "./parameters.yaml#/components/parameters/version"
-      summary: Get the test definition as an YAML file
-      description: Get the test definition as an YAML file
-      operationId: getTestVersionDefinitionFile
-      responses:
-        200:
-          description: OK
-          content:
-            application/yaml:
-              schema:
-                type: string
   /tests/{testId}/run/{runId}/stop:
     post:
       tags:

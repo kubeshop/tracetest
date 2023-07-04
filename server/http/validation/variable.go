@@ -2,13 +2,13 @@ package validation
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression/linting"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/transaction"
 )
 
@@ -55,7 +55,6 @@ func getAvailableVariables(test test.Test, environment environment.Environment) 
 
 	for _, output := range test.Outputs {
 		availableVariables = append(availableVariables, output.Name)
-		return nil
 	}
 
 	return availableVariables
@@ -71,7 +70,7 @@ func getPreviousEnvironmentValues(ctx context.Context, testRepo test.Repository,
 	if err != nil {
 		// If error is not found, it means this is the first run. So just ignore this error
 		// and provide empty values in the default values for the missing variables
-		if err != testdb.ErrNotFound {
+		if err != sql.ErrNoRows {
 			return map[string]environment.EnvironmentValue{}, err
 		}
 	} else {
