@@ -2,9 +2,9 @@ package actions
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
+	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
@@ -37,7 +37,7 @@ type runTestAction struct {
 	openapiClient *openapi.APIClient
 	environments  resourcemanager.Client
 	tests         resourcemanager.Client
-	jsonFormat    resourcemanager.Format
+	yamlFormat    resourcemanager.Format
 	cliExit       func(int)
 }
 
@@ -49,17 +49,19 @@ func NewRunTestAction(
 	environments resourcemanager.Client,
 	cliExit func(int),
 ) runTestAction {
-	jsonFormat, err := resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+
+	yamlFormat, err := resourcemanager.Formats.Get(resourcemanager.FormatYAML)
 	if err != nil {
-		panic(fmt.Errorf("could not get json format: %w", err))
+		panic(fmt.Errorf("could not get yaml format: %w", err))
 	}
+
 	return runTestAction{
 		config,
 		logger,
 		openapiClient,
 		tests,
 		environments,
-		jsonFormat,
+		yamlFormat,
 		cliExit,
 	}
 }
@@ -144,15 +146,15 @@ func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, 
 	filePath := envID
 
 	a.logger.Debug("envID is a file path", zap.String("filePath", filePath))
-	envJson, err := a.environments.Apply(ctx, filePath, a.jsonFormat)
+	updatedEnv, err := a.environments.Apply(ctx, filePath, a.yamlFormat)
 	if err != nil {
 		return "", fmt.Errorf("could not read environment file: %w", err)
 	}
 
 	var env openapi.EnvironmentResource
-	err = json.Unmarshal([]byte(envJson), &env)
+	err = yaml.Unmarshal([]byte(updatedEnv), &env)
 	if err != nil {
-		a.logger.Error("error parsing json", zap.String("content", envJson), zap.Error(err))
+		a.logger.Error("error parsing json", zap.String("content", updatedEnv), zap.Error(err))
 		return "", fmt.Errorf("could not unmarshal environment json: %w", err)
 	}
 
