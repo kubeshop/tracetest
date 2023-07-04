@@ -732,7 +732,7 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 		return handleDBError(err), err
 	}
 
-	tests, err := c.testRepository.List(ctx, int(newTake), 0, query, sortBy, sortDirection)
+	tests, err := c.testRepository.ListAugmented(ctx, int(newTake), 0, query, sortBy, sortDirection)
 	if err != nil {
 		return handleDBError(err), err
 	}
