@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
 	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
 	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
@@ -22,18 +23,14 @@ func addListTestsPreReqs(t *testing.T, env environment.Manager) {
 	// Then it should be applied with success
 	newTestPath := env.GetTestResourcePath(t, "list")
 
-	// TODO: using test run as apply test is not yet implemented
-	// result := tracetestcli.Exec(t, fmt.Sprintf("apply test --file %s", newTestPath), tracetestcli.WithCLIConfig(cliConfig))
-	result := tracetestcli.Exec(t, fmt.Sprintf("test run --definition %s", newTestPath), tracetestcli.WithCLIConfig(cliConfig))
+	result := tracetestcli.Exec(t, fmt.Sprintf("apply test --file %s", newTestPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 
 	// When I try to set up a another test
 	// Then it should be applied with success
 	anotherTestPath := env.GetTestResourcePath(t, "import")
 
-	// TODO: using test run as apply test is not yet implemented
-	// result = tracetestcli.Exec(t, fmt.Sprintf("apply test --file %s", anotherTestPath), tracetestcli.WithCLIConfig(cliConfig))
-	result = tracetestcli.Exec(t, fmt.Sprintf("test run --definition %s", anotherTestPath), tracetestcli.WithCLIConfig(cliConfig))
+	result = tracetestcli.Exec(t, fmt.Sprintf("apply test --file %s", anotherTestPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 }
 
@@ -83,21 +80,10 @@ func TestListTests(t *testing.T) {
 
 		testVarsList := helpers.UnmarshalYAMLSequence[types.TestResource](t, result.StdOut)
 		require.Len(testVarsList, 2)
-		importTest := testVarsList[0]
 
-		assert.Equal("Test", importTest.Type)
-		assert.Equal("fH_8AulVR", importTest.Spec.ID)
-		assert.Equal("Pokeshop - Import", importTest.Spec.Name)
-		assert.Equal("Import a Pokemon", importTest.Spec.Description)
-		assert.Equal("http", importTest.Spec.Trigger.Type)
-		assert.Equal("http://demo-api:8081/pokemon/import", importTest.Spec.Trigger.HTTPRequest.URL)
-		assert.Equal("POST", importTest.Spec.Trigger.HTTPRequest.Method)
-		assert.Equal(`'{"id":52}'`, importTest.Spec.Trigger.HTTPRequest.Body)
-		require.Len(importTest.Spec.Trigger.HTTPRequest.Headers, 1)
-		assert.Equal("Content-Type", importTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
-		assert.Equal("application/json", importTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
+		spew.Dump(testVarsList)
 
-		listTest := testVarsList[1]
+		listTest := testVarsList[0]
 		assert.Equal("Test", listTest.Type)
 		assert.Equal("fH_8AulVR", listTest.Spec.ID)
 		assert.Equal("Pokeshop - List", listTest.Spec.Name)
@@ -109,6 +95,19 @@ func TestListTests(t *testing.T) {
 		require.Len(listTest.Spec.Trigger.HTTPRequest.Headers, 1)
 		assert.Equal("Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
 		assert.Equal("application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
+
+		importTest := testVarsList[1]
+		assert.Equal("Test", importTest.Type)
+		assert.Equal("RXrbV__4g", importTest.Spec.ID)
+		assert.Equal("Pokeshop - Import", importTest.Spec.Name)
+		assert.Equal("Import a Pokemon", importTest.Spec.Description)
+		assert.Equal("http", importTest.Spec.Trigger.Type)
+		assert.Equal("http://demo-api:8081/pokemon/import", importTest.Spec.Trigger.HTTPRequest.URL)
+		assert.Equal("POST", importTest.Spec.Trigger.HTTPRequest.Method)
+		assert.Equal(`{"id":52}`, importTest.Spec.Trigger.HTTPRequest.Body)
+		require.Len(importTest.Spec.Trigger.HTTPRequest.Headers, 1)
+		assert.Equal("Content-Type", importTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
+		assert.Equal("application/json", importTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
 	})
 
 	// 	t.Run("list with JSON format", func(t *testing.T) {
