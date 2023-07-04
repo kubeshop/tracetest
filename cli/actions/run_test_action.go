@@ -2,8 +2,12 @@ package actions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 
+	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -87,8 +91,8 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	if err != nil {
 		return fmt.Errorf("cannot read definition file %s: %w", args.DefinitionFile, err)
 	}
-	defFile := defFile{f}
-	a.logger.Debug("Definition file read", zap.String("absolutePath", defFile.AbsPath()))
+	df := defFile{f}
+	a.logger.Debug("Definition file read", zap.String("absolutePath", df.AbsPath()))
 
 	envID, err := a.resolveEnvID(ctx, args.EnvID)
 	if err != nil {
@@ -96,18 +100,20 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	}
 	a.logger.Debug("env resolved", zap.String("ID", envID))
 
-	defFile, err = a.apply(ctx, defFile)
+	df, err = a.apply(ctx, df)
 	if err != nil {
 		return fmt.Errorf("cannot apply definition file: %w", err)
 	}
 
-	var run *openapi.TestRun
+	a.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
+
+	var run *openapi.ExecuteDefinitionResponse
 	var envVars []envVar
 
 	// iterate until we have all env vars,
 	// or the server returns an actual error
 	for {
-		run, err = a.run(ctx, defFile, envID, envVars)
+		run, err = a.run(ctx, df, envID, envVars)
 		if err == nil {
 			break
 		}
@@ -147,10 +153,13 @@ func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, 
 		return envID, nil
 	}
 
-	filePath := envID
+	f, err := fileutil.Read(envID)
+	if err != nil {
+		return "", fmt.Errorf("cannot read environment file %s: %w", envID, err)
+	}
 
-	a.logger.Debug("envID is a file path", zap.String("filePath", filePath))
-	updatedEnv, err := a.environments.Apply(ctx, filePath, a.yamlFormat)
+	a.logger.Debug("envID is a file path", zap.String("filePath", envID), zap.Any("file", f))
+	updatedEnv, err := a.environments.Apply(ctx, f, a.yamlFormat)
 	if err != nil {
 		return "", fmt.Errorf("could not read environment file: %w", err)
 	}
@@ -215,11 +224,19 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 		return df, fmt.Errorf("could not consolidate grpc file: %w", err)
 	}
 
+	marshalled, err := yaml.Marshal(test)
+	if err != nil {
+		return df, fmt.Errorf("could not marshal test yaml: %w", err)
+	}
+	df = defFile{fileutil.New(df.AbsPath(), marshalled)}
+
 	a.logger.Debug("applying test",
 		zap.String("absolutePath", df.AbsPath()),
 		zap.String("id", test.Spec.GetId()),
+		zap.String("marshalled", string(marshalled)),
 	)
-	updated, err := a.tests.Apply(ctx, df.AbsPath(), a.yamlFormat)
+
+	updated, err := a.tests.Apply(ctx, df.File, a.yamlFormat)
 	if err != nil {
 		return df, fmt.Errorf("could not read test file: %w", err)
 	}
@@ -270,17 +287,24 @@ func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFil
 		return df, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
 	}
 
-	a.logger.Debug("applying transaction",
-		zap.String("absolutePath", df.AbsPath()),
-		zap.String("id", tran.Spec.GetId()),
-	)
-
 	tran, err = a.mapTransactionSteps(ctx, df, tran)
 	if err != nil {
 		return df, fmt.Errorf("could not map transaction steps: %w", err)
 	}
 
-	updated, err := a.transactions.Apply(ctx, df.AbsPath(), a.yamlFormat)
+	marshalled, err := yaml.Marshal(tran)
+	if err != nil {
+		return df, fmt.Errorf("could not marshal test yaml: %w", err)
+	}
+	df = defFile{fileutil.New(df.AbsPath(), marshalled)}
+
+	a.logger.Debug("applying transaction",
+		zap.String("absolutePath", df.AbsPath()),
+		zap.String("id", tran.Spec.GetId()),
+		zap.String("marshalled", string(marshalled)),
+	)
+
+	updated, err := a.transactions.Apply(ctx, df.File, a.yamlFormat)
 	if err != nil {
 		return df, fmt.Errorf("could not read transaction file: %w", err)
 	}
@@ -377,26 +401,200 @@ func (ev envVar) value() string {
 	return ev.defaultValue
 }
 
-type missingEnvVarsError []envVar
+type envVars []envVar
+
+func (evs envVars) toOpenapi() []openapi.EnvironmentValue {
+	vars := make([]openapi.EnvironmentValue, len(evs))
+	for i, ev := range evs {
+		vars[i] = openapi.EnvironmentValue{
+			Key:   openapi.PtrString(ev.name),
+			Value: openapi.PtrString(ev.value()),
+		}
+	}
+
+	return vars
+}
+
+func (evs envVars) unique() envVars {
+	seen := make(map[string]bool)
+	vars := make(envVars, 0, len(evs))
+	for _, ev := range evs {
+		if seen[ev.name] {
+			continue
+		}
+
+		seen[ev.name] = true
+		vars = append(vars, ev)
+	}
+
+	return vars
+}
+
+type missingEnvVarsError envVars
 
 func (e missingEnvVarsError) Error() string {
 	return fmt.Sprintf("missing env vars: %v", []envVar(e))
 }
 
-func (a runTestAction) run(ctx context.Context, df defFile, envID string, envVars []envVar) (*openapi.TestRun, error) {
-	return openapi.NewTestRun(), fmt.Errorf("not implemented")
+func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev envVars) (*openapi.ExecuteDefinitionResponse, error) {
+	wrapperResp := &openapi.ExecuteDefinitionResponse{}
+
+	defType, err := getTypeFromFile(df)
+	if err != nil {
+		return wrapperResp, fmt.Errorf("cannot get type from file: %w", err)
+	}
+	wrapperResp.SetType(defType)
+
+	a.logger.Debug("running definition",
+		zap.String("type", defType),
+		zap.String("envID", envID),
+		zap.Any("envVars", ev),
+	)
+
+	runInfo := openapi.RunInformation{
+		EnvironmentId: openapi.PtrString(envID),
+		Variables:     ev.toOpenapi(),
+		Metadata:      getMetadata(),
+	}
+
+	switch defType {
+	case "Test":
+		var test openapi.TestResource
+		err = yaml.Unmarshal(df.Contents(), &test)
+		if err != nil {
+			a.logger.Error("error parsing test", zap.String("content", string(df.Contents())), zap.Error(err))
+			return wrapperResp, fmt.Errorf("could not unmarshal test yaml: %w", err)
+		}
+
+		req := a.openapiClient.ApiApi.
+			RunTest(ctx, test.Spec.GetId()).
+			RunInformation(runInfo)
+
+		a.logger.Debug("running test", zap.String("id", test.Spec.GetId()))
+
+		run, resp, err := a.openapiClient.ApiApi.RunTestExecute(req)
+		err = a.handleRunError(resp, err)
+		if err != nil {
+			return wrapperResp, err
+		}
+
+		wrapperResp.SetId(test.Spec.GetId())
+		wrapperResp.SetRunId(run.GetId())
+		wrapperResp.SetUrl(a.config.URL() + "/test/" + test.Spec.GetId() + "/run/" + run.GetId())
+
+	case "Transaction":
+		var tran openapi.TransactionResource
+		err = yaml.Unmarshal(df.Contents(), &tran)
+		if err != nil {
+			a.logger.Error("error parsing transaction", zap.String("content", string(df.Contents())), zap.Error(err))
+			return wrapperResp, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
+		}
+
+		req := a.openapiClient.ApiApi.
+			RunTransaction(ctx, tran.Spec.GetId()).
+			RunInformation(runInfo)
+
+		a.logger.Debug("running transaction", zap.String("id", tran.Spec.GetId()))
+
+		run, resp, err := a.openapiClient.ApiApi.RunTransactionExecute(req)
+		err = a.handleRunError(resp, err)
+		if err != nil {
+			return wrapperResp, err
+		}
+
+		wrapperResp.SetId(tran.Spec.GetId())
+		wrapperResp.SetRunId(run.GetId())
+		wrapperResp.SetUrl(a.config.URL() + "/transaction/" + tran.Spec.GetId() + "/run/" + run.GetId())
+	default:
+		return wrapperResp, fmt.Errorf("unknown type: %s", defType)
+	}
+
+	a.logger.Debug("definition run",
+		zap.String("type", defType),
+		zap.String("envID", envID),
+		zap.Any("envVars", ev),
+		zap.Any("response", wrapperResp),
+	)
+
+	return wrapperResp, nil
+}
+
+func (a runTestAction) handleRunError(resp *http.Response, reqErr error) error {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("could not read response body: %w", err)
+	}
+	resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("resource not found in server")
+	}
+
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		return buildMissingEnvVarsError(body)
+	}
+
+	if reqErr != nil {
+		a.logger.Error("error running transaction", zap.Error(err), zap.String("body", string(body)))
+		return fmt.Errorf("could not run transaction: %w", err)
+	}
+
+	return nil
+}
+
+func buildMissingEnvVarsError(body []byte) error {
+	var missingVarsErrResp openapi.MissingVariablesError
+	err := json.Unmarshal(body, &missingVarsErrResp)
+	if err != nil {
+		return fmt.Errorf("could not unmarshal response body: %w", err)
+	}
+
+	missingVars := envVars{}
+
+	for _, missingVarErr := range missingVarsErrResp.MissingVariables {
+		for _, missingVar := range missingVarErr.Variables {
+			missingVars = append(missingVars, envVar{
+				name:         missingVar.GetKey(),
+				defaultValue: missingVar.GetDefaultValue(),
+			})
+		}
+	}
+
+	return missingEnvVarsError(missingVars.unique())
 }
 
 func (a runTestAction) askForMissingVars(missingVars []envVar) []envVar {
+	panic("not implemented")
 	return []envVar{}
 }
 
-func (a runTestAction) waitForResult(ctx context.Context, run *openapi.TestRun) (*openapi.TestRun, error) {
+func (a runTestAction) waitForResult(ctx context.Context, run *openapi.ExecuteDefinitionResponse) (*openapi.TestRun, error) {
 	return openapi.NewTestRun(), fmt.Errorf("not implemented")
 }
 
 func (a runTestAction) writeJUnitReport(ctx context.Context, result *openapi.TestRun, junit string) error {
 	return fmt.Errorf("not implemented")
+}
+
+func getMetadata() map[string]string {
+	ci := cienvironment.DetectCIEnvironment()
+	if ci == nil {
+		return map[string]string{}
+	}
+
+	metadata := map[string]string{
+		"name":        ci.Name,
+		"url":         ci.URL,
+		"buildNumber": ci.BuildNumber,
+	}
+
+	if ci.Git != nil {
+		metadata["branch"] = ci.Git.Branch
+		metadata["tag"] = ci.Git.Tag
+		metadata["revision"] = ci.Git.Revision
+	}
+
+	return metadata
 }
 
 type defFile struct {
