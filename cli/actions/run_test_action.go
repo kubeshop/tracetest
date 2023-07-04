@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
 
 	cienvironment "github.com/cucumber/ci-environment/go"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -637,6 +639,8 @@ func (a runTestAction) formatTransactionResult(result runResult, hasResults bool
 	tran := result.Resource.(openapi.TransactionResource)
 	run := result.Run.(openapi.TransactionRun)
 
+	spew.Dump(run)
+
 	tro := formatters.TransactionRunOutput{
 		HasResults:  hasResults,
 		Transaction: tran.GetSpec(),
@@ -783,8 +787,29 @@ func (a runTestAction) isTransactionReady(ctx context.Context, transactionID, tr
 	return nil, nil
 }
 
-func (a runTestAction) writeJUnitReport(ctx context.Context, result runResult, junit string) error {
-	return fmt.Errorf("not implemented")
+func (a runTestAction) writeJUnitReport(ctx context.Context, result runResult, outputFile string) error {
+	test := result.Resource.(openapi.TestResource)
+	run := result.Run.(openapi.TestRun)
+	runID, err := strconv.Atoi(run.GetId())
+	if err != nil {
+		return fmt.Errorf("invalid run id format: %w", err)
+	}
+
+	req := a.openapiClient.ApiApi.GetRunResultJUnit(ctx, test.Spec.GetId(), int32(runID))
+	junit, _, err := a.openapiClient.ApiApi.GetRunResultJUnitExecute(req)
+	if err != nil {
+		return fmt.Errorf("could not execute request: %w", err)
+	}
+
+	f, err := os.Create(junit)
+	if err != nil {
+		return fmt.Errorf("could not create junit output file: %w", err)
+	}
+
+	_, err = f.WriteString(outputFile)
+
+	return err
+
 }
 
 func getMetadata() map[string]string {
