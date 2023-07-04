@@ -1,18 +1,20 @@
-import ReactCodeMirror from '@uiw/react-codemirror';
-import {loadLanguage, LanguageName, langNames} from '@uiw/codemirror-extensions-langs';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
+import {LanguageName, langNames} from '@uiw/codemirror-extensions-langs';
 import {useMemo} from 'react';
 import * as S from './CodeBlock.styled';
-import useEditorTheme from '../Editor/hooks/useEditorTheme';
 
-interface IProps {
+export interface IProps {
   value: string;
-  mimeType: string;
+  language?: string;
+  mimeType?: string;
+  maxHeight?: string;
+  minHeight?: string;
 }
 
-const getInitialLang = (mimeType: string): LanguageName | undefined =>
-  langNames.find(lang => mimeType.includes(`/${lang}`));
+const getLang = (mimeType: string): LanguageName | undefined => langNames.find(lang => mimeType.includes(`/${lang}`));
 
-const formatValue = (value: string, lang: LanguageName | undefined): string => {
+const formatValue = (value: string, lang?: string): string => {
   switch (lang) {
     case 'json':
       try {
@@ -26,24 +28,15 @@ const formatValue = (value: string, lang: LanguageName | undefined): string => {
   }
 };
 
-const CodeBlock = ({value, mimeType}: IProps) => {
-  const lang = useMemo(() => getInitialLang(mimeType), [mimeType]);
-  const theme = useEditorTheme();
-  const extensionList = useMemo(() => (lang ? [theme, loadLanguage(lang)!] : []), [lang, theme]);
+const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = ''}: IProps) => {
+  const lang = useMemo(() => language || getLang(mimeType), [language, mimeType]);
 
   return (
-    <S.Container>
-      <ReactCodeMirror
-        basicSetup={{lineNumbers: false, foldGutter: false}}
-        id="code-block"
-        data-cy="code-block"
-        value={formatValue(value, lang)}
-        readOnly
-        extensions={extensionList}
-        spellCheck={false}
-        autoFocus
-      />
-    </S.Container>
+    <S.CodeContainer data-cy="code-block" $maxHeight={maxHeight} $minHeight={minHeight}>
+      <SyntaxHighlighter language={lang} style={arduinoLight} wrapLongLines>
+        {formatValue(value, lang)}
+      </SyntaxHighlighter>
+    </S.CodeContainer>
   );
 };
 

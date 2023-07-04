@@ -3,6 +3,7 @@ package rules
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/kubeshop/tracetest/server/model"
 )
@@ -24,13 +25,18 @@ func NewEnsureSpanNamingRule() model.Rule {
 
 func (r ensureSpanNamingRule) Evaluate(ctx context.Context, trace model.Trace) (model.RuleResult, error) {
 	results := make([]model.Result, 0)
+	hasErrors := false
 	for _, span := range trace.Flat {
-		results = append(results, r.validateSpanName(ctx, span))
+		result := r.validateSpanName(ctx, span)
+		results = append(results, result)
+
+		hasErrors = hasErrors || !result.Passed
 	}
 
 	return model.RuleResult{
 		BaseRule: r.BaseRule,
 		Results:  results,
+		Passed:   !hasErrors,
 	}, nil
 }
 
@@ -66,7 +72,13 @@ func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *mo
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 
@@ -77,22 +89,32 @@ func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *mo
 }
 
 func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span *model.Span) model.Result {
-	var expectedName string
 	dbOperation := span.Attributes.Get("db.operation")
-	dbName := span.Attributes.Get("db.operation")
+	dbName := span.Attributes.Get("db.name")
 	tableName := span.Attributes.Get("db.sql.table")
+	expectedName := fmt.Sprintf("%s %s.%s", dbOperation, dbName, tableName)
 
-	if tableName != "" {
-		expectedName = fmt.Sprintf("%s %s %s", dbOperation, dbName, tableName)
-	} else {
-		expectedName = fmt.Sprintf("%s %s", dbOperation, dbName)
+	// TODO: fix this by adding proper validation for all other db systems
+	dbSystem := span.Attributes.Get("db.system")
+	if dbSystem == "redis" {
+		dbStatement := strings.ToLower(span.Attributes.Get("db.statement"))
+		return model.Result{
+			Passed: dbStatement != "" && strings.HasPrefix(dbStatement, strings.ToLower(span.Name)),
+			SpanID: span.ID.String(),
+		}
 	}
 
-	if span.Name != expectedName {
+	if strings.Trim(span.Name, "") != strings.Trim(expectedName, "") {
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 
@@ -103,17 +125,22 @@ func (r ensureSpanNamingRule) validateDatabaseSpanName(ctx context.Context, span
 }
 
 func (r ensureSpanNamingRule) validateRPCSpanName(ctx context.Context, span *model.Span) model.Result {
-	rpcPackage := span.Attributes.Get("rpc.package")
 	rpcService := span.Attributes.Get("rpc.service")
 	rpcMethod := span.Attributes.Get("rpc.method")
 
-	expectedName := fmt.Sprintf("%s.%s/%s", rpcPackage, rpcService, rpcMethod)
+	expectedName := fmt.Sprintf("%s/%s", rpcService, rpcMethod)
 
 	if span.Name != expectedName {
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 
@@ -133,7 +160,13 @@ func (r ensureSpanNamingRule) validateMessagingSpanName(ctx context.Context, spa
 		return model.Result{
 			SpanID: span.ID.String(),
 			Passed: false,
-			Errors: []string{fmt.Sprintf(`Span name is not matching the naming convention. Expected: %s`, expectedName)},
+			Errors: []model.Error{
+				{
+					Value:       span.Name,
+					Expected:    expectedName,
+					Description: fmt.Sprintf(`The Span name %s is not matching the naming convention`, span.Name),
+				},
+			},
 		}
 	}
 

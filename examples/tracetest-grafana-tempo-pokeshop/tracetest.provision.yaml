@@ -1,0 +1,32 @@
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: Tempo
+  type: tempo
+  tempo:
+    type: grpc
+    grpc:
+      endpoint: tempo:9095
+      tls:
+        insecure: true
+
+---
+type: Demo
+spec:
+  type: pokeshop
+  enabled: true
+  name: pokeshop
+  opentelemetryStore: {}
+  pokeshop:
+    httpEndpoint: http://demo-api:8081
+    grpcEndpoint: demo-rpc:8082

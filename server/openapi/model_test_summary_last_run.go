@@ -19,6 +19,8 @@ type TestSummaryLastRun struct {
 	Passes int32 `json:"passes,omitempty"`
 
 	Fails int32 `json:"fails,omitempty"`
+
+	AnalyzerScore int32 `json:"analyzerScore,omitempty"`
 }
 
 // AssertTestSummaryLastRunRequired checks if the required fields are not zero-ed

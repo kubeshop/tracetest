@@ -1,22 +1,33 @@
 import {useEffect, useRef, useState} from 'react';
 import AttributeList from 'components/AttributeList';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
-import {TResultAssertions} from 'types/Assertion.types';
+import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import TestOutput from 'models/TestOutput.model';
+import {TTestSpecSummary} from 'types/TestRun.types';
+import {IPropsAttributeRow} from './SpanDetail';
 import * as S from './SpanDetail.styled';
 
 interface IProps {
-  assertions?: TResultAssertions;
   attributeList: TSpanFlatAttribute[];
   searchText?: string;
+  semanticConventions: OtelReference;
+  testSpecs?: TTestSpecSummary;
+  testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
   onCreateOutput(attribute: TSpanFlatAttribute): void;
-  semanticConventions: OtelReference;
-  outputs: TestOutput[];
+  AttributeRowComponent: React.ComponentType<IPropsAttributeRow>;
 }
 
-const Attributes = ({assertions, attributeList, outputs, onCreateTestSpec, onCreateOutput, searchText, semanticConventions}: IProps) => {
+const Attributes = ({
+  attributeList,
+  searchText,
+  semanticConventions,
+  testSpecs,
+  testOutputs,
+  onCreateTestSpec,
+  onCreateOutput,
+  AttributeRowComponent,
+}: IProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [topPosition, setTopPosition] = useState(0);
 
@@ -27,13 +38,14 @@ const Attributes = ({assertions, attributeList, outputs, onCreateTestSpec, onCre
   return (
     <S.AttributesContainer $top={topPosition} ref={containerRef}>
       <AttributeList
-        assertions={assertions}
         attributeList={attributeList}
-        onCreateTestSpec={onCreateTestSpec}
-        onCreateOutput={onCreateOutput}
         searchText={searchText}
         semanticConventions={semanticConventions}
-        outputs={outputs}
+        testSpecs={testSpecs}
+        testOutputs={testOutputs}
+        onCreateTestSpec={onCreateTestSpec}
+        onCreateOutput={onCreateOutput}
+        AttributeRowComponent={AttributeRowComponent}
       />
     </S.AttributesContainer>
   );

@@ -57,6 +57,7 @@ func (m OpenAPI) Span(in model.Span) openapi.Span {
 		EndTime:    in.EndTime.UnixMilli(),
 		Attributes: attributes,
 		Children:   m.Spans(in.Children),
+		Name:       in.Name,
 	}
 }
 

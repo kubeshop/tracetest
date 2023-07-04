@@ -1,13 +1,14 @@
 import {Checkbox, Col, Form, Input, Radio, Row} from 'antd';
 import {ConnectionTypes, SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
-import * as S from 'components/Settings/DataStoreForm/DataStoreForm.styled';
-import {collectorExplanation} from 'constants/DataStore.constants';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import OpenTelemetryCollector from '../OpenTelemetryCollector/OpenTelemetryCollector';
+import * as S from '../../DataStorePluginForm.styled';
+import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
 
 const AzureAppInsights = () => {
   const baseName = ['dataStore', SupportedDataStores.AzureAppInsights];
   const form = Form.useFormInstance<TDraftDataStore>();
-  const connectionType = Form.useWatch([...baseName, 'connectionType'], form);
+  const connectionType = Form.useWatch([...baseName, 'connectionType'], form) || ConnectionTypes.Direct;
   const useAzureActiveDirectoryAuth = Form.useWatch([...baseName, 'useAzureActiveDirectoryAuth'], form);
 
   return (
@@ -16,15 +17,19 @@ const AzureAppInsights = () => {
         <Col span={12}>
           Connection type:
           <Form.Item name={[...baseName, 'connectionType']}>
-            <Radio.Group>
+            <Radio.Group defaultValue={connectionType}>
               <Radio value={ConnectionTypes.Direct}>Direct Connection</Radio>
               <Radio value={ConnectionTypes.Collector}>Open Telemetry Collector</Radio>
             </Radio.Group>
           </Form.Item>
         </Col>
       </Row>
-      {(connectionType === ConnectionTypes.Direct && (
+      {(connectionType === ConnectionTypes.Collector && <OpenTelemetryCollector />) || (
         <>
+          <S.Title>
+            Provide the connection info for {SupportedDataStoresToName[SupportedDataStores.AzureAppInsights]}
+          </S.Title>
+          <DataStoreDocsBanner dataStoreType={SupportedDataStores.AzureAppInsights} />
           <Row gutter={[16, 16]}>
             <Col span={16}>
               <Form.Item
@@ -52,20 +57,6 @@ const AzureAppInsights = () => {
               >
                 <Input disabled={useAzureActiveDirectoryAuth} type="password" placeholder="your access token" />
               </Form.Item>
-            </Col>
-          </Row>
-        </>
-      )) || (
-        <>
-          <Row gutter={[16, 16]}>
-            <Col span={16}>
-              <S.Explanation>{collectorExplanation}</S.Explanation>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 16]}>
-            <Col span={16}>
-              <OpenTelemetryCollector />
             </Col>
           </Row>
         </>

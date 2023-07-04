@@ -10,7 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 var _ model.TestRepository = &postgresDB{}
@@ -163,7 +163,8 @@ const (
 		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs,
 		last_test_run.created_at as last_test_run_time,
 		last_test_run.pass as last_test_run_pass,
-		last_test_run.fail as last_test_run_fail
+		last_test_run.fail as last_test_run_fail,
+		last_test_run.linter as last_test_run_linter
 	FROM tests t
 	LEFT OUTER JOIN (
 		SELECT MAX(id) as id, test_id FROM test_runs GROUP BY test_id
@@ -316,7 +317,8 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	var (
 		jsonServiceUnderTest,
 		jsonSpecs,
-		jsonOutputs []byte
+		jsonOutputs,
+		jsonLinter []byte
 
 		lastRunTime *time.Time
 
@@ -335,6 +337,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 		&lastRunTime,
 		&pass,
 		&fail,
+		&jsonLinter,
 	)
 
 	switch err {
@@ -364,6 +367,12 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 			test.Summary.LastRun.Fails = *fail
 		}
 
+		var linter model.LinterResult
+		err = json.Unmarshal(jsonLinter, &linter)
+		if err == nil {
+			test.Summary.LastRun.AnalyzerScore = linter.Score
+		}
+
 		return test, nil
 	case sql.ErrNoRows:
 		return model.Test{}, ErrNotFound
@@ -372,7 +381,7 @@ func (td *postgresDB) readTestRow(ctx context.Context, row scanner) (model.Test,
 	}
 }
 
-func (td *postgresDB) GetTransactionSteps(ctx context.Context, transaction tests.Transaction) ([]model.Test, error) {
+func (td *postgresDB) GetTransactionSteps(ctx context.Context, transaction transaction.Transaction) ([]model.Test, error) {
 	stmt, err := td.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
 	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
 	if err != nil {

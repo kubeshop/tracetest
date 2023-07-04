@@ -9,6 +9,16 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+const (
+	TracetestMetadataFieldStartTime string = "tracetest.span.start_time"
+	TracetestMetadataFieldEndTime   string = "tracetest.span.end_time"
+	TracetestMetadataFieldDuration  string = "tracetest.span.duration"
+	TracetestMetadataFieldType      string = "tracetest.span.type"
+	TracetestMetadataFieldName      string = "tracetest.span.name"
+	TracetestMetadataFieldParentID  string = "tracetest.span.parent_id"
+	TracetestMetadataFieldKind      string = "tracetest.span.kind"
+)
+
 type Attributes map[string]string
 
 func (a Attributes) Get(key string) string {
@@ -184,11 +194,11 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 }
 
 func (span Span) setMetadataAttributes() Span {
-	span.Attributes["name"] = span.Name
-	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
-	span.Attributes["tracetest.span.duration"] = spanDuration(span)
-	span.Attributes["tracetest.span.startTime"] = fmt.Sprintf("%d", span.StartTime.UnixNano())
-	span.Attributes["tracetest.span.endTime"] = fmt.Sprintf("%d", span.EndTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldName] = span.Name
+	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
+	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
+	span.Attributes[TracetestMetadataFieldStartTime] = fmt.Sprintf("%d", span.StartTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldEndTime] = fmt.Sprintf("%d", span.EndTime.UnixNano())
 
 	return span
 }
@@ -222,7 +232,7 @@ func NewTracetestRootSpan(run Run) Span {
 	return AugmentRootSpan(Span{
 		ID:         IDGen.SpanID(),
 		Name:       TriggerSpanName,
-		StartTime:  run.CreatedAt,
+		StartTime:  run.ServiceTriggeredAt,
 		EndTime:    run.ServiceTriggerCompletedAt,
 		Attributes: Attributes{},
 		Children:   []*Span{},

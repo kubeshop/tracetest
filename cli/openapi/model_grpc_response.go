@@ -19,7 +19,7 @@ var _ MappedNullable = &GRPCResponse{}
 
 // GRPCResponse struct for GRPCResponse
 type GRPCResponse struct {
-	StatusCode *int32       `json:"statusCode,omitempty"`
+	StatusCode int32        `json:"statusCode"`
 	Metadata   []GRPCHeader `json:"metadata,omitempty"`
 	Body       *string      `json:"body,omitempty"`
 }
@@ -28,8 +28,9 @@ type GRPCResponse struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGRPCResponse() *GRPCResponse {
+func NewGRPCResponse(statusCode int32) *GRPCResponse {
 	this := GRPCResponse{}
+	this.StatusCode = statusCode
 	return &this
 }
 
@@ -38,39 +39,33 @@ func NewGRPCResponse() *GRPCResponse {
 // but it doesn't guarantee that properties required by API are set
 func NewGRPCResponseWithDefaults() *GRPCResponse {
 	this := GRPCResponse{}
+	var statusCode int32 = 0
+	this.StatusCode = statusCode
 	return &this
 }
 
-// GetStatusCode returns the StatusCode field value if set, zero value otherwise.
+// GetStatusCode returns the StatusCode field value
 func (o *GRPCResponse) GetStatusCode() int32 {
-	if o == nil || isNil(o.StatusCode) {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.StatusCode
+
+	return o.StatusCode
 }
 
-// GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
+// GetStatusCodeOk returns a tuple with the StatusCode field value
 // and a boolean to check if the value has been set.
 func (o *GRPCResponse) GetStatusCodeOk() (*int32, bool) {
-	if o == nil || isNil(o.StatusCode) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StatusCode, true
+	return &o.StatusCode, true
 }
 
-// HasStatusCode returns a boolean if a field has been set.
-func (o *GRPCResponse) HasStatusCode() bool {
-	if o != nil && !isNil(o.StatusCode) {
-		return true
-	}
-
-	return false
-}
-
-// SetStatusCode gets a reference to the given int32 and assigns it to the StatusCode field.
+// SetStatusCode sets field value
 func (o *GRPCResponse) SetStatusCode(v int32) {
-	o.StatusCode = &v
+	o.StatusCode = v
 }
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
@@ -147,9 +142,7 @@ func (o GRPCResponse) MarshalJSON() ([]byte, error) {
 
 func (o GRPCResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.StatusCode) {
-		toSerialize["statusCode"] = o.StatusCode
-	}
+	toSerialize["statusCode"] = o.StatusCode
 	if !isNil(o.Metadata) {
 		toSerialize["metadata"] = o.Metadata
 	}

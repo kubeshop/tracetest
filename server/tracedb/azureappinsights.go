@@ -11,9 +11,9 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -31,7 +31,7 @@ type azureAppInsightsDB struct {
 
 var _ TraceDB = &azureAppInsightsDB{}
 
-func NewAzureAppInsightsDB(config *datastoreresource.AzureAppInsightsConfig) (TraceDB, error) {
+func NewAzureAppInsightsDB(config *datastore.AzureAppInsightsConfig) (TraceDB, error) {
 	var credentials azcore.TokenCredential
 	var err error
 	if config.UseAzureActiveDirectoryAuth {
@@ -231,9 +231,9 @@ func parseParentId(span *model.Span, row azquery.Row, index int) error {
 
 	rawParentId, ok := row[index].(string)
 	if ok {
-		span.Attributes["parent_id"] = rawParentId
+		span.Attributes[model.TracetestMetadataFieldParentID] = rawParentId
 	} else {
-		span.Attributes["parent_id"] = ""
+		span.Attributes[model.TracetestMetadataFieldParentID] = ""
 	}
 	return nil
 }

@@ -16,10 +16,9 @@ var (
 )
 
 type Config struct {
-	Scheme           string  `yaml:"scheme"`
-	Endpoint         string  `yaml:"endpoint"`
-	ServerPath       *string `yaml:"serverPath,omitempty"`
-	AnalyticsEnabled bool    `yaml:"analyticsEnabled"`
+	Scheme     string  `yaml:"scheme"`
+	Endpoint   string  `yaml:"endpoint"`
+	ServerPath *string `yaml:"serverPath,omitempty"`
 }
 
 func (c Config) URL() string {

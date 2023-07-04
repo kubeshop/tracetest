@@ -8,11 +8,11 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
-	"github.com/kubeshop/tracetest/server/tests"
+	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 type TransactionRunner interface {
-	Run(context.Context, tests.Transaction, model.RunMetadata, environment.Environment) tests.TransactionRun
+	Run(context.Context, transaction.Transaction, model.RunMetadata, environment.Environment) transaction.TransactionRun
 }
 
 type PersistentTransactionRunner interface {
@@ -22,7 +22,7 @@ type PersistentTransactionRunner interface {
 
 type transactionRunRepository interface {
 	transactionUpdater
-	CreateRun(context.Context, tests.TransactionRun) (tests.TransactionRun, error)
+	CreateRun(context.Context, transaction.TransactionRun) (transaction.TransactionRun, error)
 }
 
 func NewTransactionRunner(
@@ -48,8 +48,8 @@ func NewTransactionRunner(
 
 type transactionRunJob struct {
 	ctx         context.Context
-	transaction tests.Transaction
-	run         tests.TransactionRun
+	transaction transaction.Transaction
+	run         transaction.TransactionRun
 }
 
 type persistentTransactionRunner struct {
@@ -62,7 +62,7 @@ type persistentTransactionRunner struct {
 	exit                chan bool
 }
 
-func (r persistentTransactionRunner) Run(ctx context.Context, transaction tests.Transaction, metadata model.RunMetadata, environment environment.Environment) tests.TransactionRun {
+func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata model.RunMetadata, environment environment.Environment) transaction.TransactionRun {
 	run := transaction.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
@@ -104,18 +104,18 @@ func (r persistentTransactionRunner) Start(workers int) {
 	}
 }
 
-func (r persistentTransactionRunner) runTransaction(ctx context.Context, transaction tests.Transaction, run tests.TransactionRun) error {
-	run.State = tests.TransactionRunStateExecuting
+func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran transaction.Transaction, run transaction.TransactionRun) error {
+	run.State = transaction.TransactionRunStateExecuting
 
 	var err error
 
-	for step, test := range transaction.Steps {
+	for step, test := range tran.Steps {
 		run, err = r.runTransactionStep(ctx, run, step, test)
 		if err != nil {
 			return fmt.Errorf("could not execute step %d of transaction %s: %w", step, run.TransactionID, err)
 		}
 
-		if run.State == tests.TransactionRunStateFailed {
+		if run.State == transaction.TransactionRunStateFailed {
 			break
 		}
 
@@ -126,18 +126,18 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, transac
 		}
 	}
 
-	if run.State != tests.TransactionRunStateFailed {
-		run.State = tests.TransactionRunStateFinished
+	if run.State != transaction.TransactionRunStateFailed {
+		run.State = transaction.TransactionRunStateFinished
 	}
 
 	return r.updater.Update(ctx, run)
 }
 
-func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr tests.TransactionRun, step int, test model.Test) (tests.TransactionRun, error) {
+func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, test model.Test) (transaction.TransactionRun, error) {
 	testRun := r.testRunner.Run(ctx, test, tr.Metadata, tr.Environment)
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
-		return tests.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
+		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
 	done := make(chan bool)
@@ -146,7 +146,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 		func(m subscription.Message) error {
 			testRun := m.Content.(model.Run)
 			if testRun.LastError != nil {
-				tr.State = tests.TransactionRunStateFailed
+				tr.State = transaction.TransactionRunStateFailed
 				tr.LastError = testRun.LastError
 			}
 
@@ -175,7 +175,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 	return tr, err
 }
 
-func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr tests.TransactionRun, step int, run model.Run) (tests.TransactionRun, error) {
+func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr transaction.TransactionRun, step int, run model.Run) (transaction.TransactionRun, error) {
 	if len(tr.Steps) <= step {
 		tr.Steps = append(tr.Steps, model.Run{})
 	}
@@ -183,7 +183,7 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr tests
 	tr.Steps[step] = run
 	err := r.updater.Update(ctx, tr)
 	if err != nil {
-		return tests.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
+		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
 	return tr, nil

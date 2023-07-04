@@ -73,6 +73,9 @@ components:
             fails:
               type: integer
               readOnly: true
+            analyzerScore:
+              type: integer
+              readOnly: true
 
     TestSpecs:
       type: object

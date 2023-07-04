@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	linter_plugin_common "github.com/kubeshop/tracetest/server/linter/plugins/common"
 	linter_plugin_security "github.com/kubeshop/tracetest/server/linter/plugins/security"
 	linter_plugin_standards "github.com/kubeshop/tracetest/server/linter/plugins/standards"
-	linter_resource "github.com/kubeshop/tracetest/server/linter/resource"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -27,10 +27,10 @@ type Linter interface {
 
 type linter struct {
 	plugins        []model.Plugin
-	linterResource linter_resource.Linter
+	linterResource analyzer.Linter
 }
 
-func Newlinter(linterResource linter_resource.Linter, plugins ...model.Plugin) linter {
+func NewLinter(linterResource analyzer.Linter, plugins ...model.Plugin) Linter {
 	return linter{plugins, linterResource}
 }
 

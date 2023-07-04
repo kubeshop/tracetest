@@ -8,6 +8,7 @@ type Summary = {
     time: string;
     passes: number;
     fails: number;
+    analyzerScore: number;
   };
 };
 
@@ -18,6 +19,7 @@ const Summary = (summary: TRawTestSummary = {}): Summary => ({
     time: summary.lastRun?.time ?? '',
     passes: summary.lastRun?.passes ?? 0,
     fails: summary.lastRun?.fails ?? 0,
+    analyzerScore: summary.lastRun?.analyzerScore ?? 0,
   },
 });
 

@@ -1,4 +1,5 @@
 import {useCallback} from 'react';
+import {noop} from 'lodash';
 import {useMatch, useNavigate} from 'react-router-dom';
 import {useAppDispatch} from 'redux/hooks';
 import {reset} from 'redux/slices/TestSpecs.slice';
@@ -16,6 +17,13 @@ import {TEnvironmentValue} from 'models/Environment.model';
 import Test from 'models/Test.model';
 import RunError from 'models/RunError.model';
 
+export type TTestRunRequest = {
+  test: Test;
+  environmentId?: string;
+  variables?: TEnvironmentValue[];
+  onCancel?(): void;
+};
+
 const useTestCrud = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -28,11 +36,11 @@ const useTestCrud = () => {
   const {onOpen} = useMissingVariablesModal();
 
   const runTest = useCallback(
-    async (test: Test, runId?: string, environmentId = selectedEnvironment?.id) => {
-      const run = async (variables: TEnvironmentValue[] = []) => {
+    async ({test, environmentId = selectedEnvironment?.id, variables = [], onCancel = noop}: TTestRunRequest) => {
+      const run = async (updatedVars: TEnvironmentValue[] = variables) => {
         try {
           TestAnalyticsService.onRunTest();
-          const {id} = await runTestAction({testId: test.id, environmentId, variables}).unwrap();
+          const {id} = await runTestAction({testId: test.id, environmentId, variables: updatedVars}).unwrap();
           dispatch(reset());
 
           const mode = match?.params.mode || 'trigger';
@@ -47,6 +55,7 @@ const useTestCrud = () => {
               onSubmit(missing) {
                 run(missing);
               },
+              onCancel,
             });
           else throw error;
         }
@@ -69,7 +78,9 @@ const useTestCrud = () => {
         testId,
       }).unwrap();
 
-      runTest(test);
+      runTest({
+        test,
+      });
     },
     [editTest, runTest, updateIsInitialized]
   );

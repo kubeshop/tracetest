@@ -20,7 +20,6 @@ export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.lg};
     margin: 0;
-    font-weight: 700;
   }
 `;
 
@@ -42,7 +41,6 @@ export const TabsContainer = styled.div`
 
 export const StatusText = styled(Typography.Text)`
   && {
-    margin-left: 14px;
     font-size: ${({theme}) => theme.size.md};
   }
 `;
@@ -84,7 +82,7 @@ export const Text = styled(Typography.Text)`
 
 export const StatusSpan = styled.span<{$isError: boolean}>`
   color: ${({$isError, theme}) => ($isError ? theme.color.error : theme.color.success)};
-  font-weight: 700;
+  font-weight: 600;
 `;
 
 export const HeadersList = styled.div`
@@ -130,12 +128,14 @@ export const EmptyText = styled(Typography.Text)`
 export const EmptyTitle = styled(Typography.Title).attrs({level: 3})``;
 
 export const ResponseBodyContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 95% 5%;
   width: 100%;
 `;
 
 export const ResponseBodyContent = styled.div`
   flex: 1;
+  margin-top: 16px;
 `;
 
 export const ResponseBodyActions = styled.div`

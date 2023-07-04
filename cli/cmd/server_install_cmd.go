@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/installer"
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/slices"
 )
 
-var installerParams = &parameters.InstallerParams{
+var installerParams = &installerParameters{
 	Force:             false,
 	RunEnvironment:    installer.NoneRunEnvironmentType,
 	InstallationMode:  installer.NotChosenInstallationModeType,
@@ -25,7 +24,6 @@ var serverInstallCmd = &cobra.Command{
 		installer.InstallationMode = installerParams.InstallationMode
 		installer.KubernetesContext = installerParams.KubernetesContext
 
-		analytics.Track("Server Install", "cmd", map[string]string{})
 		installer.Start()
 	},
 	PostRun: teardownCommand,
@@ -40,4 +38,51 @@ func init() {
 	serverInstallCmd.Flags().Var(&installerParams.RunEnvironment, "run-environment", "Type of environment were Tracetest will be installed. It can be 'docker' or 'kubernetes'.")
 
 	serverCmd.AddCommand(serverInstallCmd)
+}
+
+var (
+	AllowedRunEnvironments = []installer.RunEnvironmentType{
+		installer.DockerRunEnvironmentType,
+		installer.KubernetesRunEnvironmentType,
+		installer.NoneRunEnvironmentType,
+	}
+	AllowedInstallationMode = []installer.InstallationModeType{
+		installer.WithDemoInstallationModeType,
+		installer.WithoutDemoInstallationModeType,
+		installer.NotChosenInstallationModeType,
+	}
+)
+
+type installerParameters struct {
+	Force             bool
+	RunEnvironment    installer.RunEnvironmentType
+	InstallationMode  installer.InstallationModeType
+	KubernetesContext string
+}
+
+func (p installerParameters) Validate(cmd *cobra.Command, args []string) []ParamError {
+	errors := make([]ParamError, 0)
+
+	if cmd.Flags().Lookup("run-environment").Changed && slices.Contains(AllowedRunEnvironments, p.RunEnvironment) {
+		errors = append(errors, ParamError{
+			Parameter: "run-environment",
+			Message:   "run-environment must be one of 'none', 'docker' or 'kubernetes'",
+		})
+	}
+
+	if cmd.Flags().Lookup("mode").Changed && slices.Contains(AllowedInstallationMode, p.InstallationMode) {
+		errors = append(errors, ParamError{
+			Parameter: "mode",
+			Message:   "mode must be one of 'not-chosen', 'with-demo' or 'just-tracetest'",
+		})
+	}
+
+	if cmd.Flags().Lookup("kubernetes-context").Changed && p.KubernetesContext == "" {
+		errors = append(errors, ParamError{
+			Parameter: "kubernetes-context",
+			Message:   "kubernetes-context cannot be empty",
+		})
+	}
+
+	return errors
 }

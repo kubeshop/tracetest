@@ -4,7 +4,7 @@ import {useTheme} from 'styled-components';
 
 interface IProps {
   margin?: number;
-  title: string;
+  title: React.ReactNode;
 }
 
 export const TooltipQuestion = ({margin = 8, title}: IProps) => {

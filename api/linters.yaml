@@ -74,6 +74,8 @@ components:
           type: string
         description:
           type: string
+        errorDescription:
+          type: string
         passed:
           type: boolean
         weight:
@@ -94,7 +96,7 @@ components:
         errors:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/LinterResultPluginRuleResultError"
         passed:
           type: boolean
         severity:
@@ -102,3 +104,18 @@ components:
           enum:
             - error
             - warning
+    LinterResultPluginRuleResultError:
+      type: object
+      properties:
+        value:
+          type: string
+        expected:
+          type: string
+        level:
+          type: string
+        description:
+          type: string
+        suggestions:
+          type: array
+          items:
+            type: string

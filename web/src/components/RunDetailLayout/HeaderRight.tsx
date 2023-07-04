@@ -14,10 +14,9 @@ import EventLogPopover from '../EventLogPopover/EventLogPopover';
 
 interface IProps {
   testId: string;
-  testVersion: number;
 }
 
-const HeaderRight = ({testId, testVersion}: IProps) => {
+const HeaderRight = ({testId}: IProps) => {
   const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
@@ -48,7 +47,7 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
         </S.StateContainer>
       )}
       {!isDraftMode && state && isRunStateFinished(state) && (
-        <Button data-cy="run-test-button" ghost onClick={() => onRun(run.id)} type="primary">
+        <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
           Run Test
         </Button>
       )}
@@ -57,7 +56,6 @@ const HeaderRight = ({testId, testVersion}: IProps) => {
         isRunView
         resultId={run.id}
         testId={testId}
-        testVersion={testVersion}
         transactionId={run.transactionId}
         transactionRunId={run.transactionRunId}
       />

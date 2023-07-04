@@ -1,5 +1,6 @@
 import RunEvents from 'components/RunEvents';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useCallback, useEffect} from 'react';
 import {Node, NodeChange} from 'react-flow-renderer';
@@ -84,6 +85,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     <Timeline
       isMatchedMode={isMatchedMode}
       matchedSpans={matchedSpans}
+      nodeType={NodeTypesEnum.TraceSpan}
       onNavigateToSpan={onNavigateToSpan}
       onNodeClick={onNodeClickTimeline}
       selectedSpan={selectedSpan}

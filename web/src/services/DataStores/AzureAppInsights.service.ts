@@ -29,16 +29,18 @@ const AzureAppInsightsService = (): TDataStoreService => ({
         connectionType = ConnectionTypes.Direct,
         accessToken = '',
         useAzureActiveDirectoryAuth = true,
+        isIngestorEnabled = false,
       } = {},
     } = {},
   }) {
     if (connectionType === ConnectionTypes.Direct && !resourceArmId) return Promise.resolve(false);
     if (connectionType === ConnectionTypes.Direct && !useAzureActiveDirectoryAuth && !accessToken)
       return Promise.resolve(false);
+    if (connectionType === ConnectionTypes.Collector && !isIngestorEnabled) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {azureappinsights = {}} = {}}) {
+  getInitialValues({defaultDataStore: {azureappinsights = {}} = {}}, dataStoreType, configuredDataStore) {
     const {
       resourceArmId = '',
       connectionType = ConnectionTypes.Direct,
@@ -50,7 +52,15 @@ const AzureAppInsightsService = (): TDataStoreService => ({
       dataStore: {
         name: SupportedDataStores.AzureAppInsights,
         type: SupportedDataStores.AzureAppInsights,
-        azureappinsights: {resourceArmId, connectionType, accessToken, useAzureActiveDirectoryAuth},
+        azureappinsights: {
+          resourceArmId,
+          connectionType,
+          accessToken,
+          useAzureActiveDirectoryAuth,
+          isIngestorEnabled:
+            configuredDataStore === SupportedDataStores.AzureAppInsights &&
+            connectionType === ConnectionTypes.Collector,
+        },
       },
       dataStoreType: SupportedDataStores.AzureAppInsights,
     };

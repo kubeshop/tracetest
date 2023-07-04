@@ -4,11 +4,23 @@ type TRawLinterResult = TLintersSchemas['LinterResult'];
 type TRawLinterResultPlugin = TLintersSchemas['LinterResultPlugin'];
 type TRawLinterResultPluginRule = TLintersSchemas['LinterResultPluginRule'];
 type TRawLinterResultPluginRuleResult = TLintersSchemas['LinterResultPluginRuleResult'];
+export type TRawLinterResultPluginRuleResultError = TLintersSchemas['LinterResultPluginRuleResultError'];
 
+type LinterResultPluginRuleResultError = Model<TRawLinterResultPluginRuleResultError, {}>;
 type LinterResultPluginRuleResult = Model<TRawLinterResultPluginRuleResult, {}>;
 type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: LinterResultPluginRuleResult[]}>;
 type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
 type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]; isFailed: boolean}>;
+
+function LinterResultPluginRuleResultError({
+  value = '',
+  expected = '',
+  level = '',
+  description = '',
+  suggestions = [],
+}: TRawLinterResultPluginRuleResultError = {}): LinterResultPluginRuleResultError {
+  return {value, expected, level, description, suggestions};
+}
 
 function LinterResultPluginRuleResult({
   spanId = '',
@@ -16,12 +28,18 @@ function LinterResultPluginRuleResult({
   passed = false,
   severity = 'error',
 }: TRawLinterResultPluginRuleResult = {}): LinterResultPluginRuleResult {
-  return {spanId, errors, passed, severity};
+  return {
+    spanId,
+    errors: errors.map(error => LinterResultPluginRuleResultError(error)),
+    passed,
+    severity,
+  };
 }
 
 function LinterResultPluginRule({
   name = '',
   description = '',
+  errorDescription = '',
   passed = false,
   weight = 0,
   tips = [],
@@ -30,6 +48,7 @@ function LinterResultPluginRule({
   return {
     name,
     description,
+    errorDescription,
     passed,
     weight,
     tips,

@@ -75,7 +75,7 @@ func init() {
 	configOptions = append(configOptions, serverOptions...)
 }
 
-func (c *Config) PostgresConnString() string {
+func (c *AppConfig) PostgresConnString() string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -99,35 +99,35 @@ func (c *Config) PostgresConnString() string {
 	return str
 }
 
-func (c *Config) ServerPathPrefix() string {
+func (c *AppConfig) ServerPathPrefix() string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.vp.GetString("server.pathPrefix")
 }
 
-func (c *Config) ServerPort() int {
+func (c *AppConfig) ServerPort() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.vp.GetInt("server.httpPort")
 }
 
-func (c *Config) ExperimentalFeatures() []string {
+func (c *AppConfig) ExperimentalFeatures() []string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.vp.GetStringSlice("experimentalFeatures")
 }
 
-func (c *Config) InternalTelemetryEnabled() bool {
+func (c *AppConfig) InternalTelemetryEnabled() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.vp.GetBool("internalTelemetry.enabled")
 }
 
-func (c *Config) InternalTelemetryOtelCollectorAddress() string {
+func (c *AppConfig) InternalTelemetryOtelCollectorAddress() string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

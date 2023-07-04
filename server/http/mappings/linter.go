@@ -41,20 +41,36 @@ func (m OpenAPI) LinterResultPluginRule(in model.RuleResult) openapi.LinterResul
 	}
 
 	return openapi.LinterResultPluginRule{
-		Passed:      in.Passed,
-		Description: in.Description,
-		Name:        in.Name,
-		Weight:      int32(in.Weight),
-		Tips:        in.Tips,
-		Results:     results,
+		Passed:           in.Passed,
+		Description:      in.Description,
+		ErrorDescription: in.ErrorDescription,
+		Name:             in.Name,
+		Weight:           int32(in.Weight),
+		Tips:             in.Tips,
+		Results:          results,
 	}
 }
 
 func (m OpenAPI) LinterResultPluginRuleResult(in model.Result) openapi.LinterResultPluginRuleResult {
+	errors := make([]openapi.LinterResultPluginRuleResultError, len(in.Errors))
+	for i, error := range in.Errors {
+		errors[i] = m.LinterResultPluginRuleResultError(error)
+	}
+
 	return openapi.LinterResultPluginRuleResult{
 		SpanId:   in.SpanID,
 		Passed:   in.Passed,
 		Severity: "",
-		Errors:   in.Errors,
+		Errors:   errors,
+	}
+}
+
+func (m OpenAPI) LinterResultPluginRuleResultError(in model.Error) openapi.LinterResultPluginRuleResultError {
+	return openapi.LinterResultPluginRuleResultError{
+		Value:       in.Value,
+		Expected:    in.Expected,
+		Level:       in.Level,
+		Description: in.Description,
+		Suggestions: in.Suggestions,
 	}
 }

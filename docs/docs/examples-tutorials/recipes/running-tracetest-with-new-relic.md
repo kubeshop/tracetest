@@ -264,7 +264,7 @@ First, [install the CLI](https://docs.tracetest.io/getting-started/installation#
 Then, configure the CLI:
 
 ```bash
-tracetest configure --endpoint http://localhost:11633 --analytics
+tracetest configure --endpoint http://localhost:11633
 ```
 
 Once configured, you can run a test against the Tracetest instance via the terminal.

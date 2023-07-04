@@ -1,29 +1,18 @@
 import {SettingOutlined, ToolOutlined} from '@ant-design/icons';
-import {Space, Tooltip} from 'antd';
-import {useMemo} from 'react';
-import * as SSpanNode from 'components/Visualization/components/DAG/SpanNode.styled';
+import {Space} from 'antd';
+import * as SSpanNode from 'components/Visualization/components/DAG/BaseSpanNode/BaseSpanNode.styled';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import {SpanKindToText} from 'constants/Span.constants';
-import SpanService from 'services/Span.service';
-import {TResultAssertions} from 'types/Assertion.types';
 import Span from 'models/Span.model';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import SpanService from 'services/Span.service';
 import * as S from './SpanDetail.styled';
-import AssertionResultChecks from '../AssertionResultChecks/AssertionResultChecks';
 
 interface IProps {
   span?: Span;
-  assertions?: TResultAssertions;
 }
 
-const Header = ({span, assertions = {}}: IProps) => {
+const Header = ({span}: IProps) => {
   const {kind, name, service, system, type} = SpanService.getSpanInfo(span);
-  const {failed, passed} = useMemo(() => SpanService.getAssertionResultSummary(assertions), [assertions]);
-  const {runLinterResultsBySpan} = useTestRun();
-  const lintErrors = useMemo(
-    () => SpanService.filterLintErrorsBySpan(runLinterResultsBySpan, span?.id ?? ''),
-    [runLinterResultsBySpan, span?.id]
-  );
 
   if (!span) {
     return (
@@ -38,11 +27,6 @@ const Header = ({span, assertions = {}}: IProps) => {
       <S.Column>
         <Space>
           <SSpanNode.BadgeType $hasMargin count={SemanticGroupNamesToText[type]} $type={type} />
-          {!!lintErrors.length && (
-            <Tooltip title="The analyzer found errors in this span">
-              <S.LintErrorIcon />
-            </Tooltip>
-          )}
         </Space>
         <S.HeaderTitle level={3}>{name}</S.HeaderTitle>
       </S.Column>
@@ -58,9 +42,6 @@ const Header = ({span, assertions = {}}: IProps) => {
           </S.HeaderItem>
         )}
       </S.Column>
-      <S.Row>
-        <AssertionResultChecks failed={failed} passed={passed} styleType="summary" />
-      </S.Row>
     </S.Header>
   );
 };

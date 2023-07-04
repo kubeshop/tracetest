@@ -100,23 +100,7 @@ describe('TestSpecsSelectors', () => {
     });
   });
 
-  describe('selectAssertionResultsBySpan', () => {
-    it('should return empty object', () => {
-      const assertionResults = {allPassed: false, resultList: [], results: undefined};
-      const result = TestSpecsSelectors.selectAssertionResultsBySpan(
-        {
-          testSpecs: {
-            ...initialTestSpecsState,
-            assertionResults,
-          } as ITestSpecsState,
-        } as RootState,
-        'spanId'
-      );
-      expect(result).toStrictEqual({});
-    });
-  });
-
-  describe('selectAssertionResultsBySpan', () => {
+  describe('selectIsDraftMode', () => {
     it('should return false', () => {
       const result = TestSpecsSelectors.selectIsDraftMode({
         testSpecs: {isDraftMode: false} as ITestSpecsState,

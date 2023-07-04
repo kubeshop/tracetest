@@ -19,10 +19,10 @@ var _ MappedNullable = &LinterResultPluginRuleResult{}
 
 // LinterResultPluginRuleResult struct for LinterResultPluginRuleResult
 type LinterResultPluginRuleResult struct {
-	SpanId   *string  `json:"spanId,omitempty"`
-	Errors   []string `json:"errors,omitempty"`
-	Passed   *bool    `json:"passed,omitempty"`
-	Severity *string  `json:"severity,omitempty"`
+	SpanId   *string                             `json:"spanId,omitempty"`
+	Errors   []LinterResultPluginRuleResultError `json:"errors,omitempty"`
+	Passed   *bool                               `json:"passed,omitempty"`
+	Severity *string                             `json:"severity,omitempty"`
 }
 
 // NewLinterResultPluginRuleResult instantiates a new LinterResultPluginRuleResult object
@@ -75,9 +75,9 @@ func (o *LinterResultPluginRuleResult) SetSpanId(v string) {
 }
 
 // GetErrors returns the Errors field value if set, zero value otherwise.
-func (o *LinterResultPluginRuleResult) GetErrors() []string {
+func (o *LinterResultPluginRuleResult) GetErrors() []LinterResultPluginRuleResultError {
 	if o == nil || isNil(o.Errors) {
-		var ret []string
+		var ret []LinterResultPluginRuleResultError
 		return ret
 	}
 	return o.Errors
@@ -85,7 +85,7 @@ func (o *LinterResultPluginRuleResult) GetErrors() []string {
 
 // GetErrorsOk returns a tuple with the Errors field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LinterResultPluginRuleResult) GetErrorsOk() ([]string, bool) {
+func (o *LinterResultPluginRuleResult) GetErrorsOk() ([]LinterResultPluginRuleResultError, bool) {
 	if o == nil || isNil(o.Errors) {
 		return nil, false
 	}
@@ -101,8 +101,8 @@ func (o *LinterResultPluginRuleResult) HasErrors() bool {
 	return false
 }
 
-// SetErrors gets a reference to the given []string and assigns it to the Errors field.
-func (o *LinterResultPluginRuleResult) SetErrors(v []string) {
+// SetErrors gets a reference to the given []LinterResultPluginRuleResultError and assigns it to the Errors field.
+func (o *LinterResultPluginRuleResult) SetErrors(v []LinterResultPluginRuleResultError) {
 	o.Errors = v
 }
 

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/spf13/cobra"
 )
 
@@ -12,8 +11,6 @@ var versionCmd = &cobra.Command{
 	Long:    "Display this CLI tool version",
 	PreRun:  setupCommand(),
 	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
-		analytics.Track("Version", "cmd", map[string]string{})
-
 		return versionText, nil
 	}),
 	PostRun: teardownCommand,

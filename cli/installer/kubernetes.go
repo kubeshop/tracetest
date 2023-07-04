@@ -65,8 +65,6 @@ func installSed(ui cliUI.UI) {
 }
 
 func kubernetesInstaller(config configuration, ui cliUI.UI) {
-	trackInstall("kubernetes", config, nil)
-
 	execCmdIgnoreErrors(kubectlCmd(config, "create namespace "+config.String("k8s.namespace")))
 
 	if !config.Bool("installer.only_tracetest") {
@@ -282,7 +280,10 @@ func getKubernetesContextArray(kubeconfig string) ([][]string, error) {
 	newStringBytes := spaceRegex.ReplaceAll([]byte(output), []byte(","))
 	output = string(newStringBytes)
 
-	records, err := csv.NewReader(strings.NewReader(output)).ReadAll()
+	csvReader := csv.NewReader(strings.NewReader(output))
+	// Related to issue: https://github.com/kubeshop/tracetest/issues/2723
+	csvReader.FieldsPerRecord = -1 // Disable fields length validation
+	records, err := csvReader.ReadAll()
 	if err != nil {
 		return [][]string{}, err
 	}

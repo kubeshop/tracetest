@@ -3,13 +3,17 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
+	"time"
 
+	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/parameters"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -17,12 +21,11 @@ import (
 )
 
 var (
-	cliConfig        config.Config
-	cliLogger        *zap.Logger
-	versionText      string
-	isVersionMatch   bool
-	resourceRegistry = actions.NewResourceRegistry()
-	resourceParams   = &parameters.ResourceParams{}
+	cliConfig      config.Config
+	cliLogger      *zap.Logger
+	versionText    string
+	isVersionMatch bool
+	resourceParams = &resourceParameters{}
 )
 
 type setupConfig struct {
@@ -44,6 +47,140 @@ func SkipVersionMismatchCheck() setupOption {
 	}
 }
 
+var httpClient = &resourcemanager.HTTPClient{}
+var resources = resourcemanager.NewRegistry().
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"config", "configs",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "ANALYTICS ENABLED", Path: "spec.analyticsEnabled"},
+				},
+			}),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"analyzer", "analyzers",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "ENABLED", Path: "spec.enabled"},
+					{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
+				},
+			}),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"pollingprofile", "pollingprofiles",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "STRATEGY", Path: "spec.strategy"},
+				},
+			}),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"demo", "demos",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "TYPE", Path: "spec.type"},
+					{Header: "ENABLED", Path: "spec.enabled"},
+				},
+			}),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"datastore", "datastores",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "DEFAULT", Path: "spec.default"},
+				},
+				ItemModifier: func(item *gabs.Container) error {
+					isDefault := item.Path("spec.default").Data().(bool)
+					if !isDefault {
+						item.SetP("", "spec.default")
+					} else {
+						item.SetP("*", "spec.default")
+					}
+					return nil
+				},
+			}),
+			resourcemanager.WithDeleteEnabled("DataStore removed. Defaulting back to no-tracing mode"),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"environment", "environments",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "DESCRIPTION", Path: "spec.description"},
+				},
+			}),
+		),
+	).
+	Register(
+		resourcemanager.NewClient(
+			httpClient,
+			"transaction", "transactions",
+			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+				Cells: []resourcemanager.TableCellConfig{
+					{Header: "ID", Path: "spec.id"},
+					{Header: "NAME", Path: "spec.name"},
+					{Header: "VERSION", Path: "spec.version"},
+					{Header: "STEPS", Path: "spec.summary.steps"},
+					{Header: "RUNS", Path: "spec.summary.runs"},
+					{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
+					{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
+					{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
+				},
+				ItemModifier: func(item *gabs.Container) error {
+					// set spec.summary.steps to the number of steps in the transaction
+					item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
+
+					// if lastRun.time is not empty, show it in a nicer format
+					lastRunTime := item.Path("spec.summary.lastRun.time").Data().(string)
+					if lastRunTime != "" {
+						date, err := time.Parse(time.RFC3339, lastRunTime)
+						if err != nil {
+							return fmt.Errorf("failed to parse last run time: %s", err)
+						}
+						if date.IsZero() {
+							item.SetP("", "spec.summary.lastRun.time")
+						} else {
+							item.SetP(date.Format(time.DateTime), "spec.summary.lastRun.time")
+						}
+					}
+					return nil
+				},
+			}),
+		),
+	)
+
+func resourceList() string {
+	return strings.Join(resources.List(), "|")
+}
+
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
 		shouldValidateConfig:          true,
@@ -60,58 +197,18 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		overrideConfig()
 		setupVersion()
 
-		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
+		extraHeaders := http.Header{}
+		extraHeaders.Set("x-client-id", analytics.ClientID())
+		extraHeaders.Set("x-source", "cli")
 
-		// TODO: remove this client from here when we migrate tests to the resource manager
-		openapiClient := utils.GetAPIClient(cliConfig)
-
-		configOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("configs", cliConfig)),
-			actions.WithFormatter(formatters.NewConfigFormatter()),
-		)
-		configActions := actions.NewConfigActions(configOptions...)
-		resourceRegistry.Register(configActions)
-
-		pollingOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("pollingprofiles", cliConfig)),
-			actions.WithFormatter(formatters.NewPollingFormatter()),
-		)
-		pollingActions := actions.NewPollingActions(pollingOptions...)
-		resourceRegistry.Register(pollingActions)
-
-		demoOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("demos", cliConfig)),
-			actions.WithFormatter(formatters.NewDemoFormatter()),
-		)
-		demoActions := actions.NewDemoActions(demoOptions...)
-		resourceRegistry.Register(demoActions)
-
-		dataStoreOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("datastores", cliConfig)),
-			actions.WithFormatter(formatters.NewDatastoreFormatter()),
-		)
-		dataStoreActions := actions.NewDataStoreActions(dataStoreOptions...)
-		resourceRegistry.Register(dataStoreActions)
-
-		environmentOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)),
-			actions.WithFormatter(formatters.NewEnvironmentsFormatter()),
-		)
-		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
-		resourceRegistry.Register(environmentActions)
-
-		transactionOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
-			actions.WithFormatter(formatters.NewTransactionsFormatter()),
-		)
-		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
-		resourceRegistry.Register(transactionActions)
+		// To avoid a ciruclar reference initialization when setting up the registry and its resources,
+		// we create the resources with a pointer to an unconfigured HTTPClient.
+		// When each command is run, this function is run in the PreRun stage, before any of the actual `Run` code is executed
+		// We take this chance to configure the HTTPClient with the correct URL and headers.
+		// To make this configuration propagate to all the resources, we need to replace the pointer to the HTTPClient.
+		// For more details, see https://github.com/kubeshop/tracetest/pull/2832#discussion_r1245616804
+		hc := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
+		*httpClient = *hc
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
@@ -121,7 +218,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 			validateVersionMismatch()
 		}
 
-		analytics.Init(cliConfig)
+		analytics.Init()
 	}
 }
 
@@ -201,19 +298,14 @@ func setupLogger(cmd *cobra.Command, args []string) {
 
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
-	analytics.Close()
 }
 
 func setupVersion() {
-	ctx := context.Background()
-	options := []actions.ActionArgsOption{
-		actions.ActionWithClient(utils.GetAPIClient(cliConfig)),
-		actions.ActionWithConfig(cliConfig),
-		actions.ActionWithLogger(cliLogger),
-	}
-
-	action := actions.NewGetServerVersionAction(options...)
-	versionText, isVersionMatch = action.GetVersion(ctx)
+	versionText, isVersionMatch = actions.GetVersion(
+		context.Background(),
+		cliConfig,
+		utils.GetAPIClient(cliConfig),
+	)
 }
 
 func validateVersionMismatch() {

@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -177,8 +177,8 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 		attributes[name] = value
 	}
 
-	attributes["parent_id"] = in.ParentID
-	attributes["kind"] = attributes["span.kind"]
+	attributes[model.TracetestMetadataFieldParentID] = in.ParentID
+	attributes[model.TracetestMetadataFieldKind] = attributes["span.kind"]
 	delete(attributes, "span.kind")
 
 	spanID, _ := trace.SpanIDFromHex(in.SpanID)
@@ -194,7 +194,7 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 	}
 }
 
-func newSignalFXDB(cfg *datastoreresource.SignalFXConfig) (TraceDB, error) {
+func newSignalFXDB(cfg *datastore.SignalFXConfig) (TraceDB, error) {
 	return &signalfxDB{
 		Realm:      cfg.Realm,
 		Token:      cfg.Token,

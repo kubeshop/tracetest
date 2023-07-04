@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,16 +13,16 @@ import (
 func TestCreateClient(t *testing.T) {
 	cases := []struct {
 		name          string
-		ds            datastoreresource.DataStore
+		ds            datastore.DataStore
 		expectedType  string
 		expectedError error
 	}{
 		{
 			name: "Jaeger",
-			ds: datastoreresource.DataStore{
-				Type: datastoreresource.DataStoreTypeJaeger,
-				Values: datastoreresource.DataStoreValues{
-					Jaeger: &datastoreresource.GRPCClientSettings{
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeJaeger,
+				Values: datastore.DataStoreValues{
+					Jaeger: &datastore.GRPCClientSettings{
 						Endpoint: "notexists:123",
 					},
 				},
@@ -31,97 +31,97 @@ func TestCreateClient(t *testing.T) {
 		},
 		{
 			name: "Tempo",
-			ds: datastoreresource.DataStore{
-				Type: datastoreresource.DataStoreTypeTempo,
-				Values: datastoreresource.DataStoreValues{
-					Tempo: &datastoreresource.MultiChannelClientConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeTempo,
+				Values: datastore.DataStoreValues{
+					Tempo: &datastore.MultiChannelClientConfig{},
 				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",
 		},
 		{
 			name: "ElasticSearch",
-			ds: datastoreresource.DataStore{
-				Type: datastoreresource.DataStoreTypeElasticAPM,
-				Values: datastoreresource.DataStoreValues{
-					ElasticApm: &datastoreresource.ElasticSearchConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeElasticAPM,
+				Values: datastore.DataStoreValues{
+					ElasticApm: &datastore.ElasticSearchConfig{},
 				},
 			},
 			expectedType: "*tracedb.elasticsearchDB",
 		},
 		{
 			name: "OpenSearch",
-			ds: datastoreresource.DataStore{
-				Type: datastoreresource.DataStoreTypeOpenSearch,
-				Values: datastoreresource.DataStoreValues{
-					OpenSearch: &datastoreresource.ElasticSearchConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeOpenSearch,
+				Values: datastore.DataStoreValues{
+					OpenSearch: &datastore.ElasticSearchConfig{},
 				},
 			},
 			expectedType: "*tracedb.opensearchDB",
 		},
 		{
 			name: "SignalFX",
-			ds: datastoreresource.DataStore{
-				Type: datastoreresource.DataStoreTypeSignalFX,
-				Values: datastoreresource.DataStoreValues{
-					SignalFx: &datastoreresource.SignalFXConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeSignalFX,
+				Values: datastore.DataStoreValues{
+					SignalFx: &datastore.SignalFXConfig{},
 				},
 			},
 			expectedType: "*tracedb.signalfxDB",
 		},
 		{
 			name: "AWSXRay",
-			ds: datastoreresource.DataStore{
-				Type: datastoreresource.DataStoreTypeAwsXRay,
-				Values: datastoreresource.DataStoreValues{
-					AwsXRay: &datastoreresource.AWSXRayConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeAwsXRay,
+				Values: datastore.DataStoreValues{
+					AwsXRay: &datastore.AWSXRayConfig{},
 				},
 			},
 			expectedType: "*tracedb.awsxrayDB",
 		},
 		{
 			name: "OTLP",
-			ds: datastoreresource.DataStore{
-				Type:   datastoreresource.DataStoreTypeOTLP,
-				Values: datastoreresource.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeOTLP,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "NewRelic",
-			ds: datastoreresource.DataStore{
-				Type:   datastoreresource.DataStoreTypeNewRelic,
-				Values: datastoreresource.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeNewRelic,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "Lightstep",
-			ds: datastoreresource.DataStore{
-				Type:   datastoreresource.DataStoreTypeLighStep,
-				Values: datastoreresource.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeLighStep,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "Honeycomb",
-			ds: datastoreresource.DataStore{
-				Type:   datastoreresource.DataStoreTypeHoneycomb,
-				Values: datastoreresource.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeHoneycomb,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "DataDog",
-			ds: datastoreresource.DataStore{
-				Type:   datastoreresource.DataStoreTypeDataDog,
-				Values: datastoreresource.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeDataDog,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name:         "EmptyConfig",
-			ds:           datastoreresource.DataStore{},
+			ds:           datastore.DataStore{},
 			expectedType: "*tracedb.noopTraceDB",
 		},
 	}

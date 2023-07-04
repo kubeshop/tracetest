@@ -48,19 +48,21 @@ const getSpanSignature = (
   }, []);
 };
 
-const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = ''}: TRawSpan): Span => {
-  const attributeList = Object.entries(attributes).map<TSpanFlatAttribute>(([key, value]) => ({
-    value: String(value),
-    key,
-  }));
+const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = '', name = ''}: TRawSpan): Span => {
+  const mappedAttributeList: TSpanFlatAttribute[] = [{key: 'name', value: name}];
+  const attributeList = Object.entries(attributes)
+    .map<TSpanFlatAttribute>(([key, value]) => ({
+      value: String(value),
+      key,
+    }))
+    .concat(mappedAttributeList);
 
-  const attributesMap = attributeList.reduce<Record<string, SpanAttribute>>((map, rawSpanAttribute) => {
+  const attributesMap = attributeList.reduce((map, rawSpanAttribute) => {
     const spanAttribute = SpanAttribute(rawSpanAttribute);
 
     return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
   }, {});
 
-  const name = attributes[Attributes.NAME] || '';
   const kind = SpanKindList.find(spanKind => spanKind === attributes[Attributes.KIND]) || SpanKind.INTERNAL;
   const duration = attributes[Attributes.TRACETEST_SPAN_DURATION] || '0ns';
   const type =

@@ -33,6 +33,6 @@ func TestNotEmptyAttributeRule(t *testing.T) {
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)
-		assert.Equal(t, `Attribute "http.method" is empty`, result.Results[0].Errors[0])
+		assert.Equal(t, `Attribute "http.method" is empty`, result.Results[0].Errors[0].Description)
 	})
 }

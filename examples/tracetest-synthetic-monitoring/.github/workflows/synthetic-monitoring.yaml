@@ -38,8 +38,7 @@ jobs:
         run: curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 
       - name: Configure Tracetest CLI
-        # if you want to disable analytics, change --analytics=true to --analytics=false
-        run: tracetest configure -g --endpoint http://localhost:11633 --analytics=true
+        run: tracetest configure -g --endpoint http://localhost:11633
 
       - name: Run syntethic monitoring tests
         id: monitoring

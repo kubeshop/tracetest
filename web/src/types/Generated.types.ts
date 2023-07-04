@@ -1565,7 +1565,7 @@ export interface external {
           request?: string;
         };
         GRPCResponse: {
-          statusCode?: number;
+          statusCode: number;
           metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
           body?: string;
         };
@@ -1671,6 +1671,7 @@ export interface external {
         LinterResultPluginRule: {
           name?: string;
           description?: string;
+          errorDescription?: string;
           passed?: boolean;
           weight?: number;
           tips?: string[];
@@ -1678,10 +1679,17 @@ export interface external {
         };
         LinterResultPluginRuleResult: {
           spanId?: string;
-          errors?: string[];
+          errors?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResultError"][];
           passed?: boolean;
           /** @enum {string} */
           severity?: "error" | "warning";
+        };
+        LinterResultPluginRuleResultError: {
+          value?: string;
+          expected?: string;
+          level?: string;
+          description?: string;
+          suggestions?: string[];
         };
       };
     };
@@ -1814,6 +1822,7 @@ export interface external {
             time?: string | null;
             passes?: number;
             fails?: number;
+            analyzerScore?: number;
           };
         };
         /** @example [object Object] */

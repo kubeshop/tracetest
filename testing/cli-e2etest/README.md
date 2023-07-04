@@ -31,10 +31,10 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
 | `test list`                                                        | |
-| `test run -d [test-definition]`                                    | [TestRunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
-| `test run -d [test-definition] -e [environment-id]`                | [TestRunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `test run -d [test-definition] -e [environment-definition]`        | [TestRunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `test run -d [transaction-definition]`                             | |
+| `test run -d [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
+| `test run -d [test-definition] -e [environment-id]`                | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `test run -d [test-definition] -e [environment-definition]`        | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `test run -d [transaction-definition]`                             | [RunTransaction](./testscenarios/transaction//run_transaction_test.go) |
 | `test run -d [transaction-definition] -e [environment-id]`         | |
 | `test run -d [transaction-definition] -e [environment-definition]` | |
 
@@ -42,23 +42,24 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                           | Test scenarios |
 | ----------------------------------------------------- | -------------- |
-| `apply config -f [config-file]`                       | |
-| `delete config --id current`                          | |
-| `get config --id current --output pretty`             | |
-| `get config --id current --output json`               | |
-| `get config --id current --output yaml`               | |
-| `list config --output pretty`                         | |
-| `list config --output json`                           | |
-| `list config --output yaml`                           | |
+| `apply config -f [config-file]`                       | [ApplyConfig](./testscenarios/config/apply_config_test.go) |
+| `delete config --id current`                          | [DeleteConfig](./testscenarios/config/delete_config_test.go) |
+| `get config --id current --output pretty`             | [GetConfig](./testscenarios/config/get_config_test.go), [ApplyConfig](./testscenarios/config/apply_config_test.go), [DeleteConfig](./testscenarios/config/delete_config_test.go) |
+| `get config --id current --output json`               | [GetConfig](./testscenarios/config/get_config_test.go) |
+| `get config --id current --output yaml`               | [GetConfig](./testscenarios/config/get_config_test.go) |
+| `list config --output pretty`                         | [ListConfig](./testscenarios/config/list_config_test.go) |
+| `list config --output json`                           | [ListConfig](./testscenarios/config/list_config_test.go) |
+| `list config --output yaml`                           | [ListConfig](./testscenarios/config/list_config_test.go) |
+
 ### Resources: Data Store
 
 | CLI Command                                              | Test scenarios |
 | -------------------------------------------------------- | -------------- |
-| `apply datastore -f [data-store-file]`                   | [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go) |
+| `apply datastore -f [data-store-file]`                   | [ApplyDatastore](./testscenarios/datastore/apply_datastore_test.go) |
 | `delete datastore --id current`                          | [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
-| `get datastore --id current --output pretty`             | [ApplyNewDatastore](./testscenarios/datastore/apply_new_datastore_test.go), [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
-| `get datastore --id current --output json`               | |
-| `get datastore --id current --output yaml`               | |
+| `get datastore --id current --output pretty`             | [GetDatastore](./testscenarios/datastore/get_datastore_test.go), [ApplyDatastore](./testscenarios/datastore/apply_datastore_test.go), [DeleteDatastore](./testscenarios/datastore/delete_datastore_test.go) |
+| `get datastore --id current --output json`               | [GetDatastore](./testscenarios/datastore/get_datastore_test.go) |
+| `get datastore --id current --output yaml`               | [GetDatastore](./testscenarios/datastore/get_datastore_test.go) |
 | `list datastore --output pretty`                         | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
 | `list datastore --output json`                           | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
 | `list datastore --output yaml`                           | [ListDatastore](./testscenarios/datastore/list_datastore_test.go) |
@@ -67,32 +68,32 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                          | Test scenarios |
 | ---------------------------------------------------- | -------------- |
-| `apply demo -f [new-demo-file]`                      | |
-| `apply demo -f [existing-demo-file]`                 | |
-| `delete demo --id [existing-id]`                     | |
-| `delete demo --id [non-existing-id]`                 | |
-| `get demo --id [non-existing-id]`                    | |
-| `get demo --id [existing-id] --output pretty`        | |
-| `get demo --id [existing-id] --output json`          | |
-| `get demo --id [existing-id] --output yaml`          | |
-| `list demo --output pretty`                          | |
-| `list demo --output json`                            | |
-| `list demo --output yaml`                            | |
-| `list demo --skip 1 --take 2`                        | |
-| `list demo --sortBy name --sortDirection asc`        | |
+| `apply demo -f [new-demo-file]`                      | [ApplyDemo](./testscenarios/demo/apply_demo_test.go) |
+| `apply demo -f [existing-demo-file]`                 | [ApplyDemo](./testscenarios/demo/apply_demo_test.go) |
+| `delete demo --id [existing-id]`                     | [DeleteDemo](./testscenarios/demo/delete_demo_test.go) |
+| `delete demo --id [non-existing-id]`                 | [DeleteDemo](./testscenarios/demo/delete_demo_test.go) |
+| `get demo --id [non-existing-id]`                    | [GetDemo](./testscenarios/demo/get_demo_test.go), [DeleteDemo](./testscenarios/demo/delete_demo_test.go) |
+| `get demo --id [existing-id] --output pretty`        | [GetDemo](./testscenarios/demo/get_demo_test.go) |
+| `get demo --id [existing-id] --output json`          | [GetDemo](./testscenarios/demo/get_demo_test.go) |
+| `get demo --id [existing-id] --output yaml`          | [GetDemo](./testscenarios/demo/get_demo_test.go) |
+| `list demo --output pretty`                          | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --output json`                            | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --output yaml`                            | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --skip 1 --take 1`                        | [ListDemo](./testscenarios/demo/list_demos_test.go) |
+| `list demo --sortBy name --sortDirection asc`        | [ListDemo](./testscenarios/demo/list_demos_test.go) |
 
 ### Resources: Environment
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply environment -f [new-environment-file]`               | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
-| `apply environment -f [existing-environment-file]`          | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
+| `apply environment -f [new-environment-file]`               | [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
+| `apply environment -f [existing-environment-file]`          | [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
 | `delete environment --id [existing-id]`                     | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
 | `delete environment --id [non-existing-id]`                 | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `get environment --id [non-existing-id]`                    | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `get environment --id [existing-id] --output pretty`        | |
-| `get environment --id [existing-id] --output json`          | |
-| `get environment --id [existing-id] --output yaml`          | [ApplyNewEnvironment](./testscenarios/environment/apply_new_environment_test.go) |
+| `get environment --id [non-existing-id]`                    | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
+| `get environment --id [existing-id] --output pretty`        | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
+| `get environment --id [existing-id] --output json`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
+| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
 | `list environment --output pretty`                          | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output json`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
 | `list environment --output yaml`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
@@ -103,31 +104,60 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                           | Test scenarios |
 | --------------------------------------------------------------------- | -------------- |
-| `apply pollingprofile -f [pollingprofile-file]`                       | |
-| `delete pollingprofile --id current`                                  | |
-| `export pollingprofile --id current --file [pollingprofile-file]`     | |
-| `get pollingprofile --id current --output pretty`                     | |
-| `get pollingprofile --id current --output json`                       | |
-| `get pollingprofile --id current --output yaml`                       | |
-| `list pollingprofile --output pretty`                                 | |
-| `list pollingprofile --output json`                                   | |
-| `list pollingprofile --output yaml`                                   | |
+| `apply pollingprofile -f [pollingprofile-file]`                       | [ApplyPollingProfile](./testscenarios/pollingprofile/apply_pollingprofile_test.go) |
+| `delete pollingprofile --id current`                                  | [DeletePollingProfile](./testscenarios/pollingprofile/delete_pollingprofile_test.go) |
+| `get pollingprofile --id current --output pretty`                     | [GetPollingProfile](./testscenarios/pollingprofile/get_pollingprofile_test.go), [ApplyPollingProfile](./testscenarios/pollingprofile/apply_pollingprofile_test.go), [DeletePollingProfile](./testscenarios/pollingprofile/delete_pollingprofile_test.go) |
+| `get pollingprofile --id current --output json`                       | [GetPollingProfile](./testscenarios/pollingprofile/get_pollingprofile_test.go) |
+| `get pollingprofile --id current --output yaml`                       | [GetPollingProfile](./testscenarios/pollingprofile/get_pollingprofile_test.go) |
+| `list pollingprofile --output pretty`                                 | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
+| `list pollingprofile --output json`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
+| `list pollingprofile --output yaml`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
+
+### Resources: Analyzer
+
+| CLI Command                                           | Test scenarios |
+| ----------------------------------------------------- | -------------- |
+| `apply analyzer -f [analyzer-file]`                     | [ApplyAnalyzer](./testscenarios/analyzer/apply_analyzer_test.go) |
+| `delete analyzer --id current`                          | [DeleteAnalyzer](./testscenarios/analyzer/delete_analyzer_test.go) |
+| `get analyzer --id current --output pretty`             | [GetAnalyzer](./testscenarios/analyzer/get_analyzer_test.go) |
+| `get analyzer --id current --output json`               | [GetAnalyzer](./testscenarios/analyzer/get_analyzer_test.go) |
+| `get analyzer --id current --output yaml`               | [GetAnalyzer](./testscenarios/analyzer/get_analyzer_test.go) |
+| `list analyzer --output pretty`                         | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
+| `list analyzer --output json`                           | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
+| `list analyzer --output yaml`                           | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
 
 ### Resources: Transactions
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply transaction -f [new-transaction-file]`               | |
-| `apply transaction -f [existing-transaction-file]`          | |
-| `delete transaction --id [existing-id]`                     | |
-| `delete transaction --id [non-existing-id]`                 | |
-| `export transaction --id current --file [transaction-file]` | |
-| `get transaction --id [non-existing-id]`                    | |
-| `get transaction --id [existing-id] --output pretty`        | |
-| `get transaction --id [existing-id] --output json`          | |
-| `get transaction --id [existing-id] --output yaml`          | |
-| `list transaction --output pretty`                          | |
-| `list transaction --output json`                            | |
-| `list transaction --output yaml`                            | |
-| `list transaction --skip 1 --take 2`                        | |
-| `list transaction --sortBy name --sortDirection asc`        | |
+| `apply transaction -f [new-transaction-file]`               | [ApplyTransaction](./testscenarios/transaction/apply_transaction_test.go) |
+| `apply transaction -f [existing-transaction-file]`          | [ApplyTransaction](./testscenarios/transaction/apply_transaction_test.go) |
+| `delete transaction --id [existing-id]`                     | [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
+| `delete transaction --id [non-existing-id]`                 | [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
+| `get transaction --id [non-existing-id]`                    | [GetTransaction](./testscenarios/transaction/get_transaction_test.go), [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
+| `get transaction --id [existing-id] --output pretty`        | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
+| `get transaction --id [existing-id] --output json`          | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
+| `get transaction --id [existing-id] --output yaml`          | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
+| `list transaction --output pretty`                          | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --output json`                            | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --output yaml`                            | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --skip 1 --take 2`                        | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `list transaction --sortBy name --sortDirection asc`        | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+
+### Resources: Tests
+
+| CLI Command                                                 | Test scenarios |
+| ----------------------------------------------------------- | -------------- |
+| `apply test -f [new-test-file]`                             | |
+| `apply test -f [existing-test-file]`                        | |
+| `delete test --id [existing-id]`                            | |
+| `delete test --id [non-existing-id]`                        | |
+| `get test --id [non-existing-id]`                           | |
+| `get test --id [existing-id] --output pretty`               | |
+| `get test --id [existing-id] --output json`                 | |
+| `get test --id [existing-id] --output yaml`                 | |
+| `list test --output pretty`                                 | |
+| `list test --output json`                                   | |
+| `list test --output yaml`                                   | |
+| `list test --skip 1 --take 2`                               | |
+| `list test --sortBy name --sortDirection asc`               | |

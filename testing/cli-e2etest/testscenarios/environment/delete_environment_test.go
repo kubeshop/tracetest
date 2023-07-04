@@ -24,11 +24,11 @@ func TestDeleteEnvironment(t *testing.T) {
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
-	// When I try to delete an environment that don't exo
+	// When I try to delete an environment that don't exist
 	// Then it should return an error and say that this resource does not exist
 	result := tracetestcli.Exec(t, "delete environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "Resource environments with ID .env not found") // TODO: update this message to singular
+	require.Contains(result.StdErr, "Resource environment with ID .env not found") 
 
 	// When I try to set up a new environment
 	// Then it should be applied with success

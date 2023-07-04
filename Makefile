@@ -108,4 +108,4 @@ clean: ## cleans the build artifacts
 	rm -rf dist
 	rm -rf web/build
 	rm -rf web/node_modules
-	docker rm image "kubeshop/tracetest:$(TAG)"
+	docker image rm "kubeshop/tracetest:$(TAG)"

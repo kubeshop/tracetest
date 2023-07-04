@@ -26,7 +26,7 @@ const dataStoreServiceMap = {
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
-  getInitialValues(config: DataStoreConfig): TDraftDataStore;
+  getInitialValues(config: DataStoreConfig, configuredDataStore?: SupportedDataStores): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
   shouldTestConnection(draft: TDraftDataStore): boolean;
   _getDataStore(type?: SupportedDataStores): TDataStoreService;
@@ -57,12 +57,12 @@ const DataStoreService = (): IDataStoreService => ({
     } as TRawDataStore;
   },
 
-  getInitialValues(dataStoreConfig) {
+  getInitialValues(dataStoreConfig, configuredDataStore) {
     const {defaultDataStore} = dataStoreConfig;
     const type = (defaultDataStore.type || SupportedDataStores.JAEGER) as SupportedDataStores;
     const dataStore = this._getDataStore(type);
 
-    return {...dataStore.getInitialValues(dataStoreConfig, type), dataStoreType: type};
+    return {...dataStore.getInitialValues(dataStoreConfig, type, configuredDataStore), dataStoreType: type};
   },
 
   validateDraft(draft) {

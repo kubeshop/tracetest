@@ -120,6 +120,7 @@ func setupController(t *testing.T) controllerFixture {
 			nil,
 			nil,
 			nil,
+			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry(), mdb),
 			nil,
 			&trigger.Registry{},

@@ -12,7 +12,7 @@ var (
 	httpAttrServer = []string{"http.target", "http.scheme", "net.host.name"}
 
 	databaseAttr   = []string{"db.system"}
-	rpcAttr        = []string{"rpc.system", "neet.peer.name"}
+	rpcAttr        = []string{"rpc.system", "net.peer.name"}
 	messagingAttr  = []string{"messaging.system", "messaging.operation"}
 	faasAttrServer = []string{"faas.trigger"}
 	faasAttrClient = []string{"faas.invoked_name", "faas.invoked_provider"}
@@ -59,11 +59,14 @@ func (r requiredAttributesRule) validateHttpSpan(span *model.Span) model.Result 
 	return result
 }
 
-func (r requiredAttributesRule) getMissingAttrs(span *model.Span, matchingAttrList []string, spanType string) []string {
-	missingAttributes := make([]string, 0)
+func (r requiredAttributesRule) getMissingAttrs(span *model.Span, matchingAttrList []string, spanType string) []model.Error {
+	missingAttributes := make([]model.Error, 0)
 	for _, requiredAttribute := range matchingAttrList {
 		if _, attributeExists := span.Attributes[requiredAttribute]; !attributeExists {
-			missingAttributes = append(missingAttributes, fmt.Sprintf(`Attribute "%s" is missing from span of type "%s"`, requiredAttribute, spanType))
+			missingAttributes = append(missingAttributes, model.Error{
+				Value:       requiredAttribute,
+				Description: fmt.Sprintf(`Attribute "%s" is missing from span of type "%s"`, requiredAttribute, spanType),
+			})
 		}
 	}
 
@@ -116,7 +119,7 @@ func (r requiredAttributesRule) validateMessagingSpan(span *model.Span) model.Re
 }
 
 func (r requiredAttributesRule) validateFaasSpan(span *model.Span) model.Result {
-	missingAttrs := []string{}
+	missingAttrs := make([]model.Error, 0)
 	result := model.Result{
 		Passed: true,
 		SpanID: span.ID.String(),

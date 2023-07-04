@@ -41,7 +41,7 @@ const Content = () => {
             data-cy="test-details-run-test-button"
             ghost
             loading={isLoadingRunTest}
-            onClick={() => runTest(test)}
+            onClick={() => runTest({test})}
             type="primary"
           >
             Run Test
