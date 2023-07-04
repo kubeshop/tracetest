@@ -6,7 +6,6 @@ require (
 	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
-	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/goccy/go-yaml v1.11.0
 	github.com/kubeshop/tracetest/server v0.0.0-20230512142545-cb5e526e06f9

@@ -37,6 +37,7 @@ type runTestAction struct {
 	openapiClient *openapi.APIClient
 	environments  resourcemanager.Client
 	tests         resourcemanager.Client
+	transactions  resourcemanager.Client
 	yamlFormat    resourcemanager.Format
 	cliExit       func(int)
 }
@@ -46,6 +47,7 @@ func NewRunTestAction(
 	logger *zap.Logger,
 	openapiClient *openapi.APIClient,
 	tests resourcemanager.Client,
+	transactions resourcemanager.Client,
 	environments resourcemanager.Client,
 	cliExit func(int),
 ) runTestAction {
@@ -61,6 +63,7 @@ func NewRunTestAction(
 		openapiClient,
 		tests,
 		environments,
+		transactions,
 		yamlFormat,
 		cliExit,
 	}
@@ -161,8 +164,107 @@ func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, 
 	return env.Spec.GetId(), nil
 }
 
-func (a runTestAction) apply(ctx context.Context, defFile defFile) (defFile, error) {
-	return defFile, nil
+func (a runTestAction) apply(ctx context.Context, df defFile) (defFile, error) {
+	defType, err := getTypeFromFile(df)
+	if err != nil {
+		return df, fmt.Errorf("cannot get type from definition file: %w", err)
+	}
+	a.logger.Debug("definition file type", zap.String("type", defType))
+
+	switch defType {
+	case "Test":
+		return a.applyTest(ctx, df)
+	case "Transaction":
+		return a.applyTransaction(ctx, df)
+	default:
+		return df, fmt.Errorf("unknown type %s", defType)
+	}
+}
+
+func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, error) {
+	var test openapi.TestResource
+	err := yaml.Unmarshal(df.Contents(), &test)
+	if err != nil {
+		a.logger.Error("error parsing test", zap.String("content", string(df.Contents())), zap.Error(err))
+		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
+	}
+
+	a.logger.Debug("applying test",
+		zap.String("absolutePath", df.AbsPath()),
+		zap.String("id", test.Spec.GetId()),
+	)
+	updated, err := a.tests.Apply(ctx, df.AbsPath(), a.yamlFormat)
+	if err != nil {
+		return df, fmt.Errorf("could not read test file: %w", err)
+	}
+
+	df = defFile{fileutil.New(df.AbsPath(), []byte(updated))}
+
+	err = yaml.Unmarshal(df.Contents(), &test)
+	if err != nil {
+		a.logger.Error("error parsing updated test", zap.String("content", string(df.Contents())), zap.Error(err))
+		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
+	}
+
+	a.logger.Debug("test applied",
+		zap.String("absolutePath", df.AbsPath()),
+		zap.String("id", test.Spec.GetId()),
+	)
+
+	return df, nil
+}
+
+func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFile, error) {
+	var tran openapi.TransactionResource
+	err := yaml.Unmarshal(df.Contents(), &tran)
+	if err != nil {
+		a.logger.Error("error parsing transaction", zap.String("content", string(df.Contents())), zap.Error(err))
+		return df, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
+	}
+
+	a.logger.Debug("applying transaction",
+		zap.String("absolutePath", df.AbsPath()),
+		zap.String("id", tran.Spec.GetId()),
+	)
+	updated, err := a.transactions.Apply(ctx, df.AbsPath(), a.yamlFormat)
+	if err != nil {
+		return df, fmt.Errorf("could not read transaction file: %w", err)
+	}
+
+	df = defFile{fileutil.New(df.AbsPath(), []byte(updated))}
+
+	err = yaml.Unmarshal(df.Contents(), &tran)
+	if err != nil {
+		a.logger.Error("error parsing updated transaction", zap.String("content", updated), zap.Error(err))
+		return df, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
+	}
+
+	a.logger.Debug("transaction applied",
+		zap.String("absolutePath", df.AbsPath()),
+		zap.String("updated id", tran.Spec.GetId()),
+	)
+
+	return df, nil
+}
+
+func getTypeFromFile(df defFile) (string, error) {
+	var raw map[string]any
+	err := yaml.Unmarshal(df.Contents(), &raw)
+	if err != nil {
+		return "", fmt.Errorf("cannot unmarshal definition file: %w", err)
+	}
+
+	if raw["type"] == nil {
+		return "", fmt.Errorf("missing type in definition file")
+	}
+
+	defType, ok := raw["type"].(string)
+	if !ok {
+		return "", fmt.Errorf("type is not a string")
+	}
+
+	return defType, nil
+
 }
 
 type envVar struct {
@@ -177,7 +279,6 @@ func (ev envVar) value() string {
 	}
 
 	return ev.defaultValue
-
 }
 
 type missingEnvVarsError []envVar
@@ -186,7 +287,7 @@ func (e missingEnvVarsError) Error() string {
 	return fmt.Sprintf("missing env vars: %v", []envVar(e))
 }
 
-func (a runTestAction) run(ctx context.Context, defFile defFile, envID string, envVars []envVar) (*openapi.TestRun, error) {
+func (a runTestAction) run(ctx context.Context, df defFile, envID string, envVars []envVar) (*openapi.TestRun, error) {
 	return openapi.NewTestRun(), fmt.Errorf("not implemented")
 }
 

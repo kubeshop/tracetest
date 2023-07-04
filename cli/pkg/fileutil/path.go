@@ -5,6 +5,23 @@ import (
 	"path/filepath"
 )
 
+func ToAbsDir(filePath string) (string, error) {
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Dir(absPath), nil
+}
+
+func RelativeTo(path, relativeTo string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+
+	return filepath.Join(relativeTo, path)
+}
+
 func IsFilePath(path string) bool {
 	// for the current working dir, check if the file exists
 	// by finding its absolute path and executing a stat command
