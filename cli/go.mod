@@ -7,7 +7,6 @@ require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20230703185945-ddbd134c44fd
-	github.com/davecgh/go-spew v1.1.1
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/goccy/go-yaml v1.11.0
 	github.com/kubeshop/tracetest/server v0.0.0-20230512142545-cb5e526e06f9
@@ -27,6 +26,7 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/distribution/v3 v3.0.0-20220907155224-78b9c98c5c31 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect

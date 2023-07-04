@@ -12,7 +12,6 @@ import (
 	"time"
 
 	cienvironment "github.com/cucumber/ci-environment/go"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -52,6 +51,7 @@ type runTestAction struct {
 	tests         resourcemanager.Client
 	transactions  resourcemanager.Client
 	yamlFormat    resourcemanager.Format
+	jsonFormat    resourcemanager.Format
 	cliExit       func(int)
 }
 
@@ -70,6 +70,11 @@ func NewRunTestAction(
 		panic(fmt.Errorf("could not get yaml format: %w", err))
 	}
 
+	jsonFormat, err := resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+	if err != nil {
+		panic(fmt.Errorf("could not get json format: %w", err))
+	}
+
 	return runTestAction{
 		config,
 		logger,
@@ -78,6 +83,7 @@ func NewRunTestAction(
 		tests,
 		transactions,
 		yamlFormat,
+		jsonFormat,
 		cliExit,
 	}
 }
@@ -145,8 +151,8 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 		return fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
-	fmt.Println(a.formatResult(run, true))
-	a.cliExit(a.exitCode(run))
+	fmt.Println(a.formatResult(result, true))
+	a.cliExit(a.exitCode(result))
 
 	if args.JUnit != "" {
 		err := a.writeJUnitReport(ctx, result, args.JUnit)
@@ -511,6 +517,15 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 			return res, err
 		}
 
+		full, err := a.tests.Get(ctx, test.Spec.GetId(), a.jsonFormat)
+		if err != nil {
+			return res, fmt.Errorf("cannot get full test '%s': %w", test.Spec.GetId(), err)
+		}
+		err = json.Unmarshal([]byte(full), &test)
+		if err != nil {
+			return res, fmt.Errorf("cannot get full test '%s': %w", test.Spec.GetId(), err)
+		}
+
 		res.Resource = test
 		res.Run = *run
 
@@ -532,6 +547,15 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 		err = a.handleRunError(resp, err)
 		if err != nil {
 			return res, err
+		}
+
+		full, err := a.transactions.Get(ctx, tran.Spec.GetId(), a.jsonFormat)
+		if err != nil {
+			return res, fmt.Errorf("cannot get full transaction '%s': %w", tran.Spec.GetId(), err)
+		}
+		err = json.Unmarshal([]byte(full), &tran)
+		if err != nil {
+			return res, fmt.Errorf("cannot get full transaction '%s': %w", tran.Spec.GetId(), err)
 		}
 
 		res.Resource = tran
@@ -612,7 +636,6 @@ func (a runTestAction) askForMissingVars(missingVars []envVar) []envVar {
 }
 
 func (a runTestAction) formatResult(result runResult, hasResults bool) string {
-	a.logger.Debug("formatting result", zap.Any("result", result))
 	switch result.ResourceType {
 	case "Test":
 		return a.formatTestResult(result, hasResults)
@@ -638,8 +661,6 @@ func (a runTestAction) formatTestResult(result runResult, hasResults bool) strin
 func (a runTestAction) formatTransactionResult(result runResult, hasResults bool) string {
 	tran := result.Resource.(openapi.TransactionResource)
 	run := result.Run.(openapi.TransactionRun)
-
-	spew.Dump(run)
 
 	tro := formatters.TransactionRunOutput{
 		HasResults:  hasResults,
