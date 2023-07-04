@@ -44,7 +44,7 @@ type Test struct {
 	ID          string      `mapstructure:"id"`
 	Name        string      `mapstructure:"name"`
 	Description string      `mapstructure:"description" yaml:",omitempty"`
-	Trigger     TestTrigger `mapstructure:"trigger" dc:"serviceUnderTest"`
+	Trigger     TestTrigger `mapstructure:"trigger"`
 	Specs       TestSpecs   `mapstructure:"specs" yaml:",omitempty"`
 	Outputs     Outputs     `mapstructure:"outputs,omitempty" yaml:",omitempty"`
 }

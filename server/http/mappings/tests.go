@@ -55,14 +55,14 @@ func (m OpenAPI) TransactionRun(in transaction.TransactionRun) openapi.Transacti
 
 func (m OpenAPI) Test(in test.Test) openapi.Test {
 	return openapi.Test{
-		Id:               string(in.ID),
-		Name:             in.Name,
-		Description:      in.Description,
-		ServiceUnderTest: m.Trigger(in.Trigger),
-		Specs:            m.Specs(in.Specs),
-		Version:          int32(*in.Version),
-		CreatedAt:        *in.CreatedAt,
-		Outputs:          m.Outputs(in.Outputs),
+		Id:          string(in.ID),
+		Name:        in.Name,
+		Description: in.Description,
+		Trigger:     m.Trigger(in.Trigger),
+		Specs:       m.Specs(in.Specs),
+		Version:     int32(*in.Version),
+		CreatedAt:   *in.CreatedAt,
+		Outputs:     m.Outputs(in.Outputs),
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
@@ -331,7 +331,7 @@ func (m Model) Test(in openapi.Test) (test.Test, error) {
 		ID:          id.ID(in.Id),
 		Name:        in.Name,
 		Description: in.Description,
-		Trigger:     m.Trigger(in.ServiceUnderTest),
+		Trigger:     m.Trigger(in.Trigger),
 		Specs:       definition,
 		Outputs:     outputs,
 		Version:     &version,
