@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/cli/ui"
 	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
@@ -564,8 +565,20 @@ func buildMissingEnvVarsError(body []byte) error {
 }
 
 func (a runTestAction) askForMissingVars(missingVars []envVar) []envVar {
-	panic("not implemented")
-	return []envVar{}
+	ui.DefaultUI.Warning("Some variables are required by one or more tests")
+	ui.DefaultUI.Info("Fill the values for each variable:")
+
+	filledVariables := make([]envVar, 0, len(missingVars))
+
+	for _, missingVar := range missingVars {
+		answer := missingVar
+		answer.userValue = ui.DefaultUI.TextInput(missingVar.name, missingVar.defaultValue)
+		filledVariables = append(filledVariables, answer)
+	}
+
+	a.logger.Debug("filled variables", zap.Any("variables", filledVariables))
+
+	return filledVariables
 }
 
 func (a runTestAction) waitForResult(ctx context.Context, run *openapi.ExecuteDefinitionResponse) (*openapi.TestRun, error) {
