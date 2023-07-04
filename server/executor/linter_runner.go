@@ -114,7 +114,6 @@ func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 	}
 
 	lintResource, err := lintResource.WithMetadata()
-
 	// in the future, the registry should be dynamic based on user plugins
 	linter := linter.NewLinter(linter.DefaultPluginRegistry)
 	if err != nil {

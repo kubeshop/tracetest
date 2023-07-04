@@ -14,6 +14,14 @@ type LinterResourceRule struct {
 
 	Weight int32 `json:"weight,omitempty"`
 
+	Name string `json:"name,omitempty"`
+
+	Description string `json:"description,omitempty"`
+
+	ErrorDescription string `json:"errorDescription,omitempty"`
+
+	Tips []string `json:"tips,omitempty"`
+
 	ErrorLevel string `json:"errorLevel,omitempty"`
 }
 

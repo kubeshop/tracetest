@@ -1,24 +1,22 @@
-import {Form, Switch} from 'antd';
-import {LinterPlugin} from 'models/Linter.model';
-import * as S from '../common/Settings.styled';
+import {Form} from 'antd';
+import Rule from './Rule';
 
 interface IProps {
-  formId: string;
-  index: number;
-  plugin: LinterPlugin;
+  fieldKey: number;
+  baseName: string[];
 }
 
-const Plugin = ({formId, index, plugin}: IProps) => {
+const Plugin = ({fieldKey, baseName}: IProps) => {
+  const isEnabled = Form.useWatch<boolean>([...baseName, 'enabled']) ?? true;
+
   return (
-    <>
-      <Form.Item hidden name={['plugins', index, 'name']} />
-      <S.SwitchContainer>
-        <label htmlFor={`${formId}_plugins_${index}_enabled`}>Enable {plugin.name}</label>
-        <Form.Item name={['plugins', index, 'enabled']} valuePropName="checked">
-          <Switch />
-        </Form.Item>
-      </S.SwitchContainer>
-    </>
+    <Form.List name={[fieldKey, 'rules']}>
+      {fields =>
+        fields.map(field => (
+          <Rule baseName={[...baseName, 'rules', `${field.name}`]} key={field.key} fieldKey={field.name} isDisabled={!isEnabled} />
+        ))
+      }
+    </Form.List>
   );
 };
 
