@@ -52,15 +52,21 @@ func (l Linter) Validate() error {
 
 	for _, p := range l.Plugins {
 		plugin, ok := findPlugin(p.Id, DefaultPlugins)
+		availableRules := strings.Join(getAvailableRules(plugin), " | ")
+
 		if !ok {
-			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Id, strings.Join(AvailablePlugins, " | "))
+			availablePlugins := strings.Join(AvailablePlugins, " | ")
+			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Id, availablePlugins)
+		}
+
+		if len(p.Rules) != len(plugin.Rules) {
+			return fmt.Errorf("plugin %s requires %d rules, but %d provided, supported rules for plugin are %s", p.Id, len(plugin.Rules), len(p.Rules), availableRules)
 		}
 
 		for _, r := range p.Rules {
 			index := slices.IndexFunc(plugin.Rules, func(rule LinterRule) bool { return rule.Id == r.Id })
 
 			if index == -1 {
-				availableRules := strings.Join(getAvailableRules(plugin), " | ")
 				return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Id, p.Id, availableRules)
 			}
 		}
@@ -99,7 +105,7 @@ func getAvailableRules(plugin LinterPlugin) []string {
 	return rules
 }
 
-func getDefaultLinter() Linter {
+func GetDefaultLinter() Linter {
 	return Linter{
 		ID:           id.ID("current"),
 		Name:         "analyzer",

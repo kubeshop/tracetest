@@ -39,25 +39,23 @@ var (
 )
 
 type Linter interface {
-	Run(context.Context, model.Trace) (analyzer.LinterResult, error)
+	Run(context.Context, model.Trace, analyzer.Linter) (analyzer.LinterResult, error)
 }
 
 type linter struct {
 	pluginsRegistry *plugins.Registry
-	config          analyzer.Linter
 }
 
-func NewLinter(config analyzer.Linter, registry *plugins.Registry) Linter {
+func NewLinter(registry *plugins.Registry) Linter {
 	return linter{
 		pluginsRegistry: registry,
-		config:          config,
 	}
 }
 
 var _ Linter = &linter{}
 
-func (l linter) Run(ctx context.Context, trace model.Trace) (analyzer.LinterResult, error) {
-	cfgPlugins := l.config.EnabledPlugins()
+func (l linter) Run(ctx context.Context, trace model.Trace, config analyzer.Linter) (analyzer.LinterResult, error) {
+	cfgPlugins := config.EnabledPlugins()
 	pluginResults := make([]analyzer.PluginResult, len(cfgPlugins))
 
 	totalScore := 0

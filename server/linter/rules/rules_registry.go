@@ -43,7 +43,7 @@ func (r *ruleRegistry) Get(ruleName string) (Rule, error) {
 		return rule, nil
 	}
 
-	return nil, fmt.Errorf("plugin %s not found", ruleName)
+	return nil, fmt.Errorf("rule %s not found", ruleName)
 }
 
 func (r *ruleRegistry) Register(rule Rule) RuleRegistry {

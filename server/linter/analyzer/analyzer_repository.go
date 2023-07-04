@@ -14,7 +14,7 @@ type Repository struct {
 	db *sql.DB
 }
 
-var defaultLinter = getDefaultLinter()
+var defaultLinter = GetDefaultLinter()
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}

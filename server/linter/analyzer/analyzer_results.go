@@ -58,9 +58,15 @@ type LinterResult struct {
 }
 
 func NewLinterResult(pluginResults []PluginResult, totalScore int, passed bool) LinterResult {
+	// if no plugins are enabled, then the score should be 100
+	score := 100
+	if len(pluginResults) > 0 {
+		score = totalScore / len(pluginResults)
+	}
+
 	return LinterResult{
 		Plugins: pluginResults,
-		Score:   totalScore / len(pluginResults),
+		Score:   score,
 		Passed:  passed,
 	}
 }
@@ -78,17 +84,27 @@ type PluginResult struct {
 }
 
 func (pr PluginResult) CalculateResults() PluginResult {
-	failedScore := 0
+	totalScore := 0
+	passScore := 0
 	passed := true
 
 	for _, result := range pr.Rules {
-		if !result.Passed {
-			passed = false
-			failedScore += result.Weight
+		// only error level rules are taken into account
+		if result.Level == ErrorLevelError {
+			totalScore += result.Weight
+
+			if result.Passed {
+				passScore += result.Weight
+			} else {
+				passed = false
+			}
 		}
 	}
 
-	pr.Score = 100 - failedScore
+	pr.Score = 0
+	if totalScore > 0 {
+		pr.Score = (100 * passScore) / totalScore
+	}
 	pr.Passed = passed
 	return pr
 }

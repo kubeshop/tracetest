@@ -26,9 +26,9 @@ func (p BasePlugin) RuleRegistry() rules.RuleRegistry {
 }
 
 func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analyzer.LinterPlugin) (analyzer.PluginResult, error) {
-	res := make([]analyzer.RuleResult, len(config.Rules))
+	res := make([]analyzer.RuleResult, 0, len(config.Rules))
 
-	for i, cfgRule := range config.Rules {
+	for _, cfgRule := range config.Rules {
 		rule, err := p.ruleRegistry.Get(cfgRule.Id)
 		if err != nil {
 			return analyzer.PluginResult{}, err
@@ -39,24 +39,24 @@ func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analy
 			return analyzer.PluginResult{}, err
 		}
 
-		res[i] = result
+		res = append(res, result)
 	}
 
-	var allPassed bool = true
+	passed := true
 	for _, result := range res {
 		if !result.Passed {
-			allPassed = false
+			passed = false
 		}
 	}
 
 	return analyzer.PluginResult{
 		//config
-		Id:          config.Id,
+		Id:          p.id,
 		Name:        config.Name,
 		Description: config.Description,
 
 		// results
-		Passed: allPassed,
+		Passed: passed,
 		Rules:  res,
 	}.CalculateResults(), nil
 }
