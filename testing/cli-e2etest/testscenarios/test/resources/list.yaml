@@ -1,0 +1,13 @@
+type: Test
+spec:
+  id: fH_8AulVR
+  name: Pokeshop - List
+  description: List Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon?take=20&skip=0
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json

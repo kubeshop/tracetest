@@ -1,0 +1,14 @@
+type: Test
+spec:
+  id: RXrbV__4g
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"id":52}'
