@@ -5,12 +5,18 @@ import {IPropsComponent} from '../SpanNodeFactory';
 
 const TestSpanNode = (props: IPropsComponent) => {
   const {node} = props;
-  const {span, testSpecs} = useSpanData(node.data.id);
+  const {span, testSpecs, testOutputs} = useSpanData(node.data.id);
 
   return (
     <BaseSpanNode
       {...props}
-      header={<Header totalFailedChecks={testSpecs?.failed?.length} totalPassedChecks={testSpecs?.passed?.length} />}
+      header={
+        <Header
+          hasOutputs={!!testOutputs?.length}
+          totalFailedChecks={testSpecs?.failed?.length}
+          totalPassedChecks={testSpecs?.passed?.length}
+        />
+      }
       span={span}
     />
   );

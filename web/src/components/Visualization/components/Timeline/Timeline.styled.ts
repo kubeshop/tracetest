@@ -34,6 +34,12 @@ export const CircleNumber = styled.circle`
   fill: ${({theme}) => theme.color.borderLight};
 `;
 
+export const RectOutput = styled.rect`
+  fill: ${({theme}) => theme.color.warningYellow};
+  height: 12px;
+  width: 12px;
+`;
+
 export const GroupCollapse = styled(Group)`
   cursor: pointer;
 `;
@@ -107,5 +113,12 @@ export const TextName = styled.text`
 export const TextNumber = styled.text`
   fill: ${({theme}) => theme.color.textLight};
   font-size: ${({theme}) => theme.size.sm};
+  pointer-events: none;
+`;
+
+export const TextOutput = styled.text`
+  fill: ${({theme}) => theme.color.white};
+  font-size: ${({theme}) => theme.size.xs};
+  font-weight: bold;
   pointer-events: none;
 `;
