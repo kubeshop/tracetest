@@ -187,13 +187,11 @@ flowchart TD
 **Access the Tracetest Server by port forwarding to the Tracetest `service`.**
 
 ```bash title=Terminal
-echo "Access Pokeshop demo app"
 export POD_NAME=$(kubectl get pods --namespace demo -l "app.kubernetes.io/name=pokemon-api,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
 export CONTAINER_PORT=$(kubectl get pod --namespace demo $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
 kubectl --namespace demo port-forward $POD_NAME 8080:$CONTAINER_PORT
 echo "Open http://127.0.0.1:8080 to view the Pokeshop demo app"
 
-echo "Access Tracetest"
 kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633
 echo "Open http://127.0.0.1:11633 to view the Tracetest Web UI"
 ```
