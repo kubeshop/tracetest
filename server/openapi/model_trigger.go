@@ -16,6 +16,8 @@ type Trigger struct {
 
 	Http HttpRequest `json:"http,omitempty"`
 
+	HttpRequest HttpRequest `json:"httpRequest,omitempty"`
+
 	Grpc GrpcRequest `json:"grpc,omitempty"`
 
 	Traceid TraceidRequest `json:"traceid,omitempty"`
@@ -24,6 +26,9 @@ type Trigger struct {
 // AssertTriggerRequired checks if the required fields are not zero-ed
 func AssertTriggerRequired(obj Trigger) error {
 	if err := AssertHttpRequestRequired(obj.Http); err != nil {
+		return err
+	}
+	if err := AssertHttpRequestRequired(obj.HttpRequest); err != nil {
 		return err
 	}
 	if err := AssertGrpcRequestRequired(obj.Grpc); err != nil {

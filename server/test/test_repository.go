@@ -431,9 +431,11 @@ func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 		return Test{}, err
 	}
 
+	version := in.SafeVersion()
 	if testHasChanged {
-		updated.Version = intPtr(*in.Version + 1)
+		version = version + 1
 	}
+	updated.Version = &version
 
 	return updated, nil
 }
