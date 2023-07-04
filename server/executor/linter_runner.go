@@ -114,7 +114,9 @@ func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 	}
 
 	lintResource, err := lintResource.WithMetadata()
-	linter := linter.NewLinter(lintResource, linter.DefaultPluginRegistry)
+
+	// in the future, the registry should be dynamic based on user plugins
+	linter := linter.NewLinter(linter.DefaultPluginRegistry)
 	if err != nil {
 		log.Printf("[linterRunner] Test %s Run %d: error with WithMetadata: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		e.onFinish(ctx, request, request.Run)
@@ -163,7 +165,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterStart event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 	}
 
-	result, err := linter.Run(ctx, *run.Trace)
+	result, err := linter.Run(ctx, *run.Trace, analyzer)
 	if err != nil {
 		return e.onError(ctx, request, run, err)
 	}
