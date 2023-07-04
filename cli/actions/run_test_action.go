@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"sync"
+	"time"
 
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/goccy/go-yaml"
@@ -15,6 +18,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/ui"
+	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
@@ -139,6 +143,9 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 		return fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
+	fmt.Println(a.formatResult(run, true))
+	a.cliExit(a.exitCode(run))
+
 	if args.JUnit != "" {
 		err := a.writeJUnitReport(ctx, result, args.JUnit)
 		if err != nil {
@@ -147,6 +154,22 @@ func (a runTestAction) Run(ctx context.Context, args RunResourceArgs) error {
 	}
 
 	return nil
+}
+
+func (a runTestAction) exitCode(res runResult) int {
+	switch res.ResourceType {
+	case "Test":
+		if !res.Run.(openapi.TestRun).Result.GetAllPassed() {
+			return 1
+		}
+	case "Transaction":
+		for _, step := range res.Run.(openapi.TransactionRun).Steps {
+			if !step.Result.GetAllPassed() {
+				return 1
+			}
+		}
+	}
+	return 0
 }
 
 func (a runTestAction) resolveEnvID(ctx context.Context, envID string) (string, error) {
@@ -440,7 +463,6 @@ func (e missingEnvVarsError) Error() string {
 
 type runResult struct {
 	ResourceType string
-	URL          string
 	Resource     any
 	Run          any
 }
@@ -489,7 +511,6 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 
 		res.Resource = test
 		res.Run = *run
-		res.URL = a.config.URL() + "/test/" + test.Spec.GetId() + "/run/" + run.GetId()
 
 	case "Transaction":
 		var tran openapi.TransactionResource
@@ -513,7 +534,6 @@ func (a runTestAction) run(ctx context.Context, df defFile, envID string, ev env
 
 		res.Resource = tran
 		res.Run = *run
-		res.URL = a.config.URL() + "/transaction/" + tran.Spec.GetId() + "/run/" + run.GetId()
 	default:
 		return res, fmt.Errorf("unknown type: %s", defType)
 	}
@@ -628,11 +648,142 @@ func (a runTestAction) formatTransactionResult(result runResult, hasResults bool
 		Format(tro)
 }
 
-func (a runTestAction) waitForResult(ctx context.Context, run runResult) (*openapi.TestRun, error) {
-	return openapi.NewTestRun(), fmt.Errorf("not implemented")
+func (a runTestAction) waitForResult(ctx context.Context, run runResult) (runResult, error) {
+	switch run.ResourceType {
+	case "Test":
+		tr, err := a.waitForTestResult(ctx, run)
+		if err != nil {
+			return run, err
+		}
+
+		run.Run = tr
+		return run, nil
+
+	case "Transaction":
+		tr, err := a.waitForTransactionResult(ctx, run)
+		if err != nil {
+			return run, err
+		}
+
+		run.Run = tr
+		return run, nil
+	}
+	return run, fmt.Errorf("unknown resource type: %s", run.ResourceType)
 }
 
-func (a runTestAction) writeJUnitReport(ctx context.Context, result *openapi.TestRun, junit string) error {
+func (a runTestAction) waitForTestResult(ctx context.Context, result runResult) (openapi.TestRun, error) {
+	var (
+		testRun   openapi.TestRun
+		lastError error
+		wg        sync.WaitGroup
+	)
+
+	test := result.Resource.(openapi.TestResource)
+	run := result.Run.(openapi.TestRun)
+
+	wg.Add(1)
+	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
+	go func() {
+		for range ticker.C {
+			readyTestRun, err := a.isTestReady(ctx, test.Spec.GetId(), run.GetId())
+			if err != nil {
+				lastError = err
+				wg.Done()
+				return
+			}
+
+			if readyTestRun != nil {
+				testRun = *readyTestRun
+				wg.Done()
+				return
+			}
+		}
+	}()
+	wg.Wait()
+
+	if lastError != nil {
+		return openapi.TestRun{}, lastError
+	}
+
+	return testRun, nil
+}
+
+func (a runTestAction) isTestReady(ctx context.Context, testID string, testRunID string) (*openapi.TestRun, error) {
+	runID, err := strconv.Atoi(testRunID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid transaction run id format: %w", err)
+	}
+
+	req := a.openapiClient.ApiApi.GetTestRun(ctx, testID, int32(runID))
+	run, _, err := a.openapiClient.ApiApi.GetTestRunExecute(req)
+	if err != nil {
+		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
+	}
+
+	if utils.RunStateIsFinished(run.GetState()) {
+		return run, nil
+	}
+
+	return nil, nil
+}
+
+func (a runTestAction) waitForTransactionResult(ctx context.Context, result runResult) (openapi.TransactionRun, error) {
+	var (
+		transactionRun openapi.TransactionRun
+		lastError      error
+		wg             sync.WaitGroup
+	)
+
+	tran := result.Resource.(openapi.TransactionResource)
+	run := result.Run.(openapi.TransactionRun)
+
+	wg.Add(1)
+	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
+	go func() {
+		for range ticker.C {
+			readyTransactionRun, err := a.isTransactionReady(ctx, tran.Spec.GetId(), run.GetId())
+			if err != nil {
+				lastError = err
+				wg.Done()
+				return
+			}
+
+			if readyTransactionRun != nil {
+				transactionRun = *readyTransactionRun
+				wg.Done()
+				return
+			}
+		}
+	}()
+	wg.Wait()
+
+	if lastError != nil {
+		return openapi.TransactionRun{}, lastError
+	}
+
+	return transactionRun, nil
+}
+
+func (a runTestAction) isTransactionReady(ctx context.Context, transactionID, transactionRunID string) (*openapi.TransactionRun, error) {
+	runID, err := strconv.Atoi(transactionRunID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid transaction run id format: %w", err)
+	}
+
+	req := a.openapiClient.ApiApi.GetTransactionRun(ctx, transactionID, int32(runID))
+	run, _, err := a.openapiClient.ApiApi.GetTransactionRunExecute(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not execute GetTestRun request: %w", err)
+	}
+
+	if utils.RunStateIsFinished(run.GetState()) {
+		return run, nil
+	}
+
+	return nil, nil
+}
+
+func (a runTestAction) writeJUnitReport(ctx context.Context, result runResult, junit string) error {
 	return fmt.Errorf("not implemented")
 }
 
