@@ -20,8 +20,6 @@ var _ MappedNullable = &Trigger{}
 // Trigger struct for Trigger
 type Trigger struct {
 	Type        *string         `json:"type,omitempty"`
-	TriggerType *string         `json:"triggerType,omitempty"`
-	Http        *HTTPRequest    `json:"http,omitempty"`
 	HttpRequest *HTTPRequest    `json:"httpRequest,omitempty"`
 	Grpc        *GRPCRequest    `json:"grpc,omitempty"`
 	Traceid     *TRACEIDRequest `json:"traceid,omitempty"`
@@ -74,70 +72,6 @@ func (o *Trigger) HasType() bool {
 // SetType gets a reference to the given string and assigns it to the Type field.
 func (o *Trigger) SetType(v string) {
 	o.Type = &v
-}
-
-// GetTriggerType returns the TriggerType field value if set, zero value otherwise.
-func (o *Trigger) GetTriggerType() string {
-	if o == nil || isNil(o.TriggerType) {
-		var ret string
-		return ret
-	}
-	return *o.TriggerType
-}
-
-// GetTriggerTypeOk returns a tuple with the TriggerType field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Trigger) GetTriggerTypeOk() (*string, bool) {
-	if o == nil || isNil(o.TriggerType) {
-		return nil, false
-	}
-	return o.TriggerType, true
-}
-
-// HasTriggerType returns a boolean if a field has been set.
-func (o *Trigger) HasTriggerType() bool {
-	if o != nil && !isNil(o.TriggerType) {
-		return true
-	}
-
-	return false
-}
-
-// SetTriggerType gets a reference to the given string and assigns it to the TriggerType field.
-func (o *Trigger) SetTriggerType(v string) {
-	o.TriggerType = &v
-}
-
-// GetHttp returns the Http field value if set, zero value otherwise.
-func (o *Trigger) GetHttp() HTTPRequest {
-	if o == nil || isNil(o.Http) {
-		var ret HTTPRequest
-		return ret
-	}
-	return *o.Http
-}
-
-// GetHttpOk returns a tuple with the Http field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Trigger) GetHttpOk() (*HTTPRequest, bool) {
-	if o == nil || isNil(o.Http) {
-		return nil, false
-	}
-	return o.Http, true
-}
-
-// HasHttp returns a boolean if a field has been set.
-func (o *Trigger) HasHttp() bool {
-	if o != nil && !isNil(o.Http) {
-		return true
-	}
-
-	return false
-}
-
-// SetHttp gets a reference to the given HTTPRequest and assigns it to the Http field.
-func (o *Trigger) SetHttp(v HTTPRequest) {
-	o.Http = &v
 }
 
 // GetHttpRequest returns the HttpRequest field value if set, zero value otherwise.
@@ -248,12 +182,6 @@ func (o Trigger) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Type) {
 		toSerialize["type"] = o.Type
-	}
-	if !isNil(o.TriggerType) {
-		toSerialize["triggerType"] = o.TriggerType
-	}
-	if !isNil(o.Http) {
-		toSerialize["http"] = o.Http
 	}
 	if !isNil(o.HttpRequest) {
 		toSerialize["httpRequest"] = o.HttpRequest
