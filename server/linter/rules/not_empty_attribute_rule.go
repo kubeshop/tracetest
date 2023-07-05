@@ -24,20 +24,14 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 
 	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
-			emptyAttributes := make([]string, 0)
+			errors := make([]analyzer.Error, 0)
 			for name, value := range span.Attributes {
 				if value == "" {
-					emptyAttributes = append(emptyAttributes, name)
+					errors = append(errors, analyzer.Error{
+						Value:       name,
+						Description: fmt.Sprintf(`Attribute "%s" is empty`, name),
+					})
 				}
-			}
-
-			errors := make([]analyzer.Error, 0, len(emptyAttributes))
-			for _, emptyAttribute := range emptyAttributes {
-				errors = append(errors, analyzer.Error{
-					Value:       emptyAttribute,
-					Description: fmt.Sprintf(`Attribute "%s" is empty`, emptyAttribute),
-				},
-				)
 			}
 
 			if len(errors) > 0 {
@@ -46,7 +40,7 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Tr
 
 			res = append(res, analyzer.Result{
 				SpanID: span.ID.String(),
-				Passed: len(emptyAttributes) == 0,
+				Passed: passed,
 				Errors: errors,
 			})
 		}
