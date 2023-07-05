@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -157,11 +156,30 @@ func TestListTests(t *testing.T) {
 		result := tracetestcli.Exec(t, "list test --sortBy name --sortDirection asc --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		lines := strings.Split(result.StdOut, "\n")
-		require.Len(lines, 5)
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 2)
 
-		require.Contains(lines[2], "RXrbV__4g")
-		require.Contains(lines[3], "fH_8AulVR")
+		line := parsedTable[0]
+		require.Equal("RXrbV__4g", line["ID"])
+		require.Equal("Pokeshop - Import", line["NAME"])
+		require.Equal("1", line["VERSION"])
+		require.Equal("http", line["TRIGGER TYPE"])
+		require.Equal("0", line["RUNS"])
+		require.Equal("", line["LAST RUN TIME"])
+		require.Equal("0", line["LAST RUN SUCCESSES"])
+		require.Equal("0", line["LAST RUN FAILURES"])
+		require.Equal("http://localhost:11633/test/fH_8AulVR", line["URL"])
+
+		line = parsedTable[1]
+		require.Equal("fH_8AulVR", line["ID"])
+		require.Equal("Pokeshop - List", line["NAME"])
+		require.Equal("1", line["VERSION"])
+		require.Equal("http", line["TRIGGER TYPE"])
+		require.Equal("0", line["RUNS"])
+		require.Equal("", line["LAST RUN TIME"])
+		require.Equal("0", line["LAST RUN SUCCESSES"])
+		require.Equal("0", line["LAST RUN FAILURES"])
+		require.Equal("http://localhost:11633/test/fH_8AulVR", line["URL"])
 	})
 
 	t.Run("list with YAML format skipping the first and taking two items", func(t *testing.T) {
