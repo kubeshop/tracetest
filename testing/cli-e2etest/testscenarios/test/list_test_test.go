@@ -168,7 +168,7 @@ func TestListTests(t *testing.T) {
 		require.Equal("", line["LAST RUN TIME"])
 		require.Equal("0", line["LAST RUN SUCCESSES"])
 		require.Equal("0", line["LAST RUN FAILURES"])
-		require.Equal("http://localhost:11633/test/fH_8AulVR", line["URL"])
+		require.Equal("http://localhost:11633/test/RXrbV__4g", line["URL"])
 
 		line = parsedTable[1]
 		require.Equal("fH_8AulVR", line["ID"])
