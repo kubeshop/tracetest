@@ -2033,6 +2033,7 @@ export interface external {
           /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
           http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };

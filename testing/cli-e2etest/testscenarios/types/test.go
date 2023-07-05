@@ -24,7 +24,7 @@ type Test struct {
 
 type Trigger struct {
 	Type        string      `json:"type"`
-	HTTPRequest HTTPRequest `json:"http"`
+	HTTPRequest HTTPRequest `json:"httpRequest"`
 }
 
 type HTTPRequest struct {
@@ -35,8 +35,8 @@ type HTTPRequest struct {
 }
 
 type HTTPHeader struct {
-	Key   string `json:"Key"`
-	Value string `json:"Value"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 type Output struct {

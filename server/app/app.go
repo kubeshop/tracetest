@@ -454,6 +454,7 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 		test.ResourceNamePlural,
 		repository,
 		resourcemanager.WithTracer(tracer),
+		resourcemanager.CanBeAugmented(),
 	)
 	manager.RegisterRoutes(router)
 	provisioner.AddResourceProvisioner(manager)

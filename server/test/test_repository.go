@@ -409,7 +409,7 @@ func (r *repository) Update(ctx context.Context, test Test) (Test, error) {
 		return Test{}, fmt.Errorf("could not bump test version: %w", err)
 	}
 
-	if *oldTest.Version == *testToUpdate.Version {
+	if oldTest.SafeVersion() == testToUpdate.SafeVersion() {
 		// No change in the version. Nothing changed so no need to persist it
 		r.removeNonAugmentedFields(&testToUpdate)
 		return testToUpdate, nil
@@ -431,9 +431,11 @@ func bumpTestVersionIfNeeded(in, updated Test) (Test, error) {
 		return Test{}, err
 	}
 
+	version := in.SafeVersion()
 	if testHasChanged {
-		updated.Version = intPtr(*in.Version + 1)
+		version = version + 1
 	}
+	updated.Version = &version
 
 	return updated, nil
 }

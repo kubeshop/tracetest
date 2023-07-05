@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +35,12 @@ func init() {
 				return "", err
 			}
 
-			result, err := resourceClient.Apply(ctx, applyParams.DefinitionFile, resultFormat)
+			inputFile, err := fileutil.Read(applyParams.DefinitionFile)
+			if err != nil {
+				return "", fmt.Errorf("cannot read file %s: %w", applyParams.DefinitionFile, err)
+			}
+
+			result, err := resourceClient.Apply(ctx, inputFile, resultFormat)
 			if err != nil {
 				return "", err
 			}

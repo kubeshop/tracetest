@@ -200,20 +200,6 @@ var resources = resourcemanager.NewRegistry().
 				},
 			}),
 		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"test", "tests",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "VERSION", Path: "spec.version"},
-					// TODO: add the rest of the fields here
-				},
-			}),
-		),
 	)
 
 func resourceList() string {

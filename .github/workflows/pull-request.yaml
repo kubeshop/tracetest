@@ -303,7 +303,7 @@ jobs:
       - name: Start services
         run: |
           ./run.sh down up
-          ./run.sh logstt > /tmp/docker-log &
+          ./run.sh tracetest-logs > /tmp/docker-log &
       - name: Run tests
         run: |
           chmod +x ./dist/tracetest ./dist/tracetest-server
@@ -399,7 +399,7 @@ jobs:
       - name: Run integration tests
         run: |
           ./run.sh down up
-          ./run.sh logstt > /tmp/docker-log &
+          ./run.sh tracetest-logs > /tmp/docker-log &
           ./scripts/wait-for-port.sh 11633
 
           if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then

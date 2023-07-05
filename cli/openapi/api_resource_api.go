@@ -42,8 +42,8 @@ CreateDemo Create a Demonstration setting
 
 Create a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateDemoRequest
 */
 func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoRequest {
 	return ApiCreateDemoRequest{
@@ -53,7 +53,8 @@ func (a *ResourceApiApiService) CreateDemo(ctx context.Context) ApiCreateDemoReq
 }
 
 // Execute executes the request
-//  @return Demo
+//
+//	@return Demo
 func (a *ResourceApiApiService) CreateDemoExecute(r ApiCreateDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -149,8 +150,8 @@ CreateEnvironment Create an environment
 
 Create an environment that can be used by tests and transactions
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateEnvironmentRequest
 */
 func (a *ResourceApiApiService) CreateEnvironment(ctx context.Context) ApiCreateEnvironmentRequest {
 	return ApiCreateEnvironmentRequest{
@@ -160,7 +161,8 @@ func (a *ResourceApiApiService) CreateEnvironment(ctx context.Context) ApiCreate
 }
 
 // Execute executes the request
-//  @return EnvironmentResource
+//
+//	@return EnvironmentResource
 func (a *ResourceApiApiService) CreateEnvironmentExecute(r ApiCreateEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -256,8 +258,8 @@ CreateLinter Create an Linter
 
 Create an Linter that can be used by tests and Linters
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateLinterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateLinterRequest
 */
 func (a *ResourceApiApiService) CreateLinter(ctx context.Context) ApiCreateLinterRequest {
 	return ApiCreateLinterRequest{
@@ -267,7 +269,8 @@ func (a *ResourceApiApiService) CreateLinter(ctx context.Context) ApiCreateLinte
 }
 
 // Execute executes the request
-//  @return LinterResource
+//
+//	@return LinterResource
 func (a *ResourceApiApiService) CreateLinterExecute(r ApiCreateLinterRequest) (*LinterResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -363,8 +366,8 @@ CreateTest Create new test
 
 Create new test action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateTestRequest
 */
 func (a *ResourceApiApiService) CreateTest(ctx context.Context) ApiCreateTestRequest {
 	return ApiCreateTestRequest{
@@ -374,7 +377,8 @@ func (a *ResourceApiApiService) CreateTest(ctx context.Context) ApiCreateTestReq
 }
 
 // Execute executes the request
-//  @return Test
+//
+//	@return Test
 func (a *ResourceApiApiService) CreateTestExecute(r ApiCreateTestRequest) (*Test, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -470,8 +474,8 @@ CreateTransaction Create new transaction
 
 Create new transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateTransactionRequest
 */
 func (a *ResourceApiApiService) CreateTransaction(ctx context.Context) ApiCreateTransactionRequest {
 	return ApiCreateTransactionRequest{
@@ -481,7 +485,8 @@ func (a *ResourceApiApiService) CreateTransaction(ctx context.Context) ApiCreate
 }
 
 // Execute executes the request
-//  @return TransactionResource
+//
+//	@return TransactionResource
 func (a *ResourceApiApiService) CreateTransactionExecute(r ApiCreateTransactionRequest) (*TransactionResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -572,9 +577,9 @@ DeleteDataStore Delete a Data Store
 
 Delete a Data Store
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
- @return ApiDeleteDataStoreRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
+	@return ApiDeleteDataStoreRequest
 */
 func (a *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) ApiDeleteDataStoreRequest {
 	return ApiDeleteDataStoreRequest{
@@ -664,9 +669,9 @@ DeleteDemo Delete a Demonstration setting
 
 Delete a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param demoId ID of a demonstration used on Tracetest as quick start examples
- @return ApiDeleteDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples
+	@return ApiDeleteDemoRequest
 */
 func (a *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) ApiDeleteDemoRequest {
 	return ApiDeleteDemoRequest{
@@ -756,9 +761,9 @@ DeleteEnvironment Delete an environment
 
 Delete an environment from Tracetest
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param environmentId ID of an environment used on Tracetest to inject values into tests and transactions
- @return ApiDeleteEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param environmentId ID of an environment used on Tracetest to inject values into tests and transactions
+	@return ApiDeleteEnvironmentRequest
 */
 func (a *ResourceApiApiService) DeleteEnvironment(ctx context.Context, environmentId string) ApiDeleteEnvironmentRequest {
 	return ApiDeleteEnvironmentRequest{
@@ -848,9 +853,9 @@ DeleteLinter Delete an Linter
 
 Delete an Linter from Tracetest
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param linterId ID of an Linter
- @return ApiDeleteLinterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param linterId ID of an Linter
+	@return ApiDeleteLinterRequest
 */
 func (a *ResourceApiApiService) DeleteLinter(ctx context.Context, linterId string) ApiDeleteLinterRequest {
 	return ApiDeleteLinterRequest{
@@ -940,9 +945,9 @@ DeleteTest delete a test
 
 delete a test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId id of the test
- @return ApiDeleteTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId id of the test
+	@return ApiDeleteTestRequest
 */
 func (a *ResourceApiApiService) DeleteTest(ctx context.Context, testId string) ApiDeleteTestRequest {
 	return ApiDeleteTestRequest{
@@ -1032,9 +1037,9 @@ DeleteTransaction delete a transaction
 
 delete a transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId id of the transaction
- @return ApiDeleteTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId id of the transaction
+	@return ApiDeleteTransactionRequest
 */
 func (a *ResourceApiApiService) DeleteTransaction(ctx context.Context, transactionId string) ApiDeleteTransactionRequest {
 	return ApiDeleteTransactionRequest{
@@ -1124,9 +1129,9 @@ GetConfiguration Get Tracetest configuration
 
 Get Tracetest configuration
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
- @return ApiGetConfigurationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
+	@return ApiGetConfigurationRequest
 */
 func (a *ResourceApiApiService) GetConfiguration(ctx context.Context, configId string) ApiGetConfigurationRequest {
 	return ApiGetConfigurationRequest{
@@ -1137,7 +1142,8 @@ func (a *ResourceApiApiService) GetConfiguration(ctx context.Context, configId s
 }
 
 // Execute executes the request
-//  @return ConfigurationResource
+//
+//	@return ConfigurationResource
 func (a *ResourceApiApiService) GetConfigurationExecute(r ApiGetConfigurationRequest) (*ConfigurationResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1227,9 +1233,9 @@ GetDataStore Get a Data Store
 
 Get a Data Store
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
- @return ApiGetDataStoreRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
+	@return ApiGetDataStoreRequest
 */
 func (a *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId string) ApiGetDataStoreRequest {
 	return ApiGetDataStoreRequest{
@@ -1240,7 +1246,8 @@ func (a *ResourceApiApiService) GetDataStore(ctx context.Context, dataStoreId st
 }
 
 // Execute executes the request
-//  @return DataStoreResource
+//
+//	@return DataStoreResource
 func (a *ResourceApiApiService) GetDataStoreExecute(r ApiGetDataStoreRequest) (*DataStoreResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1330,9 +1337,9 @@ GetDemo Get Demonstration setting
 
 Get a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param demoId ID of a demonstration used on Tracetest as quick start examples
- @return ApiGetDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples
+	@return ApiGetDemoRequest
 */
 func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiGetDemoRequest {
 	return ApiGetDemoRequest{
@@ -1343,7 +1350,8 @@ func (a *ResourceApiApiService) GetDemo(ctx context.Context, demoId string) ApiG
 }
 
 // Execute executes the request
-//  @return Demo
+//
+//	@return Demo
 func (a *ResourceApiApiService) GetDemoExecute(r ApiGetDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1433,9 +1441,9 @@ GetEnvironment Get a specific environment
 
 Get one environment by its id
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param environmentId ID of an environment used on Tracetest to inject values into tests and transactions
- @return ApiGetEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param environmentId ID of an environment used on Tracetest to inject values into tests and transactions
+	@return ApiGetEnvironmentRequest
 */
 func (a *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentId string) ApiGetEnvironmentRequest {
 	return ApiGetEnvironmentRequest{
@@ -1446,7 +1454,8 @@ func (a *ResourceApiApiService) GetEnvironment(ctx context.Context, environmentI
 }
 
 // Execute executes the request
-//  @return EnvironmentResource
+//
+//	@return EnvironmentResource
 func (a *ResourceApiApiService) GetEnvironmentExecute(r ApiGetEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1536,9 +1545,9 @@ GetLinter Get a specific Linter
 
 Get one Linter by its id
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param linterId ID of an Linter
- @return ApiGetLinterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param linterId ID of an Linter
+	@return ApiGetLinterRequest
 */
 func (a *ResourceApiApiService) GetLinter(ctx context.Context, linterId string) ApiGetLinterRequest {
 	return ApiGetLinterRequest{
@@ -1549,7 +1558,8 @@ func (a *ResourceApiApiService) GetLinter(ctx context.Context, linterId string) 
 }
 
 // Execute executes the request
-//  @return LinterResource
+//
+//	@return LinterResource
 func (a *ResourceApiApiService) GetLinterExecute(r ApiGetLinterRequest) (*LinterResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1639,9 +1649,9 @@ GetPollingProfile Get Polling Profile
 
 Get a polling profile used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
- @return ApiGetPollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
+	@return ApiGetPollingProfileRequest
 */
 func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingProfileId string) ApiGetPollingProfileRequest {
 	return ApiGetPollingProfileRequest{
@@ -1652,7 +1662,8 @@ func (a *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 }
 
 // Execute executes the request
-//  @return PollingProfile
+//
+//	@return PollingProfile
 func (a *ResourceApiApiService) GetPollingProfileExecute(r ApiGetPollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1776,8 +1787,8 @@ GetTests Get tests
 
 get tests
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetTestsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetTestsRequest
 */
 func (a *ResourceApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest {
 	return ApiGetTestsRequest{
@@ -1787,7 +1798,8 @@ func (a *ResourceApiApiService) GetTests(ctx context.Context) ApiGetTestsRequest
 }
 
 // Execute executes the request
-//  @return TestResourceList
+//
+//	@return TestResourceList
 func (a *ResourceApiApiService) GetTestsExecute(r ApiGetTestsRequest) (*TestResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1891,9 +1903,9 @@ GetTransaction get transaction
 
 get transaction
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId id of the transaction
- @return ApiGetTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId id of the transaction
+	@return ApiGetTransactionRequest
 */
 func (a *ResourceApiApiService) GetTransaction(ctx context.Context, transactionId string) ApiGetTransactionRequest {
 	return ApiGetTransactionRequest{
@@ -1904,7 +1916,8 @@ func (a *ResourceApiApiService) GetTransaction(ctx context.Context, transactionI
 }
 
 // Execute executes the request
-//  @return TransactionResource
+//
+//	@return TransactionResource
 func (a *ResourceApiApiService) GetTransactionExecute(r ApiGetTransactionRequest) (*TransactionResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2028,8 +2041,8 @@ GetTransactions Get transactions
 
 get transactions
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetTransactionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetTransactionsRequest
 */
 func (a *ResourceApiApiService) GetTransactions(ctx context.Context) ApiGetTransactionsRequest {
 	return ApiGetTransactionsRequest{
@@ -2039,7 +2052,8 @@ func (a *ResourceApiApiService) GetTransactions(ctx context.Context) ApiGetTrans
 }
 
 // Execute executes the request
-//  @return TransactionResourceList
+//
+//	@return TransactionResourceList
 func (a *ResourceApiApiService) GetTransactionsExecute(r ApiGetTransactionsRequest) (*TransactionResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2170,8 +2184,8 @@ ListConfiguration List Tracetest configuration
 
 List Tracetest configuration
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListConfigurationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListConfigurationRequest
 */
 func (a *ResourceApiApiService) ListConfiguration(ctx context.Context) ApiListConfigurationRequest {
 	return ApiListConfigurationRequest{
@@ -2181,7 +2195,8 @@ func (a *ResourceApiApiService) ListConfiguration(ctx context.Context) ApiListCo
 }
 
 // Execute executes the request
-//  @return ConfigurationResourceList
+//
+//	@return ConfigurationResourceList
 func (a *ResourceApiApiService) ListConfigurationExecute(r ApiListConfigurationRequest) (*ConfigurationResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2309,8 +2324,8 @@ ListDataStore List Data Store
 
 List Data Store
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListDataStoreRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListDataStoreRequest
 */
 func (a *ResourceApiApiService) ListDataStore(ctx context.Context) ApiListDataStoreRequest {
 	return ApiListDataStoreRequest{
@@ -2320,7 +2335,8 @@ func (a *ResourceApiApiService) ListDataStore(ctx context.Context) ApiListDataSt
 }
 
 // Execute executes the request
-//  @return DataStoreList
+//
+//	@return DataStoreList
 func (a *ResourceApiApiService) ListDataStoreExecute(r ApiListDataStoreRequest) (*DataStoreList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2448,8 +2464,8 @@ ListDemos List Demonstrations
 
 List demonstrations used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListDemosRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListDemosRequest
 */
 func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosRequest {
 	return ApiListDemosRequest{
@@ -2459,7 +2475,8 @@ func (a *ResourceApiApiService) ListDemos(ctx context.Context) ApiListDemosReque
 }
 
 // Execute executes the request
-//  @return DemoList
+//
+//	@return DemoList
 func (a *ResourceApiApiService) ListDemosExecute(r ApiListDemosRequest) (*DemoList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2587,8 +2604,8 @@ ListEnvironments List environments
 
 List environments available in Tracetest.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListEnvironmentsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListEnvironmentsRequest
 */
 func (a *ResourceApiApiService) ListEnvironments(ctx context.Context) ApiListEnvironmentsRequest {
 	return ApiListEnvironmentsRequest{
@@ -2598,7 +2615,8 @@ func (a *ResourceApiApiService) ListEnvironments(ctx context.Context) ApiListEnv
 }
 
 // Execute executes the request
-//  @return EnvironmentResourceList
+//
+//	@return EnvironmentResourceList
 func (a *ResourceApiApiService) ListEnvironmentsExecute(r ApiListEnvironmentsRequest) (*EnvironmentResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2726,8 +2744,8 @@ ListLinters List Linters
 
 List Linters available in Tracetest.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListLintersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListLintersRequest
 */
 func (a *ResourceApiApiService) ListLinters(ctx context.Context) ApiListLintersRequest {
 	return ApiListLintersRequest{
@@ -2737,7 +2755,8 @@ func (a *ResourceApiApiService) ListLinters(ctx context.Context) ApiListLintersR
 }
 
 // Execute executes the request
-//  @return LinterResourceList
+//
+//	@return LinterResourceList
 func (a *ResourceApiApiService) ListLintersExecute(r ApiListLintersRequest) (*LinterResourceList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2865,8 +2884,8 @@ ListPollingProfile List Polling Profile Configuration
 
 List Polling Profile configuration
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListPollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListPollingProfileRequest
 */
 func (a *ResourceApiApiService) ListPollingProfile(ctx context.Context) ApiListPollingProfileRequest {
 	return ApiListPollingProfileRequest{
@@ -2876,7 +2895,8 @@ func (a *ResourceApiApiService) ListPollingProfile(ctx context.Context) ApiListP
 }
 
 // Execute executes the request
-//  @return PollingProfileList
+//
+//	@return PollingProfileList
 func (a *ResourceApiApiService) ListPollingProfileExecute(r ApiListPollingProfileRequest) (*PollingProfileList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2977,9 +2997,9 @@ TestsTestIdGet get test
 
 get test
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId id of the test
- @return ApiTestsTestIdGetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId id of the test
+	@return ApiTestsTestIdGetRequest
 */
 func (a *ResourceApiApiService) TestsTestIdGet(ctx context.Context, testId string) ApiTestsTestIdGetRequest {
 	return ApiTestsTestIdGetRequest{
@@ -2990,7 +3010,8 @@ func (a *ResourceApiApiService) TestsTestIdGet(ctx context.Context, testId strin
 }
 
 // Execute executes the request
-//  @return TestResource
+//
+//	@return TestResource
 func (a *ResourceApiApiService) TestsTestIdGetExecute(r ApiTestsTestIdGetRequest) (*TestResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -3086,9 +3107,9 @@ UpdateConfiguration Update Tracetest configuration
 
 Update Tracetest configuration
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
- @return ApiUpdateConfigurationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param configId ID of the configuration resource used on Tracetest. It should be set as 'current'
+	@return ApiUpdateConfigurationRequest
 */
 func (a *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configId string) ApiUpdateConfigurationRequest {
 	return ApiUpdateConfigurationRequest{
@@ -3099,7 +3120,8 @@ func (a *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configI
 }
 
 // Execute executes the request
-//  @return ConfigurationResource
+//
+//	@return ConfigurationResource
 func (a *ResourceApiApiService) UpdateConfigurationExecute(r ApiUpdateConfigurationRequest) (*ConfigurationResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3197,9 +3219,9 @@ UpdateDataStore Update a Data Store
 
 Update a Data Store
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
- @return ApiUpdateDataStoreRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param dataStoreId ID of a datastore used on Tracetest to configure how to fetch traces in a test
+	@return ApiUpdateDataStoreRequest
 */
 func (a *ResourceApiApiService) UpdateDataStore(ctx context.Context, dataStoreId string) ApiUpdateDataStoreRequest {
 	return ApiUpdateDataStoreRequest{
@@ -3297,9 +3319,9 @@ UpdateDemo Update a Demonstration setting
 
 Update a demonstration used on Tracetest as quick start examples.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param demoId ID of a demonstration used on Tracetest as quick start examples
- @return ApiUpdateDemoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param demoId ID of a demonstration used on Tracetest as quick start examples
+	@return ApiUpdateDemoRequest
 */
 func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) ApiUpdateDemoRequest {
 	return ApiUpdateDemoRequest{
@@ -3310,7 +3332,8 @@ func (a *ResourceApiApiService) UpdateDemo(ctx context.Context, demoId string) A
 }
 
 // Execute executes the request
-//  @return Demo
+//
+//	@return Demo
 func (a *ResourceApiApiService) UpdateDemoExecute(r ApiUpdateDemoRequest) (*Demo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3408,9 +3431,9 @@ UpdateEnvironment Update an environment
 
 Update an environment used on Tracetest
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param environmentId ID of an environment used on Tracetest to inject values into tests and transactions
- @return ApiUpdateEnvironmentRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param environmentId ID of an environment used on Tracetest to inject values into tests and transactions
+	@return ApiUpdateEnvironmentRequest
 */
 func (a *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environmentId string) ApiUpdateEnvironmentRequest {
 	return ApiUpdateEnvironmentRequest{
@@ -3421,7 +3444,8 @@ func (a *ResourceApiApiService) UpdateEnvironment(ctx context.Context, environme
 }
 
 // Execute executes the request
-//  @return EnvironmentResource
+//
+//	@return EnvironmentResource
 func (a *ResourceApiApiService) UpdateEnvironmentExecute(r ApiUpdateEnvironmentRequest) (*EnvironmentResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3519,9 +3543,9 @@ UpdateLinter Update a Linter
 
 Update a Linter used on Tracetest
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param linterId ID of an Linter
- @return ApiUpdateLinterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param linterId ID of an Linter
+	@return ApiUpdateLinterRequest
 */
 func (a *ResourceApiApiService) UpdateLinter(ctx context.Context, linterId string) ApiUpdateLinterRequest {
 	return ApiUpdateLinterRequest{
@@ -3532,7 +3556,8 @@ func (a *ResourceApiApiService) UpdateLinter(ctx context.Context, linterId strin
 }
 
 // Execute executes the request
-//  @return LinterResource
+//
+//	@return LinterResource
 func (a *ResourceApiApiService) UpdateLinterExecute(r ApiUpdateLinterRequest) (*LinterResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3630,9 +3655,9 @@ UpdatePollingProfile Update a Polling Profile
 
 Update a polling profile used on Tracetest to configure how to fetch traces in a test.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
- @return ApiUpdatePollingProfileRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param pollingProfileId ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current'
+	@return ApiUpdatePollingProfileRequest
 */
 func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollingProfileId string) ApiUpdatePollingProfileRequest {
 	return ApiUpdatePollingProfileRequest{
@@ -3643,7 +3668,8 @@ func (a *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollin
 }
 
 // Execute executes the request
-//  @return PollingProfile
+//
+//	@return PollingProfile
 func (a *ResourceApiApiService) UpdatePollingProfileExecute(r ApiUpdatePollingProfileRequest) (*PollingProfile, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3741,9 +3767,9 @@ UpdateTest update test
 
 update test action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param testId id of the test
- @return ApiUpdateTestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId id of the test
+	@return ApiUpdateTestRequest
 */
 func (a *ResourceApiApiService) UpdateTest(ctx context.Context, testId string) ApiUpdateTestRequest {
 	return ApiUpdateTestRequest{
@@ -3841,9 +3867,9 @@ UpdateTransaction update transaction
 
 update transaction action
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param transactionId id of the transaction
- @return ApiUpdateTransactionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param transactionId id of the transaction
+	@return ApiUpdateTransactionRequest
 */
 func (a *ResourceApiApiService) UpdateTransaction(ctx context.Context, transactionId string) ApiUpdateTransactionRequest {
 	return ApiUpdateTransactionRequest{
@@ -3854,7 +3880,8 @@ func (a *ResourceApiApiService) UpdateTransaction(ctx context.Context, transacti
 }
 
 // Execute executes the request
-//  @return TransactionResource
+//
+//	@return TransactionResource
 func (a *ResourceApiApiService) UpdateTransactionExecute(r ApiUpdateTransactionRequest) (*TransactionResource, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
