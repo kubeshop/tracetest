@@ -11,7 +11,7 @@ var environmentCmd = &cobra.Command{
 	Use:        "environment",
 	Short:      "Manage your tracetest environments",
 	Long:       "Manage your tracetest environments",
-	Deprecated: "Please use `tracetest (apply|delete|list|get|export) environment` commands instead.",
+	Deprecated: "Please use `tracetest (apply|delete|export|get|list) environment` commands instead.",
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
