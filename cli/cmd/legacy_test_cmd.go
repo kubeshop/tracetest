@@ -5,12 +5,11 @@ import (
 )
 
 var testCmd = &cobra.Command{
-	GroupID:    cmdGroupTests.ID,
-	Use:        "test",
-	Short:      "Manage your tracetest tests",
-	Long:       "Manage your tracetest tests",
-	Deprecated: "Please use `tracetest (apply|delete|export|get|list) test` commands instead.",
-	PreRun:     setupCommand(),
+	GroupID: cmdGroupTests.ID,
+	Use:     "test",
+	Short:   "Manage your tracetest tests",
+	Long:    "Manage your tracetest tests",
+	PreRun:  setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
