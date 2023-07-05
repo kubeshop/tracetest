@@ -9,3 +9,9 @@ export const Container = styled.div`
     background-color: ${({theme}) => theme.color.background};
   }
 `;
+
+export const Footer = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 8px;
+`;

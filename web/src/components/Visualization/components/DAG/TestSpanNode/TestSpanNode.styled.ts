@@ -1,18 +1,18 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  position: absolute;
-  left: 20%;
+export const SelectAsCurrentContainer = styled.div`
   display: flex;
   justify-content: center;
+  left: 20%;
   margin-top: 2px;
+  position: absolute;
 `;
 
 export const FloatingText = styled.div`
   background-color: ${({theme}) => theme.color.interactive};
-  color: ${({theme}) => theme.color.white};
   border-radius: 12px;
-  padding: 2px 6px;
-  font-size: ${({theme}) => theme.size.xs};
+  color: ${({theme}) => theme.color.white};
   cursor: pointer;
+  font-size: ${({theme}) => theme.size.xs};
+  padding: 2px 6px;
 `;

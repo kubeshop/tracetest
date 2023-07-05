@@ -1,11 +1,11 @@
+import AnalyzerErrorsPopover from 'components/AnalyzerErrorsPopover';
 import {IPropsSubHeader} from '../SpanDetail';
 import * as S from './TraceSubHeader.styled';
 
 const TraceSubHeader = ({analyzerErrors}: IPropsSubHeader) => {
   return analyzerErrors ? (
     <S.Container>
-      <S.ErrorIcon />
-      <S.Text type="secondary">Analyzer errors</S.Text>
+      <AnalyzerErrorsPopover errors={analyzerErrors} />
     </S.Container>
   ) : null;
 };

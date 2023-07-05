@@ -4,10 +4,17 @@ import BaseSpanNode from '../BaseSpanNode/BaseSpanNode';
 import {IPropsComponent} from '../SpanNodeFactory';
 
 const TraceSpanNode = (props: IPropsComponent) => {
-  const {node} = props;
+  const {isMatched, node} = props;
   const {span, analyzerErrors} = useSpanData(node.data.id);
 
-  return <BaseSpanNode {...props} header={<Header hasAnalyzerErrors={!!analyzerErrors} />} span={span} />;
+  return (
+    <BaseSpanNode
+      {...props}
+      className={isMatched ? 'matched' : ''}
+      header={<Header hasAnalyzerErrors={!!analyzerErrors} />}
+      span={span}
+    />
+  );
 };
 
 export default TraceSpanNode;
