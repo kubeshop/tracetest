@@ -75,7 +75,7 @@ type resourceParameters struct {
 func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error {
 	if len(args) == 0 || args[0] == "" {
 		return []error{
-			ParamError{
+			paramError{
 				Parameter: "resource",
 				Message:   "resource name must be provided",
 			},
@@ -87,7 +87,7 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 	_, err := resources.Get(p.ResourceName)
 	if errors.Is(err, resourcemanager.ErrResourceNotFound) {
 		return []error{
-			ParamError{
+			paramError{
 				Parameter: "resource",
 				Message:   fmt.Sprintf("resource must be %s", resourceList()),
 			},
@@ -95,4 +95,13 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 	}
 
 	return nil
+}
+
+type paramError struct {
+	Parameter string
+	Message   string
+}
+
+func (pe paramError) Error() string {
+	return fmt.Sprintf(`[%s] %s`, pe.Parameter, pe.Message)
 }

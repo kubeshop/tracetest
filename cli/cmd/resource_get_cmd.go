@@ -55,7 +55,7 @@ func (p resourceIDParameters) Validate(cmd *cobra.Command, args []string) []erro
 	errors := make([]error, 0)
 
 	if p.ResourceID == "" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "id",
 			Message:   "resource id must be provided",
 		})

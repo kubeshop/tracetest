@@ -62,7 +62,7 @@ func (p applyParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := make([]error, 0)
 
 	if p.DefinitionFile == "" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "file",
 			Message:   "Definition file must be provided",
 		})

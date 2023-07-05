@@ -3,16 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
-	"strings"
 
-	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -24,7 +20,6 @@ var (
 	cliLogger      *zap.Logger
 	versionText    string
 	isVersionMatch bool
-	resourceParams = &resourceParameters{}
 )
 
 type setupConfig struct {
@@ -46,166 +41,6 @@ func SkipVersionMismatchCheck() setupOption {
 	}
 }
 
-var httpClient = &resourcemanager.HTTPClient{}
-var resources = resourcemanager.NewRegistry().
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"config", "configs",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "ANALYTICS ENABLED", Path: "spec.analyticsEnabled"},
-				},
-			}),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"analyzer", "analyzers",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "ENABLED", Path: "spec.enabled"},
-					{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
-				},
-			}),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"pollingprofile", "pollingprofiles",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "STRATEGY", Path: "spec.strategy"},
-				},
-			}),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"demo", "demos",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "TYPE", Path: "spec.type"},
-					{Header: "ENABLED", Path: "spec.enabled"},
-				},
-			}),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"datastore", "datastores",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "DEFAULT", Path: "spec.default"},
-				},
-				ItemModifier: func(item *gabs.Container) error {
-					isDefault := item.Path("spec.default").Data().(bool)
-					if !isDefault {
-						item.SetP("", "spec.default")
-					} else {
-						item.SetP("*", "spec.default")
-					}
-					return nil
-				},
-			}),
-			resourcemanager.WithDeleteEnabled("DataStore removed. Defaulting back to no-tracing mode"),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"environment", "environments",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "DESCRIPTION", Path: "spec.description"},
-				},
-			}),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"transaction", "transactions",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "VERSION", Path: "spec.version"},
-					{Header: "STEPS", Path: "spec.summary.steps"},
-					{Header: "RUNS", Path: "spec.summary.runs"},
-					{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
-					{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
-					{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
-				},
-				ItemModifier: func(item *gabs.Container) error {
-					// set spec.summary.steps to the number of steps in the transaction
-					item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
-
-					if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
-						return err
-					}
-
-					return nil
-				},
-			}),
-		),
-	).
-	Register(
-		resourcemanager.NewClient(
-			httpClient,
-			"test", "tests",
-			resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-				Cells: []resourcemanager.TableCellConfig{
-					{Header: "ID", Path: "spec.id"},
-					{Header: "NAME", Path: "spec.name"},
-					{Header: "VERSION", Path: "spec.version"},
-					{Header: "TRIGGER TYPE", Path: "spec.trigger.type"},
-					{Header: "RUNS", Path: "spec.summary.runs"},
-					{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
-					{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
-					{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
-					{Header: "URL", Path: "spec.url"},
-				},
-				ItemModifier: func(item *gabs.Container) error {
-					// set spec.summary.steps to the number of steps in the transaction
-					id, ok := item.Path("spec.id").Data().(string)
-					if !ok {
-						return fmt.Errorf("test id '%s' is not a string", id)
-					}
-
-					url := cliConfig.URL() + "/test/" + id
-					item.SetP(url, "spec.url")
-
-					if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
-						return err
-					}
-
-					return nil
-				},
-			}),
-		),
-	)
-
-func resourceList() string {
-	return strings.Join(resources.List(), "|")
-}
-
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
 		shouldValidateConfig:          true,
@@ -221,19 +56,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		loadConfig(cmd, args)
 		overrideConfig()
 		setupVersion()
-
-		extraHeaders := http.Header{}
-		extraHeaders.Set("x-client-id", analytics.ClientID())
-		extraHeaders.Set("x-source", "cli")
-
-		// To avoid a ciruclar reference initialization when setting up the registry and its resources,
-		// we create the resources with a pointer to an unconfigured HTTPClient.
-		// When each command is run, this function is run in the PreRun stage, before any of the actual `Run` code is executed
-		// We take this chance to configure the HTTPClient with the correct URL and headers.
-		// To make this configuration propagate to all the resources, we need to replace the pointer to the HTTPClient.
-		// For more details, see https://github.com/kubeshop/tracetest/pull/2832#discussion_r1245616804
-		hc := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
-		*httpClient = *hc
+		setupResources()
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)

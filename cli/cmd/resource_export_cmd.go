@@ -65,7 +65,7 @@ func (p exportParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := p.resourceIDParameters.Validate(cmd, args)
 
 	if p.OutputFile == "" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "file",
 			Message:   "output file must be provided",
 		})

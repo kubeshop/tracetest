@@ -17,7 +17,7 @@ var dataStoreCmd = &cobra.Command{
 	Use:        "datastore",
 	Short:      "Manage your tracetest data stores",
 	Long:       "Manage your tracetest data stores",
-	Deprecated: "Please use `tracetest (apply|delete|export|get) datastore` commands instead.",
+	Deprecated: "Please use `tracetest (apply|delete|export|get|list) datastore` commands instead.",
 	PreRun:     setupCommand(),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()

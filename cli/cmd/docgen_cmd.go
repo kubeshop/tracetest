@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -64,7 +63,7 @@ module.exports = pages;
 
 	fileContent := fmt.Sprintf(fileContentTemplate, sidebarItemsContent)
 	outputFile := filepath.Join(outputDir, "cli-sidebar.js")
-	err = ioutil.WriteFile(outputFile, []byte(fileContent), 0644)
+	err = os.WriteFile(outputFile, []byte(fileContent), 0644)
 	if err != nil {
 		return fmt.Errorf("could not write sidebar output file: %w", err)
 	}
@@ -73,7 +72,7 @@ module.exports = pages;
 }
 
 func generateContentItems(inputDir string, docusaurusRootFolder string) (string, error) {
-	files, err := ioutil.ReadDir(inputDir)
+	files, err := os.ReadDir(inputDir)
 	if err != nil {
 		return "", fmt.Errorf("could not read dir: %w", err)
 	}

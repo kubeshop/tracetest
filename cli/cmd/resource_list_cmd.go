@@ -72,21 +72,21 @@ func (p listParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := make([]error, 0)
 
 	if p.Take < 0 {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "take",
 			Message:   "take parameter must be greater than 0",
 		})
 	}
 
 	if p.Skip < 0 {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "skip",
 			Message:   "skip parameter must be greater than 0",
 		})
 	}
 
 	if p.SortDirection != "" && p.SortDirection != "asc" && p.SortDirection != "desc" {
-		errors = append(errors, ParamError{
+		errors = append(errors, paramError{
 			Parameter: "sortDirection",
 			Message:   "sortDirection parameter must be either asc or desc",
 		})
