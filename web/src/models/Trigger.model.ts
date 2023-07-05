@@ -35,8 +35,8 @@ const EntryData = {
   },
 };
 
-const Trigger = ({triggerType = 'http', httpRequest = {}, grpc = {}, traceid = {}}: TRawTrigger): Trigger => {
-  const type = triggerType as TriggerTypes;
+const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid = {}}: TRawTrigger): Trigger => {
+  const type = rawType as TriggerTypes;
 
   let request = {} as TTriggerRequest;
   if (type === TriggerTypes.http) {
