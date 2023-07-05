@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/linter/plugins/standards/rules"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
+	"github.com/kubeshop/tracetest/server/linter/rules"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +19,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 		)
 
 		rule := rules.NewEnsureAttributeNamingRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.True(t, result.Passed)
 	})
@@ -29,7 +30,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 		)
 
 		rule := rules.NewEnsureAttributeNamingRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)
@@ -42,7 +43,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 		)
 
 		rule := rules.NewEnsureAttributeNamingRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)
@@ -55,7 +56,7 @@ func TestEnsureAttributeNamingRule(t *testing.T) {
 		)
 
 		rule := rules.NewEnsureAttributeNamingRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
 		assert.Len(t, result.Results, 1)

@@ -10,15 +10,22 @@
 package openapi
 
 type LinterResourcePlugin struct {
+	Id string `json:"id,omitempty"`
+
 	Name string `json:"name,omitempty"`
 
 	Enabled bool `json:"enabled,omitempty"`
 
-	Required bool `json:"required,omitempty"`
+	Rules []LinterResourceRule `json:"rules,omitempty"`
 }
 
 // AssertLinterResourcePluginRequired checks if the required fields are not zero-ed
 func AssertLinterResourcePluginRequired(obj LinterResourcePlugin) error {
+	for _, el := range obj.Rules {
+		if err := AssertLinterResourceRuleRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

@@ -23,6 +23,8 @@ type LinterResultPluginRule struct {
 	Tips []string `json:"tips,omitempty"`
 
 	Results []LinterResultPluginRuleResult `json:"results,omitempty"`
+
+	Level string `json:"level,omitempty"`
 }
 
 // AssertLinterResultPluginRuleRequired checks if the required fields are not zero-ed

@@ -100,12 +100,11 @@ func (e *defaultlinterRunner) startWorker() {
 func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 	ctx := request.Context()
 	lintResource := e.analyzerGetter.GetDefault(ctx)
-	linter := linter.NewLinter(lintResource, linter.AvailablePlugins...)
 
-	shouldSkip, reason := linter.ShouldSkip()
+	shouldSkip := lintResource.ShouldSkip()
 	if shouldSkip {
-		log.Printf("[linterRunner] Skipping Tracelinter. Reason %s\n", reason)
-		err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID, reason))
+		log.Printf("[linterRunner] Skipping Trace Analyzer")
+		err := e.eventEmitter.Emit(ctx, events.TraceLinterSkip(request.Test.ID, request.Run.ID))
 		if err != nil {
 			log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterSkip event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 		}
@@ -114,9 +113,13 @@ func (e *defaultlinterRunner) onRequest(request LinterRequest) {
 		return
 	}
 
-	err := linter.IsValid()
+	lintResource, err := lintResource.WithMetadata()
+
+	// in the future, the registry should be dynamic based on user plugins
+	linter := linter.NewLinter(linter.DefaultPluginRegistry)
 	if err != nil {
-		e.onError(ctx, request, request.Run, err)
+		log.Printf("[linterRunner] Test %s Run %d: error with WithMetadata: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		e.onFinish(ctx, request, request.Run)
 		return
 	}
 
@@ -162,7 +165,7 @@ func (e *defaultlinterRunner) onRun(ctx context.Context, request LinterRequest, 
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterStart event: %s\n", request.Test.ID, request.Run.ID, err.Error())
 	}
 
-	result, err := linter.Run(ctx, *run.Trace)
+	result, err := linter.Run(ctx, *run.Trace, analyzer)
 	if err != nil {
 		return e.onError(ctx, request, run, err)
 	}

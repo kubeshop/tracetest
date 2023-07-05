@@ -14,8 +14,6 @@ type LinterResultPluginRuleResultError struct {
 
 	Expected string `json:"expected,omitempty"`
 
-	Level string `json:"level,omitempty"`
-
 	Description string `json:"description,omitempty"`
 
 	Suggestions []string `json:"suggestions,omitempty"`

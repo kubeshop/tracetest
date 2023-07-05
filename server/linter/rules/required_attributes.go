@@ -3,6 +3,7 @@ package rules
 import (
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
@@ -18,7 +19,7 @@ var (
 	faasAttrClient = []string{"faas.invoked_name", "faas.invoked_provider"}
 )
 
-func (r requiredAttributesRule) validateSpan(span *model.Span) model.Result {
+func (r requiredAttributesRule) validateSpan(span *model.Span) analyzer.Result {
 	switch span.Attributes.Get("tracetest.span.type") {
 	case "http":
 		return r.validateHttpSpan(span)
@@ -32,15 +33,15 @@ func (r requiredAttributesRule) validateSpan(span *model.Span) model.Result {
 		return r.validateFaasSpan(span)
 	}
 
-	return model.Result{
+	return analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
 }
 
-func (r requiredAttributesRule) validateHttpSpan(span *model.Span) model.Result {
+func (r requiredAttributesRule) validateHttpSpan(span *model.Span) analyzer.Result {
 	missingAttrs := r.getMissingAttrs(span, httpAttr, "http")
-	result := model.Result{
+	result := analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
@@ -59,11 +60,11 @@ func (r requiredAttributesRule) validateHttpSpan(span *model.Span) model.Result 
 	return result
 }
 
-func (r requiredAttributesRule) getMissingAttrs(span *model.Span, matchingAttrList []string, spanType string) []model.Error {
-	missingAttributes := make([]model.Error, 0)
+func (r requiredAttributesRule) getMissingAttrs(span *model.Span, matchingAttrList []string, spanType string) []analyzer.Error {
+	missingAttributes := make([]analyzer.Error, 0)
 	for _, requiredAttribute := range matchingAttrList {
 		if _, attributeExists := span.Attributes[requiredAttribute]; !attributeExists {
-			missingAttributes = append(missingAttributes, model.Error{
+			missingAttributes = append(missingAttributes, analyzer.Error{
 				Value:       requiredAttribute,
 				Description: fmt.Sprintf(`Attribute "%s" is missing from span of type "%s"`, requiredAttribute, spanType),
 			})
@@ -73,9 +74,9 @@ func (r requiredAttributesRule) getMissingAttrs(span *model.Span, matchingAttrLi
 	return missingAttributes
 }
 
-func (r requiredAttributesRule) validateDatabaseSpan(span *model.Span) model.Result {
+func (r requiredAttributesRule) validateDatabaseSpan(span *model.Span) analyzer.Result {
 	missingAttrs := r.getMissingAttrs(span, databaseAttr, "database")
-	result := model.Result{
+	result := analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
@@ -88,9 +89,9 @@ func (r requiredAttributesRule) validateDatabaseSpan(span *model.Span) model.Res
 	return result
 }
 
-func (r requiredAttributesRule) validateRPCSpan(span *model.Span) model.Result {
+func (r requiredAttributesRule) validateRPCSpan(span *model.Span) analyzer.Result {
 	missingAttrs := r.getMissingAttrs(span, rpcAttr, "rpc")
-	result := model.Result{
+	result := analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
@@ -103,9 +104,9 @@ func (r requiredAttributesRule) validateRPCSpan(span *model.Span) model.Result {
 	return result
 }
 
-func (r requiredAttributesRule) validateMessagingSpan(span *model.Span) model.Result {
+func (r requiredAttributesRule) validateMessagingSpan(span *model.Span) analyzer.Result {
 	missingAttrs := r.getMissingAttrs(span, messagingAttr, "messaging")
-	result := model.Result{
+	result := analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}
@@ -118,9 +119,9 @@ func (r requiredAttributesRule) validateMessagingSpan(span *model.Span) model.Re
 	return result
 }
 
-func (r requiredAttributesRule) validateFaasSpan(span *model.Span) model.Result {
-	missingAttrs := make([]model.Error, 0)
-	result := model.Result{
+func (r requiredAttributesRule) validateFaasSpan(span *model.Span) analyzer.Result {
+	missingAttrs := make([]analyzer.Error, 0)
+	result := analyzer.Result{
 		Passed: true,
 		SpanID: span.ID.String(),
 	}

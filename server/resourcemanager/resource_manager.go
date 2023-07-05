@@ -255,6 +255,15 @@ func (m *manager[T]) doCreate(w http.ResponseWriter, r *http.Request, encoder En
 		specs = m.rh.SetID(specs, m.config.idgen())
 	}
 
+	if err := specs.Validate(); err != nil {
+		err := fmt.Errorf(
+			"an error occurred while validating the resource: %s. error: %s",
+			specs.GetID(),
+			err.Error(),
+		)
+		writeError(w, encoder, http.StatusBadRequest, err)
+	}
+
 	created, err := m.rh.Create(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "creating", err, encoder)
@@ -334,6 +343,15 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *manager[T]) doUpdate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
+	if err := specs.Validate(); err != nil {
+		err := fmt.Errorf(
+			"an error occurred while validating the resource: %s. error: %s",
+			specs.GetID(),
+			err.Error(),
+		)
+		writeError(w, encoder, http.StatusBadRequest, err)
+	}
+
 	updated, err := m.rh.Update(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "updating", err, encoder)
