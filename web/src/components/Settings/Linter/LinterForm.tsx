@@ -49,7 +49,7 @@ const LinterForm = () => {
             name="minimumScore"
             rules={[{required: true, message: 'Minimum score is required'}]}
           >
-            <Input placeholder="0 to 100" type="number" />
+            <Input suffix="%" placeholder="0 to 100" type="number" />
           </Form.Item>
         </Col>
 

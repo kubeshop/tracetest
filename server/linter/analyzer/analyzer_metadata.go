@@ -19,6 +19,12 @@ var (
 	ErrorLevelError    string = "error"
 	ErrorLevelDisabled string = "disabled"
 
+	SortWeight = map[string]int{
+		ErrorLevelError:    2,
+		ErrorLevelWarning:  1,
+		ErrorLevelDisabled: 0,
+	}
+
 	DefaultPlugins = []LinterPlugin{
 		StandardsPlugin,
 		CommonPlugin,

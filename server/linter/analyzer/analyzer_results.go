@@ -1,5 +1,7 @@
 package analyzer
 
+import "sort"
+
 type Result struct {
 	SpanID string  `json:"span_id"`
 	Passed bool    `json:"passed"`
@@ -88,6 +90,7 @@ func (pr PluginResult) CalculateResults() PluginResult {
 	passScore := 0
 	passed := true
 
+	pr.Rules = SortRules(pr.Rules, SortWeight)
 	for _, result := range pr.Rules {
 		// only error level rules are taken into account
 		if result.Level == ErrorLevelError {
@@ -107,4 +110,15 @@ func (pr PluginResult) CalculateResults() PluginResult {
 	}
 	pr.Passed = passed
 	return pr
+}
+
+func SortRules(rules []RuleResult, sortWeight map[string]int) []RuleResult {
+	sort.Slice(rules, func(i, j int) bool {
+		iw := sortWeight[rules[i].Level]
+		jw := sortWeight[rules[j].Level]
+
+		return iw > jw
+	})
+
+	return rules
 }

@@ -4,6 +4,7 @@ import {Space, Tooltip, Typography} from 'antd';
 import {LinterResultPluginRule} from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';
 import Span from 'models/Span.model';
+import {LinterRuleErrorLevel} from 'models/Linter.model';
 import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
 import * as S from './AnalyzerResult.styled';
@@ -19,7 +20,10 @@ function getSpanName(spans: Span[], spanId: string) {
   return span?.name ?? '';
 }
 
-const Rule = ({rule: {tips, passed, description, name, errorDescription, results = [], level, weight = 0}, trace}: IProps) => {
+const Rule = ({
+  rule: {tips, passed, description, name, errorDescription, results = [], level, weight = 0},
+  trace,
+}: IProps) => {
   const dispatch = useAppDispatch();
 
   const onSpanResultClick = useCallback(
@@ -37,13 +41,17 @@ const Rule = ({rule: {tips, passed, description, name, errorDescription, results
             <RuleIcon passed={passed} level={level} />
             <Tooltip title={tips.join(' - ')}>
               <Typography.Text strong>{name}</Typography.Text>
-              {' - '}{weight}%
             </Tooltip>
           </Space>
         </S.RuleHeader>
         <Typography.Text type="secondary" style={{paddingLeft: 20}}>
           {description}
         </Typography.Text>
+        {level === LinterRuleErrorLevel.ERROR && (
+          <Typography.Text type="secondary" style={{paddingLeft: 20}}>
+            Weight: {weight}
+          </Typography.Text>
+        )}
       </S.Column>
 
       <S.RuleBody>

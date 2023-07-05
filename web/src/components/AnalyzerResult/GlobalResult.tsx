@@ -33,7 +33,7 @@ const GlobalResult = ({score, minimumScore}: IProps) => {
         </S.GlobalScoreContainer>
       </S.GlobalScoreWrapper>
       <S.ScoreResultWrapper>
-        <S.Subtitle level={3}>Minimum Acceptable Score: {minimumScore}</S.Subtitle>
+        <S.Subtitle level={3}>Minimum Acceptable Score: {minimumScore}%</S.Subtitle>
         <S.Subtitle level={3}>
           Result: <S.ResultText $passed={passedScore}>{passedScore ? 'Passed' : 'Failed'}</S.ResultText>
         </S.Subtitle>

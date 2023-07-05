@@ -30,7 +30,7 @@ const Rule = ({fieldKey, baseName, isDisabled}: IProps) => {
       <Col span="auto">-</Col>
       <Col span={11}>
         <Form.Item name={[fieldKey, 'weight']} label="Weight input configuration">
-          <Input suffix="%" type="number" disabled={isDisabled} />
+          <Input type="number" disabled={isDisabled} />
         </Form.Item>
       </Col>
     </Row>
