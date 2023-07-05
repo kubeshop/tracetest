@@ -112,6 +112,7 @@ func (m OpenAPI) Trigger(in trigger.Trigger) openapi.Trigger {
 	return openapi.Trigger{
 		TriggerType: string(in.Type),
 		Http:        m.HTTPRequest(in.HTTP),
+		HttpRequest: m.HTTPRequest(in.HTTP),
 		Grpc:        m.GRPCRequest(in.GRPC),
 		Traceid:     m.TraceIDRequest(in.TraceID),
 	}
