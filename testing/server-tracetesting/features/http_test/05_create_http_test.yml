@@ -48,7 +48,8 @@ spec:
   - selector: span[name = "Tracetest trigger"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
-    - attr:tracetest.response.status = 200
+    - attr:tracetest.response.status = 201
+    - attr:tracetest.response.body | json_path '$.spec.id' = env:HTTP_TEST_ID
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
@@ -58,12 +59,6 @@ spec:
   - selector: span[name = "exec INSERT"]:first
     assertions:
     - attr:sql.query contains "INSERT INTO tests"
-
-  # ensure we can reference outputs declared in the same test
-  - selector: span[name = "Tracetest trigger"]
-    assertions:
-    - attr:tracetest.response.body | json_path '$.id' = env:HTTP_TEST_ID
-
   outputs:
   - name: HTTP_TEST_ID
     selector: span[name = "Tracetest trigger"]
