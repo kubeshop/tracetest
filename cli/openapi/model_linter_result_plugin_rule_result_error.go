@@ -21,7 +21,6 @@ var _ MappedNullable = &LinterResultPluginRuleResultError{}
 type LinterResultPluginRuleResultError struct {
 	Value       *string  `json:"value,omitempty"`
 	Expected    *string  `json:"expected,omitempty"`
-	Level       *string  `json:"level,omitempty"`
 	Description *string  `json:"description,omitempty"`
 	Suggestions []string `json:"suggestions,omitempty"`
 }
@@ -107,38 +106,6 @@ func (o *LinterResultPluginRuleResultError) SetExpected(v string) {
 	o.Expected = &v
 }
 
-// GetLevel returns the Level field value if set, zero value otherwise.
-func (o *LinterResultPluginRuleResultError) GetLevel() string {
-	if o == nil || isNil(o.Level) {
-		var ret string
-		return ret
-	}
-	return *o.Level
-}
-
-// GetLevelOk returns a tuple with the Level field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *LinterResultPluginRuleResultError) GetLevelOk() (*string, bool) {
-	if o == nil || isNil(o.Level) {
-		return nil, false
-	}
-	return o.Level, true
-}
-
-// HasLevel returns a boolean if a field has been set.
-func (o *LinterResultPluginRuleResultError) HasLevel() bool {
-	if o != nil && !isNil(o.Level) {
-		return true
-	}
-
-	return false
-}
-
-// SetLevel gets a reference to the given string and assigns it to the Level field.
-func (o *LinterResultPluginRuleResultError) SetLevel(v string) {
-	o.Level = &v
-}
-
 // GetDescription returns the Description field value if set, zero value otherwise.
 func (o *LinterResultPluginRuleResultError) GetDescription() string {
 	if o == nil || isNil(o.Description) {
@@ -218,9 +185,6 @@ func (o LinterResultPluginRuleResultError) ToMap() (map[string]interface{}, erro
 	}
 	if !isNil(o.Expected) {
 		toSerialize["expected"] = o.Expected
-	}
-	if !isNil(o.Level) {
-		toSerialize["level"] = o.Level
 	}
 	if !isNil(o.Description) {
 		toSerialize["description"] = o.Description

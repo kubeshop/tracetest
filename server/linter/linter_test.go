@@ -37,7 +37,7 @@ func TestLinter(t *testing.T) {
 
 		result, err := linter.Run(context.TODO(), trace, analyzer.Linter{})
 		assert.Nil(t, err)
-		assert.Equal(t, 0, result.Score)
+		assert.Equal(t, 100, result.Score)
 		assert.Equal(t, true, result.Passed)
 		assert.Equal(t, 0, len(result.Plugins))
 	})

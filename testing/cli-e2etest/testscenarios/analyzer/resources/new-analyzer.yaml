@@ -5,12 +5,33 @@ spec:
   enabled: true
   minimumScore: 95
   plugins:
-  - name: standards
-    enabled: true
-    required: true
-  - name: security
-    enabled: true
-    required: true
-  - name: common
-    enabled: true
-    required: true
+    - id: standards
+      enabled: true
+      rules:
+        - id: span_naming
+          weight: 25
+          errorLevel: error
+        - id: required_attributes
+          weight: 25
+          errorLevel: error
+        - id: attribute_naming
+          weight: 25
+          errorLevel: error
+        - id: not_empty_attributes
+          weight: 25
+          errorLevel: error
+    - id: common
+      enabled: true
+      rules:
+        - id: enforce_dns
+          weight: 100
+          errorLevel: error
+    - id: security
+      enabled: true
+      rules:
+        - id: enforce_https_protocol
+          weight: 30
+          errorLevel: error
+        - id: ensures_no_api_key_leak
+          weight: 70
+          errorLevel: error
