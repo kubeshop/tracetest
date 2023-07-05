@@ -29,7 +29,26 @@ var testListCmd = &cobra.Command{
 	PostRun: teardownCommand,
 }
 
+var testExportCmd = &cobra.Command{
+	Use:        "export",
+	Short:      "Exports a test into a file",
+	Long:       "Exports a test into a file",
+	Deprecated: "Please use `tracetest export test` command instead.",
+	PreRun:     setupCommand(),
+	Run: func(_ *cobra.Command, _ []string) {
+		exportCmd.Run(exportCmd, []string{"test"})
+	},
+	PostRun: teardownCommand,
+}
+
 func init() {
 	rootCmd.AddCommand(testCmd)
+
+	// list
 	testCmd.AddCommand(testListCmd)
+
+	// export
+	testExportCmd.PersistentFlags().StringVarP(&exportParams.ResourceID, "id", "", "", "id of the test")
+	testExportCmd.PersistentFlags().StringVarP(&exportParams.OutputFile, "output", "o", "", "file to be created with definition")
+	testCmd.AddCommand(testExportCmd)
 }
