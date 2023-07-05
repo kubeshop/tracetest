@@ -13,7 +13,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
@@ -22,12 +21,11 @@ import (
 )
 
 var (
-	cliConfig        config.Config
-	cliLogger        *zap.Logger
-	versionText      string
-	isVersionMatch   bool
-	resourceRegistry = actions.NewResourceRegistry()
-	resourceParams   = &parameters.ResourceParams{}
+	cliConfig      config.Config
+	cliLogger      *zap.Logger
+	versionText    string
+	isVersionMatch bool
+	resourceParams = &resourceParameters{}
 )
 
 type setupConfig struct {
@@ -212,65 +210,6 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		hc := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
 		*httpClient = *hc
 
-		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
-
-		configOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("configs", cliConfig)),
-			actions.WithFormatter(formatters.NewConfigFormatter()),
-		)
-		configActions := actions.NewConfigActions(configOptions...)
-		resourceRegistry.Register(configActions)
-
-		analyzerOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("analyzers", cliConfig)),
-			actions.WithFormatter(formatters.NewAnalyzerFormatter()),
-		)
-		analyzerActions := actions.NewAnalyzerActions(analyzerOptions...)
-		resourceRegistry.Register(analyzerActions)
-
-		pollingOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("pollingprofiles", cliConfig)),
-			actions.WithFormatter(formatters.NewPollingFormatter()),
-		)
-		pollingActions := actions.NewPollingActions(pollingOptions...)
-		resourceRegistry.Register(pollingActions)
-
-		demoOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("demos", cliConfig)),
-			actions.WithFormatter(formatters.NewDemoFormatter()),
-		)
-		demoActions := actions.NewDemoActions(demoOptions...)
-		resourceRegistry.Register(demoActions)
-
-		dataStoreOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("datastores", cliConfig)),
-			actions.WithFormatter(formatters.NewDatastoreFormatter()),
-		)
-		dataStoreActions := actions.NewDataStoreActions(dataStoreOptions...)
-		resourceRegistry.Register(dataStoreActions)
-
-		environmentOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("environments", cliConfig)),
-			actions.WithFormatter(formatters.NewEnvironmentsFormatter()),
-		)
-		environmentActions := actions.NewEnvironmentsActions(environmentOptions...)
-		resourceRegistry.Register(environmentActions)
-
-		openapiClient := utils.GetAPIClient(cliConfig)
-		transactionOptions := append(
-			baseOptions,
-			actions.WithClient(utils.GetResourceAPIClient("transactions", cliConfig)),
-			actions.WithFormatter(formatters.NewTransactionsFormatter()),
-		)
-		transactionActions := actions.NewTransactionsActions(openapiClient, transactionOptions...)
-		resourceRegistry.Register(transactionActions)
-
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
@@ -362,15 +301,11 @@ func teardownCommand(cmd *cobra.Command, args []string) {
 }
 
 func setupVersion() {
-	ctx := context.Background()
-	options := []actions.ActionArgsOption{
-		actions.ActionWithClient(utils.GetAPIClient(cliConfig)),
-		actions.ActionWithConfig(cliConfig),
-		actions.ActionWithLogger(cliLogger),
-	}
-
-	action := actions.NewGetServerVersionAction(options...)
-	versionText, isVersionMatch = action.GetVersion(ctx)
+	versionText, isVersionMatch = actions.GetVersion(
+		context.Background(),
+		cliConfig,
+		utils.GetAPIClient(cliConfig),
+	)
 }
 
 func validateVersionMismatch() {

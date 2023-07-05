@@ -18,8 +18,6 @@ type listTestsAction struct {
 	client *openapi.APIClient
 }
 
-var _ Action[ListTestConfig] = &listTestsAction{}
-
 func NewListTestsAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) listTestsAction {
 	return listTestsAction{config, logger, client}
 }

@@ -9,11 +9,13 @@ import {IPropsComponent} from '../SpanNodeFactory';
 import * as S from '../Timeline.styled';
 
 interface IProps extends IPropsComponent {
+  className?: string;
   header?: React.ReactNode;
   span: Span;
 }
 
 const BaseSpanNode = ({
+  className,
   header,
   index,
   indexParent,
@@ -33,7 +35,6 @@ const BaseSpanNode = ({
   const durationWidth = span.endTime - span.startTime;
   const durationX = span.startTime - minStartTime;
   const leftPadding = node.depth * BaseLeftPadding;
-  const className = isMatched ? 'matched' : '';
 
   return (
     <Group className={className} id={node.data.id} left={0} top={positionTop}>

@@ -7,7 +7,7 @@ import {SelectorAttributesBlackList, SelectorAttributesWhiteList} from 'constant
 import {Attributes, TraceTestAttributes} from 'constants/SpanAttribute.constants';
 import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {TTestSpecSummary} from 'types/TestRun.types';
+import {TAnalyzerError, TTestSpecSummary} from 'types/TestRun.types';
 import {getObjectIncludesText, isJson} from 'utils/Common';
 
 const flatAttributes = Object.values(Attributes);
@@ -101,6 +101,13 @@ const SpanAttributeService = () => ({
   getAttributeTestOutputs(attributeName: string, testOutputs: TestRunOutput[] = []): TestRunOutput[] {
     const lowerCaseAttributeName = attributeName.toLowerCase();
     return testOutputs.filter(({name}) => name.toLowerCase().includes(lowerCaseAttributeName));
+  },
+
+  getAttributeAnalyzerErrors(attributeName: String, analyzerErrors: TAnalyzerError[] = []): TAnalyzerError[] {
+    const lowerCaseAttributeName = attributeName.toLowerCase();
+    return analyzerErrors.filter(analyzerError =>
+      analyzerError.errors.some(({value}) => value?.toLowerCase?.()?.includes(lowerCaseAttributeName))
+    );
   },
 });
 

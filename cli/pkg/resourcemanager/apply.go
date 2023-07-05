@@ -12,7 +12,7 @@ import (
 
 const VerbApply Verb = "apply"
 
-func (c client) Apply(ctx context.Context, filePath string, requestedFormat Format) (string, error) {
+func (c Client) Apply(ctx context.Context, filePath string, requestedFormat Format) (string, error) {
 	inputFile, err := fileutil.Read(filePath)
 	if err != nil {
 		return "", fmt.Errorf("cannot read file %s: %w", filePath, err)

@@ -3,7 +3,7 @@ import AttributeList from 'components/AttributeList';
 import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import TestRunOutput from 'models/TestRunOutput.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {TTestSpecSummary} from 'types/TestRun.types';
+import {TAnalyzerError, TTestSpecSummary} from 'types/TestRun.types';
 import {IPropsAttributeRow} from './SpanDetail';
 import * as S from './SpanDetail.styled';
 
@@ -11,6 +11,7 @@ interface IProps {
   attributeList: TSpanFlatAttribute[];
   searchText?: string;
   semanticConventions: OtelReference;
+  analyzerErrors?: TAnalyzerError[];
   testSpecs?: TTestSpecSummary;
   testOutputs?: TestRunOutput[];
   onCreateTestSpec(attribute: TSpanFlatAttribute): void;
@@ -22,6 +23,7 @@ const Attributes = ({
   attributeList,
   searchText,
   semanticConventions,
+  analyzerErrors,
   testSpecs,
   testOutputs,
   onCreateTestSpec,
@@ -41,6 +43,7 @@ const Attributes = ({
         attributeList={attributeList}
         searchText={searchText}
         semanticConventions={semanticConventions}
+        analyzerErrors={analyzerErrors}
         testSpecs={testSpecs}
         testOutputs={testOutputs}
         onCreateTestSpec={onCreateTestSpec}

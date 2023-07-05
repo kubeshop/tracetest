@@ -3,13 +3,12 @@ package cmd
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
 var (
-	listParams = parameters.ListParams{}
+	listParams = &listParameters{}
 	listCmd    *cobra.Command
 )
 
@@ -59,4 +58,39 @@ func init() {
 	listCmd.Flags().BoolVar(&listParams.All, "all", false, "All")
 
 	rootCmd.AddCommand(listCmd)
+}
+
+type listParameters struct {
+	Take          int32
+	Skip          int32
+	SortBy        string
+	SortDirection string
+	All           bool
+}
+
+func (p listParameters) Validate(cmd *cobra.Command, args []string) []error {
+	errors := make([]error, 0)
+
+	if p.Take < 0 {
+		errors = append(errors, ParamError{
+			Parameter: "take",
+			Message:   "take parameter must be greater than 0",
+		})
+	}
+
+	if p.Skip < 0 {
+		errors = append(errors, ParamError{
+			Parameter: "skip",
+			Message:   "skip parameter must be greater than 0",
+		})
+	}
+
+	if p.SortDirection != "" && p.SortDirection != "asc" && p.SortDirection != "desc" {
+		errors = append(errors, ParamError{
+			Parameter: "sortDirection",
+			Message:   "sortDirection parameter must be either asc or desc",
+		})
+	}
+
+	return errors
 }

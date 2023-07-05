@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/parameters"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
 var (
-	exportParams = &parameters.ExportParams{}
+	exportParams = &exportParameters{}
 	exportCmd    *cobra.Command
 )
 
@@ -55,4 +54,22 @@ func init() {
 	exportCmd.Flags().StringVar(&exportParams.ResourceID, "id", "", "id of the resource to export")
 	exportCmd.Flags().StringVarP(&exportParams.OutputFile, "file", "f", "resource.yaml", "file path with name where to export the resource")
 	rootCmd.AddCommand(exportCmd)
+}
+
+type exportParameters struct {
+	resourceIDParameters
+	OutputFile string
+}
+
+func (p exportParameters) Validate(cmd *cobra.Command, args []string) []error {
+	errors := p.resourceIDParameters.Validate(cmd, args)
+
+	if p.OutputFile == "" {
+		errors = append(errors, ParamError{
+			Parameter: "file",
+			Message:   "output file must be provided",
+		})
+	}
+
+	return errors
 }

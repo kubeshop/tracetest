@@ -62,7 +62,7 @@ const Visualization = ({matchedSpans, nodeType, onNodeClick, selectedSpan, spans
         />
       </Group>
 
-      <Group className="node-span-list" left={0} top={AxisHeight}>
+      <Group className={`timeline-node-${nodeType}`} left={0} top={AxisHeight}>
         {filteredNodes.map((node, index) => (
           <SpanNodeFactory
             index={index}

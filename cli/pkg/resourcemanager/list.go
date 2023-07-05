@@ -17,7 +17,7 @@ type ListOption struct {
 
 const VerbList Verb = "list"
 
-func (c client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
+func (c Client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
 	url := c.client.url(c.resourceNamePlural)
 
 	q := url.Query()

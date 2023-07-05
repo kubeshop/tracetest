@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
@@ -64,4 +66,33 @@ type Validator interface {
 func WithResourceMiddleware(runFn RunFn, params ...Validator) CobraRunFn {
 	params = append(params, resourceParams)
 	return WithResultHandler(WithParamsHandler(params...)(runFn))
+}
+
+type resourceParameters struct {
+	ResourceName string
+}
+
+func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error {
+	if len(args) == 0 || args[0] == "" {
+		return []error{
+			ParamError{
+				Parameter: "resource",
+				Message:   "resource name must be provided",
+			},
+		}
+	}
+
+	p.ResourceName = args[0]
+
+	_, err := resources.Get(p.ResourceName)
+	if errors.Is(err, resourcemanager.ErrResourceNotFound) {
+		return []error{
+			ParamError{
+				Parameter: "resource",
+				Message:   fmt.Sprintf("resource must be %s", resourceList()),
+			},
+		}
+	}
+
+	return nil
 }
