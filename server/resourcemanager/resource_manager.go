@@ -297,15 +297,6 @@ func (m *manager[T]) upsert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := targetResource.Spec.Validate(); err != nil {
-		err := fmt.Errorf(
-			"an error occurred while validating the resource: %s. error: %s",
-			targetResource.Spec.GetID(),
-			err.Error(),
-		)
-		writeError(w, encoder, http.StatusBadRequest, err)
-	}
-
 	_, err = m.rh.Get(r.Context(), targetResource.Spec.GetID())
 	if err != nil {
 		// if the given ID is not found, create the resource
@@ -348,19 +339,19 @@ func (m *manager[T]) update(w http.ResponseWriter, r *http.Request) {
 	}
 	targetResource.Spec = m.rh.SetID(targetResource.Spec, urlID)
 
-	if err := targetResource.Spec.Validate(); err != nil {
+	m.doUpdate(w, r, encoder, targetResource.Spec)
+}
+
+func (m *manager[T]) doUpdate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
+	if err := specs.Validate(); err != nil {
 		err := fmt.Errorf(
 			"an error occurred while validating the resource: %s. error: %s",
-			targetResource.Spec.GetID(),
+			specs.GetID(),
 			err.Error(),
 		)
 		writeError(w, encoder, http.StatusBadRequest, err)
 	}
 
-	m.doUpdate(w, r, encoder, targetResource.Spec)
-}
-
-func (m *manager[T]) doUpdate(w http.ResponseWriter, r *http.Request, encoder Encoder, specs T) {
 	updated, err := m.rh.Update(r.Context(), specs)
 	if err != nil {
 		m.handleResourceHandlerError(w, "updating", err, encoder)

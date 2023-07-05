@@ -10,14 +10,14 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type ensureAttributeNamingRule struct {
-	BaseRule
-}
+type ensureAttributeNamingRule struct{}
 
 func NewEnsureAttributeNamingRule() Rule {
-	return &ensureAttributeNamingRule{
-		BaseRule: NewRule(analyzer.EnsureAttributeNamingRuleId),
-	}
+	return &ensureAttributeNamingRule{}
+}
+
+func (r ensureAttributeNamingRule) ID() string {
+	return analyzer.EnsureAttributeNamingRuleID
 }
 
 func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {

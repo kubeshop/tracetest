@@ -9,27 +9,21 @@ import (
 )
 
 type Rule interface {
-	Id() string
+	ID() string
 	Evaluate(context.Context, model.Trace, analyzer.LinterRule) (analyzer.RuleResult, error)
 }
 
-type RuleRegistry interface {
-	List() []string
-	Get(string) (Rule, error)
-	Register(Rule) RuleRegistry
-}
-
-type ruleRegistry struct {
+type RuleRegistry struct {
 	rules map[string]Rule
 }
 
-func NewRegistry() RuleRegistry {
-	return &ruleRegistry{
+func NewRegistry() *RuleRegistry {
+	return &RuleRegistry{
 		rules: make(map[string]Rule),
 	}
 }
 
-func (r *ruleRegistry) List() []string {
+func (r *RuleRegistry) List() []string {
 	keys := make([]string, 0, len(r.rules))
 	for k := range r.rules {
 		keys = append(keys, k)
@@ -38,7 +32,7 @@ func (r *ruleRegistry) List() []string {
 	return keys
 }
 
-func (r *ruleRegistry) Get(ruleName string) (Rule, error) {
+func (r *RuleRegistry) Get(ruleName string) (Rule, error) {
 	if rule, ok := r.rules[ruleName]; ok {
 		return rule, nil
 	}
@@ -46,7 +40,7 @@ func (r *ruleRegistry) Get(ruleName string) (Rule, error) {
 	return nil, fmt.Errorf("rule %s not found", ruleName)
 }
 
-func (r *ruleRegistry) Register(rule Rule) RuleRegistry {
-	r.rules[rule.Id()] = rule
+func (r *RuleRegistry) Register(rule Rule) *RuleRegistry {
+	r.rules[rule.ID()] = rule
 	return r
 }

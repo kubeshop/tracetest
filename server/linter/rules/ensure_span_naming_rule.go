@@ -9,14 +9,14 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type ensureSpanNamingRule struct {
-	BaseRule
-}
+type ensureSpanNamingRule struct{}
 
 func NewEnsureSpanNamingRule() Rule {
-	return &ensureSpanNamingRule{
-		BaseRule: NewRule(analyzer.EnsureSpanNamingRuleId),
-	}
+	return &ensureSpanNamingRule{}
+}
+
+func (r ensureSpanNamingRule) ID() string {
+	return analyzer.EnsureSpanNamingRuleID
 }
 
 func (r ensureSpanNamingRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {

@@ -8,9 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type ensuresNoApiKeyLeakRule struct {
-	BaseRule
-}
+type ensuresNoApiKeyLeakRule struct{}
 
 var (
 	httpHeadersFields  = []string{"authorization", "x-api-key"}
@@ -19,9 +17,11 @@ var (
 )
 
 func NewEnsuresNoApiKeyLeakRule() Rule {
-	return &ensuresNoApiKeyLeakRule{
-		BaseRule: NewRule(analyzer.EnsuresNoApiKeyLeakRuleId),
-	}
+	return &ensuresNoApiKeyLeakRule{}
+}
+
+func (r ensuresNoApiKeyLeakRule) ID() string {
+	return analyzer.EnsuresNoApiKeyLeakRuleID
 }
 
 func (r ensuresNoApiKeyLeakRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
