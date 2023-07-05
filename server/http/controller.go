@@ -647,7 +647,6 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
 	transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
 	if err != nil {
-		fmt.Println("*-************* 1")
 		return handleDBError(err), err
 	}
 
@@ -658,18 +657,15 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	environment, err := getEnvironment(ctx, c.environmentGetter, runInformation.EnvironmentId, variablesEnv)
 
 	if err != nil {
-		fmt.Println("*-************* 2")
 		return handleDBError(err), err
 	}
 
 	missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testRepository, c.testRunRepository, transaction, environment)
 	if err != nil {
 		if err == validation.ErrMissingVariables {
-			fmt.Println("*-************* 3")
 			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
 		}
 
-		fmt.Println("*-************* 4")
 		return handleDBError(err), err
 	}
 
