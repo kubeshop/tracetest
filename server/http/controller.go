@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -107,7 +108,7 @@ func NewController(
 
 func handleDBError(err error) openapi.ImplResponse {
 	switch {
-	case errors.Is(testdb.ErrNotFound, err):
+	case errors.Is(testdb.ErrNotFound, err) || errors.Is(sql.ErrNoRows, err):
 		return openapi.Response(http.StatusNotFound, err.Error())
 	default:
 		return openapi.Response(http.StatusInternalServerError, err.Error())

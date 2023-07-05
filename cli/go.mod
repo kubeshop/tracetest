@@ -6,7 +6,7 @@ require (
 	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
-	github.com/cucumber/ci-environment/go v0.0.0-20220915001957-711b1c82415f
+	github.com/cucumber/ci-environment/go v0.0.0-20230703185945-ddbd134c44fd
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/goccy/go-yaml v1.11.0
 	github.com/kubeshop/tracetest/server v0.0.0-20230512142545-cb5e526e06f9
@@ -14,7 +14,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.15.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 	gopkg.in/yaml.v3 v3.0.1

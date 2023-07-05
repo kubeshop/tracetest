@@ -35,7 +35,20 @@ var testRunCmd = &cobra.Command{
 			return "", fmt.Errorf("failed to get test client: %w", err)
 		}
 
-		runTestAction := actions.NewRunTestAction(cliConfig, cliLogger, client, testClient, envClient, ExitCLI)
+		transactionsClient, err := resources.Get("transaction")
+		if err != nil {
+			return "", fmt.Errorf("failed to get transaction client: %w", err)
+		}
+
+		runTestAction := actions.NewRunTestAction(
+			cliConfig,
+			cliLogger,
+			client,
+			testClient,
+			transactionsClient,
+			envClient,
+			ExitCLI,
+		)
 		actionArgs := actions.RunResourceArgs{
 			DefinitionFile: runTestFileDefinition,
 			EnvID:          runTestEnvID,

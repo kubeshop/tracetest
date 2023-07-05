@@ -22,6 +22,7 @@ type Trigger struct {
 	Type        *string         `json:"type,omitempty"`
 	TriggerType *string         `json:"triggerType,omitempty"`
 	Http        *HTTPRequest    `json:"http,omitempty"`
+	HttpRequest *HTTPRequest    `json:"httpRequest,omitempty"`
 	Grpc        *GRPCRequest    `json:"grpc,omitempty"`
 	Traceid     *TRACEIDRequest `json:"traceid,omitempty"`
 }
@@ -139,6 +140,38 @@ func (o *Trigger) SetHttp(v HTTPRequest) {
 	o.Http = &v
 }
 
+// GetHttpRequest returns the HttpRequest field value if set, zero value otherwise.
+func (o *Trigger) GetHttpRequest() HTTPRequest {
+	if o == nil || isNil(o.HttpRequest) {
+		var ret HTTPRequest
+		return ret
+	}
+	return *o.HttpRequest
+}
+
+// GetHttpRequestOk returns a tuple with the HttpRequest field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Trigger) GetHttpRequestOk() (*HTTPRequest, bool) {
+	if o == nil || isNil(o.HttpRequest) {
+		return nil, false
+	}
+	return o.HttpRequest, true
+}
+
+// HasHttpRequest returns a boolean if a field has been set.
+func (o *Trigger) HasHttpRequest() bool {
+	if o != nil && !isNil(o.HttpRequest) {
+		return true
+	}
+
+	return false
+}
+
+// SetHttpRequest gets a reference to the given HTTPRequest and assigns it to the HttpRequest field.
+func (o *Trigger) SetHttpRequest(v HTTPRequest) {
+	o.HttpRequest = &v
+}
+
 // GetGrpc returns the Grpc field value if set, zero value otherwise.
 func (o *Trigger) GetGrpc() GRPCRequest {
 	if o == nil || isNil(o.Grpc) {
@@ -221,6 +254,9 @@ func (o Trigger) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Http) {
 		toSerialize["http"] = o.Http
+	}
+	if !isNil(o.HttpRequest) {
+		toSerialize["httpRequest"] = o.HttpRequest
 	}
 	if !isNil(o.Grpc) {
 		toSerialize["grpc"] = o.Grpc

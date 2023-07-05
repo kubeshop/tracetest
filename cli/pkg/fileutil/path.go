@@ -3,7 +3,32 @@ package fileutil
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+func ToAbsDir(filePath string) (string, error) {
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Dir(absPath), nil
+}
+
+func RelativeTo(path, relativeTo string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+
+	return filepath.Join(relativeTo, path)
+}
+
+func LooksLikeFilePath(path string) bool {
+	return strings.HasPrefix(path, "./") ||
+		strings.HasPrefix(path, "../") ||
+		strings.HasPrefix(path, "/")
+
+}
 
 func IsFilePath(path string) bool {
 	// for the current working dir, check if the file exists
