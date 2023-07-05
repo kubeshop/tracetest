@@ -74,7 +74,7 @@ The **Trace** tab shows the entire distributed trace for debugging and a trace a
 
 The **Test** tab shows span attributes. Here you add test specs and assertions on attribute values. You also get a test snippets out-of-the-box for common test cases.
 
-Here you see how to assert that all database spans return in less than 100ms.
+In the sample below you see how to assert that all database spans return in less than `100ms`.
 
 ![test specs](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png)
 
@@ -82,8 +82,62 @@ Here you see how to assert that all database spans return in less than 100ms.
 
 The **Automate** tab shows how to automate the test run with the Tracetest CLI and other automation options.
 
-![automate](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476810/docs/screely-1688476801601_f4s0iy.png)
+![automate](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688564019/docs/screely-1688564011617_n5pizv.png)
+
+From here you can download a YAML file test definition and run it with the CLI.
 
 ## Creating Trace-based Tests Programatically
 
-todo...
+The test definition will contain:
+
+- The **Trigger** for the test in the `trigger` section.
+- The **Test Specifications** in the`specs` section.
+
+You can either download the YAML file test definition, or write one from scratch.
+
+### Create
+
+Using the sample from above, create the Trace-based Test programatically.
+
+```yaml title="pokeshop_import.yaml"
+type: Test
+spec:
+  id: Yg9sN-94g
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"id":52}'
+  specs:
+  - name: 'All Database Spans: Processing time is less than 100ms'
+    selector: span[tracetest.span.type="database"]
+    assertions:
+    - attr:tracetest.span.duration < 100ms
+```
+
+### Trigger
+
+Using the CLI, trigger a test run.
+
+```bash title="Terminal"
+tracetest test run -d pokeshop_import.yaml --wait-for-result -o pretty
+```
+
+### Output
+
+The test run will complete and show a result.
+
+```text title="Output"
+✔ Pokeshop - Import (http://localhost:11633/test/Yg9sN-94g/run/3/test)
+	✔ All Database Spans: Processing time is less than 100ms
+```
+
+The provided link in the test output will open the test run in the Tracetest Web UI.
+
+
