@@ -18,7 +18,7 @@ const ResourceCardSummary = ({
       {!!analyzerScore && (
         <Tooltip title="Trace Analyzer score">
           <div>
-            <AnalyzerScore width="28px" height="28px" score={analyzerScore} />
+            <AnalyzerScore fontSize={10} width="28px" height="28px" score={analyzerScore} />
           </div>
         </Tooltip>
       )}
