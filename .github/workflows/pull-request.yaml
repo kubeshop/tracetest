@@ -22,6 +22,7 @@ jobs:
   backend-arch-graph:
     name: Generate backend architecture graph
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
         with:
