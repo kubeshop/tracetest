@@ -64,7 +64,6 @@ const TestService = () => ({
         name,
         description,
         trigger,
-        serviceUnderTest: trigger,
         ...(original
           ? {
               outputs: toRawTestOutputs(original.outputs ?? []),

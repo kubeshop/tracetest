@@ -1,27 +1,30 @@
 import faker from '@faker-js/faker';
 import {IMockFactory} from 'types/Common.types';
-import Test, {TRawTest} from '../Test.model';
+import Test, {TRawTestResource} from '../Test.model';
 import AssertionResultMock from './AssertionResult.mock';
 
-const TestMock: IMockFactory<Test, TRawTest> = () => ({
+const TestMock: IMockFactory<Test, TRawTestResource> = () => ({
   raw(data = {}) {
     return {
-      id: faker.datatype.uuid(),
-      name: faker.name.firstName(),
-      version: faker.datatype.number(),
-      definition: {
-        definitions: [
-          {
-            selector: {query: faker.random.word()},
-            assertions: [AssertionResultMock.raw()],
-          },
-        ],
+      type: 'Test',
+      spec: {
+        id: faker.datatype.uuid(),
+        name: faker.name.firstName(),
+        version: faker.datatype.number(),
+        definition: {
+          definitions: [
+            {
+              selector: {query: faker.random.word()},
+              assertions: [AssertionResultMock.raw()],
+            },
+          ],
+        },
+        ...data,
       },
-      ...data,
     };
   },
   model(data = {}) {
-    return Test.FromRawTest(this.raw(data));
+    return Test(this.raw(data));
   },
 });
 

@@ -1768,7 +1768,6 @@ export interface external {
           version?: number;
           /** Format: date-time */
           createdAt?: string;
-          serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
