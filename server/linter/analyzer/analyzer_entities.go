@@ -23,7 +23,7 @@ type (
 	}
 
 	LinterPlugin struct {
-		Id      string       `json:"id"`
+		ID      string       `json:"id"`
 		Enabled bool         `json:"enabled"`
 		Rules   []LinterRule `json:"rules"`
 
@@ -33,7 +33,7 @@ type (
 	}
 
 	LinterRule struct {
-		Id         string `json:"id"`
+		ID         string `json:"id"`
 		Weight     int    `json:"weight"`
 		ErrorLevel string `json:"errorLevel"`
 
@@ -51,23 +51,23 @@ func (l Linter) Validate() error {
 	}
 
 	for _, p := range l.Plugins {
-		plugin, ok := findPlugin(p.Id, DefaultPlugins)
+		plugin, ok := findPlugin(p.ID, DefaultPlugins)
 		availableRules := strings.Join(getAvailableRules(plugin), " | ")
 
 		if !ok {
 			availablePlugins := strings.Join(AvailablePlugins, " | ")
-			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Id, availablePlugins)
+			return fmt.Errorf("plugin %s not supported, supported plugins are %s", p.ID, availablePlugins)
 		}
 
 		if len(p.Rules) != len(plugin.Rules) {
-			return fmt.Errorf("plugin %s requires %d rules, but %d provided, supported rules for plugin are %s", p.Id, len(plugin.Rules), len(p.Rules), availableRules)
+			return fmt.Errorf("plugin %s requires %d rules, but %d provided, supported rules for plugin are %s", p.ID, len(plugin.Rules), len(p.Rules), availableRules)
 		}
 
 		for _, r := range p.Rules {
-			index := slices.IndexFunc(plugin.Rules, func(rule LinterRule) bool { return rule.Id == r.Id })
+			index := slices.IndexFunc(plugin.Rules, func(rule LinterRule) bool { return rule.ID == r.ID })
 
 			if index == -1 {
-				return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Id, p.Id, availableRules)
+				return fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.ID, p.ID, availableRules)
 			}
 		}
 	}
@@ -75,9 +75,9 @@ func (l Linter) Validate() error {
 	return nil
 }
 
-func findPlugin(Id string, plugins []LinterPlugin) (LinterPlugin, bool) {
+func findPlugin(ID string, plugins []LinterPlugin) (LinterPlugin, bool) {
 	for _, p := range plugins {
-		if p.Id == Id {
+		if p.ID == ID {
 			return p, true
 		}
 	}
@@ -85,9 +85,9 @@ func findPlugin(Id string, plugins []LinterPlugin) (LinterPlugin, bool) {
 	return LinterPlugin{}, false
 }
 
-func findRule(Id string, rules []LinterRule) (LinterRule, bool) {
+func findRule(ID string, rules []LinterRule) (LinterRule, bool) {
 	for _, r := range rules {
-		if r.Id == Id {
+		if r.ID == ID {
 			return r, true
 		}
 	}
@@ -99,7 +99,7 @@ func getAvailableRules(plugin LinterPlugin) []string {
 	rules := make([]string, 0)
 
 	for _, r := range plugin.Rules {
-		rules = append(rules, r.Id)
+		rules = append(rules, r.ID)
 	}
 
 	return rules
@@ -142,21 +142,21 @@ func (l Linter) WithMetadata() (Linter, error) {
 	plugins := make([]LinterPlugin, 0)
 
 	for _, p := range l.Plugins {
-		metadataPlugin, ok := findPlugin(p.Id, DefaultPlugins)
+		metadataPlugin, ok := findPlugin(p.ID, DefaultPlugins)
 		if !ok {
-			return l, fmt.Errorf("plugin %s not supported, supported plugins are %s", p.Id, strings.Join(AvailablePlugins, " | "))
+			return l, fmt.Errorf("plugin %s not supported, supported plugins are %s", p.ID, strings.Join(AvailablePlugins, " | "))
 		}
 
 		rules := make([]LinterRule, 0)
 		for _, r := range p.Rules {
-			metadataRule, ok := findRule(r.Id, metadataPlugin.Rules)
+			metadataRule, ok := findRule(r.ID, metadataPlugin.Rules)
 			if !ok {
-				return l, fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.Id, p.Id, strings.Join(getAvailableRules(metadataPlugin), " | "))
+				return l, fmt.Errorf("rule %s not found for plugin %s, supported rules for plugin are %s", r.ID, p.ID, strings.Join(getAvailableRules(metadataPlugin), " | "))
 			}
 
 			rules = append(rules, LinterRule{
 				// config
-				Id:         r.Id,
+				ID:         r.ID,
 				ErrorLevel: r.ErrorLevel,
 				Weight:     r.Weight,
 
@@ -172,7 +172,7 @@ func (l Linter) WithMetadata() (Linter, error) {
 			Rules: rules,
 
 			// config
-			Id:      p.Id,
+			ID:      p.ID,
 			Enabled: p.Enabled,
 
 			// metadata

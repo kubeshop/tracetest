@@ -23,7 +23,7 @@ func TestAnalyzerEntities(t *testing.T) {
 		linter := getLinter()
 
 		plugin := analyzer.StandardsPlugin
-		plugin.Id = "unknown"
+		plugin.ID = "unknown"
 		linter.Plugins = append(linter.Plugins, plugin)
 		err := linter.Validate()
 
@@ -35,15 +35,15 @@ func TestAnalyzerEntities(t *testing.T) {
 		linter := getLinter()
 
 		plugin := analyzer.LinterPlugin{
-			Id: analyzer.StandardsId,
+			ID: analyzer.StandardsID,
 			Rules: []analyzer.LinterRule{{
-				Id: "unknown1",
+				ID: "unknown1",
 			}, {
-				Id: "unknown2",
+				ID: "unknown2",
 			}, {
-				Id: "unknown3",
+				ID: "unknown3",
 			}, {
-				Id: "unknown4",
+				ID: "unknown4",
 			}},
 		}
 		linter.Plugins = append(linter.Plugins, plugin)
@@ -57,13 +57,13 @@ func TestAnalyzerEntities(t *testing.T) {
 		linter := getLinter()
 
 		plugin := analyzer.LinterPlugin{
-			Id: analyzer.StandardsId,
+			ID: analyzer.StandardsID,
 			Rules: []analyzer.LinterRule{{
-				Id: "unknown1",
+				ID: "unknown1",
 			}, {
-				Id: "unknown2",
+				ID: "unknown2",
 			}, {
-				Id: "unknown3",
+				ID: "unknown3",
 			}},
 		}
 		linter.Plugins = append(linter.Plugins, plugin)
@@ -89,13 +89,13 @@ func TestAnalyzerEntities(t *testing.T) {
 	t.Run("returns the list of plugins with metadata even if missing", func(t *testing.T) {
 		linter := getLinter()
 		linter.Plugins = []analyzer.LinterPlugin{{
-			Id: analyzer.StandardsId,
+			ID: analyzer.StandardsID,
 			Rules: []analyzer.LinterRule{{
-				Id:         analyzer.EnsureSpanNamingRuleId,
+				ID:         analyzer.EnsureSpanNamingRuleID,
 				Weight:     20,
 				ErrorLevel: analyzer.ErrorLevelWarning,
 			}, {
-				Id:         analyzer.EnsureAttributeNamingRuleId,
+				ID:         analyzer.EnsureAttributeNamingRuleID,
 				Weight:     20,
 				ErrorLevel: analyzer.ErrorLevelWarning,
 			}},

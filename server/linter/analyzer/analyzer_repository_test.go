@@ -10,7 +10,7 @@ import (
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
 )
 
-func TestlinterResource(t *testing.T) {
+func TestLinterResource(t *testing.T) {
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
 		ResourceTypeSingular: analyzer.ResourceName,
 		ResourceTypePlural:   analyzer.ResourceNamePlural,

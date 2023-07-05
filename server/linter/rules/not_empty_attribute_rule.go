@@ -8,14 +8,14 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type notEmptyRuleAttributesRule struct {
-	BaseRule
-}
+type notEmptyRuleAttributesRule struct{}
 
 func NewNotEmptyAttributesRule() Rule {
-	return &notEmptyRuleAttributesRule{
-		BaseRule: NewRule(analyzer.NotEmptyAttributesRuleId),
-	}
+	return &notEmptyRuleAttributesRule{}
+}
+
+func (r notEmptyRuleAttributesRule) ID() string {
+	return analyzer.NotEmptyAttributesRuleID
 }
 
 func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {

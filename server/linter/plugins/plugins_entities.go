@@ -10,18 +10,18 @@ import (
 
 type BasePlugin struct {
 	id           string
-	ruleRegistry rules.RuleRegistry
+	ruleRegistry *rules.RuleRegistry
 }
 
-func NewPlugin(id string, ruleRegistry rules.RuleRegistry) Plugin {
-	return BasePlugin{id, ruleRegistry}
+func NewPlugin(ID string, ruleRegistry *rules.RuleRegistry) Plugin {
+	return BasePlugin{id: ID, ruleRegistry: ruleRegistry}
 }
 
-func (p BasePlugin) Id() string {
+func (p BasePlugin) ID() string {
 	return p.id
 }
 
-func (p BasePlugin) RuleRegistry() rules.RuleRegistry {
+func (p BasePlugin) RuleRegistry() *rules.RuleRegistry {
 	return p.ruleRegistry
 }
 
@@ -29,7 +29,7 @@ func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analy
 	res := make([]analyzer.RuleResult, 0, len(config.Rules))
 
 	for _, cfgRule := range config.Rules {
-		rule, err := p.ruleRegistry.Get(cfgRule.Id)
+		rule, err := p.ruleRegistry.Get(cfgRule.ID)
 		if err != nil {
 			return analyzer.PluginResult{}, err
 		}
@@ -51,7 +51,7 @@ func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analy
 
 	return analyzer.PluginResult{
 		//config
-		Id:          p.id,
+		ID:          p.id,
 		Name:        config.Name,
 		Description: config.Description,
 

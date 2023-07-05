@@ -9,9 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type ensuresDnsUsage struct {
-	BaseRule
-}
+type ensuresDnsUsage struct{}
 
 var (
 	clientDnsFields = []string{"net.peer.name"}
@@ -19,9 +17,11 @@ var (
 )
 
 func NewEnforceDnsUsageRule() Rule {
-	return &ensuresDnsUsage{
-		BaseRule: NewRule(analyzer.EnforceDnsRuleId),
-	}
+	return &ensuresDnsUsage{}
+}
+
+func (r ensuresDnsUsage) ID() string {
+	return analyzer.EnforceDnsRuleID
 }
 
 func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {

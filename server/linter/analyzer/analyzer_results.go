@@ -20,7 +20,7 @@ type EvalRuleResult struct {
 
 type RuleResult struct {
 	// config
-	Id               string   `json:"id"`
+	ID               string   `json:"id"`
 	Name             string   `json:"name"`
 	Description      string   `json:"description"`
 	ErrorDescription string   `json:"errorDescription"`
@@ -36,7 +36,7 @@ type RuleResult struct {
 func NewRuleResult(config LinterRule, results EvalRuleResult) RuleResult {
 	return RuleResult{
 		// config
-		Id:               config.Id,
+		ID:               config.ID,
 		Name:             config.Name,
 		Description:      config.Description,
 		ErrorDescription: config.ErrorDescription,
@@ -73,7 +73,7 @@ func NewLinterResult(pluginResults []PluginResult, totalScore int, passed bool) 
 
 type PluginResult struct {
 	// metadata
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 

@@ -9,18 +9,18 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type enforceHttpsProtocolRule struct {
-	BaseRule
-}
+type enforceHttpsProtocolRule struct{}
 
 var (
 	httpFields = []string{"http.scheme", "http.url"}
 )
 
 func NewEnforceHttpsProtocolRule() Rule {
-	return &enforceHttpsProtocolRule{
-		BaseRule: NewRule(analyzer.EnforceHttpsProtocolRuleId),
-	}
+	return &enforceHttpsProtocolRule{}
+}
+
+func (r enforceHttpsProtocolRule) ID() string {
+	return analyzer.EnforceHttpsProtocolRuleID
 }
 
 func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
@@ -45,7 +45,7 @@ func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trac
 func (r enforceHttpsProtocolRule) validate(span *model.Span) analyzer.Result {
 	insecureFields := make([]analyzer.Error, 0)
 	for _, field := range httpFields {
-		if span.Attributes.Get(field) != "" && !strings.Contains(span.Attributes.Get(field), "https") {
+		if !strings.HasPrefix(span.Attributes.Get(field), "https") {
 			insecureFields = append(insecureFields, analyzer.Error{
 				Value:       field,
 				Description: fmt.Sprintf("Insecure http schema found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),

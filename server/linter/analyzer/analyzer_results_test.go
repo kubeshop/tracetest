@@ -9,35 +9,35 @@ import (
 
 func TestAnalyzerResults(t *testing.T) {
 	ruleResult1 := analyzer.RuleResult{
-		Id:     "rule1",
+		ID:     "rule1",
 		Weight: 25,
 		Level:  "error",
 		Passed: true,
 	}
 
 	ruleResult2 := analyzer.RuleResult{
-		Id:     "rule2",
+		ID:     "rule2",
 		Weight: 30,
 		Level:  "warning",
 		Passed: false,
 	}
 
 	ruleResult3 := analyzer.RuleResult{
-		Id:     "rule3",
+		ID:     "rule3",
 		Weight: 30,
 		Level:  "disabled",
 		Passed: true,
 	}
 
 	ruleResult4 := analyzer.RuleResult{
-		Id:     "rule4",
+		ID:     "rule4",
 		Weight: 30,
 		Level:  "error",
 		Passed: false,
 	}
 
 	ruleResult5 := analyzer.RuleResult{
-		Id:     "rule5",
+		ID:     "rule5",
 		Weight: 80,
 		Level:  "error",
 		Passed: true,
@@ -45,7 +45,7 @@ func TestAnalyzerResults(t *testing.T) {
 
 	t.Run("plugin result calculates the score and overall summary based on rules", func(t *testing.T) {
 		pluginResult := analyzer.PluginResult{
-			Id: "plugin",
+			ID: "plugin",
 
 			Rules: []analyzer.RuleResult{
 				ruleResult1,
@@ -63,7 +63,7 @@ func TestAnalyzerResults(t *testing.T) {
 
 	t.Run("plugin result handles calculation for empty rule result list", func(t *testing.T) {
 		pluginResult := analyzer.PluginResult{
-			Id: "plugin",
+			ID: "plugin",
 
 			Rules: []analyzer.RuleResult{},
 		}.CalculateResults()
@@ -74,7 +74,7 @@ func TestAnalyzerResults(t *testing.T) {
 
 	t.Run("plugin result handles calculation for only warning level rules", func(t *testing.T) {
 		pluginResult := analyzer.PluginResult{
-			Id: "plugin",
+			ID: "plugin",
 
 			Rules: []analyzer.RuleResult{
 				ruleResult2,
@@ -89,7 +89,7 @@ func TestAnalyzerResults(t *testing.T) {
 
 	t.Run("plugin result handles calculation for only disabled level rules", func(t *testing.T) {
 		pluginResult := analyzer.PluginResult{
-			Id: "plugin",
+			ID: "plugin",
 
 			Rules: []analyzer.RuleResult{
 				ruleResult3,

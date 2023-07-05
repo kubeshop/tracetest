@@ -7,14 +7,14 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 )
 
-type requiredAttributesRule struct {
-	BaseRule
-}
+type requiredAttributesRule struct{}
 
 func NewRequiredAttributesRule() Rule {
-	return requiredAttributesRule{
-		BaseRule: NewRule(analyzer.RequiredAttributesRuleId),
-	}
+	return requiredAttributesRule{}
+}
+
+func (r requiredAttributesRule) ID() string {
+	return analyzer.RequiredAttributesRuleID
 }
 
 func (r requiredAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
@@ -23,11 +23,10 @@ func (r requiredAttributesRule) Evaluate(ctx context.Context, trace model.Trace,
 
 	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
-			res = append(res, r.validateSpan(span))
-		}
+			analyzerResult := r.validateSpan(span)
+			res = append(res, analyzerResult)
 
-		for _, result := range res {
-			if !result.Passed {
+			if !analyzerResult.Passed {
 				allPassed = false
 			}
 		}

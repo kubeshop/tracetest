@@ -15,7 +15,7 @@ import (
 
 func TestAnalyzerEntities(t *testing.T) {
 	plugin := plugins.NewPlugin(
-		analyzer.StandardsId,
+		analyzer.StandardsID,
 		rules.NewRegistry().
 			Register(rules.NewEnsureSpanNamingRule()).
 			Register(rules.NewRequiredAttributesRule()).
@@ -34,27 +34,27 @@ func TestAnalyzerEntities(t *testing.T) {
 		result, err := plugin.Execute(context.TODO(), trace, analyzer.StandardsPlugin)
 
 		assert.Nil(t, err)
-		assert.Equal(t, analyzer.StandardsId, result.Id)
+		assert.Equal(t, analyzer.StandardsID, result.ID)
 		assert.Equal(t, 50, result.Score)
 		assert.Equal(t, false, result.Passed)
 	})
 
 	t.Run("EmptyPluginExecute", func(t *testing.T) {
 		emptyPlugin := plugins.NewPlugin(
-			analyzer.StandardsId,
+			analyzer.StandardsID,
 			rules.NewRegistry(),
 		)
 		result, err := emptyPlugin.Execute(context.TODO(), trace, analyzer.LinterPlugin{})
 
 		assert.Nil(t, err)
-		assert.Equal(t, analyzer.StandardsId, result.Id)
+		assert.Equal(t, analyzer.StandardsID, result.ID)
 		assert.Equal(t, 0, result.Score)
 		assert.Equal(t, true, result.Passed)
 	})
 
 	t.Run("PluginConfigMismatchExecute", func(t *testing.T) {
 		emptyPlugin := plugins.NewPlugin(
-			analyzer.StandardsId,
+			analyzer.StandardsID,
 			rules.NewRegistry(),
 		)
 		_, err := emptyPlugin.Execute(context.TODO(), trace, analyzer.StandardsPlugin)
