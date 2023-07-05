@@ -14,6 +14,8 @@ type LinterResourcePlugin struct {
 
 	Name string `json:"name,omitempty"`
 
+	Description string `json:"description,omitempty"`
+
 	Enabled bool `json:"enabled,omitempty"`
 
 	Rules []LinterResourceRule `json:"rules,omitempty"`

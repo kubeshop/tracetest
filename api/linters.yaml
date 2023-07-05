@@ -37,6 +37,10 @@ components:
           type: string
         name:
           type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
         enabled:
           type: boolean
         rules:
@@ -50,6 +54,20 @@ components:
           type: string
         weight:
           type: integer
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        errorDescription:
+          type: string
+          readOnly: true
+        tips:
+          type: array
+          items:
+            type: string
+          readOnly: true
         errorLevel:
           type: string
           enum:

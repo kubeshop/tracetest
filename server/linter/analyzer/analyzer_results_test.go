@@ -61,6 +61,31 @@ func TestAnalyzerResults(t *testing.T) {
 		assert.Equal(t, false, pluginResult.Passed)
 	})
 
+	t.Run("plugin result calculates the score and overall summary based on rules and returns sorted results by error levels", func(t *testing.T) {
+		pluginResult := analyzer.PluginResult{
+			ID: "plugin",
+
+			Rules: []analyzer.RuleResult{
+				ruleResult1,
+				ruleResult2,
+				ruleResult3,
+				ruleResult4,
+				ruleResult5,
+			},
+		}.CalculateResults()
+
+		// passed score * 100% / total score
+		assert.Equal(t, (105*100)/135, pluginResult.Score)
+		assert.Equal(t, false, pluginResult.Passed)
+		assert.Equal(t, []analyzer.RuleResult{
+			ruleResult1,
+			ruleResult4,
+			ruleResult5,
+			ruleResult2,
+			ruleResult3,
+		}, pluginResult.Rules)
+	})
+
 	t.Run("plugin result handles calculation for empty rule result list", func(t *testing.T) {
 		pluginResult := analyzer.PluginResult{
 			ID: "plugin",
@@ -68,7 +93,7 @@ func TestAnalyzerResults(t *testing.T) {
 			Rules: []analyzer.RuleResult{},
 		}.CalculateResults()
 
-		assert.Equal(t, 0, pluginResult.Score)
+		assert.Equal(t, 100, pluginResult.Score)
 		assert.Equal(t, true, pluginResult.Passed)
 	})
 
@@ -83,7 +108,7 @@ func TestAnalyzerResults(t *testing.T) {
 			},
 		}.CalculateResults()
 
-		assert.Equal(t, 0, pluginResult.Score)
+		assert.Equal(t, 100, pluginResult.Score)
 		assert.Equal(t, true, pluginResult.Passed)
 	})
 
@@ -97,7 +122,7 @@ func TestAnalyzerResults(t *testing.T) {
 			},
 		}.CalculateResults()
 
-		assert.Equal(t, 0, pluginResult.Score)
+		assert.Equal(t, 100, pluginResult.Score)
 		assert.Equal(t, true, pluginResult.Passed)
 	})
 }

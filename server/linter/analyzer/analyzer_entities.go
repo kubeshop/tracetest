@@ -28,8 +28,8 @@ type (
 		Rules   []LinterRule `json:"rules"`
 
 		// internal fields
-		Name        string `json:"-"`
-		Description string `json:"-"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
 
 	LinterRule struct {
@@ -38,10 +38,10 @@ type (
 		ErrorLevel string `json:"errorLevel"`
 
 		// internal fields
-		Name             string   `json:"-"`
-		ErrorDescription string   `json:"-"`
-		Description      string   `json:"-"`
-		Tips             []string `json:"-"`
+		Name             string   `json:"name"`
+		ErrorDescription string   `json:"errorDescription"`
+		Description      string   `json:"description"`
+		Tips             []string `json:"tips"`
 	}
 )
 
