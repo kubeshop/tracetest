@@ -54,14 +54,14 @@ func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error
 
 	if cmd.Flags().Lookup("endpoint").Changed {
 		if p.Endpoint == "" {
-			errors = append(errors, ParamError{
+			errors = append(errors, paramError{
 				Parameter: "endpoint",
 				Message:   "endpoint cannot be empty",
 			})
 		} else {
 			_, err := url.Parse(p.Endpoint)
 			if err != nil {
-				errors = append(errors, ParamError{
+				errors = append(errors, paramError{
 					Parameter: "endpoint",
 					Message:   "endpoint is not a valid URL",
 				})
