@@ -37,10 +37,10 @@ const ResponseData = {
 };
 
 const TriggerResult = ({
-  triggerType = 'http',
+  type: rawType = 'http',
   triggerResult: {http = {}, grpc = {statusCode: 0}, traceid = {}} = {},
 }: TRawTriggerResult): TriggerResult => {
-  const type = triggerType as TriggerTypes;
+  const type = rawType as TriggerTypes;
 
   let request = {};
   if (type === TriggerTypes.http) {
