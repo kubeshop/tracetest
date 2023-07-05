@@ -8,17 +8,10 @@ interface IProps {
 
 const Percentage = ({score, height, width}: IProps) => (
   <S.PercentageScoreWrapper>
-    <S.Score level={1} $isLarge>
+    <S.Score level={1} $fontSize={24}>
       {score}%
     </S.Score>
-    <S.ScoreProgress
-      $height={height}
-      $width={width}
-      $score={score}
-      format={() => ''}
-      percent={score || 100}
-      type="circle"
-    />
+    <S.ScoreProgress $height={height} $width={width} $score={score} format={() => ''} percent={score} type="circle" />
   </S.PercentageScoreWrapper>
 );
 

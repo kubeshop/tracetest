@@ -96,7 +96,7 @@ const TestRunCard = ({
         {isRunStateFinished(state) && !!linter.plugins.length && (
           <Tooltip title="Trace Analyzer score">
             <div onClick={event => handleResultClick(event, TEST_RUN_TRACE_TAB)}>
-              <AnalyzerScore width="28px" height="28px" score={linter.score} />
+              <AnalyzerScore fontSize={10} width="28px" height="28px" score={linter.score} />
             </div>
           </Tooltip>
         )}
