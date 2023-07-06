@@ -51,6 +51,23 @@ func TestSpecV1(t *testing.T) {
 	assert.Equal(t, test.Assertion("attr:http.status = 200"), testObject.Specs[1].Assertions[0])
 }
 
+func TestV1WithEmptySelector(t *testing.T) {
+	x := "[{\"Key\": \"\", \"Value\": {\"Name\": \"DURATION_CHECK\", \"Assertions\": [\"attr:tracetest.span.duration < 2s\"]}}, {\"Key\": \"span[tracetest.span.type=\\\"database\\\"]\", \"Value\": {\"Name\": \"All Database Spans: Processing time is less than 100ms\", \"Assertions\": [\"attr:tracetest.span.duration < 100ms\"]}}]"
+	testObject := test.Test{}
+	err := json.Unmarshal([]byte(x), &testObject.Specs)
+
+	require.NoError(t, err)
+	assert.Equal(t, test.SpanQuery(""), testObject.Specs[0].Selector)
+	assert.Equal(t, "DURATION_CHECK", testObject.Specs[0].Name)
+	assert.Len(t, testObject.Specs[0].Assertions, 1)
+	assert.Equal(t, test.Assertion("attr:tracetest.span.duration < 2s"), testObject.Specs[0].Assertions[0])
+
+	assert.Equal(t, test.SpanQuery("span[tracetest.span.type=\"database\"]"), testObject.Specs[1].Selector)
+	assert.Equal(t, "All Database Spans: Processing time is less than 100ms", testObject.Specs[1].Name)
+	assert.Len(t, testObject.Specs[1].Assertions, 1)
+	assert.Equal(t, test.Assertion("attr:tracetest.span.duration < 100ms"), testObject.Specs[1].Assertions[0])
+}
+
 func TestSpecV2(t *testing.T) {
 	specFormat := `
 	[

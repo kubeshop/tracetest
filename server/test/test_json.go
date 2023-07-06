@@ -17,7 +17,14 @@ func (v1 testSpecV1) valid() bool {
 	valid := true
 	specs := maps.Ordered[SpanQuery, namedAssertions](v1)
 	specs.ForEach(func(key SpanQuery, val namedAssertions) error {
-		if key == "" {
+		anyEmptyAssertion := false
+		for _, assertion := range val.Assertions {
+			if assertion == "" {
+				anyEmptyAssertion = true
+			}
+		}
+
+		if key == "" && anyEmptyAssertion {
 			valid = false
 		}
 		return nil
