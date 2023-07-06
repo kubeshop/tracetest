@@ -19,7 +19,7 @@ const OtelRepoAPI = createApi({
     getConventions: build.query<OtelReference, {kind?: string; folder?: string}>({
       query: ({folder = 'trace', kind: file = 'http'}) => {
         return {
-          url: `semantic_conventions/${folder}/${file}.yaml`,
+          url: `model/${folder}/${file}.yaml`,
           responseHandler: 'text',
         };
       },
