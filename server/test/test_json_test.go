@@ -150,6 +150,27 @@ func TestOutputsV1(t *testing.T) {
 	assert.Equal(t, `attr:user_name`, testObject.Outputs[1].Value)
 }
 
+func TestXXX(t *testing.T) {
+	jsonData := `[
+		{
+			"Key": "http.host",
+			"Value": {
+				"Name": "http.host",
+				"Error": "",
+				"Value": "demo-pokemon-api.demo.svc.cluster.local",
+				"SpanID": "e28a7819ce8e0a01",
+				"Resolved": true
+			}
+		}
+	]`
+
+	run := test.Run{}
+	err := json.Unmarshal([]byte(jsonData), &run.Outputs)
+
+	require.NoError(t, err)
+	assert.Equal(t, run.Outputs.Len(), 1)
+}
+
 func TestOutputsV2(t *testing.T) {
 	v2Format := make([]test.Output, 0)
 	v2Format = append(v2Format, test.Output{

@@ -162,6 +162,28 @@ func (o *Outputs) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("test output json version is not supported. Expecting version 1 or 2")
 }
 
+func (output *RunOutput) UnmarshalJSON(data []byte) error {
+	obj := struct {
+		Name     string
+		Value    string
+		SpanID   string
+		Resolved bool
+		Error    string
+	}{}
+
+	err := json.Unmarshal(data, &obj)
+	if err != nil {
+		return err
+	}
+
+	output.Name = obj.Name
+	output.Value = obj.Value
+	output.SpanID = obj.SpanID
+	output.Resolved = obj.Resolved
+	output.Error = fmt.Errorf(obj.Error)
+	return nil
+}
+
 func (sar SpanAssertionResult) MarshalJSON() ([]byte, error) {
 	sid := ""
 	if sar.SpanID != nil {
