@@ -4,5 +4,5 @@ spec:
   name: New Transaction
   description: a transaction
   steps:
-  - 9wtAH2_Vg
-  - ajksdkasjbd
+  - ./transaction-step-1.yaml
+  - ./transaction-step-2.yaml

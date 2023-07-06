@@ -4,6 +4,6 @@ spec:
   name: Updated Transaction
   description: an updated transaction
   steps:
-  - 9wtAH2_Vg
-  - ajksdkasjbd
-  - ajksdkasjbd
+  - ./transaction-step-1.yaml
+  - ./transaction-step-2.yaml
+  - ./transaction-step-2.yaml
