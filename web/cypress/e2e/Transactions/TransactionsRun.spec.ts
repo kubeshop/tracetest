@@ -22,7 +22,7 @@ describe('Transactions', () => {
 
     transactionUtils.testList.forEach(test => {
       cy.get('[data-cy=transaction-test-selection]').click();
-      cy.get(`[data-cy="${test.name}"]`).first().click();
+      cy.get(`[data-cy="${test.spec.name}"]`).first().click();
     });
 
     cy.submitCreateForm('CreateTransactionFactory');
@@ -38,7 +38,7 @@ describe('Transactions', () => {
 
     transactionUtils.testList.forEach(test => {
       cy.get('[data-cy=transaction-test-selection]').click();
-      cy.get(`[data-cy="${test.name}"]`).first().click();
+      cy.get(`[data-cy="${test.spec.name}"]`).first().click();
     });
 
     cy.submitCreateForm('CreateTransactionFactory');
@@ -57,7 +57,7 @@ describe('Transactions', () => {
 
     transactionUtils.testList.forEach(test => {
       cy.get('[data-cy=transaction-test-selection]').click();
-      cy.get(`[data-cy="${test.name}"]`).first().click();
+      cy.get(`[data-cy="${test.spec.name}"]`).first().click();
     });
 
     cy.submitCreateForm('CreateTransactionFactory');
@@ -70,7 +70,7 @@ describe('Transactions', () => {
     cy.get('[data-cy=create-test-name-input]').type(' - updated');
     transactionUtils.testList.forEach(test => {
       cy.get('[data-cy=transaction-test-selection]').click();
-      cy.get(`[data-cy="${test.name}"]`).first().click();
+      cy.get(`[data-cy="${test.spec.name}"]`).first().click();
     });
 
     cy.get('[data-cy=edit-transaction-submit]').click();

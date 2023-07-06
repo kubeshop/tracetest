@@ -4,10 +4,10 @@ components:
     Trigger:
       type: object
       properties:
-        triggerType:
+        type:
           type: string
           enum: ["http", "grpc", "traceid"]
-        http:
+        httpRequest:
           $ref: "./http.yaml#/components/schemas/HTTPRequest"
         grpc:
           $ref: "./grpc.yaml#/components/schemas/GRPCRequest"
@@ -17,7 +17,7 @@ components:
     TriggerResult:
       type: object
       properties:
-        triggerType:
+        type:
           type: string
           enum: ["http", "grpc", "traceid"]
         triggerResult:

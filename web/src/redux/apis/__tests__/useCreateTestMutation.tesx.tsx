@@ -1,12 +1,12 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
-import {HTTP_METHOD} from '../../../constants/Common.constants';
+import {HTTP_METHOD} from 'constants/Common.constants';
+import TestMock from 'models/__mocks__/Test.mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
 import {useCreateTestMutation} from '../TraceTest.api';
-import TestMock from '../../../models/__mocks__/Test.mock';
 
 test('useCreateTestMutation', async () => {
-  const test = TestMock.model();
+  const test = TestMock.raw();
   fetchMock.mockResponse(JSON.stringify(test));
   const {result} = renderHook(() => useCreateTestMutation(), {
     wrapper: ReduxWrapperProvider,
@@ -15,12 +15,15 @@ test('useCreateTestMutation', async () => {
   await act(async () => {
     const [createTest] = result.current;
     const newTest = await createTest({
-      name: 'New test',
-      serviceUnderTest: {
-        triggerType: 'http',
-        http: {url: 'https://google.com', method: HTTP_METHOD.GET},
+      type: 'Test',
+      spec: {
+        name: 'New test',
+        trigger: {
+          triggerType: 'http',
+          http: {url: 'https://google.com', method: HTTP_METHOD.GET},
+        },
       },
     }).unwrap();
-    expect(newTest!.id).toBe(test.id);
+    expect(newTest?.id).toBe(test.spec?.id);
   });
 });

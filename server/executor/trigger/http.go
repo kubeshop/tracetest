@@ -14,7 +14,8 @@ import (
 
 	"github.com/goware/urlx"
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -61,25 +62,25 @@ func newSpanContext(ctx context.Context) trace.SpanContext {
 	})
 }
 
-func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
+func (te *httpTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
-		Result: model.TriggerResult{
+		Result: trigger.TriggerResult{
 			Type: te.Type(),
 		},
 	}
 
-	trigger := test.ServiceUnderTest
-	if trigger.Type != model.TriggerTypeHTTP {
-		return response, fmt.Errorf(`trigger type "%s" not supported by HTTP triggerer`, trigger.Type)
+	triggerObj := test.Trigger
+	if triggerObj.Type != trigger.TriggerTypeHTTP {
+		return response, fmt.Errorf(`trigger type "%s" not supported by HTTP triggerer`, triggerObj.Type)
 	}
 
-	client := httpClient(trigger.HTTP.SSLVerification)
+	client := httpClient(triggerObj.HTTP.SSLVerification)
 
 	ctx = trace.ContextWithSpanContext(ctx, newSpanContext(ctx))
 	ctx, cncl := context.WithTimeout(ctx, 30*time.Second)
 	defer cncl()
 
-	tReq := trigger.HTTP
+	tReq := triggerObj.HTTP
 	var body io.Reader
 	if tReq.Body != "" {
 		body = bytes.NewBufferString(tReq.Body)
@@ -115,12 +116,12 @@ func (te *httpTriggerer) Trigger(ctx context.Context, test model.Test, opts *Tri
 	return response, nil
 }
 
-func (t *httpTriggerer) Type() model.TriggerType {
-	return model.TriggerTypeHTTP
+func (t *httpTriggerer) Type() trigger.TriggerType {
+	return trigger.TriggerTypeHTTP
 }
 
-func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
-	http := test.ServiceUnderTest.HTTP
+func (t *httpTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+	http := test.Trigger.HTTP
 
 	if http == nil {
 		return test, fmt.Errorf("no settings provided for HTTP triggerer")
@@ -134,7 +135,7 @@ func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 
 	http.URL = url
 
-	headers := []model.HTTPHeader{}
+	headers := []trigger.HTTPHeader{}
 	for _, h := range http.Headers {
 		h.Key, err = opts.Executor.ResolveStatement(WrapInQuotes(h.Key, "\""))
 		if err != nil {
@@ -162,12 +163,12 @@ func (t *httpTriggerer) Resolve(ctx context.Context, test model.Test, opts *Trig
 		return test, err
 	}
 
-	test.ServiceUnderTest.HTTP = http
+	test.Trigger.HTTP = http
 
 	return test, nil
 }
 
-func resolveAuth(auth *model.HTTPAuthenticator, executor expression.Executor) (*model.HTTPAuthenticator, error) {
+func resolveAuth(auth *trigger.HTTPAuthenticator, executor expression.Executor) (*trigger.HTTPAuthenticator, error) {
 	if auth == nil {
 		return nil, nil
 	}
@@ -183,11 +184,11 @@ func resolveAuth(auth *model.HTTPAuthenticator, executor expression.Executor) (*
 	return &updated, err
 }
 
-func mapResp(resp *http.Response) model.HTTPResponse {
-	var mappedHeaders []model.HTTPHeader
+func mapResp(resp *http.Response) trigger.HTTPResponse {
+	var mappedHeaders []trigger.HTTPHeader
 	for key, headers := range resp.Header {
 		for _, val := range headers {
-			val := model.HTTPHeader{
+			val := trigger.HTTPHeader{
 				Key:   key,
 				Value: val,
 			}
@@ -201,7 +202,7 @@ func mapResp(resp *http.Response) model.HTTPResponse {
 		fmt.Println(err)
 	}
 
-	return model.HTTPResponse{
+	return trigger.HTTPResponse{
 		Status:     resp.Status,
 		StatusCode: resp.StatusCode,
 		Headers:    mappedHeaders,

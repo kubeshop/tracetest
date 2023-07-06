@@ -4,6 +4,8 @@ import TestSpecs from './TestSpecs.model';
 import Summary from './Summary.model';
 import Trigger from './Trigger.model';
 
+export type TRawTestResource = TTestSchemas['TestResource'];
+export type TRawTestResourceList = TTestSchemas['TestResourceList'];
 export type TRawTest = TTestSchemas['Test'];
 type Test = Model<
   TRawTest,
@@ -18,13 +20,15 @@ type Test = Model<
   }
 >;
 
-const Test = ({
+const Test = ({spec: rawTest = {}}: TRawTestResource): Test => Test.FromRawTest(rawTest);
+
+Test.FromRawTest = ({
   id = '',
   name = '',
   description = '',
   specs = [],
   version = 1,
-  serviceUnderTest: rawTrigger,
+  trigger: rawTrigger,
   summary = {},
   outputs = [],
   createdAt = '',

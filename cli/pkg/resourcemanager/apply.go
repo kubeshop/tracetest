@@ -12,12 +12,7 @@ import (
 
 const VerbApply Verb = "apply"
 
-func (c Client) Apply(ctx context.Context, filePath string, requestedFormat Format) (string, error) {
-	inputFile, err := fileutil.Read(filePath)
-	if err != nil {
-		return "", fmt.Errorf("cannot read file %s: %w", filePath, err)
-	}
-
+func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFormat Format) (string, error) {
 	url := c.client.url(c.resourceNamePlural)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url.String(), inputFile.Reader())
 	if err != nil {

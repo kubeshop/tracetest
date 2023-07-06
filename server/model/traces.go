@@ -6,6 +6,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/timing"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -69,7 +72,7 @@ func getRootSpan(allRoots []*Span) *Span {
 	}
 
 	if root == nil {
-		root = &Span{ID: IDGen.SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: []*Span{}}
+		root = &Span{ID: id.NewRandGenerator().SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: []*Span{}}
 	}
 
 	for _, span := range allRoots {
@@ -105,8 +108,8 @@ func spanType(attrs Attributes) string {
 }
 
 func spanDuration(span Span) string {
-	timeDifference := timeDiff(span.StartTime, span.EndTime)
-	return fmt.Sprintf("%d", durationInNanoseconds(timeDifference))
+	timeDifference := timing.TimeDiff(span.StartTime, span.EndTime)
+	return fmt.Sprintf("%d", timing.DurationInNanoseconds(timeDifference))
 }
 
 func (t *Trace) Sort() Trace {
@@ -237,4 +240,10 @@ func flattenSpans(res map[trace.SpanID]*Span, root Span) {
 
 	// Remove children and parent because they are now part of the flatten structure
 	rootPtr.Children = nil
+}
+
+func AugmentRootSpan(span Span, result trigger.TriggerResult) Span {
+	return span.
+		setMetadataAttributes().
+		setTriggerResultAttributes(result)
 }

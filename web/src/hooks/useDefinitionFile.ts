@@ -1,21 +1,18 @@
 import {useCallback, useState} from 'react';
-import {useLazyGetResourceDefinitionQuery, useLazyGetResourceDefinitionV2Query} from 'redux/apis/TraceTest.api';
+import {useLazyGetResourceDefinitionQuery} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
 
 const useDefinitionFile = () => {
   const [definition, setDefinition] = useState<string>('');
   const [getResourceDefinition] = useLazyGetResourceDefinitionQuery();
-  const [getResourceDefinitionV2] = useLazyGetResourceDefinitionV2Query();
 
   const loadDefinition = useCallback(
     async (resourceType: ResourceType, resourceId: string, version?: number) => {
-      const data = await (resourceType === ResourceType.Environment || resourceType === ResourceType.Transaction
-        ? getResourceDefinitionV2({resourceId, resourceType}).unwrap()
-        : getResourceDefinition({resourceId, version, resourceType}).unwrap());
+      const data = await getResourceDefinition({resourceId, resourceType, version}).unwrap();
 
       setDefinition(data);
     },
-    [getResourceDefinition, getResourceDefinitionV2]
+    [getResourceDefinition]
   );
 
   return {definition, loadDefinition};

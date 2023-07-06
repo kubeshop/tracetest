@@ -16,9 +16,9 @@ spec:
         {
           "type": "Transaction",
           "spec": {
-              "name": "test-transaction",
-              "description": "a transaction",
-              "steps": [ "${env:TRANSACTION_STEP_ID}" ]
+            "name": "test-transaction",
+            "description": "a transaction",
+            "steps": [ "${env:TRANSACTION_STEP_ID}" ]
           }
         }
   specs:

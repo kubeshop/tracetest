@@ -10,7 +10,7 @@
 package openapi
 
 type TriggerResult struct {
-	TriggerType string `json:"triggerType,omitempty"`
+	Type string `json:"type,omitempty"`
 
 	TriggerResult TriggerResultTriggerResult `json:"triggerResult,omitempty"`
 }

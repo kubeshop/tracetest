@@ -25,15 +25,6 @@ const ResourceEndpoint = (builder: TTestApiEndpointBuilder) => ({
     },
   }),
   getResourceDefinition: builder.query<string, {resourceId: string; version?: number; resourceType: ResourceType}>({
-    query: ({resourceId, resourceType, version}) => ({
-      url: `/${resourceType}s/${resourceId}${version ? `/version/${version}` : ''}/definition.yaml`,
-      responseHandler: 'text',
-    }),
-    providesTags: (result, error, {resourceId, version}) => [
-      {type: TracetestApiTags.RESOURCE, id: `${resourceId}-${version}-definition`},
-    ],
-  }),
-  getResourceDefinitionV2: builder.query<string, {resourceId: string; version?: number; resourceType: ResourceType}>({
     query: ({resourceId, resourceType}) => ({
       url: `/${resourceType}s/${resourceId}`,
       responseHandler: 'text',

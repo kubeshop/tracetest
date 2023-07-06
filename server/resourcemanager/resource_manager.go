@@ -18,6 +18,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/validation"
 )
 
 type ResourceSpec interface {
@@ -527,6 +528,10 @@ func (m *manager[T]) handleResourceHandlerError(w http.ResponseWriter, verb stri
 	if errors.Is(err, sql.ErrNoRows) {
 		encoder.WriteEncodedResponse(w, http.StatusNotFound, nil)
 		return
+	}
+
+	if errors.Is(err, validation.ErrValidation) {
+		writeError(w, encoder, http.StatusBadRequest, err)
 	}
 
 	// 500 - internal server error

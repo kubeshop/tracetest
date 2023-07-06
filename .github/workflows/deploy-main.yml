@@ -11,6 +11,9 @@ on:
       - 'docs/**'
       - 'cli/**'
 
+  # manual trigger
+  workflow_dispatch:
+
 jobs:
   backend-arch-graph:
     name: Generate backend architecture graph
@@ -38,7 +41,7 @@ jobs:
         run: |
           cd server
           mkdir -p ../dist/
-          /tmp/go-arch/go-arch ../dist/architecture.png
+          /tmp/go-arch/go-arch -o ../dist/architecture.png
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:

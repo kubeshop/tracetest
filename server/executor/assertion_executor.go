@@ -7,44 +7,44 @@ import (
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type AssertionExecutor interface {
-	Assert(context.Context, maps.Ordered[model.SpanQuery, model.NamedAssertions], model.Trace, []expression.DataStore) (maps.Ordered[model.SpanQuery, []model.AssertionResult], bool)
+	Assert(context.Context, test.Specs, model.Trace, []expression.DataStore) (maps.Ordered[test.SpanQuery, []test.AssertionResult], bool)
 }
 
 type defaultAssertionExecutor struct{}
 
-func (e defaultAssertionExecutor) Assert(_ context.Context, defs maps.Ordered[model.SpanQuery, model.NamedAssertions], trace model.Trace, ds []expression.DataStore) (maps.Ordered[model.SpanQuery, []model.AssertionResult], bool) {
-	testResult := maps.Ordered[model.SpanQuery, []model.AssertionResult]{}
+func (e defaultAssertionExecutor) Assert(_ context.Context, specs test.Specs, trace model.Trace, ds []expression.DataStore) (maps.Ordered[test.SpanQuery, []test.AssertionResult], bool) {
+	testResult := maps.Ordered[test.SpanQuery, []test.AssertionResult]{}
 	allPassed := true
-	defs.ForEach(func(spanQuery model.SpanQuery, asserts model.NamedAssertions) error {
-		spans := selector(spanQuery).Filter(trace)
-		assertionResults := make([]model.AssertionResult, 0)
-		for _, assertion := range asserts.Assertions {
+	for _, spec := range specs {
+		spans := selector(spec.Selector).Filter(trace)
+		assertionResults := make([]test.AssertionResult, 0)
+		for _, assertion := range spec.Assertions {
 			res := e.assert(assertion, spans, ds)
 			if !res.AllPassed {
 				allPassed = false
 			}
 			assertionResults = append(assertionResults, res)
 		}
-		testResult, _ = testResult.Add(spanQuery, assertionResults)
-		return nil
-	})
+		testResult, _ = testResult.Add(spec.Selector, assertionResults)
+	}
 
 	return testResult, allPassed
 }
 
-func (e defaultAssertionExecutor) assert(assertion model.Assertion, spans model.Spans, ds []expression.DataStore) model.AssertionResult {
+func (e defaultAssertionExecutor) assert(assertion test.Assertion, spans model.Spans, ds []expression.DataStore) test.AssertionResult {
 	ds = append([]expression.DataStore{
 		expression.MetaAttributesDataStore{SelectedSpans: spans},
 		expression.VariableDataStore{},
 	}, ds...)
 
 	allPassed := true
-	spanResults := make([]model.SpanAssertionResult, 0, len(spans))
+	spanResults := make([]test.SpanAssertionResult, 0, len(spans))
 	spans.
 		ForEach(func(_ int, span model.Span) bool {
 			res := e.assertSpan(span, ds, string(assertion))
@@ -62,20 +62,20 @@ func (e defaultAssertionExecutor) assert(assertion model.Assertion, spans model.
 			allPassed = res.CompareErr == nil
 		})
 
-	return model.AssertionResult{
+	return test.AssertionResult{
 		Assertion: assertion,
 		AllPassed: allPassed,
 		Results:   spanResults,
 	}
 }
 
-func (e defaultAssertionExecutor) assertSpan(span model.Span, ds []expression.DataStore, assertion string) model.SpanAssertionResult {
+func (e defaultAssertionExecutor) assertSpan(span model.Span, ds []expression.DataStore, assertion string) test.SpanAssertionResult {
 	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
 	expressionExecutor := expression.NewExecutor(ds...)
 
 	actualValue, _, err := expressionExecutor.Statement(assertion)
 
-	sar := model.SpanAssertionResult{
+	sar := test.SpanAssertionResult{
 		ObservedValue: actualValue,
 		CompareErr:    err,
 	}
@@ -92,7 +92,7 @@ type instrumentedAssertionExecutor struct {
 	tracer            trace.Tracer
 }
 
-func (e instrumentedAssertionExecutor) Assert(ctx context.Context, defs maps.Ordered[model.SpanQuery, model.NamedAssertions], trace model.Trace, ds []expression.DataStore) (maps.Ordered[model.SpanQuery, []model.AssertionResult], bool) {
+func (e instrumentedAssertionExecutor) Assert(ctx context.Context, defs test.Specs, trace model.Trace, ds []expression.DataStore) (maps.Ordered[test.SpanQuery, []test.AssertionResult], bool) {
 	ctx, span := e.tracer.Start(ctx, "Execute assertions")
 	defer span.End()
 
@@ -111,7 +111,7 @@ func NewAssertionExecutor(tracer trace.Tracer) AssertionExecutor {
 	}
 }
 
-func selector(sq model.SpanQuery) selectors.Selector {
+func selector(sq test.SpanQuery) selectors.Selector {
 	sel, _ := selectors.New(string(sq))
 	return sel
 }

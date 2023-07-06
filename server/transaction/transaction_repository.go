@@ -9,28 +9,31 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
-func NewRepository(db *sql.DB, stepsRepository stepsRepository) *Repository {
+func NewRepository(db *sql.DB, stepRepository transactionStepRepository) *Repository {
 	repo := &Repository{
-		db:              db,
-		stepsRepository: stepsRepository,
+		db:             db,
+		stepRepository: stepRepository,
 	}
 
 	return repo
 }
 
-type stepsRepository interface {
-	GetTransactionSteps(context.Context, Transaction) ([]model.Test, error)
-	GetTransactionRunSteps(context.Context, TransactionRun) ([]model.Run, error)
+type transactionStepRepository interface {
+	GetTransactionSteps(_ context.Context, _ id.ID, version int) ([]test.Test, error)
+}
+
+type transactionStepRunRepository interface {
+	GetTransactionRunSteps(_ context.Context, _ id.ID, runID int) ([]test.Run, error)
 }
 
 type Repository struct {
-	db              *sql.DB
-	stepsRepository stepsRepository
+	db             *sql.DB
+	stepRepository transactionStepRepository
 }
 
 // needed for test
@@ -418,7 +421,7 @@ type scanner interface {
 
 func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (Transaction, error) {
 	transaction := Transaction{
-		Summary: &model.Summary{},
+		Summary: &test.Summary{},
 	}
 
 	var (
@@ -443,6 +446,10 @@ func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return transaction, err
+		}
+
 		return Transaction{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
@@ -471,7 +478,7 @@ func (r *Repository) readRow(ctx context.Context, row scanner, augmented bool) (
 	if !augmented {
 		removeNonAugmentedFields(&transaction)
 	} else {
-		steps, err := r.stepsRepository.GetTransactionSteps(ctx, transaction)
+		steps, err := r.stepRepository.GetTransactionSteps(ctx, transaction.ID, *transaction.Version)
 		if err != nil {
 			return Transaction{}, fmt.Errorf("cannot read row: %w", err)
 		}

@@ -4,51 +4,48 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func createTestWithName(t *testing.T, db model.TestRepository, name string) model.Test {
+func createTestWithName(t *testing.T, db test.Repository, name string) test.Test {
 	t.Helper()
-	test := model.Test{
+	test := test.Test{
 		Name:        name,
 		Description: "description",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
 	}
 
-	updated, err := db.CreateTest(context.TODO(), test)
+	updated, err := db.Create(context.TODO(), test)
 	if err != nil {
 		panic(err)
 	}
 	return updated
 }
 
-func getRepos() (*transaction.Repository, *transaction.RunRepository, model.Repository) {
-	db := testmock.GetRawTestingDatabase()
+func getRepos() (*transaction.Repository, *transaction.RunRepository, test.Repository) {
+	db := testmock.CreateMigratedDatabase()
 
-	testsRepo, err := testdb.Postgres(testdb.WithDB(db))
-	if err != nil {
-		panic(err)
-	}
+	testRepo := test.NewRepository(db)
+	testRunRepo := test.NewRunRepository(db)
 
-	transactionRepo := transaction.NewRepository(db, testsRepo)
+	transactionRepo := transaction.NewRepository(db, testRepo)
+	runRepo := transaction.NewRunRepository(db, testRunRepo)
 
-	runRepo := transaction.NewRunRepository(db, testsRepo)
-
-	return transactionRepo, runRepo, testsRepo
+	return transactionRepo, runRepo, testRepo
 }
 
-func getTransaction(t *testing.T, transactionRepo *transaction.Repository, testsRepo model.TestRepository) (transaction.Transaction, transactionFixture) {
+func getTransaction(t *testing.T, transactionRepo *transaction.Repository, testsRepo test.Repository) (transaction.Transaction, transactionFixture) {
 	f := setupTransactionFixture(t, transactionRepo.DB())
 
 	transaction := transaction.Transaction{
@@ -90,7 +87,7 @@ func TestUpdateTransactionRun(t *testing.T) {
 	require.NoError(t, err)
 
 	tr.State = transaction.TransactionRunStateExecuting
-	tr.Steps = []model.Run{fixture.testRun}
+	tr.Steps = []test.Run{fixture.testRun}
 	err = transactionRunRepo.UpdateRun(context.TODO(), tr)
 	require.NoError(t, err)
 
@@ -138,7 +135,7 @@ func TestListTransactionRun(t *testing.T) {
 	t1 := createTransaction(t, transactionRepo, transaction.Transaction{
 		Name:        "first test",
 		Description: "description",
-		Steps: []model.Test{
+		Steps: []test.Test{
 			createTestWithName(t, testsRepo, "first step"),
 			createTestWithName(t, testsRepo, "second step"),
 		},
@@ -147,7 +144,7 @@ func TestListTransactionRun(t *testing.T) {
 	t2 := createTransaction(t, transactionRepo, transaction.Transaction{
 		Name:        "second transaction",
 		Description: "description",
-		Steps: []model.Test{
+		Steps: []test.Test{
 			createTestWithName(t, testsRepo, "first step"),
 			createTestWithName(t, testsRepo, "second step"),
 		},
@@ -178,7 +175,7 @@ func TestBug(t *testing.T) {
 	transaction := createTransaction(t, transactionRepo, transaction.Transaction{
 		Name:        "first test",
 		Description: "description",
-		Steps: []model.Test{
+		Steps: []test.Test{
 			createTestWithName(t, testsRepo, "first step"),
 			createTestWithName(t, testsRepo, "second step"),
 		},

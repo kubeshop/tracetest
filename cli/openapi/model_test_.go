@@ -24,9 +24,9 @@ type Test struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version          *int32     `json:"version,omitempty"`
-	CreatedAt        *time.Time `json:"createdAt,omitempty"`
-	ServiceUnderTest *Trigger   `json:"serviceUnderTest,omitempty"`
+	Version   *int32     `json:"version,omitempty"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	Trigger   *Trigger   `json:"trigger,omitempty"`
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
@@ -211,36 +211,36 @@ func (o *Test) SetCreatedAt(v time.Time) {
 	o.CreatedAt = &v
 }
 
-// GetServiceUnderTest returns the ServiceUnderTest field value if set, zero value otherwise.
-func (o *Test) GetServiceUnderTest() Trigger {
-	if o == nil || isNil(o.ServiceUnderTest) {
+// GetTrigger returns the Trigger field value if set, zero value otherwise.
+func (o *Test) GetTrigger() Trigger {
+	if o == nil || isNil(o.Trigger) {
 		var ret Trigger
 		return ret
 	}
-	return *o.ServiceUnderTest
+	return *o.Trigger
 }
 
-// GetServiceUnderTestOk returns a tuple with the ServiceUnderTest field value if set, nil otherwise
+// GetTriggerOk returns a tuple with the Trigger field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Test) GetServiceUnderTestOk() (*Trigger, bool) {
-	if o == nil || isNil(o.ServiceUnderTest) {
+func (o *Test) GetTriggerOk() (*Trigger, bool) {
+	if o == nil || isNil(o.Trigger) {
 		return nil, false
 	}
-	return o.ServiceUnderTest, true
+	return o.Trigger, true
 }
 
-// HasServiceUnderTest returns a boolean if a field has been set.
-func (o *Test) HasServiceUnderTest() bool {
-	if o != nil && !isNil(o.ServiceUnderTest) {
+// HasTrigger returns a boolean if a field has been set.
+func (o *Test) HasTrigger() bool {
+	if o != nil && !isNil(o.Trigger) {
 		return true
 	}
 
 	return false
 }
 
-// SetServiceUnderTest gets a reference to the given Trigger and assigns it to the ServiceUnderTest field.
-func (o *Test) SetServiceUnderTest(v Trigger) {
-	o.ServiceUnderTest = &v
+// SetTrigger gets a reference to the given Trigger and assigns it to the Trigger field.
+func (o *Test) SetTrigger(v Trigger) {
+	o.Trigger = &v
 }
 
 // GetSpecs returns the Specs field value if set, zero value otherwise.
@@ -362,8 +362,8 @@ func (o Test) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt
 	}
-	if !isNil(o.ServiceUnderTest) {
-		toSerialize["serviceUnderTest"] = o.ServiceUnderTest
+	if !isNil(o.Trigger) {
+		toSerialize["trigger"] = o.Trigger
 	}
 	if !isNil(o.Specs) {
 		toSerialize["specs"] = o.Specs

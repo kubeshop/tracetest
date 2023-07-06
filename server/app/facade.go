@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
@@ -38,11 +39,11 @@ func (rf runnerFacade) StopTest(testID id.ID, runID int) {
 	})
 }
 
-func (rf runnerFacade) RunTest(ctx context.Context, test model.Test, rm model.RunMetadata, env environment.Environment) model.Run {
+func (rf runnerFacade) RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment) test.Run {
 	return rf.runner.Run(ctx, test, rm, env)
 }
 
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm model.RunMetadata, env environment.Environment) transaction.TransactionRun {
+func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment) transaction.TransactionRun {
 	return rf.transactionRunner.Run(ctx, tr, rm, env)
 }
 
@@ -54,17 +55,19 @@ func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastore.Repository,
 	lintRepo *analyzer.Repository,
-	testDB model.Repository,
+	db model.Repository,
+	testRepo test.Repository,
+	runRepo test.RunRepository,
 	transactionRunRepository *transaction.RunRepository,
 	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
 ) *runnerFacade {
-	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
+	eventEmitter := executor.NewEventEmitter(db, subscriptionManager)
 
 	execTestUpdater := (executor.CompositeUpdater{}).
-		Add(executor.NewDBUpdater(testDB)).
+		Add(executor.NewDBUpdater(runRepo)).
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
 	assertionRunner := executor.NewAssertionRunner(
@@ -87,7 +90,7 @@ func newRunnerFacades(
 		ppRepo,
 		tracer,
 		execTestUpdater,
-		tracedb.Factory(testDB),
+		tracedb.Factory(runRepo),
 		dsRepo,
 		eventEmitter,
 	)
@@ -105,12 +108,12 @@ func newRunnerFacades(
 
 	runner := executor.NewPersistentRunner(
 		triggerRegistry,
-		testDB,
+		runRepo,
 		execTestUpdater,
 		tracePoller,
 		tracer,
 		subscriptionManager,
-		tracedb.Factory(testDB),
+		tracedb.Factory(runRepo),
 		dsRepo,
 		eventEmitter,
 		ppRepo,
@@ -118,7 +121,7 @@ func newRunnerFacades(
 
 	transactionRunner := executor.NewTransactionRunner(
 		runner,
-		testDB,
+		testRepo,
 		transactionRunRepository,
 		subscriptionManager,
 	)

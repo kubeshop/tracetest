@@ -5,8 +5,6 @@
 
 export interface paths {
   "/definition.yaml": {
-    /** Upsert a definition */
-    put: operations["upsertDefinition"];
     /** Execute a definition */
     post: operations["executeDefinition"];
   };
@@ -52,7 +50,19 @@ export interface paths {
   };
   "/tests/{testId}": {
     /** get test */
-    get: operations["getTest"];
+    get: {
+      parameters: {};
+      responses: {
+        /** successful operation */
+        200: {
+          content: {
+            "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+          };
+        };
+        /** problem with getting a test */
+        500: unknown;
+      };
+    };
     /** update test action */
     put: operations["updateTest"];
     /** delete a test */
@@ -101,10 +111,6 @@ export interface paths {
   "/tests/{testId}/version/{version}": {
     /** get a test specific version */
     get: operations["getTestVersion"];
-  };
-  "/tests/{testId}/version/{version}/definition.yaml": {
-    /** Get the test definition as an YAML file */
-    get: operations["getTestVersionDefinitionFile"];
   };
   "/tests/{testId}/run/{runId}/stop": {
     /** stops the execution of a test run */
@@ -209,28 +215,6 @@ export interface paths {
 export interface components {}
 
 export interface operations {
-  /** Upsert a definition */
-  upsertDefinition: {
-    responses: {
-      /** Definition updated */
-      200: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
-        };
-      };
-      /** Definition created */
-      201: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
-      };
-    };
-  };
   /** Execute a definition */
   executeDefinition: {
     responses: {
@@ -434,14 +418,13 @@ export interface operations {
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"][];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestResourceList"];
+          "text/yaml": external["tests.yaml"]["components"]["schemas"]["TestResourceList"];
         };
       };
+      /** invalid query for test, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with getting tests */
       500: unknown;
     };
@@ -462,20 +445,6 @@ export interface operations {
       content: {
         "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
       };
-    };
-  };
-  /** get test */
-  getTest: {
-    parameters: {};
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-      /** problem with getting a test */
-      500: unknown;
     };
   };
   /** update test action */
@@ -665,18 +634,6 @@ export interface operations {
       };
       /** problem with getting a test */
       500: unknown;
-    };
-  };
-  /** Get the test definition as an YAML file */
-  getTestVersionDefinitionFile: {
-    parameters: {};
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
-        };
-      };
     };
   };
   /** stops the execution of a test run */
@@ -1803,6 +1760,19 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TestResourceList: {
+          count?: number;
+          items?: external["tests.yaml"]["components"]["schemas"]["TestResource"][];
+        };
+        /** @description Represents a test structured into the Resources format. */
+        TestResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Test'.
+           * @enum {string}
+           */
+          type?: "Test";
+          spec?: external["tests.yaml"]["components"]["schemas"]["Test"];
+        };
         Test: {
           id?: string;
           name?: string;
@@ -1811,7 +1781,7 @@ export interface external {
           version?: number;
           /** Format: date-time */
           createdAt?: string;
-          serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
+          trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
@@ -2071,14 +2041,19 @@ export interface external {
       schemas: {
         Trigger: {
           /** @enum {string} */
+          type?: "http" | "grpc" | "traceid";
+          /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
           http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
           triggerType?: "http" | "grpc" | "traceid";
+          /** @enum {string} */
+          type?: "http" | "grpc" | "traceid";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];

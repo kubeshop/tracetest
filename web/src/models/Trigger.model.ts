@@ -35,12 +35,12 @@ const EntryData = {
   },
 };
 
-const Trigger = ({triggerType = 'http', http = {}, grpc = {}, traceid = {}}: TRawTrigger): Trigger => {
-  const type = triggerType as TriggerTypes;
+const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid = {}}: TRawTrigger): Trigger => {
+  const type = rawType as TriggerTypes;
 
   let request = {} as TTriggerRequest;
   if (type === TriggerTypes.http) {
-    request = HttpRequest(http);
+    request = HttpRequest(httpRequest);
   } else if (type === TriggerTypes.grpc) {
     request = GrpcRequest(grpc);
   } else if (type === TriggerTypes.traceid) {
