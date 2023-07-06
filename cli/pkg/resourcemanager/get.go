@@ -42,5 +42,5 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 		return "", fmt.Errorf("cannot read Get response: %w", err)
 	}
 
-	return format.Format(string(body), c.tableConfig)
+	return format.Format(string(body), c.options.tableConfig)
 }

@@ -38,8 +38,8 @@ func (c Client) Delete(ctx context.Context, id string, format Format) (string, e
 	}
 
 	msg := ""
-	if c.deleteSuccessMsg != "" {
-		msg = c.deleteSuccessMsg
+	if c.options.deleteSuccessMsg != "" {
+		msg = c.options.deleteSuccessMsg
 	} else {
 		ucfirst := strings.ToUpper(string(c.resourceName[0])) + c.resourceName[1:]
 		msg = fmt.Sprintf("%s successfully deleted", ucfirst)

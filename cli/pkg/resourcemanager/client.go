@@ -15,8 +15,7 @@ type Client struct {
 	client             *HTTPClient
 	resourceName       string
 	resourceNamePlural string
-	deleteSuccessMsg   string
-	tableConfig        TableConfig
+	options            options
 }
 
 type HTTPClient struct {
@@ -56,27 +55,13 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 	return c.client.Do(req)
 }
 
-type options func(c *Client)
-
-func WithDeleteEnabled(deleteSuccessMssg string) options {
-	return func(c *Client) {
-		c.deleteSuccessMsg = deleteSuccessMssg
-	}
-}
-
-func WithTableConfig(tableConfig TableConfig) options {
-	return func(c *Client) {
-		c.tableConfig = tableConfig
-	}
-}
-
 // NewClient creates a new client for a resource managed by the resourceamanger.
 // The tableConfig parameter configures how the table view should be rendered.
 // This configuration work both for a single resource from a Get, or a ResourceList from a List
 func NewClient(
 	httpClient *HTTPClient,
 	resourceName, resourceNamePlural string,
-	opts ...options) Client {
+	opts ...option) Client {
 	c := Client{
 		client:             httpClient,
 		resourceName:       resourceName,
@@ -84,11 +69,10 @@ func NewClient(
 	}
 
 	for _, opt := range opts {
-		opt(&c)
+		opt(&c.options)
 	}
 
 	return c
-
 }
 
 type requestError struct {

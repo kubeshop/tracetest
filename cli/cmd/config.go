@@ -16,8 +16,8 @@ import (
 )
 
 var (
+	cliLogger      = &zap.Logger{}
 	cliConfig      config.Config
-	cliLogger      *zap.Logger
 	versionText    string
 	isVersionMatch bool
 )
@@ -140,8 +140,7 @@ func setupLogger(cmd *cobra.Command, args []string) {
 		zapcore.Lock(os.Stdout),
 		atom,
 	))
-
-	cliLogger = logger
+	*cliLogger = *logger
 }
 
 func teardownCommand(cmd *cobra.Command, args []string) {

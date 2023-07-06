@@ -55,5 +55,5 @@ func (c Client) List(ctx context.Context, opt ListOption, format Format) (string
 		return "", fmt.Errorf("cannot read List response: %w", err)
 	}
 
-	return format.Format(string(body), c.tableConfig)
+	return format.Format(string(body), c.options.tableConfig)
 }
