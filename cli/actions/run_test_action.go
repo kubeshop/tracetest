@@ -245,28 +245,8 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 		return df, fmt.Errorf("cannot inject local env vars: %w", err)
 	}
 
-	var test openapi.TestResource
-	err = yaml.Unmarshal(df.Contents(), &test)
-	if err != nil {
-		a.logger.Error("error parsing test", zap.String("content", string(df.Contents())), zap.Error(err))
-		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
-	}
-
-	test, err = a.consolidateGRPCFile(df, test)
-	if err != nil {
-		return df, fmt.Errorf("could not consolidate grpc file: %w", err)
-	}
-
-	marshalled, err := yaml.Marshal(test)
-	if err != nil {
-		return df, fmt.Errorf("could not marshal test yaml: %w", err)
-	}
-	df = defFile{fileutil.New(df.AbsPath(), marshalled)}
-
 	a.logger.Debug("applying test",
 		zap.String("absolutePath", df.AbsPath()),
-		zap.String("id", test.Spec.GetId()),
-		zap.String("marshalled", string(marshalled)),
 	)
 
 	updated, err := a.tests.Apply(ctx, df.File, a.yamlFormat)
@@ -276,44 +256,7 @@ func (a runTestAction) applyTest(ctx context.Context, df defFile) (defFile, erro
 
 	df = defFile{fileutil.New(df.AbsPath(), []byte(updated))}
 
-	err = yaml.Unmarshal(df.Contents(), &test)
-	if err != nil {
-		a.logger.Error("error parsing updated test", zap.String("content", string(df.Contents())), zap.Error(err))
-		return df, fmt.Errorf("could not unmarshal test yaml: %w", err)
-	}
-
-	a.logger.Debug("test applied",
-		zap.String("absolutePath", df.AbsPath()),
-		zap.String("id", test.Spec.GetId()),
-	)
-
 	return df, nil
-}
-
-func (a runTestAction) consolidateGRPCFile(df defFile, test openapi.TestResource) (openapi.TestResource, error) {
-	if test.Spec.Trigger.GetType() != "grpc" {
-		a.logger.Debug("test does not use grpc", zap.String("triggerType", test.Spec.Trigger.GetType()))
-		return test, nil
-	}
-
-	definedPBFile := test.Spec.Trigger.Grpc.GetProtobufFile()
-	if !fileutil.LooksLikeFilePath(definedPBFile) {
-		a.logger.Debug("protobuf file is not a file path", zap.String("protobufFile", definedPBFile))
-		return test, nil
-	}
-
-	pbFilePath := df.RelativeFile(definedPBFile)
-	a.logger.Debug("protobuf file", zap.String("path", pbFilePath))
-
-	pbFile, err := fileutil.Read(pbFilePath)
-	if err != nil {
-		return test, fmt.Errorf(`cannot read protobuf file: %w`, err)
-	}
-	a.logger.Debug("protobuf file contents", zap.String("contents", string(pbFile.Contents())))
-
-	test.Spec.Trigger.Grpc.SetProtobufFile(string(pbFile.Contents()))
-
-	return test, nil
 }
 
 func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFile, error) {
@@ -322,28 +265,8 @@ func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFil
 		return df, fmt.Errorf("cannot inject local env vars: %w", err)
 	}
 
-	var tran openapi.TransactionResource
-	err = yaml.Unmarshal(df.Contents(), &tran)
-	if err != nil {
-		a.logger.Error("error parsing transaction", zap.String("content", string(df.Contents())), zap.Error(err))
-		return df, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
-	}
-
-	tran, err = a.mapTransactionSteps(ctx, df, tran)
-	if err != nil {
-		return df, fmt.Errorf("could not map transaction steps: %w", err)
-	}
-
-	marshalled, err := yaml.Marshal(tran)
-	if err != nil {
-		return df, fmt.Errorf("could not marshal test yaml: %w", err)
-	}
-	df = defFile{fileutil.New(df.AbsPath(), marshalled)}
-
 	a.logger.Debug("applying transaction",
 		zap.String("absolutePath", df.AbsPath()),
-		zap.String("id", tran.Spec.GetId()),
-		zap.String("marshalled", string(marshalled)),
 	)
 
 	updated, err := a.transactions.Apply(ctx, df.File, a.yamlFormat)
@@ -352,61 +275,7 @@ func (a runTestAction) applyTransaction(ctx context.Context, df defFile) (defFil
 	}
 
 	df = defFile{fileutil.New(df.AbsPath(), []byte(updated))}
-
-	err = yaml.Unmarshal(df.Contents(), &tran)
-	if err != nil {
-		a.logger.Error("error parsing updated transaction", zap.String("content", updated), zap.Error(err))
-		return df, fmt.Errorf("could not unmarshal transaction yaml: %w", err)
-	}
-
-	a.logger.Debug("transaction applied",
-		zap.String("absolutePath", df.AbsPath()),
-		zap.String("updated id", tran.Spec.GetId()),
-	)
-
 	return df, nil
-}
-
-func (a runTestAction) mapTransactionSteps(ctx context.Context, df defFile, tran openapi.TransactionResource) (openapi.TransactionResource, error) {
-	for i, step := range tran.Spec.GetSteps() {
-		a.logger.Debug("mapping transaction step",
-			zap.Int("index", i),
-			zap.String("step", step),
-		)
-		if !fileutil.LooksLikeFilePath(step) {
-			a.logger.Debug("does not look like a file path",
-				zap.Int("index", i),
-				zap.String("step", step),
-			)
-			continue
-		}
-
-		f, err := fileutil.Read(df.RelativeFile(step))
-		if err != nil {
-			return openapi.TransactionResource{}, fmt.Errorf("cannot read test file: %w", err)
-		}
-
-		testDF, err := a.applyTest(ctx, defFile{f})
-		if err != nil {
-			return openapi.TransactionResource{}, fmt.Errorf("cannot apply test '%s': %w", step, err)
-		}
-
-		var test openapi.TestResource
-		err = yaml.Unmarshal(testDF.Contents(), &test)
-		if err != nil {
-			return openapi.TransactionResource{}, fmt.Errorf("cannot unmarshal updated test '%s': %w", step, err)
-		}
-
-		a.logger.Debug("mapped transaction step",
-			zap.Int("index", i),
-			zap.String("step", step),
-			zap.String("mapped step", test.Spec.GetId()),
-		)
-
-		tran.Spec.Steps[i] = test.Spec.GetId()
-	}
-
-	return tran, nil
 }
 
 func getTypeFromFile(df defFile) (string, error) {
