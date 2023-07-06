@@ -28,7 +28,7 @@ func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config
 	passed := true
 	res := make([]analyzer.Result, 0)
 
-	if config.ErrorLevel == analyzer.ErrorLevelDisabled {
+	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
 			result := r.validate(span)
 			if !result.Passed {
