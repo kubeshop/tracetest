@@ -2,6 +2,7 @@ package trigger
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/fluidtruck/deepcopy"
 	jsoniter "github.com/json-iterator/go"
@@ -103,4 +104,54 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+type triggerResultV1 struct {
+	Type    TriggerType      `json:"type"`
+	HTTP    *HTTPResponse    `json:"http,omitempty"`
+	GRPC    *GRPCResponse    `json:"grpc,omitempty"`
+	TraceID *TraceIDResponse `json:"traceid,omitempty"`
+}
+
+func (tr *triggerResultV1) valid() bool {
+	return tr.Type != "" && (tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil)
+}
+
+type triggerResultV2 struct {
+	Type    TriggerType      `json:"type"`
+	HTTP    *HTTPResponse    `json:"httpRequest,omitempty"`
+	GRPC    *GRPCResponse    `json:"grpc,omitempty"`
+	TraceID *TraceIDResponse `json:"traceid,omitempty"`
+}
+
+func (tr *triggerResultV2) valid() bool {
+	return tr.Type != "" && (tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil)
+}
+
+func (t *TriggerResult) UnmarshalJSON(data []byte) error {
+	v2 := triggerResultV2{}
+	json.Unmarshal(data, &v2)
+
+	if v2.valid() {
+		t.Type = v2.Type
+		t.HTTP = v2.HTTP
+		t.GRPC = v2.GRPC
+		t.TraceID = v2.TraceID
+
+		return nil
+	}
+
+	v1 := triggerResultV1{}
+	json.Unmarshal(data, &v1)
+
+	if v1.valid() {
+		t.Type = v1.Type
+		t.HTTP = v1.HTTP
+		t.GRPC = v1.GRPC
+		t.TraceID = v1.TraceID
+
+		return nil
+	}
+
+	return fmt.Errorf("invalid version of TriggerResult. Expected 1 or 2")
 }

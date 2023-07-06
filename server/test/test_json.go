@@ -180,7 +180,9 @@ func (output *RunOutput) UnmarshalJSON(data []byte) error {
 	output.Value = obj.Value
 	output.SpanID = obj.SpanID
 	output.Resolved = obj.Resolved
-	output.Error = fmt.Errorf(obj.Error)
+	if err = stringToErr(obj.Error); err != nil {
+		output.Error = err
+	}
 	return nil
 }
 
