@@ -2,7 +2,6 @@ package trigger
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/fluidtruck/deepcopy"
 	jsoniter "github.com/json-iterator/go"
@@ -113,10 +112,6 @@ type triggerResultV1 struct {
 	TraceID *TraceIDResponse `json:"traceid,omitempty"`
 }
 
-func (tr *triggerResultV1) valid() bool {
-	return tr.Type != "" && (tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil)
-}
-
 type triggerResultV2 struct {
 	Type    TriggerType      `json:"type"`
 	HTTP    *HTTPResponse    `json:"httpRequest,omitempty"`
@@ -125,7 +120,7 @@ type triggerResultV2 struct {
 }
 
 func (tr *triggerResultV2) valid() bool {
-	return tr.Type != "" && (tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil)
+	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil
 }
 
 func (t *TriggerResult) UnmarshalJSON(data []byte) error {
@@ -141,17 +136,15 @@ func (t *TriggerResult) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
+	// Fallback to v1 in last case
+	// TriggerResult might be empty at the time of the Unmarshal, so it's ok to not validate it
 	v1 := triggerResultV1{}
 	json.Unmarshal(data, &v1)
 
-	if v1.valid() {
-		t.Type = v1.Type
-		t.HTTP = v1.HTTP
-		t.GRPC = v1.GRPC
-		t.TraceID = v1.TraceID
+	t.Type = v1.Type
+	t.HTTP = v1.HTTP
+	t.GRPC = v1.GRPC
+	t.TraceID = v1.TraceID
 
-		return nil
-	}
-
-	return fmt.Errorf("invalid version of TriggerResult. Expected 1 or 2")
+	return nil
 }
