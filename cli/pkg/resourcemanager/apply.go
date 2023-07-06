@@ -12,7 +12,18 @@ import (
 
 const VerbApply Verb = "apply"
 
+type applyPreProcessorFn func(context.Context, fileutil.File) (fileutil.File, error)
+
 func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFormat Format) (string, error) {
+
+	if c.options.applyPreProcessor != nil {
+		var err error
+		inputFile, err = c.options.applyPreProcessor(ctx, inputFile)
+		if err != nil {
+			return "", fmt.Errorf("cannot preprocess Apply request: %w", err)
+		}
+	}
+
 	url := c.client.url(c.resourceNamePlural)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url.String(), inputFile.Reader())
 	if err != nil {
@@ -90,5 +101,5 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 
 	}
 
-	return requestedFormat.Format(string(body), c.tableConfig)
+	return requestedFormat.Format(string(body), c.options.tableConfig)
 }

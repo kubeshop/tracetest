@@ -23,8 +23,13 @@ type Test struct {
 }
 
 type Trigger struct {
-	Type        string      `json:"type"`
-	HTTPRequest HTTPRequest `json:"httpRequest"`
+	Type        string       `json:"type"`
+	HTTPRequest *HTTPRequest `json:"httpRequest"`
+	GRPCRequest *GRPCRequest `json:"grpc"`
+}
+
+type GRPCRequest struct {
+	ProtobufFile string `json:"protobufFile,omitempty"`
 }
 
 type HTTPRequest struct {
@@ -45,14 +50,9 @@ type Output struct {
 }
 
 type TestSpec struct {
-	Selector   Selector `json:"selector"`
+	Selector   string   `json:"selector"`
 	Name       string   `json:"name,omitempty"`
 	Assertions []string `json:"assertions"`
-}
-
-type Selector struct {
-	Query          string       `json:"query"`
-	ParsedSelector SpanSelector `json:"parsedSelector"`
 }
 
 type SpanSelector struct {
