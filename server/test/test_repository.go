@@ -476,10 +476,6 @@ func testFieldHasChanged(oldField interface{}, newField interface{}) (bool, erro
 	return string(oldFieldJSON) != string(newFieldJSON), nil
 }
 
-func intPtr(in int) *int {
-	return &in
-}
-
 func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	exists, err := r.Exists(ctx, id)
 	if err != nil {
