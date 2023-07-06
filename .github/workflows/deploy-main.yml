@@ -11,6 +11,9 @@ on:
       - 'docs/**'
       - 'cli/**'
 
+  # manual trigger
+  workflow_dispatch:
+
 jobs:
   backend-arch-graph:
     name: Generate backend architecture graph
