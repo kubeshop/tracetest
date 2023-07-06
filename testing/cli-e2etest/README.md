@@ -30,7 +30,6 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
-| `test list`                                                        | |
 | `test run -d [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
 | `test run -d [test-definition] -e [environment-id]`                | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
 | `test run -d [test-definition] -e [environment-definition]`        | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
@@ -148,16 +147,16 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply test -f [new-test-file]`                             | |
-| `apply test -f [existing-test-file]`                        | |
-| `delete test --id [existing-id]`                            | |
-| `delete test --id [non-existing-id]`                        | |
-| `get test --id [non-existing-id]`                           | |
-| `get test --id [existing-id] --output pretty`               | |
-| `get test --id [existing-id] --output json`                 | |
-| `get test --id [existing-id] --output yaml`                 | |
-| `list test --output pretty`                                 | |
-| `list test --output json`                                   | |
-| `list test --output yaml`                                   | |
-| `list test --skip 1 --take 2`                               | |
-| `list test --sortBy name --sortDirection asc`               | |
+| `apply test -f [new-test-file]`                             | [ApplyTest](./testscenarios/test/apply_test_test.go) |
+| `apply test -f [existing-test-file]`                        | [ApplyTest](./testscenarios/test/apply_test_test.go) |
+| `delete test --id [existing-id]`                            | [DeleteTest](./testscenarios/test/delete_test_test.go) |
+| `delete test --id [non-existing-id]`                        | [DeleteTest](./testscenarios/test/delete_test_test.go) |
+| `get test --id [non-existing-id]`                           | [GetTest](./testscenarios/test/get_test_test.go), [DeleteTest](./testscenarios/test/delete_test_test.go) |
+| `get test --id [existing-id] --output pretty`               | [GetTest](./testscenarios/test/get_test_test.go) |
+| `get test --id [existing-id] --output json`                 | [GetTest](./testscenarios/test/get_test_test.go) |
+| `get test --id [existing-id] --output yaml`                 | [GetTest](./testscenarios/test/get_test_test.go) |
+| `list test --output pretty`                                 | [ListTest](./testscenarios/test/list_test_test.go) |
+| `list test --output json`                                   | [ListTest](./testscenarios/test/list_test_test.go) |
+| `list test --output yaml`                                   | [ListTest](./testscenarios/test/list_test_test.go) |
+| `list test --skip 1 --take 2`                               | [ListTest](./testscenarios/test/list_test_test.go) |
+| `list test --sortBy name --sortDirection asc`               | [ListTest](./testscenarios/test/list_test_test.go) |

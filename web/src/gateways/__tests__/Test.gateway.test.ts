@@ -1,3 +1,4 @@
+import {TRawTestResource} from '../../models/Test.model';
 import {endpoints} from '../../redux/apis/TraceTest.api';
 import TestGateway from '../Test.gateway';
 
@@ -19,7 +20,7 @@ jest.mock('../../redux/apis/TraceTest.api', () => {
 describe('TestGateway', () => {
   it('should execute the create function', async () => {
     expect.assertions(1);
-    const test = {name: 'test', description: 'test'};
+    const test: TRawTestResource = {type: 'Test', spec: {name: 'test', description: 'test'}};
     await TestGateway.create(test);
 
     expect(createTest.initiate).toBeCalledWith(test);

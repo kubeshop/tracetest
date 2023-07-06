@@ -4,10 +4,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
 type StopRequest struct {
@@ -16,11 +16,11 @@ type StopRequest struct {
 }
 
 func (sr StopRequest) ResourceID() string {
-	runID := (model.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
+	runID := (test.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
 	return runID + "/stop"
 }
 
-func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, run model.Run) {
+func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, run test.Run) {
 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		stopRequest, ok := m.Content.(StopRequest)
 		if !ok {

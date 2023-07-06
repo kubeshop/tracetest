@@ -10,9 +10,9 @@
 package openapi
 
 type Trigger struct {
-	TriggerType string `json:"triggerType,omitempty"`
+	Type string `json:"type,omitempty"`
 
-	Http HttpRequest `json:"http,omitempty"`
+	HttpRequest HttpRequest `json:"httpRequest,omitempty"`
 
 	Grpc GrpcRequest `json:"grpc,omitempty"`
 
@@ -21,7 +21,7 @@ type Trigger struct {
 
 // AssertTriggerRequired checks if the required fields are not zero-ed
 func AssertTriggerRequired(obj Trigger) error {
-	if err := AssertHttpRequestRequired(obj.Http); err != nil {
+	if err := AssertHttpRequestRequired(obj.HttpRequest); err != nil {
 		return err
 	}
 	if err := AssertGrpcRequestRequired(obj.Grpc); err != nil {

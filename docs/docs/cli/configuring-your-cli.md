@@ -29,7 +29,7 @@ Allows you to list all tests.
 **How to Use**:
 
 ```sh
-tracetest test list
+tracetest list test
 ```
 
 ### Run a Test

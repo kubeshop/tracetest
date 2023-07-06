@@ -19,8 +19,8 @@ var _ MappedNullable = &Trigger{}
 
 // Trigger struct for Trigger
 type Trigger struct {
-	TriggerType *string         `json:"triggerType,omitempty"`
-	Http        *HTTPRequest    `json:"http,omitempty"`
+	Type        *string         `json:"type,omitempty"`
+	HttpRequest *HTTPRequest    `json:"httpRequest,omitempty"`
 	Grpc        *GRPCRequest    `json:"grpc,omitempty"`
 	Traceid     *TRACEIDRequest `json:"traceid,omitempty"`
 }
@@ -42,68 +42,68 @@ func NewTriggerWithDefaults() *Trigger {
 	return &this
 }
 
-// GetTriggerType returns the TriggerType field value if set, zero value otherwise.
-func (o *Trigger) GetTriggerType() string {
-	if o == nil || isNil(o.TriggerType) {
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *Trigger) GetType() string {
+	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
 	}
-	return *o.TriggerType
+	return *o.Type
 }
 
-// GetTriggerTypeOk returns a tuple with the TriggerType field value if set, nil otherwise
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Trigger) GetTriggerTypeOk() (*string, bool) {
-	if o == nil || isNil(o.TriggerType) {
+func (o *Trigger) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
-	return o.TriggerType, true
+	return o.Type, true
 }
 
-// HasTriggerType returns a boolean if a field has been set.
-func (o *Trigger) HasTriggerType() bool {
-	if o != nil && !isNil(o.TriggerType) {
+// HasType returns a boolean if a field has been set.
+func (o *Trigger) HasType() bool {
+	if o != nil && !isNil(o.Type) {
 		return true
 	}
 
 	return false
 }
 
-// SetTriggerType gets a reference to the given string and assigns it to the TriggerType field.
-func (o *Trigger) SetTriggerType(v string) {
-	o.TriggerType = &v
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *Trigger) SetType(v string) {
+	o.Type = &v
 }
 
-// GetHttp returns the Http field value if set, zero value otherwise.
-func (o *Trigger) GetHttp() HTTPRequest {
-	if o == nil || isNil(o.Http) {
+// GetHttpRequest returns the HttpRequest field value if set, zero value otherwise.
+func (o *Trigger) GetHttpRequest() HTTPRequest {
+	if o == nil || isNil(o.HttpRequest) {
 		var ret HTTPRequest
 		return ret
 	}
-	return *o.Http
+	return *o.HttpRequest
 }
 
-// GetHttpOk returns a tuple with the Http field value if set, nil otherwise
+// GetHttpRequestOk returns a tuple with the HttpRequest field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Trigger) GetHttpOk() (*HTTPRequest, bool) {
-	if o == nil || isNil(o.Http) {
+func (o *Trigger) GetHttpRequestOk() (*HTTPRequest, bool) {
+	if o == nil || isNil(o.HttpRequest) {
 		return nil, false
 	}
-	return o.Http, true
+	return o.HttpRequest, true
 }
 
-// HasHttp returns a boolean if a field has been set.
-func (o *Trigger) HasHttp() bool {
-	if o != nil && !isNil(o.Http) {
+// HasHttpRequest returns a boolean if a field has been set.
+func (o *Trigger) HasHttpRequest() bool {
+	if o != nil && !isNil(o.HttpRequest) {
 		return true
 	}
 
 	return false
 }
 
-// SetHttp gets a reference to the given HTTPRequest and assigns it to the Http field.
-func (o *Trigger) SetHttp(v HTTPRequest) {
-	o.Http = &v
+// SetHttpRequest gets a reference to the given HTTPRequest and assigns it to the HttpRequest field.
+func (o *Trigger) SetHttpRequest(v HTTPRequest) {
+	o.HttpRequest = &v
 }
 
 // GetGrpc returns the Grpc field value if set, zero value otherwise.
@@ -180,11 +180,11 @@ func (o Trigger) MarshalJSON() ([]byte, error) {
 
 func (o Trigger) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.TriggerType) {
-		toSerialize["triggerType"] = o.TriggerType
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
-	if !isNil(o.Http) {
-		toSerialize["http"] = o.Http
+	if !isNil(o.HttpRequest) {
+		toSerialize["httpRequest"] = o.HttpRequest
 	}
 	if !isNil(o.Grpc) {
 		toSerialize["grpc"] = o.Grpc

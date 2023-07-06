@@ -207,7 +207,9 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 				asserted++
 				prevVal = itemSpec[sortField]
 			}
-			assert.Equal(t, len(parsedJsonBody.Items), asserted)
+
+			msg := fmt.Sprintf("incorrect number of items asserted for field '%s' direction '%s'", sortField, sortDirection)
+			assert.Equal(t, len(parsedJsonBody.Items), asserted, msg)
 		},
 	}
 }

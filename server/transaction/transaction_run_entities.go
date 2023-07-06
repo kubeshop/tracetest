@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
 type TransactionRun struct {
@@ -20,7 +20,7 @@ type TransactionRun struct {
 
 	// steps
 	StepIDs []int
-	Steps   []model.Run
+	Steps   []test.Run
 
 	// trigger params
 	State       TransactionRunState
@@ -31,7 +31,7 @@ type TransactionRun struct {
 	Pass      int
 	Fail      int
 
-	Metadata model.RunMetadata
+	Metadata test.RunMetadata
 
 	// environment
 	Environment environment.Environment

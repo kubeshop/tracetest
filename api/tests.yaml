@@ -1,6 +1,29 @@
 openapi: 3.0.0
 components:
   schemas:
+
+    TestResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestResource"
+
+    TestResource:
+      type: object
+      description: "Represents a test structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Test'."
+          enum:
+            - Test
+        spec:
+          $ref: "#/components/schemas/Test"
+
     Test:
       type: object
       properties:
@@ -17,7 +40,7 @@ components:
         createdAt:
           type: string
           format: date-time
-        serviceUnderTest:
+        trigger:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
         specs:
           type: array

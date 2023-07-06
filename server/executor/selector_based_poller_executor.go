@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
 const (
@@ -22,7 +22,7 @@ func NewSelectorBasedPoller(innerPoller PollerExecutor, eventEmitter EventEmitte
 	return selectorBasedPollerExecutor{innerPoller, eventEmitter}
 }
 
-func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, model.Run, error) {
+func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, test.Run, error) {
 	ready, reason, run, err := pe.pollerExecutor.ExecuteRequest(request)
 	if !ready {
 		request.SetHeaderInt(selectorBasedPollerExecutorRetryHeader, 0)
@@ -85,14 +85,12 @@ func (pe selectorBasedPollerExecutor) getNumberTries(request *PollingRequest) in
 
 func (pe selectorBasedPollerExecutor) allSelectorsMatchSpans(request *PollingRequest) bool {
 	allSelectorsHaveMatch := true
-	request.test.Specs.ForEach(func(selectorQuery model.SpanQuery, _ model.NamedAssertions) error {
-		spans := selector(selectorQuery).Filter(*request.run.Trace)
+	for _, spec := range request.test.Specs {
+		spans := selector(spec.Selector).Filter(*request.run.Trace)
 		if len(spans) == 0 {
 			allSelectorsHaveMatch = false
 		}
-
-		return nil
-	})
+	}
 
 	return allSelectorsHaveMatch
 }

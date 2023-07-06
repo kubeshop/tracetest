@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
 )
@@ -24,38 +26,38 @@ func getDB() (model.Repository, func()) {
 	return db, clean
 }
 
-func createTestWithName(t *testing.T, db model.Repository, name string) model.Test {
+func createTestWithName(t *testing.T, db test.Repository, name string) test.Test {
 	t.Helper()
-	test := model.Test{
+	test := test.Test{
 		Name:        name,
 		Description: "description",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL: "http://localhost:3030/hello-instrumented",
 			},
 		},
 	}
 
-	updated, err := db.CreateTest(context.TODO(), test)
+	updated, err := db.Create(context.TODO(), test)
 	if err != nil {
 		panic(err)
 	}
 	return updated
 }
 
-func createTest(t *testing.T, db model.Repository) model.Test {
+func createTest(t *testing.T, db test.Repository) test.Test {
 	return createTestWithName(t, db, "first test")
 }
 
-func createRun(t *testing.T, db model.Repository, test model.Test) model.Run {
+func createRun(t *testing.T, db test.RunRepository, testObj test.Test) test.Run {
 	t.Helper()
-	run := model.Run{
+	run := test.Run{
 		TraceID:   testdb.IDGen.TraceID(),
 		SpanID:    testdb.IDGen.SpanID(),
 		CreatedAt: time.Now(),
 	}
-	updated, err := db.CreateRun(context.TODO(), test, run)
+	updated, err := db.CreateRun(context.TODO(), testObj, run)
 	if err != nil {
 		panic(err)
 	}

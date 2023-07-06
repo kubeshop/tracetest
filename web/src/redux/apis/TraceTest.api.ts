@@ -86,7 +86,6 @@ export const {
   useGetLinterQuery,
   useCreateSettingMutation,
   useUpdateSettingMutation,
-  useLazyGetResourceDefinitionV2Query,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

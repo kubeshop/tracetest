@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
 )
 
@@ -59,9 +60,9 @@ func (e subscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) 
 func (e subscribeCommandExecutor) ResourceUpdatedEvent(resource interface{}) Event {
 	var mapped interface{}
 	switch v := resource.(type) {
-	case model.Run:
+	case test.Run:
 		mapped = e.mappers.Out.Run(&v)
-	case *model.Run:
+	case *test.Run:
 		mapped = e.mappers.Out.Run(v)
 	case transaction.TransactionRun:
 		mapped = e.mappers.Out.TransactionRun(v)

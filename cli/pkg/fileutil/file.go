@@ -11,22 +11,22 @@ import (
 	"strings"
 )
 
-type file struct {
+type File struct {
 	path     string
 	contents []byte
 }
 
-func Read(filePath string) (file, error) {
+func Read(filePath string) (File, error) {
 	b, err := os.ReadFile(filePath)
 	if err != nil {
-		return file{}, fmt.Errorf("could not read definition file %s: %w", filePath, err)
+		return File{}, fmt.Errorf("could not read definition file %s: %w", filePath, err)
 	}
 
 	return New(filePath, b), nil
 }
 
-func New(path string, b []byte) file {
-	file := file{
+func New(path string, b []byte) File {
+	file := File{
 		contents: b,
 		path:     path,
 	}
@@ -34,7 +34,7 @@ func New(path string, b []byte) file {
 	return file
 }
 
-func (f file) Reader() io.Reader {
+func (f File) Reader() io.Reader {
 	return bytes.NewReader(f.contents)
 }
 
@@ -45,12 +45,12 @@ var (
 
 var ErrFileHasID = errors.New("file already has ID")
 
-func (f file) HasID() bool {
+func (f File) HasID() bool {
 	fileID := hasIDRegex.Find(f.contents)
 	return fileID != nil
 }
 
-func (f file) SetID(id string) (file, error) {
+func (f File) SetID(id string) (File, error) {
 	if f.HasID() {
 		return f, ErrFileHasID
 	}
@@ -76,16 +76,28 @@ func (f file) SetID(id string) (file, error) {
 	return New(f.path, newContents), nil
 }
 
-func (f file) AbsDir() string {
+func (f File) AbsPath() string {
 	abs, err := filepath.Abs(f.path)
 	if err != nil {
 		panic(fmt.Errorf(`cannot get absolute path from "%s": %w`, f.path, err))
 	}
 
-	return filepath.Dir(abs)
+	return abs
 }
 
-func (f file) Write() (file, error) {
+func (f File) AbsDir() string {
+	return filepath.Dir(f.AbsPath())
+}
+
+func (f File) RelativeFile(path string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+
+	return filepath.Join(f.AbsDir(), path)
+}
+
+func (f File) Write() (File, error) {
 	err := os.WriteFile(f.path, f.contents, 0644)
 	if err != nil {
 		return f, fmt.Errorf("could not write file %s: %w", f.path, err)
@@ -94,6 +106,6 @@ func (f file) Write() (file, error) {
 	return Read(f.path)
 }
 
-func (f file) ReadAll() (string, error) {
-	return string(f.contents), nil
+func (f File) Contents() []byte {
+	return f.contents
 }

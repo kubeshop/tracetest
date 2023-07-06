@@ -37,11 +37,9 @@ func (c *customController) Routes() openapi.Routes {
 	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
-	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
 
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 
-	routes[c.getRouteIndex("GetTests")].HandlerFunc = paginatedEndpoint[openapi.Test](c.service.GetTests, c.errorHandler)
 	routes[c.getRouteIndex("GetResources")].HandlerFunc = paginatedEndpoint[openapi.Resource](c.service.GetResources, c.errorHandler)
 
 	for index, route := range routes {
@@ -147,27 +145,6 @@ func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "application/xml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
-}
-
-// GetTestVersionDefinitionFile - Get the test definition as an YAML file
-func (c *customController) GetTestVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTestVersionDefinitionFile(r.Context(), testIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
 	w.Write(result.Body.([]byte))
 }
 

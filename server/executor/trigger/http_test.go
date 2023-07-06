@@ -7,9 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/executor/trigger"
-	"github.com/kubeshop/tracetest/server/model"
+	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -44,14 +45,14 @@ func TestTriggerGet(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := model.Test{
+	test := test.Test{
 		Name: "test",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL:    server.URL,
-				Method: model.HTTPMethodGET,
-				Headers: []model.HTTPHeader{
+				Method: trigger.HTTPMethodGET,
+				Headers: []trigger.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -59,7 +60,7 @@ func TestTriggerGet(t *testing.T) {
 		},
 	}
 
-	ex := trigger.HTTP()
+	ex := triggerer.HTTP()
 
 	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
@@ -91,14 +92,14 @@ func TestTriggerPost(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := model.Test{
+	test := test.Test{
 		Name: "test",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL:    server.URL,
-				Method: model.HTTPMethodPOST,
-				Headers: []model.HTTPHeader{
+				Method: trigger.HTTPMethodPOST,
+				Headers: []trigger.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
 				Body: "body",
@@ -106,7 +107,7 @@ func TestTriggerPost(t *testing.T) {
 		},
 	}
 
-	ex := trigger.HTTP()
+	ex := triggerer.HTTP()
 
 	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
@@ -144,22 +145,22 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := model.Test{
+	test := test.Test{
 		Name: "test",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL:    server.URL,
-				Method: model.HTTPMethodPOST,
-				Headers: []model.HTTPHeader{
+				Method: trigger.HTTPMethodPOST,
+				Headers: []trigger.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: &model.HTTPAuthenticator{
+				Auth: &trigger.HTTPAuthenticator{
 					Type: "apiKey",
-					APIKey: model.APIKeyAuthenticator{
+					APIKey: &trigger.APIKeyAuthenticator{
 						Key:   "key",
 						Value: "value",
-						In:    model.APIKeyPositionHeader,
+						In:    trigger.APIKeyPositionHeader,
 					},
 				},
 				Body: "body",
@@ -167,7 +168,7 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	ex := trigger.HTTP()
+	ex := triggerer.HTTP()
 
 	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
@@ -205,19 +206,19 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := model.Test{
+	test := test.Test{
 		Name: "test",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL:    server.URL,
-				Method: model.HTTPMethodPOST,
-				Headers: []model.HTTPHeader{
+				Method: trigger.HTTPMethodPOST,
+				Headers: []trigger.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: &model.HTTPAuthenticator{
+				Auth: &trigger.HTTPAuthenticator{
 					Type: "basic",
-					Basic: model.BasicAuthenticator{
+					Basic: &trigger.BasicAuthenticator{
 						Username: "username",
 						Password: "password",
 					},
@@ -227,7 +228,7 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	ex := trigger.HTTP()
+	ex := triggerer.HTTP()
 
 	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)
@@ -265,19 +266,19 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := model.Test{
+	test := test.Test{
 		Name: "test",
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
-			HTTP: &model.HTTPRequest{
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
+			HTTP: &trigger.HTTPRequest{
 				URL:    server.URL,
-				Method: model.HTTPMethodPOST,
-				Headers: []model.HTTPHeader{
+				Method: trigger.HTTPMethodPOST,
+				Headers: []trigger.HTTPHeader{
 					{Key: "Key1", Value: "Value1"},
 				},
-				Auth: &model.HTTPAuthenticator{
+				Auth: &trigger.HTTPAuthenticator{
 					Type: "bearer",
-					Bearer: model.BearerAuthenticator{
+					Bearer: &trigger.BearerAuthenticator{
 						Bearer: "token",
 					},
 				},
@@ -286,7 +287,7 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	ex := trigger.HTTP()
+	ex := triggerer.HTTP()
 
 	resp, err := ex.Trigger(createContext(), test, nil)
 	assert.NoError(t, err)

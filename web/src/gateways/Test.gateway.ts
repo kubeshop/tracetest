@@ -1,5 +1,5 @@
 import {endpoints} from 'redux/apis/TraceTest.api';
-import {TRawTest} from 'models/Test.model';
+import {TRawTestResource} from 'models/Test.model';
 
 const {createTest, editTest, getTestById, getTestList, runTest} = endpoints;
 
@@ -10,13 +10,13 @@ const TestGateway = () => ({
   getById(testId: string) {
     return getTestById.initiate({testId});
   },
-  create(test: TRawTest) {
+  create(test: TRawTestResource) {
     return createTest.initiate(test);
   },
   run(testId: string) {
     return runTest.initiate({testId});
   },
-  edit(test: TRawTest, testId: string) {
+  edit(test: TRawTestResource, testId: string) {
     return editTest.initiate({test, testId});
   },
 });

@@ -31,32 +31,6 @@ paths:
             application/json:
               schema:
                 $ref: "./definition.yaml#/components/schemas/ExecuteDefinitionResponse"
-
-    put:
-      tags:
-        - api
-      summary: "Upsert a definition"
-      description: "Upsert a definition"
-      operationId: upsertDefinition
-      requestBody:
-        content:
-          text/json:
-            schema:
-              $ref: "./definition.yaml#/components/schemas/TextDefinition"
-      responses:
-        201:
-          description: Definition created
-          content:
-            application/json:
-              schema:
-                $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
-        200:
-          description: Definition updated
-          content:
-            application/json:
-              schema:
-                $ref: "./definition.yaml#/components/schemas/UpsertDefinitionResponse"
-
   # Transactions
   /transactions:
     get:
@@ -305,7 +279,7 @@ paths:
   /tests:
     get:
       tags:
-        - api
+        - resource-api
       summary: "Get tests"
       description: "get tests"
       operationId: getTests
@@ -318,22 +292,20 @@ paths:
       responses:
         200:
           description: successful operation
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-              description: Total records count
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "./tests.yaml#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/TestResourceList"
+            text/yaml:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/TestResourceList"
+        400:
+          description: "invalid query for test, some data was sent in incorrect format."
         500:
           description: "problem with getting tests"
     post:
       tags:
-        - api
+        - resource-api
       summary: "Create new test"
       description: "Create new test action"
       operationId: createTest
@@ -354,24 +326,23 @@ paths:
   /tests/{testId}:
     get:
       tags:
-        - api
+        - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "get test"
       description: "get test"
-      operationId: getTest
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/TestResource"
         500:
           description: "problem with getting a test"
     put:
       tags:
-        - api
+        - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "update test"
@@ -389,7 +360,7 @@ paths:
           description: "problem with updating test"
     delete:
       tags:
-        - api
+        - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "delete a test"
@@ -625,23 +596,6 @@ paths:
                 $ref: "./tests.yaml#/components/schemas/Test"
         500:
           description: "problem with getting a test"
-  /tests/{testId}/version/{version}/definition.yaml:
-    get:
-      tags:
-        - api
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testId"
-        - $ref: "./parameters.yaml#/components/parameters/version"
-      summary: Get the test definition as an YAML file
-      description: Get the test definition as an YAML file
-      operationId: getTestVersionDefinitionFile
-      responses:
-        200:
-          description: OK
-          content:
-            application/yaml:
-              schema:
-                type: string
   /tests/{testId}/run/{runId}/stop:
     post:
       tags:

@@ -10,18 +10,18 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
 
 type AssertionRequest struct {
 	carrier propagation.MapCarrier
-	Test    model.Test
-	Run     model.Run
+	Test    test.Test
+	Run     test.Run
 }
 
 func (r AssertionRequest) Context() context.Context {
@@ -108,7 +108,7 @@ func (e *defaultAssertionRunner) startWorker() {
 	}
 }
 
-func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (model.Run, error) {
+func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (test.Run, error) {
 	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
 
 	err := e.eventEmitter.Emit(ctx, events.TestSpecsRunStart(request.Test.ID, request.Run.ID))
@@ -130,7 +130,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 			"finalState": string(run.State),
 		})
 
-		return model.Run{}, e.updater.Update(ctx, run)
+		return test.Run{}, e.updater.Update(ctx, run)
 	}
 	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
 
@@ -143,7 +143,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunPersistenceError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
 		}
 
-		return model.Run{}, fmt.Errorf("could not save result on database: %w", err)
+		return test.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
 	err = e.eventEmitter.Emit(ctx, events.TestSpecsRunSuccess(request.Test.ID, request.Run.ID))
@@ -154,10 +154,10 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req AssertionRequest) (model.Run, error) {
+func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req AssertionRequest) (test.Run, error) {
 	run := req.Run
 	if run.Trace == nil {
-		return model.Run{}, fmt.Errorf("trace not available")
+		return test.Run{}, fmt.Errorf("trace not available")
 	}
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
@@ -166,7 +166,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 
 	outputs, err := e.outputsProcessor(ctx, req.Test.Outputs, *run.Trace, ds)
 	if err != nil {
-		return model.Run{}, fmt.Errorf("cannot process outputs: %w", err)
+		return test.Run{}, fmt.Errorf("cannot process outputs: %w", err)
 	}
 	e.validateOutputResolution(ctx, req, outputs)
 
@@ -192,7 +192,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req AssertionRequest, result maps.Ordered[model.SpanQuery, []model.AssertionResult]) {
+func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req AssertionRequest, result maps.Ordered[test.SpanQuery, []test.AssertionResult]) {
 	for _, assertionResults := range result.Unordered() {
 		for _, assertionResult := range assertionResults {
 			for _, spanAssertionResult := range assertionResult.Results {
@@ -203,7 +203,7 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 						req.Run.TestID,
 						req.Run.ID,
 						unwrappedError,
-						spanAssertionResult.SafeSpanIDString(),
+						spanAssertionResult.SpanIDString(),
 						string(assertionResult.Assertion),
 					))
 				}
@@ -213,7 +213,7 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 						req.Run.TestID,
 						req.Run.ID,
 						spanAssertionResult.CompareErr,
-						spanAssertionResult.SafeSpanIDString(),
+						spanAssertionResult.SpanIDString(),
 						string(assertionResult.Assertion),
 					))
 				}
@@ -223,9 +223,9 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req A
 	}
 }
 
-func createEnvironment(env environment.Environment, outputs maps.Ordered[string, model.RunOutput]) environment.Environment {
+func createEnvironment(env environment.Environment, outputs maps.Ordered[string, test.RunOutput]) environment.Environment {
 	outputVariables := make([]environment.EnvironmentValue, 0)
-	outputs.ForEach(func(key string, val model.RunOutput) error {
+	outputs.ForEach(func(key string, val test.RunOutput) error {
 		outputVariables = append(outputVariables, environment.EnvironmentValue{
 			Key:   val.Name,
 			Value: val.Value,
@@ -248,8 +248,8 @@ func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request Asse
 	e.inputChannel <- request
 }
 
-func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, request AssertionRequest, outputs maps.Ordered[string, model.RunOutput]) {
-	err := outputs.ForEach(func(outputName string, outputModel model.RunOutput) error {
+func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, request AssertionRequest, outputs maps.Ordered[string, test.RunOutput]) {
+	err := outputs.ForEach(func(outputName string, outputModel test.RunOutput) error {
 		if outputModel.Resolved {
 			return nil
 		}
