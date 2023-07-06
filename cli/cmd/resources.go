@@ -89,7 +89,7 @@ var resources = resourcemanager.NewRegistry().
 					return nil
 				},
 			}),
-			resourcemanager.WithDeleteEnabled("DataStore removed. Defaulting back to no-tracing mode"),
+			resourcemanager.WithDeleteSuccessMessage("DataStore removed. Defaulting back to no-tracing mode"),
 		),
 	).
 	Register(
