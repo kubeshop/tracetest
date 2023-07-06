@@ -52,9 +52,24 @@ func TestSpecV1(t *testing.T) {
 }
 
 func TestV1WithEmptySelector(t *testing.T) {
-	x := "[{\"Key\": \"\", \"Value\": {\"Name\": \"DURATION_CHECK\", \"Assertions\": [\"attr:tracetest.span.duration < 2s\"]}}, {\"Key\": \"span[tracetest.span.type=\\\"database\\\"]\", \"Value\": {\"Name\": \"All Database Spans: Processing time is less than 100ms\", \"Assertions\": [\"attr:tracetest.span.duration < 100ms\"]}}]"
+	specsJSONWithEmptySelector := `[
+		{
+			"Key": "",
+			"Value": {
+				"Name": "DURATION_CHECK",
+				"Assertions": ["attr:tracetest.span.duration < 2s"]
+			}
+		},
+		{
+			"Key": "span[tracetest.span.type=\"database\"]",
+			"Value": {
+				"Name": "All Database Spans: Processing time is less than 100ms",
+				"Assertions": ["attr:tracetest.span.duration < 100ms"]
+			}
+		}
+	]`
 	testObject := test.Test{}
-	err := json.Unmarshal([]byte(x), &testObject.Specs)
+	err := json.Unmarshal([]byte(specsJSONWithEmptySelector), &testObject.Specs)
 
 	require.NoError(t, err)
 	assert.Equal(t, test.SpanQuery(""), testObject.Specs[0].Selector)
