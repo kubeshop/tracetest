@@ -1,0 +1,161 @@
+--- 
+hide_table_of_contents: true
+---
+
+# What if I don't have OpenTelemetry installed?
+
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+No worries! You can get started with no code changes at all!
+
+This page will explain getting started with OpenTelemetry:
+
+- Injecting auto instrumentation with **no code changes**
+- Auto instrumentation with limited code changes
+- Manual instrumentation with code changes
+
+You can also find more ways to instrument OpenTelemetry in their [documentation](https://opentelemetry.io/docs/instrumentation/).
+
+<Tabs groupId="otel-install-options">
+  <TabItem value="no-code-changes" label="No Code Changes" default>
+
+You can install the OpenTelemetry Operator in any existing Kubernetes environment in under 5 minutes by running the following set of commands.
+
+### 1. Install cert-manager. This is required for the OpenTelemetry operator to work.
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+```
+
+### 2. Install the [OpenTelemetry operator](https://opentelemetry.io/docs/k8s-operator/) so that metrics will be generated and collected automatically.
+
+```bash
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+```
+
+### 3. Create a file named `otel-collector.yaml` for the OpenTelemetry config.
+
+```yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+name: otel-instrumentation
+spec:
+exporter:
+    endpoint: http://otel-collector:4317
+propagators:
+    - tracecontext
+    - baggage
+    - b3
+
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+name: otel
+spec:
+config: |
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+  processors:
+    batch:
+        timeout: 100ms
+  exporters:
+    otlp/tracetest:
+      endpoint: tracetest:4317
+      tls:
+        insecure: true
+  service:
+    pipelines:
+        traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [otlp/tracetest]
+```
+
+<details>
+  <summary>
+    <b>What are you doing here?</b>
+  </summary>
+
+  We configure 2 separate things:
+
+  #### 1. The Instrumentation, which is an init-container which will run on any pod you explictly mark (see step 5).
+
+  #### 2. The OpenTelemetry collector, which will collect the traces from the init-container and send them to the test runner.
+
+  What's amazing here is that you can add other exporters to this config file to [send the traces to other services like these](../configuration/overview.md).
+
+</details>
+
+### 4. Apply the config file:
+
+```bash
+kubectl apply -f otel-collector.yaml
+```
+
+### 5. Update any service you want to instrument
+  
+Use the [following annotations as seen in the OpenTelemetry docs](https://opentelemetry.io/docs/k8s-operator/automatic/):
+
+- .NET: `instrumentation.opentelemetry.io/inject-dotnet: "true"`
+- Java: `instrumentation.opentelemetry.io/inject-java: "true"`
+- Node.js: `instrumentation.opentelemetry.io/inject-nodejs: "true"`
+- Python: `instrumentation.opentelemetry.io/inject-python: "true"`
+
+:::note
+Add an environment variable named `SERVICE_NAME` to your service so that you can
+later identify it in the tests.
+:::
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: your-service
+spec:
+replicas: 1
+template:
+  annotations:
+    instrumentation.opentelemetry.io/inject-nodejs: 'true'
+spec:
+    containers:
+      env:
+        - name: SERVICE_NAME
+          value: 'your-service'
+```
+
+This will automatically instrument your service with OpenTelemetry and send the metrics to the OpenTelemetry collector.
+
+Apply the changes and you're ready! You can start writing integration and end-to-end tests with trace-based testing!
+
+:::note
+Check the [official OpenTelemetry docs](https://opentelemetry.io/docs/k8s-operator/automatic/) explaining how to use the OpenTelemetry Operator.
+:::
+
+  </TabItem>
+
+  <TabItem value="auto-instrumentation" label="Auto Instrumentation" default>
+  </TabItem>
+
+  <TabItem value="manual-instrumentation" label="Manual Instrumentation" default>
+  </TabItem>
+
+  <TabItem value="other-options" label="Other Options" default>
+
+### Odigos
+
+[Odigos](https://docs.odigos.io/intro) is a new open source project that can do this for you without a single line of code.
+
+  </TabItem>
+
+</Tabs>
+
+:::tip We suggest you go back to and install Tracetest!
+Jump back to the [installation guide](./installation.mdx) once you have OpenTelemetry installed.
+:::

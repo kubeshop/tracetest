@@ -59,7 +59,6 @@ You'll be redirected to the test page where you can see four tabs and depending 
 To view the in-depth guide on test results, [check out this docs page](http://localhost:3000/web-ui/test-results)
 :::
 
-
 The **Trigger** tab shows how the test was triggered and what the API response was.
 
 ![test result](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476389/docs/screely-1688476384678_edcsgx.png)
@@ -139,5 +138,3 @@ The test run will complete and show a result.
 ```
 
 The provided link in the test output will open the test run in the Tracetest Web UI.
-
-
