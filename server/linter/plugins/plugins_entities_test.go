@@ -48,7 +48,7 @@ func TestAnalyzerEntities(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, analyzer.StandardsID, result.ID)
-		assert.Equal(t, 0, result.Score)
+		assert.Equal(t, 100, result.Score)
 		assert.Equal(t, true, result.Passed)
 	})
 

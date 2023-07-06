@@ -72,6 +72,12 @@ var resources = resourcemanager.NewRegistry().
 					{Header: "NAME", Path: "spec.name"},
 					{Header: "ENABLED", Path: "spec.enabled"},
 					{Header: "MINIMUM SCORE", Path: "spec.minimumScore"},
+					{Header: "PLUGINS", Path: "spec.total.plugins"},
+				},
+				ItemModifier: func(item *gabs.Container) error {
+					item.SetP(len(item.Path("spec.plugins").Children()), "spec.total.plugins")
+
+					return nil
 				},
 			}),
 		),
