@@ -7,7 +7,7 @@ Tracetest allows you to quickly build integration and end-to-end tests, powered 
 Tracetest requires that you have [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) added in your code.
 
 :::tip Don't have OpenTelemetry installed?
-[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./getting-started/no-otel.md)
+[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./getting-started/no-otel.mdx)
 :::
 
 ## In a Nutshell

@@ -23,13 +23,13 @@ You can also find more ways to instrument OpenTelemetry in their [documentation]
 
 You can install the OpenTelemetry Operator in any existing Kubernetes environment in under 5 minutes by running the following set of commands.
 
-### 1. Install cert-manager. This is required for the OpenTelemetry operator to work.
+### 1. Install [`cert-manager`](https://cert-manager.io/). This is required for the OpenTelemetry operator to work.
 
 ```bash
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 ```
 
-### 2. Install the [OpenTelemetry operator](https://opentelemetry.io/docs/k8s-operator/) so that metrics will be generated and collected automatically.
+### 2. Install the [OpenTelemetry operator](https://opentelemetry.io/docs/k8s-operator/) so that traces will be generated and collected automatically.
 
 ```bash
 kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
@@ -78,20 +78,13 @@ config: |
             exporters: [otlp/tracetest]
 ```
 
-<details>
-  <summary>
-    <b>What are you doing here?</b>
-  </summary>
+You configure 2 separate things:
 
-  We configure 2 separate things:
+#### 1. The Instrumentation, which is an init-container that will run on any pod you explictly mark (see step 5).
 
-  #### 1. The Instrumentation, which is an init-container which will run on any pod you explictly mark (see step 5).
+#### 2. The OpenTelemetry collector, which will collect the traces from the init-container and send them to Tracetest, and/or your trace data store.
 
-  #### 2. The OpenTelemetry collector, which will collect the traces from the init-container and send them to the test runner.
-
-  What's amazing here is that you can add other exporters to this config file to [send the traces to other services like these](../configuration/overview.md).
-
-</details>
+What's amazing here is that you can add other exporters to this config file to [send the traces to other services like these](../configuration/overview.md).
 
 ### 4. Apply the config file:
 
@@ -130,7 +123,7 @@ spec:
           value: 'your-service'
 ```
 
-This will automatically instrument your service with OpenTelemetry and send the metrics to the OpenTelemetry collector.
+This will automatically instrument your service with OpenTelemetry and send the traces to the OpenTelemetry collector.
 
 Apply the changes and you're ready! You can start writing integration and end-to-end tests with trace-based testing!
 
@@ -141,6 +134,18 @@ Check the [official OpenTelemetry docs](https://opentelemetry.io/docs/k8s-operat
   </TabItem>
 
   <TabItem value="auto-instrumentation" label="Auto Instrumentation" default>
+
+Below we provide quick links to all key docs and samples.
+
+| Language | Docs | GitHub |
+|---|---|---|
+| **C#/.NET** | https://opentelemetry.io/docs/instrumentation/net/automatic/ | https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/blob/v1.0.0-rc.1/docs/README.md |
+| **Java**  | https://opentelemetry.io/docs/instrumentation/java/automatic/ | https://github.com/open-telemetry/opentelemetry-java-instrumentation/#getting-started |
+| **JavaScript** | https://opentelemetry.io/docs/instrumentation/js/automatic/ | https://github.com/open-telemetry/opentelemetry-js#quick-start |
+| **PHP** | https://opentelemetry.io/docs/instrumentation/php/automatic/ | https://github.com/open-telemetry/opentelemetry-php-instrumentation |
+| **Python** | https://opentelemetry.io/docs/instrumentation/python/automatic/ | https://github.com/open-telemetry/opentelemetry-python-contrib/ |
+| **Ruby** | https://opentelemetry.io/docs/instrumentation/ruby/automatic/ | https://github.com/open-telemetry/opentelemetry-ruby |
+
   </TabItem>
 
   <TabItem value="manual-instrumentation" label="Manual Instrumentation" default>
