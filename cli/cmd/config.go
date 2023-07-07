@@ -84,16 +84,10 @@ func overrideConfig() {
 }
 
 func setupOutputFormat(cmd *cobra.Command) {
-	if cmd.GroupID != "resources" && output == string(formatters.Empty) {
-		output = string(formatters.DefaultOutput)
-	}
-
-	o := formatters.Output(output)
-	if !formatters.ValidOutput(o) {
+	if !formatters.ValidOutput(formatters.Output(output)) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
 		ExitCLI(1)
 	}
-	formatters.SetOutput(o)
 }
 
 func loadConfig(cmd *cobra.Command, args []string) {

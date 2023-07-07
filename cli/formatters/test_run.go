@@ -50,8 +50,8 @@ type TestRunOutput struct {
 	RunWebURL  string          `json:"testRunWebUrl"`
 }
 
-func (f testRun) Format(output TestRunOutput) string {
-	switch CurrentOutput {
+func (f testRun) Format(output TestRunOutput, format Output) string {
+	switch format {
 	case Pretty:
 		return f.pretty(output)
 	case JSON:

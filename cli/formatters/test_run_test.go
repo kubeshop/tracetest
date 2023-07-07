@@ -29,13 +29,11 @@ func TestJSON(t *testing.T) {
 		Endpoint: "localhost:11633",
 	}, false)
 
-	formatters.SetOutput(formatters.JSON)
-	actual := formatter.Format(in)
+	actual := formatter.Format(in, formatters.JSON)
 
 	expected := `{"results":{"allPassed":true},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1/test"}`
 
 	assert.JSONEq(t, expected, actual)
-	formatters.SetOutput(formatters.DefaultOutput)
 }
 
 func TestSuccessfulTestRunOutput(t *testing.T) {
@@ -56,7 +54,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 		Scheme:   "http",
 		Endpoint: "localhost:11633",
 	}, false)
-	output := formatter.Format(in)
+	output := formatter.Format(in, formatters.Pretty)
 
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)\n", output)
 }
@@ -108,7 +106,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 		Scheme:   "http",
 		Endpoint: "localhost:11633",
 	}, false)
-	output := formatter.Format(in)
+	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)
 	✔ Validate span duration
 `
@@ -197,7 +195,7 @@ func TestFailingTestOutput(t *testing.T) {
 		Scheme:   "http",
 		Endpoint: "localhost:11633",
 	}, false)
-	output := formatter.Format(in)
+	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 	✔ Validate span duration
 		✔ #123456
@@ -291,7 +289,7 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 		Scheme:   "http",
 		Endpoint: "localhost:11633",
 	}, false, formatters.WithPadding(1))
-	output := formatter.Format(in)
+	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `	✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 		✔ Validate span duration
 			✔ #123456

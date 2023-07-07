@@ -31,9 +31,9 @@ type TransactionRunOutput struct {
 	RunWebURL   string                 `json:"transactionRunWebUrl"`
 }
 
-func (f transactionRun) Format(output TransactionRunOutput) string {
+func (f transactionRun) Format(output TransactionRunOutput, format Output) string {
 	output.RunWebURL = f.getRunLink(output.Transaction.GetId(), output.Run.GetId())
-	switch CurrentOutput {
+	switch format {
 	case Pretty:
 		return f.pretty(output)
 	case JSON:
