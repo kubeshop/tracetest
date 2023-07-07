@@ -190,10 +190,10 @@ func TestEventsAreInjectedIntoAttributes(t *testing.T) {
 	spans := []model.Span{rootSpan, childSpan1, childSpan2, grandchildSpan}
 	trace := model.NewTrace("trace", spans)
 
-	require.NotEmpty(t, trace.RootSpan.Attributes["events"])
+	require.NotEmpty(t, trace.RootSpan.Attributes["span.events"])
 
 	events := []model.SpanEvent{}
-	err := json.Unmarshal([]byte(trace.RootSpan.Attributes["events"]), &events)
+	err := json.Unmarshal([]byte(trace.RootSpan.Attributes["span.events"]), &events)
 	require.NoError(t, err)
 
 	assert.Equal(t, "event 1", events[0].Name)

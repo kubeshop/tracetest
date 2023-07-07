@@ -81,7 +81,7 @@ type Span struct {
 
 func (s *Span) injectEventsIntoAttributes() {
 	eventsJson, _ := json.Marshal(s.Events)
-	s.Attributes["events"] = string(eventsJson)
+	s.Attributes["span.events"] = string(eventsJson)
 }
 
 type SpanEvent struct {
