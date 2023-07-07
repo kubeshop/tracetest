@@ -2,7 +2,7 @@ package transaction
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -92,10 +92,12 @@ func TestApplyTransaction(t *testing.T) {
 	// the steps with its ids.
 	transactionWithoutIDPath := env.GetTestResourcePath(t, "new-transaction-without-id")
 
+	helpers.RemoveIDFromTransactionFile(t, transactionWithoutIDPath)
+
 	transactionWithoutIDResult := tracetestcli.Exec(t, fmt.Sprintf("apply transaction --file %s", transactionWithoutIDPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, transactionWithoutIDResult, 0)
 
-	content, err := ioutil.ReadFile(transactionWithoutIDPath)
+	content, err := os.ReadFile(transactionWithoutIDPath)
 	require.NoError(err)
 
 	transactionWithoutID := helpers.UnmarshalYAML[types.TransactionResource](t, string(content))

@@ -1,6 +1,5 @@
 type: Transaction
 spec:
-  id: ccTdWur4R
   name: New Transaction
   description: a transaction
   steps:

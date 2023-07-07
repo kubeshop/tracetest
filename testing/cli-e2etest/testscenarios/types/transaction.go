@@ -4,7 +4,7 @@ package types
 // however they are defined here to avoid bias with the current implementation
 
 type Transaction struct {
-	ID          string   `json:"id"`
+	ID          string   `json:"id,omitempty"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Steps       []string `json:"steps"`
