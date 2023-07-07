@@ -97,3 +97,17 @@ func Copy(source, dst string) {
 		panic(err)
 	}
 }
+
+func RemoveIDFromTransactionFile(t *testing.T, filePath string) {
+	fileContent, err := os.ReadFile(filePath)
+	require.NoError(t, err)
+
+	transaction := UnmarshalYAML[types.TransactionResource](t, string(fileContent))
+	transaction.Spec.ID = ""
+
+	newFileContent, err := yaml.Marshal(transaction)
+	require.NoError(t, err)
+
+	err = os.WriteFile(filePath, newFileContent, os.ModeAppend)
+	require.NoError(t, err)
+}
