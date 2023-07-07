@@ -14,12 +14,10 @@ import (
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/goccy/go-yaml"
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/ui"
-	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 )
@@ -524,31 +522,33 @@ func (a runTestAction) formatResult(result runResult, hasResults bool) string {
 }
 
 func (a runTestAction) formatTestResult(result runResult, hasResults bool) string {
-	test := result.Resource.(openapi.TestResource)
-	run := result.Run.(openapi.TestRun)
+	return ""
+	// test := result.Resource.(openapi.TestResource)
+	// run := result.Run.(openapi.TestRun)
 
-	tro := formatters.TestRunOutput{
-		HasResults: hasResults,
-		Test:       test.GetSpec(),
-		Run:        run,
-	}
+	// tro := formatters.TestRunOutput{
+	// 	HasResults: hasResults,
+	// 	Test:       test.GetSpec(),
+	// 	Run:        run,
+	// }
 
-	formatter := formatters.TestRun(a.config, true)
-	return formatter.Format(tro)
+	// formatter := formatters.TestRun(a.config, true)
+	// return formatter.Format(tro)
 }
 func (a runTestAction) formatTransactionResult(result runResult, hasResults bool) string {
-	tran := result.Resource.(openapi.TransactionResource)
-	run := result.Run.(openapi.TransactionRun)
+	return ""
+	// tran := result.Resource.(openapi.TransactionResource)
+	// run := result.Run.(openapi.TransactionRun)
 
-	tro := formatters.TransactionRunOutput{
-		HasResults:  hasResults,
-		Transaction: tran.GetSpec(),
-		Run:         run,
-	}
+	// tro := formatters.TransactionRunOutput{
+	// 	HasResults:  hasResults,
+	// 	Transaction: tran.GetSpec(),
+	// 	Run:         run,
+	// }
 
-	return formatters.
-		TransactionRun(a.config, true).
-		Format(tro)
+	// return formatters.
+	// 	TransactionRun(a.config, true).
+	// 	Format(tro)
 }
 
 func (a runTestAction) waitForResult(ctx context.Context, run runResult) (runResult, error) {
@@ -612,20 +612,20 @@ func (a runTestAction) waitForTestResult(ctx context.Context, result runResult) 
 }
 
 func (a runTestAction) isTestReady(ctx context.Context, testID string, testRunID string) (*openapi.TestRun, error) {
-	runID, err := strconv.Atoi(testRunID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid transaction run id format: %w", err)
-	}
+	// runID, err := strconv.Atoi(testRunID)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("invalid transaction run id format: %w", err)
+	// }
 
-	req := a.openapiClient.ApiApi.GetTestRun(ctx, testID, int32(runID))
-	run, _, err := a.openapiClient.ApiApi.GetTestRunExecute(req)
-	if err != nil {
-		return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
-	}
+	// req := a.openapiClient.ApiApi.GetTestRun(ctx, testID, int32(runID))
+	// run, _, err := a.openapiClient.ApiApi.GetTestRunExecute(req)
+	// if err != nil {
+	// 	return &openapi.TestRun{}, fmt.Errorf("could not execute GetTestRun request: %w", err)
+	// }
 
-	if utils.RunStateIsFinished(run.GetState()) {
-		return run, nil
-	}
+	// if utils.RunStateIsFinished(run.GetState()) {
+	// 	return run, nil
+	// }
 
 	return nil, nil
 }
@@ -668,20 +668,20 @@ func (a runTestAction) waitForTransactionResult(ctx context.Context, result runR
 }
 
 func (a runTestAction) isTransactionReady(ctx context.Context, transactionID, transactionRunID string) (*openapi.TransactionRun, error) {
-	runID, err := strconv.Atoi(transactionRunID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid transaction run id format: %w", err)
-	}
+	// runID, err := strconv.Atoi(transactionRunID)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("invalid transaction run id format: %w", err)
+	// }
 
-	req := a.openapiClient.ApiApi.GetTransactionRun(ctx, transactionID, int32(runID))
-	run, _, err := a.openapiClient.ApiApi.GetTransactionRunExecute(req)
-	if err != nil {
-		return nil, fmt.Errorf("could not execute GetTestRun request: %w", err)
-	}
+	// req := a.openapiClient.ApiApi.GetTransactionRun(ctx, transactionID, int32(runID))
+	// run, _, err := a.openapiClient.ApiApi.GetTransactionRunExecute(req)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("could not execute GetTestRun request: %w", err)
+	// }
 
-	if utils.RunStateIsFinished(run.GetState()) {
-		return run, nil
-	}
+	// if utils.RunStateIsFinished(run.GetState()) {
+	// 	return run, nil
+	// }
 
 	return nil, nil
 }

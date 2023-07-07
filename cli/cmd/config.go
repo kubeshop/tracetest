@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/runner"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -20,6 +21,8 @@ var (
 	cliConfig      config.Config
 	versionText    string
 	isVersionMatch bool
+
+	runnerRegsitry runner.Registry
 )
 
 type setupConfig struct {
@@ -58,6 +61,13 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		setupVersion()
 		setupResources()
 
+		runnerRegsitry = runner.NewRegistry()
+		runnerRegsitry.Register(runner.TestRunner(
+			testClient,
+			utils.GetAPIClient(cliConfig),
+			formatters.TestRun(cliConfig.URL(), true),
+		))
+
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
@@ -84,7 +94,11 @@ func overrideConfig() {
 }
 
 func setupOutputFormat(cmd *cobra.Command) {
-	if !formatters.ValidOutput(formatters.Output(output)) {
+	o := formatters.Output(output)
+	if output == "" {
+		o = formatters.Pretty
+	}
+	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
 		ExitCLI(1)
 	}

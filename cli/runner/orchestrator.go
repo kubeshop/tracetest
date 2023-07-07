@@ -3,6 +3,8 @@ package runner
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
 	"sync"
@@ -13,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/cli/variable"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -57,14 +60,21 @@ type RunResult struct {
 
 // Runner defines interface for running a resource
 type Runner interface {
+	// Name of the runner. must match the resource name it handles
+	Name() string
+
 	// Apply the given file and return a resource. The resource can be of any type.
 	// It will then be used by Run method
 	Apply(context.Context, fileutil.File) (resource any, _ error)
 
 	// Run the resource and return the result. This method should not wait for the test to finish
 	StartRun(_ context.Context, resource any, _ openapi.RunInformation) (RunResult, error)
+
+	// This method is regularly called by the orchestrator to check the status of the run
 	UpdateResult(context.Context, RunResult) (RunResult, error)
-	FormatResult(RunResult) (string, error)
+
+	// Format the result of the run into a string
+	FormatResult(_ RunResult, format string) string
 }
 
 func Orchestrator(
@@ -86,13 +96,18 @@ type orchestrator struct {
 	environments  resourcemanager.Client
 }
 
-var yamlFormat resourcemanager.Format
+var yamlFormat, jsonFormat resourcemanager.Format
 
 func init() {
 	var err error
 	yamlFormat, err = resourcemanager.Formats.Get(resourcemanager.FormatYAML)
 	if err != nil {
 		panic(fmt.Errorf("could not get yaml format: %w", err))
+	}
+
+	jsonFormat, err = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+	if err != nil {
+		panic(fmt.Errorf("could not get json format: %w", err))
 	}
 }
 
@@ -102,7 +117,7 @@ const (
 	ExitCodeTestNotPasswed = 2
 )
 
-func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions) (exitCode int, _ error) {
+func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
 
 	o.logger.Debug(
 		"Running test from definition",
@@ -125,6 +140,11 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions) (exitC
 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve environment id: %w", err)
 	}
 	o.logger.Debug("env resolved", zap.String("ID", envID))
+
+	df, err = o.injectLocalEnvVars(ctx, df)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot inject local env vars: %w", err)
+	}
 
 	resource, err := r.Apply(ctx, df)
 	if err != nil {
@@ -161,7 +181,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions) (exitC
 	}
 
 	if opts.SkipResultWait {
-		fmt.Println(r.FormatResult(result))
+		fmt.Println(r.FormatResult(result, outputFormat))
 		return ExitCodeSuccess, nil
 	}
 
@@ -170,7 +190,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions) (exitC
 		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
-	fmt.Println(r.FormatResult(result))
+	fmt.Println(r.FormatResult(result, outputFormat))
 
 	err = o.writeJUnitReport(ctx, result, opts.JUnitOuptutFile)
 	if err != nil {
@@ -210,6 +230,21 @@ func (o orchestrator) resolveEnvID(ctx context.Context, envID string) (string, e
 	}
 
 	return env.Spec.GetId(), nil
+}
+
+func (o orchestrator) injectLocalEnvVars(ctx context.Context, df fileutil.File) (fileutil.File, error) {
+	variableInjector := variable.NewInjector(variable.WithVariableProvider(
+		variable.EnvironmentVariableProvider{},
+	))
+
+	injected, err := variableInjector.ReplaceInString(string(df.Contents()))
+	if err != nil {
+		return df, fmt.Errorf("cannot inject local environment variables: %w", err)
+	}
+
+	df = fileutil.New(df.AbsPath(), []byte(injected))
+
+	return df, nil
 }
 
 func (o orchestrator) waitForResult(ctx context.Context, r Runner, result RunResult) (RunResult, error) {
@@ -302,4 +337,30 @@ func getMetadata() map[string]string {
 	}
 
 	return metadata
+}
+
+// HandleRunError handles errors returned by the server when running a test.
+// It normalizes the handling of general errors, like 404,
+// but more importantly, it processes the missing environment variables error
+// so the orchestrator can request them from the user.
+func HandleRunError(resp *http.Response, reqErr error) error {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("could not read response body: %w", err)
+	}
+	resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("resource not found in server")
+	}
+
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		return buildMissingEnvVarsError(body)
+	}
+
+	if reqErr != nil {
+		return fmt.Errorf("could not run transaction: %w", err)
+	}
+
+	return nil
 }

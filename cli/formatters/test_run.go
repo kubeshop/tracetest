@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/pterm/pterm"
 )
 
@@ -17,7 +15,7 @@ const (
 )
 
 type testRun struct {
-	config        config.Config
+	baseURL       string
 	colorsEnabled bool
 	padding       int
 }
@@ -30,9 +28,9 @@ func WithPadding(padding int) testRunFormatterOption {
 	}
 }
 
-func TestRun(config config.Config, colorsEnabled bool, options ...testRunFormatterOption) testRun {
+func TestRun(baseURL string, colorsEnabled bool, options ...testRunFormatterOption) testRun {
 	testRun := testRun{
-		config:        config,
+		baseURL:       baseURL,
 		colorsEnabled: colorsEnabled,
 	}
 
@@ -45,6 +43,7 @@ func TestRun(config config.Config, colorsEnabled bool, options ...testRunFormatt
 
 type TestRunOutput struct {
 	HasResults bool            `json:"-"`
+	IsFailed   bool            `json:"-"`
 	Test       openapi.Test    `json:"test"`
 	Run        openapi.TestRun `json:"testRun"`
 	RunWebURL  string          `json:"testRunWebUrl"`
@@ -52,10 +51,10 @@ type TestRunOutput struct {
 
 func (f testRun) Format(output TestRunOutput, format Output) string {
 	switch format {
-	case Pretty:
-		return f.pretty(output)
 	case JSON:
 		return f.json(output)
+	case Pretty, "":
+		return f.pretty(output)
 	}
 
 	return ""
@@ -78,7 +77,7 @@ func (f testRun) json(output TestRunOutput) string {
 }
 
 func (f testRun) pretty(output TestRunOutput) string {
-	if utils.RunStateIsFailed(output.Run.GetState()) {
+	if output.IsFailed {
 		return f.getColoredText(false, fmt.Sprintf("%s\n%s",
 			f.formatMessage("%s %s (%s)",
 				FAILED_TEST_ICON,
@@ -95,7 +94,7 @@ func (f testRun) pretty(output TestRunOutput) string {
 		return f.formatSuccessfulTest(output.Test, output.Run)
 	}
 
-	if output.Run.Result.AllPassed == nil || !*output.Run.Result.AllPassed {
+	if !output.Run.Result.GetAllPassed() {
 		return f.formatFailedTest(output.Test, output.Run)
 	}
 
@@ -276,7 +275,7 @@ func (f testRun) getColoredText(passed bool, text string) string {
 }
 
 func (f testRun) GetRunLink(testID, runID string) string {
-	return fmt.Sprintf("%s://%s/test/%s/run/%s/test", f.config.Scheme, f.config.Endpoint, testID, runID)
+	return fmt.Sprintf("%s/test/%s/run/%s/test", f.baseURL, testID, runID)
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {

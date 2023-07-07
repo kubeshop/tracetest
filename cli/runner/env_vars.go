@@ -70,3 +70,24 @@ type missingEnvVarsError envVars
 func (e missingEnvVarsError) Error() string {
 	return fmt.Sprintf("missing env vars: %v", []envVar(e))
 }
+
+func buildMissingEnvVarsError(body []byte) error {
+	var missingVarsErrResp openapi.MissingVariablesError
+	err := jsonFormat.Unmarshal(body, &missingVarsErrResp)
+	if err != nil {
+		return fmt.Errorf("could not unmarshal response body: %w", err)
+	}
+
+	missingVars := envVars{}
+
+	for _, missingVarErr := range missingVarsErrResp.MissingVariables {
+		for _, missingVar := range missingVarErr.Variables {
+			missingVars = append(missingVars, envVar{
+				Name:         missingVar.GetKey(),
+				DefaultValue: missingVar.GetDefaultValue(),
+			})
+		}
+	}
+
+	return missingEnvVarsError(missingVars.unique())
+}

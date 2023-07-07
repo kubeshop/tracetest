@@ -12,8 +12,6 @@ import (
 var (
 	runParams = &runParameters{}
 	runCmd    *cobra.Command
-
-	runnerRegsitry runner.Registry
 )
 
 func init() {
@@ -46,7 +44,7 @@ func init() {
 				JUnitOuptutFile: runParams.JUnitOuptutFile,
 			}
 
-			exitCode, err := orchestrator.Run(ctx, r, runParams)
+			exitCode, err := orchestrator.Run(ctx, r, runParams, output)
 			if err != nil {
 				return "", err
 			}

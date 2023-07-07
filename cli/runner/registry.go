@@ -6,12 +6,12 @@ import (
 
 type Registry map[string]Runner
 
-func DefaultRegistry() Registry {
+func NewRegistry() Registry {
 	return Registry{}
 }
 
-func (r Registry) Register(name string, runner Runner) {
-	r[name] = runner
+func (r Registry) Register(runner Runner) {
+	r[runner.Name()] = runner
 }
 
 var ErrNotFound = fmt.Errorf("runner not found")

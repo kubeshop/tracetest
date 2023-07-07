@@ -5,22 +5,21 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/pterm/pterm"
 )
 
 type transactionRun struct {
-	config           config.Config
+	baseURL          string
 	colorsEnabled    bool
 	testRunFormatter testRun
 }
 
-func TransactionRun(config config.Config, colorsEnabled bool) transactionRun {
+func TransactionRun(baseURL string, colorsEnabled bool) transactionRun {
 	return transactionRun{
-		config:           config,
+		baseURL:          baseURL,
 		colorsEnabled:    colorsEnabled,
-		testRunFormatter: TestRun(config, colorsEnabled, WithPadding(1)),
+		testRunFormatter: TestRun(baseURL, colorsEnabled, WithPadding(1)),
 	}
 }
 
@@ -131,5 +130,5 @@ func (f transactionRun) getColoredText(passed bool, text string) string {
 }
 
 func (f transactionRun) getRunLink(transactionID, runID string) string {
-	return fmt.Sprintf("%s://%s/transaction/%s/run/%s", f.config.Scheme, f.config.Endpoint, transactionID, runID)
+	return fmt.Sprintf("%s://%s/transaction/%s/run/%s", f.baseURL, transactionID, runID)
 }
