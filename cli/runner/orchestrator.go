@@ -67,6 +67,9 @@ type Runner interface {
 	// It will then be used by Run method
 	Apply(context.Context, fileutil.File) (resource any, _ error)
 
+	// Get the resource by ID. This method is used to get the resource when running from id
+	GetByID(_ context.Context, id string) (resource any, _ error)
+
 	// Run the resource and return the result. This method should not wait for the test to finish
 	StartRun(_ context.Context, resource any, _ openapi.RunInformation) (RunResult, error)
 
@@ -128,30 +131,38 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
 	)
 
-	f, err := fileutil.Read(opts.DefinitionFile)
-	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot read definition file %s: %w", opts.DefinitionFile, err)
-	}
-	df := f
-	o.logger.Debug("Definition file read", zap.String("absolutePath", df.AbsPath()))
-
 	envID, err := o.resolveEnvID(ctx, opts.EnvID)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve environment id: %w", err)
 	}
 	o.logger.Debug("env resolved", zap.String("ID", envID))
 
-	df, err = o.injectLocalEnvVars(ctx, df)
-	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot inject local env vars: %w", err)
-	}
+	var resource any
+	if opts.DefinitionFile != "" {
+		f, err := fileutil.Read(opts.DefinitionFile)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot read definition file %s: %w", opts.DefinitionFile, err)
+		}
+		df := f
+		o.logger.Debug("Definition file read", zap.String("absolutePath", df.AbsPath()))
 
-	resource, err := r.Apply(ctx, df)
-	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot apply definition file: %w", err)
-	}
+		df, err = o.injectLocalEnvVars(ctx, df)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot inject local env vars: %w", err)
+		}
 
-	o.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
+		resource, err = r.Apply(ctx, df)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot apply definition file: %w", err)
+		}
+		o.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
+	} else {
+		resource, err = r.GetByID(ctx, opts.ID)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot get resource by ID: %w", err)
+		}
+		o.logger.Debug("Resource fetched by ID", zap.String("ID", opts.ID), zap.Any("resource", resource))
+	}
 
 	var result RunResult
 	var ev envVars

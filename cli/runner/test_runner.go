@@ -37,6 +37,21 @@ func (r testRunner) Name() string {
 	return "test"
 }
 
+func (r testRunner) GetByID(_ context.Context, id string) (resource any, _ error) {
+	jsonTest, err := r.client.Get(context.Background(), id, jsonFormat)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get test '%s': %w", id, err)
+	}
+
+	var test openapi.TestResource
+	err = jsonFormat.Unmarshal([]byte(jsonTest), &test)
+	if err != nil {
+		return nil, fmt.Errorf("cannot unmarshal test definition file: %w", err)
+	}
+
+	return test, nil
+}
+
 func (r testRunner) Apply(ctx context.Context, df fileutil.File) (resource any, _ error) {
 	updated, err := r.client.Apply(ctx, df, yamlFormat)
 	if err != nil {
