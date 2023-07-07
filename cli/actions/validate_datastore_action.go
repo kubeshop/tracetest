@@ -109,11 +109,11 @@ func (a *validateDataStoreAction) stringPointerToString(stringPointer *string) s
 }
 
 func (a *validateDataStoreAction) printMessage(topic string, step *openapi.ConnectionTestStep) string {
-	if step == nil {
+	if step == nil || step.Message == nil {
 		return ""
 	}
 
-	passed := step != nil || step.Passed != nil || *step.Passed
+	passed := (step != nil && step.Passed != nil && *step.Passed)
 
 	icon := PASSED_STEP_ICON
 	paintedText := termutil.GetGreenText(topic)
