@@ -18,6 +18,18 @@ var resourceParams = &resourceParameters{}
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
+	environmentClient = resourcemanager.NewClient(
+		httpClient,
+		"environment", "environments",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "DESCRIPTION", Path: "spec.description"},
+			},
+		}),
+	)
+
 	testPreprocessor = preprocessor.Test(cliLogger)
 	testClient       = resourcemanager.NewClient(
 		httpClient,
@@ -151,19 +163,7 @@ var (
 				resourcemanager.WithDeleteSuccessMessage("DataStore removed. Defaulting back to no-tracing mode"),
 			),
 		).
-		Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"environment", "environments",
-				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "DESCRIPTION", Path: "spec.description"},
-					},
-				}),
-			),
-		).
+		Register(environmentClient).
 		Register(
 			resourcemanager.NewClient(
 				httpClient,
