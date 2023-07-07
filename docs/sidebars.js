@@ -255,13 +255,84 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "concepts/tracetest-analyzer-concepts",
-          label: "Tracetest Analyzer",
-        },
-        {
-          type: "doc",
           id: "concepts/versioning",
           label: "Versioning",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Trace Analyzer",
+      items: [
+        {
+          type: "doc",
+          id: "analyzer/concepts",
+          label: "Concepts",
+        },
+        {
+          type: "category",
+          label: "OTel Semantic Conventions",
+          link: {
+            type: "doc",
+            id: "analyzer/plugin-otel",
+          },
+          items: [
+            {
+              type: "doc",
+              id: "analyzer/rules/span_naming",
+              label: "span_naming",
+            },
+            {
+              type: "doc",
+              id: "analyzer/rules/required_attributes",
+              label: "required_attributes",
+            },
+            {
+              type: "doc",
+              id: "analyzer/rules/attribute_naming",
+              label: "attribute_naming",
+            },
+            {
+              type: "doc",
+              id: "analyzer/rules/not_empty_attributes",
+              label: "not_empty_attributes",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Security",
+          link: {
+            type: "doc",
+            id: "analyzer/plugin-security",
+          },
+          items: [
+            {
+              type: "doc",
+              id: "analyzer/rules/enforce_https_protocol",
+              label: "enforce_https_protocol",
+            },
+            {
+              type: "doc",
+              id: "analyzer/rules/ensures_no_api_key_leak",
+              label: "ensures_no_api_key_leak",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Common Problems",
+          link: {
+            type: "doc",
+            id: "analyzer/plugin-common-problems",
+          },
+          items: [
+            {
+              type: "doc",
+              id: "analyzer/rules/enforce_dns",
+              label: "enforce_dns",
+            },
+          ],
         },
       ],
     },

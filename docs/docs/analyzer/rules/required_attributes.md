@@ -1,0 +1,77 @@
+# required_attributes
+
+Enforce required attributes by span type
+
+## Rule Details
+
+All instrumentations must populate the required attributes by span type based on the semantic conventions.
+
+The following OTel semantic conventions for span required attributes are defined:
+
+### HTTP spans:
+
+```
+- http.method
+```
+
+If span kind is `"server"`, the required attributes include:
+
+```
+- http.target
+- http.scheme
+- net.host.name
+```
+
+If span kind is `"client"`, the required attributes include:
+
+```
+- http.url
+- net.peer.name
+```
+
+### Database spans:
+
+```
+- db.system
+```
+
+### RPC spans:
+
+```
+- rpc.system
+- neet.peer.name
+```
+
+### Messaging spans:
+
+```
+- messaging.system
+- messaging.operation
+```
+
+### FaaS spans:
+
+If span kind is `"server"`, the required attributes include:
+
+```
+- faas.trigger
+```
+
+If span kind is `"client"`, the required attributes include:
+
+```
+- faas.invoked_name
+- faas.invoked_provider
+```
+
+## Options
+
+This rule has the following options:
+
+- `"error"` requires span attributes to follow the OTel semantic convention
+- `"disabled"` disables the span required attributes verification
+- `"warning"` verifies required attributes to follow the OTel semantic convention but does not impact the analyzer score
+
+## When Not To Use It
+
+If you don’t want to enforce OTel span required attributes, don’t enable this rule.
