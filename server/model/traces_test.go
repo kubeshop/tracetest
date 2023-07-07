@@ -1,6 +1,7 @@
 package model_test
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -14,9 +15,9 @@ import (
 
 func TestTraces(t *testing.T) {
 	rootSpan := newSpan("Root", nil)
-	childSpan1 := newSpan("child 1", &rootSpan)
-	childSpan2 := newSpan("child 2", &rootSpan)
-	grandchildSpan := newSpan("grandchild", &childSpan2)
+	childSpan1 := newSpan("child 1", withParent(&rootSpan))
+	childSpan2 := newSpan("child 2", withParent(&rootSpan))
+	grandchildSpan := newSpan("grandchild", withParent(&childSpan2))
 
 	spans := []model.Span{rootSpan, childSpan1, childSpan2, grandchildSpan}
 	trace := model.NewTrace("trace", spans)
@@ -30,11 +31,11 @@ func TestTraces(t *testing.T) {
 
 func TestTraceWithMultipleRoots(t *testing.T) {
 	root1 := newSpan("Root 1", nil)
-	root1Child := newSpan("Child from root 1", &root1)
+	root1Child := newSpan("Child from root 1", withParent(&root1))
 	root2 := newSpan("Root 2", nil)
-	root2Child := newSpan("Child from root 2", &root2)
+	root2Child := newSpan("Child from root 2", withParent(&root2))
 	root3 := newSpan("Root 3", nil)
-	root3Child := newSpan("Child from root 3", &root3)
+	root3Child := newSpan("Child from root 3", withParent(&root3))
 
 	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := model.NewTrace("trace", spans)
@@ -85,9 +86,9 @@ func TestTraceWithMultipleRootsFromOtel(t *testing.T) {
 
 func TestInjectingNewRootWhenSingleRoot(t *testing.T) {
 	rootSpan := newSpan("Root", nil)
-	childSpan1 := newSpan("child 1", &rootSpan)
-	childSpan2 := newSpan("child 2", &rootSpan)
-	grandchildSpan := newSpan("grandchild", &childSpan2)
+	childSpan1 := newSpan("child 1", withParent(&rootSpan))
+	childSpan2 := newSpan("child 2", withParent(&rootSpan))
+	grandchildSpan := newSpan("grandchild", withParent(&childSpan2))
 
 	spans := []model.Span{rootSpan, childSpan1, childSpan2, grandchildSpan}
 	trace := model.NewTrace("trace", spans)
@@ -103,11 +104,11 @@ func TestInjectingNewRootWhenSingleRoot(t *testing.T) {
 
 func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
 	root1 := newSpan("Root 1", nil)
-	root1Child := newSpan("Child from root 1", &root1)
+	root1Child := newSpan("Child from root 1", withParent(&root1))
 	root2 := newSpan("Root 2", nil)
-	root2Child := newSpan("Child from root 2", &root2)
+	root2Child := newSpan("Child from root 2", withParent(&root2))
 	root3 := newSpan("Root 3", nil)
-	root3Child := newSpan("Child from root 3", &root3)
+	root3Child := newSpan("Child from root 3", withParent(&root3))
 
 	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := model.NewTrace("trace", spans)
@@ -134,11 +135,11 @@ func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
 
 func TestNoTemporaryRootIfTracetestRootExists(t *testing.T) {
 	root1 := newSpan("Root 1", nil)
-	root1Child := newSpan("Child from root 1", &root1)
+	root1Child := newSpan("Child from root 1", withParent(&root1))
 	root2 := newSpan(model.TriggerSpanName, nil)
-	root2Child := newSpan("Child from root 2", &root2)
+	root2Child := newSpan("Child from root 2", withParent(&root2))
 	root3 := newSpan("Root 3", nil)
-	root3Child := newSpan("Child from root 3", &root3)
+	root3Child := newSpan("Child from root 3", withParent(&root3))
 
 	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := model.NewTrace("trace", spans)
@@ -149,11 +150,11 @@ func TestNoTemporaryRootIfTracetestRootExists(t *testing.T) {
 
 func TestNoTemporaryRootIfATemporaryRootExists(t *testing.T) {
 	root1 := newSpan("Root 1", nil)
-	root1Child := newSpan("Child from root 1", &root1)
+	root1Child := newSpan("Child from root 1", withParent(&root1))
 	root2 := newSpan(model.TemporaryRootSpanName, nil)
-	root2Child := newSpan("Child from root 2", &root2)
+	root2Child := newSpan("Child from root 2", withParent(&root2))
 	root3 := newSpan("Root 3", nil)
-	root3Child := newSpan("Child from root 3", &root3)
+	root3Child := newSpan("Child from root 3", withParent(&root3))
 
 	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := model.NewTrace("trace", spans)
@@ -164,11 +165,11 @@ func TestNoTemporaryRootIfATemporaryRootExists(t *testing.T) {
 
 func TestTriggerSpanShouldBeRootWhenTemporaryRootExistsToo(t *testing.T) {
 	root1 := newSpan(model.TriggerSpanName, nil)
-	root1Child := newSpan("Child from root 1", &root1)
+	root1Child := newSpan("Child from root 1", withParent(&root1))
 	root2 := newSpan(model.TemporaryRootSpanName, nil)
-	root2Child := newSpan("Child from root 2", &root2)
+	root2Child := newSpan("Child from root 2", withParent(&root2))
 	root3 := newSpan("Root 3", nil)
-	root3Child := newSpan("Child from root 3", &root3)
+	root3Child := newSpan("Child from root 3", withParent(&root3))
 
 	spans := []model.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := model.NewTrace("trace", spans)
@@ -177,18 +178,59 @@ func TestTriggerSpanShouldBeRootWhenTemporaryRootExistsToo(t *testing.T) {
 	assert.Equal(t, root1.Name, trace.RootSpan.Name)
 }
 
-func newSpan(name string, parent *model.Span) model.Span {
+func TestEventsAreInjectedIntoAttributes(t *testing.T) {
+	rootSpan := newSpan("Root", withEvents([]model.SpanEvent{
+		{Name: "event 1", Attributes: model.Attributes{"attribute1": "value"}},
+		{Name: "event 2", Attributes: model.Attributes{"attribute2": "value"}},
+	}))
+	childSpan1 := newSpan("child 1", withParent(&rootSpan))
+	childSpan2 := newSpan("child 2", withParent(&rootSpan))
+	grandchildSpan := newSpan("grandchild", withParent(&childSpan2))
+
+	spans := []model.Span{rootSpan, childSpan1, childSpan2, grandchildSpan}
+	trace := model.NewTrace("trace", spans)
+
+	require.NotEmpty(t, trace.RootSpan.Attributes["events"])
+
+	events := []model.SpanEvent{}
+	err := json.Unmarshal([]byte(trace.RootSpan.Attributes["events"]), &events)
+	require.NoError(t, err)
+
+	assert.Equal(t, "event 1", events[0].Name)
+	assert.Equal(t, "value", events[0].Attributes["attribute1"])
+	assert.Equal(t, "event 2", events[1].Name)
+	assert.Equal(t, "value", events[1].Attributes["attribute2"])
+}
+
+type option func(*model.Span)
+
+func withParent(parent *model.Span) option {
+	return func(s *model.Span) {
+		s.Parent = parent
+	}
+}
+
+func withEvents(events []model.SpanEvent) option {
+	return func(s *model.Span) {
+		s.Events = events
+	}
+}
+
+func newSpan(name string, options ...option) model.Span {
 	span := model.Span{
 		ID:         id.NewRandGenerator().SpanID(),
 		Name:       name,
-		Parent:     parent,
 		Attributes: make(model.Attributes),
 		StartTime:  time.Now(),
 		EndTime:    time.Now().Add(1 * time.Second),
 	}
 
-	if parent != nil {
-		span.Attributes[model.TracetestMetadataFieldParentID] = parent.ID.String()
+	for _, option := range options {
+		option(&span)
+	}
+
+	if span.Parent != nil {
+		span.Attributes[model.TracetestMetadataFieldParentID] = span.Parent.ID.String()
 	}
 
 	return span
