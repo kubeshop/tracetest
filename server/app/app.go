@@ -19,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -198,6 +199,7 @@ func (app *App) Start(opts ...appOption) error {
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
 	runRepo := test.NewRunRepository(db)
+	trRepo := testrunner.NewRepository(db)
 
 	transactionsRepository := transaction.NewRepository(db, testRepo)
 	transactionRunRepository := transaction.NewRunRepository(db, runRepo)
@@ -209,6 +211,7 @@ func (app *App) Start(opts ...appOption) error {
 		pollingProfileRepo,
 		dataStoreRepo,
 		linterRepo,
+		trRepo,
 		testDB,
 		testRepo,
 		runRepo,
@@ -279,6 +282,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerDemosResource(demoRepo, apiRouter, provisioner, tracer)
 	registerDataStoreResource(dataStoreRepo, apiRouter, provisioner, tracer)
 	registerAnalyzer(linterRepo, apiRouter, provisioner, tracer)
+	registerTestRunner(trRepo, apiRouter, provisioner, tracer)
 	registerTestResource(testRepo, apiRouter, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
@@ -372,6 +376,18 @@ func registerAnalyzer(linterRepo *analyzer.Repository, router *mux.Router, provi
 		analyzer.ResourceName,
 		analyzer.ResourceNamePlural,
 		linterRepo,
+		resourcemanager.DisableDelete(),
+		resourcemanager.WithTracer(tracer),
+	)
+	manager.RegisterRoutes(router)
+	provisioner.AddResourceProvisioner(manager)
+}
+
+func registerTestRunner(trRepo *testrunner.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[testrunner.TestRunner](
+		testrunner.ResourceName,
+		testrunner.ResourceNamePlural,
+		trRepo,
 		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)

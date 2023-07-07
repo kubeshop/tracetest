@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -117,6 +118,11 @@ func (r Run) SuccessfullyAsserted(
 		Results:   res,
 	}
 	r.State = RunStateFinished
+
+	if !allPassed {
+		r = r.RequiredGateFailed(testrunner.RequiredGateTestSpecs)
+	}
+
 	return r.Finish()
 }
 
@@ -158,7 +164,42 @@ func (r Run) SuccessfulLinterExecution(linter model.LinterResult) Run {
 	r.State = RunStateAwaitingTestResults
 	r.Linter = linter
 
+	if !r.Linter.Passed {
+		r = r.RequiredGateFailed(testrunner.RequiredGateAnalyzerRules)
+	}
+
+	if r.Linter.Score < linter.MinimumScore {
+		r = r.RequiredGateFailed(testrunner.RequiredGateAnalyzerScore)
+	}
+
 	return r
+}
+
+func (r Run) ConfigureRequiredGates(gates []testrunner.RequiredGate) Run {
+	r.RequiredGatesResult = testrunner.NewRequiredGatesResult(gates)
+	return r
+}
+
+func (r Run) RequiredGateFailed(gate testrunner.RequiredGate) Run {
+	r.RequiredGatesResult = r.RequiredGatesResult.OnFailed(gate)
+	return r
+}
+
+func (r Run) GenerateRequiredGateResult(gates []testrunner.RequiredGate) testrunner.RequiredGatesResult {
+	requiredGatesResult := testrunner.NewRequiredGatesResult(gates)
+	if !r.Results.AllPassed {
+		requiredGatesResult = r.RequiredGatesResult.OnFailed(testrunner.RequiredGateTestSpecs)
+	}
+
+	if !r.Linter.Passed {
+		requiredGatesResult = r.RequiredGatesResult.OnFailed(testrunner.RequiredGateAnalyzerRules)
+	}
+
+	if r.Linter.Score < r.Linter.MinimumScore {
+		requiredGatesResult = r.RequiredGatesResult.OnFailed(testrunner.RequiredGateAnalyzerScore)
+	}
+
+	return requiredGatesResult
 }
 
 func NewTracetestRootSpan(run Run) model.Span {
