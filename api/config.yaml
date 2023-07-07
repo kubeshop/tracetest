@@ -1,15 +1,6 @@
 openapi: 3.0.0
 components:
   schemas:
-    TestConnectionResponse:
-      type: object
-      properties:
-        successful:
-          type: boolean
-        steps:
-          type: array
-          items:
-            $ref: "#/components/schemas/ConnectionResult"
     ConnectionResult:
       type: object
       properties:

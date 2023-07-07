@@ -2687,7 +2687,7 @@ func (r ApiTestConnectionRequest) DataStore(dataStore DataStore) ApiTestConnecti
 	return r
 }
 
-func (r ApiTestConnectionRequest) Execute() (*TestConnectionResponse, *http.Response, error) {
+func (r ApiTestConnectionRequest) Execute() (*ConnectionResult, *http.Response, error) {
 	return r.ApiService.TestConnectionExecute(r)
 }
 
@@ -2708,13 +2708,13 @@ func (a *ApiApiService) TestConnection(ctx context.Context) ApiTestConnectionReq
 
 // Execute executes the request
 //
-//	@return TestConnectionResponse
-func (a *ApiApiService) TestConnectionExecute(r ApiTestConnectionRequest) (*TestConnectionResponse, *http.Response, error) {
+//	@return ConnectionResult
+func (a *ApiApiService) TestConnectionExecute(r ApiTestConnectionRequest) (*ConnectionResult, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *TestConnectionResponse
+		localVarReturnValue *ConnectionResult
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.TestConnection")

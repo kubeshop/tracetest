@@ -702,7 +702,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
+                $ref: "./config.yaml#/components/schemas/ConnectionResult"
   /configs:
     get:
       tags:
