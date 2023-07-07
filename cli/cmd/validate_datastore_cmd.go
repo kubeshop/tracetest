@@ -15,10 +15,11 @@ var (
 
 func init() {
 	validateCmd = &cobra.Command{
-		Use:    "validate",
-		Short:  "Validate a resource file, checking if it has valid data",
-		Long:   "Validate a resource file, checking if it has valid data",
-		PreRun: setupCommand(),
+		GroupID: cmdGroupResources.ID,
+		Use:     "validate",
+		Short:   "Validate a resource file, checking if it has valid data",
+		Long:    "Validate a resource file, checking if it has valid data",
+		PreRun:  setupCommand(),
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
