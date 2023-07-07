@@ -60,9 +60,33 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *model.Span {
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Parent:     nil,
+		Events:     extractEvents(span),
 		Children:   make([]*model.Span, 0),
 		Attributes: attributes,
 	}
+}
+
+func extractEvents(v1 *v1.Span) []model.SpanEvent {
+	output := make([]model.SpanEvent, 0, len(v1.Events))
+	for _, v1Event := range v1.Events {
+		attributes := make(model.Attributes, 0)
+		for _, attribute := range v1Event.Attributes {
+			attributes[attribute.Key] = getAttributeValue(attribute.Value)
+		}
+		var timestamp time.Time
+
+		if v1Event.GetTimeUnixNano() != 0 {
+			timestamp = time.Unix(0, int64(v1Event.GetTimeUnixNano()))
+		}
+
+		output = append(output, model.SpanEvent{
+			Name:       v1Event.Name,
+			Timestamp:  timestamp,
+			Attributes: attributes,
+		})
+	}
+
+	return output
 }
 
 func spanKind(span *v1.Span) model.SpanKind {

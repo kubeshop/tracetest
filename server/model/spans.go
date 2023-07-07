@@ -80,6 +80,10 @@ type Span struct {
 }
 
 func (s *Span) injectEventsIntoAttributes() {
+	if s.Events == nil {
+		s.Events = make([]SpanEvent, 0)
+	}
+
 	eventsJson, _ := json.Marshal(s.Events)
 	s.Attributes["span.events"] = string(eventsJson)
 }
