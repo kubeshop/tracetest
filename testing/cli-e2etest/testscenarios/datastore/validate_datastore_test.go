@@ -61,10 +61,10 @@ func TestValidateDatastore(t *testing.T) {
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		require.Contains(result.StdOut, "✔ \x1b[32mPort checking:\x1b[0m")
-		require.Contains(result.StdOut, "✔ \x1b[32mConnectivity:\x1b[0m")
-		require.Contains(result.StdOut, "✔ \x1b[32mAuthentication:\x1b[0m")
-		require.Contains(result.StdOut, "✔ \x1b[32mFetch traces:\x1b[0m")
+		require.Contains(result.StdOut, "\x1b[32m✔ Port checking:\x1b[0m")
+		require.Contains(result.StdOut, "\x1b[32m✔ Connectivity:\x1b[0m")
+		require.Contains(result.StdOut, "\x1b[32m✔ Authentication:\x1b[0m")
+		require.Contains(result.StdOut, "\x1b[32m✔ Fetch traces:\x1b[0m")
 	})
 
 	t.Run("validate file with incorrect datastore setup", func(t *testing.T) {
@@ -80,8 +80,8 @@ func TestValidateDatastore(t *testing.T) {
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		require.Contains(result.StdOut, "✔ \x1b[32mPort checking:\x1b[0m")
-		require.Contains(result.StdOut, "✘ \x1b[31mConnectivity:\x1b[0m")
+		require.Contains(result.StdOut, "\x1b[32m✔ Port checking:\x1b[0m")
+		require.Contains(result.StdOut, "\x1b[31m✘ Connectivity:\x1b[0m")
 		require.NotContains(result.StdOut, "Authentication")
 		require.NotContains(result.StdOut, "Fetch traces")
 	})
