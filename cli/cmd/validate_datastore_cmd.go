@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/kubeshop/tracetest/cli/actions"
 
 	"github.com/kubeshop/tracetest/cli/utils"
@@ -17,8 +19,8 @@ func init() {
 	validateCmd = &cobra.Command{
 		GroupID: cmdGroupResources.ID,
 		Use:     "validate",
-		Short:   "Validate a resource file, checking if it has valid data",
-		Long:    "Validate a resource file, checking if it has valid data",
+		Short:   "Validate a resource file",
+		Long:    "Validate a resource file",
 		PreRun:  setupCommand(),
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
@@ -28,19 +30,19 @@ func init() {
 
 	validateDatastoreCmd = &cobra.Command{
 		Use:    "datastore",
-		Short:  "Validate a DataStore resource file, checking if it has valid data",
-		Long:   "Validate a DataStore resource file, checking if it has valid data",
+		Short:  "Validate a DataStore resource file, checking if it is possible to connect on it",
+		Long:   "Validate a DataStore resource file, checking if it is possible to connect on it",
 		PreRun: setupCommand(),
-		Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
+		Run: WithResultHandler(WithParamsHandler(validateDataStoreParams)(func(cmd *cobra.Command, _ []string) (string, error) {
 			client := utils.GetAPIClient(cliConfig)
 
 			action := actions.NewValidateDataStoreAction(client)
 			return action.ValidateDatastore(validateDataStoreParams.DefinitionFile)
-		}),
+		})),
 		PostRun: teardownCommand,
 	}
 
-	validateDatastoreCmd.PersistentFlags().StringVarP(&validateDataStoreParams.DefinitionFile, "file", "f", "", "id of the environment to be used")
+	validateDatastoreCmd.PersistentFlags().StringVarP(&validateDataStoreParams.DefinitionFile, "file", "f", "", "definition file with datastore data")
 
 	rootCmd.AddCommand(validateCmd)
 	validateCmd.AddCommand(validateDatastoreCmd)
@@ -57,6 +59,14 @@ func (p validateDataStoreParameters) Validate(cmd *cobra.Command, args []string)
 		errors = append(errors, paramError{
 			Parameter: "file",
 			Message:   "Definition file must be provided",
+		})
+	}
+
+	_, err := os.Stat(p.DefinitionFile)
+	if os.IsNotExist(err) {
+		errors = append(errors, paramError{
+			Parameter: "file",
+			Message:   "Definition file does not exist",
 		})
 	}
 

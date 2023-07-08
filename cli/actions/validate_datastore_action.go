@@ -91,13 +91,17 @@ func (a *validateDataStoreAction) mapDataStoreFileToOpenAPI(f fileutil.File) (*o
 
 func (a *validateDataStoreAction) mapOpenAPIResponseToCLIOutput(response *openapi.ConnectionResult) (string, error) {
 	result := []string{
+		"",
+		"Testing connection with DataStore:",
+		"",
 		a.printMessage("Port checking:", response.PortCheck),
 		a.printMessage("Connectivity:", response.Connectivity),
 		a.printMessage("Authentication:", response.Authentication),
 		a.printMessage("Fetch traces:", response.FetchTraces),
 	}
 
-	return strings.Join(result, ""), nil
+	lineBreak := fmt.Sprintln("")
+	return strings.Join(result, lineBreak), nil
 }
 
 func (a *validateDataStoreAction) stringPointerToString(stringPointer *string) string {
@@ -115,16 +119,15 @@ func (a *validateDataStoreAction) printMessage(topic string, step *openapi.Conne
 
 	passed := (step != nil && step.Passed != nil && *step.Passed)
 
-	icon := PASSED_STEP_ICON
-	paintedText := termutil.GetGreenText(topic)
+	finalTopic := fmt.Sprintf("%s %s", PASSED_STEP_ICON, topic)
+	paintedText := termutil.GetGreenText(finalTopic)
 	finalMessage := a.stringPointerToString(step.Message)
 
 	if !passed {
-		icon = FAILED_STEP_ICON
-		paintedText = termutil.GetRedText(topic)
+		finalTopic := fmt.Sprintf("%s %s", FAILED_STEP_ICON, topic)
+		paintedText = termutil.GetRedText(finalTopic)
 		finalMessage = fmt.Sprintf("%s - Error: %s", a.stringPointerToString(step.Message), a.stringPointerToString(step.Error))
 	}
 
-	lineBreak := fmt.Sprintln("")
-	return fmt.Sprintf("%s %s %s%s", icon, paintedText, finalMessage, lineBreak)
+	return fmt.Sprintf("%s %s", paintedText, finalMessage)
 }

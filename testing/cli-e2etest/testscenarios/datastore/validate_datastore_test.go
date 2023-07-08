@@ -20,6 +20,34 @@ func TestValidateDatastore(t *testing.T) {
 
 	cliConfig := env.GetCLIConfigPath(t)
 
+	t.Run("forget to pass a datastore file", func(t *testing.T) {
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+
+		// When I try to validate a datastore without passing the file
+		// Then it should return an error message
+
+		result := tracetestcli.Exec(t, "validate datastore", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 1)
+
+		require.Contains(result.StdErr, "[file] Definition file must be provided")
+	})
+
+	t.Run("pass an inexistent datastore file", func(t *testing.T) {
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+
+		// When I try to validate a datastore passing a inexistent file
+		// Then it should return an error message
+
+		dataStorePath := env.GetEnvironmentResourcePath(t, "data-store-that-doesnt-exist")
+		command := fmt.Sprintf("validate datastore --file %s", dataStorePath)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 1)
+
+		require.Contains(result.StdErr, "[file] Definition file does not exist")
+	})
+
 	t.Run("validate file with correct datastore setup", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
