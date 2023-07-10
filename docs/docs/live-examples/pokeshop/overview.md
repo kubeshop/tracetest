@@ -21,8 +21,9 @@ We have three use cases that use each component of this structure and that can b
 
 ## System Architecture
 
-The system is divided into two components: 
-- an **API** that serves client requests, 
+The system is divided into two components:
+
+- an **API** that serves client requests,
 - a **Worker** who deals with background processes.
 
 The communication between the API and Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to Jaeger and communicate with a Postgres database.
