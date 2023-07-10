@@ -19,11 +19,13 @@ var _ MappedNullable = &LinterResultPluginRule{}
 
 // LinterResultPluginRule struct for LinterResultPluginRule
 type LinterResultPluginRule struct {
+	Id               *string                        `json:"id,omitempty"`
 	Name             *string                        `json:"name,omitempty"`
 	Description      *string                        `json:"description,omitempty"`
 	ErrorDescription *string                        `json:"errorDescription,omitempty"`
 	Passed           *bool                          `json:"passed,omitempty"`
 	Weight           *int32                         `json:"weight,omitempty"`
+	Documentation    *string                        `json:"documentation,omitempty"`
 	Tips             []string                       `json:"tips,omitempty"`
 	Results          []LinterResultPluginRuleResult `json:"results,omitempty"`
 	Level            *string                        `json:"level,omitempty"`
@@ -44,6 +46,38 @@ func NewLinterResultPluginRule() *LinterResultPluginRule {
 func NewLinterResultPluginRuleWithDefaults() *LinterResultPluginRule {
 	this := LinterResultPluginRule{}
 	return &this
+}
+
+// GetId returns the Id field value if set, zero value otherwise.
+func (o *LinterResultPluginRule) GetId() string {
+	if o == nil || isNil(o.Id) {
+		var ret string
+		return ret
+	}
+	return *o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinterResultPluginRule) GetIdOk() (*string, bool) {
+	if o == nil || isNil(o.Id) {
+		return nil, false
+	}
+	return o.Id, true
+}
+
+// HasId returns a boolean if a field has been set.
+func (o *LinterResultPluginRule) HasId() bool {
+	if o != nil && !isNil(o.Id) {
+		return true
+	}
+
+	return false
+}
+
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *LinterResultPluginRule) SetId(v string) {
+	o.Id = &v
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
@@ -206,6 +240,38 @@ func (o *LinterResultPluginRule) SetWeight(v int32) {
 	o.Weight = &v
 }
 
+// GetDocumentation returns the Documentation field value if set, zero value otherwise.
+func (o *LinterResultPluginRule) GetDocumentation() string {
+	if o == nil || isNil(o.Documentation) {
+		var ret string
+		return ret
+	}
+	return *o.Documentation
+}
+
+// GetDocumentationOk returns a tuple with the Documentation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LinterResultPluginRule) GetDocumentationOk() (*string, bool) {
+	if o == nil || isNil(o.Documentation) {
+		return nil, false
+	}
+	return o.Documentation, true
+}
+
+// HasDocumentation returns a boolean if a field has been set.
+func (o *LinterResultPluginRule) HasDocumentation() bool {
+	if o != nil && !isNil(o.Documentation) {
+		return true
+	}
+
+	return false
+}
+
+// SetDocumentation gets a reference to the given string and assigns it to the Documentation field.
+func (o *LinterResultPluginRule) SetDocumentation(v string) {
+	o.Documentation = &v
+}
+
 // GetTips returns the Tips field value if set, zero value otherwise.
 func (o *LinterResultPluginRule) GetTips() []string {
 	if o == nil || isNil(o.Tips) {
@@ -312,6 +378,9 @@ func (o LinterResultPluginRule) MarshalJSON() ([]byte, error) {
 
 func (o LinterResultPluginRule) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
 	if !isNil(o.Name) {
 		toSerialize["name"] = o.Name
 	}
@@ -326,6 +395,9 @@ func (o LinterResultPluginRule) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Weight) {
 		toSerialize["weight"] = o.Weight
+	}
+	if !isNil(o.Documentation) {
+		toSerialize["documentation"] = o.Documentation
 	}
 	if !isNil(o.Tips) {
 		toSerialize["tips"] = o.Tips

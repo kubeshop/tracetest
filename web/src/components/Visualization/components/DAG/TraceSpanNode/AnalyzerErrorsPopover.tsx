@@ -1,6 +1,7 @@
 import {Space} from 'antd';
 import {useRef} from 'react';
 
+import RuleLink from 'components/AnalyzerResult/RuleLink';
 import useOnClickOutside from 'hooks/useOnClickOutside';
 import {TAnalyzerError} from 'types/TestRun.types';
 import * as S from './AnalyzerErrors.styled';
@@ -46,6 +47,10 @@ const AnalyzerErrorsPopover = ({errors, onClose}: IProps) => {
                 <div>
                   <S.Text type="secondary">{analyzerError.errors[0].description}</S.Text>
                 </div>
+              )}
+
+              {analyzerError.ruleDocumentationUrl && (
+                <RuleLink id={analyzerError.ruleId} url={analyzerError.ruleDocumentationUrl} isSmall />
               )}
             </S.RuleContainer>
           ))}

@@ -63,6 +63,9 @@ components:
         errorDescription:
           type: string
           readOnly: true
+        documentation:
+          type: string
+          readOnly: true
         tips:
           type: array
           items:
@@ -105,6 +108,8 @@ components:
     LinterResultPluginRule:
       type: object
       properties:
+        id:
+          type: string
         name:
           type: string
         description:
@@ -115,6 +120,8 @@ components:
           type: boolean
         weight:
           type: integer
+        documentation:
+          type: string
         tips:
           type: array
           items:

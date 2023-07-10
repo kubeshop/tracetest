@@ -20,6 +20,8 @@ type LinterResourceRule struct {
 
 	ErrorDescription string `json:"errorDescription,omitempty"`
 
+	Documentation string `json:"documentation,omitempty"`
+
 	Tips []string `json:"tips,omitempty"`
 
 	ErrorLevel string `json:"errorLevel,omitempty"`

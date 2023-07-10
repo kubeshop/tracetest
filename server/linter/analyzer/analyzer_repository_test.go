@@ -40,7 +40,7 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "span_naming",
+								"id": "span-naming",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Span Name Convention",
@@ -49,7 +49,7 @@ func TestLinterResource(t *testing.T) {
 								"tips": []
 							},
 							{
-								"id": "required_attributes",
+								"id": "required-attributes",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Required Attributes By Span Type",
@@ -60,7 +60,7 @@ func TestLinterResource(t *testing.T) {
 								]
 							},
 							{
-								"id": "attribute_naming",
+								"id": "attribute-naming",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Attribute Naming",
@@ -72,7 +72,7 @@ func TestLinterResource(t *testing.T) {
 								]
 							},
 							{
-								"id": "not_empty_attributes",
+								"id": "no-empty-attributes",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Not Empty Attributes",
@@ -91,7 +91,7 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_dns",
+								"id": "prefer-dns",
 								"weight": 100,
 								"errorLevel": "error",
 								"name": "Enforce DNS Over IP usage",
@@ -108,7 +108,7 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_https_protocol",
+								"id": "secure-https-protocol",
 								"weight": 30,
 								"errorLevel": "error",
 								"name": "Enforce HTTPS protocol",
@@ -117,7 +117,7 @@ func TestLinterResource(t *testing.T) {
 								"tips": []
 							},
 							{
-								"id": "ensures_no_api_key_leak",
+								"id": "no-api-key-leak",
 								"weight": 70,
 								"errorLevel": "error",
 								"name": "No API Key Leak",
@@ -145,7 +145,7 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "span_naming",
+								"id": "span-naming",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Span Name Convention",
@@ -154,7 +154,7 @@ func TestLinterResource(t *testing.T) {
 								"tips": []
 							},
 							{
-								"id": "required_attributes",
+								"id": "required-attributes",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Required Attributes By Span Type",
@@ -165,7 +165,7 @@ func TestLinterResource(t *testing.T) {
 								]
 							},
 							{
-								"id": "attribute_naming",
+								"id": "attribute-naming",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Attribute Naming",
@@ -177,7 +177,7 @@ func TestLinterResource(t *testing.T) {
 								]
 							},
 							{
-								"id": "not_empty_attributes",
+								"id": "no-empty-attributes",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Not Empty Attributes",
@@ -196,7 +196,7 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_dns",
+								"id": "prefer-dns",
 								"weight": 100,
 								"errorLevel": "error",
 								"name": "Enforce DNS Over IP usage",
@@ -213,7 +213,7 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_https_protocol",
+								"id": "secure-https-protocol",
 								"weight": 30,
 								"errorLevel": "error",
 								"name": "Enforce HTTPS protocol",
@@ -222,7 +222,7 @@ func TestLinterResource(t *testing.T) {
 								"tips": []
 							},
 							{
-								"id": "ensures_no_api_key_leak",
+								"id": "no-api-key-leak",
 								"weight": 70,
 								"errorLevel": "error",
 								"name": "No API Key Leak",

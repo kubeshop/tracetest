@@ -49,8 +49,10 @@ const TestRunService = () => ({
       .flatMap(rule =>
         rule.results.map(result => ({
           ...result,
+          ruleId: rule.id,
           ruleName: rule.name,
           ruleErrorDescription: rule.errorDescription,
+          ruleDocumentationUrl: rule.documentation,
           pluginName: rule.pluginName,
         }))
       )

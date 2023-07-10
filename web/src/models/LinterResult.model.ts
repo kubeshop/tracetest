@@ -40,16 +40,19 @@ function LinterResultPluginRuleResult({
 }
 
 function LinterResultPluginRule({
+  id = '',
   name = '',
   description = '',
   errorDescription = '',
   passed = false,
   weight = 0,
   tips = [],
+  documentation = '',
   results = [],
   level = 'error',
 }: TRawLinterResultPluginRule = {}): LinterResultPluginRule {
   return {
+    id,
     name,
     level: level as LinterRuleErrorLevel,
     description,
@@ -57,6 +60,7 @@ function LinterResultPluginRule({
     passed,
     weight,
     tips,
+    documentation,
     results: results.map(result => LinterResultPluginRuleResult(result)),
   };
 }

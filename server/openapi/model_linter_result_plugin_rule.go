@@ -10,6 +10,8 @@
 package openapi
 
 type LinterResultPluginRule struct {
+	Id string `json:"id,omitempty"`
+
 	Name string `json:"name,omitempty"`
 
 	Description string `json:"description,omitempty"`
@@ -19,6 +21,8 @@ type LinterResultPluginRule struct {
 	Passed bool `json:"passed,omitempty"`
 
 	Weight int32 `json:"weight,omitempty"`
+
+	Documentation string `json:"documentation,omitempty"`
 
 	Tips []string `json:"tips,omitempty"`
 

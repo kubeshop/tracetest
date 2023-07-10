@@ -162,4 +162,10 @@ export const SwitchContainer = styled.div`
 
 export const List = styled.ul`
   padding-inline-start: 20px;
+  margin-bottom: 4px;
+`;
+
+export const RuleLinkText = styled(Typography.Text)<{$isSmall: boolean}>`
+  color: ${({theme}) => theme.color.textSecondary};
+  font-size: ${({theme, $isSmall}) => ($isSmall ? theme.size.xs : theme.size.sm)};
 `;

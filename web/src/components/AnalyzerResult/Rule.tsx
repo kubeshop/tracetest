@@ -9,6 +9,7 @@ import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
 import * as S from './AnalyzerResult.styled';
 import RuleIcon from './RuleIcon';
+import RuleLink from './RuleLink';
 
 interface IProps {
   rule: LinterResultPluginRule;
@@ -21,7 +22,7 @@ function getSpanName(spans: Span[], spanId: string) {
 }
 
 const Rule = ({
-  rule: {tips, passed, description, name, errorDescription, results = [], level, weight = 0},
+  rule: {id, tips, documentation, passed, description, name, errorDescription, results = [], level, weight = 0},
   trace,
 }: IProps) => {
   const dispatch = useAppDispatch();
@@ -89,6 +90,8 @@ const Rule = ({
                 <Typography.Text>{result.errors[0].description}</Typography.Text>
               </div>
             )}
+
+            {!result.passed && <RuleLink id={id} url={documentation} />}
           </div>
         ))}
       </S.RuleBody>
