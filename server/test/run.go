@@ -189,15 +189,15 @@ func (r Run) RequiredGateFailed(gate testrunner.RequiredGate) Run {
 func (r Run) GenerateRequiredGateResult(gates []testrunner.RequiredGate) testrunner.RequiredGatesResult {
 	requiredGatesResult := testrunner.NewRequiredGatesResult(gates)
 	if !r.Results.AllPassed {
-		requiredGatesResult = r.RequiredGatesResult.OnFailed(testrunner.RequiredGateTestSpecs)
+		requiredGatesResult = requiredGatesResult.OnFailed(testrunner.RequiredGateTestSpecs)
 	}
 
 	if !r.Linter.Passed {
-		requiredGatesResult = r.RequiredGatesResult.OnFailed(testrunner.RequiredGateAnalyzerRules)
+		requiredGatesResult = requiredGatesResult.OnFailed(testrunner.RequiredGateAnalyzerRules)
 	}
 
 	if r.Linter.Score < r.Linter.MinimumScore {
-		requiredGatesResult = r.RequiredGatesResult.OnFailed(testrunner.RequiredGateAnalyzerScore)
+		requiredGatesResult = requiredGatesResult.OnFailed(testrunner.RequiredGateAnalyzerScore)
 	}
 
 	return requiredGatesResult

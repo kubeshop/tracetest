@@ -61,7 +61,11 @@ func (r RequiredGatesResult) OnFailed(failed RequiredGate) RequiredGatesResult {
 	if r.isRequiredGate(failed) {
 		r.Passed = false
 	}
-	r.Failed = append(r.Failed, failed)
+
+	index := slices.Index(r.Failed, failed)
+	if index == -1 {
+		r.Failed = append(r.Failed, failed)
+	}
 
 	return r
 }

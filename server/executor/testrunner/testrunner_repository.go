@@ -33,7 +33,7 @@ const (
 	INSERT INTO test_runners(
 		"id",
 		"name",
-		"required_gates",
+		"required_gates"
 	)
 	VALUES ($1, $2, $3)`
 	deleteQuery = `DELETE FROM test_runners`
