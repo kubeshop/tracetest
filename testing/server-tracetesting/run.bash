@@ -68,7 +68,7 @@ run_test_suite_for_feature() {
   junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run test --file $definition --environment ./tracetesting-env.yaml --junit $junit_output"
+  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --environment ./tracetesting-env.yaml --junit $junit_output"
   echo $testCMD
   $testCMD
   return $?
