@@ -79,6 +79,34 @@ var (
 		return fileutil.New(input.AbsPath(), []byte(updated)), nil
 	})
 
+	transactionClient = resourcemanager.NewClient(
+		httpClient,
+		"transaction", "transactions",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "VERSION", Path: "spec.version"},
+				{Header: "STEPS", Path: "spec.summary.steps"},
+				{Header: "RUNS", Path: "spec.summary.runs"},
+				{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
+				{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
+				{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
+			},
+			ItemModifier: func(item *gabs.Container) error {
+				// set spec.summary.steps to the number of steps in the transaction
+				item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
+
+				if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
+					return err
+				}
+
+				return nil
+			},
+		}),
+		resourcemanager.WithApplyPreProcessor(transactionPreprocessor.Preprocess),
+	)
+
 	resources = resourcemanager.NewRegistry().
 			Register(
 			resourcemanager.NewClient(
@@ -164,35 +192,7 @@ var (
 			),
 		).
 		Register(environmentClient).
-		Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"transaction", "transactions",
-				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "VERSION", Path: "spec.version"},
-						{Header: "STEPS", Path: "spec.summary.steps"},
-						{Header: "RUNS", Path: "spec.summary.runs"},
-						{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
-						{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
-						{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
-					},
-					ItemModifier: func(item *gabs.Container) error {
-						// set spec.summary.steps to the number of steps in the transaction
-						item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
-
-						if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
-							return err
-						}
-
-						return nil
-					},
-				}),
-				resourcemanager.WithApplyPreProcessor(transactionPreprocessor.Preprocess),
-			),
-		).
+		Register(transactionClient).
 		Register(testClient)
 )
 

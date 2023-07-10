@@ -60,13 +60,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		overrideConfig()
 		setupVersion()
 		setupResources()
-
-		runnerRegsitry = runner.NewRegistry()
-		runnerRegsitry.Register(runner.TestRunner(
-			testClient,
-			utils.GetAPIClient(cliConfig),
-			formatters.TestRun(cliConfig.URL(), true),
-		))
+		setupRunners()
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
@@ -91,6 +85,21 @@ func overrideConfig() {
 		cliConfig.Scheme = scheme
 		cliConfig.Endpoint = endpoint
 	}
+}
+
+func setupRunners() {
+	runnerRegsitry = runner.NewRegistry()
+	runnerRegsitry.Register(runner.TestRunner(
+		testClient,
+		utils.GetAPIClient(cliConfig),
+		formatters.TestRun(cliConfig.URL(), true),
+	))
+
+	runnerRegsitry.Register(runner.TransactionRunner(
+		transactionClient,
+		utils.GetAPIClient(cliConfig),
+		formatters.TransactionRun(cliConfig.URL(), true),
+	))
 }
 
 func setupOutputFormat(cmd *cobra.Command) {
