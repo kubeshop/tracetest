@@ -43,21 +43,23 @@ func TestLinterResource(t *testing.T) {
 								"id": "span-naming",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Span Name Convention",
+								"name": "Span Naming",
 								"errorDescription": "",
-								"description": "Ensure all spans follow the naming convention",
-								"tips": []
+								"description": "Enforce span names that identify a class of Spans",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/span-naming"
 							},
 							{
 								"id": "required-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Required Attributes By Span Type",
+								"name": "Required Attributes",
 								"errorDescription": "This span is missing the following required attributes:",
-								"description": "Ensure all required attributes are present",
+								"description": "Enforce required attributes by span type",
 								"tips": [
 									"This rule checks if all required attributes are present in spans of given type"
-								]
+								],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/required-attributes"
 							},
 							{
 								"id": "attribute-naming",
@@ -65,26 +67,28 @@ func TestLinterResource(t *testing.T) {
 								"errorLevel": "error",
 								"name": "Attribute Naming",
 								"errorDescription": "The following attributes do not follow the naming convention:",
-								"description": "Ensure all attributes follow the naming convention",
+								"description": "Enforce attribute keys to follow common specifications",
 								"tips": [
 									"You should always add namespaces to your span names to ensure they will not be overwritten",
 									"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode"
-								]
+								],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/attribute-naming"
 							},
 							{
 								"id": "no-empty-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Not Empty Attributes",
+								"name": "No Empty Attributes",
 								"errorDescription": "The following attributes are empty:",
-								"description": "Does not allow empty attribute values in any span",
+								"description": "Disallow empty attribute values",
 								"tips": [
 									"Empty attributes don't provide any information about the operation and should be removed"
-								]
+								],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/no-empty-attributes"
 							}
 						],
 						"name": "OTel Semantic Conventions",
-						"description": "Enforce standards for spans and attributes"
+						"description": "Enforce trace standards following OTel Semantic Conventions"
 					},
 					{
 						"id": "common",
@@ -94,14 +98,15 @@ func TestLinterResource(t *testing.T) {
 								"id": "prefer-dns",
 								"weight": 100,
 								"errorLevel": "error",
-								"name": "Enforce DNS Over IP usage",
+								"name": "Prefer DNS",
 								"errorDescription": "The following attributes are using IP addresses instead of DNS:",
-								"description": "Enforce DNS usage over IP addresses",
-								"tips": []
+								"description": "Enforce usage of DNS instead of IP addresses",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/prefer-dns"
 							}
 						],
-						"name": "Common problems",
-						"description": "Helps you find common problems with your application"
+						"name": "Common Problems",
+						"description": "Help you find common mistakes with your application"
 					},
 					{
 						"id": "security",
@@ -111,10 +116,11 @@ func TestLinterResource(t *testing.T) {
 								"id": "secure-https-protocol",
 								"weight": 30,
 								"errorLevel": "error",
-								"name": "Enforce HTTPS protocol",
-								"errorDescription": "The following spans are using http protocol:",
-								"description": "Ensure all request use https",
-								"tips": []
+								"name": "Secure HTTPS Protocol",
+								"errorDescription": "The following spans are using insecure http protocol:",
+								"description": "Enforce usage of secure protocol for HTTP server spans",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/secure-https-protocol"
 							},
 							{
 								"id": "no-api-key-leak",
@@ -122,12 +128,13 @@ func TestLinterResource(t *testing.T) {
 								"errorLevel": "error",
 								"name": "No API Key Leak",
 								"errorDescription": "The following attributes are exposing API keys:",
-								"description": "Ensure no API keys are leaked in http headers",
-								"tips": []
+								"description": "Disallow leaked API keys for HTTP spans",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/no-api-key-leak"
 							}
 						],
 						"name": "Security",
-						"description": "Enforce security for spans and attributes"
+						"description": "Help you find security problems with your application"
 					}
 				]
 			}
@@ -148,21 +155,23 @@ func TestLinterResource(t *testing.T) {
 								"id": "span-naming",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Span Name Convention",
+								"name": "Span Naming",
 								"errorDescription": "",
-								"description": "Ensure all spans follow the naming convention",
-								"tips": []
+								"description": "Enforce span names that identify a class of Spans",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/span-naming"
 							},
 							{
 								"id": "required-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Required Attributes By Span Type",
+								"name": "Required Attributes",
 								"errorDescription": "This span is missing the following required attributes:",
-								"description": "Ensure all required attributes are present",
+								"description": "Enforce required attributes by span type",
 								"tips": [
 									"This rule checks if all required attributes are present in spans of given type"
-								]
+								],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/required-attributes"
 							},
 							{
 								"id": "attribute-naming",
@@ -170,26 +179,28 @@ func TestLinterResource(t *testing.T) {
 								"errorLevel": "error",
 								"name": "Attribute Naming",
 								"errorDescription": "The following attributes do not follow the naming convention:",
-								"description": "Ensure all attributes follow the naming convention",
+								"description": "Enforce attribute keys to follow common specifications",
 								"tips": [
 									"You should always add namespaces to your span names to ensure they will not be overwritten",
 									"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode"
-								]
+								],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/attribute-naming"
 							},
 							{
 								"id": "no-empty-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Not Empty Attributes",
+								"name": "No Empty Attributes",
 								"errorDescription": "The following attributes are empty:",
-								"description": "Does not allow empty attribute values in any span",
+								"description": "Disallow empty attribute values",
 								"tips": [
 									"Empty attributes don't provide any information about the operation and should be removed"
-								]
+								],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/no-empty-attributes"
 							}
 						],
 						"name": "OTel Semantic Conventions",
-						"description": "Enforce standards for spans and attributes"
+						"description": "Enforce trace standards following OTel Semantic Conventions"
 					},
 					{
 						"id": "common",
@@ -199,14 +210,15 @@ func TestLinterResource(t *testing.T) {
 								"id": "prefer-dns",
 								"weight": 100,
 								"errorLevel": "error",
-								"name": "Enforce DNS Over IP usage",
+								"name": "Prefer DNS",
 								"errorDescription": "The following attributes are using IP addresses instead of DNS:",
-								"description": "Enforce DNS usage over IP addresses",
-								"tips": []
+								"description": "Enforce usage of DNS instead of IP addresses",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/prefer-dns"
 							}
 						],
-						"name": "Common problems",
-						"description": "Helps you find common problems with your application"
+						"name": "Common Problems",
+						"description": "Help you find common mistakes with your application"
 					},
 					{
 						"id": "security",
@@ -216,10 +228,11 @@ func TestLinterResource(t *testing.T) {
 								"id": "secure-https-protocol",
 								"weight": 30,
 								"errorLevel": "error",
-								"name": "Enforce HTTPS protocol",
+								"name": "Secure HTTPS Protocol",
 								"errorDescription": "The following spans are using http protocol:",
-								"description": "Ensure all request use https",
-								"tips": []
+								"description": "Enforce usage of secure protocol for HTTP server spans",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/secure-https-protocol"
 							},
 							{
 								"id": "no-api-key-leak",
@@ -227,12 +240,13 @@ func TestLinterResource(t *testing.T) {
 								"errorLevel": "error",
 								"name": "No API Key Leak",
 								"errorDescription": "The following attributes are exposing API keys:",
-								"description": "Ensure no API keys are leaked in http headers",
-								"tips": []
+								"description": "Disallow leaked API keys for HTTP spans",
+								"tips": [],
+								"documentation": "https://docs.tracetest.io/analyzer/rules/no-api-key-leak"
 							}
 						],
 						"name": "Security",
-						"description": "Enforce security for spans and attributes"
+						"description": "Help you find security problems with your application"
 					}
 				]
 			}
