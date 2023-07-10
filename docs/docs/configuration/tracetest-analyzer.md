@@ -3,7 +3,7 @@
 Tracetest Analyzer is provided in the Tracetest application to aid in the analysis of traces and easily pinpoint issues to speed up resolution.
 
 :::tip
-[Read more about Tracetest Analyzer concepts here.](../concepts/tracetest-analyzer-concepts.md)
+[Read more about Tracetest Analyzer concepts here.](../analyzer/concepts.md)
 :::
 
 ## Create a Test
