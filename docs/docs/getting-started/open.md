@@ -73,7 +73,7 @@ The **Trace** tab shows the entire distributed trace for debugging and a trace a
 
 The **Test** tab shows span attributes. Here you add test specs and assertions on attribute values. You also get a test snippets out-of-the-box for common test cases.
 
-In the sample below you see how to assert that all database spans return in less than `100ms`.
+In the sample below, you see how to assert that all database spans return in less than `100ms`.
 
 ![test specs](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png)
 

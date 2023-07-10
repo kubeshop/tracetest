@@ -30,11 +30,11 @@ New to trace-based testing? Read more about the concepts [here](./concepts/what-
 
 Here you can see how Tracetest interacts with a system under test.
 
-1. Trigger a test and generate a trace response
-2. Fetch traces to render and analyze them
-3. Add assertions to traces
-4. See test results
-5. Run tests as part of CI/CD pipelines
+1. Trigger a test and generate a trace response.
+2. Fetch traces to render and analyze them.
+3. Add assertions to traces.
+4. See test results.
+5. Run tests as part of CI/CD pipelines.
 
 ![Marketechture](https://res.cloudinary.com/djwdcmwdz/image/upload/v1686654113/docs/tracetest-marketechture-jun12-v3_ffj2e2.png)
 
