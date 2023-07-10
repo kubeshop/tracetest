@@ -1,20 +1,14 @@
 # Detailed Instructions on Installing Tracetest Using the CLI
 
-This page contains a reference of all options for installing Tracetest CLI, and how to use it to install Tracetest Server.
-
-:::note
-To read about deploying Tracetest with Helm, view the [Kubernetes Deployment docs](../deployment/kubernetes.mdx).
-:::
-
 Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
 
 :::note
 To read about installing the Tracetest CLI, view the [CLI installation reference](./cli-installation-reference.md).
 :::
 
-This reference will provide a step-by-step guide to install Tracetest using the Tracetest CLI.
+This page provides a step-by-step guide to install Tracetest using the Tracetest CLI.
 
-### Prerequisites
+## Prerequisites
 
 :::info
 Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/), or [Kubernetes](https://kubernetes.io/) installed.
