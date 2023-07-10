@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,8 +17,44 @@ const VerbApply Verb = "apply"
 
 type applyPreProcessorFn func(context.Context, fileutil.File) (fileutil.File, error)
 
+func (c Client) validType(inputFile fileutil.File) error {
+	c.logger.Debug("Validating resource type", zap.String("inputFile", inputFile.AbsPath()))
+
+	var raw any
+	err := (yamlFormat{}).Unmarshal(inputFile.Contents(), &raw)
+	if err != nil {
+		return fmt.Errorf("cannot unmarshal yaml: %w", err)
+	}
+	c.logger.Debug("Unmarshaled yaml", zap.Any("raw", raw))
+
+	parsed := gabs.Wrap(raw)
+	rawType := parsed.Path("type").Data()
+	if rawType == nil {
+		return errors.New("cannot find type in yaml")
+	}
+	c.logger.Debug("Found type", zap.String("type", fmt.Sprintf("%T", rawType)))
+	t, ok := rawType.(string)
+	if !ok {
+		return fmt.Errorf("cannot parse type from yaml: %w", err)
+	}
+	c.logger.Debug("Parsed type", zap.String("type", t))
+
+	if t != c.resourceType() {
+		return fmt.Errorf("cannot apply %s to %s resource", t, c.resourceType())
+	}
+
+	c.logger.Debug("resource type is valid")
+
+	return nil
+
+}
+
 func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFormat Format) (string, error) {
 	originalInputFile := inputFile
+
+	if err := c.validType(inputFile); err != nil {
+		return "", err
+	}
 
 	c.logger.Debug("Applying resource",
 		zap.String("format", requestedFormat.String()),
@@ -53,11 +90,7 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 
 	// the files must be in yaml format, so we can safely force the content type,
 	// even if it doesn't matcht he user's requested format
-	yamlFormat, err := Formats.Get(FormatYAML)
-	if err != nil {
-		return "", fmt.Errorf("cannot get json format: %w", err)
-	}
-	req.Header.Set("Content-Type", yamlFormat.ContentType())
+	req.Header.Set("Content-Type", (yamlFormat{}).ContentType())
 
 	// final request looks like this:
 	// PUT {server}/{resourceNamePlural}

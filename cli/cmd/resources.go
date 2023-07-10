@@ -152,6 +152,7 @@ var (
 						{Header: "STRATEGY", Path: "spec.strategy"},
 					},
 				}),
+				resourcemanager.WithResourceType("PollingProfile"),
 			),
 		).
 		Register(
@@ -189,6 +190,7 @@ var (
 					},
 				}),
 				resourcemanager.WithDeleteSuccessMessage("DataStore removed. Defaulting back to no-tracing mode"),
+				resourcemanager.WithResourceType("DataStore"),
 			),
 		).
 		Register(environmentClient).
