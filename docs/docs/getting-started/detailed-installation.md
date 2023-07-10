@@ -94,7 +94,7 @@ In this step, you can choose to install just Tracetest alone or install it with 
 
 ```text title="Expected output:"
 Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
-  I have a tracing environment already. Just install Tracetest
+  I have a tracing environment already - Just install Tracetest.
 > Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
