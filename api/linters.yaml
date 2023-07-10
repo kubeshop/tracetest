@@ -63,9 +63,6 @@ components:
         errorDescription:
           type: string
           readOnly: true
-        documentation:
-          type: string
-          readOnly: true
         tips:
           type: array
           items:
@@ -120,8 +117,6 @@ components:
           type: boolean
         weight:
           type: integer
-        documentation:
-          type: string
         tips:
           type: array
           items:

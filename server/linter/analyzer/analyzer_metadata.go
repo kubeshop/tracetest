@@ -53,7 +53,6 @@ var (
 		Description:      "Enforce span names that identify a class of Spans",
 		ErrorDescription: "",
 		Tips:             []string{},
-		Documentation:    "https://docs.tracetest.io/analyzer/rules/span-naming",
 		Weight:           25,
 		ErrorLevel:       "error",
 	}
@@ -64,7 +63,6 @@ var (
 		Description:      "Enforce required attributes by span type",
 		ErrorDescription: "This span is missing the following required attributes:",
 		Tips:             []string{"This rule checks if all required attributes are present in spans of given type"},
-		Documentation:    "https://docs.tracetest.io/analyzer/rules/required-attributes",
 		Weight:           25,
 		ErrorLevel:       "error",
 	}
@@ -78,9 +76,8 @@ var (
 			"You should always add namespaces to your span names to ensure they will not be overwritten",
 			"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode",
 		},
-		Documentation: "https://docs.tracetest.io/analyzer/rules/attribute-naming",
-		Weight:        25,
-		ErrorLevel:    "error",
+		Weight:     25,
+		ErrorLevel: "error",
 	}
 
 	NotEmptyAttributesRule = LinterRule{
@@ -89,7 +86,6 @@ var (
 		Description:      "Disallow empty attribute values",
 		ErrorDescription: "The following attributes are empty:",
 		Tips:             []string{"Empty attributes don't provide any information about the operation and should be removed"},
-		Documentation:    "https://docs.tracetest.io/analyzer/rules/no-empty-attributes",
 		Weight:           25,
 		ErrorLevel:       "error",
 	}
@@ -111,7 +107,6 @@ var (
 		Description:      "Enforce usage of DNS instead of IP addresses",
 		ErrorDescription: "The following attributes are using IP addresses instead of DNS:",
 		Tips:             []string{},
-		Documentation:    "https://docs.tracetest.io/analyzer/rules/prefer-dns",
 		Weight:           100,
 		ErrorLevel:       "error",
 	}
@@ -134,7 +129,6 @@ var (
 		Description:      "Enforce usage of secure protocol for HTTP server spans",
 		ErrorDescription: "The following spans are using insecure http protocol:",
 		Tips:             []string{},
-		Documentation:    "https://docs.tracetest.io/analyzer/rules/secure-https-protocol",
 		Weight:           30,
 		ErrorLevel:       "error",
 	}
@@ -145,7 +139,6 @@ var (
 		Description:      "Disallow leaked API keys for HTTP spans",
 		ErrorDescription: "The following attributes are exposing API keys:",
 		Tips:             []string{},
-		Documentation:    "https://docs.tracetest.io/analyzer/rules/no-api-key-leak",
 		Weight:           70,
 		ErrorLevel:       "error",
 	}

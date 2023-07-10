@@ -42,7 +42,6 @@ type (
 		ErrorDescription string   `json:"errorDescription"`
 		Description      string   `json:"description"`
 		Tips             []string `json:"tips"`
-		Documentation    string   `json:"documentation"`
 	}
 )
 
@@ -166,7 +165,6 @@ func (l Linter) WithMetadata() (Linter, error) {
 				Name:             metadataRule.Name,
 				ErrorDescription: metadataRule.ErrorDescription,
 				Tips:             metadataRule.Tips,
-				Documentation:    metadataRule.Documentation,
 			})
 		}
 

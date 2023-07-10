@@ -52,7 +52,6 @@ const TestRunService = () => ({
           ruleId: rule.id,
           ruleName: rule.name,
           ruleErrorDescription: rule.errorDescription,
-          ruleDocumentationUrl: rule.documentation,
           pluginName: rule.pluginName,
         }))
       )

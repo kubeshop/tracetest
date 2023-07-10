@@ -1,16 +1,16 @@
+import {ANALYZER_RULES_DOCUMENTATION_URL} from 'constants/Common.constants';
 import * as S from './AnalyzerResult.styled';
 
 interface IProps {
   id: string;
-  url: string;
   isSmall?: boolean;
 }
 
-const RuleLink = ({id, url, isSmall = false}: IProps) => (
+const RuleLink = ({id, isSmall = false}: IProps) => (
   <div>
     <S.RuleLinkText $isSmall={isSmall}>
       For more information, see{' '}
-      <a href={url} target="_blank">
+      <a href={`${ANALYZER_RULES_DOCUMENTATION_URL}/${id}`} target="_blank">
         analyzer({id})
       </a>
     </S.RuleLinkText>

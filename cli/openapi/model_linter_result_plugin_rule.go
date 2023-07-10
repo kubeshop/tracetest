@@ -25,7 +25,6 @@ type LinterResultPluginRule struct {
 	ErrorDescription *string                        `json:"errorDescription,omitempty"`
 	Passed           *bool                          `json:"passed,omitempty"`
 	Weight           *int32                         `json:"weight,omitempty"`
-	Documentation    *string                        `json:"documentation,omitempty"`
 	Tips             []string                       `json:"tips,omitempty"`
 	Results          []LinterResultPluginRuleResult `json:"results,omitempty"`
 	Level            *string                        `json:"level,omitempty"`
@@ -240,38 +239,6 @@ func (o *LinterResultPluginRule) SetWeight(v int32) {
 	o.Weight = &v
 }
 
-// GetDocumentation returns the Documentation field value if set, zero value otherwise.
-func (o *LinterResultPluginRule) GetDocumentation() string {
-	if o == nil || isNil(o.Documentation) {
-		var ret string
-		return ret
-	}
-	return *o.Documentation
-}
-
-// GetDocumentationOk returns a tuple with the Documentation field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *LinterResultPluginRule) GetDocumentationOk() (*string, bool) {
-	if o == nil || isNil(o.Documentation) {
-		return nil, false
-	}
-	return o.Documentation, true
-}
-
-// HasDocumentation returns a boolean if a field has been set.
-func (o *LinterResultPluginRule) HasDocumentation() bool {
-	if o != nil && !isNil(o.Documentation) {
-		return true
-	}
-
-	return false
-}
-
-// SetDocumentation gets a reference to the given string and assigns it to the Documentation field.
-func (o *LinterResultPluginRule) SetDocumentation(v string) {
-	o.Documentation = &v
-}
-
 // GetTips returns the Tips field value if set, zero value otherwise.
 func (o *LinterResultPluginRule) GetTips() []string {
 	if o == nil || isNil(o.Tips) {
@@ -395,9 +362,6 @@ func (o LinterResultPluginRule) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Weight) {
 		toSerialize["weight"] = o.Weight
-	}
-	if !isNil(o.Documentation) {
-		toSerialize["documentation"] = o.Documentation
 	}
 	if !isNil(o.Tips) {
 		toSerialize["tips"] = o.Tips

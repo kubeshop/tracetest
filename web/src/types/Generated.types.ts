@@ -1620,7 +1620,6 @@ export interface external {
           name?: string;
           description?: string;
           errorDescription?: string;
-          documentation?: string;
           tips?: string[];
           /** @enum {string} */
           errorLevel?: "error" | "warning" | "disabled";
@@ -1645,7 +1644,6 @@ export interface external {
           errorDescription?: string;
           passed?: boolean;
           weight?: number;
-          documentation?: string;
           tips?: string[];
           results?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResult"][];
           /** @enum {string} */

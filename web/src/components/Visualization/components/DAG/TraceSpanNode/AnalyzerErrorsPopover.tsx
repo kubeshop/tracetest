@@ -49,9 +49,7 @@ const AnalyzerErrorsPopover = ({errors, onClose}: IProps) => {
                 </div>
               )}
 
-              {analyzerError.ruleDocumentationUrl && (
-                <RuleLink id={analyzerError.ruleId} url={analyzerError.ruleDocumentationUrl} isSmall />
-              )}
+              {analyzerError.ruleId && <RuleLink id={analyzerError.ruleId} isSmall />}
             </S.RuleContainer>
           ))}
         </S.Body>

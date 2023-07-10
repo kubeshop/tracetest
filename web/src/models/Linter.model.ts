@@ -37,10 +37,9 @@ export function LinterRule({
   description = '',
   errorDescription = '',
   tips = [],
-  documentation = '',
   name = '',
 }: TRawLinterRule = {}): LinterRule {
-  return {id, weight, errorLevel, name, description, errorDescription, tips, documentation};
+  return {id, weight, errorLevel, name, description, errorDescription, tips};
 }
 
 function Linter({

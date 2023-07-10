@@ -15,7 +15,6 @@ export type TAnalyzerError = {
   ruleId: string;
   ruleName: string;
   ruleErrorDescription: string;
-  ruleDocumentationUrl: string;
   pluginName: string;
   passed: boolean;
   spanId: string;

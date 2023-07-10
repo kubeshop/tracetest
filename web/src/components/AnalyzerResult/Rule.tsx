@@ -22,7 +22,7 @@ function getSpanName(spans: Span[], spanId: string) {
 }
 
 const Rule = ({
-  rule: {id, tips, documentation, passed, description, name, errorDescription, results = [], level, weight = 0},
+  rule: {id, tips, passed, description, name, errorDescription, results = [], level, weight = 0},
   trace,
 }: IProps) => {
   const dispatch = useAppDispatch();
@@ -91,7 +91,7 @@ const Rule = ({
               </div>
             )}
 
-            {!result.passed && <RuleLink id={id} url={documentation} />}
+            {!result.passed && <RuleLink id={id} />}
           </div>
         ))}
       </S.RuleBody>

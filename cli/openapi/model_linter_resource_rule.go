@@ -24,7 +24,6 @@ type LinterResourceRule struct {
 	Name             *string  `json:"name,omitempty"`
 	Description      *string  `json:"description,omitempty"`
 	ErrorDescription *string  `json:"errorDescription,omitempty"`
-	Documentation    *string  `json:"documentation,omitempty"`
 	Tips             []string `json:"tips,omitempty"`
 	ErrorLevel       *string  `json:"errorLevel,omitempty"`
 }
@@ -206,38 +205,6 @@ func (o *LinterResourceRule) SetErrorDescription(v string) {
 	o.ErrorDescription = &v
 }
 
-// GetDocumentation returns the Documentation field value if set, zero value otherwise.
-func (o *LinterResourceRule) GetDocumentation() string {
-	if o == nil || isNil(o.Documentation) {
-		var ret string
-		return ret
-	}
-	return *o.Documentation
-}
-
-// GetDocumentationOk returns a tuple with the Documentation field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *LinterResourceRule) GetDocumentationOk() (*string, bool) {
-	if o == nil || isNil(o.Documentation) {
-		return nil, false
-	}
-	return o.Documentation, true
-}
-
-// HasDocumentation returns a boolean if a field has been set.
-func (o *LinterResourceRule) HasDocumentation() bool {
-	if o != nil && !isNil(o.Documentation) {
-		return true
-	}
-
-	return false
-}
-
-// SetDocumentation gets a reference to the given string and assigns it to the Documentation field.
-func (o *LinterResourceRule) SetDocumentation(v string) {
-	o.Documentation = &v
-}
-
 // GetTips returns the Tips field value if set, zero value otherwise.
 func (o *LinterResourceRule) GetTips() []string {
 	if o == nil || isNil(o.Tips) {
@@ -321,7 +288,6 @@ func (o LinterResourceRule) ToMap() (map[string]interface{}, error) {
 	// skip: name is readOnly
 	// skip: description is readOnly
 	// skip: errorDescription is readOnly
-	// skip: documentation is readOnly
 	// skip: tips is readOnly
 	if !isNil(o.ErrorLevel) {
 		toSerialize["errorLevel"] = o.ErrorLevel

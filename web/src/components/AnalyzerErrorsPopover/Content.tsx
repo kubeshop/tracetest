@@ -33,9 +33,7 @@ const Content = ({errors}: IProps) => (
           </div>
         )}
 
-        {analyzerError.ruleDocumentationUrl && (
-          <RuleLink id={analyzerError.ruleId} url={analyzerError.ruleDocumentationUrl} />
-        )}
+        {analyzerError.ruleId && <RuleLink id={analyzerError.ruleId} />}
       </S.RuleContainer>
     ))}
   </S.ContentContainer>

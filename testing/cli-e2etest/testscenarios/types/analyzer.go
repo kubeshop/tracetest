@@ -32,7 +32,6 @@ type AnalyzerRule struct {
 	ErrorDescription string   `json:"errorDescription"`
 	Description      string   `json:"description"`
 	Tips             []string `json:"tips"`
-	Documentation    string   `json:"documentation"`
 	Name             string   `json:"name"`
 	Enabled          bool     `json:"enabled"`
 }

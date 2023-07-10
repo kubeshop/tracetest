@@ -48,7 +48,6 @@ func (m OpenAPI) LinterResultPluginRule(in analyzer.RuleResult) openapi.LinterRe
 		Name:             in.Name,
 		Weight:           int32(in.Weight),
 		Tips:             in.Tips,
-		Documentation:    in.Documentation,
 		Results:          results,
 		Level:            in.Level,
 	}

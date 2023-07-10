@@ -22,8 +22,6 @@ type LinterResultPluginRule struct {
 
 	Weight int32 `json:"weight,omitempty"`
 
-	Documentation string `json:"documentation,omitempty"`
-
 	Tips []string `json:"tips,omitempty"`
 
 	Results []LinterResultPluginRuleResult `json:"results,omitempty"`

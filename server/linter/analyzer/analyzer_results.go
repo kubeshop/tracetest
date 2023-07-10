@@ -27,7 +27,6 @@ type RuleResult struct {
 	Description      string   `json:"description"`
 	ErrorDescription string   `json:"errorDescription"`
 	Tips             []string `json:"tips"`
-	Documentation    string   `json:"documentation"`
 	Weight           int      `json:"weight"`
 	Level            string   `json:"level"`
 
@@ -44,7 +43,6 @@ func NewRuleResult(config LinterRule, results EvalRuleResult) RuleResult {
 		Description:      config.Description,
 		ErrorDescription: config.ErrorDescription,
 		Tips:             config.Tips,
-		Documentation:    config.Documentation,
 		Weight:           config.Weight,
 		Level:            config.ErrorLevel,
 
