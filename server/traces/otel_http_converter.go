@@ -30,11 +30,18 @@ type httpSpan struct {
 	StartTimeUnixNano string               `json:"startTimeUnixNano"`
 	EndTimeUnixNano   string               `json:"endTimeUnixNano"`
 	Attributes        []*httpSpanAttribute `json:"attributes"`
+	Events            []*httpSpanEvent     `json:"events"`
 	Status            *httpSpanStatus      `json:"status"`
 }
 
 type httpSpanStatus struct {
 	Code string `json:"code"`
+}
+
+type httpSpanEvent struct {
+	Name       string               `json:"name"`
+	Timestamp  string               `json:"timeUnixNano"`
+	Attributes []*httpSpanAttribute `json:"attributes"`
 }
 
 type httpSpanAttribute struct {
@@ -90,7 +97,32 @@ func convertHttpOtelSpanIntoSpan(span *httpSpan) *model.Span {
 		Parent:     nil,
 		Children:   make([]*model.Span, 0),
 		Attributes: attributes,
+		Events:     extractEventsFromHttpSpan(span),
 	}
+}
+
+func extractEventsFromHttpSpan(span *httpSpan) []model.SpanEvent {
+	output := make([]model.SpanEvent, 0, len(span.Events))
+	for _, event := range span.Events {
+		attributes := make(model.Attributes, 0)
+		for _, attribute := range event.Attributes {
+			attributes[attribute.Key] = getHttpAttributeValue(attribute.Value)
+		}
+
+		var timestamp time.Time
+		if event.Timestamp != "" {
+			timestampNs, _ := strconv.ParseInt(span.StartTimeUnixNano, 10, 64)
+			timestamp = time.Unix(0, timestampNs)
+		}
+
+		output = append(output, model.SpanEvent{
+			Name:       event.Name,
+			Timestamp:  timestamp,
+			Attributes: attributes,
+		})
+	}
+
+	return output
 }
 
 func getHttpAttributeValue(value map[string]interface{}) string {
