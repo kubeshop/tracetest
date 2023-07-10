@@ -35,11 +35,10 @@ func init() {
 			}
 
 			result, err := resourceClient.Get(ctx, getParams.ResourceID, resultFormat)
+			if errors.Is(err, resourcemanager.ErrNotFound) {
+				return result, nil
+			}
 			if err != nil {
-				if errors.Is(err, resourcemanager.ErrNotFound) {
-					return result, nil
-				}
-
 				return "", err
 			}
 
