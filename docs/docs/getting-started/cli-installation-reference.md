@@ -1,6 +1,6 @@
 # CLI Installation Reference
 
-This page contains a reference of all options how to install Tracetest CLI.
+This page contains a reference of all options for installing Tracetest CLI.
 
 ## Detailed Instructions on Installing Tracetest Using the CLI
 
