@@ -71,6 +71,11 @@ func (e missingEnvVarsError) Error() string {
 	return fmt.Sprintf("missing env vars: %v", []envVar(e))
 }
 
+func (e missingEnvVarsError) Is(target error) bool {
+	_, ok := target.(missingEnvVarsError)
+	return ok
+}
+
 func buildMissingEnvVarsError(body []byte) error {
 	var missingVarsErrResp openapi.MissingVariablesError
 	err := jsonFormat.Unmarshal(body, &missingVarsErrResp)

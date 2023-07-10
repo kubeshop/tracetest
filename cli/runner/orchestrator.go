@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -181,14 +182,13 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		if err == nil {
 			break
 		}
-		missingEnvVarsErr, ok := err.(missingEnvVarsError)
-		if !ok {
+		if !errors.Is(err, missingEnvVarsError{}) {
 			// actual error, return
 			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
 		}
 
 		// missing vars error
-		ev = askForMissingVars([]envVar(missingEnvVarsErr))
+		ev = askForMissingVars([]envVar(err.(missingEnvVarsError)))
 		o.logger.Debug("filled variables", zap.Any("variables", ev))
 	}
 

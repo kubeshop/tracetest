@@ -103,6 +103,11 @@ func (e requestError) Error() string {
 	return e.Message
 }
 
+func (e requestError) Is(target error) bool {
+	_, ok := target.(requestError)
+	return ok
+}
+
 func isSuccessResponse(resp *http.Response) bool {
 	// successfull http status codes are 2xx
 	return resp.StatusCode >= 200 && resp.StatusCode < 300

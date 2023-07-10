@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -41,12 +42,14 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
-		reqErr, ok := err.(requestError)
-		if ok && reqErr.Code == http.StatusNotFound {
+		if err != nil && !errors.Is(err, requestError{}) {
+			return "", fmt.Errorf("could not Get resource: %w", err)
+		}
+
+		if err.(requestError).Code == http.StatusNotFound {
 			return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), ErrNotFound
 		}
 
-		return "", fmt.Errorf("could not Get resource: %w", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
