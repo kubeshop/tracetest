@@ -22,7 +22,7 @@ With Tracetest you can:
 - Work with your existing distributed tracing solution, allowing you to build tests based on your already instrumented system.
 - Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
 - Define assertions against both the response and trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
-- Save and run the tests manually or via CI build jobs with
+- Save and run the tests manually or via CI build jobs
 
 New to trace-based testing? Read more about the concepts [here](./concepts/what-is-trace-based-testing).
 
