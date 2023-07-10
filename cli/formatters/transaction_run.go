@@ -32,11 +32,12 @@ type TransactionRunOutput struct {
 
 func (f transactionRun) Format(output TransactionRunOutput, format Output) string {
 	output.RunWebURL = f.getRunLink(output.Transaction.GetId(), output.Run.GetId())
+
 	switch format {
-	case Pretty:
-		return f.pretty(output)
 	case JSON:
 		return f.json(output)
+	case Pretty, "":
+		return f.pretty(output)
 	}
 
 	return ""
@@ -77,16 +78,14 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 }
 
 func (f transactionRun) pretty(output TransactionRunOutput) string {
+	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), output.RunWebURL)
 	if !output.HasResults {
-		return ""
+		return f.getColoredText(true, message)
 	}
 
-	link := output.RunWebURL
 	allStepsPassed := f.allTransactionStepsPassed(output)
-	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
-
 	if !allStepsPassed {
-		message = fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), link)
+		message = fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), output.RunWebURL)
 	}
 
 	// the transaction name + all steps
@@ -130,5 +129,5 @@ func (f transactionRun) getColoredText(passed bool, text string) string {
 }
 
 func (f transactionRun) getRunLink(transactionID, runID string) string {
-	return fmt.Sprintf("%s://%s/transaction/%s/run/%s", f.baseURL, transactionID, runID)
+	return fmt.Sprintf("%s/transaction/%s/run/%s", f.baseURL, transactionID, runID)
 }
