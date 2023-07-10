@@ -1,6 +1,6 @@
 # Detailed Instructions on Installing Tracetest Using the CLI
 
-This page contains a reference of all options how to install Tracetest CLI, and how to use it to install Tracetest Server.
+This page contains a reference of all options for installing Tracetest CLI, and how to use it to install Tracetest Server.
 
 :::note
 To read about deploying Tracetest with Helm, view the [Kubernetes Deployment docs](../deployment/kubernetes.mdx).
