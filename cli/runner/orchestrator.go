@@ -157,6 +157,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		}
 		o.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
 	} else {
+		o.logger.Debug("Definition file not provided, fetching resource by ID", zap.String("ID", opts.ID))
 		resource, err = r.GetByID(ctx, opts.ID)
 		if err != nil {
 			return ExitCodeGeneralError, fmt.Errorf("cannot get resource by ID: %w", err)

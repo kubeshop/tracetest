@@ -1,12 +1,15 @@
 package resourcemanager
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"path"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 type Verb string
@@ -15,6 +18,7 @@ type Client struct {
 	client             *HTTPClient
 	resourceName       string
 	resourceNamePlural string
+	logger             *zap.Logger
 	options            options
 }
 
@@ -60,12 +64,14 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 // This configuration work both for a single resource from a Get, or a ResourceList from a List
 func NewClient(
 	httpClient *HTTPClient,
+	logger *zap.Logger,
 	resourceName, resourceNamePlural string,
 	opts ...option) Client {
 	c := Client{
 		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
+		logger:             logger,
 	}
 
 	for _, opt := range opts {
@@ -74,6 +80,8 @@ func NewClient(
 
 	return c
 }
+
+var ErrNotFound = errors.New("not found")
 
 type requestError struct {
 	Code    int    `json:"code"`

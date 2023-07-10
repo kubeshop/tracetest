@@ -37,8 +37,8 @@ func (r testRunner) Name() string {
 	return "test"
 }
 
-func (r testRunner) GetByID(_ context.Context, id string) (resource any, _ error) {
-	jsonTest, err := r.client.Get(context.Background(), id, jsonFormat)
+func (r testRunner) GetByID(ctx context.Context, id string) (resource any, _ error) {
+	jsonTest, err := r.client.Get(ctx, id, jsonFormat)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get test '%s': %w", id, err)
 	}

@@ -19,7 +19,7 @@ var (
 	httpClient = &resourcemanager.HTTPClient{}
 
 	environmentClient = resourcemanager.NewClient(
-		httpClient,
+		httpClient, cliLogger,
 		"environment", "environments",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
@@ -32,7 +32,7 @@ var (
 
 	testPreprocessor = preprocessor.Test(cliLogger)
 	testClient       = resourcemanager.NewClient(
-		httpClient,
+		httpClient, cliLogger,
 		"test", "tests",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
@@ -80,7 +80,7 @@ var (
 	})
 
 	transactionClient = resourcemanager.NewClient(
-		httpClient,
+		httpClient, cliLogger,
 		"transaction", "transactions",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
@@ -110,7 +110,7 @@ var (
 	resources = resourcemanager.NewRegistry().
 			Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"config", "configs",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -123,7 +123,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"analyzer", "analyzers",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -143,7 +143,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"pollingprofile", "pollingprofiles",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -156,7 +156,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"demo", "demos",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -170,7 +170,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"datastore", "datastores",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
