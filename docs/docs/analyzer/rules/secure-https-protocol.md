@@ -1,6 +1,6 @@
-# enforce_https_protocol
+# secure-https-protocol
 
-Enforce usage of secure protocol for HTTP server spans
+Enforce usage of secure protocol for HTTP server spans.
 
 ## Rule Details
 

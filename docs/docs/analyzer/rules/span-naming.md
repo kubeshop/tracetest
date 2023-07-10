@@ -1,6 +1,6 @@
-# span_naming
+# span-naming
 
-Enforce span names that identify a class of Spans, rather than individual Span instances
+Enforce span names that identify a class of Spans, rather than individual Span instances.
 
 ## Rule Details
 

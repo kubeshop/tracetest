@@ -1,6 +1,6 @@
-# enforce_dns
+# prefer-dns
 
-Enforce usage of DNS instead of IP addresses
+Enforce usage of DNS instead of IP addresses.
 
 ## Rule Details
 
@@ -23,9 +23,9 @@ If span kind is `"client"`, the following attributes are evaluated:
 
 This rule has the following options:
 
-- `"error"` requires dns over IP addresses
-- `"disabled"` disables the dns over IP addresses verification
-- `"warning"` verifies dns over IP addresses but does not impact the analyzer score
+- `"error"` requires DNS over IP addresses
+- `"disabled"` disables the DNS over IP addresses verification
+- `"warning"` verifies DNS over IP addresses but does not impact the analyzer score
 
 ## When Not To Use It
 

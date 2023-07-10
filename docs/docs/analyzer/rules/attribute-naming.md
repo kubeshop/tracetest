@@ -1,12 +1,12 @@
-# attribute_naming
+# attribute-naming
 
-Enforce attribute keys to follow common specifications
+Enforce attribute keys to follow common specifications.
 
 ## Rule Details
 
-An Attribute is a key-value pair, which is encapsulated as part of a span. The attribute key should follow a set of common specifications to be considered valid.
+An `Attribute` is a key-value pair, which is encapsulated as part of a span. The attribute key should follow a set of common specifications to be considered valid.
 
-The following OTel semantic conventions for attribute keys are defined:
+The following OpenTelemetry Semantic Conventions for attribute keys are defined:
 
 - It must be a non-null and non-empty string.
 - It must be a valid Unicode sequence.

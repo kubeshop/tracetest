@@ -1,10 +1,10 @@
-# not_empty_attributes
+# no-empty-attributes
 
-Disallow empty attribute values
+Disallow empty attribute values.
 
 ## Rule Details
 
-An Attribute is a key-value pair, which is encapsulated as part of a span. The attribute value should should not be empty to be considered valid.
+An `Attribute` is a key-value pair, which is encapsulated as part of a span. The attribute value should not be empty to be considered valid.
 
 ## Options
 

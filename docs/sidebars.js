@@ -271,66 +271,72 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "OTel Semantic Conventions",
-          link: {
-            type: "doc",
-            id: "analyzer/plugin-otel",
-          },
+          label: "Plugins",
           items: [
             {
-              type: "doc",
-              id: "analyzer/rules/span_naming",
-              label: "span_naming",
+              type: "category",
+              label: "OTel Semantic Conventions",
+              link: {
+                type: "doc",
+                id: "analyzer/plugins/otel-semantic-conventions",
+              },
+              items: [
+                {
+                  type: "doc",
+                  id: "analyzer/rules/span-naming",
+                  label: "span-naming",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/attribute-naming",
+                  label: "attribute-naming",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/required-attributes",
+                  label: "required-attributes",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/no-empty-attributes",
+                  label: "no-empty-attributes",
+                },
+              ],
             },
             {
-              type: "doc",
-              id: "analyzer/rules/required_attributes",
-              label: "required_attributes",
+              type: "category",
+              label: "Security",
+              link: {
+                type: "doc",
+                id: "analyzer/plugins/security",
+              },
+              items: [
+                {
+                  type: "doc",
+                  id: "analyzer/rules/secure-https-protocol",
+                  label: "secure-https-protocol",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/no-api-key-leak",
+                  label: "no-api-key-leak",
+                },
+              ],
             },
             {
-              type: "doc",
-              id: "analyzer/rules/attribute_naming",
-              label: "attribute_naming",
-            },
-            {
-              type: "doc",
-              id: "analyzer/rules/not_empty_attributes",
-              label: "not_empty_attributes",
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "Security",
-          link: {
-            type: "doc",
-            id: "analyzer/plugin-security",
-          },
-          items: [
-            {
-              type: "doc",
-              id: "analyzer/rules/enforce_https_protocol",
-              label: "enforce_https_protocol",
-            },
-            {
-              type: "doc",
-              id: "analyzer/rules/ensures_no_api_key_leak",
-              label: "ensures_no_api_key_leak",
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "Common Problems",
-          link: {
-            type: "doc",
-            id: "analyzer/plugin-common-problems",
-          },
-          items: [
-            {
-              type: "doc",
-              id: "analyzer/rules/enforce_dns",
-              label: "enforce_dns",
+              type: "category",
+              label: "Common Problems",
+              link: {
+                type: "doc",
+                id: "analyzer/plugins/common-problems",
+              },
+              items: [
+                {
+                  type: "doc",
+                  id: "analyzer/rules/prefer-dns",
+                  label: "prefer-dns",
+                },
+              ],
             },
           ],
         },

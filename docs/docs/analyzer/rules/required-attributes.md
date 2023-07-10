@@ -1,6 +1,6 @@
-# required_attributes
+# required-attributes
 
-Enforce required attributes by span type
+Enforce required attributes by span type.
 
 ## Rule Details
 
