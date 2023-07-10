@@ -1,4 +1,5 @@
 import {Model, TLintersSchemas} from 'types/Common.types';
+import {LinterRuleErrorLevel} from './Linter.model';
 
 type TRawLinterResult = TLintersSchemas['LinterResult'];
 type TRawLinterResultPlugin = TLintersSchemas['LinterResultPlugin'];
@@ -8,18 +9,20 @@ export type TRawLinterResultPluginRuleResultError = TLintersSchemas['LinterResul
 
 type LinterResultPluginRuleResultError = Model<TRawLinterResultPluginRuleResultError, {}>;
 type LinterResultPluginRuleResult = Model<TRawLinterResultPluginRuleResult, {}>;
-type LinterResultPluginRule = Model<TRawLinterResultPluginRule, {results: LinterResultPluginRuleResult[]}>;
-type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
+export type LinterResultPluginRule = Model<
+  TRawLinterResultPluginRule,
+  {results: LinterResultPluginRuleResult[]; level: LinterRuleErrorLevel}
+>;
+export type LinterResultPlugin = Model<TRawLinterResultPlugin, {rules: LinterResultPluginRule[]}>;
 type LinterResult = Model<TRawLinterResult, {plugins: LinterResultPlugin[]; isFailed: boolean}>;
 
 function LinterResultPluginRuleResultError({
   value = '',
   expected = '',
-  level = '',
   description = '',
   suggestions = [],
 }: TRawLinterResultPluginRuleResultError = {}): LinterResultPluginRuleResultError {
-  return {value, expected, level, description, suggestions};
+  return {value, expected, description, suggestions};
 }
 
 function LinterResultPluginRuleResult({
@@ -44,9 +47,11 @@ function LinterResultPluginRule({
   weight = 0,
   tips = [],
   results = [],
+  level = 'error',
 }: TRawLinterResultPluginRule = {}): LinterResultPluginRule {
   return {
     name,
+    level: level as LinterRuleErrorLevel,
     description,
     errorDescription,
     passed,

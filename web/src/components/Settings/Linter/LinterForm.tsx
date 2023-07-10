@@ -1,12 +1,14 @@
-import {Button, Form, Input, Switch} from 'antd';
+import {Button, Col, Form, Input, Row, Switch} from 'antd';
 import {useEffect} from 'react';
-
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import SettingService from 'services/Setting.service';
+import Collapse from 'components/Collapse/Collapse';
 import {ResourceType, TDraftLinter} from 'types/Settings.types';
-// import Plugin from './Plugin';
+import {CollapsePanel} from 'components/Collapse';
 import * as S from '../common/Settings.styled';
+import PluginHeader from './PluginHeader';
+import Plugin from './Plugin';
 
 const FORM_ID = 'linter';
 
@@ -16,7 +18,7 @@ const LinterForm = () => {
   const {linter} = useSettingsValues();
 
   useEffect(() => {
-    form.resetFields();
+    form.setFieldsValue(linter);
   }, [form, linter]);
 
   const handleOnSubmit = (values: TDraftLinter) => {
@@ -24,7 +26,6 @@ const LinterForm = () => {
       SettingService.getDraftResource(ResourceType.AnalyzerType, {
         ...values,
         minimumScore: parseInt(String(values?.minimumScore ?? 0), 10),
-        plugins: linter.plugins,
       }),
     ]);
   };
@@ -41,28 +42,42 @@ const LinterForm = () => {
       <Form.Item hidden name="id" />
       <Form.Item hidden name="name" />
 
-      <S.SwitchContainer>
-        <Form.Item name="enabled" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <label htmlFor={`${FORM_ID}_enabled`}>Enable Analyzer for All Tests</label>
-      </S.SwitchContainer>
+      <Row gutter={32} align="middle">
+        <Col span={8}>
+          <Form.Item
+            label="Minimum score"
+            name="minimumScore"
+            rules={[{required: true, message: 'Minimum score is required'}]}
+          >
+            <Input suffix="%" placeholder="0 to 100" type="number" />
+          </Form.Item>
+        </Col>
 
-      <Form.Item
-        label="Minimum score"
-        name="minimumScore"
-        rules={[{required: true, message: 'Minimum score is required'}]}
-        wrapperCol={{span: 8}}
-      >
-        <Input placeholder="0 to 100" type="number" />
-      </Form.Item>
+        <Col span={8}>
+          <S.SwitchContainer>
+            <Form.Item name="enabled" valuePropName="checked" noStyle>
+              <Switch />
+            </Form.Item>
+            <label htmlFor={`${FORM_ID}_enabled`}>Enable Analyzer for All Tests</label>
+          </S.SwitchContainer>
+        </Col>
+      </Row>
 
-      {/* <Typography.Title level={3}>Plugins</Typography.Title>
-      <S.LinterPluginsContainer>
-        {linter.plugins.map((plugin, index) => (
-          <Plugin formId={FORM_ID} index={index} key={plugin.name} plugin={plugin} />
-        ))}
-      </S.LinterPluginsContainer> */}
+      <Row>
+        <Col span={16}>
+          <Form.List name="plugins">
+            {fields => (
+              <Collapse>
+                {fields.map(field => (
+                  <CollapsePanel key={field.key} header={<PluginHeader fieldKey={field.name} />}>
+                    <Plugin fieldKey={field.name} baseName={['plugins', `${field.name}`]} />
+                  </CollapsePanel>
+                ))}
+              </Collapse>
+            )}
+          </Form.List>
+        </Col>
+      </Row>
 
       <S.FooterContainer>
         <Button htmlType="submit" loading={isLoading} type="primary">

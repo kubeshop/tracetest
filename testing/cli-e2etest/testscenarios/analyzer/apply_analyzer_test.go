@@ -38,9 +38,16 @@ func TestApplyAnalyzer(t *testing.T) {
 
 	analyzer := helpers.UnmarshalYAML[types.AnalyzerResource](t, result.StdOut)
 	require.Equal("Analyzer", analyzer.Type)
-	require.Equal("current", analyzer.Spec.Id)
+	require.Equal("current", analyzer.Spec.ID)
 	require.Equal("analyzer", analyzer.Spec.Name)
 	require.True(analyzer.Spec.Enabled)
 	require.Equal(analyzer.Spec.MinimumScore, 95)
 	require.Len(analyzer.Spec.Plugins, 3)
+
+	plugin1 := analyzer.Spec.Plugins[0]
+	require.Len(plugin1.Rules, 4)
+	require.Equal(plugin1.Rules[0].ID, "span_naming")
+	for _, rule := range plugin1.Rules {
+		require.Equal(rule.Weight, 25)
+	}
 }

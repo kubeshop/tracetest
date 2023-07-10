@@ -33,12 +33,47 @@ components:
     LinterResourcePlugin:
       type: object
       properties:
+        id:
+          type: string
         name:
           type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
         enabled:
           type: boolean
-        required:
-          type: boolean
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResourceRule"
+    LinterResourceRule:
+      type: object
+      properties:
+        id:
+          type: string
+        weight:
+          type: integer
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        errorDescription:
+          type: string
+          readOnly: true
+        tips:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        errorLevel:
+          type: string
+          enum:
+            - error
+            - warning
+            - disabled
     LinterResult:
       type: object
       properties:
@@ -88,6 +123,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/LinterResultPluginRuleResult"
+        level:
+          type: string
+          enum:
+            - error
+            - warning
+            - disabled
     LinterResultPluginRuleResult:
       type: object
       properties:
@@ -110,8 +151,6 @@ components:
         value:
           type: string
         expected:
-          type: string
-        level:
           type: string
         description:
           type: string

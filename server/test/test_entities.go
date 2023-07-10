@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -128,7 +129,7 @@ type (
 
 		TransactionID    string
 		TransactionRunID string
-		Linter           model.LinterResult
+		Linter           analyzer.LinterResult
 	}
 
 	RunResults struct {

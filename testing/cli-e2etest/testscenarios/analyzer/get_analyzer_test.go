@@ -43,7 +43,7 @@ func TestGetAnalyzer(t *testing.T) {
 
 		analyzer := helpers.UnmarshalYAML[types.AnalyzerResource](t, result.StdOut)
 		require.Equal("Analyzer", analyzer.Type)
-		require.Equal("current", analyzer.Spec.Id)
+		require.Equal("current", analyzer.Spec.ID)
 		require.Equal("analyzer", analyzer.Spec.Name)
 		require.True(analyzer.Spec.Enabled)
 		require.Equal(analyzer.Spec.MinimumScore, 0)
@@ -64,7 +64,7 @@ func TestGetAnalyzer(t *testing.T) {
 
 		analyzer := helpers.UnmarshalYAML[types.AnalyzerResource](t, result.StdOut)
 		require.Equal("Analyzer", analyzer.Type)
-		require.Equal("current", analyzer.Spec.Id)
+		require.Equal("current", analyzer.Spec.ID)
 		require.Equal("analyzer", analyzer.Spec.Name)
 		require.True(analyzer.Spec.Enabled)
 		require.Equal(analyzer.Spec.MinimumScore, 95)
@@ -83,11 +83,16 @@ func TestGetAnalyzer(t *testing.T) {
 
 		analyzer := helpers.UnmarshalJSON[types.AnalyzerResource](t, result.StdOut)
 		require.Equal("Analyzer", analyzer.Type)
-		require.Equal("current", analyzer.Spec.Id)
+		require.Equal("current", analyzer.Spec.ID)
 		require.Equal("analyzer", analyzer.Spec.Name)
 		require.True(analyzer.Spec.Enabled)
 		require.Equal(analyzer.Spec.MinimumScore, 95)
 		require.Len(analyzer.Spec.Plugins, 3)
+
+		plugin2 := analyzer.Spec.Plugins[1]
+		require.Len(plugin2.Rules, 1)
+		require.Equal(plugin2.Rules[0].ID, "enforce_dns")
+		require.Equal(plugin2.Rules[0].Weight, 100)
 	})
 
 	t.Run("get with pretty format", func(t *testing.T) {
@@ -109,5 +114,6 @@ func TestGetAnalyzer(t *testing.T) {
 		require.Equal("analyzer", singleLine["NAME"])
 		require.Equal("true", singleLine["ENABLED"])
 		require.Equal("95", singleLine["MINIMUM SCORE"])
+		require.Equal("3", singleLine["PLUGINS"])
 	})
 }

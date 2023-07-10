@@ -14,17 +14,7 @@ type Repository struct {
 	db *sql.DB
 }
 
-var defaultlinter = Linter{
-	ID:           id.ID("current"),
-	Name:         "analyzer",
-	Enabled:      true,
-	MinimumScore: 0,
-	Plugins: []LinterPlugin{
-		{Name: "standards", Enabled: true, Required: true},
-		{Name: "security", Enabled: true, Required: true},
-		{Name: "common", Enabled: true, Required: true},
-	},
-}
+var defaultLinter = GetDefaultLinter()
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}
@@ -161,7 +151,7 @@ func (*Repository) SortingFields() []string {
 }
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (Linter, error) {
-	linter := defaultlinter
+	linter := defaultLinter
 
 	var rawPlugins []byte
 	err := r.db.

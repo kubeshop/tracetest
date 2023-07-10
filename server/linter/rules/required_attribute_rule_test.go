@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/linter/plugins/standards/rules"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
+	"github.com/kubeshop/tracetest/server/linter/rules"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,7 @@ func TestRequiredAttributesRule(t *testing.T) {
 		)
 
 		rule := rules.NewRequiredAttributesRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		for _, result := range result.Results {
 			assert.True(t, result.Passed)
@@ -39,14 +40,14 @@ func TestRequiredAttributesRule(t *testing.T) {
 
 	t.Run("When some attribute is missing", func(t *testing.T) {
 		rule := rules.NewRequiredAttributesRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
 	})
 
 	t.Run("When all attributes are missing", func(t *testing.T) {
 		rule := rules.NewRequiredAttributesRule()
-		result, _ := rule.Evaluate(context.Background(), trace)
+		result, _ := rule.Evaluate(context.Background(), trace, analyzer.LinterRule{})
 
 		assert.False(t, result.Passed)
 	})
