@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"sync"
 	"time"
 
@@ -68,14 +67,17 @@ type Runner interface {
 	// It will then be used by Run method
 	Apply(context.Context, fileutil.File) (resource any, _ error)
 
-	// Get the resource by ID. This method is used to get the resource when running from id
+	// GetByID gets the resource by ID. This method is used to get the resource when running from id
 	GetByID(_ context.Context, id string) (resource any, _ error)
 
-	// Run the resource and return the result. This method should not wait for the test to finish
+	// StartRun starts running the resource and return the result. This method should not wait for the test to finish
 	StartRun(_ context.Context, resource any, _ openapi.RunInformation) (RunResult, error)
 
-	// This method is regularly called by the orchestrator to check the status of the run
+	// UpdateResult is regularly called by the orchestrator to check the status of the run
 	UpdateResult(context.Context, RunResult) (RunResult, error)
+
+	// JUnitResult returns the result of the run in JUnit format
+	JUnitResult(context.Context, RunResult) (string, error)
 
 	// Format the result of the run into a string
 	FormatResult(_ RunResult, format string) string
@@ -204,7 +206,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 
 	fmt.Println(r.FormatResult(result, outputFormat))
 
-	err = o.writeJUnitReport(ctx, result, opts.JUnitOuptutFile)
+	err = o.writeJUnitReport(ctx, r, result, opts.JUnitOuptutFile)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
 	}
@@ -297,35 +299,28 @@ func (o orchestrator) waitForResult(ctx context.Context, r Runner, result RunRes
 	return updatedResult, nil
 }
 
-func (a orchestrator) writeJUnitReport(ctx context.Context, result RunResult, outputFile string) error {
+var ErrJUnitNotSupported = errors.New("junit report is not supported for this resource type")
+
+func (a orchestrator) writeJUnitReport(ctx context.Context, r Runner, result RunResult, outputFile string) error {
 	if outputFile == "" {
+		a.logger.Debug("no junit output file specified")
 		return nil
 	}
 
-	test := result.Resource.(openapi.TestResource)
-	run := result.Run.(openapi.TestRun)
-	runID, err := strconv.Atoi(run.GetId())
+	a.logger.Debug("saving junit report", zap.String("outputFile", outputFile))
+
+	report, err := r.JUnitResult(ctx, result)
 	if err != nil {
-		return fmt.Errorf("invalid run id format: %w", err)
+		return err
 	}
 
-	junit, _, err := a.openapiClient.ApiApi.
-		GetRunResultJUnit(
-			ctx,
-			test.Spec.GetId(),
-			int32(runID),
-		).
-		Execute()
-	if err != nil {
-		return fmt.Errorf("could not execute request: %w", err)
-	}
-
-	f, err := os.Create(junit)
+	a.logger.Debug("junit report", zap.String("report", report))
+	f, err := os.Create(outputFile)
 	if err != nil {
 		return fmt.Errorf("could not create junit output file: %w", err)
 	}
 
-	_, err = f.WriteString(outputFile)
+	_, err = f.WriteString(report)
 
 	return err
 }

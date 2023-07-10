@@ -62,7 +62,7 @@ func init() {
 	runCmd.Flags().StringVar(&runParams.ID, "id", "", "id of the resource to run")
 	runCmd.PersistentFlags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
 	runCmd.PersistentFlags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
-	runCmd.PersistentFlags().StringVarP(&runTestJUnit, "junit", "j", "", "file path to save test results in junit format")
+	runCmd.PersistentFlags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
 	rootCmd.AddCommand(runCmd)
 }
 

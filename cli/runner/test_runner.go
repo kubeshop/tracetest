@@ -120,6 +120,28 @@ func (r testRunner) UpdateResult(ctx context.Context, result RunResult) (RunResu
 	}, nil
 }
 
+func (r testRunner) JUnitResult(ctx context.Context, result RunResult) (string, error) {
+	test := result.Resource.(openapi.TestResource)
+	run := result.Run.(openapi.TestRun)
+	runID, err := strconv.Atoi(run.GetId())
+	if err != nil {
+		return "", fmt.Errorf("invalid run id format: %w", err)
+	}
+
+	junit, _, err := r.openapiClient.ApiApi.
+		GetRunResultJUnit(
+			ctx,
+			test.Spec.GetId(),
+			int32(runID),
+		).
+		Execute()
+	if err != nil {
+		return "", fmt.Errorf("could not execute request: %w", err)
+	}
+
+	return junit, nil
+}
+
 func (r testRunner) FormatResult(result RunResult, format string) string {
 	test := result.Resource.(openapi.TestResource)
 	run := result.Run.(openapi.TestRun)

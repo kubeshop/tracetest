@@ -128,6 +128,10 @@ func (r transactionRunner) UpdateResult(ctx context.Context, result RunResult) (
 	}, nil
 }
 
+func (r transactionRunner) JUnitResult(ctx context.Context, result RunResult) (string, error) {
+	return "", ErrJUnitNotSupported
+}
+
 func (r transactionRunner) FormatResult(result RunResult, format string) string {
 	transaction := result.Resource.(openapi.TransactionResource)
 	run := result.Run.(openapi.TransactionRun)
