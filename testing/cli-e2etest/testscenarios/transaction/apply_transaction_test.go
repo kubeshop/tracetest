@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli-e2etest/environment"
@@ -85,4 +86,27 @@ func TestApplyTransaction(t *testing.T) {
 	require.Equal("9wtAH2_Vg", updatedTransaction.Spec.Steps[0])
 	require.Equal("ajksdkasjbd", updatedTransaction.Spec.Steps[1])
 	require.Equal("ajksdkasjbd", updatedTransaction.Spec.Steps[2])
+
+	// When I try to set up a new transaction without any id
+	// Then it should be applied with success and it should not update
+	// the steps with its ids.
+	transactionWithoutIDPath := env.GetTestResourcePath(t, "new-transaction-without-id")
+
+	helpers.RemoveIDFromTransactionFile(t, transactionWithoutIDPath)
+
+	transactionWithoutIDResult := tracetestcli.Exec(t, fmt.Sprintf("apply transaction --file %s", transactionWithoutIDPath), tracetestcli.WithCLIConfig(cliConfig))
+	helpers.RequireExitCodeEqual(t, transactionWithoutIDResult, 0)
+
+	content, err := os.ReadFile(transactionWithoutIDPath)
+	require.NoError(err)
+
+	transactionWithoutID := helpers.UnmarshalYAML[types.TransactionResource](t, string(content))
+
+	require.Equal("Transaction", transactionWithoutID.Type)
+	require.NotEmpty(transactionWithoutID.Spec.ID)
+	require.Equal("New Transaction", transactionWithoutID.Spec.Name)
+	require.Equal("a transaction", transactionWithoutID.Spec.Description)
+	require.Len(transactionWithoutID.Spec.Steps, 2)
+	require.Equal("./transaction-step-1.yaml", transactionWithoutID.Spec.Steps[0])
+	require.Equal("./transaction-step-2.yaml", transactionWithoutID.Spec.Steps[1])
 }

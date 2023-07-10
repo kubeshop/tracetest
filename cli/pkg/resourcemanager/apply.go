@@ -15,6 +15,7 @@ const VerbApply Verb = "apply"
 type applyPreProcessorFn func(context.Context, fileutil.File) (fileutil.File, error)
 
 func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFormat Format) (string, error) {
+	originalInputFile := inputFile
 
 	if c.options.applyPreProcessor != nil {
 		var err error
@@ -72,7 +73,7 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 
 	// if the original file doesn't have an ID, we need to get the server generated ID from the response
 	// and write it to the original file
-	if !inputFile.HasID() {
+	if !originalInputFile.HasID() {
 
 		jsonBody, err := requestedFormat.ToJSON(body)
 		if err != nil {
@@ -89,12 +90,12 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 			return "", fmt.Errorf("cannot get ID from Apply response")
 		}
 
-		inputFile, err = inputFile.SetID(id)
+		originalInputFile, err = originalInputFile.SetID(id)
 		if err != nil {
 			return "", fmt.Errorf("cannot set ID on input file: %w", err)
 		}
 
-		_, err = inputFile.Write()
+		_, err = originalInputFile.Write()
 		if err != nil {
 			return "", fmt.Errorf("cannot write updated input file: %w", err)
 		}
