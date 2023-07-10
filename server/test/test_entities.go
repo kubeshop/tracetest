@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -129,7 +130,7 @@ type (
 
 		TransactionID       string
 		TransactionRunID    string
-		Linter              model.LinterResult
+		Linter              analyzer.LinterResult
 		RequiredGatesResult testrunner.RequiredGatesResult
 	}
 

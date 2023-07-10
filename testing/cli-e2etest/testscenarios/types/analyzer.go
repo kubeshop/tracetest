@@ -9,7 +9,7 @@ type AnalyzerResource struct {
 }
 
 type Analyzer struct {
-	Id           string           `json:"id"`
+	ID           string           `json:"id"`
 	Name         string           `json:"name"`
 	Enabled      bool             `json:"enabled"`
 	MinimumScore int              `json:"minimumScore"`
@@ -17,7 +17,21 @@ type Analyzer struct {
 }
 
 type AnalyzerPlugin struct {
-	Name     string `json:"name"`
-	Enabled  bool   `json:"enabled"`
-	Required bool   `json:"required"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Enabled     bool   `json:"enabled"`
+	Description string `json:"description"`
+
+	Rules []AnalyzerRule `json:"rules"`
+}
+
+type AnalyzerRule struct {
+	ID               string   `json:"id"`
+	Weight           int      `json:"weight"`
+	ErrorLevel       string   `json:"errorLevel"`
+	ErrorDescription string   `json:"errorDescription"`
+	Description      string   `json:"description"`
+	Tips             []string `json:"tips"`
+	Name             string   `json:"name"`
+	Enabled          bool     `json:"enabled"`
 }

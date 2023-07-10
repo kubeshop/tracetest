@@ -3,76 +3,12 @@
 Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
 
 :::note
-To read about deploying Tracetest with Helm, view the [Kubernetes Deployment docs](../deployment/kubernetes.mdx).
+To read about installing the Tracetest CLI, view the [CLI installation reference](./cli-installation-reference.md).
 :::
 
-## Installing the Tracetest Server via the CLI
+This page provides a step-by-step guide to install Tracetest using the Tracetest CLI.
 
-Use the CLI's install wizard to install a Tracetest server locally using Docker Compose or to a local or remote Kubernetes cluster.
-
-The wizard installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
-
-Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures, in `tar.gz`, `deb`, `rpm` and `exe` formats.
-
-You can find the latest version [here](https://github.com/kubeshop/tracetest/releases/latest).
-
-### Linux/MacOS
-
-Tracetest CLI can be installed automatically using the following script:
-
-```sh
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
-```
-
-It works for systems with Homebrew, `apt-get`, `dpkg`, `yum`, `rpm` installed, and if no package manager is available, it will try to download the build and install it manually.
-
-You can also manually install it with one of the following methods.
-
-#### Homebrew
-
-```sh
-brew install kubeshop/tracetest/tracetest
-```
-
-#### APT
-
-```sh
-# requirements for our deb repo to work
-sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates
-
-# add repo
-echo "deb [trusted=yes] https://apt.fury.io/tracetest/ /" | sudo tee /etc/apt/sources.list.d/fury.list
-
-# update and install
-sudo apt-get update
-sudo apt-get install tracetest
-```
-
-#### YUM
-
-```sh
-# add repository
-cat <<EOF | sudo tee /etc/yum.repos.d/tracetest.repo
-[tracetest]
-name=Tracetest
-baseurl=https://yum.fury.io/tracetest/
-enabled=1
-gpgcheck=0
-EOF
-
-# install
-sudo yum install tracetest --refresh
-```
-
-### Windows
-
-Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179)
-
-## Install a Tracetest Server for Development with the CLI
-
-This guide will help you get Tracetest running using the Tracetest CLI.
-
-### Prerequisites
+## Prerequisites
 
 :::info
 Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/), or [Kubernetes](https://kubernetes.io/) installed.
@@ -152,8 +88,8 @@ In this step, you can choose to install just Tracetest alone or install it with 
 
 ```text title="Expected output:"
 Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
-> I have a tracing environment already. Just install Tracetest
-  Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
+  I have a tracing environment already - Just install Tracetest.
+> Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
 By choosing any option, this installer will create a `tracetest` directory in the current directory and will add a `docker-compose.yaml` file to it.

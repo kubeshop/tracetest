@@ -2,23 +2,19 @@ import * as S from './AnalyzerScore.styled';
 
 interface IProps {
   score: number;
+  fontSize?: number;
   height?: string;
   width?: string;
 }
 
-const AnalyzerScore = ({score, height, width}: IProps) => (
+const AnalyzerScore = ({score, fontSize, height, width}: IProps) => (
   <S.ScoreWrapper>
     <S.ScoreTexContainer>
-      <S.Score level={1}>{score}</S.Score>
+      <S.Score level={1} $fontSize={fontSize}>
+        {score}
+      </S.Score>
     </S.ScoreTexContainer>
-    <S.ScoreProgress
-      $height={height}
-      $width={width}
-      format={() => ''}
-      percent={score || 100}
-      $score={score}
-      type="circle"
-    />
+    <S.ScoreProgress $height={height} $width={width} format={() => ''} percent={score} $score={score} type="circle" />
   </S.ScoreWrapper>
 );
 

@@ -31,10 +31,6 @@ export const SwitchContainer = styled.div`
   align-items: center;
   display: flex;
   gap: 8px;
-
-  label {
-    margin-bottom: 24px;
-  }
 `;
 
 export const LinterPluginsContainer = styled.div`

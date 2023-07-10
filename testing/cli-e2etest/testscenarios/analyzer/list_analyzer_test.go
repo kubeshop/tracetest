@@ -75,7 +75,7 @@ func TestListAnalyzer(t *testing.T) {
 
 		require.Len(analyzerYAML, 1)
 		require.Equal("Analyzer", analyzerYAML[0].Type)
-		require.Equal("current", analyzerYAML[0].Spec.Id)
+		require.Equal("current", analyzerYAML[0].Spec.ID)
 		require.Equal("analyzer", analyzerYAML[0].Spec.Name)
 		require.True(analyzerYAML[0].Spec.Enabled)
 		require.Equal(analyzerYAML[0].Spec.MinimumScore, 95)
@@ -96,7 +96,7 @@ func TestListAnalyzer(t *testing.T) {
 		require.Len(analyzerList.Items, 1)
 
 		require.Equal("Analyzer", analyzerList.Items[0].Type)
-		require.Equal("current", analyzerList.Items[0].Spec.Id)
+		require.Equal("current", analyzerList.Items[0].Spec.ID)
 		require.Equal("analyzer", analyzerList.Items[0].Spec.Name)
 		require.True(analyzerList.Items[0].Spec.Enabled)
 		require.Equal(analyzerList.Items[0].Spec.MinimumScore, 95)
@@ -122,5 +122,6 @@ func TestListAnalyzer(t *testing.T) {
 		require.Equal("analyzer", singleLine["NAME"])
 		require.Equal("true", singleLine["ENABLED"])
 		require.Equal("95", singleLine["MINIMUM SCORE"])
+		require.Equal("3", singleLine["PLUGINS"])
 	})
 }

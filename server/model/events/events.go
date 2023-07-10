@@ -431,14 +431,14 @@ func TraceLinterStart(testID id.ID, runID int) model.TestRunEvent {
 	}
 }
 
-func TraceLinterSkip(testID id.ID, runID int, reason string) model.TestRunEvent {
+func TraceLinterSkip(testID id.ID, runID int) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,
 		RunID:               runID,
 		Stage:               model.StageTrace,
 		Type:                "TRACE_LINTER_SKIPPED",
 		Title:               "Trace linter skipped",
-		Description:         fmt.Sprintf("The trace linter process has been skipped. Reason: %s", reason),
+		Description:         "The trace linter process has been skipped",
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
