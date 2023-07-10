@@ -29,7 +29,7 @@ func TestRunTestWithGrpcTrigger(t *testing.T) {
 		// Then it should pass
 		testFile := env.GetTestResourcePath(t, "grpc-trigger-embedded-protobuf")
 
-		command := fmt.Sprintf("test run -w -d %s", testFile)
+		command := fmt.Sprintf("run test -f %s", testFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
@@ -47,7 +47,7 @@ func TestRunTestWithGrpcTrigger(t *testing.T) {
 		// Then it should pass
 		testFile := env.GetTestResourcePath(t, "grpc-trigger-reference-protobuf")
 
-		command := fmt.Sprintf("test run -w -d %s", testFile)
+		command := fmt.Sprintf("run test -f %s", testFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded

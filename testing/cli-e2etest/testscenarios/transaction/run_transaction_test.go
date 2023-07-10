@@ -29,7 +29,7 @@ func TestRunTransaction(t *testing.T) {
 		// Then it should pass
 		transactionFile := env.GetTestResourcePath(t, "transaction-to-run")
 
-		command := fmt.Sprintf("test run -w -d %s", transactionFile)
+		command := fmt.Sprintf("run transaction -f %s", transactionFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "Transaction To Run") // transaction name
