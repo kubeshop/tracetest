@@ -40,6 +40,31 @@ var testExportCmd = &cobra.Command{
 	PostRun: teardownCommand,
 }
 
+var (
+	runTestFileDefinition,
+	runTestEnvID,
+	runTestJUnit string
+	runTestWaitForResult bool
+)
+
+var testRunCmd = &cobra.Command{
+	Use:        "run",
+	Short:      "Run a test on your Tracetest server",
+	Long:       "Run a test on your Tracetest server",
+	Deprecated: "Please use `tracetest run test` command instead.",
+	PreRun:     setupCommand(),
+	Run: func(_ *cobra.Command, _ []string) {
+		// map old flags to new ones
+		runParams.DefinitionFile = runTestFileDefinition
+		runParams.EnvID = runTestEnvID
+		runParams.SkipResultWait = !runTestWaitForResult
+		runParams.JUnitOuptutFile = runTestJUnit
+
+		runCmd.Run(listCmd, []string{"test"})
+	},
+	PostRun: teardownCommand,
+}
+
 func init() {
 	rootCmd.AddCommand(testCmd)
 
@@ -50,4 +75,12 @@ func init() {
 	testExportCmd.PersistentFlags().StringVarP(&exportParams.ResourceID, "id", "", "", "id of the test")
 	testExportCmd.PersistentFlags().StringVarP(&exportParams.OutputFile, "output", "o", "", "file to be created with definition")
 	testCmd.AddCommand(testExportCmd)
+
+	// run
+	testRunCmd.PersistentFlags().StringVarP(&runTestEnvID, "environment", "e", "", "id of the environment to be used")
+	testRunCmd.PersistentFlags().StringVarP(&runTestFileDefinition, "definition", "d", "", "path to the definition file to be run")
+	testRunCmd.PersistentFlags().BoolVarP(&runTestWaitForResult, "wait-for-result", "w", false, "wait for the test result to print it's result")
+	testRunCmd.PersistentFlags().StringVarP(&runTestJUnit, "junit", "j", "", "path to the junit file that will be generated")
+
+	testCmd.AddCommand(testRunCmd)
 }
