@@ -161,7 +161,7 @@ func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata t
 	r.listenForStopRequests(ctx, cancelCtx, run)
 
 	// configuring required gates
-	if requiredGates != nil {
+	if requiredGates == nil {
 		rg := r.trGetter.GetDefault(ctx).RequiredGates
 		requiredGates = &rg
 	}
