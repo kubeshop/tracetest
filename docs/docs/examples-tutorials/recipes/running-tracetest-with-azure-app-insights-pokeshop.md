@@ -29,7 +29,11 @@ You will also need an [App Insights API Access Key](https://learn.microsoft.com/
 
 The project is built with Docker Compose.
 
-### 1. Tracetest
+### 1. Pokeshop API
+
+The Pokeshop API is a fully instrumented REST API that makes use of different services to mimic a real life scenario. Learn more about it, [here](../../live-examples/pokeshop/overview.md).
+
+### 2. Tracetest
 
 The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up the Pokeshop API, Tracetest and OpenTelemetry Collector.
 
@@ -39,9 +43,7 @@ All `services` in the `docker-compose.yaml` are on the same network and will be 
 
 ## Pokeshop API
 
-The Pokeshop API is a fully instrumented REST API that makes use of different services to mimic a real life scenario.
-
-It is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/), sending the data to the OpenTelemetry collector that will be pushing the telemetry information to the Azure cloud.
+The Pokeshop API is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/), sending the data to the OpenTelemetry collector that will be pushing the telemetry information to the Azure cloud.
 
 This is a fragment from the main tracing file from the [Pokeshop API repo.](https://github.com/kubeshop/pokeshop)
 
