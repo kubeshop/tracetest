@@ -89,7 +89,7 @@ For more information about selectors or assertions, take a look at the documenta
 
 ## Testing Span Events
 
-As a MVP of how to test span events, we are injecting all spans events into the span attributes as a JSON array. To assert your span events, use the `json_path` filter to select and test the write events.
+As an MVP of how to test span events, we are injecting `all spans` events into the span attributes as a JSON array. To assert your span events, use the `json_path` filter to select and test the **write events**.
 
 ```yaml
 specs:
