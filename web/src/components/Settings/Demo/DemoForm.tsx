@@ -39,10 +39,10 @@ const DemoForm = () => {
       <Form.Item name={[SupportedDemosFormField.Pokeshop, 'name']} hidden />
 
       <S.SwitchContainer>
-        <label htmlFor={`${FORM_ID}_pokeshopEnabled`}>Enable Pokeshop</label>
         <Form.Item name={[SupportedDemosFormField.Pokeshop, 'enabled']} valuePropName="checked">
           <Switch />
         </Form.Item>
+        <S.SwitchLabel htmlFor={`${FORM_ID}_pokeshop_enabled`}>Enable Pokeshop</S.SwitchLabel>
       </S.SwitchContainer>
 
       {pokeshopEnabled && <PokeshopFields />}
@@ -50,11 +50,14 @@ const DemoForm = () => {
       <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'type']} hidden />
       <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'id']} hidden />
       <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'name']} hidden />
+
       <S.SwitchContainer>
-        <label htmlFor={`${FORM_ID}_otelEnabled`}>Enable OpenTelemetry Astronomy Shop Demo</label>
         <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'enabled']} valuePropName="checked">
           <Switch />
         </Form.Item>
+        <S.SwitchLabel htmlFor={`${FORM_ID}_opentelemetryStore_enabled`}>
+          Enable OpenTelemetry Astronomy Shop Demo
+        </S.SwitchLabel>
       </S.SwitchContainer>
 
       {otelEnabled && <OtelFields />}

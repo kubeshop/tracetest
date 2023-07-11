@@ -33,6 +33,10 @@ export const SwitchContainer = styled.div`
   gap: 8px;
 `;
 
+export const SwitchLabel = styled.label`
+  margin-bottom: 24px;
+`;
+
 export const LinterPluginsContainer = styled.div`
   margin-top: 10px;
   padding: 24px 24px 0;
