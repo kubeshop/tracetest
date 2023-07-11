@@ -68,8 +68,8 @@ type transactionRunRepository interface {
 
 type runner interface {
 	StopTest(testID id.ID, runID int)
-	RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *testrunner.RequiredGates) test.Run
-	RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *testrunner.RequiredGates) transaction.TransactionRun
+	RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run
+	RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 

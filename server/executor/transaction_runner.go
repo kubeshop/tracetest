@@ -13,7 +13,7 @@ import (
 )
 
 type TransactionRunner interface {
-	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment, *testrunner.RequiredGates) transaction.TransactionRun
+	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) transaction.TransactionRun
 }
 
 type PersistentTransactionRunner interface {
@@ -63,7 +63,7 @@ type persistentTransactionRunner struct {
 	exit                chan bool
 }
 
-func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata test.RunMetadata, environment environment.Environment, requiredGates *testrunner.RequiredGates) transaction.TransactionRun {
+func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) transaction.TransactionRun {
 	run := transaction.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment

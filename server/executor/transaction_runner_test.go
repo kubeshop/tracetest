@@ -29,7 +29,7 @@ type fakeTestRunner struct {
 	uid                 int
 }
 
-func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, env environment.Environment, requiredGates *testrunner.RequiredGates) test.Run {
+func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, env environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
 	run := test.NewRun()
 	run.Environment = env
 	run.State = test.RunStateCreated

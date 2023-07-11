@@ -23,12 +23,12 @@ func (m OpenAPI) RequiredGatesResult(in testrunner.RequiredGatesResult) openapi.
 	}
 }
 
-func (m Model) RequiredGates(in *[]openapi.SupportedGates) *testrunner.RequiredGates {
+func (m Model) RequiredGates(in *[]openapi.SupportedGates) *[]testrunner.RequiredGate {
 	if in == nil {
 		return nil
 	}
 
-	parsedGates := make(testrunner.RequiredGates, len(*in))
+	parsedGates := make([]testrunner.RequiredGate, len(*in))
 
 	for i, gate := range *in {
 		parsedGates[i] = testrunner.RequiredGate(gate)

@@ -199,7 +199,7 @@ func (app *App) Start(opts ...appOption) error {
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
 	runRepo := test.NewRunRepository(db)
-	trRepo := testrunner.NewRepository(db)
+	testRunnerRepo := testrunner.NewRepository(db)
 
 	transactionsRepository := transaction.NewRepository(db, testRepo)
 	transactionRunRepository := transaction.NewRunRepository(db, runRepo)
@@ -211,7 +211,7 @@ func (app *App) Start(opts ...appOption) error {
 		pollingProfileRepo,
 		dataStoreRepo,
 		linterRepo,
-		trRepo,
+		testRunnerRepo,
 		testDB,
 		testRepo,
 		runRepo,
@@ -282,7 +282,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerDemosResource(demoRepo, apiRouter, provisioner, tracer)
 	registerDataStoreResource(dataStoreRepo, apiRouter, provisioner, tracer)
 	registerAnalyzer(linterRepo, apiRouter, provisioner, tracer)
-	registerTestRunner(trRepo, apiRouter, provisioner, tracer)
+	registerTestRunner(testRunnerRepo, apiRouter, provisioner, tracer)
 	registerTestResource(testRepo, apiRouter, provisioner, tracer)
 
 	isTracetestDev := os.Getenv("TRACETEST_DEV") != ""
@@ -383,11 +383,11 @@ func registerAnalyzer(linterRepo *analyzer.Repository, router *mux.Router, provi
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerTestRunner(trRepo *testrunner.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+func registerTestRunner(testRunnerRepo *testrunner.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
 	manager := resourcemanager.New[testrunner.TestRunner](
 		testrunner.ResourceName,
 		testrunner.ResourceNamePlural,
-		trRepo,
+		testRunnerRepo,
 		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
 	)

@@ -36,7 +36,7 @@ type TransactionRun struct {
 
 	// environment
 	Environment   environment.Environment
-	RequiredGates *testrunner.RequiredGates
+	RequiredGates *[]testrunner.RequiredGate
 }
 
 func (tr TransactionRun) ResourceID() string {

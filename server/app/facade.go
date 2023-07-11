@@ -40,11 +40,11 @@ func (rf runnerFacade) StopTest(testID id.ID, runID int) {
 	})
 }
 
-func (rf runnerFacade) RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *testrunner.RequiredGates) test.Run {
+func (rf runnerFacade) RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run {
 	return rf.runner.Run(ctx, test, rm, env, gates)
 }
 
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *testrunner.RequiredGates) transaction.TransactionRun {
+func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun {
 	return rf.transactionRunner.Run(ctx, tr, rm, env, gates)
 }
 

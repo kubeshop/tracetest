@@ -129,7 +129,7 @@ func TestRunTriggerTime(t *testing.T) {
 
 func TestRunRequiredGates(t *testing.T) {
 	t.Run("NoGates", func(t *testing.T) {
-		run := test.Run{}.ConfigureRequiredGates(testrunner.RequiredGates{})
+		run := test.Run{}.ConfigureRequiredGates([]testrunner.RequiredGate{})
 		linterResult := analyzer.LinterResult{
 			Passed:       false,
 			MinimumScore: 80,
@@ -141,12 +141,12 @@ func TestRunRequiredGates(t *testing.T) {
 		assert.Equal(t, true, run.RequiredGatesResult.Passed)
 		assert.Len(t, run.RequiredGatesResult.Failed, 2)
 
-		failed := testrunner.RequiredGates{testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
+		failed := []testrunner.RequiredGate{testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
 		assert.Equal(t, failed, run.RequiredGatesResult.Failed)
 	})
 
 	t.Run("AnalyzerGates", func(t *testing.T) {
-		gates := testrunner.RequiredGates{testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
+		gates := []testrunner.RequiredGate{testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
 		run := test.Run{}.ConfigureRequiredGates(gates)
 		linterResult := analyzer.LinterResult{
 			Passed:       true,
@@ -159,12 +159,12 @@ func TestRunRequiredGates(t *testing.T) {
 		assert.Len(t, run.RequiredGatesResult.Required, 2)
 		assert.Equal(t, false, run.RequiredGatesResult.Passed)
 		assert.Len(t, run.RequiredGatesResult.Failed, 1)
-		failed := testrunner.RequiredGates{testrunner.RequiredGateAnalyzerScore}
+		failed := []testrunner.RequiredGate{testrunner.RequiredGateAnalyzerScore}
 		assert.Equal(t, failed, run.RequiredGatesResult.Failed)
 	})
 
 	t.Run("TestSpecGate", func(t *testing.T) {
-		gates := testrunner.RequiredGates{testrunner.RequiredGateTestSpecs}
+		gates := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs}
 		outputs := maps.Ordered[string, test.RunOutput]{}
 		environment := environment.Environment{}
 		res := maps.Ordered[test.SpanQuery, []test.AssertionResult]{}
@@ -176,12 +176,12 @@ func TestRunRequiredGates(t *testing.T) {
 		assert.Len(t, run.RequiredGatesResult.Required, 1)
 		assert.Equal(t, false, run.RequiredGatesResult.Passed)
 		assert.Len(t, run.RequiredGatesResult.Failed, 1)
-		failed := testrunner.RequiredGates{testrunner.RequiredGateTestSpecs}
+		failed := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs}
 		assert.Equal(t, failed, run.RequiredGatesResult.Failed)
 	})
 
 	t.Run("GenerateRequiredGateResult", func(t *testing.T) {
-		gates := testrunner.RequiredGates{testrunner.RequiredGateTestSpecs, testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
+		gates := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs, testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
 		result := test.Run{
 			Results: &test.RunResults{
 				AllPassed: false,

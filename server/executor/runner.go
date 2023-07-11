@@ -32,7 +32,7 @@ type RunResult struct {
 }
 
 type Runner interface {
-	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *testrunner.RequiredGates) test.Run
+	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
 }
 
 type PersistentRunner interface {
@@ -147,7 +147,7 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
-func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment, requiredGates *testrunner.RequiredGates) test.Run {
+func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
 	ctx, cancelCtx := context.WithCancel(
 		getNewCtx(ctx),
 	)
@@ -162,11 +162,11 @@ func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata t
 
 	// configuring required gates
 	if requiredGates != nil {
-		run = run.ConfigureRequiredGates(*requiredGates)
-	} else {
-		testRunner := r.trGetter.GetDefault(ctx)
-		run = run.ConfigureRequiredGates(testRunner.RequiredGates)
+		rg := r.trGetter.GetDefault(ctx).RequiredGates
+		requiredGates = &rg
 	}
+
+	run = run.ConfigureRequiredGates(*requiredGates)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
 		Values: environment.Values,

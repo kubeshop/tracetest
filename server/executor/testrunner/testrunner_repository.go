@@ -44,11 +44,11 @@ func (r *Repository) Update(ctx context.Context, updated TestRunner) (TestRunner
 	updated.ID = "current"
 
 	tx, err := r.db.BeginTx(ctx, nil)
-	defer tx.Rollback()
 	if err != nil {
 		return TestRunner{}, err
 	}
 
+	defer tx.Rollback()
 	_, err = tx.ExecContext(ctx, deleteQuery)
 	if err != nil {
 		return TestRunner{}, fmt.Errorf("sql exec delete: %w", err)
@@ -89,7 +89,11 @@ const (
 )
 
 func (r *Repository) GetDefault(ctx context.Context) TestRunner {
-	tr, _ := r.Get(ctx, id.ID("current"))
+	tr, err := r.Get(ctx, id.ID("current"))
+	if err != nil {
+		return DefaultTestRunner
+	}
+
 	return tr
 }
 
@@ -114,7 +118,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (TestRunner, error) {
 	}
 
 	if string(requiredGatesJSON) != "null" {
-		var requiredGates RequiredGates
+		var requiredGates []RequiredGate
 		err = json.Unmarshal(requiredGatesJSON, &requiredGates)
 		if err != nil {
 			return TestRunner{}, fmt.Errorf("could not unmarshal periodic strategy config: %w", err)
