@@ -19,8 +19,8 @@ test('useCreateTestMutation', async () => {
       spec: {
         name: 'New test',
         trigger: {
-          triggerType: 'http',
-          http: {url: 'https://google.com', method: HTTP_METHOD.GET},
+          type: 'http',
+          httpRequest: {url: 'https://google.com', method: HTTP_METHOD.GET},
         },
       },
     }).unwrap();

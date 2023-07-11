@@ -41,6 +41,7 @@ func (m OpenAPI) LinterResultPluginRule(in analyzer.RuleResult) openapi.LinterRe
 	}
 
 	return openapi.LinterResultPluginRule{
+		Id:               in.ID,
 		Passed:           in.Passed,
 		Description:      in.Description,
 		ErrorDescription: in.ErrorDescription,

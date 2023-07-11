@@ -1638,6 +1638,7 @@ export interface external {
           rules?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRule"][];
         };
         LinterResultPluginRule: {
+          id?: string;
           name?: string;
           description?: string;
           errorDescription?: string;
@@ -2042,16 +2043,11 @@ export interface external {
         Trigger: {
           /** @enum {string} */
           type?: "http" | "grpc" | "traceid";
-          /** @enum {string} */
-          triggerType?: "http" | "grpc" | "traceid";
-          http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };
         TriggerResult: {
-          /** @enum {string} */
-          triggerType?: "http" | "grpc" | "traceid";
           /** @enum {string} */
           type?: "http" | "grpc" | "traceid";
           triggerResult?: {

@@ -1,3 +1,4 @@
+import RuleLink from 'components/AnalyzerResult/RuleLink';
 import {TAnalyzerError} from 'types/TestRun.types';
 import * as S from './AnalyzerErrorsPopover.styled';
 
@@ -31,6 +32,8 @@ const Content = ({errors}: IProps) => (
             <S.Text type="secondary">{analyzerError.errors[0].description}</S.Text>
           </div>
         )}
+
+        {analyzerError.ruleId && <RuleLink id={analyzerError.ruleId} />}
       </S.RuleContainer>
     ))}
   </S.ContentContainer>
