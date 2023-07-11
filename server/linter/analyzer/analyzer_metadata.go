@@ -127,7 +127,7 @@ var (
 		ID:               EnforceHttpsProtocolRuleID,
 		Name:             "Secure HTTPS Protocol",
 		Description:      "Enforce usage of secure protocol for HTTP server spans",
-		ErrorDescription: "The following spans are using insecure http protocol:",
+		ErrorDescription: "The following attributes are using insecure http protocol:",
 		Tips:             []string{},
 		Weight:           30,
 		ErrorLevel:       "error",
