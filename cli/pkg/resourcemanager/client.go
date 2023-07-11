@@ -1,7 +1,6 @@
 package resourcemanager
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -92,7 +91,10 @@ func (c Client) resourceType() string {
 	return caser.String(c.resourceName)
 }
 
-var ErrNotFound = errors.New("not found")
+var ErrNotFound = requestError{
+	Code:    http.StatusNotFound,
+	Message: "Resource not found",
+}
 
 type requestError struct {
 	Code    int    `json:"code"`
@@ -104,8 +106,8 @@ func (e requestError) Error() string {
 }
 
 func (e requestError) Is(target error) bool {
-	_, ok := target.(requestError)
-	return ok
+	t, ok := target.(requestError)
+	return ok && t.Code == e.Code
 }
 
 func isSuccessResponse(resp *http.Response) bool {

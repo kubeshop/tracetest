@@ -30,13 +30,11 @@ func (c Client) Delete(ctx context.Context, id string, format Format) (string, e
 
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
-		if err != nil && !errors.Is(err, requestError{}) {
-			return "", fmt.Errorf("could not Get resource: %w", err)
-		}
-
-		if err.(requestError).Code == http.StatusNotFound {
+		if errors.Is(err, ErrNotFound) {
 			return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), ErrNotFound
 		}
+
+		return "", fmt.Errorf("could not Delete resource: %w", err)
 	}
 
 	msg := ""
