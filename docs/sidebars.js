@@ -462,13 +462,90 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "concepts/tracetest-analyzer-concepts",
-          label: "Tracetest Analyzer",
-        },
-        {
-          type: "doc",
           id: "concepts/versioning",
           label: "Versioning",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Trace Analyzer",
+      items: [
+        {
+          type: "doc",
+          id: "analyzer/concepts",
+          label: "Concepts",
+        },
+        {
+          type: "category",
+          label: "Plugins",
+          items: [
+            {
+              type: "category",
+              label: "OTel Semantic Conventions",
+              link: {
+                type: "doc",
+                id: "analyzer/plugins/otel-semantic-conventions",
+              },
+              items: [
+                {
+                  type: "doc",
+                  id: "analyzer/rules/span-naming",
+                  label: "span-naming",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/attribute-naming",
+                  label: "attribute-naming",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/required-attributes",
+                  label: "required-attributes",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/no-empty-attributes",
+                  label: "no-empty-attributes",
+                },
+              ],
+            },
+            {
+              type: "category",
+              label: "Security",
+              link: {
+                type: "doc",
+                id: "analyzer/plugins/security",
+              },
+              items: [
+                {
+                  type: "doc",
+                  id: "analyzer/rules/secure-https-protocol",
+                  label: "secure-https-protocol",
+                },
+                {
+                  type: "doc",
+                  id: "analyzer/rules/no-api-key-leak",
+                  label: "no-api-key-leak",
+                },
+              ],
+            },
+            {
+              type: "category",
+              label: "Common Problems",
+              link: {
+                type: "doc",
+                id: "analyzer/plugins/common-problems",
+              },
+              items: [
+                {
+                  type: "doc",
+                  id: "analyzer/rules/prefer-dns",
+                  label: "prefer-dns",
+                },
+              ],
+            },
+          ],
         },
       ],
     },

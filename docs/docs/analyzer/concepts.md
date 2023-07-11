@@ -1,6 +1,12 @@
-# Tracetest Analyzer Concepts
+# Trace Analyzer Concepts
 
 The Tracetest Analyzer is a plugin-based framework used to analyze OpenTelemetry traces to help teams improve their instrumentation data, find potential problems and provide tips to fix the problems.
+
+## Plugins
+
+- [OpenTelemetry Semantic Conventions](./plugins/otel-semantic-conventions.md)
+- [Security](./plugins/security.md)
+- [Common Problems](./plugins/common-problems.md)
 
 ## Problem
 
@@ -8,7 +14,7 @@ Today, implementing open telemetry instrumentation in any application can become
 
 Usually, there are official libraries for the most common languages that can be used to add basic auto-instrumentation. Still, when it comes to adding custom instrumentation it can be confusing to understand if what is added is aligned to the Otel standard in terms of having the right information and/or not leaking any sensitive data.
 
-Another problem is that adding instrumentation is the very first step to achieving and improving an application architecture, having visibility is just a way to understand what’s going on, but then it can become a little more difficult to understand what's next. 
+Another problem is that adding instrumentation is the very first step to achieving and improving an application architecture, having visibility is just a way to understand what’s going on, but then it can become a little more difficult to understand what's next.
 
 ## Solution
 
@@ -37,6 +43,6 @@ There are two main rule types:
 [This documentation will be focused on single trace rules for timing purposes.](../configuration/tracetest-analyzer.md)
 :::
 
-### Linter Resource
+### Analyzer Resource
 
-Allows the user to configure the linter framework, a global on/off switch, an opt-in/out for specific plugins or rules, setting up required and optional rules, etc.
+Allows the user to configure the analyzer framework, a global on/off switch, an opt-in/out for specific plugins or rules, setting up required and optional rules, etc.
