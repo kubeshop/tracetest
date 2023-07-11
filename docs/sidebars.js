@@ -207,7 +207,7 @@ const sidebars = {
     },
     {
       type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
+      id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop",
       label: "Azure App Insights, The OpenTelemetry Collector & Pokeshop API",
     },
   ],
