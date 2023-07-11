@@ -215,8 +215,7 @@ func parseSpans(table *azquery.Table) ([]model.Span, error) {
 		parentSpan := spanMap[eventRow.ParentID()]
 		event, err := parseEvent(eventRow)
 		if err != nil {
-			// don't fail conversion, just print a message
-			fmt.Printf(`failed to convert span event "%s" from span "%s" from AppInsights\n`, event.Name, eventRow.ParentID())
+			return []model.Span{}, err
 		}
 
 		parentSpan.Events = append(parentSpan.Events, event)
@@ -264,7 +263,7 @@ func parseRowToSpan(row spanRow) (model.Span, error) {
 	for name, value := range row.values {
 		switch name {
 		case "id":
-			err := parseSpanId(&span, value)
+			err := parseSpanID(&span, value)
 			if err != nil {
 				return span, err
 			}
@@ -274,7 +273,7 @@ func parseRowToSpan(row spanRow) (model.Span, error) {
 				return span, err
 			}
 		case "operation_ParentId":
-			err := parseParentId(&span, value)
+			err := parseParentID(&span, value)
 			if err != nil {
 				return span, err
 			}
@@ -302,13 +301,13 @@ func parseRowToSpan(row spanRow) (model.Span, error) {
 	return span, nil
 }
 
-func parseSpanId(span *model.Span, value any) error {
-	spanId, err := trace.SpanIDFromHex(value.(string))
+func parseSpanID(span *model.Span, value any) error {
+	spanID, err := trace.SpanIDFromHex(value.(string))
 	if err != nil {
 		return fmt.Errorf("failed to parse spanId: %w", err)
 	}
 
-	span.ID = spanId
+	span.ID = spanID
 	return nil
 }
 
@@ -326,10 +325,10 @@ func parseAttributes(span *model.Span, value any) error {
 	return nil
 }
 
-func parseParentId(span *model.Span, value any) error {
-	rawParentId, ok := value.(string)
+func parseParentID(span *model.Span, value any) error {
+	rawParentID, ok := value.(string)
 	if ok {
-		span.Attributes[model.TracetestMetadataFieldParentID] = rawParentId
+		span.Attributes[model.TracetestMetadataFieldParentID] = rawParentID
 	} else {
 		span.Attributes[model.TracetestMetadataFieldParentID] = ""
 	}
