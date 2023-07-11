@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -70,7 +71,10 @@ INSERT INTO test_runs (
 	"environment",
 
 	-- linter
-	"linter"
+	"linter",
+
+	-- required gates
+	"required_gates_result"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
@@ -99,7 +103,8 @@ INSERT INTO test_runs (
 
 	$12, -- metadata
 	$13, -- environment
-	$14 -- linter
+	$14, -- linter
+	$15  -- required_gates_result
 )
 RETURNING "id"`
 
@@ -133,7 +138,12 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 
 	jsonlinter, err := json.Marshal(run.Linter)
 	if err != nil {
-		return Run{}, fmt.Errorf("environment encoding error: %w", err)
+		return Run{}, fmt.Errorf("linter encoding error: %w", err)
+	}
+
+	jsonGatesResult, err := json.Marshal(run.RequiredGatesResult)
+	if err != nil {
+		return Run{}, fmt.Errorf("required gates result encoding error: %w", err)
 	}
 
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -165,6 +175,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		jsonMetadata,
 		jsonEnvironment,
 		jsonlinter,
+		jsonGatesResult,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
@@ -203,7 +214,10 @@ UPDATE test_runs SET
 	"environment" = $18,
 
 	--- linter
-	"linter" = $19
+	"linter" = $19,
+
+	--- required gates
+	"required_gates_result" = $20
 
 WHERE id = $16 AND test_id = $17
 `
@@ -245,7 +259,12 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	jsonlinter, err := json.Marshal(run.Linter)
+	jsonLinter, err := json.Marshal(run.Linter)
+	if err != nil {
+		return fmt.Errorf("encoding error: %w", err)
+	}
+
+	jsonGatesResult, err := json.Marshal(run.RequiredGatesResult)
 	if err != nil {
 		return fmt.Errorf("encoding error: %w", err)
 	}
@@ -278,7 +297,8 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		run.ID,
 		run.TestID,
 		jsonEnvironment,
-		jsonlinter,
+		jsonLinter,
+		jsonGatesResult,
 	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
@@ -344,7 +364,8 @@ SELECT
 	-- transaction run
 	transaction_run_steps.transaction_run_id,
 	transaction_run_steps.transaction_run_transaction_id,
-	"linter"
+	"linter",
+	"required_gates_result"
 
 FROM
 	test_runs
@@ -448,6 +469,7 @@ func readRunRow(row scanner) (Run, error) {
 		jsonOutputs,
 		jsonEnvironment,
 		jsonLinter,
+		jsonGatesResult,
 		jsonMetadata []byte
 
 		lastError *string
@@ -480,6 +502,7 @@ func readRunRow(row scanner) (Run, error) {
 		&transactionRunID,
 		&transactionID,
 		&jsonLinter,
+		&jsonGatesResult,
 	)
 
 	if err != nil {
@@ -537,6 +560,16 @@ func readRunRow(row scanner) (Run, error) {
 	err = json.Unmarshal(jsonEnvironment, &r.Environment)
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot parse Environment: %w", err)
+	}
+
+	if jsonGatesResult != nil {
+		err = json.Unmarshal(jsonGatesResult, &r.RequiredGatesResult)
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse required gates result: %w", err)
+		}
+	} else {
+		// fallback for retro-compatibility
+		r.RequiredGatesResult = r.GenerateRequiredGateResult(testrunner.DefaultTestRunner.RequiredGates)
 	}
 
 	if traceID != "" {

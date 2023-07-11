@@ -288,6 +288,7 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		TransactionId:             in.TransactionID,
 		TransactionRunId:          in.TransactionRunID,
 		Linter:                    m.LinterResult(in.Linter),
+		RequiredGatesResult:       m.RequiredGatesResult(in.RequiredGatesResult),
 	}
 }
 
