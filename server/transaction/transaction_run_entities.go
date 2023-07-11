@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
 )
@@ -34,7 +35,8 @@ type TransactionRun struct {
 	Metadata test.RunMetadata
 
 	// environment
-	Environment environment.Environment
+	Environment   environment.Environment
+	RequiredGates *[]testrunner.RequiredGate
 }
 
 func (tr TransactionRun) ResourceID() string {

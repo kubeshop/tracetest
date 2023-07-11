@@ -15,6 +15,8 @@ type RunInformation struct {
 	EnvironmentId string `json:"environmentId,omitempty"`
 
 	Variables []EnvironmentValue `json:"variables,omitempty"`
+
+	RequiredGates *[]SupportedGates `json:"requiredGates,omitempty"`
 }
 
 // AssertRunInformationRequired checks if the required fields are not zero-ed

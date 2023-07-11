@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -22,6 +23,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
+
+type defaultTestRunnerGetter struct{}
+
+func (dpc defaultTestRunnerGetter) GetDefault(context.Context) testrunner.TestRunner {
+	testRunner := testrunner.DefaultTestRunner
+
+	return testRunner
+}
 
 func TestPersistentRunner(t *testing.T) {
 	t.Run("TestIsTriggerd", func(t *testing.T) {
@@ -99,7 +108,7 @@ func (f runnerFixture) run(tests []test.Test, ttl time.Duration) {
 	f.runner.Start(2)
 	time.Sleep(10 * time.Millisecond)
 	for _, testObj := range tests {
-		f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{})
+		f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{}, nil)
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()
@@ -161,6 +170,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 		getDataStoreRepositoryMock(t),
 		eventEmitter,
 		defaultProfileGetter{5 * time.Second, 30 * time.Second},
+		defaultTestRunnerGetter{},
 	)
 
 	mtp.Test(t)

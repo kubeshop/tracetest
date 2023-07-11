@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
@@ -31,12 +32,16 @@ type RunResult struct {
 }
 
 type Runner interface {
-	Run(context.Context, test.Test, test.RunMetadata, environment.Environment) test.Run
+	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
 }
 
 type PersistentRunner interface {
 	Runner
 	WorkerPool
+}
+
+type TestRunnerGetter interface {
+	GetDefault(ctx context.Context) testrunner.TestRunner
 }
 
 func NewPersistentRunner(
@@ -50,6 +55,7 @@ func NewPersistentRunner(
 	dsRepo resourcemanager.Current[datastore.DataStore],
 	eventEmitter EventEmitter,
 	ppGetter PollingProfileGetter,
+	trGetter TestRunnerGetter,
 ) PersistentRunner {
 	return persistentRunner{
 		triggers:            triggers,
@@ -62,6 +68,7 @@ func NewPersistentRunner(
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
 		ppGetter:            ppGetter,
+		trGetter:            trGetter,
 		executeQueue:        make(chan execReq, 5),
 		exit:                make(chan bool, 1),
 	}
@@ -78,6 +85,7 @@ type persistentRunner struct {
 	dsRepo              resourcemanager.Current[datastore.DataStore]
 	eventEmitter        EventEmitter
 	ppGetter            PollingProfileGetter
+	trGetter            TestRunnerGetter
 
 	executeQueue chan execReq
 	exit         chan bool
@@ -139,7 +147,7 @@ func getNewCtx(ctx context.Context) context.Context {
 	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
 }
 
-func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment) test.Run {
+func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
 	ctx, cancelCtx := context.WithCancel(
 		getNewCtx(ctx),
 	)
@@ -151,6 +159,14 @@ func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata t
 	r.handleDBError(run, err)
 
 	r.listenForStopRequests(ctx, cancelCtx, run)
+
+	// configuring required gates
+	if requiredGates == nil {
+		rg := r.trGetter.GetDefault(ctx).RequiredGates
+		requiredGates = &rg
+	}
+
+	run = run.ConfigureRequiredGates(*requiredGates)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
 		Values: environment.Values,

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
@@ -12,7 +13,7 @@ import (
 )
 
 type TransactionRunner interface {
-	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment) transaction.TransactionRun
+	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) transaction.TransactionRun
 }
 
 type PersistentTransactionRunner interface {
@@ -62,10 +63,11 @@ type persistentTransactionRunner struct {
 	exit                chan bool
 }
 
-func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata test.RunMetadata, environment environment.Environment) transaction.TransactionRun {
+func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) transaction.TransactionRun {
 	run := transaction.NewRun()
 	run.Metadata = metadata
 	run.Environment = environment
+	run.RequiredGates = requiredGates
 
 	ctx = getNewCtx(ctx)
 
@@ -134,7 +136,7 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran tr
 }
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, testObj test.Test) (transaction.TransactionRun, error) {
-	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.Environment)
+	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.Environment, tr.RequiredGates)
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
 		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)

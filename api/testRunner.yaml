@@ -1,0 +1,51 @@
+openapi: 3.0.0
+components:
+  schemas:
+    TestRunnerResource:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'TestRunner'."
+          enum:
+            - TestRunner
+        spec:
+          $ref: "#/components/schemas/TestRunner"
+    TestRunner:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "ID of the test runner resource. It should always be set as 'current'."
+          enum:
+            - current
+        name:
+          type: string
+          description: "Name given for this test runner set"
+        requiredGates:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportedGates"
+    RequiredGatesResult:
+      type: object
+      properties:
+        required:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportedGates"
+        failed:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportedGates"
+        passed:
+          type: boolean
+      required:
+        - passed
+        - failed
+        - required
+    SupportedGates:
+      type: string
+      enum:
+        - analyzer-score
+        - analyzer-rules
+        - test-specs
