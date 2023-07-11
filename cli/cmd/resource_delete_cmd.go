@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
@@ -35,6 +36,9 @@ func init() {
 			}
 
 			result, err := resourceClient.Delete(ctx, deleteParams.ResourceID, resultFormat)
+			if errors.Is(err, resourcemanager.ErrNotFound) {
+				return "", errors.New(result)
+			}
 			if err != nil {
 				return "", err
 			}
