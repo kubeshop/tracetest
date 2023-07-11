@@ -65,10 +65,10 @@ mkdir -p results/responses
 run_test_suite_for_feature() {
   feature=$1
 
-  junit_output='results/'$feature'_test_suite.xml'
+  # junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --environment ./tracetesting-env.yaml --junit $junit_output"
+  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --environment ./tracetesting-env.yaml"
   echo $testCMD
   $testCMD
   return $?
