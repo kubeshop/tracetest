@@ -112,7 +112,7 @@ func TestLinterResource(t *testing.T) {
 								"weight": 30,
 								"errorLevel": "error",
 								"name": "Secure HTTPS Protocol",
-								"errorDescription": "The following spans are using insecure http protocol:",
+								"errorDescription": "The following attributes are using insecure http protocol:",
 								"description": "Enforce usage of secure protocol for HTTP server spans",
 								"tips": []
 							},
