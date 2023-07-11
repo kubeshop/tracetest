@@ -292,6 +292,11 @@ func TestArrayExecution(t *testing.T) {
 			ShouldPass: true,
 		},
 		{
+			Name:       "arrays_can_be_filtered_by_value",
+			Query:      `'[{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]' | json_path '$[?(@.name == "john")].age' = 37`,
+			ShouldPass: true,
+		},
+		{
 			Name:       "should_check_if_array_contains_value",
 			Query:      `[31,35,39] contains 35`,
 			ShouldPass: true,

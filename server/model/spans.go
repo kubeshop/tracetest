@@ -73,9 +73,25 @@ type Span struct {
 	EndTime    time.Time
 	Attributes Attributes
 	Kind       SpanKind
+	Events     []SpanEvent
 
 	Parent   *Span   `json:"-"`
 	Children []*Span `json:"-"`
+}
+
+func (s *Span) injectEventsIntoAttributes() {
+	if s.Events == nil {
+		s.Events = make([]SpanEvent, 0)
+	}
+
+	eventsJson, _ := json.Marshal(s.Events)
+	s.Attributes["span.events"] = string(eventsJson)
+}
+
+type SpanEvent struct {
+	Name       string     `json:"name"`
+	Timestamp  time.Time  `json:"timestamp"`
+	Attributes Attributes `json:"attributes"`
 }
 
 type encodedSpan struct {
