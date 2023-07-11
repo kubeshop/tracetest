@@ -102,25 +102,15 @@ type orchestrator struct {
 	environments  resourcemanager.Client
 }
 
-var yamlFormat, jsonFormat resourcemanager.Format
-
-func init() {
-	var err error
-	yamlFormat, err = resourcemanager.Formats.Get(resourcemanager.FormatYAML)
-	if err != nil {
-		panic(fmt.Errorf("could not get yaml format: %w", err))
-	}
-
-	jsonFormat, err = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
-	if err != nil {
-		panic(fmt.Errorf("could not get json format: %w", err))
-	}
-}
+var (
+	yamlFormat = resourcemanager.Formats.Get(resourcemanager.FormatYAML)
+	jsonFormat = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+)
 
 const (
-	ExitCodeSuccess        = 0
-	ExitCodeGeneralError   = 1
-	ExitCodeTestNotPasswed = 2
+	ExitCodeSuccess       = 0
+	ExitCodeGeneralError  = 1
+	ExitCodeTestNotPassed = 2
 )
 
 func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
@@ -213,7 +203,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 
 	exitCode = ExitCodeSuccess
 	if !result.Passed {
-		exitCode = ExitCodeTestNotPasswed
+		exitCode = ExitCodeTestNotPassed
 	}
 
 	return exitCode, nil
@@ -222,6 +212,18 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 func (o orchestrator) resolveEnvID(ctx context.Context, envID string) (string, error) {
 	if !fileutil.IsFilePath(envID) {
 		o.logger.Debug("envID is not a file path", zap.String("envID", envID))
+
+		// validate that env exists
+		_, err := o.environments.Get(ctx, envID, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
+		if errors.Is(err, resourcemanager.ErrNotFound) {
+			return "", fmt.Errorf("environment '%s' not found", envID)
+		}
+		if err != nil {
+			return "", fmt.Errorf("cannot get environment '%s': %w", envID, err)
+		}
+
+		o.logger.Debug("envID is valid")
+
 		return envID, nil
 	}
 

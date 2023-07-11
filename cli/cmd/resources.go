@@ -67,11 +67,7 @@ var (
 	)
 
 	transactionPreprocessor = preprocessor.Transaction(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
-		formatYAML, err := resourcemanager.Formats.Get(resourcemanager.FormatYAML)
-		if err != nil {
-			return input, fmt.Errorf("cannot get yaml format: %w", err)
-		}
-		updated, err := testClient.Apply(ctx, input, formatYAML)
+		updated, err := testClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
 			return input, fmt.Errorf("cannot apply test: %w", err)
 		}
