@@ -69,7 +69,7 @@ Now you can validate this entire use case.
 If you want to replicate this entire test on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
 
 ```sh
-tracetest test run -d test-definition.yml --wait-for-results
+tracetest run test -f test-definition.yml
 ```
 
 ```yaml

@@ -43,12 +43,8 @@ Every time the test is run, changes are detected and, if any change is introduce
 **How to Use**:
 
 ```sh
-tracetest test run --definition <file-path>
+tracetest run test --file <file-path>
 ```
-
-**Options**:
-
-`--wait-for-result`: The CLI will only exit after the test run has completed (the trace was retrieved and assertions were executed).
 
 ### Running Tracetest CLI From Docker
 
@@ -62,5 +58,5 @@ Use the command below, substituting the following placeholders:
 - `file-path` - The path to the saved Tracetest test. Example: `./mytest.yaml`
 
 ```bash wordWrap=true
-docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s <your-tracetest-server-url> test run  --definition <file-path> --wait-for-result
+docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s <your-tracetest-server-url> run test --file <file-path>
 ```

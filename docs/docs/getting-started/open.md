@@ -125,7 +125,7 @@ spec:
 Using the CLI, trigger a test run.
 
 ```bash title="Terminal"
-tracetest test run -d pokeshop_import.yaml --wait-for-result -o pretty
+tracetest run test -f pokeshop_import.yaml -o pretty
 ```
 
 ### Output

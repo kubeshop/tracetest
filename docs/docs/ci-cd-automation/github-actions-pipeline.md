@@ -54,9 +54,9 @@ jobs:
 
     - name: Run tests via the Tracetest CLI
       run: |
-        tracetest test run -d ./tracetest/tests/test-api.yaml -w
-        tracetest test run -d ./tracetest/tests/test-api-and-av.yaml -w
-        tracetest test run -d ./tracetest/tests/transaction-api.yaml -w
+        tracetest run test -f ./tracetest/tests/test-api.yaml
+        tracetest run test -f ./tracetest/tests/test-api-and-av.yaml
+        tracetest run transaction -f ./tracetest/tests/transaction-api.yaml
 
     - name: Stop containers
       if: always()
@@ -94,9 +94,9 @@ jobs:
 
     - name: Run tests via the Tracetest CLI
       run: |
-        tracetest test run -d ./tracetest/tests/test-api.yaml -w
-        tracetest test run -d ./tracetest/tests/test-api-and-av.yaml -w
-        tracetest test run -d ./tracetest/tests/transaction-api.yaml -w
+        tracetest run test -f ./tracetest/tests/test-api.yaml
+        tracetest run test -f ./tracetest/tests/test-api-and-av.yaml
+        tracetest run transaction -f ./tracetest/tests/transaction-api.yaml
 
     - name: Stop containers
       if: always()
@@ -422,7 +422,7 @@ spec:
 To run the test, run this command in the terminal:
 
 ```bash
-tracetest test run -d ./tracetest/tests/test-api.yaml -w
+tracetest run test -f ./tracetest/tests/test-api.yaml
 ```
 
 This test will fail just like the sample above due to the `attr:books.list.count = 4` assertion.

@@ -3,7 +3,7 @@
 When a user runs a test or a transaction, any variables that will be needed but are not defined will be prompted for:
 
 ```sh
-tracetest test run -d path/to/test.yaml
+tracetest run test -f path/to/test.yaml
 ```
 
 ```text title="Output:"
@@ -44,7 +44,7 @@ spec:
 ```
 
 ```sh
-tracetest test run -d path/to/test.yaml -e testenv
+tracetest run test -f path/to/test.yaml -e testenv
 ```
 
 ```text title="Output:"

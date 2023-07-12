@@ -314,7 +314,7 @@ Duration:
 Getting logs from test job 641885f39922b3e1003dd5b6
 Execution completed
 🔬 Executing in directory :
- $ tracetest test run --server-url http://10.96.93.106:11633 --definition /tmp/test-content737616681 --wait-for-result --output pretty
+ $ tracetest run test --server-url http://10.96.93.106:11633 --file /tmp/test-content737616681 --output pretty
 ✘ Pokeshop - List (http://10.96.93.106:11633/test/RUkKQ_aVR/run/2/test)
 	✘ Database queries less than 500 ms
 		✘ #2b213392d0e3ff21
@@ -359,7 +359,7 @@ Duration:
 Getting logs from test job 6418873d9922b3e1003dd5b8
 Execution completed
 🔬 Executing in directory :
- $ tracetest test run --server-url http://10.96.93.106:11633 --definition /tmp/test-content1901459587 --wait-for-result --output pretty
+ $ tracetest run test --server-url http://10.96.93.106:11633 --file /tmp/test-content1901459587 --output pretty
 ✔ Pokeshop - List (http://10.96.93.106:11633/test/RUkKQ_aVR/run/3/test)
 	✔ Database queries less than 500 ms
 

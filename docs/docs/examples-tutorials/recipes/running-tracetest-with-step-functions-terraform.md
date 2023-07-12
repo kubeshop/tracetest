@@ -161,9 +161,9 @@ Now that all of the required services and infra have been created, you can start
 3. Run the tests YAML file using the CLI.
 
 ```bash
-  tracetest test run -d tests/incident.yaml \
-  tracetest test run -d tests/exam.yaml \
-  tracetest test run -d tests/transaction.yaml
+  tracetest run test -f tests/incident.yaml \
+  tracetest run test -f tests/exam.yaml \
+  tracetest run transaction -f tests/transaction.yaml
 ```
 
 4. Follow the link to find the results.

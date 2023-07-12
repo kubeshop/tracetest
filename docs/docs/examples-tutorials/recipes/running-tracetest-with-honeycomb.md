@@ -315,7 +315,7 @@ This file defines the a test the same way you would through the Web UI.
 To run the test, run this command in the terminal:
 
 ```bash
-tracetest test run -d ./test-api.yaml -w
+tracetest run test -f ./test-api.yaml
 ```
 
 ```bash
