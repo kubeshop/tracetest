@@ -28,9 +28,10 @@ type TransactionRun struct {
 	CurrentTest int
 
 	// result info
-	LastError error
-	Pass      int
-	Fail      int
+	LastError                   error
+	Pass                        int
+	Fail                        int
+	AllStepsRequiredGatesPassed bool
 
 	Metadata test.RunMetadata
 
@@ -56,4 +57,14 @@ func (tr TransactionRun) ResultsCount() (pass, fail int) {
 	}
 
 	return
+}
+
+func (tr TransactionRun) StepsGatesValidation() bool {
+	for _, step := range tr.Steps {
+		if !step.RequiredGatesResult.Passed {
+			return false
+		}
+	}
+
+	return true
 }

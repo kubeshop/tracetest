@@ -11,6 +11,7 @@ import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './RunDetailLayout.styled';
 import EventLogPopover from '../EventLogPopover/EventLogPopover';
+import RunStatusIcon from '../RunStatusIcon/RunStatusIcon';
 
 interface IProps {
   testId: string;
@@ -20,9 +21,14 @@ const HeaderRight = ({testId}: IProps) => {
   const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
-  const {isLoadingStop, run, stopRun, runEvents} = useTestRun();
+  const {
+    isLoadingStop,
+    run: {state, requiredGatesResult},
+    run,
+    stopRun,
+    runEvents,
+  } = useTestRun();
   const {onRun} = useTest();
-  const state = run.state;
 
   return (
     <S.Section $justifyContent="flex-end">
@@ -47,9 +53,12 @@ const HeaderRight = ({testId}: IProps) => {
         </S.StateContainer>
       )}
       {!isDraftMode && state && isRunStateFinished(state) && (
-        <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
-          Run Test
-        </Button>
+        <>
+          <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
+          <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
+            Run Test
+          </Button>
+        </>
       )}
       <EventLogPopover runEvents={runEvents} />
       <RunActionsMenu

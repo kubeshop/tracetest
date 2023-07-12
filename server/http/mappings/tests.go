@@ -40,16 +40,17 @@ func (m OpenAPI) TransactionRun(in transaction.TransactionRun) openapi.Transacti
 	}
 
 	return openapi.TransactionRun{
-		Id:          strconv.Itoa(in.ID),
-		Version:     int32(in.TransactionVersion),
-		CreatedAt:   in.CreatedAt,
-		CompletedAt: in.CompletedAt,
-		State:       string(in.State),
-		Steps:       steps,
-		Metadata:    in.Metadata,
-		Environment: m.Environment(in.Environment),
-		Pass:        int32(in.Pass),
-		Fail:        int32(in.Fail),
+		Id:                          strconv.Itoa(in.ID),
+		Version:                     int32(in.TransactionVersion),
+		CreatedAt:                   in.CreatedAt,
+		CompletedAt:                 in.CompletedAt,
+		State:                       string(in.State),
+		Steps:                       steps,
+		Metadata:                    in.Metadata,
+		Environment:                 m.Environment(in.Environment),
+		Pass:                        int32(in.Pass),
+		Fail:                        int32(in.Fail),
+		AllStepsRequiredGatesPassed: in.AllStepsRequiredGatesPassed,
 	}
 }
 

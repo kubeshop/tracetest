@@ -33,6 +33,8 @@ type TransactionRun struct {
 	Pass int32 `json:"pass,omitempty"`
 
 	Fail int32 `json:"fail,omitempty"`
+
+	AllStepsRequiredGatesPassed bool `json:"allStepsRequiredGatesPassed,omitempty"`
 }
 
 // AssertTransactionRunRequired checks if the required fields are not zero-ed

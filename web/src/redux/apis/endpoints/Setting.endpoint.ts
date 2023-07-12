@@ -4,6 +4,7 @@ import Config, {TRawConfig, TRawLiveConfig} from 'models/Config.model';
 import Demo, {TRawDemo} from 'models/Demo.model';
 import Linter, {TRawLinter} from 'models/Linter.model';
 import Polling, {TRawPolling} from 'models/Polling.model';
+import TestRunner, {TRawTestRunnerResource} from 'models/TestRunner.model';
 import {ResourceType, TDraftResource, TListResponse} from 'types/Settings.types';
 import {TTestApiEndpointBuilder} from 'types/Test.types';
 import {IListenerFunction} from 'gateways/WebSocket.gateway';
@@ -62,6 +63,15 @@ const ConfigEndpoint = (builder: TTestApiEndpointBuilder) => ({
     }),
     providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.AnalyzerType}],
     transformResponse: (rawLinter: TRawLinter) => Linter(rawLinter),
+  }),
+  getTestRunner: builder.query<TestRunner, unknown>({
+    query: () => ({
+      url: '/testrunners/current',
+      method: HTTP_METHOD.GET,
+      headers: {'content-type': 'application/json'},
+    }),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.TestRunnerType}],
+    transformResponse: (rawTestRunner: TRawTestRunnerResource) => TestRunner(rawTestRunner),
   }),
   createSetting: builder.mutation<undefined, {resource: TDraftResource}>({
     query: ({resource}) => ({
