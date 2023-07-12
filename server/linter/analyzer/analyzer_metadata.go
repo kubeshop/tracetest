@@ -7,13 +7,13 @@ var (
 	SecurityID  = "security"
 
 	// rules
-	EnsureSpanNamingRuleID      string = "span_naming"
-	RequiredAttributesRuleID    string = "required_attributes"
-	EnsureAttributeNamingRuleID string = "attribute_naming"
-	NotEmptyAttributesRuleID    string = "not_empty_attributes"
-	EnforceDnsRuleID            string = "enforce_dns"
-	EnforceHttpsProtocolRuleID  string = "enforce_https_protocol"
-	EnsuresNoApiKeyLeakRuleID   string = "ensures_no_api_key_leak"
+	EnsureSpanNamingRuleID      string = "span-naming"
+	RequiredAttributesRuleID    string = "required-attributes"
+	EnsureAttributeNamingRuleID string = "attribute-naming"
+	NotEmptyAttributesRuleID    string = "no-empty-attributes"
+	EnforceDnsRuleID            string = "prefer-dns"
+	EnforceHttpsProtocolRuleID  string = "secure-https-protocol"
+	EnsuresNoApiKeyLeakRuleID   string = "no-api-key-leak"
 
 	ErrorLevelWarning  string = "warning"
 	ErrorLevelError    string = "error"
@@ -37,7 +37,7 @@ var (
 	StandardsPlugin = LinterPlugin{
 		ID:          StandardsID,
 		Name:        "OTel Semantic Conventions",
-		Description: "Enforce standards for spans and attributes",
+		Description: "Enforce trace standards following OTel Semantic Conventions",
 		Enabled:     true,
 		Rules: []LinterRule{
 			EnsureSpanNamingRule,
@@ -49,8 +49,8 @@ var (
 
 	EnsureSpanNamingRule = LinterRule{
 		ID:               EnsureSpanNamingRuleID,
-		Name:             "Span Name Convention",
-		Description:      "Ensure all spans follow the naming convention",
+		Name:             "Span Naming",
+		Description:      "Enforce span names that identify a class of Spans",
 		ErrorDescription: "",
 		Tips:             []string{},
 		Weight:           25,
@@ -59,8 +59,8 @@ var (
 
 	RequiredAttributesRule = LinterRule{
 		ID:               RequiredAttributesRuleID,
-		Name:             "Required Attributes By Span Type",
-		Description:      "Ensure all required attributes are present",
+		Name:             "Required Attributes",
+		Description:      "Enforce required attributes by span type",
 		ErrorDescription: "This span is missing the following required attributes:",
 		Tips:             []string{"This rule checks if all required attributes are present in spans of given type"},
 		Weight:           25,
@@ -70,7 +70,7 @@ var (
 	EnsureAttributeNamingRule = LinterRule{
 		ID:               EnsureAttributeNamingRuleID,
 		Name:             "Attribute Naming",
-		Description:      "Ensure all attributes follow the naming convention",
+		Description:      "Enforce attribute keys to follow common specifications",
 		ErrorDescription: "The following attributes do not follow the naming convention:",
 		Tips: []string{
 			"You should always add namespaces to your span names to ensure they will not be overwritten",
@@ -82,8 +82,8 @@ var (
 
 	NotEmptyAttributesRule = LinterRule{
 		ID:               NotEmptyAttributesRuleID,
-		Name:             "Not Empty Attributes",
-		Description:      "Does not allow empty attribute values in any span",
+		Name:             "No Empty Attributes",
+		Description:      "Disallow empty attribute values",
 		ErrorDescription: "The following attributes are empty:",
 		Tips:             []string{"Empty attributes don't provide any information about the operation and should be removed"},
 		Weight:           25,
@@ -93,8 +93,8 @@ var (
 	// common
 	CommonPlugin = LinterPlugin{
 		ID:          CommonID,
-		Name:        "Common problems",
-		Description: "Helps you find common problems with your application",
+		Name:        "Common Problems",
+		Description: "Help you find common mistakes with your application",
 		Enabled:     true,
 		Rules: []LinterRule{
 			EnforceDnsRule,
@@ -103,8 +103,8 @@ var (
 
 	EnforceDnsRule = LinterRule{
 		ID:               EnforceDnsRuleID,
-		Name:             "Enforce DNS Over IP usage",
-		Description:      "Enforce DNS usage over IP addresses",
+		Name:             "Prefer DNS",
+		Description:      "Enforce usage of DNS instead of IP addresses",
 		ErrorDescription: "The following attributes are using IP addresses instead of DNS:",
 		Tips:             []string{},
 		Weight:           100,
@@ -115,7 +115,7 @@ var (
 	SecurityPlugin = LinterPlugin{
 		ID:          SecurityID,
 		Name:        "Security",
-		Description: "Enforce security for spans and attributes",
+		Description: "Help you find security problems with your application",
 		Enabled:     true,
 		Rules: []LinterRule{
 			EnforceHttpsProtocolRule,
@@ -125,9 +125,9 @@ var (
 
 	EnforceHttpsProtocolRule = LinterRule{
 		ID:               EnforceHttpsProtocolRuleID,
-		Name:             "Enforce HTTPS protocol",
-		Description:      "Ensure all request use https",
-		ErrorDescription: "The following spans are using http protocol:",
+		Name:             "Secure HTTPS Protocol",
+		Description:      "Enforce usage of secure protocol for HTTP server spans",
+		ErrorDescription: "The following attributes are using insecure http protocol:",
 		Tips:             []string{},
 		Weight:           30,
 		ErrorLevel:       "error",
@@ -136,7 +136,7 @@ var (
 	EnsuresNoApiKeyLeakRule = LinterRule{
 		ID:               EnsuresNoApiKeyLeakRuleID,
 		Name:             "No API Key Leak",
-		Description:      "Ensure no API keys are leaked in http headers",
+		Description:      "Disallow leaked API keys for HTTP spans",
 		ErrorDescription: "The following attributes are exposing API keys:",
 		Tips:             []string{},
 		Weight:           70,

@@ -12,6 +12,7 @@ export type TTestRunState = NonNullable<TTestSchemas['TestRun']['state'] | 'WAIT
 /* AnalyzerErrors by Span types */
 
 export type TAnalyzerError = {
+  ruleId: string;
   ruleName: string;
   ruleErrorDescription: string;
   pluginName: string;

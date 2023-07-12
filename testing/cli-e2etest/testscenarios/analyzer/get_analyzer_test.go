@@ -91,7 +91,7 @@ func TestGetAnalyzer(t *testing.T) {
 
 		plugin2 := analyzer.Spec.Plugins[1]
 		require.Len(plugin2.Rules, 1)
-		require.Equal(plugin2.Rules[0].ID, "enforce_dns")
+		require.Equal(plugin2.Rules[0].ID, "prefer-dns")
 		require.Equal(plugin2.Rules[0].Weight, 100)
 	})
 

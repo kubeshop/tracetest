@@ -40,6 +40,7 @@ function LinterResultPluginRuleResult({
 }
 
 function LinterResultPluginRule({
+  id = '',
   name = '',
   description = '',
   errorDescription = '',
@@ -50,6 +51,7 @@ function LinterResultPluginRule({
   level = 'error',
 }: TRawLinterResultPluginRule = {}): LinterResultPluginRule {
   return {
+    id,
     name,
     level: level as LinterRuleErrorLevel,
     description,

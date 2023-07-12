@@ -29,7 +29,11 @@ const Rule = ({fieldKey, baseName, isDisabled}: IProps) => {
       </Col>
       <Col span="auto">-</Col>
       <Col span={11}>
-        <Form.Item name={[fieldKey, 'weight']} label="Weight input configuration">
+        <Form.Item
+          name={[fieldKey, 'weight']}
+          label="Weight input configuration"
+          normalize={value => parseInt(String(value ?? 0), 10)}
+        >
           <Input type="number" disabled={isDisabled} />
         </Form.Item>
       </Col>

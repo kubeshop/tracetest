@@ -86,3 +86,19 @@ For more information about selectors or assertions, take a look at the documenta
 | `>=`           | Check if value from left side is larger or equal to the one on the right side of the operation.                           |
 | `contains`     | Check if value on the right side of the operation is contained inside of the value of the left side of the operation.     |
 | `not-contains` | Check if value on the right side of the operation is not contained inside of the value of the left side of the operation. |
+
+## Testing Span Events
+
+As an MVP of how to test span events, we are injecting `all spans` events into the span attributes as a JSON array. To assert your span events, use the `json_path` filter to select and test the **write events**.
+
+```yaml
+specs:
+  - selector: span[name = "my span"]
+    assertions:
+      - attr:span.events | json_path '$[?(@.name = "event name")].attributes.key' = "expected_value"
+```
+
+### Query breakdown
+
+* **@.name = "event name"**: select the event with name "**event name**"
+* $[?(@.name = "event name")]**.attributes.key**: select the attribute "**key**" from the event with name "**event name**"

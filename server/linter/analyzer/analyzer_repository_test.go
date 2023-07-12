@@ -40,94 +40,94 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "span_naming",
+								"id": "span-naming",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Span Name Convention",
+								"name": "Span Naming",
 								"errorDescription": "",
-								"description": "Ensure all spans follow the naming convention",
+								"description": "Enforce span names that identify a class of Spans",
 								"tips": []
 							},
 							{
-								"id": "required_attributes",
+								"id": "required-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Required Attributes By Span Type",
+								"name": "Required Attributes",
 								"errorDescription": "This span is missing the following required attributes:",
-								"description": "Ensure all required attributes are present",
+								"description": "Enforce required attributes by span type",
 								"tips": [
 									"This rule checks if all required attributes are present in spans of given type"
 								]
 							},
 							{
-								"id": "attribute_naming",
+								"id": "attribute-naming",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Attribute Naming",
 								"errorDescription": "The following attributes do not follow the naming convention:",
-								"description": "Ensure all attributes follow the naming convention",
+								"description": "Enforce attribute keys to follow common specifications",
 								"tips": [
 									"You should always add namespaces to your span names to ensure they will not be overwritten",
 									"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode"
 								]
 							},
 							{
-								"id": "not_empty_attributes",
+								"id": "no-empty-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Not Empty Attributes",
+								"name": "No Empty Attributes",
 								"errorDescription": "The following attributes are empty:",
-								"description": "Does not allow empty attribute values in any span",
+								"description": "Disallow empty attribute values",
 								"tips": [
 									"Empty attributes don't provide any information about the operation and should be removed"
 								]
 							}
 						],
 						"name": "OTel Semantic Conventions",
-						"description": "Enforce standards for spans and attributes"
+						"description": "Enforce trace standards following OTel Semantic Conventions"
 					},
 					{
 						"id": "common",
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_dns",
+								"id": "prefer-dns",
 								"weight": 100,
 								"errorLevel": "error",
-								"name": "Enforce DNS Over IP usage",
+								"name": "Prefer DNS",
 								"errorDescription": "The following attributes are using IP addresses instead of DNS:",
-								"description": "Enforce DNS usage over IP addresses",
+								"description": "Enforce usage of DNS instead of IP addresses",
 								"tips": []
 							}
 						],
-						"name": "Common problems",
-						"description": "Helps you find common problems with your application"
+						"name": "Common Problems",
+						"description": "Help you find common mistakes with your application"
 					},
 					{
 						"id": "security",
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_https_protocol",
+								"id": "secure-https-protocol",
 								"weight": 30,
 								"errorLevel": "error",
-								"name": "Enforce HTTPS protocol",
-								"errorDescription": "The following spans are using http protocol:",
-								"description": "Ensure all request use https",
+								"name": "Secure HTTPS Protocol",
+								"errorDescription": "The following attributes are using insecure http protocol:",
+								"description": "Enforce usage of secure protocol for HTTP server spans",
 								"tips": []
 							},
 							{
-								"id": "ensures_no_api_key_leak",
+								"id": "no-api-key-leak",
 								"weight": 70,
 								"errorLevel": "error",
 								"name": "No API Key Leak",
 								"errorDescription": "The following attributes are exposing API keys:",
-								"description": "Ensure no API keys are leaked in http headers",
+								"description": "Disallow leaked API keys for HTTP spans",
 								"tips": []
 							}
 						],
 						"name": "Security",
-						"description": "Enforce security for spans and attributes"
+						"description": "Help you find security problems with your application"
 					}
 				]
 			}
@@ -145,94 +145,94 @@ func TestLinterResource(t *testing.T) {
 						"enabled": true,
 						"rules": [
 							{
-								"id": "span_naming",
+								"id": "span-naming",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Span Name Convention",
+								"name": "Span Naming",
 								"errorDescription": "",
-								"description": "Ensure all spans follow the naming convention",
+								"description": "Enforce span names that identify a class of Spans",
 								"tips": []
 							},
 							{
-								"id": "required_attributes",
+								"id": "required-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Required Attributes By Span Type",
+								"name": "Required Attributes",
 								"errorDescription": "This span is missing the following required attributes:",
-								"description": "Ensure all required attributes are present",
+								"description": "Enforce required attributes by span type",
 								"tips": [
 									"This rule checks if all required attributes are present in spans of given type"
 								]
 							},
 							{
-								"id": "attribute_naming",
+								"id": "attribute-naming",
 								"weight": 25,
 								"errorLevel": "error",
 								"name": "Attribute Naming",
 								"errorDescription": "The following attributes do not follow the naming convention:",
-								"description": "Ensure all attributes follow the naming convention",
+								"description": "Enforce attribute keys to follow common specifications",
 								"tips": [
 									"You should always add namespaces to your span names to ensure they will not be overwritten",
 									"Use snake_case to separate multi-words. Ex: http.status_code instead of http.statusCode"
 								]
 							},
 							{
-								"id": "not_empty_attributes",
+								"id": "no-empty-attributes",
 								"weight": 25,
 								"errorLevel": "error",
-								"name": "Not Empty Attributes",
+								"name": "No Empty Attributes",
 								"errorDescription": "The following attributes are empty:",
-								"description": "Does not allow empty attribute values in any span",
+								"description": "Disallow empty attribute values",
 								"tips": [
 									"Empty attributes don't provide any information about the operation and should be removed"
 								]
 							}
 						],
 						"name": "OTel Semantic Conventions",
-						"description": "Enforce standards for spans and attributes"
+						"description": "Enforce trace standards following OTel Semantic Conventions"
 					},
 					{
 						"id": "common",
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_dns",
+								"id": "prefer-dns",
 								"weight": 100,
 								"errorLevel": "error",
-								"name": "Enforce DNS Over IP usage",
+								"name": "Prefer DNS",
 								"errorDescription": "The following attributes are using IP addresses instead of DNS:",
-								"description": "Enforce DNS usage over IP addresses",
+								"description": "Enforce usage of DNS instead of IP addresses",
 								"tips": []
 							}
 						],
-						"name": "Common problems",
-						"description": "Helps you find common problems with your application"
+						"name": "Common Problems",
+						"description": "Help you find common mistakes with your application"
 					},
 					{
 						"id": "security",
 						"enabled": true,
 						"rules": [
 							{
-								"id": "enforce_https_protocol",
+								"id": "secure-https-protocol",
 								"weight": 30,
 								"errorLevel": "error",
-								"name": "Enforce HTTPS protocol",
+								"name": "Secure HTTPS Protocol",
 								"errorDescription": "The following spans are using http protocol:",
-								"description": "Ensure all request use https",
+								"description": "Enforce usage of secure protocol for HTTP server spans",
 								"tips": []
 							},
 							{
-								"id": "ensures_no_api_key_leak",
+								"id": "no-api-key-leak",
 								"weight": 70,
 								"errorLevel": "error",
 								"name": "No API Key Leak",
 								"errorDescription": "The following attributes are exposing API keys:",
-								"description": "Ensure no API keys are leaked in http headers",
+								"description": "Disallow leaked API keys for HTTP spans",
 								"tips": []
 							}
 						],
 						"name": "Security",
-						"description": "Enforce security for spans and attributes"
+						"description": "Help you find security problems with your application"
 					}
 				]
 			}

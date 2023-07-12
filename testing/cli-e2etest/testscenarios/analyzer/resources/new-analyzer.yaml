@@ -8,30 +8,30 @@ spec:
     - id: standards
       enabled: true
       rules:
-        - id: span_naming
+        - id: span-naming
           weight: 25
           errorLevel: error
-        - id: required_attributes
+        - id: required-attributes
           weight: 25
           errorLevel: error
-        - id: attribute_naming
+        - id: attribute-naming
           weight: 25
           errorLevel: error
-        - id: not_empty_attributes
+        - id: no-empty-attributes
           weight: 25
           errorLevel: error
     - id: common
       enabled: true
       rules:
-        - id: enforce_dns
+        - id: prefer-dns
           weight: 100
           errorLevel: error
     - id: security
       enabled: true
       rules:
-        - id: enforce_https_protocol
+        - id: secure-https-protocol
           weight: 30
           errorLevel: error
-        - id: ensures_no_api_key_leak
+        - id: no-api-key-leak
           weight: 70
           errorLevel: error

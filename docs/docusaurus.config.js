@@ -171,6 +171,10 @@ const config = {
             to: '/ci-cd-automation/testkube-pipeline',
             from: ['/examples-tutorials/recipes/running-tracetest-with-testkube' /*, '/docs/legacyDocFrom2016'*/],
           },
+          {
+            to: '/analyzer/concepts',
+            from: ['/concepts/tracetest-analyzer-concepts'],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {

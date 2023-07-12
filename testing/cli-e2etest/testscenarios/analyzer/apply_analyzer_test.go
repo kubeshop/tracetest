@@ -46,7 +46,7 @@ func TestApplyAnalyzer(t *testing.T) {
 
 	plugin1 := analyzer.Spec.Plugins[0]
 	require.Len(plugin1.Rules, 4)
-	require.Equal(plugin1.Rules[0].ID, "span_naming")
+	require.Equal(plugin1.Rules[0].ID, "span-naming")
 	for _, rule := range plugin1.Rules {
 		require.Equal(rule.Weight, 25)
 	}

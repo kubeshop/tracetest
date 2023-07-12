@@ -60,7 +60,7 @@ func TestAnalyzerEntities(t *testing.T) {
 		_, err := emptyPlugin.Execute(context.TODO(), trace, analyzer.StandardsPlugin)
 
 		assert.NotNil(t, err)
-		assert.Contains(t, "rule span_naming not found", err.Error())
+		assert.Contains(t, "rule span-naming not found", err.Error())
 	})
 }
 
