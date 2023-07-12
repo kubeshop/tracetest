@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRunTest(t *testing.T) {
+func TestRunTransactionInsteadOfTest(t *testing.T) {
 	t.Run("should fail if transaction resource is selected", func(t *testing.T) {
 		// setup isolated e2e environment
 		env := environment.CreateAndStart(t)
