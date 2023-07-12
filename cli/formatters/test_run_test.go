@@ -8,6 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func baseURL() string {
+	return "http://localhost:11633"
+}
+
 func TestJSON(t *testing.T) {
 	in := formatters.TestRunOutput{
 		Test: openapi.Test{
@@ -23,7 +27,7 @@ func TestJSON(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.TestRun("http://localhost:11633", false)
+	formatter := formatters.TestRun(baseURL, false)
 
 	actual := formatter.Format(in, formatters.JSON)
 
@@ -46,7 +50,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			},
 		},
 	}
-	formatter := formatters.TestRun("http://localhost:11633", false)
+	formatter := formatters.TestRun(baseURL, false)
 	output := formatter.Format(in, formatters.Pretty)
 
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)\n", output)
@@ -95,7 +99,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			},
 		},
 	}
-	formatter := formatters.TestRun("http://localhost:11633", false)
+	formatter := formatters.TestRun(baseURL, false)
 	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)
 	✔ Validate span duration
@@ -181,7 +185,7 @@ func TestFailingTestOutput(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.TestRun("http://localhost:11633", false)
+	formatter := formatters.TestRun(baseURL, false)
 	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 	✔ Validate span duration
@@ -272,7 +276,7 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.TestRun("http://localhost:11633", false, formatters.WithPadding(1))
+	formatter := formatters.TestRun(baseURL, false, formatters.WithPadding(1))
 	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `	✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 		✔ Validate span duration

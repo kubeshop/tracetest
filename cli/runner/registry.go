@@ -10,8 +10,9 @@ func NewRegistry() Registry {
 	return Registry{}
 }
 
-func (r Registry) Register(runner Runner) {
+func (r Registry) Register(runner Runner) Registry {
 	r[runner.Name()] = runner
+	return r
 }
 
 var ErrNotFound = fmt.Errorf("runner not found")
@@ -22,4 +23,13 @@ func (r Registry) Get(name string) (Runner, error) {
 	}
 
 	return nil, ErrNotFound
+}
+
+func (r Registry) List() []string {
+	var list []string
+	for name := range r {
+		list = append(list, name)
+	}
+
+	return list
 }

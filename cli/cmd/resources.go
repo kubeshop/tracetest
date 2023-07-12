@@ -9,12 +9,29 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/preprocessor"
+	"github.com/kubeshop/tracetest/cli/runner"
 )
 
 var resourceParams = &resourceParameters{}
+
+var (
+	runnerRegsitry = runner.NewRegistry().
+		Register(runner.TestRunner(
+			testClient,
+			openapiClient,
+			formatters.TestRun(func() string { return cliConfig.URL() }, true),
+		)).
+		Register(runner.TransactionRunner(
+			transactionClient,
+			openapiClient,
+			formatters.TransactionRun(func() string { return cliConfig.URL() }, true),
+		))
+)
+
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
@@ -196,6 +213,10 @@ var (
 
 func resourceList() string {
 	return strings.Join(resources.List(), "|")
+}
+
+func runnableResourceList() string {
+	return strings.Join(runnerRegsitry.List(), "|")
 }
 
 func setupResources() {

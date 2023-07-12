@@ -9,7 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/runner"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -19,10 +19,9 @@ import (
 var (
 	cliLogger      = &zap.Logger{}
 	cliConfig      config.Config
+	openapiClient  = &openapi.APIClient{}
 	versionText    string
 	isVersionMatch bool
-
-	runnerRegsitry runner.Registry
 )
 
 type setupConfig struct {
@@ -88,18 +87,8 @@ func overrideConfig() {
 }
 
 func setupRunners() {
-	runnerRegsitry = runner.NewRegistry()
-	runnerRegsitry.Register(runner.TestRunner(
-		testClient,
-		utils.GetAPIClient(cliConfig),
-		formatters.TestRun(cliConfig.URL(), true),
-	))
-
-	runnerRegsitry.Register(runner.TransactionRunner(
-		transactionClient,
-		utils.GetAPIClient(cliConfig),
-		formatters.TransactionRun(cliConfig.URL(), true),
-	))
+	c := utils.GetAPIClient(cliConfig)
+	*openapiClient = *c
 }
 
 func setupOutputFormat(cmd *cobra.Command) {

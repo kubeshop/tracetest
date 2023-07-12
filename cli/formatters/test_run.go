@@ -15,7 +15,7 @@ const (
 )
 
 type testRun struct {
-	baseURL       string
+	baseURLFn     func() string
 	colorsEnabled bool
 	padding       int
 }
@@ -28,9 +28,9 @@ func WithPadding(padding int) testRunFormatterOption {
 	}
 }
 
-func TestRun(baseURL string, colorsEnabled bool, options ...testRunFormatterOption) testRun {
+func TestRun(baseURLFn func() string, colorsEnabled bool, options ...testRunFormatterOption) testRun {
 	testRun := testRun{
-		baseURL:       baseURL,
+		baseURLFn:     baseURLFn,
 		colorsEnabled: colorsEnabled,
 	}
 
@@ -275,7 +275,7 @@ func (f testRun) getColoredText(passed bool, text string) string {
 }
 
 func (f testRun) GetRunLink(testID, runID string) string {
-	return fmt.Sprintf("%s/test/%s/run/%s/test", f.baseURL, testID, runID)
+	return fmt.Sprintf("%s/test/%s/run/%s/test", f.baseURLFn(), testID, runID)
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {

@@ -17,7 +17,7 @@ var (
 func init() {
 	runCmd = &cobra.Command{
 		GroupID: cmdGroupResources.ID,
-		Use:     "run " + resourceList(),
+		Use:     "run " + runnableResourceList(),
 		Short:   "run resources",
 		Long:    "run resources",
 		PreRun:  setupCommand(),

@@ -10,16 +10,16 @@ import (
 )
 
 type transactionRun struct {
-	baseURL          string
+	baseURLFn        func() string
 	colorsEnabled    bool
 	testRunFormatter testRun
 }
 
-func TransactionRun(baseURL string, colorsEnabled bool) transactionRun {
+func TransactionRun(baseURLFn func() string, colorsEnabled bool) transactionRun {
 	return transactionRun{
-		baseURL:          baseURL,
+		baseURLFn:        baseURLFn,
 		colorsEnabled:    colorsEnabled,
-		testRunFormatter: TestRun(baseURL, colorsEnabled, WithPadding(1)),
+		testRunFormatter: TestRun(baseURLFn, colorsEnabled, WithPadding(1)),
 	}
 }
 
@@ -129,5 +129,5 @@ func (f transactionRun) getColoredText(passed bool, text string) string {
 }
 
 func (f transactionRun) getRunLink(transactionID, runID string) string {
-	return fmt.Sprintf("%s/transaction/%s/run/%s", f.baseURL, transactionID, runID)
+	return fmt.Sprintf("%s/transaction/%s/run/%s", f.baseURLFn(), transactionID, runID)
 }
