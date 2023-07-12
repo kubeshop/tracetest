@@ -46,7 +46,7 @@ Every time the test is run, changes are detected and, if any change is introduce
 tracetest run test --file <file-path>
 ```
 
-### Running Tracetest CLI From Docker
+### Running Tracetest CLI from Docker
 
 There are times when it is easier to directly execute the Tracetest CLI from a Docker image rather than installing the CLI on your local machine. This can be convenient when you wish to execute the CLI in a CI/CD environment.
 
