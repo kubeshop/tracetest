@@ -1,4 +1,4 @@
-import {Form} from 'antd';
+import {Col, Form, Row} from 'antd';
 import {CollectorConfigMap} from 'constants/CollectorConfig.constants';
 import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
 import {FramedCodeBlock} from 'components/CodeBlock';
@@ -20,9 +20,15 @@ const Configuration = () => {
           own OpenTelemetry Collector config and apply it.
         </S.Description>
       </S.SubtitleContainer>
-      <S.CodeContainer data-cy="file-viewer-code-container">
-        <FramedCodeBlock value={example} language="yaml" title="Collector Configuration" />
-      </S.CodeContainer>
+
+      <Row>
+        <Col span={16}>
+          <S.CodeContainer data-cy="file-viewer-code-container">
+            <FramedCodeBlock value={example} language="yaml" title="Collector Configuration" />
+          </S.CodeContainer>
+        </Col>
+      </Row>
+
       <DataStoreDocsBanner dataStoreType={dataStoreType} />
     </>
   );
