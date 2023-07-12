@@ -1,20 +1,37 @@
-import {toUpper} from 'lodash';
-import {useEffect} from 'react';
 import {Form, Radio, Typography} from 'antd';
+import {toUpper} from 'lodash';
+import {useEffect, useMemo} from 'react';
+import Test from 'models/Test.model';
 import {CliCommandFormat, CliCommandOption, TCliCommandConfig} from 'services/CliCommand.service';
 import * as S from './CliCommand.styled';
 import SwitchControl from './SwitchControl';
 import {defaultOptions} from './hooks/useCliCommand';
-import Test from '../../../../models/Test.model';
 
-const optionToText: Record<CliCommandOption, string> = {
-  [CliCommandOption.Wait]: 'Wait for test to complete',
-  [CliCommandOption.UseHostname]: 'Specify Tracetest server hostname',
-  [CliCommandOption.UseCurrentEnvironment]: 'Use current environment',
-  // [CliCommandOption.UseId]: 'Use file or test id',
-  [CliCommandOption.GeneratesJUnit]: 'Generate JUnit report',
-  [CliCommandOption.useDocker]: 'Run CLI via Docker image',
-};
+interface IOptionsMetadataParams {
+  isEnvironmentSelected: boolean;
+}
+interface IOptionsMetadata {
+  label: string;
+  help?: string;
+  disabled?: boolean;
+}
+
+function getOptionsMetadata({
+  isEnvironmentSelected,
+}: IOptionsMetadataParams): Record<CliCommandOption, IOptionsMetadata> {
+  return {
+    [CliCommandOption.UseId]: {label: 'Use test ID instead of file'},
+    [CliCommandOption.SkipResultWait]: {label: 'Skip waiting for test to complete'},
+    [CliCommandOption.UseHostname]: {label: 'Specify Tracetest server hostname'},
+    [CliCommandOption.UseCurrentEnvironment]: {
+      label: 'Use selected environment',
+      help: !isEnvironmentSelected ? 'This option is only available when an environment is selected' : undefined,
+      disabled: !isEnvironmentSelected,
+    },
+    [CliCommandOption.GeneratesJUnit]: {label: 'Generate JUnit report'},
+    [CliCommandOption.useDocker]: {label: 'Run CLI via Docker image'},
+  };
+}
 
 interface IProps {
   onChange(cmdConfig: TCliCommandConfig): void;
@@ -27,6 +44,7 @@ const Controls = ({onChange, test, environmentId, fileName}: IProps) => {
   const [form] = Form.useForm<TCliCommandConfig>();
   const options = Form.useWatch('options', form);
   const format = Form.useWatch('format', form);
+  const optionsMetadata = useMemo(() => getOptionsMetadata({isEnvironmentSelected: !!environmentId}), [environmentId]);
 
   useEffect(() => {
     onChange({
@@ -51,9 +69,9 @@ const Controls = ({onChange, test, environmentId, fileName}: IProps) => {
     >
       <S.ControlsContainer>
         <S.OptionsContainer>
-          {Object.entries(optionToText).map(([name, text]) => (
+          {Object.entries(optionsMetadata).map(([name, data]) => (
             <Form.Item name={['options', name]} noStyle>
-              <SwitchControl id={name} text={text} key={name} />
+              <SwitchControl id={name} text={data.label} key={name} disabled={data.disabled} help={data.help} />
             </Form.Item>
           ))}
         </S.OptionsContainer>

@@ -2,10 +2,10 @@ import Test from 'models/Test.model';
 import {getServerBaseUrl} from 'utils/Common';
 
 export enum CliCommandOption {
-  Wait = 'wait',
+  UseId = 'useId',
+  SkipResultWait = 'skipWait',
   UseHostname = 'useHostname',
   UseCurrentEnvironment = 'useCurrentEnvironment',
-  // UseId = 'useId',
   GeneratesJUnit = 'generateJUnit',
   useDocker = 'useDocker',
 }
@@ -30,19 +30,21 @@ type TApplyProps = {
   test: Test;
   environmentId?: string;
   enabled: boolean;
+  fileName: string;
 };
 type TApplyOption = (props: TApplyProps) => string;
 
 const CliCommandService = () => ({
   applyOptions: {
-    [CliCommandOption.Wait]: ({command, enabled}) => (enabled ? `${command} --wait-for-result` : command),
+    [CliCommandOption.UseId]: ({enabled, command, test: {id}, fileName}) =>
+      `${command} ${enabled ? `--id ${id}` : `--file ${fileName}`}`,
+    [CliCommandOption.SkipResultWait]: ({command, enabled}) => (enabled ? `${command} --skip-result-wait` : command),
     [CliCommandOption.UseHostname]: ({command, enabled}) => {
       const baseUrl = getServerBaseUrl();
-      return enabled ? `${command} -s ${baseUrl}` : command;
+      return enabled ? `${command} --server-url ${baseUrl}` : command;
     },
     [CliCommandOption.UseCurrentEnvironment]: ({command, enabled, environmentId}) =>
-      enabled && environmentId ? `${command} -e ${environmentId}` : command,
-    // [CliCommandOption.UseId]: ({enabled, command, test: {id}}) => `${command} -d ${enabled ? id : `${id}.yaml`}`,
+      enabled && environmentId ? `${command} --environment ${environmentId}` : command,
     [CliCommandOption.GeneratesJUnit]: ({command, enabled}) => (enabled ? `${command} --junit result.junit` : command),
     [CliCommandOption.useDocker]: ({enabled, command}) =>
       `${
@@ -54,11 +56,11 @@ const CliCommandService = () => ({
   getCommand({options, format, test, environmentId, fileName}: TCliCommandConfig) {
     const command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
-        this.applyOptions[option as CliCommandOption]({command: acc, enabled, test, environmentId}),
-      `test run -d ${fileName}`
+        this.applyOptions[option as CliCommandOption]({command: acc, enabled, test, environmentId, fileName}),
+      `run test`
     );
 
-    return `${command} -o ${format}`;
+    return `${command} --output ${format}`;
   },
 });
 
