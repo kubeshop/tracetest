@@ -23,19 +23,21 @@ const RequiredGatesInput = ({value = [], onChange = noop}: IProps) => {
   );
 
   return (
-    <div>
+    <>
       <Typography.Title level={3}>Required Gates</Typography.Title>
       <S.SwitchListContainer>
         {supportedGates.map(gate => (
           <S.SwitchContainer>
-            <Switch checked={value.includes(gate)} onChange={isChecked => handleChange(gate, isChecked)} />
-            <Typography.Text>
-              {ToTitle(gate)} <TooltipQuestion margin={6} title={SupportedRequiredGatesDescription[gate]} />
-            </Typography.Text>
+            <Switch checked={value.includes(gate)} onChange={isChecked => handleChange(gate, isChecked)} id={gate} />
+            <label htmlFor={gate}>
+              <Typography.Text>
+                {ToTitle(gate)} <TooltipQuestion margin={6} title={SupportedRequiredGatesDescription[gate]} />
+              </Typography.Text>
+            </label>
           </S.SwitchContainer>
         ))}
       </S.SwitchListContainer>
-    </div>
+    </>
   );
 };
 
