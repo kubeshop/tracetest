@@ -14,8 +14,8 @@ actions:
       args:
         - --config
         - /keptn/data/tracetest-cli-config.yaml
-        - test
         - run
-        - --definition
+        - test
+        - --file
         - /keptn/data/test-definition.yaml
-        - --wait-for-result
+

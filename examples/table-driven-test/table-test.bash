@@ -44,7 +44,7 @@ EOF
   echo "Running test"
 
   $TRACETEST apply environment --file "${envFile}" > /dev/null
-  $TRACETEST test run --definition "${TEST_DEFINITION}" --environment "${envFile}" --wait-for-result
+  $TRACETEST run test --file "${TEST_DEFINITION}" --environment "${envFile}"
 
 
   ((line=line+1))

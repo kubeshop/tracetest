@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -29,9 +30,8 @@ func (c Client) Delete(ctx context.Context, id string, format Format) (string, e
 
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
-		reqErr, ok := err.(requestError)
-		if ok && reqErr.Code == http.StatusNotFound {
-			return "", fmt.Errorf("Resource %s with ID %s not found", c.resourceName, id)
+		if errors.Is(err, ErrNotFound) {
+			return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), ErrNotFound
 		}
 
 		return "", fmt.Errorf("could not Delete resource: %w", err)

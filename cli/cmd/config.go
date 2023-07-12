@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -18,6 +19,7 @@ import (
 var (
 	cliLogger      = &zap.Logger{}
 	cliConfig      config.Config
+	openapiClient  = &openapi.APIClient{}
 	versionText    string
 	isVersionMatch bool
 )
@@ -57,6 +59,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 		overrideConfig()
 		setupVersion()
 		setupResources()
+		setupRunners()
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
@@ -83,17 +86,20 @@ func overrideConfig() {
 	}
 }
 
-func setupOutputFormat(cmd *cobra.Command) {
-	if cmd.GroupID != "resources" && output == string(formatters.Empty) {
-		output = string(formatters.DefaultOutput)
-	}
+func setupRunners() {
+	c := utils.GetAPIClient(cliConfig)
+	*openapiClient = *c
+}
 
+func setupOutputFormat(cmd *cobra.Command) {
 	o := formatters.Output(output)
+	if output == "" {
+		o = formatters.Pretty
+	}
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
 		ExitCLI(1)
 	}
-	formatters.SetOutput(o)
 }
 
 func loadConfig(cmd *cobra.Command, args []string) {

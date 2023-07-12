@@ -7,6 +7,10 @@ import (
 	"net/url"
 	"path"
 	"strings"
+
+	"go.uber.org/zap"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Verb string
@@ -15,6 +19,7 @@ type Client struct {
 	client             *HTTPClient
 	resourceName       string
 	resourceNamePlural string
+	logger             *zap.Logger
 	options            options
 }
 
@@ -60,12 +65,14 @@ func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 // This configuration work both for a single resource from a Get, or a ResourceList from a List
 func NewClient(
 	httpClient *HTTPClient,
+	logger *zap.Logger,
 	resourceName, resourceNamePlural string,
 	opts ...option) Client {
 	c := Client{
 		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
+		logger:             logger,
 	}
 
 	for _, opt := range opts {
@@ -75,6 +82,20 @@ func NewClient(
 	return c
 }
 
+func (c Client) resourceType() string {
+	if c.options.resourceType != "" {
+		return c.options.resourceType
+	}
+	// language.Und means Undefined
+	caser := cases.Title(language.Und, cases.NoLower)
+	return caser.String(c.resourceName)
+}
+
+var ErrNotFound = requestError{
+	Code:    http.StatusNotFound,
+	Message: "Resource not found",
+}
+
 type requestError struct {
 	Code    int    `json:"code"`
 	Message string `json:"error"`
@@ -82,6 +103,11 @@ type requestError struct {
 
 func (e requestError) Error() string {
 	return e.Message
+}
+
+func (e requestError) Is(target error) bool {
+	t, ok := target.(requestError)
+	return ok && t.Code == e.Code
 }
 
 func isSuccessResponse(resp *http.Response) bool {

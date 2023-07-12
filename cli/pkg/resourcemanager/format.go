@@ -28,20 +28,25 @@ func (f formatRegistry) GetWithFallback(format, fallback string) (Format, error)
 	}
 
 	if format == "" {
-		return f.Get(fallback)
+		format = fallback
 	}
 
-	return f.Get(format)
+	actualFormat := f.Get(format)
+	if actualFormat == nil {
+		return nil, fmt.Errorf("unknown format '%s'", format)
+	}
+
+	return actualFormat, nil
 }
 
-func (f formatRegistry) Get(format string) (Format, error) {
+func (f formatRegistry) Get(format string) Format {
 	for _, fr := range f {
 		if fr.String() == format {
-			return fr, nil
+			return fr
 		}
 	}
 
-	return nil, fmt.Errorf("format '%s' not supported", format)
+	return nil
 }
 
 var Formats = formatRegistry{

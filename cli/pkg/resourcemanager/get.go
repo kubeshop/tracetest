@@ -2,9 +2,13 @@ package resourcemanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
+
+	"go.uber.org/zap"
 )
 
 const VerbGet Verb = "get"
@@ -20,6 +24,10 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 	if err != nil {
 		return "", fmt.Errorf("cannot build Get request: %w", err)
 	}
+	d, _ := httputil.DumpRequestOut(req, true)
+	c.logger.Debug("get request",
+		zap.String("request", string(d)),
+	)
 
 	resp, err := c.client.do(req)
 	if err != nil {
@@ -27,14 +35,19 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 	}
 	defer resp.Body.Close()
 
+	d, _ = httputil.DumpResponse(resp, true)
+	c.logger.Debug("apply response",
+		zap.String("response", string(d)),
+	)
+
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
-		reqErr, ok := err.(requestError)
-		if ok && reqErr.Code == http.StatusNotFound {
-			return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), nil
+		if errors.Is(err, ErrNotFound) {
+			return fmt.Sprintf("Resource %s with ID %s not found", c.resourceName, id), ErrNotFound
 		}
 
 		return "", fmt.Errorf("could not Get resource: %w", err)
+
 	}
 
 	body, err := io.ReadAll(resp.Body)

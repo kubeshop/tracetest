@@ -74,7 +74,7 @@ TRACE_ID=$(cat $traces | jq -r '.data | first' | jq -r '.traceID')
 echo "-> TraceID": $TRACE_ID
 
 testFile=$(mktemp)
-tracetestCommand="tracetest test run --definition $testFile --wait-for-result"
+tracetestCommand="tracetest run test --file $testFile"
 cat $TEST_FILE | sed "8s/.*/      id: $TRACE_ID/" > $testFile
 
 if [ "$DEBUG" == "yes" ]; then
