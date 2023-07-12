@@ -11,14 +11,12 @@ import * as S from './TransactionRunResult.styled';
 import RunStatusIcon from '../RunStatusIcon';
 
 interface IProps {
-  index: number;
   test: Test;
   testRun?: TestRun;
   hasRunFailed: boolean;
 }
 
 const ExecutionStep = ({
-  index,
   test: {name, trigger, id: testId},
   hasRunFailed,
   testRun: {

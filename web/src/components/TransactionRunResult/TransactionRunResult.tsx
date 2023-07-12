@@ -19,7 +19,6 @@ const TransactionRunResult = ({transactionRun: {steps, environment, state}, tran
         <S.Title>Execution Steps</S.Title>
         {steps.map((step, index) => (
           <ExecutionStep
-            index={index}
             key={`${step.id}-${transaction.fullSteps[index]?.id}`}
             test={transaction.fullSteps[index]}
             testRun={step}
