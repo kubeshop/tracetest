@@ -19,7 +19,7 @@ import (
 var resourceParams = &resourceParameters{}
 
 var (
-	runnerRegsitry = runner.NewRegistry().
+	runnerRegistry = runner.NewRegistry().
 		Register(runner.TestRunner(
 			testClient,
 			openapiClient,
@@ -216,7 +216,7 @@ func resourceList() string {
 }
 
 func runnableResourceList() string {
-	return strings.Join(runnerRegsitry.List(), "|")
+	return strings.Join(runnerRegistry.List(), "|")
 }
 
 func setupResources() {

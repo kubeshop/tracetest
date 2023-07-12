@@ -25,7 +25,7 @@ func init() {
 			resourceType := resourceParams.ResourceName
 			ctx := context.Background()
 
-			r, err := runnerRegsitry.Get(resourceType)
+			r, err := runnerRegistry.Get(resourceType)
 			if err != nil {
 				return "", fmt.Errorf("resource type '%s' cannot be run", resourceType)
 			}
