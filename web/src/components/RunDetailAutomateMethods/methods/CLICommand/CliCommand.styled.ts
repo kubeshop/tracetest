@@ -34,8 +34,9 @@ export const SwitchContainer = styled.div`
   margin-bottom: 12px;
 `;
 
-export const SwitchLabel = styled.label`
-  cursor: pointer;
+export const SwitchLabel = styled.label<{$disabled?: boolean}>`
+  color: ${({$disabled, theme}) => ($disabled ? theme.color.textLight : theme.color.text)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
 `;
 
 export const ControlsContainer = styled.div`

@@ -5,22 +5,21 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/pterm/pterm"
 )
 
 type transactionRun struct {
-	config           config.Config
+	baseURLFn        func() string
 	colorsEnabled    bool
 	testRunFormatter testRun
 }
 
-func TransactionRun(config config.Config, colorsEnabled bool) transactionRun {
+func TransactionRun(baseURLFn func() string, colorsEnabled bool) transactionRun {
 	return transactionRun{
-		config:           config,
+		baseURLFn:        baseURLFn,
 		colorsEnabled:    colorsEnabled,
-		testRunFormatter: TestRun(config, colorsEnabled, WithPadding(1)),
+		testRunFormatter: TestRun(baseURLFn, colorsEnabled, WithPadding(1)),
 	}
 }
 
@@ -31,13 +30,14 @@ type TransactionRunOutput struct {
 	RunWebURL   string                 `json:"transactionRunWebUrl"`
 }
 
-func (f transactionRun) Format(output TransactionRunOutput) string {
+func (f transactionRun) Format(output TransactionRunOutput, format Output) string {
 	output.RunWebURL = f.getRunLink(output.Transaction.GetId(), output.Run.GetId())
-	switch CurrentOutput {
-	case Pretty:
-		return f.pretty(output)
+
+	switch format {
 	case JSON:
 		return f.json(output)
+	case Pretty, "":
+		return f.pretty(output)
 	}
 
 	return ""
@@ -78,16 +78,14 @@ func (f transactionRun) json(output TransactionRunOutput) string {
 }
 
 func (f transactionRun) pretty(output TransactionRunOutput) string {
+	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), output.RunWebURL)
 	if !output.HasResults {
-		return ""
+		return f.getColoredText(true, message)
 	}
 
-	link := output.RunWebURL
 	allStepsPassed := f.allTransactionStepsPassed(output)
-	message := fmt.Sprintf("%s %s (%s)\n", PASSED_TEST_ICON, output.Transaction.GetName(), link)
-
 	if !allStepsPassed {
-		message = fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), link)
+		message = fmt.Sprintf("%s %s (%s)\n", FAILED_TEST_ICON, output.Transaction.GetName(), output.RunWebURL)
 	}
 
 	// the transaction name + all steps
@@ -131,5 +129,5 @@ func (f transactionRun) getColoredText(passed bool, text string) string {
 }
 
 func (f transactionRun) getRunLink(transactionID, runID string) string {
-	return fmt.Sprintf("%s://%s/transaction/%s/run/%s", f.config.Scheme, f.config.Endpoint, transactionID, runID)
+	return fmt.Sprintf("%s/transaction/%s/run/%s", f.baseURLFn(), transactionID, runID)
 }

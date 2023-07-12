@@ -71,3 +71,28 @@ export const getServerBaseUrl = () => {
 export const ToTitle = (str: string) => {
   return capitalize(str.replace(/\W/g, ' '));
 };
+
+export const getIsValidUrl = (url: string): boolean => {
+  try {
+    return !!getParsedURL(url);
+  } catch (e) {
+    return false;
+  }
+};
+
+const regex =
+  '(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+
+export const getParsedURL = (rawUrl: string): URL => {
+  const urlRegex = new RegExp(regex, 'i');
+
+  const [matchedUrl = ''] = rawUrl.match(urlRegex) || [];
+
+  if (!matchedUrl) throw new Error('Invalid URL');
+
+  if (!!matchedUrl && !matchedUrl.startsWith('http')) {
+    return new URL(`http://${matchedUrl}`);
+  }
+
+  return new URL(matchedUrl);
+};

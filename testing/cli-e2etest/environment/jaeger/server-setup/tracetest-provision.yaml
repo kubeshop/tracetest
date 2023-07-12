@@ -5,5 +5,5 @@ spec:
   strategy: periodic
   default: true
   periodic:
-    retryDelay: 5s
-    timeout: 10m
+    retryDelay: 500ms
+    timeout: 1m

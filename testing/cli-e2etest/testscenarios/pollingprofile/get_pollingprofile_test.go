@@ -47,8 +47,8 @@ func TestGetPollingProfile(t *testing.T) {
 		require.Equal("Default", pollingProfile.Spec.Name)
 		require.True(pollingProfile.Spec.Default)
 		require.Equal("periodic", pollingProfile.Spec.Strategy)
-		require.Equal("5s", pollingProfile.Spec.Periodic.RetryDelay)
-		require.Equal("10m", pollingProfile.Spec.Periodic.Timeout)
+		require.Equal("500ms", pollingProfile.Spec.Periodic.RetryDelay)
+		require.Equal("1m", pollingProfile.Spec.Periodic.Timeout)
 	})
 
 	addGetPollingProfilePreReqs(t, env)

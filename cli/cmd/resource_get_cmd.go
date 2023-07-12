@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
@@ -34,6 +35,9 @@ func init() {
 			}
 
 			result, err := resourceClient.Get(ctx, getParams.ResourceID, resultFormat)
+			if errors.Is(err, resourcemanager.ErrNotFound) {
+				return result, nil
+			}
 			if err != nil {
 				return "", err
 			}

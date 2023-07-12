@@ -11,6 +11,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestRunTransactionInsteadOfTest(t *testing.T) {
+	t.Run("should fail if transaction resource is selected", func(t *testing.T) {
+		// setup isolated e2e environment
+		env := environment.CreateAndStart(t)
+		defer env.Close(t)
+
+		cliConfig := env.GetCLIConfigPath(t)
+
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I try to run a transaction
+		// Then it should pass
+		testFil := env.GetTestResourcePath(t, "import")
+
+		command := fmt.Sprintf("run transaction -f %s", testFil)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 1)
+		require.Contains(result.StdErr, "cannot apply Test to Transaction resource")
+	})
+}
+
 func TestRunTestWithHttpTriggerAndEnvironmentFile(t *testing.T) {
 	// setup isolated e2e environment
 	env := environment.CreateAndStart(t, environment.WithDataStoreEnabled(), environment.WithPokeshop())
@@ -37,7 +63,7 @@ func TestRunTestWithHttpTriggerAndEnvironmentFile(t *testing.T) {
 		environmentFile := env.GetTestResourcePath(t, "environment-file")
 		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
 
-		command := fmt.Sprintf("test run -w -d %s --environment %s", testFile, environmentFile)
+		command := fmt.Sprintf("run test -f %s --environment %s", testFile, environmentFile)
 		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
@@ -86,10 +112,54 @@ func TestRunTestWithHttpTriggerAndEnvironmentFile(t *testing.T) {
 
 		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
 
-		command := fmt.Sprintf("test run -w -d %s --environment pokeapi-env", testFile)
+		command := fmt.Sprintf("run test -f %s --environment pokeapi-env", testFile)
 		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
 		require.Contains(result.StdOut, "✔ It should save the correct data")
+	})
+}
+
+func TestRunTestWithGrpcTrigger(t *testing.T) {
+	// setup isolated e2e environment
+	env := environment.CreateAndStart(t, environment.WithDataStoreEnabled(), environment.WithPokeshop())
+	defer env.Close(t)
+
+	cliConfig := env.GetCLIConfigPath(t)
+
+	t.Run("should pass when using an embedded protobuf string in the test", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I try to run a test with a gRPC trigger with embedded protobuf
+		// Then it should pass
+		testFile := env.GetTestResourcePath(t, "grpc-trigger-embedded-protobuf")
+
+		command := fmt.Sprintf("run test -f %s", testFile)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
+	})
+
+	t.Run("should pass when referencing a protobuf file in the test", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I try to run a test with a gRPC trigger with a reference to a protobuf file
+		// Then it should pass
+		testFile := env.GetTestResourcePath(t, "grpc-trigger-reference-protobuf")
+
+		command := fmt.Sprintf("run test -f %s", testFile)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "✔ It calls Pokeshop correctly") // checks if the assertion was succeeded
 	})
 }

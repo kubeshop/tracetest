@@ -6,10 +6,10 @@ import CliCommandService, {
 } from 'services/CliCommand.service';
 
 export const defaultOptions: TCliCommandEnabledOptions = {
-  [CliCommandOption.Wait]: false,
+  [CliCommandOption.UseId]: false,
+  [CliCommandOption.SkipResultWait]: false,
   [CliCommandOption.UseHostname]: false,
-  [CliCommandOption.UseCurrentEnvironment]: true,
-  // [CliCommandOption.UseId]: true,
+  [CliCommandOption.UseCurrentEnvironment]: false,
   [CliCommandOption.GeneratesJUnit]: false,
   [CliCommandOption.useDocker]: false,
 };
@@ -17,13 +17,10 @@ export const defaultOptions: TCliCommandEnabledOptions = {
 const useCliCommand = () => {
   const [command, setCommand] = useState<string>('');
 
-  const onGetCommand = useCallback(
-    (config: TCliCommandConfig) => {
-      const cmd = CliCommandService.getCommand(config);
-      setCommand(cmd);
-    },
-    []
-  );
+  const onGetCommand = useCallback((config: TCliCommandConfig) => {
+    const cmd = CliCommandService.getCommand(config);
+    setCommand(cmd);
+  }, []);
 
   return {command, onGetCommand};
 };

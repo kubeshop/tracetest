@@ -3,6 +3,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {SupportedEditors} from 'constants/Editor.constants';
 import Editor from 'components/Editor';
 import * as S from './RequestDetails.styled';
+import UrlDockerTipInput from './UrlDockerTipInput';
 
 interface IProps {
   showMethodSelector?: boolean;
@@ -39,6 +40,9 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => {
           <Editor type={SupportedEditors.Interpolation} placeholder="Enter request url" />
         </Form.Item>
       </S.URLInputContainer>
+      <Form.Item name="url">
+        <UrlDockerTipInput />
+      </Form.Item>
     </div>
   );
 };
