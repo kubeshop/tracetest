@@ -4,7 +4,7 @@ Once you have created a test, whether from the Tracetest UI or via a text editor
 
 The documentation for running a test via the CLI can be found here:
 
-- [tracetest run test](./reference/tracetest_test_run.md): This page provides examples of using this command.
+- [tracetest run](./reference/tracetest_run.md): This page provides examples of using this command.
 
 ## Running Your First Test
 
