@@ -1,17 +1,20 @@
 package mappings
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/id"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -29,31 +32,7 @@ func optionalTime(in time.Time) *time.Time {
 	return &in
 }
 
-func (m OpenAPI) Transaction(in model.Transaction) openapi.Transaction {
-	steps := make([]openapi.Test, len(in.Steps))
-	for i, step := range in.Steps {
-		steps[i] = m.Test(step)
-	}
-
-	return openapi.Transaction{
-		Id:          in.ID.String(),
-		Name:        in.Name,
-		Description: in.Description,
-		Version:     int32(in.Version),
-		Steps:       steps,
-		CreatedAt:   in.CreatedAt,
-		Summary: openapi.TestSummary{
-			Runs: int32(in.Summary.Runs),
-			LastRun: openapi.TestSummaryLastRun{
-				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: int32(in.Summary.LastRun.Fails),
-				Fails:  int32(in.Summary.LastRun.Passes),
-			},
-		},
-	}
-}
-
-func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun {
+func (m OpenAPI) TransactionRun(in transaction.TransactionRun) openapi.TransactionRun {
 	steps := make([]openapi.TestRun, 0, len(in.Steps))
 
 	for _, step := range in.Steps {
@@ -74,37 +53,39 @@ func (m OpenAPI) TransactionRun(in model.TransactionRun) openapi.TransactionRun 
 	}
 }
 
-func (m OpenAPI) Test(in model.Test) openapi.Test {
+func (m OpenAPI) Test(in test.Test) openapi.Test {
 	return openapi.Test{
-		Id:               string(in.ID),
-		Name:             in.Name,
-		Description:      in.Description,
-		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Specs:            m.Specs(in.Specs),
-		Version:          int32(in.Version),
-		CreatedAt:        in.CreatedAt,
-		Outputs:          m.Outputs(in.Outputs),
+		Id:          string(in.ID),
+		Name:        in.Name,
+		Description: in.Description,
+		Trigger:     m.Trigger(in.Trigger),
+		Specs:       m.Specs(in.Specs),
+		Version:     int32(*in.Version),
+		CreatedAt:   *in.CreatedAt,
+		Outputs:     m.Outputs(in.Outputs),
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{
-				Time:   optionalTime(in.Summary.LastRun.Time),
-				Passes: int32(in.Summary.LastRun.Passes),
-				Fails:  int32(in.Summary.LastRun.Fails),
+				Time:          optionalTime(in.Summary.LastRun.Time),
+				Passes:        int32(in.Summary.LastRun.Passes),
+				Fails:         int32(in.Summary.LastRun.Fails),
+				AnalyzerScore: int32(in.Summary.LastRun.AnalyzerScore),
 			},
 		},
 	}
 }
 
-func (m OpenAPI) Environment(in model.Environment) openapi.Environment {
+// TODO: after migrating tests and transactions, we can remove this
+func (m OpenAPI) Environment(in environment.Environment) openapi.Environment {
 	return openapi.Environment{
-		Id:          in.ID,
+		Id:          in.ID.String(),
 		Name:        in.Name,
 		Description: in.Description,
 		Values:      m.EnvironmentValues(in.Values),
 	}
 }
 
-func (m OpenAPI) EnvironmentValues(in []model.EnvironmentValue) []openapi.EnvironmentValue {
+func (m OpenAPI) EnvironmentValues(in []environment.EnvironmentValue) []openapi.EnvironmentValue {
 	values := make([]openapi.EnvironmentValue, len(in))
 	for i, v := range in {
 		values[i] = openapi.EnvironmentValue{Key: v.Key, Value: v.Value}
@@ -113,44 +94,42 @@ func (m OpenAPI) EnvironmentValues(in []model.EnvironmentValue) []openapi.Enviro
 	return values
 }
 
-func (m OpenAPI) Outputs(in model.OrderedMap[string, model.Output]) []openapi.TestOutput {
-	res := make([]openapi.TestOutput, 0, in.Len())
-	in.ForEach(func(key string, val model.Output) error {
+func (m OpenAPI) Outputs(in []test.Output) []openapi.TestOutput {
+	res := make([]openapi.TestOutput, 0, len(in))
+	for _, output := range in {
 		res = append(res, openapi.TestOutput{
-			Name:     key,
-			Selector: m.Selector(val.Selector),
-			Value:    val.Value,
+			Name:           output.Name,
+			Selector:       string(output.Selector),
+			SelectorParsed: m.Selector(output.Selector),
+			Value:          output.Value,
 		})
-		return nil
-	})
+	}
 
 	return res
 }
 
-func (m OpenAPI) Trigger(in model.Trigger) openapi.Trigger {
+func (m OpenAPI) Trigger(in trigger.Trigger) openapi.Trigger {
 	return openapi.Trigger{
-		TriggerType: string(in.Type),
-		TriggerSettings: openapi.TriggerTriggerSettings{
-			Http:    m.HTTPRequest(in.HTTP),
-			Grpc:    m.GRPCRequest(in.GRPC),
-			Traceid: m.TRACEIDRequest(in.TRACEID),
-		},
+		Type:        string(in.Type),
+		HttpRequest: m.HTTPRequest(in.HTTP),
+		Grpc:        m.GRPCRequest(in.GRPC),
+		Traceid:     m.TraceIDRequest(in.TraceID),
 	}
 }
 
-func (m OpenAPI) TriggerResult(in model.TriggerResult) openapi.TriggerResult {
+func (m OpenAPI) TriggerResult(in trigger.TriggerResult) openapi.TriggerResult {
 
 	return openapi.TriggerResult{
-		TriggerType: string(in.Type),
+		Type: string(in.Type),
 		TriggerResult: openapi.TriggerResultTriggerResult{
 			Http:    m.HTTPResponse(in.HTTP),
 			Grpc:    m.GRPCResponse(in.GRPC),
-			Traceid: m.TRACEIDResponse(in.TRACEID),
+			Traceid: m.TraceIDResponse(in.TraceID),
 		},
 	}
 }
 
-func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
+func (m OpenAPI) Tests(in []test.Test) []openapi.Test {
 	tests := make([]openapi.Test, len(in))
 	for i, t := range in {
 		tests[i] = m.Test(t)
@@ -159,7 +138,7 @@ func (m OpenAPI) Tests(in []model.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPI) Environments(in []model.Environment) []openapi.Environment {
+func (m OpenAPI) Environments(in []environment.Environment) []openapi.Environment {
 	environments := make([]openapi.Environment, len(in))
 	for i, t := range in {
 		environments[i] = m.Environment(t)
@@ -168,32 +147,27 @@ func (m OpenAPI) Environments(in []model.Environment) []openapi.Environment {
 	return environments
 }
 
-func (m OpenAPI) Specs(in model.OrderedMap[model.SpanQuery, model.NamedAssertions]) openapi.TestSpecs {
+func (m OpenAPI) Specs(in test.Specs) []openapi.TestSpec {
+	specs := make([]openapi.TestSpec, len(in))
 
-	specs := make([]openapi.TestSpecsSpecsInner, in.Len())
-
-	i := 0
-	in.ForEach(func(spanQuery model.SpanQuery, namedAssertions model.NamedAssertions) error {
-		assertions := make([]string, len(namedAssertions.Assertions))
-		for j, a := range namedAssertions.Assertions {
+	for i, spec := range in {
+		assertions := make([]string, len(spec.Assertions))
+		for j, a := range spec.Assertions {
 			assertions[j] = string(a)
 		}
 
-		specs[i] = openapi.TestSpecsSpecsInner{
-			Name:       &namedAssertions.Name,
-			Selector:   m.Selector(spanQuery),
-			Assertions: assertions,
+		specs[i] = openapi.TestSpec{
+			Name:           spec.Name,
+			Selector:       string(spec.Selector),
+			SelectorParsed: m.Selector(test.SpanQuery(spec.Selector)),
+			Assertions:     assertions,
 		}
-		i++
-		return nil
-	})
-
-	return openapi.TestSpecs{
-		Specs: specs,
 	}
+
+	return specs
 }
 
-func (m OpenAPI) Selector(in model.SpanQuery) openapi.Selector {
+func (m OpenAPI) Selector(in test.SpanQuery) openapi.Selector {
 	structuredSelector := selectors.FromSpanQuery(in)
 
 	spanSelectors := make([]openapi.SpanSelector, 0)
@@ -241,7 +215,7 @@ func (m OpenAPI) SpanSelector(in selectors.SpanSelector) openapi.SpanSelector {
 	}
 }
 
-func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
+func (m OpenAPI) Result(in *test.RunResults) openapi.AssertionResults {
 	if in == nil {
 		return openapi.AssertionResults{}
 	}
@@ -249,7 +223,7 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 	results := make([]openapi.AssertionResultsResultsInner, in.Results.Len())
 
 	i := 0
-	in.Results.ForEach(func(query model.SpanQuery, inRes []model.AssertionResult) error {
+	in.Results.ForEach(func(query test.SpanQuery, inRes []test.AssertionResult) error {
 		res := make([]openapi.AssertionResult, len(inRes))
 		for j, r := range inRes {
 			sres := make([]openapi.AssertionSpanResult, len(r.Results))
@@ -286,7 +260,7 @@ func (m OpenAPI) Result(in *model.RunResults) openapi.AssertionResults {
 	}
 }
 
-func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
+func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 	if in == nil {
 		return openapi.TestRun{}
 	}
@@ -313,17 +287,19 @@ func (m OpenAPI) Run(in *model.Run) openapi.TestRun {
 		Environment:               m.Environment(in.Environment),
 		TransactionId:             in.TransactionID,
 		TransactionRunId:          in.TransactionRunID,
+		Linter:                    m.LinterResult(in.Linter),
 	}
 }
 
-func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []openapi.TestRunOutputsInner {
+func (m OpenAPI) RunOutputs(in maps.Ordered[string, test.RunOutput]) []openapi.TestRunOutputsInner {
 	res := make([]openapi.TestRunOutputsInner, 0, in.Len())
 
-	in.ForEach(func(key string, val model.RunOutput) error {
+	in.ForEach(func(key string, val test.RunOutput) error {
 		res = append(res, openapi.TestRunOutputsInner{
 			Name:   key,
 			Value:  val.Value,
 			SpanId: val.SpanID,
+			Error:  errToString(val.Error),
 		})
 		return nil
 	})
@@ -331,7 +307,7 @@ func (m OpenAPI) RunOutputs(in model.OrderedMap[string, model.RunOutput]) []open
 	return res
 }
 
-func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
+func (m OpenAPI) Runs(in []test.Run) []openapi.TestRun {
 	runs := make([]openapi.TestRun, len(in))
 	for i, t := range in {
 		runs[i] = m.Run(&t)
@@ -344,133 +320,84 @@ func (m OpenAPI) Runs(in []model.Run) []openapi.TestRun {
 type Model struct {
 	comparators           comparator.Registry
 	traceConversionConfig traces.ConversionConfig
-	testRepository        model.TestRepository
 }
 
-func (m Model) Transaction(ctx context.Context, in openapi.Transaction) (model.Transaction, error) {
-	tests := make([]model.Test, len(in.Steps))
-	for i, test := range in.Steps {
-		test, err := m.testRepository.GetLatestTestVersion(ctx, id.ID(test.Id))
-		if err != nil {
-			return model.Transaction{}, err
-		}
+func (m Model) Test(in openapi.Test) (test.Test, error) {
+	definition := m.Definition(in.Specs)
+	outputs := m.Outputs(in.Outputs)
 
-		tests[i] = test
-	}
-
-	return model.Transaction{
+	version := int(in.Version)
+	return test.Test{
 		ID:          id.ID(in.Id),
 		Name:        in.Name,
 		Description: in.Description,
-		Version:     int(in.Version),
-		Steps:       tests,
+		Trigger:     m.Trigger(in.Trigger),
+		Specs:       definition,
+		Outputs:     outputs,
+		Version:     &version,
 	}, nil
 }
 
-func (m Model) Test(in openapi.Test) (model.Test, error) {
-	definition, err := m.Definition(in.Specs)
-	if err != nil {
-		return model.Test{}, fmt.Errorf("could not convert definition: %w", err)
-	}
+func (m Model) Outputs(in []openapi.TestOutput) test.Outputs {
+	res := make(test.Outputs, 0, len(in))
 
-	outputs, err := m.Outputs(in.Outputs)
-	if err != nil {
-		return model.Test{}, fmt.Errorf("could not convert outputs: %w", err)
-	}
-
-	return model.Test{
-		ID:               id.ID(in.Id),
-		Name:             in.Name,
-		Description:      in.Description,
-		ServiceUnderTest: m.Trigger(in.ServiceUnderTest),
-		Specs:            definition,
-		Outputs:          outputs,
-		Version:          int(in.Version),
-	}, nil
-}
-
-func (m Model) Outputs(in []openapi.TestOutput) (model.OrderedMap[string, model.Output], error) {
-	res := model.OrderedMap[string, model.Output]{}
-
-	var err error
 	for _, output := range in {
-		res, err = res.Add(output.Name, model.Output{
-			Selector: model.SpanQuery(output.Selector.Query),
+		res = append(res, test.Output{
+			Name:     output.Name,
+			Selector: test.SpanQuery(output.SelectorParsed.Query),
 			Value:    output.Value,
 		})
-
-		if err != nil {
-			return res, fmt.Errorf("cannot parse outputs: %w", err)
-		}
 	}
 
-	return res, nil
+	return res
 }
 
-func (m Model) Tests(in []openapi.Test) ([]model.Test, error) {
-	tests := make([]model.Test, len(in))
+func (m Model) Tests(in []openapi.Test) ([]test.Test, error) {
+	tests := make([]test.Test, len(in))
 	for i, t := range in {
-		test, err := m.Test(t)
+		testObject, err := m.Test(t)
 		if err != nil {
-			return []model.Test{}, fmt.Errorf("could not convert test: %w", err)
+			return []test.Test{}, fmt.Errorf("could not convert test: %w", err)
 		}
-		tests[i] = test
+		tests[i] = testObject
 	}
 
 	return tests, nil
 }
 
-func (m Model) ValidateDefinition(in openapi.TestSpecs) error {
-	selectors := map[string]bool{}
-	for _, d := range in.Specs {
-		if _, exists := selectors[d.Selector.Query]; exists {
-			return fmt.Errorf("duplicated selector %s", d.Selector.Query)
-		}
-
-		selectors[d.Selector.Query] = true
-	}
-
-	return nil
-}
-
-func (m Model) Definition(in openapi.TestSpecs) (model.OrderedMap[model.SpanQuery, model.NamedAssertions], error) {
-	specs := model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}
-	for _, spec := range in.Specs {
-		asserts := make([]model.Assertion, len(spec.Assertions))
+func (m Model) Definition(in []openapi.TestSpec) test.Specs {
+	specs := make(test.Specs, 0, len(in))
+	for _, spec := range in {
+		asserts := make([]test.Assertion, len(spec.Assertions))
 		for i, a := range spec.Assertions {
-			assertion := model.Assertion(a)
+			assertion := test.Assertion(a)
 			asserts[i] = assertion
 		}
-		name := ""
-		if spec.Name != nil {
-			name = *spec.Name
-		}
-
-		namedAssertions := model.NamedAssertions{
-			Name:       name,
+		specs = append(specs, test.TestSpec{
+			Selector:   test.SpanQuery(spec.SelectorParsed.Query),
+			Name:       spec.Name,
 			Assertions: asserts,
-		}
-		specs, _ = specs.Add(model.SpanQuery(spec.Selector.Query), namedAssertions)
+		})
 	}
 
-	return specs, nil
+	return specs
 }
 
-func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
+func (m Model) Run(in openapi.TestRun) (*test.Run, error) {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
 	id, _ := strconv.Atoi(in.Id)
 	result, err := m.Result(in.Result)
 
 	if err != nil {
-		return &model.Run{}, fmt.Errorf("could not convert result: %w", err)
+		return &test.Run{}, fmt.Errorf("could not convert result: %w", err)
 	}
 
-	return &model.Run{
+	return &test.Run{
 		ID:                        id,
 		TraceID:                   tid,
 		SpanID:                    sid,
-		State:                     model.RunState(in.State),
+		State:                     test.RunState(in.State),
 		LastError:                 stringToErr(in.LastErrorState),
 		CreatedAt:                 in.CreatedAt,
 		ServiceTriggeredAt:        in.ServiceTriggeredAt,
@@ -487,82 +414,83 @@ func (m Model) Run(in openapi.TestRun) (*model.Run, error) {
 	}, nil
 }
 
-func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) model.OrderedMap[string, model.RunOutput] {
-	res := model.OrderedMap[string, model.RunOutput]{}
+func (m Model) RunOutputs(in []openapi.TestRunOutputsInner) maps.Ordered[string, test.RunOutput] {
+	res := maps.Ordered[string, test.RunOutput]{}
 
 	for _, output := range in {
-		res.Add(output.Name, model.RunOutput{
+		res.Add(output.Name, test.RunOutput{
 			Value:  output.Value,
 			Name:   output.Name,
 			SpanID: output.SpanId,
+			Error:  fmt.Errorf(output.Error),
 		})
 	}
 
 	return res
 }
 
-func (m Model) Trigger(in openapi.Trigger) model.Trigger {
-	return model.Trigger{
-		Type:    model.TriggerType(in.TriggerType),
-		HTTP:    m.HTTPRequest(in.TriggerSettings.Http),
-		GRPC:    m.GRPCRequest(in.TriggerSettings.Grpc),
-		TRACEID: m.TRACEIDRequest(in.TriggerSettings.Traceid),
+func (m Model) Trigger(in openapi.Trigger) trigger.Trigger {
+	return trigger.Trigger{
+		Type:    trigger.TriggerType(in.Type),
+		HTTP:    m.HTTPRequest(in.HttpRequest),
+		GRPC:    m.GRPCRequest(in.Grpc),
+		TraceID: m.TraceIDRequest(in.Traceid),
 	}
 }
 
-func (m Model) TriggerResult(in openapi.TriggerResult) model.TriggerResult {
+func (m Model) TriggerResult(in openapi.TriggerResult) trigger.TriggerResult {
 
-	return model.TriggerResult{
-		Type:    model.TriggerType(in.TriggerType),
+	return trigger.TriggerResult{
+		Type:    trigger.TriggerType(in.Type),
 		HTTP:    m.HTTPResponse(in.TriggerResult.Http),
 		GRPC:    m.GRPCResponse(in.TriggerResult.Grpc),
-		TRACEID: m.TRACEIDResponse(in.TriggerResult.Traceid),
+		TraceID: m.TraceIDResponse(in.TriggerResult.Traceid),
 	}
 }
 
-func (m Model) Result(in openapi.AssertionResults) (*model.RunResults, error) {
-	results := model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}
+func (m Model) Result(in openapi.AssertionResults) (*test.RunResults, error) {
+	results := maps.Ordered[test.SpanQuery, []test.AssertionResult]{}
 
 	for _, res := range in.Results {
-		ars := make([]model.AssertionResult, len(res.Results))
+		ars := make([]test.AssertionResult, len(res.Results))
 		for i, r := range res.Results {
-			sars := make([]model.SpanAssertionResult, len(r.SpanResults))
+			sars := make([]test.SpanAssertionResult, len(r.SpanResults))
 			for j, sar := range r.SpanResults {
 				var sid *trace.SpanID
 				if sar.SpanId != "" {
 					s, _ := trace.SpanIDFromHex(sar.SpanId)
 					sid = &s
 				}
-				sars[j] = model.SpanAssertionResult{
+				sars[j] = test.SpanAssertionResult{
 					SpanID:        sid,
 					ObservedValue: sar.ObservedValue,
 					CompareErr:    fmt.Errorf(sar.Error),
 				}
 			}
 
-			assertion := model.Assertion(r.Assertion)
+			assertion := test.Assertion(r.Assertion)
 
-			ars[i] = model.AssertionResult{
+			ars[i] = test.AssertionResult{
 				Assertion: assertion,
 				AllPassed: r.AllPassed,
 				Results:   sars,
 			}
 		}
-		results, _ = results.Add(model.SpanQuery(res.Selector.Query), ars)
+		results, _ = results.Add(test.SpanQuery(res.Selector.Query), ars)
 	}
 
-	return &model.RunResults{
+	return &test.RunResults{
 		AllPassed: in.AllPassed,
 		Results:   results,
 	}, nil
 }
 
-func (m Model) Runs(in []openapi.TestRun) ([]model.Run, error) {
-	runs := make([]model.Run, len(in))
+func (m Model) Runs(in []openapi.TestRun) ([]test.Run, error) {
+	runs := make([]test.Run, len(in))
 	for i, r := range in {
 		run, err := m.Run(r)
 		if err != nil {
-			return []model.Run{}, fmt.Errorf("could not convert run: %w", err)
+			return []test.Run{}, fmt.Errorf("could not convert run: %w", err)
 		}
 		runs[i] = *run
 	}
@@ -570,20 +498,20 @@ func (m Model) Runs(in []openapi.TestRun) ([]model.Run, error) {
 	return runs, nil
 }
 
-func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []model.EnvironmentValue {
-	values := make([]model.EnvironmentValue, len(in))
-	for i, h := range in {
-		values[i] = model.EnvironmentValue{Key: h.Key, Value: h.Value}
-	}
-
-	return values
-}
-
-func (m Model) Environment(in openapi.Environment) model.Environment {
-	return model.Environment{
-		ID:          in.Id,
+func (m Model) Environment(in openapi.Environment) environment.Environment {
+	return environment.Environment{
+		ID:          id.ID(in.Id),
 		Name:        in.Name,
 		Description: in.Description,
 		Values:      m.EnvironmentValue(in.Values),
 	}
+}
+
+func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []environment.EnvironmentValue {
+	values := make([]environment.EnvironmentValue, len(in))
+	for i, h := range in {
+		values[i] = environment.EnvironmentValue{Key: h.Key, Value: h.Value}
+	}
+
+	return values
 }

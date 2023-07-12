@@ -34,24 +34,24 @@
     "antd": "4.20.4",
     "d3-dag": "0.9.1",
     "date-fns": "2.28.0",
-    "fast-xml-parser": "4.0.10",
+    "fast-xml-parser": "4.2.4",
     "html-react-parser": "3.0.4",
     "lodash": "4.17.21",
     "markdown-it": "13.0.1",
     "parse-curl-js": "1.0.3",
     "path-browserify": "1.0.1",
-    "posthog-js": "1.43.0",
+    "posthog-js": "1.57.2",
     "postman-collection": "4.1.4",
-    "protobufjs": "6.11.3",
+    "protobufjs": "7.2.4",
     "query-string": "7.1.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-flow-renderer": "10.3.7",
     "react-joyride": "2.5.3",
     "react-redux": "7.2.6",
-    "react-reflex": "4.0.9",
     "react-router-dom": "6.2.1",
     "react-scripts": "5.0.1",
+    "react-spaces": "0.3.8",
     "react-syntax-highlighter": "15.5.0",
     "react-use": "17.4.0",
     "redux-first-history": "5.0.12",
@@ -97,7 +97,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "/node_modules/(?!antd|@ant-design|d3-array|d3|internmap|delaunator|robust-predicates|rc-.+?|@babel/runtime).+(js|jsx)$"
+      "/node_modules/(?!antd|@ant-design|d3-array|d3|internmap|delaunator|@codemirror|robust-predicates|rc-.+?|@babel/runtime).+(js|jsx)$"
     ],
     "collectCoverageFrom": [
       "src/**/*.(ts|tsx)",

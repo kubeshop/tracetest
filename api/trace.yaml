@@ -23,6 +23,8 @@ components:
           type: string
         name:
           type: string
+        kind:
+          type: string
         startTime:
           type: integer
           format: int64

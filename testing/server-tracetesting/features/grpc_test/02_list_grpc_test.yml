@@ -1,0 +1,25 @@
+type: Test
+spec:
+  id: ojzHeDQ4Rc
+  name: List gRPC Test
+  description: Test step of 'gRPC Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/tests
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
+    - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains env:GRPC_TEST_ID # check if the test is listed
+  - selector: span[name="GET /api/tests" tracetest.span.type="http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[name = "query SELECT"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 2

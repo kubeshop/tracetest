@@ -8,11 +8,18 @@ Trace-Based Testing is a means of conducting deep integration or system tests by
 
 A Distributed Trace, more commonly known as a Trace, records the paths taken by requests (made by an application or end-user) take as they propagate through multi-service architectures, like microservice and serverless applications. [Source - OpenTelemetry.io](https://opentelemetry.io/docs/concepts/observability-primer/)
 
-![Trace & Spans Diagram](../img/trace-explainer.gif)
+In Tracetest, after selecting a test from the first screen and clicking on the **Trace** tab, you will see the distributed trace for the selected test:
+
+![Trace Example](../img/trace-example.png)
+
+
+<!---![Trace & Spans Diagram](../img/trace-explainer.gif)-->
 
 ### **What is a Span?**
 
 Traces are comprised of spans. A span represents a single operation in a trace. Spans are nested, typically with a parent child relationship to form a deeply nested tree.
+
+![Span Example](../img/span-example.png)
 
 ### **What Data do Spans Contain?**
 
@@ -34,10 +41,10 @@ Attributes are a key-value pair, and they contain information about the operatio
 ## **What is a Test Spec?**
 
 
-In Tracetest, an Test Spec is comprised of two parts:
+In Tracetest, a Test Spec is comprised of two parts:
 
 
-- Selector
+- Selectors
 - Checks
 
 <!--- ![Selectors and Checks](img/assertion-explainer.gif) -->
@@ -51,7 +58,7 @@ A selector contains criteria to limit the scope of the spans from a trace that w
 ### **What is a Check?**
 
 
-A check is a logical verification that will be performed on all spans that match the selector. It is comprised of an attribute, a comparison operator, and a value.
+A check is a logical verification that will be performed on all spans that match the selector. It is comprised of an attribute, a comparison operator and a value.
 
 ### **What is a Span Signature?**
 

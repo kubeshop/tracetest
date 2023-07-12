@@ -4,7 +4,6 @@ import TestState from 'components/TestState';
 import TransactionRunActionsMenu from 'components/TransactionRunActionsMenu';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import TransactionRun from 'models/TransactionRun.model';
-import TestRun from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 
@@ -14,7 +13,7 @@ interface IProps {
   transactionId: string;
 }
 
-function getIcon(state: TestRun['state'], fail: number) {
+function getIcon(state: TransactionRun['state'], fail: number) {
   if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
     return null;
   }

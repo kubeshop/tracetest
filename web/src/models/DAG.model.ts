@@ -1,32 +1,19 @@
-import {NodeTypesEnum} from 'constants/DAG.constants';
-import {Attributes} from 'constants/SpanAttribute.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import DAGService from 'services/DAG.service';
 import {INodeDataSpan, INodeDatum} from 'types/DAG.types';
 import Span from './Span.model';
 
-function getNodesDatumFromSpans(spans: Span[]): INodeDatum<INodeDataSpan>[] {
+function getNodesDatumFromSpans(spans: Span[], type: NodeTypesEnum): INodeDatum<INodeDataSpan>[] {
   return spans.map(span => ({
-    data: {
-      duration: span.duration,
-      id: span.id,
-      isMatched: false,
-      kind: span.kind,
-      name: span.name,
-      programmingLanguage: span.attributes?.[Attributes.TELEMETRY_SDK_LANGUAGE]?.value ?? '',
-      service: span.service,
-      startTime: span.startTime,
-      system: span.system,
-      totalAttributes: span.attributeList.length,
-      type: span.type,
-    },
+    data: {id: span.id, isMatched: false, startTime: span.startTime},
     id: span.id,
     parentIds: span.parentId ? [span.parentId] : [],
-    type: NodeTypesEnum.Span,
+    type,
   }));
 }
 
-function DAG(spans: Span[]) {
-  const nodesDatum = getNodesDatumFromSpans(spans).sort((a, b) => {
+function DAG(spans: Span[], type: NodeTypesEnum) {
+  const nodesDatum = getNodesDatumFromSpans(spans, type).sort((a, b) => {
     if (b.data.startTime !== a.data.startTime) return b.data.startTime - a.data.startTime;
     if (b.id < a.id) return -1;
     if (b.id > a.id) return 1;

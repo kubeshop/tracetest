@@ -2,12 +2,32 @@ openapi: 3.0.0
 
 components:
   schemas:
+    EnvironmentResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "./environments.yaml#/components/schemas/EnvironmentResource"
+    
+    EnvironmentResource:
+      type: object
+      description: "Represents an environment structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Environment'."
+          enum:
+            - Environment
+        spec:
+          $ref: "#/components/schemas/Environment"
     Environment:
       type: object
       properties:
         id:
           type: string
-          readOnly: true
         name:
           type: string
         description:

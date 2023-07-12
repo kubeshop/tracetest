@@ -24,7 +24,7 @@ We can do that by creating the tests and transactions through the Web UI or usin
 
 ### Mapping Environment Variables 
 
-The first thing that we need to think about is to map the variables are needed in this process. At first glance, we can identify the vars to the API address and the user ID:
+The first thing that we need to think about is to map the variables that are needed in this process. At first glance, we can identify the vars to the API address and the user ID:
 With these variables, we can create the following definition file as saving as `user-buying-products.env`:
 
 ```sh
@@ -90,7 +90,7 @@ spec:
     - attr:tracetest.selected_spans.count >= 1
 ```
 
-After that, we will [Check Shopping Cart Contents](./check-shopping-cart-contents.md) (on `check-shopping-cart-contents.yaml`), simulating a user validating its products before finishing its purchase:
+After that, we will [Check Shopping Cart Contents](./check-shopping-cart-contents.md) (on `check-shopping-cart-contents.yaml`), simulating a user validating the products selected before finishing the purchase:
 
 ```yaml
 type: Test

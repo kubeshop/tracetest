@@ -74,6 +74,9 @@ const BaseClientService = (): TDataStoreService => ({
       dataStoreType,
     };
   },
+  shouldTestConnection() {
+    return true;
+  },
 });
 
 export default BaseClientService();

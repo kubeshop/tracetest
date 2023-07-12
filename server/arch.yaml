@@ -1,0 +1,149 @@
+name: tracetest
+
+style:
+  core:
+    color: "#c9e6be"
+  infrastructure:
+    color: "#a1bbe3"
+  mixed:
+    color: "#de957f"
+
+
+modules:
+
+  main:
+    type: infrastructure
+    group: startup
+
+  cmd:
+    type: infrastructure
+    group: startup
+
+  config/*:
+    type: core
+    group: config
+
+  expression/*:
+    type: core
+    group: assertion_engine
+
+  assertions/*:
+    type: core
+    group: assertion_engine
+
+  executor/*:
+    type: core
+    group: test_runner
+
+  tracedb/*:
+    type: core
+    group: test_runner
+
+  otlp/*:
+    type: mixed
+    group: otlp_ingestor
+
+  http/websocket:
+    type: infrastructure
+    group: notification
+
+  subscription:
+    type: infrastructure
+    group: notification
+
+  http:
+    type: infrastructure
+    group: api
+
+  http/validation:
+    type: infrastructure
+    group: api
+
+  openapi:
+    type: infrastructure
+    group: api
+
+  http/mappings:
+    type: infrastructure
+    group: api
+
+  junit:
+    type: infrastructure
+    group: api
+
+  model/yaml/*:
+    type: infrastructure
+    group: api
+
+  analytics:
+    type: infrastructure
+    group: observability
+
+  tracing:
+    type: infrastructure
+    group: observability
+
+  pkg/id:
+    type: infrastructure
+    group: central_libraries
+
+  pkg/*:
+    type: infrastructure
+    group: libraries
+
+  resourcemanager:
+    type: infrastructure
+    group: libraries
+
+  tests/*:
+    type: core
+    group: test_management
+
+  environment/*:
+    type: core
+    group: test_management
+
+  testdb:
+    type: infrastructure
+    group: persistence
+
+  migrations:
+    type: infrastructure
+    group: persistence
+
+  app:
+    type: infrastructure
+    group: startup
+
+  provisioning:
+    type: infrastructure
+    group: startup
+
+  model:
+    type: core
+    group: models
+
+  model/events:
+    type: core
+    group: models
+
+  traces:
+    type: core
+    group: models
+
+
+clusters:
+  config:
+    color: "#20BF55"
+
+  assertion_engine:
+    color: "#0B4F6C"
+
+  test_runner:
+    color: "#976391"
+
+  test_management:
+    color: "#20BF55"
+
+  startup:
+    color: "#293F14"

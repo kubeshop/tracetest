@@ -1,24 +1,16 @@
-import {CopyOutlined} from '@ant-design/icons';
-import {useTheme} from 'styled-components';
+import AttributeActions from 'components/AttributeActions';
+import {TSpanFlatAttribute} from 'types/Span.types';
 import {THeader} from 'types/Test.types';
-import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import useCopy from 'hooks/useCopy';
 import Highlighted from '../Highlighted';
 import * as S from './HeaderRow.styled';
 
 interface IProps {
   header: THeader;
+  onCreateTestOutput(attribute: TSpanFlatAttribute): void;
+  onCreateTestSpec(attribute: TSpanFlatAttribute): void;
 }
 
-const HeaderRow = ({header: {key = '', value = ''}}: IProps) => {
-  const copy = useCopy();
-  const handleOnClick = () => {
-    TestRunAnalyticsService.onTriggerResponseHeaderCopy();
-    return copy(value);
-  };
-
-  const theme = useTheme();
-
+const HeaderRow = ({header: {key = '', value = ''}, onCreateTestOutput, onCreateTestSpec}: IProps) => {
   return (
     <S.HeaderContainer>
       <S.Header>
@@ -27,7 +19,11 @@ const HeaderRow = ({header: {key = '', value = ''}}: IProps) => {
           <Highlighted text={value} highlight="" />
         </S.HeaderValue>
       </S.Header>
-      <CopyOutlined style={{color: theme.color.textLight}} onClick={handleOnClick} />
+      <AttributeActions
+        attribute={{key: `tracetest.response.headers | json_path '$[?(@.Key=="${key}")].Value'`, value}}
+        onCreateTestOutput={onCreateTestOutput}
+        onCreateTestSpec={onCreateTestSpec}
+      />
     </S.HeaderContainer>
   );
 };

@@ -8,7 +8,9 @@ import (
 	"testing"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/slices"
 )
 
 func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer *httptest.Server, t *testing.T) *http.Request {
@@ -16,7 +18,7 @@ func buildDeleteRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 	url := fmt.Sprintf(
 		"%s/%s/%s",
 		testServer.URL,
-		strings.ToLower(rt.ResourceType),
+		strings.ToLower(rt.ResourceTypePlural),
 		id,
 	)
 
@@ -31,17 +33,21 @@ var deleteSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	name:               OperationDeleteSuccess,
 	neededForOperation: rm.OperationDelete,
 	postAssert: func(t *testing.T, ct contentTypeConverter, rt ResourceTypeTest, testServer *httptest.Server) {
+		if slices.Contains(rt.operationsWithoutPostAssert, OperationDeleteSuccess) {
+			return
+		}
+
 		req := buildGetRequest(rt, ct, testServer, t)
 		resp := doRequest(t, req, ct.contentType, testServer)
-		require.Equal(t, 404, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 404, resp.StatusCode), resp)
 	},
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildDeleteRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		require.Equal(t, 204, resp.StatusCode)
-		require.Empty(t, responseBody(t, resp))
+		dumpResponseIfNot(t, assert.Equal(t, 204, resp.StatusCode), resp)
+		dumpResponseIfNot(t, assert.Empty(t, responseBody(t, resp)), resp)
 	},
 })
 
@@ -55,7 +61,7 @@ var deleteNotFoundOperation = buildSingleStepOperation(singleStepOperationTester
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		require.Equal(t, 404, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 404, resp.StatusCode), resp)
 	},
 })
 
@@ -68,6 +74,6 @@ var deleteInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 		return buildDeleteRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "deleting")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "deleting")
 	},
 })

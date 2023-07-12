@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/datastore"
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -22,7 +23,7 @@ import (
 )
 
 func tempoDefaultPorts() []string {
-	return []string{"9095"}
+	return []string{"9095", ""}
 }
 
 type tempoTraceDB struct {
@@ -30,7 +31,7 @@ type tempoTraceDB struct {
 	dataSource datasource.DataSource
 }
 
-func newTempoDB(config *model.BaseClientConfig) (TraceDB, error) {
+func newTempoDB(config *datastore.MultiChannelClientConfig) (TraceDB, error) {
 	dataSource := datasource.New("Tempo", config, datasource.Callbacks{
 		HTTP: httpGetTraceByID,
 		GRPC: grpcGetTraceByID,
@@ -43,6 +44,10 @@ func newTempoDB(config *model.BaseClientConfig) (TraceDB, error) {
 
 func (tdb *tempoTraceDB) Connect(ctx context.Context) error {
 	return tdb.dataSource.Connect(ctx)
+}
+
+func (ttd *tempoTraceDB) GetEndpoints() string {
+	return ttd.dataSource.Endpoint()
 }
 
 func (ttd *tempoTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {

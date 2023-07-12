@@ -17,7 +17,7 @@ func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
 	switch conf.String("installer") {
 	case "docker-compose":
 		conf.set("demo.endpoint.pokeshop.http", "http://demo-api:8081")
-		conf.set("demo.endpoint.pokeshop.grpc", "demo-api:8082")
+		conf.set("demo.endpoint.pokeshop.grpc", "demo-rpc:8082")
 		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend:8084")
 		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice:3550")
 		conf.set("demo.endpoint.otel.cart", "otel-cartservice:7070")
@@ -56,12 +56,12 @@ func configureBackend(conf configuration, ui cliUI.UI) configuration {
 		conf.set("tracetest.backend.type", "otlp")
 		conf.set("tracetest.backend.tls.insecure", true)
 		conf.set("tracetest.backend.endpoint.collector", "http://otel-collector:4317")
-		conf.set("tracetest.backend.endpoint", "tracetest:21321")
+		conf.set("tracetest.backend.endpoint", "tracetest:4317")
 	case "kubernetes":
 		conf.set("tracetest.backend.type", "otlp")
 		conf.set("tracetest.backend.tls.insecure", true)
 		conf.set("tracetest.backend.endpoint.collector", "http://otel-collector.tracetest:4317")
-		conf.set("tracetest.backend.endpoint", "tracetest:21321")
+		conf.set("tracetest.backend.endpoint", "tracetest:4317")
 
 	default:
 		conf.set("tracetest.backend.type", "")

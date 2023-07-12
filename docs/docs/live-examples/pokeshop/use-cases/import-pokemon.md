@@ -1,6 +1,6 @@
 # Pokeshop API - Import Pokemon
 
-This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports, or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
+This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
 Here the process is split into two phases: 
 1. An API call that enqueues an import request to a queue.
@@ -69,7 +69,7 @@ Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that 
 
 ### Traces
 
-Running these tests for the first time will create an Observability trace like the image above, where you can see spans for the API call, the queue messaging, the PokeAPI (external API) call, and database calls. One interesting thing about this trace is that **you can observe the entire use case, end to end**:
+Running these tests for the first time will create an Observability trace like the image below, where you can see spans for the API call, the queue messaging, the PokeAPI (external API) call and database calls. One interesting thing about this trace is that **you can observe the entire use case, end to end**:
 
 ![](../images/import-pokemon-trace.png)
 

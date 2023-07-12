@@ -4,14 +4,16 @@ export type TRawTestRunOutput = {
   name?: string;
   value?: string;
   spanId?: string;
+  error?: string;
 };
 type TestRunOutput = Model<TRawTestRunOutput, {}>;
 
-const TestRunOutput = ({name = '', value = '', spanId = ''}: TRawTestRunOutput): TestRunOutput => {
+const TestRunOutput = ({name = '', value = '', spanId = '', error = ''}: TRawTestRunOutput): TestRunOutput => {
   return {
     name,
     value,
     spanId,
+    error,
   };
 };
 

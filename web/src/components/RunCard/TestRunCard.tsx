@@ -1,11 +1,14 @@
 import {Tooltip} from 'antd';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import AnalyzerScore from 'components/AnalyzerScore';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
-import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import TestRun from 'models/TestRun.model';
+import TestRun, {isRunStateFailed, isRunStateFinished, isRunStateStopped} from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
+
+const TEST_RUN_TRACE_TAB = 'trace';
+const TEST_RUN_TEST_TAB = 'test';
 
 interface IProps {
   run: TestRun;
@@ -13,11 +16,14 @@ interface IProps {
   linkTo: string;
 }
 
-function getIcon(state: TestRun['state'], failedAssertions: number) {
-  if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
+function getIcon(state: TestRun['state'], failedAssertions: number, isFailedAnalyzer: boolean) {
+  if (!isRunStateFinished(state)) {
     return null;
   }
-  if (state === TestStateEnum.FAILED || failedAssertions > 0) {
+  if (isRunStateStopped(state)) {
+    return <S.IconInfo />;
+  }
+  if (isRunStateFailed(state) || failedAssertions > 0 || isFailedAnalyzer) {
     return <S.IconFail />;
   }
   return <S.IconSuccess />;
@@ -35,19 +41,29 @@ const TestRunCard = ({
     metadata,
     transactionId,
     transactionRunId,
+    linter,
   },
   testId,
   linkTo,
 }: IProps) => {
+  const navigate = useNavigate();
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
   const metadataBranch = metadata?.branch;
   const metadataUrl = metadata?.url;
 
+  const handleResultClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    type: typeof TEST_RUN_TRACE_TAB | typeof TEST_RUN_TEST_TAB
+  ) => {
+    event.preventDefault();
+    navigate(`${linkTo}/${type}`);
+  };
+
   return (
     <Link to={linkTo}>
       <S.Container $isWhite data-cy={`run-card-${runId}`}>
-        <S.IconContainer>{getIcon(state, failedAssertionCount)}</S.IconContainer>
+        <S.IconContainer>{getIcon(state, failedAssertionCount, linter.isFailed)}</S.IconContainer>
 
         <S.Info>
           <div>
@@ -58,9 +74,7 @@ const TestRunCard = ({
               <S.Text>{Date.getTimeAgo(createdAt)}</S.Text>
             </Tooltip>
 
-            {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
-              <S.Text>&nbsp;• {executionTime}s</S.Text>
-            )}
+            {isRunStateFinished(state) && <S.Text>&nbsp;• {executionTime}s</S.Text>}
 
             {metadataName && (
               <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
@@ -73,14 +87,22 @@ const TestRunCard = ({
 
         {!!transactionId && !!transactionRunId && <S.Text>Part of transaction</S.Text>}
 
-        {state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED && (
+        {!isRunStateFinished(state) && (
           <div data-cy={`test-run-result-status-${runId}`}>
             <TestState testState={state} />
           </div>
         )}
 
-        {(state === TestStateEnum.FAILED || state === TestStateEnum.FINISHED) && (
-          <S.Row>
+        {isRunStateFinished(state) && !!linter.plugins.length && (
+          <Tooltip title="Trace Analyzer score">
+            <div onClick={event => handleResultClick(event, TEST_RUN_TRACE_TAB)}>
+              <AnalyzerScore fontSize={10} width="28px" height="28px" score={linter.score} />
+            </div>
+          </Tooltip>
+        )}
+
+        {isRunStateFinished(state) && (
+          <S.Row $minWidth={70} onClick={event => handleResultClick(event, TEST_RUN_TEST_TAB)}>
             <Tooltip title="Passed assertions">
               <S.HeaderDetail>
                 <S.HeaderDot $passed />
@@ -100,7 +122,6 @@ const TestRunCard = ({
           <RunActionsMenu
             resultId={runId}
             testId={testId}
-            testVersion={testVersion}
             transactionRunId={transactionRunId}
             transactionId={transactionId}
           />

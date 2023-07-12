@@ -4,32 +4,56 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"testing"
 
+	"github.com/Jeffail/gabs/v2"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/kubeshop/tracetest/server/id"
 )
+
+func dumpResponseIfNot(t *testing.T, success bool, resp *http.Response) {
+	t.Helper()
+
+	if success {
+		return
+	}
+
+	b, _ := httputil.DumpResponse(resp, true)
+	t.Log("\n", string(b))
+	t.FailNow()
+}
 
 func generateRandomString() string {
 	generator := id.NewRandGenerator()
 	return generator.TraceID().String()
 }
 
-func removeID(input map[string]any) map[string]any {
-	out := map[string]any{}
-	out["type"] = input["type"]
-	newSpec := map[string]any{}
-	for k, v := range input["spec"].(map[string]any) {
-		if k == "id" {
-			continue
-		}
-		newSpec[k] = v
+func RemoveFieldFromJSONResource(field, jsonResource string) string {
+	jsonParsed, err := gabs.ParseJSON([]byte(jsonResource))
+	if err != nil {
+		panic(err)
 	}
 
-	out["spec"] = newSpec
+	field = "spec." + field
 
-	return out
+	jf := jsonParsed.Path(field)
+	if jf == nil {
+		// field not exists, do nothing
+		return jsonResource
+	}
+
+	err = jsonParsed.DeleteP(field)
+	if err != nil {
+		panic(err)
+	}
+
+	return jsonParsed.String()
+}
+
+func removeIDFromJSON(input string) string {
+	return RemoveFieldFromJSONResource("id", input)
 }
 
 func parseJSON(input string) map[string]any {
@@ -40,17 +64,6 @@ func parseJSON(input string) map[string]any {
 	}
 
 	return parsed
-}
-
-func removeIDFromJSON(input string) string {
-
-	clean := removeID(parseJSON(input))
-
-	out, err := json.Marshal(clean)
-	if err != nil {
-		panic(err)
-	}
-	return string(out)
 }
 
 func extractID(input string) string {
@@ -78,7 +91,7 @@ func responseBodyJSON(t *testing.T, resp *http.Response, ct contentTypeConverter
 }
 
 func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConverter, resourceType, verb string) {
-	require.Equal(t, 500, resp.StatusCode)
+	dumpResponseIfNot(t, assert.Equal(t, 500, resp.StatusCode), resp)
 
 	jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -89,6 +102,6 @@ func assertInternalError(t *testing.T, resp *http.Response, ct contentTypeConver
 	}{}
 	json.Unmarshal([]byte(jsonBody), &bodyValues)
 
-	require.Equal(t, 500, bodyValues.Code)
-	require.Contains(t, bodyValues.Error, "error "+verb+" resource "+resourceType)
+	dumpResponseIfNot(t, assert.Equal(t, 500, bodyValues.Code), resp)
+	dumpResponseIfNot(t, assert.Contains(t, bodyValues.Error, "error "+verb+" resource "+resourceType), resp)
 }

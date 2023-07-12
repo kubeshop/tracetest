@@ -1,0 +1,4 @@
+results/
+config.yml
+.env
+tracetesting-env.yaml

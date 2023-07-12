@@ -24,7 +24,6 @@ interface IProps {
   field: Pick<FormListFieldData, never>;
   name: number;
   attributeList: TSpanFlatAttribute[];
-  index: number;
   runId: string;
   testId: string;
   spanIdList: string[];
@@ -35,17 +34,7 @@ const operatorList = Object.values(CompareOperator).map(value => ({
   label: OperatorService.getOperatorSymbol(value),
 }));
 
-export const AssertionCheck = ({
-  field,
-  index,
-  name,
-  remove,
-  attributeList,
-  runId,
-  testId,
-  spanIdList,
-  form,
-}: IProps) => {
+export const AssertionCheck = ({field, name, remove, attributeList, runId, testId, spanIdList, form}: IProps) => {
   const [selectedAttributeKey, setSelectedAttributeKey] = useState('');
   const onAttributeFocus = useCallback((view: EditorView) => {
     if (!view?.state.doc.length) delay(() => startCompletion(view!), 0);
@@ -115,14 +104,12 @@ export const AssertionCheck = ({
         />
       </S.FieldsContainer>
       <S.ActionContainer>
-        {index !== 0 && (
-          <S.DeleteCheckIcon
-            onClick={() => {
-              CreateAssertionModalAnalyticsService.onRemoveCheck();
-              remove(name);
-            }}
-          />
-        )}
+        <S.DeleteCheckIcon
+          onClick={() => {
+            CreateAssertionModalAnalyticsService.onRemoveCheck();
+            remove(name);
+          }}
+        />
       </S.ActionContainer>
     </S.Container>
   );

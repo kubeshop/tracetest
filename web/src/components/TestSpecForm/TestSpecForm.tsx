@@ -76,14 +76,12 @@ const TestSpecForm = ({
   }, []);
 
   useEffect(() => {
-    if (!isEditing) {
-      form.setFieldsValue({
-        selector,
-        name,
-        assertions,
-      });
-    }
-  }, [form, isEditing, name, selector]);
+    form.setFieldsValue({
+      selector,
+      name,
+      assertions,
+    });
+  }, [assertions, form, name, selector]);
 
   const selectorSuggestions = useAppSelector(TestSpecsSelectors.selectSelectorSuggestions);
   const prevSelector = useAppSelector(TestSpecsSelectors.selectPrevSelector);

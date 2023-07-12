@@ -1,6 +1,26 @@
 openapi: 3.0.0
 components:
   schemas:
+    DataStoreList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataStoreResource"
+    DataStoreResource:
+      type: object
+      description: "Represents a data store structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'DataStore'."
+          enum:
+            - DataStore
+        spec:
+          $ref: "#/components/schemas/DataStore"
     DataStore:
       type: object
       required:
@@ -14,20 +34,22 @@ components:
           type: string
         type:
           $ref: "#/components/schemas/SupportedDataStores"
-        isDefault:
+        default:
           type: boolean
         jaeger:
           $ref: "#/components/schemas/GRPCClientSettings"
         tempo:
           $ref: "#/components/schemas/BaseClient"
-        openSearch:
+        opensearch:
           $ref: "#/components/schemas/ElasticSearch"
-        elasticApm:
+        elasticapm:
           $ref: "#/components/schemas/ElasticSearch"
-        signalFx:
+        signalfx:
           $ref: "#/components/schemas/SignalFX"
         awsxray:
           $ref: "#/components/schemas/AwsXRay"
+        azureappinsights:
+          $ref: "#/components/schemas/AzureAppInsights"
         createdAt:
           type: string
           format: date-time
@@ -63,6 +85,17 @@ components:
         realm:
           type: string
         token:
+          type: string
+    AzureAppInsights:
+      type: object
+      properties:
+        useAzureActiveDirectoryAuth:
+          type: boolean
+        accessToken:
+          type: string
+        connectionType:
+          $ref: "#/components/schemas/SupportedConnectionTypes"
+        resourceArmId:
           type: string
     AwsXRay:
       type: object
@@ -150,16 +183,21 @@ components:
       enum:
         [
           jaeger,
-          openSearch,
+          opensearch,
           tempo,
-          signalFx,
+          signalfx,
           otlp,
-          elasticApm,
-          newRelic,
+          elasticapm,
+          newrelic,
           lightstep,
           datadog,
           awsxray,
+          honeycomb,
+          azureappinsights,
         ]
     SupportedClients:
       type: string
       enum: [http, grpc]
+    SupportedConnectionTypes:
+      type: string
+      enum: [direct, collector]

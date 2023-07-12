@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    image: quick-start-nodejs
+    build: .
+    command: npm run app-with-grpc-tracer
+    ports:
+      - "8080:8080"
+  availability:
+    image: quick-start-nodejs-availability
+    build: .
+    command: npm run availability-with-grpc-tracer
+    ports:
+      - "8080"

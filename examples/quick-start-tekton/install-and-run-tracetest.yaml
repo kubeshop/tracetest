@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: install-and-run-tracetest
+spec:
+  steps:
+    - name: create-test-files
+      image: ubuntu
+      script: |
+        #!/usr/bin/env bash
+        cat <<EOF >/workspace/test-api.yaml
+        type: Test
+        spec:
+          id: RUkKQ_aVR
+          name: Pokeshop - List
+          description: Get a Pokemon
+          trigger:
+            type: http
+            httpRequest:
+              url: http://demo-pokemon-api.demo/pokemon?take=20&skip=0
+              method: GET
+              headers:
+              - key: Content-Type
+                value: application/json
+          specs:
+          - name: Database queries less than 500 ms
+            selector: span[tracetest.span.type="database"]
+            assertions:
+            - attr:tracetest.span.duration  <  500ms
+        EOF
+      volumeMounts:
+      - name: custom
+        mountPath: /workspace
+    - name: install-and-run-tracetest
+      image: kubeshop/tracetest:v0.11.9 # The official Tracetest image comes with the Tracetest CLI installed
+      script: |
+        # Configure and Run Tracetest CLI
+        tracetest configure -g --endpoint http://tracetest.tracetest.svc.cluster.local:11633/
+        tracetest run test -f /workspace/test-api.yaml
+      volumeMounts:
+      - name: custom
+        mountPath: /workspace
+  volumes:
+  - name: custom
+    emptyDir: {}

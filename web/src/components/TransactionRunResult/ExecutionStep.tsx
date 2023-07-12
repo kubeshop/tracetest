@@ -10,12 +10,17 @@ import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
 import * as S from './TransactionRunResult.styled';
 
-const iconBasedOnResult = (state: TTestRunState, failedAssertions: number, index: number) => {
+const iconBasedOnResult = (
+  state: TTestRunState,
+  failedAssertions: number,
+  index: number,
+  isFailedAnalyzer: boolean
+) => {
   if (state !== TestState.FAILED && state !== TestState.FINISHED) {
     return null;
   }
 
-  if (state === TestState.FAILED || failedAssertions > 0) {
+  if (state === TestState.FAILED || failedAssertions > 0 || isFailedAnalyzer) {
     return <S.IconFail />;
   }
   if (state === TestState.FINISHED || failedAssertions === 0) {
@@ -36,7 +41,7 @@ const ExecutionStep = ({
   index,
   test: {name, trigger, id: testId},
   hasRunFailed,
-  testRun: {id: runId, state, testVersion, passedAssertionCount, failedAssertionCount, outputs} = TestRun({
+  testRun: {id: runId, state, testVersion, passedAssertionCount, failedAssertionCount, outputs, linter} = TestRun({
     state: hasRunFailed ? TestState.SKIPPED : TestState.WAITING,
   }),
 }: IProps) => {
@@ -47,7 +52,9 @@ const ExecutionStep = ({
   return (
     <S.Container data-cy={`transaction-execution-step-${name}`}>
       <S.Content>
-        <S.ExecutionStepStatus>{iconBasedOnResult(state, failedAssertionCount, index)}</S.ExecutionStepStatus>
+        <S.ExecutionStepStatus>
+          {iconBasedOnResult(state, failedAssertionCount, index, linter.isFailed)}
+        </S.ExecutionStepStatus>
         <Link to={toLink} target="_blank">
           <S.Info>
             <S.ItemName>{`${name} v${testVersion}`}</S.ItemName>

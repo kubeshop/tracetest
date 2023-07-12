@@ -1,10 +1,9 @@
-# Configuration Overview
+# Configuration
 
-There is one way you can set configuration options in Tracetest. By using a configuration file, commonly known as the `tracetest.config.yaml` file.
+There are several configuration options with Tracetest:
 
-When using Docker, ensure that the configuration file is mounted to `/app/config.yaml` within the Tracetest Docker container.
-
-<!-- To view all the configuration options see the [config file reference page](./config-file-reference). -->
+- [Server configuration](./server) to set database connection information needed to connect to required PostgreSQL instance.
+- [Provisioning configuration](./provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
 
 ## Supported Trace Data Stores
 
@@ -21,15 +20,29 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [New Relic](./connecting-to-data-stores/new-relic)
 - [AWS X-Ray](./connecting-to-data-stores/awsxray)
 - [Datadog](./connecting-to-data-stores/datadog)
+- [Honeycomb](./connecting-to-data-stores/honeycomb)
+- [Azure App Insights](./connecting-to-data-stores/azure-app-insights.md)
 
 ## Using Tracetest without a Trace Data Store
 
 Another option is to send traces directly to Tracetest using the OpenTelemetry Collector. And, you don't have to change your existing pipelines to do so.
 
-View the [configuration for OpenTelemetry Collector](./connecting-to-data-stores/opentelemetry-collector) for more details.
+View [configuration for OpenTelemetry Collector](./connecting-to-data-stores/opentelemetry-collector) for more details.
 
 ## Trace Data Store Configuration Examples
 
 Examples of configuring Tracetest to access different data stores can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). Check out the [**Recipes**](../examples-tutorials/recipes.md) for guided walkthroughs of sample use cases.
 
 We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) any additional data stores you would like to see us support.
+
+## Configuring the Server
+
+Tracetest has a configuration file to contain the minimal information needed to start the Tracetest server. See more at [Tracetest Server Configuration](./server).
+
+You can also provision the server when it first starts, configuring most aspects of your Tracetest server environment. This is useful in a CI/CD environment to preload and configure the server. See more at [Provisioning a Tracetest Server](./provisioning).
+
+Many of the server configuration settings can be set individually in the UI or via the CLI. See:
+
+- [Trace Polling](./trace-polling)
+- [Demo Applications](./demo)
+- [Analytics](./analytics)

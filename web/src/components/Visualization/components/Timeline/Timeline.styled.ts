@@ -16,7 +16,8 @@ export const Container = styled.div<{$showMatched: boolean}>`
   ${({$showMatched}) =>
     $showMatched &&
     css`
-      .node-span-list > g:not(.matched) {
+      .timeline-node-traceSpan > g:not(.matched),
+      .timeline-node-testSpan > g:not(.matched):not(.selectedAsCurrent) {
         opacity: 0.5;
       }
     `}
@@ -38,9 +39,9 @@ export const GroupCollapse = styled(Group)`
   cursor: pointer;
 `;
 
-export const Image = styled.image`
-  height: 8px;
-  width: 8px;
+export const Image = styled.image<{$width?: number; $height?: number}>`
+  height: ${({$height}) => $height ?? 8}px;
+  width: ${({$width}) => $width ?? 8}px;
 `;
 
 export const LineConnector = styled.line`
@@ -72,8 +73,21 @@ export const RectDurationGuideline = styled.rect`
   width: 100%;
 `;
 
-export const RectOverlay = styled.rect<{$isMatched: boolean; $isSelected: boolean}>`
+export const RectSelectAsCurrent = styled.rect`
   cursor: pointer;
+  fill: ${({theme}) => theme.color.interactive};
+  height: 12px;
+  width: 124px;
+`;
+
+export const RectOutput = styled.rect`
+  fill: ${({theme}) => theme.color.warningYellow};
+  height: 12px;
+  width: 12px;
+`;
+
+export const RectOverlay = styled.rect<{$isMatched: boolean; $isSelected: boolean}>`
+  cursor: grab;
   fill: ${({$isSelected, theme}) => ($isSelected ? theme.color.backgroundInteractive : 'transparent')};
   stroke: ${({$isMatched, theme}) => $isMatched && theme.color.text};
   stroke: ${({$isSelected, theme}) => $isSelected && theme.color.interactive};
@@ -107,5 +121,12 @@ export const TextName = styled.text`
 export const TextNumber = styled.text`
   fill: ${({theme}) => theme.color.textLight};
   font-size: ${({theme}) => theme.size.sm};
+  pointer-events: none;
+`;
+
+export const TextOutput = styled.text`
+  fill: ${({theme}) => theme.color.white};
+  font-size: ${({theme}) => theme.size.xs};
+  font-weight: bold;
   pointer-events: none;
 `;

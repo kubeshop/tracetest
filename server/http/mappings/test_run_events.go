@@ -31,10 +31,9 @@ func (m OpenAPI) TestRunEvent(in model.TestRunEvent) openapi.TestRunEvent {
 
 func (m OpenAPI) PollingInfo(in model.PollingInfo) openapi.PollingInfo {
 	return openapi.PollingInfo{
-		Type:                string(in.Type),
-		ReasonNextIteration: in.ReasonNextIteration,
-		IsComplete:          in.IsComplete,
-		Periodic:            m.PeriodicPollingInfo(in.Periodic),
+		Type:       string(in.Type),
+		IsComplete: in.IsComplete,
+		Periodic:   m.PeriodicPollingInfo(in.Periodic),
 	}
 }
 

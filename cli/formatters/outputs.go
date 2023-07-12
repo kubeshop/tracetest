@@ -5,22 +5,15 @@ import "golang.org/x/exp/slices"
 type Output string
 
 var (
-	CurrentOutput = DefaultOutput
-
 	Outputs = []Output{
 		Pretty,
 		JSON,
+		YAML,
 	}
-
-	DefaultOutput = Pretty
-
 	Pretty Output = "pretty"
 	JSON   Output = "json"
+	YAML   Output = "yaml"
 )
-
-func SetOutput(o Output) {
-	CurrentOutput = o
-}
 
 func OuputsStr() []string {
 	out := make([]string, len(Outputs))

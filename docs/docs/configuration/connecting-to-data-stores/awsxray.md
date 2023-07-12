@@ -18,9 +18,9 @@ Need help configuring the OpenTelemetry Collector so send trace data from your a
 
 ## Connect Tracetest to X-Ray with the Web UI
 
-In the Web UI, open settings, and select AWS X-Ray.
+In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) AWS X-Ray.
 
-![AWS X-Ray Settings](../img/configure-awsxray.png)
+![AWS X-Ray Settings](../img/configure-awsxray-0.11.3.png)
 
 From the configuration page, add your AWS credentials. You can use temporary credentials by running `aws sts get-session-token`.
 Lastly, you can ensure the connection is working as expected by pressing the `Test Connection` button.
@@ -32,7 +32,9 @@ Or, if you prefer using the CLI, you can use this file config.
 ```yaml
 type: DataStore
 spec:
+  name: AWS X-Ray
   type: awsxray
+  default: true
   awsxray:
     accessKeyId: <your-accessKeyId>
     secretAccessKey: <your-secretAccessKey>
@@ -43,7 +45,7 @@ spec:
 Run this command in the terminal and specify the file above.
 
 ```bash
-tracetest datastore apply -f my/data-store/file/location.yaml
+tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip

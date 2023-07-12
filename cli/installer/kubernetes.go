@@ -40,8 +40,8 @@ func windowsGnuToolsChecker(ui cliUI.UI) {
 
 	ui.Warning("I didn't find sed in your system")
 	option := ui.Select("What do you want to do?", []cliUI.Option{
-		{"Install sed", installSed},
-		{"Fix it manually", exitOption(
+		{Text: "Install sed", Fn: installSed},
+		{Text: "Fix it manually", Fn: exitOption(
 			"Check the helm install docs on https://community.chocolatey.org/packages/sed",
 		)},
 	}, 0)
@@ -65,8 +65,6 @@ func installSed(ui cliUI.UI) {
 }
 
 func kubernetesInstaller(config configuration, ui cliUI.UI) {
-	trackInstall("kubernetes", config, nil)
-
 	execCmdIgnoreErrors(kubectlCmd(config, "create namespace "+config.String("k8s.namespace")))
 
 	if !config.Bool("installer.only_tracetest") {
@@ -168,6 +166,10 @@ func installTracetestChart(conf configuration, ui cliUI.UI) {
 
 	if cliConfig.Version == "dev" {
 		cmd = append(cmd, "--set image.tag=latest")
+	}
+
+	if os.Getenv("TRACETEST_DEV") != "" {
+		cmd = append(cmd, "--set env.tracetestDev=true")
 	}
 
 	execCmd(helmCmd(conf, cmd...), ui)
@@ -278,7 +280,10 @@ func getKubernetesContextArray(kubeconfig string) ([][]string, error) {
 	newStringBytes := spaceRegex.ReplaceAll([]byte(output), []byte(","))
 	output = string(newStringBytes)
 
-	records, err := csv.NewReader(strings.NewReader(output)).ReadAll()
+	csvReader := csv.NewReader(strings.NewReader(output))
+	// Related to issue: https://github.com/kubeshop/tracetest/issues/2723
+	csvReader.FieldsPerRecord = -1 // Disable fields length validation
+	records, err := csvReader.ReadAll()
 	if err != nil {
 		return [][]string{}, err
 	}
@@ -286,9 +291,17 @@ func getKubernetesContextArray(kubeconfig string) ([][]string, error) {
 	return records, nil
 }
 
-func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
-	conf.set("k8s.kubeconfig", "${HOME}/.kube/config")
+func kubernetesContextExists(name string, contexts []k8sContext) bool {
+	for _, context := range contexts {
+		if context.name == name {
+			return true
+		}
+	}
 
+	return false
+}
+
+func getKubernetesContext(conf configuration, ui cliUI.UI) string {
 	contexts := getK8sContexts(conf, ui)
 	if len(contexts) == 0 {
 		ui.Exit(
@@ -298,23 +311,38 @@ func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
 		)
 	}
 
+	if KubernetesContext != "" && kubernetesContextExists(KubernetesContext, contexts) {
+		ui.Println("On which kubectl context do you want to install Tracetest?")
+		ui.Println(fmt.Sprintf("  > %s", KubernetesContext))
+
+		return KubernetesContext
+	}
+
 	if len(contexts) == 1 {
-		conf.set("k8s.context", contexts[0].name)
+		ui.Println("On which kubectl context do you want to install Tracetest?")
+		ui.Println(fmt.Sprintf("  > %s", contexts[0].name))
+
+		return contexts[0].name
 	}
 
-	if len(contexts) > 1 {
-		options := []cliUI.Option{}
-		defaultIndex := 0
-		for i, c := range contexts {
-			if c.selected {
-				defaultIndex = i
-			}
-			options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
+	options := []cliUI.Option{}
+	defaultIndex := 0
+	for i, c := range contexts {
+		if c.selected {
+			defaultIndex = i
 		}
-
-		selected := ui.Select("Kubectl context", options, defaultIndex)
-		conf.set("k8s.context", selected.Text)
+		options = append(options, cliUI.Option{Text: c.name, Fn: func(ui cliUI.UI) {}})
 	}
+
+	selected := ui.Select("On which kubectl context do you want to install Tracetest?", options, defaultIndex)
+	return selected.Text
+}
+
+func configureKubernetes(conf configuration, ui cliUI.UI) configuration {
+	conf.set("k8s.kubeconfig", "${HOME}/.kube/config")
+
+	context := getKubernetesContext(conf, ui)
+	conf.set("k8s.context", context)
 
 	conf.set("k8s.namespace", "tracetest")
 	return conf

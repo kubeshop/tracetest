@@ -1,4 +1,5 @@
 import {CloseCircleFilled} from '@ant-design/icons';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -9,6 +10,8 @@ export const Container = styled.div`
 
 export const SearchContainer = styled.div`
   padding: 24px 24px 0;
+  position: relative;
+  z-index: 9;
 `;
 
 export const Section = styled.div`
@@ -17,6 +20,18 @@ export const Section = styled.div`
   overflow: hidden;
   width: 100%;
   z-index: 1;
+`;
+
+export const SectionLeft = styled(Section)`
+  background-color: ${({theme}) => theme.color.background};
+  z-index: 1;
+`;
+
+export const SectionRight = styled(Section)<{$shouldScroll: boolean}>`
+  background-color: ${({theme}) => theme.color.white};
+  box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
+  overflow-y: ${({$shouldScroll}) => ($shouldScroll ? 'scroll' : 'hidden')};
+  z-index: 2;
 `;
 
 export const VisualizationContainer = styled.div`
@@ -37,4 +52,14 @@ export const ClearSearchIcon = styled(CloseCircleFilled)`
   top: 8px;
   color: ${({theme}) => theme.color.textLight};
   cursor: pointer;
+`;
+
+export const NoMatchesContainer = styled.div`
+  color: ${({theme}) => theme.color.textSecondary};
+  margin-top: 8px;
+  margin-left: 8px;
+`;
+
+export const NoMatchesText = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.textSecondary};
 `;

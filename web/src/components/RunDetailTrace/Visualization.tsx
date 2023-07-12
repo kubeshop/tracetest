@@ -1,6 +1,6 @@
 import RunEvents from 'components/RunEvents';
-import {TestState} from 'constants/TestRun.constants';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useCallback, useEffect} from 'react';
 import {Node, NodeChange} from 'react-flow-renderer';
@@ -9,9 +9,9 @@ import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
+import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
 import Span from 'models/Span.model';
-import {useDrawer} from '../Drawer/Drawer';
 import DAG from '../Visualization/components/DAG';
 import Timeline from '../Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
@@ -30,7 +30,6 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const nodes = useAppSelector(TraceSelectors.selectNodes);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const isMatchedMode = Boolean(matchedSpans.length);
-  const {openDrawer} = useDrawer();
 
   useEffect(() => {
     dispatch(initNodes({spans}));
@@ -48,18 +47,16 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     (event, {id}: Node) => {
       TraceDiagramAnalyticsService.onClickSpan(id);
       dispatch(selectSpan({spanId: id}));
-      openDrawer();
     },
-    [dispatch, openDrawer]
+    [dispatch]
   );
 
   const onNodeClickTimeline = useCallback(
     (spanId: string) => {
       TraceAnalyticsService.onTimelineSpanClick(spanId);
       dispatch(selectSpan({spanId}));
-      openDrawer();
     },
-    [dispatch, openDrawer]
+    [dispatch]
   );
 
   const onNavigateToSpan = useCallback(
@@ -69,7 +66,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     [dispatch]
   );
 
-  if (runState !== TestState.FINISHED) {
+  if (TestRunService.shouldDisplayTraceEvents(runState, spans.length)) {
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 
@@ -88,6 +85,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     <Timeline
       isMatchedMode={isMatchedMode}
       matchedSpans={matchedSpans}
+      nodeType={NodeTypesEnum.TraceSpan}
       onNavigateToSpan={onNavigateToSpan}
       onNodeClick={onNodeClickTimeline}
       selectedSpan={selectedSpan}

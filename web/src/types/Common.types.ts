@@ -9,6 +9,7 @@ export interface IEnv {
   serverID: string;
   serverPathPrefix: string;
   segmentLoaded: boolean;
+  isTracetestDev: boolean;
 }
 
 export interface IMockFactory<T, R> {
@@ -32,6 +33,7 @@ export type TDataStoreSchemas = external['dataStores.yaml']['components']['schem
 export type TConfigSchemas = external['config.yaml']['components']['schemas'];
 export type TVariablesSchemas = external['variables.yaml']['components']['schemas'];
 export type TTestEventsSchemas = external['testEvents.yaml']['components']['schemas'];
+export type TLintersSchemas = external['linters.yaml']['components']['schemas'];
 
 export type TSelector = TTestSchemas['Selector'];
 

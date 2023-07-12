@@ -110,7 +110,7 @@ func (i Injector) injectValueIntoField(field reflect.Value) error {
 
 	// We only support variables replacements in strings right now
 	strValue := field.String()
-	newValue, err := i.replaceVariable(strValue)
+	newValue, err := i.ReplaceInString(strValue)
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (i Injector) injectValueIntoField(field reflect.Value) error {
 	return nil
 }
 
-func (i Injector) replaceVariable(value string) (string, error) {
+func (i Injector) ReplaceInString(value string) (string, error) {
 	envVarRegex, err := regexp.Compile(`\$\{\w+\}`)
 	if err != nil {
 		return "", fmt.Errorf("could not compile env variable regex: %w", err)

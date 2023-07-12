@@ -4,12 +4,17 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
 )
 
 type DataStore interface {
 	Source() string
 	Get(name string) (string, error)
+}
+
+var attributeAlias = map[string]string{
+	"name": "tracetest.span.name",
 }
 
 type AttributeDataStore struct {
@@ -20,10 +25,25 @@ func (ds AttributeDataStore) Source() string {
 	return "attr"
 }
 
+func (ds AttributeDataStore) getFromAlias(name string) (string, error) {
+	alias, found := attributeAlias[name]
+
+	if !found {
+		return "", fmt.Errorf(`attribute "%s" not found`, name)
+	}
+
+	value := ds.Span.Attributes.Get(alias)
+	if value == "" {
+		return "", fmt.Errorf(`attribute "%s" not found`, name)
+	}
+
+	return value, nil
+}
+
 func (ds AttributeDataStore) Get(name string) (string, error) {
 	value := ds.Span.Attributes.Get(name)
 	if value == "" {
-		return "", fmt.Errorf(`attribute "%s" not found`, name)
+		return ds.getFromAlias(name)
 	}
 
 	return value, nil
@@ -65,7 +85,7 @@ func (ds VariableDataStore) Get(name string) (string, error) {
 }
 
 type EnvironmentDataStore struct {
-	Values []model.EnvironmentValue
+	Values []environment.EnvironmentValue
 }
 
 func (ds EnvironmentDataStore) Source() string {

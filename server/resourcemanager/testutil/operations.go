@@ -66,12 +66,15 @@ var (
 		getNotFoundOperation,
 		getSuccessOperation,
 
+		getAugmentedSuccessOperation,
+		listAugmentedSuccessOperation,
+
 		deleteNotFoundOperation,
 		deleteSuccessOperation,
 
 		listNoResultsOperation,
 		listSuccessOperation,
-		listPaginatedSuccessOperation,
+		listSortSuccessOperation,
 		// TODO: add tests for other operations
 	}
 

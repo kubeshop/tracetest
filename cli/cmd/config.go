@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -8,18 +9,24 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var cliConfig config.Config
-var cliLogger *zap.Logger
-var resourceRegistry = actions.NewResourceRegistry()
+var (
+	cliLogger      = &zap.Logger{}
+	cliConfig      config.Config
+	openapiClient  = &openapi.APIClient{}
+	versionText    string
+	isVersionMatch bool
+)
 
 type setupConfig struct {
-	shouldValidateConfig bool
+	shouldValidateConfig          bool
+	shouldValidateVersionMismatch bool
 }
 
 type setupOption func(*setupConfig)
@@ -30,39 +37,39 @@ func SkipConfigValidation() setupOption {
 	}
 }
 
+func SkipVersionMismatchCheck() setupOption {
+	return func(sc *setupConfig) {
+		sc.shouldValidateVersionMismatch = false
+	}
+}
+
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
-		shouldValidateConfig: true,
+		shouldValidateConfig:          true,
+		shouldValidateVersionMismatch: true,
 	}
 	for _, option := range options {
 		option(&config)
 	}
 
 	return func(cmd *cobra.Command, args []string) {
-		setupOutputFormat()
+		setupOutputFormat(cmd)
 		setupLogger(cmd, args)
 		loadConfig(cmd, args)
 		overrideConfig()
-
-		baseOptions := []actions.ResourceArgsOption{actions.WithLogger(cliLogger), actions.WithConfig(cliConfig)}
-
-		configOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("config", cliConfig)))
-		configActions := actions.NewConfigActions(configOptions...)
-		resourceRegistry.Register(configActions)
-
-		pollingOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("pollingprofile", cliConfig)))
-		pollingActions := actions.NewPollingActions(pollingOptions...)
-		resourceRegistry.Register(pollingActions)
-
-		demoOptions := append(baseOptions, actions.WithClient(utils.GetResourceAPIClient("demo", cliConfig)))
-		demoActions := actions.NewDemoActions(demoOptions...)
-		resourceRegistry.Register(demoActions)
+		setupVersion()
+		setupResources()
+		setupRunners()
 
 		if config.shouldValidateConfig {
 			validateConfig(cmd, args)
 		}
 
-		analytics.Init(cliConfig)
+		if config.shouldValidateVersionMismatch {
+			validateVersionMismatch()
+		}
+
+		analytics.Init()
 	}
 }
 
@@ -72,20 +79,27 @@ func overrideConfig() {
 		if err != nil {
 			msg := fmt.Sprintf("cannot parse endpoint %s", overrideEndpoint)
 			cliLogger.Error(msg, zap.Error(err))
-			os.Exit(1)
+			ExitCLI(1)
 		}
 		cliConfig.Scheme = scheme
 		cliConfig.Endpoint = endpoint
 	}
 }
 
-func setupOutputFormat() {
+func setupRunners() {
+	c := utils.GetAPIClient(cliConfig)
+	*openapiClient = *c
+}
+
+func setupOutputFormat(cmd *cobra.Command) {
 	o := formatters.Output(output)
+	if output == "" {
+		o = formatters.Pretty
+	}
 	if !formatters.ValidOutput(o) {
 		fmt.Fprintf(os.Stderr, "Invalid output format %s. Available formats are [%s]\n", output, outputFormatsString)
-		os.Exit(1)
+		ExitCLI(1)
 	}
-	formatters.SetOutput(o)
 }
 
 func loadConfig(cmd *cobra.Command, args []string) {
@@ -132,11 +146,29 @@ func setupLogger(cmd *cobra.Command, args []string) {
 		zapcore.Lock(os.Stdout),
 		atom,
 	))
-
-	cliLogger = logger
+	*cliLogger = *logger
 }
 
 func teardownCommand(cmd *cobra.Command, args []string) {
 	cliLogger.Sync()
-	analytics.Close()
+}
+
+func setupVersion() {
+	versionText, isVersionMatch = actions.GetVersion(
+		context.Background(),
+		cliConfig,
+		utils.GetAPIClient(cliConfig),
+	)
+}
+
+func validateVersionMismatch() {
+	if !isVersionMatch && os.Getenv("TRACETEST_DEV") == "" {
+		fmt.Fprintf(os.Stderr, versionText+`
+✖️ Error: Version Mismatch
+The CLI version and the server version are not compatible. To fix this, you'll need to make sure that both your CLI and server are using compatible versions.
+We recommend upgrading both of them to the latest available version. Check out our documentation https://docs.tracetest.io/configuration/upgrade for simple instructions on how to upgrade.
+Thank you for using Tracetest! We apologize for any inconvenience caused.
+`)
+		ExitCLI(1)
+	}
 }

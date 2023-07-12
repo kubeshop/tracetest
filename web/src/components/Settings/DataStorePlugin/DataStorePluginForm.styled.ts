@@ -56,7 +56,6 @@ export const FormColumn = styled.div`
 export const Title = styled(Typography.Title)`
   && {
     font-size: ${({theme}) => theme.size.md};
-    font-weight: 700;
     margin: 0;
   }
 `;

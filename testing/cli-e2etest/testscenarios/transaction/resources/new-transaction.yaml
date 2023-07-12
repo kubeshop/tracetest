@@ -1,0 +1,8 @@
+type: Transaction
+spec:
+  id: Qti5R3_VR
+  name: New Transaction
+  description: a transaction
+  steps:
+  - ./transaction-step-1.yaml
+  - ./transaction-step-2.yaml

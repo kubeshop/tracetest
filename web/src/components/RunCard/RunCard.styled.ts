@@ -1,4 +1,4 @@
-import {CheckCircleFilled, MinusCircleFilled, MoreOutlined} from '@ant-design/icons';
+import {CheckCircleFilled, InfoCircleFilled, MinusCircleFilled, MoreOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -49,6 +49,10 @@ export const IconFail = styled(MinusCircleFilled)`
   color: ${({theme}) => theme.color.error};
 `;
 
+export const IconInfo = styled(InfoCircleFilled)`
+  color: ${({theme}) => theme.color.textLight};
+`;
+
 export const Info = styled.div`
   flex: 1;
 `;
@@ -67,6 +71,7 @@ export const Title = styled(Typography.Title).attrs({level: 3})`
   }
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{$minWidth?: number}>`
   display: flex;
+  min-width: ${({$minWidth}) => $minWidth && `${$minWidth}px`};
 `;

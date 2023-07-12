@@ -13,7 +13,8 @@ describe('TestDefinitionService', () => {
       });
       expect(testResultCount).toEqual({
         assertions: [],
-        selector: {
+        selector: '',
+        selectorParsed: {
           query: '',
         },
         name: '',

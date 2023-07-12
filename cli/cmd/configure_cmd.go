@@ -2,17 +2,13 @@ package cmd
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/kubeshop/tracetest/cli/actions"
-	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
-var analyticsEnabled bool
-var endpoint string
-var global bool
+var configParams = &configureParameters{}
 
 var configureCmd = &cobra.Command{
 	GroupID: cmdGroupConfig.ID,
@@ -20,32 +16,21 @@ var configureCmd = &cobra.Command{
 	Short:   "Configure your tracetest CLI",
 	Long:    "Configure your tracetest CLI",
 	PreRun:  setupLogger,
-	Run: func(cmd *cobra.Command, args []string) {
-		analytics.Track("Configure", "cmd", map[string]string{})
-
+	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
-		client := utils.GetAPIClient(cliConfig)
-		action := actions.NewConfigureAction(cliConfig, cliLogger, client)
+		action := actions.NewConfigureAction(cliConfig)
 
 		actionConfig := actions.ConfigureConfig{
-			Global:    global,
-			SetValues: actions.ConfigureConfigSetValues{},
+			Global: configParams.Global,
 		}
 
 		if flagProvided(cmd, "endpoint") {
-			actionConfig.SetValues.Endpoint = &endpoint
-		}
-
-		if flagProvided(cmd, "analytics") {
-			actionConfig.SetValues.AnalyticsEnabled = &analyticsEnabled
+			actionConfig.SetValues.Endpoint = configParams.Endpoint
 		}
 
 		err := action.Run(ctx, actionConfig)
-		if err != nil {
-			cliLogger.Error("could not get tests", zap.Error(err))
-			return
-		}
-	},
+		return "", err
+	})),
 	PostRun: teardownCommand,
 }
 
@@ -54,8 +39,35 @@ func flagProvided(cmd *cobra.Command, name string) bool {
 }
 
 func init() {
-	configureCmd.PersistentFlags().BoolVarP(&global, "global", "g", false, "configuration will be saved in your home dir")
-	configureCmd.PersistentFlags().StringVarP(&endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
-	configureCmd.PersistentFlags().BoolVarP(&analyticsEnabled, "analytics", "a", true, "configure the analytic state, so the CLI won't ask for this value")
+	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
+	configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
 	rootCmd.AddCommand(configureCmd)
+}
+
+type configureParameters struct {
+	Endpoint string
+	Global   bool
+}
+
+func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error {
+	var errors []error
+
+	if cmd.Flags().Lookup("endpoint").Changed {
+		if p.Endpoint == "" {
+			errors = append(errors, paramError{
+				Parameter: "endpoint",
+				Message:   "endpoint cannot be empty",
+			})
+		} else {
+			_, err := url.Parse(p.Endpoint)
+			if err != nil {
+				errors = append(errors, paramError{
+					Parameter: "endpoint",
+					Message:   "endpoint is not a valid URL",
+				})
+			}
+		}
+	}
+
+	return errors
 }

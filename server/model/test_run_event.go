@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 type (
@@ -61,10 +61,9 @@ func (e TestRunEvent) ResourceID() string {
 }
 
 type PollingInfo struct {
-	Type                PollingType
-	ReasonNextIteration string
-	IsComplete          bool
-	Periodic            *PeriodicPollingConfig
+	Type       PollingType
+	IsComplete bool
+	Periodic   *PeriodicPollingConfig
 }
 
 type PeriodicPollingConfig struct {

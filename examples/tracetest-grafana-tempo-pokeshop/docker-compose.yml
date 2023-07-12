@@ -1,0 +1,169 @@
+version: "3"
+services:
+
+  # Tracetest
+  tracetest:
+    image: kubeshop/tracetest:${TAG:-latest}
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./tracetest.config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest.provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+  # Tracetest End
+
+  # Grafana
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.59.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+    depends_on:
+      - tempo
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.config.yaml:/etc/tempo.yaml
+      - ./tempo-data:/tmp/tempo
+    ports:
+      - "3200"   # tempo
+      - "4317"  # otlp grpc
+      - "4318"  # otlp http
+  grafana:
+    image: grafana/grafana:9.4.3
+    volumes:
+      - ./grafana.config.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3000:3000"
+  # Grafana End
+
+  # Demo
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    ports:
+      - 5432:5432
+
+  demo-cache:
+    image: redis:6
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  demo-queue:
+    image: rabbitmq:3.8-management
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  demo-api:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: demo-cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: demo-queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: api
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      demo-cache:
+        condition: service_healthy
+      demo-queue:
+        condition: service_healthy
+
+  demo-worker:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: demo-cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: demo-queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      demo-cache:
+        condition: service_healthy
+      demo-queue:
+        condition: service_healthy
+
+  demo-rpc:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: demo-cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: demo-queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: rpc
+    ports:
+      - 8082:8082
+    healthcheck:
+      test: ["CMD", "lsof", "-i", "8082"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      demo-cache:
+        condition: service_healthy
+      demo-queue:
+        condition: service_healthy
+  # Demo End

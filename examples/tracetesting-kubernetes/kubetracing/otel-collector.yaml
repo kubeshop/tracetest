@@ -1,0 +1,24 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+processors:
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+  batch:
+    timeout: 100ms
+exporters:
+  logging:
+    logLevel: debug
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [probabilistic_sampler, batch]
+      exporters: [otlp/jaeger,logging]

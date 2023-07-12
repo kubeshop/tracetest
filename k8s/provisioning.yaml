@@ -1,13 +1,4 @@
 ---
-type: DataStore
-spec:
-  name: Jaeger
-  type: jaeger
-  jaeger:
-    endpoint: jaeger-query.tracetest:16685
-    tls:
-      insecure: true
----
 type: Config
 spec:
   analyticsEnabled: false
@@ -18,8 +9,8 @@ spec:
   strategy: periodic
   default: true
   periodic:
-    timeout: 10s
-    retryDelay: 500ms
+    timeout: 30s
+    retryDelay: 1s
 ---
 type: Demo
 spec:
@@ -40,3 +31,13 @@ spec:
     productCatalogEndpoint: http://otel-productcatalogservice.otel-demo:3550
     cartEndpoint: http://otel-cartservice.otel-demo:7070
     checkoutEndpoint: http://otel-checkoutservice.otel-demo:5050
+---
+type: DataStore
+spec:
+  name: Jaeger
+  type: jaeger
+  default: true
+  jaeger:
+    endpoint: jaeger-query.tracetest:16685
+    tls:
+      insecure: true

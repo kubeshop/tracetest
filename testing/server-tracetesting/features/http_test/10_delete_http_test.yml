@@ -1,0 +1,25 @@
+type: Test
+spec:
+  id: TCkHevQVR_
+  name: Delete HTTP Test
+  description: Test step of 'HTTP Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/tests/${env:HTTP_TEST_ID}
+      method: DELETE
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 204
+  - selector: span[name="DELETE /api/tests/{id}" tracetest.span.type="http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[name = "exec DELETE"]
+    assertions:
+    # must delete test and runs. That's why we need 2 deletes
+    - attr:tracetest.selected_spans.count = 4

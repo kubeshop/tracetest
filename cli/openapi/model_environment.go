@@ -180,7 +180,9 @@ func (o Environment) MarshalJSON() ([]byte, error) {
 
 func (o Environment) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	// skip: id is readOnly
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
 	if !isNil(o.Name) {
 		toSerialize["name"] = o.Name
 	}

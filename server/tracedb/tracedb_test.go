@@ -4,26 +4,25 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/config/configgrpc"
 )
 
 func TestCreateClient(t *testing.T) {
 	cases := []struct {
 		name          string
-		ds            model.DataStore
+		ds            datastore.DataStore
 		expectedType  string
 		expectedError error
 	}{
 		{
 			name: "Jaeger",
-			ds: model.DataStore{
-				Type: model.DataStoreTypeJaeger,
-				Values: model.DataStoreValues{
-					Jaeger: &configgrpc.GRPCClientSettings{
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeJaeger,
+				Values: datastore.DataStoreValues{
+					Jaeger: &datastore.GRPCClientSettings{
 						Endpoint: "notexists:123",
 					},
 				},
@@ -32,89 +31,97 @@ func TestCreateClient(t *testing.T) {
 		},
 		{
 			name: "Tempo",
-			ds: model.DataStore{
-				Type: model.DataStoreTypeTempo,
-				Values: model.DataStoreValues{
-					Tempo: &model.BaseClientConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeTempo,
+				Values: datastore.DataStoreValues{
+					Tempo: &datastore.MultiChannelClientConfig{},
 				},
 			},
 			expectedType: "*tracedb.tempoTraceDB",
 		},
 		{
 			name: "ElasticSearch",
-			ds: model.DataStore{
-				Type: model.DataStoreTypeElasticAPM,
-				Values: model.DataStoreValues{
-					ElasticApm: &model.ElasticSearchDataStoreConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeElasticAPM,
+				Values: datastore.DataStoreValues{
+					ElasticApm: &datastore.ElasticSearchConfig{},
 				},
 			},
 			expectedType: "*tracedb.elasticsearchDB",
 		},
 		{
 			name: "OpenSearch",
-			ds: model.DataStore{
-				Type: model.DataStoreTypeOpenSearch,
-				Values: model.DataStoreValues{
-					OpenSearch: &model.ElasticSearchDataStoreConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeOpenSearch,
+				Values: datastore.DataStoreValues{
+					OpenSearch: &datastore.ElasticSearchConfig{},
 				},
 			},
 			expectedType: "*tracedb.opensearchDB",
 		},
 		{
 			name: "SignalFX",
-			ds: model.DataStore{
-				Type: model.DataStoreTypeSignalFX,
-				Values: model.DataStoreValues{
-					SignalFx: &model.SignalFXDataStoreConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeSignalFX,
+				Values: datastore.DataStoreValues{
+					SignalFx: &datastore.SignalFXConfig{},
 				},
 			},
 			expectedType: "*tracedb.signalfxDB",
 		},
 		{
 			name: "AWSXRay",
-			ds: model.DataStore{
-				Type: model.DataStoreTypeAwsXRay,
-				Values: model.DataStoreValues{
-					AwsXRay: &model.AWSXRayDataStoreConfig{},
+			ds: datastore.DataStore{
+				Type: datastore.DataStoreTypeAwsXRay,
+				Values: datastore.DataStoreValues{
+					AwsXRay: &datastore.AWSXRayConfig{},
 				},
 			},
 			expectedType: "*tracedb.awsxrayDB",
 		},
 		{
 			name: "OTLP",
-			ds: model.DataStore{
-				Type:   model.DataStoreTypeOTLP,
-				Values: model.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeOTLP,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "NewRelic",
-			ds: model.DataStore{
-				Type:   model.DataStoreTypeNewRelic,
-				Values: model.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeNewRelic,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "Lightstep",
-			ds: model.DataStore{
-				Type:   model.DataStoreTypeLighStep,
-				Values: model.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeLighStep,
+				Values: datastore.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
+			name: "Honeycomb",
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeHoneycomb,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name: "DataDog",
-			ds: model.DataStore{
-				Type:   model.DataStoreTypeDataDog,
-				Values: model.DataStoreValues{},
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeDataDog,
+				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
 			name:         "EmptyConfig",
-			ds:           model.DataStore{},
+			ds:           datastore.DataStore{},
 			expectedType: "*tracedb.noopTraceDB",
 		},
 	}

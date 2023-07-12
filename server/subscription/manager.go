@@ -4,13 +4,13 @@ import "sync"
 
 type Manager struct {
 	subscriptions map[string][]Subscriber
-	mutex         sync.Mutex
+	mutex         sync.RWMutex
 }
 
 func NewManager() *Manager {
 	return &Manager{
 		subscriptions: make(map[string][]Subscriber),
-		mutex:         sync.Mutex{},
+		mutex:         sync.RWMutex{},
 	}
 }
 
@@ -56,12 +56,8 @@ func (m *Manager) PublishUpdate(message Message) {
 }
 
 func (m *Manager) Publish(resourceID string, message any) {
-	if subscribers, ok := m.subscriptions[resourceID]; ok {
-		for _, subscriber := range subscribers {
-			subscriber.Notify(Message{
-				ResourceID: resourceID,
-				Content:    message,
-			})
-		}
-	}
+	m.PublishUpdate(Message{
+		ResourceID: resourceID,
+		Content:    message,
+	})
 }

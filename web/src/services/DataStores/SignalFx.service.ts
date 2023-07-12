@@ -1,28 +1,31 @@
 import {SupportedDataStores, TDataStoreService} from 'types/DataStore.types';
 
 const SignalFxService = (): TDataStoreService => ({
-  getRequest({dataStore: {signalFx: {realm = '', token = ''} = {}} = {}}) {
+  getRequest({dataStore: {signalfx: {realm = '', token = ''} = {}} = {}}) {
     return Promise.resolve({
       type: SupportedDataStores.SignalFX,
       name: SupportedDataStores.SignalFX,
-      signalFx: {
+      signalfx: {
         realm,
         token,
       },
     });
   },
-  validateDraft({dataStore: {signalFx: {realm = '', token = ''} = {}} = {}}) {
+  validateDraft({dataStore: {signalfx: {realm = '', token = ''} = {}} = {}}) {
     if (!realm || !token) return Promise.resolve(false);
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {signalFx = {}} = {}}) {
-    const {realm = '', token = ''} = signalFx;
+  getInitialValues({defaultDataStore: {signalfx = {}} = {}}) {
+    const {realm = '', token = ''} = signalfx;
 
     return {
-      dataStore: {name: SupportedDataStores.SignalFX, type: SupportedDataStores.SignalFX, signalFx: {realm, token}},
+      dataStore: {name: SupportedDataStores.SignalFX, type: SupportedDataStores.SignalFX, signalfx: {realm, token}},
       dataStoreType: SupportedDataStores.SignalFX,
     };
+  },
+  shouldTestConnection() {
+    return true;
   },
 });
 

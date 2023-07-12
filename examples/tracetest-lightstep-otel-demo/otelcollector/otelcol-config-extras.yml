@@ -7,23 +7,23 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Lightstep
-  otlp/ls:
+  otlp/lightstep:
     endpoint: ingest.lightstep.com:443
     headers:
       "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start 
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/ls:
+      exporters: [otlp/tracetest]
+    traces/lightstep:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp/lightstep]

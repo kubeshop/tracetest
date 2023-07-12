@@ -1,0 +1,37 @@
+type: Analyzer
+spec:
+  id: current
+  name: analyzer
+  enabled: true
+  minimumScore: 95
+  plugins:
+    - id: standards
+      enabled: true
+      rules:
+        - id: span-naming
+          weight: 25
+          errorLevel: error
+        - id: required-attributes
+          weight: 25
+          errorLevel: error
+        - id: attribute-naming
+          weight: 25
+          errorLevel: error
+        - id: no-empty-attributes
+          weight: 25
+          errorLevel: error
+    - id: common
+      enabled: true
+      rules:
+        - id: prefer-dns
+          weight: 100
+          errorLevel: error
+    - id: security
+      enabled: true
+      rules:
+        - id: secure-https-protocol
+          weight: 30
+          errorLevel: error
+        - id: no-api-key-leak
+          weight: 70
+          errorLevel: error

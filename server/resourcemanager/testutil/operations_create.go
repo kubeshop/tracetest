@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,22 +29,22 @@ var createNoIDOperation = buildSingleStepOperation(singleStepOperationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			removeIDFromJSON(rt.SampleJSON),
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 201, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 201, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
 		clean := removeIDFromJSON(rt.SampleJSON)
 		expected := ct.toJSON(clean)
 
-		require.JSONEq(t, expected, removeIDFromJSON(jsonBody))
-		require.NotEmpty(t, extractID(jsonBody))
+		rt.customJSONComparer(t, OperationCreateNoID, expected, removeIDFromJSON(jsonBody))
+		dumpResponseIfNot(t, assert.NotEmpty(t, extractID(jsonBody)), resp)
 	},
 })
 
@@ -55,19 +56,19 @@ var createSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 201, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 201, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 		expected := ct.toJSON(rt.SampleJSON)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationCreateSuccess, expected, jsonBody)
 	},
 })
 
@@ -79,13 +80,13 @@ var createInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildCreateRequest(
 			rt.SampleJSON,
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			ct,
 			testServer,
 			t,
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "creating")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "creating")
 	},
 })

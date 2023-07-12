@@ -6,22 +6,43 @@ A common use case for tests is to assert the same behavior across multiple envir
 
 Environments are objects containing variables that can be referenced by tests. You can use a single test and provide the information on which environment object will be used to run the test. To illustrate this, consider an app that is deployed in three stages: `dev`, `staging`, and `production`. We can execute the same test in all those environments, however, both `URL` and `credentials` change from environment to environment. To run the same test against the three deployments of the app, you can create three environments:
 
-```dotenv
+```yaml
 # dev.env
-URL=https://app-dev.com
-API_TOKEN=dev-key
+type: Environment
+spec:
+  name: dev.env
+  id: dev.env
+  values:
+    - key: URL
+      value: https://app-dev.com
+    - key: API_TOKEN
+      value: dev-key
 ```
 
-```dotenv
+```yaml
 # staging.env
-URL=https://app-staging.com
-API_TOKEN=staging-key
+type: Environment
+spec:
+  name: staging.env
+  id: staging.env
+  values:
+    - key: URL
+      value: https://app-staging.com
+    - key: API_TOKEN
+      value: staging-key
 ```
 
-```dotenv
+```yaml
 # production.env
-URL=https://app-prod.com
-API_TOKEN=prod-key
+type: Environment
+spec:
+  name: production.env
+  id: production.env
+  values:
+    - key: URL
+      value: https://app-prod.com
+    - key: API_TOKEN
+      value: prod-key
 ```
 
 Now consider the following test:

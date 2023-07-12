@@ -7,11 +7,11 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
-  otlp/nr:
+  otlp/newrelic:
     endpoint: otlp.nr-data.net:443
     headers:
       api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
@@ -20,11 +20,11 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/nr:
+      exporters: [otlp/tracetest]
+    traces/newrelic:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/nr]
+      exporters: [logging, otlp/newrelic]

@@ -44,7 +44,7 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{},
 			ct,
 			testServer,
@@ -52,7 +52,7 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 200, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -61,7 +61,7 @@ var listNoResultsOperation = buildSingleStepOperation(singleStepOperationTester{
 			"items": []
 		}`
 
-		require.JSONEq(t, expected, jsonBody)
+		dumpResponseIfNot(t, assert.JSONEq(t, expected, jsonBody), resp)
 	},
 })
 
@@ -72,7 +72,7 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{},
 			ct,
 			testServer,
@@ -80,18 +80,32 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 200, resp.StatusCode)
-
-		jsonBody := responseBodyJSON(t, resp, ct)
-
-		expected := `{
-			"count": 1,
-			"items": [` + ct.toJSON(rt.SampleJSON) + `]
-		}`
-
-		require.JSONEq(t, expected, jsonBody)
+		assertListSuccessResponse(t, resp, ct, rt, rt.SampleJSON)
 	},
 })
+
+func assertListSuccessResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest, itemSample string) {
+	dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
+
+	jsonBody := responseBodyJSON(t, resp, ct)
+
+	var parsedJsonBody struct {
+		Count int   `json:"count"`
+		Items []any `json:"items"`
+	}
+	json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
+
+	dumpResponseIfNot(t, assert.Equal(t, 1, parsedJsonBody.Count), resp)
+	dumpResponseIfNot(t, assert.Equal(t, 1, len(parsedJsonBody.Items)), resp)
+
+	obtainedAsBytes, err := json.Marshal(parsedJsonBody.Items[0])
+	dumpResponseIfNot(t, assert.NoError(t, err), resp)
+
+	expected := ct.toJSON(itemSample)
+	obtained := string(obtainedAsBytes)
+
+	rt.customJSONComparer(t, OperationListSuccess, expected, obtained)
+}
 
 const OperationListWithInvalidSortField Operation = "ListWithInvalidSortField"
 
@@ -102,7 +116,7 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 		invalidSortField := generateRandomString()
 
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{
 				"take":          "2",
 				"skip":          "1",
@@ -115,14 +129,14 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		require.Equal(t, 400, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 400, resp.StatusCode), resp)
 	},
 })
 
-const OperationListPaginatedSuccess Operation = "ListPaginatedSuccess"
+const OperationListSortSuccess Operation = "ListSortSuccess"
 
-var listPaginatedSuccessOperation = operationTester{
-	name:               OperationListPaginatedSuccess,
+var listSortSuccessOperation = operationTester{
+	name:               OperationListSortSuccess,
 	neededForOperation: rm.OperationList,
 	getSteps: func(t *testing.T, rt ResourceTypeTest) []operationTesterStep {
 		steps := []operationTesterStep{}
@@ -145,7 +159,7 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 	return operationTesterStep{
 		buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 			return buildListRequest(
-				rt.ResourceType,
+				rt.ResourceTypePlural,
 				map[string]string{
 					"take":          "2",
 					"skip":          "1",
@@ -159,7 +173,7 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 		},
 		assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 			sortField := sortField
-			require.Equal(t, 200, resp.StatusCode)
+			dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 			jsonBody := responseBodyJSON(t, resp, ct)
 
@@ -169,8 +183,8 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 			}
 			json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
 
-			require.Equal(t, 3, parsedJsonBody.Count)
-			require.Greater(t, len(parsedJsonBody.Items), 1)
+			dumpResponseIfNot(t, assert.Equal(t, 3, parsedJsonBody.Count), resp)
+			dumpResponseIfNot(t, assert.Greater(t, len(parsedJsonBody.Items), 1), resp)
 
 			// we skip the 1st item, so starting in 1 instead of 0
 			// makes things match later when comparing to len(parsedJsonBody.Items)
@@ -183,15 +197,19 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 					continue
 				}
 
+				msg := fmt.Sprintf("incorrect sorting for field '%s' direction '%s'", sortField, sortDirection)
+
 				if sortDirection == "asc" {
-					assert.LessOrEqual(t, prevVal, itemSpec[sortField])
-					asserted++
+					assert.LessOrEqual(t, prevVal, itemSpec[sortField], msg)
 				} else {
-					assert.GreaterOrEqual(t, prevVal, itemSpec[sortField])
-					asserted++
+					assert.GreaterOrEqual(t, prevVal, itemSpec[sortField], msg)
 				}
+				asserted++
+				prevVal = itemSpec[sortField]
 			}
-			assert.Equal(t, len(parsedJsonBody.Items), asserted)
+
+			msg := fmt.Sprintf("incorrect number of items asserted for field '%s' direction '%s'", sortField, sortDirection)
+			assert.Equal(t, len(parsedJsonBody.Items), asserted, msg)
 		},
 	}
 }
@@ -203,7 +221,7 @@ var listInternalErrorOperation = buildSingleStepOperation(singleStepOperationTes
 	neededForOperation: rm.OperationList,
 	buildRequest: func(t *testing.T, testServer *httptest.Server, ct contentTypeConverter, rt ResourceTypeTest) *http.Request {
 		return buildListRequest(
-			rt.ResourceType,
+			rt.ResourceTypePlural,
 			map[string]string{},
 			ct,
 			testServer,
@@ -211,6 +229,6 @@ var listInternalErrorOperation = buildSingleStepOperation(singleStepOperationTes
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "listing")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "listing")
 	},
 })

@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"database/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,22 +11,29 @@ import (
 	"gotest.tools/v3/assert"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/kubeshop/tracetest/server/testmock"
 )
 
 type ResourceTypeTest struct {
-	ResourceType      string
-	RegisterManagerFn func(*mux.Router) rm.Manager
-	Prepare           func(t *testing.T, operation Operation, manager rm.Manager)
+	ResourceTypeSingular string
+	ResourceTypePlural   string
+	RegisterManagerFn    func(*mux.Router, *sql.DB) rm.Manager
+	Prepare              func(t *testing.T, operation Operation, manager rm.Manager)
 
-	SampleJSON        string
-	SampleJSONUpdated string
+	SampleJSON          string
+	SampleJSONUpdated   string
+	SampleJSONAugmented string
 
-	// private files
-	sortFields []string
+	// private fields
+	sortFields                  []string
+	customJSONComparer          func(t require.TestingT, operation Operation, firstValue, secondValue string)
+	operationsWithoutPostAssert []Operation
 }
 
 type config struct {
-	operations operationTesters
+	operations                  operationTesters
+	operationsWithoutPostAssert []Operation
+	customJSONComparer          func(t require.TestingT, operation Operation, firstValue, secondValue string)
 }
 
 type testOption func(*config)
@@ -34,6 +42,22 @@ func ExcludeOperations(ops ...Operation) testOption {
 	return func(c *config) {
 		c.operations = c.operations.exclude(ops...)
 	}
+}
+
+func IgnorePostAssertForOperations(ops ...Operation) testOption {
+	return func(c *config) {
+		c.operationsWithoutPostAssert = ops
+	}
+}
+
+func JSONComparer(comparer func(t require.TestingT, operation Operation, firstValue, secondValue string)) testOption {
+	return func(c *config) {
+		c.customJSONComparer = comparer
+	}
+}
+
+func rawJSONComparer(t require.TestingT, operation Operation, firstValue, secondValue string) {
+	require.JSONEq(t, firstValue, secondValue)
 }
 
 func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
@@ -47,11 +71,23 @@ func TestResourceType(t *testing.T, rt ResourceTypeTest, opts ...testOption) {
 		opt(&cfg)
 	}
 
+	// consider customJSONComparer option
+	if cfg.customJSONComparer == nil {
+		cfg.customJSONComparer = rawJSONComparer
+	}
+	rt.customJSONComparer = cfg.customJSONComparer
+
+	// consider operationsWithoutPostAssert option
+	rt.operationsWithoutPostAssert = cfg.operationsWithoutPostAssert
+
 	TestResourceTypeOperations(t, rt, cfg.operations)
 }
 
 func TestResourceTypeWithErrorOperations(t *testing.T, rt ResourceTypeTest) {
 	t.Helper()
+
+	// assumes default
+	rt.customJSONComparer = rawJSONComparer
 
 	TestResourceTypeOperations(t, rt, append(defaultOperations, errorOperations...))
 }
@@ -60,7 +96,15 @@ func TestResourceTypeOperations(t *testing.T, rt ResourceTypeTest, operations []
 	t.Parallel()
 	t.Helper()
 
-	t.Run(rt.ResourceType, func(t *testing.T) {
+	if rt.ResourceTypeSingular == "" {
+		t.Fatalf("ResourceTypeTest.ResourceTypeSingular not set")
+	}
+
+	if rt.ResourceTypePlural == "" {
+		t.Fatalf("ResourceTypeTest.ResourceTypePlural not set")
+	}
+
+	t.Run(rt.ResourceTypeSingular, func(t *testing.T) {
 		testProvisioning(t, rt)
 
 		for _, op := range operations {
@@ -80,7 +124,6 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 	for _, ct := range contentTypeConverters {
 		t.Run(ct.name, func(t *testing.T) {
 			ct := ct
-			t.Parallel()
 
 			testOperationForContentType(t, op, ct, rt)
 		})
@@ -88,11 +131,15 @@ func testOperation(t *testing.T, op operationTester, rt ResourceTypeTest) {
 }
 
 func testOperationForContentType(t *testing.T, op operationTester, ct contentTypeConverter, rt ResourceTypeTest) {
-	t.Helper()
+	db := testmock.CreateMigratedDatabase()
+	defer db.Close()
 
 	router := mux.NewRouter()
+
 	testServer := httptest.NewServer(router)
-	manager := rt.RegisterManagerFn(router)
+	defer testServer.Close()
+
+	manager := rt.RegisterManagerFn(router, db)
 
 	sortable, ok := manager.Handler().(rm.SortableHandler)
 	if ok {
@@ -112,6 +159,7 @@ func testOperationForContentType(t *testing.T, op operationTester, ct contentTyp
 	for _, step := range operationSteps {
 		req := step.buildRequest(t, testServer, ct, rt)
 		resp := doRequest(t, req, ct.contentType, testServer)
+		t.Log(resp.Header.Get("Content-Type"))
 
 		step.assertResponse(t, resp, ct, rt)
 		assert.Equal(t, ct.contentType, resp.Header.Get("Content-Type"))

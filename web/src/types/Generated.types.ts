@@ -5,8 +5,6 @@
 
 export interface paths {
   "/definition.yaml": {
-    /** Upsert a definition */
-    put: operations["upsertDefinition"];
     /** Execute a definition */
     post: operations["executeDefinition"];
   };
@@ -52,7 +50,19 @@ export interface paths {
   };
   "/tests/{testId}": {
     /** get test */
-    get: operations["getTest"];
+    get: {
+      parameters: {};
+      responses: {
+        /** successful operation */
+        200: {
+          content: {
+            "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+          };
+        };
+        /** problem with getting a test */
+        500: unknown;
+      };
+    };
     /** update test action */
     put: operations["updateTest"];
     /** delete a test */
@@ -102,35 +112,13 @@ export interface paths {
     /** get a test specific version */
     get: operations["getTestVersion"];
   };
-  "/tests/{testId}/version/{version}/definition.yaml": {
-    /** Get the test definition as an YAML file */
-    get: operations["getTestVersionDefinitionFile"];
-  };
-  "/test/{testId}/run/{runId}/stop": {
+  "/tests/{testId}/run/{runId}/stop": {
     /** stops the execution of a test run */
     post: operations["stopTestRun"];
   };
   "/tests/{testId}/run/{runId}/events": {
     /** get events from a test run */
     get: operations["getTestRunEvents"];
-  };
-  "/environments": {
-    /** Get Environments */
-    get: operations["getEnvironments"];
-    /** Create new environment action */
-    post: operations["createEnvironment"];
-  };
-  "/environments/{environmentId}": {
-    /** get environment */
-    get: operations["getEnvironment"];
-    /** update environment action */
-    put: operations["updateEnvironment"];
-    /** delete a environment */
-    delete: operations["deleteEnvironment"];
-  };
-  "/environments/{environmentId}/definition.yaml": {
-    /** Get the environment as an YAML file */
-    get: operations["getEnvironmentDefinitionFile"];
   };
   "/expressions/resolve": {
     /** resolves an expression and returns the result string */
@@ -144,33 +132,33 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
-  "/config/{configId}": {
+  "/configs": {
+    /** List Tracetest configuration */
+    get: operations["listConfiguration"];
+  };
+  "/configs/{configId}": {
     /** Get Tracetest configuration */
     get: operations["getConfiguration"];
     /** Update Tracetest configuration */
     put: operations["updateConfiguration"];
   };
-  "/pollingprofile": {
-    /** List polling profiles used on Tracetest to configure how to fetch traces in a test. */
-    get: operations["listPollingProfiles"];
-    /** Create a polling profile used on Tracetest to configure how to fetch traces in a test. */
-    post: operations["createPollingProfile"];
+  "/pollingprofiles": {
+    /** List Polling Profile configuration */
+    get: operations["listPollingProfile"];
   };
-  "/pollingprofile/{pollingProfileId}": {
+  "/pollingprofiles/{pollingProfileId}": {
     /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
     get: operations["getPollingProfile"];
     /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
     put: operations["updatePollingProfile"];
-    /** Delete a polling profile used on Tracetest to configure how to fetch traces in a test. */
-    delete: operations["deletePollingProfile"];
   };
-  "/demo": {
+  "/demos": {
     /** List demonstrations used on Tracetest as quick start examples. */
     get: operations["listDemos"];
     /** Create a demonstration used on Tracetest as quick start examples. */
     post: operations["createDemo"];
   };
-  "/demo/{demoId}": {
+  "/demos/{demoId}": {
     /** Get a demonstration used on Tracetest as quick start examples. */
     get: operations["getDemo"];
     /** Update a demonstration used on Tracetest as quick start examples. */
@@ -179,10 +167,8 @@ export interface paths {
     delete: operations["deleteDemo"];
   };
   "/datastores": {
-    /** Get all Data Stores */
-    get: operations["getDataStores"];
-    /** Create a new Data Store */
-    post: operations["createDataStore"];
+    /** List Data Store */
+    get: operations["listDataStore"];
   };
   "/datastores/{dataStoreId}": {
     /** Get a Data Store */
@@ -192,37 +178,43 @@ export interface paths {
     /** Delete a Data Store */
     delete: operations["deleteDataStore"];
   };
-  "/datastores/{dataStoreId}/definition.yaml": {
-    /** Get the data store as an YAML file */
-    get: operations["getDataStoreDefinitionFile"];
+  "/environments": {
+    /** List environments available in Tracetest. */
+    get: operations["listEnvironments"];
+    /** Create an environment that can be used by tests and transactions */
+    post: operations["createEnvironment"];
+  };
+  "/environments/{environmentId}": {
+    /** Get one environment by its id */
+    get: operations["getEnvironment"];
+    /** Update an environment used on Tracetest */
+    put: operations["updateEnvironment"];
+    /** Delete an environment from Tracetest */
+    delete: operations["deleteEnvironment"];
+  };
+  "/version": {
+    /** Get the version of the API */
+    get: operations["getVersion"];
+  };
+  "/linters": {
+    /** List Linters available in Tracetest. */
+    get: operations["listLinters"];
+    /** Create an Linter that can be used by tests and Linters */
+    post: operations["createLinter"];
+  };
+  "/linters/{LinterId}": {
+    /** Get one Linter by its id */
+    get: operations["getLinter"];
+    /** Update a Linter used on Tracetest */
+    put: operations["updateLinter"];
+    /** Delete an Linter from Tracetest */
+    delete: operations["deleteLinter"];
   };
 }
 
 export interface components {}
 
 export interface operations {
-  /** Upsert a definition */
-  upsertDefinition: {
-    responses: {
-      /** Definition updated */
-      200: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
-        };
-      };
-      /** Definition created */
-      201: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["UpsertDefinitionResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
-      };
-    };
-  };
   /** Execute a definition */
   executeDefinition: {
     responses: {
@@ -247,31 +239,20 @@ export interface operations {
   };
   /** get transactions */
   getTransactions: {
-    parameters: {
-      query: {
-        /** indicates how many transactions can be returned by each page */
-        take?: number;
-        /** indicates how many transactions will be skipped when paginating */
-        skip?: number;
-        /** query to search transactions, based on transaction name and description */
-        query?: string;
-        /** indicates the sort field for the transactions */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the transactions */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"][];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResourceList"];
+          "text/yaml": {
+            count?: number;
+            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+          };
         };
       };
+      /** invalid query for transactions, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with getting transactions */
       500: unknown;
     };
@@ -280,77 +261,81 @@ export interface operations {
   createTransaction: {
     responses: {
       /** successful operation */
-      200: {
+      201: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
         };
       };
       /** trying to create a transaction with an already existing ID */
       400: unknown;
+      /** problem creating a transaction */
+      500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
       };
     };
   };
   /** get transaction */
   getTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
         };
       };
-      /** problem with getting a transaction */
+      /** transaction not found */
+      404: unknown;
+      /** problem getting an transaction */
       500: unknown;
     };
   };
   /** update transaction action */
   updateTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
-      204: never;
-      /** problem with updating transaction */
+      200: {
+        content: {
+          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        };
+      };
+      /** invalid transaction, some data was sent in incorrect format. */
+      400: unknown;
+      /** transaction not found */
+      404: unknown;
+      /** problem updating a transaction */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
       };
     };
   };
   /** delete a transaction */
   deleteTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
-      /** OK */
+      /** successful operation */
       204: never;
+      /** transaction not found */
+      404: unknown;
+      /** problem deleting a transaction */
+      500: unknown;
     };
   };
   /** get a transaction specific version */
   getTransactionVersion: {
-    parameters: {
-      path: {
-        transactionId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -364,12 +349,7 @@ export interface operations {
   };
   /** Get the transaction as an YAML file */
   getTransactionVersionDefinitionFile: {
-    parameters: {
-      path: {
-        transactionId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -381,17 +361,7 @@ export interface operations {
   };
   /** Get all runs from a particular transaction */
   getTransactionRuns: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-      query: {
-        /** indicates how many results can be returned by each page */
-        take?: number;
-        /** indicates how many results will be skipped when paginating */
-        skip?: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -403,11 +373,7 @@ export interface operations {
   };
   /** run a particular transaction */
   runTransaction: {
-    parameters: {
-      path: {
-        transactionId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -424,12 +390,7 @@ export interface operations {
   };
   /** Get a specific run from a particular transaction */
   getTransactionRun: {
-    parameters: {
-      path: {
-        transactionId: string;
-        runId: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -443,12 +404,7 @@ export interface operations {
   };
   /** Delete a specific run from a particular transaction */
   deleteTransactionRun: {
-    parameters: {
-      path: {
-        transactionId: string;
-        runId: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -458,31 +414,17 @@ export interface operations {
   };
   /** get tests */
   getTests: {
-    parameters: {
-      query: {
-        /** indicates how many tests can be returned by each page */
-        take?: number;
-        /** indicates how many tests will be skipped when paginating */
-        skip?: number;
-        /** query to search tests, based on test name and description */
-        query?: string;
-        /** indicates the sort field for the tests */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the tests */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"][];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestResourceList"];
+          "text/yaml": external["tests.yaml"]["components"]["schemas"]["TestResourceList"];
         };
       };
+      /** invalid query for test, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with getting tests */
       500: unknown;
     };
@@ -505,31 +447,9 @@ export interface operations {
       };
     };
   };
-  /** get test */
-  getTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
-        };
-      };
-      /** problem with getting a test */
-      500: unknown;
-    };
-  };
   /** update test action */
   updateTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
@@ -544,11 +464,7 @@ export interface operations {
   };
   /** delete a test */
   deleteTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -556,17 +472,7 @@ export interface operations {
   };
   /** get the runs from a particular test */
   getTestRuns: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-      query: {
-        /** indicates how many results can be returned by each page */
-        take?: number;
-        /** indicates how many results will be skipped when paginating */
-        skip?: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -582,11 +488,7 @@ export interface operations {
   };
   /** run a particular test */
   runTest: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -609,15 +511,7 @@ export interface operations {
   };
   /** get the spans ids that would be selected by a specific selector query */
   getTestResultSelectedSpans: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-      query: {
-        query?: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -629,12 +523,7 @@ export interface operations {
   };
   /** use this method to test a definition against an actual trace without creating a new version or persisting anything */
   dryRunAssertion: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -651,12 +540,7 @@ export interface operations {
   };
   /** rerun a test run */
   rerunTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -668,12 +552,7 @@ export interface operations {
   };
   /** get test run results in JUnit xml format */
   getRunResultJUnit: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** JUnit formatted file */
       200: {
@@ -685,12 +564,7 @@ export interface operations {
   };
   /** export test and test run information for debugging */
   exportTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successfuly exported test and test run information */
       200: {
@@ -718,12 +592,7 @@ export interface operations {
   };
   /** get a particular test Run */
   getTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -735,12 +604,7 @@ export interface operations {
   };
   /** delete a test run */
   deleteTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
@@ -748,11 +612,7 @@ export interface operations {
   };
   /** Gets definition for a test */
   getTestSpecs: {
-    parameters: {
-      path: {
-        testId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       201: {
@@ -764,12 +624,7 @@ export interface operations {
   };
   /** get a test specific version */
   getTestVersion: {
-    parameters: {
-      path: {
-        testId: string;
-        version: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -781,31 +636,9 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Get the test definition as an YAML file */
-  getTestVersionDefinitionFile: {
-    parameters: {
-      path: {
-        testId: string;
-        version: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
-        };
-      };
-    };
-  };
   /** stops the execution of a test run */
   stopTestRun: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: unknown;
@@ -815,131 +648,12 @@ export interface operations {
   };
   /** get events from a test run */
   getTestRunEvents: {
-    parameters: {
-      path: {
-        testId: string;
-        runId: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
           "application/json": external["testEvents.yaml"]["components"]["schemas"]["TestRunEvent"][];
-        };
-      };
-    };
-  };
-  /** Get Environments */
-  getEnvironments: {
-    parameters: {
-      query: {
-        /** indicates how many environments can be returned by each page */
-        take?: number;
-        /** indicates how many environments will be skipped when paginating */
-        skip?: number;
-        /** query to search environments, based on environments name and description */
-        query?: string;
-        /** indicates the sort field for the environments */
-        sortBy?: "created" | "name";
-        /** indicates the sort direction for the environments */
-        sortDirection?: "asc" | "desc";
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
-        content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"][];
-        };
-      };
-      /** problem with getting environments */
-      500: unknown;
-    };
-  };
-  /** Create new environment action */
-  createEnvironment: {
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-        };
-      };
-      /** trying to create a environment with an already existing ID */
-      400: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-      };
-    };
-  };
-  /** get environment */
-  getEnvironment: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-        };
-      };
-      /** problem with getting a environment */
-      500: unknown;
-    };
-  };
-  /** update environment action */
-  updateEnvironment: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      204: never;
-      /** problem with updating environment */
-      500: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
-      };
-    };
-  };
-  /** delete a environment */
-  deleteEnvironment: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** OK */
-      204: never;
-    };
-  };
-  /** Get the environment as an YAML file */
-  getEnvironmentDefinitionFile: {
-    parameters: {
-      path: {
-        environmentId: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
         };
       };
     };
@@ -962,20 +676,7 @@ export interface operations {
   };
   /** get resources */
   getResources: {
-    parameters: {
-      query: {
-        /** indicates how many transactions can be returned by each page */
-        take?: number;
-        /** indicates how many transactions will be skipped when paginating */
-        skip?: number;
-        /** query to search transactions, based on transaction name and description */
-        query?: string;
-        /** indicates the sort field for the transactions */
-        sortBy?: "created" | "name" | "last_run";
-        /** indicates the sort direction for the transactions */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1005,14 +706,24 @@ export interface operations {
       };
     };
   };
+  /** List Tracetest configuration */
+  listConfiguration: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["ConfigurationResourceList"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["ConfigurationResourceList"];
+        };
+      };
+      /** problem getting the configuration list */
+      500: unknown;
+    };
+  };
   /** Get Tracetest configuration */
   getConfiguration: {
-    parameters: {
-      path: {
-        /** ID of the configuration resource used on Tracetest. It should be set as 'current'. */
-        configId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1027,12 +738,7 @@ export interface operations {
   };
   /** Update Tracetest configuration */
   updateConfiguration: {
-    parameters: {
-      path: {
-        /** ID of the configuration resource used on Tracetest. It should be set as 'current'. */
-        configId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1051,65 +757,24 @@ export interface operations {
       };
     };
   };
-  /** List polling profiles used on Tracetest to configure how to fetch traces in a test. */
-  listPollingProfiles: {
-    parameters: {
-      query: {
-        /** Indicates the maximum number of polling profiles that can be returned on this call. */
-        take?: number;
-        /** Indicates how many polling profiles will be skipped when paginating. */
-        skip?: number;
-        /** Indicates the sort field for on which all polling profiles will be sorted. */
-        sortBy?: "id" | "name" | "strategy";
-        /** Indicates the sort direction for the polling profiles (ascending or descending). */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+  /** List Polling Profile configuration */
+  listPollingProfile: {
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": {
-            count?: number;
-            items?: external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
-          };
-          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfileList"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfileList"];
         };
       };
-      /** invalid query for polling profiles, some data was sent in incorrect format. */
-      400: unknown;
-      /** problem listing polling profile */
+      /** problem getting the polling profile list */
       500: unknown;
-    };
-  };
-  /** Create a polling profile used on Tracetest to configure how to fetch traces in a test. */
-  createPollingProfile: {
-    responses: {
-      /** successful operation */
-      201: {
-        content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-        };
-      };
-      /** problem creating a polling profile */
-      500: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-        "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
-      };
     };
   };
   /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
   getPollingProfile: {
-    parameters: {
-      path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
-        pollingProfileId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1126,12 +791,7 @@ export interface operations {
   };
   /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
   updatePollingProfile: {
-    parameters: {
-      path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
-        pollingProfileId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1154,45 +814,18 @@ export interface operations {
       };
     };
   };
-  /** Delete a polling profile used on Tracetest to configure how to fetch traces in a test. */
-  deletePollingProfile: {
-    parameters: {
-      path: {
-        /** ID of a polling profile used on Tracetest to configure how to fetch traces in a test. */
-        pollingProfileId: string;
-      };
-    };
-    responses: {
-      /** successful operation */
-      204: never;
-      /** invalid polling profile, some data was sent in incorrect format. */
-      400: unknown;
-      /** polling profile not found */
-      404: unknown;
-      /** problem deleting a polling profile */
-      500: unknown;
-    };
-  };
   /** List demonstrations used on Tracetest as quick start examples. */
   listDemos: {
-    parameters: {
-      query: {
-        /** Indicates the maximum number of demos that can be returned on this call. */
-        take?: number;
-        /** Indicates how many demos will be skipped when paginating. */
-        skip?: number;
-        /** Indicates the sort field for on which all demos will be sorted. */
-        sortBy?: "type" | "enabled";
-        /** Indicates the sort direction for the demos (ascending or descending). */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["config.yaml"]["components"]["schemas"]["Demo"][];
-          "text/yaml": external["config.yaml"]["components"]["schemas"]["Demo"][];
+          "application/json": external["config.yaml"]["components"]["schemas"]["DemoList"];
+          "text/yaml": {
+            count?: number;
+            items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
+          };
         };
       };
       /** invalid query for demos, some data was sent in incorrect format. */
@@ -1223,12 +856,7 @@ export interface operations {
   };
   /** Get a demonstration used on Tracetest as quick start examples. */
   getDemo: {
-    parameters: {
-      path: {
-        /** ID of a demonstration used on Tracetest as quick start examples. */
-        demoId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1245,12 +873,7 @@ export interface operations {
   };
   /** Update a demonstration used on Tracetest as quick start examples. */
   updateDemo: {
-    parameters: {
-      path: {
-        /** ID of a demonstration used on Tracetest as quick start examples. */
-        demoId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1275,12 +898,7 @@ export interface operations {
   };
   /** Delete a demonstration used on Tracetest as quick start examples. */
   deleteDemo: {
-    parameters: {
-      path: {
-        /** ID of a demonstration used on Tracetest as quick start examples. */
-        demoId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
@@ -1292,83 +910,45 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Get all Data Stores */
-  getDataStores: {
-    parameters: {
-      query: {
-        /** indicates how many data stores can be returned by each page */
-        take?: number;
-        /** indicates how many data stores will be skipped when paginating */
-        skip?: number;
-        /** query to search data stores, based on data store name */
-        query?: string;
-        /** indicates the sort field for the data stores */
-        sortBy?: "created" | "name";
-        /** indicates the sort direction for the data stores */
-        sortDirection?: "asc" | "desc";
-      };
-    };
+  /** List Data Store */
+  listDataStore: {
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
-        headers: {
-          /** Total records count */
-          "X-Total-Count"?: number;
-        };
         content: {
-          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"][];
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStoreList"];
+          "text/yaml": external["dataStores.yaml"]["components"]["schemas"]["DataStoreList"];
         };
       };
-      /** problem with getting data stores */
+      /** problem getting the data store list */
       500: unknown;
-    };
-  };
-  /** Create a new Data Store */
-  createDataStore: {
-    responses: {
-      /** successful operation */
-      200: {
-        content: {
-          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
-        };
-      };
-      /** trying to create a data store with an already existing ID */
-      400: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
-      };
     };
   };
   /** Get a Data Store */
   getDataStore: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+          "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStoreResource"];
         };
       };
+      /** data store not found */
+      404: unknown;
       /** problem with getting a data store */
       500: unknown;
     };
   };
   /** Update a Data Store */
   updateDataStore: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** successful operation */
       204: never;
+      /** invalid data store, some data was sent in incorrect format. */
+      400: unknown;
       /** problem with updating data store */
       500: unknown;
     };
@@ -1380,30 +960,212 @@ export interface operations {
   };
   /** Delete a Data Store */
   deleteDataStore: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       204: never;
     };
   };
-  /** Get the data store as an YAML file */
-  getDataStoreDefinitionFile: {
-    parameters: {
-      path: {
-        dataStoreId: string;
-      };
-    };
+  /** List environments available in Tracetest. */
+  listEnvironments: {
+    parameters: {};
     responses: {
-      /** OK */
+      /** successful operation */
       200: {
         content: {
-          "application/yaml": string;
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResourceList"];
+          "text/yaml": {
+            count?: number;
+            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          };
         };
       };
+      /** invalid query for environments, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing environments */
+      500: unknown;
+    };
+  };
+  /** Create an environment that can be used by tests and transactions */
+  createEnvironment: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** problem creating an environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+      };
+    };
+  };
+  /** Get one environment by its id */
+  getEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** environment not found */
+      404: unknown;
+      /** problem getting an environment */
+      500: unknown;
+    };
+  };
+  /** Update an environment used on Tracetest */
+  updateEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        };
+      };
+      /** invalid environment, some data was sent in incorrect format. */
+      400: unknown;
+      /** environment not found */
+      404: unknown;
+      /** problem updating an environment */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+      };
+    };
+  };
+  /** Delete an environment from Tracetest */
+  deleteEnvironment: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid environment, some data was sent in incorrect format. */
+      400: unknown;
+      /** environment not found */
+      404: unknown;
+      /** problem deleting an environment */
+      500: unknown;
+    };
+  };
+  /** Get the version of the API */
+  getVersion: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["version.yaml"]["components"]["schemas"]["Version"];
+        };
+      };
+      /** problem getting the version of the API */
+      500: unknown;
+    };
+  };
+  /** List Linters available in Tracetest. */
+  listLinters: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResourceList"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResourceList"];
+        };
+      };
+      /** invalid query for Linters, some data was sent in incorrect format. */
+      400: unknown;
+      /** problem listing Linters */
+      500: unknown;
+    };
+  };
+  /** Create an Linter that can be used by tests and Linters */
+  createLinter: {
+    responses: {
+      /** successful operation */
+      201: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        };
+      };
+      /** problem creating an Linter */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+      };
+    };
+  };
+  /** Get one Linter by its id */
+  getLinter: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        };
+      };
+      /** Linter not found */
+      404: unknown;
+      /** problem getting a Linter */
+      500: unknown;
+    };
+  };
+  /** Update a Linter used on Tracetest */
+  updateLinter: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+          "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        };
+      };
+      /** invalid Linter, some data was sent in incorrect format. */
+      400: unknown;
+      /** Linter not found */
+      404: unknown;
+      /** problem updating an Linter */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+        "text/yaml": external["linters.yaml"]["components"]["schemas"]["LinterResource"];
+      };
+    };
+  };
+  /** Delete an Linter from Tracetest */
+  deleteLinter: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid Linter, some data was sent in incorrect format. */
+      400: unknown;
+      /** Linter not found */
+      404: unknown;
+      /** problem deleting an Linter */
+      500: unknown;
     };
   };
 }
@@ -1430,6 +1192,10 @@ export interface external {
           message?: string;
           error?: string;
         };
+        ConfigurationResourceList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["ConfigurationResource"][];
+        };
         /** @description Represents a configuration structured into the Resources format. */
         ConfigurationResource: {
           /**
@@ -1452,6 +1218,10 @@ export interface external {
             /** @description Flag telling if a user allow Tracetest to send analytics about its usage. */
             analyticsEnabled: boolean;
           };
+        };
+        PollingProfileList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["PollingProfile"][];
         };
         /** @description Represents a polling profile structured into the Resources format. */
         PollingProfile: {
@@ -1523,6 +1293,10 @@ export interface external {
             opentelemetryStore?: external["config.yaml"]["components"]["schemas"]["DemoOpenTelemetryStore"];
           };
         };
+        DemoList: {
+          count?: number;
+          items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
+        };
       };
     };
     operations: {};
@@ -1531,17 +1305,31 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        DataStoreList: {
+          count?: number;
+          items?: external["dataStores.yaml"]["components"]["schemas"]["DataStoreResource"][];
+        };
+        /** @description Represents a data store structured into the Resources format. */
+        DataStoreResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'DataStore'.
+           * @enum {string}
+           */
+          type?: "DataStore";
+          spec?: external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
+        };
         DataStore: {
           id?: string;
           name: string;
           type: external["dataStores.yaml"]["components"]["schemas"]["SupportedDataStores"];
-          isDefault?: boolean;
+          default?: boolean;
           jaeger?: external["dataStores.yaml"]["components"]["schemas"]["GRPCClientSettings"];
           tempo?: external["dataStores.yaml"]["components"]["schemas"]["BaseClient"];
-          openSearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
-          elasticApm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
-          signalFx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
+          opensearch?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
+          elasticapm?: external["dataStores.yaml"]["components"]["schemas"]["ElasticSearch"];
+          signalfx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
           awsxray?: external["dataStores.yaml"]["components"]["schemas"]["AwsXRay"];
+          azureappinsights?: external["dataStores.yaml"]["components"]["schemas"]["AzureAppInsights"];
           /** Format: date-time */
           createdAt?: string;
         };
@@ -1561,6 +1349,12 @@ export interface external {
         SignalFX: {
           realm?: string;
           token?: string;
+        };
+        AzureAppInsights: {
+          useAzureActiveDirectoryAuth?: boolean;
+          accessToken?: string;
+          connectionType?: external["dataStores.yaml"]["components"]["schemas"]["SupportedConnectionTypes"];
+          resourceArmId?: string;
         };
         AwsXRay: {
           region?: string;
@@ -1610,17 +1404,21 @@ export interface external {
         /** @enum {string} */
         SupportedDataStores:
           | "jaeger"
-          | "openSearch"
+          | "opensearch"
           | "tempo"
-          | "signalFx"
+          | "signalfx"
           | "otlp"
-          | "elasticApm"
-          | "newRelic"
+          | "elasticapm"
+          | "newrelic"
           | "lightstep"
           | "datadog"
-          | "awsxray";
+          | "awsxray"
+          | "honeycomb"
+          | "azureappinsights";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
+        /** @enum {string} */
+        SupportedConnectionTypes: "direct" | "collector";
       };
     };
     operations: {};
@@ -1657,6 +1455,19 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        EnvironmentResourceList: {
+          count?: number;
+          items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+        };
+        /** @description Represents an environment structured into the Resources format. */
+        EnvironmentResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Environment'.
+           * @enum {string}
+           */
+          type?: "Environment";
+          spec?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
         Environment: {
           id?: string;
           name?: string;
@@ -1711,7 +1522,7 @@ export interface external {
           request?: string;
         };
         GRPCResponse: {
-          statusCode?: number;
+          statusCode: number;
           metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
           body?: string;
         };
@@ -1749,6 +1560,7 @@ export interface external {
           headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
           body?: string;
           auth?: external["http.yaml"]["components"]["schemas"]["HTTPAuth"];
+          sslVerification?: boolean;
         };
         HTTPResponse: {
           status?: string;
@@ -1773,6 +1585,125 @@ export interface external {
             token?: string;
           };
         };
+      };
+    };
+    operations: {};
+  };
+  "linters.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        LinterResourceList: {
+          items?: external["linters.yaml"]["components"]["schemas"]["LinterResource"][];
+        };
+        LinterResource: {
+          /** @enum {string} */
+          type?: "Linter";
+          spec?: {
+            id?: string;
+            name?: string;
+            enabled?: boolean;
+            minimumScore?: number;
+            plugins?: external["linters.yaml"]["components"]["schemas"]["LinterResourcePlugin"][];
+          };
+        };
+        LinterResourcePlugin: {
+          id?: string;
+          name?: string;
+          description?: string;
+          enabled?: boolean;
+          rules?: external["linters.yaml"]["components"]["schemas"]["LinterResourceRule"][];
+        };
+        LinterResourceRule: {
+          id?: string;
+          weight?: number;
+          name?: string;
+          description?: string;
+          errorDescription?: string;
+          tips?: string[];
+          /** @enum {string} */
+          errorLevel?: "error" | "warning" | "disabled";
+        };
+        LinterResult: {
+          minimumScore?: number;
+          passed?: boolean;
+          score?: number;
+          plugins?: external["linters.yaml"]["components"]["schemas"]["LinterResultPlugin"][];
+        };
+        LinterResultPlugin: {
+          name?: string;
+          description?: string;
+          passed?: boolean;
+          score?: number;
+          rules?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRule"][];
+        };
+        LinterResultPluginRule: {
+          id?: string;
+          name?: string;
+          description?: string;
+          errorDescription?: string;
+          passed?: boolean;
+          weight?: number;
+          tips?: string[];
+          results?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResult"][];
+          /** @enum {string} */
+          level?: "error" | "warning" | "disabled";
+        };
+        LinterResultPluginRuleResult: {
+          spanId?: string;
+          errors?: external["linters.yaml"]["components"]["schemas"]["LinterResultPluginRuleResultError"][];
+          passed?: boolean;
+          /** @enum {string} */
+          severity?: "error" | "warning";
+        };
+        LinterResultPluginRuleResultError: {
+          value?: string;
+          expected?: string;
+          description?: string;
+          suggestions?: string[];
+        };
+      };
+    };
+    operations: {};
+  };
+  "parameters.yaml": {
+    paths: {};
+    components: {
+      parameters: {
+        /** @description id of the test */
+        testId: string;
+        /** @description id of the run */
+        runId: number;
+        /** @description version of the test */
+        version: number;
+        /** @description id of the transaction */
+        transactionId: string;
+        /** @description indicates how many resources can be returned by each page */
+        take: number;
+        /** @description indicates how many resources will be skipped when paginating */
+        skip: number;
+        /** @description query to search resources */
+        query: string;
+        /** @description indicates the sort field for the resources */
+        runnableResourceSortBy: "created" | "name" | "last_run";
+        /** @description indicates the sort field for the resources */
+        sortBy: "created" | "name";
+        /** @description indicates the sort field for the resources */
+        switchableResourceSortBy: "type" | "enabled";
+        /** @description indicates the sort direction for the resources */
+        sortDirection: "asc" | "desc";
+        /** @description ID of the configuration resource used on Tracetest. It should be set as 'current' */
+        configId: string;
+        /** @description ID of a demonstration used on Tracetest as quick start examples */
+        demoId: string;
+        /** @description ID of a polling profile used on Tracetest to configure how to fetch traces in a test. It should be set as 'current' */
+        pollingProfileId: string;
+        /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
+        dataStoreId: string;
+        /** @description ID of an environment used on Tracetest to inject values into tests and transactions */
+        environmentId: string;
+        /** @description ID of an Linter */
+        LinterId: string;
       };
     };
     operations: {};
@@ -1810,7 +1741,6 @@ export interface external {
         PollingInfo: {
           /** @enum {string} */
           type?: "periodic";
-          reasonNextIteration?: string;
           isComplete?: boolean;
           periodic?: {
             numberSpans?: number;
@@ -1831,6 +1761,19 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TestResourceList: {
+          count?: number;
+          items?: external["tests.yaml"]["components"]["schemas"]["TestResource"][];
+        };
+        /** @description Represents a test structured into the Resources format. */
+        TestResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Test'.
+           * @enum {string}
+           */
+          type?: "Test";
+          spec?: external["tests.yaml"]["components"]["schemas"]["Test"];
+        };
         Test: {
           id?: string;
           name?: string;
@@ -1839,9 +1782,9 @@ export interface external {
           version?: number;
           /** Format: date-time */
           createdAt?: string;
-          serviceUnderTest?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
+          trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description specification of assertions that are going to be made */
-          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpecs"];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
            * @description define test outputs, in a key/value format. The value is processed as an expression
            * @example [object Object],[object Object]
@@ -1852,7 +1795,8 @@ export interface external {
         };
         TestOutput: {
           name?: string;
-          selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           value?: string;
         };
         TestSummary: {
@@ -1862,15 +1806,18 @@ export interface external {
             time?: string | null;
             passes?: number;
             fails?: number;
+            analyzerScore?: number;
           };
         };
         /** @example [object Object] */
         TestSpecs: {
-          specs?: {
-            name?: string | null;
-            selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
-            assertions?: string[];
-          }[];
+          specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
+        };
+        TestSpec: {
+          name?: string;
+          selector?: string;
+          selectorParsed?: external["tests.yaml"]["components"]["schemas"]["Selector"];
+          assertions?: string[];
         };
         TestRun: {
           id?: string;
@@ -1887,8 +1834,13 @@ export interface external {
             | "EXECUTING"
             | "AWAITING_TRACE"
             | "AWAITING_TEST_RESULTS"
+            | "ANALYZING_TRACE"
+            | "ANALYZING_ERROR"
             | "FINISHED"
-            | "FAILED";
+            | "STOPPED"
+            | "TRIGGER_FAILED"
+            | "TRACE_FAILED"
+            | "ASSERTION_FAILED";
           /** @description Details of the cause for the last `FAILED` state */
           lastErrorState?: string;
           /** @description time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
@@ -1909,10 +1861,12 @@ export interface external {
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
+          linter?: external["linters.yaml"]["components"]["schemas"]["LinterResult"];
           outputs?: {
             name?: string;
             spanId?: string;
             value?: string;
+            error?: string;
           }[];
           metadata?: { [key: string]: string };
           transactionId?: string;
@@ -1993,6 +1947,7 @@ export interface external {
           id?: string;
           parentId?: string;
           name?: string;
+          kind?: string;
           /**
            * Format: int64
            * @description span start time in unix milli format
@@ -2034,13 +1989,29 @@ export interface external {
     paths: {};
     components: {
       schemas: {
+        TransactionResourceList: {
+          count?: number;
+          items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+        };
+        /** @description Represents a transaction structured into the Resources format. */
+        TransactionResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Transaction'.
+           * @enum {string}
+           */
+          type?: "Transaction";
+          spec?: external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+        };
         Transaction: {
           id?: string;
           name?: string;
           description?: string;
           /** @description version number of the test */
           version?: number;
-          steps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          /** @description list of steps of the transaction containing just each test id */
+          steps?: string[];
+          /** @description list of steps of the transaction containing the whole test object */
+          fullSteps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
           /** Format: date-time */
           createdAt?: string;
           /** @description summary of transaction */
@@ -2071,16 +2042,14 @@ export interface external {
       schemas: {
         Trigger: {
           /** @enum {string} */
-          triggerType?: "http" | "grpc" | "traceid";
-          triggerSettings?: {
-            http?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
-            grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
-            traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
-          };
+          type?: "http" | "grpc" | "traceid";
+          httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
+          grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
+          traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
-          triggerType?: "http" | "grpc" | "traceid";
+          type?: "http" | "grpc" | "traceid";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
@@ -2105,6 +2074,18 @@ export interface external {
         Variable: {
           key?: string;
           defaultValue?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "version.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Version: {
+          /** @example 1.0.0 */
+          version?: string;
         };
       };
     };

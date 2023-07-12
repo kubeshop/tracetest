@@ -36,6 +36,14 @@ export const ContainerHeader = styled.div`
       display: none;
     }
 
+    .ant-tabs-nav-wrap {
+      overflow: visible;
+    }
+
+    .ant-tabs-nav-more {
+      display: none;
+    }
+
     ::before {
       display: none;
     }
@@ -86,14 +94,17 @@ export const Section = styled.div<{$justifyContent: string}>`
   display: flex;
   gap: 14px;
   justify-content: ${({$justifyContent}) => $justifyContent};
-  width: calc((100vw / 2) - 150px);
+  width: calc((100vw / 2) - 200px);
 `;
 
 export const StateContainer = styled.div`
   align-items: center;
   display: flex;
   justify-self: flex-end;
-  cursor: pointer;
+`;
+
+export const StopContainer = styled.div`
+  margin-left: 12px;
 `;
 
 export const StateText = styled(Typography.Text)`
@@ -115,7 +126,7 @@ export const Text = styled(Typography.Text).attrs({
 export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
   && {
     margin: 0;
-    max-width: calc((100vw / 2) - 150px - 54px);
+    max-width: calc((100vw / 2) - 200px - 54px);
   }
 `;
 

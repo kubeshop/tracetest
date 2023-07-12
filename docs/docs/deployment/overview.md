@@ -1,6 +1,6 @@
-# Deployment Overview
+# Deployment
 
-This section contains a general overview of deploying a Tracetest in production. You can find platform-specific guides for:
+This section contains a general overview of deploying Tracetest in production. You can find platform-specific guides for:
 
 - [Docker](./docker)
 - [Kubernetes](./kubernetes)

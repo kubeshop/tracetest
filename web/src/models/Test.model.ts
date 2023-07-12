@@ -4,6 +4,8 @@ import TestSpecs from './TestSpecs.model';
 import Summary from './Summary.model';
 import Trigger from './Trigger.model';
 
+export type TRawTestResource = TTestSchemas['TestResource'];
+export type TRawTestResourceList = TTestSchemas['TestResourceList'];
 export type TRawTest = TTestSchemas['Test'];
 type Test = Model<
   TRawTest,
@@ -18,26 +20,30 @@ type Test = Model<
   }
 >;
 
-const Test = ({
+const Test = ({spec: rawTest = {}}: TRawTestResource): Test => Test.FromRawTest(rawTest);
+
+Test.FromRawTest = ({
   id = '',
   name = '',
   description = '',
-  specs,
+  specs = [],
   version = 1,
-  serviceUnderTest: rawTrigger,
+  trigger: rawTrigger,
   summary = {},
   outputs = [],
   createdAt = '',
-}: TRawTest): Test => ({
-  id,
-  name,
-  version,
-  description,
-  createdAt,
-  definition: TestSpecs(specs || {}),
-  trigger: Trigger(rawTrigger || {}),
-  summary: Summary(summary),
-  outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
-});
+}: TRawTest): Test => {
+  return {
+    id,
+    name,
+    version,
+    description,
+    createdAt,
+    definition: TestSpecs({specs}),
+    trigger: Trigger(rawTrigger || {}),
+    summary: Summary(summary),
+    outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
+  };
+};
 
 export default Test;

@@ -15,7 +15,7 @@ This is a simple test to check if Tracetest is working correctly given it was pr
 The steps that we should follow are:
 
 - [ ] Open WebUI and go to `/settings` page. The provisioned Data Store should be selected.
-- [ ] Run `tracetest datastore export -d {provisioned_datastore}` and check if the data was exported correctly.
+- [ ] Run `tracetest export datastore --id current` and check if the data was exported correctly.
 - [ ] Create a test on WebUI that calls a demo API (like [Pokeshop](https://docs.tracetest.io/live-examples/pokeshop/overview) or [Open Telemetry Store](https://docs.tracetest.io/live-examples/opentelemetry-store/overview)). This test should fetch traces correctly and run without errors.
 
 ### Checklist on version release
@@ -25,28 +25,33 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
 - [ ] Check if our release pipeline on [Release Tracetest](https://github.com/kubeshop/tracetest/actions/workflows/release-version.yml) workflow on Github Actions worked correctly.
 - [ ] Double check [Detailed installation](https://docs.tracetest.io/getting-started/detailed-installation) doc and see if everything is documented correctly
 
-
 ### Tests to validate RC
 
 - Test server installation via CLI
+
   - [ ] Docker Compose and no demo API
   - [ ] Docker Compose and demo API
   - [ ] Kubernetes and no demo API
   - [ ] Kubernetes and demo API
 
 - Test Tracetest examples
+
   - [ ] [Amazon X-Ray example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray)
   - [ ] [Datadog example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-datadog)
   - [ ] [Elastic APM example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm)
   - [ ] [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
   - [ ] [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)
   - [ ] [SignalFX example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signalfx)
+  - [ ] [Tempo Cloud example](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-grafana-cloud-tempo-nodejs)
 
 - Test specific features added/changed on this release:
+
   - [ ] Add features here
-  
+
   ### Tests to validate final release
+
 - Test CLI updates
+
   - [ ] MacOS via homebrew
   - [ ] MacOS via curl script
   - [ ] Windows via chocolatey
@@ -54,7 +59,6 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
 
 - Test specific features added/changed on this release:
   - [ ] Add features here
-  
 
 ## Automatic Tests
 
@@ -63,7 +67,7 @@ Today Tracetest has 3 main components: a WebUI, a CLI and a Server.
 ### Web UI
 
 - **Unit tests**: Run by executing `npm test` on `./web` folder
-- **End-to-end tests**: Run using [cypress](https://www.cypress.io/) against a temporary Tracetest created on Kubernetes. 
+- **End-to-end tests**: Run using [cypress](https://www.cypress.io/) against a temporary Tracetest created on Kubernetes.
 
 ### CLI
 

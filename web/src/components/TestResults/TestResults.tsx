@@ -36,22 +36,27 @@ const TestResults = ({onDelete, onEdit, onRevert}: IProps) => {
 
   return (
     <S.Container>
-      <Header selectedSpan={selectedSpan!} totalFailedSpecs={totalFailedSpecs} totalPassedSpecs={totalPassedSpecs} />
-
-      {(isLoading || !assertionResults) && (
+      {isLoading && (
         <S.LoadingContainer>
           <LoadingSpinner />
         </S.LoadingContainer>
       )}
 
-      {!isLoading && Boolean(assertionResults) && (
-        <TestSpecs
-          assertionResults={assertionResults!}
-          onDelete={onDelete}
-          onEdit={onEdit}
-          onOpen={handleOpen}
-          onRevert={onRevert}
-        />
+      {!isLoading && (
+        <>
+          <Header
+            selectedSpan={selectedSpan!}
+            totalFailedSpecs={totalFailedSpecs}
+            totalPassedSpecs={totalPassedSpecs}
+          />
+          <TestSpecs
+            assertionResults={assertionResults}
+            onDelete={onDelete}
+            onEdit={onEdit}
+            onOpen={handleOpen}
+            onRevert={onRevert}
+          />
+        </>
       )}
     </S.Container>
   );

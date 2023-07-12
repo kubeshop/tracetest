@@ -31,3 +31,7 @@ export const EmptyText = styled(Typography.Text)`
 `;
 
 export const EmptyTitle = styled(Typography.Title).attrs({level: 3})``;
+
+export const SnippetsContainer = styled.div`
+  margin: 16px 0;
+`;

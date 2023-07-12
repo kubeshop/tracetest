@@ -42,6 +42,7 @@ type TestRun struct {
 	TriggerResult             *TriggerResult        `json:"triggerResult,omitempty"`
 	Trace                     *Trace                `json:"trace,omitempty"`
 	Result                    *AssertionResults     `json:"result,omitempty"`
+	Linter                    *LinterResult         `json:"linter,omitempty"`
 	Outputs                   []TestRunOutputsInner `json:"outputs,omitempty"`
 	Metadata                  *map[string]string    `json:"metadata,omitempty"`
 	TransactionId             *string               `json:"transactionId,omitempty"`
@@ -609,6 +610,38 @@ func (o *TestRun) SetResult(v AssertionResults) {
 	o.Result = &v
 }
 
+// GetLinter returns the Linter field value if set, zero value otherwise.
+func (o *TestRun) GetLinter() LinterResult {
+	if o == nil || isNil(o.Linter) {
+		var ret LinterResult
+		return ret
+	}
+	return *o.Linter
+}
+
+// GetLinterOk returns a tuple with the Linter field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetLinterOk() (*LinterResult, bool) {
+	if o == nil || isNil(o.Linter) {
+		return nil, false
+	}
+	return o.Linter, true
+}
+
+// HasLinter returns a boolean if a field has been set.
+func (o *TestRun) HasLinter() bool {
+	if o != nil && !isNil(o.Linter) {
+		return true
+	}
+
+	return false
+}
+
+// SetLinter gets a reference to the given LinterResult and assigns it to the Linter field.
+func (o *TestRun) SetLinter(v LinterResult) {
+	o.Linter = &v
+}
+
 // GetOutputs returns the Outputs field value if set, zero value otherwise.
 func (o *TestRun) GetOutputs() []TestRunOutputsInner {
 	if o == nil || isNil(o.Outputs) {
@@ -791,6 +824,9 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Result) {
 		toSerialize["result"] = o.Result
+	}
+	if !isNil(o.Linter) {
+		toSerialize["linter"] = o.Linter
 	}
 	if !isNil(o.Outputs) {
 		toSerialize["outputs"] = o.Outputs

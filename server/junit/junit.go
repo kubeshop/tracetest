@@ -6,10 +6,10 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
 )
 
-func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
+func FromRunResult(t test.Test, run test.Run) ([]byte, error) {
 
 	assertions := []assertion{}
 
@@ -18,7 +18,7 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 	if run.Results == nil {
 		return nil, fmt.Errorf("run has no results")
 	}
-	run.Results.Results.ForEach(func(selector model.SpanQuery, results []model.AssertionResult) error {
+	run.Results.Results.ForEach(func(selector test.SpanQuery, results []test.AssertionResult) error {
 		checks := []check{}
 		var total, fails, errs int
 		for _, res := range results {
@@ -63,7 +63,7 @@ func FromRunResult(test model.Test, run model.Run) ([]byte, error) {
 	})
 
 	r := report{
-		TestName:   test.Name,
+		TestName:   t.Name,
 		Time:       run.ExecutionTime(),
 		Total:      testTotals,
 		Failures:   testFails,

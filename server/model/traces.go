@@ -6,6 +6,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/timing"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -23,18 +26,22 @@ func NewTrace(traceID string, spans []Span) Trace {
 		spanMap[spanID] = &spanCopy
 	}
 
-	var rootSpan *Span = nil
+	rootSpans := make([]*Span, 0)
 	for _, span := range spanMap {
-		parentID := span.Attributes["parent_id"]
+		span.injectEventsIntoAttributes()
+
+		parentID := span.Attributes[TracetestMetadataFieldParentID]
 		parentSpan, found := spanMap[parentID]
 		if !found {
-			rootSpan = span
+			rootSpans = append(rootSpans, span)
 			continue
 		}
 
 		parentSpan.Children = append(parentSpan.Children, span)
 		span.Parent = parentSpan
 	}
+
+	rootSpan := getRootSpan(rootSpans)
 
 	id, _ := trace.TraceIDFromHex(traceID)
 	trace := Trace{
@@ -45,6 +52,39 @@ func NewTrace(traceID string, spans []Span) Trace {
 	trace = trace.Sort()
 
 	return trace
+}
+
+func getRootSpan(allRoots []*Span) *Span {
+	if len(allRoots) == 1 {
+		return allRoots[0]
+	}
+
+	var root *Span
+	for _, span := range allRoots {
+		if span.Name == TriggerSpanName || span.Name == TemporaryRootSpanName {
+			// This span should be promoted because it's either a temporary root or the definitive root
+			if root != nil && root.Name == TriggerSpanName {
+				// We cannot override the root because we already have the definitive root, otherwise,
+				// we will replace the definitive root with the temporary root.
+				continue
+			}
+
+			root = span
+		}
+	}
+
+	if root == nil {
+		root = &Span{ID: id.NewRandGenerator().SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: []*Span{}}
+	}
+
+	for _, span := range allRoots {
+		if root != span {
+			root.Children = append(root.Children, span)
+			span.Parent = root
+		}
+	}
+
+	return root
 }
 
 func spanType(attrs Attributes) string {
@@ -70,8 +110,8 @@ func spanType(attrs Attributes) string {
 }
 
 func spanDuration(span Span) string {
-	timeDifference := span.EndTime.Sub(span.StartTime)
-	return fmt.Sprintf("%d", int64(timeDifference))
+	timeDifference := timing.TimeDiff(span.StartTime, span.EndTime)
+	return fmt.Sprintf("%d", timing.DurationInNanoseconds(timeDifference))
 }
 
 func (t *Trace) Sort() Trace {
@@ -89,6 +129,7 @@ func (t *Trace) Sort() Trace {
 }
 
 const TriggerSpanName = "Tracetest trigger"
+const TemporaryRootSpanName = "Temporary Tracetest root span"
 
 func (t *Trace) HasRootSpan() bool {
 	return t.RootSpan.Name == TriggerSpanName
@@ -110,11 +151,20 @@ func (t *Trace) InsertRootSpan(newRoot Span) *Trace {
 }
 
 func replaceRoot(oldRoot, newRoot Span) Span {
+	if oldRoot.Name == TemporaryRootSpanName {
+		// Replace the temporary root with the actual root
+		newRoot.Children = oldRoot.Children
+		for _, span := range oldRoot.Children {
+			span.Parent = &newRoot
+		}
+		return newRoot
+	}
+
 	if oldRoot.Attributes == nil {
 		oldRoot.Attributes = make(Attributes)
 	}
 	oldRoot.Parent = &newRoot
-	oldRoot.Attributes["parent_id"] = newRoot.ID.String()
+	oldRoot.Attributes[TracetestMetadataFieldParentID] = newRoot.ID.String()
 
 	newRoot.Children = append(newRoot.Children, &oldRoot)
 
@@ -192,4 +242,10 @@ func flattenSpans(res map[trace.SpanID]*Span, root Span) {
 
 	// Remove children and parent because they are now part of the flatten structure
 	rootPtr.Children = nil
+}
+
+func AugmentRootSpan(span Span, result trigger.TriggerResult) Span {
+	return span.
+		setMetadataAttributes().
+		setTriggerResultAttributes(result)
 }

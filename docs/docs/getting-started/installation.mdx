@@ -1,4 +1,4 @@
-# Quick Start
+# Installing Tracetest
 
 <!-- Docusaurus imports start -->
 
@@ -11,15 +11,35 @@ import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
 This page showcases getting started with Tracetest by using the Tracetest CLI, Docker, or Kubernetes.
 
-:::note
-You need to add [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) to your code and configure sending traces to a trace data store, or Tracetest directly, to benefit for Tracetest's trace-based testing.
+This simple installation includes a demo app called [Pokeshop](../live-examples/pokeshop/overview.md) that will be installed alongside Tracetest. It shows how to configure OpenTelemetry and Tracetest and the architecture of the Pokeshop sample app.
+
+:::note Prerequisites
+Tracetest requires that you have [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) added in your code, and configured [sending traces to a trace data store](../configuration/connecting-to-data-stores/jaeger.md), or [Tracetest directly](../configuration/connecting-to-data-stores/opentelemetry-collector.md).
+:::
+
+:::tip Don't have OpenTelemetry installed?
+[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./no-otel.mdx)
 :::
 
 ## Install the Tracetest CLI
 
 <GtagInstallCliTabs></GtagInstallCliTabs>
 
-## Install the Tracetest server
+:::tip Want more info?
+Read the CLI installation reference [here](./detailed-installation).
+:::
+
+## Install the Tracetest Server
+
+Tracetest runs as a standalone container. It runs a Server and exposes a Web UI on port `11633`.
+
+You have two options to install Tracetest Server:
+
+- Using the Tracetest CLI to guide your installation in Docker and Kubernetes.
+- Using the official [Helm chart](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
+
+<Tabs groupId="installation">
+  <TabItem value="cli" label="Tracetest CLI" default>
 
 ```bash title="Terminal"
 tracetest server install
@@ -36,14 +56,58 @@ tracetest server install
   Using Kubernetes`}
     </CodeBlock>
 
-:::note
-Follow the prompts and continue with all the default settings.
-This will generate a `./tracetest/` directory that contains a `docker-compose.yaml` and two more config files. One for Tracetest and one for OpenTelemetry collector.
+Choose to install Tracetest with the OpenTelemetry Collector and the [Pokeshop](../live-examples/pokeshop/overview.md) sample app.
 
-To see the output of this command, view [this sample setup](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-jaeger) from our GitHub examples.
-:::
+```text title="Expected output:"
+Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
+  I have a tracing environment already. - Just install Tracetest.
+> Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
+```
 
-Start Docker Compose from the directory where you ran `tracetest server install`.
+Choosing any option, this installer will create a `tracetest` directory in the current directory and add a `docker-compose.yaml` file to it.
+
+- If you choose the first option, the `docker-compose.yaml` will have only Tracetest and its dependencies.
+- **By choosing the second option, a sample app called [Pokeshop](../live-examples/pokeshop/overview.md) will be installed with Tracetest, allowing you to create sample tests right away!**
+
+<details>
+  <summary>
+    <b>Click to view Pokeshop Sample App Architecture</b>
+  </summary>
+
+Here's the Architecture of the Pokeshop Sample App:
+
+- an **API** that serves client requests,
+- a **Worker** who deals with background processes.
+
+The communication between the API and Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to OpenTelemetry Collector and communicate with a Postgres database.
+
+Tracetest triggers tests against the Node.js API.
+
+```mermaid
+flowchart TD
+    A[(Redis)]
+    B[(Postgres)]
+    C(Node.js API)
+    D(RabbitMQ)
+    E(Worker)
+    F(OpenTelemetry Collector)
+    G(Tracetest)
+
+    G --> C
+    F --> G
+    C --> A
+    C --> B
+    C --> D
+    D --> E
+    E --> B
+    C --> F
+    E --> F
+    
+    
+```
+</details>
+
+**Start Docker Compose from the directory where you ran `tracetest server install`.**
 
 <CodeBlock
   language="bash"
@@ -51,15 +115,13 @@ Start Docker Compose from the directory where you ran `tracetest server install`
 >
 {`docker compose -f tracetest/docker-compose.yaml up -d`}
 </CodeBlock>
-<CodeBlock
-  language="bash"
-  title="Condensed expected output from the Tracetest container:"
->
-{`Starting tracetest ...
-...
-2022/11/28 18:24:09 HTTP Server started
-...`}
-</CodeBlock>
+
+This will start the Tracetest Server and expose the Web UI on [`http://localhost:11633`](http://localhost:11633).
+
+:::note
+View deployment instructions for Docker [here](../deployment/docker).
+:::
+
   </TabItem>
   <TabItem value="kubernetes" label="Kubernetes">
     <CodeBlock
@@ -71,40 +133,116 @@ Start Docker Compose from the directory where you ran `tracetest server install`
 > Using Kubernetes`}
     </CodeBlock>
 
+Choose to install Tracetest with the OpenTelemetry Collector and the [Pokeshop](../live-examples/pokeshop/overview.md) sample app.
+
+```text title="Expected output:"
+Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
+  I have a tracing environment already - Just install Tracetest.
+> Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
+```
+
+Choosing any option, this installer will create a `tracetest` namespace in the Kubernetes context you choose and create deployments for Tracetest and its dependencies.
+
+- If you choose the first option, the `tracetest` namespace will only contain Tracetest and its dependencies.
+- **By choosing the second option, a sample app called [Pokeshop](../live-examples/pokeshop/overview.md) will be installed in a `demo` namespace alongside Tracetest, allowing you to create sample tests right away!**
+
+<details>
+  <summary>
+    <b>Click to view Pokeshop Sample App Architecture</b>
+  </summary>
+
+Here's the Architecture of the Pokeshop Sample App:
+
+- an **API** that serves client requests,
+- a **Worker** who deals with background processes.
+
+The communication between the API and Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to OpenTelemetry Collector and communicate with a Postgres database.
+
+Tracetest triggers tests against the Node.js API.
+
+```mermaid
+flowchart TD
+    A[(Redis)]
+    B[(Postgres)]
+    C(Node.js API)
+    D(RabbitMQ)
+    E(Worker)
+    F(OpenTelemetry Collector)
+    G(Tracetest)
+
+    G --> C
+    F --> G
+    C --> A
+    C --> B
+    C --> D
+    D --> E
+    E --> B
+    C --> F
+    E --> F
+    
+    
+```
+</details>
+
+**Access the Tracetest Server by port forwarding to the Tracetest `service`.**
+
+```bash title=Terminal
+export POD_NAME=$(kubectl get pods --namespace demo -l "app.kubernetes.io/name=pokemon-api,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
+export CONTAINER_PORT=$(kubectl get pod --namespace demo $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+kubectl --namespace demo port-forward $POD_NAME 8080:$CONTAINER_PORT
+echo "Open http://127.0.0.1:8080 to view the Pokeshop demo app"
+
+kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633
+echo "Open http://127.0.0.1:11633 to view the Tracetest Web UI"
+```
+
+Access the Tracetest Web UI on [`http://localhost:11633`](http://localhost:11633).
+
 :::note
-Follow the prompts and continue with all the default settings.
-This will deploy all resources to Kubernetes.
-To see exactly what is deployed, view [the deployment instructions](../deployment/kubernetes) in the Deployment section of the docs.
+View deployment instructions for Kubernetes [here](../deployment/kubernetes).
 :::
 
-<CodeBlock
-  language="bash"
-  title="Condensed expected output from the Tracetest CLI:"
->
-{`export POD_NAME=$(kubectl get pods --namespace demo -l "app.kubernetes.io/name=pokemon-api,app.kubernetes.io/instance=demo" -o jsonpath="{.items[0].metadata.name}")
-export CONTAINER_PORT=$(kubectl get pod --namespace demo $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-echo "Visit http://127.0.0.1:8080 to use your application"
-kubectl --namespace demo port-forward $POD_NAME 8080:$CONTAINER_PORT
-kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633`}
-</CodeBlock>
   </TabItem>
 </Tabs>
 
-Open your browser on [`http://localhost:11633`](http://localhost:11633).
+  </TabItem>
+  <TabItem value="helm" label="Helm Chart">
 
-Create a [test](../web-ui/creating-tests.md).
+First, be sure that you have [Helm](https://helm.sh/) installed in your machine.
 
-Need more detailed information about how to install Tracetest? Read the detailed setup on the [CLI installation page](./detailed-installation).
+The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
+
+You can install them locally on your machine with the command:
+
+```bash title=Terminal
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm repo update
+```
+
+After that, you can install Tracetest with `helm install`:
+
+```bash title=Terminal
+helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
+```
+
+Or, generate a manifest file and apply it manually in your Kubernetes cluster:
+
+```bash title=Terminal
+helm template tracetest kubeshop/tracetest > tracetest-kubernetes-manifests.yaml
+kubectl apply -f ./tracetest-kubernetes-manifests.yaml
+```
+
+**Access the Tracetest Server by port forwarding to the Tracetest `service`.**
+
+```bash title=Terminal
+kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633
+```
+
+Access the Tracetest Web UI on [`http://localhost:11633`](http://localhost:11633).
 
 :::note
-View deployment instructions for Docker and Kubernetes in the [Deployment section](../deployment/overview).
+View deployment instructions for Kubernetes [here](../deployment/kubernetes).
 :::
 
-:::info
-Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest container. To run tests against apps running on your local machine, add them to the same network and use service name mapping instead. Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest service, and use `service-name:8080` in the URL field when creating an app.
-
-You can reach services running on your local machine using:
-
-- Linux (docker version < 20.10.0): `172.17.0.1:8080`
-- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
-:::
+  </TabItem>
+</Tabs>

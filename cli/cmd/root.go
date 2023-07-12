@@ -18,7 +18,8 @@ var (
 	outputFormatsString = strings.Join(outputFormats, "|")
 
 	// overrides
-	overrideEndpoint string
+	overrideEndpoint   string
+	cliExitInterceptor func(code int)
 )
 
 var rootCmd = &cobra.Command{
@@ -32,8 +33,21 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		ExitCLI(1)
 	}
+}
+
+func ExitCLI(errorCode int) {
+	if cliExitInterceptor != nil {
+		cliExitInterceptor(errorCode)
+		return
+	}
+
+	os.Exit(errorCode)
+}
+
+func RegisterCLIExitInterceptor(interceptor func(int)) {
+	cliExitInterceptor = interceptor
 }
 
 var (
@@ -59,7 +73,7 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", string(formatters.DefaultOutput), fmt.Sprintf("output format [%s]", outputFormatsString))
+	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
 

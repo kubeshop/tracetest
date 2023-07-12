@@ -6,9 +6,11 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,17 +19,17 @@ import (
 func TestEventEmitter_SuccessfulScenario(t *testing.T) {
 	// Given I have a test run event
 
-	run := model.NewRun()
+	run := test.NewRun()
 
-	test := model.Test{
+	testObj := test.Test{
 		ID: id.ID("some-test"),
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
 		},
 	}
 
 	testRunEvent := model.TestRunEvent{
-		TestID:      test.ID,
+		TestID:      testObj.ID,
 		RunID:       run.ID,
 		Type:        "EVENT_1",
 		Stage:       model.StageTrigger,
@@ -60,17 +62,17 @@ func TestEventEmitter_SuccessfulScenario(t *testing.T) {
 func TestEventEmitter_FailedScenario(t *testing.T) {
 	// Given I have a test run event
 
-	run := model.NewRun()
+	run := test.NewRun()
 
-	test := model.Test{
+	testObj := test.Test{
 		ID: id.ID("some-test"),
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
 		},
 	}
 
 	testRunEvent := model.TestRunEvent{
-		TestID:      test.ID,
+		TestID:      testObj.ID,
 		RunID:       run.ID,
 		Type:        "EVENT_1",
 		Stage:       model.StageTrigger,

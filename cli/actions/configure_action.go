@@ -8,9 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/ui"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,33 +18,26 @@ type ConfigureConfig struct {
 }
 
 type ConfigureConfigSetValues struct {
-	Endpoint         *string
-	AnalyticsEnabled *bool
+	Endpoint string
 }
 
 type configureAction struct {
 	config config.Config
-	logger *zap.Logger
-	client *openapi.APIClient
 }
 
-var _ Action[ConfigureConfig] = &configureAction{}
-
-func NewConfigureAction(config config.Config, logger *zap.Logger, client *openapi.APIClient) configureAction {
+func NewConfigureAction(config config.Config) configureAction {
 	return configureAction{
 		config: config,
-		logger: logger,
-		client: client,
 	}
 }
 
 func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 	ui := ui.DefaultUI
 	existingConfig := a.loadExistingConfig(args)
-	var serverURL string
 
-	if args.SetValues.Endpoint != nil {
-		serverURL = *args.SetValues.Endpoint
+	var serverURL string
+	if args.SetValues.Endpoint != "" {
+		serverURL = args.SetValues.Endpoint
 	} else {
 		serverURL = ui.TextInput("Enter your Tracetest server URL", existingConfig.URL())
 	}
@@ -55,23 +46,14 @@ func (a configureAction) Run(ctx context.Context, args ConfigureConfig) error {
 		return err
 	}
 
-	var analyticsEnabled bool
-
-	if args.SetValues.AnalyticsEnabled != nil {
-		analyticsEnabled = *args.SetValues.AnalyticsEnabled
-	} else {
-		analyticsEnabled = ui.Confirm("Enable analytics?", true)
-	}
-
 	scheme, endpoint, err := config.ParseServerURL(serverURL)
 	if err != nil {
 		return err
 	}
 
 	config := config.Config{
-		Scheme:           scheme,
-		Endpoint:         endpoint,
-		AnalyticsEnabled: analyticsEnabled,
+		Scheme:   scheme,
+		Endpoint: endpoint,
 	}
 
 	err = a.saveConfiguration(ctx, config, args)

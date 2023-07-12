@@ -8,6 +8,8 @@ import (
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 type subscriptionMessage struct {
@@ -58,14 +60,16 @@ func (e subscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte) 
 func (e subscribeCommandExecutor) ResourceUpdatedEvent(resource interface{}) Event {
 	var mapped interface{}
 	switch v := resource.(type) {
-	case model.Run:
+	case test.Run:
 		mapped = e.mappers.Out.Run(&v)
-	case *model.Run:
+	case *test.Run:
 		mapped = e.mappers.Out.Run(v)
-	case model.TransactionRun:
+	case transaction.TransactionRun:
 		mapped = e.mappers.Out.TransactionRun(v)
-	case *model.TransactionRun:
+	case *transaction.TransactionRun:
 		mapped = e.mappers.Out.TransactionRun(*v)
+	case model.TestRunEvent:
+		mapped = e.mappers.Out.TestRunEvent(v)
 	default:
 		fmt.Printf("type %T mapping not supported\n", v)
 		mapped = v

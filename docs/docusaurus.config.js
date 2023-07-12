@@ -112,6 +112,14 @@ const config = {
             from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
+            to: '/deployment/docker',
+            from: ['/deployment/overview/docker' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/deployment/kubernetes',
+            from: ['/deployment/overview/kubernetes' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
             to: '/getting-started/detailed-installation',
             from: ['/getting-started/cli' /*, '/docs/legacyDocFrom2016'*/],
           },
@@ -159,6 +167,14 @@ const config = {
             to: '/tools-and-integrations/testkube',
             from: ['/tools-and-integrations/integrations/testkube' /*, '/docs/legacyDocFrom2016'*/],
           },
+          {
+            to: '/ci-cd-automation/testkube-pipeline',
+            from: ['/examples-tutorials/recipes/running-tracetest-with-testkube' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/analyzer/concepts',
+            from: ['/concepts/tracetest-analyzer-concepts'],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {
@@ -176,36 +192,61 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      docs: {
+        sidebar: {
+          hideable: true,
+          autoCollapseCategories: true,
+        },
+      },  
       colorMode: {
         defaultMode: 'light',
         disableSwitch: false,
         respectPrefersColorScheme: false,
       },
       navbar: {
-        title: 'Tracetest',
+        title: 'Tracetest Docs',
         logo: {
           alt: 'Tracetest Logo',
           src: 'img/logo.svg',
+          href: '/',
+          target: '_self',
         },
         items: [
-          // {
-          //   to: "/quick-start",
-          //   label: "Quick Start",
-          //   position: "left",
-          // },
           {
-            href: "https://discord.gg/6zupCZFQbe",
-            label: "Discord",
+            type: 'docSidebar',
+            position: 'left',
+            sidebarId: 'examplesTutorialsSidebar',
+            label: 'Examples & Tutorials'
+          },
+          {
+            type: 'docSidebar',
+            position: 'left',
+            sidebarId: 'liveExamplesSidebar',
+            label: 'Live Examples'
+          },
+          {
+            href: '/openapi',
+            // Only one of "to" or "href" should be used
+            // href: 'https://www.facebook.com',
+            label: 'Open API',
+            // Only one of "label" or "html" should be used
+            // html: '<b>Introduction</b>'
+            position: 'left',
+            target: '_self',
+          },
+          {
+            href: "https://tracetest.io/community",
+            label: "Community",
             position: "left",
           },
           {
             type: "html",
-            position: "right",
-            value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=large" style='margin-top: 6px' frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>`,
+            position: "left",
+            value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=medium" style='margin-top: 6px' frameborder="0" scrolling="0" width="150" height="20" title="GitHub"></iframe>`,
           },
           {
             type: "search",
-            position: "left",
+            position: "right",
           },
         ],
       },
@@ -232,11 +273,19 @@ const config = {
                 label: "Twitter",
                 href: "https://twitter.com/tracetest_io",
               },
+              {
+                label: "LinkedIn",
+                href: "https://www.linkedin.com/company/87135575",
+              },
             ],
           },
           {
             title: "More",
             items: [
+              {
+                label: "Home",
+                to: "https://tracetest.io",
+              },
               {
                 label: "Blog",
                 to: "https://tracetest.io/blog",

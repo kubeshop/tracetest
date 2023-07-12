@@ -1,13 +1,14 @@
 import countBy from 'lodash/countBy';
 import uniq from 'lodash/uniq';
 
-import {ICheckResult, TStructuredAssertion} from 'types/Assertion.types';
 import {durationRegExp} from 'constants/Common.constants';
-import {Attributes} from 'constants/SpanAttribute.constants';
 import {CompareOperatorSymbolMap, OperatorRegexp} from 'constants/Operator.constants';
+import {Attributes} from 'constants/SpanAttribute.constants';
+import {TestSpecErrors} from 'constants/TestSpecs.constants';
+import AssertionResult, {TRawAssertionResult} from 'models/AssertionResult.model';
+import {ICheckResult, TStructuredAssertion} from 'types/Assertion.types';
 import {TCompareOperatorSymbol} from 'types/Operator.types';
 import {isJson} from 'utils/Common';
-import AssertionResult, {TRawAssertionResult} from 'models/AssertionResult.model';
 
 const isNumeric = (num: string): boolean => /^-?\d+(?:\.\d+)?$/.test(num);
 const isNumericTime = (num: string): boolean => durationRegExp.test(num);
@@ -40,6 +41,16 @@ const AssertionService = () => ({
   getTotalPassedChecks(resultList: AssertionResult[]) {
     const passedResults = resultList.flatMap(({spanResults}) => spanResults.map(({passed}) => passed));
     return countBy(passedResults);
+  },
+
+  isValidError(error: string) {
+    return TestSpecErrors.some(testSpecError => error.includes(testSpecError));
+  },
+
+  hasError(resultList: AssertionResult[]) {
+    return resultList
+      .map(({spanResults}) => spanResults.some(({error}) => !!error && this.isValidError(error)))
+      .some(result => !!result);
   },
 
   getResultsHashedBySpanId(resultList: AssertionResult[]) {

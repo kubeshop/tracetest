@@ -1,0 +1,25 @@
+---
+postgres:
+  host: postgres
+  user: postgres
+  password: postgres
+  port: 5432
+  dbname: postgres
+  params: sslmode=disable
+
+# This section enables sending traces that the Tracetest
+# server generates into Honeycomb for a histogram overview.
+# View docs here: https://docs.tracetest.io/configuration/telemetry
+telemetry:
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+server:
+  telemetry:
+    exporter: collector
+    applicationExporter: collector

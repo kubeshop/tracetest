@@ -10,7 +10,7 @@
 package openapi
 
 type GrpcResponse struct {
-	StatusCode int32 `json:"statusCode,omitempty"`
+	StatusCode int32 `json:"statusCode"`
 
 	Metadata []GrpcHeader `json:"metadata,omitempty"`
 
@@ -19,6 +19,15 @@ type GrpcResponse struct {
 
 // AssertGrpcResponseRequired checks if the required fields are not zero-ed
 func AssertGrpcResponseRequired(obj GrpcResponse) error {
+	elements := map[string]interface{}{
+		"statusCode": obj.StatusCode,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	for _, el := range obj.Metadata {
 		if err := AssertGrpcHeaderRequired(el); err != nil {
 			return err

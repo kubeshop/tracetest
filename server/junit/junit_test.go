@@ -11,22 +11,23 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/junit"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestConversion(t *testing.T) {
-	test := model.Test{
+	sampleTest := test.Test{
 		Name: "Example test",
 	}
 
-	results := model.RunResults{
-		Results: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(
-			model.SpanQuery(`span[tracetest.span.type = "database"]`), []model.AssertionResult{
+	results := test.RunResults{
+		Results: (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).MustAdd(
+			test.SpanQuery(`span[tracetest.span.type = "database"]`), []test.AssertionResult{
 				{
 					Assertion: `attr:db.statement contains "INSERT"`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							ObservedValue: "INSERT into whatever",
 							CompareErr:    nil,
@@ -35,7 +36,7 @@ func TestConversion(t *testing.T) {
 				},
 				{
 					Assertion: `attr:tracetest.span.duration < 500`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							ObservedValue: "notANumber",
 							CompareErr:    errors.New(`cannot parse "notANumber" as integer`),
@@ -44,7 +45,7 @@ func TestConversion(t *testing.T) {
 				},
 				{
 					Assertion: `attr:tracetest.span.type = "http"`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							ObservedValue: "database",
 							CompareErr:    comparator.ErrNoMatch,
@@ -54,7 +55,7 @@ func TestConversion(t *testing.T) {
 			}),
 	}
 
-	run := model.Run{
+	run := test.Run{
 		CreatedAt:   time.Date(2022, 05, 23, 14, 55, 07, 0, time.UTC),
 		CompletedAt: time.Date(2022, 05, 23, 14, 55, 18, 0, time.UTC),
 		Results:     &results,
@@ -63,7 +64,7 @@ func TestConversion(t *testing.T) {
 	expected, err := os.ReadFile("testdata/junit_result.xml")
 	require.NoError(t, err)
 
-	actual, err := junit.FromRunResult(test, run)
+	actual, err := junit.FromRunResult(sampleTest, run)
 	require.NoError(t, err)
 
 	t.Log("File:", string(actual))

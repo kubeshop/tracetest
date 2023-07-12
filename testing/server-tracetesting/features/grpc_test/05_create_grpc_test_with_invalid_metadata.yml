@@ -1,0 +1,54 @@
+type: Test
+spec:
+  id: oCzH6vw4go
+  name: Create gRPC Test with invalid metadata
+  description: Test step of 'gRPC Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/tests
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+          "type": "Test",
+          "spec": {
+            "name": "gRPC pokemon list",
+            "trigger": {
+              "type": "grpc",
+              "grpc": {
+                "protobufFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_outer_classname = \"PokeshopProto\";\noption objc_class_prefix = \"PKS\";\n\npackage pokeshop;\n\nservice Pokeshop {\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\n  rpc createPokemon (Pokemon) returns (Pokemon) {}\n  rpc importPokemon (ImportPokemonRequest) returns (ImportPokemonRequest) {}\n}\n\nmessage ImportPokemonRequest {\n  int32 id = 1;\n  optional bool isFixed = 2;\n}\n\nmessage GetPokemonRequest {\n  optional int32 skip = 1;\n  optional int32 take = 2;\n  optional bool isFixed = 3;\n}\n\nmessage GetPokemonListResponse {\n  repeated Pokemon items = 1;\n  int32 totalCount = 2;\n}\n\nmessage Pokemon {\n  optional int32 id = 1;\n  string name = 2;\n  string type = 3;\n  bool isFeatured = 4;\n  optional string imageUrl = 5;\n}",
+                "address": "${env:DEMO_APP_GRPC_URL}",
+                "method": "pokeshop.Pokeshop.importPokemon",
+                "request": "{\"id\": 52}",
+                "metadata": [{}]
+              }
+            },
+            "specs":  [
+              {
+                "selector": "span[name = \"queue.synchronizePokemon publish\"]",
+                "assertions": ["attr:tracetest.selected_spans.count > 0"]
+              }
+            ]
+          }
+        }
+  specs:
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 201
+    - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]:first
+      assertions:
+        - attr:sql.query contains "INSERT INTO tests"
+  outputs:
+    - name: GRPC_TEST_INVALID_METADATA_ID
+      selector: span[name = "Tracetest trigger"]
+      value: attr:tracetest.response.body | json_path '$.spec.id'

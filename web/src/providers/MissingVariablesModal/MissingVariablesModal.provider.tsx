@@ -10,6 +10,7 @@ type TOnOPenProps = {
   missingVariables: MissingVariables;
   name: string;
   onSubmit(draft: TEnvironmentValue[]): void;
+  onCancel?(): void;
   testList: Test[];
 };
 
@@ -28,9 +29,10 @@ interface IProps {
 export const useMissingVariablesModal = () => useContext(Context);
 
 const MissingVariablesModalProvider = ({children}: IProps) => {
-  const [{missingVariables = [], testList = [], onSubmit, name}, setProps] = useState<TOnOPenProps>({
+  const [{missingVariables = [], testList = [], onSubmit, onCancel = noop, name}, setProps] = useState<TOnOPenProps>({
     missingVariables: [],
     onSubmit: noop,
+    onCancel: noop,
     name: '',
     testList: [],
   });
@@ -61,7 +63,10 @@ const MissingVariablesModalProvider = ({children}: IProps) => {
       {children}
       <MissingVariablesModal
         testVariables={testVariables}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          onCancel();
+        }}
         onSubmit={handleSubmit}
         isOpen={isOpen}
         name={name}

@@ -33,10 +33,10 @@ const AnalyticsForm = () => {
       <Form.Item hidden name="name" />
 
       <S.SwitchContainer>
-        <label htmlFor={`${FORM_ID}_analyticsEnabled`}>Enable analytics</label>
         <Form.Item name="analyticsEnabled" valuePropName="checked">
           <Switch />
         </Form.Item>
+        <S.SwitchLabel htmlFor={`${FORM_ID}_analyticsEnabled`}>Enable analytics</S.SwitchLabel>
       </S.SwitchContainer>
 
       <S.FooterContainer>

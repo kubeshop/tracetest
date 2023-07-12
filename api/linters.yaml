@@ -1,0 +1,162 @@
+openapi: 3.0.0
+components:
+  schemas:
+    LinterResourceList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResource"
+    LinterResource:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Linter
+        spec:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            enabled:
+              type: boolean
+            minimumScore:
+              type: integer
+            plugins:
+              type: array
+              items:
+                $ref: "#/components/schemas/LinterResourcePlugin"
+    LinterResourcePlugin:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        enabled:
+          type: boolean
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResourceRule"
+    LinterResourceRule:
+      type: object
+      properties:
+        id:
+          type: string
+        weight:
+          type: integer
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        errorDescription:
+          type: string
+          readOnly: true
+        tips:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        errorLevel:
+          type: string
+          enum:
+            - error
+            - warning
+            - disabled
+    LinterResult:
+      type: object
+      properties:
+        minimumScore:
+          type: integer
+        passed:
+          type: boolean
+        score:
+          type: integer
+        plugins:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPlugin"
+    LinterResultPlugin:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        passed:
+          type: boolean
+        score:
+          type: integer
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPluginRule"
+    LinterResultPluginRule:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        errorDescription:
+          type: string
+        passed:
+          type: boolean
+        weight:
+          type: integer
+        tips:
+          type: array
+          items:
+            type: string
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPluginRuleResult"
+        level:
+          type: string
+          enum:
+            - error
+            - warning
+            - disabled
+    LinterResultPluginRuleResult:
+      type: object
+      properties:
+        spanId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinterResultPluginRuleResultError"
+        passed:
+          type: boolean
+        severity:
+          type: string
+          enum:
+            - error
+            - warning
+    LinterResultPluginRuleResultError:
+      type: object
+      properties:
+        value:
+          type: string
+        expected:
+          type: string
+        description:
+          type: string
+        suggestions:
+          type: array
+          items:
+            type: string

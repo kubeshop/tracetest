@@ -1,7 +1,9 @@
+import {TestState} from 'constants/TestRun.constants';
+import {Model, Modify, TTestSchemas, TTriggerSchemas} from 'types/Common.types';
 import {TTestRunState} from 'types/TestRun.types';
-import {Model, Modify, TTestSchemas, TTriggerSchemas} from '../types/Common.types';
 import AssertionResults, {TRawAssertionResults} from './AssertionResults.model';
 import Environment from './Environment.model';
+import LinterResult from './LinterResult.model';
 import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
@@ -28,6 +30,7 @@ type TestRun = Model<
     outputs?: TestRunOutput[];
     environment?: Environment;
     state: TTestRunState;
+    linter: LinterResult;
   }
 >;
 
@@ -55,6 +58,35 @@ const getTestResultCount = (
   }).length;
 };
 
+export function isRunStateFinished(state: TTestRunState) {
+  return (
+    [
+      TestState.FINISHED,
+      TestState.STOPPED,
+      TestState.TRIGGER_FAILED,
+      TestState.TRACE_FAILED,
+      TestState.ASSERTION_FAILED,
+      TestState.ANALYZING_ERROR,
+    ] as string[]
+  ).includes(state);
+}
+
+export function isRunStateFailed(state: TTestRunState) {
+  return ([TestState.TRIGGER_FAILED, TestState.TRACE_FAILED, TestState.ASSERTION_FAILED] as string[]).includes(state);
+}
+
+export function isRunStateSucceeded(state: TTestRunState) {
+  return state === TestState.FINISHED;
+}
+
+export function isRunStateStopped(state: TTestRunState) {
+  return state === TestState.STOPPED;
+}
+
+export function isRunStateAnalyzingError(state: TTestRunState) {
+  return state === TestState.ANALYZING_ERROR;
+}
+
 const TestRun = ({
   id = '',
   traceId = '',
@@ -77,6 +109,7 @@ const TestRun = ({
   environment = {},
   transactionId = '',
   transactionRunId = '',
+  linter = {},
 }: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
@@ -100,9 +133,10 @@ const TestRun = ({
     passedAssertionCount: getTestResultCount(result, 'passed'),
     metadata,
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
-    environment: Environment(environment),
+    environment: Environment.fromRun(environment),
     transactionId,
     transactionRunId,
+    linter: LinterResult(linter),
   };
 };
 

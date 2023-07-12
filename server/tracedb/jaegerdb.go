@@ -6,13 +6,13 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/id"
+	"github.com/kubeshop/tracetest/server/datastore"
 	pb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/api_v3"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracedb/datasource"
 	"github.com/kubeshop/tracetest/server/traces"
-	"go.opentelemetry.io/collector/config/configgrpc"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
@@ -27,10 +27,10 @@ type jaegerTraceDB struct {
 	dataSource datasource.DataSource
 }
 
-func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
-	baseConfig := &model.BaseClientConfig{
-		Type: string(datasource.GRPC),
-		Grpc: *grpcConfig,
+func newJaegerDB(grpcConfig *datastore.GRPCClientSettings) (TraceDB, error) {
+	baseConfig := &datastore.MultiChannelClientConfig{
+		Type: datastore.MultiChannelClientTypeGRPC,
+		Grpc: grpcConfig,
 	}
 
 	dataSource := datasource.New("Jaeger", baseConfig, datasource.Callbacks{
@@ -44,6 +44,10 @@ func newJaegerDB(grpcConfig *configgrpc.GRPCClientSettings) (TraceDB, error) {
 
 func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
 	return jtd.dataSource.Connect(ctx)
+}
+
+func (jtd *jaegerTraceDB) GetEndpoints() string {
+	return jtd.dataSource.Endpoint()
 }
 
 func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {

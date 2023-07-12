@@ -11,7 +11,42 @@ on:
       - 'docs/**'
       - 'cli/**'
 
+  # manual trigger
+  workflow_dispatch:
+
 jobs:
+  backend-arch-graph:
+    name: Generate backend architecture graph
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.work'
+          cache: true
+          cache-dependency-path: go.work
+      - name: install graph tool
+        run: |
+          mkdir /tmp/go-arch
+          cd /tmp/go-arch
+          curl -SLO https://github.com/mathnogueira/golang-arch-viewer/archive/refs/heads/master.zip
+          unzip master.zip
+          cd golang-arch-viewer-master
+          make
+          mv dist/go-arch /tmp/go-arch/go-arch
+      - name: generate graph
+        run: |
+          cd server
+          mkdir -p ../dist/
+          /tmp/go-arch/go-arch -o ../dist/architecture.png
+      - name: Upload assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: architecture-graph
+          path: dist/architecture.png
 
   build-web:
     name: build web
@@ -85,7 +120,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.16.2
+          version: v1.18.2
           args: release --clean --split --nightly
         env:
           GOOS: ${{ matrix.GOOS }}
@@ -93,6 +128,11 @@ jobs:
           TRACETEST_ENV: main
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
+      - name: Upload assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ matrix.GOOS }}
+          path: dist/${{ matrix.GOOS }}
 
   release:
     runs-on: ubuntu-latest
@@ -124,28 +164,32 @@ jobs:
       - shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short=8 $GITHUB_SHA)" >> $GITHUB_ENV
-      - uses: actions/cache@v3
+      - uses: actions/download-artifact@v3
         with:
           path: dist/linux
-          key: linux-${{ env.sha_short }}
-      - uses: actions/cache@v3
+          name: dist-linux
+      - uses: actions/download-artifact@v3
         with:
           path: dist/darwin
-          key: darwin-${{ env.sha_short }}
-      - uses: actions/cache@v3
+          name: dist-darwin
+      - uses: actions/download-artifact@v3
         with:
           path: dist/windows
-          key: windows-${{ env.sha_short }}
+          name: dist-windows
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-web
           path: web/build/
+      - uses: actions/download-artifact@v3
+        with:
+          name: architecture-graph
+          path: dist/architecture.png
 
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.16.2
+          version: v1.18.2
           args: continue --merge
         env:
           VERSION: sha-${{ env.sha_short }}

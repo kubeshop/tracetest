@@ -5,16 +5,16 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 )
 
-type TestingAppOption func(*config.Config)
+type TestingAppOption func(*config.AppConfig)
 
 func WithServerPrefix(prefix string) TestingAppOption {
-	return func(cfg *config.Config) {
+	return func(cfg *config.AppConfig) {
 		cfg.Set("server.pathPrefix", prefix)
 	}
 }
 
 func WithHttpPort(port int) TestingAppOption {
-	return func(cfg *config.Config) {
+	return func(cfg *config.AppConfig) {
 		cfg.Set("server.httpPort", port)
 	}
 }
@@ -24,10 +24,18 @@ func GetTestingApp(options ...TestingAppOption) (*app.App, error) {
 	for _, option := range options {
 		option(cfg)
 	}
-	err := ConfigureDB(cfg)
-	if err != nil {
-		panic(err)
-	}
+
+	ConfigureDB(cfg)
 
 	return app.New(cfg)
+}
+
+func ConfigureDB(cfg *config.AppConfig) {
+	db := getTestDatabaseEnvironment()
+
+	cfg.Set("postgres.host", db.container.Host)
+	cfg.Set("postgres.user", "tracetest")
+	cfg.Set("postgres.password", "tracetest")
+	cfg.Set("postgres.dbname", "postgres")
+	cfg.Set("postgres.port", db.container.DefaultPort())
 }

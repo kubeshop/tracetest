@@ -36,6 +36,15 @@ components:
           type: string
         error:
           type: string
+    ConfigurationResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConfigurationResource"
     ConfigurationResource:
       type: object
       description: "Represents a configuration structured into the Resources format."
@@ -64,6 +73,15 @@ components:
               description: "Flag telling if a user allow Tracetest to send analytics about its usage."
           required:
             - analyticsEnabled
+    PollingProfileList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PollingProfile"
     PollingProfile:
       type: object
       description: "Represents a polling profile structured into the Resources format."
@@ -164,3 +182,12 @@ components:
               $ref: "#/components/schemas/DemoOpenTelemetryStore"
           required:
             - enabled
+    DemoList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "./config.yaml#/components/schemas/Demo"

@@ -20,26 +20,16 @@ const ImportCommand = () => {
     [onNext]
   );
 
-  const onRefreshData = useCallback(async () => {
+  useEffect(() => {
     const {command} = draftTest as ICurlValues;
     form.setFieldsValue({command});
-
-    try {
-      form.validateFields();
-      onIsFormValid(true);
-    } catch (err) {
-      onIsFormValid(false);
-    }
+    onIsFormValid(CurlService.getIsValidCommand(command));
   }, [draftTest, form, onIsFormValid]);
-
-  useEffect(() => {
-    onRefreshData();
-  }, [onRefreshData]);
 
   return (
     <Step.Step>
       <Step.FormContainer>
-        <Step.Title>Paste the CURL command</Step.Title>
+        <Step.Title>CURL command</Step.Title>
         <Form<ICurlValues>
           id={ComponentNames.ImportCommand}
           autoComplete="off"

@@ -13,9 +13,8 @@ type TestRunEvent = Model<
   {logLevel: LogLevel; dataStoreConnection?: ConnectionResult; polling?: PollingInfo; outputs?: OutputInfo[]}
 >;
 
-function PollingInfo({
+export function PollingInfo({
   type = PollingInfoType.Periodic,
-  reasonNextIteration = '',
   isComplete = false,
   periodic = {},
 }: TRawPollingInfo): PollingInfo {
@@ -23,7 +22,6 @@ function PollingInfo({
 
   return {
     type: types.includes(type) ? type : PollingInfoType.Periodic,
-    reasonNextIteration,
     isComplete,
     periodic: {
       numberSpans: periodic?.numberSpans ?? 0,

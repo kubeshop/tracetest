@@ -7,8 +7,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
-func validateDuration(key string) func(c *Config) error {
-	return func(c *Config) error {
+func validateDuration(key string) func(c *AppConfig) error {
+	return func(c *AppConfig) error {
 		input := c.vp.GetString(key)
 		_, err := time.ParseDuration(input)
 		if err == nil {
@@ -19,7 +19,7 @@ func validateDuration(key string) func(c *Config) error {
 	}
 }
 
-func (c *Config) Validate() error {
+func (c *AppConfig) Validate() error {
 	var err error
 	for _, opt := range configOptions {
 		if opt.validate == nil {

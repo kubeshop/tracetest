@@ -1,13 +1,13 @@
 package mappings
 
 import (
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 // out
 
-func (m OpenAPI) HTTPHeaders(in []model.HTTPHeader) []openapi.HttpHeader {
+func (m OpenAPI) HTTPHeaders(in []trigger.HTTPHeader) []openapi.HttpHeader {
 	headers := make([]openapi.HttpHeader, len(in))
 	for i, h := range in {
 		headers[i] = openapi.HttpHeader{Key: h.Key, Value: h.Value}
@@ -16,21 +16,22 @@ func (m OpenAPI) HTTPHeaders(in []model.HTTPHeader) []openapi.HttpHeader {
 	return headers
 }
 
-func (m OpenAPI) HTTPRequest(in *model.HTTPRequest) openapi.HttpRequest {
+func (m OpenAPI) HTTPRequest(in *trigger.HTTPRequest) openapi.HttpRequest {
 	if in == nil {
 		return openapi.HttpRequest{}
 	}
 
 	return openapi.HttpRequest{
-		Url:     in.URL,
-		Method:  string(in.Method),
-		Headers: m.HTTPHeaders(in.Headers),
-		Body:    in.Body,
-		Auth:    m.Auth(in.Auth),
+		Url:             in.URL,
+		Method:          string(in.Method),
+		Headers:         m.HTTPHeaders(in.Headers),
+		Body:            in.Body,
+		Auth:            m.Auth(in.Auth),
+		SslVerification: in.SSLVerification,
 	}
 }
 
-func (m OpenAPI) HTTPResponse(in *model.HTTPResponse) openapi.HttpResponse {
+func (m OpenAPI) HTTPResponse(in *trigger.HTTPResponse) openapi.HttpResponse {
 	if in == nil {
 		return openapi.HttpResponse{}
 	}
@@ -42,7 +43,7 @@ func (m OpenAPI) HTTPResponse(in *model.HTTPResponse) openapi.HttpResponse {
 	}
 }
 
-func (m OpenAPI) Auth(in *model.HTTPAuthenticator) openapi.HttpAuth {
+func (m OpenAPI) Auth(in *trigger.HTTPAuthenticator) openapi.HttpAuth {
 	if in == nil {
 		return openapi.HttpAuth{}
 	}
@@ -73,37 +74,38 @@ func (m OpenAPI) Auth(in *model.HTTPAuthenticator) openapi.HttpAuth {
 
 // in
 
-func (m Model) HTTPHeaders(in []openapi.HttpHeader) []model.HTTPHeader {
-	headers := make([]model.HTTPHeader, len(in))
+func (m Model) HTTPHeaders(in []openapi.HttpHeader) []trigger.HTTPHeader {
+	headers := make([]trigger.HTTPHeader, len(in))
 	for i, h := range in {
-		headers[i] = model.HTTPHeader{Key: h.Key, Value: h.Value}
+		headers[i] = trigger.HTTPHeader{Key: h.Key, Value: h.Value}
 	}
 
 	return headers
 }
 
-func (m Model) HTTPRequest(in openapi.HttpRequest) *model.HTTPRequest {
+func (m Model) HTTPRequest(in openapi.HttpRequest) *trigger.HTTPRequest {
 	// ignore unset http requests
 	if in.Url == "" {
 		return nil
 	}
 
-	return &model.HTTPRequest{
-		URL:     in.Url,
-		Method:  model.HTTPMethod(in.Method),
-		Headers: m.HTTPHeaders(in.Headers),
-		Body:    in.Body,
-		Auth:    m.Auth(in.Auth),
+	return &trigger.HTTPRequest{
+		URL:             in.Url,
+		Method:          trigger.HTTPMethod(in.Method),
+		Headers:         m.HTTPHeaders(in.Headers),
+		Body:            in.Body,
+		Auth:            m.Auth(in.Auth),
+		SSLVerification: in.SslVerification,
 	}
 }
 
-func (m Model) HTTPResponse(in openapi.HttpResponse) *model.HTTPResponse {
+func (m Model) HTTPResponse(in openapi.HttpResponse) *trigger.HTTPResponse {
 	// ignore unset http responses
 	if in.StatusCode == 0 {
 		return nil
 	}
 
-	return &model.HTTPResponse{
+	return &trigger.HTTPResponse{
 		Status:     in.Status,
 		StatusCode: int(in.StatusCode),
 		Headers:    m.HTTPHeaders(in.Headers),
@@ -111,19 +113,19 @@ func (m Model) HTTPResponse(in openapi.HttpResponse) *model.HTTPResponse {
 	}
 }
 
-func (m Model) Auth(in openapi.HttpAuth) *model.HTTPAuthenticator {
-	return &model.HTTPAuthenticator{
+func (m Model) Auth(in openapi.HttpAuth) *trigger.HTTPAuthenticator {
+	return &trigger.HTTPAuthenticator{
 		Type: in.Type,
-		APIKey: model.APIKeyAuthenticator{
+		APIKey: &trigger.APIKeyAuthenticator{
 			Key:   in.ApiKey.Key,
 			Value: in.ApiKey.Value,
-			In:    model.APIKeyPosition(in.ApiKey.In),
+			In:    trigger.APIKeyPosition(in.ApiKey.In),
 		},
-		Basic: model.BasicAuthenticator{
+		Basic: &trigger.BasicAuthenticator{
 			Username: in.Basic.Username,
 			Password: in.Basic.Password,
 		},
-		Bearer: model.BearerAuthenticator{
+		Bearer: &trigger.BearerAuthenticator{
 			Bearer: in.Bearer.Token,
 		},
 	}

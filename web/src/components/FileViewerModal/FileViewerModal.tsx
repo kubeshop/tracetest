@@ -1,12 +1,9 @@
 import {useCallback} from 'react';
 import {Button, Typography} from 'antd';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import {arduinoLight} from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import {DownloadOutlined} from '@ant-design/icons';
 import {downloadFile} from 'utils/Common';
-import useCopy from 'hooks/useCopy';
-
 import * as S from './FileViewerModal.styled';
+import {FramedCodeBlock} from '../CodeBlock';
 
 interface IProps {
   data: string;
@@ -22,8 +19,6 @@ const FileViewerModal = ({data, isOpen, onClose, title, language = 'javascript',
   const onDownload = useCallback(() => {
     downloadFile(data, fileName);
   }, [data, fileName]);
-
-  const copy = useCopy();
 
   const footer = (
     <>
@@ -48,17 +43,9 @@ const FileViewerModal = ({data, isOpen, onClose, title, language = 'javascript',
       width="70%"
       visible={isOpen}
     >
-      <S.SubtitleContainer>
-        <Typography.Text>{subtitle}</Typography.Text>
-      </S.SubtitleContainer>
-      <S.CodeContainer data-cy="file-viewer-code-container">
-        <S.CopyIconContainer onClick={() => copy(data)}>
-          <S.CopyIcon />
-        </S.CopyIconContainer>
-        <SyntaxHighlighter language={language} style={arduinoLight}>
-          {data}
-        </SyntaxHighlighter>
-      </S.CodeContainer>
+      <div data-cy="file-viewer-code-container">
+        <FramedCodeBlock title={subtitle} value={data} language={language} />
+      </div>
     </S.FileViewerModal>
   );
 };

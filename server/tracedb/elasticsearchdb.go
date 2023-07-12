@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"go.opentelemetry.io/otel/trace"
@@ -25,7 +26,7 @@ func elasticSearchDefaultPorts() []string {
 
 type elasticsearchDB struct {
 	realTraceDB
-	config *model.ElasticSearchDataStoreConfig
+	config *datastore.ElasticSearchConfig
 	client *elasticsearch.Client
 }
 
@@ -36,6 +37,10 @@ func (db *elasticsearchDB) Connect(ctx context.Context) error {
 func (db *elasticsearchDB) Close() error {
 	// No need to close this db
 	return nil
+}
+
+func (db *elasticsearchDB) GetEndpoints() string {
+	return strings.Join(db.config.Addresses, ", ")
 }
 
 func (db *elasticsearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
@@ -98,7 +103,7 @@ func (db *elasticsearchDB) GetTraceByID(ctx context.Context, traceID string) (mo
 	return convertElasticSearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newElasticSearchDB(cfg *model.ElasticSearchDataStoreConfig) (TraceDB, error) {
+func newElasticSearchDB(cfg *datastore.ElasticSearchConfig) (TraceDB, error) {
 	var caCert []byte
 	if cfg.Certificate != "" {
 		caCert = []byte(cfg.Certificate)
@@ -211,7 +216,7 @@ func convertElasticSearchSpanIntoSpan(input map[string]interface{}) model.Span {
 	// ParentId
 	parentId := flatInput["parent.id"]
 	if parentId != nil {
-		attributes["parent_id"] = flatInput["parent.id"].(string)
+		attributes[model.TracetestMetadataFieldParentID] = flatInput["parent.id"].(string)
 	}
 
 	return model.Span{

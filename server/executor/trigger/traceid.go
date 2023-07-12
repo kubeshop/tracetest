@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 func TRACEID() Triggerer {
@@ -13,23 +14,23 @@ func TRACEID() Triggerer {
 
 type traceidTriggerer struct{}
 
-func (t *traceidTriggerer) Trigger(ctx context.Context, test model.Test, opts *TriggerOptions) (Response, error) {
+func (t *traceidTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
-		Result: model.TriggerResult{
+		Result: trigger.TriggerResult{
 			Type:    t.Type(),
-			TRACEID: &model.TRACEIDResponse{ID: test.ServiceUnderTest.TRACEID.ID},
+			TraceID: &trigger.TraceIDResponse{ID: test.Trigger.TraceID.ID},
 		},
 	}
 
 	return response, nil
 }
 
-func (t *traceidTriggerer) Type() model.TriggerType {
-	return model.TriggerTypeTRACEID
+func (t *traceidTriggerer) Type() trigger.TriggerType {
+	return trigger.TriggerTypeTraceID
 }
 
-func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *TriggerOptions) (model.Test, error) {
-	traceid := test.ServiceUnderTest.TRACEID
+func (t *traceidTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+	traceid := test.Trigger.TraceID
 	if traceid == nil {
 		return test, fmt.Errorf("no settings provided for TRACEID triggerer")
 	}
@@ -40,7 +41,7 @@ func (t *traceidTriggerer) Resolve(ctx context.Context, test model.Test, opts *T
 	}
 
 	traceid.ID = id
-	test.ServiceUnderTest.TRACEID = traceid
+	test.Trigger.TraceID = traceid
 
 	return test, nil
 }

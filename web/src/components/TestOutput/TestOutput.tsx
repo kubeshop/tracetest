@@ -1,4 +1,4 @@
-import {Tag} from 'antd';
+import {Tag, Tooltip} from 'antd';
 import {useCallback} from 'react';
 import AttributeValue from 'components/AttributeValue';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
@@ -18,19 +18,24 @@ interface IProps {
 
 const TestOutput = ({
   index,
-  output: {id, name, isDeleted, isDraft, spanId, selector, value, valueRun, valueRunDraft},
+  output: {name, isDeleted, isDraft, spanId, selector, value, valueRun, valueRunDraft, error},
   output,
   onEdit,
   onDelete,
 }: IProps) => {
   const {onSelectedOutputs} = useTestOutput();
   const {onSelectSpan} = useSpan();
-  const isSelected = useAppSelector(state => selectIsSelectedOutput(state, id));
+  const isSelected = useAppSelector(state => selectIsSelectedOutput(state, name));
 
   const handleOutputClick = useCallback(() => {
+    if (isSelected) {
+      onSelectedOutputs([]);
+      onSelectSpan('');
+      return;
+    }
     onSelectedOutputs([output]);
     onSelectSpan(spanId);
-  }, [onSelectSpan, onSelectedOutputs, output, spanId]);
+  }, [onSelectSpan, onSelectedOutputs, output, spanId, isSelected]);
 
   return (
     <S.Container
@@ -74,6 +79,11 @@ const TestOutput = ({
               <S.Key>Run value</S.Key>
               <AttributeValue value={valueRunDraft} />
             </>
+          )}
+          {error && (
+            <Tooltip title={error}>
+              <S.IconWarning />
+            </Tooltip>
           )}
         </S.Entry>
       </S.Row>

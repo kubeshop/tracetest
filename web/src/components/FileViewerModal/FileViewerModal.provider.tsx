@@ -1,17 +1,18 @@
 import {capitalize, noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import FileViewerModal from 'components/FileViewerModal';
-import {useLazyGetJUnitByRunIdQuery, useLazyGetResourceDefinitionQuery} from 'redux/apis/TraceTest.api';
 import {ResourceType} from 'types/Resource.type';
+import useDefinitionFile from 'hooks/useDefinitionFile';
+import useJUnitResult from 'hooks/useJUnitResult';
 
 interface IContext {
-  loadJUnit(testId: string, runId: string): void;
-  loadDefinition(resourceType: ResourceType, resourceId: string, version?: number): void;
+  onJUnit(testId: string, runId: string): void;
+  onDefinition(resourceType: ResourceType, resourceId: string, version?: number): void;
 }
 
 export const Context = createContext<IContext>({
-  loadJUnit: noop,
-  loadDefinition: noop,
+  onJUnit: noop,
+  onDefinition: noop,
 });
 
 interface IProps {
@@ -37,12 +38,8 @@ const propsMap = {
 
 const FileViewerModalProvider = ({children}: IProps) => {
   const [isFileViewerOpen, setIsFileViewerOpen] = useState(false);
-  const [fileViewerData, setFileViewerData] = useState<{data: string; type: 'definition' | 'junit'}>({
-    data: '',
-    type: 'definition',
-  });
-  const [getJUnit] = useLazyGetJUnitByRunIdQuery();
-  const [getResourceDefinition] = useLazyGetResourceDefinitionQuery();
+  const {definition, loadDefinition} = useDefinitionFile();
+  const {jUnit, loadJUnit} = useJUnitResult();
   const [fileProps, setProps] = useState({
     title: '',
     language: '',
@@ -50,21 +47,19 @@ const FileViewerModalProvider = ({children}: IProps) => {
     fileName: '',
   });
 
-  const loadJUnit = useCallback(
+  const onJUnit = useCallback(
     async (testId: string, runId: string) => {
-      const data = await getJUnit({runId, testId}).unwrap();
+      loadJUnit(testId, runId);
       setIsFileViewerOpen(true);
-      setFileViewerData({data, type: 'junit'});
       setProps(propsMap.junit);
     },
-    [getJUnit]
+    [loadJUnit]
   );
 
-  const loadDefinition = useCallback(
+  const onDefinition = useCallback(
     async (resourceType: ResourceType, resourceId: string, version?: number) => {
-      const data = await getResourceDefinition({resourceId, version, resourceType}).unwrap();
       setIsFileViewerOpen(true);
-      setFileViewerData({data, type: 'definition'});
+      loadDefinition(resourceType, resourceId, version);
       setProps({
         title: `${capitalize(resourceType)} Definition`,
         language: 'yaml',
@@ -72,10 +67,10 @@ const FileViewerModalProvider = ({children}: IProps) => {
         fileName: `${resourceType}-${resourceId}-${version || 0}-definition.yaml`,
       });
     },
-    [getResourceDefinition]
+    [loadDefinition]
   );
 
-  const value: IContext = useMemo(() => ({loadJUnit, loadDefinition}), [loadJUnit, loadDefinition]);
+  const value: IContext = useMemo(() => ({onJUnit, onDefinition}), [onJUnit, onDefinition]);
 
   return (
     <>
@@ -83,7 +78,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
       <FileViewerModal
         isOpen={isFileViewerOpen}
         {...fileProps}
-        data={fileViewerData.data}
+        data={definition || jUnit}
         onClose={() => setIsFileViewerOpen(false)}
       />
     </>

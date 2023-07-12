@@ -1,12 +1,12 @@
 # Demo Settings
 
-Tracetest has the option to enable Test examples for our Pokeshop Demo App or the OpenTelemetry Astronomy Shop Demo. You will require an instance of those applications running alongside your Tracetest server to be able to use them. The demo settings can be adjusted both from the Tracetest UI and from the CLI. 
+Tracetest has the option to enable Test examples for our Pokeshop Demo App or the OpenTelemetry Astronomy Shop Demo. You will need an instance of those applications running alongside your Tracetest server to be able to use them. The demo settings can be adjusted both from the Tracetest UI and from the CLI. 
 
 ## Changing Demo Settings from the UI
 
-In the Web UI, open Settings and select Demo:
+In the Web UI, open (1) Settings and select the (2) Demo tab:
 
-![Demo Settings](./img/demo-settings.png)
+![Demo Settings](./img/demo-settings-0.11.3.png)
 
 From this demo settings page, you can enable the Pokeshop and/or OpenTelemetry Astronomy Shop demos. For each demo, you will need to tell Tracetest the location of the relevant demo's endpoints, adjusting the domain name/ip address and, possibly, the port to match your configuration.
 
@@ -26,7 +26,7 @@ spec:
     grpcEndpoint: demo-pokemon-api.demo:8082
 ```
 
-Proceed to run this command in the terminal, and specify the file above.
+Proceed to run this command in the terminal and specify the file above.
 
 ```bash
 tracetest apply demo -f my/resource/demo-resource.yaml

@@ -1,6 +1,3 @@
-import {Typography} from 'antd';
-
-import {TRACE_DOCUMENTATION_URL} from 'constants/Common.constants';
 import {TestState} from 'constants/TestRun.constants';
 import {TraceEventType} from 'constants/TestRunEvents.constants';
 import TestRunService from 'services/TestRun.service';
@@ -9,49 +6,40 @@ import RunEventDataStore from './RunEventDataStore';
 import RunEventPolling from './RunEventPolling';
 import {IPropsComponent} from './RunEvents';
 import * as S from './RunEvents.styled';
+import FailedTraceHeader from './TraceHeader/FailedTraceHeader';
+import FailedTriggerHeader from './TraceHeader/FailedTriggerHeader';
+import LoadingHeader from './TraceHeader/LoadingHeader';
+import StoppedHeader from './TraceHeader/StoppedHeader';
 
-const ComponentMap: Record<TraceEventType, (props: IPropsEvent) => React.ReactElement> = {
+type TestStateType = TestState.TRIGGER_FAILED | TestState.TRACE_FAILED | TestState.STOPPED;
+
+const HeaderComponentMap: Record<TestStateType, () => React.ReactElement> = {
+  [TestState.TRIGGER_FAILED]: FailedTriggerHeader,
+  [TestState.TRACE_FAILED]: FailedTraceHeader,
+  [TestState.STOPPED]: StoppedHeader,
+};
+
+export type TraceEventTypeWithoutFetching = Exclude<
+  TraceEventType,
+  TraceEventType.FETCHING_START | TraceEventType.FETCHING_ERROR | TraceEventType.FETCHING_SUCCESS
+>;
+
+const ComponentMap: Record<TraceEventTypeWithoutFetching, (props: IPropsEvent) => React.ReactElement> = {
   [TraceEventType.DATA_STORE_CONNECTION_INFO]: RunEventDataStore,
   [TraceEventType.POLLING_ITERATION_INFO]: RunEventPolling,
 };
 
 const RunEventsTrace = ({events, state}: IPropsComponent) => {
-  const filteredEvents = TestRunService.getTestRunEventsWithLastPolling(events);
-
-  const loadingHeader = (
-    <>
-      <S.LoadingIcon />
-      <Typography.Title level={3} type="secondary">
-        We are working to gather the trace associated with this test run
-      </Typography.Title>
-      <S.Paragraph type="secondary">
-        Want to know more about traces? Head to the official{' '}
-        <S.Link href={TRACE_DOCUMENTATION_URL} target="_blank">
-          Open Telemetry Documentation
-        </S.Link>
-      </S.Paragraph>
-    </>
-  );
-
-  const failedHeader = (
-    <>
-      <S.ErrorIcon />
-      <Typography.Title level={2} type="secondary">
-        Trace Fetch Failed
-      </Typography.Title>
-      <S.Paragraph type="secondary">
-        We prepared the breakdown of diagnostic steps and tips to help identify the source of the issue:
-      </S.Paragraph>
-    </>
-  );
+  const filteredEvents = TestRunService.getTestRunTraceEvents(events);
+  const HeaderComponent = HeaderComponentMap[state as TestStateType] ?? LoadingHeader;
 
   return (
     <S.Container $hasScroll>
-      {state === TestState.FAILED ? failedHeader : loadingHeader}
+      <HeaderComponent />
 
       <S.ListContainer>
         {filteredEvents.map(event => {
-          const Component = ComponentMap[event.type as TraceEventType] ?? RunEvent;
+          const Component = ComponentMap[event.type as TraceEventTypeWithoutFetching] ?? RunEvent;
           return <Component event={event} key={event.type} />;
         })}
       </S.ListContainer>

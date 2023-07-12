@@ -10,6 +10,8 @@ import Otlp from './Icons/Otlp';
 import SignalFx from './Icons/SignalFx';
 import Tempo from './Icons/Tempo';
 import AWSXRay from './Icons/AwsXRay';
+import Honeycomb from './Icons/Honeycomb';
+import AzureAppInsights from './Icons/AzureAppInsights';
 
 const iconMap = {
   [SupportedDataStores.JAEGER]: Jaeger,
@@ -22,6 +24,8 @@ const iconMap = {
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.AWSXRay]: AWSXRay,
+  [SupportedDataStores.Honeycomb]: Honeycomb,
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
 } as const;
 
 interface IProps {

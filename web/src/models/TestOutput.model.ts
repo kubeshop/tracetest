@@ -11,19 +11,21 @@ type TestOutput = {
   valueRunDraft: string;
   id: number;
   spanId: string;
+  error: string;
 };
 
-function TestOutput({name = '', selector = {}, value = ''}: TRawTestOutput, id = -1): TestOutput {
+function TestOutput({name = '', selectorParsed = {}, value = ''}: TRawTestOutput, id = -1): TestOutput {
   return {
     id,
     isDeleted: false,
     isDraft: false,
     name,
-    selector: selector.query || '',
+    selector: selectorParsed.query || '',
     value,
     valueRun: '',
     valueRunDraft: '',
     spanId: '',
+    error: '',
   };
 }
 
@@ -32,7 +34,8 @@ export function toRawTestOutputs(testOutputs: TestOutput[]): TRawTestOutput[] {
     .filter(output => !output.isDeleted)
     .map<TRawTestOutput>(output => ({
       name: output.name,
-      selector: {query: output.selector},
+      selector: output.selector,
+      selectorParsed: {query: output.selector},
       value: output.value,
     }));
 }

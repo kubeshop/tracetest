@@ -1,4 +1,4 @@
-import {MoreOutlined} from '@ant-design/icons';
+import {InfoCircleFilled, MoreOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -59,4 +59,8 @@ export const ActionsContainer = styled.div`
   align-items: center;
   display: flex;
   justify-content: flex-end;
+`;
+
+export const IconWarning = styled(InfoCircleFilled)`
+  color: ${({theme}) => theme.color.warningYellow};
 `;

@@ -47,15 +47,9 @@ export const VariablesText = styled(Typography)`
   flex-basis: 50%;
 `;
 
-export const HeaderText = styled(Typography)`
+export const HeaderText = styled(Typography.Text)`
   flex-basis: 50%;
-  font-weight: bold;
-  padding-left: 8px;
-`;
-
-export const HeaderTextRight = styled(Typography)`
-  flex-basis: 50%;
-  font-weight: bold;
+  font-weight: 600;
 `;
 
 export const VariablesMainContainer = styled.div`

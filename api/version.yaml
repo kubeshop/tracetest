@@ -1,0 +1,9 @@
+openapi: 3.0.0
+components:
+  schemas:
+    Version:
+      type: object
+      properties:
+        version:
+          type: string
+          example: 1.0.0

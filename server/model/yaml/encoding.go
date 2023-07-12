@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
@@ -37,7 +38,7 @@ func Decode(contents []byte) (File, error) {
 		}
 		f.Spec = transaction
 	case FileTypeEnvironment:
-		var environment Environment
+		var environment environment.Environment
 		err := mapstructure.Decode(f.Spec, &environment)
 		if err != nil {
 			return File{}, fmt.Errorf("cannot decode environment: %w", err)

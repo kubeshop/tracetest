@@ -7,8 +7,10 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"
@@ -19,18 +21,21 @@ func TestAssertion(t *testing.T) {
 	spanID := id.NewRandGenerator().SpanID()
 	cases := []struct {
 		name              string
-		testDef           model.OrderedMap[model.SpanQuery, model.NamedAssertions]
+		testDef           test.Specs
 		trace             model.Trace
-		expectedResult    model.OrderedMap[model.SpanQuery, []model.AssertionResult]
+		expectedResult    maps.Ordered[test.SpanQuery, []test.AssertionResult]
 		expectedAllPassed bool
 	}{
 		{
 			name: "CanAssert",
-			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
-				Assertions: []model.Assertion{
-					`attr:tracetest.span.duration = 2000ns`,
+			testDef: test.Specs{
+				{
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
+					Assertions: []test.Assertion{
+						`attr:tracetest.span.duration = 2000ns`,
+					},
 				},
-			}),
+			},
 			trace: model.Trace{
 				RootSpan: model.Span{
 					ID: spanID,
@@ -41,10 +46,10 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedAllPassed: true,
-			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+			expectedResult: (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []test.AssertionResult{
 				{
 					Assertion: `attr:tracetest.span.duration = 2000ns`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
 							ObservedValue: "2us",
@@ -56,14 +61,20 @@ func TestAssertion(t *testing.T) {
 		},
 		{
 			name: "CanAssertOnSpanMatchCount",
-			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
-				Assertions: []model.Assertion{
-					`attr:tracetest.selected_spans.count = 1`,
+			testDef: test.Specs{
+				{
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
+					Assertions: []test.Assertion{
+						`attr:tracetest.selected_spans.count = 1`,
+					},
 				},
-			}).MustAdd(`span[service.name="NotExists"]`, model.NamedAssertions{
-				Assertions: []model.Assertion{
-					`attr:tracetest.selected_spans.count = 0`,
-				}}),
+				{
+					Selector: test.SpanQuery(`span[service.name="NotExists"]`),
+					Assertions: []test.Assertion{
+						`attr:tracetest.selected_spans.count = 0`,
+					},
+				},
+			},
 			trace: model.Trace{
 				RootSpan: model.Span{
 					ID: spanID,
@@ -74,10 +85,10 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedAllPassed: true,
-			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+			expectedResult: (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []test.AssertionResult{
 				{
 					Assertion: `attr:tracetest.selected_spans.count = 1`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
 							ObservedValue: "1",
@@ -85,10 +96,10 @@ func TestAssertion(t *testing.T) {
 						},
 					},
 				},
-			}).MustAdd(`span[service.name="NotExists"]`, []model.AssertionResult{
+			}).MustAdd(`span[service.name="NotExists"]`, []test.AssertionResult{
 				{
 					Assertion: `attr:tracetest.selected_spans.count = 0`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        nil,
 							ObservedValue: "0",
@@ -101,11 +112,15 @@ func TestAssertion(t *testing.T) {
 		// https://github.com/kubeshop/tracetest/issues/617
 		{
 			name: "ContainsWithJSON",
-			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
-				Assertions: []model.Assertion{
-					`attr:http.response.body contains 52`,
-					`attr:tracetest.span.duration <= 21ms`,
-				}}),
+			testDef: test.Specs{
+				{
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
+					Assertions: []test.Assertion{
+						`attr:http.response.body contains 52`,
+						`attr:tracetest.span.duration <= 21ms`,
+					},
+				},
+			},
 			trace: model.Trace{
 				RootSpan: model.Span{
 					ID: spanID,
@@ -117,10 +132,10 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedAllPassed: true,
-			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+			expectedResult: (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []test.AssertionResult{
 				{
 					Assertion: `attr:http.response.body contains 52`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
 							ObservedValue: `{"id":52}`,
@@ -130,7 +145,7 @@ func TestAssertion(t *testing.T) {
 				},
 				{
 					Assertion: `attr:tracetest.span.duration <= 21ms`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
 							ObservedValue: "21ms",
@@ -143,10 +158,14 @@ func TestAssertion(t *testing.T) {
 		// https://github.com/kubeshop/tracetest/issues/1203
 		{
 			name: "DurationComparison",
-			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
-				Assertions: []model.Assertion{
-					`attr:tracetest.span.duration <= 25ms`,
-				}}),
+			testDef: test.Specs{
+				{
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
+					Assertions: []test.Assertion{
+						`attr:tracetest.span.duration <= 25ms`,
+					},
+				},
+			},
 			trace: model.Trace{
 				RootSpan: model.Span{
 					ID: spanID,
@@ -158,10 +177,10 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedAllPassed: true,
-			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+			expectedResult: (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []test.AssertionResult{
 				{
 					Assertion: `attr:tracetest.span.duration <= 25ms`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
 							ObservedValue: "25ms",
@@ -174,10 +193,14 @@ func TestAssertion(t *testing.T) {
 		// https://github.com/kubeshop/tracetest/issues/1421
 		{
 			name: "FailedAssertionsConvertDurationFieldsIntoDurationFormat",
-			testDef: (model.OrderedMap[model.SpanQuery, model.NamedAssertions]{}).MustAdd(`span[service.name="Pokeshop"]`, model.NamedAssertions{
-				Assertions: []model.Assertion{
-					`attr:tracetest.span.duration <= 25ms`,
-				}}),
+			testDef: test.Specs{
+				{
+					Selector: test.SpanQuery(`span[service.name="Pokeshop"]`),
+					Assertions: []test.Assertion{
+						`attr:tracetest.span.duration <= 25ms`,
+					},
+				},
+			},
 			trace: model.Trace{
 				RootSpan: model.Span{
 					ID: spanID,
@@ -189,10 +212,10 @@ func TestAssertion(t *testing.T) {
 				},
 			},
 			expectedAllPassed: false,
-			expectedResult: (model.OrderedMap[model.SpanQuery, []model.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []model.AssertionResult{
+			expectedResult: (maps.Ordered[test.SpanQuery, []test.AssertionResult]{}).MustAdd(`span[service.name="Pokeshop"]`, []test.AssertionResult{
 				{
 					Assertion: `attr:tracetest.span.duration <= 25ms`,
-					Results: []model.SpanAssertionResult{
+					Results: []test.SpanAssertionResult{
 						{
 							SpanID:        &spanID,
 							ObservedValue: "35ms",
@@ -213,7 +236,7 @@ func TestAssertion(t *testing.T) {
 
 			assert.Equal(t, cl.expectedAllPassed, allPassed)
 
-			cl.expectedResult.ForEach(func(expectedSel model.SpanQuery, expectedAssertionResults []model.AssertionResult) error {
+			cl.expectedResult.ForEach(func(expectedSel test.SpanQuery, expectedAssertionResults []test.AssertionResult) error {
 				actualAssertionResults := actual.Get(expectedSel)
 				assert.NotEmpty(t, actualAssertionResults, `expected selector "%s" not found`, expectedSel)
 				for i := 0; i < len(expectedAssertionResults); i++ {

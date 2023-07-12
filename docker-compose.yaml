@@ -5,6 +5,8 @@ services:
     image: kubeshop/tracetest:${TAG:-latest}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    build:
+      context: .
     volumes:
       - type: bind
         source: ./local-config/tracetest.config.yaml
@@ -27,7 +29,7 @@ services:
       TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
-    image: postgres
+    image: postgres:14
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -44,11 +46,13 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-        - "55679:55679"
-        - "4317:4317"
-        - "8888:8888"
+      - "55679:55679"
+      - "4317:4317"
+      - "8888:8888"
     command:
-        - "--config"
-        - "/otel-local-config.yaml"
+      - "--config"
+      - "/otel-local-config.yaml"
     volumes:
-        - ./local-config/collector.config.yaml:/otel-local-config.yaml
+      - ./local-config/collector.config.yaml:/otel-local-config.yaml
+    depends_on:
+      - tracetest

@@ -57,7 +57,6 @@ const (
 )
 
 func dockerComposeInstaller(config configuration, ui cliUI.UI) {
-	trackInstall("docker-compose", config, nil)
 	dir := config.String("output.dir")
 
 	err := os.RemoveAll(dir)
@@ -71,7 +70,7 @@ func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
 
 	dockerCmd := fmt.Sprintf(
-		"docker compose -f %s  up -d",
+		"docker compose -f %s up -d",
 		dockerComposeFName,
 	)
 
@@ -130,6 +129,7 @@ func getDockerComposeFileContents(ui cliUI.UI, config configuration) []byte {
 
 	sout := fixPortConfig(string(output))
 	sout = strings.ReplaceAll(sout, "$", "$$")
+	sout = strings.ReplaceAll(sout, "$${TRACETEST_DEV}", "${TRACETEST_DEV}")
 
 	return []byte(sout)
 }
@@ -259,6 +259,8 @@ func fixTracetestContainer(config configuration, project *types.Project, version
 	tts.Image = "kubeshop/tracetest:" + version
 	tts.Build = nil
 	tts.Volumes[0].Source = tracetestConfigFilename
+	tracetestDevEnv := "${TRACETEST_DEV}"
+	tts.Environment["TRACETEST_DEV"] = &tracetestDevEnv
 
 	replaceService(project, serviceName, tts)
 
@@ -322,6 +324,9 @@ func getCompleteProject(ui cliUI.UI, config configuration) *types.Project {
 	project, err := loader.Load(types.ConfigDetails{
 		WorkingDir:  workingDir,
 		ConfigFiles: configFiles,
+		Environment: map[string]string{
+			"TRACETEST_DEV": "",
+		},
 	})
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot parse docker-compose file: %w", err).Error())

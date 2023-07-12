@@ -17,6 +17,9 @@ const TraceTestAPI = createApi({
   reducerPath: 'tests',
   baseQuery: fetchBaseQuery({
     baseUrl: PATH,
+    prepareHeaders: headers => {
+      headers.set('x-source', 'web');
+    },
   }),
   tagTypes: Object.values(TracetestApiTags),
   endpoints(builder: TTestApiEndpointBuilder) {
@@ -50,6 +53,7 @@ export const {
   useLazyGetRunListQuery,
   useDryRunMutation,
   useDeleteRunByIdMutation,
+  useStopRunMutation,
   useGetJUnitByRunIdQuery,
   useLazyGetJUnitByRunIdQuery,
   useEditTestMutation,
@@ -71,8 +75,7 @@ export const {
   useGetTransactionVersionByIdQuery,
   useGetResourceDefinitionQuery,
   useLazyGetResourceDefinitionQuery,
-  useGetDataStoresQuery,
-  useCreateDataStoreMutation,
+  useGetDataStoreQuery,
   useUpdateDataStoreMutation,
   useDeleteDataStoreMutation,
   useTestConnectionMutation,
@@ -80,6 +83,7 @@ export const {
   useGetConfigQuery,
   useGetPollingQuery,
   useGetDemoQuery,
+  useGetLinterQuery,
   useCreateSettingMutation,
   useUpdateSettingMutation,
 } = TraceTestAPI;

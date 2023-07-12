@@ -6,14 +6,19 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
-	"github.com/kubeshop/tracetest/server/id"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"go.opentelemetry.io/otel/trace"
@@ -145,8 +150,8 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": firstSpan.ID.String(),
+			"testSpan":                           "true",
+			model.TracetestMetadataFieldParentID: firstSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -261,8 +266,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
 			Attributes: map[string]string{
-				"testSpan":  "true",
-				"parent_id": rootSpanID.String(),
+				"testSpan":                           "true",
+				model.TracetestMetadataFieldParentID: rootSpanID.String(),
 			},
 			Children: []*model.Span{},
 		},
@@ -322,8 +327,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": rootSpan.ID.String(),
+			"testSpan":                           "true",
+			model.TracetestMetadataFieldParentID: rootSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -391,8 +396,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": rootSpan.ID.String(),
+			"testSpan":                           "true",
+			model.TracetestMetadataFieldParentID: rootSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -403,8 +408,8 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":  "true",
-			"parent_id": firstSpan.ID.String(),
+			"testSpan":                           "true",
+			model.TracetestMetadataFieldParentID: firstSpan.ID.String(),
 		},
 		Children: []*model.Span{},
 	}
@@ -443,27 +448,29 @@ type iterationExpectedValues struct {
 
 func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
 	ctx := context.Background()
-	run := model.NewRun()
+	run := test.NewRun()
 
-	test := model.Test{
+	test := test.Test{
 		ID: id.ID("some-test"),
-		ServiceUnderTest: model.Trigger{
-			Type: model.TriggerTypeHTTP,
+		Trigger: trigger.Trigger{
+			Type: trigger.TriggerTypeHTTP,
 		},
 	}
 
 	for i, value := range expectedValues {
-		request := executor.NewPollingRequest(ctx, test, run, i)
+		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
 
-		finished, anotherRun, err := pollerExecutor.ExecuteRequest(request)
+		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(request)
 		run = anotherRun // should store a run to use in another iteration
 
 		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
 
 		if value.finished {
 			require.Truef(t, finished, "The poller should have finished on iteration %d", i)
+			require.NotEmptyf(t, finishReason, "The poller should not have finish reason on iteration %d", i)
 		} else {
 			require.Falsef(t, finished, "The poller should have not finished on iteration %d", i)
+			require.Emptyf(t, finishReason, "The poller should have finish reason on iteration %d", i)
 		}
 
 		if value.expectNoTraceError {
@@ -503,15 +510,18 @@ func (dpc defaultProfileGetter) GetDefault(context.Context) pollingprofile.Polli
 func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
-	testDB := getDataStoreRepositoryMock(t)
+	testDB := getRunRepositoryMock(t)
+	dataStoreRepo := getDataStoreRepositoryMock(t)
 	traceDBFactory := getTraceDBMockFactory(t, tracePerIteration, &traceDBState{})
+	eventEmitter := getEventEmitterMock(t, testDB)
 
 	return executor.NewPollerExecutor(
 		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
 		tracer,
 		updater,
 		traceDBFactory,
-		testDB,
+		dataStoreRepo,
+		eventEmitter,
 	)
 }
 
@@ -520,30 +530,38 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 // RunUpdater
 type runUpdaterMock struct{}
 
-func (m runUpdaterMock) Update(context.Context, model.Run) error { return nil }
+func (m runUpdaterMock) Update(context.Context, test.Run) error { return nil }
 
 func getRunUpdaterMock(t *testing.T) executor.RunUpdater {
 	return runUpdaterMock{}
 }
 
-// DataStoreRepository
-type dataStoreRepositoryMock struct {
-	testdb.MockRepository
-	// ...
-}
-
-func (m dataStoreRepositoryMock) DefaultDataStore(_ context.Context) (model.DataStore, error) {
-	return model.DataStore{}, nil
-}
-
-func getDataStoreRepositoryMock(t *testing.T) model.Repository {
+// RunRepository
+func getRunRepositoryMock(t *testing.T) model.Repository {
 	t.Helper()
 
-	mock := new(dataStoreRepositoryMock)
-	mock.T = t
-	mock.Test(t)
+	testDB := testdb.MockRepository{}
+	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
 
-	return mock
+	return &testDB
+}
+
+// DataStoreRepository
+type dataStoreRepositoryMock struct{}
+
+func (m *dataStoreRepositoryMock) Current(ctx context.Context) (datastore.DataStore, error) {
+	return datastore.DataStore{Type: datastore.DataStoreTypeOTLP}, nil
+}
+
+func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {
+	return &dataStoreRepositoryMock{}
+}
+
+// EventEmitter
+func getEventEmitterMock(t *testing.T, db model.Repository) executor.EventEmitter {
+	t.Helper()
+
+	return executor.NewEventEmitter(db, subscription.NewManager())
 }
 
 // Tracer
@@ -585,6 +603,7 @@ func (db *traceDBMock) GetTraceID() trace.TraceID {
 func (db *traceDBMock) Connect(ctx context.Context) error { return nil }
 func (db *traceDBMock) Close() error                      { return nil }
 func (db *traceDBMock) Ready() bool                       { return true }
+func (db *traceDBMock) GetEndpoints() string              { return "" }
 func (db *traceDBMock) TestConnection(ctx context.Context) model.ConnectionResult {
 	return model.ConnectionResult{}
 }
@@ -593,10 +612,10 @@ type traceDBState struct {
 	currentIteration int
 }
 
-func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(model.DataStore) (tracedb.TraceDB, error) {
+func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(datastore.DataStore) (tracedb.TraceDB, error) {
 	t.Helper()
 
-	return func(ds model.DataStore) (tracedb.TraceDB, error) {
+	return func(ds datastore.DataStore) (tracedb.TraceDB, error) {
 		return &traceDBMock{
 			tracePerIteration: tracePerIteration,
 			state:             state,

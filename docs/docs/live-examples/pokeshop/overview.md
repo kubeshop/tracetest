@@ -2,13 +2,13 @@
 
 As a testing ground, the team at Tracetest has implemented a sample instrumented API around the [PokeAPI](https://pokeapi.co/).
 
-The idea is to have a microservice-divided system that behaves like a typical scenario by having async processes ([RabbitMQ](https://www.rabbitmq.com/)), cache layers ([Redis](https://redis.io/)), database storage ([Postgres](https://www.postgresql.org/)), and simple CRUD interfaces for Pokemons.
+The idea is to have a microservice-divided system that behaves like a typical scenario by having async processes ([RabbitMQ](https://www.rabbitmq.com/)), cache layers ([Redis](https://redis.io/)), database storage ([Postgres](https://www.postgresql.org/)) and simple CRUD interfaces for Pokemons.
 
-With this, users can get familiar with the Tracetest tool by focusing on creating assertions, visualizing the trace, and identifying the different data that comes from the Collector ([Jaeger](https://www.jaegertracing.io/)). Users will learn about basic instrumentation practices like what tools to use, what data to send, when, and what suggested standards need to be followed.
+With this, users can get familiar with the Tracetest tool by focusing on creating assertions, visualizing the trace and identifying the different data that comes from the Collector ([Jaeger](https://www.jaegertracing.io/)). Users will learn about basic instrumentation practices: what tools to use, what data to send, when, and what suggested standards need to be followed.
 
 - **Source Code**: https://github.com/kubeshop/pokeshop
-- **Running it locally**: [instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-it-locally)
-- **Running on Kubernetes**: [instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster)
+- **Running it locally**: [Instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-it-locally)
+- **Running on Kubernetes**: [Instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster)
 
 ## Use Cases
 
@@ -21,8 +21,9 @@ We have three use cases that use each component of this structure and that can b
 
 ## System Architecture
 
-The system is divided into two components: 
-- an **API** that serves client requests, 
+The system is divided into two components:
+
+- an **API** that serves client requests,
 - a **Worker** who deals with background processes.
 
 The communication between the API and Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to Jaeger and communicate with a Postgres database.

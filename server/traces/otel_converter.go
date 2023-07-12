@@ -52,15 +52,57 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *model.Span {
 	}
 
 	spanID := createSpanID(span.SpanId)
-	attributes["parent_id"] = createSpanID(span.ParentSpanId).String()
+	attributes[model.TracetestMetadataFieldParentID] = createSpanID(span.ParentSpanId).String()
 	return &model.Span{
 		ID:         spanID,
 		Name:       span.Name,
+		Kind:       spanKind(span),
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Parent:     nil,
+		Events:     extractEvents(span),
 		Children:   make([]*model.Span, 0),
 		Attributes: attributes,
+	}
+}
+
+func extractEvents(v1 *v1.Span) []model.SpanEvent {
+	output := make([]model.SpanEvent, 0, len(v1.Events))
+	for _, v1Event := range v1.Events {
+		attributes := make(model.Attributes, 0)
+		for _, attribute := range v1Event.Attributes {
+			attributes[attribute.Key] = getAttributeValue(attribute.Value)
+		}
+		var timestamp time.Time
+
+		if v1Event.GetTimeUnixNano() != 0 {
+			timestamp = time.Unix(0, int64(v1Event.GetTimeUnixNano()))
+		}
+
+		output = append(output, model.SpanEvent{
+			Name:       v1Event.Name,
+			Timestamp:  timestamp,
+			Attributes: attributes,
+		})
+	}
+
+	return output
+}
+
+func spanKind(span *v1.Span) model.SpanKind {
+	switch span.Kind {
+	case v1.Span_SPAN_KIND_CLIENT:
+		return model.SpanKindClient
+	case v1.Span_SPAN_KIND_SERVER:
+		return model.SpanKindServer
+	case v1.Span_SPAN_KIND_INTERNAL:
+		return model.SpanKindInternal
+	case v1.Span_SPAN_KIND_PRODUCER:
+		return model.SpanKindProducer
+	case v1.Span_SPAN_KIND_CONSUMER:
+		return model.SpanKindConsumer
+	default:
+		return model.SpanKindUnespecified
 	}
 }
 

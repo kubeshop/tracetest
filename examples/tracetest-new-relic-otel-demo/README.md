@@ -24,7 +24,7 @@ The `tracetest` directory also contains an `e2e` directory with a `http-test.yam
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:21321` in the `otelcol-config-extras.yml` will map to the `tracetest` service, where the port `21321` is the port where Tracetest accepts traces.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `otelcol-config-extras.yml` will map to the `tracetest` service, where the port `4317` is the port where Tracetest accepts traces.
 
 ## OpenTelemetry Demo
 
@@ -84,7 +84,7 @@ The `TRACETEST_SERVICE_PORT` is configured in the `.env` file
 
   # Postgres used by the Tracetest instance
   tt_postgres:
-    image: postgres
+    image: postgres:14
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -156,9 +156,9 @@ dataStore:
 
 **How to send traces to Tracetest and New Relic?**
 
-The `otelcol-config-extras.yml` explains that. But first, check the `otelcol-config.yml`. It receives traces via either `grpc` or `http`. Then, in the `otelcol-config-extras.yml` you see a `exporters` that exports traces to Tracetest's OTLP endpoint `tracetest:21321` in one pipeline, and to New Relic in another.
+The `otelcol-config-extras.yml` explains that. But first, check the `otelcol-config.yml`. It receives traces via either `grpc` or `http`. Then, in the `otelcol-config-extras.yml` you see a `exporters` that exports traces to Tracetest's OTLP endpoint `tracetest:4317` in one pipeline, and to New Relic in another.
 
-Make sure to add your New Relic access token in the headers of the `otlp/nr` exporter.
+Make sure to add your New Relic access token in the headers of the `otlp/newrelic` exporter.
 
 ```yaml
 # otelcol-config-extras.yml
@@ -172,11 +172,11 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
-    endpoint: tracetest:21321 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
-  otlp/nr:
+  otlp/newrelic:
     endpoint: otlp.nr-data.net:443
     headers:
       api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
@@ -185,14 +185,14 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/nr:
+      exporters: [otlp/tracetest]
+    traces/newrelic:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/nr]
+      exporters: [logging, otlp/newrelic]
 ```
 
 ## Run the OpenTelemetry Demo with Tracetest and New Relic
@@ -229,7 +229,7 @@ First, [install the CLI](https://docs.tracetest.io/getting-started/installation#
 Then, configure the CLI:
 
 ```bash
-tracetest configure --endpoint http://localhost:11633 --analytics
+tracetest configure --endpoint http://localhost:11633
 ```
 
 Once configure, you can run a test against the Tracetest instance via the terminal.

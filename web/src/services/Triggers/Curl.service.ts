@@ -18,7 +18,7 @@ const CurlTriggerService = (): ICurlTriggerService => ({
 
   async validateDraft(draft) {
     const {url, method} = draft as ICurlValues;
-    return Validator.required(url) && Validator.required(method) && Validator.url(url);
+    return Validator.required(url) && Validator.required(method);
   },
 
   getRequestFromCommand(command) {
@@ -37,6 +37,7 @@ const CurlTriggerService = (): ICurlTriggerService => ({
       method: method as HTTP_METHOD,
       headers: Object.entries(headers).map(([key, value]) => ({key, value})),
       body: body === 'data' ? '' : JSON.stringify(body),
+      sslVerification: false,
     };
   },
 

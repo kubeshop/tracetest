@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	rm "github.com/kubeshop/tracetest/server/resourcemanager"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,7 +16,7 @@ func buildUpdateRequest(rt ResourceTypeTest, ct contentTypeConverter, testServer
 	id := extractID(rt.SampleJSON)
 	input := ct.fromJSON(rt.SampleJSONUpdated)
 
-	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(rt.ResourceType), id)
+	url := fmt.Sprintf("%s/%s/%s", testServer.URL, strings.ToLower(rt.ResourceTypePlural), id)
 
 	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(input))
 	require.NoError(t, err)
@@ -32,13 +33,13 @@ var updateSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		require.Equal(t, 200, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
 
 		jsonBody := responseBodyJSON(t, resp, ct)
 
 		expected := ct.toJSON(rt.SampleJSONUpdated)
 
-		require.JSONEq(t, expected, jsonBody)
+		rt.customJSONComparer(t, OperationUpdateSuccess, expected, jsonBody)
 	},
 })
 
@@ -52,7 +53,7 @@ var updateNotFoundOperation = buildSingleStepOperation(singleStepOperationTester
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
 		t.Helper()
-		require.Equal(t, 404, resp.StatusCode)
+		dumpResponseIfNot(t, assert.Equal(t, 404, resp.StatusCode), resp)
 	},
 })
 
@@ -65,6 +66,6 @@ var updateInternalErrorOperation = buildSingleStepOperation(singleStepOperationT
 		return buildUpdateRequest(rt, ct, testServer, t)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		assertInternalError(t, resp, ct, rt.ResourceType, "updating")
+		assertInternalError(t, resp, ct, rt.ResourceTypeSingular, "updating")
 	},
 })

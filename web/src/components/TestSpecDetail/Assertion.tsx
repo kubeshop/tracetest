@@ -1,4 +1,5 @@
 import AttributeValue from 'components/AttributeValue';
+import AssertionService from 'services/Assertion.service';
 import OperatorService from 'services/Operator.service';
 import {ICheckResult} from 'types/Assertion.types';
 import {TCompareOperatorSymbol} from 'types/Operator.types';
@@ -16,12 +17,23 @@ interface IProps {
 const Assertion = ({check, testId, runId, selector}: IProps) => (
   <S.CheckItemContainer>
     <S.GridContainer>
-      <S.Row $justify="center">{check.result.passed ? <S.IconSuccess /> : <S.IconError />}</S.Row>
-      <AttributeValue
-        strong
-        type={check.result.passed ? 'success' : 'danger'}
-        value={check.result.observedValue || '<Empty Value>'}
-      />
+      {check.result.error && AssertionService.isValidError(check.result.error) ? (
+        <>
+          <S.Row $justify="center">
+            <S.IconWarning />
+          </S.Row>
+          <AttributeValue strong type="warning" value={check.result.error} />
+        </>
+      ) : (
+        <>
+          <S.Row $justify="center">{check.result.passed ? <S.IconSuccess /> : <S.IconError />}</S.Row>
+          <AttributeValue
+            strong
+            type={check.result.passed ? 'success' : 'danger'}
+            value={check.result.observedValue || '<Empty Value>'}
+          />
+        </>
+      )}
       <div />
       <S.Row>
         <S.AssertionContainer>
