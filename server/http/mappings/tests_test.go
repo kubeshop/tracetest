@@ -4,9 +4,8 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/http/mappings"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
-	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +16,7 @@ func Test_OpenApiToModel_Outputs(t *testing.T) {
 		Outputs: []openapi.TestOutput{
 			{
 				Name: "OUTPUT",
-				Selector: openapi.Selector{
+				SelectorParsed: openapi.Selector{
 					Query: `span[name="root"]`,
 				},
 				Value: "attr:tracetest.selected_spans.count",
@@ -25,12 +24,15 @@ func Test_OpenApiToModel_Outputs(t *testing.T) {
 		},
 	}
 
-	expected := (maps.Ordered[string, model.Output]{}).MustAdd("OUTPUT", model.Output{
-		Selector: `span[name="root"]`,
-		Value:    "attr:tracetest.selected_spans.count",
-	})
+	expected := test.Outputs{
+		{
+			Name:     "OUTPUT",
+			Selector: `span[name="root"]`,
+			Value:    "attr:tracetest.selected_spans.count",
+		},
+	}
 
-	m := mappings.New(traces.NewConversionConfig(), nil, nil)
+	m := mappings.New(traces.NewConversionConfig(), nil)
 
 	actual, err := m.In.Test(in)
 	require.NoError(t, err)

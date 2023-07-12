@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configcompression"
@@ -22,7 +22,7 @@ type GrpcClient struct {
 	callback GrpcCallback
 }
 
-func convertDomainConfigToOpenTelemetryConfig(config *datastoreresource.GRPCClientSettings) *configgrpc.GRPCClientSettings {
+func convertDomainConfigToOpenTelemetryConfig(config *datastore.GRPCClientSettings) *configgrpc.GRPCClientSettings {
 	// manual map domain fields to OTel fields
 
 	otelConfig := &configgrpc.GRPCClientSettings{
@@ -61,7 +61,7 @@ func convertDomainConfigToOpenTelemetryConfig(config *datastoreresource.GRPCClie
 	return otelConfig
 }
 
-func NewGrpcClient(name string, config *datastoreresource.GRPCClientSettings, callback GrpcCallback) DataSource {
+func NewGrpcClient(name string, config *datastore.GRPCClientSettings, callback GrpcCallback) DataSource {
 	otelConfig := convertDomainConfigToOpenTelemetryConfig(config)
 
 	return &GrpcClient{

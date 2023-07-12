@@ -1,0 +1,22 @@
+type: Test
+spec:
+  id: create-pokemon
+  name: "Create Pokemon"
+  description: Create a single pokemon on Pokeshop
+  trigger:
+    type: grpc
+    grpc:
+      protobufFile: ./api.proto
+      address: demo-rpc:8082
+      method: pokeshop.Pokeshop.createPokemon
+      request: |-
+        {
+          "name": "Pikachu",
+          "type": "eletric",
+          "isFeatured": true
+        }
+  specs:
+    - name: It calls Pokeshop correctly
+      selector: span[tracetest.span.type="rpc" name="pokeshop.Pokeshop/createPokemon" rpc.system="grpc" rpc.method="createPokemon" rpc.service="pokeshop.Pokeshop"]
+      assertions:
+        - attr:rpc.grpc.status_code  =  0

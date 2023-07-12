@@ -39,6 +39,9 @@ const JaegerService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.JAEGER,
     };
   },
+  shouldTestConnection() {
+    return true;
+  },
 });
 
 export default JaegerService();

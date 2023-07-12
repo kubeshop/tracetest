@@ -80,28 +80,32 @@ var listSuccessOperation = buildSingleStepOperation(singleStepOperationTester{
 		)
 	},
 	assertResponse: func(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest) {
-		dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
-
-		jsonBody := responseBodyJSON(t, resp, ct)
-
-		var parsedJsonBody struct {
-			Count int   `json:"count"`
-			Items []any `json:"items"`
-		}
-		json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
-
-		dumpResponseIfNot(t, assert.Equal(t, 1, parsedJsonBody.Count), resp)
-		dumpResponseIfNot(t, assert.Equal(t, 1, len(parsedJsonBody.Items)), resp)
-
-		obtainedAsBytes, err := json.Marshal(parsedJsonBody.Items[0])
-		dumpResponseIfNot(t, assert.NoError(t, err), resp)
-
-		expected := ct.toJSON(rt.SampleJSON)
-		obtained := string(obtainedAsBytes)
-
-		rt.customJSONComparer(t, OperationListSuccess, expected, obtained)
+		assertListSuccessResponse(t, resp, ct, rt, rt.SampleJSON)
 	},
 })
+
+func assertListSuccessResponse(t *testing.T, resp *http.Response, ct contentTypeConverter, rt ResourceTypeTest, itemSample string) {
+	dumpResponseIfNot(t, assert.Equal(t, 200, resp.StatusCode), resp)
+
+	jsonBody := responseBodyJSON(t, resp, ct)
+
+	var parsedJsonBody struct {
+		Count int   `json:"count"`
+		Items []any `json:"items"`
+	}
+	json.Unmarshal([]byte(jsonBody), &parsedJsonBody)
+
+	dumpResponseIfNot(t, assert.Equal(t, 1, parsedJsonBody.Count), resp)
+	dumpResponseIfNot(t, assert.Equal(t, 1, len(parsedJsonBody.Items)), resp)
+
+	obtainedAsBytes, err := json.Marshal(parsedJsonBody.Items[0])
+	dumpResponseIfNot(t, assert.NoError(t, err), resp)
+
+	expected := ct.toJSON(itemSample)
+	obtained := string(obtainedAsBytes)
+
+	rt.customJSONComparer(t, OperationListSuccess, expected, obtained)
+}
 
 const OperationListWithInvalidSortField Operation = "ListWithInvalidSortField"
 
@@ -129,10 +133,10 @@ var listWithInvalidSortFieldOperation = buildSingleStepOperation(singleStepOpera
 	},
 })
 
-const OperationListPaginatedSuccess Operation = "ListPaginatedSuccess"
+const OperationListSortSuccess Operation = "ListSortSuccess"
 
-var listPaginatedSuccessOperation = operationTester{
-	name:               OperationListPaginatedSuccess,
+var listSortSuccessOperation = operationTester{
+	name:               OperationListSortSuccess,
 	neededForOperation: rm.OperationList,
 	getSteps: func(t *testing.T, rt ResourceTypeTest) []operationTesterStep {
 		steps := []operationTesterStep{}
@@ -193,15 +197,19 @@ func buildPaginationOperationStep(sortDirection, sortField string) operationTest
 					continue
 				}
 
+				msg := fmt.Sprintf("incorrect sorting for field '%s' direction '%s'", sortField, sortDirection)
+
 				if sortDirection == "asc" {
-					assert.LessOrEqual(t, prevVal, itemSpec[sortField])
-					asserted++
+					assert.LessOrEqual(t, prevVal, itemSpec[sortField], msg)
 				} else {
-					assert.GreaterOrEqual(t, prevVal, itemSpec[sortField])
-					asserted++
+					assert.GreaterOrEqual(t, prevVal, itemSpec[sortField], msg)
 				}
+				asserted++
+				prevVal = itemSpec[sortField]
 			}
-			assert.Equal(t, len(parsedJsonBody.Items), asserted)
+
+			msg := fmt.Sprintf("incorrect number of items asserted for field '%s' direction '%s'", sortField, sortDirection)
+			assert.Equal(t, len(parsedJsonBody.Items), asserted, msg)
 		},
 	}
 }

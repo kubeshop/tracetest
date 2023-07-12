@@ -22,7 +22,7 @@ export const EnvironmentCard = ({
   onEdit,
 }: IProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const {loadDefinition} = useFileViewerModal();
+  const {onDefinition} = useFileViewerModal();
   const {selectedEnvironment} = useEnvironment();
   const isSelected = selectedEnvironment?.id === id;
 
@@ -62,7 +62,7 @@ export const EnvironmentCard = ({
                   label: <span data-cy="environment-actions-definition">Environment Definition</span>,
                   onClick: e => {
                     e.domEvent.stopPropagation();
-                    loadDefinition(ResourceType.Environment, id);
+                    onDefinition(ResourceType.Environment, id);
                   },
                 },
                 {
@@ -90,7 +90,7 @@ export const EnvironmentCard = ({
           <E.VariablesMainContainer>
             <E.HeaderContainer>
               <E.HeaderText>Key</E.HeaderText>
-              <E.HeaderTextRight>Value</E.HeaderTextRight>
+              <E.HeaderText>Value</E.HeaderText>
             </E.HeaderContainer>
             <E.VariablesContainer>
               {values.map(value => (

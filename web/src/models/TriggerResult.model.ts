@@ -24,7 +24,7 @@ const ResponseData = {
     return {
       body: get(response, 'body', ''),
       headers: get(response, 'metadata', undefined) as THeader[],
-      statusCode: get(response, 'statusCode', 200),
+      statusCode: get(response, 'statusCode', 0),
     };
   },
   [TriggerTypes.traceid](response: object) {
@@ -37,10 +37,10 @@ const ResponseData = {
 };
 
 const TriggerResult = ({
-  triggerType = 'http',
-  triggerResult: {http = {}, grpc = {}, traceid = {}} = {},
+  type: rawType = 'http',
+  triggerResult: {http = {}, grpc = {statusCode: 0}, traceid = {}} = {},
 }: TRawTriggerResult): TriggerResult => {
-  const type = triggerType as TriggerTypes;
+  const type = rawType as TriggerTypes;
 
   let request = {};
   if (type === TriggerTypes.http) {

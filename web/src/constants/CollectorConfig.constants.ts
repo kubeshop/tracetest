@@ -14,26 +14,26 @@ exporters:
   logging:
     logLevel: debug
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Lightstep
-  otlp/ls:
+  otlp/lightstep:
     endpoint: ingest.lightstep.com:443
     headers:
       "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/ls:
+      exporters: [otlp/tracetest]
+    traces/lightstep:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp/lightstep]
 `;
 
 export const OtelCollector = `receivers:
@@ -74,12 +74,12 @@ exporters:
   logging:
     logLevel: debug
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for New Relic
-  otlp/nr:
+  otlp/newrelic:
     endpoint: otlp.nr-data.net:443
     headers:
       api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
@@ -88,14 +88,14 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/nr:
+      exporters: [otlp/tracetest]
+    traces/newrelic:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/nr]
+      exporters: [logging, otlp/newrelic]
 `;
 
 export const Datadog = `receivers:
@@ -112,7 +112,7 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
@@ -124,11 +124,11 @@ exporters:
       # Read more in docs here: https://docs.datadoghq.com/opentelemetry/otel_collector_datadog_exporter
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/dd:
+      exporters: [otlp/tracetest]
+    traces/datadog:
       receivers: [otlp]
       processors: [batch]
       exporters: [datadog]
@@ -148,12 +148,12 @@ exporters:
   logging:
     logLevel: debug
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Honeycomb
-  otlp/hc:
+  otlp/honeycomb:
     endpoint: "api.honeycomb.io:443"
     headers:
       "x-honeycomb-team": "YOUR_API_KEY"
@@ -161,14 +161,42 @@ exporters:
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/hc:
+      exporters: [otlp/tracetest]
+    traces/honeycomb:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/hc]
+      exporters: [logging, otlp/honeycomb]
+`;
+
+export const AzureAppInsights = `receivers:
+otlp:
+  protocols:
+    grpc:
+    http:
+
+processors:
+  batch:
+
+exporters:
+  azuremonitor:
+    instrumentation_key: <your-instrumentation-key>
+  otlp/tracetest:
+    endpoint: tracetest:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tracetest]
+    traces/appinsights:
+      receivers: [otlp]
+      exporters: [azuremonitor]
 `;
 
 export const CollectorConfigMap = {
@@ -177,4 +205,5 @@ export const CollectorConfigMap = {
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.OtelCollector]: OtelCollector,
   [SupportedDataStores.Honeycomb]: Honeycomb,
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
 } as const;

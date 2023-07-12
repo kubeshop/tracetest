@@ -48,6 +48,8 @@ components:
           $ref: "#/components/schemas/SignalFX"
         awsxray:
           $ref: "#/components/schemas/AwsXRay"
+        azureappinsights:
+          $ref: "#/components/schemas/AzureAppInsights"
         createdAt:
           type: string
           format: date-time
@@ -83,6 +85,17 @@ components:
         realm:
           type: string
         token:
+          type: string
+    AzureAppInsights:
+      type: object
+      properties:
+        useAzureActiveDirectoryAuth:
+          type: boolean
+        accessToken:
+          type: string
+        connectionType:
+          $ref: "#/components/schemas/SupportedConnectionTypes"
+        resourceArmId:
           type: string
     AwsXRay:
       type: object
@@ -180,7 +193,11 @@ components:
           datadog,
           awsxray,
           honeycomb,
+          azureappinsights,
         ]
     SupportedClients:
       type: string
       enum: [http, grpc]
+    SupportedConnectionTypes:
+      type: string
+      enum: [direct, collector]

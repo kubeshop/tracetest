@@ -1,0 +1,8 @@
+version: "3"
+services:
+  app:
+    build: .
+    environment:
+      CONNECTION_STRING: ${CONNECTION_STRING}
+    ports:
+      - "8080:8080"

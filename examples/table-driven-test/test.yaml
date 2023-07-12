@@ -1,0 +1,22 @@
+type: Test
+spec:
+  id: nply2H84g
+  name: ITERATION TEST
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-pokemon-api.demo/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      - key: X-Some-Header
+        value: ${env:someValue}
+      body: '{"id":${env:pokeid}}'
+
+  specs:
+  - name: 'All Database Spans: Processing time is less than 100ms'
+    selector: span[tracetest.span.type="database"]
+    assertions:
+    - attr:tracetest.span.duration < 100ms

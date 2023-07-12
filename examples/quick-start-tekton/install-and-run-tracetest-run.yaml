@@ -1,0 +1,7 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: install-and-run-tracetest-run
+spec:
+  taskRef:
+    name: install-and-run-tracetest

@@ -1,3 +1,5 @@
+import Env from './Env';
+
 export const escapeString = (str: string): string => {
   // eslint-disable-next-line no-control-regex
   return str.replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
@@ -57,3 +59,10 @@ export function ordinalSuffixOf(i: number) {
 export function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);
 }
+
+export const getServerBaseUrl = () => {
+  const {host, protocol} = window.location;
+  const prefix = Env.get('serverPathPrefix');
+
+  return `${protocol}//${host}${prefix}`;
+};

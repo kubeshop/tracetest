@@ -1,11 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
+export TAG=${TAG:-dev}
+
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
 
+help_message() {
+  echo "usage: ./run.sh [cypress|tracetests|up|stop|build|down|tracetest-logs|logs|ps|restart]"
+}
+
 restart() {
-  make build-docker
   docker compose $opts kill tracetest
   docker compose $opts up -d tracetest
 }
@@ -14,7 +19,7 @@ logs() {
   docker compose $opts logs -f
 }
 
-logstt() {
+tracetest-logs() {
   docker compose $opts logs -f tracetest
 }
 
@@ -26,46 +31,95 @@ down() {
   docker compose $opts down
 }
 
-up() {
+build() {
   make build-docker
+  # the previous commands builds the cli binary for linux (because its the os in docker)
+  # if the script is run on another os, like macos, we need to rebuild for the binary to match the os
+  make dist/tracetest
+}
+
+up() {
   docker compose $opts up -d --remove-orphans
 }
 
-test() {
-
-  echo "Running tests: "${TESTS[@]}
-
-  docker compose $opts -f local-config/docker-compose.testrunner.yaml build ${TESTS[@]}
-  docker compose $opts -f local-config/docker-compose.testrunner.yaml run ${TESTS[@]}
+stop() {
+  docker compose $opts stop
 }
 
-TESTS=()
+cypress-ci() {
+
+  echo "Running cypress"
+
+
+  export CYPRESS_BASE_URL=http://localhost:11633
+  export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
+
+  cd web
+  npm run cy:ci
+}
+
+cypress() {
+
+  echo "Running cypress"
+
+
+  export CYPRESS_BASE_URL=http://localhost:11633
+  export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
+
+  cd web
+  npm run cy:run
+}
+
+tracetests() {
+
+  echo "Running tracetests"
+
+  SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+  export TRACETEST_CLI=${SCRIPT_DIR}/dist/tracetest
+  export TARGET_URL=http://localhost:11633
+  export TRACETEST_ENDPOINT=localhost:11633
+  export DEMO_APP_URL=http://demo-api:8081
+  export DEMO_APP_GRPC_URL=demo-rpc:8082
+
+  cd testing/server-tracetesting
+  ./run.bash
+}
+
 CMD=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     cypress)
-      TESTS+=("cypress")
+      CMD+=("cypress")
       shift
       ;;
-    dogfood)
-      TESTS+=("dogfood")
+    cypress-ci)
+      CMD+=("cypress-ci")
+      shift
+      ;;
+    tracetests)
+      CMD+=("tracetests")
       shift
       ;;
     up)
       CMD+=("up")
       shift
       ;;
+    stop)
+      CMD+=("stop")
+      shift
+      ;;
+    build)
+      CMD+=("build")
+      shift
+      ;;
     down)
       CMD+=("down")
       shift
       ;;
-    test)
-      CMD+=("test")
-      shift
-      ;;
-    logstt)
-      CMD+=("logstt")
+    tracetest-logs)
+      CMD+=("tracetest-logs")
       shift
       ;;
     logs)
@@ -90,7 +144,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ ${#CMD[@]} -eq 0 ]; then
-  echo "missing command. usage: ./run.sh [up|down|ps|logs|restart|test|dogfood|cypress]"
+  echo "Missing command"
+  help_message
   exit 1
 fi
 

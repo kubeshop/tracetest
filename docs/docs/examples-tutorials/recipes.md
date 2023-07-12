@@ -42,12 +42,26 @@ This integration point uses the OpenTelemetry Collector as a router to send trac
 - [Running Tracetest with AWS X-Ray (AWS Distro for OpenTelemetry & Pokeshop API)](./recipes/running-tracetest-with-aws-x-ray-pokeshop.md)
 - [Running Tracetest with AWS Step Functions, AWS X-Ray and Terraform](./recipes/running-tracetest-with-step-functions-terraform.md)
 
+### Azure App Insights
+
+- [Running Tracetest with Azure App Insights (AppInsights Otel Node.js SDK)](./recipes/running-tracetest-with-azure-app-insights.md)
+- [Running Tracetest with Azure App Insights (Otel Node.js SDK & OpenTelemetry Collector)](./recipes/running-tracetest-with-azure-app-insights-collector.md)
+- [Running Tracetest with Azure App Insights (OpenTelemetry Collector & Pokeshop API)](./recipes/running-tracetest-with-azure-app-insights-pokeshop.md)
+
+## CI/CD Automation
+
+These guides show integrations with CI/CD tools.
+
+- [GitHub Actions](../ci-cd-automation/github-actions-pipeline.md)
+- [Testkube](../ci-cd-automation/testkube-pipeline.md)
+- [Tekton](../ci-cd-automation/tekton-pipeline.md)
+
 ## Tools
 
-These recipes show integrations with other tools and vendors.
+These guides show integrations with other tools and vendors.
 
-### Testkube
-
-- [Running Tracetest with Testkube](./recipes/running-tracetest-with-testkube.md)
+- [Running Tracetest with Testkube](../tools-and-integrations/testkube.md)
+- [Running Tracetest with k6](../tools-and-integrations/k6.md)
+- [Running Tracetest with Keptn](../tools-and-integrations/keptn.md)
 
 Stay tuned! More recipes are coming soon. 🚀

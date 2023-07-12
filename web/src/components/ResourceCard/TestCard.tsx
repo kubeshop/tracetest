@@ -62,7 +62,7 @@ const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
             shouldEdit={shouldEdit}
             onDelete={() => onDelete(test.id, test.name, ResourceType.Test)}
             onEdit={() => onEdit(test.id, lastRunId, ResourceType.Test)}
-           />
+          />
         </S.Row>
       </S.TestContainer>
 

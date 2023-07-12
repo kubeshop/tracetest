@@ -3,11 +3,14 @@ package formatters_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/stretchr/testify/assert"
 )
+
+func baseURL() string {
+	return "http://localhost:11633"
+}
 
 func TestJSON(t *testing.T) {
 	in := formatters.TestRunOutput{
@@ -24,18 +27,13 @@ func TestJSON(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.TestRun(config.Config{
-		Scheme:   "http",
-		Endpoint: "localhost:11633",
-	}, false)
+	formatter := formatters.TestRun(baseURL, false)
 
-	formatters.SetOutput(formatters.JSON)
-	actual := formatter.Format(in)
+	actual := formatter.Format(in, formatters.JSON)
 
 	expected := `{"results":{"allPassed":true},"testRunWebUrl":"http://localhost:11633/test/9876543/run/1/test"}`
 
 	assert.JSONEq(t, expected, actual)
-	formatters.SetOutput(formatters.DefaultOutput)
 }
 
 func TestSuccessfulTestRunOutput(t *testing.T) {
@@ -52,11 +50,8 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			},
 		},
 	}
-	formatter := formatters.TestRun(config.Config{
-		Scheme:   "http",
-		Endpoint: "localhost:11633",
-	}, false)
-	output := formatter.Format(in)
+	formatter := formatters.TestRun(baseURL, false)
+	output := formatter.Format(in, formatters.Pretty)
 
 	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)\n", output)
 }
@@ -68,14 +63,10 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 		Test: openapi.Test{
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 1"),
-			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecsInner{
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my span"]`),
-						},
-						Name: *openapi.NewNullableString(&testSpecName),
-					},
+			Specs: []openapi.TestSpec{
+				{
+					Selector: openapi.PtrString(`span[name = "my span"]`),
+					Name:     openapi.PtrString(testSpecName),
 				},
 			},
 		},
@@ -108,11 +99,8 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			},
 		},
 	}
-	formatter := formatters.TestRun(config.Config{
-		Scheme:   "http",
-		Endpoint: "localhost:11633",
-	}, false)
-	output := formatter.Format(in)
+	formatter := formatters.TestRun(baseURL, false)
+	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)
 	✔ Validate span duration
 `
@@ -127,19 +115,13 @@ func TestFailingTestOutput(t *testing.T) {
 		Test: openapi.Test{
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 2"),
-			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecsInner{
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my span"]`),
-						},
-						Name: *openapi.NewNullableString(&testSpecName),
-					},
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my other span"]`),
-						},
-					},
+			Specs: []openapi.TestSpec{
+				{
+					Selector: openapi.PtrString(`span[name = "my span"]`),
+					Name:     openapi.PtrString(testSpecName),
+				},
+				{
+					Selector: openapi.PtrString(`span[name = "my other span"]`),
 				},
 			},
 		},
@@ -203,11 +185,8 @@ func TestFailingTestOutput(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.TestRun(config.Config{
-		Scheme:   "http",
-		Endpoint: "localhost:11633",
-	}, false)
-	output := formatter.Format(in)
+	formatter := formatters.TestRun(baseURL, false)
+	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 	✔ Validate span duration
 		✔ #123456
@@ -227,19 +206,13 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 		Test: openapi.Test{
 			Id:   openapi.PtrString("9876543"),
 			Name: openapi.PtrString("Testcase 2"),
-			Specs: &openapi.TestSpecs{
-				Specs: []openapi.TestSpecsSpecsInner{
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my span"]`),
-						},
-						Name: *openapi.NewNullableString(&testSpecName),
-					},
-					{
-						Selector: &openapi.Selector{
-							Query: openapi.PtrString(`span[name = "my other span"]`),
-						},
-					},
+			Specs: []openapi.TestSpec{
+				{
+					Selector: openapi.PtrString(`span[name = "my span"]`),
+					Name:     openapi.PtrString(testSpecName),
+				},
+				{
+					Selector: openapi.PtrString(`span[name = "my other span"]`),
 				},
 			},
 		},
@@ -303,11 +276,8 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 		},
 	}
 
-	formatter := formatters.TestRun(config.Config{
-		Scheme:   "http",
-		Endpoint: "localhost:11633",
-	}, false, formatters.WithPadding(1))
-	output := formatter.Format(in)
+	formatter := formatters.TestRun(baseURL, false, formatters.WithPadding(1))
+	output := formatter.Format(in, formatters.Pretty)
 	expectedOutput := `	✘ Testcase 2 (http://localhost:11633/test/9876543/run/1/test)
 		✔ Validate span duration
 			✔ #123456

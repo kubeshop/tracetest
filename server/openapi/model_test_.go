@@ -25,9 +25,10 @@ type Test struct {
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
-	ServiceUnderTest Trigger `json:"serviceUnderTest,omitempty"`
+	Trigger Trigger `json:"trigger,omitempty"`
 
-	Specs TestSpecs `json:"specs,omitempty"`
+	// specification of assertions that are going to be made
+	Specs []TestSpec `json:"specs,omitempty"`
 
 	// define test outputs, in a key/value format. The value is processed as an expression
 	Outputs []TestOutput `json:"outputs,omitempty"`
@@ -37,11 +38,13 @@ type Test struct {
 
 // AssertTestRequired checks if the required fields are not zero-ed
 func AssertTestRequired(obj Test) error {
-	if err := AssertTriggerRequired(obj.ServiceUnderTest); err != nil {
+	if err := AssertTriggerRequired(obj.Trigger); err != nil {
 		return err
 	}
-	if err := AssertTestSpecsRequired(obj.Specs); err != nil {
-		return err
+	for _, el := range obj.Specs {
+		if err := AssertTestSpecRequired(el); err != nil {
+			return err
+		}
 	}
 	for _, el := range obj.Outputs {
 		if err := AssertTestOutputRequired(el); err != nil {

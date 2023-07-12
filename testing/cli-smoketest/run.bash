@@ -50,7 +50,7 @@ EXIT_STATUS=0
 
 run_cli_command '--help' || EXIT_STATUS=$?
 run_cli_command 'version' || EXIT_STATUS=$?
-run_cli_command 'test run --definition ./tests/simple-test.yaml --wait-for-result' || EXIT_STATUS=$?
+run_cli_command 'run test --file ./tests/simple-test.yaml' || EXIT_STATUS=$?
 
 echo ""
 echo "Tests done! Exit code: $EXIT_STATUS"

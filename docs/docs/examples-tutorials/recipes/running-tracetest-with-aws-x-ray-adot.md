@@ -194,18 +194,18 @@ processors:
 exporters:
   awsxray:
     region: ${AWS_REGION}
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317
     tls:
       insecure: true
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [awsxray]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/xr:
+      exporters: [otlp/tracetest]
+    traces/awsxray:
       receivers: [awsxray]
       exporters: [awsxray]
 ```

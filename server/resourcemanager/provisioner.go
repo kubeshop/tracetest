@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/goccy/go-yaml"
 )
 
 var ErrTypeNotSupported = errors.New("type not supported")
@@ -34,4 +36,18 @@ func (m *manager[T]) Provision(ctx context.Context, values map[string]any) error
 	}
 
 	return m.rh.Provision(ctx, targetResource.Spec)
+}
+
+func decode(input any, output any) error {
+	yamlContent, err := yaml.Marshal(input)
+	if err != nil {
+		return fmt.Errorf("couldn't convert marshal input into YAML: %w", err)
+	}
+
+	err = yaml.Unmarshal(yamlContent, output)
+	if err != nil {
+		return fmt.Errorf("couldn't unmarshal YAML into target: %w", err)
+	}
+
+	return nil
 }

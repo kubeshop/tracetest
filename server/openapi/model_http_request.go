@@ -19,6 +19,8 @@ type HttpRequest struct {
 	Body string `json:"body,omitempty"`
 
 	Auth HttpAuth `json:"auth,omitempty"`
+
+	SslVerification bool `json:"sslVerification,omitempty"`
 }
 
 // AssertHttpRequestRequired checks if the required fields are not zero-ed

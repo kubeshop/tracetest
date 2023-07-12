@@ -21,8 +21,6 @@ How do you want to run TraceTest? [type to search]:
   Using Kubernetes
 ```
 
-<!-- ![Installer using docker compose](../img/installer/1_docker-compose_0.7.0.png) -->
-
 Select `Using Docker Compose` and follow the instructions.
 
 **Tools required (installed if missing)**:
@@ -30,20 +28,14 @@ Select `Using Docker Compose` and follow the instructions.
 - Docker
 - Docker Compose
 
-**Requirements**:
-
-- Jaeger or other compatible backend. If missing, the installer will help you configure one.
-- OpenTelemetry Collector. If missing, the installer will help you configure one.
-- A `docker-compose.yaml` (configurable) file in the project directory. If missing, the installer will create an empty file.
-
 **Optionals**:
 
 - [PokeShop demo app](https://github.com/kubeshop/pokeshop/). A sample microservice app to test your Tracetest installation.
+- [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/). A trace collector, that receives telemetry of other applications and sent it to Tracetest.
 
 **Result**:
 
 - `tracetest/` directory (configurable) with a `docker-compose.yaml` and other config files.
-- [Jaeger](https://www.jaegertracing.io/) instance, if selected.
 - [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/), if selected.
 - [PokeShop demo app](https://github.com/kubeshop/pokeshop/), if selected.
 

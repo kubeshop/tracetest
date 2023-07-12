@@ -1,0 +1,8 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: install-and-run-tracetest-binding
+spec:
+  params:
+  - name: run
+    value: $(body.run)

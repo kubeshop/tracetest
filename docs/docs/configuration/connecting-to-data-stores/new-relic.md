@@ -10,7 +10,7 @@ Examples of configuring Tracetest with New Relic can be found in the [`examples`
 
 In your OpenTelemetry Collector config file:
 
-- Set the `exporter` to `otlp/tt`
+- Set the `exporter` to `otlp/tracetest`
 - Set the `endpoint` to your Tracetest instance on port `4317`
 
 :::tip
@@ -19,7 +19,7 @@ If you are running Tracetest with Docker and Tracetest's service name is `tracet
 
 Additionally, add another config:
 
-- Set the `exporter` to `otlp/nr`.
+- Set the `exporter` to `otlp/newrelic`.
 - Set the `endpoint` pointing to your New Relic account and the New Relic ingest API.
 - Set your New Relic access token as a `header`.
 
@@ -42,12 +42,12 @@ exporters:
   logging:
     logLevel: debug
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for New Relic
-  otlp/nr:
+  otlp/newrelic:
     endpoint: otlp.nr-data.net:443
     headers:
       api-key: <new_relic_ingest_licence_key> # Send traces to New Relic.
@@ -59,14 +59,14 @@ service:
     # Your probably already have a traces pipeline, you don't have to change it.
     # Add these two to your configuration. Just make sure to not have two
     # pipelines with the same name
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp] # your receiver
       processors: [batch]
-      exporters: [otlp/tt] # your exporter pointing to your tracetest instance
-    traces/nr:
+      exporters: [otlp/tracetest] # your exporter pointing to your tracetest instance
+    traces/newrelic:
       receivers: [otlp] # your receiver
       processors: [batch]
-      exporters: [logging, otlp/nr] # your exporter pointing to your lighstep account
+      exporters: [logging, otlp/newrelic] # your exporter pointing to your lighstep account
 ```
 
 ## Configure Tracetest to Use New Relic as a Trace Data Store

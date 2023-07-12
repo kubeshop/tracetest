@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	dc "github.com/fluidtruck/deepcopy"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 type Transaction struct {
@@ -16,16 +16,13 @@ type Transaction struct {
 	Steps       []string          `mapstructure:"steps"`
 }
 
-func (t Transaction) Model() model.Transaction {
-	mt := model.Transaction{}
+func (t Transaction) Model() transaction.Transaction {
+	mt := transaction.Transaction{}
 	dc.DeepCopy(t, &mt)
-	steps := make([]model.Test, 0, len(t.Steps))
+	mt.StepIDs = make([]id.ID, 0, len(t.Steps))
 	for _, stepID := range t.Steps {
-		steps = append(steps, model.Test{
-			ID: id.ID(stepID),
-		})
+		mt.StepIDs = append(mt.StepIDs, id.ID(stepID))
 	}
-	mt.Steps = steps
 
 	return mt
 }

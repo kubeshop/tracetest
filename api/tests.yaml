@@ -1,6 +1,29 @@
 openapi: 3.0.0
 components:
   schemas:
+
+    TestResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestResource"
+
+    TestResource:
+      type: object
+      description: "Represents a test structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Test'."
+          enum:
+            - Test
+        spec:
+          $ref: "#/components/schemas/Test"
+
     Test:
       type: object
       properties:
@@ -17,10 +40,12 @@ components:
         createdAt:
           type: string
           format: date-time
-        serviceUnderTest:
+        trigger:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
         specs:
-          $ref: "#/components/schemas/TestSpecs"
+          type: array
+          items:
+            $ref: "#/components/schemas/TestSpec"
           description: specification of assertions that are going to be made
         outputs:
           description: define test outputs, in a key/value format. The value is processed as an expression
@@ -45,6 +70,8 @@ components:
         name:
           type: string
         selector:
+          type: string
+        selectorParsed:
           $ref: "#/components/schemas/Selector"
         value:
           type: string
@@ -69,6 +96,9 @@ components:
             fails:
               type: integer
               readOnly: true
+            analyzerScore:
+              type: integer
+              readOnly: true
 
     TestSpecs:
       type: object
@@ -76,17 +106,8 @@ components:
         specs:
           type: array
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                nullable: true
-              selector:
-                $ref: "#/components/schemas/Selector"
-              assertions:
-                type: array
-                items:
-                  type: string
+            $ref: "#/components/schemas/TestSpec"
+
       example:
         specs:
           - selector:
@@ -103,6 +124,20 @@ components:
               - attribute: http.status_code
                 comparator: "="
                 expected: "200"
+
+    TestSpec:
+      type: object
+      properties:
+        name:
+          type: string
+        selector:
+          type: string
+        selectorParsed:
+          $ref: "#/components/schemas/Selector"
+        assertions:
+          type: array
+          items:
+            type: string
 
     TestRun:
       type: object
@@ -127,6 +162,8 @@ components:
               EXECUTING,
               AWAITING_TRACE,
               AWAITING_TEST_RESULTS,
+              ANALYZING_TRACE,
+              ANALYZING_ERROR,
               FINISHED,
               STOPPED,
               TRIGGER_FAILED,
@@ -166,6 +203,8 @@ components:
           $ref: "./trace.yaml#/components/schemas/Trace"
         result:
           $ref: "#/components/schemas/AssertionResults"
+        linter:
+          $ref: "linters.yaml#/components/schemas/LinterResult"
         outputs:
           type: array
           items:

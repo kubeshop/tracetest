@@ -1,8 +1,9 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
+
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
+import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
 import TestProvider from '../Test';
 
 interface IContext {

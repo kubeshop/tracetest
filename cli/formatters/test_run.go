@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/pterm/pterm"
 )
 
@@ -17,7 +15,7 @@ const (
 )
 
 type testRun struct {
-	config        config.Config
+	baseURLFn     func() string
 	colorsEnabled bool
 	padding       int
 }
@@ -30,9 +28,9 @@ func WithPadding(padding int) testRunFormatterOption {
 	}
 }
 
-func TestRun(config config.Config, colorsEnabled bool, options ...testRunFormatterOption) testRun {
+func TestRun(baseURLFn func() string, colorsEnabled bool, options ...testRunFormatterOption) testRun {
 	testRun := testRun{
-		config:        config,
+		baseURLFn:     baseURLFn,
 		colorsEnabled: colorsEnabled,
 	}
 
@@ -45,17 +43,18 @@ func TestRun(config config.Config, colorsEnabled bool, options ...testRunFormatt
 
 type TestRunOutput struct {
 	HasResults bool            `json:"-"`
+	IsFailed   bool            `json:"-"`
 	Test       openapi.Test    `json:"test"`
 	Run        openapi.TestRun `json:"testRun"`
 	RunWebURL  string          `json:"testRunWebUrl"`
 }
 
-func (f testRun) Format(output TestRunOutput) string {
-	switch CurrentOutput {
-	case Pretty:
-		return f.pretty(output)
+func (f testRun) Format(output TestRunOutput, format Output) string {
+	switch format {
 	case JSON:
 		return f.json(output)
+	case Pretty, "":
+		return f.pretty(output)
 	}
 
 	return ""
@@ -78,7 +77,7 @@ func (f testRun) json(output TestRunOutput) string {
 }
 
 func (f testRun) pretty(output TestRunOutput) string {
-	if utils.RunStateIsFailed(output.Run.GetState()) {
+	if output.IsFailed {
 		return f.getColoredText(false, fmt.Sprintf("%s\n%s",
 			f.formatMessage("%s %s (%s)",
 				FAILED_TEST_ICON,
@@ -95,7 +94,7 @@ func (f testRun) pretty(output TestRunOutput) string {
 		return f.formatSuccessfulTest(output.Test, output.Run)
 	}
 
-	if output.Run.Result.AllPassed == nil || !*output.Run.Result.AllPassed {
+	if !output.Run.Result.GetAllPassed() {
 		return f.formatFailedTest(output.Test, output.Run)
 	}
 
@@ -111,7 +110,11 @@ func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) st
 	buffer.WriteString(message)
 
 	for i, specResult := range run.Result.Results {
-		title := f.getTestSpecTitle(test.Specs.Specs[i].GetName(), specResult)
+		if len(test.Specs) <= i {
+			break // guard clause: this means that the server sent more results than specs
+		}
+
+		title := f.getTestSpecTitle(test.Specs[i].GetName(), specResult)
 		message := f.formatMessage("\t%s %s\n", PASSED_TEST_ICON, title)
 		message = f.getColoredText(true, message)
 		buffer.WriteString(message)
@@ -145,7 +148,6 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		allPassed := true
 
 		for _, result := range specResult.Results {
-
 			for _, spanResult := range result.SpanResults {
 				// meta assertions such as tracetest.selected_spans.count don't have a spanID,
 				// so they will be treated differently. To overcome them, we will place all
@@ -182,7 +184,11 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 			}
 		}
 
-		title := f.getTestSpecTitle(test.Specs.Specs[i].GetName(), specResult)
+		if len(test.Specs) <= i {
+			break // guard clause: this means that the server sent more results than specs
+		}
+
+		title := f.getTestSpecTitle(test.Specs[i].GetName(), specResult)
 		icon := f.getStateIcon(allPassed)
 		message := f.formatMessage("\t%s %s\n", icon, title)
 		message = f.getColoredText(allPassed, message)
@@ -269,7 +275,7 @@ func (f testRun) getColoredText(passed bool, text string) string {
 }
 
 func (f testRun) GetRunLink(testID, runID string) string {
-	return fmt.Sprintf("%s://%s/test/%s/run/%s/test", f.config.Scheme, f.config.Endpoint, testID, runID)
+	return fmt.Sprintf("%s/test/%s/run/%s/test", f.baseURLFn(), testID, runID)
 }
 
 func (f testRun) getDeepLink(baseLink string, index int, spanID string) string {

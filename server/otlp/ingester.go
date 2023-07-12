@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -16,16 +17,16 @@ import (
 )
 
 type ingester struct {
-	db           model.Repository
-	eventEmitter executor.EventEmitter
-	dsRepo       *datastoreresource.Repository
+	runRepository test.RunRepository
+	eventEmitter  executor.EventEmitter
+	dsRepo        *datastore.Repository
 }
 
-func NewIngester(db model.Repository, eventEmitter executor.EventEmitter, dsRepo *datastoreresource.Repository) ingester {
+func NewIngester(runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
 	return ingester{
-		db:           db,
-		eventEmitter: eventEmitter,
-		dsRepo:       dsRepo,
+		runRepository: runRepository,
+		eventEmitter:  eventEmitter,
+		dsRepo:        dsRepo,
 	}
 }
 
@@ -81,7 +82,7 @@ func (i ingester) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[tra
 }
 
 func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span, requestType string) error {
-	run, err := e.db.GetRunByTraceID(ctx, traceID)
+	run, err := e.runRepository.GetRunByTraceID(ctx, traceID)
 	if err != nil && strings.Contains(err.Error(), "record not found") {
 		// span is not part of any known test run. So it will be ignored
 		return nil
@@ -91,7 +92,7 @@ func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, 
 		return fmt.Errorf("could not find test run with traceID %s: %w", traceID.String(), err)
 	}
 
-	if run.State != model.RunStateAwaitingTrace {
+	if run.State != test.RunStateAwaitingTrace {
 		// test is not waiting for trace, so we can completely ignore those as they might
 		// mess up with the test integrity.
 		//
@@ -114,7 +115,7 @@ func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, 
 	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans), requestType))
 	run.Trace = &newTrace
 
-	err = e.db.UpdateRun(ctx, run)
+	err = e.runRepository.UpdateRun(ctx, run)
 	if err != nil {
 		return fmt.Errorf("could not update run: %w", err)
 	}

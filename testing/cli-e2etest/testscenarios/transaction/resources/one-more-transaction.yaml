@@ -1,0 +1,9 @@
+type: Transaction
+spec:
+  id: i2ug34j
+  name: One More Transaction
+  description: one more transaction
+  steps:
+  - ./transaction-step-1.yaml
+  - ./transaction-step-1.yaml
+  - ./transaction-step-2.yaml

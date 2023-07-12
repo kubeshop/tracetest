@@ -1,5 +1,8 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
 import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
+import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
+import * as S from '../../DataStorePluginForm.styled';
+import { SupportedDataStoresToName } from '../../../../../constants/DataStore.constants';
 
 const AwsXRay = () => {
   const baseName = ['dataStore', SupportedDataStores.AWSXRay];
@@ -8,6 +11,8 @@ const AwsXRay = () => {
 
   return (
     <>
+      <S.Title>Provide the connection info for {SupportedDataStoresToName[SupportedDataStores.AWSXRay]}</S.Title>
+      <DataStoreDocsBanner dataStoreType={SupportedDataStores.AWSXRay} />
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item name={[...baseName, 'useDefaultAuth']} valuePropName="checked">

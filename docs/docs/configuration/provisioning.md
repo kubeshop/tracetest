@@ -1,4 +1,4 @@
-# Provisioning server
+# Provisioning a Tracetest Server
 
 Tracetest allows a server to be provisioned the first time a new Tracetest server is installed and launched. Provisioning sets certain resources in the server to the specified values, allowing you to configure the server. It is convenient in a CI/CD flow where you want to launch a server with a specified configuration.
 

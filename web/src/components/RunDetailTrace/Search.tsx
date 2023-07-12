@@ -1,13 +1,16 @@
-import {Col, Row} from 'antd';
+import {CloseCircleOutlined} from '@ant-design/icons';
+import {Col, Row, Space} from 'antd';
 import {debounce} from 'lodash';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useCallback, useMemo, useState} from 'react';
-import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
-import {useAppDispatch} from 'redux/hooks';
-import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
-import SpanService from 'services/Span.service';
+
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
+import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import {useAppDispatch, useAppSelector} from 'redux/hooks';
+import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
+import TraceSelectors from 'selectors/Trace.selectors';
+import SpanService from 'services/Span.service';
 import EditorService from 'services/Editor.service';
 import * as S from './RunDetailTrace.styled';
 
@@ -19,6 +22,7 @@ interface IProps {
 const Search = ({runId, testId}: IProps) => {
   const [search, setSearch] = useState('');
   const dispatch = useAppDispatch();
+  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
   const {
     run: {trace: {spans = []} = {}},
   } = useTestRun();
@@ -43,7 +47,9 @@ const Search = ({runId, testId}: IProps) => {
       }
 
       dispatch(matchSpans({spanIds}));
-      dispatch(selectSpan({spanId: spanIds[0]}));
+      if (spanIds.length) {
+        dispatch(selectSpan({spanId: spanIds[0]}));
+      }
     },
     [dispatch, getSelectedSpans, runId, spans, testId]
   );
@@ -66,7 +72,15 @@ const Search = ({runId, testId}: IProps) => {
           }}
           value={search}
         />
-        {Boolean(search) && <S.ClearSearchIcon onClick={onClear} />}
+        {!!search && <S.ClearSearchIcon onClick={onClear} />}
+        {!!search && !matchedSpans.length && (
+          <S.NoMatchesContainer>
+            <Space>
+              <CloseCircleOutlined />
+              <S.NoMatchesText>No matches found</S.NoMatchesText>
+            </Space>
+          </S.NoMatchesContainer>
+        )}
       </Col>
     </Row>
   );

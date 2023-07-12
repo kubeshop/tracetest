@@ -19,7 +19,7 @@ var _ MappedNullable = &TriggerResult{}
 
 // TriggerResult struct for TriggerResult
 type TriggerResult struct {
-	TriggerType   *string                     `json:"triggerType,omitempty"`
+	Type          *string                     `json:"type,omitempty"`
 	TriggerResult *TriggerResultTriggerResult `json:"triggerResult,omitempty"`
 }
 
@@ -40,36 +40,36 @@ func NewTriggerResultWithDefaults() *TriggerResult {
 	return &this
 }
 
-// GetTriggerType returns the TriggerType field value if set, zero value otherwise.
-func (o *TriggerResult) GetTriggerType() string {
-	if o == nil || isNil(o.TriggerType) {
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *TriggerResult) GetType() string {
+	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
 	}
-	return *o.TriggerType
+	return *o.Type
 }
 
-// GetTriggerTypeOk returns a tuple with the TriggerType field value if set, nil otherwise
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TriggerResult) GetTriggerTypeOk() (*string, bool) {
-	if o == nil || isNil(o.TriggerType) {
+func (o *TriggerResult) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
-	return o.TriggerType, true
+	return o.Type, true
 }
 
-// HasTriggerType returns a boolean if a field has been set.
-func (o *TriggerResult) HasTriggerType() bool {
-	if o != nil && !isNil(o.TriggerType) {
+// HasType returns a boolean if a field has been set.
+func (o *TriggerResult) HasType() bool {
+	if o != nil && !isNil(o.Type) {
 		return true
 	}
 
 	return false
 }
 
-// SetTriggerType gets a reference to the given string and assigns it to the TriggerType field.
-func (o *TriggerResult) SetTriggerType(v string) {
-	o.TriggerType = &v
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *TriggerResult) SetType(v string) {
+	o.Type = &v
 }
 
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
@@ -114,8 +114,8 @@ func (o TriggerResult) MarshalJSON() ([]byte, error) {
 
 func (o TriggerResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.TriggerType) {
-		toSerialize["triggerType"] = o.TriggerType
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
 	if !isNil(o.TriggerResult) {
 		toSerialize["triggerResult"] = o.TriggerResult

@@ -5,11 +5,11 @@ import {TDraftTest} from 'types/Test.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import TestService from 'services/Test.service';
 import Test from 'models/Test.model';
-import useTestCrud from './hooks/useTestCrud';
+import useTestCrud, {TTestRunRequest} from './hooks/useTestCrud';
 
 interface IContext {
   onEdit(values: TDraftTest): void;
-  onRun(runId?: string): void;
+  onRun(runRequest?: Partial<TTestRunRequest>): void;
   isLoading: boolean;
   isError: boolean;
   test: Test;
@@ -49,13 +49,14 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
   } = useGetTestVersionByIdQuery({testId, version}, {skip: !version});
   const {data: latestTest, isLoading: isLatestLoading, isError: isLatestError} = useGetTestByIdQuery({testId});
 
-  const isLatestVersion = useMemo(
-    () => Boolean(version) && version === latestTest?.version,
-    [latestTest?.version, version]
-  );
   const isLoading = isLatestLoading || isCurrentLoading;
   const isError = isLatestError || isCurrentError;
   const currentTest = (version ? test : latestTest)!;
+
+  const isLatestVersion = useMemo(
+    () => (Boolean(version) && version === latestTest?.version) || currentTest?.version === latestTest?.version,
+    [currentTest?.version, latestTest?.version, version]
+  );
 
   const onEdit = useCallback(
     (values: TDraftTest) => {
@@ -70,14 +71,18 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
   );
 
   const onRun = useCallback(
-    (runId?: string) => {
-      if (isLatestVersion) runTest(test!, runId);
+    (request: Partial<TTestRunRequest> = {}) => {
+      if (isLatestVersion)
+        runTest({
+          test: currentTest,
+          ...request,
+        });
       else {
         setAction('run');
         setIsVersionModalOpen(true);
       }
     },
-    [isLatestVersion, runTest, test]
+    [currentTest, isLatestVersion, runTest]
   );
 
   const onConfirm = useCallback(() => {

@@ -11,13 +11,13 @@ function Resource({item, type}: TRawResource): Resource {
   if (type === ResourceType.Test) {
     return {
       type: ResourceType.Test,
-      item: Test(item as TRawTest),
+      item: Test.FromRawTest(item as TRawTest),
     };
   }
 
   return {
     type: ResourceType.Transaction,
-    item: Transaction(item as TRawTransaction),
+    item: Transaction.FromRawTransaction(item as TRawTransaction),
   };
 }
 

@@ -24,8 +24,11 @@ type Transaction struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	// version number of the test
-	Version   *int32       `json:"version,omitempty"`
-	Steps     []Test       `json:"steps,omitempty"`
+	Version *int32 `json:"version,omitempty"`
+	// list of steps of the transaction containing just each test id
+	Steps []string `json:"steps,omitempty"`
+	// list of steps of the transaction containing the whole test object
+	FullSteps []Test       `json:"fullSteps,omitempty"`
 	CreatedAt *time.Time   `json:"createdAt,omitempty"`
 	Summary   *TestSummary `json:"summary,omitempty"`
 }
@@ -176,9 +179,9 @@ func (o *Transaction) SetVersion(v int32) {
 }
 
 // GetSteps returns the Steps field value if set, zero value otherwise.
-func (o *Transaction) GetSteps() []Test {
+func (o *Transaction) GetSteps() []string {
 	if o == nil || isNil(o.Steps) {
-		var ret []Test
+		var ret []string
 		return ret
 	}
 	return o.Steps
@@ -186,7 +189,7 @@ func (o *Transaction) GetSteps() []Test {
 
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Transaction) GetStepsOk() ([]Test, bool) {
+func (o *Transaction) GetStepsOk() ([]string, bool) {
 	if o == nil || isNil(o.Steps) {
 		return nil, false
 	}
@@ -202,9 +205,41 @@ func (o *Transaction) HasSteps() bool {
 	return false
 }
 
-// SetSteps gets a reference to the given []Test and assigns it to the Steps field.
-func (o *Transaction) SetSteps(v []Test) {
+// SetSteps gets a reference to the given []string and assigns it to the Steps field.
+func (o *Transaction) SetSteps(v []string) {
 	o.Steps = v
+}
+
+// GetFullSteps returns the FullSteps field value if set, zero value otherwise.
+func (o *Transaction) GetFullSteps() []Test {
+	if o == nil || isNil(o.FullSteps) {
+		var ret []Test
+		return ret
+	}
+	return o.FullSteps
+}
+
+// GetFullStepsOk returns a tuple with the FullSteps field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Transaction) GetFullStepsOk() ([]Test, bool) {
+	if o == nil || isNil(o.FullSteps) {
+		return nil, false
+	}
+	return o.FullSteps, true
+}
+
+// HasFullSteps returns a boolean if a field has been set.
+func (o *Transaction) HasFullSteps() bool {
+	if o != nil && !isNil(o.FullSteps) {
+		return true
+	}
+
+	return false
+}
+
+// SetFullSteps gets a reference to the given []Test and assigns it to the FullSteps field.
+func (o *Transaction) SetFullSteps(v []Test) {
+	o.FullSteps = v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -281,7 +316,9 @@ func (o Transaction) MarshalJSON() ([]byte, error) {
 
 func (o Transaction) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	// skip: id is readOnly
+	if !isNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
 	if !isNil(o.Name) {
 		toSerialize["name"] = o.Name
 	}
@@ -293,6 +330,9 @@ func (o Transaction) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Steps) {
 		toSerialize["steps"] = o.Steps
+	}
+	if !isNil(o.FullSteps) {
+		toSerialize["fullSteps"] = o.FullSteps
 	}
 	if !isNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt

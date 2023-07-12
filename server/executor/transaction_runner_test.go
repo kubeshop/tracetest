@@ -11,25 +11,28 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testmock"
+	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 type fakeTestRunner struct {
-	db                  model.Repository
+	db                  test.RunRepository
 	subscriptionManager *subscription.Manager
 	returnErr           bool
 	uid                 int
 }
 
-func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata model.RunMetadata, env environment.Environment) model.Run {
-	run := model.NewRun()
+func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, env environment.Environment) test.Run {
+	run := test.NewRun()
 	run.Environment = env
-	run.State = model.RunStateCreated
-	newRun, err := r.db.CreateRun(ctx, test, run)
+	run.State = test.RunStateCreated
+	newRun, err := r.db.CreateRun(ctx, testObj, run)
 	if err != nil {
 		panic(err)
 	}
@@ -39,15 +42,15 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 		time.Sleep(100 * time.Millisecond) // simulate some real work
 
 		if r.returnErr {
-			run.State = model.RunStateTriggerFailed
+			run.State = test.RunStateTriggerFailed
 			run.LastError = fmt.Errorf("failed to do something")
 		} else {
-			run.State = model.RunStateFinished
+			run.State = test.RunStateFinished
 		}
 
 		r.uid++
 
-		run.Outputs = (maps.Ordered[string, model.RunOutput]{}).MustAdd("USER_ID", model.RunOutput{
+		run.Outputs = (maps.Ordered[string, test.RunOutput]{}).MustAdd("USER_ID", test.RunOutput{
 			Value: strconv.Itoa(r.uid),
 		})
 
@@ -65,14 +68,14 @@ func (r *fakeTestRunner) Run(ctx context.Context, test model.Test, metadata mode
 func TestTransactionRunner(t *testing.T) {
 
 	t.Run("NoErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, false, func(t *testing.T, actual model.TransactionRun) {
-			assert.Equal(t, model.TransactionRunStateFinished, actual.State)
+		runTransactionRunnerTest(t, false, func(t *testing.T, actual transaction.TransactionRun) {
+			assert.Equal(t, transaction.TransactionRunStateFinished, actual.State)
 			assert.Len(t, actual.Steps, 2)
-			assert.Equal(t, actual.Steps[0].State, model.RunStateFinished)
-			assert.Equal(t, actual.Steps[1].State, model.RunStateFinished)
+			assert.Equal(t, actual.Steps[0].State, test.RunStateFinished)
+			assert.Equal(t, actual.Steps[1].State, test.RunStateFinished)
 			assert.Equal(t, "http://my-service.com", actual.Environment.Get("url"))
 
-			assert.Equal(t, model.RunOutput{Name: "", Value: "1", SpanID: ""}, actual.Steps[0].Outputs.Get("USER_ID"))
+			assert.Equal(t, test.RunOutput{Name: "", Value: "1", SpanID: ""}, actual.Steps[0].Outputs.Get("USER_ID"))
 
 			// this assertion is supposed to test that the output from the previous step
 			// is injected in the env for the next. In practice, this depends
@@ -80,7 +83,7 @@ func TestTransactionRunner(t *testing.T) {
 			// to the test run, like the real test runner would.
 			// see line 27
 			assert.Equal(t, "1", actual.Steps[1].Environment.Get("USER_ID"))
-			assert.Equal(t, model.RunOutput{Name: "", Value: "2", SpanID: ""}, actual.Steps[1].Outputs.Get("USER_ID"))
+			assert.Equal(t, test.RunOutput{Name: "", Value: "2", SpanID: ""}, actual.Steps[1].Outputs.Get("USER_ID"))
 
 			assert.Equal(t, "2", actual.Environment.Get("USER_ID"))
 
@@ -88,57 +91,55 @@ func TestTransactionRunner(t *testing.T) {
 	})
 
 	t.Run("WithErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, true, func(t *testing.T, actual model.TransactionRun) {
-			assert.Equal(t, model.TransactionRunStateFailed, actual.State)
+		runTransactionRunnerTest(t, true, func(t *testing.T, actual transaction.TransactionRun) {
+			assert.Equal(t, transaction.TransactionRunStateFailed, actual.State)
 			require.Len(t, actual.Steps, 1)
-			assert.Equal(t, model.RunStateTriggerFailed, actual.Steps[0].State)
+			assert.Equal(t, test.RunStateTriggerFailed, actual.Steps[0].State)
 		})
 	})
 
 }
 
-func getDB() (model.Repository, *sql.DB, func()) {
+func getDB() (model.Repository, *sql.DB) {
 	rawDB := testmock.GetRawTestingDatabase()
 	db := testmock.GetTestingDatabaseFromRawDB(rawDB)
 
-	clean := func() {
-		err := db.Drop()
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	return db, rawDB, clean
+	return db, rawDB
 }
 
-func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual model.TransactionRun)) {
+func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual transaction.TransactionRun)) {
 	ctx := context.Background()
-	rawDB := testmock.GetRawTestingDatabase()
-	db, rawDB, clear := getDB()
-	defer clear()
+	_, rawDB := getDB()
 
 	subscriptionManager := subscription.NewManager()
+	testRepo := test.NewRepository(rawDB)
+	runRepo := test.NewRunRepository(rawDB)
 
 	testRunner := &fakeTestRunner{
-		db,
+		runRepo,
 		subscriptionManager,
 		withErrors,
 		0,
 	}
 
-	test1, err := db.CreateTest(ctx, model.Test{Name: "Test 1"})
+	test1, err := testRepo.Create(ctx, test.Test{Name: "Test 1"})
 	require.NoError(t, err)
 
-	test2, err := db.CreateTest(ctx, model.Test{Name: "Test 2"})
+	test2, err := testRepo.Create(ctx, test.Test{Name: "Test 2"})
 	require.NoError(t, err)
 
-	transaction, err := db.CreateTransaction(ctx, model.Transaction{
-		Name:  "transaction",
-		Steps: []model.Test{test1, test2},
+	transactionsRepo := transaction.NewRepository(rawDB, testRepo)
+	transactionRunRepo := transaction.NewRunRepository(rawDB, runRepo)
+	tran, err := transactionsRepo.Create(ctx, transaction.Transaction{
+		Name:    "transaction",
+		StepIDs: []id.ID{test1.ID, test2.ID},
 	})
 	require.NoError(t, err)
 
-	metadata := model.RunMetadata{
+	tran, err = transactionsRepo.GetAugmented(context.TODO(), tran.ID)
+	require.NoError(t, err)
+
+	metadata := test.RunMetadata{
 		"environment": "production",
 		"service":     "tracetest",
 	}
@@ -155,17 +156,17 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner, db, subscriptionManager)
+	runner := executor.NewTransactionRunner(testRunner, testRepo, transactionRunRepo, subscriptionManager)
 	runner.Start(1)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	transactionRun := runner.Run(ctxWithTimeout, transaction, metadata, env)
+	transactionRun := runner.Run(ctxWithTimeout, tran, metadata, env)
 
-	done := make(chan model.TransactionRun, 1)
+	done := make(chan transaction.TransactionRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		tr := m.Content.(model.TransactionRun)
+		tr := m.Content.(transaction.TransactionRun)
 		if tr.State.IsFinal() {
 			done <- tr
 		}
@@ -174,7 +175,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
 
-	var finalRun model.TransactionRun
+	var finalRun transaction.TransactionRun
 	select {
 	case finalRun = <-done:
 		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions

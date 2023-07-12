@@ -2,6 +2,8 @@ package model
 
 import "google.golang.org/grpc/metadata"
 
+type TriggerType string
+
 const TriggerTypeGRPC TriggerType = "grpc"
 
 type GRPCHeader struct {

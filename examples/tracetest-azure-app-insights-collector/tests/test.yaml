@@ -1,0 +1,21 @@
+type: Test
+spec:
+  id: 4F1jCHJVR
+  name: App Insights
+  description: App Insights
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080/http-request
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count   =   3
+        - attr:tracetest.span.duration   <   1s
+    - selector: span[tracetest.span.type="http" name="GET" http.target="/" http.method="GET"]
+      assertions:
+        - attr:http.url = "https://www.microsoft.com/"

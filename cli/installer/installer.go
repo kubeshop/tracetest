@@ -1,9 +1,6 @@
 package installer
 
 import (
-	"fmt"
-
-	"github.com/kubeshop/tracetest/cli/analytics"
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
@@ -17,7 +14,6 @@ var (
 const createIssueMsg = "If you need help, please create an issue: https://github.com/kubeshop/tracetest/issues/new/choose"
 
 func Start() {
-	analytics.Track("Start", "installer", map[string]string{})
 	ui := cliUI.DefaultUI
 
 	ui.Banner()
@@ -85,10 +81,8 @@ func (i installer) Configure(ui cliUI.UI) configuration {
 }
 
 func (i installer) Install(ui cliUI.UI) {
-	analytics.Track("PreCheck", "installer", map[string]string{})
 	i.PreCheck(ui)
 
-	analytics.Track("Configure", "installer", map[string]string{})
 	conf := i.Configure(ui)
 
 	ui.Title("Thanks! We are ready to install TraceTest now")
@@ -123,21 +117,4 @@ func setInstallationType(ui cliUI.UI, config configuration) {
 	}, 0)
 
 	option.Fn(ui)
-}
-
-func trackInstall(name string, config configuration, extra map[string]string) {
-	props := map[string]string{
-		"type":                    name,
-		"install_backend":         fmt.Sprintf("%t", config.Bool("tracetest.backend.install")),
-		"install_demo_pokeshop":   fmt.Sprintf("%t", config.Bool("demo.enable.pokeshop")),
-		"install_demo_otel":       fmt.Sprintf("%t", config.Bool("demo.enable.otel")),
-		"enable_server_analytics": fmt.Sprintf("%t", config.Bool("tracetest.analytics")),
-		"backend_type":            config.String("tracetest.backend.type"),
-	}
-
-	for k, v := range extra {
-		props[k] = v
-	}
-
-	analytics.Track("Apply", "installer", props)
 }

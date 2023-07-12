@@ -1,0 +1,1 @@
+curl -d '{"id":"6"}' -H "Content-Type: application/json" -X POST http://localhost:8081/pokemon/import

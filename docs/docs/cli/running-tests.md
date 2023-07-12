@@ -1,23 +1,30 @@
 # Running Tests From the Command Line Interface (CLI)
-Once you have created a test, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow. The documentation for running a test via the CLI can be found here: [tracetest test run](./reference/tracetest_test_run.md). This page will provide some examples of using this command.
+
+Once you have created a test, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
+
+The documentation for running a test via the CLI can be found here:
+
+- [tracetest test run](./reference/tracetest_test_run.md): This page provides examples of using this command.
 
 ## Running Your First Test
-To run a test, give the path to the test definition file with the '-d' option. This will launch a test, providing us with a link to the created test run.
 
+To run a test, give the path to the test definition file with the `'-d'` option. This will launch a test and provide a link to the created test run.
+
+```sh
+tracetest test run -d path/to/test.yaml
 ```
-tracetest test run -d path/to/test.yaml -w
-```
-Output:
-```
+
+```text title="Output:"
 ✔ Pokeshop - Import (http://localhost:11633/test/4oI08rA4g/run/3/test)
 ```
 
-Now, let's run the same test but tell the CLI to wait for the test to complete running before returning. This will provide results from the test.
-```
+Now, let's run the same test but tell the CLI to wait for the test to complete running before returning with the `'-w'` option. This will provide results from the test.
+
+```sh
 tracetest test run -d path/to/test.yaml -w
 ```
-Output:
-```
+
+```text title="Output:"
 ✘ Pokeshop - Import (http://localhost:11633/test/4oI08rA4g/run/12/test)
 	✔ Response should be ok
 		✔ #59ce1f4250482ba5
@@ -35,11 +42,12 @@ Output:
 ```
 
 Running the same command with the '-o json' option would change the output from the default of human readable 'pretty' to 'json'. This can be useful when you wish to extract particular data from the response. This would look like:
+
+```sh
+tracetest test run -d path/to/test.yaml -w -o json
 ```
-tracetest test run -d path/to/test.yaml -w - o json
-```
-Output:
-```
+
+```json title="Output:"
 {
   "testRunWebUrl": "http://localhost:11633/test/4oI08rA4g/run/13/test",
   "results": {
@@ -163,11 +171,14 @@ Output:
 ```
 
 You can also opt to output the result as JUnit to a file. You would run the command with a -j option and a file name, ie:
-```
+
+```sh
 tracetest test run -d path/to/test.yaml -w -j junit.out
 ```
+
 The JUnit output file would then contain the JUnit result, for example:
-```
+
+```xml
 <testsuites name="Pokeshop - Import" tests="5" failures="1" errors="0" skipped="0" time="10">
         <testsuite name="span[tracetest.span.type=&#34;general&#34; name=&#34;Tracetest trigger&#34;]" tests="1" failures="0" errors="0" skipped="0">
                 <testcase name="attr:tracetest.response.status = 200"></testcase>
@@ -194,12 +205,14 @@ You can reference an existing environment using its id. For example, given this 
 ![testenv](../img/show-environment-definition.png)
 
 We can run a test and specify that environment with this command:
-```
+
+```sh
 tracetest test run -d path/to/test.yaml -e testenv -w
 ```
 
 You can also reference an environment resource file which will be used to create a new environment or update an existing one. For example, if you have a file named local.env with this content:
-```
+
+```yaml
 type: Environment
 spec:
   id: local.env
@@ -211,7 +224,7 @@ spec:
     value: vileplume
 ```
 
-```
+```sh
 tracetest test run -d path/to/test.yaml -e path/to/local.env -w
 ```
 

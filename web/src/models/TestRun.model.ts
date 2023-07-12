@@ -3,6 +3,7 @@ import {Model, Modify, TTestSchemas, TTriggerSchemas} from 'types/Common.types';
 import {TTestRunState} from 'types/TestRun.types';
 import AssertionResults, {TRawAssertionResults} from './AssertionResults.model';
 import Environment from './Environment.model';
+import LinterResult from './LinterResult.model';
 import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
@@ -29,6 +30,7 @@ type TestRun = Model<
     outputs?: TestRunOutput[];
     environment?: Environment;
     state: TTestRunState;
+    linter: LinterResult;
   }
 >;
 
@@ -64,6 +66,7 @@ export function isRunStateFinished(state: TTestRunState) {
       TestState.TRIGGER_FAILED,
       TestState.TRACE_FAILED,
       TestState.ASSERTION_FAILED,
+      TestState.ANALYZING_ERROR,
     ] as string[]
   ).includes(state);
 }
@@ -78,6 +81,10 @@ export function isRunStateSucceeded(state: TTestRunState) {
 
 export function isRunStateStopped(state: TTestRunState) {
   return state === TestState.STOPPED;
+}
+
+export function isRunStateAnalyzingError(state: TTestRunState) {
+  return state === TestState.ANALYZING_ERROR;
 }
 
 const TestRun = ({
@@ -102,6 +109,7 @@ const TestRun = ({
   environment = {},
   transactionId = '',
   transactionRunId = '',
+  linter = {},
 }: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
@@ -128,6 +136,7 @@ const TestRun = ({
     environment: Environment.fromRun(environment),
     transactionId,
     transactionRunId,
+    linter: LinterResult(linter),
   };
 };
 

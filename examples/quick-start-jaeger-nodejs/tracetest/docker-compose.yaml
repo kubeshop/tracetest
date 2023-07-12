@@ -2,7 +2,7 @@ version: "3"
 services:
   tracetest:
     image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
+    # platform: linux/amd64
     volumes:
       - type: bind
         source: ./tracetest/tracetest.config.yaml
@@ -38,6 +38,8 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+    ports:
+      - "5432:5432"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.59.0
@@ -52,6 +54,7 @@ services:
     restart: unless-stopped
     ports:
       - "16686:16686"
+      - "16685:16685"
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:16686"]
       interval: 1s

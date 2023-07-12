@@ -6,6 +6,8 @@ export enum TestState {
   TRIGGER_FAILED = 'TRIGGER_FAILED',
   TRACE_FAILED = 'TRACE_FAILED',
   ASSERTION_FAILED = 'ASSERTION_FAILED',
+  ANALYZING_TRACE = 'ANALYZING_TRACE',
+  ANALYZING_ERROR = 'ANALYZING_ERROR',
   FAILED = 'FAILED',
   STOPPED = 'STOPPED',
   FINISHED = 'FINISHED',
@@ -68,10 +70,19 @@ export const TestStateMap: Record<
     status: 'warning',
     label: 'Skipped',
   },
+  [TestState.ANALYZING_TRACE]: {
+    status: 'default',
+    label: 'Linting Trace',
+  },
+  [TestState.ANALYZING_ERROR]: {
+    status: 'error',
+    label: 'Lint Error',
+  },
 };
 
 export enum RunDetailModes {
   TRIGGER = 'trigger',
   TRACE = 'trace',
   TEST = 'test',
+  AUTOMATE = 'automate',
 }

@@ -2,15 +2,14 @@ import {Typography} from 'antd';
 import {useCallback} from 'react';
 import {SupportedDataStores, TConnectionResult} from 'types/DataStore.types';
 import TestConnectionNotification from 'components/TestConnectionNotification/TestConnectionNotification';
-import {NoTestConnectionDataStoreList} from 'constants/DataStore.constants';
 import {useNotification} from 'providers/Notification/Notification.provider';
 
 const useDataStoreNotification = () => {
   const {showNotification} = useNotification();
 
   const showTestConnectionNotification = useCallback(
-    (result: TConnectionResult, dataStoreType: SupportedDataStores) => {
-      if (NoTestConnectionDataStoreList.includes(dataStoreType)) {
+    (result: TConnectionResult, dataStoreType: SupportedDataStores, hasTestedTheConnection = true) => {
+      if (!hasTestedTheConnection) {
         return showNotification({
           type: 'info',
           title: <Typography.Title level={2}>No Automated Test</Typography.Title>,

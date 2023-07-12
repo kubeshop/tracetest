@@ -13,12 +13,13 @@ spec:
         value: application/json
       body: |
         {
-          "id": "${env:EXAMPLE_TEST_ID}",
-          "name": "Pokemon - List - Get a Pokemon",
-          "serviceUnderTest": {
-            "triggerType": "http",
-            "triggerSettings": {
-              "http": {
+          "type": "Test",
+          "spec": {
+            "id": "${env:EXAMPLE_TEST_ID}",
+            "name": "Pokemon - List - Get a Pokemon",
+            "trigger": {
+              "type": "http",
+              "httpRequest": {
                 "url": "${env:DEMO_APP_URL}/pokemon?take=20&skip=0",
                 "method": "GET",
                 "body": "",

@@ -16,7 +16,7 @@ interface IProps {
   isError: boolean;
 }
 
-const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, runEvents, isError}: IProps) => {
+const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, runEvents, isError}: IProps) => {
   const shouldDisplayError = isError || state === TestState.TRIGGER_FAILED;
 
   return (
@@ -29,7 +29,9 @@ const RunDetailTrigger = ({test, run: {state, triggerResult, triggerTime}, runEv
           <RunEvents events={runEvents} stage={TestRunStage.Trigger} state={state} />
         ) : (
           <RunDetailTriggerResponseFactory
+            runId={id}
             state={state}
+            testId={test.id}
             triggerResult={triggerResult}
             triggerTime={triggerTime}
             type={triggerResult?.type ?? TriggerTypes.http}

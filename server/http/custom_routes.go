@@ -6,12 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -34,14 +33,13 @@ func (c *customController) Routes() openapi.Routes {
 
 	routes := c.router.Routes()
 
-	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
-	routes[c.getRouteIndex("GetTestVersionDefinitionFile")].HandlerFunc = c.GetTestVersionDefinitionFile
+	routes[c.getRouteIndex("GetTransactionVersion")].HandlerFunc = c.GetTransactionVersion
 	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
+
+	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 
 	routes[c.getRouteIndex("GetTestRuns")].HandlerFunc = c.GetTestRuns
 
-	routes[c.getRouteIndex("GetTests")].HandlerFunc = paginatedEndpoint[openapi.Test](c.service.GetTests, c.errorHandler)
-	routes[c.getRouteIndex("GetTransactions")].HandlerFunc = paginatedEndpoint[openapi.Transaction](c.service.GetTransactions, c.errorHandler)
 	routes[c.getRouteIndex("GetResources")].HandlerFunc = paginatedEndpoint[openapi.Resource](c.service.GetResources, c.errorHandler)
 
 	for index, route := range routes {
@@ -49,7 +47,6 @@ func (c *customController) Routes() openapi.Routes {
 		hf := route.HandlerFunc
 
 		hf = c.instrumentRoute(routeName, route.Pattern, hf)
-		hf = c.analytics(route.Name, hf)
 
 		route.HandlerFunc = hf
 
@@ -57,6 +54,50 @@ func (c *customController) Routes() openapi.Routes {
 	}
 
 	return routes
+}
+
+// GetTransactionVersion - get a transaction specific version
+func (c *customController) GetTransactionVersion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+
+	enc := resourcemanager.EncoderFromRequest(r)
+	enc.WriteEncodedResponse(w, result.Code, result.Body)
+}
+
+// GetTransactionVersionDefinitionFile - Get the transaction definition as an YAML file
+func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	transactionIdParam := params["transactionId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+
+	enc := resourcemanager.EncoderFromRequest(r)
+	enc.WriteEncodedResponse(w, result.Code, result.Body)
 }
 
 // GetTestRuns - get the runs for a test
@@ -104,48 +145,6 @@ func (c *customController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "application/xml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
-}
-
-// GetTestVersionDefinitionFile - Get the test definition as an YAML file
-func (c *customController) GetTestVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTestVersionDefinitionFile(r.Context(), testIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
-	w.Write(result.Body.([]byte))
-}
-
-// GetTransactionVersionDefinitionFile - Get the test definition as an YAML file
-func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	w.Header().Set("Content-Type", "application/yaml; charset=UTF-8")
 	w.Write(result.Body.([]byte))
 }
 
@@ -198,26 +197,6 @@ func parseInt32Parameter(param string, required bool) (int32, error) {
 	}
 
 	return int32(val), nil
-}
-
-var (
-	matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
-)
-
-func toWords(str string) string {
-	words := matchFirstCap.ReplaceAllString(str, "${1} ${2}")
-	words = matchAllCap.ReplaceAllString(words, "${1} ${2}")
-	return words
-}
-
-func (c *customController) analytics(name string, f http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		machineID := r.Header.Get("x-client-id")
-		analytics.SendEvent(toWords(name), "test", machineID, nil)
-
-		f(w, r)
-	}
 }
 
 func (c *customController) instrumentRoute(name string, route string, f http.HandlerFunc) http.HandlerFunc {

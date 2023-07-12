@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: TCkN6vwVRN
   name: List Environment
   description: Test step of 'Environment Feature - Test Suite'
   trigger:

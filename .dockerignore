@@ -5,7 +5,6 @@ demo/
 docs/
 examples/
 k8s/
-local-config/
 scripts/
 testing/
 web/node_modules

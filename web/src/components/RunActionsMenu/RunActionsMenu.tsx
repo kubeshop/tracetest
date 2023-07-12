@@ -10,21 +10,13 @@ import * as S from './RunActionsMenu.styled';
 interface IProps {
   resultId: string;
   testId: string;
-  testVersion: number;
   isRunView?: boolean;
   transactionId?: string;
   transactionRunId: string;
 }
 
-const RunActionsMenu = ({
-  resultId,
-  testId,
-  testVersion,
-  transactionId,
-  transactionRunId,
-  isRunView = false,
-}: IProps) => {
-  const {loadJUnit, loadDefinition} = useFileViewerModal();
+const RunActionsMenu = ({resultId, testId, transactionId, transactionRunId, isRunView = false}: IProps) => {
+  const {onJUnit} = useFileViewerModal();
 
   const navigate = useNavigate();
 
@@ -51,20 +43,19 @@ const RunActionsMenu = ({
               key="view-junit"
               onClick={() => {
                 TestRunAnalyticsService.onLoadJUnitReport();
-                loadJUnit(testId, resultId);
+                onJUnit(testId, resultId);
               }}
             >
               JUnit Results
             </Menu.Item>
             <Menu.Item
-              data-cy="view-test-definition-button"
-              key="view-test-definition"
+              data-cy="automate-test-button"
+              key="automate-test"
               onClick={() => {
-                TestRunAnalyticsService.onLoadTestDefinition();
-                loadDefinition(ResourceType.Test, testId, testVersion);
+                navigate(`/test/${testId}/run/${resultId}/automate`);
               }}
             >
-              Test Definition
+              Automate
             </Menu.Item>
             <Menu.Item
               data-cy="test-edit-button"

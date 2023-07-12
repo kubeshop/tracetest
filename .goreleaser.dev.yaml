@@ -16,9 +16,12 @@ before:
       cmd: go mod tidy
 env:
   - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}
+  # if TAG is defined, use it. Fallback to VERSION
+  - TAG={{ if index .Env "TAG"  }}{{ .Env.TAG }}{{ else }}{{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}{{ end }}
   - TRACETEST_ENV={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
   - ANALYTICS_BE_KEY={{ if index .Env "ANALYTICS_BE_KEY"  }}{{ .Env.ANALYTICS_BE_KEY }}{{ else }}{{ end }}
   - ANALYTICS_FE_KEY={{ if index .Env "ANALYTICS_FE_KEY"  }}{{ .Env.ANALYTICS_FE_KEY }}{{ else }}{{ end }}
+
 builds:
   - id: server
     binary: tracetest-server
@@ -49,11 +52,11 @@ builds:
     - amd64
 
 dockers:
-- image_templates:
-  - 'kubeshop/tracetest:{{ .Env.VERSION }}'
+- skip_push: true
+  image_templates:
+  - 'kubeshop/tracetest:{{ .Env.TAG }}'
   extra_files:
     - web/build
-    - server/migrations
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"

@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"github.com/kubeshop/tracetest/server/tracedb/datastoreresource"
 	"github.com/opensearch-project/opensearch-go"
 	"github.com/opensearch-project/opensearch-go/opensearchapi"
 	"go.opentelemetry.io/otel/trace"
@@ -24,7 +24,7 @@ func opensearchDefaultPorts() []string {
 
 type opensearchDB struct {
 	realTraceDB
-	config *datastoreresource.ElasticSearchConfig
+	config *datastore.ElasticSearchConfig
 	client *opensearch.Client
 }
 
@@ -35,6 +35,10 @@ func (db *opensearchDB) Connect(ctx context.Context) error {
 func (db *opensearchDB) Close() error {
 	// No need to close this db
 	return nil
+}
+
+func (db *opensearchDB) GetEndpoints() string {
+	return strings.Join(db.config.Addresses, ", ")
 }
 
 func (db *opensearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
@@ -95,7 +99,7 @@ func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
 }
 
-func newOpenSearchDB(cfg *datastoreresource.ElasticSearchConfig) (TraceDB, error) {
+func newOpenSearchDB(cfg *datastore.ElasticSearchConfig) (TraceDB, error) {
 	var caCert []byte
 	if cfg.Certificate != "" {
 		caCert = []byte(cfg.Certificate)
@@ -156,8 +160,8 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) model.Span {
 		attributes[name] = fmt.Sprintf("%v", attrValue)
 	}
 
-	attributes["kind"] = input["kind"].(string)
-	attributes["parent_id"] = input["parentSpanId"].(string)
+	attributes[model.TracetestMetadataFieldKind] = input["kind"].(string)
+	attributes[model.TracetestMetadataFieldKind] = input["parentSpanId"].(string)
 
 	return model.Span{
 		ID:         spanId,

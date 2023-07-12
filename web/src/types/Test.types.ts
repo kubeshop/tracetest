@@ -6,7 +6,7 @@ import {VariableDefinition, Request} from 'postman-collection';
 
 import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
-import {Model, TGrpcSchemas, THttpSchemas, TTriggerSchemas} from './Common.types';
+import {Model, TGrpcSchemas, THttpSchemas} from './Common.types';
 import {ICreateTestStep, IPlugin} from './Plugins.types';
 import GRPCRequest from '../models/GrpcRequest.model';
 import HttpRequest from '../models/HttpRequest.model';
@@ -16,7 +16,6 @@ export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
 export type TRawHeader = THttpSchemas['HTTPHeader'];
 export type TRawGRPCHeader = TGrpcSchemas['GRPCHeader'];
-export type TTriggerType = Required<TTriggerSchemas['Trigger']['triggerType']>;
 export type THeader = Model<TRawHeader, {}>;
 
 export interface IRpcValues {
@@ -34,6 +33,7 @@ export interface IHttpValues {
   headers: HttpRequest['headers'];
   method: HTTP_METHOD;
   url: string;
+  sslVerification: boolean;
 }
 
 export interface RequestDefinitionExtended extends Request {

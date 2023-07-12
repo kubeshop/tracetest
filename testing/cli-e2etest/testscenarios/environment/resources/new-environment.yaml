@@ -1,0 +1,9 @@
+type: Environment
+spec:
+  id: .env
+  name: .env
+  values:
+  - key: FIRST_VAR
+    value: some-value
+  - key: SECOND_VAR
+    value: another_value

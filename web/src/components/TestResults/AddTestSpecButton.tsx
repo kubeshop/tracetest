@@ -2,6 +2,7 @@ import {CaretDownOutlined} from '@ant-design/icons';
 import {Dropdown, Menu} from 'antd';
 import React, {useCallback, useMemo} from 'react';
 
+import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
 import {TEST_SPEC_SNIPPETS, TSnippet} from 'constants/TestSpecs.constants';
 import Span from 'models/Span.model';
@@ -71,6 +72,7 @@ const AddTestSpecButton = ({selectedSpan}: IProps) => {
 
   return (
     <Dropdown.Button
+      data-tour={StepsID.TestSpecs}
       disabled={!isRunStateSucceeded(state)}
       overlay={menu}
       trigger={['click']}

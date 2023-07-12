@@ -108,6 +108,19 @@ func TestAttributeExecution(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:       "should_get_values_from_attributes_with_dashes",
+			Query:      "attr:dapr-app-id = 42",
+			ShouldPass: true,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: model.Span{
+					Attributes: model.Attributes{
+						"dapr-app-id": "42",
+					},
+				},
+			},
+		},
 	}
 
 	executeTestCases(t, testCases)
@@ -276,6 +289,11 @@ func TestArrayExecution(t *testing.T) {
 		{
 			Name:       "arrays_can_be_compared_with_other_arrays_generated_by_filters",
 			Query:      `'{ "array": [{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]}' | json_path '$.array[*].age' = [37, 38]`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "arrays_can_be_filtered_by_value",
+			Query:      `'[{ "name": "john", "age": 37 }, { "name": "jonas", "age": 38 }]' | json_path '$[?(@.name == "john")].age' = 37`,
 			ShouldPass: true,
 		},
 		{

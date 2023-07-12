@@ -6,7 +6,18 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	TracetestMetadataFieldStartTime string = "tracetest.span.start_time"
+	TracetestMetadataFieldEndTime   string = "tracetest.span.end_time"
+	TracetestMetadataFieldDuration  string = "tracetest.span.duration"
+	TracetestMetadataFieldType      string = "tracetest.span.type"
+	TracetestMetadataFieldName      string = "tracetest.span.name"
+	TracetestMetadataFieldParentID  string = "tracetest.span.parent_id"
+	TracetestMetadataFieldKind      string = "tracetest.span.kind"
 )
 
 type Attributes map[string]string
@@ -44,15 +55,43 @@ func (s Spans) OrEmpty(fn func()) Spans {
 	return s
 }
 
+type SpanKind string
+
+var (
+	SpanKindClient       SpanKind = "client"
+	SpanKindServer       SpanKind = "server"
+	SpanKindConsumer     SpanKind = "consumer"
+	SpanKindProducer     SpanKind = "producer"
+	SpanKindInternal     SpanKind = "internal"
+	SpanKindUnespecified SpanKind = "unespecified"
+)
+
 type Span struct {
 	ID         trace.SpanID
 	Name       string
 	StartTime  time.Time
 	EndTime    time.Time
 	Attributes Attributes
+	Kind       SpanKind
+	Events     []SpanEvent
 
 	Parent   *Span   `json:"-"`
 	Children []*Span `json:"-"`
+}
+
+func (s *Span) injectEventsIntoAttributes() {
+	if s.Events == nil {
+		s.Events = make([]SpanEvent, 0)
+	}
+
+	eventsJson, _ := json.Marshal(s.Events)
+	s.Attributes["span.events"] = string(eventsJson)
+}
+
+type SpanEvent struct {
+	Name       string     `json:"name"`
+	Timestamp  time.Time  `json:"timestamp"`
+	Attributes Attributes `json:"attributes"`
 }
 
 type encodedSpan struct {
@@ -172,24 +211,24 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 }
 
 func (span Span) setMetadataAttributes() Span {
-	span.Attributes["name"] = span.Name
-	span.Attributes["tracetest.span.type"] = spanType(span.Attributes)
-	span.Attributes["tracetest.span.duration"] = spanDuration(span)
-	span.Attributes["tracetest.span.startTime"] = fmt.Sprintf("%d", span.StartTime.UnixNano())
-	span.Attributes["tracetest.span.endTime"] = fmt.Sprintf("%d", span.EndTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldName] = span.Name
+	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
+	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
+	span.Attributes[TracetestMetadataFieldStartTime] = fmt.Sprintf("%d", span.StartTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldEndTime] = fmt.Sprintf("%d", span.EndTime.UnixNano())
 
 	return span
 }
 
-func (span Span) setTriggerResultAttributes(result TriggerResult) Span {
+func (span Span) setTriggerResultAttributes(result trigger.TriggerResult) Span {
 	switch result.Type {
-	case TriggerTypeHTTP:
+	case trigger.TriggerTypeHTTP:
 		resp := result.HTTP
 		jsonheaders, _ := json.Marshal(resp.Headers)
 		span.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
 		span.Attributes["tracetest.response.body"] = resp.Body
 		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
-	case TriggerTypeGRPC:
+	case trigger.TriggerTypeGRPC:
 		resp := result.GRPC
 		jsonheaders, _ := json.Marshal(resp.Metadata)
 		span.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
@@ -198,21 +237,4 @@ func (span Span) setTriggerResultAttributes(result TriggerResult) Span {
 	}
 
 	return span
-}
-
-func AugmentRootSpan(span Span, result TriggerResult) Span {
-	return span.
-		setMetadataAttributes().
-		setTriggerResultAttributes(result)
-}
-
-func NewTracetestRootSpan(run Run) Span {
-	return AugmentRootSpan(Span{
-		ID:         IDGen.SpanID(),
-		Name:       TriggerSpanName,
-		StartTime:  run.CreatedAt,
-		EndTime:    run.ServiceTriggerCompletedAt,
-		Attributes: Attributes{},
-		Children:   []*Span{},
-	}, run.TriggerResult)
 }

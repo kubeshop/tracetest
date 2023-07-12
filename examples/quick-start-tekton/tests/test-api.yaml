@@ -1,0 +1,18 @@
+type: Test
+spec:
+  id: RUkKQ_aVR
+  name: Pokeshop - List
+  description: Get a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-pokemon-api.demo/pokemon?take=20&skip=0
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - name: Database queries less than 500 ms
+    selector: span[tracetest.span.type="database"]
+    assertions:
+    - attr:tracetest.span.duration  <  10ms

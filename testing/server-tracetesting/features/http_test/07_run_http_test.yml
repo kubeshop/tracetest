@@ -1,5 +1,6 @@
 type: Test
 spec:
+  id: TjkNevQ4Rs
   name: Run HTTP Test
   description: Test step of 'HTTP Test Feature - Test Suite'
   trigger:
@@ -17,8 +18,8 @@ spec:
     - attr:tracetest.selected_spans.count = 1
     - attr:tracetest.response.status = 200
     # Ensure startTime and endTime are present in span
-    - attr:tracetest.span.startTime > 0
-    - attr:tracetest.span.endTime > 0
+    - attr:tracetest.span.start_time > 0
+    - attr:tracetest.span.end_time > 0
   - selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1

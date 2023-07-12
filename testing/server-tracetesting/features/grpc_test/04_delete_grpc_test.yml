@@ -1,6 +1,7 @@
 ---
 type: Test
 spec:
+  id: ojzNeDw4gh
   name: Delete gRPC Test
   description: Test step of 'gRPC Test Feature - Test Suite'
   trigger:
@@ -16,7 +17,7 @@ spec:
     assertions:
     - attr:tracetest.selected_spans.count = 1
     - attr:tracetest.response.status = 204
-  - selector: span[name="DELETE /api/tests/{testId}" tracetest.span.type="http"]
+  - selector: span[name="DELETE /api/tests/{id}" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
   - selector: span[name = "exec DELETE"]

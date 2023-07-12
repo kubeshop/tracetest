@@ -1,10 +1,11 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
 
 import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
-import {SupportedDataStoresToDefaultEndpoint} from 'constants/DataStore.constants';
+import {SupportedDataStoresToDefaultEndpoint, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from '../../DataStorePluginForm.styled';
 import AddressesList from './AddressesList';
+import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
 
 const OpenSearch = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
@@ -14,6 +15,8 @@ const OpenSearch = () => {
 
   return (
     <>
+      <S.Title>Provide the connection info for {SupportedDataStoresToName[dataStoreType]}</S.Title>
+      <DataStoreDocsBanner dataStoreType={dataStoreType} />
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item

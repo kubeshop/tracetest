@@ -1,25 +1,28 @@
-name: Pull Request
+name: Code build and checks
+
 on:
+  push:
+    branches: [main]
   pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-    paths:
-      - .github/workflows/pull-request.yaml
-      - api/**
-      - cli/**
-      - examples/**
-      - server/**
-      - tracetesting/**
-      - web/**
-      - Dockerfile
-      - k8s/**
+
+env:
+  VERSION: ${{ github.sha }}
+  TAG: latest
+
+  TRACETEST_ENV: ci
+  TRACETEST_DEV: true
+  CYPRESS_BASE_URL: http://localhost:11633
+  POKEMON_HTTP_ENDPOINT: http://demo-api:8081
+
+  # We need to remove the need for these secrets so anyone can run the pipeline
+  GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
 jobs:
   backend-arch-graph:
     name: Generate backend architecture graph
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -27,7 +30,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - name: install graph tool
@@ -43,7 +46,7 @@ jobs:
         run: |
           cd server
           mkdir -p ../dist/
-          /tmp/go-arch/go-arch ../dist/architecture.png
+          /tmp/go-arch/go-arch -o ../dist/architecture.png
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
@@ -62,16 +65,17 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - name: Run unit tests
         run: cd cli; make test
 
-  test-server:
+  unit-test-server:
     name: API Server unit tests
     runs-on: ubuntu-latest
 
+    # git log --pretty=tformat:"%H" -n1 web
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,22 +84,15 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.work"
           cache: true
           cache-dependency-path: go.work
       - name: Run unit tests
-        run: cd server; make test
+        run: cd server; make test -B
 
-  test-web:
+  unit-test-web:
     name: WebUI unit tests
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        cmd:
-          - npm run lint
-          - npm test
 
     steps:
       - name: Checkout
@@ -117,111 +114,101 @@ jobs:
           restore-keys: npm-
       - run: cd web; npm ci
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-      - run: cd web; ${{ matrix.cmd }}
+      - run: cd web; npm run lint && npm test
 
-  build-go:
-    name: Build go binaries (API Server and CLI)
-    needs: [unit-test-cli, test-server]
+  build-docker:
+    name: Build docker image
     runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup go
-      uses: actions/setup-go@v3
-      with:
-        go-version-file: 'go.work'
-        cache: true
-        cache-dependency-path: go.work
-    - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v4
-      with:
-        distribution: goreleaser-pro
-        version: v1.17.2
-        args: build --single-target --clean --snapshot
-      env:
-        VERSION: pr-${{ github.event.pull_request.number }}
-        TRACETEST_ENV: pr
-        ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
-        ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
-    - run: echo $(go env GOOS)_$(go env GOARCH) > dist/arch.txt
-    - name: Upload assets
-      uses: actions/upload-artifact@v3
-      with:
-        name: tracetest-go
-        path: dist/
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  build-web:
-    name: Build WebUI resources
-    runs-on: ubuntu-latest
-    needs: [test-web]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: set cache keys
+        shell: bash
+        run: |
+          echo "WEB_CACHE_KEY=$(git log --pretty=tformat:"%H" -n1 web)" >> $GITHUB_ENV
+          echo "SERVER_CACHE_KEY=$(git log --pretty=tformat:"%H" -n1 server)" >> $GITHUB_ENV
+          echo "CLI_CACHE_KEY=$(git log --pretty=tformat:"%H" -n1 cli)" >> $GITHUB_ENV
+
+      # web
+      - name: Cache Web Build
+        id: cache-web-build
+        uses: actions/cache@v3
+        with:
+          path: web/build/
+          key: web-build-${{ env.WEB_CACHE_KEY }}
+
       - name: Setup node
+        # if cache miss
+        if: steps.cache-web-build.outputs.cache-hit != 'true'
         uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Cache Build
-        id: cache-build
+
+      - name: Cache dependencies
+        id: cache-nodemodules
+        # if cache miss
+        if: steps.cache-web-build.outputs.cache-hit != 'true'
         uses: actions/cache@v3
         with:
-          path: web/build/
-          key: web-build-${{ hashFiles('web/*') }}
-      - run: cd web; npm ci
-        if: steps.cache-build.outputs.cache-hit != 'true'
+          path: |
+            web/node_modules
+            /home/runner/.cache/Cypress
+          key: npm--${{ hashFiles('web/package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Install dependencies
+        run: cd web/; npm ci
+        # if cache miss for build and deps
+        if: steps.cache-web-build.outputs.cache-hit != 'true' &&  steps.cache-nodemodules.outputs.cache-hit != 'true'
+
       - run: cd web; CI= npm run build
-        if: steps.cache-build.outputs.cache-hit != 'true'
+        if: steps.cache-web-build.outputs.cache-hit != 'true'
+
+      # go+docker
+      - name: Cache Build
+        id: cache-docker-build
+        uses: actions/cache@v3
+        with:
+          path: dist/
+          key: dist-${{env.SERVER_CACHE_KEY }}-${{env.CLI_CACHE_KEY }}-${{ hashFiles('.goreleaser.dev.yaml', 'Dockerfile') }}
+      - name: Setup go
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.work"
+          cache: true
+          cache-dependency-path: go.work
+      - uses: goreleaser/goreleaser-action@v4
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
+        with:
+          distribution: goreleaser-pro
+          version: v1.18.2
+          args: release --skip-announce --snapshot -f .goreleaser.dev.yaml
+      - name: Move binaries to known location
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
+        run: |
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
+          find ./dist -name 'tracetest-server' -exec cp {} ./dist \;
+          chmod +x ./dist/tracetest ./dist/tracetest-server
+      - name: Export docker image
+        if: steps.cache-docker-build.outputs.cache-hit != 'true'
+        run: |
+          docker save --output dist/image.tar "kubeshop/tracetest:$TAG"
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
-          name: tracetest-web
-          path: web/build/
-
-  build-docker:
-    name: Build docker image
-    runs-on: ubuntu-latest
-    needs: [build-web, build-go]
-    env:
-      DOCKER_CLI_EXPERIMENTAL: "enabled"
-      GORELEASER_KEY: ${{ secrets.GORELEASER_LICENSE }}
-      GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-      FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Setup go
-        uses: actions/setup-go@v3
-        with:
-          go-version-file: 'go.work'
-          cache: true
-          cache-dependency-path: go.work
-      - uses: actions/download-artifact@v3
-        with:
-          name: tracetest-web
-          path: web/build/
-      # release
-      - uses: goreleaser/goreleaser-action@v4
-        with:
-          distribution: goreleaser-pro
-          version: v1.17.2
-          args: release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
-        env:
-          VERSION: pr-${{ github.event.pull_request.number }}
-          TRACETEST_ENV: pr
-          ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
-          ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
-      - run: docker push kubeshop/tracetest:pr-${{ github.event.pull_request.number }}
+          name: tracetest-dist
+          path: dist/
 
   test-examples:
     name: Test examples
-    needs:  [build-docker]
+    needs: [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -238,26 +225,29 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: tracetest-go
+          name: tracetest-dist
           path: dist/
+      - name: Import image
+        run: |
+          docker load --input dist/image.tar
+
       - name: Build example
         run: |
           cd examples/${{ matrix.example_dir }}
-          TAG=pr-${{ github.event.pull_request.number }} docker-compose up -d
+          docker-compose up -d
           docker compose logs -f > /tmp/docker-log &
       - name: Run example test
         run: |
-          find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
           ./scripts/wait-for-port.sh 11633
 
-          ./dist/tracetest configure -g --endpoint http://localhost:11633 --analytics=false
-          ./dist/tracetest test run -d examples/${{ matrix.example_dir }}/tests/list-tests.yaml --wait-for-result || (cat /tmp/docker-log; exit 1)
+          ./dist/tracetest configure -g --endpoint http://localhost:11633
+          ./dist/tracetest run test -f examples/${{ matrix.example_dir }}/tests/list-tests.yaml || (cat /tmp/docker-log; exit 1)
 
   smoke-test-cli:
     name: CLI smoke tests
-    needs:  [build-docker]
+    needs: [build-docker]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -270,135 +260,108 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: tracetest-go
+          name: tracetest-dist
           path: dist/
+
+      - name: Import image
+        run: |
+          docker load --input dist/image.tar
       - name: Start server
         run: |
           cd examples/collector
-          TAG="pr-${{ github.event.pull_request.number }}" docker-compose up -d
+          docker-compose up -d
           docker compose logs -f > /tmp/docker-log &
       - name: Run tests
         run: |
-          find ./dist -name 'tracetest' -exec cp {} ./dist \;
-          chmod +x ./dist/tracetest
+          chmod +x ./dist/tracetest ./testing/cli-smoketest/run.bash
+
+          ./scripts/wait-for-port.sh 11633
 
           cd ./testing/cli-smoketest
-          chmod +x ./run.bash
-
-          ../../scripts/wait-for-port.sh 11633
 
           TRACETEST_CLI="../../dist/tracetest" \
-          TAG="pr-${{ github.event.pull_request.number }}" \
           TEST_ENV="${{ matrix.test_env }}" \
-          ./run.bash
-
-  e2e-cli:
-    name: CLI e2e tests
-    needs:  [build-docker]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: tracetest-go
-          path: dist/
-      - name: Run tests
-        run: |
-          find ./dist -name 'tracetest' -exec cp {} ./dist \;
-          chmod +x ./dist/tracetest
-
-          export TRACETEST_COMMAND=$PWD/dist/tracetest
-          export TEST_ENVIRONMENT=jaeger
-          export TAG=pr-${{ github.event.pull_request.number }}
-
-          cd ./testing/cli-e2etest
-          make test
-
-  deploy:
-    name: Deploy test infra
-    needs: [build-docker]
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-      with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ secrets.GKE_PROJECT }}
-
-    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-      with:
-        cluster_name: ${{ secrets.GKE_CLUSTER }}
-        location: ${{ secrets.GKE_ZONE }}
-        credentials: ${{ secrets.GKE_SA_KEY }}
-
-    - name: Deploy
-      run: |
-        TAG=pr-${{ github.event.pull_request.number }} \
-        NAME=tracetest-$TAG \
-        CONFIG_FILE=./k8s/tracetest.beta.yaml \
-        ./k8s/deploy.sh
+          ./run.bash || (cat /tmp/docker-log; exit 1)
 
   trace-testing:
-    needs: [deploy]
+    needs: [build-docker]
     name: Tracetesting API Server
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-        with:
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-        with:
-          cluster_name: ${{ secrets.GKE_CLUSTER }}
-          location: ${{ secrets.GKE_ZONE }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
 
-      - name: Install CLI integration version (latest main)
-        run: |
-          cd /tmp
-          curl -L https://github.com/kubeshop/tracetest/releases/download/nightly/tracetest_latest_linux_amd64.tar.gz  | tar -xz
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-dist
+          path: dist/
 
-      - name: Connecting with integration env (port-forwarding)
+      - name: Import image
         run: |
-          kubectl port-forward \
-            --namespace tracetest-integration \
-            svc/tracetest-integration 11633 &
+          docker load --input dist/image.tar
+
+      - name: Start services
+        run: |
+          ./run.sh down up
+          ./run.sh tracetest-logs > /tmp/docker-log &
+      - name: Run tests
+        run: |
+          chmod +x ./dist/tracetest ./dist/tracetest-server
 
           ./scripts/wait-for-port.sh 11633
+          ./run.sh tracetests || (cat /tmp/docker-log; exit 1)
 
-      - name: Connecting with PR env (port-forwarding)
+  e2e-cli:
+    name: CLI e2e tests
+    needs: [build-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-dist
+          path: dist/
+      - name: Import image
         run: |
-          kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 11634:11633 &
-
-          ./scripts/wait-for-port.sh 11634
-
-      - name: Run integration tests
+          docker load --input dist/image.tar
+      - name: Run tests
         run: |
-          cd testing/server-tracetesting
-          TRACETEST_CLI="/tmp/tracetest" \
-          TARGET_URL="http://tracetest-pr-${{ github.event.pull_request.number }}.tracetest-pr-${{ github.event.pull_request.number }}:11633" \
-          ./run.bash
+          find ./dist -name 'tracetest' -exec cp {} ./dist \;
+          chmod +x ./dist/tracetest
+
+          export TRACETEST_CLI=$PWD/dist/tracetest
+          export TEST_ENVIRONMENT=jaeger
+
+          cd ./testing/cli-e2etest
+          make test
+
+  config-e2e:
+    runs-on: ubuntu-latest
+    outputs:
+      CYPRESS_CONTAINERS: ${{ steps.configure-cypress-containers.outputs.CYPRESS_CONTAINERS }}
+    steps:
+    - name: Configure Cypress containers
+      id: configure-cypress-containers
+      run: |
+        # env.CYPRESS_RECORD_KEY is required for parallelization, so if it's empty run a single container
+        if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then
+          echo "CYPRESS_CONTAINERS=[1]" >> $GITHUB_OUTPUT
+        else
+          echo "CYPRESS_CONTAINERS=[1,2,3,4,5,6,7,8]" >> $GITHUB_OUTPUT
+        fi
 
   e2e:
-    needs: [deploy, trace-testing]
+    needs: [build-docker, config-e2e]
     name: WebUI End-to-end tests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         # run copies of the current job in parallel
-        containers: [1, 2, 3, 4, 5, 6, 7, 8]
+
+        containers: ${{fromJson(needs.config-e2e.outputs.CYPRESS_CONTAINERS)}}
 
     steps:
       - name: Checkout
@@ -410,16 +373,6 @@ jobs:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
-
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-        with:
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-        with:
-          cluster_name: ${{ secrets.GKE_CLUSTER }}
-          location: ${{ secrets.GKE_ZONE }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
 
       - name: Cache dependencies
         id: cache-nodemodules
@@ -435,39 +388,24 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: cd web/; npm ci
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-dist
+          path: dist/
 
-      - name: Forward port
+      - name: Import image
         run: |
-          kubectl port-forward \
-            --namespace tracetest-pr-${{ github.event.pull_request.number }} \
-            svc/tracetest-pr-${{ github.event.pull_request.number }} 3000:11633 &
+          docker load --input dist/image.tar
 
       - name: Run integration tests
         run: |
-          ./scripts/wait-for-port.sh 3000 &
-          cd web/
-          npm run cy:ci
-        env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          ./run.sh down up
+          ./run.sh tracetest-logs > /tmp/docker-log &
+          ./scripts/wait-for-port.sh 11633
 
-  cleanup:
-    name: Cleanup test infra
-    runs-on: ubuntu-latest
-    needs: [trace-testing, e2e]
-    steps:
-      - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-        with:
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
-
-      - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-        with:
-          cluster_name: ${{ secrets.GKE_CLUSTER }}
-          location: ${{ secrets.GKE_ZONE }}
-          credentials: ${{ secrets.GKE_SA_KEY }}
-
-      - name: Uninstall tracetest
-        run: |
-          helm delete tracetest-pr-${{ github.event.pull_request.number }} \
-          --namespace tracetest-pr-${{ github.event.pull_request.number }}
-          kubectl delete ns tracetest-pr-${{ github.event.pull_request.number }}
+          if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then
+            # if this is not container #1, the script won't get here, so don't need for additional checks
+            ./run.sh cypress
+          else
+            ./run.sh cypress-ci
+          fi

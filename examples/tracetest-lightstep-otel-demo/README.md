@@ -158,7 +158,7 @@ dataStore:
 
 The `otelcol-config-extras.yml` explains that. But first, check the `otelcol-config.yml`. It receives traces via either `grpc` or `http`. Then, in the `otelcol-config-extras.yml` you see a `exporters` that exports traces to Tracetest's OTLP endpoint `tracetest:4317` in one pipeline, and to Lightstep in another.
 
-Make sure to add your Lightstep access token in the headers of the `otlp/ls` exporter.
+Make sure to add your Lightstep access token in the headers of the `otlp/lightstep` exporter.
 
 ```yaml
 # otelcol-config-extras.yml
@@ -172,26 +172,26 @@ processors:
 
 exporters:
   # OTLP for Tracetest
-  otlp/tt:
+  otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Lightstep
-  otlp/ls:
+  otlp/lightstep:
     endpoint: ingest.lightstep.com:443
     headers:
       "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start
 
 service:
   pipelines:
-    traces/tt:
+    traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tt]
-    traces/ls:
+      exporters: [otlp/tracetest]
+    traces/lightstep:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/ls]
+      exporters: [logging, otlp/lightstep]
 ```
 
 ## Run the OpenTelemetry Demo with Tracetest
@@ -228,7 +228,7 @@ First, [install the CLI](https://docs.tracetest.io/getting-started/installation#
 Then, configure the CLI:
 
 ```bash
-tracetest configure --endpoint http://localhost:11633 --analytics
+tracetest configure --endpoint http://localhost:11633
 ```
 
 Once configured, you can run a test against the Tracetest instance via the terminal.

@@ -44,13 +44,20 @@ func (m OpenAPI) Span(in model.Span) openapi.Span {
 		}
 	}
 
+	kind := string(in.Kind)
+	if kind == "" {
+		kind = string(model.SpanKindUnespecified)
+	}
+
 	return openapi.Span{
 		Id:         in.ID.String(),
 		ParentId:   parentID,
+		Kind:       kind,
 		StartTime:  in.StartTime.UnixMilli(),
 		EndTime:    in.EndTime.UnixMilli(),
 		Attributes: attributes,
 		Children:   m.Spans(in.Children),
+		Name:       in.Name,
 	}
 }
 
