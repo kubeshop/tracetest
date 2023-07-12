@@ -7,6 +7,7 @@ import TransactionRun from 'models/TransactionRun.model';
 import TestState from '../TestState';
 import * as S from './TransactionHeader.styled';
 import TransactionRunActionsMenu from '../TransactionRunActionsMenu';
+import {TransactionRunStatusIcon} from '../RunStatusIcon';
 
 interface IProps {
   transaction: Transaction;
@@ -15,7 +16,7 @@ interface IProps {
 
 const TransactionHeader = ({
   transaction: {id: transactionId, name, version, description},
-  transactionRun: {state, id: runId},
+  transactionRun: {state, id: runId, allStepsRequiredGatesPassed},
 }: IProps) => {
   const {onRun} = useTransaction();
   const navigate = useNavigate();
@@ -41,9 +42,12 @@ const TransactionHeader = ({
           </S.StateContainer>
         )}
         {state && state === TestStateEnum.FINISHED && (
-          <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="transaction-run-button">
-            Run Transaction
-          </Button>
+          <>
+            <TransactionRunStatusIcon state={state!} hasFailedTests={!allStepsRequiredGatesPassed} />
+            <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="transaction-run-button">
+              Run Transaction
+            </Button>
+          </>
         )}
         <TransactionRunActionsMenu transactionId={transactionId} runId={runId} isRunView transactionVersion={version} />
       </S.Section>

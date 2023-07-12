@@ -23,6 +23,7 @@ const TransactionRun = ({
   version = 1,
   pass = 0,
   fail = 0,
+  allStepsRequiredGatesPassed = false,
 }: TRawTransactionResourceRun): TransactionRun => {
   return {
     id,
@@ -31,6 +32,7 @@ const TransactionRun = ({
     state,
     steps: steps.map(step => TestRun(step)),
     environment: Environment.fromRun(environment),
+    allStepsRequiredGatesPassed,
     metadata,
     version,
     pass,

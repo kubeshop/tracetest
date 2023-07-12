@@ -86,6 +86,7 @@ export const {
   useGetLinterQuery,
   useCreateSettingMutation,
   useUpdateSettingMutation,
+  useGetTestRunnerQuery,
 } = TraceTestAPI;
 export const {endpoints} = TraceTestAPI;
 

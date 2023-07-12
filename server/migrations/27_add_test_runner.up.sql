@@ -6,7 +6,14 @@ CREATE TABLE "test_runners" (
   "required_gates" JSONB
 );
 
-ALTER TABLE test_runs
-    ADD COLUMN required_gates_result JSONB;
+ALTER TABLE
+  test_runs
+ADD
+  COLUMN required_gates_result JSONB;
+
+ALTER TABLE
+  transaction_runs
+ADD
+  COLUMN all_steps_required_gates_passed boolean;
 
 COMMIT;

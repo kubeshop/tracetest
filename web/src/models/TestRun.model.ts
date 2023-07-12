@@ -7,6 +7,7 @@ import LinterResult from './LinterResult.model';
 import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
+import RequiredGatesResult from './RequiredGatesResult.model';
 
 export type TRawTestRun = Modify<
   TTestSchemas['TestRun'],
@@ -31,6 +32,7 @@ type TestRun = Model<
     environment?: Environment;
     state: TTestRunState;
     linter: LinterResult;
+    requiredGatesResult: RequiredGatesResult;
   }
 >;
 
@@ -110,6 +112,7 @@ const TestRun = ({
   transactionId = '',
   transactionRunId = '',
   linter = {},
+  requiredGatesResult = {required: [], failed: [], passed: true},
 }: TRawTestRun): TestRun => {
   return {
     obtainedTraceAt,
@@ -137,6 +140,7 @@ const TestRun = ({
     transactionId,
     transactionRunId,
     linter: LinterResult(linter),
+    requiredGatesResult: RequiredGatesResult(requiredGatesResult),
   };
 };
 

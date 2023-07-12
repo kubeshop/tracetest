@@ -1757,6 +1757,39 @@ export interface external {
     };
     operations: {};
   };
+  "testRunner.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        TestRunnerResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'TestRunner'.
+           * @enum {string}
+           */
+          type?: "TestRunner";
+          spec?: external["testRunner.yaml"]["components"]["schemas"]["TestRunner"];
+        };
+        TestRunner: {
+          /**
+           * @description ID of the test runner resource. It should always be set as 'current'.
+           * @enum {string}
+           */
+          id?: "current";
+          /** @description Name given for this test runner set */
+          name?: string;
+          requiredGates?: external["testRunner.yaml"]["components"]["schemas"]["SupportedGates"][];
+        };
+        RequiredGatesResult: {
+          required: external["testRunner.yaml"]["components"]["schemas"]["SupportedGates"][];
+          failed: external["testRunner.yaml"]["components"]["schemas"]["SupportedGates"][];
+          passed: boolean;
+        };
+        /** @enum {string} */
+        SupportedGates: "analyzer-score" | "analyzer-rules" | "test-specs";
+      };
+    };
+    operations: {};
+  };
   "tests.yaml": {
     paths: {};
     components: {
@@ -1868,6 +1901,7 @@ export interface external {
             value?: string;
             error?: string;
           }[];
+          requiredGatesResult?: external["testRunner.yaml"]["components"]["schemas"]["RequiredGatesResult"];
           metadata?: { [key: string]: string };
           transactionId?: string;
           transactionRunId?: string;
@@ -1876,6 +1910,9 @@ export interface external {
           metadata?: { [key: string]: string } | null;
           environmentId?: string;
           variables?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
+          requiredGates?:
+            | external["testRunner.yaml"]["components"]["schemas"]["SupportedGates"][]
+            | null;
         };
         /** @example [object Object] */
         AssertionResults: {
@@ -2031,6 +2068,7 @@ export interface external {
           metadata?: { [key: string]: string };
           pass?: number;
           fail?: number;
+          allStepsRequiredGatesPassed?: boolean;
         };
       };
     };

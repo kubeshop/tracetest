@@ -3,9 +3,10 @@ import {Link, useNavigate} from 'react-router-dom';
 import AnalyzerScore from 'components/AnalyzerScore';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
-import TestRun, {isRunStateFailed, isRunStateFinished, isRunStateStopped} from 'models/TestRun.model';
+import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
+import RunStatusIcon from '../RunStatusIcon';
 
 const TEST_RUN_TRACE_TAB = 'trace';
 const TEST_RUN_TEST_TAB = 'test';
@@ -14,19 +15,6 @@ interface IProps {
   run: TestRun;
   testId: string;
   linkTo: string;
-}
-
-function getIcon(state: TestRun['state'], failedAssertions: number, isFailedAnalyzer: boolean) {
-  if (!isRunStateFinished(state)) {
-    return null;
-  }
-  if (isRunStateStopped(state)) {
-    return <S.IconInfo />;
-  }
-  if (isRunStateFailed(state) || failedAssertions > 0 || isFailedAnalyzer) {
-    return <S.IconFail />;
-  }
-  return <S.IconSuccess />;
 }
 
 const TestRunCard = ({
@@ -42,6 +30,7 @@ const TestRunCard = ({
     transactionId,
     transactionRunId,
     linter,
+    requiredGatesResult,
   },
   testId,
   linkTo,
@@ -63,8 +52,7 @@ const TestRunCard = ({
   return (
     <Link to={linkTo}>
       <S.Container $isWhite data-cy={`run-card-${runId}`}>
-        <S.IconContainer>{getIcon(state, failedAssertionCount, linter.isFailed)}</S.IconContainer>
-
+        <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
         <S.Info>
           <div>
             <S.Title>v{testVersion}</S.Title>

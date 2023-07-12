@@ -6,6 +6,7 @@ import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import TransactionRun from 'models/TransactionRun.model';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
+import {TransactionRunStatusIcon} from '../RunStatusIcon';
 
 interface IProps {
   linkTo: string;
@@ -13,18 +14,8 @@ interface IProps {
   transactionId: string;
 }
 
-function getIcon(state: TransactionRun['state'], fail: number) {
-  if (state !== TestStateEnum.FAILED && state !== TestStateEnum.FINISHED) {
-    return null;
-  }
-  if (state === TestStateEnum.FAILED || fail > 0) {
-    return <S.IconFail />;
-  }
-  return <S.IconSuccess />;
-}
-
 const TransactionRunCard = ({
-  run: {id: runId, createdAt, state, metadata, version, pass, fail},
+  run: {id: runId, createdAt, state, metadata, version, pass, fail, allStepsRequiredGatesPassed},
   transactionId,
   linkTo,
 }: IProps) => {
@@ -36,8 +27,7 @@ const TransactionRunCard = ({
   return (
     <Link to={linkTo}>
       <S.Container $isWhite>
-        <S.IconContainer>{getIcon(state, fail)}</S.IconContainer>
-
+        <TransactionRunStatusIcon state={state} hasFailedTests={!allStepsRequiredGatesPassed} />
         <S.Info>
           <div>
             <S.Title>v{version}</S.Title>
