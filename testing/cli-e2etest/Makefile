@@ -15,7 +15,7 @@ test: # run tests for this application
 	export TAG=$(TAG); \
 	export ENABLE_CLI_DEBUG=$(ENABLE_CLI_DEBUG); \
 	go clean -testcache; \
-	go test -timeout 300s -p 1 ./...;
+	go test -v -timeout 300s -p 1 ./...;
 
 test/debug: # run tests for this application with debug mode enabled
 	export ENABLE_CLI_DEBUG="true"; \

@@ -31,12 +31,7 @@ func init() {
 			}
 
 			// export is ALWAYS yaml, so we can hardcode it here
-			resultFormat, err := resourcemanager.Formats.Get("yaml")
-			if err != nil {
-				return "", err
-			}
-
-			result, err := resourceClient.Get(ctx, exportParams.ResourceID, resultFormat)
+			result, err := resourceClient.Get(ctx, exportParams.ResourceID, resourcemanager.Formats.Get("yaml"))
 			if err != nil {
 				return "", err
 			}

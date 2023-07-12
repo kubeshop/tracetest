@@ -43,7 +43,7 @@ jobs:
       - name: Run syntethic monitoring tests
         id: monitoring
         run: |
-          tracetest test run -d test-api.yaml
+          tracetest test run -f test-api.yaml
 
       - name: Send custom JSON data to Slack workflow
         if: ${{ failure() }}

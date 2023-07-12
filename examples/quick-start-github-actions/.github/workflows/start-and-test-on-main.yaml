@@ -26,9 +26,9 @@ jobs:
 
     - name: Run tests via the Tracetest CLI
       run: |
-        tracetest test run -d ./tracetest/tests/test-api.yaml -w
-        tracetest test run -d ./tracetest/tests/test-api-and-av.yaml -w
-        tracetest test run -d ./tracetest/tests/transaction-api.yaml -w
+        tracetest run test -f ./tracetest/tests/test-api.yaml
+        tracetest run test -f ./tracetest/tests/test-api-and-av.yaml
+        tracetest run test -f ./tracetest/tests/transaction-api.yaml
 
     - name: Stop containers
       if: always()

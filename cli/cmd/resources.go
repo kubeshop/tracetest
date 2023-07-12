@@ -9,18 +9,47 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/preprocessor"
+	"github.com/kubeshop/tracetest/cli/runner"
 )
 
 var resourceParams = &resourceParameters{}
+
+var (
+	runnerRegistry = runner.NewRegistry().
+		Register(runner.TestRunner(
+			testClient,
+			openapiClient,
+			formatters.TestRun(func() string { return cliConfig.URL() }, true),
+		)).
+		Register(runner.TransactionRunner(
+			transactionClient,
+			openapiClient,
+			formatters.TransactionRun(func() string { return cliConfig.URL() }, true),
+		))
+)
+
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
+	environmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environment", "environments",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "DESCRIPTION", Path: "spec.description"},
+			},
+		}),
+	)
+
 	testPreprocessor = preprocessor.Test(cliLogger)
 	testClient       = resourcemanager.NewClient(
-		httpClient,
+		httpClient, cliLogger,
 		"test", "tests",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
@@ -55,11 +84,7 @@ var (
 	)
 
 	transactionPreprocessor = preprocessor.Transaction(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
-		formatYAML, err := resourcemanager.Formats.Get(resourcemanager.FormatYAML)
-		if err != nil {
-			return input, fmt.Errorf("cannot get yaml format: %w", err)
-		}
-		updated, err := testClient.Apply(ctx, input, formatYAML)
+		updated, err := testClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
 			return input, fmt.Errorf("cannot apply test: %w", err)
 		}
@@ -67,10 +92,38 @@ var (
 		return fileutil.New(input.AbsPath(), []byte(updated)), nil
 	})
 
+	transactionClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"transaction", "transactions",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "VERSION", Path: "spec.version"},
+				{Header: "STEPS", Path: "spec.summary.steps"},
+				{Header: "RUNS", Path: "spec.summary.runs"},
+				{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
+				{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
+				{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
+			},
+			ItemModifier: func(item *gabs.Container) error {
+				// set spec.summary.steps to the number of steps in the transaction
+				item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
+
+				if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
+					return err
+				}
+
+				return nil
+			},
+		}),
+		resourcemanager.WithApplyPreProcessor(transactionPreprocessor.Preprocess),
+	)
+
 	resources = resourcemanager.NewRegistry().
 			Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"config", "configs",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -83,7 +136,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"analyzer", "analyzers",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -103,7 +156,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"pollingprofile", "pollingprofiles",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -112,11 +165,12 @@ var (
 						{Header: "STRATEGY", Path: "spec.strategy"},
 					},
 				}),
+				resourcemanager.WithResourceType("PollingProfile"),
 			),
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"demo", "demos",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -130,7 +184,7 @@ var (
 		).
 		Register(
 			resourcemanager.NewClient(
-				httpClient,
+				httpClient, cliLogger,
 				"datastore", "datastores",
 				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 					Cells: []resourcemanager.TableCellConfig{
@@ -149,55 +203,20 @@ var (
 					},
 				}),
 				resourcemanager.WithDeleteSuccessMessage("DataStore removed. Defaulting back to no-tracing mode"),
+				resourcemanager.WithResourceType("DataStore"),
 			),
 		).
-		Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"environment", "environments",
-				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "DESCRIPTION", Path: "spec.description"},
-					},
-				}),
-			),
-		).
-		Register(
-			resourcemanager.NewClient(
-				httpClient,
-				"transaction", "transactions",
-				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "VERSION", Path: "spec.version"},
-						{Header: "STEPS", Path: "spec.summary.steps"},
-						{Header: "RUNS", Path: "spec.summary.runs"},
-						{Header: "LAST RUN TIME", Path: "spec.summary.lastRun.time"},
-						{Header: "LAST RUN SUCCESSES", Path: "spec.summary.lastRun.passes"},
-						{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
-					},
-					ItemModifier: func(item *gabs.Container) error {
-						// set spec.summary.steps to the number of steps in the transaction
-						item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
-
-						if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
-							return err
-						}
-
-						return nil
-					},
-				}),
-				resourcemanager.WithApplyPreProcessor(transactionPreprocessor.Preprocess),
-			),
-		).
+		Register(environmentClient).
+		Register(transactionClient).
 		Register(testClient)
 )
 
 func resourceList() string {
 	return strings.Join(resources.List(), "|")
+}
+
+func runnableResourceList() string {
+	return strings.Join(runnerRegistry.List(), "|")
 }
 
 func setupResources() {

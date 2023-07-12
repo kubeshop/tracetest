@@ -91,6 +91,7 @@ func TestApplyTransaction(t *testing.T) {
 	// Then it should be applied with success and it should not update
 	// the steps with its ids.
 	transactionWithoutIDPath := env.GetTestResourcePath(t, "new-transaction-without-id")
+	helpers.Copy(transactionWithoutIDPath+".tpl", transactionWithoutIDPath)
 
 	helpers.RemoveIDFromTransactionFile(t, transactionWithoutIDPath)
 

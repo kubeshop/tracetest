@@ -55,7 +55,7 @@ const CliCommandService = () => ({
     const command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
         this.applyOptions[option as CliCommandOption]({command: acc, enabled, test, environmentId}),
-      `test run -d ${fileName}`
+      `run test -f ${fileName}`
     );
 
     return `${command} -o ${format}`;

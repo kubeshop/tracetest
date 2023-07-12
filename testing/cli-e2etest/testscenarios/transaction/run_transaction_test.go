@@ -11,13 +11,13 @@ import (
 )
 
 func TestRunTransaction(t *testing.T) {
-	// setup isolated e2e environment
-	env := environment.CreateAndStart(t, environment.WithDataStoreEnabled(), environment.WithPokeshop())
-	defer env.Close(t)
+	t.Run("should fail if test resource is selected", func(t *testing.T) {
+		// setup isolated e2e environment
+		env := environment.CreateAndStart(t)
+		defer env.Close(t)
 
-	cliConfig := env.GetCLIConfigPath(t)
+		cliConfig := env.GetCLIConfigPath(t)
 
-	t.Run("should pass", func(t *testing.T) {
 		// instantiate require with testing helper
 		require := require.New(t)
 
@@ -29,7 +29,31 @@ func TestRunTransaction(t *testing.T) {
 		// Then it should pass
 		transactionFile := env.GetTestResourcePath(t, "transaction-to-run")
 
-		command := fmt.Sprintf("test run -w -d %s", transactionFile)
+		command := fmt.Sprintf("run test -f %s", transactionFile)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 1)
+		require.Contains(result.StdErr, "cannot apply Transaction to Test resource")
+	})
+
+	t.Run("should pass", func(t *testing.T) {
+		// setup isolated e2e environment
+		env := environment.CreateAndStart(t, environment.WithDataStoreEnabled(), environment.WithPokeshop())
+		defer env.Close(t)
+
+		cliConfig := env.GetCLIConfigPath(t)
+
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I try to run a transaction
+		// Then it should pass
+		transactionFile := env.GetTestResourcePath(t, "transaction-to-run")
+
+		command := fmt.Sprintf("run transaction -f %s", transactionFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "Transaction To Run") // transaction name
