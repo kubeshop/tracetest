@@ -4,7 +4,7 @@ import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {isRunStateFinished} from 'models/TestRun.model';
+import {isRunStateFinished, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
@@ -52,13 +52,13 @@ const HeaderRight = ({testId}: IProps) => {
           )}
         </S.StateContainer>
       )}
+      {(isRunStateSucceeded(state) || isRunStateStopped(state)) && (
+        <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
+      )}
       {!isDraftMode && state && isRunStateFinished(state) && (
-        <>
-          <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
-          <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
-            Run Test
-          </Button>
-        </>
+        <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
+          Run Test
+        </Button>
       )}
       <EventLogPopover runEvents={runEvents} />
       <RunActionsMenu

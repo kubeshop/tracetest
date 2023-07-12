@@ -7,7 +7,7 @@ const TestRunner = () => {
   return (
     <S.Container>
       <S.Description>
-        The Test Runner allows you to configure the behavior used to execute your tests and generate the results
+        <p>The Test Runner allows you to configure the behavior used to execute your tests and generate the results</p>
         <DocsBanner>
           Need more information about Test Runner?{' '}
           <a href={TEST_RUNNER_DOCUMENTATION_URL} target="_blank">

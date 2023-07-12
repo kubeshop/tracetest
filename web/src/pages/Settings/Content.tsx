@@ -47,9 +47,6 @@ const Content = () => {
           <Tabs.TabPane key={TabsKeys.Demo} tab="Demo">
             <Demo />
           </Tabs.TabPane>
-          <Tabs.TabPane key={TabsKeys.TestRunner} tab="Test Runner">
-            <TestRunner />
-          </Tabs.TabPane>
           <Tabs.TabPane
             key={TabsKeys.Analyzer}
             tab={
@@ -60,6 +57,9 @@ const Content = () => {
             }
           >
             <Linter />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={TabsKeys.TestRunner} tab="Test Runner">
+            <TestRunner />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>
