@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"os"
+	"strings"
+
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
@@ -61,9 +65,32 @@ var testRunCmd = &cobra.Command{
 		runParams.SkipResultWait = !runTestWaitForResult
 		runParams.JUnitOuptutFile = runTestJUnit
 
-		runCmd.Run(listCmd, []string{"test"})
+		fileType := getFileType(runTestFileDefinition)
+
+		runCmd.Run(listCmd, []string{fileType})
 	},
 	PostRun: teardownCommand,
+}
+
+// getFileType returns the value of the `type` field defined in the definition file.
+// if any error happens, it will return `test` as default, and errors will be ignored.
+func getFileType(filePath string) string {
+	const defaultFileType = "test"
+
+	contents, err := os.ReadFile(filePath)
+	if err != nil {
+		return defaultFileType
+	}
+
+	var definition struct {
+		Type string `json:"type"`
+	}
+	yaml := resourcemanager.Formats.Get(resourcemanager.FormatYAML)
+	if err := yaml.Unmarshal(contents, &definition); err != nil {
+		return defaultFileType
+	}
+
+	return strings.ToLower(definition.Type)
 }
 
 func init() {
