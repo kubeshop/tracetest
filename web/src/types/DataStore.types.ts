@@ -28,6 +28,7 @@ export enum SupportedDataStores {
   AWSXRay = 'awsxray',
   Honeycomb = 'honeycomb',
   AzureAppInsights = 'azureappinsights',
+  Signoz = 'signoz',
 }
 
 export enum SupportedClientTypes {
@@ -39,7 +40,8 @@ export type TCollectorDataStores =
   | SupportedDataStores.NewRelic
   | SupportedDataStores.OtelCollector
   | SupportedDataStores.Lightstep
-  | SupportedDataStores.Datadog;
+  | SupportedDataStores.Datadog
+  | SupportedDataStores.Signoz;
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
@@ -93,6 +95,7 @@ export type IDataStore = DataStore & {
   newrelic?: TRawOtlpDataStore;
   datadog?: TRawOtlpDataStore;
   honeycomb?: TRawOtlpDataStore;
+  signoz?: TRawOtlpDataStore;
 };
 
 export type TDraftDataStore = {

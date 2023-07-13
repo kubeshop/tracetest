@@ -38,8 +38,6 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
-    ports:
-      - 5432:5432
 
   otel-collector:
     image: otel/opentelemetry-collector:0.54.0
@@ -115,7 +113,6 @@ services:
 
   query-service:
     image: signoz/query-service:${DOCKER_TAG:-0.22.0}
-    container_name: query-service
     command: ["-config=/root/config/prometheus.yml"]
     volumes:
       - ./signoz/prometheus.yml:/root/config/prometheus.yml
@@ -141,7 +138,6 @@ services:
 
   frontend:
     image: signoz/frontend:${DOCKER_TAG:-0.22.0}
-    container_name: frontend
     restart: on-failure
     depends_on:
       - alertmanager

@@ -1414,7 +1414,8 @@ export interface external {
           | "datadog"
           | "awsxray"
           | "honeycomb"
-          | "azureappinsights";
+          | "azureappinsights"
+          | "signoz";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
         /** @enum {string} */

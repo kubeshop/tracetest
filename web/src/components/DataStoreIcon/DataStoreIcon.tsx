@@ -12,6 +12,7 @@ import Tempo from './Icons/Tempo';
 import AWSXRay from './Icons/AwsXRay';
 import Honeycomb from './Icons/Honeycomb';
 import AzureAppInsights from './Icons/AzureAppInsights';
+import Signoz from './Icons/Signoz';
 
 const iconMap = {
   [SupportedDataStores.JAEGER]: Jaeger,
@@ -26,6 +27,7 @@ const iconMap = {
   [SupportedDataStores.AWSXRay]: AWSXRay,
   [SupportedDataStores.Honeycomb]: Honeycomb,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
+  [SupportedDataStores.Signoz]: Signoz,
 } as const;
 
 interface IProps {
