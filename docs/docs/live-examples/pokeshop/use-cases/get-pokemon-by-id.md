@@ -87,7 +87,7 @@ Now you can validate this entire use case.
 If you want to replicate those tests on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving one of the test definitions as the file `test-definition.yml` and running:
 
 ```sh
-tracetest test -d test-definition.yml --wait-for-results
+tracetest run test -f test-definition.yml
 ```
 
 #### Cache Miss Scenario

@@ -30,12 +30,12 @@ The main idea is to test every CLI command against the Tracetest server with dif
 
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
-| `test run -d [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
-| `test run -d [test-definition] -e [environment-id]`                | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `test run -d [test-definition] -e [environment-definition]`        | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `test run -d [transaction-definition]`                             | [RunTransaction](./testscenarios/transaction//run_transaction_test.go) |
-| `test run -d [transaction-definition] -e [environment-id]`         | |
-| `test run -d [transaction-definition] -e [environment-definition]` | |
+| `run test -f [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
+| `run test -f [test-definition] -e [environment-id]`                | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `run test -f [test-definition] -e [environment-definition]`        | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `run transaction -f [transaction-definition]`                             | [RunTransaction](./testscenarios/transaction//run_transaction_test.go) |
+| `run transaction -f [transaction-definition] -e [environment-id]`         | |
+| `run transaction -f [transaction-definition] -e [environment-definition]` | |
 
 ### Resources: Config
 

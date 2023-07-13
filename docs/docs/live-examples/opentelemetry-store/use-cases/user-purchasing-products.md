@@ -175,7 +175,7 @@ spec:
 By having the test, transaction and environment files in the same directory, we can call the CLI and execute this transaction:
 
 ```sh
-tracetest test run -d transaction.yaml -e user-buying-products.env --wait-for-result
+tracetest run transaction -f transaction.yaml -e user-buying-products.env
 ```
 
 The result should be an output like this:

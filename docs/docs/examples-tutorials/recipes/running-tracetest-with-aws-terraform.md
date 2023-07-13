@@ -279,7 +279,7 @@ Now that all of the required services and infra have been created, you can start
 
 1. From the Terraform output you can copy the `api_endpoint` and replace the `<your_api_endpoint>` placeholder from the `tests/test.yaml` file.
 2. Configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --endpoint <tracetest_url>`.
-3. Run the test YAML file using the CLI `tracetest test run -d tests/test.yaml`.
+3. Run the test YAML file using the CLI `tracetest run test -f tests/test.yaml`.
 4. Follow the link to find the results.
 
 ## Learn More

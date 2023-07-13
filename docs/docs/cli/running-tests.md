@@ -4,24 +4,14 @@ Once you have created a test, whether from the Tracetest UI or via a text editor
 
 The documentation for running a test via the CLI can be found here:
 
-- [tracetest test run](./reference/tracetest_test_run.md): This page provides examples of using this command.
+- [tracetest run](./reference/tracetest_run.md): This page provides examples of using this command.
 
 ## Running Your First Test
 
-To run a test, give the path to the test definition file with the `'-d'` option. This will launch a test and provide a link to the created test run.
+To run a test, give the path to the test definition file with the `'-f'` option. This will launch a test and provide a link to the created test run.
 
 ```sh
-tracetest test run -d path/to/test.yaml
-```
-
-```text title="Output:"
-✔ Pokeshop - Import (http://localhost:11633/test/4oI08rA4g/run/3/test)
-```
-
-Now, let's run the same test but tell the CLI to wait for the test to complete running before returning with the `'-w'` option. This will provide results from the test.
-
-```sh
-tracetest test run -d path/to/test.yaml -w
+tracetest run test -f path/to/test.yaml
 ```
 
 ```text title="Output:"
@@ -44,7 +34,7 @@ tracetest test run -d path/to/test.yaml -w
 Running the same command with the '-o json' option would change the output from the default of human readable 'pretty' to 'json'. This can be useful when you wish to extract particular data from the response. This would look like:
 
 ```sh
-tracetest test run -d path/to/test.yaml -w -o json
+tracetest run test -f path/to/test.yaml -o json
 ```
 
 ```json title="Output:"
@@ -173,7 +163,7 @@ tracetest test run -d path/to/test.yaml -w -o json
 You can also opt to output the result as JUnit to a file. You would run the command with a -j option and a file name, ie:
 
 ```sh
-tracetest test run -d path/to/test.yaml -w -j junit.out
+tracetest run test -f path/to/test.yaml -j junit.out
 ```
 
 The JUnit output file would then contain the JUnit result, for example:
@@ -207,7 +197,7 @@ You can reference an existing environment using its id. For example, given this 
 We can run a test and specify that environment with this command:
 
 ```sh
-tracetest test run -d path/to/test.yaml -e testenv -w
+tracetest run test -f path/to/test.yaml -e testenv
 ```
 
 You can also reference an environment resource file which will be used to create a new environment or update an existing one. For example, if you have a file named local.env with this content:
@@ -225,7 +215,7 @@ spec:
 ```
 
 ```sh
-tracetest test run -d path/to/test.yaml -e path/to/local.env -w
+tracetest run test -f path/to/test.yaml -e path/to/local.env
 ```
 
 If you use the environment resource approach, a new environment will be created in Tracetest.

@@ -1,6 +1,6 @@
 # Configuring your CLI
 
-Our web interface makes it easier to visualize your traces and add assertions, but sometimes a CLI is needed for automation. The CLI was developed for users creating tests and executing them each time a change is made in the system, so Tracetest can detect regressions and check service Service Level Objectives (SLOs).
+Our web interface makes it easier to visualize your traces and add assertions, but sometimes a CLI is needed for automation. The CLI was developed for users creating tests and executing them each time a change is made in the system, so Tracetest can detect regressions and check your Service Level Objectives (SLOs).
 
 ## Available Commands
 
@@ -43,14 +43,10 @@ Every time the test is run, changes are detected and, if any change is introduce
 **How to Use**:
 
 ```sh
-tracetest test run --definition <file-path>
+tracetest run test --file <file-path>
 ```
 
-**Options**:
-
-`--wait-for-result`: The CLI will only exit after the test run has completed (the trace was retrieved and assertions were executed).
-
-### Running Tracetest CLI From Docker
+### Running Tracetest CLI from Docker
 
 There are times when it is easier to directly execute the Tracetest CLI from a Docker image rather than installing the CLI on your local machine. This can be convenient when you wish to execute the CLI in a CI/CD environment.
 
@@ -62,5 +58,5 @@ Use the command below, substituting the following placeholders:
 - `file-path` - The path to the saved Tracetest test. Example: `./mytest.yaml`
 
 ```bash wordWrap=true
-docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s <your-tracetest-server-url> test run  --definition <file-path> --wait-for-result
+docker run --rm -it -v$(pwd):$(pwd) -w $(pwd) --network host --entrypoint tracetest kubeshop/tracetest:latest -s <your-tracetest-server-url> run test --file <file-path>
 ```

@@ -25,9 +25,8 @@ actions:
         - /keptn/data/tracetest-cli-config.yaml
         - test
         - run
-        - --definition
+        - --file
         - /keptn/data/test-definition.yaml
-        - --wait-for-result
 
 ```
 
@@ -144,9 +143,8 @@ actions:
         - /keptn/data/tracetest-cli-config.yaml
         - test
         - run
-        - --definition
+        - --file
         - /keptn/data/test-definition.yaml
-        - --wait-for-result
 ```
 
 This job will run Tracetest every time a `test` event happens, listening to the event `sh.keptn.event.test.triggered` (event emitted by the `test` task on the `validate-pokeshop` sequence).

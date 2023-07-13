@@ -243,7 +243,7 @@ spec:
       script: |
         # Configure and Run Tracetest CLI
         tracetest configure -g --endpoint http://tracetest.tracetest.svc.cluster.local:11633/
-        tracetest test run -d /workspace/test-api.yaml -w
+        tracetest run test -f /workspace/test-api.yaml
       volumeMounts:
       - name: custom
         mountPath: /workspace

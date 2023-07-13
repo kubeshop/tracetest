@@ -14,9 +14,9 @@ This is a simple quick start on how to configure a .NET State Machine (AWS Step 
 7. Inject the Tests and Transactions definitions to the tracetest server  using the following:
 
 ```bash
-tracetest test run -d tests/incident.yaml \
-tracetest test run -d tests/exam.yaml \
-tracetest test run -d tests/transaction.yaml
+tracetest run test -f tests/incident.yaml \
+tracetest run test -f tests/exam.yaml \
+tracetest run transaction -f tests/transaction.yaml
 ```
 
 Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

@@ -6,26 +6,15 @@ The command to run a transaction is the same as running a test from the CLI.
 
 The documentation for running a test via the CLI can be found here:
 
-- [tracetest test run](./reference/tracetest_test_run.md): This page provides examples of using this command.
+- [tracetest run](./reference/tracetest_run.md): This page provides examples of using this command.
 
 ## Running Your First Transaction
 
-To run a transaction, give the path to the transaction definition file with the `'-d'` option. This will launch a transaction, providing us with a link to the created transaction run.
+To run a transaction, give the path to the transaction definition file with the `'-f'` option. This will launch a transaction, providing us with a link to the created transaction run.
 
 ```sh
-tracetest test run -d path/to/transaction.yaml
+tracetest run transaction -f path/to/transaction.yaml
 ```
-
-```text title="Output:"
-✔ Pokemon Transaction (http://localhost:11633/transaction/xcGqfHl4g/run/3)
-```
-
-Now, let's run the same test but tell the CLI to wait for the test to complete running before returning with the `'-w'` option. This will provide results from the test.
-
-```sh
-tracetest test run -d path/to/transaction.yaml -w
-```
-
 ```text title="Output:"
 ✔ Pokemon Transaction (http://localhost:11633/transaction/xcGqfHl4g/run/3)
 	✔ Pokeshop - Import (http://localhost:11633/test/XRHjfH_4R/run/4/test)
@@ -43,7 +32,7 @@ You can reference an existing environment using its id. For example, given this 
 We can run a transaction and specify that environment with this command:
 
 ```sh
-tracetest test run -d path/to/transaction.yaml -e testenv -w
+tracetest run transaction -f path/to/transaction.yaml -e testenv
 ```
 
 You can also reference an environment resource file which will be used to create a new environment or update an existing one. For example, if you have a file named `local.env` with this content:
@@ -61,7 +50,7 @@ spec:
 ```
 
 ```sh
-tracetest test run -d path/to/transaction.yaml -e path/to/local.env -w
+tracetest run test -f path/to/transaction.yaml -e path/to/local.env
 ```
 
 If you use the environment resource approach, a new environment will be created in Tracetest.
