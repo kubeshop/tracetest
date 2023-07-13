@@ -228,7 +228,7 @@ service:
     traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tracetest]
+      exporters: [logging, otlp/tracetest]
     traces/signoz:
       receivers: [otlp]
       processors: [batch]

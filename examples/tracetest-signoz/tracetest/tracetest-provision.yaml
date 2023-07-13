@@ -11,5 +11,5 @@ spec:
 ---
 type: DataStore
 spec:
-  name: OTLP
-  type: otlp
+  name: Signoz
+  type: signoz
