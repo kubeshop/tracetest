@@ -14,7 +14,7 @@ interface IProps {
   trace: Trace;
 }
 
-const AnalyzerResult = ({result: {score, minimumScore, plugins = []}, trace}: IProps) => {
+const AnalyzerResult = ({result: {score, minimumScore, plugins = [], passed}, trace}: IProps) => {
   const {linter} = useSettingsValues();
 
   return (
@@ -36,7 +36,7 @@ const AnalyzerResult = ({result: {score, minimumScore, plugins = []}, trace}: IP
       </S.Description>
       {plugins.length ? (
         <>
-          <GlobalResult score={score} minimumScore={minimumScore} />
+          <GlobalResult score={score} minimumScore={minimumScore} allRulesPassed={passed} />
           <Plugins plugins={plugins} trace={trace} />
         </>
       ) : (

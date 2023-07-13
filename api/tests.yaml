@@ -218,6 +218,8 @@ components:
                 type: string
               error:
                 type: string
+        requiredGatesResult:
+          $ref: "./testRunner.yaml#/components/schemas/RequiredGatesResult"
 
         metadata:
           type: object
@@ -242,6 +244,11 @@ components:
           type: array
           items:
             $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
+        requiredGates:
+          type: array
+          nullable: true
+          items:
+            $ref: "./testRunner.yaml#/components/schemas/SupportedGates"
 
     AssertionResults:
       type: object

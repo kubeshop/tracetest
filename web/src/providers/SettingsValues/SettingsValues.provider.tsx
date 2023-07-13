@@ -6,12 +6,14 @@ import DataStoreConfig from 'models/DataStoreConfig.model';
 import Demo from 'models/Demo.model';
 import Linter from 'models/Linter.model';
 import Polling from 'models/Polling.model';
+import TestRunner from 'models/TestRunner.model';
 import {
   useGetDataStoreQuery,
   useGetConfigQuery,
   useGetDemoQuery,
   useGetPollingQuery,
   useGetLinterQuery,
+  useGetTestRunnerQuery,
 } from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
@@ -33,6 +35,7 @@ interface IContext {
   pollingProfile: Polling;
   demos: Demo[];
   linter: Linter;
+  testRunner: TestRunner;
 }
 
 const Context = createContext<IContext>({
@@ -48,6 +51,7 @@ const Context = createContext<IContext>({
   pollingProfile: Polling(),
   demos: [],
   linter: Linter(),
+  testRunner: TestRunner(),
 });
 
 interface IProps {
@@ -105,6 +109,9 @@ const SettingsValuesProvider = ({children}: IProps) => {
   // Linter
   const {data: linter = Linter()} = useGetLinterQuery({});
 
+  // Test Runner
+  const {data: testRunner = TestRunner()} = useGetTestRunnerQuery({});
+
   const value = useMemo<IContext>(
     () => ({
       dataStoreConfig,
@@ -119,6 +126,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       pollingProfile,
       demos,
       linter,
+      testRunner,
     }),
     [
       dataStoreConfig,
@@ -133,6 +141,7 @@ const SettingsValuesProvider = ({children}: IProps) => {
       pollingProfile,
       demos,
       linter,
+      testRunner,
     ]
   );
 

@@ -1,3 +1,4 @@
+import {capitalize} from 'lodash';
 import Env from './Env';
 
 export const escapeString = (str: string): string => {
@@ -65,6 +66,10 @@ export const getServerBaseUrl = () => {
   const prefix = Env.get('serverPathPrefix');
 
   return `${protocol}//${host}${prefix}`;
+};
+
+export const ToTitle = (str: string) => {
+  return capitalize(str.replace(/\W/g, ' '));
 };
 
 export const getIsValidUrl = (url: string): boolean => {

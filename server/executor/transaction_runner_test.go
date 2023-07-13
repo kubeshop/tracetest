@@ -10,6 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -28,7 +29,7 @@ type fakeTestRunner struct {
 	uid                 int
 }
 
-func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, env environment.Environment) test.Run {
+func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, env environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
 	run := test.NewRun()
 	run.Environment = env
 	run.State = test.RunStateCreated
@@ -162,7 +163,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	transactionRun := runner.Run(ctxWithTimeout, tran, metadata, env)
+	transactionRun := runner.Run(ctxWithTimeout, tran, metadata, env, nil)
 
 	done := make(chan transaction.TransactionRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {

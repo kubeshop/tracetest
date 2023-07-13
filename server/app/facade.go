@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
@@ -39,12 +40,12 @@ func (rf runnerFacade) StopTest(testID id.ID, runID int) {
 	})
 }
 
-func (rf runnerFacade) RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment) test.Run {
-	return rf.runner.Run(ctx, test, rm, env)
+func (rf runnerFacade) RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run {
+	return rf.runner.Run(ctx, test, rm, env, gates)
 }
 
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment) transaction.TransactionRun {
-	return rf.transactionRunner.Run(ctx, tr, rm, env)
+func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun {
+	return rf.transactionRunner.Run(ctx, tr, rm, env, gates)
 }
 
 func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.AssertionRequest) {
@@ -55,6 +56,7 @@ func newRunnerFacades(
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastore.Repository,
 	lintRepo *analyzer.Repository,
+	trRepo *testrunner.Repository,
 	db model.Repository,
 	testRepo test.Repository,
 	runRepo test.RunRepository,
@@ -117,6 +119,7 @@ func newRunnerFacades(
 		dsRepo,
 		eventEmitter,
 		ppRepo,
+		trRepo,
 	)
 
 	transactionRunner := executor.NewTransactionRunner(

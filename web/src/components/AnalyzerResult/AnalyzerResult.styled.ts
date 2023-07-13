@@ -72,7 +72,10 @@ export const RuleBody = styled(Column)`
 
 export const Subtitle = styled(Typography.Title)`
   && {
-    margin-bottom: 8px;
+    && {
+      margin: 0;
+      margin-bottom: 8px;
+    }
   }
 `;
 

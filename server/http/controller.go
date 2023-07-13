@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
@@ -67,8 +68,8 @@ type transactionRunRepository interface {
 
 type runner interface {
 	StopTest(testID id.ID, runID int)
-	RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment) test.Run
-	RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment) transaction.TransactionRun
+	RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run
+	RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun
 	RunAssertions(ctx context.Context, request executor.AssertionRequest)
 }
 
@@ -270,7 +271,9 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInformation 
 		return handleDBError(err), err
 	}
 
-	run := c.runner.RunTest(ctx, test, metadata, environment)
+	requiredGates := c.mappers.In.RequiredGates(runInformation.RequiredGates)
+
+	run := c.runner.RunTest(ctx, test, metadata, environment, requiredGates)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -669,7 +672,8 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 		return handleDBError(err), err
 	}
 
-	run := c.runner.RunTransaction(ctx, transaction, metadata, environment)
+	requiredGates := c.mappers.In.RequiredGates(runInformation.RequiredGates)
+	run := c.runner.RunTransaction(ctx, transaction, metadata, environment, requiredGates)
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
 }

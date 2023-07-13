@@ -1,9 +1,14 @@
 package test_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/environment"
+	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/linter/analyzer"
+	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -120,4 +125,79 @@ func TestRunTriggerTime(t *testing.T) {
 			test.Now = now
 		})
 	}
+}
+
+func TestRunRequiredGates(t *testing.T) {
+	t.Run("NoGates", func(t *testing.T) {
+		run := test.Run{}.ConfigureRequiredGates([]testrunner.RequiredGate{})
+		linterResult := analyzer.LinterResult{
+			Passed:       false,
+			MinimumScore: 80,
+			Score:        60,
+		}
+
+		run = run.SuccessfulLinterExecution(linterResult)
+
+		assert.Equal(t, true, run.RequiredGatesResult.Passed)
+		assert.Len(t, run.RequiredGatesResult.Failed, 2)
+
+		failed := []testrunner.RequiredGate{testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
+		assert.Equal(t, failed, run.RequiredGatesResult.Failed)
+	})
+
+	t.Run("AnalyzerGates", func(t *testing.T) {
+		gates := []testrunner.RequiredGate{testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
+		run := test.Run{}.ConfigureRequiredGates(gates)
+		linterResult := analyzer.LinterResult{
+			Passed:       true,
+			MinimumScore: 80,
+			Score:        60,
+		}
+
+		run = run.SuccessfulLinterExecution(linterResult)
+
+		assert.Len(t, run.RequiredGatesResult.Required, 2)
+		assert.Equal(t, false, run.RequiredGatesResult.Passed)
+		assert.Len(t, run.RequiredGatesResult.Failed, 1)
+		failed := []testrunner.RequiredGate{testrunner.RequiredGateAnalyzerScore}
+		assert.Equal(t, failed, run.RequiredGatesResult.Failed)
+	})
+
+	t.Run("TestSpecGate", func(t *testing.T) {
+		gates := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs}
+		outputs := maps.Ordered[string, test.RunOutput]{}
+		environment := environment.Environment{}
+		res := maps.Ordered[test.SpanQuery, []test.AssertionResult]{}
+		allPassed := false
+		run := test.Run{}.ConfigureRequiredGates(gates)
+
+		run = run.SuccessfullyAsserted(outputs, environment, res, allPassed)
+
+		assert.Len(t, run.RequiredGatesResult.Required, 1)
+		assert.Equal(t, false, run.RequiredGatesResult.Passed)
+		assert.Len(t, run.RequiredGatesResult.Failed, 1)
+		failed := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs}
+		assert.Equal(t, failed, run.RequiredGatesResult.Failed)
+	})
+
+	t.Run("GenerateRequiredGateResult", func(t *testing.T) {
+		gates := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs, testrunner.RequiredGateAnalyzerRules, testrunner.RequiredGateAnalyzerScore}
+		result := test.Run{
+			Results: &test.RunResults{
+				AllPassed: false,
+			},
+			Linter: analyzer.LinterResult{
+				Passed:       false,
+				MinimumScore: 80,
+				Score:        60,
+			},
+		}.GenerateRequiredGateResult(gates)
+
+		fmt.Println(result)
+
+		assert.Len(t, result.Required, 3)
+		assert.Equal(t, false, result.Passed)
+		assert.Len(t, result.Failed, 3)
+		assert.Equal(t, gates, result.Failed)
+	})
 }

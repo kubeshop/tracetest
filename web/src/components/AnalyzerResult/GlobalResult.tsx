@@ -6,10 +6,12 @@ import * as S from './AnalyzerResult.styled';
 interface IProps {
   score: number;
   minimumScore: number;
+  allRulesPassed: boolean;
 }
 
-const GlobalResult = ({score, minimumScore}: IProps) => {
-  const passedScore = score >= minimumScore;
+const GlobalResult = ({score, minimumScore, allRulesPassed}: IProps) => {
+  const scorePassed = score >= minimumScore;
+  const allPassed = scorePassed && allRulesPassed;
 
   return (
     <S.GlobalResultWrapper>
@@ -33,9 +35,14 @@ const GlobalResult = ({score, minimumScore}: IProps) => {
         </S.GlobalScoreContainer>
       </S.GlobalScoreWrapper>
       <S.ScoreResultWrapper>
-        <S.Subtitle level={3}>Minimum Acceptable Score: {minimumScore}%</S.Subtitle>
         <S.Subtitle level={3}>
-          Result: <S.ResultText $passed={passedScore}>{passedScore ? 'Passed' : 'Failed'}</S.ResultText>
+          Minimum Acceptable Score: <S.ResultText $passed={scorePassed}>{minimumScore}%</S.ResultText>
+        </S.Subtitle>
+        <S.Subtitle level={3}>
+          Errors Found: <S.ResultText $passed={allRulesPassed}>{!allRulesPassed ? 'Yes' : 'No'}</S.ResultText>
+        </S.Subtitle>
+        <S.Subtitle level={3}>
+          Result: <S.ResultText $passed={allPassed}>{allPassed ? 'Passed' : 'Failed'}</S.ResultText>
         </S.Subtitle>
       </S.ScoreResultWrapper>
     </S.GlobalResultWrapper>

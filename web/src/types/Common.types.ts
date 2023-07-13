@@ -34,6 +34,7 @@ export type TConfigSchemas = external['config.yaml']['components']['schemas'];
 export type TVariablesSchemas = external['variables.yaml']['components']['schemas'];
 export type TTestEventsSchemas = external['testEvents.yaml']['components']['schemas'];
 export type TLintersSchemas = external['linters.yaml']['components']['schemas'];
+export type TTestRunnerSchemas = external['testRunner.yaml']['components']['schemas'];
 
 export type TSelector = TTestSchemas['Selector'];
 

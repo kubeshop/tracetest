@@ -1,7 +1,6 @@
 openapi: 3.0.0
 components:
   schemas:
-
     TransactionResourceList:
       type: object
       properties:
@@ -86,3 +85,5 @@ components:
           type: integer
         fail:
           type: integer
+        allStepsRequiredGatesPassed:
+          type: boolean

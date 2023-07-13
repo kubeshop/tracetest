@@ -4,13 +4,14 @@ import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {isRunStateFinished} from 'models/TestRun.model';
+import {isRunStateFinished, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './RunDetailLayout.styled';
 import EventLogPopover from '../EventLogPopover/EventLogPopover';
+import RunStatusIcon from '../RunStatusIcon/RunStatusIcon';
 
 interface IProps {
   testId: string;
@@ -20,9 +21,14 @@ const HeaderRight = ({testId}: IProps) => {
   const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
-  const {isLoadingStop, run, stopRun, runEvents} = useTestRun();
+  const {
+    isLoadingStop,
+    run: {state, requiredGatesResult},
+    run,
+    stopRun,
+    runEvents,
+  } = useTestRun();
   const {onRun} = useTest();
-  const state = run.state;
 
   return (
     <S.Section $justifyContent="flex-end">
@@ -45,6 +51,9 @@ const HeaderRight = ({testId}: IProps) => {
             </S.StopContainer>
           )}
         </S.StateContainer>
+      )}
+      {(isRunStateSucceeded(state) || isRunStateStopped(state)) && (
+        <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
       )}
       {!isDraftMode && state && isRunStateFinished(state) && (
         <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">

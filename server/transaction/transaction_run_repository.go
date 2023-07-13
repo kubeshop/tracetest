@@ -42,6 +42,7 @@ INSERT INTO transaction_runs (
 	"last_error",
 	"pass",
 	"fail",
+	"all_steps_required_gates_passed",
 
 	"metadata",
 
@@ -64,6 +65,7 @@ INSERT INTO transaction_runs (
 	NULL, -- last_error
 	0,    -- pass
 	0,    -- fail
+	TRUE, -- all_steps_required_gates_passed
 
 	$6, -- metadata
 	$7 -- environment
@@ -153,6 +155,7 @@ UPDATE transaction_runs SET
 	"last_error" = $4,
 	"pass" = $5,
 	"fail" = $6,
+	"all_steps_required_gates_passed" = $11,
 
 	"metadata" = $7,
 
@@ -190,6 +193,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 	}
 
 	pass, fail := tr.ResultsCount()
+	AllStepsRequiredGatesPassed := tr.StepsGatesValidation()
 
 	_, err = stmt.ExecContext(
 		ctx,
@@ -203,6 +207,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		jsonEnvironment,
 		tr.ID,
 		tr.TransactionID,
+		AllStepsRequiredGatesPassed,
 	)
 
 	if err != nil {
@@ -291,6 +296,7 @@ SELECT
 	"last_error",
 	"pass",
 	"fail",
+	"all_steps_required_gates_passed",
 
 	"metadata",
 
@@ -349,6 +355,12 @@ func (td *RunRepository) GetTransactionsRuns(ctx context.Context, transactionID 
 		if err != nil {
 			return []TransactionRun{}, err
 		}
+
+		run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run.TransactionID, run.ID)
+		if err != nil {
+			return []TransactionRun{}, err
+		}
+
 		runs = append(runs, run)
 	}
 
@@ -365,6 +377,8 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 		lastError *string
 		pass      sql.NullInt32
 		fail      sql.NullInt32
+
+		allStepsRequiredGatesPassed *bool
 	)
 
 	err := row.Scan(
@@ -378,6 +392,7 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 		&lastError,
 		&pass,
 		&fail,
+		&allStepsRequiredGatesPassed,
 		&jsonMetadata,
 		&jsonEnvironment,
 	)
@@ -406,6 +421,14 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 	if fail.Valid {
 		r.Fail = int(fail.Int32)
 	}
+
+	// checks if the flag exists, if it doesn't we use the fail field to determine if all steps passed
+	if allStepsRequiredGatesPassed == nil {
+		failed := fail.Valid && fail.Int32 == 0
+		allStepsRequiredGatesPassed = &failed
+	}
+
+	r.AllStepsRequiredGatesPassed = *allStepsRequiredGatesPassed
 
 	return r, nil
 }

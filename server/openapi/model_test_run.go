@@ -57,6 +57,8 @@ type TestRun struct {
 
 	Outputs []TestRunOutputsInner `json:"outputs,omitempty"`
 
+	RequiredGatesResult RequiredGatesResult `json:"requiredGatesResult,omitempty"`
+
 	Metadata map[string]string `json:"metadata,omitempty"`
 
 	TransactionId string `json:"transactionId,omitempty"`
@@ -85,6 +87,9 @@ func AssertTestRunRequired(obj TestRun) error {
 		if err := AssertTestRunOutputsInnerRequired(el); err != nil {
 			return err
 		}
+	}
+	if err := AssertRequiredGatesResultRequired(obj.RequiredGatesResult); err != nil {
+		return err
 	}
 	return nil
 }

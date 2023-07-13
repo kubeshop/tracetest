@@ -3,8 +3,9 @@ import {useSearchParams} from 'react-router-dom';
 import Analytics from 'components/Settings/Analytics';
 import DataStore from 'components/Settings/DataStore';
 import Demo from 'components/Settings/Demo';
-import Linter from 'components/Settings/Linter/Linter';
+import Linter from 'components/Settings/Linter';
 import Polling from 'components/Settings/Polling';
+import TestRunner from 'components/Settings/TestRunner';
 import BetaBadge from 'components/BetaBadge/BetaBadge';
 import * as S from './Settings.styled';
 
@@ -14,6 +15,7 @@ const TabsKeys = {
   Demo: 'demo',
   Polling: 'polling',
   Analyzer: 'analyzer',
+  TestRunner: 'testRunner',
 };
 
 const Content = () => {
@@ -55,6 +57,9 @@ const Content = () => {
             }
           >
             <Linter />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={TabsKeys.TestRunner} tab="Test Runner">
+            <TestRunner />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>
