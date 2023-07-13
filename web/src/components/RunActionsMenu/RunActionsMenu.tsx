@@ -17,9 +17,7 @@ interface IProps {
 
 const RunActionsMenu = ({resultId, testId, transactionId, transactionRunId, isRunView = false}: IProps) => {
   const {onJUnit} = useFileViewerModal();
-
   const navigate = useNavigate();
-
   const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
 
   return (

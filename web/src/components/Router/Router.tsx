@@ -8,7 +8,8 @@ import RunDetail from 'pages/RunDetail';
 import Settings from 'pages/Settings';
 import Test from 'pages/Test';
 import Transaction from 'pages/Transaction';
-import TransactionRunDetail from 'pages/TransactionRunDetail';
+import TransactionRunTrigger from 'pages/TransactionRunTrigger';
+import TransactionRunAutomate from 'pages/TransactionRunAutomate';
 import AutomatedTestRun from 'pages/AutomatedTestRun';
 import Env from 'utils/Env';
 
@@ -24,15 +25,14 @@ const Router = () => (
       <Route path="/settings" element={<Settings />} />
 
       <Route path="/test/:testId" element={<Test />} />
-
-      <Route path="/test/:testId/run/:runId" element={<RunDetail />}>
-        <Route path=":mode" element={<RunDetail />} />
-      </Route>
-
+      <Route path="/test/:testId/run/:runId" element={<RunDetail />} />
+      <Route path="/test/:testId/run/:runId/:mode" element={<RunDetail />} />
       <Route path="/test/:testId/run" element={<AutomatedTestRun />} />
 
       <Route path="/transaction/:transactionId" element={<Transaction />} />
-      <Route path="/transaction/:transactionId/run/:runId" element={<TransactionRunDetail />} />
+      <Route path="/transaction/:transactionId/run/:runId" element={<TransactionRunTrigger />} />
+      <Route path="/transaction/:transactionId/run/:runId/trigger" element={<TransactionRunTrigger />} />
+      <Route path="/transaction/:transactionId/run/:runId/automate" element={<TransactionRunAutomate />} />
 
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

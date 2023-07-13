@@ -1,30 +1,42 @@
 import {Button} from 'antd';
-import {useNavigate} from 'react-router-dom';
-import {useTransaction} from 'providers/Transaction/Transaction.provider';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {TransactionRunStatusIcon} from 'components/RunStatusIcon';
+import TestState from 'components/TestState';
+import TransactionRunActionsMenu from 'components/TransactionRunActionsMenu';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import Transaction from 'models/Transaction.model';
-import TransactionRun from 'models/TransactionRun.model';
-import TestState from '../TestState';
+import {useTransaction} from 'providers/Transaction/Transaction.provider';
+import {useTransactionRun} from 'providers/TransactionRun/TransactionRun.provider';
 import * as S from './TransactionHeader.styled';
-import TransactionRunActionsMenu from '../TransactionRunActionsMenu';
-import {TransactionRunStatusIcon} from '../RunStatusIcon';
 
-interface IProps {
-  transaction: Transaction;
-  transactionRun: TransactionRun;
+const transactionLastPathRegex = /\/transaction\/[\w-]+\/run\/[\d-]+\/([\w-]+)/;
+
+function getLastPath(pathname: string): string {
+  const match = pathname.match(transactionLastPathRegex);
+  if (match === null) {
+    return '';
+  }
+
+  return match.length > 1 ? match[1] : '';
 }
 
-const TransactionHeader = ({
-  transaction: {id: transactionId, name, version, description},
-  transactionRun: {state, id: runId, allStepsRequiredGatesPassed},
-}: IProps) => {
-  const {onRun} = useTransaction();
+const LINKS = [
+  {id: 'trigger', label: 'Trigger'},
+  {id: 'automate', label: 'Automate'},
+];
+
+const TransactionHeader = () => {
+  const {transaction, onRun} = useTransaction();
+  const {transactionRun} = useTransactionRun();
   const navigate = useNavigate();
+  const {pathname} = useLocation();
+  const {id: transactionId, name, version, description} = transaction;
+  const {state, id: runId, allStepsRequiredGatesPassed} = transactionRun;
+  const lastPath = getLastPath(pathname);
 
   return (
     <S.Container>
       <S.Section>
-        <a onClick={() => navigate(-1)} data-cy="transaction-header-back-button">
+        <a onClick={() => navigate('/')} data-cy="transaction-header-back-button">
           <S.BackIcon />
         </a>
         <div>
@@ -34,7 +46,20 @@ const TransactionHeader = ({
           <S.Text>{description}</S.Text>
         </div>
       </S.Section>
-      <S.Section>
+
+      <S.LinksContainer>
+        {LINKS.map(({id, label}) => (
+          <S.Link
+            key={id}
+            to={`/transaction/${transactionId}/run/${runId}/${id}`}
+            $isActive={lastPath === id || (!lastPath && id === LINKS[0].id)}
+          >
+            {label}
+          </S.Link>
+        ))}
+      </S.LinksContainer>
+
+      <S.SectionRight>
         {state && state !== TestStateEnum.FINISHED && (
           <S.StateContainer data-cy="transaction-run-result-status">
             <S.StateText>Status:</S.StateText>
@@ -49,8 +74,8 @@ const TransactionHeader = ({
             </Button>
           </>
         )}
-        <TransactionRunActionsMenu transactionId={transactionId} runId={runId} isRunView transactionVersion={version} />
-      </S.Section>
+        <TransactionRunActionsMenu transactionId={transactionId} runId={runId} isRunView />
+      </S.SectionRight>
     </S.Container>
   );
 };

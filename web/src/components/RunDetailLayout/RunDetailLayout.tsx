@@ -1,6 +1,7 @@
 import {Tabs, TabsProps} from 'antd';
 import {useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
+import RunDetailAutomate from 'components/RunDetailAutomate';
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
 import RunDetailTrigger from 'components/RunDetailTrigger';
@@ -16,7 +17,6 @@ import {ConfigMode} from 'types/DataStore.types';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
-import RunDetailAutomate from '../RunDetailAutomate/RunDetailAutomate';
 
 interface IProps {
   test: Test;
