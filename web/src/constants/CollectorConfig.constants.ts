@@ -199,6 +199,42 @@ service:
       exporters: [azuremonitor]
 `;
 
+export const Signoz = `receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  logging:
+    logLevel: debug
+  # OTLP for Tracetest
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true
+  # OTLP for Signoz
+  otlp/signoz:
+    endpoint: address-to-your-signoz-server:4317 # Send traces to Signoz. Read more in docs here: https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/#opentelemetry-collector-configuration
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/tracetest]
+    traces/signoz:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/signoz]
+`;
+
 export const CollectorConfigMap = {
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
@@ -206,4 +242,5 @@ export const CollectorConfigMap = {
   [SupportedDataStores.OtelCollector]: OtelCollector,
   [SupportedDataStores.Honeycomb]: Honeycomb,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
+  [SupportedDataStores.Signoz]: Signoz,
 } as const;

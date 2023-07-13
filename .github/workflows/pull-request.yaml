@@ -220,6 +220,7 @@ jobs:
           - tracetest-tempo
           - tracetest-no-tracing
           - tracetest-provisioning-env
+          - tracetest-signoz
     steps:
       - name: Checkout
         uses: actions/checkout@v3

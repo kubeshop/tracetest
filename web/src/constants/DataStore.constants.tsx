@@ -13,6 +13,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.AWSXRay]: 'AWS X-Ray',
   [SupportedDataStores.Honeycomb]: 'Honeycomb',
   [SupportedDataStores.AzureAppInsights]: 'Azure App Insights',
+  [SupportedDataStores.Signoz]: 'Signoz',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -30,6 +31,8 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.Honeycomb]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/honeycomb',
   [SupportedDataStores.AzureAppInsights]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
+  [SupportedDataStores.Signoz]:
+    'https://docs.tracetest.io/configuration/connecting-to-data-stores/signoz',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
@@ -45,4 +48,5 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.AWSXRay]: '',
   [SupportedDataStores.Honeycomb]: '',
   [SupportedDataStores.AzureAppInsights]: '',
+  [SupportedDataStores.Signoz]: '',
 } as const;
