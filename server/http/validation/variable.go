@@ -8,13 +8,18 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression/linting"
 	"github.com/kubeshop/tracetest/server/openapi"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 var ErrMissingVariables = errors.New("variables are missing")
 
-func ValidateMissingVariables(ctx context.Context, testRepo test.Repository, runRepo test.RunRepository, test test.Test, env environment.Environment) (openapi.MissingVariablesError, error) {
+type augmentedTestGetter interface {
+	GetAugmented(context.Context, id.ID) (test.Test, error)
+}
+
+func ValidateMissingVariables(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, test test.Test, env environment.Environment) (openapi.MissingVariablesError, error) {
 	missingVariables := getMissingVariables(test, env)
 	previousValues := map[string]environment.EnvironmentValue{}
 	var err error
@@ -60,7 +65,7 @@ func getAvailableVariables(test test.Test, environment environment.Environment) 
 	return availableVariables
 }
 
-func getPreviousEnvironmentValues(ctx context.Context, testRepo test.Repository, runRepo test.RunRepository, test test.Test) (map[string]environment.EnvironmentValue, error) {
+func getPreviousEnvironmentValues(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, test test.Test) (map[string]environment.EnvironmentValue, error) {
 	latestTestVersion, err := testRepo.GetAugmented(ctx, test.ID)
 	if err != nil {
 		return map[string]environment.EnvironmentValue{}, err
@@ -85,7 +90,7 @@ func getPreviousEnvironmentValues(ctx context.Context, testRepo test.Repository,
 	return map[string]environment.EnvironmentValue{}, nil
 }
 
-func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo test.Repository, runRepo test.RunRepository, transaction transaction.Transaction, env environment.Environment) (openapi.MissingVariablesError, error) {
+func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, transaction transaction.Transaction, env environment.Environment) (openapi.MissingVariablesError, error) {
 	missingVariables := make([]openapi.MissingVariable, 0)
 	for _, step := range transaction.Steps {
 		stepValidationResult, err := ValidateMissingVariables(ctx, testRepo, runRepo, step, env)
