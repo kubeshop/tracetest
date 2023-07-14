@@ -40,6 +40,9 @@ type RunOptions struct {
 	// Optional path to the file where the result of the run will be saved
 	// in JUnit xml format
 	JUnitOuptutFile string
+
+	// Overrides the default required gates for the resource
+	RequiredGates []string
 }
 
 // RunResult holds the result of the run
@@ -122,6 +125,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.String("envID", opts.EnvID),
 		zap.Bool("skipResultsWait", opts.SkipResultWait),
 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
+		zap.Strings("requriedGates", opts.RequiredGates),
 	)
 
 	envID, err := o.resolveEnvID(ctx, opts.EnvID)

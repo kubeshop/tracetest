@@ -42,6 +42,7 @@ func init() {
 				EnvID:           runParams.EnvID,
 				SkipResultWait:  runParams.SkipResultWait,
 				JUnitOuptutFile: runParams.JUnitOuptutFile,
+				RequiredGates:   runParams.RequriedGates,
 			}
 
 			exitCode, err := orchestrator.Run(ctx, r, runParams, output)
@@ -60,9 +61,10 @@ func init() {
 
 	runCmd.Flags().StringVarP(&runParams.DefinitionFile, "file", "f", "", "path to the definition file")
 	runCmd.Flags().StringVar(&runParams.ID, "id", "", "id of the resource to run")
-	runCmd.PersistentFlags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
-	runCmd.PersistentFlags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
-	runCmd.PersistentFlags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
+	runCmd.Flags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
+	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
+	runCmd.Flags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
+	runCmd.Flags().StringSliceVar(&runParams.RequriedGates, "required-gates", []string{}, "require specific gates to be passed before running the resource")
 	rootCmd.AddCommand(runCmd)
 }
 
@@ -72,6 +74,7 @@ type runParameters struct {
 	EnvID           string
 	SkipResultWait  bool
 	JUnitOuptutFile string
+	RequriedGates   []string
 }
 
 func (p runParameters) Validate(cmd *cobra.Command, args []string) []error {
