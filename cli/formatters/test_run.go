@@ -211,20 +211,22 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 		}
 	}
 
-	buffer.WriteString("\n")
-	gatesPassed := run.RequiredGatesResult.GetPassed()
-	icon := f.getStateIcon(gatesPassed)
-	message = f.getColoredText(
-		gatesPassed,
-		f.formatMessage("\t%s %s\n", icon, "Required gates"),
-	)
-	buffer.WriteString(message)
-	for _, gateResult := range run.RequiredGatesResult.Required {
-		passed := slices.Index(run.RequiredGatesResult.Failed, gateResult) == -1
-		icon := f.getStateIcon(passed)
-		message := f.formatMessage("\t\t%s %s\n", icon, gateResult)
-		message = f.getColoredText(passed, message)
+	if len(run.GetRequiredGatesResult().Required) > 0 {
+		buffer.WriteString("\n")
+		gatesPassed := run.RequiredGatesResult.GetPassed()
+		icon := f.getStateIcon(gatesPassed)
+		message = f.getColoredText(
+			gatesPassed,
+			f.formatMessage("\t%s %s\n", icon, "Required gates"),
+		)
 		buffer.WriteString(message)
+		for _, gateResult := range run.GetRequiredGatesResult().Required {
+			passed := slices.Index(run.RequiredGatesResult.Failed, gateResult) == -1
+			icon := f.getStateIcon(passed)
+			message := f.formatMessage("\t\t%s %s\n", icon, gateResult)
+			message = f.getColoredText(passed, message)
+			buffer.WriteString(message)
+		}
 	}
 
 	return buffer.String()
