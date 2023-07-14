@@ -354,6 +354,9 @@ func getMetadata() map[string]string {
 }
 
 func getRequiredGates(gates []string) []openapi.SupportedGates {
+	if len(gates) == 0 {
+		return nil
+	}
 	requiredGates := make([]openapi.SupportedGates, 0, len(gates))
 
 	for _, g := range gates {
