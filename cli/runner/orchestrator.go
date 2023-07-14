@@ -172,6 +172,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 			EnvironmentId: &envID,
 			Variables:     ev.toOpenapi(),
 			Metadata:      getMetadata(),
+			RequiredGates: getRequiredGates(opts.RequiredGates),
 		}
 
 		result, err = r.StartRun(ctx, resource, runInfo)
@@ -350,6 +351,16 @@ func getMetadata() map[string]string {
 	}
 
 	return metadata
+}
+
+func getRequiredGates(gates []string) []openapi.SupportedGates {
+	requiredGates := make([]openapi.SupportedGates, 0, len(gates))
+
+	for _, g := range gates {
+		requiredGates = append(requiredGates, openapi.SupportedGates(g))
+	}
+
+	return requiredGates
 }
 
 // HandleRunError handles errors returned by the server when running a test.
