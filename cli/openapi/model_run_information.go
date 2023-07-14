@@ -22,6 +22,7 @@ type RunInformation struct {
 	Metadata      map[string]string  `json:"metadata,omitempty"`
 	EnvironmentId *string            `json:"environmentId,omitempty"`
 	Variables     []EnvironmentValue `json:"variables,omitempty"`
+	RequiredGates []SupportedGates   `json:"requiredGates,omitempty"`
 }
 
 // NewRunInformation instantiates a new RunInformation object
@@ -138,6 +139,39 @@ func (o *RunInformation) SetVariables(v []EnvironmentValue) {
 	o.Variables = v
 }
 
+// GetRequiredGates returns the RequiredGates field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *RunInformation) GetRequiredGates() []SupportedGates {
+	if o == nil {
+		var ret []SupportedGates
+		return ret
+	}
+	return o.RequiredGates
+}
+
+// GetRequiredGatesOk returns a tuple with the RequiredGates field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *RunInformation) GetRequiredGatesOk() ([]SupportedGates, bool) {
+	if o == nil || isNil(o.RequiredGates) {
+		return nil, false
+	}
+	return o.RequiredGates, true
+}
+
+// HasRequiredGates returns a boolean if a field has been set.
+func (o *RunInformation) HasRequiredGates() bool {
+	if o != nil && isNil(o.RequiredGates) {
+		return true
+	}
+
+	return false
+}
+
+// SetRequiredGates gets a reference to the given []SupportedGates and assigns it to the RequiredGates field.
+func (o *RunInformation) SetRequiredGates(v []SupportedGates) {
+	o.RequiredGates = v
+}
+
 func (o RunInformation) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -156,6 +190,9 @@ func (o RunInformation) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Variables) {
 		toSerialize["variables"] = o.Variables
+	}
+	if o.RequiredGates != nil {
+		toSerialize["requiredGates"] = o.RequiredGates
 	}
 	return toSerialize, nil
 }

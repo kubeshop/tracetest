@@ -44,6 +44,7 @@ type TestRun struct {
 	Result                    *AssertionResults     `json:"result,omitempty"`
 	Linter                    *LinterResult         `json:"linter,omitempty"`
 	Outputs                   []TestRunOutputsInner `json:"outputs,omitempty"`
+	RequiredGatesResult       *RequiredGatesResult  `json:"requiredGatesResult,omitempty"`
 	Metadata                  *map[string]string    `json:"metadata,omitempty"`
 	TransactionId             *string               `json:"transactionId,omitempty"`
 	TransactionRunId          *string               `json:"transactionRunId,omitempty"`
@@ -674,6 +675,38 @@ func (o *TestRun) SetOutputs(v []TestRunOutputsInner) {
 	o.Outputs = v
 }
 
+// GetRequiredGatesResult returns the RequiredGatesResult field value if set, zero value otherwise.
+func (o *TestRun) GetRequiredGatesResult() RequiredGatesResult {
+	if o == nil || isNil(o.RequiredGatesResult) {
+		var ret RequiredGatesResult
+		return ret
+	}
+	return *o.RequiredGatesResult
+}
+
+// GetRequiredGatesResultOk returns a tuple with the RequiredGatesResult field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetRequiredGatesResultOk() (*RequiredGatesResult, bool) {
+	if o == nil || isNil(o.RequiredGatesResult) {
+		return nil, false
+	}
+	return o.RequiredGatesResult, true
+}
+
+// HasRequiredGatesResult returns a boolean if a field has been set.
+func (o *TestRun) HasRequiredGatesResult() bool {
+	if o != nil && !isNil(o.RequiredGatesResult) {
+		return true
+	}
+
+	return false
+}
+
+// SetRequiredGatesResult gets a reference to the given RequiredGatesResult and assigns it to the RequiredGatesResult field.
+func (o *TestRun) SetRequiredGatesResult(v RequiredGatesResult) {
+	o.RequiredGatesResult = &v
+}
+
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
 func (o *TestRun) GetMetadata() map[string]string {
 	if o == nil || isNil(o.Metadata) {
@@ -830,6 +863,9 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Outputs) {
 		toSerialize["outputs"] = o.Outputs
+	}
+	if !isNil(o.RequiredGatesResult) {
+		toSerialize["requiredGatesResult"] = o.RequiredGatesResult
 	}
 	if !isNil(o.Metadata) {
 		toSerialize["metadata"] = o.Metadata
