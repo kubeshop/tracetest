@@ -125,7 +125,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.String("envID", opts.EnvID),
 		zap.Bool("skipResultsWait", opts.SkipResultWait),
 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
-		zap.Strings("requriedGates", opts.RequiredGates),
+		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
 	envID, err := o.resolveEnvID(ctx, opts.EnvID)
