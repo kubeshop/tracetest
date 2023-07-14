@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/runner"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
@@ -64,8 +66,17 @@ func init() {
 	runCmd.Flags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
 	runCmd.Flags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
-	runCmd.Flags().StringSliceVar(&runParams.RequriedGates, "required-gates", []string{}, "require specific gates to be passed before running the resource")
+	runCmd.Flags().StringSliceVar(&runParams.RequriedGates, "required-gates", []string{}, "override default required gate. "+validRequiredGatesMsg())
 	rootCmd.AddCommand(runCmd)
+}
+
+func validRequiredGatesMsg() string {
+	opts := make([]string, 0, len(openapi.AllowedSupportedGatesEnumValues))
+	for _, v := range openapi.AllowedSupportedGatesEnumValues {
+		opts = append(opts, string(v))
+	}
+
+	return "valid options: " + strings.Join(opts, ", ")
 }
 
 type runParameters struct {
@@ -98,6 +109,16 @@ func (p runParameters) Validate(cmd *cobra.Command, args []string) []error {
 			Parameter: "junit",
 			Message:   "--junit option is incompatible with --skip-result-wait option",
 		})
+	}
+
+	for _, rg := range p.RequriedGates {
+		_, err := openapi.NewSupportedGatesFromValue(rg)
+		if err != nil {
+			errs = append(errs, paramError{
+				Parameter: "required-gates",
+				Message:   fmt.Sprintf("invalid option '%s'. "+validRequiredGatesMsg(), rg),
+			})
+		}
 	}
 
 	return errs
