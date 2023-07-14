@@ -1,6 +1,7 @@
-import {Form, Radio, Typography} from 'antd';
+import {Form, Radio, Select, Typography} from 'antd';
 import {toUpper} from 'lodash';
 import {useEffect, useMemo} from 'react';
+import {SupportedRequiredGates} from 'models/TestRunner.model';
 import {CliCommandFormat, CliCommandOption, TCliCommandConfig} from 'services/CliCommand.service';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './CliCommand.styled';
@@ -47,6 +48,7 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
   const [form] = Form.useForm<TCliCommandConfig>();
   const options = Form.useWatch('options', form);
   const format = Form.useWatch('format', form);
+  const requiredGates = Form.useWatch('required-gates', form);
   const optionsMetadata = useMemo(
     () => getOptionsMetadata({isEnvironmentSelected: !!environmentId, resourceType}),
     [environmentId, resourceType]
@@ -56,12 +58,13 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
     onChange({
       options: options ?? defaultOptions,
       format: format ?? CliCommandFormat.Pretty,
+      requiredGates,
       id,
       environmentId,
       fileName,
       resourceType,
     });
-  }, [environmentId, fileName, format, onChange, options, id, resourceType]);
+  }, [environmentId, fileName, format, requiredGates, onChange, options, id, resourceType]);
 
   return (
     <Form<TCliCommandConfig>
@@ -82,6 +85,20 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
             </Form.Item>
           ))}
         </S.OptionsContainer>
+
+        <S.RequiredGatesContainer>
+          <Typography.Paragraph>Required Gates:</Typography.Paragraph>
+          <Form.Item name="required-gates">
+            <Select mode="multiple" placeholder="Please select the required gates">
+              {Object.values(SupportedRequiredGates).map(requiredGate => (
+                <Select.Option key={requiredGate} value={requiredGate}>
+                  {requiredGate}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </S.RequiredGatesContainer>
+
         <S.FormatContainer>
           <Typography.Paragraph>Output Format:</Typography.Paragraph>
           <Form.Item name="format" noStyle>
