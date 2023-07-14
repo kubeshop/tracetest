@@ -87,7 +87,7 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
         </S.OptionsContainer>
 
         <S.RequiredGatesContainer>
-          <Typography.Paragraph>Required Gates:</Typography.Paragraph>
+          <Typography.Paragraph>Override default Required Gates:</Typography.Paragraph>
           <Form.Item name="required-gates">
             <Select mode="multiple" placeholder="Please select the required gates">
               {Object.values(SupportedRequiredGates).map(requiredGate => (
