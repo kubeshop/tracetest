@@ -1,4 +1,4 @@
-import Test from 'models/Test.model';
+import {ResourceType} from 'types/Resource.type';
 import {getServerBaseUrl} from 'utils/Common';
 
 export enum CliCommandOption {
@@ -19,15 +19,16 @@ export type TCliCommandEnabledOptions = Record<CliCommandOption, boolean>;
 
 export type TCliCommandConfig = {
   options: TCliCommandEnabledOptions;
-  format: CliCommandFormat;
+  id: string;
   environmentId?: string;
-  test: Test;
   fileName: string;
+  format: CliCommandFormat;
+  resourceType: ResourceType;
 };
 
 type TApplyProps = {
   command: string;
-  test: Test;
+  id: string;
   environmentId?: string;
   enabled: boolean;
   fileName: string;
@@ -36,7 +37,7 @@ type TApplyOption = (props: TApplyProps) => string;
 
 const CliCommandService = () => ({
   applyOptions: {
-    [CliCommandOption.UseId]: ({enabled, command, test: {id}, fileName}) =>
+    [CliCommandOption.UseId]: ({enabled, command, id, fileName}) =>
       `${command} ${enabled ? `--id ${id}` : `--file ${fileName}`}`,
     [CliCommandOption.SkipResultWait]: ({command, enabled}) => (enabled ? `${command} --skip-result-wait` : command),
     [CliCommandOption.UseHostname]: ({command, enabled}) => {
@@ -53,11 +54,11 @@ const CliCommandService = () => ({
           : 'tracetest'
       } ${command}`,
   } as Record<CliCommandOption, TApplyOption>,
-  getCommand({options, format, test, environmentId, fileName}: TCliCommandConfig) {
+  getCommand({options, format, id, environmentId, fileName, resourceType}: TCliCommandConfig) {
     const command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
-        this.applyOptions[option as CliCommandOption]({command: acc, enabled, test, environmentId, fileName}),
-      'run test'
+        this.applyOptions[option as CliCommandOption]({command: acc, enabled, id, environmentId, fileName}),
+      `run ${resourceType}`
     );
 
     return `${command} --output ${format}`;

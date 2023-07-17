@@ -3,18 +3,15 @@ import {useNavigate} from 'react-router-dom';
 
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
 import {ResourceType} from 'types/Resource.type';
-import {useFileViewerModal} from '../FileViewerModal/FileViewerModal.provider';
 import * as S from './TransactionRunActionsMenu.styled';
 
 interface IProps {
   runId: string;
   transactionId: string;
   isRunView?: boolean;
-  transactionVersion: number;
 }
 
-const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, transactionVersion}: IProps) => {
-  const {onDefinition} = useFileViewerModal();
+const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false}: IProps) => {
   const navigate = useNavigate();
   const onDelete = useDeleteResourceRun({id: transactionId, isRunView, type: ResourceType.Transaction});
 
@@ -23,30 +20,24 @@ const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false, tra
       <Dropdown
         overlay={
           <Menu>
-            <Menu.Item
-              data-cy="view-transaction-definition-button"
-              key="view-transaction-definition"
-              onClick={() => onDefinition(ResourceType.Transaction, transactionId, transactionVersion)}
-            >
-              Transaction Definition
+            <Menu.Item key="automate" onClick={() => navigate(`/transaction/${transactionId}/run/${runId}/automate`)}>
+              Automate
             </Menu.Item>
             <Menu.Item
-              data-cy="test-edit-button"
+              key="edit"
               onClick={({domEvent}) => {
                 domEvent.stopPropagation();
                 navigate(`/transaction/${transactionId}/run/${runId}`);
               }}
-              key="edit"
             >
               Edit
             </Menu.Item>
             <Menu.Item
-              data-cy="test-delete-button"
+              key="delete"
               onClick={({domEvent}) => {
                 domEvent.stopPropagation();
                 onDelete(runId);
               }}
-              key="delete"
             >
               Delete
             </Menu.Item>

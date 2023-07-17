@@ -1,21 +1,23 @@
-import {useCallback, useEffect} from 'react';
 import {DownloadOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import {downloadFile} from 'utils/Common';
+import {capitalize} from 'lodash';
+import {useCallback, useEffect} from 'react';
+import {FramedCodeBlock} from 'components/CodeBlock';
+import InputOverlay from 'components/InputOverlay/InputOverlay';
 import useDefinitionFile from 'hooks/useDefinitionFile';
 import {ResourceType} from 'types/Resource.type';
-import Test from 'models/Test.model';
+import {downloadFile} from 'utils/Common';
 import * as S from './RunDetailAutomateDefinition.styled';
-import {FramedCodeBlock} from '../CodeBlock';
-import InputOverlay from '../InputOverlay/InputOverlay';
 
 interface IProps {
-  test: Test;
-  onFileNameChange(value: string): void;
+  id: string;
+  version: number;
+  resourceType: ResourceType;
   fileName: string;
+  onFileNameChange(value: string): void;
 }
 
-const RunDetailAutomateDefinition = ({test: {id, version}, onFileNameChange, fileName}: IProps) => {
+const RunDetailAutomateDefinition = ({id, version, resourceType, fileName, onFileNameChange}: IProps) => {
   const {definition, loadDefinition} = useDefinitionFile();
 
   const onDownload = useCallback(() => {
@@ -23,12 +25,12 @@ const RunDetailAutomateDefinition = ({test: {id, version}, onFileNameChange, fil
   }, [definition, fileName]);
 
   useEffect(() => {
-    loadDefinition(ResourceType.Test, id, version);
-  }, [id, loadDefinition, version]);
+    loadDefinition(resourceType, id, version);
+  }, [id, loadDefinition, resourceType, version]);
 
   return (
     <S.Container>
-      <S.Title>Test Definition</S.Title>
+      <S.Title>{capitalize(resourceType)} Definition</S.Title>
       <S.FileName>
         <InputOverlay value={fileName} onChange={onFileNameChange} />
       </S.FileName>
