@@ -4,10 +4,6 @@
  */
 
 export interface paths {
-  "/definition.yaml": {
-    /** Execute a definition */
-    post: operations["executeDefinition"];
-  };
   "/transactions": {
     /** get transactions */
     get: operations["getTransactions"];
@@ -25,10 +21,6 @@ export interface paths {
   "/transactions/{transactionId}/version/{version}": {
     /** get a transaction specific version */
     get: operations["getTransactionVersion"];
-  };
-  "/transactions/{transactionId}/version/{version}/definition.yaml": {
-    /** Get the transaction as an YAML file */
-    get: operations["getTransactionVersionDefinitionFile"];
   };
   "/transactions/{transactionId}/run": {
     /** Get all runs from a particular transaction */
@@ -215,28 +207,6 @@ export interface paths {
 export interface components {}
 
 export interface operations {
-  /** Execute a definition */
-  executeDefinition: {
-    responses: {
-      /** Definition updated */
-      200: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
-        };
-      };
-      /** Definition created */
-      201: {
-        content: {
-          "application/json": external["definition.yaml"]["components"]["schemas"]["ExecuteDefinitionResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "text/json": external["definition.yaml"]["components"]["schemas"]["TextDefinition"];
-      };
-    };
-  };
   /** get transactions */
   getTransactions: {
     parameters: {};
@@ -345,18 +315,6 @@ export interface operations {
       };
       /** problem with getting a test */
       500: unknown;
-    };
-  };
-  /** Get the transaction as an YAML file */
-  getTransactionVersionDefinitionFile: {
-    parameters: {};
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/yaml": string;
-        };
-      };
     };
   };
   /** Get all runs from a particular transaction */
@@ -1420,34 +1378,6 @@ export interface external {
         SupportedClients: "http" | "grpc";
         /** @enum {string} */
         SupportedConnectionTypes: "direct" | "collector";
-      };
-    };
-    operations: {};
-  };
-  "definition.yaml": {
-    paths: {};
-    components: {
-      schemas: {
-        UpsertDefinitionResponse: {
-          /** @description resource ID */
-          id?: string;
-          /** @description resource type */
-          type?: string;
-        };
-        ExecuteDefinitionResponse: {
-          /** @description resource ID */
-          id?: string;
-          /** @description run ID */
-          runId?: string;
-          /** @description resource type */
-          type?: string;
-          /** @description resource web UI url */
-          url?: string;
-        };
-        TextDefinition: {
-          runInformation?: external["tests.yaml"]["components"]["schemas"]["RunInformation"];
-          content?: string;
-        };
       };
     };
     operations: {};

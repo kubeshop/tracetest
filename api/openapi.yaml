@@ -6,31 +6,6 @@ info:
 servers:
   - url: /api
 paths:
-  /definition.yaml:
-    post:
-      tags:
-        - api
-      summary: "Execute a definition"
-      description: "Execute a definition"
-      operationId: executeDefinition
-      requestBody:
-        content:
-          text/json:
-            schema:
-              $ref: "./definition.yaml#/components/schemas/TextDefinition"
-      responses:
-        201:
-          description: Definition created
-          content:
-            application/json:
-              schema:
-                $ref: "./definition.yaml#/components/schemas/ExecuteDefinitionResponse"
-        200:
-          description: Definition updated
-          content:
-            application/json:
-              schema:
-                $ref: "./definition.yaml#/components/schemas/ExecuteDefinitionResponse"
   # Transactions
   /transactions:
     get:
@@ -183,23 +158,7 @@ paths:
                 $ref: "./transactions.yaml#/components/schemas/Transaction"
         500:
           description: "problem with getting a test"
-  /transactions/{transactionId}/version/{version}/definition.yaml:
-    get:
-      tags:
-        - api
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/transactionId"
-        - $ref: "./parameters.yaml#/components/parameters/version"
-      summary: Get the transaction definition as an YAML file
-      description: Get the transaction as an YAML file
-      operationId: getTransactionVersionDefinitionFile
-      responses:
-        200:
-          description: OK
-          content:
-            application/yaml:
-              schema:
-                type: string
+
   /transactions/{transactionId}/run:
     post:
       tags:
