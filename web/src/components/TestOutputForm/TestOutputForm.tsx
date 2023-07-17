@@ -1,4 +1,7 @@
+import {startCompletion} from '@codemirror/autocomplete';
+import {EditorView} from '@codemirror/view';
 import {Button, Form, Input, Tag} from 'antd';
+import {delay} from 'lodash';
 import {useEffect} from 'react';
 
 import Editor from 'components/Editor';
@@ -57,6 +60,10 @@ const TestOutputForm = ({
     };
   }, []);
 
+  const onAttributeFocus = (view: EditorView) => {
+    if (!view?.state.doc.length) delay(() => startCompletion(view!), 0);
+  };
+
   return (
     <S.Container>
       <S.Title>{isEditing ? 'Edit Test Output' : 'Add Test Output'}</S.Title>
@@ -105,6 +112,7 @@ const TestOutputForm = ({
               }}
               placeholder="Attribute"
               type={SupportedEditors.Expression}
+              onFocus={onAttributeFocus}
             />
           </Form.Item>
         </S.FormSection>

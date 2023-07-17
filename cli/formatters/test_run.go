@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/pterm/pterm"
+	"golang.org/x/exp/slices"
 )
 
 const (
@@ -94,7 +95,7 @@ func (f testRun) pretty(output TestRunOutput) string {
 		return f.formatSuccessfulTest(output.Test, output.Run)
 	}
 
-	if !output.Run.Result.GetAllPassed() {
+	if !output.Run.Result.GetAllPassed() || !output.Run.RequiredGatesResult.GetPassed() {
 		return f.formatFailedTest(output.Test, output.Run)
 	}
 
@@ -207,6 +208,24 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 
 		for spanId, spanResult := range results {
 			f.generateSpanResult(&buffer, spanId, spanResult, baseLink)
+		}
+	}
+
+	if len(run.GetRequiredGatesResult().Required) > 0 {
+		buffer.WriteString("\n")
+		gatesPassed := run.RequiredGatesResult.GetPassed()
+		icon := f.getStateIcon(gatesPassed)
+		message = f.getColoredText(
+			gatesPassed,
+			f.formatMessage("\t%s %s\n", icon, "Required gates"),
+		)
+		buffer.WriteString(message)
+		for _, gateResult := range run.GetRequiredGatesResult().Required {
+			passed := slices.Index(run.RequiredGatesResult.Failed, gateResult) == -1
+			icon := f.getStateIcon(passed)
+			message := f.formatMessage("\t\t%s %s\n", icon, gateResult)
+			message = f.getColoredText(passed, message)
+			buffer.WriteString(message)
 		}
 	}
 

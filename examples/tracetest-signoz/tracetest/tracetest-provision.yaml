@@ -13,3 +13,11 @@ type: DataStore
 spec:
   name: Signoz
   type: signoz
+---
+type: TestRunner
+spec:
+  id: current
+  name: default
+  requiredGates:
+    - analyzer-score
+    - test-specs

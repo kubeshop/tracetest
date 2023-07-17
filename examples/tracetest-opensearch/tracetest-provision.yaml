@@ -17,3 +17,11 @@ spec:
     addresses:
       - http://opensearch:9200
     index: traces
+---
+type: TestRunner
+spec:
+  id: current
+  name: default
+  requiredGates:
+    - analyzer-score
+    - test-specs

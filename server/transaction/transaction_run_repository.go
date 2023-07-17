@@ -155,14 +155,14 @@ UPDATE transaction_runs SET
 	"last_error" = $4,
 	"pass" = $5,
 	"fail" = $6,
-	"all_steps_required_gates_passed" = $11,
+	"all_steps_required_gates_passed" = $7,
 
-	"metadata" = $7,
+	"metadata" = $8,
 
 	-- environment
-	"environment" = $8
+	"environment" = $9
 
-WHERE id = $9 AND transaction_id = $10
+WHERE id = $10 AND transaction_id = $11
 `
 
 func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error {
@@ -193,7 +193,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 	}
 
 	pass, fail := tr.ResultsCount()
-	AllStepsRequiredGatesPassed := tr.StepsGatesValidation()
+	allStepsRequiredGatesPassed := tr.StepsGatesValidation()
 
 	_, err = stmt.ExecContext(
 		ctx,
@@ -203,11 +203,11 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		lastError,
 		pass,
 		fail,
+		allStepsRequiredGatesPassed,
 		jsonMetadata,
 		jsonEnvironment,
 		tr.ID,
 		tr.TransactionID,
-		AllStepsRequiredGatesPassed,
 	)
 
 	if err != nil {
@@ -424,7 +424,7 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 
 	// checks if the flag exists, if it doesn't we use the fail field to determine if all steps passed
 	if allStepsRequiredGatesPassed == nil {
-		failed := fail.Valid && fail.Int32 == 0
+		failed := r.Fail == 0
 		allStepsRequiredGatesPassed = &failed
 	}
 

@@ -21,3 +21,11 @@ spec:
   periodic:
     timeout: 30s
     retryDelay: 1s
+---
+type: TestRunner
+spec:
+  id: current
+  name: default
+  requiredGates:
+    - analyzer-score
+    - test-specs

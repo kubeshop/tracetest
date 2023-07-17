@@ -118,7 +118,7 @@ func (r transactionRunner) UpdateResult(ctx context.Context, result RunResult) (
 		}
 	}
 
-	passed := !isStateFailed(updated.GetState()) && allPassed
+	passed := !isStateFailed(updated.GetState()) && allPassed && updated.GetAllStepsRequiredGatesPassed()
 
 	return RunResult{
 		Resource: transaction,

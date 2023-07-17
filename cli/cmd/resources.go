@@ -206,6 +206,28 @@ var (
 				resourcemanager.WithResourceType("DataStore"),
 			),
 		).
+		Register(
+			resourcemanager.NewClient(
+				httpClient, cliLogger,
+				"testrunner", "testrunners",
+				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+					Cells: []resourcemanager.TableCellConfig{
+						{Header: "ID", Path: "spec.id"},
+						{Header: "NAME", Path: "spec.name"},
+						{Header: "REQUIRED GATES", Path: "spec.gates"},
+					},
+					ItemModifier: func(item *gabs.Container) error {
+						gates := []string{}
+						for _, gate := range item.Path("spec.requiredGates").Children() {
+							gates = append(gates, "- "+gate.Data().(string))
+						}
+						item.SetP(strings.Join(gates, "\n"), "spec.gates")
+						return nil
+					},
+				}),
+				resourcemanager.WithResourceType("TestRunner"),
+			),
+		).
 		Register(environmentClient).
 		Register(transactionClient).
 		Register(testClient)

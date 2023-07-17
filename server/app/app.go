@@ -263,7 +263,6 @@ func (app *App) Start(opts ...appOption) error {
 		tracer,
 		environmentRepo,
 		rf,
-		triggerRegistry,
 	)
 	registerWSHandler(router, mappers, subscriptionManager)
 
@@ -511,7 +510,6 @@ func controller(
 	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
-	triggerRegistry *trigger.Registry,
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry())
 
@@ -526,7 +524,6 @@ func controller(
 		environmentRepo,
 		rf,
 		mappers,
-		triggerRegistry,
 	))
 
 	return router, mappers
@@ -543,7 +540,6 @@ func httpRouter(
 	environmentRepo *environment.Repository,
 	rf *runnerFacade,
 	mappers mappings.Mappings,
-	triggerRegistry *trigger.Registry,
 ) openapi.Router {
 	controller := httpServer.NewController(
 		testDB,
@@ -555,7 +551,6 @@ func httpRouter(
 		rf,
 		mappers,
 		environmentRepo,
-		triggerRegistry,
 		tracer,
 		Version,
 	)
