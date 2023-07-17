@@ -3,7 +3,8 @@ import styled from 'styled-components';
 export const Container = styled.div`
   background: ${({theme}) => theme.color.white};
   display: flex;
-  height: 100%;
+  flex: auto;
+  min-height: 0;
   width: 100%;
 `;
 
