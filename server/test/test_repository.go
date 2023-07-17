@@ -121,8 +121,9 @@ func (r *repository) ListAugmented(ctx context.Context, take, skip int, query, s
 func (r *repository) list(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Test, error) {
 	sql := getTestSQL + testMaxVersionQuery
 	params := []any{take, skip}
+	paramNumber := len(params) + 1
 
-	const condition = " AND (t.name ilike $3 OR t.description ilike $3)"
+	condition := fmt.Sprintf(" WHERE (t.name ilike $%d OR t.description ilike $%d)", paramNumber, paramNumber)
 	q, params := sqlutil.Search(sql, condition, query, params)
 
 	sortingFields := map[string]string{
@@ -154,16 +155,16 @@ func (r *repository) list(ctx context.Context, take, skip int, query, sortBy, so
 }
 
 func (r *repository) Count(ctx context.Context, query string) (int, error) {
-	countQuery := "SELECT COUNT(*) FROM tests t" + testMaxVersionQuery
+	var params []any
 
-	if query != "" {
-		countQuery = fmt.Sprintf("%s WHERE %s", countQuery, query)
-	}
+	countQuery := "SELECT COUNT(*) FROM tests t" + testMaxVersionQuery
+	const condition = " WHERE (t.name ilike $1 OR t.description ilike $1)"
+	sql, params := sqlutil.Search(countQuery, condition, query, params)
 
 	count := 0
 
 	err := r.db.
-		QueryRowContext(ctx, countQuery).
+		QueryRowContext(ctx, sql, params...).
 		Scan(&count)
 
 	if err != nil {
