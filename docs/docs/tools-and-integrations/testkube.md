@@ -12,6 +12,15 @@ For Testkube, tests are meant to be part of a cluster's state and can be execute
 
 By using the [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) you can unlock Testkube's capacity in conjunction with Tracetest, and leverage the work you have already done to instrument your services.
 
+:::info
+If you are using the latest version of Testkube, the Tracetest Executor will be bundled in Testkube by default. Read more in the Testkube docs, [here](https://docs.testkube.io/test-types/executor-tracetest/).
+
+Or, check out the hands-on workshop on YouTube!
+
+<iframe width="100%" height="250" src="https://www.youtube.com/embed/nAp3zYgykok" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+:::
+
 ## How does it work?
 
 The following is high level sequence diagram on how Testkube and Tracetest interact with the different pieces of the system:
@@ -61,6 +70,10 @@ Testkube works with the concept of [Executors](https://kubeshop.github.io/testku
 ```bash
 kubectl testkube create executor --image kubeshop/testkube-executor-tracetest:latest --types "tracetest/test" --name tracetest-executor --icon-uri icon --content-type string --content-type file-uri
 ```
+
+:::info
+If you are using the latest version of Testkube, the Tracetest Executor will be bundled in Testkube by default. Read more in the Testkube docs, [here](https://docs.testkube.io/test-types/executor-tracetest/).
+:::
 
 ### 2. Create a Test
 
