@@ -5,7 +5,7 @@ import useDocumentTitle from 'hooks/useDocumentTitle';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {useTransactionRun} from 'providers/TransactionRun/TransactionRun.provider';
 import TransactionService from 'services/Transaction.service';
-import * as S from './TransactionRunTrigger.styled';
+import * as S from './TransactionRunOverview.styled';
 
 const Content = () => {
   const {transaction} = useTransaction();

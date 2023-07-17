@@ -14,7 +14,8 @@ import (
 
 type HttpResourceSpans struct {
 	v1.ResourceSpans
-	ScopeSpans []*httpScopeSpans `json:"scopeSpans"`
+	ScopeSpans                  []*httpScopeSpans `json:"scopeSpans"`
+	InstrumentationLibrarySpans []*httpScopeSpans `json:"instrumentationLibrarySpans"`
 }
 
 type httpScopeSpans struct {
@@ -54,6 +55,10 @@ func FromHttpOtelResourceSpans(resourceSpans []*HttpResourceSpans) model.Trace {
 	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {
 			flattenSpans = append(flattenSpans, scopeSpans.Spans...)
+		}
+
+		for _, librarySpans := range resource.InstrumentationLibrarySpans {
+			flattenSpans = append(flattenSpans, librarySpans.Spans...)
 		}
 	}
 

@@ -34,7 +34,6 @@ func (c *customController) Routes() openapi.Routes {
 	routes := c.router.Routes()
 
 	routes[c.getRouteIndex("GetTransactionVersion")].HandlerFunc = c.GetTransactionVersion
-	routes[c.getRouteIndex("GetTransactionVersionDefinitionFile")].HandlerFunc = c.GetTransactionVersionDefinitionFile
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 
@@ -68,28 +67,6 @@ func (c *customController) GetTransactionVersion(w http.ResponseWriter, r *http.
 	}
 
 	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-
-	enc := resourcemanager.EncoderFromRequest(r)
-	enc.WriteEncodedResponse(w, result.Code, result.Body)
-}
-
-// GetTransactionVersionDefinitionFile - Get the transaction definition as an YAML file
-func (c *customController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &openapi.ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

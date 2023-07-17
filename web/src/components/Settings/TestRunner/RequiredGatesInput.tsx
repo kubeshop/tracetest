@@ -27,7 +27,7 @@ const RequiredGatesInput = ({value = [], onChange = noop}: IProps) => {
       <Typography.Title level={3}>Required Gates</Typography.Title>
       <S.SwitchListContainer>
         {supportedGates.map(gate => (
-          <S.SwitchContainer>
+          <S.SwitchContainer key={gate}>
             <Switch checked={value.includes(gate)} onChange={isChecked => handleChange(gate, isChecked)} id={gate} />
             <label htmlFor={gate}>
               <Typography.Text>

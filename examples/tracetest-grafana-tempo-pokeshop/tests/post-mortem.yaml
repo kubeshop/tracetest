@@ -1,0 +1,13 @@
+type: Test
+spec:
+  id: rA8wtOjVR
+  name: post mortem pokemon import
+  trigger:
+    type: traceid
+    traceid:
+      id: ${env:traceId}
+  specs:
+  - selector: span[tracetest.span.type="general" name="import pokemon"]
+    name: Validate there are no exceptions when importing pokemon.
+    assertions:
+    - attr:span.events   not-contains   "exception"

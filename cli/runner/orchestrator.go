@@ -40,6 +40,9 @@ type RunOptions struct {
 	// Optional path to the file where the result of the run will be saved
 	// in JUnit xml format
 	JUnitOuptutFile string
+
+	// Overrides the default required gates for the resource
+	RequiredGates []string
 }
 
 // RunResult holds the result of the run
@@ -122,6 +125,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.String("envID", opts.EnvID),
 		zap.Bool("skipResultsWait", opts.SkipResultWait),
 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
+		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
 	envID, err := o.resolveEnvID(ctx, opts.EnvID)
@@ -168,6 +172,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 			EnvironmentId: &envID,
 			Variables:     ev.toOpenapi(),
 			Metadata:      getMetadata(),
+			RequiredGates: getRequiredGates(opts.RequiredGates),
 		}
 
 		result, err = r.StartRun(ctx, resource, runInfo)
@@ -346,6 +351,19 @@ func getMetadata() map[string]string {
 	}
 
 	return metadata
+}
+
+func getRequiredGates(gates []string) []openapi.SupportedGates {
+	if len(gates) == 0 {
+		return nil
+	}
+	requiredGates := make([]openapi.SupportedGates, 0, len(gates))
+
+	for _, g := range gates {
+		requiredGates = append(requiredGates, openapi.SupportedGates(g))
+	}
+
+	return requiredGates
 }
 
 // HandleRunError handles errors returned by the server when running a test.

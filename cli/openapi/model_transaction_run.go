@@ -20,16 +20,17 @@ var _ MappedNullable = &TransactionRun{}
 
 // TransactionRun struct for TransactionRun
 type TransactionRun struct {
-	Id          *string            `json:"id,omitempty"`
-	Version     *int32             `json:"version,omitempty"`
-	CreatedAt   *time.Time         `json:"createdAt,omitempty"`
-	CompletedAt *time.Time         `json:"completedAt,omitempty"`
-	State       *string            `json:"state,omitempty"`
-	Steps       []TestRun          `json:"steps,omitempty"`
-	Environment *Environment       `json:"environment,omitempty"`
-	Metadata    *map[string]string `json:"metadata,omitempty"`
-	Pass        *int32             `json:"pass,omitempty"`
-	Fail        *int32             `json:"fail,omitempty"`
+	Id                          *string            `json:"id,omitempty"`
+	Version                     *int32             `json:"version,omitempty"`
+	CreatedAt                   *time.Time         `json:"createdAt,omitempty"`
+	CompletedAt                 *time.Time         `json:"completedAt,omitempty"`
+	State                       *string            `json:"state,omitempty"`
+	Steps                       []TestRun          `json:"steps,omitempty"`
+	Environment                 *Environment       `json:"environment,omitempty"`
+	Metadata                    *map[string]string `json:"metadata,omitempty"`
+	Pass                        *int32             `json:"pass,omitempty"`
+	Fail                        *int32             `json:"fail,omitempty"`
+	AllStepsRequiredGatesPassed *bool              `json:"allStepsRequiredGatesPassed,omitempty"`
 }
 
 // NewTransactionRun instantiates a new TransactionRun object
@@ -369,6 +370,38 @@ func (o *TransactionRun) SetFail(v int32) {
 	o.Fail = &v
 }
 
+// GetAllStepsRequiredGatesPassed returns the AllStepsRequiredGatesPassed field value if set, zero value otherwise.
+func (o *TransactionRun) GetAllStepsRequiredGatesPassed() bool {
+	if o == nil || isNil(o.AllStepsRequiredGatesPassed) {
+		var ret bool
+		return ret
+	}
+	return *o.AllStepsRequiredGatesPassed
+}
+
+// GetAllStepsRequiredGatesPassedOk returns a tuple with the AllStepsRequiredGatesPassed field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TransactionRun) GetAllStepsRequiredGatesPassedOk() (*bool, bool) {
+	if o == nil || isNil(o.AllStepsRequiredGatesPassed) {
+		return nil, false
+	}
+	return o.AllStepsRequiredGatesPassed, true
+}
+
+// HasAllStepsRequiredGatesPassed returns a boolean if a field has been set.
+func (o *TransactionRun) HasAllStepsRequiredGatesPassed() bool {
+	if o != nil && !isNil(o.AllStepsRequiredGatesPassed) {
+		return true
+	}
+
+	return false
+}
+
+// SetAllStepsRequiredGatesPassed gets a reference to the given bool and assigns it to the AllStepsRequiredGatesPassed field.
+func (o *TransactionRun) SetAllStepsRequiredGatesPassed(v bool) {
+	o.AllStepsRequiredGatesPassed = &v
+}
+
 func (o TransactionRun) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -404,6 +437,9 @@ func (o TransactionRun) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Fail) {
 		toSerialize["fail"] = o.Fail
+	}
+	if !isNil(o.AllStepsRequiredGatesPassed) {
+		toSerialize["allStepsRequiredGatesPassed"] = o.AllStepsRequiredGatesPassed
 	}
 	return toSerialize, nil
 }

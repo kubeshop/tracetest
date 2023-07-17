@@ -110,7 +110,7 @@ func (r testRunner) UpdateResult(ctx context.Context, result RunResult) (RunResu
 		return RunResult{}, err
 	}
 
-	passed := !isStateFailed(updated.GetState()) && updated.Result.GetAllPassed()
+	passed := !isStateFailed(updated.GetState()) && updated.Result.GetAllPassed() && updated.RequiredGatesResult.GetPassed()
 
 	return RunResult{
 		Resource: test,
