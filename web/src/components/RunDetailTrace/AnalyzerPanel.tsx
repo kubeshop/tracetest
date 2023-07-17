@@ -10,7 +10,7 @@ interface IProps {
 
 const panel = {
   name: 'ANALYZER',
-  maxSize: 650,
+  maxSize: window.innerWidth / 2 || 650,
   minSize: 25,
   isDefaultOpen: true,
 };
