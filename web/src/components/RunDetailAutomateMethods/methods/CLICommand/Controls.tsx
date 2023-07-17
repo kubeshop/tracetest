@@ -1,6 +1,8 @@
 import {Form, Radio, Typography} from 'antd';
 import {toUpper} from 'lodash';
 import {useEffect, useMemo} from 'react';
+import RequiredGatesInput from 'components/Settings/TestRunner/RequiredGatesInput';
+import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import {CliCommandFormat, CliCommandOption, TCliCommandConfig} from 'services/CliCommand.service';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './CliCommand.styled';
@@ -47,6 +49,7 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
   const [form] = Form.useForm<TCliCommandConfig>();
   const options = Form.useWatch('options', form);
   const format = Form.useWatch('format', form);
+  const requiredGates = Form.useWatch('required-gates', form);
   const optionsMetadata = useMemo(
     () => getOptionsMetadata({isEnvironmentSelected: !!environmentId, resourceType}),
     [environmentId, resourceType]
@@ -56,12 +59,13 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
     onChange({
       options: options ?? defaultOptions,
       format: format ?? CliCommandFormat.Pretty,
+      requiredGates,
       id,
       environmentId,
       fileName,
       resourceType,
     });
-  }, [environmentId, fileName, format, onChange, options, id, resourceType]);
+  }, [environmentId, fileName, format, requiredGates, onChange, options, id, resourceType]);
 
   return (
     <Form<TCliCommandConfig>
@@ -82,6 +86,21 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
             </Form.Item>
           ))}
         </S.OptionsContainer>
+
+        <Form.Item name="required-gates">
+          <RequiredGatesInput
+            title={
+              <Typography.Paragraph>
+                Override default Required Gates:{' '}
+                <TooltipQuestion
+                  margin={6}
+                  title="Required Gates are used by the test runner to evaluate if a test is failed or not. You can override the default Required Gates for this run"
+                />
+              </Typography.Paragraph>
+            }
+          />
+        </Form.Item>
+
         <S.FormatContainer>
           <Typography.Paragraph>Output Format:</Typography.Paragraph>
           <Form.Item name="format" noStyle>

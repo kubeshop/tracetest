@@ -23,6 +23,7 @@ export type TCliCommandConfig = {
   environmentId?: string;
   fileName: string;
   format: CliCommandFormat;
+  requiredGates: string[];
   resourceType: ResourceType;
 };
 
@@ -54,12 +55,18 @@ const CliCommandService = () => ({
           : 'tracetest'
       } ${command}`,
   } as Record<CliCommandOption, TApplyOption>,
-  getCommand({options, format, id, environmentId, fileName, resourceType}: TCliCommandConfig) {
-    const command = Object.entries(options).reduce(
+
+  applyRequiredGates: (command: string, requiredGates: string[]) =>
+    requiredGates?.length ? `${command} --required-gates ${requiredGates.join(',')}` : command,
+
+  getCommand({options, format, id, environmentId, fileName, requiredGates, resourceType}: TCliCommandConfig) {
+    let command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
         this.applyOptions[option as CliCommandOption]({command: acc, enabled, id, environmentId, fileName}),
       `run ${resourceType}`
     );
+
+    command = this.applyRequiredGates(command, requiredGates);
 
     return `${command} --output ${format}`;
   },
