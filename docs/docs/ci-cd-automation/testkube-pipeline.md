@@ -8,6 +8,15 @@
 
 [Testkube Tracetest Executor](https://github.com/kubeshop/testkube-executor-tracetest) is a test executor to run Tracetest tests with Testkube.
 
+:::info
+If you are using the latest version of Testkube, the Tracetest Executor will be bundled in Testkube by default. Read more in the Testkube docs, [here](https://docs.testkube.io/test-types/executor-tracetest/).
+
+Or, check out the hands-on workshop on YouTube!
+
+<iframe width="100%" height="250" src="https://www.youtube.com/embed/nAp3zYgykok" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+:::
+
 ## Why do we want to run Tracetest with Testkube?
 
 Tracetest leverages existing OpenTelemetry instrumentation to run assertions against every part of an HTTP transaction.
