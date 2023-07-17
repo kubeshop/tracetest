@@ -20,7 +20,7 @@ function getLastPath(pathname: string): string {
 }
 
 const LINKS = [
-  {id: 'trigger', label: 'Trigger'},
+  {id: 'overview', label: 'Overview'},
   {id: 'automate', label: 'Automate'},
 ];
 
