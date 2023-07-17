@@ -3,15 +3,10 @@ services:
 
   # Tracetest
   tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
+    image: kubeshop/tracetest:v0.12.2
     volumes:
-      - type: bind
-        source: ./tracetest.config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest.provision.yaml
-        target: /app/provisioning.yaml
+      - ./tracetest.config.yaml:/app/tracetest.yaml
+      - ./tracetest.provision.yaml:/app/provisioning.yaml
     ports:
       - 11633:11633
     command: --provisioning-file /app/provisioning.yaml
@@ -22,11 +17,6 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
     environment:
       TRACETEST_DEV: ${TRACETEST_DEV}
   # Tracetest End
