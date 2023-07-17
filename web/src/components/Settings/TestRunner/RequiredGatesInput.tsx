@@ -9,11 +9,12 @@ import * as S from '../common/Settings.styled';
 interface IProps {
   value?: string[];
   onChange?(value: string[]): void;
+  title?: React.ReactNode;
 }
 
 const supportedGates = Object.values(SupportedRequiredGates);
 
-const RequiredGatesInput = ({value = [], onChange = noop}: IProps) => {
+const RequiredGatesInput = ({value = [], onChange = noop, title}: IProps) => {
   const handleChange = useCallback(
     (gate: SupportedRequiredGates, isChecked: boolean) => {
       const newValue = isChecked ? [...value, gate] : value.filter(g => g !== gate);
@@ -24,7 +25,7 @@ const RequiredGatesInput = ({value = [], onChange = noop}: IProps) => {
 
   return (
     <>
-      <Typography.Title level={3}>Required Gates</Typography.Title>
+      {title || <Typography.Title level={3}>Required Gates</Typography.Title>}
       <S.SwitchListContainer>
         {supportedGates.map(gate => (
           <S.SwitchContainer key={gate}>

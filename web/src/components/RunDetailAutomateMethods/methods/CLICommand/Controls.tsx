@@ -1,7 +1,8 @@
-import {Form, Radio, Select, Typography} from 'antd';
+import {Form, Radio, Typography} from 'antd';
 import {toUpper} from 'lodash';
 import {useEffect, useMemo} from 'react';
-import {SupportedRequiredGates} from 'models/TestRunner.model';
+import RequiredGatesInput from 'components/Settings/TestRunner/RequiredGatesInput';
+import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import {CliCommandFormat, CliCommandOption, TCliCommandConfig} from 'services/CliCommand.service';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './CliCommand.styled';
@@ -86,18 +87,19 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
           ))}
         </S.OptionsContainer>
 
-        <S.RequiredGatesContainer>
-          <Typography.Paragraph>Override default Required Gates:</Typography.Paragraph>
-          <Form.Item name="required-gates">
-            <Select mode="multiple" placeholder="Please select the required gates">
-              {Object.values(SupportedRequiredGates).map(requiredGate => (
-                <Select.Option key={requiredGate} value={requiredGate}>
-                  {requiredGate}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </S.RequiredGatesContainer>
+        <Form.Item name="required-gates">
+          <RequiredGatesInput
+            title={
+              <Typography.Paragraph>
+                Override default Required Gates:{' '}
+                <TooltipQuestion
+                  margin={6}
+                  title="Required Gates are used by the test runner to evaluate if a test is failed or not. You can override the default Required Gates for this run"
+                />
+              </Typography.Paragraph>
+            }
+          />
+        </Form.Item>
 
         <S.FormatContainer>
           <Typography.Paragraph>Output Format:</Typography.Paragraph>

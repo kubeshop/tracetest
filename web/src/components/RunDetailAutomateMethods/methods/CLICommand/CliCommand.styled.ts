@@ -47,8 +47,4 @@ export const OptionsContainer = styled.div`
   margin-bottom: 24px;
 `;
 
-export const RequiredGatesContainer = styled.div`
-  width: 50%;
-`;
-
 export const FormatContainer = styled.div``;
