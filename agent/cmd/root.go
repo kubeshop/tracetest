@@ -13,6 +13,8 @@ var (
 
 var rootCmd = cobra.Command{
 	Use: "agent",
+	Short: "Manages the tracetest agent"
+	Long: "Manages the tracetest agent"
 }
 
 func init() {
