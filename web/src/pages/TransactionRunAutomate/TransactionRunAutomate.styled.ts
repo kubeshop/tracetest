@@ -1,17 +1,17 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
+  background: ${({theme}) => theme.color.white};
   display: flex;
-  height: 100%;
+  flex: auto;
+  min-height: 0;
   width: 100%;
 `;
 
 export const Section = styled.div`
-  flex: 1;
   background-color: ${({theme}) => theme.color.white};
-  overflow-y: scroll;
   flex-basis: 50%;
-  max-width: 50vw;
+  overflow-y: auto;
 `;
 
 export const SectionLeft = styled(Section)`
@@ -20,6 +20,6 @@ export const SectionLeft = styled(Section)`
 
 export const SectionRight = styled(Section)`
   border-left: 1px solid rgba(3, 24, 73, 0.1);
-  z-index: 2;
   padding: 24px;
+  z-index: 2;
 `;

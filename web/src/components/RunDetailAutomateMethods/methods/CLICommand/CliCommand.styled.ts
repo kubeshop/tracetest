@@ -42,5 +42,9 @@ export const SwitchLabel = styled.label<{$disabled?: boolean}>`
 export const ControlsContainer = styled.div`
   margin-top: 16px;
 `;
-export const OptionsContainer = styled.div``;
+
+export const OptionsContainer = styled.div`
+  margin-bottom: 24px;
+`;
+
 export const FormatContainer = styled.div``;

@@ -69,12 +69,6 @@ func (c *ApiApiController) Routes() Routes {
 			c.DryRunAssertion,
 		},
 		{
-			"ExecuteDefinition",
-			strings.ToUpper("Post"),
-			"/api/definition.yaml",
-			c.ExecuteDefinition,
-		},
-		{
 			"ExportTestRun",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/export",
@@ -151,12 +145,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/transactions/{transactionId}/version/{version}",
 			c.GetTransactionVersion,
-		},
-		{
-			"GetTransactionVersionDefinitionFile",
-			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/version/{version}/definition.yaml",
-			c.GetTransactionVersionDefinitionFile,
 		},
 		{
 			"GetVersion",
@@ -270,30 +258,6 @@ func (c *ApiApiController) DryRunAssertion(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	result, err := c.service.DryRunAssertion(r.Context(), testIdParam, runIdParam, testSpecsParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// ExecuteDefinition - Execute a definition
-func (c *ApiApiController) ExecuteDefinition(w http.ResponseWriter, r *http.Request) {
-	textDefinitionParam := TextDefinition{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&textDefinitionParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertTextDefinitionRequired(textDefinitionParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.ExecuteDefinition(r.Context(), textDefinitionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -593,28 +557,6 @@ func (c *ApiApiController) GetTransactionVersion(w http.ResponseWriter, r *http.
 	}
 
 	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransactionVersionDefinitionFile - Get the transaction definition as an YAML file
-func (c *ApiApiController) GetTransactionVersionDefinitionFile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTransactionVersionDefinitionFile(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

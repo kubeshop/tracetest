@@ -15,8 +15,8 @@ export const SupportedRequiredGatesDescription = {
   [SupportedRequiredGates.AnalyzerScore]:
     'Test Runs will be marked as failed if the Analyzer Score is below the configured threshold',
   [SupportedRequiredGates.AnalyzerRules]:
-    'Test Runs will be marked as failed if one the Error Level Analyzer Rules are not met',
-  [SupportedRequiredGates.TestSpecs]: 'Test Runs will be marked as failed if on of the defined Test Specs fail',
+    'Test Runs will be marked as failed if one the Error Level Analyzer Rules fails',
+  [SupportedRequiredGates.TestSpecs]: 'Test Runs will be marked as failed if one of the defined Test Specs fails',
 } as const;
 
 const TestRunner = ({spec: rawTestRunner = {}}: TRawTestRunnerResource = {}): TestRunner =>

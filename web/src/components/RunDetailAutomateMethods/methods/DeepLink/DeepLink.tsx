@@ -1,11 +1,18 @@
 import {Typography} from 'antd';
 import {FramedCodeBlock} from 'components/CodeBlock';
-import * as S from './DeepLink.styled';
+import Test from 'models/Test.model';
+import TestRun from 'models/TestRun.model';
 import Controls from './Controls';
-import {IMethodProps} from '../../RunDetailAutomateMethods';
+import * as S from './DeepLink.styled';
 import useDeepLink from './hooks/useDeepLink';
 
-const DeepLink = ({test, environmentId, run: {environment}}: IMethodProps) => {
+interface IProps {
+  test: Test;
+  run: TestRun;
+  environmentId?: string;
+}
+
+const DeepLink = ({test, environmentId, run: {environment}}: IProps) => {
   const {deepLink, onGetDeepLink} = useDeepLink();
 
   return (

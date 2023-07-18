@@ -14,13 +14,11 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
-	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
 	"github.com/kubeshop/tracetest/server/http/validation"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/model/yaml"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
@@ -33,31 +31,34 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	tracer          trace.Tracer
-	runner          runner
-	newTraceDBFn    func(ds datastore.DataStore) (tracedb.TraceDB, error)
-	mappers         mappings.Mappings
-	triggerRegistry *trigger.Registry
-	version         string
+	tracer       trace.Tracer
+	runner       runner
+	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error)
+	mappers      mappings.Mappings
+	version      string
 
 	testDB                   model.Repository
 	transactionRepository    transactionsRepository
 	transactionRunRepository transactionRunRepository
-	testRepository           test.Repository
+	testRepository           testsRepository
 	testRunRepository        test.RunRepository
 	environmentGetter        environmentGetter
 }
 
 type transactionsRepository interface {
-	SetID(transaction.Transaction, id.ID) transaction.Transaction
-	IDExists(ctx context.Context, id id.ID) (bool, error)
-	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]transaction.Transaction, error)
 	GetAugmented(context.Context, id.ID) (transaction.Transaction, error)
+	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]transaction.Transaction, error)
 	Count(ctx context.Context, query string) (int, error)
-	Get(context.Context, id.ID) (transaction.Transaction, error)
 	GetVersion(context.Context, id.ID, int) (transaction.Transaction, error)
-	Create(context.Context, transaction.Transaction) (transaction.Transaction, error)
-	Update(context.Context, transaction.Transaction) (transaction.Transaction, error)
+}
+
+type testsRepository interface {
+	Get(context.Context, id.ID) (test.Test, error)
+	GetAugmented(context.Context, id.ID) (test.Test, error)
+	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]test.Test, error)
+	Count(ctx context.Context, query string) (int, error)
+	GetVersion(context.Context, id.ID, int) (test.Test, error)
+	Create(context.Context, test.Test) (test.Test, error)
 }
 
 type transactionRunRepository interface {
@@ -81,13 +82,12 @@ func NewController(
 	testDB model.Repository,
 	transactionRepository transactionsRepository,
 	transactionRunRepository transactionRunRepository,
-	testRepository test.Repository,
+	testRepository testsRepository,
 	testRunRepository test.RunRepository,
 	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error),
 	runner runner,
 	mappers mappings.Mappings,
 	envGetter environmentGetter,
-	triggerRegistry *trigger.Registry,
 	tracer trace.Tracer,
 	version string,
 ) openapi.ApiApiServicer {
@@ -102,7 +102,6 @@ func NewController(
 		runner:                   runner,
 		newTraceDBFn:             newTraceDBFn,
 		mappers:                  mappers,
-		triggerRegistry:          triggerRegistry,
 		version:                  version,
 	}
 }
@@ -394,115 +393,6 @@ func (c controller) ImportTestRun(ctx context.Context, exportedTest openapi.Expo
 	return openapi.Response(http.StatusOK, response), nil
 }
 
-func (c *controller) ExecuteDefinition(ctx context.Context, testDefinition openapi.TextDefinition) (openapi.ImplResponse, error) {
-	def, err := yaml.Decode([]byte(testDefinition.Content))
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	if test, err := def.Test(); err == nil {
-		return c.executeTest(ctx, test.Model(), testDefinition.RunInformation)
-	}
-
-	if transaction, err := def.Transaction(); err == nil {
-		return c.executeTransaction(ctx, transaction.Model(), testDefinition.RunInformation)
-	}
-
-	return openapi.Response(http.StatusUnprocessableEntity, nil), nil
-}
-
-func (c *controller) executeTransaction(ctx context.Context, tran transaction.Transaction, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
-	// create or update transaction
-	resp, err := c.doCreateTransaction(ctx, tran)
-	if err != nil {
-		if errors.Is(err, errTransactionExists) {
-			resp, err = c.doUpdateTransaction(ctx, tran.ID, tran)
-			if err != nil {
-				return resp, err
-			}
-		} else {
-			return resp, err
-		}
-	} else {
-		// the transaction was created, make sure we have the correct ID
-		tran = resp.Body.(transaction.Transaction)
-	}
-
-	transactionID := tran.ID
-
-	// transaction ready, execute it
-	resp, err = c.RunTransaction(ctx, transactionID.String(), runInfo)
-	if resp.Code != http.StatusOK || err != nil {
-		return resp, err
-	}
-
-	res := openapi.ExecuteDefinitionResponse{
-		Id:    transactionID.String(),
-		RunId: resp.Body.(openapi.TransactionRun).Id,
-		Type:  yaml.FileTypeTransaction.String(),
-	}
-	return openapi.Response(200, res), nil
-}
-
-var errTransactionExists = errors.New("transaction already exists")
-
-func (c *controller) doCreateTransaction(ctx context.Context, transaction transaction.Transaction) (openapi.ImplResponse, error) {
-	// if they try to create a transaction with preset ID, we need to make sure that ID doesn't exists already
-	if transaction.HasID() {
-		exists, err := c.transactionRepository.IDExists(ctx, transaction.ID)
-		if err != nil {
-			return handleDBError(err), err
-		}
-
-		if exists {
-			err := fmt.Errorf(`cannot create transaction with ID "%s: %w`, transaction.ID, errTransactionExists)
-			r := map[string]string{
-				"error": err.Error(),
-			}
-			return openapi.Response(http.StatusBadRequest, r), err
-		}
-	} else {
-		transaction = c.transactionRepository.SetID(transaction, id.GenerateID())
-	}
-
-	transaction, err := c.transactionRepository.Create(ctx, transaction)
-	if err != nil {
-		return handleDBError(err), err
-	}
-	transaction, err = c.transactionRepository.GetAugmented(ctx, transaction.ID)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(200, transaction), nil
-}
-
-func (c *controller) GetTransactionVersionDefinitionFile(ctx context.Context, transactionId string, version int32) (openapi.ImplResponse, error) {
-	transaction, err := c.transactionRepository.GetVersion(ctx, id.ID(transactionId), int(version))
-	if err != nil {
-		return openapi.Response(http.StatusBadRequest, err.Error()), err
-	}
-
-	return openapi.Response(200, transaction), nil
-}
-
-func (c *controller) doUpdateTransaction(ctx context.Context, transactionID id.ID, updated transaction.Transaction) (openapi.ImplResponse, error) {
-	transaction, err := c.transactionRepository.Get(ctx, transactionID)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	updated.Version = transaction.Version
-	updated.ID = transaction.ID
-
-	_, err = c.transactionRepository.Update(ctx, updated)
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	return openapi.Response(204, nil), nil
-}
-
 func metadata(in *map[string]string) test.RunMetadata {
 	if in == nil {
 		return nil
@@ -523,26 +413,6 @@ func getEnvironment(ctx context.Context, environmentRepository environmentGetter
 	}
 
 	return variablesEnv, nil
-}
-
-func (c *controller) executeTest(ctx context.Context, test test.Test, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
-	createdTest, err := c.testRepository.Create(ctx, test)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	// test ready, execute it
-	resp, err := c.RunTest(ctx, createdTest.ID.String(), runInfo)
-	if resp.Code != http.StatusOK || err != nil {
-		return resp, err
-	}
-
-	res := openapi.ExecuteDefinitionResponse{
-		Id:    createdTest.ID.String(),
-		RunId: resp.Body.(openapi.TestRun).Id,
-		Type:  yaml.FileTypeTest.String(),
-	}
-	return openapi.Response(200, res), nil
 }
 
 // Expressions

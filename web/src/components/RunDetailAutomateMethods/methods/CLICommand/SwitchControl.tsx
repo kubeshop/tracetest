@@ -18,7 +18,7 @@ const SwitchControl = ({value = false, onChange = noop, text, id, disabled, help
     <S.SwitchLabel htmlFor={id} $disabled={disabled}>
       {text}
     </S.SwitchLabel>
-    {!!help && <TooltipQuestion title={help} />}
+    {!!help && <TooltipQuestion margin={6} title={help} />}
   </S.SwitchContainer>
 );
 

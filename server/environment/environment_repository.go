@@ -122,7 +122,7 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 
 func listQuery(baseSQL, query string, params []any) (string, []any) {
 	paramNumber := len(params) + 1
-	condition := fmt.Sprintf(" AND (t.name ilike $%d OR e.description ilike $%d)", paramNumber, paramNumber)
+	condition := fmt.Sprintf(" WHERE (e.name ilike $%d OR e.description ilike $%d)", paramNumber, paramNumber)
 
 	sql, params := sqlutil.Search(baseSQL, condition, query, params)
 
@@ -249,7 +249,8 @@ func (r *Repository) countEnvironments(ctx context.Context, query string) (int, 
 		params []any
 	)
 
-	sql := countQuery + query
+	condition := " WHERE (e.name ilike $1 OR e.description ilike $1)"
+	sql, params := sqlutil.Search(countQuery, condition, query, params)
 
 	err := r.db.
 		QueryRowContext(ctx, sql, params...).

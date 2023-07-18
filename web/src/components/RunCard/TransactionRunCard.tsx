@@ -72,7 +72,7 @@ const TransactionRunCard = ({
         )}
 
         <div>
-          <TransactionRunActionsMenu runId={runId} transactionId={transactionId} transactionVersion={version} />
+          <TransactionRunActionsMenu runId={runId} transactionId={transactionId} />
         </div>
       </S.Container>
     </Link>
