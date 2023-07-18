@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"strings"
 )
 
 var serverOptions = options{
@@ -80,23 +82,18 @@ func (c *AppConfig) PostgresConnString() string {
 	defer c.mu.Unlock()
 
 	if postgresConnString := c.vp.GetString("postgresConnString"); postgresConnString != "" {
-		return postgresConnString
+		fmt.Println("ERROR: postgresConnString was discontinued. Migrate to the new postgres format")
+		os.Exit(1)
 	}
 
-	str := fmt.Sprintf(
-		"host=%s user=%s password=%s port=%d dbname=%s",
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable?%s",
 		c.vp.GetString("postgres.host"),
 		c.vp.GetString("postgres.user"),
 		c.vp.GetString("postgres.password"),
 		c.vp.GetInt("postgres.port"),
 		c.vp.GetString("postgres.dbname"),
+		strings.ReplaceAll(c.vp.GetString("postgres.params"), " ", "&"),
 	)
-
-	if params := c.vp.GetString("postgres.params"); params != "" {
-		str += " " + params
-	}
-
-	return str
 }
 
 func (c *AppConfig) ServerPathPrefix() string {

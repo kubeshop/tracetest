@@ -7,6 +7,7 @@ GO_LDFLAGS := $(shell echo \
 		-X "'github.com/kubeshop/tracetest/server/analytics.FrontendKey=$(ANALYTICS_FE_KEY)'" \
 	| sed 's/ / /g')
 
+.PHONY: help
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"
 	@echo ""
@@ -18,12 +19,15 @@ init-submodule:
 	git submodule init
 	git submodule update
 
+.PHONY: test
 test: ## run go tests for this application
 	go test -timeout 150s -coverprofile=coverage.out ./...
 
+.PHONY: vet
 vet: ## run vet tool to analyze the code for suspicious, abnormal, or useless code
 	go vet -structtag=false ./...
 
+.PHONY: run
 run: ## run server locally
 	go run -ldflags="$(GO_LDFLAGS)" main.go serve
 
