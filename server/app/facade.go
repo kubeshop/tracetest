@@ -98,7 +98,6 @@ func newRunnerFacades(
 	)
 
 	pollerExecutor = executor.NewSelectorBasedPoller(pollerExecutor, eventEmitter)
-
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
 		ppRepo,
@@ -108,11 +107,18 @@ func newRunnerFacades(
 		eventEmitter,
 	)
 
+	pollerQueueDriver := executor.NewInMemoryQueueDriver()
+	pollerQueue := executor.NewQueue(
+		runRepo,
+		testRepo,
+		pollerQueueDriver,
+		pollerExecutor,
+	)
+
 	runner := executor.NewPersistentRunner(
 		triggerRegistry,
 		runRepo,
 		execTestUpdater,
-		tracePoller,
 		tracer,
 		subscriptionManager,
 		tracedb.Factory(runRepo),
@@ -120,6 +126,15 @@ func newRunnerFacades(
 		eventEmitter,
 		ppRepo,
 		trRepo,
+		pollerQueue, //input queue
+	)
+
+	testRunnerQueueDriver := executor.NewInMemoryQueueDriver()
+	testRunnerQueue := executor.NewQueue(
+		runRepo,
+		testRepo,
+		testRunnerQueueDriver,
+		runner,
 	)
 
 	transactionRunner := executor.NewTransactionRunner(

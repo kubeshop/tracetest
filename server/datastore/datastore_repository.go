@@ -25,7 +25,7 @@ func (r *Repository) SetID(dataStore DataStore, id id.ID) DataStore {
 	return dataStore
 }
 
-const dataStoreSingleID id.ID = "current"
+const DataStoreSingleID id.ID = "current"
 
 const insertQuery = `
 INSERT INTO data_stores (
@@ -66,13 +66,13 @@ func (r *Repository) getCreatedAt(ctx context.Context, dataStore DataStore) (str
 }
 
 func (r *Repository) Create(ctx context.Context, updated DataStore) (DataStore, error) {
-	updated.ID = dataStoreSingleID
+	updated.ID = DataStoreSingleID
 	return r.Update(ctx, updated)
 }
 
 func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore, error) {
 	// enforce ID and default
-	dataStore.ID = dataStoreSingleID
+	dataStore.ID = DataStoreSingleID
 	dataStore.Default = true
 
 	// reuse the created_at field for auditing purposes,
@@ -91,7 +91,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery, dataStoreSingleID)
+	_, err = tx.ExecContext(ctx, deleteQuery, DataStoreSingleID)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
 	}
