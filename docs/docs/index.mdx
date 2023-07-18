@@ -1,0 +1,119 @@
+---
+id: index
+title: Welcome to the Tracetest Docs! 👋
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
+
+import CodeBlock from '@theme/CodeBlock';
+
+Tracetest is a trace-based testing tool for building integration and end-to-end tests in minutes using your OpenTelemetry traces.
+
+```mdx-code-block
+import {GettingStartedGuideCardsRow} from '@site/src/components/GettingStartedGuide';
+
+<GettingStartedGuideCardsRow />
+```
+
+## Why Tracetest?
+
+Tracetest uses existing [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces to power trace-based testing with assertions against your trace data at every point of a request transaction.
+
+To get started, point Tracetest to your existing [trace data source](./configuration/connecting-to-data-stores/jaeger.md) or [send traces to Tracetest](./configuration/connecting-to-data-stores/opentelemetry-collector.md) directly!
+
+### With Tracetest you can
+
+- Define tests and assertions against every single microservice that a trace goes through.
+- Work with your existing distributed tracing solution, allowing you to build tests based on your already instrumented system.
+- Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
+- Define assertions against both the response and trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
+- Save and run the tests manually or via CI build jobs
+
+New to trace-based testing? Read more about the concepts [here](./concepts/what-is-trace-based-testing).
+
+### Build tests in two ways
+
+<div className="row">
+  <div className="col col--12 margin-bottom--lg">
+    <div>
+      <div className="card__body">
+        <p align="center">
+          <b>Visually, in the Web UI</b>
+        </p>
+      </div>
+      <div className="card__footer">
+        <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png" />
+      </div>
+    </div>
+  </div>
+  <div className="col col--12 margin-bottom--lg">
+    <div>
+      <div className="card__body">
+        <p align="center">
+          <b>Programmatically, in YAML</b>
+        </p>
+      </div>
+      <div className="card__footer">
+        <CodeBlock
+          language="yaml"
+        >
+        {`
+    type: Test
+    spec:
+      id: Yg9sN-94g
+      name: Pokeshop - Import
+      description: Import a Pokemon
+      trigger:
+        type: http
+        httpRequest:
+          url: http://demo-api:8081/pokemon/import
+          method: POST
+          headers:
+          - key: Content-Type
+            value: application/json
+          body: '{"id":52}'
+      specs:
+      - name: 'All Database Spans: Processing time is less than 100ms'
+        selector: span[tracetest.span.type="database"]
+        assertions:
+        - attr:tracetest.span.duration < 100ms
+        `}
+        </CodeBlock> 
+      </div>
+    </div>
+  </div>
+</div>
+
+## Architecture
+
+Understand how Tracetest works.
+
+1. Trigger a test and generate a trace response.
+2. Fetch traces to render and analyze them.
+3. Add assertions to traces.
+4. See test results.
+5. Run tests as part of CI/CD pipelines.
+
+![Marketechture](https://res.cloudinary.com/djwdcmwdz/image/upload/v1686654113/docs/tracetest-marketechture-jun12-v3_ffj2e2.png)
+
+## Who uses Tracetest?
+
+Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js and Python.
+
+Tracetest enables you to write detailed trace-based tests, primarily:
+
+- End-to-end tests
+- Integration tests
+
+## What makes Tracetest special?
+
+Tracetest can be compared with Cypress or Selenium; however Tracetest is fundamentally different.
+
+Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a request transaction.

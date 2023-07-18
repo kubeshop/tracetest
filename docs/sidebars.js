@@ -216,12 +216,11 @@ const sidebars = {
     {
       type: "category",
       label: "Getting Started",
-      collapsed: false,
       items: [
         {
           type: "doc",
           id: "index",
-          label: "Introduction",
+          label: "Welcome! 👋",
         },
         {
           type: "doc",
