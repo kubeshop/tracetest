@@ -86,7 +86,7 @@ func (c *AppConfig) PostgresConnString() string {
 		os.Exit(1)
 	}
 
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable?%s",
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?%s",
 		c.vp.GetString("postgres.host"),
 		c.vp.GetString("postgres.user"),
 		c.vp.GetString("postgres.password"),
