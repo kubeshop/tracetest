@@ -5,6 +5,16 @@ on:
       - main
 
 jobs:
+  custom-version:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - run: |
+        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.-
+        tracetest --version | grep "CLI: v0.12.0"
+        exit $?
   linux:
     name: Linux
     strategy:
