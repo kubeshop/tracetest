@@ -124,6 +124,7 @@ func newRunnerFacades(
 	pipeline := NewPipeline(queueBuilder,
 		PipelineStep{processor: runner, driver: executor.NewInMemoryQueueDriver()},
 		PipelineStep{processor: pollerExecutor, driver: executor.NewInMemoryQueueDriver()},
+		PipelineStep{processor: assertionRunner, driver: executor.NewInMemoryQueueDriver()},
 	)
 
 	pipeline.Start()

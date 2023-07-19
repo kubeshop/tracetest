@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/environment"
@@ -14,38 +13,15 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
 )
-
-type AssertionRequest struct {
-	carrier propagation.MapCarrier
-	Test    test.Test
-	Run     test.Run
-}
-
-func (r AssertionRequest) Context() context.Context {
-	ctx := context.Background()
-	return otel.GetTextMapPropagator().Extract(ctx, r.carrier)
-}
-
-type AssertionRunner interface {
-	RunAssertions(ctx context.Context, request AssertionRequest)
-	WorkerPool
-}
 
 type defaultAssertionRunner struct {
 	updater             RunUpdater
 	assertionExecutor   AssertionExecutor
 	outputsProcessor    OutputsProcessorFn
-	inputChannel        chan AssertionRequest
-	exitChannel         chan bool
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
 }
-
-var _ WorkerPool = &defaultAssertionRunner{}
-var _ AssertionRunner = &defaultAssertionRunner{}
 
 func NewAssertionRunner(
 	updater RunUpdater,
@@ -53,76 +29,51 @@ func NewAssertionRunner(
 	op OutputsProcessorFn,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
-) AssertionRunner {
+) *defaultAssertionRunner {
 	return &defaultAssertionRunner{
 		outputsProcessor:    op,
 		updater:             updater,
 		assertionExecutor:   assertionExecutor,
-		inputChannel:        make(chan AssertionRequest, 1),
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
 	}
 }
 
-func (e *defaultAssertionRunner) Start(workers int) {
-	e.exitChannel = make(chan bool, workers)
-
-	for i := 0; i < workers; i++ {
-		go e.startWorker()
-	}
+func (e *defaultAssertionRunner) SetOutputQueue(*Queue) {
+	// do nothing, this is the last step
 }
 
-func (e *defaultAssertionRunner) Stop() {
-	ticker := time.NewTicker(1 * time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			e.exitChannel <- true
-			return
-		}
-	}
-}
+func (e *defaultAssertionRunner) ProcessItem(ctx context.Context, job Job) {
+	run, err := e.runAssertionsAndUpdateResult(ctx, job)
 
-func (e *defaultAssertionRunner) startWorker() {
-	for {
-		select {
-		case <-e.exitChannel:
-			fmt.Println("Exiting assertion executor worker")
-			return
-		case request := <-e.inputChannel:
-			ctx := request.Context()
-			run, err := e.runAssertionsAndUpdateResult(ctx, request)
+	log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", job.Test.ID, job.Run.ID)
+	e.subscriptionManager.PublishUpdate(subscription.Message{
+		ResourceID: run.TransactionStepResourceID(),
+		Type:       "run_update",
+		Content:    RunResult{Run: run, Err: err},
+	})
+	log.Printf("[AssertionRunner] Test %s Run %d: update channel complete\n", job.Test.ID, job.Run.ID)
 
-			log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", request.Test.ID, request.Run.ID)
-			e.subscriptionManager.PublishUpdate(subscription.Message{
-				ResourceID: run.TransactionStepResourceID(),
-				Type:       "run_update",
-				Content:    RunResult{Run: run, Err: err},
-			})
-			log.Printf("[AssertionRunner] Test %s Run %d: update channel complete\n", request.Test.ID, request.Run.ID)
-
-			if err != nil {
-				log.Printf("[AssertionRunner] Test %s Run %d: error with runAssertionsAndUpdateResult: %s\n", request.Test.ID, request.Run.ID, err.Error())
-			}
-		}
-	}
-}
-
-func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, request AssertionRequest) (test.Run, error) {
-	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", request.Test.ID, request.Run.ID)
-
-	err := e.eventEmitter.Emit(ctx, events.TestSpecsRunStart(request.Test.ID, request.Run.ID))
 	if err != nil {
-		log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunStart event: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		log.Printf("[AssertionRunner] Test %s Run %d: error with runAssertionsAndUpdateResult: %s\n", job.Test.ID, job.Run.ID, err.Error())
+	}
+}
+
+func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Context, job Job) (test.Run, error) {
+	log.Printf("[AssertionRunner] Test %s Run %d: Starting\n", job.Test.ID, job.Run.ID)
+
+	err := e.eventEmitter.Emit(ctx, events.TestSpecsRunStart(job.Test.ID, job.Run.ID))
+	if err != nil {
+		log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunStart event: %s\n", job.Test.ID, job.Run.ID, err.Error())
 	}
 
-	run, err := e.executeAssertions(ctx, request)
+	run, err := e.executeAssertions(ctx, job)
 	if err != nil {
-		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		log.Printf("[AssertionRunner] Test %s Run %d: error executing assertions: %s\n", job.Test.ID, job.Run.ID, err.Error())
 
-		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunError(request.Test.ID, request.Run.ID, err))
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunError(job.Test.ID, job.Run.ID, err))
 		if anotherErr != nil {
-			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunError event: %s\n", job.Test.ID, job.Run.ID, anotherErr.Error())
 		}
 
 		run = run.AssertionFailed(err)
@@ -132,29 +83,29 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 
 		return test.Run{}, e.updater.Update(ctx, run)
 	}
-	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", request.Test.ID, request.Run.ID, run.Pass, run.Fail)
+	log.Printf("[AssertionRunner] Test %s Run %d: Success. pass: %d, fail: %d\n", job.Test.ID, job.Run.ID, run.Pass, run.Fail)
 
 	err = e.updater.Update(ctx, run)
 	if err != nil {
-		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		log.Printf("[AssertionRunner] Test %s Run %d: error updating run: %s\n", job.Test.ID, job.Run.ID, err.Error())
 
-		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunPersistenceError(request.Test.ID, request.Run.ID, err))
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestSpecsRunPersistenceError(job.Test.ID, job.Run.ID, err))
 		if anotherErr != nil {
-			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunPersistenceError event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunPersistenceError event: %s\n", job.Test.ID, job.Run.ID, anotherErr.Error())
 		}
 
 		return test.Run{}, fmt.Errorf("could not save result on database: %w", err)
 	}
 
-	err = e.eventEmitter.Emit(ctx, events.TestSpecsRunSuccess(request.Test.ID, request.Run.ID))
+	err = e.eventEmitter.Emit(ctx, events.TestSpecsRunSuccess(job.Test.ID, job.Run.ID))
 	if err != nil {
-		log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunSuccess event: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestSpecsRunSuccess event: %s\n", job.Test.ID, job.Run.ID, err.Error())
 	}
 
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req AssertionRequest) (test.Run, error) {
+func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job) (test.Run, error) {
 	run := req.Run
 	if run.Trace == nil {
 		return test.Run{}, fmt.Errorf("trace not available")
@@ -192,7 +143,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Asse
 	return run, nil
 }
 
-func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req AssertionRequest, result maps.Ordered[test.SpanQuery, []test.AssertionResult]) {
+func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req Job, result maps.Ordered[test.SpanQuery, []test.AssertionResult]) {
 	for _, assertionResults := range result.Unordered() {
 		for _, assertionResult := range assertionResults {
 			for _, spanAssertionResult := range assertionResult.Results {
@@ -238,31 +189,21 @@ func createEnvironment(env environment.Environment, outputs maps.Ordered[string,
 
 	return env.Merge(outputEnv)
 }
-
-func (e *defaultAssertionRunner) RunAssertions(ctx context.Context, request AssertionRequest) {
-	carrier := propagation.MapCarrier{}
-	otel.GetTextMapPropagator().Inject(ctx, carrier)
-
-	request.carrier = carrier
-
-	e.inputChannel <- request
-}
-
-func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, request AssertionRequest, outputs maps.Ordered[string, test.RunOutput]) {
+func (e *defaultAssertionRunner) validateOutputResolution(ctx context.Context, job Job, outputs maps.Ordered[string, test.RunOutput]) {
 	err := outputs.ForEach(func(outputName string, outputModel test.RunOutput) error {
 		if outputModel.Resolved {
 			return nil
 		}
 
-		anotherErr := e.eventEmitter.Emit(ctx, events.TestOutputGenerationWarning(request.Test.ID, request.Run.ID, outputModel.Error, outputName))
+		anotherErr := e.eventEmitter.Emit(ctx, events.TestOutputGenerationWarning(job.Test.ID, job.Run.ID, outputModel.Error, outputName))
 		if anotherErr != nil {
-			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestOutputGenerationWarning event: %s\n", request.Test.ID, request.Run.ID, anotherErr.Error())
+			log.Printf("[AssertionRunner] Test %s Run %d: fail to emit TestOutputGenerationWarning event: %s\n", job.Test.ID, job.Run.ID, anotherErr.Error())
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		log.Printf("[AssertionRunner] Test %s Run %d: fail to validate outputs: %s\n", request.Test.ID, request.Run.ID, err.Error())
+		log.Printf("[AssertionRunner] Test %s Run %d: fail to validate outputs: %s\n", job.Test.ID, job.Run.ID, err.Error())
 	}
 }
