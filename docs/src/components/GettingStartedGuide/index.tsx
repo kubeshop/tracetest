@@ -28,7 +28,7 @@ const GettingStartedGuides = [
     button: 'Create tests',
   },
   {
-    name: '🤔 Don\'t have OpenTelemetry installed?',
+    name: '🤔 Don\'t have OpenTelemetry?',
     url: './getting-started/no-otel',
     description: (
       <Translate >
@@ -46,6 +46,26 @@ const GettingStartedGuides = [
       </Translate>
     ),
     button: 'Go to GitHub',
+  },
+  {
+    name: '⚙️ Configure trace data stores',
+    url: '../configuration/overview#supported-trace-data-stores',
+    description: (
+      <Translate>
+        Connect your existing trace data store or send traces to Tracetest directly!
+      </Translate>
+    ),
+    button: 'Configure Tracetest',
+  },
+  {
+    name: '🙄 New to Trace-based Testing?',
+    url: '../concepts/what-is-trace-based-testing',
+    description: (
+      <Translate>
+        Read about the concepts of trace-based testing to learn more!
+      </Translate>
+    ),
+    button: 'View Concepts',
   },
 ];
 

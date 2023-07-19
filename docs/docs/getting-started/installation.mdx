@@ -1,32 +1,31 @@
-# Installing Tracetest
-
-<!-- Docusaurus imports start -->
+---
+id: installation
+title: Installing Tracetest
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
-<!-- Docusaurus imports end -->
-
 This page showcases getting started with Tracetest by using the Tracetest CLI, Docker, or Kubernetes.
 
 This simple installation includes a demo app called [Pokeshop](../live-examples/pokeshop/overview.md) that will be installed alongside Tracetest. It shows how to configure OpenTelemetry and Tracetest and the architecture of the Pokeshop sample app.
-
-:::note Prerequisites
-Tracetest requires that you have [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) added in your code, and configured [sending traces to a trace data store](../configuration/connecting-to-data-stores/jaeger.md), or [Tracetest directly](../configuration/connecting-to-data-stores/opentelemetry-collector.md).
-:::
-
-:::tip Don't have OpenTelemetry installed?
-[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./no-otel.mdx)
-:::
 
 ## Install the Tracetest CLI
 
 <GtagInstallCliTabs></GtagInstallCliTabs>
 
 :::tip Want more info?
-Read the CLI installation reference [here](./detailed-installation).
+Read the CLI installation reference [here](../cli/cli-installation-reference.md).
 :::
 
 ## Install the Tracetest Server
@@ -118,10 +117,6 @@ flowchart TD
 
 This will start the Tracetest Server and expose the Web UI on [`http://localhost:11633`](http://localhost:11633).
 
-:::note
-View deployment instructions for Docker [here](../deployment/docker).
-:::
-
   </TabItem>
   <TabItem value="kubernetes" label="Kubernetes">
     <CodeBlock
@@ -198,10 +193,6 @@ echo "Open http://127.0.0.1:11633 to view the Tracetest Web UI"
 
 Access the Tracetest Web UI on [`http://localhost:11633`](http://localhost:11633).
 
-:::note
-View deployment instructions for Kubernetes [here](../deployment/kubernetes).
-:::
-
   </TabItem>
 </Tabs>
 
@@ -240,9 +231,11 @@ kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-co
 
 Access the Tracetest Web UI on [`http://localhost:11633`](http://localhost:11633).
 
-:::note
-View deployment instructions for Kubernetes [here](../deployment/kubernetes).
-:::
-
   </TabItem>
 </Tabs>
+
+:::tip Don't have OpenTelemetry installed?
+Tracetest requires that you have [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) added in your code, and configured [sending traces to a trace data store](../configuration/connecting-to-data-stores/jaeger.md), or [Tracetest directly](../configuration/connecting-to-data-stores/opentelemetry-collector.md).
+
+[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./no-otel.mdx)
+:::

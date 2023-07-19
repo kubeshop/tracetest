@@ -10,11 +10,12 @@ keywords:
   - distributed tracing
   - testing
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+breadcrumb_label: Nothing
 ---
 
 import CodeBlock from '@theme/CodeBlock';
 
-Tracetest is a trace-based testing tool for building integration and end-to-end tests in minutes using your OpenTelemetry traces.
+Tracetest is a trace-based testing tool for building integration and end-to-end tests in minutes using your [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces. Assert against your trace data at every point of a request transaction.
 
 ```mdx-code-block
 import {GettingStartedGuideCardsRow} from '@site/src/components/GettingStartedGuide';
@@ -24,28 +25,30 @@ import {GettingStartedGuideCardsRow} from '@site/src/components/GettingStartedGu
 
 ## Why Tracetest?
 
-Tracetest uses existing [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces to power trace-based testing with assertions against your trace data at every point of a request transaction.
-
-To get started, point Tracetest to your existing [trace data source](./configuration/connecting-to-data-stores/jaeger.md) or [send traces to Tracetest](./configuration/connecting-to-data-stores/opentelemetry-collector.md) directly!
-
-### With Tracetest you can
+You can:
 
 - Define tests and assertions against every single microservice that a trace goes through.
-- Work with your existing distributed tracing solution, allowing you to build tests based on your already instrumented system.
-- Define multiple transaction triggers, such as a GET against an API endpoint, a GRPC request, etc.
-- Define assertions against both the response and trace data, ensuring both your response and the underlying processes worked correctly, quickly, and without errors.
-- Save and run the tests manually or via CI build jobs
-
-New to trace-based testing? Read more about the concepts [here](./concepts/what-is-trace-based-testing).
-
-### Build tests in two ways
+- Define **assertions against** both the **response and trace data**.
+- Ensure both your response and the underlying processes worked correctly, quickly, and without errors.
+- Work with your existing distributed tracing solution.
+- Build tests based on your already instrumented system.
+- Define multiple transaction triggers:
+  - HTTP requests
+  - GRPC requests
+  - trace IDs
+  - and many more...
+- Save and run the tests manually or via CI build jobs.
+- Write detailed trace-based tests as:
+  - End-to-end tests
+  - Integration tests
+- Build tests in minutes
 
 <div className="row">
   <div className="col col--12 margin-bottom--lg">
     <div>
       <div className="card__body">
         <p align="center">
-          <b>Visually, in the Web UI</b>
+          <b>Visually - Build tests in the Web UI</b>
         </p>
       </div>
       <div className="card__footer">
@@ -57,7 +60,7 @@ New to trace-based testing? Read more about the concepts [here](./concepts/what-
     <div>
       <div className="card__body">
         <p align="center">
-          <b>Programmatically, in YAML</b>
+          <b>Programmatically - Build tests in YAML</b>
         </p>
       </div>
       <div className="card__footer">
@@ -106,11 +109,6 @@ Understand how Tracetest works.
 ## Who uses Tracetest?
 
 Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js and Python.
-
-Tracetest enables you to write detailed trace-based tests, primarily:
-
-- End-to-end tests
-- Integration tests
 
 ## What makes Tracetest special?
 
