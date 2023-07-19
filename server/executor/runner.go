@@ -10,7 +10,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
@@ -29,12 +28,7 @@ type RunResult struct {
 	Err error
 }
 
-type Runner interface {
-	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
-}
-
 type PersistentRunner interface {
-	Runner
 	QueueItemProcessor
 }
 

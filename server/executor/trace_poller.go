@@ -56,8 +56,8 @@ type tracePoller struct {
 	pollerExecutor      PollerExecutor
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
-	inputQueue          *Queue
-	outputQueue         *Queue
+	inputQueue          Enqueuer
+	outputQueue         Enqueuer
 }
 
 type PollingRequest struct {
@@ -139,11 +139,11 @@ func (tp tracePoller) isFirstRequest(job Job) bool {
 	return job.EnqueueCount() == 1
 }
 
-func (tp *tracePoller) SetOutputQueue(queue *Queue) {
+func (tp *tracePoller) SetOutputQueue(queue Enqueuer) {
 	tp.outputQueue = queue
 }
 
-func (tp *tracePoller) SetInputQueue(queue *Queue) {
+func (tp *tracePoller) SetInputQueue(queue Enqueuer) {
 	tp.inputQueue = queue
 }
 

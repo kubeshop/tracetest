@@ -88,7 +88,6 @@ func newRunnerFacades(
 	)
 
 	pollerExecutor := executor.NewPollerExecutor(
-		ppRepo,
 		tracer,
 		execTestUpdater,
 		tracedb.Factory(runRepo),
@@ -113,8 +112,6 @@ func newRunnerFacades(
 		tracedb.Factory(runRepo),
 		dsRepo,
 		eventEmitter,
-		ppRepo,
-		trRepo,
 	)
 
 	queueBuilder := executor.NewQueueBuilder(runRepo, testRepo)
