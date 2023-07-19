@@ -12,8 +12,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - run: |
-        wget -qO- https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.0
+        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.0
+        set +x
         tracetest version | grep "CLI: v0.12.0"
+        set -x
         exit $?
   linux:
     name: Linux
@@ -30,10 +32,12 @@ jobs:
         image: ${{matrix.distro}}
         options: -v ${{ github.workspace }}:/app -e GITHUB_SHA
         run: |
+         # certificates for raw.githubusercontent.com are not validated when running from docker for some reason
+         echo insecure >> ~/.curlrc
          case "${{ matrix.distro }}" in
             ubuntu)
               apt-get update -q -y
-              apt-get install -q -y wget curl
+              apt-get install -q -y curl
               ;;
             fedora)
               yum install -y wget curl --refresh
@@ -43,5 +47,5 @@ jobs:
               ;;
           esac
 
-          wget -qO- https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash
           tracetest
