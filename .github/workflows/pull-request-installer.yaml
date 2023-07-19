@@ -6,7 +6,7 @@ on:
 
 jobs:
   custom-version:
-    name: Linux
+    name: Custom Version
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -33,13 +33,13 @@ jobs:
          case "${{ matrix.distro }}" in
             ubuntu)
               apt-get update -q -y
-              apt-get install -q -y wget
+              apt-get install -q -y wget curl
               ;;
             fedora)
-              yum install -y wget --refresh
+              yum install -y wget curl --refresh
               ;;
             alpine)
-              apk add --update wget bash
+              apk add --update wget curl bash
               ;;
           esac
 
