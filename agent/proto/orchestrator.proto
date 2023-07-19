@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "../proto";
+
+// Orchestrator is the piece of software that will orchestrate the work and send
+// requests to the agent
+service Orchestrator {
+    rpc Connect(stream ConnectRequest) returns (stream ConnectResponse) {}
+}
+
+// ConnectRequest is the initial request sent by the agent to the orchestrator
+// it contains all necessary information for authentication and identification
+// of the agent.
+// An established connection is called a "session".
+message ConnectRequest {
+    string apiKey = 1;
+    string name = 2;
+}
+
+// ConnectResponse is the Orchestrator response to the ConnectRequest. It contains
+// configuration that must be used by the agent while working with this Orchestrator.
+message ConnectResponse {
+    SessionConfiguration configuration = 1;
+}
+
+// SessionConfiguration is a set of configuration values that must be used by the agent while
+// communicating with the Orchestrator in the current session.
+message SessionConfiguration {}
