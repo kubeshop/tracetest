@@ -39,7 +39,7 @@ func NewAssertionRunner(
 	}
 }
 
-func (e *defaultAssertionRunner) SetOutputQueue(*Queue) {
+func (e *defaultAssertionRunner) SetOutputQueue(Enqueuer) {
 	// do nothing, this is the last step
 }
 

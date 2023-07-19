@@ -21,7 +21,7 @@ type InitialJobConfigurations struct {
 }
 
 type Enqueuer interface {
-	Enqueue(Job)
+	Enqueue(context.Context, Job)
 }
 
 type QueueItemProcessor interface {

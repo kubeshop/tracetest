@@ -23,7 +23,7 @@ type queueBuilder interface {
 
 type pipelineStep interface {
 	executor.QueueItemProcessor
-	SetOutputQueue(*executor.Queue)
+	SetOutputQueue(executor.Enqueuer)
 }
 
 type PipelineStep struct {

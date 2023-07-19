@@ -86,7 +86,7 @@ type persistentRunner struct {
 	outputQueue         Enqueuer
 }
 
-func (r *persistentRunner) SetOutputQueue(queue *Queue) {
+func (r *persistentRunner) SetOutputQueue(queue Enqueuer) {
 	r.outputQueue = queue
 }
 
