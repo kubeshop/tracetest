@@ -3,21 +3,40 @@ package executor
 import (
 	"context"
 	"fmt"
+	"strconv"
 
-	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/test"
 )
 
+const (
+	jobCountHeader string = "X-Tracetest-Job-Count"
+)
+
 type Job struct {
-	ctxHeaders               map[string]string
-	Test                     test.Test
-	Run                      test.Run
-	InitialJobConfigurations InitialJobConfigurations
+	ctxHeaders     map[string]string
+	Test           test.Test
+	Run            test.Run
+	PollingProfile pollingprofile.PollingProfile
+	DataStore      datastore.DataStore
 }
 
-type InitialJobConfigurations struct {
-	PollingProfileID id.ID
-	DataStoreID      id.ID
+func (j Job) EnqueueCount() int {
+	count := j.ctxHeaders[jobCountHeader]
+	if count == "" {
+		return 1
+	}
+
+	number, _ := strconv.Atoi(count)
+	return number
+}
+
+func (j Job) increaseEnqueueCount() Job {
+	currentCounter := j.EnqueueCount()
+	j.ctxHeaders[jobCountHeader] = fmt.Sprintf("%d", currentCounter+1)
+
+	return j
 }
 
 type Enqueuer interface {
@@ -72,6 +91,8 @@ type QueueDriver interface {
 
 func (r Queue) Enqueue(ctx context.Context, job Job) {
 	// TODO: carry context propagation
+	job = job.increaseEnqueueCount()
+
 	r.driver.Enqueue(Job{
 		ctxHeaders: job.ctxHeaders,
 		Test:       test.Test{ID: job.Test.ID},
@@ -95,10 +116,11 @@ func (r Queue) Listen(job Job) {
 	}
 
 	r.itemProcessor.ProcessItem(ctx, Job{
-		ctxHeaders:               job.ctxHeaders,
-		InitialJobConfigurations: job.InitialJobConfigurations,
-		Test:                     test,
-		Run:                      run,
+		ctxHeaders:     job.ctxHeaders,
+		Test:           test,
+		Run:            run,
+		PollingProfile: job.PollingProfile,
+		DataStore:      job.DataStore,
 	})
 }
 

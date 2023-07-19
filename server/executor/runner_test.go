@@ -163,13 +163,12 @@ func runnerSetup(t *testing.T) runnerFixture {
 		reg,
 		db,
 		executor.NewDBUpdater(db),
-		mtp,
-		tracer,
 		subscription.NewManager(),
 		tracedb.Factory(db),
 		getDataStoreRepositoryMock(t),
 		eventEmitter,
 		defaultProfileGetter{5 * time.Second, 30 * time.Second},
+		defaultTestRunnerGetter{},
 		defaultTestRunnerGetter{},
 	)
 

@@ -460,7 +460,7 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	for i, value := range expectedValues {
 		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
 
-		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(request)
+		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(ctx, request)
 		run = anotherRun // should store a run to use in another iteration
 
 		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
@@ -516,7 +516,6 @@ func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace ti
 	eventEmitter := getEventEmitterMock(t, testDB)
 
 	return executor.NewPollerExecutor(
-		defaultProfileGetter{retryDelay, maxWaitTimeForTrace},
 		tracer,
 		updater,
 		traceDBFactory,

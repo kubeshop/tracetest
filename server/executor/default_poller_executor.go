@@ -18,7 +18,6 @@ import (
 type traceDBFactoryFn func(ds datastore.DataStore) (tracedb.TraceDB, error)
 
 type DefaultPollerExecutor struct {
-	ppGetter     PollingProfileGetter
 	updater      RunUpdater
 	newTraceDBFn traceDBFactoryFn
 	dsRepo       resourcemanager.Current[datastore.DataStore]
@@ -30,11 +29,11 @@ type InstrumentedPollerExecutor struct {
 	pollerExecutor PollerExecutor
 }
 
-func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, test.Run, error) {
+func (pe InstrumentedPollerExecutor) ExecuteRequest(ctx context.Context, request *PollingRequest) (bool, string, test.Run, error) {
 	_, span := pe.tracer.Start(request.Context(), "Fetch trace")
 	defer span.End()
 
-	finished, finishReason, run, err := pe.pollerExecutor.ExecuteRequest(request)
+	finished, finishReason, run, err := pe.pollerExecutor.ExecuteRequest(ctx, request)
 
 	spanCount := 0
 	if run.Trace != nil {
@@ -63,7 +62,6 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(request *PollingRequest) (bo
 }
 
 func NewPollerExecutor(
-	ppGetter PollingProfileGetter,
 	tracer trace.Tracer,
 	updater RunUpdater,
 	newTraceDBFn traceDBFactoryFn,
@@ -72,7 +70,6 @@ func NewPollerExecutor(
 ) PollerExecutor {
 
 	defaultExecutor := &DefaultPollerExecutor{
-		ppGetter:     ppGetter,
 		updater:      updater,
 		newTraceDBFn: newTraceDBFn,
 		dsRepo:       dsRepo,
@@ -99,10 +96,9 @@ func (pe DefaultPollerExecutor) traceDB(ctx context.Context) (tracedb.TraceDB, e
 	return tdb, nil
 }
 
-func (pe DefaultPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, test.Run, error) {
+func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *PollingRequest) (bool, string, test.Run, error) {
 	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
 	run := request.run
-	ctx := request.Context()
 
 	traceDB, err := pe.traceDB(ctx)
 	if err != nil {
@@ -190,12 +186,8 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
-	pp := pe.ppGetter.GetDefault(job.Context())
-	if pp.Periodic == nil {
-		return false, "Polling profile not configured"
-	}
 
-	maxTracePollRetry := pp.Periodic.MaxTracePollRetry()
+	maxTracePollRetry := job.pollingProfile.Periodic.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	if job.count == maxTracePollRetry {
 		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)

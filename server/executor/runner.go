@@ -11,7 +11,6 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
@@ -22,8 +21,6 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -54,8 +51,6 @@ func NewPersistentRunner(
 	newTraceDBFn traceDBFactoryFn,
 	dsRepo resourcemanager.Current[datastore.DataStore],
 	eventEmitter EventEmitter,
-	ppGetter PollingProfileGetter,
-	trGetter TestRunnerGetter,
 ) *persistentRunner {
 	return &persistentRunner{
 		triggers:            triggers,
@@ -66,8 +61,6 @@ func NewPersistentRunner(
 		dsRepo:              dsRepo,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
-		ppGetter:            ppGetter,
-		trGetter:            trGetter,
 	}
 }
 
@@ -80,8 +73,6 @@ type persistentRunner struct {
 	newTraceDBFn        traceDBFactoryFn
 	dsRepo              resourcemanager.Current[datastore.DataStore]
 	eventEmitter        EventEmitter
-	ppGetter            PollingProfileGetter
-	trGetter            TestRunnerGetter
 	inputQueue          Enqueuer
 	outputQueue         Enqueuer
 }
@@ -100,47 +91,6 @@ func (r persistentRunner) handleError(run test.Run, err error) {
 	if err != nil {
 		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
-}
-
-func getNewCtx(ctx context.Context) context.Context {
-	carrier := propagation.MapCarrier{}
-	otel.GetTextMapPropagator().Inject(ctx, carrier)
-
-	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
-}
-
-func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
-	ctx, cancelCtx := context.WithCancel(
-		getNewCtx(ctx),
-	)
-
-	run := test.NewRun()
-	run.Metadata = metadata
-	run.Environment = environment
-
-	// configuring required gates
-	if requiredGates == nil {
-		rg := r.trGetter.GetDefault(ctx).RequiredGates
-		requiredGates = &rg
-	}
-	run = run.ConfigureRequiredGates(*requiredGates)
-
-	run, err := r.runs.CreateRun(ctx, testObj, run)
-	r.handleDBError(run, err)
-
-	r.listenForStopRequests(ctx, cancelCtx, run)
-
-	pipeline.Begin(ctx, Job{
-		ctxHeaders: map[string]string{},
-		InitialJobConfigurations: InitialJobConfigurations{
-			DataStoreID:      datastore.DataStoreSingleID,
-			PollingProfileID: pollingprofile.DefaultPollingProfile.ID,
-		},
-		Test: testObj,
-		Run:  run,
-	})
-
-	return run
 }
 
 func (r persistentRunner) traceDB(ctx context.Context) (tracedb.TraceDB, error) {
@@ -261,7 +211,7 @@ func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
 
 	ctx, pollingSpan := r.tracer.Start(ctx, "Start Polling trace")
 	defer pollingSpan.End()
-	r.outputQueue.Enqueue(job)
+	r.outputQueue.Enqueue(ctx, job)
 }
 
 func (r persistentRunner) handleExecutionResult(run test.Run, response triggerer.Response, err error) test.Run {

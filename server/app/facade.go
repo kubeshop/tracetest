@@ -99,9 +99,7 @@ func newRunnerFacades(
 	pollerExecutor = executor.NewSelectorBasedPoller(pollerExecutor, eventEmitter)
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
-		ppRepo,
 		execTestUpdater,
-		linterRunner,
 		subscriptionManager,
 		eventEmitter,
 	)
@@ -122,14 +120,14 @@ func newRunnerFacades(
 	queueBuilder := executor.NewQueueBuilder(runRepo, testRepo)
 	pipeline := NewPipeline(queueBuilder,
 		PipelineStep{processor: runner, driver: executor.NewInMemoryQueueDriver()},
-		PipelineStep{processor: pollerExecutor, driver: executor.NewInMemoryQueueDriver()},
+		PipelineStep{processor: tracePoller, driver: executor.NewInMemoryQueueDriver()},
 		PipelineStep{processor: linterRunner, driver: executor.NewInMemoryQueueDriver()},
 		PipelineStep{processor: assertionRunner, driver: executor.NewInMemoryQueueDriver()},
 	)
 
 	pipeline.Start()
 
-	testPipeline := NewTestPipeline(pipeline, runRepo, trRepo)
+	testPipeline := NewTestPipeline(pipeline, runRepo, trRepo, ppRepo, dsRepo)
 
 	transactionRunner := executor.NewTransactionRunner(
 		runner,

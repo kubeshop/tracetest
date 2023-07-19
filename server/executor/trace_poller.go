@@ -30,32 +30,22 @@ type PersistentTracePoller interface {
 }
 
 type PollerExecutor interface {
-	ExecuteRequest(*PollingRequest) (bool, string, test.Run, error)
+	ExecuteRequest(context.Context, *PollingRequest) (bool, string, test.Run, error)
 }
 
 type TraceFetcher interface {
 	GetTraceByID(ctx context.Context, traceID string) (*v1.TracesData, error)
 }
 
-type PollingProfileGetter interface {
-	GetDefault(ctx context.Context) pollingprofile.PollingProfile
-}
-
 func NewTracePoller(
 	pe PollerExecutor,
-	ppGetter PollingProfileGetter,
 	updater RunUpdater,
-	linterRunner LinterRunner,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
-) PersistentTracePoller {
-	return tracePoller{
+) *tracePoller {
+	return &tracePoller{
 		updater:             updater,
-		ppGetter:            ppGetter,
 		pollerExecutor:      pe,
-		executeQueue:        make(chan PollingRequest, 5),
-		exit:                make(chan bool, 1),
-		linterRunner:        linterRunner,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
 	}
@@ -63,14 +53,11 @@ func NewTracePoller(
 
 type tracePoller struct {
 	updater             RunUpdater
-	ppGetter            PollingProfileGetter
 	pollerExecutor      PollerExecutor
-	linterRunner        LinterRunner
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
-
-	executeQueue chan PollingRequest
-	exit         chan bool
+	inputQueue          *Queue
+	outputQueue         *Queue
 }
 
 type PollingRequest struct {
@@ -144,43 +131,23 @@ func (tp tracePoller) handleDBError(err error) {
 	}
 }
 
-func (tp tracePoller) Start(workers int) {
-	for i := 0; i < workers; i++ {
-		go func() {
-			fmt.Println("tracePoller start goroutine")
-			for {
-				select {
-				case <-tp.exit:
-					fmt.Println("tracePoller exit goroutine")
-					return
-				case job := <-tp.executeQueue:
-					log.Printf("[TracePoller] Test %s Run %d: Received job\n", job.test.ID, job.run.ID)
-					tp.processJob(job)
-				}
-			}
-		}()
-	}
+func (tp tracePoller) enqueueJob(ctx context.Context, job Job) {
+	tp.inputQueue.Enqueue(ctx, job)
 }
 
-func (tp tracePoller) Stop() {
-	fmt.Println("tracePoller stopping")
-	tp.exit <- true
+func (tp tracePoller) isFirstRequest(job Job) bool {
+	return job.EnqueueCount() == 1
 }
 
-func (tp tracePoller) Poll(ctx context.Context, test test.Test, run test.Run, pollingProfile pollingprofile.PollingProfile) {
-	log.Printf("[TracePoller] Test %s Run %d: Poll\n", test.ID, run.ID)
-
-	job := NewPollingRequest(ctx, test, run, PollingRequestStartIteration, pollingProfile)
-
-	tp.enqueueJob(*job)
+func (tp *tracePoller) SetOutputQueue(queue *Queue) {
+	tp.outputQueue = queue
 }
 
-func (tp tracePoller) enqueueJob(job PollingRequest) {
-	tp.executeQueue <- job
+func (tp *tracePoller) SetInputQueue(queue *Queue) {
+	tp.inputQueue = queue
 }
 
-func (tp tracePoller) processJob(job PollingRequest) {
-	ctx := job.Context()
+func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
 	select {
 	default:
 	case <-ctx.Done():
@@ -188,29 +155,37 @@ func (tp tracePoller) processJob(job PollingRequest) {
 		return
 	}
 
-	if job.IsFirstRequest() {
-		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.test.ID, job.run.ID))
+	if tp.isFirstRequest(job) {
+		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 		if err != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.test.ID, job.run.ID, err.Error())
+			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.Test.ID, job.Run.ID, err.Error())
 		}
 	}
 
-	fmt.Println("tracePoller processJob", job.count)
+	fmt.Println("tracePoller processJob", job.EnqueueCount())
 
-	finished, finishReason, run, err := tp.pollerExecutor.ExecuteRequest(&job)
+	pollingRequest := PollingRequest{
+		test:           job.Test,
+		run:            job.Run,
+		pollingProfile: job.PollingProfile,
+		count:          job.EnqueueCount(),
+		headers:        job.ctxHeaders,
+	}
+
+	finished, finishReason, run, err := tp.pollerExecutor.ExecuteRequest(ctx, &pollingRequest)
 	if err != nil {
-		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.test.ID, job.run.ID, err.Error())
-		jobFailed, reason := tp.handleTraceDBError(job, err)
+		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.Test.ID, job.Run.ID, err.Error())
+		jobFailed, reason := tp.handleTraceDBError(ctx, job, err)
 
 		if jobFailed {
-			anotherErr := tp.eventEmitter.Emit(ctx, events.TracePollingError(job.test.ID, job.run.ID, reason, err))
+			anotherErr := tp.eventEmitter.Emit(ctx, events.TracePollingError(job.Test.ID, job.Run.ID, reason, err))
 			if anotherErr != nil {
-				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
+				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.Test.ID, job.Run.ID, err.Error())
 			}
 
-			anotherErr = tp.eventEmitter.Emit(ctx, events.TraceFetchingError(job.test.ID, job.run.ID, err))
+			anotherErr = tp.eventEmitter.Emit(ctx, events.TraceFetchingError(job.Test.ID, job.Run.ID, err))
 			if anotherErr != nil {
-				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.test.ID, job.run.ID, err.Error())
+				log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.Test.ID, job.Run.ID, err.Error())
 			}
 		}
 
@@ -218,55 +193,40 @@ func (tp tracePoller) processJob(job PollingRequest) {
 	}
 
 	if !finished {
-		job.count += 1
-		tp.requeue(job)
+		tp.requeue(ctx, job)
 		return
 	}
 
-	err = tp.eventEmitter.Emit(ctx, events.TracePollingSuccess(job.test.ID, job.run.ID, finishReason))
+	err = tp.eventEmitter.Emit(ctx, events.TracePollingSuccess(job.Test.ID, job.Run.ID, finishReason))
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", job.test.ID, job.run.ID, err.Error())
+		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", job.Test.ID, job.Run.ID, err.Error())
 	}
 
-	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.test.ID, job.run.ID, finishReason, job.count+1, len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, finishReason, job.EnqueueCount(), len(run.Trace.Flat))
 
-	err = tp.eventEmitter.Emit(ctx, events.TraceFetchingSuccess(job.test.ID, job.run.ID))
+	err = tp.eventEmitter.Emit(ctx, events.TraceFetchingSuccess(job.Test.ID, job.Run.ID))
 	if err != nil {
-		log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingSuccess event: %s \n", job.test.ID, job.run.ID, err.Error())
+		log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingSuccess event: %s \n", job.Test.ID, job.Run.ID, err.Error())
 	}
 
 	tp.handleDBError(tp.updater.Update(ctx, run))
-
-	job.run = run
-	tp.runAssertions(job)
+	tp.outputQueue.Enqueue(ctx, job)
 }
 
-func (tp tracePoller) runAssertions(job PollingRequest) {
-	linterRequest := LinterRequest{
-		Test: job.test,
-		Run:  job.run,
-	}
+func (tp tracePoller) handleTraceDBError(ctx context.Context, job Job, err error) (bool, string) {
+	run := job.Run
 
-	tp.linterRunner.RunLinter(job.Context(), linterRequest)
-}
-
-func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, string) {
-	run := job.run
-	ctx := job.Context()
-
-	profile := tp.ppGetter.GetDefault(ctx)
-	if profile.Periodic == nil {
+	if job.PollingProfile.Periodic == nil {
 		log.Println("[TracePoller] cannot get polling profile.")
 		return true, "Cannot get polling profile"
 	}
 
-	pp := *profile.Periodic
+	pp := *job.PollingProfile.Periodic
 
 	// Edge case: the trace still not avaiable on Data Store during polling
 	if errors.Is(err, connection.ErrTraceNotFound) && time.Since(run.ServiceTriggeredAt) < pp.TimeoutDuration() {
 		log.Println("[TracePoller] Trace not found on Data Store yet. Requeuing...")
-		job.count += 1
-		tp.requeue(job)
+		tp.requeue(ctx, job)
 		return false, "Trace not found" // job without fail
 	}
 
@@ -300,14 +260,11 @@ func (tp tracePoller) handleTraceDBError(job PollingRequest, err error) (bool, s
 	return true, reason // job failed
 }
 
-func (tp tracePoller) requeue(job PollingRequest) {
+func (tp tracePoller) requeue(ctx context.Context, job Job) {
 	go func() {
-		pp := tp.ppGetter.GetDefault(job.Context())
-		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.run.ID, job.count)
-		time.Sleep(pp.Periodic.RetryDelayDuration())
+		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.Run.ID, job.EnqueueCount())
+		time.Sleep(job.PollingProfile.Periodic.RetryDelayDuration())
 
-		job.SetHeaderBool("requeued", true)
-		job.pollingProfile = pp
-		tp.enqueueJob(job)
+		tp.enqueueJob(ctx, job)
 	}()
 }

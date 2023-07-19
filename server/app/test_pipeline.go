@@ -16,21 +16,35 @@ type TestPipeline struct {
 	pipeline *Pipeline
 	runs     test.RunRepository
 	trGetter TestRunnerGetter
+	ppGetter PollingProfileGetter
+	dsGetter DataStoreGetter
 }
 
 type TestRunnerGetter interface {
 	GetDefault(ctx context.Context) testrunner.TestRunner
 }
 
+type PollingProfileGetter interface {
+	GetDefault(ctx context.Context) pollingprofile.PollingProfile
+}
+
+type DataStoreGetter interface {
+	GetCurrent(ctx context.Context) (datastore.DataStore, error)
+}
+
 func NewTestPipeline(
 	pipeline *Pipeline,
 	runs test.RunRepository,
 	trGetter TestRunnerGetter,
+	ppGetter PollingProfileGetter,
+	dsGetter DataStoreGetter,
 ) *TestPipeline {
 	return &TestPipeline{
 		pipeline: pipeline,
 		runs:     runs,
 		trGetter: trGetter,
+		ppGetter: ppGetter,
+		dsGetter: dsGetter,
 	}
 }
 
@@ -51,13 +65,14 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 
 	// r.listenForStopRequests(ctx, cancelCtx, run)
 
+	datastore, err := p.dsGetter.GetCurrent(ctx)
+	p.handleDBError(run, err)
+
 	p.pipeline.Begin(ctx, executor.Job{
-		InitialJobConfigurations: executor.InitialJobConfigurations{
-			DataStoreID:      datastore.DataStoreSingleID,
-			PollingProfileID: pollingprofile.DefaultPollingProfile.ID,
-		},
-		Test: testObj,
-		Run:  run,
+		Test:           testObj,
+		Run:            run,
+		PollingProfile: p.ppGetter.GetDefault(ctx),
+		DataStore:      datastore,
 	})
 
 	return run

@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
@@ -22,8 +23,8 @@ func NewSelectorBasedPoller(innerPoller PollerExecutor, eventEmitter EventEmitte
 	return selectorBasedPollerExecutor{innerPoller, eventEmitter}
 }
 
-func (pe selectorBasedPollerExecutor) ExecuteRequest(request *PollingRequest) (bool, string, test.Run, error) {
-	ready, reason, run, err := pe.pollerExecutor.ExecuteRequest(request)
+func (pe selectorBasedPollerExecutor) ExecuteRequest(ctx context.Context, request *PollingRequest) (bool, string, test.Run, error) {
+	ready, reason, run, err := pe.pollerExecutor.ExecuteRequest(ctx, request)
 	if !ready {
 		request.SetHeaderInt(selectorBasedPollerExecutorRetryHeader, 0)
 		return ready, reason, run, err

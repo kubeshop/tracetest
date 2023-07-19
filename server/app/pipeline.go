@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/kubeshop/tracetest/server/executor"
 )
@@ -24,6 +25,10 @@ type queueBuilder interface {
 type pipelineStep interface {
 	executor.QueueItemProcessor
 	SetOutputQueue(executor.Enqueuer)
+}
+
+type InputQueueSetter interface {
+	SetInputQueue(*executor.Queue)
 }
 
 type PipelineStep struct {
@@ -50,6 +55,12 @@ func NewPipeline(builder queueBuilder, steps ...PipelineStep) *Pipeline {
 		}
 
 		step.processor.SetOutputQueue(pipeline.queues[i+1])
+
+		// a processor might need to have a reference to its input queue, to requeue items for example.
+		// This can be done if it implements the `InputQueueSetter` interace
+		if setter, ok := reflect.ValueOf(step.processor).Interface().(InputQueueSetter); ok {
+			setter.SetInputQueue(pipeline.queues[i])
+		}
 	}
 
 	return pipeline
