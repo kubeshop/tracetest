@@ -1,8 +1,8 @@
 name: Installer Pull Request
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
 
 jobs:
   custom-version:
