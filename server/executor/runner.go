@@ -56,9 +56,8 @@ func NewPersistentRunner(
 	eventEmitter EventEmitter,
 	ppGetter PollingProfileGetter,
 	trGetter TestRunnerGetter,
-	outputQueue Enqueuer,
-) PersistentRunner {
-	return persistentRunner{
+) *persistentRunner {
+	return &persistentRunner{
 		triggers:            triggers,
 		runs:                runs,
 		updater:             updater,
@@ -69,7 +68,6 @@ func NewPersistentRunner(
 		eventEmitter:        eventEmitter,
 		ppGetter:            ppGetter,
 		trGetter:            trGetter,
-		outputQueue:         outputQueue,
 	}
 }
 
@@ -88,12 +86,8 @@ type persistentRunner struct {
 	outputQueue         Enqueuer
 }
 
-type RunRequest struct {
-	ctx      context.Context
-	test     test.Test
-	run      test.Run
-	Headers  propagation.MapCarrier
-	executor expression.Executor
+func (r *persistentRunner) SetOutputQueue(queue *Queue) {
+	r.outputQueue = queue
 }
 
 func (r persistentRunner) handleDBError(run test.Run, err error) {
@@ -136,11 +130,11 @@ func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata t
 
 	r.listenForStopRequests(ctx, cancelCtx, run)
 
-	r.inputQueue.Enqueue(Job{
+	pipeline.Begin(ctx, Job{
 		ctxHeaders: map[string]string{},
-		initialJobConfigurations: initialJobConfigurations{
-			dataStoreID:      datastore.DataStoreSingleID,
-			pollingProfileID: pollingprofile.DefaultPollingProfile.ID,
+		InitialJobConfigurations: InitialJobConfigurations{
+			DataStoreID:      datastore.DataStoreSingleID,
+			PollingProfileID: pollingprofile.DefaultPollingProfile.ID,
 		},
 		Test: testObj,
 		Run:  run,

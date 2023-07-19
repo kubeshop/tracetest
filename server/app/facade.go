@@ -21,7 +21,7 @@ import (
 
 type runnerFacade struct {
 	sm                *subscription.Manager
-	runner            executor.PersistentRunner
+	testsPipeline     *TestPipeline
 	transactionRunner executor.PersistentTransactionRunner
 	assertionRunner   executor.AssertionRunner
 	tracePoller       executor.PersistentTracePoller
@@ -40,8 +40,8 @@ func (rf runnerFacade) StopTest(testID id.ID, runID int) {
 	})
 }
 
-func (rf runnerFacade) RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run {
-	return rf.runner.Run(ctx, test, rm, env, gates)
+func (rf runnerFacade) RunTest(ctx context.Context, testObj test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run {
+	return rf.testsPipeline.Run(ctx, testObj, rm, env, gates)
 }
 
 func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun {
@@ -107,14 +107,6 @@ func newRunnerFacades(
 		eventEmitter,
 	)
 
-	pollerQueueDriver := executor.NewInMemoryQueueDriver()
-	pollerQueue := executor.NewQueue(
-		runRepo,
-		testRepo,
-		pollerQueueDriver,
-		pollerExecutor,
-	)
-
 	runner := executor.NewPersistentRunner(
 		triggerRegistry,
 		runRepo,
@@ -126,16 +118,17 @@ func newRunnerFacades(
 		eventEmitter,
 		ppRepo,
 		trRepo,
-		pollerQueue, //input queue
 	)
 
-	testRunnerQueueDriver := executor.NewInMemoryQueueDriver()
-	testRunnerQueue := executor.NewQueue(
-		runRepo,
-		testRepo,
-		testRunnerQueueDriver,
-		runner,
+	queueBuilder := executor.NewQueueBuilder(runRepo, testRepo)
+	pipeline := NewPipeline(queueBuilder,
+		PipelineStep{processor: runner, driver: executor.NewInMemoryQueueDriver()},
+		PipelineStep{processor: pollerExecutor, driver: executor.NewInMemoryQueueDriver()},
 	)
+
+	pipeline.Start()
+
+	testPipeline := NewTestPipeline(pipeline, runRepo, trRepo)
 
 	transactionRunner := executor.NewTransactionRunner(
 		runner,
@@ -146,7 +139,7 @@ func newRunnerFacades(
 
 	return &runnerFacade{
 		sm:                subscriptionManager,
-		runner:            runner,
+		testsPipeline:     testPipeline,
 		transactionRunner: transactionRunner,
 		assertionRunner:   assertionRunner,
 		tracePoller:       tracePoller,

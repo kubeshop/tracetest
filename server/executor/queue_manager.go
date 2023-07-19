@@ -9,17 +9,15 @@ import (
 )
 
 type Job struct {
-	ctxHeaders map[string]string
-	Test       test.Test
-	Run        test.Run
-	// TestID                   id.ID
-	// RunID                    int
-	initialJobConfigurations initialJobConfigurations
+	ctxHeaders               map[string]string
+	Test                     test.Test
+	Run                      test.Run
+	InitialJobConfigurations InitialJobConfigurations
 }
 
-type initialJobConfigurations struct {
-	pollingProfileID id.ID
-	dataStoreID      id.ID
+type InitialJobConfigurations struct {
+	PollingProfileID id.ID
+	DataStoreID      id.ID
 }
 
 type Enqueuer interface {
@@ -34,29 +32,46 @@ type Queue struct {
 	runs          test.RunRepository
 	tests         test.Repository
 	itemProcessor QueueItemProcessor
-	driver        queueDriver
+	driver        QueueDriver
 }
 
-func NewQueue(runs test.RunRepository, tests test.Repository, driver queueDriver, itemProcessor QueueItemProcessor) *Queue {
-	q := &Queue{
-		runs:          runs,
-		tests:         tests,
-		itemProcessor: itemProcessor,
+type QueueBuilder struct {
+	runs  test.RunRepository
+	tests test.Repository
+}
+
+func NewQueueBuilder(runs test.RunRepository, tests test.Repository) *QueueBuilder {
+	return &QueueBuilder{
+		runs,
+		tests,
+	}
+}
+
+func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcessor) *Queue {
+	queue := &Queue{
+		runs:          qb.runs,
+		tests:         qb.tests,
 		driver:        driver,
+		itemProcessor: itemProcessor,
 	}
 
-	driver.SetQueue(q)
+	driver.SetQueue(queue)
 
-	return q
-
+	return queue
 }
 
-type queueDriver interface {
+func (q *Queue) SetDriver(driver QueueDriver) {
+	q.driver = driver
+	driver.SetQueue(q)
+}
+
+type QueueDriver interface {
 	Enqueue(Job)
 	SetQueue(*Queue)
 }
 
-func (r Queue) Enqueue(job Job) {
+func (r Queue) Enqueue(ctx context.Context, job Job) {
+	// TODO: carry context propagation
 	r.driver.Enqueue(Job{
 		ctxHeaders: job.ctxHeaders,
 		Test:       test.Test{ID: job.Test.ID},
@@ -81,7 +96,7 @@ func (r Queue) Listen(job Job) {
 
 	r.itemProcessor.ProcessItem(ctx, Job{
 		ctxHeaders:               job.ctxHeaders,
-		initialJobConfigurations: job.initialJobConfigurations,
+		InitialJobConfigurations: job.InitialJobConfigurations,
 		Test:                     test,
 		Run:                      run,
 	})
@@ -108,8 +123,8 @@ func (r InMemoryQueueDriver) Enqueue(job Job) {
 	r.queue <- job
 }
 
-func (r InMemoryQueueDriver) Start(workers int) {
-	for i := 0; i < workers; i++ {
+func (r InMemoryQueueDriver) Start() {
+	for i := 0; i < 5; i++ {
 		go func() {
 			fmt.Println("persistentRunner start goroutine")
 			for {
