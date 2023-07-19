@@ -12,7 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - run: |
-        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.0
+        wget -qO- https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.0
         tracetest version | grep "CLI: v0.12.0"
         exit $?
   linux:
@@ -33,15 +33,15 @@ jobs:
          case "${{ matrix.distro }}" in
             ubuntu)
               apt-get update -q -y
-              apt-get install -q -y curl
+              apt-get install -q -y wget
               ;;
             fedora)
-              yum install -y curl --refresh
+              yum install -y wget --refresh
               ;;
             alpine)
-              apk add --update curl bash
+              apk add --update wget bash
               ;;
           esac
 
-          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash
+          wget -qO- https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash
           tracetest
