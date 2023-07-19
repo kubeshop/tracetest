@@ -14,7 +14,7 @@ jobs:
     - run: |
         curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.0
         set +e
-        tracetest version  > /tmp/version 2&>1
+        tracetest version  > /tmp/version 2>&1
         cat /tmp/version
         cat /tmp/version | grep "CLI: v0.12.0"
         exit $?

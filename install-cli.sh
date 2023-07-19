@@ -130,12 +130,11 @@ install_brew() {
 }
 
 run() {
+  ensure_dependency_exist "uname"
   if [ ! -z "$version" ]; then
     echo "Installing version $version"
     install_tar
-  fi
-  ensure_dependency_exist "uname"
-  if cmd_exists brew; then
+  elif cmd_exists brew; then
     install_brew
   elif cmd_exists apt-get; then
     install_apt
