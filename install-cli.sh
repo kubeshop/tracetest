@@ -1,5 +1,7 @@
 #!/bin/sh
 
+version=$1
+
 cmd_exists() {
   command -v $1 &> /dev/null
 }
@@ -12,6 +14,11 @@ ensure_dependency_exist() {
 }
 
 get_latest_version() {
+  if [[ -n "$version" ]]; then
+    echo $version
+    exit 0
+  fi
+
   ensure_dependency_exist "curl"
 
   curl --silent "https://api.github.com/repos/kubeshop/tracetest/releases/latest" |
@@ -52,7 +59,6 @@ get_download_link() {
   raw_version=`echo $version | sed 's/v//'`
   pkg=$1
 
-  if [[ "$(get_os)" = "darwin" ]]; then arch="all";fi
 
   echo "https://github.com/kubeshop/tracetest/releases/download/${version}/tracetest_${raw_version}_${os}_${arch}.${pkg}"
 }
@@ -125,7 +131,10 @@ install_brew() {
 
 run() {
   ensure_dependency_exist "uname"
-  if cmd_exists brew; then
+  if [ ! -z "$version" ]; then
+    echo "Installing version $version"
+    install_tar
+  elif cmd_exists brew; then
     install_brew
   elif cmd_exists apt-get; then
     install_apt
