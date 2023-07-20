@@ -1,14 +1,16 @@
 # Detailed Instructions on Installing Tracetest Using the CLI
 
-Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
+This page contains detailed instructions for all installation options the Tracetest CLI provides.
 
-:::note
-To read about installing the Tracetest CLI, view the [CLI installation reference](./cli-installation-reference.md).
-:::
+Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
 
 This page provides a step-by-step guide to install Tracetest using the Tracetest CLI.
 
 ## Prerequisites
+
+:::info
+Make sure you have the Tracetest CLI installed. Read the installation reference [here](../cli/cli-installation-reference.md).
+:::
 
 :::info
 Make sure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/), or [Kubernetes](https://kubernetes.io/) installed.
@@ -232,7 +234,7 @@ SUCCESS  Install successful!
 
 To access tracetest:
 
-	kubectl --kubeconfig ${HOME}/.kube/config --context kind-kind --namespace tracetest port-forward svc/tracetest 11633
+	kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633
 
 Then, use your browser to navigate to:
 
@@ -244,7 +246,7 @@ Happy TraceTesting =)
 ### 5. Port forward the Tracetest service
 
 ```bash
-kubectl --kubeconfig ${HOME}/.kube/config --context kind-kind --namespace tracetest port-forward svc/tracetest 11633
+kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633
 ```
 
 ```bash title="Expected output..."

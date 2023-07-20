@@ -1,0 +1,117 @@
+---
+id: index
+title: Welcome to Tracetest Docs! 👋
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+breadcrumb_label: Nothing
+---
+
+import CodeBlock from '@theme/CodeBlock';
+
+Tracetest is a trace-based testing tool for building integration and end-to-end tests in minutes using your [OpenTelemetry](https://opentelemetry.io/docs/getting-started/) traces. Assert against your trace data at every point of a request transaction.
+
+```mdx-code-block
+import {GettingStartedGuideCardsRow} from '@site/src/components/GettingStartedGuide';
+
+<GettingStartedGuideCardsRow />
+```
+
+## Why Tracetest?
+
+You can:
+
+- Define tests and assertions against every single microservice that a trace goes through.
+- Define **assertions against** both the **response and trace data**.
+- Ensure both your response and the underlying processes worked correctly, quickly, and without errors.
+- Work with your existing distributed tracing solution.
+- Build tests based on your already instrumented system.
+- Define multiple transaction triggers:
+  - HTTP requests
+  - GRPC requests
+  - trace IDs
+  - and many more...
+- Save and run the tests manually or via CI build jobs.
+- Write detailed trace-based tests as:
+  - End-to-end tests
+  - Integration tests
+- Build tests in minutes.
+
+<div className="row">
+  <div className="col col--12 margin-bottom--lg">
+    <div>
+      <div className="card__body">
+        <p align="center">
+          <b>Visually - Build tests in the Web UI</b>
+        </p>
+      </div>
+      <div className="card__footer">
+        <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png" />
+      </div>
+    </div>
+  </div>
+  <div className="col col--12 margin-bottom--lg">
+    <div>
+      <div className="card__body">
+        <p align="center">
+          <b>Programmatically - Build tests in YAML</b>
+        </p>
+      </div>
+      <div className="card__footer">
+        <CodeBlock
+          language="yaml"
+        >
+        {`
+    type: Test
+    spec:
+      id: Yg9sN-94g
+      name: Pokeshop - Import
+      description: Import a Pokemon
+      trigger:
+        type: http
+        httpRequest:
+          url: http://demo-api:8081/pokemon/import
+          method: POST
+          headers:
+          - key: Content-Type
+            value: application/json
+          body: '{"id":52}'
+      specs:
+      - name: 'All Database Spans: Processing time is less than 100ms'
+        selector: span[tracetest.span.type="database"]
+        assertions:
+        - attr:tracetest.span.duration < 100ms
+        `}
+        </CodeBlock> 
+      </div>
+    </div>
+  </div>
+</div>
+
+## Architecture
+
+Understand how Tracetest works.
+
+1. Trigger a test and generate a trace response.
+2. Fetch traces to render and analyze them.
+3. Add assertions to traces.
+4. See test results.
+5. Run tests as part of CI/CD pipelines.
+
+![Marketechture](https://res.cloudinary.com/djwdcmwdz/image/upload/v1686654113/docs/tracetest-marketechture-jun12-v3_ffj2e2.png)
+
+## Who uses Tracetest?
+
+Our users are typically developers or QA engineers building distributed systems with microservices using back-end languages like Go, Rust, Node.js and Python.
+
+## What makes Tracetest special?
+
+Tracetest can be compared with Cypress or Selenium; however Tracetest is fundamentally different.
+
+Cypress and Selenium are constrained by using the browser for testing. Tracetest bypasses this entirely by using your existing OpenTelemetry instrumentation and trace data to run tests and assertions against traces in every step of a request transaction.

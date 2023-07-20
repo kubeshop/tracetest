@@ -214,15 +214,14 @@ const sidebars = {
 
   tutorialSidebar: [
     {
+      type: "doc",
+      id: "index",
+      label: "Welcome! 👋",
+    },
+    {
       type: "category",
       label: "Getting Started",
-      collapsed: false,
       items: [
-        {
-          type: "doc",
-          id: "index",
-          label: "Introduction",
-        },
         {
           type: "doc",
           id: "getting-started/installation",
@@ -237,16 +236,6 @@ const sidebars = {
           type: "doc",
           id: "getting-started/no-otel",
           label: "What if I don't have OpenTelemetry installed?",
-        },
-        {
-          type: "doc",
-          id: "getting-started/cli-installation-reference",
-          label: "CLI Installation Reference",
-        },
-        {
-          type: "doc",
-          id: "getting-started/detailed-installation",
-          label: "Detailed Server Installation",
         },
       ],
     },
@@ -610,6 +599,11 @@ const sidebars = {
       type: "category",
       label: "CLI",
       items: [
+        {
+          type: "doc",
+          id: "cli/cli-installation-reference",
+          label: "CLI Installation Reference",
+        },
         {
           type: "doc",
           id: "cli/configuring-your-cli",
