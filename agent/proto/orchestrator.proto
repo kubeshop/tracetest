@@ -6,7 +6,11 @@ option go_package = "github.com/kubeshop/tracetest/agent/proto";
 // Orchestrator is the piece of software that will orchestrate the work and send
 // requests to the agent
 service Orchestrator {
+    // Connects an agent and returns the configuration that must be used by that agent
     rpc Connect(ConnectRequest) returns (ConnectResponse) {}
+
+    // Register an agent as a trigger agent, once connected, the server will be able to send
+    // multiple trigger requests to the agent.
     rpc RegisterTriggerAgent(ConnectRequest) returns (stream TriggerRequest) {}
 }
 
