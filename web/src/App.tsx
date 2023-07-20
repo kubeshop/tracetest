@@ -6,7 +6,7 @@ import {theme} from 'constants/Theme.constants';
 import SettingsValuesProvider from 'providers/SettingsValues';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
 import {ThemeProvider} from 'styled-components';
-import './App.less';
+import './App.css';
 
 const App = () => {
   return (

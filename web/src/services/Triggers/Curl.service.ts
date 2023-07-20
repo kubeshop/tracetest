@@ -5,9 +5,32 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import HttpRequest from 'models/HttpRequest.model';
 
 class CURLParser {
-  constructor(command: string) {}
+  command: string;
 
-  parse(): any {}
+  constructor(command: string) {
+    this.command = command;
+  }
+
+  parse(): any {
+    const {command} = this;
+    const parser = new CURLParser(command);
+    const {
+      url = '',
+      method,
+      headers = [],
+      body: {data: body = {}},
+    } = parser.parse();
+
+    return {
+      url: url.split('')[0] === "'" ? url.slice(1, -1) : url,
+      auth: undefined,
+      command,
+      method: method as HTTP_METHOD,
+      headers: Object.entries(headers).map(([key, value]) => ({key, value})),
+      body: body === 'data' ? '' : JSON.stringify(body),
+      sslVerification: false,
+    };
+  }
 }
 
 interface ICurlTriggerService extends ITriggerService {
