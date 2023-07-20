@@ -9,14 +9,22 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func Connect(ctx context.Context, endpoint string) (*Client, error) {
+func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, error) {
 	conn, err := connect(ctx, endpoint)
 	if err != nil {
 		return nil, err
 	}
 
 	client := &Client{conn: conn}
-	client.start()
+	for _, opt := range opts {
+		opt(client)
+	}
+
+	err = client.start(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not start client: %w", err)
+	}
+
 	return client, nil
 }
 

@@ -6,7 +6,7 @@ option go_package = "../proto";
 // Orchestrator is the piece of software that will orchestrate the work and send
 // requests to the agent
 service Orchestrator {
-    rpc Connect(stream ConnectRequest) returns (stream ConnectResponse) {}
+    rpc Connect(ConnectRequest) returns (ConnectResponse) {}
 }
 
 // ConnectRequest is the initial request sent by the agent to the orchestrator
@@ -26,4 +26,7 @@ message ConnectResponse {
 
 // SessionConfiguration is a set of configuration values that must be used by the agent while
 // communicating with the Orchestrator in the current session.
-message SessionConfiguration {}
+message SessionConfiguration {
+    // Milliseconds to wait for spans before sending batch
+    int32 BatchTimeout = 1;
+}
