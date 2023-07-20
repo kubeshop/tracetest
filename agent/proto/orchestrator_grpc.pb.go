@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Orchestrator_Connect_FullMethodName              = "/proto.Orchestrator/Connect"
 	Orchestrator_RegisterTriggerAgent_FullMethodName = "/proto.Orchestrator/RegisterTriggerAgent"
+	Orchestrator_SendTriggerResult_FullMethodName    = "/proto.Orchestrator/SendTriggerResult"
 )
 
 // OrchestratorClient is the client API for Orchestrator service.
@@ -32,6 +33,8 @@ type OrchestratorClient interface {
 	// Register an agent as a trigger agent, once connected, the server will be able to send
 	// multiple trigger requests to the agent.
 	RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
+	// Sends the trigger result back to the server
+	SendTriggerResult(ctx context.Context, in *TriggerResponse, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type orchestratorClient struct {
@@ -83,6 +86,15 @@ func (x *orchestratorRegisterTriggerAgentClient) Recv() (*TriggerRequest, error)
 	return m, nil
 }
 
+func (c *orchestratorClient) SendTriggerResult(ctx context.Context, in *TriggerResponse, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Orchestrator_SendTriggerResult_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
@@ -92,6 +104,8 @@ type OrchestratorServer interface {
 	// Register an agent as a trigger agent, once connected, the server will be able to send
 	// multiple trigger requests to the agent.
 	RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error
+	// Sends the trigger result back to the server
+	SendTriggerResult(context.Context, *TriggerResponse) (*Empty, error)
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -104,6 +118,9 @@ func (UnimplementedOrchestratorServer) Connect(context.Context, *ConnectRequest)
 }
 func (UnimplementedOrchestratorServer) RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error {
 	return status.Errorf(codes.Unimplemented, "method RegisterTriggerAgent not implemented")
+}
+func (UnimplementedOrchestratorServer) SendTriggerResult(context.Context, *TriggerResponse) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendTriggerResult not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -157,6 +174,24 @@ func (x *orchestratorRegisterTriggerAgentServer) Send(m *TriggerRequest) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Orchestrator_SendTriggerResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TriggerResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrchestratorServer).SendTriggerResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Orchestrator_SendTriggerResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrchestratorServer).SendTriggerResult(ctx, req.(*TriggerResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -167,6 +202,10 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Connect",
 			Handler:    _Orchestrator_Connect_Handler,
+		},
+		{
+			MethodName: "SendTriggerResult",
+			Handler:    _Orchestrator_SendTriggerResult_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

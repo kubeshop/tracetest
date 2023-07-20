@@ -62,10 +62,10 @@ func (c *Client) OnTriggerRequest(listener func(*proto.TriggerRequest) error) {
 	}()
 }
 
-func (c *Client) getConnectionRequest() (proto.ConnectRequest, error) {
+func (c *Client) getConnectionRequest() (*proto.ConnectRequest, error) {
 	name, err := c.getName()
 	if err != nil {
-		return proto.ConnectRequest{}, err
+		return nil, err
 	}
 
 	request := proto.ConnectRequest{
@@ -73,7 +73,7 @@ func (c *Client) getConnectionRequest() (proto.ConnectRequest, error) {
 		Name:   name,
 	}
 
-	return request, nil
+	return &request, nil
 }
 
 // getName retrieves the name of the agent. By default, it is the host name, however,

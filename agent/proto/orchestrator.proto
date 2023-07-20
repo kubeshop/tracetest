@@ -12,7 +12,13 @@ service Orchestrator {
     // Register an agent as a trigger agent, once connected, the server will be able to send
     // multiple trigger requests to the agent.
     rpc RegisterTriggerAgent(ConnectRequest) returns (stream TriggerRequest) {}
+
+    // Sends the trigger result back to the server
+    rpc SendTriggerResult(TriggerResponse) returns (Empty) {}
 }
+
+// Empty message for endpoints that don't return anything
+message Empty {}
 
 // ConnectRequest is the initial request sent by the agent to the orchestrator
 // it contains all necessary information for authentication and identification
@@ -103,5 +109,35 @@ message GrpcHeader {
 }
 
 message TraceIDRequest {
+    string id = 1;
+}
+
+message TriggerResponse {
+    string testID = 1;
+    int32 runID = 2;
+    TriggerResult triggerResult = 3;
+}
+
+message TriggerResult {
+    string type = 1;
+    HttpResponse http = 2;
+    GrpcResponse grpc = 3;
+    TraceIdResponse traceIDResponse = 4;
+}
+
+message HttpResponse {
+    int32 statusCode = 1;
+    string status = 2;
+    repeated HttpHeader headers = 3;
+    string body = 4;
+}
+
+message GrpcResponse {
+    int32 statusCode = 1;
+    repeated GrpcHeader metadata = 2;
+    string body = 3;
+}
+
+message TraceIdResponse {
     string id = 1;
 }

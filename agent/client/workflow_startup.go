@@ -21,7 +21,7 @@ func (c *Client) startup(ctx context.Context) error {
 		return err
 	}
 
-	response, err := orchestratorClient.Connect(ctx, &request)
+	response, err := orchestratorClient.Connect(ctx, request)
 	if err != nil {
 		return fmt.Errorf("could not send request to server: %w", err)
 	}

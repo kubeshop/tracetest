@@ -19,7 +19,7 @@ func (c *Client) startTriggerListener() error {
 		return err
 	}
 
-	stream, err := client.RegisterTriggerAgent(ctx, &request)
+	stream, err := client.RegisterTriggerAgent(ctx, request)
 	if err != nil {
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}
