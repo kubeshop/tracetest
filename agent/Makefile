@@ -17,3 +17,6 @@ build-proto: clean-proto
 
 clean-proto:
 	@rm -f proto/*.go
+
+test:
+	go test -timeout 150s -coverprofile=coverage.out ./...
