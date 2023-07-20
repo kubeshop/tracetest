@@ -17,6 +17,9 @@ func TestStartupFlow(t *testing.T) {
 	client, err := client.Connect(context.Background(), server.Addr())
 	require.NoError(t, err)
 
+	err = client.Start(context.Background())
+	require.NoError(t, err)
+
 	assert.NotNil(t, client.SessionConfiguration())
 	assert.Equal(t, 1*time.Second, client.SessionConfiguration().BatchTimeout)
 }

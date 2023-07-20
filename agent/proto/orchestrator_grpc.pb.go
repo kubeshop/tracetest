@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Orchestrator_Connect_FullMethodName = "/proto.Orchestrator/Connect"
+	Orchestrator_Connect_FullMethodName              = "/proto.Orchestrator/Connect"
+	Orchestrator_RegisterTriggerAgent_FullMethodName = "/proto.Orchestrator/RegisterTriggerAgent"
 )
 
 // OrchestratorClient is the client API for Orchestrator service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrchestratorClient interface {
 	Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*ConnectResponse, error)
+	RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
 }
 
 type orchestratorClient struct {
@@ -46,11 +48,44 @@ func (c *orchestratorClient) Connect(ctx context.Context, in *ConnectRequest, op
 	return out, nil
 }
 
+func (c *orchestratorClient) RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[0], Orchestrator_RegisterTriggerAgent_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &orchestratorRegisterTriggerAgentClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Orchestrator_RegisterTriggerAgentClient interface {
+	Recv() (*TriggerRequest, error)
+	grpc.ClientStream
+}
+
+type orchestratorRegisterTriggerAgentClient struct {
+	grpc.ClientStream
+}
+
+func (x *orchestratorRegisterTriggerAgentClient) Recv() (*TriggerRequest, error) {
+	m := new(TriggerRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
 type OrchestratorServer interface {
 	Connect(context.Context, *ConnectRequest) (*ConnectResponse, error)
+	RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -60,6 +95,9 @@ type UnimplementedOrchestratorServer struct {
 
 func (UnimplementedOrchestratorServer) Connect(context.Context, *ConnectRequest) (*ConnectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
+}
+func (UnimplementedOrchestratorServer) RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegisterTriggerAgent not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -92,6 +130,27 @@ func _Orchestrator_Connect_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Orchestrator_RegisterTriggerAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ConnectRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OrchestratorServer).RegisterTriggerAgent(m, &orchestratorRegisterTriggerAgentServer{stream})
+}
+
+type Orchestrator_RegisterTriggerAgentServer interface {
+	Send(*TriggerRequest) error
+	grpc.ServerStream
+}
+
+type orchestratorRegisterTriggerAgentServer struct {
+	grpc.ServerStream
+}
+
+func (x *orchestratorRegisterTriggerAgentServer) Send(m *TriggerRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +163,12 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Orchestrator_Connect_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RegisterTriggerAgent",
+			Handler:       _Orchestrator_RegisterTriggerAgent_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/orchestrator.proto",
 }

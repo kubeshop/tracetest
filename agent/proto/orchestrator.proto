@@ -7,6 +7,7 @@ option go_package = "github.com/kubeshop/tracetest/agent/proto";
 // requests to the agent
 service Orchestrator {
     rpc Connect(ConnectRequest) returns (ConnectResponse) {}
+    rpc RegisterTriggerAgent(ConnectRequest) returns (stream TriggerRequest) {}
 }
 
 // ConnectRequest is the initial request sent by the agent to the orchestrator
@@ -29,4 +30,74 @@ message ConnectResponse {
 message SessionConfiguration {
     // Milliseconds to wait for spans before sending batch
     int32 BatchTimeout = 1;
+}
+
+
+message TriggerRequest{
+    string testID = 1;
+    int32 runID = 2;
+    Trigger trigger = 3;
+}
+
+message Trigger {
+    string type = 1;
+    HttpRequest http = 2;
+    GrpcRequest grpc = 3;
+    TraceIDRequest traceID = 4;
+}
+
+
+message HttpRequest {
+    string method = 1;
+    string url = 2;
+    string body = 3;
+    repeated HttpHeader headers = 4;
+    HttpAuthentication authentication = 5;
+    bool SSLVerification = 6;
+}
+
+message HttpHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message HttpAuthentication {
+    string type = 1;
+    ApiKeyAuthentication apiKey = 2;
+    BasicAuthentication basic = 3;
+    BearerAuthentication bearer = 4;
+}
+
+message ApiKeyAuthentication{
+    string key = 1;
+    string value = 2;
+    string in = 3;
+}
+
+message BasicAuthentication{
+    string username = 1;
+    string password = 2;
+}
+
+message BearerAuthentication{
+    string token = 1;
+}
+
+message GrpcRequest {
+    string protobufFile = 1;
+    string address = 2;
+    string service = 3;
+    string method = 4;
+    string request = 5;
+    HttpAuthentication authentication = 6;
+    repeated GrpcHeader metadata = 7;
+}
+
+message GrpcHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message TraceIDRequest {
+    string id = 1;
 }

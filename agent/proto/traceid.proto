@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package proto;
-option go_package = "github.com/kubeshop/tracetest/agent/proto";
-
-message TraceIDRequest {
-    string id = 1;
-}

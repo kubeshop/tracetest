@@ -178,6 +178,715 @@ func (x *SessionConfiguration) GetBatchTimeout() int32 {
 	return 0
 }
 
+type TriggerRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TestID  string   `protobuf:"bytes,1,opt,name=testID,proto3" json:"testID,omitempty"`
+	RunID   int32    `protobuf:"varint,2,opt,name=runID,proto3" json:"runID,omitempty"`
+	Trigger *Trigger `protobuf:"bytes,3,opt,name=trigger,proto3" json:"trigger,omitempty"`
+}
+
+func (x *TriggerRequest) Reset() {
+	*x = TriggerRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TriggerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerRequest) ProtoMessage() {}
+
+func (x *TriggerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerRequest.ProtoReflect.Descriptor instead.
+func (*TriggerRequest) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TriggerRequest) GetTestID() string {
+	if x != nil {
+		return x.TestID
+	}
+	return ""
+}
+
+func (x *TriggerRequest) GetRunID() int32 {
+	if x != nil {
+		return x.RunID
+	}
+	return 0
+}
+
+func (x *TriggerRequest) GetTrigger() *Trigger {
+	if x != nil {
+		return x.Trigger
+	}
+	return nil
+}
+
+type Trigger struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type    string          `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Http    *HttpRequest    `protobuf:"bytes,2,opt,name=http,proto3" json:"http,omitempty"`
+	Grpc    *GrpcRequest    `protobuf:"bytes,3,opt,name=grpc,proto3" json:"grpc,omitempty"`
+	TraceID *TraceIDRequest `protobuf:"bytes,4,opt,name=traceID,proto3" json:"traceID,omitempty"`
+}
+
+func (x *Trigger) Reset() {
+	*x = Trigger{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Trigger) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Trigger) ProtoMessage() {}
+
+func (x *Trigger) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Trigger.ProtoReflect.Descriptor instead.
+func (*Trigger) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Trigger) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Trigger) GetHttp() *HttpRequest {
+	if x != nil {
+		return x.Http
+	}
+	return nil
+}
+
+func (x *Trigger) GetGrpc() *GrpcRequest {
+	if x != nil {
+		return x.Grpc
+	}
+	return nil
+}
+
+func (x *Trigger) GetTraceID() *TraceIDRequest {
+	if x != nil {
+		return x.TraceID
+	}
+	return nil
+}
+
+type HttpRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Method          string              `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
+	Url             string              `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	Body            string              `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
+	Headers         []*HttpHeader       `protobuf:"bytes,4,rep,name=headers,proto3" json:"headers,omitempty"`
+	Authentication  *HttpAuthentication `protobuf:"bytes,5,opt,name=authentication,proto3" json:"authentication,omitempty"`
+	SSLVerification bool                `protobuf:"varint,6,opt,name=SSLVerification,proto3" json:"SSLVerification,omitempty"`
+}
+
+func (x *HttpRequest) Reset() {
+	*x = HttpRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HttpRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HttpRequest) ProtoMessage() {}
+
+func (x *HttpRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HttpRequest.ProtoReflect.Descriptor instead.
+func (*HttpRequest) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *HttpRequest) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *HttpRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *HttpRequest) GetBody() string {
+	if x != nil {
+		return x.Body
+	}
+	return ""
+}
+
+func (x *HttpRequest) GetHeaders() []*HttpHeader {
+	if x != nil {
+		return x.Headers
+	}
+	return nil
+}
+
+func (x *HttpRequest) GetAuthentication() *HttpAuthentication {
+	if x != nil {
+		return x.Authentication
+	}
+	return nil
+}
+
+func (x *HttpRequest) GetSSLVerification() bool {
+	if x != nil {
+		return x.SSLVerification
+	}
+	return false
+}
+
+type HttpHeader struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *HttpHeader) Reset() {
+	*x = HttpHeader{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HttpHeader) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HttpHeader) ProtoMessage() {}
+
+func (x *HttpHeader) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HttpHeader.ProtoReflect.Descriptor instead.
+func (*HttpHeader) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *HttpHeader) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *HttpHeader) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+type HttpAuthentication struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type   string                `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	ApiKey *ApiKeyAuthentication `protobuf:"bytes,2,opt,name=apiKey,proto3" json:"apiKey,omitempty"`
+	Basic  *BasicAuthentication  `protobuf:"bytes,3,opt,name=basic,proto3" json:"basic,omitempty"`
+	Bearer *BearerAuthentication `protobuf:"bytes,4,opt,name=bearer,proto3" json:"bearer,omitempty"`
+}
+
+func (x *HttpAuthentication) Reset() {
+	*x = HttpAuthentication{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HttpAuthentication) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HttpAuthentication) ProtoMessage() {}
+
+func (x *HttpAuthentication) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HttpAuthentication.ProtoReflect.Descriptor instead.
+func (*HttpAuthentication) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *HttpAuthentication) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *HttpAuthentication) GetApiKey() *ApiKeyAuthentication {
+	if x != nil {
+		return x.ApiKey
+	}
+	return nil
+}
+
+func (x *HttpAuthentication) GetBasic() *BasicAuthentication {
+	if x != nil {
+		return x.Basic
+	}
+	return nil
+}
+
+func (x *HttpAuthentication) GetBearer() *BearerAuthentication {
+	if x != nil {
+		return x.Bearer
+	}
+	return nil
+}
+
+type ApiKeyAuthentication struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	In    string `protobuf:"bytes,3,opt,name=in,proto3" json:"in,omitempty"`
+}
+
+func (x *ApiKeyAuthentication) Reset() {
+	*x = ApiKeyAuthentication{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ApiKeyAuthentication) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApiKeyAuthentication) ProtoMessage() {}
+
+func (x *ApiKeyAuthentication) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApiKeyAuthentication.ProtoReflect.Descriptor instead.
+func (*ApiKeyAuthentication) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ApiKeyAuthentication) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *ApiKeyAuthentication) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *ApiKeyAuthentication) GetIn() string {
+	if x != nil {
+		return x.In
+	}
+	return ""
+}
+
+type BasicAuthentication struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+}
+
+func (x *BasicAuthentication) Reset() {
+	*x = BasicAuthentication{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BasicAuthentication) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BasicAuthentication) ProtoMessage() {}
+
+func (x *BasicAuthentication) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BasicAuthentication.ProtoReflect.Descriptor instead.
+func (*BasicAuthentication) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *BasicAuthentication) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *BasicAuthentication) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type BearerAuthentication struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+}
+
+func (x *BearerAuthentication) Reset() {
+	*x = BearerAuthentication{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BearerAuthentication) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BearerAuthentication) ProtoMessage() {}
+
+func (x *BearerAuthentication) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BearerAuthentication.ProtoReflect.Descriptor instead.
+func (*BearerAuthentication) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *BearerAuthentication) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type GrpcRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ProtobufFile   string              `protobuf:"bytes,1,opt,name=protobufFile,proto3" json:"protobufFile,omitempty"`
+	Address        string              `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Service        string              `protobuf:"bytes,3,opt,name=service,proto3" json:"service,omitempty"`
+	Method         string              `protobuf:"bytes,4,opt,name=method,proto3" json:"method,omitempty"`
+	Request        string              `protobuf:"bytes,5,opt,name=request,proto3" json:"request,omitempty"`
+	Authentication *HttpAuthentication `protobuf:"bytes,6,opt,name=authentication,proto3" json:"authentication,omitempty"`
+	Metadata       []*GrpcHeader       `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty"`
+}
+
+func (x *GrpcRequest) Reset() {
+	*x = GrpcRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GrpcRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrpcRequest) ProtoMessage() {}
+
+func (x *GrpcRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrpcRequest.ProtoReflect.Descriptor instead.
+func (*GrpcRequest) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GrpcRequest) GetProtobufFile() string {
+	if x != nil {
+		return x.ProtobufFile
+	}
+	return ""
+}
+
+func (x *GrpcRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *GrpcRequest) GetService() string {
+	if x != nil {
+		return x.Service
+	}
+	return ""
+}
+
+func (x *GrpcRequest) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *GrpcRequest) GetRequest() string {
+	if x != nil {
+		return x.Request
+	}
+	return ""
+}
+
+func (x *GrpcRequest) GetAuthentication() *HttpAuthentication {
+	if x != nil {
+		return x.Authentication
+	}
+	return nil
+}
+
+func (x *GrpcRequest) GetMetadata() []*GrpcHeader {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+type GrpcHeader struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *GrpcHeader) Reset() {
+	*x = GrpcHeader{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GrpcHeader) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrpcHeader) ProtoMessage() {}
+
+func (x *GrpcHeader) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrpcHeader.ProtoReflect.Descriptor instead.
+func (*GrpcHeader) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GrpcHeader) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *GrpcHeader) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+type TraceIDRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *TraceIDRequest) Reset() {
+	*x = TraceIDRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_orchestrator_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TraceIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TraceIDRequest) ProtoMessage() {}
+
+func (x *TraceIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_orchestrator_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TraceIDRequest.ProtoReflect.Descriptor instead.
+func (*TraceIDRequest) Descriptor() ([]byte, []int) {
+	return file_proto_orchestrator_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *TraceIDRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 var File_proto_orchestrator_proto protoreflect.FileDescriptor
 
 var file_proto_orchestrator_proto_rawDesc = []byte{
@@ -196,15 +905,101 @@ var file_proto_orchestrator_proto_rawDesc = []byte{
 	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x0a,
 	0x0c, 0x42, 0x61, 0x74, 0x63, 0x68, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x05, 0x52, 0x0c, 0x42, 0x61, 0x74, 0x63, 0x68, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75,
-	0x74, 0x32, 0x4a, 0x0a, 0x0c, 0x4f, 0x72, 0x63, 0x68, 0x65, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x12, 0x3a, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x12, 0x15, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x43, 0x6f, 0x6e, 0x6e,
-	0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2b, 0x5a,
-	0x29, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6b, 0x75, 0x62, 0x65,
-	0x73, 0x68, 0x6f, 0x70, 0x2f, 0x74, 0x72, 0x61, 0x63, 0x65, 0x74, 0x65, 0x73, 0x74, 0x2f, 0x61,
-	0x67, 0x65, 0x6e, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x74, 0x22, 0x68, 0x0a, 0x0e, 0x54, 0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x74, 0x65, 0x73, 0x74, 0x49, 0x44, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x65, 0x73, 0x74, 0x49, 0x44, 0x12, 0x14, 0x0a, 0x05, 0x72,
+	0x75, 0x6e, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x72, 0x75, 0x6e, 0x49,
+	0x44, 0x12, 0x28, 0x0a, 0x07, 0x74, 0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x54, 0x72, 0x69, 0x67, 0x67,
+	0x65, 0x72, 0x52, 0x07, 0x74, 0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x22, 0x9e, 0x01, 0x0a, 0x07,
+	0x54, 0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x26, 0x0a, 0x04, 0x68,
+	0x74, 0x74, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x04, 0x68,
+	0x74, 0x74, 0x70, 0x12, 0x26, 0x0a, 0x04, 0x67, 0x72, 0x70, 0x63, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x12, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x72, 0x70, 0x63, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x04, 0x67, 0x72, 0x70, 0x63, 0x12, 0x2f, 0x0a, 0x07, 0x74,
+	0x72, 0x61, 0x63, 0x65, 0x49, 0x44, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x54, 0x72, 0x61, 0x63, 0x65, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x52, 0x07, 0x74, 0x72, 0x61, 0x63, 0x65, 0x49, 0x44, 0x22, 0xe5, 0x01, 0x0a,
+	0x0b, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06,
+	0x6d, 0x65, 0x74, 0x68, 0x6f, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x65,
+	0x74, 0x68, 0x6f, 0x64, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x12, 0x2b, 0x0a, 0x07, 0x68, 0x65,
+	0x61, 0x64, 0x65, 0x72, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x52, 0x07,
+	0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x12, 0x41, 0x0a, 0x0e, 0x61, 0x75, 0x74, 0x68, 0x65,
+	0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x41, 0x75, 0x74, 0x68,
+	0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0e, 0x61, 0x75, 0x74, 0x68,
+	0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x28, 0x0a, 0x0f, 0x53, 0x53,
+	0x4c, 0x56, 0x65, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0f, 0x53, 0x53, 0x4c, 0x56, 0x65, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x22, 0x34, 0x0a, 0x0a, 0x48, 0x74, 0x74, 0x70, 0x48, 0x65, 0x61, 0x64,
+	0x65, 0x72, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0xc4, 0x01, 0x0a, 0x12, 0x48,
+	0x74, 0x74, 0x70, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x33, 0x0a, 0x06, 0x61, 0x70, 0x69, 0x4b, 0x65, 0x79, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x70,
+	0x69, 0x4b, 0x65, 0x79, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x52, 0x06, 0x61, 0x70, 0x69, 0x4b, 0x65, 0x79, 0x12, 0x30, 0x0a, 0x05, 0x62, 0x61,
+	0x73, 0x69, 0x63, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x42, 0x61, 0x73, 0x69, 0x63, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x05, 0x62, 0x61, 0x73, 0x69, 0x63, 0x12, 0x33, 0x0a, 0x06,
+	0x62, 0x65, 0x61, 0x72, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x42, 0x65, 0x61, 0x72, 0x65, 0x72, 0x41, 0x75, 0x74, 0x68, 0x65,
+	0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x06, 0x62, 0x65, 0x61, 0x72, 0x65,
+	0x72, 0x22, 0x4e, 0x0a, 0x14, 0x41, 0x70, 0x69, 0x4b, 0x65, 0x79, 0x41, 0x75, 0x74, 0x68, 0x65,
+	0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x6e, 0x22, 0x4d, 0x0a, 0x13, 0x42, 0x61, 0x73, 0x69, 0x63, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e,
+	0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72,
+	0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64,
+	0x22, 0x2c, 0x0a, 0x14, 0x42, 0x65, 0x61, 0x72, 0x65, 0x72, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e,
+	0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x89,
+	0x02, 0x0a, 0x0b, 0x47, 0x72, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x22,
+	0x0a, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x46, 0x69, 0x6c, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x46, 0x69,
+	0x6c, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x18, 0x0a, 0x07,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65, 0x74, 0x68, 0x6f, 0x64,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x65, 0x74, 0x68, 0x6f, 0x64, 0x12, 0x18,
+	0x0a, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x41, 0x0a, 0x0e, 0x61, 0x75, 0x74, 0x68,
+	0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x41, 0x75, 0x74,
+	0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0e, 0x61, 0x75, 0x74,
+	0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2d, 0x0a, 0x08, 0x6d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x07, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x72, 0x70, 0x63, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72,
+	0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x22, 0x34, 0x0a, 0x0a, 0x47, 0x72,
+	0x70, 0x63, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x22, 0x20, 0x0a, 0x0e, 0x54, 0x72, 0x61, 0x63, 0x65, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x32, 0x94, 0x01, 0x0a, 0x0c, 0x4f, 0x72, 0x63, 0x68, 0x65, 0x73, 0x74, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x12, 0x3a, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x12, 0x15,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x43, 0x6f,
+	0x6e, 0x6e, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x48, 0x0a, 0x14, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x54, 0x72, 0x69, 0x67, 0x67,
+	0x65, 0x72, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x12, 0x15, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x54, 0x72, 0x69, 0x67, 0x67, 0x65, 0x72, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x30, 0x01, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6b, 0x75, 0x62, 0x65, 0x73, 0x68, 0x6f, 0x70,
+	0x2f, 0x74, 0x72, 0x61, 0x63, 0x65, 0x74, 0x65, 0x73, 0x74, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -219,21 +1014,45 @@ func file_proto_orchestrator_proto_rawDescGZIP() []byte {
 	return file_proto_orchestrator_proto_rawDescData
 }
 
-var file_proto_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_proto_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_proto_orchestrator_proto_goTypes = []interface{}{
 	(*ConnectRequest)(nil),       // 0: proto.ConnectRequest
 	(*ConnectResponse)(nil),      // 1: proto.ConnectResponse
 	(*SessionConfiguration)(nil), // 2: proto.SessionConfiguration
+	(*TriggerRequest)(nil),       // 3: proto.TriggerRequest
+	(*Trigger)(nil),              // 4: proto.Trigger
+	(*HttpRequest)(nil),          // 5: proto.HttpRequest
+	(*HttpHeader)(nil),           // 6: proto.HttpHeader
+	(*HttpAuthentication)(nil),   // 7: proto.HttpAuthentication
+	(*ApiKeyAuthentication)(nil), // 8: proto.ApiKeyAuthentication
+	(*BasicAuthentication)(nil),  // 9: proto.BasicAuthentication
+	(*BearerAuthentication)(nil), // 10: proto.BearerAuthentication
+	(*GrpcRequest)(nil),          // 11: proto.GrpcRequest
+	(*GrpcHeader)(nil),           // 12: proto.GrpcHeader
+	(*TraceIDRequest)(nil),       // 13: proto.TraceIDRequest
 }
 var file_proto_orchestrator_proto_depIdxs = []int32{
-	2, // 0: proto.ConnectResponse.configuration:type_name -> proto.SessionConfiguration
-	0, // 1: proto.Orchestrator.Connect:input_type -> proto.ConnectRequest
-	1, // 2: proto.Orchestrator.Connect:output_type -> proto.ConnectResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2,  // 0: proto.ConnectResponse.configuration:type_name -> proto.SessionConfiguration
+	4,  // 1: proto.TriggerRequest.trigger:type_name -> proto.Trigger
+	5,  // 2: proto.Trigger.http:type_name -> proto.HttpRequest
+	11, // 3: proto.Trigger.grpc:type_name -> proto.GrpcRequest
+	13, // 4: proto.Trigger.traceID:type_name -> proto.TraceIDRequest
+	6,  // 5: proto.HttpRequest.headers:type_name -> proto.HttpHeader
+	7,  // 6: proto.HttpRequest.authentication:type_name -> proto.HttpAuthentication
+	8,  // 7: proto.HttpAuthentication.apiKey:type_name -> proto.ApiKeyAuthentication
+	9,  // 8: proto.HttpAuthentication.basic:type_name -> proto.BasicAuthentication
+	10, // 9: proto.HttpAuthentication.bearer:type_name -> proto.BearerAuthentication
+	7,  // 10: proto.GrpcRequest.authentication:type_name -> proto.HttpAuthentication
+	12, // 11: proto.GrpcRequest.metadata:type_name -> proto.GrpcHeader
+	0,  // 12: proto.Orchestrator.Connect:input_type -> proto.ConnectRequest
+	0,  // 13: proto.Orchestrator.RegisterTriggerAgent:input_type -> proto.ConnectRequest
+	1,  // 14: proto.Orchestrator.Connect:output_type -> proto.ConnectResponse
+	3,  // 15: proto.Orchestrator.RegisterTriggerAgent:output_type -> proto.TriggerRequest
+	14, // [14:16] is the sub-list for method output_type
+	12, // [12:14] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_proto_orchestrator_proto_init() }
@@ -278,6 +1097,138 @@ func file_proto_orchestrator_proto_init() {
 				return nil
 			}
 		}
+		file_proto_orchestrator_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TriggerRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Trigger); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HttpRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HttpHeader); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HttpAuthentication); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ApiKeyAuthentication); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*BasicAuthentication); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*BearerAuthentication); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GrpcRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GrpcHeader); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_orchestrator_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TraceIDRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -285,7 +1236,7 @@ func file_proto_orchestrator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_orchestrator_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

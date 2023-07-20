@@ -1,13 +1,9 @@
 package agent
 
 import (
-	"fmt"
-	"os"
+	"github.com/kubeshop/tracetest/agent/cmd"
 )
 
 func main() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		ExitCLI(1)
-	}
+	cmd.Execute()
 }

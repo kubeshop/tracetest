@@ -20,11 +20,6 @@ func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, err
 		opt(client)
 	}
 
-	err = client.start(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("could not start client: %w", err)
-	}
-
 	return client, nil
 }
 

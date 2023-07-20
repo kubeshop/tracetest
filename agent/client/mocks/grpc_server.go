@@ -13,11 +13,14 @@ import (
 
 type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
-	port int
+	port           int
+	triggerChannel chan *proto.TriggerRequest
 }
 
 func NewGrpcServer() *GrpcServerMock {
-	server := &GrpcServerMock{}
+	server := &GrpcServerMock{
+		triggerChannel: make(chan *proto.TriggerRequest),
+	}
 	var wg sync.WaitGroup
 	wg.Add(1)
 
@@ -53,4 +56,20 @@ func (s *GrpcServerMock) Connect(ctx context.Context, req *proto.ConnectRequest)
 	return &proto.ConnectResponse{Configuration: &proto.SessionConfiguration{
 		BatchTimeout: 1000,
 	}}, nil
+}
+
+func (s *GrpcServerMock) RegisterTriggerAgent(_ *proto.ConnectRequest, stream proto.Orchestrator_RegisterTriggerAgentServer) error {
+	for {
+		triggerRequest := <-s.triggerChannel
+		err := stream.Send(triggerRequest)
+		if err != nil {
+			log.Println("could not send trigger request to agent: %w", err)
+		}
+	}
+}
+
+// Test methods
+
+func (s *GrpcServerMock) SendTriggerRequest(request *proto.TriggerRequest) {
+	s.triggerChannel <- request
 }
