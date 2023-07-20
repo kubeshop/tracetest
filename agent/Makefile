@@ -15,12 +15,5 @@ build-proto: clean-proto
 		--go-grpc_opt=paths=source_relative \
 		proto/orchestrator.proto
 
-	protoc \
-		--go_out=./ \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=./ \
-		--go-grpc_opt=paths=source_relative \
-		proto/agent.proto
-
 clean-proto:
 	@rm -f proto/*.go
