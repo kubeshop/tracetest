@@ -1,11 +1,17 @@
-import {CURLParser} from 'parse-curl-js';
+// import {CURLParser} from 'parse-curl-js';
 import {ICurlValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import HttpRequest from 'models/HttpRequest.model';
 
+class CURLParser {
+  constructor(command: string) {}
+
+  parse(): any {}
+}
+
 interface ICurlTriggerService extends ITriggerService {
-  getRequestFromCommand(command: string): ICurlValues;
+  getRequestFromCommand(command: string): any;
   getIsValidCommand(command: string): boolean;
 }
 

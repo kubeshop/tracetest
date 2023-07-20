@@ -24,3 +24,5 @@ yarn-error.log*
 
 cypress/videos
 cypress/screenshots
+
+/src/antd-theme/antd-customized.css

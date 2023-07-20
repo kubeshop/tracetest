@@ -1,4 +1,4 @@
-import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
+import {FieldData} from 'rc-field-form/es/interface';
 import {useCallback} from 'react';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
 
