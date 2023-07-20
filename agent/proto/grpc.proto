@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/kubeshop/tracetest/agent/proto";
+
+import "proto/http.proto";
+
+message GrpcRequest {
+    string protobufFile = 1;
+    string address = 2;
+    string service = 3;
+    string method = 4;
+    string request = 5;
+    HttpAuthentication authentication = 6;
+    repeated GrpcHeader metadata = 7;
+}
+
+message GrpcHeader {
+    string key = 1;
+    string value = 2;
+}

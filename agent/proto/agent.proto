@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/kubeshop/tracetest/agent/proto";
+
+import "proto/http.proto";
+import "proto/grpc.proto";
+import "proto/traceid.proto";
+
+service Agent {
+    rpc Trigger(stream TriggerRequest) returns (Ack) {}
+}
+
+// Ack is usually returned by async processes that got a request and will send the response later
+message Ack{}
+
+message TriggerRequest{
+    string testID = 1;
+    int32 runID = 2;
+    Trigger trigger = 3;
+}
+
+message Trigger {
+    string type = 1;
+    HttpRequest http = 2;
+    GrpcRequest grpc = 3;
+    TraceIDRequest traceID = 4;
+}

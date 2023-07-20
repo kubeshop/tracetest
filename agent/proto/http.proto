@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/kubeshop/tracetest/agent/proto";
+
+message HttpRequest {
+    string method = 1;
+    string url = 2;
+    string body = 3;
+    repeated HttpHeader headers = 4;
+    HttpAuthentication authentication = 5;
+    bool SSLVerification = 6;
+}
+
+message HttpHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message HttpAuthentication {
+    string type = 1;
+    ApiKeyAuthentication apiKey = 2;
+    BasicAuthentication basic = 3;
+    BearerAuthentication bearer = 4;
+}
+
+message ApiKeyAuthentication{
+    string key = 1;
+    string value = 2;
+    string in = 3;
+}
+
+message BasicAuthentication{
+    string username = 1;
+    string password = 2;
+}
+
+message BearerAuthentication{
+    string token = 1;
+}

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package proto;
-option go_package = "../proto";
+option go_package = "github.com/kubeshop/tracetest/agent/proto";
 
 // Orchestrator is the piece of software that will orchestrate the work and send
 // requests to the agent
