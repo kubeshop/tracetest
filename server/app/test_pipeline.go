@@ -100,7 +100,7 @@ func (p *TestPipeline) Rerun(ctx context.Context, testObj test.Test, runID int) 
 		DataStore:      ds,
 	})
 
-	return run
+	return newTestRun
 }
 
 func (p *TestPipeline) handleDBError(run test.Run, err error) {
