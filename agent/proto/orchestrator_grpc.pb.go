@@ -27,7 +27,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrchestratorClient interface {
+	// Connects an agent and returns the configuration that must be used by that agent
 	Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*ConnectResponse, error)
+	// Register an agent as a trigger agent, once connected, the server will be able to send
+	// multiple trigger requests to the agent.
 	RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
 }
 
@@ -84,7 +87,10 @@ func (x *orchestratorRegisterTriggerAgentClient) Recv() (*TriggerRequest, error)
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
 type OrchestratorServer interface {
+	// Connects an agent and returns the configuration that must be used by that agent
 	Connect(context.Context, *ConnectRequest) (*ConnectResponse, error)
+	// Register an agent as a trigger agent, once connected, the server will be able to send
+	// multiple trigger requests to the agent.
 	RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error
 	mustEmbedUnimplementedOrchestratorServer()
 }
