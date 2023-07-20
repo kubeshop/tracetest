@@ -123,6 +123,8 @@ func setupController(t *testing.T) controllerFixture {
 		db:          mdb,
 		testRunRepo: runRepo,
 		c: http.NewController(
+			trace.NewNoopTracerProvider().Tracer("tracer"),
+			nil,
 			mdb,
 			nil,
 			nil,
@@ -131,8 +133,6 @@ func setupController(t *testing.T) controllerFixture {
 			nil,
 			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry()),
-			nil,
-			trace.NewNoopTracerProvider().Tracer("tracer"),
 			"unit-test",
 		),
 	}

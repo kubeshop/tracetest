@@ -74,11 +74,14 @@ func (r PollingRequest) Context() context.Context {
 }
 
 func (pr *PollingRequest) SetHeader(name, value string) {
+	if pr.headers == nil {
+		pr.headers = make(map[string]string)
+	}
 	pr.headers[name] = value
 }
 
 func (pr *PollingRequest) SetHeaderInt(name string, value int) {
-	pr.headers[name] = strconv.Itoa(value)
+	pr.SetHeader(name, strconv.Itoa(value))
 }
 
 func (pr *PollingRequest) SetHeaderBool(name string, value bool) {

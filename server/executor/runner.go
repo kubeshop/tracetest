@@ -36,6 +36,8 @@ type TestRunnerGetter interface {
 	GetDefault(ctx context.Context) testrunner.TestRunner
 }
 
+const ProcessorName = "test_runner"
+
 func NewPersistentRunner(
 	triggers *triggerer.Registry,
 	runs test.RunRepository,
@@ -67,7 +69,6 @@ type persistentRunner struct {
 	newTraceDBFn        traceDBFactoryFn
 	dsRepo              resourcemanager.Current[datastore.DataStore]
 	eventEmitter        EventEmitter
-	inputQueue          Enqueuer
 	outputQueue         Enqueuer
 }
 

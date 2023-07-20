@@ -116,12 +116,12 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	testRepo := test.NewRepository(rawDB)
 	runRepo := test.NewRunRepository(rawDB)
 
-	testRunner := &fakeTestRunner{
-		runRepo,
-		subscriptionManager,
-		withErrors,
-		0,
-	}
+	// testRunner := &fakeTestRunner{
+	// 	runRepo,
+	// 	subscriptionManager,
+	// 	withErrors,
+	// 	0,
+	// }
 
 	test1, err := testRepo.Create(ctx, test.Test{Name: "Test 1"})
 	require.NoError(t, err)
@@ -157,7 +157,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner, testRepo, transactionRunRepo, subscriptionManager)
+	runner := executor.NewTransactionRunner(testRepo, transactionRunRepo, subscriptionManager)
 	runner.Start(1)
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)

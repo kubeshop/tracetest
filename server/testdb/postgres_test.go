@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
-	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testmock"
 )
 
@@ -53,8 +53,8 @@ func createTest(t *testing.T, db test.Repository) test.Test {
 func createRun(t *testing.T, db test.RunRepository, testObj test.Test) test.Run {
 	t.Helper()
 	run := test.Run{
-		TraceID:   testdb.IDGen.TraceID(),
-		SpanID:    testdb.IDGen.SpanID(),
+		TraceID:   id.NewRandGenerator().TraceID(),
+		SpanID:    id.NewRandGenerator().SpanID(),
 		CreatedAt: time.Now(),
 	}
 	updated, err := db.CreateRun(context.TODO(), testObj, run)

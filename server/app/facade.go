@@ -1,17 +1,13 @@
 package app
 
 import (
-	"context"
-
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -19,40 +15,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type runnerFacade struct {
-	sm                *subscription.Manager
-	testsPipeline     *TestPipeline
-	transactionRunner executor.PersistentTransactionRunner
-	assertionRunner   executor.AssertionRunner
-	tracePoller       executor.PersistentTracePoller
-	linterRunner      executor.LinterRunner
-}
-
-func (rf runnerFacade) StopTest(testID id.ID, runID int) {
-	sr := executor.StopRequest{
-		TestID: testID,
-		RunID:  runID,
-	}
-
-	rf.sm.PublishUpdate(subscription.Message{
-		ResourceID: sr.ResourceID(),
-		Content:    sr,
-	})
-}
-
-func (rf runnerFacade) RunTest(ctx context.Context, testObj test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run {
-	return rf.testsPipeline.Run(ctx, testObj, rm, env, gates)
-}
-
-func (rf runnerFacade) RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun {
-	return rf.transactionRunner.Run(ctx, tr, rm, env, gates)
-}
-
-func (rf runnerFacade) RunAssertions(ctx context.Context, request executor.AssertionRequest) {
-	rf.assertionRunner.RunAssertions(ctx, request)
-}
-
-func newRunnerFacades(
+func buildTestPipeline(
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastore.Repository,
 	lintRepo *analyzer.Repository,
@@ -65,7 +28,7 @@ func newRunnerFacades(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
-) *runnerFacade {
+) *TestPipeline {
 	eventEmitter := executor.NewEventEmitter(db, subscriptionManager)
 
 	execTestUpdater := (executor.CompositeUpdater{}).
@@ -114,31 +77,27 @@ func newRunnerFacades(
 		eventEmitter,
 	)
 
-	queueBuilder := executor.NewQueueBuilder(runRepo, testRepo)
+	queueBuilder := executor.NewQueueBuilder().
+		WithDataStoreGetter(dsRepo).
+		WithPollingProfileGetter(ppRepo).
+		WithTestGetter(testRepo).
+		WithRunGetter(runRepo)
+
 	pipeline := NewPipeline(queueBuilder,
-		PipelineStep{processor: runner, driver: executor.NewInMemoryQueueDriver()},
-		PipelineStep{processor: tracePoller, driver: executor.NewInMemoryQueueDriver()},
-		PipelineStep{processor: linterRunner, driver: executor.NewInMemoryQueueDriver()},
-		PipelineStep{processor: assertionRunner, driver: executor.NewInMemoryQueueDriver()},
+		PipelineStep{processor: runner, driver: executor.NewInMemoryQueueDriver("runner")},
+		PipelineStep{processor: tracePoller, driver: executor.NewInMemoryQueueDriver("tracePoller")},
+		PipelineStep{processor: linterRunner, driver: executor.NewInMemoryQueueDriver("linterRunner")},
+		PipelineStep{processor: assertionRunner, driver: executor.NewInMemoryQueueDriver("assertionRunner")},
 	)
 
 	pipeline.Start()
 
-	testPipeline := NewTestPipeline(pipeline, runRepo, trRepo, ppRepo, dsRepo)
-
-	transactionRunner := executor.NewTransactionRunner(
-		runner,
-		testRepo,
-		transactionRunRepository,
-		subscriptionManager,
+	return NewTestPipeline(
+		pipeline,
+		pipeline.GetQueueForStep(3), // assertion runner step
+		runRepo,
+		trRepo,
+		ppRepo,
+		dsRepo,
 	)
-
-	return &runnerFacade{
-		sm:                subscriptionManager,
-		testsPipeline:     testPipeline,
-		transactionRunner: transactionRunner,
-		assertionRunner:   assertionRunner,
-		tracePoller:       tracePoller,
-		linterRunner:      linterRunner,
-	}
 }

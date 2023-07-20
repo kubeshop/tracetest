@@ -22,7 +22,6 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
@@ -31,18 +30,19 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	tracer       trace.Tracer
-	runner       runner
-	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error)
-	mappers      mappings.Mappings
-	version      string
+	tracer     trace.Tracer
+	testRunner testRunner
 
-	testDB                   model.Repository
+	testRunEvents            model.TestRunEventRepository
 	transactionRepository    transactionsRepository
 	transactionRunRepository transactionRunRepository
 	testRepository           testsRepository
 	testRunRepository        test.RunRepository
 	environmentGetter        environmentGetter
+
+	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error)
+	mappers      mappings.Mappings
+	version      string
 }
 
 type transactionsRepository interface {
@@ -67,11 +67,10 @@ type transactionRunRepository interface {
 	DeleteTransactionRun(ctx context.Context, tr transaction.TransactionRun) error
 }
 
-type runner interface {
-	StopTest(testID id.ID, runID int)
-	RunTest(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run
-	RunTransaction(ctx context.Context, tr transaction.Transaction, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) transaction.TransactionRun
-	RunAssertions(ctx context.Context, request executor.AssertionRequest)
+type testRunner interface {
+	// StopTest(testID id.ID, runID int)
+	Run(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run
+	Rerun(ctx context.Context, testObj test.Test, runID int) test.Run
 }
 
 type environmentGetter interface {
@@ -79,36 +78,39 @@ type environmentGetter interface {
 }
 
 func NewController(
-	testDB model.Repository,
+	tracer trace.Tracer,
+	testRunner testRunner,
+
+	testRunEvents model.TestRunEventRepository,
 	transactionRepository transactionsRepository,
 	transactionRunRepository transactionRunRepository,
 	testRepository testsRepository,
 	testRunRepository test.RunRepository,
+	environmentGetter environmentGetter,
+
 	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error),
-	runner runner,
 	mappers mappings.Mappings,
-	envGetter environmentGetter,
-	tracer trace.Tracer,
 	version string,
 ) openapi.ApiApiServicer {
 	return &controller{
-		tracer:                   tracer,
-		testDB:                   testDB,
+		testRunEvents:            testRunEvents,
 		transactionRepository:    transactionRepository,
 		transactionRunRepository: transactionRunRepository,
 		testRepository:           testRepository,
 		testRunRepository:        testRunRepository,
-		environmentGetter:        envGetter,
-		runner:                   runner,
-		newTraceDBFn:             newTraceDBFn,
-		mappers:                  mappers,
-		version:                  version,
+		environmentGetter:        environmentGetter,
+
+		tracer:       tracer,
+		testRunner:   testRunner,
+		newTraceDBFn: newTraceDBFn,
+		mappers:      mappers,
+		version:      version,
 	}
 }
 
 func handleDBError(err error) openapi.ImplResponse {
 	switch {
-	case errors.Is(testdb.ErrNotFound, err) || errors.Is(sql.ErrNoRows, err):
+	case errors.Is(sql.ErrNoRows, err):
 		return openapi.Response(http.StatusNotFound, err.Error())
 	default:
 		return openapi.Response(http.StatusInternalServerError, err.Error())
@@ -165,7 +167,7 @@ func (c *controller) GetTestRun(ctx context.Context, testID string, runID int32)
 }
 
 func (c *controller) GetTestRunEvents(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
-	events, err := c.testDB.GetTestRunEvents(ctx, id.ID(testID), int(runID))
+	events, err := c.testRunEvents.GetTestRunEvents(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, nil), err
 	}
@@ -214,71 +216,49 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 }
 
 func (c *controller) RerunTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
-	test, err := c.testRepository.GetAugmented(ctx, id.ID(testID))
+	testObj, err := c.testRepository.GetAugmented(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	run, err := c.testRunRepository.GetRun(ctx, id.ID(testID), int(runID))
-	if err != nil {
-		return handleDBError(err), err
-	}
-
-	newTestRun, err := c.testRunRepository.CreateRun(ctx, test, run.Copy())
-	if err != nil {
-		return openapi.Response(http.StatusUnprocessableEntity, err.Error()), err
-	}
-
-	newTestRun = newTestRun.SuccessfullyPolledTraces(run.Trace)
-	err = c.testRunRepository.UpdateRun(ctx, newTestRun)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
-	}
-
-	assertionRequest := executor.AssertionRequest{
-		Test: test,
-		Run:  newTestRun,
-	}
-
-	c.runner.RunAssertions(ctx, assertionRequest)
+	newTestRun := c.testRunner.Rerun(ctx, testObj, int(runID))
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&newTestRun)), nil
 }
 
-func (c *controller) RunTest(ctx context.Context, testID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
+func (c *controller) RunTest(ctx context.Context, testID string, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
 	test, err := c.testRepository.GetAugmented(ctx, id.ID(testID))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	metadata := metadata(runInformation.Metadata)
 	variablesEnv := c.mappers.In.Environment(openapi.Environment{
-		Values: runInformation.Variables,
+		Values: runInfo.Variables,
 	})
 
-	environment, err := getEnvironment(ctx, c.environmentGetter, runInformation.EnvironmentId, variablesEnv)
+	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentID, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
 	missingVariablesError, err := validation.ValidateMissingVariables(ctx, c.testRepository, c.testRunRepository, test, environment)
 	if err != nil {
-		if err == validation.ErrMissingVariables {
+		if errors.Is(err, validation.ErrMissingVariables) {
 			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
 		}
 
 		return handleDBError(err), err
 	}
 
-	requiredGates := c.mappers.In.RequiredGates(runInformation.RequiredGates)
+	requiredGates := c.mappers.In.RequiredGates(runInfo.RequiredGates)
 
-	run := c.runner.RunTest(ctx, test, metadata, environment, requiredGates)
+	run := c.testRunner.Run(ctx, test, metadata(runInfo.Metadata), environment, requiredGates)
 
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
 func (c *controller) StopTestRun(_ context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
-	c.runner.StopTest(id.ID(testID), int(runID))
+	// c.testRunner.StopTest(id.ID(testID), int(runID))
 
 	return openapi.Response(http.StatusOK, map[string]string{"result": "success"}), nil
 }
@@ -401,18 +381,19 @@ func metadata(in *map[string]string) test.RunMetadata {
 	return test.RunMetadata(*in)
 }
 
-func getEnvironment(ctx context.Context, environmentRepository environmentGetter, environmentId string, variablesEnv environment.Environment) (environment.Environment, error) {
-	if environmentId != "" {
-		environment, err := environmentRepository.Get(ctx, id.ID(environmentId))
-
-		if err != nil {
-			return variablesEnv, err
-		}
-
-		return environment.Merge(variablesEnv), nil
+func (c *controller) getEnvironment(ctx context.Context, environmentID string, variablesEnv environment.Environment) (environment.Environment, error) {
+	if environmentID == "" {
+		return variablesEnv, nil
 	}
 
-	return variablesEnv, nil
+	environment, err := c.environmentGetter.Get(ctx, id.ID(environmentID))
+
+	if err != nil {
+		return variablesEnv, err
+	}
+
+	return environment.Merge(variablesEnv), nil
+
 }
 
 // Expressions
@@ -517,35 +498,36 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 }
 
 // RunTransaction implements openapi.ApiApiServicer
-func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInformation openapi.RunInformation) (openapi.ImplResponse, error) {
-	transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
-	if err != nil {
-		return handleDBError(err), err
-	}
+func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
+	// transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
+	// if err != nil {
+	// 	return handleDBError(err), err
+	// }
 
-	metadata := metadata(runInformation.Metadata)
-	variablesEnv := c.mappers.In.Environment(openapi.Environment{
-		Values: runInformation.Variables,
-	})
-	environment, err := getEnvironment(ctx, c.environmentGetter, runInformation.EnvironmentId, variablesEnv)
+	// metadata := metadata(runInfo.Metadata)
+	// variablesEnv := c.mappers.In.Environment(openapi.Environment{
+	// 	Values: runInfo.Variables,
+	// })
+	// environment, err := c.getEnvironment(ctx, runInfo.EnvironmentID, variablesEnv)
 
-	if err != nil {
-		return handleDBError(err), err
-	}
+	// if err != nil {
+	// 	return handleDBError(err), err
+	// }
 
-	missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testRepository, c.testRunRepository, transaction, environment)
-	if err != nil {
-		if err == validation.ErrMissingVariables {
-			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
-		}
+	// missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testRepository, c.testRunRepository, transaction, environment)
+	// if err != nil {
+	// 	if err == validation.ErrMissingVariables {
+	// 		return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
+	// 	}
 
-		return handleDBError(err), err
-	}
+	// 	return handleDBError(err), err
+	// }
 
-	requiredGates := c.mappers.In.RequiredGates(runInformation.RequiredGates)
-	run := c.runner.RunTransaction(ctx, transaction, metadata, environment, requiredGates)
+	// requiredGates := c.mappers.In.RequiredGates(runInfo.RequiredGates)
+	// run := c.testRunner.RunTransaction(ctx, transaction, metadata, environment, requiredGates)
 
-	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+	// return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+	return openapi.Response(http.StatusOK, openapi.TransactionRun{}), nil
 }
 
 func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {

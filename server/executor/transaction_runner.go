@@ -27,7 +27,7 @@ type transactionRunRepository interface {
 }
 
 func NewTransactionRunner(
-	runner Runner,
+	// runner Runner,
 	db test.Repository,
 	transactionRuns transactionRunRepository,
 	subscriptionManager *subscription.Manager,
@@ -37,7 +37,7 @@ func NewTransactionRunner(
 		Add(NewSubscriptionTransactionUpdater(subscriptionManager))
 
 	return persistentTransactionRunner{
-		testRunner:          runner,
+		// testRunner:          runner,
 		db:                  db,
 		transactionRuns:     transactionRuns,
 		updater:             updater,
@@ -54,7 +54,7 @@ type transactionRunJob struct {
 }
 
 type persistentTransactionRunner struct {
-	testRunner          Runner
+	// testRunner          Runner
 	db                  test.Repository
 	transactionRuns     transactionRunRepository
 	updater             TransactionRunUpdater
@@ -69,7 +69,7 @@ func (r persistentTransactionRunner) Run(ctx context.Context, transaction transa
 	run.Environment = environment
 	run.RequiredGates = requiredGates
 
-	ctx = getNewCtx(ctx)
+	// ctx = getNewCtx(ctx)
 
 	run, _ = r.transactionRuns.CreateRun(ctx, run)
 
@@ -136,7 +136,8 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran tr
 }
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, testObj test.Test) (transaction.TransactionRun, error) {
-	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.Environment, tr.RequiredGates)
+	// testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.Environment, tr.RequiredGates)
+	testRun := test.NewRun()
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
 		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)

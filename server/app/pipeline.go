@@ -28,7 +28,7 @@ type pipelineStep interface {
 }
 
 type InputQueueSetter interface {
-	SetInputQueue(*executor.Queue)
+	SetInputQueue(executor.Enqueuer)
 }
 
 type PipelineStep struct {
@@ -64,6 +64,14 @@ func NewPipeline(builder queueBuilder, steps ...PipelineStep) *Pipeline {
 	}
 
 	return pipeline
+}
+
+func (p *Pipeline) GetQueueForStep(i int) *executor.Queue {
+	if i < 0 || i >= len(p.queues) {
+		return nil
+	}
+
+	return p.queues[i]
 }
 
 func (p *Pipeline) Begin(ctx context.Context, job executor.Job) {

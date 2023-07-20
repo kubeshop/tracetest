@@ -13,11 +13,12 @@ import (
 )
 
 type TestPipeline struct {
-	pipeline *Pipeline
-	runs     test.RunRepository
-	trGetter TestRunnerGetter
-	ppGetter PollingProfileGetter
-	dsGetter DataStoreGetter
+	*Pipeline
+	assertionQueue executor.Enqueuer
+	runs           test.RunRepository
+	trGetter       TestRunnerGetter
+	ppGetter       PollingProfileGetter
+	dsGetter       DataStoreGetter
 }
 
 type TestRunnerGetter interface {
@@ -34,17 +35,19 @@ type DataStoreGetter interface {
 
 func NewTestPipeline(
 	pipeline *Pipeline,
+	assertionQueue executor.Enqueuer,
 	runs test.RunRepository,
 	trGetter TestRunnerGetter,
 	ppGetter PollingProfileGetter,
 	dsGetter DataStoreGetter,
 ) *TestPipeline {
 	return &TestPipeline{
-		pipeline: pipeline,
-		runs:     runs,
-		trGetter: trGetter,
-		ppGetter: ppGetter,
-		dsGetter: dsGetter,
+		Pipeline:       pipeline,
+		assertionQueue: assertionQueue,
+		runs:           runs,
+		trGetter:       trGetter,
+		ppGetter:       ppGetter,
+		dsGetter:       dsGetter,
 	}
 }
 
@@ -68,11 +71,33 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 	datastore, err := p.dsGetter.GetCurrent(ctx)
 	p.handleDBError(run, err)
 
-	p.pipeline.Begin(ctx, executor.Job{
+	job := executor.Job{
 		Test:           testObj,
 		Run:            run,
 		PollingProfile: p.ppGetter.GetDefault(ctx),
 		DataStore:      datastore,
+	}
+
+	p.Pipeline.Begin(ctx, job)
+
+	return run
+}
+
+func (p *TestPipeline) Rerun(ctx context.Context, testObj test.Test, runID int) test.Run {
+	run, err := p.runs.GetRun(ctx, testObj.ID, runID)
+	p.handleDBError(run, err)
+
+	newTestRun, err := p.runs.CreateRun(ctx, testObj, run.Copy())
+	p.handleDBError(run, err)
+
+	ds, err := p.dsGetter.GetCurrent(ctx)
+	p.handleDBError(run, err)
+
+	p.assertionQueue.Enqueue(ctx, executor.Job{
+		Test:           testObj,
+		Run:            newTestRun,
+		PollingProfile: p.ppGetter.GetDefault(ctx),
+		DataStore:      ds,
 	})
 
 	return run
@@ -80,6 +105,6 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 
 func (p *TestPipeline) handleDBError(run test.Run, err error) {
 	if err != nil {
-		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
+		fmt.Printf("test %s run #%d DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
 }
