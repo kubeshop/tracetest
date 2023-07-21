@@ -15,6 +15,13 @@ service Orchestrator {
 
     // Sends the trigger result back to the server
     rpc SendTriggerResult(TriggerResponse) returns (Empty) {}
+
+    // Register an agent as a poller agent, once connected, the server will be able to send
+    // multiple polling requests to the agent
+    rpc RegisterPollerAgent(ConnectRequest) returns (stream PollingRequest) {}
+
+    // Sends polled spans to the server
+    rpc SendPolledSpans(PollingResponse) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -140,4 +147,117 @@ message GrpcResponse {
 
 message TraceIdResponse {
     string id = 1;
+}
+
+message PollingRequest {
+    string testID = 1;
+    int32 runID = 2;
+    string traceID = 3;
+    DataStore datastore = 4;
+}
+
+message DataStore {
+    string type = 1;
+    JaegerConfig jaeger = 2;
+    TempoConfig tempo = 3;
+    ElasticConfig opensearch = 4;
+    ElasticConfig elasticapm = 5;
+    SignalfxConfig signalfx = 6;
+    AwsXRayConfig awsxray = 7;
+    AzureAppInsightsConfig azureappinsights = 8;
+}
+
+message JaegerConfig {
+    GrpcClientSettings grpc = 1;
+}
+
+message TempoConfig{
+    string type = 1;
+    HttpClientSettings http = 2;
+    GrpcClientSettings grpc = 3;
+}
+
+message ElasticConfig{
+    repeated string addresses = 1;
+    string username = 2;
+    string password = 3;
+    string index = 4;
+    string certificate = 5;
+    bool insecureSkipVerify = 6;
+}
+
+message SignalfxConfig{
+    string realm = 1;
+    string token = 2;
+}
+
+message AwsXRayConfig{
+    string region = 1;
+    string accessKeyId = 2;
+    string secretAccessKey = 3;
+    string sessionToken = 4;
+    bool useDefaultAuth = 5;
+}
+
+message AzureAppInsightsConfig{
+    bool useAzureActiveDirectoryAuth = 1;
+    string accessToken = 2;
+    string connectionType = 3;
+    string resourceArmId = 4;
+}
+
+message HttpClientSettings {
+    string url = 1;
+    repeated HttpHeader headers = 2;
+    TLS tls = 3;
+    HttpAuthentication authentication = 4;
+}
+
+message GrpcClientSettings {
+    string endpoint = 1;
+    int64 readBufferSize = 2;
+    int64 writeBufferSize = 3;
+    bool waitForReady = 4;
+    HttpHeader headers = 5;
+    string balancerName = 6;
+    string compression = 7;
+    TLS tls = 8;
+    HttpAuthentication auth = 9;
+}
+
+message TLS {
+    bool insecure = 1;
+    bool insecureSkipVerify = 2;
+    string serverName = 3;
+    TLSSetting settings = 4;
+}
+
+message TLSSetting {
+    string cAFile = 1;
+    string certFile = 2;
+    string keyFile = 3;
+    string minVersion = 4;
+    string maxVersion = 5;
+}
+
+message PollingResponse {
+    string testID = 1;
+    int32 runID = 2;
+    string traceID = 3;
+    repeated Span spans = 4;
+}
+
+message Span {
+    string id = 1;
+    string parentId = 2;
+    string name = 3;
+    string kind = 4;
+    int64 startTime = 5;
+    int64 endTime = 6;
+    repeated KeyValuePair attributes = 7;
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
 }

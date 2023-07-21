@@ -26,6 +26,7 @@ type Client struct {
 	done          chan bool
 
 	triggerListener func(*proto.TriggerRequest) error
+	pollListener    func(*proto.PollingRequest) error
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -35,6 +36,11 @@ func (c *Client) Start(ctx context.Context) error {
 	}
 
 	err = c.startTriggerListener()
+	if err != nil {
+		return err
+	}
+
+	err = c.startPollerListener()
 	if err != nil {
 		return err
 	}
@@ -57,9 +63,11 @@ func (c *Client) Close() error {
 }
 
 func (c *Client) OnTriggerRequest(listener func(*proto.TriggerRequest) error) {
-	go func() {
-		c.triggerListener = listener
-	}()
+	c.triggerListener = listener
+}
+
+func (c *Client) OnPollingRequest(listener func(*proto.PollingRequest) error) {
+	c.pollListener = listener
 }
 
 func (c *Client) getConnectionRequest() (*proto.ConnectRequest, error) {
