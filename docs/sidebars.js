@@ -340,6 +340,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "configuration/test-runner",
+          label: "Test Runner",
+        }, 
+        {
+          type: "doc",
           id: "configuration/demo",
           label: "Demo Applications",
         },
