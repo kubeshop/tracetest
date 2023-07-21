@@ -5,7 +5,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import HttpRequest from 'models/HttpRequest.model';
 
 interface ICurlTriggerService extends ITriggerService {
-  getRequestFromCommand(command: string): any;
+  getRequestFromCommand(command: string): ICurlValues;
   getIsValidCommand(command: string): boolean;
 }
 
