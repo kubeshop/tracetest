@@ -90,6 +90,25 @@ jobs:
       - name: Run unit tests
         run: cd server; make test -B
 
+  unit-test-agent:
+    name: Agent unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.work"
+          cache: true
+          cache-dependency-path: go.work
+      - name: Run unit tests
+        run: cd agent; make test -B
+
+
   unit-test-web:
     name: WebUI unit tests
     runs-on: ubuntu-latest

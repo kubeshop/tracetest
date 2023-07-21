@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/kubeshop/tracetest/agent/proto";
+
+// Orchestrator is the piece of software that will orchestrate the work and send
+// requests to the agent
+service Orchestrator {
+    // Connects an agent and returns the configuration that must be used by that agent
+    rpc Connect(ConnectRequest) returns (ConnectResponse) {}
+
+    // Register an agent as a trigger agent, once connected, the server will be able to send
+    // multiple trigger requests to the agent.
+    rpc RegisterTriggerAgent(ConnectRequest) returns (stream TriggerRequest) {}
+
+    // Sends the trigger result back to the server
+    rpc SendTriggerResult(TriggerResponse) returns (Empty) {}
+}
+
+// Empty message for endpoints that don't return anything
+message Empty {}
+
+// ConnectRequest is the initial request sent by the agent to the orchestrator
+// it contains all necessary information for authentication and identification
+// of the agent.
+// An established connection is called a "session".
+message ConnectRequest {
+    string apiKey = 1;
+    string name = 2;
+}
+
+// ConnectResponse is the Orchestrator response to the ConnectRequest. It contains
+// configuration that must be used by the agent while working with this Orchestrator.
+message ConnectResponse {
+    SessionConfiguration configuration = 1;
+}
+
+// SessionConfiguration is a set of configuration values that must be used by the agent while
+// communicating with the Orchestrator in the current session.
+message SessionConfiguration {
+    // Milliseconds to wait for spans before sending batch
+    int32 BatchTimeout = 1;
+}
+
+
+message TriggerRequest{
+    string testID = 1;
+    int32 runID = 2;
+    Trigger trigger = 3;
+}
+
+message Trigger {
+    string type = 1;
+    HttpRequest http = 2;
+    GrpcRequest grpc = 3;
+    TraceIDRequest traceID = 4;
+}
+
+
+message HttpRequest {
+    string method = 1;
+    string url = 2;
+    string body = 3;
+    repeated HttpHeader headers = 4;
+    HttpAuthentication authentication = 5;
+    bool SSLVerification = 6;
+}
+
+message HttpHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message HttpAuthentication {
+    string type = 1;
+    ApiKeyAuthentication apiKey = 2;
+    BasicAuthentication basic = 3;
+    BearerAuthentication bearer = 4;
+}
+
+message ApiKeyAuthentication{
+    string key = 1;
+    string value = 2;
+    string in = 3;
+}
+
+message BasicAuthentication{
+    string username = 1;
+    string password = 2;
+}
+
+message BearerAuthentication{
+    string token = 1;
+}
+
+message GrpcRequest {
+    string protobufFile = 1;
+    string address = 2;
+    string service = 3;
+    string method = 4;
+    string request = 5;
+    HttpAuthentication authentication = 6;
+    repeated GrpcHeader metadata = 7;
+}
+
+message GrpcHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message TraceIDRequest {
+    string id = 1;
+}
+
+message TriggerResponse {
+    string testID = 1;
+    int32 runID = 2;
+    TriggerResult triggerResult = 3;
+}
+
+message TriggerResult {
+    string type = 1;
+    HttpResponse http = 2;
+    GrpcResponse grpc = 3;
+    TraceIdResponse traceIDResponse = 4;
+}
+
+message HttpResponse {
+    int32 statusCode = 1;
+    string status = 2;
+    repeated HttpHeader headers = 3;
+    string body = 4;
+}
+
+message GrpcResponse {
+    int32 statusCode = 1;
+    repeated GrpcHeader metadata = 2;
+    string body = 3;
+}
+
+message TraceIdResponse {
+    string id = 1;
+}
