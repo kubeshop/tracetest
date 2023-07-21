@@ -18,7 +18,14 @@ type TriggerWorker struct {
 }
 
 func NewTriggerWorker(client *client.Client) *TriggerWorker {
-	registry := agentTrigger.NewRegistry(nil)
+	// TODO: use a real tracer
+	tracer := trace.NewNoopTracerProvider().Tracer("noop")
+
+	registry := agentTrigger.NewRegistry(tracer)
+	registry.Add(agentTrigger.HTTP())
+	registry.Add(agentTrigger.GRPC())
+	registry.Add(agentTrigger.TRACEID())
+
 	return &TriggerWorker{client, registry}
 }
 
@@ -58,6 +65,10 @@ func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
 }
 
 func convertProtoHttpTriggerToHttpTrigger(pt *proto.HttpRequest) *trigger.HTTPRequest {
+	if pt == nil {
+		return nil
+	}
+
 	headers := make([]trigger.HTTPHeader, 0, len(pt.Headers))
 
 	for _, header := range pt.Headers {
@@ -75,6 +86,10 @@ func convertProtoHttpTriggerToHttpTrigger(pt *proto.HttpRequest) *trigger.HTTPRe
 }
 
 func convertProtoHttpAuthToHttpAuth(httpAuthentication *proto.HttpAuthentication) *trigger.HTTPAuthenticator {
+	if httpAuthentication == nil {
+		return nil
+	}
+
 	var (
 		apiKey *trigger.APIKeyAuthenticator
 		basic  *trigger.BasicAuthenticator
@@ -111,6 +126,10 @@ func convertProtoHttpAuthToHttpAuth(httpAuthentication *proto.HttpAuthentication
 }
 
 func convertProtoGrpcTriggerToGrpcTrigger(grpcRequest *proto.GrpcRequest) *trigger.GRPCRequest {
+	if grpcRequest == nil {
+		return nil
+	}
+
 	metadata := make([]trigger.GRPCHeader, 0, len(grpcRequest.Metadata))
 	for _, keyValuePair := range grpcRequest.Metadata {
 		metadata = append(metadata, trigger.GRPCHeader{Key: keyValuePair.Key, Value: keyValuePair.Value})
@@ -128,6 +147,10 @@ func convertProtoGrpcTriggerToGrpcTrigger(grpcRequest *proto.GrpcRequest) *trigg
 }
 
 func convertProtoTraceIDTriggerToTraceIDTrigger(traceIDRequest *proto.TraceIDRequest) *trigger.TraceIDRequest {
+	if traceIDRequest == nil {
+		return nil
+	}
+
 	return &trigger.TraceIDRequest{
 		ID: traceIDRequest.Id,
 	}
