@@ -1,10 +1,23 @@
 name: Installer Pull Request
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
 
 jobs:
+  custom-version:
+    name: Custom Version
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - run: |
+        curl -L https://raw.githubusercontent.com/kubeshop/tracetest/${GITHUB_SHA}/install-cli.sh | bash -s -- v0.12.0
+        set +e
+        tracetest version  > /tmp/version 2>&1
+        cat /tmp/version
+        cat /tmp/version | grep "CLI: v0.12.0"
+        exit $?
   linux:
     name: Linux
     strategy:
@@ -20,16 +33,18 @@ jobs:
         image: ${{matrix.distro}}
         options: -v ${{ github.workspace }}:/app -e GITHUB_SHA
         run: |
+         # certificates for raw.githubusercontent.com are not validated when running from docker for some reason
+         echo insecure >> ~/.curlrc
          case "${{ matrix.distro }}" in
             ubuntu)
               apt-get update -q -y
               apt-get install -q -y curl
               ;;
             fedora)
-              yum install -y curl --refresh
+              yum install -y wget curl --refresh
               ;;
             alpine)
-              apk add --update curl bash
+              apk add --update wget curl bash
               ;;
           esac
 

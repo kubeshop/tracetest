@@ -26,7 +26,7 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `--help`, `-h` | [HelpCommand](./testscenarios/help_test.go)       |
 | `--config`     | All scenarios                                     |
 
-### Tests and Test Runner
+### Run Tests and Transactions
 
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
@@ -111,6 +111,19 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `list pollingprofile --output pretty`                                 | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
 | `list pollingprofile --output json`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
 | `list pollingprofile --output yaml`                                   | [ListPollingProfile](./testscenarios/pollingprofile/list_pollingprofile_test.go) |
+
+### Resources: TestRunner
+
+| CLI Command                                                           | Test scenarios |
+| --------------------------------------------------------------------- | -------------- |
+| `apply testrunner -f [testrunner-file]`                               | [ApplyTestRunner](./testscenarios/testrunner/apply_testrunner_test.go) |
+| `delete testrunner --id current`                                      | [DeleteTestRunner](./testscenarios/testrunner/delete_testrunner_test.go) |
+| `get testrunner --id current --output pretty`                         | [GetTestRunner](./testscenarios/testrunner/get_testrunner_test.go) |
+| `get testrunner --id current --output json`                           | [GetTestRunner](./testscenarios/testrunner/get_testrunner_test.go) |
+| `get testrunner --id current --output yaml`                           | [GetTestRunner](./testscenarios/testrunner/get_testrunner_test.go) |
+| `list testrunner --output pretty`                                     | [ListTestRunner](./testscenarios/testrunner/list_testrunner_test.go) |
+| `list testrunner --output json`                                       | [ListTestRunner](./testscenarios/testrunner/list_testrunner_test.go) |
+| `list testrunner --output yaml`                                       | [ListTestRunner](./testscenarios/testrunner/list_testrunner_test.go) |
 
 ### Resources: Analyzer
 

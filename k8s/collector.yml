@@ -56,6 +56,10 @@ spec:
           volumeMounts:
             - mountPath: /conf
               name: collector-config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
       volumes:
         - configMap:
             items:

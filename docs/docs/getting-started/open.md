@@ -1,4 +1,15 @@
-# Opening Tracetest
+---
+id: open
+title: Opening Tracetest
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to get started with creating tests once you open Tracetest.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
 
 This page showcases opening the Tracetest Web UI regardless if you used the Tracetest CLI, Docker, Kubernetes, or Helm to install Tracetest Server.
 

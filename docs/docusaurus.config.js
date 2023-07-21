@@ -82,6 +82,16 @@ const config = {
     //   },
     // ],
     [
+      '@docusaurus/plugin-ideal-image',
+      {
+        quality: 70,
+        max: 1030, // max resized image's size.
+        min: 640, // min resized image's size. if original is lower, use that size.
+        steps: 2, // the max number of images generated between min and max (inclusive)
+        disableInDev: false,
+      },
+    ],
+    [
       require.resolve('docusaurus-gtm-plugin'),
       {
         id: 'GTM-MZ7RNS7', // GTM Container ID
@@ -175,6 +185,10 @@ const config = {
             to: '/analyzer/concepts',
             from: ['/concepts/tracetest-analyzer-concepts'],
           },
+          {
+            to: '/cli/cli-installation-reference',
+            from: ['/getting-started/cli-installation-reference'],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {
@@ -204,14 +218,21 @@ const config = {
         respectPrefersColorScheme: false,
       },
       navbar: {
-        title: 'Tracetest Docs',
+        hideOnScroll: true,
         logo: {
           alt: 'Tracetest Logo',
-          src: 'img/logo.svg',
-          href: '/',
-          target: '_self',
+          src: 'img/logo-landscape.svg',
+          srcDark: 'img/logo-landscape-dark.svg',
+          href: 'https://tracetest.io/',
+          target: '_blank',
         },
         items: [
+          {
+            type: 'docSidebar',
+            position: 'left',
+            sidebarId: 'tutorialSidebar',
+            label: 'Docs'
+          },
           {
             type: 'docSidebar',
             position: 'left',

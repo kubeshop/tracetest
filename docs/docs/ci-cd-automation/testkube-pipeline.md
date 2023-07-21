@@ -194,7 +194,7 @@ By default, Tracetest is installed in the `tracetest` namespace.
 To explore the Tracetest Web UI, run the command:
 
 ```bash
-kubectl --kubeconfig ${HOME}/.kube/config --context kind-kind --namespace tracetest port-forward svc/tracetest 11633
+kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-context> --namespace tracetest port-forward svc/tracetest 11633
 ```
 
 ![Tracetest Web UI](https://res.cloudinary.com/djwdcmwdz/image/upload/v1679064296/Blogposts/Docs/screely-1679064291876_jxlhmn.png)
