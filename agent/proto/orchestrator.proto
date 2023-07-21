@@ -19,6 +19,9 @@ service Orchestrator {
     // Register an agent as a poller agent, once connected, the server will be able to send
     // multiple polling requests to the agent
     rpc RegisterPollerAgent(ConnectRequest) returns (stream PollingRequest) {}
+
+    // Sends polled spans to the server
+    rpc SendPolledSpans(PollingResponse) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -235,4 +238,26 @@ message TLSSetting {
     string keyFile = 3;
     string minVersion = 4;
     string maxVersion = 5;
+}
+
+message PollingResponse {
+    string testID = 1;
+    int32 runID = 2;
+    string traceID = 3;
+    repeated Span spans = 4;
+}
+
+message Span {
+    string id = 1;
+    string parentId = 2;
+    string name = 3;
+    string kind = 4;
+    int64 startTime = 5;
+    int64 endTime = 6;
+    repeated KeyValuePair attributes = 7;
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
 }

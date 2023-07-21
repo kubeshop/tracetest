@@ -13,10 +13,12 @@ import (
 
 type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
-	port                int
-	triggerChannel      chan *proto.TriggerRequest
-	pollingChannel      chan *proto.PollingRequest
+	port           int
+	triggerChannel chan *proto.TriggerRequest
+	pollingChannel chan *proto.PollingRequest
+
 	lastTriggerResponse *proto.TriggerResponse
+	lastPollingResponse *proto.PollingResponse
 }
 
 func NewGrpcServer() *GrpcServerMock {
@@ -86,6 +88,11 @@ func (s *GrpcServerMock) RegisterPollerAgent(_ *proto.ConnectRequest, stream pro
 	}
 }
 
+func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.PollingResponse) (*proto.Empty, error) {
+	s.lastPollingResponse = result
+	return &proto.Empty{}, nil
+}
+
 // Test methods
 
 func (s *GrpcServerMock) SendTriggerRequest(request *proto.TriggerRequest) {
@@ -98,4 +105,8 @@ func (s *GrpcServerMock) SendPollingRequest(request *proto.PollingRequest) {
 
 func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
 	return s.lastTriggerResponse
+}
+
+func (s *GrpcServerMock) GetLastSpans() *proto.PollingResponse {
+	return s.lastPollingResponse
 }
