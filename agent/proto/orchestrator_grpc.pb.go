@@ -22,6 +22,8 @@ const (
 	Orchestrator_Connect_FullMethodName              = "/proto.Orchestrator/Connect"
 	Orchestrator_RegisterTriggerAgent_FullMethodName = "/proto.Orchestrator/RegisterTriggerAgent"
 	Orchestrator_SendTriggerResult_FullMethodName    = "/proto.Orchestrator/SendTriggerResult"
+	Orchestrator_RegisterPollerAgent_FullMethodName  = "/proto.Orchestrator/RegisterPollerAgent"
+	Orchestrator_SendPolledSpans_FullMethodName      = "/proto.Orchestrator/SendPolledSpans"
 )
 
 // OrchestratorClient is the client API for Orchestrator service.
@@ -35,6 +37,11 @@ type OrchestratorClient interface {
 	RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
 	// Sends the trigger result back to the server
 	SendTriggerResult(ctx context.Context, in *TriggerResponse, opts ...grpc.CallOption) (*Empty, error)
+	// Register an agent as a poller agent, once connected, the server will be able to send
+	// multiple polling requests to the agent
+	RegisterPollerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error)
+	// Sends polled spans to the server
+	SendPolledSpans(ctx context.Context, in *PollingResponse, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type orchestratorClient struct {
@@ -95,6 +102,47 @@ func (c *orchestratorClient) SendTriggerResult(ctx context.Context, in *TriggerR
 	return out, nil
 }
 
+func (c *orchestratorClient) RegisterPollerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[1], Orchestrator_RegisterPollerAgent_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &orchestratorRegisterPollerAgentClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Orchestrator_RegisterPollerAgentClient interface {
+	Recv() (*PollingRequest, error)
+	grpc.ClientStream
+}
+
+type orchestratorRegisterPollerAgentClient struct {
+	grpc.ClientStream
+}
+
+func (x *orchestratorRegisterPollerAgentClient) Recv() (*PollingRequest, error) {
+	m := new(PollingRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *orchestratorClient) SendPolledSpans(ctx context.Context, in *PollingResponse, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Orchestrator_SendPolledSpans_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
@@ -106,6 +154,11 @@ type OrchestratorServer interface {
 	RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error
 	// Sends the trigger result back to the server
 	SendTriggerResult(context.Context, *TriggerResponse) (*Empty, error)
+	// Register an agent as a poller agent, once connected, the server will be able to send
+	// multiple polling requests to the agent
+	RegisterPollerAgent(*ConnectRequest, Orchestrator_RegisterPollerAgentServer) error
+	// Sends polled spans to the server
+	SendPolledSpans(context.Context, *PollingResponse) (*Empty, error)
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -121,6 +174,12 @@ func (UnimplementedOrchestratorServer) RegisterTriggerAgent(*ConnectRequest, Orc
 }
 func (UnimplementedOrchestratorServer) SendTriggerResult(context.Context, *TriggerResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendTriggerResult not implemented")
+}
+func (UnimplementedOrchestratorServer) RegisterPollerAgent(*ConnectRequest, Orchestrator_RegisterPollerAgentServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegisterPollerAgent not implemented")
+}
+func (UnimplementedOrchestratorServer) SendPolledSpans(context.Context, *PollingResponse) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendPolledSpans not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -192,6 +251,45 @@ func _Orchestrator_SendTriggerResult_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Orchestrator_RegisterPollerAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ConnectRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OrchestratorServer).RegisterPollerAgent(m, &orchestratorRegisterPollerAgentServer{stream})
+}
+
+type Orchestrator_RegisterPollerAgentServer interface {
+	Send(*PollingRequest) error
+	grpc.ServerStream
+}
+
+type orchestratorRegisterPollerAgentServer struct {
+	grpc.ServerStream
+}
+
+func (x *orchestratorRegisterPollerAgentServer) Send(m *PollingRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Orchestrator_SendPolledSpans_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PollingResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrchestratorServer).SendPolledSpans(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Orchestrator_SendPolledSpans_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrchestratorServer).SendPolledSpans(ctx, req.(*PollingResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -207,11 +305,20 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SendTriggerResult",
 			Handler:    _Orchestrator_SendTriggerResult_Handler,
 		},
+		{
+			MethodName: "SendPolledSpans",
+			Handler:    _Orchestrator_SendPolledSpans_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "RegisterTriggerAgent",
 			Handler:       _Orchestrator_RegisterTriggerAgent_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RegisterPollerAgent",
+			Handler:       _Orchestrator_RegisterPollerAgent_Handler,
 			ServerStreams: true,
 		},
 	},
