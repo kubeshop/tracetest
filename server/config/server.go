@@ -87,9 +87,9 @@ func (c *AppConfig) PostgresConnString() string {
 	}
 
 	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?%s",
-		c.vp.GetString("postgres.host"),
 		c.vp.GetString("postgres.user"),
 		c.vp.GetString("postgres.password"),
+		c.vp.GetString("postgres.host"),
 		c.vp.GetInt("postgres.port"),
 		c.vp.GetString("postgres.dbname"),
 		strings.ReplaceAll(c.vp.GetString("postgres.params"), " ", "&"),
