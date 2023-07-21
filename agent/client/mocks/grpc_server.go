@@ -15,12 +15,14 @@ type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
 	port                int
 	triggerChannel      chan *proto.TriggerRequest
+	pollingChannel      chan *proto.PollingRequest
 	lastTriggerResponse *proto.TriggerResponse
 }
 
 func NewGrpcServer() *GrpcServerMock {
 	server := &GrpcServerMock{
 		triggerChannel: make(chan *proto.TriggerRequest),
+		pollingChannel: make(chan *proto.PollingRequest),
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -74,10 +76,24 @@ func (s *GrpcServerMock) SendTriggerResult(ctx context.Context, result *proto.Tr
 	return &proto.Empty{}, nil
 }
 
+func (s *GrpcServerMock) RegisterPollerAgent(_ *proto.ConnectRequest, stream proto.Orchestrator_RegisterPollerAgentServer) error {
+	for {
+		pollerRequest := <-s.pollingChannel
+		err := stream.Send(pollerRequest)
+		if err != nil {
+			log.Println("could not send polling request to agent: %w", err)
+		}
+	}
+}
+
 // Test methods
 
 func (s *GrpcServerMock) SendTriggerRequest(request *proto.TriggerRequest) {
 	s.triggerChannel <- request
+}
+
+func (s *GrpcServerMock) SendPollingRequest(request *proto.PollingRequest) {
+	s.pollingChannel <- request
 }
 
 func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
