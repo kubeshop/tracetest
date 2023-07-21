@@ -8,14 +8,19 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/trace"
 )
+
+type runByTraceIDGetter interface {
+	GetRunByTraceID(context.Context, trace.TraceID) (test.Run, error)
+}
 
 type OTLPTraceDB struct {
 	realTraceDB
-	db test.RunRepository
+	db runByTraceIDGetter
 }
 
-func newCollectorDB(repository test.RunRepository) (TraceDB, error) {
+func newCollectorDB(repository runByTraceIDGetter) (TraceDB, error) {
 	return &OTLPTraceDB{
 		db: repository,
 	}, nil

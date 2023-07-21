@@ -546,10 +546,17 @@ func getRunRepositoryMock(t *testing.T) model.Repository {
 }
 
 // DataStoreRepository
-type dataStoreRepositoryMock struct{}
+type dataStoreRepositoryMock struct {
+	mock.Mock
+}
 
-func (m *dataStoreRepositoryMock) Current(ctx context.Context) (datastore.DataStore, error) {
+func (m *dataStoreRepositoryMock) Current(context.Context) (datastore.DataStore, error) {
 	return datastore.DataStore{Type: datastore.DataStoreTypeOTLP}, nil
+}
+
+func (m *dataStoreRepositoryMock) Get(_ context.Context, id id.ID) (datastore.DataStore, error) {
+	args := m.Called(id)
+	return args.Get(0).(datastore.DataStore), args.Error(1)
 }
 
 func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {

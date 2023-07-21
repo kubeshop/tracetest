@@ -28,7 +28,7 @@ func buildTestPipeline(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
-) *TestPipeline {
+) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(db, subscriptionManager)
 
 	execTestUpdater := (executor.CompositeUpdater{}).
@@ -68,7 +68,6 @@ func buildTestPipeline(
 
 	runner := executor.NewPersistentRunner(
 		triggerRegistry,
-		runRepo,
 		execTestUpdater,
 		tracer,
 		subscriptionManager,
@@ -83,16 +82,16 @@ func buildTestPipeline(
 		WithTestGetter(testRepo).
 		WithRunGetter(runRepo)
 
-	pipeline := NewPipeline(queueBuilder,
-		PipelineStep{processor: runner, driver: executor.NewInMemoryQueueDriver("runner")},
-		PipelineStep{processor: tracePoller, driver: executor.NewInMemoryQueueDriver("tracePoller")},
-		PipelineStep{processor: linterRunner, driver: executor.NewInMemoryQueueDriver("linterRunner")},
-		PipelineStep{processor: assertionRunner, driver: executor.NewInMemoryQueueDriver("assertionRunner")},
+	pipeline := executor.NewPipeline(queueBuilder,
+		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
+		executor.PipelineStep{Processor: tracePoller, Driver: executor.NewInMemoryQueueDriver("tracePoller")},
+		executor.PipelineStep{Processor: linterRunner, Driver: executor.NewInMemoryQueueDriver("linterRunner")},
+		executor.PipelineStep{Processor: assertionRunner, Driver: executor.NewInMemoryQueueDriver("assertionRunner")},
 	)
 
 	pipeline.Start()
 
-	return NewTestPipeline(
+	return executor.NewTestPipeline(
 		pipeline,
 		pipeline.GetQueueForStep(3), // assertion runner step
 		runRepo,

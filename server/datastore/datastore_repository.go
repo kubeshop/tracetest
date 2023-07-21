@@ -165,22 +165,6 @@ func (r *Repository) Current(ctx context.Context) (DataStore, error) {
 	return dataStore, nil
 }
 
-func (r *Repository) GetCurrent(ctx context.Context) (DataStore, error) {
-	row := r.db.QueryRowContext(ctx, getQuery, DataStoreSingleID)
-
-	dataStore, err := r.readRow(row)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		return DataStore{
-			CreatedAt: newCreateAtDateString(),
-		}, nil // Assumes an empty datastore
-	}
-	if err != nil {
-		return DataStore{}, fmt.Errorf("datastore repository get sql query: %w", err)
-	}
-
-	return dataStore, nil
-}
-
 func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
 	query, params := sqlutil.Tenant(ctx, getQuery, id)
 	row := r.db.QueryRowContext(ctx, query, params...)

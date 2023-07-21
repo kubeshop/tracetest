@@ -1,50 +1,48 @@
-package app
+package executor
 
 import (
 	"context"
 	"reflect"
-
-	"github.com/kubeshop/tracetest/server/executor"
 )
 
 type Pipeline struct {
-	steps  []PipelineStep    // N
-	queues []*executor.Queue // N + 1
+	steps  []PipelineStep // N
+	queues []*Queue       // N + 1
 }
 
 type workerDriver interface {
-	executor.QueueDriver
+	QueueDriver
 	Start()
 	Stop()
 }
 
 type queueBuilder interface {
-	Build(executor.QueueDriver, executor.QueueItemProcessor) *executor.Queue
+	Build(QueueDriver, QueueItemProcessor) *Queue
 }
 
 type pipelineStep interface {
-	executor.QueueItemProcessor
-	SetOutputQueue(executor.Enqueuer)
+	QueueItemProcessor
+	SetOutputQueue(Enqueuer)
 }
 
 type InputQueueSetter interface {
-	SetInputQueue(executor.Enqueuer)
+	SetInputQueue(Enqueuer)
 }
 
 type PipelineStep struct {
-	driver    workerDriver
-	processor pipelineStep
+	Driver    workerDriver
+	Processor pipelineStep
 }
 
 func NewPipeline(builder queueBuilder, steps ...PipelineStep) *Pipeline {
 	pipeline := &Pipeline{
 		steps:  steps,
-		queues: make([]*executor.Queue, 0, len(steps)),
+		queues: make([]*Queue, 0, len(steps)),
 	}
 
 	// setup an input queue for each pipeline step
 	for _, step := range steps {
-		pipeline.queues = append(pipeline.queues, builder.Build(step.driver, step.processor))
+		pipeline.queues = append(pipeline.queues, builder.Build(step.Driver, step.Processor))
 	}
 
 	// set the output queue for each step. the ouput queue of a processor (N) is the input queue of the next one (N+1)
@@ -54,11 +52,11 @@ func NewPipeline(builder queueBuilder, steps ...PipelineStep) *Pipeline {
 			break
 		}
 
-		step.processor.SetOutputQueue(pipeline.queues[i+1])
+		step.Processor.SetOutputQueue(pipeline.queues[i+1])
 
 		// a processor might need to have a reference to its input queue, to requeue items for example.
 		// This can be done if it implements the `InputQueueSetter` interace
-		if setter, ok := reflect.ValueOf(step.processor).Interface().(InputQueueSetter); ok {
+		if setter, ok := reflect.ValueOf(step.Processor).Interface().(InputQueueSetter); ok {
 			setter.SetInputQueue(pipeline.queues[i])
 		}
 	}
@@ -66,7 +64,7 @@ func NewPipeline(builder queueBuilder, steps ...PipelineStep) *Pipeline {
 	return pipeline
 }
 
-func (p *Pipeline) GetQueueForStep(i int) *executor.Queue {
+func (p *Pipeline) GetQueueForStep(i int) *Queue {
 	if i < 0 || i >= len(p.queues) {
 		return nil
 	}
@@ -74,18 +72,18 @@ func (p *Pipeline) GetQueueForStep(i int) *executor.Queue {
 	return p.queues[i]
 }
 
-func (p *Pipeline) Begin(ctx context.Context, job executor.Job) {
+func (p *Pipeline) Begin(ctx context.Context, job Job) {
 	p.queues[0].Enqueue(ctx, job)
 }
 
 func (p *Pipeline) Start() {
 	for _, step := range p.steps {
-		step.driver.Start()
+		step.Driver.Start()
 	}
 }
 
 func (p *Pipeline) Stop() {
 	for _, step := range p.steps {
-		step.driver.Stop()
+		step.Driver.Stop()
 	}
 }

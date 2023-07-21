@@ -486,7 +486,7 @@ func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscripti
 func controller(
 	cfg httpServerConfig,
 	tracer trace.Tracer,
-	testRunner *TestPipeline,
+	testRunner *executor.TestPipeline,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepo *transaction.Repository,
@@ -518,7 +518,7 @@ func controller(
 func httpRouter(
 	cfg httpServerConfig,
 	tracer trace.Tracer,
-	testRunner *TestPipeline,
+	testRunner *executor.TestPipeline,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepo *transaction.Repository,

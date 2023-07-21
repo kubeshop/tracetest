@@ -34,10 +34,14 @@ func (u CompositeUpdater) Update(ctx context.Context, run test.Run) error {
 }
 
 type dbUpdater struct {
-	repo test.RunRepository
+	repo runDBUpdater
 }
 
-func NewDBUpdater(repo test.RunRepository) RunUpdater {
+type runDBUpdater interface {
+	UpdateRun(context.Context, test.Run) error
+}
+
+func NewDBUpdater(repo runDBUpdater) RunUpdater {
 	return dbUpdater{repo}
 }
 

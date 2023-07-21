@@ -1,12 +1,7 @@
 package executor
 
 import (
-	"context"
-	"log"
-
-	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 )
 
@@ -20,35 +15,35 @@ func (sr StopRequest) ResourceID() string {
 	return runID + "/stop"
 }
 
-func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, run test.Run) {
-	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		stopRequest, ok := m.Content.(StopRequest)
-		if !ok {
-			return nil
-		}
+// func (r persistentRunner) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, run test.Run) {
+// 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+// 		stopRequest, ok := m.Content.(StopRequest)
+// 		if !ok {
+// 			return nil
+// 		}
 
-		ctx, _ := r.tracer.Start(ctx, "User Requested Stop Run")
-		// refresh data from DB to make sure we have the latest possible data before updating
-		run, err := r.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
-		if err != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to get test run data: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
-			return err
-		}
+// 		ctx, _ := r.tracer.Start(ctx, "User Requested Stop Run")
+// 		// refresh data from DB to make sure we have the latest possible data before updating
+// 		run, err := r.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
+// 		if err != nil {
+// 			log.Printf("[TracePoller] Test %s Run %d: fail to get test run data: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
+// 			return err
+// 		}
 
-		run = run.Stopped()
-		r.handleDBError(run, r.updater.Update(ctx, run))
+// 		run = run.Stopped()
+// 		r.handleDBError(run, r.updater.Update(ctx, run))
 
-		evt := events.TraceStoppedInfo(stopRequest.TestID, stopRequest.RunID)
-		err = r.eventEmitter.Emit(ctx, evt)
-		if err != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to emit TraceStoppedInfo event: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
-			return err
-		}
+// 		evt := events.TraceStoppedInfo(stopRequest.TestID, stopRequest.RunID)
+// 		err = r.eventEmitter.Emit(ctx, evt)
+// 		if err != nil {
+// 			log.Printf("[TracePoller] Test %s Run %d: fail to emit TraceStoppedInfo event: %s \n", stopRequest.TestID, stopRequest.RunID, err.Error())
+// 			return err
+// 		}
 
-		cancelCtx()
+// 		cancelCtx()
 
-		return nil
-	})
+// 		return nil
+// 	})
 
-	r.subscriptionManager.Subscribe((StopRequest{run.TestID, run.ID}).ResourceID(), sfn)
-}
+// 	r.subscriptionManager.Subscribe((StopRequest{run.TestID, run.ID}).ResourceID(), sfn)
+// }

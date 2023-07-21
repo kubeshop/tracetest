@@ -1,45 +1,45 @@
-package app
+package executor
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
 )
 
 type TestPipeline struct {
 	*Pipeline
-	assertionQueue executor.Enqueuer
-	runs           test.RunRepository
-	trGetter       TestRunnerGetter
-	ppGetter       PollingProfileGetter
-	dsGetter       DataStoreGetter
+	assertionQueue Enqueuer
+	runs           runsRepo
+	trGetter       testRunnerGetter
+	ppGetter       defaultPollingProfileGetter
+	dsGetter       currentDataStoreGetter
 }
 
-type TestRunnerGetter interface {
+type runsRepo interface {
+	CreateRun(context.Context, test.Test, test.Run) (test.Run, error)
+	GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error)
+}
+
+type testRunnerGetter interface {
 	GetDefault(ctx context.Context) testrunner.TestRunner
 }
 
-type PollingProfileGetter interface {
+type defaultPollingProfileGetter interface {
 	GetDefault(ctx context.Context) pollingprofile.PollingProfile
-}
-
-type DataStoreGetter interface {
-	GetCurrent(ctx context.Context) (datastore.DataStore, error)
 }
 
 func NewTestPipeline(
 	pipeline *Pipeline,
-	assertionQueue executor.Enqueuer,
-	runs test.RunRepository,
-	trGetter TestRunnerGetter,
-	ppGetter PollingProfileGetter,
-	dsGetter DataStoreGetter,
+	assertionQueue Enqueuer,
+	runs runsRepo,
+	trGetter testRunnerGetter,
+	ppGetter defaultPollingProfileGetter,
+	dsGetter currentDataStoreGetter,
 ) *TestPipeline {
 	return &TestPipeline{
 		Pipeline:       pipeline,
@@ -68,10 +68,10 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 
 	// r.listenForStopRequests(ctx, cancelCtx, run)
 
-	datastore, err := p.dsGetter.GetCurrent(ctx)
+	datastore, err := p.dsGetter.Current(ctx)
 	p.handleDBError(run, err)
 
-	job := executor.Job{
+	job := Job{
 		Test:           testObj,
 		Run:            run,
 		PollingProfile: p.ppGetter.GetDefault(ctx),
@@ -90,10 +90,10 @@ func (p *TestPipeline) Rerun(ctx context.Context, testObj test.Test, runID int) 
 	newTestRun, err := p.runs.CreateRun(ctx, testObj, run.Copy())
 	p.handleDBError(run, err)
 
-	ds, err := p.dsGetter.GetCurrent(ctx)
+	ds, err := p.dsGetter.Current(ctx)
 	p.handleDBError(run, err)
 
-	p.assertionQueue.Enqueue(ctx, executor.Job{
+	p.assertionQueue.Enqueue(ctx, Job{
 		Test:           testObj,
 		Run:            newTestRun,
 		PollingProfile: p.ppGetter.GetDefault(ctx),

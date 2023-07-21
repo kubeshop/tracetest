@@ -10,12 +10,10 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
@@ -32,25 +30,19 @@ type PersistentRunner interface {
 	QueueItemProcessor
 }
 
-type TestRunnerGetter interface {
-	GetDefault(ctx context.Context) testrunner.TestRunner
-}
-
 const ProcessorName = "test_runner"
 
 func NewPersistentRunner(
 	triggers *triggerer.Registry,
-	runs test.RunRepository,
 	updater RunUpdater,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
-	dsRepo resourcemanager.Current[datastore.DataStore],
+	dsRepo currentDataStoreGetter,
 	eventEmitter EventEmitter,
 ) *persistentRunner {
 	return &persistentRunner{
 		triggers:            triggers,
-		runs:                runs,
 		updater:             updater,
 		tracer:              tracer,
 		newTraceDBFn:        newTraceDBFn,
@@ -60,14 +52,17 @@ func NewPersistentRunner(
 	}
 }
 
+type currentDataStoreGetter interface {
+	Current(context.Context) (datastore.DataStore, error)
+}
+
 type persistentRunner struct {
 	triggers            *triggerer.Registry
-	runs                test.RunRepository
 	updater             RunUpdater
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
 	newTraceDBFn        traceDBFactoryFn
-	dsRepo              resourcemanager.Current[datastore.DataStore]
+	dsRepo              currentDataStoreGetter
 	eventEmitter        EventEmitter
 	outputQueue         Enqueuer
 }
