@@ -1,14 +1,14 @@
 import Demo from 'models/Demo.model';
+import SettingService from 'services/Setting.service';
+import {SupportedDemos} from 'types/Settings.types';
 import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
-// import pokeshopProtoData from '../assets/pokeshop.proto.json';
-// import otelProtoData from '../assets/otel-demo.proto.json';
-// import pokeshopPostmanData from '../assets/pokeshop.postman_collection.json';
-import SettingService from '../services/Setting.service';
-import {SupportedDemos} from '../types/Settings.types';
+import pokeshopProtoData from './demos/pokeshop.proto';
+import otelDemoProtoData from './demos/otel-demo.proto';
+import pokeshopPostmanData from './demos/pokeshop.postman';
 
-// const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
-// const otelProtoFile = new File([otelProtoData?.proto], 'otel-demo.proto');
-// const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
+const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
+const otelProtoFile = new File([otelDemoProtoData?.proto], 'otel-demo.proto');
+const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
 const userId = '2491f868-88f1-4345-8836-d5d8511a9f83';
 
@@ -48,7 +48,7 @@ export function getPokeshopDemo(demoSettings: Demo) {
         message: '',
         method: 'pokeshop.Pokeshop.getPokemonList',
         description: 'Get a Pokemon',
-        // protoFile: pokeshopProtoFile,
+        protoFile: pokeshopProtoFile,
       },
       {
         name: 'Pokeshop - Add',
@@ -56,7 +56,7 @@ export function getPokeshopDemo(demoSettings: Demo) {
         message:
           '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
         method: 'pokeshop.Pokeshop.createPokemon',
-        // protoFile: pokeshopProtoFile,
+        protoFile: pokeshopProtoFile,
         description: 'Add a Pokemon',
       },
       {
@@ -64,7 +64,7 @@ export function getPokeshopDemo(demoSettings: Demo) {
         url: pokeshopGrpc,
         message: '{"id":52}',
         method: 'pokeshop.Pokeshop.importPokemon',
-        // protoFile: pokeshopProtoFile,
+        protoFile: pokeshopProtoFile,
         description: 'Import a Pokemon',
       },
     ],
@@ -76,7 +76,7 @@ export function getPokeshopDemo(demoSettings: Demo) {
         body: '',
         description: 'Get a Pokemon',
         collectionTest: 'List',
-        // collectionFile: pokeshopPostmanFile,
+        collectionFile: pokeshopPostmanFile,
       },
       {
         name: 'Pokeshop - Add',
@@ -85,7 +85,7 @@ export function getPokeshopDemo(demoSettings: Demo) {
         body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
         description: 'Add a Pokemon',
         collectionTest: 'Create',
-        // collectionFile: pokeshopPostmanFile,
+        collectionFile: pokeshopPostmanFile,
       },
       {
         name: 'Pokeshop - Import',
@@ -94,7 +94,7 @@ export function getPokeshopDemo(demoSettings: Demo) {
         body: '{"id":52}',
         description: 'Import a Pokemon',
         collectionTest: 'Import',
-        // collectionFile: pokeshopPostmanFile,
+        collectionFile: pokeshopPostmanFile,
       },
     ],
     [SupportedPlugins.CURL]: [
@@ -192,7 +192,7 @@ export function getOtelDemo(demoSettings: Demo) {
         message: '',
         method: 'hipstershop.ProductCatalogService.ListProducts',
         description: 'Otel - List Products',
-        // protoFile: otelProtoFile,
+        protoFile: otelProtoFile,
       },
       {
         name: 'Otel - Get Product',
@@ -200,7 +200,7 @@ export function getOtelDemo(demoSettings: Demo) {
         message: '{"id": "OLJCESPC7Z"}',
         method: 'hipstershop.ProductCatalogService.GetProduct',
         description: 'Otel - Get Product',
-        // protoFile: otelProtoFile,
+        protoFile: otelProtoFile,
       },
       {
         name: 'Otel - Add To Cart',
@@ -208,7 +208,7 @@ export function getOtelDemo(demoSettings: Demo) {
         message: JSON.stringify({item: {product_id: 'OLJCESPC7Z', quantity: 1}, user_id: userId}),
         method: 'hipstershop.CartService.AddItem',
         description: 'Otel - Add To Cart',
-        // protoFile: otelProtoFile,
+        protoFile: otelProtoFile,
       },
       {
         name: 'Otel - Get Cart',
@@ -216,7 +216,7 @@ export function getOtelDemo(demoSettings: Demo) {
         message: `{"user_id": "${userId}"}`,
         method: 'hipstershop.CartService.GetCart',
         description: 'Otel - Get Cart',
-        // protoFile: otelProtoFile,
+        protoFile: otelProtoFile,
       },
       {
         name: 'Otel - Checkout',
@@ -241,7 +241,7 @@ export function getOtelDemo(demoSettings: Demo) {
         }),
         method: 'hipstershop.CheckoutService.PlaceOrder',
         description: 'Otel - Checkout',
-        // protoFile: otelProtoFile,
+        protoFile: otelProtoFile,
       },
     ],
   };
