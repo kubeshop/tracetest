@@ -28,19 +28,17 @@ type Response struct {
 	SpanID         trace.SpanID
 }
 
-func NewRegsitry(tracer, triggerSpanTracer trace.Tracer) *Registry {
+func NewRegistry(tracer trace.Tracer) *Registry {
 	return &Registry{
-		tracer:            tracer,
-		triggerSpanTracer: triggerSpanTracer,
-		reg:               map[trigger.TriggerType]Triggerer{},
+		tracer: tracer,
+		reg:    map[trigger.TriggerType]Triggerer{},
 	}
 }
 
 type Registry struct {
 	sync.Mutex
-	tracer            trace.Tracer
-	triggerSpanTracer trace.Tracer
-	reg               map[trigger.TriggerType]Triggerer
+	tracer trace.Tracer
+	reg    map[trigger.TriggerType]Triggerer
 }
 
 func (r *Registry) Add(t Triggerer) {
@@ -61,9 +59,5 @@ func (r *Registry) Get(triggererType trigger.TriggerType) (Triggerer, error) {
 		return nil, fmt.Errorf(`cannot get trigger type "%s": %w`, triggererType, ErrTriggererTypeNotRegistered)
 	}
 
-	return Instrument(r.tracer, r.triggerSpanTracer, t), nil
-}
-
-func WrapInQuotes(input string, quoteChar string) string {
-	return fmt.Sprintf("%s%s%s", quoteChar, input, quoteChar)
+	return Instrument(r.tracer, t), nil
 }

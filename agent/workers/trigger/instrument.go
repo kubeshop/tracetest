@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -15,18 +14,16 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Instrument(tracer, triggerSpanTracer trace.Tracer, wrapped Triggerer) Triggerer {
+func Instrument(tracer trace.Tracer, wrapped Triggerer) Triggerer {
 	return &instrumentedTriggerer{
-		tracer:            tracer,
-		triggerSpanTracer: triggerSpanTracer,
-		triggerer:         wrapped,
+		tracer:    tracer,
+		triggerer: wrapped,
 	}
 }
 
 type instrumentedTriggerer struct {
-	tracer            trace.Tracer
-	triggerSpanTracer trace.Tracer
-	triggerer         Triggerer
+	tracer    trace.Tracer
+	triggerer Triggerer
 }
 
 func (t *instrumentedTriggerer) Type() trigger.TriggerType {
@@ -54,22 +51,14 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigg
 
 	triggerCtx := trace.ContextWithSpanContext(context.Background(), spanContext)
 
-	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(triggerCtx, model.TriggerSpanName)
-	defer triggerSpan.End()
+	tid := spanContext.TraceID()
 
-	triggerSpan.SpanContext().TraceState().Insert("tracetest", "true")
-
-	tid := triggerSpan.SpanContext().TraceID()
-	sid := triggerSpan.SpanContext().SpanID()
-
-	resp, err := t.triggerer.Trigger(triggerSpanCtx, triggerConfig, opts)
+	resp, err := t.triggerer.Trigger(triggerCtx, triggerConfig, opts)
 
 	resp.TraceID = tid
-	resp.SpanID = sid
 
 	attrs := []attribute.KeyValue{
 		attribute.String("tracetest.run.trigger.trace_id", tid.String()),
-		attribute.String("tracetest.run.trigger.span_id", sid.String()),
 		attribute.String("tracetest.run.trigger.test_id", string(opts.TestID)),
 		attribute.String("tracetest.run.trigger.type", string(t.triggerer.Type())),
 	}
