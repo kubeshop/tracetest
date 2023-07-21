@@ -52,6 +52,13 @@ func TestTrigger(t *testing.T) {
 	// make the control plane send a trigger request to the agent
 	controlPlane.SendTriggerRequest(triggerRequest)
 	time.Sleep(1 * time.Second)
+
+	response := controlPlane.GetLastTriggerResponse()
+
+	require.NotNil(t, response)
+	assert.Equal(t, "http", response.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
+	assert.JSONEq(t, `{"hello": "world"}`, response.TriggerResult.Http.Body)
 }
 
 func createHelloWorldApi() *httptest.Server {

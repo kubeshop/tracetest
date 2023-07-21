@@ -50,8 +50,12 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 		return fmt.Errorf("could not trigger test: %w", err)
 	}
 
-	// TODO: send response to the server
-	fmt.Println(response)
+	protoResponse := convertResponseToProtoResponse(triggerRequest, response)
+	err = w.client.SendTriggerResponse(ctx, protoResponse)
+	if err != nil {
+		return fmt.Errorf("could not send trigger response to server: %w", err)
+	}
+
 	return nil
 }
 
@@ -153,5 +157,63 @@ func convertProtoTraceIDTriggerToTraceIDTrigger(traceIDRequest *proto.TraceIDReq
 
 	return &trigger.TraceIDRequest{
 		ID: traceIDRequest.Id,
+	}
+}
+
+func convertResponseToProtoResponse(request *proto.TriggerRequest, response agentTrigger.Response) *proto.TriggerResponse {
+	return &proto.TriggerResponse{
+		TestID: request.TestID,
+		RunID:  request.RunID,
+		TriggerResult: &proto.TriggerResult{
+			Type:            string(response.Result.Type),
+			Http:            convertHttpResponseToProto(response.Result.HTTP),
+			Grpc:            convertGrpcResponseToProto(response.Result.GRPC),
+			TraceIDResponse: convertTraceIDResponseToProto(response.Result.TraceID),
+		},
+	}
+}
+
+func convertHttpResponseToProto(http *trigger.HTTPResponse) *proto.HttpResponse {
+	if http == nil {
+		return nil
+	}
+
+	headers := make([]*proto.HttpHeader, 0, len(http.Headers))
+	for _, header := range http.Headers {
+		headers = append(headers, &proto.HttpHeader{Key: header.Key, Value: header.Value})
+	}
+
+	return &proto.HttpResponse{
+		StatusCode: int32(http.StatusCode),
+		Status:     http.Status,
+		Headers:    headers,
+		Body:       http.Body,
+	}
+}
+
+func convertGrpcResponseToProto(grpc *trigger.GRPCResponse) *proto.GrpcResponse {
+	if grpc == nil {
+		return nil
+	}
+
+	headers := make([]*proto.GrpcHeader, 0, len(grpc.Metadata))
+	for _, header := range grpc.Metadata {
+		headers = append(headers, &proto.GrpcHeader{Key: header.Key, Value: header.Value})
+	}
+
+	return &proto.GrpcResponse{
+		StatusCode: int32(grpc.StatusCode),
+		Metadata:   headers,
+		Body:       grpc.Body,
+	}
+}
+
+func convertTraceIDResponseToProto(traceID *trigger.TraceIDResponse) *proto.TraceIdResponse {
+	if traceID == nil {
+		return nil
+	}
+
+	return &proto.TraceIdResponse{
+		Id: traceID.ID,
 	}
 }
