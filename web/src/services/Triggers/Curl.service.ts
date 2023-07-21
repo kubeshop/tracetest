@@ -1,37 +1,8 @@
-// import {CURLParser} from 'parse-curl-js';
+import parseCurl from 'parse-curl';
 import {ICurlValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import HttpRequest from 'models/HttpRequest.model';
-
-class CURLParser {
-  command: string;
-
-  constructor(command: string) {
-    this.command = command;
-  }
-
-  parse(): any {
-    const {command} = this;
-    const parser = new CURLParser(command);
-    const {
-      url = '',
-      method,
-      headers = [],
-      body: {data: body = {}},
-    } = parser.parse();
-
-    return {
-      url: url.split('')[0] === "'" ? url.slice(1, -1) : url,
-      auth: undefined,
-      command,
-      method: method as HTTP_METHOD,
-      headers: Object.entries(headers).map(([key, value]) => ({key, value})),
-      body: body === 'data' ? '' : JSON.stringify(body),
-      sslVerification: false,
-    };
-  }
-}
 
 interface ICurlTriggerService extends ITriggerService {
   getRequestFromCommand(command: string): any;
@@ -51,33 +22,22 @@ const CurlTriggerService = (): ICurlTriggerService => ({
   },
 
   getRequestFromCommand(command) {
-    const parser = new CURLParser(command);
-    const {
-      url = '',
-      method,
-      headers = [],
-      body: {data: body = {}},
-    } = parser.parse();
+    const {url = '', method, header = {}, body} = parseCurl(command);
 
     return {
       url: url.split('')[0] === "'" ? url.slice(1, -1) : url,
       auth: undefined,
       command,
       method: method as HTTP_METHOD,
-      headers: Object.entries(headers).map(([key, value]) => ({key, value})),
-      body: body === 'data' ? '' : JSON.stringify(body),
+      headers: Object.entries(header).map(([key, value]) => ({key, value})),
+      body,
       sslVerification: false,
     };
   },
 
   getIsValidCommand(command) {
     try {
-      const parser = new CURLParser(command);
-      const {
-        url = '',
-        method,
-        body: {data: body = {}},
-      } = parser.parse();
+      const {url, method, body} = parseCurl(command);
 
       return Boolean((method.toUpperCase() === HTTP_METHOD.POST && body) || (url && method));
     } catch (e) {
