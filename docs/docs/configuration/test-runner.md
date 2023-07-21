@@ -2,7 +2,7 @@
 
 The Test Runner settings allow you to configure the default behavior used when executing your tests to determine whether to mark the test as passed or failed. Only the enabled gates will be will be used to determine whether a test is passed or failed.
 
-## Setting Up Test Runner with Tracetest
+## Setting Up the Default Test Runner Settings
 
 In the Tracetest settings, on the **Test Runner** tab, select the default gates used for every test to determine success or failure:
 
