@@ -9,7 +9,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
-	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -22,14 +21,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
-
-type defaultTestRunnerGetter struct{}
-
-func (dpc defaultTestRunnerGetter) GetDefault(context.Context) testrunner.TestRunner {
-	testRunner := testrunner.DefaultTestRunner
-
-	return testRunner
-}
 
 func TestPersistentRunner(t *testing.T) {
 	t.Run("TestIsTriggerd", func(t *testing.T) {
@@ -154,10 +145,10 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New()))
 
-	testDB := testdb.MockRepository{}
+	testDB := new(testdb.MockRepository)
 	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
 
-	eventEmitter := executor.NewEventEmitter(&testDB, subscription.NewManager())
+	eventEmitter := executor.NewEventEmitter(testDB, subscription.NewManager())
 
 	persistentRunner := executor.NewPersistentRunner(
 		reg,
@@ -213,10 +204,6 @@ func (m *mockDB) UpdateRun(_ context.Context, run test.Run) error {
 func (m *mockDB) GetTransactionRunSteps(ctx context.Context, id id.ID, runID int) ([]test.Run, error) {
 	args := m.Called(ctx, id, runID)
 	return args.Get(0).([]test.Run), args.Error(1)
-}
-
-type mockRunRepository struct {
-	mock.Mock
 }
 
 type mockTriggerer struct {
