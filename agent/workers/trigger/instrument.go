@@ -33,7 +33,7 @@ func (t *instrumentedTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerType("instrumented")
 }
 
-func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts Options) (Response, error) {
+func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
 	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
@@ -46,7 +46,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigg
 		TraceState: tracestate,
 	}
 
-	if len(opts.TraceID) > 0 {
+	if opts != nil {
 		spanContextConfig.TraceID = opts.TraceID
 	}
 

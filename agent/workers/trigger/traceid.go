@@ -12,7 +12,7 @@ func TRACEID() Triggerer {
 
 type traceidTriggerer struct{}
 
-func (t *traceidTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts Options) (Response, error) {
+func (t *traceidTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
 	response := Response{
 		Result: trigger.TriggerResult{
 			Type:    t.Type(),

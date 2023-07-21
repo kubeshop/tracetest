@@ -7,9 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
+	triggerer "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
@@ -45,24 +44,21 @@ func TestTriggerGet(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := test.Test{
-		Name: "test",
-		Trigger: trigger.Trigger{
-			Type: trigger.TriggerTypeHTTP,
-			HTTP: &trigger.HTTPRequest{
-				URL:    server.URL,
-				Method: trigger.HTTPMethodGET,
-				Headers: []trigger.HTTPHeader{
-					{Key: "Key1", Value: "Value1"},
-				},
-				Body: "body",
+	triggerConfig := trigger.Trigger{
+		Type: trigger.TriggerTypeHTTP,
+		HTTP: &trigger.HTTPRequest{
+			URL:    server.URL,
+			Method: trigger.HTTPMethodGET,
+			Headers: []trigger.HTTPHeader{
+				{Key: "Key1", Value: "Value1"},
 			},
+			Body: "body",
 		},
 	}
 
 	ex := triggerer.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test, nil)
+	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -92,24 +88,21 @@ func TestTriggerPost(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := test.Test{
-		Name: "test",
-		Trigger: trigger.Trigger{
-			Type: trigger.TriggerTypeHTTP,
-			HTTP: &trigger.HTTPRequest{
-				URL:    server.URL,
-				Method: trigger.HTTPMethodPOST,
-				Headers: []trigger.HTTPHeader{
-					{Key: "Key1", Value: "Value1"},
-				},
-				Body: "body",
+	triggerConfig := trigger.Trigger{
+		Type: trigger.TriggerTypeHTTP,
+		HTTP: &trigger.HTTPRequest{
+			URL:    server.URL,
+			Method: trigger.HTTPMethodPOST,
+			Headers: []trigger.HTTPHeader{
+				{Key: "Key1", Value: "Value1"},
 			},
+			Body: "body",
 		},
 	}
 
 	ex := triggerer.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test, nil)
+	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -145,32 +138,29 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := test.Test{
-		Name: "test",
-		Trigger: trigger.Trigger{
-			Type: trigger.TriggerTypeHTTP,
-			HTTP: &trigger.HTTPRequest{
-				URL:    server.URL,
-				Method: trigger.HTTPMethodPOST,
-				Headers: []trigger.HTTPHeader{
-					{Key: "Key1", Value: "Value1"},
-				},
-				Auth: &trigger.HTTPAuthenticator{
-					Type: "apiKey",
-					APIKey: &trigger.APIKeyAuthenticator{
-						Key:   "key",
-						Value: "value",
-						In:    trigger.APIKeyPositionHeader,
-					},
-				},
-				Body: "body",
+	triggerConfig := trigger.Trigger{
+		Type: trigger.TriggerTypeHTTP,
+		HTTP: &trigger.HTTPRequest{
+			URL:    server.URL,
+			Method: trigger.HTTPMethodPOST,
+			Headers: []trigger.HTTPHeader{
+				{Key: "Key1", Value: "Value1"},
 			},
+			Auth: &trigger.HTTPAuthenticator{
+				Type: "apiKey",
+				APIKey: &trigger.APIKeyAuthenticator{
+					Key:   "key",
+					Value: "value",
+					In:    trigger.APIKeyPositionHeader,
+				},
+			},
+			Body: "body",
 		},
 	}
 
 	ex := triggerer.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test, nil)
+	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -206,31 +196,28 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := test.Test{
-		Name: "test",
-		Trigger: trigger.Trigger{
-			Type: trigger.TriggerTypeHTTP,
-			HTTP: &trigger.HTTPRequest{
-				URL:    server.URL,
-				Method: trigger.HTTPMethodPOST,
-				Headers: []trigger.HTTPHeader{
-					{Key: "Key1", Value: "Value1"},
-				},
-				Auth: &trigger.HTTPAuthenticator{
-					Type: "basic",
-					Basic: &trigger.BasicAuthenticator{
-						Username: "username",
-						Password: "password",
-					},
-				},
-				Body: "body",
+	triggerConfig := trigger.Trigger{
+		Type: trigger.TriggerTypeHTTP,
+		HTTP: &trigger.HTTPRequest{
+			URL:    server.URL,
+			Method: trigger.HTTPMethodPOST,
+			Headers: []trigger.HTTPHeader{
+				{Key: "Key1", Value: "Value1"},
 			},
+			Auth: &trigger.HTTPAuthenticator{
+				Type: "basic",
+				Basic: &trigger.BasicAuthenticator{
+					Username: "username",
+					Password: "password",
+				},
+			},
+			Body: "body",
 		},
 	}
 
 	ex := triggerer.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test, nil)
+	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)
@@ -266,30 +253,27 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 	}))
 	defer server.Close()
 
-	test := test.Test{
-		Name: "test",
-		Trigger: trigger.Trigger{
-			Type: trigger.TriggerTypeHTTP,
-			HTTP: &trigger.HTTPRequest{
-				URL:    server.URL,
-				Method: trigger.HTTPMethodPOST,
-				Headers: []trigger.HTTPHeader{
-					{Key: "Key1", Value: "Value1"},
-				},
-				Auth: &trigger.HTTPAuthenticator{
-					Type: "bearer",
-					Bearer: &trigger.BearerAuthenticator{
-						Bearer: "token",
-					},
-				},
-				Body: "body",
+	triggerConfig := trigger.Trigger{
+		Type: trigger.TriggerTypeHTTP,
+		HTTP: &trigger.HTTPRequest{
+			URL:    server.URL,
+			Method: trigger.HTTPMethodPOST,
+			Headers: []trigger.HTTPHeader{
+				{Key: "Key1", Value: "Value1"},
 			},
+			Auth: &trigger.HTTPAuthenticator{
+				Type: "bearer",
+				Bearer: &trigger.BearerAuthenticator{
+					Bearer: "token",
+				},
+			},
+			Body: "body",
 		},
 	}
 
 	ex := triggerer.HTTP()
 
-	resp, err := ex.Trigger(createContext(), test, nil)
+	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Result.HTTP.StatusCode)

@@ -17,7 +17,7 @@ type Options struct {
 }
 
 type Triggerer interface {
-	Trigger(context.Context, trigger.Trigger, Options) (Response, error)
+	Trigger(context.Context, trigger.Trigger, *Options) (Response, error)
 	Type() trigger.TriggerType
 }
 

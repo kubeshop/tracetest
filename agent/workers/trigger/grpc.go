@@ -27,7 +27,7 @@ func GRPC() Triggerer {
 
 type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts Options) (Response, error) {
+func (te *grpcTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
 	response := Response{
 		Result: trigger.TriggerResult{
 			Type: te.Type(),
