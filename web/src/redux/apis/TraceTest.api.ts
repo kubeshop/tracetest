@@ -11,8 +11,7 @@ import TransactionEndpoint from './endpoints/Transaction.endpoint';
 import TransactionRunEndpoint from './endpoints/TransactionRun.endpoint';
 import SettingEndpoint from './endpoints/Setting.endpoint';
 
-// const PATH = `${document.baseURI}api/`;
-const PATH = `http://localhost:3000/api/`;
+const PATH = `${document.baseURI}api/`;
 
 const TraceTestAPI = createApi({
   reducerPath: 'tests',
