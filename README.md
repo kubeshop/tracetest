@@ -61,9 +61,10 @@
   </a>
 </h4>
 
-Tracetest lets you build integration and end-to-end tests 98% faster with disitrbuted traces.
+Tracetest lets you build integration and end-to-end tests 98% faster with disitrbuted traces. No plumbing, no mocks, no fakes. Test against real data.
 
-- **No plumbing, no mocks, no fakes. Test against real data.**
+You can:
+
 - **Assert** against both the **response and trace data** at every point of a request transaction.
 - **Assert** on the **timing of trace spans**.
   - Eg. A database span executes within `100ms`.
@@ -79,11 +80,8 @@ Tracetest lets you build integration and end-to-end tests 98% faster with disitr
   - Trace IDs
   - and many more...
 - Save and run tests manually and via CI build jobs.
-- Write detailed trace-based tests as:
-  - End-to-end tests
-  - Integration tests
 - Verify and analyze the quality of your OpenTelemetry instrumentation to enforce rules and standards.
-- Testing long running processes.
+- Test long-running processes.
 
 **Build tests in minutes**.
 
