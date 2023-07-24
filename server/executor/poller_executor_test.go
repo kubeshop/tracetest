@@ -45,8 +45,8 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	maxWaitTimeForTrace := 30 * time.Second
 
 	tracePerIteration := []model.Trace{
-		model.Trace{},
-		model.Trace{},
+		{},
+		{},
 	}
 
 	// mock external dependencies
@@ -96,7 +96,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 
 	// test
 	tracePerIteration := []model.Trace{
-		model.Trace{},
+		{},
 		trace,
 		trace,
 	}
@@ -161,7 +161,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 
 	// test
 	tracePerIteration := []model.Trace{
-		model.Trace{},
+		{},
 		traceWithOneSpan,
 		traceWithTwoSpans,
 		traceWithTwoSpans,
@@ -210,7 +210,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan})
 
 	tracePerIteration := []model.Trace{
-		model.Trace{},
+		{},
 		trace,
 		trace,
 		trace,
@@ -250,7 +250,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 	rootSpanID := randomIDGenerator.SpanID()
 
 	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
-		model.Span{
+		{
 			ID:        rootSpanID,
 			Name:      model.TriggerSpanName,
 			StartTime: time.Now(),
@@ -275,7 +275,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 
 	// test
 	tracePerIteration := []model.Trace{
-		model.Trace{},
+		{},
 		trace,
 		trace,
 	}
@@ -338,7 +338,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 
 	// test
 	tracePerIteration := []model.Trace{
-		model.Trace{},
+		{},
 		traceWithOnlyRoot,
 		traceWithOnlyRoot,
 		completeTrace,
@@ -419,7 +419,7 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 
 	// test
 	tracePerIteration := []model.Trace{
-		model.Trace{},
+		{},
 		traceWithOneSpan,
 		traceWithTwoSpans,
 		traceWithTwoSpans,
@@ -457,15 +457,15 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 		},
 	}
 
-	for i, value := range expectedValues {
+	for i, expected := range expectedValues {
 		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
 
-		finished, finishReason, anotherRun, err := pollerExecutor.ExecuteRequest(ctx, request)
-		run = anotherRun // should store a run to use in another iteration
+		finished, finishReason, nextRun, err := pollerExecutor.ExecuteRequest(ctx, request)
+		run = nextRun // should store a run to use in another iteration
 
 		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
 
-		if value.finished {
+		if expected.finished {
 			require.Truef(t, finished, "The poller should have finished on iteration %d", i)
 			require.NotEmptyf(t, finishReason, "The poller should not have finish reason on iteration %d", i)
 		} else {
@@ -473,38 +473,20 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 			require.Emptyf(t, finishReason, "The poller should have finish reason on iteration %d", i)
 		}
 
-		if value.expectNoTraceError {
+		if expected.expectNoTraceError {
 			require.Errorf(t, err, "An error should have happened on iteration %d", i)
 			require.ErrorIsf(t, err, connection.ErrTraceNotFound, "An connection error should have happened on iteration %d", i)
 		} else {
 			require.NoErrorf(t, err, "An error should not have happened on iteration %d", i)
 
 			// only validate root span if we have a root span
-			if value.expectRootSpan {
+			if expected.expectRootSpan {
 				require.Truef(t, run.Trace.HasRootSpan(), "The trace associated with the run on iteration %d should have a root span", i)
 			} else {
 				require.Falsef(t, run.Trace.HasRootSpan(), "The trace associated with the run on iteration %d should not have a root span", i)
 			}
 		}
 	}
-}
-
-type defaultProfileGetter struct {
-	retryDelay, maxWaitTimeForTrace time.Duration
-}
-
-func (dpc defaultProfileGetter) GetDefault(context.Context) pollingprofile.PollingProfile {
-	pp := pollingprofile.DefaultPollingProfile
-
-	if dpc.retryDelay > 0 {
-		pp.Periodic.RetryDelay = dpc.retryDelay.String()
-	}
-
-	if dpc.maxWaitTimeForTrace > 0 {
-		pp.Periodic.Timeout = dpc.maxWaitTimeForTrace.String()
-	}
-
-	return pp
 }
 
 func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
@@ -531,18 +513,19 @@ type runUpdaterMock struct{}
 
 func (m runUpdaterMock) Update(context.Context, test.Run) error { return nil }
 
-func getRunUpdaterMock(t *testing.T) executor.RunUpdater {
+func getRunUpdaterMock(_ *testing.T) executor.RunUpdater {
 	return runUpdaterMock{}
 }
 
 // RunRepository
-func getRunRepositoryMock(t *testing.T) model.Repository {
+func getRunRepositoryMock(t *testing.T) *testdb.MockRepository {
 	t.Helper()
 
-	testDB := testdb.MockRepository{}
-	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
+	testDB := new(testdb.MockRepository)
+	testDB.Test(t)
+	testDB.On("CreateTestRunEvent", mock.Anything).Return(noError)
 
-	return &testDB
+	return testDB
 }
 
 // DataStoreRepository
@@ -560,11 +543,13 @@ func (m *dataStoreRepositoryMock) Get(_ context.Context, id id.ID) (datastore.Da
 }
 
 func getDataStoreRepositoryMock(t *testing.T) *dataStoreRepositoryMock {
-	return &dataStoreRepositoryMock{}
+	m := new(dataStoreRepositoryMock)
+	m.Test(t)
+	return m
 }
 
 // EventEmitter
-func getEventEmitterMock(t *testing.T, db model.Repository) executor.EventEmitter {
+func getEventEmitterMock(t *testing.T, db *testdb.MockRepository) executor.EventEmitter {
 	t.Helper()
 
 	return executor.NewEventEmitter(db, subscription.NewManager())
