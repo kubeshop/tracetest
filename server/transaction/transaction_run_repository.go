@@ -11,7 +11,12 @@ import (
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
+	"github.com/kubeshop/tracetest/server/test"
 )
+
+type transactionStepRunRepository interface {
+	GetTransactionRunSteps(_ context.Context, _ id.ID, runID int) ([]test.Run, error)
+}
 
 func NewRunRepository(db *sql.DB, stepsRepository transactionStepRunRepository) *RunRepository {
 	return &RunRepository{

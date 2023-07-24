@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/transaction"
 )
 
 const (
@@ -46,9 +47,14 @@ func (h headers) SetInt(key string, value int) {
 }
 
 type Job struct {
-	ctxHeaders     headers
-	Test           test.Test
-	Run            test.Run
+	ctxHeaders headers
+
+	Transaction    transaction.Transaction
+	TransactionRun transaction.TransactionRun
+
+	Test test.Test
+	Run  test.Run
+
 	PollingProfile pollingprofile.PollingProfile
 	DataStore      datastore.DataStore
 }
@@ -92,9 +98,21 @@ type testRunGetter interface {
 	GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error)
 }
 
+type transactionGetter interface {
+	Get(context.Context, id.ID) (transaction.Transaction, error)
+}
+
+type transactionRunGetter interface {
+	GetTransactionRun(_ context.Context, transactionID id.ID, runID int) (transaction.TransactionRun, error)
+}
+
 type Queue struct {
-	runs            testRunGetter
-	tests           testGetter
+	runs  testRunGetter
+	tests testGetter
+
+	transactionRuns transactionRunGetter
+	transactions    transactionGetter
+
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
 
@@ -103,8 +121,12 @@ type Queue struct {
 }
 
 type QueueBuilder struct {
-	runs            testRunGetter
-	tests           testGetter
+	runs  testRunGetter
+	tests testGetter
+
+	transactionRuns transactionRunGetter
+	transactions    transactionGetter
+
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
 }
@@ -133,14 +155,29 @@ func (qb *QueueBuilder) WithDataStoreGetter(dataStore dataStoreGetter) *QueueBui
 	return qb
 }
 
+func (qb *QueueBuilder) WithTransactionGetter(transactions transactionGetter) *QueueBuilder {
+	qb.transactions = transactions
+	return qb
+}
+
+func (qb *QueueBuilder) WithTransactionRunGetter(transactionRuns transactionRunGetter) *QueueBuilder {
+	qb.transactionRuns = transactionRuns
+	return qb
+}
+
 func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcessor) *Queue {
 	queue := &Queue{
-		runs:            qb.runs,
-		tests:           qb.tests,
+		runs:  qb.runs,
+		tests: qb.tests,
+
+		transactionRuns: qb.transactionRuns,
+		transactions:    qb.transactions,
+
 		pollingProfiles: qb.pollingProfiles,
 		dataStores:      qb.dataStores,
-		driver:          driver,
-		itemProcessor:   itemProcessor,
+
+		driver:        driver,
+		itemProcessor: itemProcessor,
 	}
 
 	driver.SetQueue(queue)
@@ -158,51 +195,119 @@ type QueueDriver interface {
 	SetQueue(*Queue)
 }
 
-func (r Queue) Enqueue(ctx context.Context, job Job) {
+func (q Queue) Enqueue(ctx context.Context, job Job) {
 	// TODO: carry context propagation
 	job = job.increaseEnqueueCount()
 
-	r.driver.Enqueue(Job{
-		ctxHeaders:     job.ctxHeaders,
-		Test:           test.Test{ID: job.Test.ID},
-		Run:            test.Run{ID: job.Run.ID},
+	q.driver.Enqueue(Job{
+		ctxHeaders: job.ctxHeaders,
+
+		Test: test.Test{ID: job.Test.ID},
+		Run:  test.Run{ID: job.Run.ID},
+
+		Transaction:    transaction.Transaction{ID: job.Transaction.ID},
+		TransactionRun: transaction.TransactionRun{ID: job.TransactionRun.ID},
+
 		PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
 		DataStore:      datastore.DataStore{ID: job.DataStore.ID},
 	})
 }
 
-func (r Queue) Listen(job Job) {
+func (q Queue) Listen(job Job) {
 	// this is called when a new job is put in the queue and we need to process it
 	ctx := context.Background()
 	// TODO - carry over headers
 
-	test, err := r.tests.GetAugmented(ctx, job.Test.ID)
+	newJob := Job{
+		ctxHeaders: job.ctxHeaders,
+	}
+	newJob.Test = q.resolveTest(job)
+	newJob.Run = q.resolveTestRun(job)
+
+	newJob.Transaction = q.resolveTransaction(job)
+	newJob.TransactionRun = q.resolveTransactionRun(job)
+
+	newJob.PollingProfile = q.resolvePollingProfile(job)
+	newJob.DataStore = q.resolveDataStore(job)
+
+	q.itemProcessor.ProcessItem(ctx, newJob)
+}
+
+func (q Queue) resolveTransaction(job Job) transaction.Transaction {
+	if q.transactions == nil {
+		return transaction.Transaction{}
+	}
+
+	tran, err := q.transactions.Get(context.Background(), job.Transaction.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	run, err := r.runs.GetRun(ctx, test.ID, job.Run.ID)
+	return tran
+}
+func (q Queue) resolveTransactionRun(job Job) transaction.TransactionRun {
+	if q.transactionRuns == nil {
+		return transaction.TransactionRun{}
+	}
+
+	tranRun, err := q.transactionRuns.GetTransactionRun(context.Background(), job.Transaction.ID, job.TransactionRun.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	pp, err := r.pollingProfiles.Get(ctx, job.PollingProfile.ID)
+	return tranRun
+}
+
+func (q Queue) resolveTest(job Job) test.Test {
+	if q.tests == nil {
+		return test.Test{}
+	}
+
+	t, err := q.tests.GetAugmented(context.Background(), job.Test.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	ds, err := r.dataStores.Get(ctx, job.DataStore.ID)
+	return t
+}
+
+func (q Queue) resolveTestRun(job Job) test.Run {
+	if q.runs == nil {
+		return test.Run{}
+	}
+
+	run, err := q.runs.GetRun(context.Background(), job.Test.ID, job.Run.ID)
 	if err != nil {
 		panic(err)
 	}
 
-	r.itemProcessor.ProcessItem(ctx, Job{
-		ctxHeaders:     job.ctxHeaders,
-		Test:           test,
-		Run:            run,
-		PollingProfile: pp,
-		DataStore:      ds,
-	})
+	return run
+}
+
+func (q Queue) resolvePollingProfile(job Job) pollingprofile.PollingProfile {
+	if q.pollingProfiles == nil {
+		return pollingprofile.PollingProfile{}
+	}
+
+	profile, err := q.pollingProfiles.Get(context.Background(), job.PollingProfile.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	return profile
+}
+
+func (q Queue) resolveDataStore(job Job) datastore.DataStore {
+	if q.dataStores == nil {
+		return datastore.DataStore{}
+	}
+
+	ds, err := q.dataStores.Get(context.Background(), job.DataStore.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	return ds
 }
 
 func NewInMemoryQueueDriver(name string) *InMemoryQueueDriver {

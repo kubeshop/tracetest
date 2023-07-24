@@ -116,12 +116,12 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	testRepo := test.NewRepository(rawDB)
 	runRepo := test.NewRunRepository(rawDB)
 
-	// testRunner := &fakeTestRunner{
-	// 	runRepo,
-	// 	subscriptionManager,
-	// 	withErrors,
-	// 	0,
-	// }
+	testRunner := &fakeTestRunner{
+		runRepo,
+		subscriptionManager,
+		withErrors,
+		0,
+	}
 
 	test1, err := testRepo.Create(ctx, test.Test{Name: "Test 1"})
 	require.NoError(t, err)
@@ -157,13 +157,23 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRepo, transactionRunRepo, subscriptionManager)
-	runner.Start(1)
+	runner := executor.NewTransactionRunner(testRunner, transactionRunRepo, subscriptionManager)
+
+	queueBuilder := executor.NewQueueBuilder().
+		WithTransactionGetter(transactionsRepo).
+		WithTransactionRunGetter(transactionRunRepo)
+
+	pipeline := executor.NewPipeline(queueBuilder,
+		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
+	)
+
+	transactionPipeline := executor.NewTransactionPipeline(pipeline, transactionRunRepo)
+	transactionPipeline.Start()
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	transactionRun := runner.Run(ctxWithTimeout, tran, metadata, env, nil)
+	transactionRun := transactionPipeline.Run(ctxWithTimeout, tran, metadata, env, nil)
 
 	done := make(chan transaction.TransactionRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
@@ -185,6 +195,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 		t.Log("timeout after 10 second")
 		t.FailNow()
 	}
+	transactionPipeline.Stop()
 
 	assert(t, finalRun)
 }

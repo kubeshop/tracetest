@@ -40,7 +40,7 @@ func NewAssertionRunner(
 }
 
 func (e *defaultAssertionRunner) SetOutputQueue(Enqueuer) {
-	// do nothing, this is the last step
+	// this is a no-op, as assertion runner does not need to enqueue anything
 }
 
 func (e *defaultAssertionRunner) ProcessItem(ctx context.Context, job Job) {
