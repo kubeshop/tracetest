@@ -23,6 +23,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	httpServer "github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/http/websocket"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
@@ -268,6 +269,9 @@ func (app *App) Start(opts ...appOption) error {
 
 	// use the analytics middleware on complete router
 	router.Use(analyticsMW)
+
+	// use the tenant middleware on complete router
+	router.Use(middleware.TenantMiddleware)
 
 	apiRouter := router.
 		PathPrefix(app.cfg.ServerPathPrefix()).

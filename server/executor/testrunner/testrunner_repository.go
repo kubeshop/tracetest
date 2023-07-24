@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 func NewRepository(db *sql.DB) *Repository {
@@ -33,9 +34,10 @@ const (
 	INSERT INTO test_runners(
 		"id",
 		"name",
-		"required_gates"
+		"required_gates",
+		"tenant_id"
 	)
-	VALUES ($1, $2, $3)`
+	VALUES ($1, $2, $3, $4)`
 	deleteQuery = `DELETE FROM test_runners`
 )
 
@@ -53,6 +55,7 @@ func (r *Repository) Update(ctx context.Context, updated TestRunner) (TestRunner
 	if err != nil {
 		return TestRunner{}, fmt.Errorf("sql exec delete: %w", err)
 	}
+	tenantID := sqlutil.TenantID(ctx)
 
 	var requiredGatesJSON []byte
 	if updated.RequiredGates != nil {
@@ -66,6 +69,7 @@ func (r *Repository) Update(ctx context.Context, updated TestRunner) (TestRunner
 		updated.ID,
 		updated.Name,
 		requiredGatesJSON,
+		tenantID,
 	)
 	if err != nil {
 		return TestRunner{}, fmt.Errorf("sql exec insert: %w", err)
@@ -103,8 +107,9 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (TestRunner, error) {
 	}
 
 	var requiredGatesJSON []byte
+	query, params := sqlutil.Tenant(ctx, getQuery)
 	err := r.db.
-		QueryRowContext(ctx, getQuery).
+		QueryRowContext(ctx, query, params...).
 		Scan(
 			&testRunner.Name,
 			&requiredGatesJSON,

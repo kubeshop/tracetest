@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 type Repository struct {
@@ -27,8 +28,9 @@ const (
 			"name",
 			"enabled",
 			"minimum_score",
-			"plugins"
-		) VALUES ($1, $2, $3, $4, $5)`
+			"plugins",
+			"tenant_id"
+		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	getQuery = `
 	SELECT
@@ -74,7 +76,8 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		return Linter{}, err
 	}
 
-	_, err = tx.ExecContext(ctx, deleteQuery, updated.ID)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, updated.ID)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return Linter{}, fmt.Errorf("sql exec delete: %w", err)
 	}
@@ -87,6 +90,7 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		}
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
 	_, err = tx.ExecContext(
 		ctx,
 		insertQuery,
@@ -95,6 +99,7 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		updated.Enabled,
 		updated.MinimumScore,
 		pluginsJSON,
+		tenantID,
 	)
 	if err != nil {
 		return Linter{}, fmt.Errorf("sql exec insert: %w", err)
@@ -154,8 +159,9 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (Linter, error) {
 	linter := defaultLinter
 
 	var rawPlugins []byte
+	query, params := sqlutil.Tenant(ctx, getQuery)
 	err := r.db.
-		QueryRowContext(ctx, getQuery).
+		QueryRowContext(ctx, query, params...).
 		Scan(
 			&linter.ID,
 			&linter.Name,

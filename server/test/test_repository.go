@@ -125,6 +125,7 @@ func (r *repository) list(ctx context.Context, take, skip int, query, sortBy, so
 
 	condition := fmt.Sprintf(" WHERE (t.name ilike $%d OR t.description ilike $%d)", paramNumber, paramNumber)
 	q, params := sqlutil.Search(sql, condition, query, params)
+	q, params = sqlutil.TenantWithPrefix(ctx, q, "t.", params...)
 
 	sortingFields := map[string]string{
 		"created":  "t.created_at",
@@ -160,6 +161,7 @@ func (r *repository) Count(ctx context.Context, query string) (int, error) {
 	countQuery := "SELECT COUNT(*) FROM tests t" + testMaxVersionQuery
 	const condition = " WHERE (t.name ilike $1 OR t.description ilike $1)"
 	sql, params := sqlutil.Search(countQuery, condition, query, params)
+	sql, params = sqlutil.TenantWithPrefix(ctx, sql, "t.", params...)
 
 	count := 0
 
@@ -188,14 +190,12 @@ func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
 	return r.get(ctx, id)
 }
 
-func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
-	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
-	if err != nil {
-		return Test{}, fmt.Errorf("prepare: %w", err)
-	}
-	defer stmt.Close()
+const sortQuery = `ORDER BY t.version DESC LIMIT 1`
 
-	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id))
+func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
+	query, params := sqlutil.Tenant(ctx, getTestSQL+" WHERE t.id = $1", id)
+
+	test, err := r.readRow(ctx, r.db.QueryRowContext(ctx, query+sortQuery, params...))
 	if err != nil {
 		return Test{}, err
 	}
@@ -204,14 +204,16 @@ func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
 }
 
 func (r *repository) GetTransactionSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
-	stmt, err := r.db.Prepare(getTestSQL + testMaxVersionQuery + ` INNER JOIN transaction_steps ts ON t.id = ts.test_id
-	 WHERE ts.transaction_id = $1 AND ts.transaction_version = $2 ORDER BY ts.step_number ASC`)
+	sortQuery := `ORDER BY ts.step_number ASC`
+	query, params := sqlutil.Tenant(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN transaction_steps ts ON t.id = ts.test_id
+	WHERE ts.transaction_id = $1 AND ts.transaction_version = $2`, id, version)
+	stmt, err := r.db.Prepare(query + sortQuery)
 	if err != nil {
 		return []Test{}, fmt.Errorf("prepare 2: %w", err)
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, id, version)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return []Test{}, fmt.Errorf("query context: %w", err)
 	}
@@ -322,8 +324,9 @@ INSERT INTO tests (
 	"service_under_test",
 	"specs",
 	"outputs",
-	"created_at"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	"created_at",
+	"tenant_id"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 
 func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
 	if test.HasID() {
@@ -377,6 +380,8 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		return Test{}, fmt.Errorf("encoding error: %w", err)
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	_, err = stmt.ExecContext(
 		ctx,
 		test.ID,
@@ -387,6 +392,7 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		specsJson,
 		outputsJson,
 		test.CreatedAt,
+		tenantID,
 	)
 	if err != nil {
 		return Test{}, fmt.Errorf("sql exec: %w", err)
@@ -500,7 +506,8 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	defer tx.Rollback()
 
 	for _, sql := range queries {
-		_, err := tx.ExecContext(ctx, sql, id)
+		sql, params := sqlutil.Tenant(ctx, sql, id)
+		_, err := tx.ExecContext(ctx, sql, params...)
 		if err != nil {
 			return fmt.Errorf("sql error: %w", err)
 		}
@@ -559,13 +566,14 @@ func (r *repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 }
 
 func (r *repository) GetVersion(ctx context.Context, id id.ID, version int) (Test, error) {
-	stmt, err := r.db.Prepare(getTestSQL + " WHERE t.id = $1 AND t.version = $2")
+	query, params := sqlutil.Tenant(ctx, getTestSQL+" WHERE t.id = $1 AND t.version = $2", id, version)
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return Test{}, fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id, version))
+	test, err := r.readRow(ctx, stmt.QueryRowContext(ctx, params...))
 	if err != nil {
 		return Test{}, err
 	}

@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 func NewRepository(db *sql.DB) *Repository {
@@ -35,9 +36,10 @@ const (
 		"name",
 		"default",
 		"strategy",
-		"periodic"
+		"periodic",
+		"tenant_id"
 	)
-	VALUES ($1, $2, $3, $4, $5)`
+	VALUES ($1, $2, $3, $4, $5, $6)`
 	deleteQuery = `DELETE FROM polling_profiles`
 )
 
@@ -47,12 +49,13 @@ func (r *Repository) Update(ctx context.Context, updated PollingProfile) (Pollin
 	updated.Default = true
 
 	tx, err := r.db.BeginTx(ctx, nil)
-	defer tx.Rollback()
 	if err != nil {
 		return PollingProfile{}, err
 	}
+	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery)
+	query, params := sqlutil.Tenant(ctx, deleteQuery)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return PollingProfile{}, fmt.Errorf("sql exec delete: %w", err)
 	}
@@ -65,12 +68,14 @@ func (r *Repository) Update(ctx context.Context, updated PollingProfile) (Pollin
 		}
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
 	_, err = tx.ExecContext(ctx, insertQuery,
 		updated.ID,
 		updated.Name,
 		updated.Default,
 		updated.Strategy,
 		periodicJSON,
+		tenantID,
 	)
 	if err != nil {
 		return PollingProfile{}, fmt.Errorf("sql exec insert: %w", err)
@@ -106,8 +111,9 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (PollingProfile, error) 
 	}
 
 	var periodicJSON []byte
+	query, params := sqlutil.Tenant(ctx, getQuery)
 	err := r.db.
-		QueryRowContext(ctx, getQuery).
+		QueryRowContext(ctx, query, params...).
 		Scan(
 			&profile.Name,
 			&profile.Strategy,

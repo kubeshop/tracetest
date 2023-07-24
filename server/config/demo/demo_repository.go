@@ -30,9 +30,10 @@ const insertQuery = `INSERT INTO demos (
 		"enabled",
 		"type",
 		"pokeshop",
-		"opentelemetry_store"
+		"opentelemetry_store",
+		"tenant_id"
 	)
-	VALUES ($1, $2, $3, $4, $5, $6)`
+	VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 func (r *Repository) Create(ctx context.Context, demo Demo) (Demo, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -50,6 +51,8 @@ func (r *Repository) Create(ctx context.Context, demo Demo) (Demo, error) {
 		return Demo{}, fmt.Errorf("could not get JSON data from opentelemetry store example: %w", err)
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	_, err = tx.ExecContext(ctx, insertQuery,
 		demo.ID,
 		demo.Name,
@@ -57,6 +60,7 @@ func (r *Repository) Create(ctx context.Context, demo Demo) (Demo, error) {
 		demo.Type,
 		pokeshopJSONData,
 		openTelemetryStoreJSONData,
+		tenantID,
 	)
 
 	if err != nil {
@@ -102,7 +106,7 @@ func (r *Repository) Update(ctx context.Context, demo Demo) (Demo, error) {
 		return Demo{}, fmt.Errorf("could not get JSON data from opentelemetry store example: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, updateQuery,
+	query, params := sqlutil.Tenant(ctx, updateQuery,
 		oldDemo.ID,
 		demo.Name,
 		demo.Enabled,
@@ -110,6 +114,8 @@ func (r *Repository) Update(ctx context.Context, demo Demo) (Demo, error) {
 		pokeshopJSONData,
 		openTelemetryStoreJSONData,
 	)
+
+	_, err = tx.ExecContext(ctx, query, params...)
 
 	if err != nil {
 		tx.Rollback()
@@ -133,10 +139,10 @@ const (
 			"type",
 			"pokeshop",
 			"opentelemetry_store"
-		FROM demos `
+		FROM demos`
 
-	getQuery        = baseSelect + `WHERE "id" = $1`
-	getDefaultQuery = baseSelect + `WHERE "default" = true`
+	getQuery        = baseSelect + ` WHERE "id" = $1`
+	getDefaultQuery = baseSelect + ` WHERE "default" = true`
 )
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (Demo, error) {
@@ -144,6 +150,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (Demo, error) {
 }
 
 func (r *Repository) get(ctx context.Context, query string, args ...any) (Demo, error) {
+	query, args = sqlutil.Tenant(ctx, query, args...)
 	row := r.db.QueryRowContext(ctx, query, args...)
 	return readRow(row)
 }
@@ -161,7 +168,8 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, deleteQuery, demo.ID)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, demo.ID)
+	_, err = tx.ExecContext(ctx, query, params...)
 
 	if err != nil {
 		tx.Rollback()
@@ -191,6 +199,7 @@ func listQuery(baseSQL, query string, params []any) (string, []any) {
 
 func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Demo, error) {
 	q, params := listQuery(baseSelect, query, []any{take, skip})
+	q, params = sqlutil.Tenant(ctx, q, params...)
 
 	sortingFields := map[string]string{
 		"id":   "id",
@@ -240,8 +249,9 @@ func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 
 	count := 0
 
+	countQuery, params := sqlutil.Tenant(ctx, countQuery)
 	err := r.db.
-		QueryRowContext(ctx, countQuery).
+		QueryRowContext(ctx, countQuery, params...).
 		Scan(&count)
 
 	if err != nil {
