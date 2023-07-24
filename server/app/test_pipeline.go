@@ -11,7 +11,6 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -20,16 +19,14 @@ func buildTestPipeline(
 	dsRepo *datastore.Repository,
 	lintRepo *analyzer.Repository,
 	trRepo *testrunner.Repository,
-	db model.Repository,
+	treRepo model.TestRunEventRepository,
 	testRepo test.Repository,
 	runRepo test.RunRepository,
-	transactionRunRepository *transaction.RunRepository,
-	appTracer trace.Tracer,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
 ) *executor.TestPipeline {
-	eventEmitter := executor.NewEventEmitter(db, subscriptionManager)
+	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
 	execTestUpdater := (executor.CompositeUpdater{}).
 		Add(executor.NewDBUpdater(runRepo)).

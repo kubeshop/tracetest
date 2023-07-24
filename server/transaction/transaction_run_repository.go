@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -326,7 +327,7 @@ FROM transaction_runs
 `
 
 func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
-	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE id = $1 AND transaction_id = $2", runID, transactionID)
+	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE id = $1 AND transaction_id = $2", strconv.Itoa(runID), transactionID)
 	stmt, err := td.db.Prepare(query)
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("prepare: %w", err)

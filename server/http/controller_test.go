@@ -125,6 +125,7 @@ func setupController(t *testing.T) controllerFixture {
 		c: http.NewController(
 			trace.NewNoopTracerProvider().Tracer("tracer"),
 			nil,
+			nil,
 			mdb,
 			nil,
 			nil,

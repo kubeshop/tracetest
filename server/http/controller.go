@@ -30,19 +30,21 @@ import (
 var IDGen = id.NewRandGenerator()
 
 type controller struct {
-	tracer     trace.Tracer
-	testRunner testRunner
+	tracer trace.Tracer
+
+	testRunner        testRunner
+	transactionRunner transactionRunner
 
 	testRunEvents            model.TestRunEventRepository
+	testRunRepository        test.RunRepository
+	testRepository           testsRepository
 	transactionRepository    transactionsRepository
 	transactionRunRepository transactionRunRepository
-	testRepository           testsRepository
-	testRunRepository        test.RunRepository
-	environmentGetter        environmentGetter
 
-	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error)
-	mappers      mappings.Mappings
-	version      string
+	environmentGetter environmentGetter
+	newTraceDBFn      func(ds datastore.DataStore) (tracedb.TraceDB, error)
+	mappers           mappings.Mappings
+	version           string
 }
 
 type transactionsRepository interface {
@@ -69,8 +71,12 @@ type transactionRunRepository interface {
 
 type testRunner interface {
 	// StopTest(testID id.ID, runID int)
-	Run(ctx context.Context, test test.Test, rm test.RunMetadata, env environment.Environment, gates *[]testrunner.RequiredGate) test.Run
-	Rerun(ctx context.Context, testObj test.Test, runID int) test.Run
+	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
+	Rerun(_ context.Context, _ test.Test, runID int) test.Run
+}
+
+type transactionRunner interface {
+	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) transaction.TransactionRun
 }
 
 type environmentGetter interface {
@@ -79,7 +85,9 @@ type environmentGetter interface {
 
 func NewController(
 	tracer trace.Tracer,
+
 	testRunner testRunner,
+	transactionRunner transactionRunner,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepository transactionsRepository,
@@ -100,8 +108,10 @@ func NewController(
 		testRunRepository:        testRunRepository,
 		environmentGetter:        environmentGetter,
 
+		testRunner:        testRunner,
+		transactionRunner: transactionRunner,
+
 		tracer:       tracer,
-		testRunner:   testRunner,
 		newTraceDBFn: newTraceDBFn,
 		mappers:      mappers,
 		version:      version,
@@ -499,35 +509,35 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 
 // RunTransaction implements openapi.ApiApiServicer
 func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
-	// transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
-	// if err != nil {
-	// 	return handleDBError(err), err
-	// }
+	transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
+	if err != nil {
+		return handleDBError(err), err
+	}
 
-	// metadata := metadata(runInfo.Metadata)
-	// variablesEnv := c.mappers.In.Environment(openapi.Environment{
-	// 	Values: runInfo.Variables,
-	// })
-	// environment, err := c.getEnvironment(ctx, runInfo.EnvironmentID, variablesEnv)
+	metadata := metadata(runInfo.Metadata)
+	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+		Values: runInfo.Variables,
+	})
 
-	// if err != nil {
-	// 	return handleDBError(err), err
-	// }
+	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentID, variablesEnv)
+	if err != nil {
+		return handleDBError(err), err
+	}
 
-	// missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testRepository, c.testRunRepository, transaction, environment)
-	// if err != nil {
-	// 	if err == validation.ErrMissingVariables {
-	// 		return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
-	// 	}
+	missingVariablesError, err := validation.ValidateMissingVariablesFromTransaction(ctx, c.testRepository, c.testRunRepository, transaction, environment)
+	if err != nil {
+		if err == validation.ErrMissingVariables {
+			return openapi.Response(http.StatusUnprocessableEntity, missingVariablesError), nil
+		}
 
-	// 	return handleDBError(err), err
-	// }
+		return handleDBError(err), err
+	}
 
-	// requiredGates := c.mappers.In.RequiredGates(runInfo.RequiredGates)
-	// run := c.testRunner.RunTransaction(ctx, transaction, metadata, environment, requiredGates)
+	requiredGates := c.mappers.In.RequiredGates(runInfo.RequiredGates)
 
-	// return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
-	return openapi.Response(http.StatusOK, openapi.TransactionRun{}), nil
+	run := c.transactionRunner.Run(ctx, transaction, metadata, environment, requiredGates)
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
 }
 
 func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {

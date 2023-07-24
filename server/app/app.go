@@ -216,14 +216,25 @@ func (app *App) Start(opts ...appOption) error {
 		testDB,
 		testRepo,
 		runRepo,
-		transactionRunRepository,
-		applicationTracer,
 		tracer,
 		subscriptionManager,
 		triggerRegistry,
 	)
+	testPipeline.Start()
 	app.registerStopFn(func() {
 		testPipeline.Stop()
+	})
+
+	transactionPipeline := buildTransactionPipeline(
+		transactionsRepository,
+		transactionRunRepository,
+		testPipeline,
+		subscriptionManager,
+	)
+
+	transactionPipeline.Start()
+	app.registerStopFn(func() {
+		transactionPipeline.Stop()
 	})
 
 	err = analytics.SendEvent("Server Started", "beacon", "", nil)
@@ -235,7 +246,9 @@ func (app *App) Start(opts ...appOption) error {
 
 	router, mappers := controller(app.cfg,
 		tracer,
+
 		testPipeline,
+		transactionPipeline,
 
 		testDB,
 		transactionsRepository,
@@ -293,7 +306,7 @@ func (app *App) Start(opts ...appOption) error {
 var (
 	matchFirstCap     = regexp.MustCompile("(.)([A-Z][a-z]+)")
 	matchAllCap       = regexp.MustCompile("([a-z0-9])([A-Z])")
-	matchResourceName = regexp.MustCompile("(\\w)(\\.)(\\w)")
+	matchResourceName = regexp.MustCompile(`(\w)(\.)(\w)`)
 )
 
 func toWords(str string) string {
@@ -485,8 +498,11 @@ func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscripti
 
 func controller(
 	cfg httpServerConfig,
+
 	tracer trace.Tracer,
+
 	testRunner *executor.TestPipeline,
+	transactionRunner *executor.TransactionPipeline,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepo *transaction.Repository,
@@ -499,8 +515,11 @@ func controller(
 
 	router := openapi.NewRouter(httpRouter(
 		cfg,
+
 		tracer,
+
 		testRunner,
+		transactionRunner,
 
 		testRunEvents,
 		transactionRepo,
@@ -517,8 +536,11 @@ func controller(
 
 func httpRouter(
 	cfg httpServerConfig,
+
 	tracer trace.Tracer,
+
 	testRunner *executor.TestPipeline,
+	transactionRunner *executor.TransactionPipeline,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepo *transaction.Repository,
@@ -531,7 +553,9 @@ func httpRouter(
 ) openapi.Router {
 	controller := httpServer.NewController(
 		tracer,
+
 		testRunner,
+		transactionRunner,
 
 		testRunEvents,
 		transactionRepo,

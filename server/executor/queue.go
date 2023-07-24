@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -250,6 +251,7 @@ func (q Queue) resolveTransactionRun(job Job) transaction.TransactionRun {
 		return transaction.TransactionRun{}
 	}
 
+	spew.Dump(job.Transaction.ID, job.TransactionRun.ID)
 	tranRun, err := q.transactionRuns.GetTransactionRun(context.Background(), job.Transaction.ID, job.TransactionRun.ID)
 	if err != nil {
 		panic(err)
