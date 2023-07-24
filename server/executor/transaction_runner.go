@@ -55,8 +55,11 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 	run := job.TransactionRun
 
 	run.State = transaction.TransactionRunStateExecuting
-
-	var err error
+	err := r.updater.Update(ctx, run)
+	if err != nil {
+		log.Printf("[TransactionRunner] could not update transaction run: %s", err.Error())
+		return
+	}
 
 	log.Printf("[TransactionRunner] running transaction %s with %d steps", run.TransactionID, len(tran.Steps))
 	for step, test := range tran.Steps {
@@ -73,7 +76,7 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 		run.Environment = mergeOutputsIntoEnv(run.Environment, run.Steps[step].Outputs)
 		err = r.transactionRuns.UpdateRun(ctx, run)
 		if err != nil {
-			log.Printf("[TransactionRunner] coult not update transaction step: %s", err.Error())
+			log.Printf("[TransactionRunner] could not update transaction step: %s", err.Error())
 			return
 		}
 	}
@@ -84,7 +87,7 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 
 	err = r.updater.Update(ctx, run)
 	if err != nil {
-		log.Printf("[TransactionRunner] coult not update transaction run: %s", err.Error())
+		log.Printf("[TransactionRunner] could not update transaction run: %s", err.Error())
 		return
 	}
 }

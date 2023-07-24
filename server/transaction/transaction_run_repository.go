@@ -214,7 +214,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		allStepsRequiredGatesPassed,
 		jsonMetadata,
 		jsonEnvironment,
-		tr.ID,
+		strconv.Itoa(tr.ID),
 		tr.TransactionID,
 	)
 	stmt, err := tx.Prepare(query)
@@ -235,7 +235,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 
 func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
 	// delete existing steps
-	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", tr.ID, tr.TransactionID)
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", strconv.Itoa(tr.ID), tr.TransactionID)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -243,7 +243,7 @@ func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx,
 
 	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot reset transaction run steps: %w", err)
 	}
 
 	if len(tr.Steps) == 0 {

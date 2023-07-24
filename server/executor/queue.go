@@ -2,11 +2,12 @@ package executor
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -240,6 +241,9 @@ func (q Queue) resolveTransaction(job Job) transaction.Transaction {
 	}
 
 	tran, err := q.transactions.GetAugmented(context.Background(), job.Transaction.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return transaction.Transaction{}
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -251,8 +255,10 @@ func (q Queue) resolveTransactionRun(job Job) transaction.TransactionRun {
 		return transaction.TransactionRun{}
 	}
 
-	spew.Dump(job.Transaction.ID, job.TransactionRun.ID)
 	tranRun, err := q.transactionRuns.GetTransactionRun(context.Background(), job.Transaction.ID, job.TransactionRun.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return transaction.TransactionRun{}
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -266,6 +272,9 @@ func (q Queue) resolveTest(job Job) test.Test {
 	}
 
 	t, err := q.tests.GetAugmented(context.Background(), job.Test.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return test.Test{}
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -279,6 +288,9 @@ func (q Queue) resolveTestRun(job Job) test.Run {
 	}
 
 	run, err := q.runs.GetRun(context.Background(), job.Test.ID, job.Run.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return test.Run{}
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -292,6 +304,9 @@ func (q Queue) resolvePollingProfile(job Job) pollingprofile.PollingProfile {
 	}
 
 	profile, err := q.pollingProfiles.Get(context.Background(), job.PollingProfile.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return pollingprofile.PollingProfile{}
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -305,6 +320,9 @@ func (q Queue) resolveDataStore(job Job) datastore.DataStore {
 	}
 
 	ds, err := q.dataStores.Get(context.Background(), job.DataStore.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return datastore.DataStore{}
+	}
 	if err != nil {
 		panic(err)
 	}
