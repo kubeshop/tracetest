@@ -8,7 +8,7 @@
 ---
 
 <p align="center">
-  Build integration and end-to-end tests in minutes using OpenTelemetry and trace-based testing.
+  Build integration and end-to-end tests in minutes, instead of days, using OpenTelemetry and trace-based testing.
 </p>
 
 <b>
@@ -61,34 +61,38 @@
   </a>
 </h4>
 
-Tracetest allows you to use Observability-Driven Development to build integration and end-to-end tests 98% faster with disitrbuted traces. No plumbing, no mocks, just real data.
+Tracetest lets you build integration and end-to-end tests 98% faster with disitrbuted traces.
 
-You can:
-
-- Assert against your trace data at every point of a request transaction.
-- Assert on the timing of trace spans. Eg. A database span executes within `100ms`.
-- Wildcard assertions across common types of activities. Eg. All gRPC return codes should be `0`, all database calls should happen in less than `100ms`.
-- Ensure both your response and the underlying processes worked correctly, quickly, and without errors.
-- Test any side-effects in your distributed system. Eg. Message queue, async API calls, external APIs, etc.
-- Work with your existing distributed tracing solution.
-- Define multiple transaction triggers:
+- **No plumbing, no mocks, no fakes. Test against real data.**
+- **Assert** against both the **response and trace data** at every point of a request transaction.
+- **Assert** on the **timing of trace spans**.
+  - Eg. A database span executes within `100ms`.
+- **Wildcard assertions** across common types of activities.
+  - Eg. All gRPC return codes should be `0`.
+  - Eg. All database calls should happen in less than `100ms`.
+- **Assert** against **side-effects** in your distributed system.
+  - Eg. Message queues, async API calls, external APIs, etc.
+- **Integrate** with your **existing distributed tracing solution**.
+- Define multiple test triggers:
   - HTTP requests
-  - GRPC requests
-  - trace IDs
+  - gRPC requests
+  - Trace IDs
   - and many more...
-- Save and run the tests manually or via CI build jobs.
+- Save and run tests manually and via CI build jobs.
 - Write detailed trace-based tests as:
   - End-to-end tests
   - Integration tests
 - Verify and analyze the quality of your OpenTelemetry instrumentation to enforce rules and standards.
-- Testing long running processes
+- Testing long running processes.
 
-Build tests in minutes.
+**Build tests in minutes**.
 
-- Visually - in the Web UI
-  ![Build tests visually](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png)
+- **Visually** - in the Web UI
+  <p align="center">
+    <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png" style="width:66%;height:auto">
+  </p>
 
-- Programmatically - in YAML
+- **Programmatically** - in YAML
 
   ```yaml
   type: Test
@@ -114,17 +118,30 @@ Build tests in minutes.
 
 # 🔥 Features
 
-- Works out of the box with your existing OTel instrumentation, supporting [numerous backend trace datastores](https://docs.tracetest.io/getting-started/supported-backends), including Jeager and Grafana Tempo. In addition, supports adding Tracetest as an [additional pipeline](https://docs.tracetest.io/getting-started/supported-backends#using-tracetest-without-a-backend) via your OpenTelemetry Collector config. Tell us others backend datastores you want supported!
+- Works out of the box with your existing OpenTelemetry instrumentation, supporting [numerous trace data stores](https://docs.tracetest.io/configuration/overview/#supported-trace-data-stores), including:
+  - Jeager
+  - Grafana Tempo
+  - OpenSearch
+  - Elastic
+  - And, many more...
+  - Tell us which other trace data stores you want supported!
+- Works out of the box by adding Tracetest as an [additional pipeline](https://docs.tracetest.io/getting-started/supported-backends#using-tracetest-without-a-backend) via your OpenTelemetry Collector config.
 - Supporting multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
 - Visualize the changes you are making to your trace as you develop, enabling Observability-Driven Development.
-- [Add assertions](https://docs.tracetest.io/using-tracetest/adding-assertions) based on return data from trigger call and/or data contained in the spans in your distributed trace.
+- [Add assertions](https://docs.tracetest.io/using-tracetest/adding-assertions) based on response data from the trigger request and all trace data contained in the spans of your distributed trace.
 - Specify which spans to check in assertions via the [selector language](https://docs.tracetest.io/concepts/selectors).
 - Define checks against the attributes in these spans, including properties, return status, or timing.
-- Create tests via graphical UI or via [YAML-based test definition file](https://docs.tracetest.io/cli/test-definition-file).
-- Use the test definition file to [enable Gitops flows](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
-- [Tracetest CLI](https://docs.tracetest.io/cli/command-line-tool) allows importing & exporting tests, running tests, and more.
-- [Version tests](https://docs.tracetest.io/using-tracetest/versioning) as the definition of the test is altered.
-- Install can include [an example microservice](https://kubeshop.github.io/tracetest/pokeshop/) that is instrumented with OpenTelemetry to use as an example application under test.
+- Create tests visually in the Tracetest Web UI or programatically via [YAML-based test definition files](https://docs.tracetest.io/cli/test-definition-file).
+- Use test definition files and the Tracetest CLI to [enable Gitops flows and CI/CD automation](https://docs.tracetest.io/ci-cd-automation/overview).
+- [Tracetest CLI](https://docs.tracetest.io/cli/cli-installation-reference) allows importing & exporting tests, running tests, and more.
+- [Version tests](https://docs.tracetest.io/concepts/versioning/) as the definition of the test is altered.
+- The [guided install](https://docs.tracetest.io/getting-started/installation) can include [an example "Pokeshop" microservice](https://docs.tracetest.io/live-examples/pokeshop/overview) that is instrumented with OpenTelemetry to use as an example application under test.
+- Create [environment variables](https://docs.tracetest.io/concepts/environments) to assert the same behavior across multiple environments (dev, staging, and production, for example)
+- Create [test outputs](https://docs.tracetest.io/web-ui/creating-test-outputs/) by defining a variable based on the information contained in a particular span's attributes.
+- Run [ad-hoc tests](https://docs.tracetest.io/concepts/ad-hoc-testing) by using undefined variables to enable supplying variables at runtime.
+- Define [test suites/transactions](https://docs.tracetest.io/concepts/transactions) to chain tests together and use variables obtained from a test in a subsequent test. These variables can also be loaded from the environment.
+- Run comprehensive [trace analysis and validation](https://docs.tracetest.io/analyzer/concepts) to adhere to OpenTelemetry rules and standards.
+- Configure [test runner](https://docs.tracetest.io/configuration/test-runner) behavior with required gates used when executing your tests to determine whether to mark the test as passed or failed.
 
 # 🚀 Getting Started
 
@@ -151,7 +168,7 @@ curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh
 tracetest server install
 ```
 
-This command will launch an install wizard that automatically installs Tracetest and a sample Pokeshop Demo app into either Docker or Kubernetes based on your selection.
+This command will launch an install wizard that automatically installs Tracetest and a [sample Pokeshop Demo app](https://docs.tracetest.io/live-examples/pokeshop/overview) into either Docker or Kubernetes based on your selection.
 
 Or, install Tracetest with Helm. The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
 
@@ -159,20 +176,20 @@ Or, install Tracetest with Helm. The Tracetest Helm charts are located [here](ht
 helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
 ```
 
-> [Read the Server installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-server)
+> [:gear: Read the Server installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-server)
 
 ## 3️⃣ Open Tracetest
 
 Once you've installed Tracetest Server, access the Tracetest Web UI on `http://localhost:11633`.
 
-Check out the [Opening Tracetest guide](https://docs.tracetest.io/getting-started/open) to access the Tracetest Dashboard and start creating and running tests!
+Check out the [Opening Tracetest guide](https://docs.tracetest.io/getting-started/open) to start creating and running tests!
 
 # 🤔 How does Tracetest work?
 
 1. Pick an endpoint to test.
 2. Run a test, and get the trace.
 3. The trace is the blueprint of your system under test. It shows all the steps the system has taken to execute the request.
-4. Use this blueprint to define assertions through Tracetest UI.
+4. Use this blueprint to define assertions in the Tracetest Web UI.
 5. Add assertions on different services, checking return statuses, data, or even execution times of a system.
 6. Run the tests.
 
@@ -182,9 +199,9 @@ Once the test is built, it can be run automatically as part of a build process. 
 
 The Tracetest [test definition files](https://docs.tracetest.io/cli/test-definition-file) are written in a simple YAML format. You can write them directly or build them graphically via the UI. Here is an example of a test which:
 
-- executes POST against the pokemon/import endpoint.
-- verifies that the HTTP blocks return a 200 status code.
-- verifies all database calls execute in less than 50ms.
+- Executes `POST` against the `pokemon/import` endpoint.
+- Verifies that the HTTP blocks return a `200` status code.
+- Verifies all database calls execute in less than `50ms`.
 
 ```yaml
 type: Test
@@ -223,15 +240,17 @@ spec:
 
 # 🤖 How to run an automated test?
 
-Save a test definition file as `pokeshop_import.yaml`. Use the CLI to run a test.
+Save a test definition file above as `pokeshop_import.yaml`. Use the CLI to run a test.
 
 ```bash
-tracetest run test --file pokeshop_import.yaml
+tracetest run test --file /path/to/pokeshop_import.yaml
 ```
+
+Check out the [CI/CD docs](https://docs.tracetest.io/ci-cd-automation/overview) to learn more about test automation.
 
 # Tests
 
-We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both frontend and backend tests. We are using Cypress to test our frontend code and (surprise, surprise) Tracetest for our backend code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://tracetest.io/blog/integrating-tracetest-with-github-actions-in-a-ci-pipeline).
+We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both front-end and back-end tests. Cypress tests are running against the front-end code and (surprise, surprise) Tracetest against the back-end code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://tracetest.io/blog/50-faster-ci-pipelines-with-github-actions).
 
 # 🎤 Feedback
 
@@ -240,10 +259,9 @@ Have an idea to improve Tracetest?
 You can:
 
 - [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose)!
-- Visit our [Community Page](https://tracetest.io/community).
 - Join our [Discord](https://discord.gg/eBvEQRVyKX), and ask us any questions there.
 - Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates.
-- Give us a ⭐️ on Github if you're interested in the project!
+- Give us a ⭐️ on Github if you like what we're doing!
 
 # 🌱 Contributing & Community
 
