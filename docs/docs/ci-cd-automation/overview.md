@@ -4,9 +4,9 @@ This section contains a general overview of running Tracetest in CI/CD pipelines
 
 You can find guides for:
 
-- [GitHub Actions](./github-actions-pipeline)
-- [Testkube](./testkube-pipeline)
-- [Tekton](./tekton-pipeline)
+- [GitHub Actions](./github-actions-pipeline.md)
+- [Testkube](./testkube-pipeline.md)
+- [Tekton](./tekton-pipeline.md)
 
 :::note
 If you want to see more examples with other CI/CD tools, let us know by [opening an issue in GitHub](https://github.com/kubeshop/tracetest/issues/new/choose)!
@@ -21,7 +21,7 @@ To read more about integrating Tracetest with CI/CD tools, check out tutorials i
 
 ## Running Tracetest CLI from Docker
 
-Many integrations with CI/CD tools can be accomplished by running the [Tracetest CLI](../cli/configuring-your-cli) to execute a test against a remote Tracetest server. If you do not want to install the Tracetest CLI in your environment, you can choose to directly execute it from a Docker image.
+Many integrations with CI/CD tools can be accomplished by running the [Tracetest CLI](../cli/configuring-your-cli.md) to execute a test against a remote Tracetest server. If you do not want to install the Tracetest CLI in your environment, you can choose to directly execute it from a Docker image.
 
 **How to Use**:
 
