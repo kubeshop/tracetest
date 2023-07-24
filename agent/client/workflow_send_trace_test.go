@@ -43,7 +43,7 @@ func TestSendTrace(t *testing.T) {
 	err = client.SendTrace(context.Background(), pollingRequest, spans...)
 	require.NoError(t, err)
 
-	receivedPollingResponse := server.GetLastSpans()
+	receivedPollingResponse := server.GetLastPollingResponse()
 
 	assert.Equal(t, pollingRequest.TestID, receivedPollingResponse.TestID)
 	assert.Equal(t, pollingRequest.RunID, receivedPollingResponse.RunID)
