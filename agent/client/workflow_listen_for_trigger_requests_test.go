@@ -19,7 +19,7 @@ func TestTriggerWorkflow(t *testing.T) {
 	require.NoError(t, err)
 
 	var receivedTrigger *proto.TriggerRequest
-	client.OnTriggerRequest(func(request *proto.TriggerRequest) error {
+	client.OnTriggerRequest(func(_ context.Context, request *proto.TriggerRequest) error {
 		receivedTrigger = request
 		return nil
 	})

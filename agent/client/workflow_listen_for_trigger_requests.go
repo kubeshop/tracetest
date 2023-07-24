@@ -36,7 +36,8 @@ func (c *Client) startTriggerListener() error {
 				log.Fatal("could not get message from trigger stream: %w", err)
 			}
 
-			c.triggerListener(&resp)
+			// TODO: get context from request
+			c.triggerListener(context.Background(), &resp)
 		}
 	}()
 	return nil

@@ -19,7 +19,7 @@ func TestPollWorkflow(t *testing.T) {
 	require.NoError(t, err)
 
 	var receivedPollingRequest *proto.PollingRequest
-	client.OnPollingRequest(func(request *proto.PollingRequest) error {
+	client.OnPollingRequest(func(_ context.Context, request *proto.PollingRequest) error {
 		receivedPollingRequest = request
 		return nil
 	})
