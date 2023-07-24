@@ -25,9 +25,14 @@ func Start(config config.Config) {
 	}
 
 	triggerWorker := workers.NewTriggerWorker(client)
+	pollingWorker := workers.NewPollerWorker(client)
 
 	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
 		return triggerWorker.Trigger(ctx, tr)
+	})
+
+	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
+		return pollingWorker.Poll(ctx, pr)
 	})
 
 	err = client.Start(ctx)
