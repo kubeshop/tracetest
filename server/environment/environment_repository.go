@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -31,8 +30,9 @@ const (
 			"name",
 			"description",
 			"created_at",
-			"values"
-		) VALUES ($1, $2, $3, $4, $5)`
+			"values",
+			"tenant_id"
+		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	updateQuery = `
 		UPDATE environments SET
@@ -107,7 +107,8 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery, id)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return fmt.Errorf("sql error: %w", err)
 	}
@@ -144,6 +145,7 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	sql = sqlutil.Sort(sql, sortBy, sortDirection, "created", sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
+	sql, params = sqlutil.Tenant(ctx, sql, params...)
 	stmt, err := r.db.Prepare(sql)
 	if err != nil {
 		return []Environment{}, err
@@ -173,30 +175,11 @@ func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	return r.countEnvironments(ctx, query)
 }
 
-func sortQuery(sql, sortBy, sortDirection string, sortingFields map[string]string) string {
-	sortField, ok := sortingFields[sortBy]
-
-	if !ok {
-		sortField = sortingFields["created"]
-	}
-
-	dir := "DESC"
-	if strings.ToLower(sortDirection) == "asc" {
-		dir = "ASC"
-	}
-
-	return fmt.Sprintf("%s ORDER BY %s %s", sql, sortField, dir)
-}
-
 func (r *Repository) Get(ctx context.Context, id id.ID) (Environment, error) {
-	stmt, err := r.db.Prepare(getQuery + " WHERE e.id = $1")
+	query, params := sqlutil.Tenant(ctx, getQuery+" WHERE e.id = $1", id)
+	row := r.db.QueryRowContext(ctx, query, params...)
 
-	if err != nil {
-		return Environment{}, fmt.Errorf("prepare: %w", err)
-	}
-	defer stmt.Close()
-
-	environment, err := r.readEnvironmentRow(ctx, stmt.QueryRowContext(ctx, id))
+	environment, err := r.readEnvironmentRow(ctx, row)
 	if err != nil {
 		return Environment{}, err
 	}
@@ -207,7 +190,8 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (Environment, error) {
 func (r *Repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
 
-	row := r.db.QueryRowContext(ctx, idExistsQuery, id)
+	query, params := sqlutil.Tenant(ctx, idExistsQuery, id)
+	row := r.db.QueryRowContext(ctx, query, params...)
 
 	err := row.Scan(&exists)
 
@@ -251,6 +235,7 @@ func (r *Repository) countEnvironments(ctx context.Context, query string) (int, 
 
 	condition := " WHERE (e.name ilike $1 OR e.description ilike $1)"
 	sql, params := sqlutil.Search(countQuery, condition, query, params)
+	sql, params = sqlutil.Tenant(ctx, sql, params...)
 
 	err := r.db.
 		QueryRowContext(ctx, sql, params...).
@@ -274,6 +259,8 @@ func (r *Repository) insertIntoEnvironments(ctx context.Context, environment Env
 		return Environment{}, fmt.Errorf("encoding error: %w", err)
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	_, err = stmt.ExecContext(
 		ctx,
 		environment.ID,
@@ -281,6 +268,7 @@ func (r *Repository) insertIntoEnvironments(ctx context.Context, environment Env
 		environment.Description,
 		environment.CreatedAt,
 		jsonValues,
+		tenantID,
 	)
 
 	if err != nil {
@@ -291,28 +279,35 @@ func (r *Repository) insertIntoEnvironments(ctx context.Context, environment Env
 }
 
 func (r *Repository) updateIntoEnvironments(ctx context.Context, environment Environment, oldId id.ID) (Environment, error) {
-	stmt, err := r.db.Prepare(updateQuery)
-	if err != nil {
-		return Environment{}, fmt.Errorf("sql prepare: %w", err)
-	}
-	defer stmt.Close()
-
 	jsonValues, err := json.Marshal(environment.Values)
 	if err != nil {
 		return Environment{}, fmt.Errorf("encoding error: %w", err)
 	}
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return Environment{}, err
+	}
+	defer tx.Rollback()
 
-	_, err = stmt.ExecContext(
-		ctx,
-		oldId,
+	query, params := sqlutil.Tenant(ctx, updateQuery, oldId,
 		environment.Name,
 		environment.Description,
 		environment.CreatedAt,
 		jsonValues,
 	)
 
+	_, err = tx.ExecContext(
+		ctx,
+		query,
+		params...,
+	)
 	if err != nil {
 		return Environment{}, fmt.Errorf("sql exec: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return Environment{}, fmt.Errorf("commit: %w", err)
 	}
 
 	return environment, nil

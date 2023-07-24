@@ -117,26 +117,29 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_steps WHERE transaction_id = $1", id)
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_steps WHERE transaction_id = $1", id)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	q := "DELETE FROM transaction_run_steps WHERE transaction_run_id IN (SELECT id FROM transaction_runs WHERE transaction_id = $1)"
-	_, err = tx.ExecContext(ctx, q, id)
+	q, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id IN (SELECT id FROM transaction_runs WHERE transaction_id = $1)", id)
+	_, err = tx.ExecContext(ctx, q, params...)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", id)
+	q, params = sqlutil.Tenant(ctx, "DELETE FROM transaction_runs WHERE transaction_id = $1", id)
+	_, err = tx.ExecContext(ctx, q, params...)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, "DELETE FROM transactions WHERE id = $1", id)
+	q, params = sqlutil.Tenant(ctx, "DELETE FROM transactions WHERE id = $1", id)
+	_, err = tx.ExecContext(ctx, q, params...)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -147,11 +150,8 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 
 func (r *Repository) IDExists(ctx context.Context, id id.ID) (bool, error) {
 	exists := false
-	row := r.db.QueryRowContext(
-		ctx,
-		"SELECT COUNT(*) > 0 as exists FROM transactions WHERE id = $1",
-		id,
-	)
+	query, params := sqlutil.Tenant(ctx, "SELECT COUNT(*) > 0 as exists FROM transactions WHERE id = $1", id)
+	row := r.db.QueryRowContext(ctx, query, params...)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -197,7 +197,7 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 }
 
 func (r *Repository) list(ctx context.Context, take, skip int, query, sortBy, sortDirection string, augmented bool) ([]Transaction, error) {
-	q, params := listQuery(querySelect(), query, []any{take, skip})
+	q, params := listQuery(ctx, querySelect(), query, []any{take, skip})
 
 	sortingFields := map[string]string{
 		"created":  "t.created_at",
@@ -253,7 +253,7 @@ func querySelect() string {
 }
 
 func (r *Repository) Count(ctx context.Context, query string) (int, error) {
-	sql, params := listQuery(queryCount(), query, []any{})
+	sql, params := listQuery(ctx, queryCount(), query, []any{})
 
 	count := 0
 	err := r.db.
@@ -276,13 +276,14 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (Transaction, error) {
 }
 
 func (r *Repository) get(ctx context.Context, id id.ID, augmented bool) (Transaction, error) {
-	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
+	query, params := sqlutil.Tenant(ctx, querySelect()+" WHERE t.id = $1", id)
+	stmt, err := r.db.Prepare(query + "ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return Transaction{}, fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	transaction, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id), augmented)
+	transaction, err := r.readRow(ctx, stmt.QueryRowContext(ctx, params...), augmented)
 	if err != nil {
 		return Transaction{}, err
 	}
@@ -291,13 +292,14 @@ func (r *Repository) get(ctx context.Context, id id.ID, augmented bool) (Transac
 }
 
 func (r *Repository) GetVersion(ctx context.Context, id id.ID, version int) (Transaction, error) {
-	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 AND t.version = $2")
+	query, params := sqlutil.Tenant(ctx, querySelect()+" WHERE t.id = $1 AND t.version = $2", id, version)
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return Transaction{}, fmt.Errorf("prepare 1: %w", err)
 	}
 	defer stmt.Close()
 
-	transaction, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id, version), true)
+	transaction, err := r.readRow(ctx, stmt.QueryRowContext(ctx, params...), true)
 	if err != nil {
 		return Transaction{}, err
 	}
@@ -305,24 +307,26 @@ func (r *Repository) GetVersion(ctx context.Context, id id.ID, version int) (Tra
 	return transaction, nil
 }
 
-func listQuery(baseSQL, query string, params []any) (string, []any) {
+func listQuery(ctx context.Context, baseSQL, query string, params []any) (string, []any) {
 	paramNumber := len(params) + 1
 	condition := fmt.Sprintf(" AND (t.name ilike $%d OR t.description ilike $%d)", paramNumber, paramNumber)
 
 	sql := baseSQL + transactionMaxVersionQuery
 	sql, params = sqlutil.Search(sql, condition, query, params)
+	sql, params = sqlutil.Tenant(ctx, sql, params...)
 
 	return sql, params
 }
 
 func (r *Repository) GetLatestVersion(ctx context.Context, id id.ID) (Transaction, error) {
-	stmt, err := r.db.Prepare(querySelect() + " WHERE t.id = $1 ORDER BY t.version DESC LIMIT 1")
+	query, params := sqlutil.Tenant(ctx, querySelect()+" WHERE t.id = $1", id)
+	stmt, err := r.db.Prepare(query + " ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return Transaction{}, fmt.Errorf("prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	transaction, err := r.readRow(ctx, stmt.QueryRowContext(ctx, id), true)
+	transaction, err := r.readRow(ctx, stmt.QueryRowContext(ctx, params...), true)
 	if err != nil {
 		return Transaction{}, err
 	}
@@ -336,8 +340,9 @@ INSERT INTO transactions (
 	"version",
 	"name",
 	"description",
-	"created_at"
-) VALUES ($1, $2, $3, $4, $5)`
+	"created_at",
+	"tenant_id"
+) VALUES ($1, $2, $3, $4, $5, $6)`
 
 func (r *Repository) insertIntoTransactions(ctx context.Context, transaction Transaction) (Transaction, error) {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{})
@@ -352,6 +357,8 @@ func (r *Repository) insertIntoTransactions(ctx context.Context, transaction Tra
 	}
 	defer stmt.Close()
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	_, err = stmt.ExecContext(
 		ctx,
 		transaction.ID,
@@ -359,6 +366,7 @@ func (r *Repository) insertIntoTransactions(ctx context.Context, transaction Tra
 		transaction.Name,
 		transaction.Description,
 		transaction.GetCreatedAt(),
+		tenantID,
 	)
 	if err != nil {
 		return Transaction{}, fmt.Errorf("sql exec: %w", err)
@@ -369,12 +377,13 @@ func (r *Repository) insertIntoTransactions(ctx context.Context, transaction Tra
 
 func (r *Repository) setTransactionSteps(ctx context.Context, tx *sql.Tx, transaction Transaction) (Transaction, error) {
 	// delete existing steps
-	stmt, err := tx.Prepare("DELETE FROM transaction_steps WHERE transaction_id = $1 AND transaction_version = $2")
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_steps WHERE transaction_id = $1 AND transaction_version = $2", transaction.ID, transaction.GetVersion())
+	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return Transaction{}, err
 	}
 
-	_, err = stmt.ExecContext(ctx, transaction.ID, transaction.GetVersion())
+	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
 		return Transaction{}, err
 	}
@@ -383,13 +392,23 @@ func (r *Repository) setTransactionSteps(ctx context.Context, tx *sql.Tx, transa
 		return transaction, tx.Commit()
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	values := []string{}
 	for i, testID := range transaction.StepIDs {
 		stepNumber := i + 1
-		values = append(
-			values,
-			fmt.Sprintf("('%s', %d, '%s', %d)", transaction.ID, transaction.GetVersion(), testID, stepNumber),
-		)
+
+		if tenantID == nil {
+			values = append(
+				values,
+				fmt.Sprintf("('%s', %d, '%s', %d, NULL)", transaction.ID, transaction.GetVersion(), testID, stepNumber),
+			)
+		} else {
+			values = append(
+				values,
+				fmt.Sprintf("('%s', %d, '%s', %d, '%s')", transaction.ID, transaction.GetVersion(), testID, stepNumber, *tenantID),
+			)
+		}
 	}
 
 	sql := "INSERT INTO transaction_steps VALUES " + strings.Join(values, ", ")

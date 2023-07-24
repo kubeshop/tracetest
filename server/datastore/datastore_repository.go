@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 func NewRepository(db *sql.DB) *Repository {
@@ -33,8 +34,9 @@ INSERT INTO data_stores (
 	"type",
 	"is_default",
 	"values",
-	"created_at"
-) VALUES ($1, $2, $3, $4, $5, $6)`
+	"created_at",
+	"tenant_id"
+) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 const deleteQuery = `DELETE FROM data_stores WHERE "id" = $1`
 
@@ -99,6 +101,8 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		return DataStore{}, fmt.Errorf("could not marshal values field configuration: %w", err)
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	_, err = tx.ExecContext(ctx, insertQuery,
 		dataStore.ID,
 		dataStore.Name,
@@ -106,6 +110,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		dataStore.Default,
 		valuesJSON,
 		dataStore.CreatedAt,
+		tenantID,
 	)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec create: %w", err)
@@ -126,7 +131,8 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery, dataStoreSingleID)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return fmt.Errorf("datastore repository sql exec delete: %w", err)
 	}
@@ -160,7 +166,8 @@ func (r *Repository) Current(ctx context.Context) (DataStore, error) {
 }
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
-	row := r.db.QueryRowContext(ctx, getQuery, id)
+	query, params := sqlutil.Tenant(ctx, getQuery, id)
+	row := r.db.QueryRowContext(ctx, query, params...)
 
 	dataStore, err := r.readRow(row)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {

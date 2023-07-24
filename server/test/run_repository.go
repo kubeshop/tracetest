@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -74,7 +75,9 @@ INSERT INTO test_runs (
 	"linter",
 
 	-- required gates
-	"required_gates_result"
+	"required_gates_result",
+
+	"tenant_id"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
 	$1,   -- test_id
@@ -104,7 +107,8 @@ INSERT INTO test_runs (
 	$12, -- metadata
 	$13, -- environment
 	$14, -- linter
-	$15  -- required_gates_result
+	$15,  -- required_gates_result
+	$16  -- tenant_id
 )
 RETURNING "id"`
 
@@ -157,6 +161,8 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		return Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	var runID int
 	err = tx.QueryRowContext(
 		ctx,
@@ -176,6 +182,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		jsonEnvironment,
 		jsonlinter,
 		jsonGatesResult,
+		tenantID,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
@@ -223,12 +230,6 @@ WHERE id = $16 AND test_id = $17
 `
 
 func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
-	stmt, err := r.db.Prepare(updateRunQuery)
-	if err != nil {
-		return fmt.Errorf("prepare: %w", err)
-	}
-	defer stmt.Close()
-
 	jsonTriggerResults, err := json.Marshal(run.TriggerResult)
 	if err != nil {
 		return fmt.Errorf("trigger results encoding error: %w", err)
@@ -277,8 +278,9 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 
 	pass, fail := run.ResultsCount()
 
-	_, err = stmt.ExecContext(
+	query, params := sqlutil.Tenant(
 		ctx,
+		updateRunQuery,
 		run.ServiceTriggeredAt,
 		run.ServiceTriggerCompletedAt,
 		run.ObtainedTraceAt,
@@ -300,6 +302,12 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		jsonLinter,
 		jsonGatesResult,
 	)
+
+	_, err = r.db.ExecContext(
+		ctx,
+		query,
+		params...,
+	)
 	if err != nil {
 		return fmt.Errorf("sql exec: %w", err)
 	}
@@ -319,7 +327,8 @@ func (r *runRepository) DeleteRun(ctx context.Context, run Run) error {
 	}
 
 	for _, sql := range queries {
-		_, err := tx.ExecContext(ctx, sql, run.ID, run.TestID)
+		query, params := sqlutil.Tenant(ctx, sql, run.ID, run.TestID)
+		_, err := tx.ExecContext(ctx, query, params...)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("sql error: %w", err)
@@ -374,13 +383,9 @@ FROM
 `
 
 func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Run, error) {
-	stmt, err := r.db.Prepare(selectRunQuery + " WHERE id = $1 AND test_id = $2")
-	if err != nil {
-		return Run{}, err
-	}
-	defer stmt.Close()
+	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE id = $1 AND test_id = $2", runID, testID)
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, runID, testID.String()))
+	run, err := readRunRow(r.db.QueryRowContext(ctx, query, params...))
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
@@ -388,14 +393,14 @@ func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Ru
 }
 
 func (r *runRepository) GetTestRuns(ctx context.Context, test Test, take, skip int32) ([]Run, error) {
-	const condition = " WHERE test_id = $1"
-	stmt, err := r.db.Prepare(selectRunQuery + condition + " ORDER BY created_at DESC LIMIT $2 OFFSET $3")
+	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE test_id = $1", test.ID, take, skip)
+	stmt, err := r.db.Prepare(query + " ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return []Run{}, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, test.ID, take, skip)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return []Run{}, err
 	}
@@ -405,25 +410,18 @@ func (r *runRepository) GetTestRuns(ctx context.Context, test Test, take, skip i
 		return []Run{}, err
 	}
 
-	var count int
-	err = r.db.
-		QueryRowContext(ctx, "SELECT COUNT(*) FROM test_runs"+condition, test.ID).
-		Scan(&count)
-	if err != nil {
-		return []Run{}, err
-	}
-
 	return runs, nil
 }
 
 func (r *runRepository) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (Run, error) {
-	stmt, err := r.db.Prepare(selectRunQuery + " WHERE trace_id = $1")
+	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE trace_id = $1", traceID.String())
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return Run{}, err
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, traceID.String()))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, params...))
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
@@ -431,14 +429,15 @@ func (r *runRepository) GetRunByTraceID(ctx context.Context, traceID trace.Trace
 }
 
 func (r *runRepository) GetLatestRunByTestVersion(ctx context.Context, testID id.ID, version int) (Run, error) {
-	stmt, err := r.db.Prepare(selectRunQuery + " WHERE test_id = $1 AND test_version = $2 ORDER BY created_at DESC LIMIT 1")
+	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE test_id = $1 AND test_version = $2 ORDER BY created_at DESC LIMIT 1", testID.String(), version)
+	stmt, err := r.db.Prepare(query)
 
 	if err != nil {
 		return Run{}, err
 	}
 	defer stmt.Close()
 
-	run, err := readRunRow(stmt.QueryRowContext(ctx, testID.String(), version))
+	run, err := readRunRow(stmt.QueryRowContext(ctx, params...))
 	if err != nil {
 		return Run{}, err
 	}
@@ -603,6 +602,7 @@ func (r *runRepository) GetTransactionRunSteps(ctx context.Context, id id.ID, ru
 WHERE transaction_run_steps.transaction_run_id = $1 AND transaction_run_steps.transaction_run_transaction_id = $2
 ORDER BY test_runs.completed_at ASC
 `
+	query, params := sqlutil.Tenant(ctx, query, runID, id)
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -610,7 +610,7 @@ ORDER BY test_runs.completed_at ASC
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, runID, id)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return []Run{}, fmt.Errorf("query context: %w", err)
 	}

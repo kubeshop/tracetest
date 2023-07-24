@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 func NewRunRepository(db *sql.DB, stepsRepository transactionStepRunRepository) *RunRepository {
@@ -47,7 +48,9 @@ INSERT INTO transaction_runs (
 	"metadata",
 
 	-- environment
-	"environment"
+	"environment",
+
+	"tenant_id"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
 	$1,   -- transaction_id
@@ -68,7 +71,8 @@ INSERT INTO transaction_runs (
 	TRUE, -- all_steps_required_gates_passed
 
 	$6, -- metadata
-	$7 -- environment
+	$7, -- environment
+	$8 -- tenant_id
 )
 RETURNING "id"`
 
@@ -114,6 +118,8 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 		return TransactionRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	var runID int
 	err = tx.QueryRowContext(
 		ctx,
@@ -125,6 +131,7 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 		tr.CurrentTest,
 		jsonMetadata,
 		jsonEnvironment,
+		tenantID,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
@@ -171,12 +178,6 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		return fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	stmt, err := tx.Prepare(updateTransactionRunQuery)
-	if err != nil {
-		return fmt.Errorf("prepare: %w", err)
-	}
-	defer stmt.Close()
-
 	jsonMetadata, err := json.Marshal(tr.Metadata)
 	if err != nil {
 		return fmt.Errorf("failed to marshal transaction run metadata: %w", err)
@@ -195,8 +196,9 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 	pass, fail := tr.ResultsCount()
 	allStepsRequiredGatesPassed := tr.StepsGatesValidation()
 
-	_, err = stmt.ExecContext(
+	query, params := sqlutil.Tenant(
 		ctx,
+		updateTransactionRunQuery,
 		tr.CompletedAt,
 		tr.State,
 		tr.CurrentTest,
@@ -209,6 +211,13 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		tr.ID,
 		tr.TransactionID,
 	)
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("prepare: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, params...)
 
 	if err != nil {
 		tx.Rollback()
@@ -220,12 +229,13 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 
 func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
 	// delete existing steps
-	stmt, err := tx.Prepare("DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2")
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", tr.ID, tr.TransactionID)
+	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.ExecContext(ctx, tr.ID, tr.TransactionID)
+	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
 		return err
 	}
@@ -234,16 +244,26 @@ func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx,
 		return tx.Commit()
 	}
 
+	tenantID := sqlutil.TenantID(ctx)
+
 	values := []string{}
 	for _, run := range tr.Steps {
 		if run.ID == 0 {
 			// step not set, skip
 			continue
 		}
-		values = append(
-			values,
-			fmt.Sprintf("('%d', '%s', %d, '%s')", tr.ID, tr.TransactionID, run.ID, run.TestID),
-		)
+
+		if tenantID == nil {
+			values = append(
+				values,
+				fmt.Sprintf("('%d', '%s', %d, '%s', NULL)", tr.ID, tr.TransactionID, run.ID, run.TestID),
+			)
+		} else {
+			values = append(
+				values,
+				fmt.Sprintf("('%d', '%s', %d, '%s', '%s')", tr.ID, tr.TransactionID, run.ID, run.TestID, *tenantID),
+			)
+		}
 	}
 
 	sql := "INSERT INTO transaction_run_steps VALUES " + strings.Join(values, ", ")
@@ -260,19 +280,15 @@ func (td *RunRepository) DeleteTransactionRun(ctx context.Context, tr Transactio
 		return fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	_, err = tx.ExecContext(
-		ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2",
-		tr.ID, tr.TransactionID,
-	)
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", tr.ID, tr.TransactionID)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("delete transaction run steps: %w", err)
 	}
 
-	_, err = tx.ExecContext(
-		ctx, "DELETE FROM transaction_runs WHERE id = $1 AND transaction_id = $2",
-		tr.ID, tr.TransactionID,
-	)
+	query, params = sqlutil.Tenant(ctx, "DELETE FROM transaction_runs WHERE id = $1 AND transaction_id = $2", tr.ID, tr.TransactionID)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("delete transaction runs: %w", err)
@@ -305,12 +321,13 @@ FROM transaction_runs
 `
 
 func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
-	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE id = $1 AND transaction_id = $2")
+	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE id = $1 AND transaction_id = $2", runID, transactionID)
+	stmt, err := td.db.Prepare(query)
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
-	run, err := td.readRunRow(stmt.QueryRowContext(ctx, runID, transactionID))
+	run, err := td.readRunRow(stmt.QueryRowContext(ctx, params...))
 	if err != nil {
 		return TransactionRun{}, err
 	}
@@ -322,12 +339,14 @@ func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id
 }
 
 func (td *RunRepository) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (TransactionRun, error) {
-	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 AND transaction_version = $2 ORDER BY created_at DESC LIMIT 1")
+	sortQuery := "ORDER BY created_at DESC LIMIT 1"
+	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE transaction_id = $1 AND transaction_version = $2", transactionID, version)
+	stmt, err := td.db.Prepare(query + sortQuery)
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
-	run, err := td.readRunRow(stmt.QueryRowContext(ctx, transactionID, version))
+	run, err := td.readRunRow(stmt.QueryRowContext(ctx, params...))
 	if err != nil {
 		return TransactionRun{}, err
 	}
@@ -339,12 +358,14 @@ func (td *RunRepository) GetLatestRunByTransactionVersion(ctx context.Context, t
 }
 
 func (td *RunRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]TransactionRun, error) {
-	stmt, err := td.db.Prepare(selectTransactionRunQuery + " WHERE transaction_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")
+	sortQuery := "ORDER BY created_at DESC LIMIT $2 OFFSET $3"
+	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE transaction_id = $1", transactionID.String(), take, skip)
+	stmt, err := td.db.Prepare(query + sortQuery)
 	if err != nil {
 		return []TransactionRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
-	rows, err := stmt.QueryContext(ctx, transactionID.String(), take, skip)
+	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
 		return []TransactionRun{}, fmt.Errorf("query: %w", err)
 	}
