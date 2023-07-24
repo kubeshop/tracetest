@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 const (
@@ -198,11 +199,14 @@ type QueueDriver interface {
 }
 
 func (q Queue) Enqueue(ctx context.Context, job Job) {
-	// TODO: carry context propagation
 	job = job.increaseEnqueueCount()
 
+	headers := map[string]string{}
+	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+	propagator.Inject(ctx, propagation.MapCarrier(headers))
+
 	q.driver.Enqueue(Job{
-		ctxHeaders: job.ctxHeaders,
+		ctxHeaders: headers,
 
 		Test: test.Test{ID: job.Test.ID},
 		Run:  test.Run{ID: job.Run.ID},
@@ -217,8 +221,8 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 
 func (q Queue) Listen(job Job) {
 	// this is called when a new job is put in the queue and we need to process it
-	ctx := context.Background()
-	// TODO - carry over headers
+	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+	ctx := propagator.Extract(context.Background(), propagation.MapCarrier(job.ctxHeaders))
 
 	newJob := Job{
 		ctxHeaders: job.ctxHeaders,
