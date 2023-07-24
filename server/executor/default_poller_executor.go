@@ -97,12 +97,12 @@ func (pe DefaultPollerExecutor) traceDB(ctx context.Context) (tracedb.TraceDB, e
 }
 
 func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *PollingRequest) (bool, string, test.Run, error) {
-	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest\n", request.test.ID, request.run.ID)
+	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest", request.test.ID, request.run.ID)
 	run := request.run
 
 	traceDB, err := pe.traceDB(ctx)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s\n", request.test.ID, request.run.ID, err.Error())
+		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s", request.test.ID, request.run.ID, err.Error())
 		return false, "", test.Run{}, err
 	}
 
@@ -112,7 +112,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *Pol
 
 			err = pe.eventEmitter.Emit(ctx, events.TraceDataStoreConnectionInfo(request.test.ID, request.run.ID, connectionResult))
 			if err != nil {
-				log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+				log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s", request.test.ID, request.run.ID, err.Error())
 			}
 		}
 
@@ -124,7 +124,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *Pol
 
 		err = pe.eventEmitter.Emit(ctx, events.TracePollingStart(request.test.ID, request.run.ID, string(ds.Type), endpoints))
 		if err != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingStart event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingStart event: error: %s", request.test.ID, request.run.ID, err.Error())
 		}
 	}
 
@@ -133,10 +133,10 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *Pol
 	if err != nil {
 		anotherErr := pe.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, 0, request.count, false, err.Error()))
 		if anotherErr != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, anotherErr.Error())
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s", request.test.ID, request.run.ID, anotherErr.Error())
 		}
 
-		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s\n", request.test.ID, request.run.ID, traceID, err.Error())
+		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s", request.test.ID, request.run.ID, traceID, err.Error())
 		return false, "", test.Run{}, err
 	}
 
@@ -145,20 +145,20 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *Pol
 	if !done {
 		err := pe.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(request.test.ID, request.run.ID, len(trace.Flat), request.count, false, reason))
 		if err != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s\n", request.test.ID, request.run.ID, err.Error())
+			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s", request.test.ID, request.run.ID, err.Error())
 		}
 
-		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)\n", request.test.ID, request.run.ID, reason)
+		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)", request.test.ID, request.run.ID, reason)
 		run.Trace = &trace
 		request.run = run
 		return false, "", run, nil
 	}
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Done polling. (%s)\n", request.test.ID, request.run.ID, reason)
+	log.Printf("[PollerExecutor] Test %s Run %d: Done polling. (%s)", request.test.ID, request.run.ID, reason)
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Start Sorting\n", request.test.ID, request.run.ID)
+	log.Printf("[PollerExecutor] Test %s Run %d: Start Sorting", request.test.ID, request.run.ID)
 	trace = trace.Sort()
-	log.Printf("[PollerExecutor] Test %s Run %d: Sorting complete\n", request.test.ID, request.run.ID)
+	log.Printf("[PollerExecutor] Test %s Run %d: Sorting complete", request.test.ID, request.run.ID)
 	run.Trace = &trace
 	request.run = run
 
@@ -170,12 +170,12 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, request *Pol
 	}
 	run = run.SuccessfullyPolledTraces(run.Trace)
 
-	fmt.Printf("[PollerExecutor] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d \n", run.ID, request.count+1, len(run.Trace.Flat))
+	log.Printf("[PollerExecutor] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d ", run.ID, request.count+1, len(run.Trace.Flat))
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Start updating\n", request.test.ID, request.run.ID)
+	log.Printf("[PollerExecutor] Test %s Run %d: Start updating", request.test.ID, request.run.ID)
 	err = pe.updater.Update(ctx, run)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s\n", request.test.ID, request.run.ID, err.Error())
+		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s", request.test.ID, request.run.ID, err.Error())
 		return false, "", test.Run{}, err
 	}
 
@@ -189,6 +189,7 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *PollingRequest, traceDB t
 
 	maxTracePollRetry := job.pollingProfile.Periodic.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
+	log.Printf("[PollerExecutor] Test %s Run %d: Job count %d, max retries: %d", job.test.ID, job.run.ID, job.count, maxTracePollRetry)
 	if job.count == maxTracePollRetry {
 		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
 	}

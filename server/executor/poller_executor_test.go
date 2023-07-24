@@ -50,11 +50,11 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: true},
 	})
@@ -102,11 +102,11 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: false},
 		{finished: true, expectNoTraceError: false, expectRootSpan: true},
@@ -168,11 +168,11 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: false},
 		{finished: false, expectNoTraceError: false, expectRootSpan: false},
@@ -217,11 +217,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
@@ -281,11 +281,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: true, expectNoTraceError: false, expectRootSpan: true},
@@ -346,11 +346,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
@@ -426,11 +426,11 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 	}
 
 	// mock external dependencies
-	pollerExecutor := getPollerExecutorWithMocks(t, retryDelay, maxWaitTimeForTrace, tracePerIteration)
+	pollerExecutor := getPollerExecutorWithMocks(t, tracePerIteration)
 
 	// When doing polling process
 	// Then validate outputs
-	executeAndValidatePollingRequests(t, pollerExecutor, []iterationExpectedValues{
+	executeAndValidatePollingRequests(t, retryDelay, maxWaitTimeForTrace, pollerExecutor, []iterationExpectedValues{
 		{finished: false, expectNoTraceError: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
 		{finished: false, expectNoTraceError: false, expectRootSpan: true},
@@ -446,7 +446,7 @@ type iterationExpectedValues struct {
 	expectRootSpan     bool
 }
 
-func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
+func executeAndValidatePollingRequests(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
 	ctx := context.Background()
 	run := test.NewRun()
 
@@ -458,6 +458,9 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	}
 
 	for i, expected := range expectedValues {
+		pp := pollingprofile.DefaultPollingProfile
+		pp.Periodic.RetryDelay = retryDelay.String()
+		pp.Periodic.Timeout = maxWaitTimeForTrace.String()
 		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
 
 		finished, finishReason, nextRun, err := pollerExecutor.ExecuteRequest(ctx, request)
@@ -489,7 +492,7 @@ func executeAndValidatePollingRequests(t *testing.T, pollerExecutor executor.Pol
 	}
 }
 
-func getPollerExecutorWithMocks(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, tracePerIteration []model.Trace) executor.PollerExecutor {
+func getPollerExecutorWithMocks(t *testing.T, tracePerIteration []model.Trace) executor.PollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
 	testDB := getRunRepositoryMock(t)
@@ -571,7 +574,7 @@ type traceDBMock struct {
 	state             *traceDBState
 }
 
-func (db *traceDBMock) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
+func (db *traceDBMock) GetTraceByID(_ context.Context, _ string) (t model.Trace, err error) {
 	trace := db.tracePerIteration[db.state.currentIteration]
 	db.state.currentIteration += 1
 
