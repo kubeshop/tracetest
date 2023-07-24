@@ -61,7 +61,13 @@
   </a>
 </h4>
 
-Tracetest lets you build integration and end-to-end tests 98% faster with disitrbuted traces. No plumbing, no mocks, no fakes. Test against real data.
+<p align="center">
+  Tracetest lets you build integration and end-to-end tests 98% faster with disitrbuted traces.
+</p>
+
+<p align="center">
+  No plumbing, no mocks, no fakes. Test against real data.
+</p>
 
 You can:
 
