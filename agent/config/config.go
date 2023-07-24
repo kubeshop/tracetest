@@ -11,6 +11,7 @@ type Config struct {
 	ServerURL string `json:"serverURL"`
 	DevMode   bool   `json:"devMode"`
 	APIKey    string `json:"apiKey"`
+	AgentName string `json:"name"`
 }
 
 func LoadConfig() (Config, error) {

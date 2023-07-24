@@ -36,7 +36,8 @@ func (c *Client) startPollerListener() error {
 				log.Fatal("could not get message from trigger stream: %w", err)
 			}
 
-			c.pollListener(&resp)
+			// TODO: Get ctx from request
+			c.pollListener(context.Background(), &resp)
 		}
 	}()
 	return nil
