@@ -99,7 +99,7 @@ type testRunGetter interface {
 }
 
 type transactionGetter interface {
-	Get(context.Context, id.ID) (transaction.Transaction, error)
+	GetAugmented(context.Context, id.ID) (transaction.Transaction, error)
 }
 
 type transactionRunGetter interface {
@@ -238,7 +238,7 @@ func (q Queue) resolveTransaction(job Job) transaction.Transaction {
 		return transaction.Transaction{}
 	}
 
-	tran, err := q.transactions.Get(context.Background(), job.Transaction.ID)
+	tran, err := q.transactions.GetAugmented(context.Background(), job.Transaction.ID)
 	if err != nil {
 		panic(err)
 	}

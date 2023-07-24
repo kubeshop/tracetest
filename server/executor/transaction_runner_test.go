@@ -71,7 +71,7 @@ func TestTransactionRunner(t *testing.T) {
 	t.Run("NoErrors", func(t *testing.T) {
 		runTransactionRunnerTest(t, false, func(t *testing.T, actual transaction.TransactionRun) {
 			assert.Equal(t, transaction.TransactionRunStateFinished, actual.State)
-			assert.Len(t, actual.Steps, 2)
+			require.Len(t, actual.Steps, 2)
 			assert.Equal(t, actual.Steps[0].State, test.RunStateFinished)
 			assert.Equal(t, actual.Steps[1].State, test.RunStateFinished)
 			assert.Equal(t, "http://my-service.com", actual.Environment.Get("url"))
@@ -132,6 +132,7 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	transactionsRepo := transaction.NewRepository(rawDB, testRepo)
 	transactionRunRepo := transaction.NewRunRepository(rawDB, runRepo)
 	tran, err := transactionsRepo.Create(ctx, transaction.Transaction{
+		ID:      id.ID("tran1"),
 		Name:    "transaction",
 		StepIDs: []id.ID{test1.ID, test2.ID},
 	})
@@ -186,16 +187,13 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
 
-	var finalRun transaction.TransactionRun
 	select {
-	case finalRun = <-done:
+	case finalRun := <-done:
 		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions
-		fmt.Println("run completed")
+		assert(t, finalRun)
 	case <-time.After(10 * time.Second):
 		t.Log("timeout after 10 second")
 		t.FailNow()
 	}
 	transactionPipeline.Stop()
-
-	assert(t, finalRun)
 }

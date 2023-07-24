@@ -53,10 +53,12 @@ func (r *persistentTransactionRunner) SetOutputQueue(_ Enqueuer) {
 func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 	tran := job.Transaction
 	run := job.TransactionRun
+
 	run.State = transaction.TransactionRunStateExecuting
 
 	var err error
 
+	log.Printf("[TransactionRunner] running transaction %s with %d steps", run.TransactionID, len(tran.Steps))
 	for step, test := range tran.Steps {
 		run, err = r.runTransactionStep(ctx, run, step, test)
 		if err != nil {
