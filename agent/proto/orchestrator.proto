@@ -53,7 +53,8 @@ message SessionConfiguration {
 message TriggerRequest{
     string testID = 1;
     int32 runID = 2;
-    Trigger trigger = 3;
+    string traceID = 3;
+    Trigger trigger = 4;
 }
 
 message Trigger {
