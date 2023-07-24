@@ -107,6 +107,6 @@ func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
 	return s.lastTriggerResponse
 }
 
-func (s *GrpcServerMock) GetLastSpans() *proto.PollingResponse {
+func (s *GrpcServerMock) GetLastPollingResponse() *proto.PollingResponse {
 	return s.lastPollingResponse
 }
