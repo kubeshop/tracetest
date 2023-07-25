@@ -446,7 +446,7 @@ type iterationExpectedValues struct {
 	expectRootSpan     bool
 }
 
-func executeAndValidatePollingRequests(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, pollerExecutor executor.PollerExecutor, expectedValues []iterationExpectedValues) {
+func executeAndValidatePollingRequests(t *testing.T, retryDelay, maxWaitTimeForTrace time.Duration, pollerExecutor *executor.InstrumentedPollerExecutor, expectedValues []iterationExpectedValues) {
 	ctx := context.Background()
 	run := test.NewRun()
 
@@ -457,30 +457,40 @@ func executeAndValidatePollingRequests(t *testing.T, retryDelay, maxWaitTimeForT
 		},
 	}
 
-	for i, expected := range expectedValues {
-		pp := pollingprofile.DefaultPollingProfile
-		pp.Periodic.RetryDelay = retryDelay.String()
-		pp.Periodic.Timeout = maxWaitTimeForTrace.String()
-		request := executor.NewPollingRequest(ctx, test, run, i, pollingprofile.DefaultPollingProfile)
+	// using `pollingprofile.DefaultPollingProfile` and changing the periodic configs directly
+	// causes a race condition because `DefaultPollingProfile.Periodic` is a reference, so it's shared by the copies.
+	// The easiest solution is to create a new polling profile for each test.
+	pp := pollingprofile.PollingProfile{
+		Strategy: pollingprofile.Periodic,
+		Periodic: &pollingprofile.PeriodicPollingConfig{
+			RetryDelay: retryDelay.String(),
+			Timeout:    maxWaitTimeForTrace.String(),
+		},
+	}
 
-		finished, finishReason, nextRun, err := pollerExecutor.ExecuteRequest(ctx, request)
-		run = nextRun // should store a run to use in another iteration
+	job := executor.NewJob()
+	job.Test = test
+	job.Run = run
+	job.PollingProfile = pp
+
+	for i, expected := range expectedValues {
+		res, err := pollerExecutor.ExecuteRequest(ctx, &job)
+		run = res.Run() // should store a run to use in another iteration
 
 		require.NotNilf(t, run, "The test run should not be nil on iteration %d", i)
-
-		if expected.finished {
-			require.Truef(t, finished, "The poller should have finished on iteration %d", i)
-			require.NotEmptyf(t, finishReason, "The poller should not have finish reason on iteration %d", i)
-		} else {
-			require.Falsef(t, finished, "The poller should have not finished on iteration %d", i)
-			require.Emptyf(t, finishReason, "The poller should have finish reason on iteration %d", i)
-		}
 
 		if expected.expectNoTraceError {
 			require.Errorf(t, err, "An error should have happened on iteration %d", i)
 			require.ErrorIsf(t, err, connection.ErrTraceNotFound, "An connection error should have happened on iteration %d", i)
 		} else {
 			require.NoErrorf(t, err, "An error should not have happened on iteration %d", i)
+			require.NotEmptyf(t, res.Reason(), "The poller should have a reason on iteration %d", i)
+
+			if expected.finished {
+				require.Truef(t, res.Finished(), "The poller should have finished on iteration %d", i)
+			} else {
+				require.Falsef(t, res.Finished(), "The poller should have not finished on iteration %d", i)
+			}
 
 			// only validate root span if we have a root span
 			if expected.expectRootSpan {
@@ -489,10 +499,13 @@ func executeAndValidatePollingRequests(t *testing.T, retryDelay, maxWaitTimeForT
 				require.Falsef(t, run.Trace.HasRootSpan(), "The trace associated with the run on iteration %d should not have a root span", i)
 			}
 		}
+
+		job.IncreaseEnqueueCount()
+		job.Headers.SetBool("requeued", true)
 	}
 }
 
-func getPollerExecutorWithMocks(t *testing.T, tracePerIteration []model.Trace) executor.PollerExecutor {
+func getPollerExecutorWithMocks(t *testing.T, tracePerIteration []model.Trace) *executor.InstrumentedPollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
 	testDB := getRunRepositoryMock(t)

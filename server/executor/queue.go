@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	jobCountHeader string = "X-Tracetest-Job-Count"
+	JobCountHeader string = "X-Tracetest-Job-Count"
 )
 
 type headers map[string]string
@@ -27,7 +27,7 @@ func (h headers) Get(key string) string {
 }
 
 func (h headers) GetInt(key string) int {
-	if h[key] == "" {
+	if h.Get(key) == "" {
 		return 0
 	}
 
@@ -38,19 +38,37 @@ func (h headers) GetInt(key string) int {
 	return v
 }
 
-func (h headers) Set(key, value string) {
-	if h == nil {
-		h = make(map[string]string)
+func (h headers) GetBool(key string) bool {
+	if h.Get(key) == "" {
+		return false
 	}
-	h[key] = value
+
+	v, err := strconv.ParseBool(h[key])
+	if err != nil {
+		panic(fmt.Errorf("cannot convert header %s to bool: %w", key, err))
+	}
+
+	return v
+}
+
+func (h *headers) Set(key, value string) {
+	// if h == nil {
+	// 	nh := &headers{}
+	// 	*h = *nh
+	// }
+	(*h)[key] = value
 }
 
 func (h headers) SetInt(key string, value int) {
 	h.Set(key, fmt.Sprintf("%d", value))
 }
 
+func (h headers) SetBool(key string, value bool) {
+	h.Set(key, fmt.Sprintf("%t", value))
+}
+
 type Job struct {
-	ctxHeaders headers
+	Headers *headers
 
 	Transaction    transaction.Transaction
 	TransactionRun transaction.TransactionRun
@@ -62,19 +80,18 @@ type Job struct {
 	DataStore      datastore.DataStore
 }
 
-func (j Job) EnqueueCount() int {
-	count := j.ctxHeaders.GetInt(jobCountHeader)
-	if count == 0 {
-		return 1
+func NewJob() Job {
+	return Job{
+		Headers: &headers{},
 	}
-
-	return count
 }
 
-func (j Job) increaseEnqueueCount() Job {
-	j.ctxHeaders.SetInt(jobCountHeader, j.EnqueueCount()+1)
+func (j Job) EnqueueCount() int {
+	return j.Headers.GetInt(JobCountHeader)
+}
 
-	return j
+func (j *Job) IncreaseEnqueueCount() {
+	j.Headers.SetInt(JobCountHeader, j.EnqueueCount()+1)
 }
 
 type Enqueuer interface {
@@ -199,14 +216,12 @@ type QueueDriver interface {
 }
 
 func (q Queue) Enqueue(ctx context.Context, job Job) {
-	job = job.increaseEnqueueCount()
-
-	headers := map[string]string{}
+	hdrs := headers{}
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-	propagator.Inject(ctx, propagation.MapCarrier(headers))
+	propagator.Inject(ctx, propagation.MapCarrier(hdrs))
 
-	q.driver.Enqueue(Job{
-		ctxHeaders: headers,
+	newJob := Job{
+		Headers: &hdrs,
 
 		Test: test.Test{ID: job.Test.ID},
 		Run:  test.Run{ID: job.Run.ID},
@@ -216,16 +231,18 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 
 		PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
 		DataStore:      datastore.DataStore{ID: job.DataStore.ID},
-	})
+	}
+
+	q.driver.Enqueue(newJob)
 }
 
 func (q Queue) Listen(job Job) {
 	// this is called when a new job is put in the queue and we need to process it
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-	ctx := propagator.Extract(context.Background(), propagation.MapCarrier(job.ctxHeaders))
+	ctx := propagator.Extract(context.Background(), propagation.MapCarrier(*job.Headers))
 
 	newJob := Job{
-		ctxHeaders: job.ctxHeaders,
+		Headers: job.Headers,
 	}
 	newJob.Test = q.resolveTest(job)
 	newJob.Run = q.resolveTestRun(job)

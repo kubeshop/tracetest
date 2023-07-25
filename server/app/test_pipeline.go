@@ -47,15 +47,17 @@ func buildTestPipeline(
 		lintRepo,
 	)
 
-	pollerExecutor := executor.NewPollerExecutor(
-		tracer,
-		execTestUpdater,
-		tracedb.Factory(runRepo),
-		dsRepo,
+	pollerExecutor := executor.NewSelectorBasedPoller(
+		executor.NewPollerExecutor(
+			tracer,
+			execTestUpdater,
+			tracedb.Factory(runRepo),
+			dsRepo,
+			eventEmitter,
+		),
 		eventEmitter,
 	)
 
-	pollerExecutor = executor.NewSelectorBasedPoller(pollerExecutor, eventEmitter)
 	tracePoller := executor.NewTracePoller(
 		pollerExecutor,
 		execTestUpdater,

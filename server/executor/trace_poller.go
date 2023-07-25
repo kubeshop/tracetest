@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/analytics"
@@ -14,7 +13,6 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
-	"go.opentelemetry.io/otel/propagation"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
@@ -29,8 +27,34 @@ type PersistentTracePoller interface {
 	WorkerPool
 }
 
-type PollerExecutor interface {
-	ExecuteRequest(context.Context, *PollingRequest) (bool, string, test.Run, error)
+func NewPollResult(finished bool, reason string, run test.Run) PollResult {
+	return PollResult{
+		finished: finished,
+		reason:   reason,
+		run:      run,
+	}
+}
+
+type PollResult struct {
+	finished bool
+	reason   string
+	run      test.Run
+}
+
+func (pr PollResult) Finished() bool {
+	return pr.finished
+}
+
+func (pr PollResult) Reason() string {
+	return pr.reason
+}
+
+func (pr PollResult) Run() test.Run {
+	return pr.run
+}
+
+type pollerExecutor interface {
+	ExecuteRequest(context.Context, *Job) (PollResult, error)
 }
 
 type TraceFetcher interface {
@@ -38,7 +62,7 @@ type TraceFetcher interface {
 }
 
 func NewTracePoller(
-	pe PollerExecutor,
+	pe pollerExecutor,
 	updater RunUpdater,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
@@ -53,79 +77,11 @@ func NewTracePoller(
 
 type tracePoller struct {
 	updater             RunUpdater
-	pollerExecutor      PollerExecutor
+	pollerExecutor      pollerExecutor
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
 	inputQueue          Enqueuer
 	outputQueue         Enqueuer
-}
-
-type PollingRequest struct {
-	test           test.Test
-	run            test.Run
-	pollingProfile pollingprofile.PollingProfile
-	count          int
-	headers        map[string]string
-}
-
-func (r PollingRequest) Context() context.Context {
-	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-	return propagator.Extract(context.Background(), propagation.MapCarrier(r.headers))
-}
-
-func (pr *PollingRequest) SetHeader(name, value string) {
-	if pr.headers == nil {
-		pr.headers = make(map[string]string)
-	}
-	pr.headers[name] = value
-}
-
-func (pr *PollingRequest) SetHeaderInt(name string, value int) {
-	pr.SetHeader(name, strconv.Itoa(value))
-}
-
-func (pr *PollingRequest) SetHeaderBool(name string, value bool) {
-	pr.headers[name] = fmt.Sprintf("%t", value)
-}
-
-func (pr *PollingRequest) Header(name string) string {
-	return pr.headers[name]
-}
-
-func (pr *PollingRequest) HeaderInt(name string) int {
-	if value, err := strconv.Atoi(pr.headers[name]); err == nil {
-		return value
-	}
-
-	return 0
-}
-
-func (pr *PollingRequest) HeaderBool(name string) bool {
-	if value, err := strconv.ParseBool(pr.headers[name]); err == nil {
-		return value
-	}
-
-	return false
-}
-
-func (pr PollingRequest) IsFirstRequest() bool {
-	return !pr.HeaderBool("requeued")
-}
-
-func NewPollingRequest(ctx context.Context, test test.Test, run test.Run, count int, pollingProfile pollingprofile.PollingProfile) *PollingRequest {
-	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-
-	request := &PollingRequest{
-		test:           test,
-		run:            run,
-		headers:        make(map[string]string),
-		pollingProfile: pollingProfile,
-		count:          count,
-	}
-
-	propagator.Inject(ctx, propagation.MapCarrier(request.headers))
-
-	return request
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -151,13 +107,6 @@ func (tp *tracePoller) SetInputQueue(queue Enqueuer) {
 }
 
 func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
-	select {
-	default:
-	case <-ctx.Done():
-		log.Printf("[TracePoller] Context cancelled.")
-		return
-	}
-
 	if tp.isFirstRequest(job) {
 		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 		if err != nil {
@@ -167,15 +116,8 @@ func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
 
 	fmt.Println("tracePoller processJob", job.EnqueueCount())
 
-	pollingRequest := PollingRequest{
-		test:           job.Test,
-		run:            job.Run,
-		pollingProfile: job.PollingProfile,
-		count:          job.EnqueueCount(),
-		headers:        job.ctxHeaders,
-	}
-
-	finished, finishReason, run, err := tp.pollerExecutor.ExecuteRequest(ctx, &pollingRequest)
+	result, err := tp.pollerExecutor.ExecuteRequest(ctx, &job)
+	run := result.run
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.Test.ID, job.Run.ID, err.Error())
 		jobFailed, reason := tp.handleTraceDBError(ctx, job, err)
@@ -195,17 +137,17 @@ func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
 		return
 	}
 
-	if !finished {
+	if !result.finished {
 		tp.requeue(ctx, job)
 		return
 	}
 
-	err = tp.eventEmitter.Emit(ctx, events.TracePollingSuccess(job.Test.ID, job.Run.ID, finishReason))
+	err = tp.eventEmitter.Emit(ctx, events.TracePollingSuccess(job.Test.ID, job.Run.ID, result.reason))
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", job.Test.ID, job.Run.ID, err.Error())
 	}
 
-	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, finishReason, job.EnqueueCount(), len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, result.reason, job.EnqueueCount(), len(run.Trace.Flat))
 
 	err = tp.eventEmitter.Emit(ctx, events.TraceFetchingSuccess(job.Test.ID, job.Run.ID))
 	if err != nil {
@@ -268,6 +210,12 @@ func (tp tracePoller) requeue(ctx context.Context, job Job) {
 		fmt.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.Run.ID, job.EnqueueCount())
 		time.Sleep(job.PollingProfile.Periodic.RetryDelayDuration())
 
+		job.IncreaseEnqueueCount()
+		job.Headers.SetBool("requeued", true)
 		tp.enqueueJob(ctx, job)
 	}()
+}
+
+func isFirstRequest(job *Job) bool {
+	return !job.Headers.GetBool("requeued")
 }
