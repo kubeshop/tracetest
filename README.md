@@ -74,7 +74,7 @@
 </h4>
 
 <p align="center">
-  Tracetest lets you build integration and end-to-end tests 98% faster with disitrbuted traces.
+  Tracetest lets you build integration and end-to-end tests 98% faster with distributed traces.
 </p>
 
 <p align="center">
