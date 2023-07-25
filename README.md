@@ -1,9 +1,9 @@
 <a href="https://tracetest.io">
   <p align="center">
-    <picture>
+    <picture style="width:50%">
       <source media="(prefers-color-scheme: light)" srcset="assets/tracetest-logo-color-w-black-text.svg">
       <source media="(prefers-color-scheme: dark)" srcset="assets/tracetest-logo-color-w-white-text.svg">
-      <img alt="Tracetest Logo" src="assets/tracetest-logo-color-w-black-text.svg" style="width:66%">
+      <img alt="Tracetest Logo" src="assets/tracetest-logo-color-w-black-text.svg" style="width:50%">
     </picture>
   </p>
 </a>
