@@ -110,16 +110,16 @@ func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
 	if tp.isFirstRequest(job) {
 		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 		if err != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s \n", job.Test.ID, job.Run.ID, err.Error())
+			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s", job.Test.ID, job.Run.ID, err.Error())
 		}
 	}
 
-	fmt.Println("tracePoller processJob", job.EnqueueCount())
+	log.Println("TracePoller] processJob", job.EnqueueCount())
 
 	result, err := tp.pollerExecutor.ExecuteRequest(ctx, &job)
 	run := result.run
 	if err != nil {
-		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s\n", job.Test.ID, job.Run.ID, err.Error())
+		log.Printf("[TracePoller] Test %s Run %d: ExecuteRequest Error: %s", job.Test.ID, job.Run.ID, err.Error())
 		jobFailed, reason := tp.handleTraceDBError(ctx, job, err)
 
 		if jobFailed {

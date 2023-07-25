@@ -52,10 +52,6 @@ func (h headers) GetBool(key string) bool {
 }
 
 func (h *headers) Set(key, value string) {
-	// if h == nil {
-	// 	nh := &headers{}
-	// 	*h = *nh
-	// }
 	(*h)[key] = value
 }
 
@@ -246,24 +242,24 @@ func (q Queue) Listen(job Job) {
 	newJob := Job{
 		Headers: job.Headers,
 	}
-	newJob.Test = q.resolveTest(job)
-	newJob.Run = q.resolveTestRun(job)
+	newJob.Test = q.resolveTest(ctx, job)
+	newJob.Run = q.resolveTestRun(ctx, job)
 
-	newJob.Transaction = q.resolveTransaction(job)
-	newJob.TransactionRun = q.resolveTransactionRun(job)
+	newJob.Transaction = q.resolveTransaction(ctx, job)
+	newJob.TransactionRun = q.resolveTransactionRun(ctx, job)
 
-	newJob.PollingProfile = q.resolvePollingProfile(job)
-	newJob.DataStore = q.resolveDataStore(job)
+	newJob.PollingProfile = q.resolvePollingProfile(ctx, job)
+	newJob.DataStore = q.resolveDataStore(ctx, job)
 
 	q.itemProcessor.ProcessItem(ctx, newJob)
 }
 
-func (q Queue) resolveTransaction(job Job) transaction.Transaction {
+func (q Queue) resolveTransaction(ctx context.Context, job Job) transaction.Transaction {
 	if q.transactions == nil {
 		return transaction.Transaction{}
 	}
 
-	tran, err := q.transactions.GetAugmented(context.Background(), job.Transaction.ID)
+	tran, err := q.transactions.GetAugmented(ctx, job.Transaction.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return transaction.Transaction{}
 	}
@@ -273,12 +269,12 @@ func (q Queue) resolveTransaction(job Job) transaction.Transaction {
 
 	return tran
 }
-func (q Queue) resolveTransactionRun(job Job) transaction.TransactionRun {
+func (q Queue) resolveTransactionRun(ctx context.Context, job Job) transaction.TransactionRun {
 	if q.transactionRuns == nil {
 		return transaction.TransactionRun{}
 	}
 
-	tranRun, err := q.transactionRuns.GetTransactionRun(context.Background(), job.Transaction.ID, job.TransactionRun.ID)
+	tranRun, err := q.transactionRuns.GetTransactionRun(ctx, job.Transaction.ID, job.TransactionRun.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return transaction.TransactionRun{}
 	}
@@ -289,12 +285,12 @@ func (q Queue) resolveTransactionRun(job Job) transaction.TransactionRun {
 	return tranRun
 }
 
-func (q Queue) resolveTest(job Job) test.Test {
+func (q Queue) resolveTest(ctx context.Context, job Job) test.Test {
 	if q.tests == nil {
 		return test.Test{}
 	}
 
-	t, err := q.tests.GetAugmented(context.Background(), job.Test.ID)
+	t, err := q.tests.GetAugmented(ctx, job.Test.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return test.Test{}
 	}
@@ -305,12 +301,12 @@ func (q Queue) resolveTest(job Job) test.Test {
 	return t
 }
 
-func (q Queue) resolveTestRun(job Job) test.Run {
+func (q Queue) resolveTestRun(ctx context.Context, job Job) test.Run {
 	if q.runs == nil {
 		return test.Run{}
 	}
 
-	run, err := q.runs.GetRun(context.Background(), job.Test.ID, job.Run.ID)
+	run, err := q.runs.GetRun(ctx, job.Test.ID, job.Run.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return test.Run{}
 	}
@@ -321,12 +317,12 @@ func (q Queue) resolveTestRun(job Job) test.Run {
 	return run
 }
 
-func (q Queue) resolvePollingProfile(job Job) pollingprofile.PollingProfile {
+func (q Queue) resolvePollingProfile(ctx context.Context, job Job) pollingprofile.PollingProfile {
 	if q.pollingProfiles == nil {
 		return pollingprofile.PollingProfile{}
 	}
 
-	profile, err := q.pollingProfiles.Get(context.Background(), job.PollingProfile.ID)
+	profile, err := q.pollingProfiles.Get(ctx, job.PollingProfile.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return pollingprofile.PollingProfile{}
 	}
@@ -337,12 +333,12 @@ func (q Queue) resolvePollingProfile(job Job) pollingprofile.PollingProfile {
 	return profile
 }
 
-func (q Queue) resolveDataStore(job Job) datastore.DataStore {
+func (q Queue) resolveDataStore(ctx context.Context, job Job) datastore.DataStore {
 	if q.dataStores == nil {
 		return datastore.DataStore{}
 	}
 
-	ds, err := q.dataStores.Get(context.Background(), job.DataStore.ID)
+	ds, err := q.dataStores.Get(ctx, job.DataStore.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return datastore.DataStore{}
 	}

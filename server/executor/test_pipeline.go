@@ -71,12 +71,11 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 	datastore, err := p.dsGetter.Current(ctx)
 	p.handleDBError(run, err)
 
-	job := Job{
-		Test:           testObj,
-		Run:            run,
-		PollingProfile: p.ppGetter.GetDefault(ctx),
-		DataStore:      datastore,
-	}
+	job := NewJob()
+	job.Test = testObj
+	job.Run = run
+	job.PollingProfile = p.ppGetter.GetDefault(ctx)
+	job.DataStore = datastore
 
 	p.Pipeline.Begin(ctx, job)
 

@@ -36,10 +36,9 @@ func (p *TransactionPipeline) Run(ctx context.Context, tran transaction.Transact
 
 	tranRun, _ = p.runs.CreateRun(ctx, tranRun)
 
-	job := Job{
-		Transaction:    tran,
-		TransactionRun: tranRun,
-	}
+	job := NewJob()
+	job.Transaction = tran
+	job.TransactionRun = tranRun
 
 	p.Pipeline.Begin(ctx, job)
 
