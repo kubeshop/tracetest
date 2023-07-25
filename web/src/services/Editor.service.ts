@@ -204,7 +204,8 @@ const EditorService = () => ({
       } catch (e) {
         if (!(e instanceof SyntaxError)) throw e;
 
-        const whiteListTest = CUSTOM_SYNTAX_ERRORS_WHITE_LIST.map(regex => regex.test(e.message));
+        const message = e.message;
+        const whiteListTest = CUSTOM_SYNTAX_ERRORS_WHITE_LIST.map(regex => regex.test(message));
         if (whiteListTest.every(t => t)) return [];
 
         const pos = getJsonErrorPosition(e, view.state.doc);

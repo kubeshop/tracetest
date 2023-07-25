@@ -1,12 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "es2019"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "es2019"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -21,14 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "./src",
-    "types": [
-      "node",
-      "jest",
-      "cypress",
-      "cypress-file-upload"
-    ]
+    "types": ["node", "jest", "cypress", "cypress-file-upload"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

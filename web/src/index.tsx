@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as Sentry from '@sentry/react';
 import {BrowserTracing} from '@sentry/tracing';
+import './antd-theme/antd-customized.css';
 import App from './App';
-
 import * as serviceWorker from './serviceWorker';
 import {IEnv} from './types/Common.types';
 import {SENTRY_ALLOWED_URLS, SENTRY_DNS} from './constants/Common.constants';

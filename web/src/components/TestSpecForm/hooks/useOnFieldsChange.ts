@@ -1,6 +1,13 @@
-import {FieldData} from 'antd/node_modules/rc-field-form/es/interface';
 import {useCallback} from 'react';
 import CreateAssertionModalAnalyticsService from 'services/Analytics/CreateAssertionModalAnalytics.service';
+
+interface FieldData {
+  name: string | number | (string | number)[];
+  value?: any;
+  touched?: boolean;
+  validating?: boolean;
+  errors?: string[];
+}
 
 const {onChecksChange, onSelectorChange} = CreateAssertionModalAnalyticsService;
 

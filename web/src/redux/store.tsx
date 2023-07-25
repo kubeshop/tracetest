@@ -1,4 +1,4 @@
-import {Action, configureStore, ThunkAction} from '@reduxjs/toolkit';
+import {Action, configureStore, Middleware, ThunkAction} from '@reduxjs/toolkit';
 import {createReduxHistoryContext} from 'redux-first-history';
 import {createBrowserHistory} from 'history';
 import TestAPI from 'redux/apis/TraceTest.api';
@@ -17,25 +17,31 @@ const {createReduxHistory, routerMiddleware, routerReducer} = createReduxHistory
   history: createBrowserHistory(),
 });
 
+export const middlewares: Middleware[] = [TestAPI.middleware, OtelRepoApi.middleware];
+
+export const reducers = {
+  [TestAPI.reducerPath]: TestAPI.reducer,
+  [OtelRepoApi.reducerPath]: OtelRepoApi.reducer,
+
+  spans: Spans,
+  dag: DAG,
+  trace: Trace,
+  testSpecs: TestSpecs,
+  createTest: CreateTest,
+  createTransaction: CreateTransaction,
+  user: User,
+  testOutputs: TestOutputs,
+};
+
 export const store = configureStore({
   reducer: {
-    [TestAPI.reducerPath]: TestAPI.reducer,
-    [OtelRepoApi.reducerPath]: OtelRepoApi.reducer,
-
+    ...reducers,
     router: routerReducer,
-    spans: Spans,
-    dag: DAG,
-    trace: Trace,
-    testSpecs: TestSpecs,
-    createTest: CreateTest,
-    createTransaction: CreateTransaction,
-    user: User,
-    testOutputs: TestOutputs,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware()
       .prepend(RouterMiddleware.middleware)
-      .concat(TestAPI.middleware, routerMiddleware, OtelRepoApi.middleware),
+      .concat(...middlewares, routerMiddleware),
 });
 
 export const history = createReduxHistory(store);

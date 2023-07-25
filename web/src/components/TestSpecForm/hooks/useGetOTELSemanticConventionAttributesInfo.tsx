@@ -1,4 +1,4 @@
-import TracetestSemanticConventions from 'constants/TracetestSemanticConventions.json';
+import TraceTestAttributes from 'constants/TracetestAttributes.constants';
 import {useGetConventionsQuery} from 'redux/apis/OtelRepo.api';
 
 export type OtelReference = Record<string, OtelReferenceModel>;
@@ -8,8 +8,6 @@ export interface OtelReferenceModel {
   note: string;
   tags: string[];
 }
-
-const tracetestSemanticConventions: OtelReference = TracetestSemanticConventions;
 
 export const useGetOTELSemanticConventionAttributesInfo = (): OtelReference => {
   return {
@@ -22,6 +20,6 @@ export const useGetOTELSemanticConventionAttributesInfo = (): OtelReference => {
     ...useGetConventionsQuery({kind: 'general'})?.data,
     ...useGetConventionsQuery({kind: 'messaging'})?.data,
     ...useGetConventionsQuery({kind: 'rpc'})?.data,
-    ...tracetestSemanticConventions,
+    ...TraceTestAttributes,
   };
 };
