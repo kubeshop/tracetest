@@ -1,5 +1,5 @@
-import {Link} from 'react-router-dom';
 import BetaBadge from 'components/BetaBadge/BetaBadge';
+import Link from 'components/Link';
 import {DISCORD_URL, OCTOLIINT_ISSUE_URL} from 'constants/Common.constants';
 import LinterResult from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';

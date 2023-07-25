@@ -1,14 +1,14 @@
 import {noop} from 'lodash';
 import {createContext, ReactNode, useCallback, useContext, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 
-import {useGetTransactionByIdQuery, useGetTransactionVersionByIdQuery} from 'redux/apis/TraceTest.api';
-import {TDraftTransaction} from 'types/Transaction.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
-import TransactionService from 'services/Transaction.service';
 import Transaction from 'models/Transaction.model';
-import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {useGetTransactionByIdQuery, useGetTransactionVersionByIdQuery} from 'redux/apis/TraceTest.api';
+import TransactionService from 'services/Transaction.service';
+import {TDraftTransaction} from 'types/Transaction.types';
 import useTransactionCrud from './hooks/useTransactionCrud';
+import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 
 interface IContext {
   isError: boolean;
@@ -67,15 +67,18 @@ const TransactionProvider = ({children, transactionId, version = 0}: IProps) => 
   );
 
   const {onOpen} = useConfirmationModal();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
-  const onRun = useCallback((runId?: string) => {
-    if (isLatestVersion) runTransaction(transaction!, runId);
-    else {
-      setAction('run');
-      setIsVersionModalOpen(true);
-    }
-  }, [isLatestVersion, runTransaction, transaction]);
+  const onRun = useCallback(
+    (runId?: string) => {
+      if (isLatestVersion) runTransaction(transaction!, runId);
+      else {
+        setAction('run');
+        setIsVersionModalOpen(true);
+      }
+    },
+    [isLatestVersion, runTransaction, transaction]
+  );
 
   const onDelete = useCallback(
     (id: string, name: string) => {

@@ -1,6 +1,6 @@
 import {HolderOutlined, DeleteOutlined} from '@ant-design/icons';
-import {Link} from 'react-router-dom';
 import styled from 'styled-components';
+import Link from 'components/Link';
 
 export const TestItemContainer = styled.li`
   padding: 0px 10px;

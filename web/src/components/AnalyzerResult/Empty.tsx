@@ -1,5 +1,5 @@
 import {Button} from 'antd';
-import {Link} from 'react-router-dom';
+import Link from 'components/Link';
 import * as S from './AnalyzerResult.styled';
 
 const Empty = () => {

@@ -9,11 +9,11 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useGetResourcesQuery} from 'redux/apis/TraceTest.api';
 import {ADD_TEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
 import Resource from 'models/Resource.model';
 import Transaction from 'models/Transaction.model';
@@ -36,7 +36,7 @@ const Resources = () => {
   const onDeleteResource = useDeleteResource();
   const {runTest} = useTestCrud();
   const {runTransaction} = useTransactionCrud();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   const handleOnRun = useCallback(
     (resource: Transaction | Test, type: ResourceType) => {

@@ -1,9 +1,9 @@
 import {Dropdown, Menu} from 'antd';
-import {useNavigate} from 'react-router-dom';
 
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './TransactionRunActionsMenu.styled';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 
 interface IProps {
   runId: string;
@@ -12,7 +12,7 @@ interface IProps {
 }
 
 const TransactionRunActionsMenu = ({runId, transactionId, isRunView = false}: IProps) => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const onDelete = useDeleteResourceRun({id: transactionId, isRunView, type: ResourceType.Transaction});
 
   return (

@@ -1,15 +1,14 @@
 import {Button} from 'antd';
 import {useCallback, useMemo} from 'react';
-import {useNavigate} from 'react-router-dom';
-
 import PaginatedList from 'components/PaginatedList';
 import TransactionRunCard from 'components/RunCard/TransactionRunCard';
 import TestHeader from 'components/TestHeader';
-import {useTransaction} from 'providers/Transaction/Transaction.provider';
-import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
-import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import TransactionRun from 'models/TransactionRun.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {useTransaction} from 'providers/Transaction/Transaction.provider';
+import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
+import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
 import * as S from './Transaction.styled';
 
 const Content = () => {
@@ -23,7 +22,7 @@ const Content = () => {
     if (transaction.id) runTransaction(transaction);
   }, [runTransaction, transaction]);
 
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   const shouldEdit = transaction.summary.hasRuns;
   const onEdit = () => navigate(`/transaction/${transaction.id}/run/${transaction.summary.runs}`);

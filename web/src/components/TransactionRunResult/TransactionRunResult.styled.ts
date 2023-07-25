@@ -1,7 +1,7 @@
 import {CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
 import {Typography, Tag, Button} from 'antd';
-import {Link} from 'react-router-dom';
 import styled from 'styled-components';
+import Link from 'components/Link';
 
 export const Container = styled.div`
   border: ${({theme}) => `1px solid ${theme.color.borderLight}`};

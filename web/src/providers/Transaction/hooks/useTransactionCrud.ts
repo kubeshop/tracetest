@@ -1,21 +1,21 @@
 import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {TEnvironmentValue} from 'models/Environment.model';
+import RunError from 'models/RunError.model';
+import Transaction from 'models/Transaction.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
-import {TDraftTransaction} from 'types/Transaction.types';
+import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {
   useDeleteTransactionByIdMutation,
   useEditTransactionMutation,
   useLazyGetTransactionVersionByIdQuery,
   useRunTransactionMutation,
 } from 'redux/apis/TraceTest.api';
-import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {RunErrorTypes} from 'types/TestRun.types';
-import Transaction from 'models/Transaction.model';
-import {TEnvironmentValue} from 'models/Environment.model';
-import RunError from 'models/RunError.model';
+import {TDraftTransaction} from 'types/Transaction.types';
 
 const useTransactionCrud = () => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const [editTransaction, {isLoading: isTransactionEditLoading}] = useEditTransactionMutation();
   const [runTransactionAction, {isLoading: isLoadingRunTransaction}] = useRunTransactionMutation();
   const [getTransaction] = useLazyGetTransactionVersionByIdQuery();

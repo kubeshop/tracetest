@@ -1,6 +1,5 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import {useParseExpressionMutation} from 'redux/apis/TraceTest.api';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
@@ -17,11 +16,12 @@ import {
 } from 'redux/testOutputs/slice';
 import TestOutput from 'models/TestOutput.model';
 import SpanSelectors from 'selectors/Span.selectors';
+import useValidateOutput from './hooks/useValidateOutput';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+import {useDashboard} from '../Dashboard/Dashboard.provider';
 import {useEnvironment} from '../Environment/Environment.provider';
 import {useTest} from '../Test/Test.provider';
 import {useTestRun} from '../TestRun/TestRun.provider';
-import useValidateOutput from './hooks/useValidateOutput';
 
 interface IContext {
   isDraftMode: boolean;
@@ -76,7 +76,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const {onOpen: onOpenConfirmationModal} = useConfirmationModal();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const {selectedEnvironment} = useEnvironment();
   const {
     test: {outputs: testOutputs = []},

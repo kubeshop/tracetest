@@ -1,9 +1,9 @@
 import {LinkOutlined} from '@ant-design/icons';
 import {Tooltip} from 'antd';
 import {capitalize} from 'lodash';
-import React, {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {useState} from 'react';
 import KeyValueRow from 'components/KeyValueRow';
+import Link from 'components/Link';
 import {TestState} from 'constants/TestRun.constants';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';

@@ -1,5 +1,5 @@
 import {Tooltip} from 'antd';
-import {Link} from 'react-router-dom';
+import Link from 'components/Link';
 import TestState from 'components/TestState';
 import TransactionRunActionsMenu from 'components/TransactionRunActionsMenu';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';

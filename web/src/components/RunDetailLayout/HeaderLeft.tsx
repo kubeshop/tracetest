@@ -1,7 +1,6 @@
-import {useNavigate} from 'react-router-dom';
-import {useMemo} from 'react';
 import {LinkOutlined} from '@ant-design/icons';
-
+import {useMemo} from 'react';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import Date from 'utils/Date';
 import Info from './Info';
@@ -16,7 +15,7 @@ const HeaderLeft = ({name, triggerType}: IProps) => {
   const {run: {createdAt, transactionId, transactionRunId, executionTime, trace, traceId, testVersion} = {}, run} =
     useTestRun();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   const description = useMemo(() => {
     return (

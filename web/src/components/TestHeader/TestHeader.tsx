@@ -1,5 +1,5 @@
 import ResourceCardActions from 'components/ResourceCard/ResourceCardActions';
-import {useNavigate} from 'react-router-dom';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import * as S from './TestHeader.styled';
 
 interface IProps {
@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, title, runButton}: IProps) => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   return (
     <S.Container $isWhite>

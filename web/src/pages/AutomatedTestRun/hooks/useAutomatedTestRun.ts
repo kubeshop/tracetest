@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 import {TEnvironmentValue} from 'models/Environment.model';
 import {useTest} from 'providers/Test/Test.provider';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
-import {useNavigate} from 'react-router-dom';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 
 const getParsedVariables = (rawVars: string): TEnvironmentValue[] => {
   try {
@@ -20,7 +20,7 @@ const useAutomatedTestRun = (query: URLSearchParams) => {
     test: {id: testId},
   } = useTest();
   const {selectedEnvironment} = useEnvironment();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   const onAutomatedRun = useCallback(() => {
     const variables = getParsedVariables(query.get('variables') ?? '[]');

@@ -1,10 +1,10 @@
 import {useCallback} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {useDeleteRunByIdMutation, useDeleteTransactionRunByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 
 interface IProps {
   id: string;
@@ -15,7 +15,7 @@ interface IProps {
 const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
   const [deleteTestRunById] = useDeleteRunByIdMutation();
   const [deleteTransactionRunById] = useDeleteTransactionRunByIdMutation();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const {onOpen} = useConfirmationModal();
 
   const onConfirmDelete = useCallback(

@@ -1,16 +1,16 @@
 import {useCallback} from 'react';
 import {capitalize} from 'lodash';
-import {useNavigate} from 'react-router-dom';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {useDeleteTestByIdMutation, useDeleteTransactionByIdMutation} from 'redux/apis/TraceTest.api';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
-import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {ResourceType} from 'types/Resource.type';
 import {useNotification} from 'providers/Notification/Notification.provider';
 
 const useDeleteResource = () => {
   const [deleteTestMutation] = useDeleteTestByIdMutation();
   const [deleteTransactionMutation] = useDeleteTransactionByIdMutation();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const {showNotification} = useNotification();
 
   const {onOpen} = useConfirmationModal();

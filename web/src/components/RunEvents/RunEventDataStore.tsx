@@ -1,5 +1,5 @@
 import {Typography} from 'antd';
-import {Link} from 'react-router-dom';
+import Link from 'components/Link';
 import TestConnectionNotification from 'components/TestConnectionNotification/TestConnectionNotification';
 import {IPropsEvent} from './RunEvent';
 import * as S from './RunEvents.styled';
