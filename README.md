@@ -1,7 +1,10 @@
 <a href="https://tracetest.io">
   <p align="center">
-    <img style="width:66%" src="assets/tracetest-logo-color-w-white-text.svg#gh-dark-mode-only" alt="Tracetest Logo Light"/>
-    <img style="width:66%" src="assets/tracetest-logo-color-w-black-text.svg#gh-light-mode-only" alt="Tracetest Logo Dark" />
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="assets/tracetest-logo-color-w-black-text.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/tracetest-logo-color-w-white-text.svg">
+      <img alt="Tracetest Logo" src="assets/tracetest-logo-color-w-black-text.svg" style="width:66%">
+    </picture>
   </p>
 </a>
 
