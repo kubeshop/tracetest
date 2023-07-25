@@ -1,9 +1,9 @@
 import {Dropdown, Menu} from 'antd';
 
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './TransactionRunActionsMenu.styled';
-import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 
 interface IProps {
   runId: string;

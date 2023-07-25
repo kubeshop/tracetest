@@ -1,8 +1,8 @@
 import {Button, Col, Space, Typography} from 'antd';
 
 import icon from 'assets/data-stores.svg';
-import * as S from './Home.styled';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import * as S from './Home.styled';
 
 interface IProps {
   onSkip(): void;
