@@ -1,9 +1,9 @@
 <a href="https://tracetest.io">
   <p align="center">
     <picture>
-      <source media="(prefers-color-scheme: light)" srcset="assets/tracetest-logo-color-w-black-text.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="assets/tracetest-logo-color-w-white-text.svg">
-      <img alt="Tracetest Logo" src="assets/tracetest-logo-color-w-black-text.svg" style="max-width:450px">
+      <source media="(prefers-color-scheme: light)" srcset="assets/tracetest-logo-color-w-black-text.svg" width="auto" height="80">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/tracetest-logo-color-w-white-text.svg" width="auto" height="80">
+      <img alt="Tracetest Logo" src="assets/tracetest-logo-color-w-black-text.svg" width="auto" height="80">
     </picture>
   </p>
 </a>
