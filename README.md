@@ -1,7 +1,10 @@
 <a href="https://tracetest.io">
   <p align="center">
-    <img style="width:66%" src="assets/tracetest-logo-color-w-white-text.svg#gh-dark-mode-only" alt="Tracetest Logo Light"/>
-    <img style="width:66%" src="assets/tracetest-logo-color-w-black-text.svg#gh-light-mode-only" alt="Tracetest Logo Dark" />
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="assets/tracetest-logo-color-w-black-text.svg" width="auto" height="80">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/tracetest-logo-color-w-white-text.svg" width="auto" height="80">
+      <img alt="Tracetest Logo" src="assets/tracetest-logo-color-w-black-text.svg" width="auto" height="80">
+    </picture>
   </p>
 </a>
 
@@ -37,10 +40,19 @@
   </a>
   <a href="https://kubeshop.io/"><img src="https://img.shields.io/website?url=https://kubeshop.io/&up_message=Kubeshop&up_color=%232635F1&label=Accelerator&down_color=%232635F1&down_message=Kubeshop"></a>
   <a href="https://github.com/kubeshop/tracetest/releases">
-    <img title="Release" src="https://img.shields.io/github/v/release/kubeshop/tracetest"/>
+    <img title="Release" src="https://img.shields.io/github/v/release/kubeshop/tracetest?logo=github"/>
   </a>
   <a href="https://github.com/kubeshop/tracetest/releases">
-    <img title="Release date" src="https://img.shields.io/github/release-date/kubeshop/tracetest"/>
+    <img title="Release date" src="https://img.shields.io/github/release-date/kubeshop/tracetest?logo=github"/>
+  </a>
+  <a href="https://github.com/kubeshop/tracetest/graphs/contributors">
+    <img title="Contributors" src="https://img.shields.io/github/contributors/kubeshop/tracetest?logo=github"/>
+  </a>
+  <a href="https://github.com/kubeshop/tracetest/pulls?q=is%3Apr+is%3Aclosed">
+    <img title="Pull Requests" src="https://img.shields.io/github/issues-pr-closed/kubeshop/tracetest?logo=github"/>
+  </a>
+  <a href="https://github.com/kubeshop/tracetest/pulls?q=is%3Apr+is%3Aclosed">
+    <img title="Release Candidate" src="https://img.shields.io/github/actions/workflow/status/kubeshop/tracetest/release-candidate.yml?logo=github&label=RC Build"/>
   </a>
   <a href="https://github.com/kubeshop/tracetest/blob/main/CONTRIBUTING.md">
     <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?logo=github" alt="PRs welcome!" />
