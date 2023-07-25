@@ -216,12 +216,14 @@ type QueueDriver interface {
 }
 
 func (q Queue) Enqueue(ctx context.Context, job Job) {
-	hdrs := headers{}
+	if job.Headers == nil {
+		job.Headers = &headers{}
+	}
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-	propagator.Inject(ctx, propagation.MapCarrier(hdrs))
+	propagator.Inject(ctx, propagation.MapCarrier(*job.Headers))
 
 	newJob := Job{
-		Headers: &hdrs,
+		Headers: job.Headers,
 
 		Test: test.Test{ID: job.Test.ID},
 		Run:  test.Run{ID: job.Run.ID},

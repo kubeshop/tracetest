@@ -95,7 +95,7 @@ func (tp tracePoller) enqueueJob(ctx context.Context, job Job) {
 }
 
 func (tp tracePoller) isFirstRequest(job Job) bool {
-	return job.EnqueueCount() == 1
+	return job.EnqueueCount() == 0
 }
 
 func (tp *tracePoller) SetOutputQueue(queue Enqueuer) {
