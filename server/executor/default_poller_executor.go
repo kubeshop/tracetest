@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -48,12 +47,6 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(ctx context.Context, job *Jo
 		attribute.String("tracetest.run.trace_poller.test_id", string(job.Test.ID)),
 		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
 	}
-
-	fmt.Println("********")
-	fmt.Println("job", job.EnqueueCount())
-	fmt.Println("job", job.Test.ID)
-	spew.Dump(attrs)
-	fmt.Println("********")
 
 	if res.reason != "" {
 		attrs = append(attrs, attribute.String("tracetest.run.trace_poller.finish_reason", res.reason))
@@ -228,13 +221,6 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *Job, traceDB tracedb.Trac
 	// and we have collected at least one span for this test run
 	// and we have not collected only the root span
 
-	fmt.Println("********** DEBUG **********", job.Run.TestID, job.EnqueueCount())
-	fmt.Println("len(trace.Flat)", len(trace.Flat))
-	fmt.Println("len(job.Run.Trace.Flat)", len(job.Run.Trace.Flat))
-	fmt.Println("haveNotCollectedSpansSinceLastPoll", haveNotCollectedSpansSinceLastPoll)
-	fmt.Println("haveCollectedSpansInTestRun", haveCollectedSpansInTestRun)
-	fmt.Println("haveCollectedOnlyRootNode", haveCollectedOnlyRootNode)
-	fmt.Println("********** DEBUG **********")
 	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun && !haveCollectedOnlyRootNode {
 		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
 	}
