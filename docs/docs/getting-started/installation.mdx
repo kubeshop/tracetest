@@ -232,6 +232,64 @@ kubectl --kubeconfig <path-to-your-home>/.kube/config --context <your-cluster-co
 Access the Tracetest Web UI on [`http://localhost:11633`](http://localhost:11633).
 
   </TabItem>
+  <TabItem value="docker-compose" label="Docker Compose">
+
+First, be sure that you have [Docker](https://docker.com/) installed in your machine.
+
+The Quick Start with the Pokeshop Sample App is located [here](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-pokeshop).
+
+**The [`docker-compose.yaml`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-pokeshop/docker-compose.yml) contains Tracetest, the OpenTelemetry Collector, and a sample app called [Pokeshop](../live-examples/pokeshop/overview.md). This allows you to create sample tests right away!**
+
+<details>
+  <summary>
+    <b>Click to view Pokeshop Sample App Architecture</b>
+  </summary>
+
+Here's the Architecture of the Pokeshop Sample App:
+
+- an **API** that serves client requests,
+- a **Worker** who deals with background processes.
+
+The communication between the API and Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to OpenTelemetry Collector and communicate with a Postgres database.
+
+Tracetest triggers tests against the Node.js API.
+
+```mermaid
+flowchart TD
+    A[(Redis)]
+    B[(Postgres)]
+    C(Node.js API)
+    D(RabbitMQ)
+    E(Worker)
+    F(OpenTelemetry Collector)
+    G(Tracetest)
+
+    G --> C
+    F --> G
+    C --> A
+    C --> B
+    C --> D
+    D --> E
+    E --> B
+    C --> F
+    E --> F
+    
+    
+```
+</details>
+
+**Start Docker Compose.**
+
+<CodeBlock
+  language="bash"
+  title="Terminal"
+>
+{`docker compose -f docker-compose.yaml up -d`}
+</CodeBlock>
+
+This will start the Tracetest Server and expose the Web UI on [`http://localhost:11633`](http://localhost:11633).
+
+  </TabItem>
 </Tabs>
 
 :::tip Don't have OpenTelemetry installed?
