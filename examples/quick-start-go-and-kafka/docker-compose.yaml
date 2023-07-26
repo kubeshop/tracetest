@@ -1,0 +1,99 @@
+version: '3'
+services:
+  producer-api:
+    image: quick-start-producer-api
+    platform: linux/amd64
+    build: ./producer-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 8080:8080
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=producer-api
+    depends_on:
+      otel-collector:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+  kafka:
+    image: quick-start-kafka
+    build: ./kafka
+    restart: unless-stopped
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=cumulative
+      - OTEL_RESOURCE_ATTRIBUTES="service.namespace=quick-start-go-and-kafka"
+      - OTEL_SERVICE_NAME=kafka
+      - KAFKA_HEAP_OPTS=-Xmx200m -Xms200m
+    healthcheck:
+      test: nc -z kafka 9092
+      start_period: 10s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  tracetest:
+    image: kubeshop/tracetest:latest
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./tracetest/tracetest-config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest/tracetest-provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.59.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    ports:
+      - 16686:16686
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
