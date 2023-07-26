@@ -108,9 +108,10 @@ func (f runnerFixture) run(tests []test.Test, ttl time.Duration) {
 	time.Sleep(10 * time.Millisecond)
 	for _, testObj := range tests {
 		newRun := f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{}, nil)
-		f.runsMock.
-			On("GetRun", testObj.ID, newRun.ID).
-			Return(newRun, noError)
+		// readd this when using not-in-memory queues
+		// f.runsMock.
+		// 	On("GetRun", testObj.ID, newRun.ID).
+		// 	Return(newRun, noError)
 		f.processorMock.
 			On("ProcessItem", testObj.ID, newRun.ID, datastore.DataStoreSingleID, pollingprofile.DefaultPollingProfile.ID).
 			Return(newRun, noError)
