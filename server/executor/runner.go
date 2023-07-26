@@ -199,6 +199,7 @@ func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
 		return
 	}
 
+	job.Run = run
 	ctx, pollingSpan := r.tracer.Start(ctx, "Start Polling trace")
 	defer pollingSpan.End()
 	r.outputQueue.Enqueue(ctx, job)

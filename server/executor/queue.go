@@ -222,7 +222,7 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		Headers: job.Headers,
 
 		Test: test.Test{ID: job.Test.ID},
-		Run:  test.Run{ID: job.Run.ID},
+		Run:  job.Run,
 
 		Transaction:    transaction.Transaction{ID: job.Transaction.ID},
 		TransactionRun: transaction.TransactionRun{ID: job.TransactionRun.ID},
@@ -243,7 +243,7 @@ func (q Queue) Listen(job Job) {
 		Headers: job.Headers,
 	}
 	newJob.Test = q.resolveTest(ctx, job)
-	newJob.Run = q.resolveTestRun(ctx, job)
+	newJob.Run = job.Run
 
 	newJob.Transaction = q.resolveTransaction(ctx, job)
 	newJob.TransactionRun = q.resolveTransactionRun(ctx, job)
