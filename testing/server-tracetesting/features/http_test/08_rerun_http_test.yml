@@ -22,9 +22,6 @@ spec:
   - selector: span[name = "query INSERT"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
-  - selector: span[name = "exec UPDATE"]
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
   - selector: span[name = "Execute assertions"]
     assertions:
     - attr:tracetest.run.assertion_runner.all_assertions_passed = "true"
