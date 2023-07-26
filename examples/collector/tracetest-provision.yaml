@@ -5,8 +5,9 @@ spec:
   strategy: periodic
   default: true
   periodic:
-    retryDelay: 5s
+    retryDelay: 30s
     timeout: 10m
+    selectorMatchRetries: 3
 
 ---
 type: DataStore

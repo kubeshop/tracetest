@@ -147,7 +147,7 @@ func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
 		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", job.Test.ID, job.Run.ID, err.Error())
 	}
 
-	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, result.reason, job.EnqueueCount(), len(run.Trace.Flat))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, result.reason, job.EnqueueCount()+1, len(run.Trace.Flat))
 
 	err = tp.eventEmitter.Emit(ctx, events.TraceFetchingSuccess(job.Test.ID, job.Run.ID))
 	if err != nil {

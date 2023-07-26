@@ -9,7 +9,6 @@ import (
 
 const (
 	selectorBasedPollerExecutorRetryHeader = "SelectorBasedPollerExecutor.retryCount"
-	selectorBasedPollerExecutorMaxTries    = 3
 )
 
 type selectorBasedPollerExecutor struct {

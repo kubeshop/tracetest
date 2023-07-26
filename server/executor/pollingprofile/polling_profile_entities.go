@@ -32,8 +32,9 @@ var DefaultPollingProfile = PollingProfile{
 	Default:  true,
 	Strategy: Periodic,
 	Periodic: &PeriodicPollingConfig{
-		Timeout:    "1m",
-		RetryDelay: "5s",
+		Timeout:              "1m",
+		RetryDelay:           "5s",
+		SelectorMatchRetries: 3,
 	},
 }
 
