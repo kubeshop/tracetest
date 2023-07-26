@@ -239,6 +239,10 @@ func (q Queue) Listen(job Job) {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
 	ctx := propagator.Extract(context.Background(), propagation.MapCarrier(*job.Headers))
 
+	// TODO: do this
+	// ctx, cancelCtx := context.WithCancel(ctx)
+	// listenForStopRequests(ctx, cancelCtx, job.Headers)
+
 	newJob := Job{
 		Headers: job.Headers,
 	}
