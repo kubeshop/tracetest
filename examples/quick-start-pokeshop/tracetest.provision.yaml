@@ -1,0 +1,17 @@
+---
+type: DataStore
+spec:
+  name: OpenTelemetry Collector pipeline
+  type: otlp
+  default: true
+
+---
+type: Demo
+spec:
+  type: pokeshop
+  enabled: true
+  name: pokeshop
+  opentelemetryStore: {}
+  pokeshop:
+    httpEndpoint: http://demo-api:8081
+    grpcEndpoint: demo-rpc:8082
