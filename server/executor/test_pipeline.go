@@ -132,16 +132,17 @@ type runCancelHandlerFn func(ctx context.Context, run test.Run) error
 
 func HandleRunCancelation(updater RunUpdater, tracer trace.Tracer, eventEmitter EventEmitter) runCancelHandlerFn {
 	return func(ctx context.Context, run test.Run) error {
-		fmt.Println("********* HandleRunCancelation *********")
 		ctx, span := tracer.Start(ctx, "User Requested Stop Run")
 		defer span.End()
 
+		if run.State == test.RunStateStopped {
+			return nil
+		}
 		err := updater.Update(ctx, run.Stopped())
 		if err != nil {
 			fmt.Printf("test %s run #%d cancel DB error: %s\n", run.TestID, run.ID, err.Error())
 		}
 
-		fmt.Println("********* freno bien *********")
 		evt := events.TraceStoppedInfo(run.TestID, run.ID)
 		err = eventEmitter.Emit(ctx, evt)
 		if err != nil {

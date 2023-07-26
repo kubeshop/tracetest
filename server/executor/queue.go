@@ -8,7 +8,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -315,21 +314,20 @@ func (q Queue) listenForStopRequests(ctx context.Context, cancelCtx context.Canc
 
 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		cancelCtx()
-		fmt.Println("********** got an event")
 		stopRequest, ok := m.Content.(StopRequest)
 		if !ok {
 			return nil
 		}
-		fmt.Println("********** stop request")
-		spew.Dump(stopRequest)
 
 		run, err := q.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
 		if err != nil {
-			fmt.Println("********** errpr!!!!", err.Error())
 			return fmt.Errorf("failed to get run %d for test %s: %w", stopRequest.RunID, stopRequest.TestID, err)
 		}
 
-		fmt.Println("********** cancelling run")
+		if run.State == test.RunStateStopped {
+			return nil
+		}
+
 		return q.cancelRunHandlerFn(ctx, run)
 
 	})
