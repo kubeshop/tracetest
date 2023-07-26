@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
@@ -119,8 +118,6 @@ func (p *TestPipeline) StopTest(ctx context.Context, testID id.ID, runID int) {
 		TestID: testID,
 		RunID:  runID,
 	}
-
-	spew.Dump(sr)
 
 	p.updatePublisher.PublishUpdate(subscription.Message{
 		ResourceID: sr.ResourceID(),

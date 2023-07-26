@@ -293,8 +293,6 @@ func (q Queue) Listen(job Job) {
 		return
 	}
 	q.itemProcessor.ProcessItem(ctx, newJob)
-
-	fmt.Println("***************** Done!!")
 }
 
 type StopRequest struct {
