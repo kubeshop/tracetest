@@ -91,6 +91,11 @@ func (tp tracePoller) handleDBError(err error) {
 }
 
 func (tp tracePoller) enqueueJob(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
 	tp.inputQueue.Enqueue(ctx, job)
 }
 
@@ -107,6 +112,12 @@ func (tp *tracePoller) SetInputQueue(queue Enqueuer) {
 }
 
 func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	if tp.isFirstRequest(job) {
 		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 		if err != nil {

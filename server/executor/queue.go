@@ -8,9 +8,11 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
 	"go.opentelemetry.io/otel/propagation"
@@ -122,7 +124,14 @@ type transactionRunGetter interface {
 	GetTransactionRun(_ context.Context, transactionID id.ID, runID int) (transaction.TransactionRun, error)
 }
 
+type subscriptor interface {
+	Subscribe(string, subscription.Subscriber)
+}
+
 type Queue struct {
+	cancelRunHandlerFn func(ctx context.Context, run test.Run) error
+	subscriptor        subscriptor
+
 	runs  testRunGetter
 	tests testGetter
 
@@ -137,6 +146,9 @@ type Queue struct {
 }
 
 type QueueBuilder struct {
+	cancelRunHandlerFn func(ctx context.Context, run test.Run) error
+	subscriptor        subscriptor
+
 	runs  testRunGetter
 	tests testGetter
 
@@ -149,6 +161,16 @@ type QueueBuilder struct {
 
 func NewQueueBuilder() *QueueBuilder {
 	return &QueueBuilder{}
+}
+
+func (qb *QueueBuilder) WithCancelRunHandlerFn(fn func(ctx context.Context, run test.Run) error) *QueueBuilder {
+	qb.cancelRunHandlerFn = fn
+	return qb
+}
+
+func (qb *QueueBuilder) WithSubscriptor(subscriptor subscriptor) *QueueBuilder {
+	qb.subscriptor = subscriptor
+	return qb
 }
 
 func (qb *QueueBuilder) WithRunGetter(runs testRunGetter) *QueueBuilder {
@@ -183,6 +205,9 @@ func (qb *QueueBuilder) WithTransactionRunGetter(transactionRuns transactionRunG
 
 func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcessor) *Queue {
 	queue := &Queue{
+		cancelRunHandlerFn: qb.cancelRunHandlerFn,
+		subscriptor:        qb.subscriptor,
+
 		runs:  qb.runs,
 		tests: qb.tests,
 
@@ -212,6 +237,12 @@ type QueueDriver interface {
 }
 
 func (q Queue) Enqueue(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	if job.Headers == nil {
 		job.Headers = &headers{}
 	}
@@ -239,14 +270,15 @@ func (q Queue) Listen(job Job) {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
 	ctx := propagator.Extract(context.Background(), propagation.MapCarrier(*job.Headers))
 
-	// TODO: do this
-	// ctx, cancelCtx := context.WithCancel(ctx)
-	// listenForStopRequests(ctx, cancelCtx, job.Headers)
+	ctx, cancelCtx := context.WithCancel(ctx)
+	q.listenForStopRequests(context.Background(), cancelCtx, job)
 
 	newJob := Job{
 		Headers: job.Headers,
 	}
 	newJob.Test = q.resolveTest(ctx, job)
+	// todo: revert when using actual queues
+	// newJob.Run = q.resolveTestRun(ctx, job)
 	newJob.Run = job.Run
 
 	newJob.Transaction = q.resolveTransaction(ctx, job)
@@ -255,7 +287,54 @@ func (q Queue) Listen(job Job) {
 	newJob.PollingProfile = q.resolvePollingProfile(ctx, job)
 	newJob.DataStore = q.resolveDataStore(ctx, job)
 
+	// Process the item with cancellation monitoring
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
 	q.itemProcessor.ProcessItem(ctx, newJob)
+
+	fmt.Println("***************** Done!!")
+}
+
+type StopRequest struct {
+	TestID id.ID
+	RunID  int
+}
+
+func (sr StopRequest) ResourceID() string {
+	runID := (test.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
+	return runID + "/stop"
+}
+
+func (q Queue) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, job Job) {
+	if q.subscriptor == nil {
+		return
+	}
+
+	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		cancelCtx()
+		fmt.Println("********** got an event")
+		stopRequest, ok := m.Content.(StopRequest)
+		if !ok {
+			return nil
+		}
+		fmt.Println("********** stop request")
+		spew.Dump(stopRequest)
+
+		run, err := q.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
+		if err != nil {
+			fmt.Println("********** errpr!!!!", err.Error())
+			return fmt.Errorf("failed to get run %d for test %s: %w", stopRequest.RunID, stopRequest.TestID, err)
+		}
+
+		fmt.Println("********** cancelling run")
+		return q.cancelRunHandlerFn(ctx, run)
+
+	})
+
+	q.subscriptor.Subscribe((StopRequest{job.Test.ID, job.Run.ID}).ResourceID(), sfn)
 }
 
 func (q Queue) resolveTransaction(ctx context.Context, job Job) transaction.Transaction {

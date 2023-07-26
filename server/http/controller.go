@@ -70,7 +70,7 @@ type transactionRunRepository interface {
 }
 
 type testRunner interface {
-	// StopTest(testID id.ID, runID int)
+	StopTest(_ context.Context, testID id.ID, runID int)
 	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
 	Rerun(_ context.Context, _ test.Test, runID int) test.Run
 }
@@ -267,8 +267,8 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInfo openapi
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
-func (c *controller) StopTestRun(_ context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
-	// c.testRunner.StopTest(id.ID(testID), int(runID))
+func (c *controller) StopTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	c.testRunner.StopTest(ctx, id.ID(testID), int(runID))
 
 	return openapi.Response(http.StatusOK, map[string]string{"result": "success"}), nil
 }

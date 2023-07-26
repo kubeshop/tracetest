@@ -200,6 +200,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 
 	testPipeline := executor.NewTestPipeline(
 		pipeline,
+		nil,
 		pipeline.GetQueueForStep(1), // processorMock queue
 		runsMock,
 		trMock,

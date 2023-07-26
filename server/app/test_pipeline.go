@@ -75,7 +75,11 @@ func buildTestPipeline(
 		eventEmitter,
 	)
 
+	cancelRunHandlerFn := executor.HandleRunCancelation(execTestUpdater, tracer, eventEmitter)
+
 	queueBuilder := executor.NewQueueBuilder().
+		WithCancelRunHandlerFn(cancelRunHandlerFn).
+		WithSubscriptor(subscriptionManager).
 		WithDataStoreGetter(dsRepo).
 		WithPollingProfileGetter(ppRepo).
 		WithTestGetter(testRepo).
@@ -92,6 +96,7 @@ func buildTestPipeline(
 
 	return executor.NewTestPipeline(
 		pipeline,
+		subscriptionManager,
 		pipeline.GetQueueForStep(3), // assertion runner step
 		runRepo,
 		trRepo,
