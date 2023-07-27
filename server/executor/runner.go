@@ -10,19 +10,14 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
-	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -31,72 +26,49 @@ type RunResult struct {
 	Err error
 }
 
-type Runner interface {
-	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
-}
-
 type PersistentRunner interface {
-	Runner
-	WorkerPool
+	QueueItemProcessor
 }
 
-type TestRunnerGetter interface {
-	GetDefault(ctx context.Context) testrunner.TestRunner
-}
+const ProcessorName = "test_runner"
 
 func NewPersistentRunner(
 	triggers *triggerer.Registry,
-	runs test.RunRepository,
 	updater RunUpdater,
-	tp TracePoller,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	newTraceDBFn traceDBFactoryFn,
-	dsRepo resourcemanager.Current[datastore.DataStore],
+	dsRepo currentDataStoreGetter,
 	eventEmitter EventEmitter,
-	ppGetter PollingProfileGetter,
-	trGetter TestRunnerGetter,
-) PersistentRunner {
-	return persistentRunner{
+) *persistentRunner {
+	return &persistentRunner{
 		triggers:            triggers,
-		runs:                runs,
 		updater:             updater,
-		tp:                  tp,
 		tracer:              tracer,
 		newTraceDBFn:        newTraceDBFn,
 		dsRepo:              dsRepo,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
-		ppGetter:            ppGetter,
-		trGetter:            trGetter,
-		executeQueue:        make(chan execReq, 5),
-		exit:                make(chan bool, 1),
 	}
+}
+
+type currentDataStoreGetter interface {
+	Current(context.Context) (datastore.DataStore, error)
 }
 
 type persistentRunner struct {
 	triggers            *triggerer.Registry
-	tp                  TracePoller
-	runs                test.RunRepository
 	updater             RunUpdater
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
 	newTraceDBFn        traceDBFactoryFn
-	dsRepo              resourcemanager.Current[datastore.DataStore]
+	dsRepo              currentDataStoreGetter
 	eventEmitter        EventEmitter
-	ppGetter            PollingProfileGetter
-	trGetter            TestRunnerGetter
-
-	executeQueue chan execReq
-	exit         chan bool
+	outputQueue         Enqueuer
 }
 
-type execReq struct {
-	ctx      context.Context
-	test     test.Test
-	run      test.Run
-	Headers  propagation.MapCarrier
-	executor expression.Executor
+func (r *persistentRunner) SetOutputQueue(queue Enqueuer) {
+	r.outputQueue = queue
 }
 
 func (r persistentRunner) handleDBError(run test.Run, err error) {
@@ -109,79 +81,6 @@ func (r persistentRunner) handleError(run test.Run, err error) {
 	if err != nil {
 		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
-}
-
-func (r persistentRunner) Start(workers int) {
-	for i := 0; i < workers; i++ {
-		go func() {
-			fmt.Println("persistentRunner start goroutine")
-			for {
-				select {
-				case <-r.exit:
-					fmt.Println("persistentRunner exit goroutine")
-					return
-				case job := <-r.executeQueue:
-					fmt.Printf(
-						"persistentRunner job. ID %d, testID %s, TraceID %s, SpanID %s\n",
-						job.run.ID,
-						job.test.ID,
-						job.run.TraceID,
-						job.run.SpanID,
-					)
-					r.processExecQueue(job)
-				}
-			}
-		}()
-	}
-}
-
-func (r persistentRunner) Stop() {
-	fmt.Println("persistentRunner stopping")
-	r.exit <- true
-}
-
-func getNewCtx(ctx context.Context) context.Context {
-	carrier := propagation.MapCarrier{}
-	otel.GetTextMapPropagator().Inject(ctx, carrier)
-
-	return otel.GetTextMapPropagator().Extract(context.Background(), carrier)
-}
-
-func (r persistentRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
-	ctx, cancelCtx := context.WithCancel(
-		getNewCtx(ctx),
-	)
-
-	run := test.NewRun()
-	run.Metadata = metadata
-	run.Environment = environment
-	run, err := r.runs.CreateRun(ctx, testObj, run)
-	r.handleDBError(run, err)
-
-	r.listenForStopRequests(ctx, cancelCtx, run)
-
-	// configuring required gates
-	if requiredGates == nil {
-		rg := r.trGetter.GetDefault(ctx).RequiredGates
-		requiredGates = &rg
-	}
-
-	run = run.ConfigureRequiredGates(*requiredGates)
-
-	ds := []expression.DataStore{expression.EnvironmentDataStore{
-		Values: environment.Values,
-	}}
-
-	executor := expression.NewExecutor(ds...)
-
-	r.executeQueue <- execReq{
-		ctx:      ctx,
-		test:     testObj,
-		run:      run,
-		executor: executor,
-	}
-
-	return run
 }
 
 func (r persistentRunner) traceDB(ctx context.Context) (tracedb.TraceDB, error) {
@@ -198,80 +97,86 @@ func (r persistentRunner) traceDB(ctx context.Context) (tracedb.TraceDB, error) 
 	return tdb, nil
 }
 
-func (r persistentRunner) processExecQueue(job execReq) {
-	run := job.run.Start()
-	r.handleDBError(run, r.updater.Update(job.ctx, run))
+func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
+	run := job.Run.Start()
+	r.handleDBError(run, r.updater.Update(ctx, run))
 
-	err := r.eventEmitter.Emit(job.ctx, events.TriggerCreatedInfo(job.run.TestID, job.run.ID))
+	err := r.eventEmitter.Emit(ctx, events.TriggerCreatedInfo(job.Run.TestID, job.Run.ID))
 	if err != nil {
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
-	triggererObj, err := r.triggers.Get(job.test.Trigger.Type)
+	triggererObj, err := r.triggers.Get(job.Test.Trigger.Type)
 	if err != nil {
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
-	tdb, err := r.traceDB(job.ctx)
+	tdb, err := r.traceDB(ctx)
 	if err != nil {
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
 	traceID := tdb.GetTraceID()
 	run.TraceID = traceID
-	r.handleDBError(run, r.updater.Update(job.ctx, run))
+	r.handleDBError(run, r.updater.Update(ctx, run))
+
+	ds := []expression.DataStore{expression.EnvironmentDataStore{
+		Values: run.Environment.Values,
+	}}
+
+	executor := expression.NewExecutor(ds...)
 
 	triggerOptions := &triggerer.TriggerOptions{
 		TraceID:  traceID,
-		Executor: job.executor,
+		Executor: executor,
 	}
 
-	err = r.eventEmitter.Emit(job.ctx, events.TriggerResolveStart(job.run.TestID, job.run.ID))
+	err = r.eventEmitter.Emit(ctx, events.TriggerResolveStart(job.Run.TestID, job.Run.ID))
 	if err != nil {
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
-	resolvedTest, err := triggererObj.Resolve(job.ctx, job.test, triggerOptions)
+	resolvedTest, err := triggererObj.Resolve(ctx, job.Test, triggerOptions)
 	if err != nil {
-		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerResolveError(job.run.TestID, job.run.ID, err))
+		emitErr := r.eventEmitter.Emit(ctx, events.TriggerResolveError(job.Run.TestID, job.Run.ID, err))
 		if emitErr != nil {
-			r.handleError(job.run, emitErr)
+			r.handleError(job.Run, emitErr)
 		}
 
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
-	err = r.eventEmitter.Emit(job.ctx, events.TriggerResolveSuccess(job.run.TestID, job.run.ID))
+	err = r.eventEmitter.Emit(ctx, events.TriggerResolveSuccess(job.Run.TestID, job.Run.ID))
 	if err != nil {
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
-	if job.test.Trigger.Type == trigger.TriggerTypeTraceID {
-		traceIDFromParam, err := trace.TraceIDFromHex(job.test.Trigger.TraceID.ID)
+	if job.Test.Trigger.Type == trigger.TriggerTypeTraceID {
+		traceIDFromParam, err := trace.TraceIDFromHex(job.Test.Trigger.TraceID.ID)
 		if err == nil {
 			run.TraceID = traceIDFromParam
 		}
 	}
 
-	err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionStart(job.run.TestID, job.run.ID))
+	err = r.eventEmitter.Emit(ctx, events.TriggerExecutionStart(job.Run.TestID, job.Run.ID))
 	if err != nil {
-		r.handleError(job.run, err)
+		r.handleError(job.Run, err)
 	}
 
-	response, err := triggererObj.Trigger(job.ctx, resolvedTest, triggerOptions)
+	response, err := triggererObj.Trigger(ctx, resolvedTest, triggerOptions)
 	run = r.handleExecutionResult(run, response, err)
 	if err != nil {
 		if isConnectionError(err) {
-			r.emitUnreachableEndpointEvent(job, err)
+			r.emitUnreachableEndpointEvent(ctx, job, err)
 
 			if isTargetLocalhost(job) && isServerRunningInsideContainer() {
-				r.emitMismatchEndpointEvent(job, err)
+				r.emitMismatchEndpointEvent(ctx, job, err)
 			}
 		}
 
-		emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerExecutionError(job.run.TestID, job.run.ID, err))
+		emitErr := r.eventEmitter.Emit(ctx, events.TriggerExecutionError(job.Run.TestID, job.Run.ID, err))
 		if emitErr != nil {
-			r.handleError(job.run, emitErr)
+			r.handleError(job.Run, emitErr)
 		}
 
 		fmt.Printf("test %s run #%d trigger error: %s\n", run.TestID, run.ID, err.Error())
@@ -281,20 +186,23 @@ func (r persistentRunner) processExecQueue(job execReq) {
 			Content:    RunResult{Run: run, Err: err},
 		})
 	} else {
-		err = r.eventEmitter.Emit(job.ctx, events.TriggerExecutionSuccess(job.run.TestID, job.run.ID))
+		err = r.eventEmitter.Emit(ctx, events.TriggerExecutionSuccess(job.Run.TestID, job.Run.ID))
 		if err != nil {
-			r.handleDBError(job.run, err)
+			r.handleDBError(job.Run, err)
 		}
 	}
 
 	run.SpanID = response.SpanID
 
-	r.handleDBError(run, r.updater.Update(job.ctx, run))
-	if run.State == test.RunStateAwaitingTrace {
-		ctx, pollingSpan := r.tracer.Start(job.ctx, "Start Polling trace")
-		defer pollingSpan.End()
-		r.tp.Poll(ctx, job.test, run, r.ppGetter.GetDefault(ctx))
+	r.handleDBError(run, r.updater.Update(ctx, run))
+	if run.State != test.RunStateAwaitingTrace {
+		return
 	}
+
+	job.Run = run
+	ctx, pollingSpan := r.tracer.Start(ctx, "Start Polling trace")
+	defer pollingSpan.End()
+	r.outputQueue.Enqueue(ctx, job)
 }
 
 func (r persistentRunner) handleExecutionResult(run test.Run, response triggerer.Response, err error) test.Run {
@@ -312,25 +220,25 @@ func (r persistentRunner) handleExecutionResult(run test.Run, response triggerer
 	return run.SuccessfullyTriggered()
 }
 
-func (r persistentRunner) emitUnreachableEndpointEvent(job execReq, err error) {
+func (r persistentRunner) emitUnreachableEndpointEvent(ctx context.Context, job Job, err error) {
 	var event model.TestRunEvent
-	switch job.test.Trigger.Type {
+	switch job.Test.Trigger.Type {
 	case trigger.TriggerTypeHTTP:
-		event = events.TriggerHTTPUnreachableHostError(job.run.TestID, job.run.ID, err)
+		event = events.TriggerHTTPUnreachableHostError(job.Run.TestID, job.Run.ID, err)
 	case trigger.TriggerTypeGRPC:
-		event = events.TriggergRPCUnreachableHostError(job.run.TestID, job.run.ID, err)
+		event = events.TriggergRPCUnreachableHostError(job.Run.TestID, job.Run.ID, err)
 	}
 
-	emitErr := r.eventEmitter.Emit(job.ctx, event)
+	emitErr := r.eventEmitter.Emit(ctx, event)
 	if emitErr != nil {
-		r.handleError(job.run, emitErr)
+		r.handleError(job.Run, emitErr)
 	}
 }
 
-func (r persistentRunner) emitMismatchEndpointEvent(job execReq, err error) {
-	emitErr := r.eventEmitter.Emit(job.ctx, events.TriggerDockerComposeHostMismatchError(job.run.TestID, job.run.ID))
+func (r persistentRunner) emitMismatchEndpointEvent(ctx context.Context, job Job, err error) {
+	emitErr := r.eventEmitter.Emit(ctx, events.TriggerDockerComposeHostMismatchError(job.Run.TestID, job.Run.ID))
 	if emitErr != nil {
-		r.handleError(job.run, emitErr)
+		r.handleError(job.Run, emitErr)
 	}
 }
 
@@ -352,13 +260,13 @@ func isConnectionError(err error) bool {
 	return false
 }
 
-func isTargetLocalhost(job execReq) bool {
+func isTargetLocalhost(job Job) bool {
 	var endpoint string
-	switch job.test.Trigger.Type {
+	switch job.Test.Trigger.Type {
 	case trigger.TriggerTypeHTTP:
-		endpoint = job.test.Trigger.HTTP.URL
+		endpoint = job.Test.Trigger.HTTP.URL
 	case trigger.TriggerTypeGRPC:
-		endpoint = job.test.Trigger.GRPC.Address
+		endpoint = job.Test.Trigger.GRPC.Address
 	}
 
 	url, err := url.Parse(endpoint)

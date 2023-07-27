@@ -8,7 +8,8 @@ import (
 
 	"github.com/j2gg0s/otsql"
 	"github.com/j2gg0s/otsql/hook/trace"
-	pq "github.com/lib/pq"
+	"github.com/jackc/pgx/v5"
+	pgxsql "github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -27,10 +28,11 @@ func dbSpanNameFormatter(ctx context.Context, method, query string) string {
 }
 
 func Connect(dsn string) (*sql.DB, error) {
-	connector, err := pq.NewConnector(dsn)
+	config, err := pgx.ParseConfig(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("sql open: %w", err)
 	}
+	connector := pgxsql.GetConnector(*config)
 	db := sql.OpenDB(
 		otsql.WrapConnector(connector,
 			otsql.WithHooks(

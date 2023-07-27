@@ -16,13 +16,10 @@ type defaultPollerMock struct {
 	mock.Mock
 }
 
-// ExecuteRequest implements executor.PollerExecutor
-func (m *defaultPollerMock) ExecuteRequest(request *executor.PollingRequest) (bool, string, test.Run, error) {
-	args := m.Called(request)
-	return args.Bool(0), args.String(1), args.Get(2).(test.Run), args.Error(3)
+func (m *defaultPollerMock) ExecuteRequest(_ context.Context, job *executor.Job) (executor.PollResult, error) {
+	args := m.Called(job)
+	return args.Get(0).(executor.PollResult), args.Error(1)
 }
-
-var _ executor.PollerExecutor = &defaultPollerMock{}
 
 type eventEmitterMock struct {
 	mock.Mock
@@ -41,12 +38,16 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 	eventEmitter := new(eventEmitterMock)
 	eventEmitter.On("Emit", mock.Anything, mock.Anything).Return(nil)
 
-	createRequest := func(test test.Test, run test.Run) *executor.PollingRequest {
+	createRequest := func(test test.Test, run test.Run) *executor.Job {
 		pollingProfile := pollingprofile.DefaultPollingProfile
 		pollingProfile.Periodic.SelectorMatchRetries = 3
 
-		request := executor.NewPollingRequest(context.Background(), test, run, 0, pollingProfile)
-		return request
+		job := executor.NewJob()
+		job.Test = test
+		job.Run = run
+		job.PollingProfile = pollingProfile
+
+		return &job
 	}
 
 	t.Run("should return false when default poller returns false", func(t *testing.T) {
@@ -55,10 +56,10 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 
 		request := createRequest(test.Test{}, test.Run{})
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(false, "", test.Run{}, nil)
-		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(executor.PollResult{}, nil)
+		res, _ := selectorBasedPoller.ExecuteRequest(context.TODO(), request)
 
-		assert.False(t, ready)
+		assert.False(t, res.Finished())
 	})
 
 	t.Run("should return false when default poller returns true but not all selector match at least one span", func(t *testing.T) {
@@ -76,11 +77,11 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 
 		request := createRequest(testObj, run)
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
-		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(executor.NewPollResult(true, "all spans found", run), nil)
+		res, _ := selectorBasedPoller.ExecuteRequest(context.TODO(), request)
 
-		assert.False(t, ready)
-		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor.retryCount"))
+		assert.False(t, res.Finished())
+		assert.Equal(t, 1, request.Headers.GetInt("SelectorBasedPollerExecutor.retryCount"))
 	})
 
 	t.Run("should return true if default poller returns true and selectors don't match spans 3 times in a row", func(t *testing.T) {
@@ -98,27 +99,27 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 
 		request := createRequest(testObj, run)
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(false, "trace not found", run, nil).Once()
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(executor.NewPollResult(false, "trace not found", run), nil).Once()
 
-		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
-		assert.False(t, ready)
+		res, _ := selectorBasedPoller.ExecuteRequest(context.TODO(), request)
+		assert.False(t, res.Finished())
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(executor.NewPollResult(true, "all spans found", run), nil)
 
-		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
-		assert.False(t, ready)
-		assert.Equal(t, "1", request.Header("SelectorBasedPollerExecutor.retryCount"))
+		res, _ = selectorBasedPoller.ExecuteRequest(context.TODO(), request)
+		assert.False(t, res.Finished())
+		assert.Equal(t, 1, request.Headers.GetInt("SelectorBasedPollerExecutor.retryCount"))
 
-		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
-		assert.False(t, ready)
-		assert.Equal(t, "2", request.Header("SelectorBasedPollerExecutor.retryCount"))
+		res, _ = selectorBasedPoller.ExecuteRequest(context.TODO(), request)
+		assert.False(t, res.Finished())
+		assert.Equal(t, 2, request.Headers.GetInt("SelectorBasedPollerExecutor.retryCount"))
 
-		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
-		assert.False(t, ready)
-		assert.Equal(t, "3", request.Header("SelectorBasedPollerExecutor.retryCount"))
+		res, _ = selectorBasedPoller.ExecuteRequest(context.TODO(), request)
+		assert.False(t, res.Finished())
+		assert.Equal(t, 3, request.Headers.GetInt("SelectorBasedPollerExecutor.retryCount"))
 
-		ready, _, _, _ = selectorBasedPoller.ExecuteRequest(request)
-		assert.True(t, ready)
+		res, _ = selectorBasedPoller.ExecuteRequest(context.TODO(), request)
+		assert.True(t, res.Finished())
 	})
 
 	t.Run("should return true if default poller returns true and each selector match at least one span", func(t *testing.T) {
@@ -140,9 +141,9 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 
 		request := createRequest(testObj, run)
 
-		defaultPoller.On("ExecuteRequest", mock.Anything).Return(true, "all spans found", run, nil)
+		defaultPoller.On("ExecuteRequest", mock.Anything).Return(executor.NewPollResult(true, "all spans found", run), nil)
 
-		ready, _, _, _ := selectorBasedPoller.ExecuteRequest(request)
-		assert.True(t, ready)
+		res, _ := selectorBasedPoller.ExecuteRequest(context.TODO(), request)
+		assert.True(t, res.Finished())
 	})
 }

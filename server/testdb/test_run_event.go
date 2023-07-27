@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
@@ -136,10 +135,6 @@ func readTestRunEventFromRows(rows *sql.Rows) (model.TestRunEvent, error) {
 	)
 
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return model.TestRunEvent{}, ErrNotFound
-		}
-
 		return model.TestRunEvent{}, fmt.Errorf("could not scan event: %w", err)
 	}
 

@@ -7,11 +7,17 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
+	"github.com/kubeshop/tracetest/server/test"
 )
+
+type transactionStepRunRepository interface {
+	GetTransactionRunSteps(_ context.Context, _ id.ID, runID int) ([]test.Run, error)
+}
 
 func NewRunRepository(db *sql.DB, stepsRepository transactionStepRunRepository) *RunRepository {
 	return &RunRepository{
@@ -208,7 +214,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		allStepsRequiredGatesPassed,
 		jsonMetadata,
 		jsonEnvironment,
-		tr.ID,
+		strconv.Itoa(tr.ID),
 		tr.TransactionID,
 	)
 	stmt, err := tx.Prepare(query)
@@ -229,7 +235,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 
 func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
 	// delete existing steps
-	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", tr.ID, tr.TransactionID)
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", strconv.Itoa(tr.ID), tr.TransactionID)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -237,7 +243,7 @@ func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx,
 
 	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot reset transaction run steps: %w", err)
 	}
 
 	if len(tr.Steps) == 0 {
@@ -321,7 +327,7 @@ FROM transaction_runs
 `
 
 func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
-	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE id = $1 AND transaction_id = $2", runID, transactionID)
+	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE id = $1 AND transaction_id = $2", strconv.Itoa(runID), transactionID)
 	stmt, err := td.db.Prepare(query)
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("prepare: %w", err)

@@ -2,14 +2,14 @@
 
 import React from 'react';
 import clsx from 'clsx';
-import Link from '@docusaurus/Link';
 import Translate from '@docusaurus/Translate';
+import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
 
-const GettingStartedGuides = [
+const WelcomeGuides = [
   {
     name: '👇 Install Tracetest',
-    url: './installation',
+    url: './getting-started/installation',
     description: (
       <Translate >
         Set up Tracetest and start trace-based testing your distributed system.
@@ -19,7 +19,7 @@ const GettingStartedGuides = [
   },
   {
     name: '🙌 Open Tracetest',
-    url: './open',
+    url: './getting-started/open',
     description: (
       <Translate>
         After installing it, open Tracetest start to creating trace-based tests.
@@ -29,7 +29,7 @@ const GettingStartedGuides = [
   },
   {
     name: '🤔 Don\'t have OpenTelemetry?',
-    url: './no-otel',
+    url: './getting-started/no-otel',
     description: (
       <Translate >
         Install OpenTelemetry in 5 minutes without any code changes!
@@ -47,6 +47,26 @@ const GettingStartedGuides = [
     ),
     button: 'Go to GitHub',
   },
+  {
+    name: '⚙️ Configure trace data stores',
+    url: '../configuration/overview#supported-trace-data-stores',
+    description: (
+      <Translate>
+        Connect your existing trace data store or send traces to Tracetest directly!
+      </Translate>
+    ),
+    button: 'Configure Tracetest',
+  },
+  {
+    name: '🙄 New to Trace-based Testing?',
+    url: '../concepts/what-is-trace-based-testing',
+    description: (
+      <Translate>
+        Read about the concepts of trace-based testing to learn more!
+      </Translate>
+    ),
+    button: 'View Concepts',
+  },
 ];
 
 interface Props {
@@ -56,7 +76,7 @@ interface Props {
   description: JSX.Element;
 }
 
-function GettingStartedGuideCard({name, url, description, button}: Props) {
+function WelcomeGuideCard({name, url, description, button}: Props) {
   return (
     <div className="col col--6 margin-bottom--lg">
       <div className={clsx('card')}>
@@ -76,11 +96,11 @@ function GettingStartedGuideCard({name, url, description, button}: Props) {
   );
 }
 
-export function GettingStartedGuideCardsRow(): JSX.Element {
+export function WelcomeGuideCardsRow(): JSX.Element {
   return (
     <div className="row">
-      {GettingStartedGuides.map((gettingStartedGuide) => (
-        <GettingStartedGuideCard key={gettingStartedGuide.name} {...gettingStartedGuide} />
+      {WelcomeGuides.map((WelcomeGuide) => (
+        <WelcomeGuideCard key={WelcomeGuide.name} {...WelcomeGuide} />
       ))}
     </div>
   );

@@ -2,15 +2,13 @@
 
 This page contains a reference of all options for installing Tracetest CLI.
 
-## Detailed Instructions on Installing Tracetest Using the CLI
-
 Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
 
-## Installing the Tracetest Server via the CLI
+:::tip Want more info?
+Read more about the installation guide [here](../getting-started/installation.mdx).
+:::
 
-Use the CLI's install wizard to install a Tracetest server locally using Docker Compose or to a local or remote Kubernetes cluster.
-
-The wizard installs all the tools required to set up the desired environment and creates all the configurations, tailored to your case.
+## Installing the Tracetest CLI in different operating systems
 
 Every time we release a new version of Tracetest, we generate binaries for Linux, MacOS, and Windows. Supporting both amd64, and ARM64 architectures, in `tar.gz`, `deb`, `rpm` and `exe` formats.
 
@@ -75,3 +73,21 @@ choco source add --name=kubeshop_repo --source=https://chocolatey.kubeshop.io/ch
 #### From source
 
 Download one of the files from the latest tag, extract to your machine, and then [add the tracetest binary to your PATH variable](https://stackoverflow.com/a/41895179).
+
+## Installing a specific version of the Tracetest CLI
+
+You can request to install a specific version by appending `-s -- [version]` to the installation script.
+
+```bash
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s -- [version]
+```
+
+If you would want version `v0.13.0` you would run this command:
+
+```bash
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s -- v0.12.1
+```
+
+This method skips package managers and directly downloads the build from the release page.
+
+Due to this, if the Tracetest CLI was previously installed using a package manager, that version will still exist in the system, so depending on the `$PATH` environment variable configuration, that version might take precedence over the specific version you installed with the install script.

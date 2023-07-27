@@ -3,6 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
@@ -12,109 +13,60 @@ import (
 	"github.com/kubeshop/tracetest/server/transaction"
 )
 
-type TransactionRunner interface {
-	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) transaction.TransactionRun
-}
-
-type PersistentTransactionRunner interface {
-	TransactionRunner
-	WorkerPool
-}
-
 type transactionRunRepository interface {
 	transactionUpdater
 	CreateRun(context.Context, transaction.TransactionRun) (transaction.TransactionRun, error)
 }
 
+type testRunner interface {
+	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
+}
+
 func NewTransactionRunner(
-	runner Runner,
-	db test.Repository,
+	testRunner testRunner,
 	transactionRuns transactionRunRepository,
 	subscriptionManager *subscription.Manager,
-) persistentTransactionRunner {
+) *persistentTransactionRunner {
 	updater := (CompositeTransactionUpdater{}).
 		Add(NewDBTranasctionUpdater(transactionRuns)).
 		Add(NewSubscriptionTransactionUpdater(subscriptionManager))
 
-	return persistentTransactionRunner{
-		testRunner:          runner,
-		db:                  db,
+	return &persistentTransactionRunner{
+		testRunner:          testRunner,
 		transactionRuns:     transactionRuns,
 		updater:             updater,
 		subscriptionManager: subscriptionManager,
-		executionChannel:    make(chan transactionRunJob, 1),
-		exit:                make(chan bool),
 	}
-}
-
-type transactionRunJob struct {
-	ctx         context.Context
-	transaction transaction.Transaction
-	run         transaction.TransactionRun
 }
 
 type persistentTransactionRunner struct {
-	testRunner          Runner
-	db                  test.Repository
+	testRunner          testRunner
 	transactionRuns     transactionRunRepository
 	updater             TransactionRunUpdater
 	subscriptionManager *subscription.Manager
-	executionChannel    chan transactionRunJob
-	exit                chan bool
 }
 
-func (r persistentTransactionRunner) Run(ctx context.Context, transaction transaction.Transaction, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) transaction.TransactionRun {
-	run := transaction.NewRun()
-	run.Metadata = metadata
-	run.Environment = environment
-	run.RequiredGates = requiredGates
-
-	ctx = getNewCtx(ctx)
-
-	run, _ = r.transactionRuns.CreateRun(ctx, run)
-
-	r.executionChannel <- transactionRunJob{
-		ctx:         ctx,
-		transaction: transaction,
-		run:         run,
-	}
-
-	return run
+func (r *persistentTransactionRunner) SetOutputQueue(_ Enqueuer) {
+	// this is a no-op, as transaction runner does not need to enqueue anything
 }
 
-func (r persistentTransactionRunner) Stop() {
-	r.exit <- true
-}
+func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
+	tran := job.Transaction
+	run := job.TransactionRun
 
-func (r persistentTransactionRunner) Start(workers int) {
-	for i := 0; i < workers; i++ {
-		go func() {
-			fmt.Println("PersistentTransactionRunner start goroutine")
-			for {
-				select {
-				case <-r.exit:
-					fmt.Println("PersistentTransactionRunner exit goroutine")
-					return
-				case job := <-r.executionChannel:
-					err := r.runTransaction(job.ctx, job.transaction, job.run)
-					if err != nil {
-						fmt.Println(err.Error())
-					}
-				}
-			}
-		}()
-	}
-}
-
-func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran transaction.Transaction, run transaction.TransactionRun) error {
 	run.State = transaction.TransactionRunStateExecuting
+	err := r.updater.Update(ctx, run)
+	if err != nil {
+		log.Printf("[TransactionRunner] could not update transaction run: %s", err.Error())
+		return
+	}
 
-	var err error
-
+	log.Printf("[TransactionRunner] running transaction %s with %d steps", run.TransactionID, len(tran.Steps))
 	for step, test := range tran.Steps {
 		run, err = r.runTransactionStep(ctx, run, step, test)
 		if err != nil {
-			return fmt.Errorf("could not execute step %d of transaction %s: %w", step, run.TransactionID, err)
+			log.Printf("[TransactionRunner] could not execute step %d of transaction %s: %s", step, run.TransactionID, err.Error())
+			return
 		}
 
 		if run.State == transaction.TransactionRunStateFailed {
@@ -124,7 +76,8 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran tr
 		run.Environment = mergeOutputsIntoEnv(run.Environment, run.Steps[step].Outputs)
 		err = r.transactionRuns.UpdateRun(ctx, run)
 		if err != nil {
-			return fmt.Errorf("coult not update transaction step: %w", err)
+			log.Printf("[TransactionRunner] could not update transaction step: %s", err.Error())
+			return
 		}
 	}
 
@@ -132,7 +85,11 @@ func (r persistentTransactionRunner) runTransaction(ctx context.Context, tran tr
 		run.State = transaction.TransactionRunStateFinished
 	}
 
-	return r.updater.Update(ctx, run)
+	err = r.updater.Update(ctx, run)
+	if err != nil {
+		log.Printf("[TransactionRunner] could not update transaction run: %s", err.Error())
+		return
+	}
 }
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, testObj test.Test) (transaction.TransactionRun, error) {

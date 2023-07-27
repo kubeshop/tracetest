@@ -63,7 +63,7 @@ func TestFlags(t *testing.T) {
 
 		cfg := configFromFile(t, "./testdata/basic.yaml")
 
-		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
+		assert.Equal(t, "postgres://postgres:postgres@postgres:5432/tracetest?sslmode=disable", cfg.PostgresConnString())
 
 		assert.Equal(t, "/tracetest", cfg.ServerPathPrefix())
 		assert.Equal(t, 9999, cfg.ServerPort())
