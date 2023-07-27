@@ -244,7 +244,7 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInfo openapi
 		Values: runInfo.Variables,
 	})
 
-	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentID, variablesEnv)
+	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentId, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -517,7 +517,7 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 		Values: runInfo.Variables,
 	})
 
-	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentID, variablesEnv)
+	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentId, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}
