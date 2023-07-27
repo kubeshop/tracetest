@@ -10,7 +10,7 @@ import {
   useEditTransactionMutation,
   useLazyGetTransactionVersionByIdQuery,
   useRunTransactionMutation,
-} from 'redux/apis/TraceTest.api';
+} from 'redux/apis/Tracetest';
 import {RunErrorTypes} from 'types/TestRun.types';
 import {TDraftTransaction} from 'types/Transaction.types';
 

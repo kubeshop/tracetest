@@ -1,7 +1,7 @@
 import {renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useGetRunListQuery} from '../TraceTest.api';
+import {useGetRunListQuery} from '../Tracetest';
 
 test('useGetRunListQuery', async () => {
   fetchMock.mockResponse(JSON.stringify([]));

@@ -3,7 +3,7 @@ import fetchMock from 'jest-fetch-mock';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import TestMock from 'models/__mocks__/Test.mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useCreateTestMutation} from '../TraceTest.api';
+import {useCreateTestMutation} from '../Tracetest';
 
 test('useCreateTestMutation', async () => {
   const test = TestMock.raw();

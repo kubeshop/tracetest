@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import Span from 'models/Span.model';
 import TestRun from 'models/TestRun.model';
-import {endpoints} from 'redux/apis/TraceTest.api';
+import {endpoints} from 'redux/apis/Tracetest';
 import TestRunService from 'services/TestRun.service';
 import {RootState} from '../redux/store';
 

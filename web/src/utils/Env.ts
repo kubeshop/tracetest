@@ -5,6 +5,7 @@ type TEnv = keyof IEnv;
 const emptyValues: IEnv = {
   analyticsEnabled: false,
   appVersion: '',
+  baseApiUrl: `${document.baseURI}api/`,
   env: '',
   experimentalFeatures: [],
   measurementId: '',

@@ -1,5 +1,5 @@
 import {TRawTestResource} from '../../models/Test.model';
-import {endpoints} from '../../redux/apis/TraceTest.api';
+import {endpoints} from '../../redux/apis/Tracetest';
 import TestGateway from '../Test.gateway';
 
 const {createTest, getTestById, getTestList, runTest} = endpoints;

@@ -1,5 +1,5 @@
 import {Col, Form, Row} from 'antd';
-import {useGetTestListQuery} from 'redux/apis/TraceTest.api';
+import {useGetTestListQuery} from 'redux/apis/Tracetest';
 import TestsSelectionInput from './TestsSelectionInput/TestsSelectionInput';
 
 const TestsSelectionForm = () => {

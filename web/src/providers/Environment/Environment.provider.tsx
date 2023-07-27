@@ -1,6 +1,6 @@
 import {noop} from 'lodash';
 import {createContext, useContext, useMemo, useCallback, useState} from 'react';
-import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
+import {useGetEnvironmentsQuery} from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import EnvironmentSelectors from 'selectors/Environment.selectors';

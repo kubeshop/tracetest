@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import {useDeleteRunByIdMutation, useDeleteTransactionRunByIdMutation} from 'redux/apis/TraceTest.api';
+import {useDeleteRunByIdMutation, useDeleteTransactionRunByIdMutation} from 'redux/apis/Tracetest';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';

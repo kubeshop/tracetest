@@ -1,4 +1,4 @@
-import {endpoints} from '../../redux/apis/TraceTest.api';
+import {endpoints} from '../../redux/apis/Tracetest';
 import TestRunResultGateway from '../TestRun.gateway';
 
 const {getRunList, getRunById, reRun} = endpoints;

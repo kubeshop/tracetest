@@ -1,7 +1,7 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
 import TestRunCard from 'components/RunCard/TestRunCard';
-import {useLazyGetRunListQuery} from 'redux/apis/TraceTest.api';
+import {useLazyGetRunListQuery} from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';

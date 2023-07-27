@@ -1,7 +1,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {sortBy} from 'lodash';
 
-import {endpoints} from 'redux/apis/TraceTest.api';
+import {endpoints} from 'redux/apis/Tracetest';
 import {RootState} from 'redux/store';
 import SpanAttributeService from '../services/SpanAttribute.service';
 import {TSpanSelector} from '../types/Assertion.types';
@@ -22,7 +22,8 @@ const currentSelectorListSelector = (
   currentSelectorList: TSpanSelector[] = []
 ) => currentSelectorList.map(({key}) => key);
 
-const attributeKeySelector = (state: RootState, testId: string, runId: string, spanIdList: string[], key: string) => key;
+const attributeKeySelector = (state: RootState, testId: string, runId: string, spanIdList: string[], key: string) =>
+  key;
 
 const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (state, {spanIdList, testId, runId}) => {
   const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);

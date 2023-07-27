@@ -2,7 +2,7 @@ import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
 
 import TransactionRunCard from 'components/RunCard/TransactionRunCard';
-import {useLazyGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
+import {useLazyGetTransactionRunsQuery} from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import Transaction from 'models/Transaction.model';
 import TransactionRun from 'models/TransactionRun.model';

@@ -3,7 +3,7 @@ import {
   useCreateEnvironmentMutation,
   useDeleteEnvironmentMutation,
   useUpdateEnvironmentMutation,
-} from 'redux/apis/TraceTest.api';
+} from 'redux/apis/Tracetest';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {useNotification} from 'providers/Notification/Notification.provider';
 import {TRawEnvironment} from 'models/Environment.model';

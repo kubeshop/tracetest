@@ -6,7 +6,7 @@ import {useCallback, useMemo, useState} from 'react';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {useLazyGetSelectedSpansQuery} from 'redux/apis/TraceTest.api';
+import {useLazyGetSelectedSpansQuery} from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';

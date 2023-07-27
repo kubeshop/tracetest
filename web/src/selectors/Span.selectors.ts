@@ -1,6 +1,6 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {RootState} from 'redux/store';
-import {endpoints} from '../redux/apis/TraceTest.api';
+import {endpoints} from '../redux/apis/Tracetest';
 
 const spansStateSelector = (state: RootState) => state.spans;
 const stateSelector = (state: RootState) => state;

@@ -9,7 +9,7 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
-import {useGetResourcesQuery} from 'redux/apis/TraceTest.api';
+import {useGetResourcesQuery} from 'redux/apis/Tracetest';
 import {ADD_TEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType} from 'types/Resource.type';

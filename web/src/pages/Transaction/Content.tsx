@@ -8,7 +8,7 @@ import TransactionRun from 'models/TransactionRun.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
-import {useGetTransactionRunsQuery} from 'redux/apis/TraceTest.api';
+import {useGetTransactionRunsQuery} from 'redux/apis/Tracetest';
 import * as S from './Transaction.styled';
 
 const Content = () => {

@@ -3,7 +3,7 @@ import {createContext, useCallback, useContext, useEffect, useMemo, useState} fr
 
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
-import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/TraceTest.api';
+import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/Tracetest';
 import TestProvider from '../Test';
 
 interface IContext {

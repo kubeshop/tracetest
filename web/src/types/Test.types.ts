@@ -89,9 +89,3 @@ export type TCreateTestSliceActions = {
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
   setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
 };
-
-export type TTestApiEndpointBuilder = EndpointBuilder<
-  BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta>,
-  TracetestApiTags,
-  'tests'
->;

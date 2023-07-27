@@ -1,7 +1,8 @@
 import {Action, configureStore, Middleware, ThunkAction} from '@reduxjs/toolkit';
 import {createReduxHistoryContext} from 'redux-first-history';
 import {createBrowserHistory} from 'history';
-import TestAPI from 'redux/apis/TraceTest.api';
+import TracetestAPI from 'redux/apis/Tracetest';
+import OtelRepoAPI from 'redux/apis/OtelRepo';
 import TestSpecs from 'redux/slices/TestSpecs.slice';
 import Spans from 'redux/slices/Span.slice';
 import CreateTest from 'redux/slices/CreateTest.slice';
@@ -9,19 +10,18 @@ import DAG from 'redux/slices/DAG.slice';
 import Trace from 'redux/slices/Trace.slice';
 import CreateTransaction from 'redux/slices/CreateTransaction.slice';
 import User from 'redux/slices/User.slice';
+import TestOutputs from 'redux/testOutputs/slice';
 import RouterMiddleware from './Router.middleware';
-import OtelRepoApi from './apis/OtelRepo.api';
-import TestOutputs from './testOutputs/slice';
 
 const {createReduxHistory, routerMiddleware, routerReducer} = createReduxHistoryContext({
   history: createBrowserHistory(),
 });
 
-export const middlewares: Middleware[] = [TestAPI.middleware, OtelRepoApi.middleware];
+export const middlewares: Middleware[] = [TracetestAPI.middleware, OtelRepoAPI.middleware];
 
 export const reducers = {
-  [TestAPI.reducerPath]: TestAPI.reducer,
-  [OtelRepoApi.reducerPath]: OtelRepoApi.reducer,
+  [TracetestAPI.reducerPath]: TracetestAPI.reducer,
+  [OtelRepoAPI.reducerPath]: OtelRepoAPI.reducer,
 
   spans: Spans,
   dag: DAG,
