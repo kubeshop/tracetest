@@ -262,11 +262,11 @@ Here's a sample of a failed test run, which happens if you add this assertion:
 attr:tracetest.span.duration  < 10ms
 ```
 
-![](../img/dynatrace-recipe-failed-test.png)
+![](../img/dynatrace-failed-test.png)
 
 Increasing the duration to a more reasonable `500ms` will make the test pass.
 
-![](../img/dynatrace-recipe-successful-test.png)
+![](../img/dynatrace-successful-test.png)
 
 ## Run Tracetest Tests with the Tracetest CLI
 
