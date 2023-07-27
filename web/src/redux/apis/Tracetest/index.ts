@@ -2,6 +2,7 @@ import {endpoints as environmentEndpoints} from './endpoints/Environment.endpoin
 import {endpoints as testEndpoints} from './endpoints/Test.endpoint';
 import {endpoints as testRunEndpoints} from './endpoints/TestRun.endpoint';
 
+// eslint-disable-next-line no-restricted-exports
 export {default} from './Tracetest.api';
 
 export {
