@@ -9,8 +9,10 @@ services:
     ports:
       - 8080:8080
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
       - OTEL_SERVICE_NAME=producer-api
+      - KAFKA_BROKER_URL=kafka:9092
+      - KAFKA_TOPIC=messaging
     depends_on:
       otel-collector:
         condition: service_started
