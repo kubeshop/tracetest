@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -17,13 +18,13 @@ type Config struct {
 	RemoteServerToken string
 }
 
-func Start(config Config) {
-	ingester := &forwardIngester{
-		BatchTimeout: config.BatchTimeout,
-		RemoteIngester: remoteIngesterConfig{
-			URL:   config.RemoteServerURL,
-			Token: config.RemoteServerToken,
-		},
+func Start(ctx context.Context, config Config) error {
+	ingester, err := newForwardIngester(ctx, config.BatchTimeout, remoteIngesterConfig{
+		URL:   config.RemoteServerURL,
+		Token: config.RemoteServerToken,
+	})
+	if err != nil {
+		return fmt.Errorf("could not start local collector: %w", err)
 	}
 
 	grpcServer := newGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester)
@@ -32,6 +33,7 @@ func Start(config Config) {
 	onProcessTermination(func() {
 		grpcServer.Stop()
 		httpServer.Stop()
+		ingester.Stop()
 	})
 
 	go func() {
@@ -47,6 +49,8 @@ func Start(config Config) {
 			log.Println("ERROR: could not start HTTP OTLP listener: %w", err)
 		}
 	}()
+
+	return nil
 }
 
 func onProcessTermination(callback func()) {
