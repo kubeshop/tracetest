@@ -23,7 +23,7 @@ func TestCollector(t *testing.T) {
 		RemoteServerURL: targetServer.Addr(),
 	})
 
-	tracer, err := targetServer.CreateTracer("localhost:4317")
+	tracer, err := mocks.NewTracer(context.Background(), "localhost:4317")
 	require.NoError(t, err)
 
 	func(ctx context.Context) {

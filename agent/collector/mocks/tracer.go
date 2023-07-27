@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func newTracer(ctx context.Context, endpoint string) (trace.Tracer, error) {
+func NewTracer(ctx context.Context, endpoint string) (trace.Tracer, error) {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})
 	otel.SetTextMapPropagator(propagator)
 

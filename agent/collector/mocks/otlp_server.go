@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 
-	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
@@ -23,15 +22,6 @@ func NewOTLPIngestionServer() (*OTLPIngestionServer, error) {
 	return &OTLPIngestionServer{
 		otlpServer: grpcServer,
 	}, nil
-}
-
-func (s *OTLPIngestionServer) CreateTracer(endpoint string) (trace.Tracer, error) {
-	tracer, err := newTracer(context.Background(), endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	return tracer, nil
 }
 
 func (s *OTLPIngestionServer) Addr() string {
