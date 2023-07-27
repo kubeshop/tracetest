@@ -208,7 +208,7 @@ func (app *App) Start(opts ...appOption) error {
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 	registerOtlpServer(app, runRepo, eventEmitter, dataStoreRepo)
 
-	rf := newRunnerFacades(
+	testPipeline := buildTestPipeline(
 		pollingProfileRepo,
 		dataStoreRepo,
 		linterRepo,
@@ -216,36 +216,25 @@ func (app *App) Start(opts ...appOption) error {
 		testDB,
 		testRepo,
 		runRepo,
-		transactionRunRepository,
-		applicationTracer,
 		tracer,
 		subscriptionManager,
 		triggerRegistry,
 	)
+	testPipeline.Start()
+	app.registerStopFn(func() {
+		testPipeline.Stop()
+	})
 
-	// worker count. should be configurable
-	rf.tracePoller.Start(5)
-	rf.runner.Start(5)
-	rf.runner.Start(5)
-	rf.transactionRunner.Start(5)
-	rf.assertionRunner.Start(5)
-	rf.linterRunner.Start(5)
+	transactionPipeline := buildTransactionPipeline(
+		transactionsRepository,
+		transactionRunRepository,
+		testPipeline,
+		subscriptionManager,
+	)
 
+	transactionPipeline.Start()
 	app.registerStopFn(func() {
-		fmt.Println("stopping tracePoller")
-		rf.tracePoller.Stop()
-	})
-	app.registerStopFn(func() {
-		fmt.Println("stopping runner")
-		rf.runner.Stop()
-	})
-	app.registerStopFn(func() {
-		fmt.Println("stopping transactionRunner")
-		rf.transactionRunner.Stop()
-	})
-	app.registerStopFn(func() {
-		fmt.Println("stopping assertionRunner")
-		rf.assertionRunner.Stop()
+		transactionPipeline.Stop()
 	})
 
 	err = analytics.SendEvent("Server Started", "beacon", "", nil)
@@ -256,14 +245,17 @@ func (app *App) Start(opts ...appOption) error {
 	provisioner := provisioning.New()
 
 	router, mappers := controller(app.cfg,
+		tracer,
+
+		testPipeline,
+		transactionPipeline,
+
 		testDB,
 		transactionsRepository,
 		transactionRunRepository,
 		testRepo,
 		runRepo,
-		tracer,
 		environmentRepo,
-		rf,
 	)
 	registerWSHandler(router, mappers, subscriptionManager)
 
@@ -314,7 +306,7 @@ func (app *App) Start(opts ...appOption) error {
 var (
 	matchFirstCap     = regexp.MustCompile("(.)([A-Z][a-z]+)")
 	matchAllCap       = regexp.MustCompile("([a-z0-9])([A-Z])")
-	matchResourceName = regexp.MustCompile("(\\w)(\\.)(\\w)")
+	matchResourceName = regexp.MustCompile(`(\w)(\.)(\w)`)
 )
 
 func toWords(str string) string {
@@ -506,27 +498,36 @@ func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscripti
 
 func controller(
 	cfg httpServerConfig,
-	testDB model.Repository,
-	transactionRepository *transaction.Repository,
-	transactionRunRepository *transaction.RunRepository,
-	testRepository test.Repository,
-	runRepository test.RunRepository,
+
 	tracer trace.Tracer,
+
+	testRunner *executor.TestPipeline,
+	transactionRunner *executor.TransactionPipeline,
+
+	testRunEvents model.TestRunEventRepository,
+	transactionRepo *transaction.Repository,
+	transactionRunRepo *transaction.RunRepository,
+	testRepo test.Repository,
+	testRunRepo test.RunRepository,
 	environmentRepo *environment.Repository,
-	rf *runnerFacade,
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry())
 
 	router := openapi.NewRouter(httpRouter(
 		cfg,
-		testDB,
-		transactionRepository,
-		transactionRunRepository,
-		testRepository,
-		runRepository,
+
 		tracer,
+
+		testRunner,
+		transactionRunner,
+
+		testRunEvents,
+		transactionRepo,
+		transactionRunRepo,
+		testRepo,
+		testRunRepo,
 		environmentRepo,
-		rf,
+
 		mappers,
 	))
 
@@ -535,27 +536,36 @@ func controller(
 
 func httpRouter(
 	cfg httpServerConfig,
-	testDB model.Repository,
+
+	tracer trace.Tracer,
+
+	testRunner *executor.TestPipeline,
+	transactionRunner *executor.TransactionPipeline,
+
+	testRunEvents model.TestRunEventRepository,
 	transactionRepo *transaction.Repository,
 	transactionRunRepo *transaction.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
-	tracer trace.Tracer,
 	environmentRepo *environment.Repository,
-	rf *runnerFacade,
+
 	mappers mappings.Mappings,
 ) openapi.Router {
 	controller := httpServer.NewController(
-		testDB,
+		tracer,
+
+		testRunner,
+		transactionRunner,
+
+		testRunEvents,
 		transactionRepo,
 		transactionRunRepo,
 		testRepo,
 		testRunRepo,
-		tracedb.Factory(testRunRepo),
-		rf,
-		mappers,
 		environmentRepo,
-		tracer,
+
+		tracedb.Factory(testRunRepo),
+		mappers,
 		Version,
 	)
 	apiApiController := openapi.NewApiApiController(controller)

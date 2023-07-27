@@ -2,7 +2,6 @@ package testdb
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 
@@ -10,20 +9,10 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/kubeshop/tracetest/server/migrations"
-	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 type postgresDB struct {
 	db *sql.DB
-}
-
-var (
-	IDGen       = id.NewRandGenerator()
-	ErrNotFound = errors.New("record not found")
-)
-
-type scanner interface {
-	Scan(dest ...interface{}) error
 }
 
 func Postgres(options ...PostgresOption) (*postgresDB, error) {

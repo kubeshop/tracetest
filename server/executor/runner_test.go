@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -22,15 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace"
 )
-
-type defaultTestRunnerGetter struct{}
-
-func (dpc defaultTestRunnerGetter) GetDefault(context.Context) testrunner.TestRunner {
-	testRunner := testrunner.DefaultTestRunner
-
-	return testRunner
-}
 
 func TestPersistentRunner(t *testing.T) {
 	t.Run("TestIsTriggerd", func(t *testing.T) {
@@ -46,7 +40,7 @@ func TestPersistentRunner(t *testing.T) {
 
 		f.run([]test.Test{testObj}, 10*time.Millisecond)
 
-		result := f.mockDB.runs[testObj.ID]
+		result := f.runsMock.runs[testObj.ID]
 		require.NotNil(t, result)
 		assert.Greater(t, result.ServiceTriggerCompletedAt.UnixNano(), result.CreatedAt.UnixNano())
 
@@ -65,8 +59,8 @@ func TestPersistentRunner(t *testing.T) {
 
 		f.run([]test.Test{test1, test2}, 100*time.Millisecond)
 
-		run1 := f.mockDB.runs[test1.ID]
-		run2 := f.mockDB.runs[test2.ID]
+		run1 := f.runsMock.runs[test1.ID]
+		run2 := f.runsMock.runs[test2.ID]
 
 		assert.Greater(t, run1.ServiceTriggerCompletedAt.UnixNano(), run2.ServiceTriggerCompletedAt.UnixNano(), "test1 did not complete after test2")
 	})
@@ -98,99 +92,189 @@ var (
 )
 
 type runnerFixture struct {
-	runner          executor.PersistentRunner
-	mockExecutor    *mockTriggerer
-	mockDB          *mockDB
-	mockTracePoller *mockTracePoller
+	runner        *executor.TestPipeline
+	dsMock        *datastoreGetterMock
+	ppMock        *pollingprofileGetterMock
+	trMock        *testrunnerGetterMock
+	testMock      *testGetterMock
+	runsMock      *runsRepoMock
+	triggererMock *mockTriggerer
+	processorMock *mockProcessor
 }
 
 func (f runnerFixture) run(tests []test.Test, ttl time.Duration) {
-	f.runner.Start(2)
+	// TODO - fix this test
+	f.runner.Start()
 	time.Sleep(10 * time.Millisecond)
 	for _, testObj := range tests {
-		f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{}, nil)
+		newRun := f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{}, nil)
+		// readd this when using not-in-memory queues
+		// f.runsMock.
+		// 	On("GetRun", testObj.ID, newRun.ID).
+		// 	Return(newRun, noError)
+		f.processorMock.
+			On("ProcessItem", testObj.ID, newRun.ID, datastore.DataStoreSingleID, pollingprofile.DefaultPollingProfile.ID).
+			Return(newRun, noError)
 	}
 	time.Sleep(ttl)
 	f.runner.Stop()
 }
 
+func (f runnerFixture) assert(t *testing.T) {
+	f.dsMock.AssertExpectations(t)
+	f.ppMock.AssertExpectations(t)
+	f.trMock.AssertExpectations(t)
+	f.testMock.AssertExpectations(t)
+	f.runsMock.AssertExpectations(t)
+	f.triggererMock.AssertExpectations(t)
+}
+
 func (f runnerFixture) expectSuccessExecLong(test test.Test) {
-	f.mockExecutor.expectTriggerTestLong(test)
+	f.triggererMock.expectTriggerTestLong(test)
 	f.expectSuccessResultPersist(test)
 }
 
 func (f runnerFixture) expectSuccessExec(test test.Test) {
-	f.mockExecutor.expectTriggerTest(test)
+	f.testMock.On("GetAugmented", test.ID).Return(test, noError)
+	f.triggererMock.expectTriggerTest(test)
 	f.expectSuccessResultPersist(test)
 }
 
 func (f runnerFixture) expectSuccessResultPersist(test test.Test) {
-	expectCreateRun(f.mockDB, test)
-	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
-	f.mockDB.On("UpdateRun", mock.Anything).Return(noError)
-	f.mockTracePoller.expectPoll(test)
-}
-
-func (f runnerFixture) assert(t *testing.T) {
-	f.mockExecutor.AssertExpectations(t)
-	f.mockDB.AssertExpectations(t)
+	f.testMock.On("GetAugmented", test.ID).Return(test, noError)
+	expectCreateRun(f.runsMock, test)
+	f.runsMock.On("UpdateRun", mock.Anything).Return(noError)
+	f.runsMock.On("UpdateRun", mock.Anything).Return(noError)
 }
 
 func runnerSetup(t *testing.T) runnerFixture {
-	tr, _ := tracing.NewTracer(context.TODO(), config.Must(config.New()))
-	reg := triggerer.NewRegsitry(tr, tr)
 
-	me := new(mockTriggerer)
-	me.t = t
-	me.Test(t)
-	reg.Add(me)
+	dsMock := new(datastoreGetterMock)
+	dsMock.Test(t)
 
-	db := new(mockDB)
-	db.T = t
-	db.Test(t)
+	ppMock := new(pollingprofileGetterMock)
+	ppMock.Test(t)
 
-	mtp := new(mockTracePoller)
-	mtp.t = t
+	trMock := new(testrunnerGetterMock)
+	trMock.Test(t)
 
+	testMock := new(testGetterMock)
+	testMock.Test(t)
+
+	runsMock := new(runsRepoMock)
+	runsMock.Test(t)
+
+	triggererMock := new(mockTriggerer)
+	runsMock.Test(t)
+
+	processorMock := new(mockProcessor)
+	processorMock.Test(t)
+
+	sm := subscription.NewManager()
 	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New()))
+	eventEmitter := executor.NewEventEmitter(getTestRunEventRepositoryMock(t, false), sm)
 
-	testDB := testdb.MockRepository{}
-	testDB.Mock.On("CreateTestRunEvent", mock.Anything).Return(noError)
+	registry := triggerer.NewRegsitry(tracer, tracer)
+	registry.Add(triggererMock)
 
-	eventEmitter := executor.NewEventEmitter(&testDB, subscription.NewManager())
-
-	persistentRunner := executor.NewPersistentRunner(
-		reg,
-		db,
-		executor.NewDBUpdater(db),
-		mtp,
+	runner := executor.NewPersistentRunner(
+		registry,
+		executor.NewDBUpdater(runsMock),
 		tracer,
-		subscription.NewManager(),
-		tracedb.Factory(db),
-		getDataStoreRepositoryMock(t),
+		sm,
+		tracedb.Factory(runsMock),
+		dsMock,
 		eventEmitter,
-		defaultProfileGetter{5 * time.Second, 30 * time.Second},
-		defaultTestRunnerGetter{},
 	)
 
-	mtp.Test(t)
+	queueBuilder := executor.NewQueueBuilder().
+		WithDataStoreGetter(dsMock).
+		WithPollingProfileGetter(ppMock).
+		WithTestGetter(testMock).
+		WithRunGetter(runsMock)
+
+	pipeline := executor.NewPipeline(queueBuilder,
+		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
+		executor.PipelineStep{Processor: processorMock, Driver: executor.NewInMemoryQueueDriver("runner")},
+	)
+
+	testPipeline := executor.NewTestPipeline(
+		pipeline,
+		nil,
+		pipeline.GetQueueForStep(1), // processorMock queue
+		runsMock,
+		trMock,
+		ppMock,
+		dsMock,
+	)
+
 	return runnerFixture{
-		runner:          persistentRunner,
-		mockExecutor:    me,
-		mockDB:          db,
-		mockTracePoller: mtp,
+		runner:        testPipeline,
+		dsMock:        dsMock,
+		ppMock:        ppMock,
+		trMock:        trMock,
+		testMock:      testMock,
+		runsMock:      runsMock,
+		triggererMock: triggererMock,
+		processorMock: processorMock,
 	}
 }
 
-type mockDB struct {
+type mockProcessor struct {
+	mock.Mock
+}
+
+func (m *mockProcessor) ProcessItem(_ context.Context, job executor.Job) {
+	m.Called(job.Test.ID, job.Run.ID, job.DataStore.ID, job.PollingProfile.ID)
+}
+
+func (m *mockProcessor) SetOutputQueue(_ executor.Enqueuer) {}
+
+type datastoreGetterMock struct {
+	mock.Mock
+}
+
+func (r *datastoreGetterMock) Get(ctx context.Context, id id.ID) (datastore.DataStore, error) {
+	return r.Current(ctx)
+}
+
+func (r *datastoreGetterMock) Current(context.Context) (datastore.DataStore, error) {
+	return datastore.DataStore{
+		ID:      datastore.DataStoreSingleID,
+		Name:    "test",
+		Type:    datastore.DataStoreTypeOTLP,
+		Default: true,
+	}, nil
+}
+
+type pollingprofileGetterMock struct {
+	mock.Mock
+}
+
+func (r *pollingprofileGetterMock) Get(ctx context.Context, _ id.ID) (pollingprofile.PollingProfile, error) {
+	return r.GetDefault(ctx), nil
+}
+
+func (r *pollingprofileGetterMock) GetDefault(context.Context) pollingprofile.PollingProfile {
+	return pollingprofile.DefaultPollingProfile
+}
+
+type testGetterMock struct {
+	mock.Mock
+}
+
+func (r *testGetterMock) GetAugmented(_ context.Context, id id.ID) (test.Test, error) {
+	args := r.Called(id)
+	return args.Get(0).(test.Test), args.Error(1)
+}
+
+type runsRepoMock struct {
 	testdb.MockRepository
 
 	runs map[id.ID]test.Run
 }
 
-var _ test.RunRepository = &mockDB{}
-
-func (m *mockDB) CreateRun(_ context.Context, testObj test.Test, run test.Run) (test.Run, error) {
+func (m *runsRepoMock) CreateRun(_ context.Context, testObj test.Test, run test.Run) (test.Run, error) {
 	args := m.Called(testObj.ID)
 	if m.runs == nil {
 		m.runs = map[id.ID]test.Run{}
@@ -202,7 +286,7 @@ func (m *mockDB) CreateRun(_ context.Context, testObj test.Test, run test.Run) (
 	return run, args.Error(0)
 }
 
-func (m *mockDB) UpdateRun(_ context.Context, run test.Run) error {
+func (m *runsRepoMock) UpdateRun(_ context.Context, run test.Run) error {
 	args := m.Called(run.ID)
 	for k, v := range m.runs {
 		if v.ID == run.ID {
@@ -213,18 +297,26 @@ func (m *mockDB) UpdateRun(_ context.Context, run test.Run) error {
 	return args.Error(0)
 }
 
-func (m *mockDB) GetTransactionRunSteps(ctx context.Context, id id.ID, runID int) ([]test.Run, error) {
-	args := m.Called(ctx, id, runID)
-	return args.Get(0).([]test.Run), args.Error(1)
+func (r *runsRepoMock) GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error) {
+	args := r.Called(testID, runID)
+	return args.Get(0).(test.Run), args.Error(1)
 }
 
-type mockRunRepository struct {
+func (r *runsRepoMock) GetRunByTraceID(_ context.Context, id trace.TraceID) (test.Run, error) {
+	args := r.Called(id)
+	return args.Get(0).(test.Run), args.Error(1)
+}
+
+type testrunnerGetterMock struct {
 	mock.Mock
+}
+
+func (r *testrunnerGetterMock) GetDefault(context.Context) testrunner.TestRunner {
+	return testrunner.DefaultTestRunner
 }
 
 type mockTriggerer struct {
 	mock.Mock
-	t *testing.T
 }
 
 func (m *mockTriggerer) Type() trigger.TriggerType {
@@ -258,22 +350,8 @@ func (m *mockTriggerer) expectTriggerTestLong(test test.Test) *mock.Call {
 		Return(test, noError)
 }
 
-func expectCreateRun(m *mockDB, test test.Test) *mock.Call {
+func expectCreateRun(m *runsRepoMock, test test.Test) *mock.Call {
 	return m.
 		On("CreateRun", test.ID).
 		Return(noError)
-}
-
-type mockTracePoller struct {
-	mock.Mock
-	t *testing.T
-}
-
-func (m *mockTracePoller) Poll(_ context.Context, test test.Test, run test.Run, pollingProfile pollingprofile.PollingProfile) {
-	m.Called(test.ID)
-}
-
-func (m *mockTracePoller) expectPoll(test test.Test) *mock.Call {
-	return m.
-		On("Poll", test.ID)
 }

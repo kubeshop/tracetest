@@ -7,7 +7,6 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/test"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -47,10 +46,10 @@ func (db *noopTraceDB) TestConnection(ctx context.Context) model.ConnectionResul
 }
 
 type traceDBFactory struct {
-	runRepository test.RunRepository
+	runRepository runByTraceIDGetter
 }
 
-func Factory(runRepository test.RunRepository) func(ds datastore.DataStore) (TraceDB, error) {
+func Factory(runRepository runByTraceIDGetter) func(ds datastore.DataStore) (TraceDB, error) {
 	f := traceDBFactory{
 		runRepository: runRepository,
 	}

@@ -37,14 +37,10 @@ type Generator interface {
 }
 
 func NewRandGenerator() Generator {
-	return randGenerator{
-		rand: rand.New(rand.NewSource(time.Now().UnixNano())),
-	}
+	return randGenerator{}
 }
 
-type randGenerator struct {
-	rand *rand.Rand
-}
+type randGenerator struct{}
 
 func (g randGenerator) UUID() uuid.UUID {
 	return uuid.New()
@@ -56,12 +52,13 @@ func (g randGenerator) ID() ID {
 
 func (g randGenerator) TraceID() trace.TraceID {
 	tid := trace.TraceID{}
-	g.rand.Read(tid[:])
+	rndSeed := rand.NewSource(time.Now().UnixNano())
+	rand.New(rndSeed).Read(tid[:])
 	return tid
 }
 
 func (g randGenerator) SpanID() trace.SpanID {
 	sid := trace.SpanID{}
-	g.rand.Read(sid[:])
+	rand.New(rand.NewSource(time.Now().UnixNano())).Read(sid[:])
 	return sid
 }

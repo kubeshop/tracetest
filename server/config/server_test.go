@@ -11,7 +11,7 @@ func TestServerConfig(t *testing.T) {
 	t.Run("DefaultValues", func(t *testing.T) {
 		cfg, _ := config.New()
 
-		assert.Equal(t, "host=postgres user=postgres password=postgres port=5432 dbname=tracetest sslmode=disable", cfg.PostgresConnString())
+		assert.Equal(t, "postgres://postgres:postgres@postgres:5432/tracetest?sslmode=disable", cfg.PostgresConnString())
 
 		assert.Equal(t, 11633, cfg.ServerPort())
 		assert.Equal(t, "", cfg.ServerPathPrefix())
@@ -40,7 +40,7 @@ func TestServerConfig(t *testing.T) {
 
 		cfg := configWithFlags(t, flags)
 
-		assert.Equal(t, "host=localhost user=user password=passwd port=1234 dbname=other_dbname custom=params", cfg.PostgresConnString())
+		assert.Equal(t, "postgres://user:passwd@localhost:1234/other_dbname?custom=params", cfg.PostgresConnString())
 
 		assert.Equal(t, 4321, cfg.ServerPort())
 		assert.Equal(t, "/prefix", cfg.ServerPathPrefix())
@@ -68,7 +68,7 @@ func TestServerConfig(t *testing.T) {
 
 		cfg := configWithEnv(t, env)
 
-		assert.Equal(t, "host=localhost user=user password=passwd port=1234 dbname=other_dbname custom=params", cfg.PostgresConnString())
+		assert.Equal(t, "postgres://user:passwd@localhost:1234/other_dbname?custom=params", cfg.PostgresConnString())
 
 		assert.Equal(t, 4321, cfg.ServerPort())
 		assert.Equal(t, "/prefix", cfg.ServerPathPrefix())
@@ -77,21 +77,5 @@ func TestServerConfig(t *testing.T) {
 
 		assert.Equal(t, true, cfg.InternalTelemetryEnabled())
 		assert.Equal(t, "otel-collector.tracetest", cfg.InternalTelemetryOtelCollectorAddress())
-	})
-
-	t.Run("postgresConnStringCompatibility", func(t *testing.T) {
-		flags := []string{
-			"--postgres.dbname", "other_dbname",
-			"--postgres.host", "localhost",
-			"--postgres.user", "user",
-			"--postgres.password", "passwd",
-			"--postgres.port", "1234",
-			"--postgres.params", "custom=params",
-			"--postgresConnString", "host=postgres user=postgres password=postgres port=5432 sslmode=disable",
-		}
-
-		cfg := configWithFlags(t, flags)
-
-		assert.Equal(t, cfg.PostgresConnString(), "host=postgres user=postgres password=postgres port=5432 sslmode=disable")
 	})
 }

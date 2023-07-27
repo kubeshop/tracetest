@@ -27,10 +27,6 @@ type transactionStepRepository interface {
 	GetTransactionSteps(_ context.Context, _ id.ID, version int) ([]test.Test, error)
 }
 
-type transactionStepRunRepository interface {
-	GetTransactionRunSteps(_ context.Context, _ id.ID, runID int) ([]test.Run, error)
-}
-
 type Repository struct {
 	db             *sql.DB
 	stepRepository transactionStepRepository

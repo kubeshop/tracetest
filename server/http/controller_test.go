@@ -24,11 +24,11 @@ var (
 	exampleRun = test.Run{
 		ID:      1,
 		TestID:  id.ID("abc123"),
-		TraceID: http.IDGen.TraceID(),
+		TraceID: id.NewRandGenerator().TraceID(),
 		Trace: &model.Trace{
-			ID: http.IDGen.TraceID(),
+			ID: id.NewRandGenerator().TraceID(),
 			RootSpan: model.Span{
-				ID:   http.IDGen.SpanID(),
+				ID:   id.NewRandGenerator().SpanID(),
 				Name: "POST /pokemon/import",
 				Attributes: model.Attributes{
 					"tracetest.span.type": "http",
@@ -123,6 +123,9 @@ func setupController(t *testing.T) controllerFixture {
 		db:          mdb,
 		testRunRepo: runRepo,
 		c: http.NewController(
+			trace.NewNoopTracerProvider().Tracer("tracer"),
+			nil,
+			nil,
 			mdb,
 			nil,
 			nil,
@@ -131,8 +134,6 @@ func setupController(t *testing.T) controllerFixture {
 			nil,
 			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry()),
-			nil,
-			trace.NewNoopTracerProvider().Tracer("tracer"),
 			"unit-test",
 		),
 	}

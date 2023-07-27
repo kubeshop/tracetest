@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/environment"
@@ -602,7 +603,7 @@ func (r *runRepository) GetTransactionRunSteps(ctx context.Context, id id.ID, ru
 WHERE transaction_run_steps.transaction_run_id = $1 AND transaction_run_steps.transaction_run_transaction_id = $2
 ORDER BY test_runs.completed_at ASC
 `
-	query, params := sqlutil.Tenant(ctx, query, runID, id)
+	query, params := sqlutil.Tenant(ctx, query, strconv.Itoa(runID), id)
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
