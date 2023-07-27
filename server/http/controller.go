@@ -27,8 +27,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var IDGen = id.NewRandGenerator()
-
 type controller struct {
 	tracer trace.Tracer
 

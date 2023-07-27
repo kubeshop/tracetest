@@ -12,7 +12,7 @@ package openapi
 type RunInformation struct {
 	Metadata *map[string]string `json:"metadata,omitempty"`
 
-	EnvironmentID string `json:"environmentId,omitempty"`
+	EnvironmentId string `json:"environmentId,omitempty"`
 
 	Variables []EnvironmentValue `json:"variables,omitempty"`
 
