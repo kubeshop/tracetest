@@ -58,7 +58,7 @@ Let's fix this by configuring Tracetest and the OpenTelemetry Collector to forwa
 The `docker-compose.yaml` in the `tracetest` directory is configured with three services.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running trace-based tests.
-- [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data. To support sending traces to Datadog, we are using the [`contrib` version](https://github.com/open-telemetry/opentelemetry-collector-contrib), which contains vendor-related code.
+- [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data. To support sending traces to Dynatrace, we are using the [`contrib` version](https://github.com/open-telemetry/opentelemetry-collector-contrib), which contains vendor-related code.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
 
 ```yaml
