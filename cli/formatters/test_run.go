@@ -106,7 +106,7 @@ func (f testRun) formatSuccessfulTest(test openapi.Test, run openapi.TestRun) st
 	var buffer bytes.Buffer
 
 	link := f.GetRunLink(test.GetId(), run.GetId())
-	message := f.formatMessage("%s %s (%s)\n", PASSED_TEST_ICON, *test.Name, link)
+	message := f.formatMessage("%s %s (%s) - trace id: %s\n", PASSED_TEST_ICON, *test.Name, link, run.GetTraceId())
 	message = f.getColoredText(true, message)
 	buffer.WriteString(message)
 

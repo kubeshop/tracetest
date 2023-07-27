@@ -43,8 +43,9 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			Name: openapi.PtrString("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    openapi.PtrString("1"),
-			State: openapi.PtrString("FINISHED"),
+			Id:      openapi.PtrString("1"),
+			State:   openapi.PtrString("FINISHED"),
+			TraceId: openapi.PtrString("cb5e80748cc06f8a63f6b96c056defec"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(true),
 			},
@@ -53,7 +54,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 	formatter := formatters.TestRun(baseURL, false)
 	output := formatter.Format(in, formatters.Pretty)
 
-	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)\n", output)
+	assert.Equal(t, "✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test) - trace id: cb5e80748cc06f8a63f6b96c056defec\n", output)
 }
 
 func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
@@ -71,8 +72,9 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			},
 		},
 		Run: openapi.TestRun{
-			Id:    openapi.PtrString("1"),
-			State: openapi.PtrString("FINISHED"),
+			Id:      openapi.PtrString("1"),
+			TraceId: openapi.PtrString("cb5e80748cc06f8a63f6b96c056defec"),
+			State:   openapi.PtrString("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(true),
 				Results: []openapi.AssertionResultsResultsInner{
@@ -101,7 +103,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 	}
 	formatter := formatters.TestRun(baseURL, false)
 	output := formatter.Format(in, formatters.Pretty)
-	expectedOutput := `✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test)
+	expectedOutput := `✔ Testcase 1 (http://localhost:11633/test/9876543/run/1/test) - trace id: cb5e80748cc06f8a63f6b96c056defec
 	✔ Validate span duration
 `
 
