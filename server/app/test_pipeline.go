@@ -94,10 +94,12 @@ func buildTestPipeline(
 
 	pipeline.Start()
 
+	const assertionRunnerStepIndex = 3
+
 	return executor.NewTestPipeline(
 		pipeline,
 		subscriptionManager,
-		pipeline.GetQueueForStep(3), // assertion runner step
+		pipeline.GetQueueForStep(assertionRunnerStepIndex), // assertion runner step
 		runRepo,
 		trRepo,
 		ppRepo,
