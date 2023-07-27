@@ -19,6 +19,23 @@ services:
       kafka:
         condition: service_healthy
 
+  consumer-worker:
+    image: quick-start-consumer-worker
+    platform: linux/amd64
+    build: ./consumer-worker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - OTEL_SERVICE_NAME=consumer-worker
+      - KAFKA_BROKER_URL=kafka:9092
+      - KAFKA_TOPIC=messaging
+    depends_on:
+      otel-collector:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
   kafka:
     image: quick-start-kafka
     build: ./kafka
