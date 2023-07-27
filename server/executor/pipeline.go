@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 )
 
@@ -73,6 +74,10 @@ func (p *Pipeline) GetQueueForStep(i int) *Queue {
 }
 
 func (p *Pipeline) Begin(ctx context.Context, job Job) {
+	if len(p.queues) < 1 {
+		// this is a panic instead of an error because this could only happen during development
+		panic(fmt.Errorf("pipeline has no input queue"))
+	}
 	p.queues[0].Enqueue(ctx, job)
 }
 
