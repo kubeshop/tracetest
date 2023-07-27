@@ -12,7 +12,7 @@ spec:
 type: DataStore
 spec:
   name: Dynatrace
-  type: dynatracee
+  type: dynatrace
 ---
 type: TestRunner
 spec:

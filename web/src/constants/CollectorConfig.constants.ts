@@ -253,7 +253,7 @@ exporters:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
-  # OTLP for Signoz
+  # OTLP for Dynatrace
   otlp/dynatrace:
     endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp # Send traces to Dynatrace. Read more in docs here: https://www.dynatrace.com/support/help/extend-dynatrace/opentelemetry/collector#configuration
     headers:
