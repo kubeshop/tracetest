@@ -52,7 +52,8 @@ func (g randGenerator) ID() ID {
 
 func (g randGenerator) TraceID() trace.TraceID {
 	tid := trace.TraceID{}
-	rand.New(rand.NewSource(time.Now().UnixNano())).Read(tid[:])
+	rndSeed := rand.NewSource(time.Now().UnixNano())
+	rand.New(rndSeed).Read(tid[:])
 	return tid
 }
 
