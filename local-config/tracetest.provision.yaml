@@ -21,6 +21,7 @@ spec:
   periodic:
     timeout: 30s
     retryDelay: 1s
+    selectorMatchRetries: 3
 ---
 type: TestRunner
 spec:
