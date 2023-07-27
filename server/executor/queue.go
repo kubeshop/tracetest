@@ -451,8 +451,10 @@ func (r InMemoryQueueDriver) Enqueue(job Job) {
 	r.queue <- job
 }
 
+const inMemoryQueueWorkerCount = 5
+
 func (r InMemoryQueueDriver) Start() {
-	for i := 0; i < 5; i++ {
+	for i := 0; i < inMemoryQueueWorkerCount; i++ {
 		go func() {
 			log.Printf("[InMemoryQueueDriver - %s] start", r.name)
 			for {
