@@ -14,7 +14,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.Honeycomb]: 'Honeycomb',
   [SupportedDataStores.AzureAppInsights]: 'Azure App Insights',
   [SupportedDataStores.Signoz]: 'Signoz',
-  [SupportedDataStores.Signoz]: 'Signoz',
+  [SupportedDataStores.Dynatrace]: 'Dynatrace',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
