@@ -23,6 +23,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.AWSXRay]: AwsXRayService,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsightsService,
   [SupportedDataStores.Signoz]: OtelCollectorService,
+  [SupportedDataStores.Dynatrace]: OtelCollectorService,
 } as const;
 
 interface IDataStoreService {

@@ -21,6 +21,7 @@ export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.AWSXRay]: AwsXRay,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: OpenTelemetryCollector,
+  [SupportedDataStores.Dynatrace]: OpenTelemetryCollector,
 };
 
 export default DataStoreComponentMap;

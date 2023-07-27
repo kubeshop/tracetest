@@ -26,6 +26,7 @@ const (
 	HONEYCOMB        SupportedDataStores = "honeycomb"
 	AZUREAPPINSIGHTS SupportedDataStores = "azureappinsights"
 	SIGNOZ           SupportedDataStores = "signoz"
+	DYNATRACE        SupportedDataStores = "dynatrace"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

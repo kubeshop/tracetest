@@ -38,6 +38,7 @@ This is the entire checklist on what we should do to assert that Tracetest is wo
 
   - [ ] [Amazon X-Ray example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray)
   - [ ] [Datadog example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-datadog)
+  - [ ] [Dynatrace example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-dynatrace)
   - [ ] [Elastic APM example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-elasticapm)
   - [ ] [Lightstep example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-lightstep)
   - [ ] [New Relic example](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-new-relic)

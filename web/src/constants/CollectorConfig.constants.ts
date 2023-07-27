@@ -235,6 +235,42 @@ service:
       exporters: [logging, otlp/signoz]
 `;
 
+export const Dynatrace = `receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  logging:
+    verbosity: detailed
+  # OTLP for Tracetest
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true
+  # OTLP for Signoz
+  otlp/dynatrace:
+    endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp # Send traces to Dynatrace. Read more in docs here: https://www.dynatrace.com/support/help/extend-dynatrace/opentelemetry/collector#configuration
+    headers:
+      Authorization: "Api-Token dt0c01.sample.secret"  # Requires "openTelemetryTrace.ingest" permission
+
+service:
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/tracetest]
+    traces/dynatrace:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/dynatrace]
+`;
+
 export const CollectorConfigMap = {
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
@@ -243,4 +279,5 @@ export const CollectorConfigMap = {
   [SupportedDataStores.Honeycomb]: Honeycomb,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: Signoz,
+  [SupportedDataStores.Dynatrace]: Dynatrace,
 } as const;

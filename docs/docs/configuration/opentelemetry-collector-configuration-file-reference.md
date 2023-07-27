@@ -23,6 +23,7 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [Datadog](./connecting-to-data-stores/datadog)
 - [Honeycomb](./connecting-to-data-stores/honeycomb.md)
 - [Azure App Insights](./connecting-to-data-stores/azure-app-insights.md)
+- [Dynatrace](./connecting-to-data-stores/dynatrace)
 
 Continue reading below to learn how to configure the OpenTelemetry Collector to send trace data from your application to any of the trace data stores above.
 

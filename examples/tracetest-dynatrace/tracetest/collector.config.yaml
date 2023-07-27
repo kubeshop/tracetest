@@ -1,0 +1,34 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+  # Data sources: traces
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+
+exporters:
+  # OTLP for Tracetest
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest.
+                             # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true
+  # OTLP for Dynatrace
+  otlp/dynatrace:
+    endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp
+    headers:
+      Authorization: "Api-Token dt0c01.sample.secret"  # Requires "openTelemetryTrace.ingest" permission
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [probabilistic_sampler, batch]
+      exporters: [otlp/dynatrace,otlp/tracetest]

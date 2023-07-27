@@ -120,6 +120,14 @@ func TestCreateClient(t *testing.T) {
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
+			name: "Dynatrace",
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeDynatrace,
+				Values: datastore.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
 			name:         "EmptyConfig",
 			ds:           datastore.DataStore{},
 			expectedType: "*tracedb.noopTraceDB",

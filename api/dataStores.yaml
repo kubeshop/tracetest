@@ -194,7 +194,8 @@ components:
           awsxray,
           honeycomb,
           azureappinsights,
-          signoz
+          signoz,
+          dynatrace
         ]
     SupportedClients:
       type: string

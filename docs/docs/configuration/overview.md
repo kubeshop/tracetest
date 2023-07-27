@@ -22,6 +22,7 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [Datadog](./connecting-to-data-stores/datadog)
 - [Honeycomb](./connecting-to-data-stores/honeycomb)
 - [Azure App Insights](./connecting-to-data-stores/azure-app-insights.md)
+- [Dynatrace](./connecting-to-data-stores/dynatrace)
 
 ## Using Tracetest without a Trace Data Store
 
