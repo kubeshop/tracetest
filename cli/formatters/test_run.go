@@ -141,7 +141,7 @@ func (f testRun) formatFailedTest(test openapi.Test, run openapi.TestRun) string
 	var buffer bytes.Buffer
 
 	link := f.GetRunLink(test.GetId(), run.GetId())
-	message := f.formatMessage("%s %s (%s)\n", FAILED_TEST_ICON, *test.Name, link)
+	message := f.formatMessage("%s %s (%s) - trace id: %s\n", FAILED_TEST_ICON, test.GetName(), link, run.GetTraceId())
 	message = f.getColoredText(false, message)
 	buffer.WriteString(message)
 	for i, specResult := range run.Result.Results {
