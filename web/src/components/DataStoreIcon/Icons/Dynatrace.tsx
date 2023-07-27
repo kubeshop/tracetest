@@ -42,4 +42,4 @@ const Dynatrace = ({color, width = '20', height = '20'}: IIconProps) => {
   );
 };
 
-export default Datadog;
+export default Dynatrace;
