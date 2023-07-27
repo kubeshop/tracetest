@@ -127,21 +127,9 @@ type subscriptor interface {
 	Subscribe(string, subscription.Subscriber)
 }
 
-type Queue struct {
-	cancelRunHandlerFn func(ctx context.Context, run test.Run) error
-	subscriptor        subscriptor
-
-	runs  testRunGetter
-	tests testGetter
-
-	transactionRuns transactionRunGetter
-	transactions    transactionGetter
-
-	pollingProfiles pollingProfileGetter
-	dataStores      dataStoreGetter
-
-	itemProcessor QueueItemProcessor
-	driver        QueueDriver
+type QueueDriver interface {
+	Enqueue(Job)
+	SetQueue(*Queue)
 }
 
 type QueueBuilder struct {
@@ -225,14 +213,26 @@ func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcess
 	return queue
 }
 
+type Queue struct {
+	cancelRunHandlerFn func(ctx context.Context, run test.Run) error
+	subscriptor        subscriptor
+
+	runs  testRunGetter
+	tests testGetter
+
+	transactionRuns transactionRunGetter
+	transactions    transactionGetter
+
+	pollingProfiles pollingProfileGetter
+	dataStores      dataStoreGetter
+
+	itemProcessor QueueItemProcessor
+	driver        QueueDriver
+}
+
 func (q *Queue) SetDriver(driver QueueDriver) {
 	q.driver = driver
 	driver.SetQueue(q)
-}
-
-type QueueDriver interface {
-	Enqueue(Job)
-	SetQueue(*Queue)
 }
 
 func (q Queue) Enqueue(ctx context.Context, job Job) {
