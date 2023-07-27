@@ -27,6 +27,7 @@ type TestPipeline struct {
 
 type runsRepo interface {
 	CreateRun(context.Context, test.Test, test.Run) (test.Run, error)
+	UpdateRun(context.Context, test.Run) error
 	GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error)
 }
 
@@ -98,6 +99,9 @@ func (p *TestPipeline) Rerun(ctx context.Context, testObj test.Test, runID int) 
 	p.handleDBError(run, err)
 
 	newTestRun, err := p.runs.CreateRun(ctx, testObj, run.Copy())
+	p.handleDBError(run, err)
+
+	err = p.runs.UpdateRun(ctx, newTestRun.SuccessfullyPolledTraces(run.Trace))
 	p.handleDBError(run, err)
 
 	ds, err := p.dsGetter.Current(ctx)
