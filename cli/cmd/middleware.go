@@ -77,7 +77,7 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 		return []error{
 			paramError{
 				Parameter: "resource",
-				Message:   "resource name must be provided",
+				Message:   fmt.Sprintf("resource name must be provided. Available resources: %s", resourceList()),
 			},
 		}
 	}
@@ -86,6 +86,16 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 
 	_, err := resources.Get(p.ResourceName)
 	if errors.Is(err, resourcemanager.ErrResourceNotFound) {
+		suggestion := resources.Suggest(p.ResourceName)
+		if suggestion != "" {
+			return []error{
+				paramError{
+					Parameter: "resource",
+					Message:   fmt.Sprintf("resource \"%s\" not found. Did you mean this?\n\t%s", p.ResourceName, suggestion),
+				},
+			}
+		}
+
 		return []error{
 			paramError{
 				Parameter: "resource",

@@ -3,6 +3,8 @@ package resourcemanager
 import (
 	"errors"
 	"sort"
+
+	"github.com/agnivade/levenshtein"
 )
 
 type Registry struct {
@@ -40,4 +42,18 @@ func (r *Registry) List() []string {
 	sort.Strings(resources)
 
 	return resources
+}
+
+const minDistanceForSuggestion = 2
+
+func (r *Registry) Suggest(input string) string {
+	for resource := range r.resources {
+		distance := levenshtein.ComputeDistance(input, resource)
+		if distance <= minDistanceForSuggestion {
+			return resource
+		}
+
+	}
+
+	return ""
 }
