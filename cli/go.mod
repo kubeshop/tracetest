@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/Jeffail/gabs/v2 v2.7.0
+	github.com/agnivade/levenshtein v1.1.1
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/compose-spec/compose-go v1.5.1
 	github.com/cucumber/ci-environment/go v0.0.0-20230703185945-ddbd134c44fd
