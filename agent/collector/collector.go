@@ -35,7 +35,9 @@ func Start(ctx context.Context, config Config) error {
 	onProcessTermination(func() {
 		grpcServer.Stop()
 		httpServer.Stop()
-		ingester.Stop()
+		if stoppableIngester, ok := ingester.(stoppable); ok {
+			stoppableIngester.Stop()
+		}
 	})
 
 	go func() {

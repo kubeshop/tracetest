@@ -14,12 +14,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type ingester interface {
-	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error)
+type stoppable interface {
 	Stop()
 }
 
-func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteIngesterConfig remoteIngesterConfig) (ingester, error) {
+func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteIngesterConfig remoteIngesterConfig) (otlp.Ingester, error) {
 	ingester := &forwardIngester{
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: remoteIngesterConfig,
