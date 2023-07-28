@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -194,7 +193,7 @@ func decompressBody(reqBody io.ReadCloser) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	output, err := ioutil.ReadAll(gzReader)
+	output, err := io.ReadAll(gzReader)
 	if err != nil {
 		return nil, err
 	}
