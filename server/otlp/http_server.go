@@ -28,12 +28,12 @@ const (
 
 type httpServer struct {
 	addr     string
-	ingester ingester
+	ingester Ingester
 
 	hServer *http.Server
 }
 
-func NewHttpServer(addr string, ingester ingester) *httpServer {
+func NewHttpServer(addr string, ingester Ingester) *httpServer {
 	return &httpServer{
 		addr:     addr,
 		ingester: ingester,

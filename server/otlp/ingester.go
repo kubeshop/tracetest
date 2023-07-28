@@ -16,13 +16,24 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
+type Ingester interface {
+	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error)
+}
+
+type RequestType string
+
+var (
+	RequestTypeHTTP RequestType = "HTTP"
+	RequestTypeGRPC RequestType = "gRPC"
+)
+
 type ingester struct {
 	runRepository test.RunRepository
 	eventEmitter  executor.EventEmitter
 	dsRepo        *datastore.Repository
 }
 
-func NewIngester(runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
+func NewIngester(runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) Ingester {
 	return ingester{
 		runRepository: runRepository,
 		eventEmitter:  eventEmitter,
@@ -30,7 +41,7 @@ func NewIngester(runRepository test.RunRepository, eventEmitter executor.EventEm
 	}
 }
 
-func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType string) (*pb.ExportTraceServiceResponse, error) {
+func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := i.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
@@ -81,7 +92,7 @@ func (i ingester) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[tra
 	return spansByTrace
 }
 
-func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span, requestType string) error {
+func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span, requestType RequestType) error {
 	run, err := e.runRepository.GetRunByTraceID(ctx, traceID)
 	if err != nil && strings.Contains(err.Error(), "record not found") {
 		// span is not part of any known test run. So it will be ignored
@@ -112,7 +123,7 @@ func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, 
 	newSpans := append(existingSpans, spans...)
 	newTrace := model.NewTrace(traceID.String(), newSpans)
 
-	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans), requestType))
+	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans), string(requestType)))
 	run.Trace = &newTrace
 
 	err = e.runRepository.UpdateRun(ctx, run)

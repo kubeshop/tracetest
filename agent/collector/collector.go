@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/kubeshop/tracetest/server/otlp"
 )
 
 type Config struct {
@@ -27,8 +29,8 @@ func Start(ctx context.Context, config Config) error {
 		return fmt.Errorf("could not start local collector: %w", err)
 	}
 
-	grpcServer := newGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester)
-	httpServer := newHttpServer(fmt.Sprintf("0.0.0.0:%d", config.HTTPPort), ingester)
+	grpcServer := otlp.NewGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester)
+	httpServer := otlp.NewHttpServer(fmt.Sprintf("0.0.0.0:%d", config.HTTPPort), ingester)
 
 	onProcessTermination(func() {
 		grpcServer.Stop()

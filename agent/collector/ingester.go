@@ -7,21 +7,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/otlp"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type requestType string
-
-var (
-	RequestTypeHTTP requestType = "HTTP"
-	RequestTypeGRPC requestType = "gRPC"
-)
-
 type ingester interface {
-	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType requestType) (*pb.ExportTraceServiceResponse, error)
+	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error)
 	Stop()
 }
 
@@ -63,7 +57,7 @@ type buffer struct {
 	spans []*v1.ResourceSpans
 }
 
-func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType requestType) (*pb.ExportTraceServiceResponse, error) {
+func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
 	i.buffer.mutex.Lock()
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
 	i.buffer.mutex.Unlock()
