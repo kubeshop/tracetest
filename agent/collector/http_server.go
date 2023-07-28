@@ -107,9 +107,9 @@ func (s httpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error
 
 func (s httpServer) parseBody(reqBody io.ReadCloser, contentType string) (*pb.ExportTraceServiceRequest, error) {
 	var body []byte
-	if b, err := io.ReadAll(reqBody); err == nil {
-		body = b
-	} else {
+	body, err := io.ReadAll(reqBody)
+	
+	if err != nil {
 		return nil, err
 	}
 
