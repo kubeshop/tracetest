@@ -1,5 +1,5 @@
-import {endpoints} from 'redux/apis/TraceTest.api';
-import { TRawTestSpecs } from 'models/TestSpecs.model';
+import {endpoints} from 'redux/apis/Tracetest';
+import {TRawTestSpecs} from 'models/TestSpecs.model';
 
 const {getRunList, getRunById, reRun, dryRun, runTest} = endpoints;
 

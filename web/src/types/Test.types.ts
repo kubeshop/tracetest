@@ -1,16 +1,13 @@
 import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
-import {BaseQueryFn, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta} from '@reduxjs/toolkit/dist/query';
-import {EndpointBuilder} from '@reduxjs/toolkit/dist/query/endpointDefinitions';
 import {FormInstance} from 'antd';
 import {VariableDefinition, Request} from 'postman-collection';
 
 import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
-import {TracetestApiTags} from 'constants/Test.constants';
+import GRPCRequest from 'models/GrpcRequest.model';
+import HttpRequest from 'models/HttpRequest.model';
+import TraceIDRequest from 'models/TraceIDRequest.model';
 import {Model, TGrpcSchemas, THttpSchemas} from './Common.types';
 import {ICreateTestStep, IPlugin} from './Plugins.types';
-import GRPCRequest from '../models/GrpcRequest.model';
-import HttpRequest from '../models/HttpRequest.model';
-import TraceIDRequest from '../models/TraceIDRequest.model';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
@@ -89,9 +86,3 @@ export type TCreateTestSliceActions = {
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
   setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
 };
-
-export type TTestApiEndpointBuilder = EndpointBuilder<
-  BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta>,
-  TracetestApiTags,
-  'tests'
->;

@@ -1,6 +1,6 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {useGetTestByIdQuery, useGetTestVersionByIdQuery} from 'redux/apis/TraceTest.api';
+import {useGetTestByIdQuery, useGetTestVersionByIdQuery} from 'redux/apis/Tracetest';
 import {TDraftTest} from 'types/Test.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import TestService from 'services/Test.service';

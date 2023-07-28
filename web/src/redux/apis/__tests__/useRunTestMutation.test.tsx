@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useRunTestMutation} from '../TraceTest.api';
+import {useRunTestMutation} from '../Tracetest';
 
 test('useRunTestMutation', async () => {
   const testId = 22;

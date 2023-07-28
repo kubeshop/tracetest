@@ -10,7 +10,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useEditTestMutation, useRunTestMutation} from 'redux/apis/Tracetest';
 import {useAppDispatch} from 'redux/hooks';
 import {reset} from 'redux/slices/TestSpecs.slice';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';

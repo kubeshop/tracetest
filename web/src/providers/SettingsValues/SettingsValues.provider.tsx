@@ -14,7 +14,7 @@ import {
   useGetPollingQuery,
   useGetLinterQuery,
   useGetTestRunnerQuery,
-} from 'redux/apis/TraceTest.api';
+} from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import UserSelectors from 'selectors/User.selectors';

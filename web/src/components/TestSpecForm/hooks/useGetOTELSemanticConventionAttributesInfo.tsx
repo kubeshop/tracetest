@@ -1,5 +1,5 @@
 import TraceTestAttributes from 'constants/TracetestAttributes.constants';
-import {useGetConventionsQuery} from 'redux/apis/OtelRepo.api';
+import {useGetConventionsQuery} from 'redux/apis/OtelRepo';
 
 export type OtelReference = Record<string, OtelReferenceModel>;
 

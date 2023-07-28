@@ -4,7 +4,7 @@ import {createContext, ReactNode, useCallback, useContext, useMemo, useState} fr
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import Transaction from 'models/Transaction.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import {useGetTransactionByIdQuery, useGetTransactionVersionByIdQuery} from 'redux/apis/TraceTest.api';
+import {useGetTransactionByIdQuery, useGetTransactionVersionByIdQuery} from 'redux/apis/Tracetest';
 import TransactionService from 'services/Transaction.service';
 import {TDraftTransaction} from 'types/Transaction.types';
 import useTransactionCrud from './hooks/useTransactionCrud';

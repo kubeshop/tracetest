@@ -1,7 +1,7 @@
 import {renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useGetRunByIdQuery} from '../TraceTest.api';
+import {useGetRunByIdQuery} from '../Tracetest';
 
 test('useGetResultByIdQuery', async () => {
   fetchMock.mockResponse(JSON.stringify({}));

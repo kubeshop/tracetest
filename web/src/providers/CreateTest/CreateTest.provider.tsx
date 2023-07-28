@@ -12,7 +12,7 @@ import {
 } from 'redux/slices/CreateTest.slice';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import CreateTestSelectors from 'selectors/CreateTest.selectors';
-import {useCreateTestMutation} from 'redux/apis/TraceTest.api';
+import {useCreateTestMutation} from 'redux/apis/Tracetest';
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import {Plugins} from 'constants/Plugins.constants';

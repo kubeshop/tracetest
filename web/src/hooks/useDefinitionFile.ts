@@ -1,5 +1,5 @@
 import {useCallback, useState} from 'react';
-import {useLazyGetResourceDefinitionQuery} from 'redux/apis/TraceTest.api';
+import {useLazyGetResourceDefinitionQuery} from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 
 const useDefinitionFile = () => {

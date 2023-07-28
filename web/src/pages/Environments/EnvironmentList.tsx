@@ -2,7 +2,7 @@ import Empty from 'components/Empty';
 import Pagination from 'components/Pagination';
 import usePagination from 'hooks/usePagination';
 import Loading from 'pages/Home/Loading';
-import {useGetEnvironmentsQuery} from 'redux/apis/TraceTest.api';
+import {useGetEnvironmentsQuery} from 'redux/apis/Tracetest';
 import Environment from 'models/Environment.model';
 import {ENVIRONMENTS_DOCUMENTATION_URL} from 'constants/Common.constants';
 import * as S from './Environment.styled';

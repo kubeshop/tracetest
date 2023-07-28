@@ -1,7 +1,7 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
 
-import {useCreateSettingMutation, useUpdateSettingMutation} from 'redux/apis/TraceTest.api';
+import {useCreateSettingMutation, useUpdateSettingMutation} from 'redux/apis/Tracetest';
 import {TDraftResource} from 'types/Settings.types';
 import {useNotification} from '../Notification/Notification.provider';
 

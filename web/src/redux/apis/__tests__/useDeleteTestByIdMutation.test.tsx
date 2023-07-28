@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react-hooks';
 import fetchMock from 'jest-fetch-mock';
 import {ReduxWrapperProvider} from '../../ReduxWrapperProvider';
-import {useDeleteTestByIdMutation} from '../TraceTest.api';
+import {useDeleteTestByIdMutation} from '../Tracetest';
 
 test('useDeleteTestByIdMutation', async () => {
   const testId = 22;

@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import * as jsyaml from 'js-yaml';
-import {OtelReference} from '../../components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
+import {OtelReference} from 'components/TestSpecForm/hooks/useGetOTELSemanticConventionAttributesInfo';
 import {CompleteAttribute, OTELYaml} from './OTELYaml';
 
 const PATH = 'https://raw.githubusercontent.com/open-telemetry/semantic-conventions/main/';
@@ -41,6 +41,4 @@ const OtelRepoAPI = createApi({
 });
 
 export const {useGetConventionsQuery} = OtelRepoAPI;
-export const {endpoints} = OtelRepoAPI;
-
 export default OtelRepoAPI;

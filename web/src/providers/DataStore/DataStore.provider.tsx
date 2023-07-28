@@ -3,11 +3,7 @@ import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import ConnectionResult from 'models/ConnectionResult.model';
-import {
-  useTestConnectionMutation,
-  useUpdateDataStoreMutation,
-  useDeleteDataStoreMutation,
-} from 'redux/apis/TraceTest.api';
+import {useTestConnectionMutation, useUpdateDataStoreMutation, useDeleteDataStoreMutation} from 'redux/apis/Tracetest';
 import DataStoreService from 'services/DataStore.service';
 import {useContactUsModal} from 'components/ContactUs';
 import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/DataStore.types';

@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 import {capitalize} from 'lodash';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import {useDeleteTestByIdMutation, useDeleteTransactionByIdMutation} from 'redux/apis/TraceTest.api';
+import {useDeleteTestByIdMutation, useDeleteTransactionByIdMutation} from 'redux/apis/Tracetest';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useNotification} from 'providers/Notification/Notification.provider';
