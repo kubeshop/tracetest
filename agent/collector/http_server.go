@@ -140,7 +140,7 @@ func (r httpResponse) send(statusCode int, message proto.Message) error {
 	body, err := r.paseResponseBody(message)
 	if err != nil {
 		fmt.Println("Could not attach body to response", err.Error())
-		return err
+		return fmt.Errorf("could not attach body to response: %w", err)
 	}
 
 	r.w.WriteHeader(statusCode)
