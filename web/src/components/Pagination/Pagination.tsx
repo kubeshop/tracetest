@@ -1,8 +1,7 @@
 import {Pagination as PG} from 'antd';
-import {useNavigate} from 'react-router-dom';
 import {ReactNode, useCallback, useEffect} from 'react';
 import {IPagination} from 'hooks/usePagination';
-
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import * as S from './Pagination.styled';
 
 interface IProps<T> extends IPagination<T> {
@@ -26,7 +25,7 @@ const Pagination = <T extends any>({
   take,
   loadPage,
 }: IProps<T>) => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const handleNextPage = useCallback(() => {
     if (isLoading || !hasNext) return;
     loadNext();

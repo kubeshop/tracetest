@@ -1,7 +1,6 @@
 import {Divider, Space, Tabs} from 'antd';
 import {useCallback} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
-
+import {useSearchParams} from 'react-router-dom';
 import AttributeActions from 'components/AttributeActions';
 import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
@@ -9,6 +8,7 @@ import {CompareOperatorSymbolMap} from 'constants/Operator.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TestState} from 'constants/TestRun.constants';
 import TestOutput from 'models/TestOutput.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
@@ -39,7 +39,7 @@ const RunDetailTriggerResponse = ({
     bodyMimeType: '',
   },
 }: IPropsComponent) => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const [query, updateQuery] = useSearchParams();
   const {onNavigateAndOpen} = useTestOutput();
   const {open} = useTestSpecForm();

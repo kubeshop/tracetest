@@ -1,16 +1,16 @@
 import {useMemo} from 'react';
 import {Button} from 'antd';
-import {useNavigate} from 'react-router-dom';
 import PaginatedList from 'components/PaginatedList';
 import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
 import useDeleteResource from 'hooks/useDeleteResource';
-import {useTest} from 'providers/Test/Test.provider';
-import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import {ResourceType} from 'types/Resource.type';
-import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import TestRun from 'models/TestRun.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {useTest} from 'providers/Test/Test.provider';
+import useTestCrud from 'providers/Test/hooks/useTestCrud';
+import {useGetRunListQuery} from 'redux/apis/TraceTest.api';
+import {ResourceType} from 'types/Resource.type';
 import * as S from './Test.styled';
 
 const Content = () => {
@@ -20,7 +20,7 @@ const Content = () => {
   const params = useMemo(() => ({testId: test.id}), [test.id]);
   useDocumentTitle(`${test.name}`);
 
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   const shouldEdit = test.summary.hasRuns;
   const onEdit = () => navigate(`/test/${test.id}/run/${test.summary.runs}`);

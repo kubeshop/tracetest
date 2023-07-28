@@ -1,7 +1,7 @@
 import {Button, Col, Space, Typography} from 'antd';
-import {useNavigate} from 'react-router-dom';
 
 import icon from 'assets/data-stores.svg';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import * as S from './Home.styled';
 
 interface IProps {
@@ -9,7 +9,7 @@ interface IProps {
 }
 
 const ConfigCTA = ({onSkip}: IProps) => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
 
   return (
     <S.ConfigContainer align="middle">

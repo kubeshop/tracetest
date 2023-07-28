@@ -1,8 +1,8 @@
-import {useNavigate} from 'react-router-dom';
 import {useCallback} from 'react';
 import {useAppSelector} from 'redux/hooks';
 import SpanDetail, {TraceAttributeRow, TraceSubHeader} from 'components/SpanDetail';
 import TestRun from 'models/TestRun.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import {LeftPanel, PanelContainer} from '../ResizablePanels';
@@ -21,7 +21,7 @@ const panel = {
 const SpanDetailsPanel = ({run, testId}: IProps) => {
   const searchText = useAppSelector(TraceSelectors.selectSearchText);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const span = useAppSelector(state => SpanSelectors.selectSpanById(state, selectedSpan, testId, run.id));
 
   const handleOnCreateSpec = useCallback(() => {

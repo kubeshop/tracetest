@@ -1,6 +1,6 @@
 import {Button, Popover} from 'antd';
 import {useMemo} from 'react';
-import {Link} from 'react-router-dom';
+import Link from 'components/Link';
 import * as S from './NoTracingPopover.styled';
 
 const NoTracingPopover = () => {

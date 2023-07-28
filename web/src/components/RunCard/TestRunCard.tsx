@@ -1,9 +1,10 @@
 import {Tooltip} from 'antd';
-import {Link, useNavigate} from 'react-router-dom';
 import AnalyzerScore from 'components/AnalyzerScore';
+import Link from 'components/Link';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestState from 'components/TestState';
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import Date from 'utils/Date';
 import * as S from './RunCard.styled';
 import RunStatusIcon from '../RunStatusIcon';
@@ -35,7 +36,7 @@ const TestRunCard = ({
   testId,
   linkTo,
 }: IProps) => {
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const metadataName = metadata?.name;
   const metadataBuildNumber = metadata?.buildNumber;
   const metadataBranch = metadata?.branch;

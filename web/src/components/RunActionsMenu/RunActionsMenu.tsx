@@ -1,8 +1,8 @@
 import {Dropdown, Menu} from 'antd';
-import {useNavigate} from 'react-router-dom';
 
 import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './RunActionsMenu.styled';
@@ -17,7 +17,7 @@ interface IProps {
 
 const RunActionsMenu = ({resultId, testId, transactionId, transactionRunId, isRunView = false}: IProps) => {
   const {onJUnit} = useFileViewerModal();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
 
   return (

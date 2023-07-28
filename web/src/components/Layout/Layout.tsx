@@ -1,11 +1,12 @@
 import {ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 import React from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 import logoAsset from 'assets/logo-white.svg';
 import FileViewerModalProvider from 'components/FileViewerModal/FileViewerModal.provider';
 import Header from 'components/Header';
+import Link from 'components/Link';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
 import EnvironmentProvider from 'providers/Environment';

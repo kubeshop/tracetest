@@ -1,21 +1,22 @@
 import {useCallback} from 'react';
 import {noop} from 'lodash';
-import {useMatch, useNavigate} from 'react-router-dom';
-import {useAppDispatch} from 'redux/hooks';
-import {reset} from 'redux/slices/TestSpecs.slice';
-import {TDraftTest} from 'types/Test.types';
-import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import {useMatch} from 'react-router-dom';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
-import TestService from 'services/Test.service';
-import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {TEnvironmentValue} from 'models/Environment.model';
+import RunError from 'models/RunError.model';
+import Test from 'models/Test.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useEnvironment} from 'providers/Environment/Environment.provider';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
+import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
+import {useEditTestMutation, useRunTestMutation} from 'redux/apis/TraceTest.api';
+import {useAppDispatch} from 'redux/hooks';
+import {reset} from 'redux/slices/TestSpecs.slice';
+import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
+import TestService from 'services/Test.service';
+import {TDraftTest} from 'types/Test.types';
 import {RunErrorTypes} from 'types/TestRun.types';
-import {TEnvironmentValue} from 'models/Environment.model';
-import Test from 'models/Test.model';
-import RunError from 'models/RunError.model';
 
 export type TTestRunRequest = {
   test: Test;
@@ -26,7 +27,7 @@ export type TTestRunRequest = {
 
 const useTestCrud = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const {updateIsInitialized} = useTestSpecs();
   const [editTest, {isLoading: isLoadingEditTest}] = useEditTestMutation();
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();

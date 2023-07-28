@@ -1,9 +1,10 @@
 import {Button} from 'antd';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {TransactionRunStatusIcon} from 'components/RunStatusIcon';
 import TestState from 'components/TestState';
 import TransactionRunActionsMenu from 'components/TransactionRunActionsMenu';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {useTransactionRun} from 'providers/TransactionRun/TransactionRun.provider';
 import * as S from './TransactionHeader.styled';
@@ -27,7 +28,7 @@ const LINKS = [
 const TransactionHeader = () => {
   const {transaction, onRun} = useTransaction();
   const {transactionRun} = useTransactionRun();
-  const navigate = useNavigate();
+  const {navigate} = useDashboard();
   const {pathname} = useLocation();
   const {id: transactionId, name, version, description} = transaction;
   const {state, id: runId, allStepsRequiredGatesPassed} = transactionRun;

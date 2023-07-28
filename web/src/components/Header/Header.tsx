@@ -1,8 +1,8 @@
 import {Space} from 'antd';
-import {Link} from 'react-router-dom';
 
 import Logo from 'assets/Logo.svg';
 import EnvironmentSelector from 'components/EnvironmentSelector';
+import Link from 'components/Link';
 import NoTracingPopover from 'components/NoTracingPopover';
 import * as S from './Header.styled';
 import HelpMenu from './HelpMenu';
