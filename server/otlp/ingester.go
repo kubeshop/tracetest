@@ -26,7 +26,7 @@ type tracePersister interface {
 	UpdateTraceSpans(context.Context, *traces.Trace) error
 }
 
-type ingester struct {
+type Ingester struct {
 	log            func(string, ...interface{})
 	tracePersister tracePersister
 	runGetter      runGetter
@@ -34,8 +34,8 @@ type ingester struct {
 	dsRepo         *datastore.Repository
 }
 
-func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
-	return ingester{
+func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) Ingester {
+	return Ingester{
 		log: func(format string, args ...interface{}) {
 			log.Printf("[OTLP] "+format, args...)
 		},
@@ -46,7 +46,14 @@ func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEm
 	}
 }
 
-func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType string) (*pb.ExportTraceServiceResponse, error) {
+type RequestType string
+
+var (
+	RequestTypeHTTP RequestType = "HTTP"
+	RequestTypeGRPC RequestType = "gRPC"
+)
+
+func (i Ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := i.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
@@ -94,7 +101,7 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	}, nil
 }
 
-func (i ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
+func (i Ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 	spansByTrace := map[string][]*v1.Span{}
 
 	for _, rs := range input {
@@ -123,7 +130,7 @@ func (i ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 
 var errNoTestRun = errors.New("no test run")
 
-func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
+func (i Ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
 	run, err := i.runGetter.GetRunByTraceID(ctx, trace.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		// trace is not part of any known test run, no need to notify
@@ -141,12 +148,12 @@ func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tra
 	return run, nil
 }
 
-func (i ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType string) error {
+func (i Ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
 	evt := events.TraceOtlpServerReceivedSpans(
 		run.TestID,
 		run.ID,
 		len(trace.Flat),
-		requestType,
+		string(requestType),
 	)
 	err := i.eventEmitter.Emit(ctx, evt)
 	if err != nil {
