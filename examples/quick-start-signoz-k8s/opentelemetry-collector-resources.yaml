@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: collector-config
+data:
+  collector.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    processors:
+      batch:
+        timeout: 100ms
+
+      # Data sources: traces
+      probabilistic_sampler:
+        hash_seed: 22
+        sampling_percentage: 100
+
+    exporters:
+      # Output logger, used to check OTel Collector sanity
+      logging:
+        loglevel: debug
+
+      # OTLP for Tracetest
+      otlp/tracetest:
+        endpoint: tracetest.tracetest.svc.cluster.local:4317
+        tls:
+          insecure: true
+      # OTLP for Signoz
+      otlp/signoz:
+        endpoint: signoz-otel-collector.observability.svc.cluster.local:4317
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [probabilistic_sampler, batch]
+          exporters: [otlp/signoz, otlp/tracetest, logging]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: otel-collector
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: otel-collector
+    spec:
+      containers:
+        - name: otelcol
+          args:
+            - --config=/conf/collector.yaml
+          image: otel/opentelemetry-collector-contrib:0.67.0
+          volumeMounts:
+            - mountPath: /conf
+              name: collector-config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+      volumes:
+        - configMap:
+            items:
+              - key: collector.yaml
+                path: collector.yaml
+            name: collector-config
+          name: collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+spec:
+  ports:
+    - name: grpc-otlp
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+  selector:
+    app.kubernetes.io/name: otel-collector
+  type: ClusterIP
