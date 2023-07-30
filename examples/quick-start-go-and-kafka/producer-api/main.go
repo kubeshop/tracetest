@@ -9,6 +9,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	"github.com/kubeshop/tracetest/examples/quick-start-go-and-kafka/producer-api/config"
 	"github.com/kubeshop/tracetest/examples/quick-start-go-and-kafka/producer-api/streaming"
 	"github.com/kubeshop/tracetest/examples/quick-start-go-and-kafka/producer-api/telemetry"
@@ -45,11 +47,13 @@ func main() {
 	defer publisher.Close()
 	logger.Info("Kafka publisher initialized.")
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/publish", publishHandler(tracer, publisher))
+	handler := http.HandlerFunc(publishHandler(tracer, publisher))
+	otelHandler := otelhttp.NewHandler(handler, "GET /publish")
+
+	http.Handle("/publish", otelHandler)
 
 	logger.Info("Starting producer-api on port 8080...")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		logger.Error("unable to start server", zap.Error(err))
 		return
 	}
@@ -62,7 +66,7 @@ func publishHandler(tracer trace.Tracer, publisher *streaming.Publisher) func(ht
 			return
 		}
 
-		_, span := tracer.Start(req.Context(), "GET /publish")
+		ctx, span := tracer.Start(req.Context(), "publish handler")
 		defer span.End()
 
 		bodyContent, err := io.ReadAll(req.Body)
@@ -72,7 +76,7 @@ func publishHandler(tracer trace.Tracer, publisher *streaming.Publisher) func(ht
 			return
 		}
 
-		err = publisher.Publish(req.Context(), bodyContent)
+		err = publisher.Publish(ctx, bodyContent)
 		if err != nil {
 			fmt.Printf("error when publishing message: %s", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)

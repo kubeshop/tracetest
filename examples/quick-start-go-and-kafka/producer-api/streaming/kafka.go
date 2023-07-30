@@ -6,6 +6,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama"
+
 	"go.opentelemetry.io/otel"
 )
 
@@ -16,6 +17,7 @@ type Publisher struct {
 
 func GetKafkaPublisher(brokerUrl, topic string) (*Publisher, error) {
 	config := sarama.NewConfig()
+	config.Version = sarama.V2_5_0_0
 	config.Producer.Return.Successes = true
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 5
@@ -26,10 +28,10 @@ func GetKafkaPublisher(brokerUrl, topic string) (*Publisher, error) {
 	}
 
 	// Wrap instrumentation
-	conn = otelsarama.WrapSyncProducer(config, conn)
+	wrappedConn := otelsarama.WrapSyncProducer(config, conn)
 
 	return &Publisher{
-		producer: conn,
+		producer: wrappedConn,
 		topic:    topic,
 	}, nil
 }
@@ -43,6 +45,7 @@ func (p *Publisher) Publish(ctx context.Context, message []byte) error {
 	otel.GetTextMapPropagator().Inject(ctx, otelsarama.NewProducerMessageCarrier(msg))
 
 	fmt.Printf("Sending message to topic: %s\n", p.topic)
+	fmt.Println("Headers: ", msg.Headers)
 
 	partition, offset, err := p.producer.SendMessage(msg)
 	if err != nil {

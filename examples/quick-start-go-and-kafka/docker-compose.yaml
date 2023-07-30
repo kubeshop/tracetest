@@ -35,6 +35,8 @@ services:
         condition: service_started
       kafka:
         condition: service_healthy
+      producer-api:
+        condition: service_started
 
   kafka:
     image: quick-start-kafka

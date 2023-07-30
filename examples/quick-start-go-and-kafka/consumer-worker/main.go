@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"syscall"
 
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
 	"github.com/kubeshop/tracetest/examples/quick-start-go-and-kafka/consumer-worker/config"
@@ -42,30 +42,28 @@ func main() {
 		logger.Error("Unable to setup Kafka reader", zap.Error(err))
 		return
 	}
-	defer reader.Close()
 	logger.Info("Kafka reader initialized.")
 
-	// based on https://github.com/zaynkorai/go-kafka-example/blob/main/worker/worker.go
 	logger.Info("Starting worker...")
 
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
-	doneCh := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case err := <-reader.PartitionConsumer().Errors():
-				logger.Error("Error on reader", zap.Error(err))
-			case msg := <-reader.PartitionConsumer().Messages():
-				_, span := tracer.Start(ctx, "Incoming message")
-				logger.Info("Incoming message", zap.String("topic", string(msg.Topic)), zap.String("message", string(msg.Value)))
-				span.End()
-			case <-sigchan:
-				logger.Info("Worker stop signal detected")
-				doneCh <- struct{}{}
-			}
-		}
-	}()
-	<-doneCh
+	err = reader.Read(ctx, getMessageReader(tracer, logger))
+	if err != nil {
+		logger.Error("Unable to read messages from Kafka", zap.Error(err))
+		return
+	}
+
+	<-ctx.Done()
+	logger.Info("Worker stop signal detected")
+}
+
+func getMessageReader(tracer trace.Tracer, logger *zap.Logger) func(context.Context, string, string) {
+	return func(readerContext context.Context, topic, message string) {
+		_, span := tracer.Start(readerContext, "Process incoming message")
+		defer span.End()
+
+		logger.Info("Incoming message", zap.String("topic", topic), zap.String("message", message))
+	}
 }

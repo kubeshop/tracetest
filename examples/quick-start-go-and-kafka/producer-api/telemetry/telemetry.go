@@ -69,6 +69,8 @@ func newTraceProvider(ctx context.Context, spanExporter sdkTrace.SpanExporter, s
 		sdkTrace.WithResource(mergedResource),
 	)
 
+	otel.SetTracerProvider(tp)
+
 	otel.SetTextMapPropagator(
 		propagation.NewCompositeTextMapPropagator(
 			propagation.TraceContext{},
