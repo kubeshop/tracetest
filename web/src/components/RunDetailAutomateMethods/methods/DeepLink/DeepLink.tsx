@@ -9,10 +9,10 @@ import useDeepLink from './hooks/useDeepLink';
 interface IProps {
   test: Test;
   run: TestRun;
-  environmentId?: string;
+  variableSetId?: string;
 }
 
-const DeepLink = ({test, environmentId, run: {environment}}: IProps) => {
+const DeepLink = ({test, variableSetId, run: {variableSet}}: IProps) => {
   const {deepLink, onGetDeepLink} = useDeepLink();
 
   return (
@@ -38,7 +38,7 @@ const DeepLink = ({test, environmentId, run: {environment}}: IProps) => {
           </a>
         }
       />
-      <Controls onChange={onGetDeepLink} environment={environment} test={test} environmentId={environmentId} />
+      <Controls onChange={onGetDeepLink} variableSet={variableSet} test={test} variableSetId={variableSetId} />
     </S.Container>
   );
 };

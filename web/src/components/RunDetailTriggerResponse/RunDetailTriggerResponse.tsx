@@ -14,7 +14,7 @@ import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service
 import AssertionService from 'services/Assertion.service';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import ResponseBody from './ResponseBody';
-import ResponseEnvironment from './ResponseEnvironment';
+import ResponseVariableSet from './ResponseVariableSet';
 import ResponseHeaders from './ResponseHeaders';
 import * as S from './RunDetailTriggerResponse.styled';
 import {IPropsComponent} from './RunDetailTriggerResponseFactory';
@@ -22,7 +22,7 @@ import {IPropsComponent} from './RunDetailTriggerResponseFactory';
 const TabsKeys = {
   Body: 'body',
   Headers: 'headers',
-  Environment: 'environment',
+  VariableSet: 'variable-set',
 };
 
 const tracetestTriggerSelector = 'span[tracetest.span.type="general" name="Tracetest trigger"]';
@@ -143,8 +143,8 @@ const RunDetailTriggerResponse = ({
               onCreateTestSpec={handleCreateTestSpec}
             />
           </Tabs.TabPane>
-          <Tabs.TabPane key={TabsKeys.Environment} tab="Environment">
-            <ResponseEnvironment />
+          <Tabs.TabPane key={TabsKeys.VariableSet} tab="Variable Set">
+            <ResponseVariableSet />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>

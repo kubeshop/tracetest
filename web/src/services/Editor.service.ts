@@ -83,7 +83,7 @@ const EditorService = () => ({
     type: SupportedEditors.Interpolation | SupportedEditors.Expression,
     node: SyntaxNode,
     state: EditorState,
-    environmentList: IKeyValue[] = [],
+    variableList: IKeyValue[] = [],
     attributeList: TSpanFlatAttribute[] = [],
     customValueList: string[] = [],
     onSelect: (option: Completion) => void = noop
@@ -105,7 +105,7 @@ const EditorService = () => ({
         from: node.to,
         options:
           sourceText === 'env'
-            ? environmentList.map(({key}) => ({
+            ? variableList.map(({key}) => ({
                 label: key,
                 type: 'variableName',
               }))
@@ -125,7 +125,7 @@ const EditorService = () => ({
         from: node.from,
         options:
           sourceText === 'env'
-            ? environmentList.map(({key}) => ({
+            ? variableList.map(({key}) => ({
                 label: key,
                 type: 'variableName',
               }))

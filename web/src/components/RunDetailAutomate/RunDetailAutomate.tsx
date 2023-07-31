@@ -7,7 +7,7 @@ import DeepLink from 'components/RunDetailAutomateMethods/methods/DeepLink';
 import {CLI_RUNNING_TESTS_URL} from 'constants/Common.constants';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './RunDetailAutomate.styled';
 
@@ -18,7 +18,7 @@ interface IProps {
 
 const RunDetailAutomate = ({test, run}: IProps) => {
   const [fileName, setFileName] = useState<string>(`${snakeCase(test.name)}.yaml`);
-  const {selectedEnvironment: {id: environmentId} = {}} = useEnvironment();
+  const {selectedVariableSet: {id: variableSetId} = {}} = useVariableSet();
 
   return (
     <S.Container>
@@ -41,7 +41,7 @@ const RunDetailAutomate = ({test, run}: IProps) => {
               children: (
                 <CliCommand
                   id={test.id}
-                  environmentId={environmentId}
+                  variableSetId={variableSetId}
                   fileName={fileName}
                   resourceType={ResourceType.Test}
                   docsUrl={CLI_RUNNING_TESTS_URL}
@@ -51,7 +51,7 @@ const RunDetailAutomate = ({test, run}: IProps) => {
             {
               id: 'deeplink',
               label: 'Deep Link',
-              children: <DeepLink test={test} environmentId={environmentId} run={run} />,
+              children: <DeepLink test={test} variableSetId={variableSetId} run={run} />,
             },
           ]}
         />

@@ -8,13 +8,13 @@ const expressionEndpoints = TraceTestAPI.injectEndpoints({
     parseExpression: builder.mutation<string[], TResolveRequestInfo>({
       query: ({
         expression,
-        context: {spanId = '', runId = '', environmentId = '', testId = '', selector = ''} = {},
+        context: {spanId = '', runId = '', variableSetId = '', testId = '', selector = ''} = {},
       }) => ({
         url: '/expressions/resolve',
         method: HTTP_METHOD.POST,
         body: {
           expression: AssertionService.extractExpectedString(expression),
-          context: {spanId, runId, testId, selector, environmentId},
+          context: {spanId, runId, testId, selector, variableSetId},
         },
       }),
       transformResponse: ({resolvedValues = []}: TResolveResponseInfo) => resolvedValues,

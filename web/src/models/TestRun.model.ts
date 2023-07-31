@@ -2,7 +2,7 @@ import {TestState} from 'constants/TestRun.constants';
 import {Model, Modify, TTestSchemas, TTriggerSchemas} from 'types/Common.types';
 import {TTestRunState} from 'types/TestRun.types';
 import AssertionResults, {TRawAssertionResults} from './AssertionResults.model';
-import Environment from './Environment.model';
+import VariableSet from './VariableSet.model';
 import LinterResult from './LinterResult.model';
 import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
@@ -29,7 +29,7 @@ type TestRun = Model<
     trigger?: TTriggerSchemas['Trigger'];
     triggerResult?: TriggerResult;
     outputs?: TestRunOutput[];
-    environment?: Environment;
+    variableSet?: VariableSet;
     state: TTestRunState;
     linter: LinterResult;
     requiredGatesResult: RequiredGatesResult;
@@ -108,7 +108,7 @@ const TestRun = ({
   serviceTriggeredAt = '',
   metadata = {},
   outputs = [],
-  environment = {},
+  variableSet = {},
   transactionId = '',
   transactionRunId = '',
   linter = {},
@@ -136,7 +136,7 @@ const TestRun = ({
     passedAssertionCount: getTestResultCount(result, 'passed'),
     metadata,
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
-    environment: Environment.fromRun(environment),
+    variableSet: VariableSet.fromRun(variableSet),
     transactionId,
     transactionRunId,
     linter: LinterResult(linter),

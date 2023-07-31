@@ -1,12 +1,12 @@
 import {useCallback} from 'react';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import {useTest} from 'providers/Test/Test.provider';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 
-const getParsedVariables = (rawVars: string): TEnvironmentValue[] => {
+const getParsedVariables = (rawVars: string): TVariableSetValue[] => {
   try {
-    const variables = JSON.parse(rawVars) as TEnvironmentValue[];
+    const variables = JSON.parse(rawVars) as TVariableSetValue[];
 
     return Array.isArray(variables) ? variables : [];
   } catch (err) {
@@ -19,21 +19,21 @@ const useAutomatedTestRun = (query: URLSearchParams) => {
     onRun,
     test: {id: testId},
   } = useTest();
-  const {selectedEnvironment} = useEnvironment();
+  const {selectedVariableSet} = useVariableSet();
   const {navigate} = useDashboard();
 
   const onAutomatedRun = useCallback(() => {
     const variables = getParsedVariables(query.get('variables') ?? '[]');
-    const environmentId = query.get('environmentId') ?? selectedEnvironment?.id;
+    const variableSetId = query.get('variableSetId') ?? selectedVariableSet?.id;
 
     onRun({
       variables,
-      environmentId,
+      variableSetId,
       onCancel() {
         navigate(`/test/${testId}`, {replace: true});
       },
     });
-  }, [navigate, onRun, query, selectedEnvironment?.id, testId]);
+  }, [navigate, onRun, query, selectedVariableSet?.id, testId]);
 
   return onAutomatedRun;
 };

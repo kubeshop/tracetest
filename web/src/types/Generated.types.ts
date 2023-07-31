@@ -170,19 +170,19 @@ export interface paths {
     /** Delete a Data Store */
     delete: operations["deleteDataStore"];
   };
-  "/environments": {
-    /** List environments available in Tracetest. */
-    get: operations["listEnvironments"];
-    /** Create an environment that can be used by tests and transactions */
-    post: operations["createEnvironment"];
+  "/variableSets": {
+    /** List variableSets available in Tracetest. */
+    get: operations["listVariableSets"];
+    /** Create an VariableSet that can be used by tests and transactions */
+    post: operations["createVariableSet"];
   };
-  "/environments/{environmentId}": {
-    /** Get one environment by its id */
-    get: operations["getEnvironment"];
-    /** Update an environment used on Tracetest */
-    put: operations["updateEnvironment"];
-    /** Delete an environment from Tracetest */
-    delete: operations["deleteEnvironment"];
+  "/variableSets/{variableSetId}": {
+    /** Get one VariableSet by its id */
+    get: operations["getVariableSet"];
+    /** Update an VariableSet used on Tracetest */
+    put: operations["updateVariableSet"];
+    /** Delete an VariableSet from Tracetest */
+    delete: operations["deleteVariableSet"];
   };
   "/version": {
     /** Get the version of the API */
@@ -924,99 +924,99 @@ export interface operations {
       204: never;
     };
   };
-  /** List environments available in Tracetest. */
-  listEnvironments: {
+  /** List variableSets available in Tracetest. */
+  listVariableSets: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResourceList"];
+          "application/json": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResourceList"];
           "text/yaml": {
             count?: number;
-            items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+            items?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"][];
           };
         };
       };
-      /** invalid query for environments, some data was sent in incorrect format. */
+      /** invalid query for VariableSets, some data was sent in incorrect format. */
       400: unknown;
-      /** problem listing environments */
+      /** problem listing VariableSets */
       500: unknown;
     };
   };
-  /** Create an environment that can be used by tests and transactions */
-  createEnvironment: {
+  /** Create an VariableSet that can be used by tests and transactions */
+  createVariableSet: {
     responses: {
       /** successful operation */
       201: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "application/json": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
+          "text/yaml": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
         };
       };
-      /** problem creating an environment */
+      /** problem creating an VariableSet */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "application/json": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
+        "text/yaml": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
       };
     };
   };
-  /** Get one environment by its id */
-  getEnvironment: {
+  /** Get one VariableSet by its id */
+  getVariableSet: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "application/json": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
+          "text/yaml": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
         };
       };
-      /** environment not found */
+      /** VariableSet not found */
       404: unknown;
-      /** problem getting an environment */
+      /** problem getting an VariableSet */
       500: unknown;
     };
   };
-  /** Update an environment used on Tracetest */
-  updateEnvironment: {
+  /** Update an VariableSet used on Tracetest */
+  updateVariableSet: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-          "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          "application/json": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
+          "text/yaml": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
         };
       };
-      /** invalid environment, some data was sent in incorrect format. */
+      /** invalid VariableSet, some data was sent in incorrect format. */
       400: unknown;
-      /** environment not found */
+      /** VariableSet not found */
       404: unknown;
-      /** problem updating an environment */
+      /** problem updating an VariableSet */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
-        "text/yaml": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+        "application/json": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
+        "text/yaml": external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"];
       };
     };
   };
-  /** Delete an environment from Tracetest */
-  deleteEnvironment: {
+  /** Delete an VariableSet from Tracetest */
+  deleteVariableSet: {
     parameters: {};
     responses: {
       /** successful operation */
       204: never;
-      /** invalid environment, some data was sent in incorrect format. */
+      /** invalid VariableSet, some data was sent in incorrect format. */
       400: unknown;
-      /** environment not found */
+      /** VariableSet not found */
       404: unknown;
-      /** problem deleting an environment */
+      /** problem deleting an VariableSet */
       500: unknown;
     };
   };
@@ -1383,37 +1383,6 @@ export interface external {
     };
     operations: {};
   };
-  "environments.yaml": {
-    paths: {};
-    components: {
-      schemas: {
-        EnvironmentResourceList: {
-          count?: number;
-          items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
-        };
-        /** @description Represents an environment structured into the Resources format. */
-        EnvironmentResource: {
-          /**
-           * @description Represents the type of this resource. It should always be set as 'Environment'.
-           * @enum {string}
-           */
-          type?: "Environment";
-          spec?: external["environments.yaml"]["components"]["schemas"]["Environment"];
-        };
-        Environment: {
-          id?: string;
-          name?: string;
-          description?: string;
-          values?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
-        };
-        EnvironmentValue: {
-          key?: string;
-          value?: string;
-        };
-      };
-    };
-    operations: {};
-  };
   "expressions.yaml": {
     paths: {};
     components: {
@@ -1427,7 +1396,7 @@ export interface external {
           runId?: string;
           spanId?: string;
           selector?: string;
-          environmentId?: string;
+          variableSetId?: string;
         };
         ResolveResponseInfo: {
           resolvedValues?: string[];
@@ -1632,8 +1601,8 @@ export interface external {
         pollingProfileId: string;
         /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
         dataStoreId: string;
-        /** @description ID of an environment used on Tracetest to inject values into tests and transactions */
-        environmentId: string;
+        /** @description ID of an VariableSet used on Tracetest to inject values into tests and transactions */
+        variableSetId: string;
         /** @description ID of an Linter */
         LinterId: string;
       };
@@ -1822,7 +1791,7 @@ export interface external {
           obtainedTraceAt?: string;
           /** Format: date-time */
           completedAt?: string;
-          environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+          variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];
@@ -1840,8 +1809,8 @@ export interface external {
         };
         RunInformation: {
           metadata?: { [key: string]: string } | null;
-          environmentId?: string;
-          variables?: external["environments.yaml"]["components"]["schemas"]["EnvironmentValue"][];
+          variableSetId?: string;
+          variables?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetValue"][];
           requiredGates?:
             | external["testRunner.yaml"]["components"]["schemas"]["SupportedGates"][]
             | null;
@@ -1996,7 +1965,7 @@ export interface external {
           /** @enum {string} */
           state?: "CREATED" | "EXECUTING" | "FINISHED" | "FAILED";
           steps?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
-          environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+          variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
           metadata?: { [key: string]: string };
           pass?: number;
           fail?: number;
@@ -2044,6 +2013,37 @@ export interface external {
         Variable: {
           key?: string;
           defaultValue?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "variableSets.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        VariableSetResourceList: {
+          count?: number;
+          items?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"][];
+        };
+        /** @description Represents an VariableSet structured into the Resources format. */
+        VariableSetResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'VariableSet'.
+           * @enum {string}
+           */
+          type?: "VariableSet";
+          spec?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
+        };
+        VariableSet: {
+          id?: string;
+          name?: string;
+          description?: string;
+          values?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetValue"][];
+        };
+        VariableSetValue: {
+          key?: string;
+          value?: string;
         };
       };
     };

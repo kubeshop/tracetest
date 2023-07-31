@@ -10,7 +10,7 @@ import SwitchControl from './SwitchControl';
 import {defaultOptions} from './hooks/useCliCommand';
 
 interface IOptionsMetadataParams {
-  isEnvironmentSelected: boolean;
+  isVariableSetSelected: boolean;
   resourceType: ResourceType;
 }
 interface IOptionsMetadata {
@@ -20,17 +20,17 @@ interface IOptionsMetadata {
 }
 
 function getOptionsMetadata({
-  isEnvironmentSelected,
+  isVariableSetSelected,
   resourceType,
 }: IOptionsMetadataParams): Record<CliCommandOption, IOptionsMetadata> {
   return {
     [CliCommandOption.UseId]: {label: `Use ${resourceType} ID instead of file`},
     [CliCommandOption.SkipResultWait]: {label: `Skip waiting for ${resourceType} to complete`},
     [CliCommandOption.UseHostname]: {label: 'Specify Tracetest server hostname'},
-    [CliCommandOption.UseCurrentEnvironment]: {
-      label: 'Use selected environment',
-      help: !isEnvironmentSelected ? 'This option is only available when an environment is selected' : undefined,
-      disabled: !isEnvironmentSelected,
+    [CliCommandOption.UseCurrentVariableSet]: {
+      label: 'Use selected variable set',
+      help: !isVariableSetSelected ? 'This option is only available when an variable set is selected' : undefined,
+      disabled: !isVariableSetSelected,
     },
     [CliCommandOption.GeneratesJUnit]: {label: 'Generate JUnit report'},
     [CliCommandOption.useDocker]: {label: 'Run CLI via Docker image'},
@@ -40,19 +40,19 @@ function getOptionsMetadata({
 interface IProps {
   onChange(cmdConfig: TCliCommandConfig): void;
   id: string;
-  environmentId?: string;
+  variableSetId?: string;
   fileName: string;
   resourceType: ResourceType;
 }
 
-const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps) => {
+const Controls = ({onChange, id, variableSetId, fileName, resourceType}: IProps) => {
   const [form] = Form.useForm<TCliCommandConfig>();
   const options = Form.useWatch('options', form);
   const format = Form.useWatch('format', form);
   const requiredGates = Form.useWatch('required-gates', form);
   const optionsMetadata = useMemo(
-    () => getOptionsMetadata({isEnvironmentSelected: !!environmentId, resourceType}),
-    [environmentId, resourceType]
+    () => getOptionsMetadata({isVariableSetSelected: !!variableSetId, resourceType}),
+    [variableSetId, resourceType]
   );
 
   useEffect(() => {
@@ -61,11 +61,11 @@ const Controls = ({onChange, id, environmentId, fileName, resourceType}: IProps)
       format: format ?? CliCommandFormat.Pretty,
       requiredGates,
       id,
-      environmentId,
+      variableSetId,
       fileName,
       resourceType,
     });
-  }, [environmentId, fileName, format, requiredGates, onChange, options, id, resourceType]);
+  }, [fileName, format, requiredGates, onChange, options, id, resourceType, variableSetId]);
 
   return (
     <Form<TCliCommandConfig>

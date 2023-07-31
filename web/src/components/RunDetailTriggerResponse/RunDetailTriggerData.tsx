@@ -3,12 +3,12 @@ import {useSearchParams} from 'react-router-dom';
 import {StepsID} from 'components/GuidedTour/testRunSteps';
 import {TestState} from 'constants/TestRun.constants';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import ResponseEnvironment from './ResponseEnvironment';
+import ResponseVariableSet from './ResponseVariableSet';
 import * as S from './RunDetailTriggerResponse.styled';
 import {IPropsComponent} from './RunDetailTriggerResponseFactory';
 
 const TABS = {
-  Environment: 'environment',
+  VariableSet: 'variable-set',
 } as const;
 
 const RunDetailTriggerData = ({state, triggerTime = 0}: IPropsComponent) => {
@@ -29,15 +29,15 @@ const RunDetailTriggerData = ({state, triggerTime = 0}: IPropsComponent) => {
       </S.TitleContainer>
       <S.TabsContainer data-tour={StepsID.Response}>
         <Tabs
-          defaultActiveKey={query.get('tab') || TABS.Environment}
+          defaultActiveKey={query.get('tab') || TABS.VariableSet}
           size="small"
           onChange={newTab => {
             TestRunAnalyticsService.onTriggerResponseTabChange(newTab);
             updateQuery([['tab', newTab]]);
           }}
         >
-          <Tabs.TabPane key={TABS.Environment} tab="Environment">
-            <ResponseEnvironment />
+          <Tabs.TabPane key={TABS.VariableSet} tab="Variable Set">
+            <ResponseVariableSet />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>

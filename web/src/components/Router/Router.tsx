@@ -1,6 +1,6 @@
 import {Navigate, Route, Routes} from 'react-router-dom';
 
-import Environments from 'pages/Environments';
+import VariableSets from 'pages/VariableSet';
 import Home from 'pages/Home';
 import RunDetail from 'pages/RunDetail';
 import Settings from 'pages/Settings';
@@ -14,7 +14,7 @@ const Router = () => (
   <Routes>
     <Route path="/" element={<Home />} />
 
-    <Route path="/environments" element={<Environments />} />
+    <Route path="/variablesets" element={<VariableSets />} />
 
     <Route path="/settings" element={<Settings />} />
 

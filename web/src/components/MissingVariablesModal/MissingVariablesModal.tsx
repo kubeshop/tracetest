@@ -2,7 +2,7 @@ import {useEffect} from 'react';
 import {Form} from 'antd';
 import VariablesService from 'services/Variables.service';
 import {TDraftVariables, TTestVariablesMap} from 'types/Variables.types';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import * as S from './MissingVariablesModal.styled';
 import MissingVariablesModalFooter from './MissingVariablesModalFooter';
 import MissingVariablesModalForm from './MissingVariablesModalForm';
@@ -12,7 +12,7 @@ interface IProps {
   isOpen: boolean;
   name: string;
   onClose(): void;
-  onSubmit(values: TEnvironmentValue[]): void;
+  onSubmit(values: TVariableSetValue[]): void;
   testVariables: TTestVariablesMap;
 }
 

@@ -9,7 +9,7 @@ import Header from 'components/Header';
 import Link from 'components/Link';
 import useRouterSync from 'hooks/useRouterSync';
 import ConfirmationModalProvider from 'providers/ConfirmationModal';
-import EnvironmentProvider from 'providers/Environment';
+import VariableSetProvider from 'providers/VariableSet';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import NotificationProvider from 'providers/Notification/Notification.provider';
@@ -31,8 +31,8 @@ const menuItems = [
   {
     key: '1',
     icon: <GlobalOutlined />,
-    label: <Link to="/environments">Environments</Link>,
-    path: '/environments',
+    label: <Link to="/variablesets">Variable Sets</Link>,
+    path: '/variablesets',
   },
 ];
 
@@ -56,7 +56,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
       <MissingVariablesModalProvider>
         <FileViewerModalProvider>
           <ConfirmationModalProvider>
-            <EnvironmentProvider>
+            <VariableSetProvider>
               <S.Layout hasSider>
                 {hasMenu && (
                   <S.Sider width={256}>
@@ -97,7 +97,7 @@ const Layout = ({children, hasMenu = false}: IProps) => {
                   <S.Content $hasMenu={hasMenu}>{children}</S.Content>
                 </S.Layout>
               </S.Layout>
-            </EnvironmentProvider>
+            </VariableSetProvider>
           </ConfirmationModalProvider>
         </FileViewerModalProvider>
       </MissingVariablesModalProvider>

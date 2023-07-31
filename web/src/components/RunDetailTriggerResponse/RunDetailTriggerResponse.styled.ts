@@ -100,7 +100,7 @@ export const Actions = styled.div`
   gap: 10px;
 `;
 
-export const ResponseEnvironmentContainer = styled.div`
+export const ResponseVarsContainer = styled.div`
   padding: 16px 0;
 `;
 
