@@ -254,7 +254,7 @@ exporters:
     tls:
       insecure: true
   # OTLP for Dynatrace
-  otlp/dynatrace:
+  otlphttp/dynatrace:
     endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp # Send traces to Dynatrace. Read more in docs here: https://www.dynatrace.com/support/help/extend-dynatrace/opentelemetry/collector#configuration
     headers:
       Authorization: "Api-Token dt0c01.sample.secret"  # Requires "openTelemetryTrace.ingest" permission
@@ -268,7 +268,7 @@ service:
     traces/dynatrace:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/dynatrace]
+      exporters: [logging, otlphttp/dynatrace]
 `;
 
 export const CollectorConfigMap = {
