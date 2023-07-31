@@ -1,4 +1,4 @@
-package environment_test
+package variableset_test
 
 import (
 	"os"

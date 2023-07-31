@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/model"
@@ -18,6 +17,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -29,9 +29,9 @@ type fakeTestRunner struct {
 	uid                 int
 }
 
-func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, env environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
+func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, variableSet variableset.VariableSet, requiredGates *[]testrunner.RequiredGate) test.Run {
 	run := test.NewRun()
-	run.Environment = env
+	run.VariableSet = variableSet
 	run.State = test.RunStateCreated
 	newRun, err := r.db.CreateRun(ctx, testObj, run)
 	if err != nil {
@@ -74,7 +74,7 @@ func TestTransactionRunner(t *testing.T) {
 			require.Len(t, actual.Steps, 2)
 			assert.Equal(t, actual.Steps[0].State, test.RunStateFinished)
 			assert.Equal(t, actual.Steps[1].State, test.RunStateFinished)
-			assert.Equal(t, "http://my-service.com", actual.Environment.Get("url"))
+			assert.Equal(t, "http://my-service.com", actual.VariableSet.Get("url"))
 
 			assert.Equal(t, test.RunOutput{Name: "", Value: "1", SpanID: ""}, actual.Steps[0].Outputs.Get("USER_ID"))
 
@@ -83,10 +83,10 @@ func TestTransactionRunner(t *testing.T) {
 			// on the `fakeTestRunner` used here to actually save the environment
 			// to the test run, like the real test runner would.
 			// see line 27
-			assert.Equal(t, "1", actual.Steps[1].Environment.Get("USER_ID"))
+			assert.Equal(t, "1", actual.Steps[1].VariableSet.Get("USER_ID"))
 			assert.Equal(t, test.RunOutput{Name: "", Value: "2", SpanID: ""}, actual.Steps[1].Outputs.Get("USER_ID"))
 
-			assert.Equal(t, "2", actual.Environment.Get("USER_ID"))
+			assert.Equal(t, "2", actual.VariableSet.Get("USER_ID"))
 
 		})
 	})
@@ -146,10 +146,10 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 		"service":     "tracetest",
 	}
 
-	envRepository := environment.NewRepository(rawDB)
-	env, err := envRepository.Create(ctx, environment.Environment{
+	envRepository := variableset.NewRepository(rawDB)
+	env, err := envRepository.Create(ctx, variableset.VariableSet{
 		Name: "production",
-		Values: []environment.EnvironmentValue{
+		Values: []variableset.VariableSetValue{
 			{
 				Key:   "url",
 				Value: "http://my-service.com",

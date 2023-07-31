@@ -1,4 +1,4 @@
-package environment
+package variableset
 
 import (
 	"fmt"
@@ -8,47 +8,47 @@ import (
 )
 
 type (
-	Environment struct {
+	VariableSet struct {
 		ID          id.ID              `json:"id"`
 		Name        string             `json:"name"`
 		Description string             `json:"description"`
 		CreatedAt   string             `json:"createdAt"`
-		Values      []EnvironmentValue `json:"values"`
+		Values      []VariableSetValue `json:"values"`
 	}
 
-	EnvironmentValue struct {
+	VariableSetValue struct {
 		Key   string `json:"key"`
 		Value string `json:"value"`
 	}
 )
 
-func (e Environment) Validate() error {
+func (e VariableSet) Validate() error {
 	if e.Name == "" {
-		return fmt.Errorf("environment name cannot be empty")
+		return fmt.Errorf("variable set name cannot be empty")
 	}
 
 	for _, v := range e.Values {
 		if v.Key == "" {
-			return fmt.Errorf("environment value name cannot be empty")
+			return fmt.Errorf("variable set value name cannot be empty")
 		}
 	}
 
 	return nil
 }
 
-func (e Environment) HasID() bool {
+func (e VariableSet) HasID() bool {
 	return e.ID != ""
 }
 
-func (e Environment) GetID() id.ID {
+func (e VariableSet) GetID() id.ID {
 	return e.ID
 }
 
-func (e Environment) Slug() id.ID {
+func (e VariableSet) Slug() id.ID {
 	return id.ID(strings.ToLower(strings.ReplaceAll(strings.TrimSpace(e.Name), " ", "-")))
 }
 
-func (e Environment) Get(key string) string {
+func (e VariableSet) Get(key string) string {
 	for _, v := range e.Values {
 		if v.Key == key {
 			return v.Value
@@ -57,7 +57,7 @@ func (e Environment) Get(key string) string {
 	return ""
 }
 
-func (e Environment) Merge(env Environment) Environment {
+func (e VariableSet) Merge(env VariableSet) VariableSet {
 	values := make(map[string]string)
 	for _, variable := range e.Values {
 		values[variable.Key] = variable.Value
@@ -67,9 +67,9 @@ func (e Environment) Merge(env Environment) Environment {
 		values[variable.Key] = variable.Value
 	}
 
-	newValues := make([]EnvironmentValue, 0, len(values))
+	newValues := make([]VariableSetValue, 0, len(values))
 	for key, value := range values {
-		newValues = append(newValues, EnvironmentValue{
+		newValues = append(newValues, VariableSetValue{
 			Key:   key,
 			Value: value,
 		})

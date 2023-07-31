@@ -3,10 +3,10 @@ package executor
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 type TransactionPipeline struct {
@@ -28,10 +28,10 @@ func NewTransactionPipeline(
 	}
 }
 
-func (p *TransactionPipeline) Run(ctx context.Context, tran transaction.Transaction, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) transaction.TransactionRun {
+func (p *TransactionPipeline) Run(ctx context.Context, tran transaction.Transaction, metadata test.RunMetadata, variableSet variableset.VariableSet, requiredGates *[]testrunner.RequiredGate) transaction.TransactionRun {
 	tranRun := tran.NewRun()
 	tranRun.Metadata = metadata
-	tranRun.Environment = environment
+	tranRun.VariableSet = variableSet
 	tranRun.RequiredGates = requiredGates
 
 	tranRun, _ = p.runs.CreateRun(ctx, tranRun)

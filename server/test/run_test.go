@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -166,12 +166,12 @@ func TestRunRequiredGates(t *testing.T) {
 	t.Run("TestSpecGate", func(t *testing.T) {
 		gates := []testrunner.RequiredGate{testrunner.RequiredGateTestSpecs}
 		outputs := maps.Ordered[string, test.RunOutput]{}
-		environment := environment.Environment{}
+		variableSet := variableset.VariableSet{}
 		res := maps.Ordered[test.SpanQuery, []test.AssertionResult]{}
 		allPassed := false
 		run := test.Run{}.ConfigureRequiredGates(gates)
 
-		run = run.SuccessfullyAsserted(outputs, environment, res, allPassed)
+		run = run.SuccessfullyAsserted(outputs, variableSet, res, allPassed)
 
 		assert.Len(t, run.RequiredGatesResult.Required, 1)
 		assert.Equal(t, false, run.RequiredGatesResult.Passed)

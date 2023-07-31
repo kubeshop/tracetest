@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 type transactionRunRepository interface {
@@ -19,7 +19,7 @@ type transactionRunRepository interface {
 }
 
 type testRunner interface {
-	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
+	Run(context.Context, test.Test, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) test.Run
 }
 
 func NewTransactionRunner(
@@ -73,7 +73,7 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 			break
 		}
 
-		run.Environment = mergeOutputsIntoEnv(run.Environment, run.Steps[step].Outputs)
+		run.VariableSet = mergeOutputsIntoEnv(run.VariableSet, run.Steps[step].Outputs)
 		err = r.transactionRuns.UpdateRun(ctx, run)
 		if err != nil {
 			log.Printf("[TransactionRunner] could not update transaction step: %s", err.Error())
@@ -93,7 +93,7 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 }
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, testObj test.Test) (transaction.TransactionRun, error) {
-	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.Environment, tr.RequiredGates)
+	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.VariableSet, tr.RequiredGates)
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
 		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
@@ -148,10 +148,10 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr trans
 	return tr, nil
 }
 
-func mergeOutputsIntoEnv(env environment.Environment, outputs maps.Ordered[string, test.RunOutput]) environment.Environment {
-	newEnv := make([]environment.EnvironmentValue, 0, outputs.Len())
+func mergeOutputsIntoEnv(variableSet variableset.VariableSet, outputs maps.Ordered[string, test.RunOutput]) variableset.VariableSet {
+	newEnv := make([]variableset.VariableSetValue, 0, outputs.Len())
 	outputs.ForEach(func(key string, val test.RunOutput) error {
-		newEnv = append(newEnv, environment.EnvironmentValue{
+		newEnv = append(newEnv, variableset.VariableSetValue{
 			Key:   key,
 			Value: val.Value,
 		})
@@ -159,7 +159,7 @@ func mergeOutputsIntoEnv(env environment.Environment, outputs maps.Ordered[strin
 		return nil
 	})
 
-	return env.Merge(environment.Environment{
+	return variableSet.Merge(variableset.VariableSet{
 		Values: newEnv,
 	})
 }
