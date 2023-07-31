@@ -122,7 +122,7 @@ func TestCreateClient(t *testing.T) {
 		{
 			name: "Dynatrace",
 			ds: datastore.DataStore{
-				Type:   datastore.DataStoreTypeDynatrace,
+				Type:   datastore.DatastoreTypeDynatrace,
 				Values: datastore.DataStoreValues{},
 			},
 			expectedType: "*tracedb.OTLPTraceDB",
