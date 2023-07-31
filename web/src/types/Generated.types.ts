@@ -1373,7 +1373,8 @@ export interface external {
           | "awsxray"
           | "honeycomb"
           | "azureappinsights"
-          | "signoz";
+          | "signoz"
+          | "dynatrace";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
         /** @enum {string} */
