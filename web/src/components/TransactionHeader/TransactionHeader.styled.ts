@@ -1,7 +1,7 @@
 import {LeftOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
-import {Link as RRLink} from 'react-router-dom';
 import styled from 'styled-components';
+import RRLink from 'components/Link';
 
 export const BackIcon = styled(LeftOutlined)`
   cursor: pointer;
