@@ -33,7 +33,7 @@ const (
 	HONEYCOMB        SupportedDataStores = "honeycomb"
 	AZUREAPPINSIGHTS SupportedDataStores = "azureappinsights"
 	SIGNOZ           SupportedDataStores = "signoz"
-	DYNATRACE          SupportedDataStores = "dynatrace"
+	DYNATRACE        SupportedDataStores = "dynatrace"
 )
 
 // All allowed values of SupportedDataStores enum
