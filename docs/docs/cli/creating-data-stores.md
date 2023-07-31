@@ -121,6 +121,16 @@ spec:
   default: true
 ```
 
+### Dynatrace
+
+```yaml
+type: DataStore
+spec:
+  name: Dynatrace pipeline
+  type: dynatrace
+  default: true
+```
+
 ### Honeycomb
 
 ```yaml

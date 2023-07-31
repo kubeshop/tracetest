@@ -59,6 +59,7 @@ var dataStoreTypesMapping = map[datastore.DataStoreType]openapi.SupportedDataSto
 	datastore.DataStoreTypeAwsXRay:          openapi.AWSXRAY,
 	datastore.DataStoreTypeHoneycomb:        openapi.HONEYCOMB,
 	datastore.DatastoreTypeAzureAppInsights: openapi.AZUREAPPINSIGHTS,
+	datastore.DatastoreTypeDynatrace:        openapi.DYNATRACE,
 }
 
 func (m OpenAPI) DataStoreType(in datastore.DataStoreType) openapi.SupportedDataStores {

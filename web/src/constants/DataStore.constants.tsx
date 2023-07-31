@@ -14,6 +14,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.Honeycomb]: 'Honeycomb',
   [SupportedDataStores.AzureAppInsights]: 'Azure App Insights',
   [SupportedDataStores.Signoz]: 'Signoz',
+  [SupportedDataStores.Dynatrace]: 'Dynatrace',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -33,6 +34,8 @@ export const SupportedDataStoresToDocsLink = {
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
   [SupportedDataStores.Signoz]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/signoz',
+  [SupportedDataStores.Dynatrace]:
+    'https://docs.tracetest.io/configuration/connecting-to-data-stores/dynatrace',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
@@ -49,4 +52,5 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.Honeycomb]: '',
   [SupportedDataStores.AzureAppInsights]: '',
   [SupportedDataStores.Signoz]: '',
+  [SupportedDataStores.Dynatrace]: 'https://abc12345.live.dynatrace.com/api/v2/otlp',
 } as const;

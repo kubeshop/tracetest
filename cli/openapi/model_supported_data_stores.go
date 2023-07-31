@@ -33,6 +33,7 @@ const (
 	HONEYCOMB        SupportedDataStores = "honeycomb"
 	AZUREAPPINSIGHTS SupportedDataStores = "azureappinsights"
 	SIGNOZ           SupportedDataStores = "signoz"
+	DYNATRACE          SupportedDataStores = "dynatrace"
 )
 
 // All allowed values of SupportedDataStores enum
@@ -50,6 +51,7 @@ var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"honeycomb",
 	"azureappinsights",
 	"signoz",
+	"dynatrace",
 }
 
 func (v *SupportedDataStores) UnmarshalJSON(src []byte) error {

@@ -192,6 +192,11 @@ const sidebars = {
     },
     {
       type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-dynatrace",
+      label: "OpenTelemetry Demo and Dynatrace",
+    },
+    {
+      type: "doc",
       id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
       label: "Node.js and Honeycomb",
     },
@@ -309,6 +314,11 @@ const sidebars = {
               type: "doc",
               id: "configuration/connecting-to-data-stores/datadog",
               label: "Datadog",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/dynatrace",
+              label: "Dynatrace",
             },
             {
               type: "doc",

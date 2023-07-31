@@ -29,6 +29,7 @@ export enum SupportedDataStores {
   Honeycomb = 'honeycomb',
   AzureAppInsights = 'azureappinsights',
   Signoz = 'signoz',
+  Dynatrace = 'dynatrace'
 }
 
 export enum SupportedClientTypes {
@@ -41,7 +42,8 @@ export type TCollectorDataStores =
   | SupportedDataStores.OtelCollector
   | SupportedDataStores.Lightstep
   | SupportedDataStores.Datadog
-  | SupportedDataStores.Signoz;
+  | SupportedDataStores.Signoz
+  | SupportedDataStores.Dynatrace;
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
@@ -96,6 +98,7 @@ export type IDataStore = DataStore & {
   datadog?: TRawOtlpDataStore;
   honeycomb?: TRawOtlpDataStore;
   signoz?: TRawOtlpDataStore;
+  dynatrace?: TRawOtlpDataStore;
 };
 
 export type TDraftDataStore = {

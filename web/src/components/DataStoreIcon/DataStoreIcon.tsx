@@ -13,6 +13,7 @@ import AWSXRay from './Icons/AwsXRay';
 import Honeycomb from './Icons/Honeycomb';
 import AzureAppInsights from './Icons/AzureAppInsights';
 import Signoz from './Icons/Signoz';
+import Dynatrace from './Icons/Dynatrace';
 
 const iconMap = {
   [SupportedDataStores.JAEGER]: Jaeger,
@@ -28,6 +29,7 @@ const iconMap = {
   [SupportedDataStores.Honeycomb]: Honeycomb,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: Signoz,
+  [SupportedDataStores.Dynatrace]: Dynatrace,
 } as const;
 
 interface IProps {
