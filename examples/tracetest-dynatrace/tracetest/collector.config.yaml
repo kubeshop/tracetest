@@ -21,7 +21,7 @@ exporters:
     tls:
       insecure: true
   # OTLP for Dynatrace
-  otlp/dynatrace:
+  otlphttp/dynatrace:
     endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp
     headers:
       Authorization: "Api-Token dt0c01.sample.secret"  # Requires "openTelemetryTrace.ingest" permission
@@ -31,4 +31,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      exporters: [otlp/dynatrace,otlp/tracetest]
+      exporters: [otlphttp/dynatrace, otlp/tracetest]
