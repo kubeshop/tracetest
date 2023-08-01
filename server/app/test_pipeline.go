@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -15,6 +16,7 @@ import (
 )
 
 func buildTestPipeline(
+	pool *pgxpool.Pool,
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastore.Repository,
 	lintRepo *analyzer.Repository,
@@ -87,10 +89,10 @@ func buildTestPipeline(
 		WithRunGetter(runRepo)
 
 	pipeline := executor.NewPipeline(queueBuilder,
-		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
-		executor.PipelineStep{Processor: tracePoller, Driver: executor.NewInMemoryQueueDriver("tracePoller")},
-		executor.PipelineStep{Processor: linterRunner, Driver: executor.NewInMemoryQueueDriver("linterRunner")},
-		executor.PipelineStep{Processor: assertionRunner, Driver: executor.NewInMemoryQueueDriver("assertionRunner")},
+		executor.PipelineStep{Processor: runner, Driver: executor.NewPostgresQueueDriver(pool, "runner")},
+		executor.PipelineStep{Processor: tracePoller, Driver: executor.NewPostgresQueueDriver(pool, "tracePoller")},
+		executor.PipelineStep{Processor: linterRunner, Driver: executor.NewPostgresQueueDriver(pool, "linterRunner")},
+		executor.PipelineStep{Processor: assertionRunner, Driver: executor.NewPostgresQueueDriver(pool, "assertionRunner")},
 	)
 
 	pipeline.Start()

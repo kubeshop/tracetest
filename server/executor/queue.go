@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/kubeshop/tracetest/server/datastore"
@@ -426,51 +425,4 @@ func (q Queue) resolveDataStore(ctx context.Context, job Job) datastore.DataStor
 	}
 
 	return ds
-}
-
-func NewInMemoryQueueDriver(name string) *InMemoryQueueDriver {
-	return &InMemoryQueueDriver{
-		queue: make(chan Job),
-		exit:  make(chan bool),
-		name:  name,
-	}
-}
-
-type InMemoryQueueDriver struct {
-	queue chan Job
-	exit  chan bool
-	q     *Queue
-	name  string
-}
-
-func (r *InMemoryQueueDriver) SetQueue(q *Queue) {
-	r.q = q
-}
-
-func (r InMemoryQueueDriver) Enqueue(job Job) {
-	r.queue <- job
-}
-
-const inMemoryQueueWorkerCount = 5
-
-func (r InMemoryQueueDriver) Start() {
-	for i := 0; i < inMemoryQueueWorkerCount; i++ {
-		go func() {
-			log.Printf("[InMemoryQueueDriver - %s] start", r.name)
-			for {
-				select {
-				case <-r.exit:
-					log.Printf("[InMemoryQueueDriver - %s] exit", r.name)
-					return
-				case job := <-r.queue:
-					r.q.Listen(job)
-				}
-			}
-		}()
-	}
-}
-
-func (r InMemoryQueueDriver) Stop() {
-	log.Printf("[InMemoryQueueDriver - %s] stopping", r.name)
-	r.exit <- true
 }
