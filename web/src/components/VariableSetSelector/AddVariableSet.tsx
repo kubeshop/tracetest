@@ -4,7 +4,7 @@ const AddVariableSet = () => {
   return (
     <S.AddVarsContainer>
       <S.AddVarsIcon />
-      Create new variable set
+      Create variable set
     </S.AddVarsContainer>
   );
 };
