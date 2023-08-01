@@ -5,13 +5,13 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 var (
@@ -108,12 +108,12 @@ func (r Run) SuccessfullyPolledTraces(t *model.Trace) Run {
 
 func (r Run) SuccessfullyAsserted(
 	outputs maps.Ordered[string, RunOutput],
-	environment environment.Environment,
+	variableSet variableset.VariableSet,
 	res maps.Ordered[SpanQuery, []AssertionResult],
 	allPassed bool,
 ) Run {
 	r.Outputs = outputs
-	r.Environment = environment
+	r.VariableSet = variableSet
 	r.Results = &RunResults{
 		AllPassed: allPassed,
 		Results:   res,

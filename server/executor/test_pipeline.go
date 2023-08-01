@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -65,10 +65,10 @@ func NewTestPipeline(
 	}
 }
 
-func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, environment environment.Environment, requiredGates *[]testrunner.RequiredGate) test.Run {
+func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, variableSet variableset.VariableSet, requiredGates *[]testrunner.RequiredGate) test.Run {
 	run := test.NewRun()
 	run.Metadata = metadata
-	run.Environment = environment
+	run.VariableSet = variableSet
 
 	// configuring required gates
 	if requiredGates == nil {

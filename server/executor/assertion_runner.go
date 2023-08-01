@@ -7,12 +7,12 @@ import (
 	"log"
 
 	"github.com/kubeshop/tracetest/server/analytics"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 type defaultAssertionRunner struct {
@@ -112,7 +112,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 	}
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
-		Values: req.Run.Environment.Values,
+		Values: req.Run.VariableSet.Values,
 	}}
 
 	outputs, err := e.outputsProcessor(ctx, req.Test.Outputs, *run.Trace, ds)
@@ -121,9 +121,9 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 	}
 	e.validateOutputResolution(ctx, req, outputs)
 
-	newEnvironment := createEnvironment(req.Run.Environment, outputs)
+	newVariableSet := createVariableSet(req.Run.VariableSet, outputs)
 
-	ds = []expression.DataStore{expression.EnvironmentDataStore{Values: newEnvironment.Values}}
+	ds = []expression.DataStore{expression.EnvironmentDataStore{Values: newVariableSet.Values}}
 
 	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace, ds)
 
@@ -131,7 +131,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 
 	run = run.SuccessfullyAsserted(
 		outputs,
-		newEnvironment,
+		newVariableSet,
 		assertionResult,
 		allPassed,
 	)
@@ -174,10 +174,10 @@ func (e *defaultAssertionRunner) emitFailedAssertions(ctx context.Context, req J
 	}
 }
 
-func createEnvironment(env environment.Environment, outputs maps.Ordered[string, test.RunOutput]) environment.Environment {
-	outputVariables := make([]environment.EnvironmentValue, 0)
+func createVariableSet(env variableset.VariableSet, outputs maps.Ordered[string, test.RunOutput]) variableset.VariableSet {
+	outputVariables := make([]variableset.VariableSetValue, 0)
 	outputs.ForEach(func(key string, val test.RunOutput) error {
-		outputVariables = append(outputVariables, environment.EnvironmentValue{
+		outputVariables = append(outputVariables, variableset.VariableSetValue{
 			Key:   val.Name,
 			Value: val.Value,
 		})
@@ -185,7 +185,7 @@ func createEnvironment(env environment.Environment, outputs maps.Ordered[string,
 		return nil
 	})
 
-	outputEnv := environment.Environment{Values: outputVariables}
+	outputEnv := variableset.VariableSet{Values: outputVariables}
 
 	return env.Merge(outputEnv)
 }

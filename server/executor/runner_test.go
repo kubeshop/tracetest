@@ -8,7 +8,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
@@ -20,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -107,7 +107,7 @@ func (f runnerFixture) run(tests []test.Test, ttl time.Duration) {
 	f.runner.Start()
 	time.Sleep(10 * time.Millisecond)
 	for _, testObj := range tests {
-		newRun := f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{}, nil)
+		newRun := f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, variableset.VariableSet{}, nil)
 		// readd this when using not-in-memory queues
 		// f.runsMock.
 		// 	On("GetRun", testObj.ID, newRun.ID).

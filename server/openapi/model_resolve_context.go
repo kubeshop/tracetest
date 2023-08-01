@@ -18,7 +18,7 @@ type ResolveContext struct {
 
 	Selector string `json:"selector,omitempty"`
 
-	EnvironmentId string `json:"environmentId,omitempty"`
+	VariableSetId string `json:"variableSetId,omitempty"`
 }
 
 // AssertResolveContextRequired checks if the required fields are not zero-ed

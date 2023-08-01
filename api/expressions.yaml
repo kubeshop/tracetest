@@ -20,7 +20,7 @@ components:
           type: string
         selector:
           type: string
-        environmentId:
+        variableSetId:
           type: string
     ResolveResponseInfo:
       type: object

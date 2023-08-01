@@ -45,7 +45,7 @@ type TestRun struct {
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
 
-	Environment Environment `json:"environment,omitempty"`
+	VariableSet VariableSet `json:"variableSet,omitempty"`
 
 	TriggerResult TriggerResult `json:"triggerResult,omitempty"`
 
@@ -68,7 +68,7 @@ type TestRun struct {
 
 // AssertTestRunRequired checks if the required fields are not zero-ed
 func AssertTestRunRequired(obj TestRun) error {
-	if err := AssertEnvironmentRequired(obj.Environment); err != nil {
+	if err := AssertVariableSetRequired(obj.VariableSet); err != nil {
 		return err
 	}
 	if err := AssertTriggerResultRequired(obj.TriggerResult); err != nil {

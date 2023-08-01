@@ -1,4 +1,4 @@
-package environment_test
+package variableset_test
 
 import (
 	"context"
@@ -7,56 +7,56 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	rmtests "github.com/kubeshop/tracetest/server/resourcemanager/testutil"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/require"
 )
 
-func TestEnvironmentRepository(t *testing.T) {
-	sampleEnvironment := environment.Environment{
+func TestVariableSetRepository(t *testing.T) {
+	sampleVariableSet := variableset.VariableSet{
 		ID:          "dev",
 		Name:        "dev",
 		Description: "dev variables",
 		CreatedAt:   time.Now().UTC().Format(time.RFC3339Nano),
-		Values: []environment.EnvironmentValue{
+		Values: []variableset.VariableSetValue{
 			{Key: "URL", Value: "http://dev-app.com"},
 		},
 	}
 
-	secondEnvironment := environment.Environment{
+	secondVariableSet := variableset.VariableSet{
 		ID:          "new-dev",
 		Name:        "new dev",
 		Description: "new dev variables",
 		CreatedAt:   time.Now().UTC().Format(time.RFC3339Nano),
-		Values: []environment.EnvironmentValue{
+		Values: []variableset.VariableSetValue{
 			{Key: "URL", Value: "http://dev-app.com"},
 			{Key: "AUTH", Value: "user:pass"},
 		},
 	}
 
-	thirdEnvironment := environment.Environment{
+	thirdVariableSet := variableset.VariableSet{
 		ID:          "stg",
 		Name:        "staging",
 		Description: "staging variables",
 		CreatedAt:   time.Now().UTC().Format(time.RFC3339Nano),
-		Values: []environment.EnvironmentValue{
+		Values: []variableset.VariableSetValue{
 			{Key: "URL", Value: "http://stg-app.com"},
 			{Key: "AUTH", Value: "user:pass"},
 		},
 	}
 
 	resourceTypeTest := rmtests.ResourceTypeTest{
-		ResourceTypeSingular: environment.ResourceName,
-		ResourceTypePlural:   environment.ResourceNamePlural,
+		ResourceTypeSingular: variableset.ResourceName,
+		ResourceTypePlural:   variableset.ResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
-			environmentRepository := environment.NewRepository(db)
+			variableSetRepository := variableset.NewRepository(db)
 
-			manager := resourcemanager.New[environment.Environment](
-				environment.ResourceName,
-				environment.ResourceNamePlural,
-				environmentRepository,
+			manager := resourcemanager.New[variableset.VariableSet](
+				variableset.ResourceName,
+				variableset.ResourceNamePlural,
+				variableSetRepository,
 				resourcemanager.WithIDGen(id.GenerateID),
 			)
 			manager.RegisterRoutes(router)
@@ -64,21 +64,21 @@ func TestEnvironmentRepository(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			environmentRepository := manager.Handler().(*environment.Repository)
+			variableSetRepository := manager.Handler().(*variableset.Repository)
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
 				rmtests.OperationDeleteSuccess,
 				rmtests.OperationListSuccess:
-				environmentRepository.Create(context.TODO(), sampleEnvironment)
+				variableSetRepository.Create(context.TODO(), sampleVariableSet)
 			case rmtests.OperationListSortSuccess:
-				environmentRepository.Create(context.TODO(), sampleEnvironment)
-				environmentRepository.Create(context.TODO(), secondEnvironment)
-				environmentRepository.Create(context.TODO(), thirdEnvironment)
+				variableSetRepository.Create(context.TODO(), sampleVariableSet)
+				variableSetRepository.Create(context.TODO(), secondVariableSet)
+				variableSetRepository.Create(context.TODO(), thirdVariableSet)
 			}
 		},
 		SampleJSON: `{
-			"type": "Environment",
+			"type": "VariableSet",
 			"spec": {
 				"id": "dev",
 				"name": "dev",
@@ -89,7 +89,7 @@ func TestEnvironmentRepository(t *testing.T) {
 			}
 		}`,
 		SampleJSONUpdated: `{
-			"type": "Environment",
+			"type": "VariableSet",
 			"spec": {
 				"id": "dev",
 				"name": "new-dev",
@@ -102,10 +102,10 @@ func TestEnvironmentRepository(t *testing.T) {
 		}`,
 	}
 
-	rmtests.TestResourceType(t, resourceTypeTest, rmtests.JSONComparer(environmentJSONComparer))
+	rmtests.TestResourceType(t, resourceTypeTest, rmtests.JSONComparer(VariableSetJSONComparer))
 }
 
-func environmentJSONComparer(t require.TestingT, operation rmtests.Operation, firstValue, secondValue string) {
+func VariableSetJSONComparer(t require.TestingT, operation rmtests.Operation, firstValue, secondValue string) {
 	expected := rmtests.RemoveFieldFromJSONResource("createdAt", firstValue)
 	obtained := rmtests.RemoveFieldFromJSONResource("createdAt", secondValue)
 

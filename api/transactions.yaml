@@ -75,8 +75,8 @@ components:
           type: array
           items:
             $ref: "./tests.yaml#/components/schemas/TestRun"
-        environment:
-          $ref: "./environments.yaml#/components/schemas/Environment"
+        variableSet:
+          $ref: "./variableSets.yaml#/components/schemas/VariableSet"
         metadata:
           type: object
           additionalProperties:

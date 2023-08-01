@@ -1,4 +1,4 @@
-package environment
+package variableset
 
 import (
 	"context"
@@ -25,7 +25,7 @@ type scanner interface {
 
 const (
 	insertQuery = `
-		INSERT INTO environments (
+		INSERT INTO variable_sets (
 			"id",
 			"name",
 			"description",
@@ -35,7 +35,7 @@ const (
 		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	updateQuery = `
-		UPDATE environments SET
+		UPDATE variable_sets SET
 			"name" = $2,
 			"description" = $3,
 			"created_at" = $4,
@@ -50,17 +50,17 @@ const (
 		e.description,
 		e.created_at,
 		e.values
-	FROM environments e
+	FROM variable_sets e
 `
 
-	deleteQuery = "DELETE FROM environments WHERE id = $1"
+	deleteQuery = "DELETE FROM variable_sets WHERE id = $1"
 
 	idExistsQuery = `
-		SELECT COUNT(*) > 0 as exists FROM environments WHERE id = $1
+		SELECT COUNT(*) > 0 as exists FROM variable_sets WHERE id = $1
 	`
 
 	countQuery = `
-		SELECT COUNT(*) FROM environments e
+		SELECT COUNT(*) FROM variable_sets e
 	`
 )
 
@@ -68,31 +68,31 @@ func (*Repository) SortingFields() []string {
 	return []string{"name", "createdAt"}
 }
 
-func (r *Repository) SetID(environment Environment, id id.ID) Environment {
-	environment.ID = id
-	return environment
+func (r *Repository) SetID(variableSet VariableSet, id id.ID) VariableSet {
+	variableSet.ID = id
+	return variableSet
 }
 
-func (r *Repository) Create(ctx context.Context, environment Environment) (Environment, error) {
-	if !environment.HasID() {
-		environment.ID = environment.Slug()
+func (r *Repository) Create(ctx context.Context, variableSet VariableSet) (VariableSet, error) {
+	if !variableSet.HasID() {
+		variableSet.ID = variableSet.Slug()
 	}
 
-	environment.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
-	return r.insertIntoEnvironments(ctx, environment)
+	variableSet.CreatedAt = time.Now().UTC().Format(time.RFC3339Nano)
+	return r.insertIntoEnvironments(ctx, variableSet)
 }
 
-func (r *Repository) Update(ctx context.Context, environment Environment) (Environment, error) {
-	oldEnvironment, err := r.Get(ctx, environment.ID)
+func (r *Repository) Update(ctx context.Context, variableSet VariableSet) (VariableSet, error) {
+	oldEnvironment, err := r.Get(ctx, variableSet.ID)
 	if err != nil {
-		return Environment{}, err
+		return VariableSet{}, err
 	}
 
 	// keep the same creation date to keep sort order
-	environment.CreatedAt = oldEnvironment.CreatedAt
-	environment.ID = oldEnvironment.ID
+	variableSet.CreatedAt = oldEnvironment.CreatedAt
+	variableSet.ID = oldEnvironment.ID
 
-	return r.updateIntoEnvironments(ctx, environment, oldEnvironment.ID)
+	return r.updateIntoEnvironments(ctx, variableSet, oldEnvironment.ID)
 }
 
 func (r *Repository) Delete(ctx context.Context, id id.ID) error {
@@ -130,7 +130,7 @@ func listQuery(baseSQL, query string, params []any) (string, []any) {
 	return sql, params
 }
 
-func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]Environment, error) {
+func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]VariableSet, error) {
 	if take == 0 {
 		take = 20
 	}
@@ -148,43 +148,43 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 	sql, params = sqlutil.Tenant(ctx, sql, params...)
 	stmt, err := r.db.Prepare(sql)
 	if err != nil {
-		return []Environment{}, err
+		return []VariableSet{}, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
-		return []Environment{}, err
+		return []VariableSet{}, err
 	}
 
-	environments := []Environment{}
+	variableSets := []VariableSet{}
 
 	for rows.Next() {
-		environment, err := r.readEnvironmentRow(ctx, rows)
+		variableSet, err := r.readEnvironmentRow(ctx, rows)
 		if err != nil {
-			return []Environment{}, err
+			return []VariableSet{}, err
 		}
 
-		environments = append(environments, environment)
+		variableSets = append(variableSets, variableSet)
 	}
 
-	return environments, nil
+	return variableSets, nil
 }
 
 func (r *Repository) Count(ctx context.Context, query string) (int, error) {
 	return r.countEnvironments(ctx, query)
 }
 
-func (r *Repository) Get(ctx context.Context, id id.ID) (Environment, error) {
+func (r *Repository) Get(ctx context.Context, id id.ID) (VariableSet, error) {
 	query, params := sqlutil.Tenant(ctx, getQuery+" WHERE e.id = $1", id)
 	row := r.db.QueryRowContext(ctx, query, params...)
 
-	environment, err := r.readEnvironmentRow(ctx, row)
+	variableSet, err := r.readEnvironmentRow(ctx, row)
 	if err != nil {
-		return Environment{}, err
+		return VariableSet{}, err
 	}
 
-	return environment, nil
+	return variableSet, nil
 }
 
 func (r *Repository) Exists(ctx context.Context, id id.ID) (bool, error) {
@@ -198,32 +198,32 @@ func (r *Repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 	return exists, err
 }
 
-func (r *Repository) readEnvironmentRow(ctx context.Context, row scanner) (Environment, error) {
-	environment := Environment{}
+func (r *Repository) readEnvironmentRow(ctx context.Context, row scanner) (VariableSet, error) {
+	variableSet := VariableSet{}
 
 	var (
 		jsonValues []byte
 	)
 	err := row.Scan(
-		&environment.ID,
-		&environment.Name,
-		&environment.Description,
-		&environment.CreatedAt,
+		&variableSet.ID,
+		&variableSet.Name,
+		&variableSet.Description,
+		&variableSet.CreatedAt,
 		&jsonValues,
 	)
 
 	switch err {
 	case sql.ErrNoRows:
-		return Environment{}, err
+		return VariableSet{}, err
 	case nil:
-		err = json.Unmarshal(jsonValues, &environment.Values)
+		err = json.Unmarshal(jsonValues, &variableSet.Values)
 		if err != nil {
-			return Environment{}, fmt.Errorf("cannot parse environment: %w", err)
+			return VariableSet{}, fmt.Errorf("cannot parse variableSet: %w", err)
 		}
 
-		return environment, nil
+		return variableSet, nil
 	default:
-		return Environment{}, err
+		return VariableSet{}, err
 	}
 }
 
@@ -247,52 +247,52 @@ func (r *Repository) countEnvironments(ctx context.Context, query string) (int, 
 	return count, nil
 }
 
-func (r *Repository) insertIntoEnvironments(ctx context.Context, environment Environment) (Environment, error) {
+func (r *Repository) insertIntoEnvironments(ctx context.Context, variableSet VariableSet) (VariableSet, error) {
 	stmt, err := r.db.Prepare(insertQuery)
 	if err != nil {
-		return Environment{}, fmt.Errorf("sql prepare: %w", err)
+		return VariableSet{}, fmt.Errorf("sql prepare: %w", err)
 	}
 	defer stmt.Close()
 
-	jsonValues, err := json.Marshal(environment.Values)
+	jsonValues, err := json.Marshal(variableSet.Values)
 	if err != nil {
-		return Environment{}, fmt.Errorf("encoding error: %w", err)
+		return VariableSet{}, fmt.Errorf("encoding error: %w", err)
 	}
 
 	tenantID := sqlutil.TenantID(ctx)
 
 	_, err = stmt.ExecContext(
 		ctx,
-		environment.ID,
-		environment.Name,
-		environment.Description,
-		environment.CreatedAt,
+		variableSet.ID,
+		variableSet.Name,
+		variableSet.Description,
+		variableSet.CreatedAt,
 		jsonValues,
 		tenantID,
 	)
 
 	if err != nil {
-		return Environment{}, fmt.Errorf("sql exec: %w", err)
+		return VariableSet{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	return environment, nil
+	return variableSet, nil
 }
 
-func (r *Repository) updateIntoEnvironments(ctx context.Context, environment Environment, oldId id.ID) (Environment, error) {
-	jsonValues, err := json.Marshal(environment.Values)
+func (r *Repository) updateIntoEnvironments(ctx context.Context, variableSet VariableSet, oldId id.ID) (VariableSet, error) {
+	jsonValues, err := json.Marshal(variableSet.Values)
 	if err != nil {
-		return Environment{}, fmt.Errorf("encoding error: %w", err)
+		return VariableSet{}, fmt.Errorf("encoding error: %w", err)
 	}
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return Environment{}, err
+		return VariableSet{}, err
 	}
 	defer tx.Rollback()
 
 	query, params := sqlutil.Tenant(ctx, updateQuery, oldId,
-		environment.Name,
-		environment.Description,
-		environment.CreatedAt,
+		variableSet.Name,
+		variableSet.Description,
+		variableSet.CreatedAt,
 		jsonValues,
 	)
 
@@ -302,18 +302,18 @@ func (r *Repository) updateIntoEnvironments(ctx context.Context, environment Env
 		params...,
 	)
 	if err != nil {
-		return Environment{}, fmt.Errorf("sql exec: %w", err)
+		return VariableSet{}, fmt.Errorf("sql exec: %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return Environment{}, fmt.Errorf("commit: %w", err)
+		return VariableSet{}, fmt.Errorf("commit: %w", err)
 	}
 
-	return environment, nil
+	return variableSet, nil
 }
 
-func (r *Repository) Provision(ctx context.Context, environment Environment) error {
-	_, err := r.Create(ctx, environment)
+func (r *Repository) Provision(ctx context.Context, variableSet VariableSet) error {
+	_, err := r.Create(ctx, variableSet)
 	return err
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
@@ -15,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -47,7 +47,7 @@ func (m OpenAPI) TransactionRun(in transaction.TransactionRun) openapi.Transacti
 		State:                       string(in.State),
 		Steps:                       steps,
 		Metadata:                    in.Metadata,
-		Environment:                 m.Environment(in.Environment),
+		VariableSet:                 m.VariableSet(in.VariableSet),
 		Pass:                        int32(in.Pass),
 		Fail:                        int32(in.Fail),
 		AllStepsRequiredGatesPassed: in.AllStepsRequiredGatesPassed,
@@ -77,19 +77,19 @@ func (m OpenAPI) Test(in test.Test) openapi.Test {
 }
 
 // TODO: after migrating tests and transactions, we can remove this
-func (m OpenAPI) Environment(in environment.Environment) openapi.Environment {
-	return openapi.Environment{
+func (m OpenAPI) VariableSet(in variableset.VariableSet) openapi.VariableSet {
+	return openapi.VariableSet{
 		Id:          in.ID.String(),
 		Name:        in.Name,
 		Description: in.Description,
-		Values:      m.EnvironmentValues(in.Values),
+		Values:      m.VariableSetValues(in.Values),
 	}
 }
 
-func (m OpenAPI) EnvironmentValues(in []environment.EnvironmentValue) []openapi.EnvironmentValue {
-	values := make([]openapi.EnvironmentValue, len(in))
+func (m OpenAPI) VariableSetValues(in []variableset.VariableSetValue) []openapi.VariableSetValue {
+	values := make([]openapi.VariableSetValue, len(in))
 	for i, v := range in {
-		values[i] = openapi.EnvironmentValue{Key: v.Key, Value: v.Value}
+		values[i] = openapi.VariableSetValue{Key: v.Key, Value: v.Value}
 	}
 
 	return values
@@ -139,10 +139,10 @@ func (m OpenAPI) Tests(in []test.Test) []openapi.Test {
 	return tests
 }
 
-func (m OpenAPI) Environments(in []environment.Environment) []openapi.Environment {
-	environments := make([]openapi.Environment, len(in))
+func (m OpenAPI) VariableSets(in []variableset.VariableSet) []openapi.VariableSet {
+	environments := make([]openapi.VariableSet, len(in))
 	for i, t := range in {
-		environments[i] = m.Environment(t)
+		environments[i] = m.VariableSet(t)
 	}
 
 	return environments
@@ -285,7 +285,7 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		Result:                    m.Result(in.Results),
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
-		Environment:               m.Environment(in.Environment),
+		VariableSet:               m.VariableSet(in.VariableSet),
 		TransactionId:             in.TransactionID,
 		TransactionRunId:          in.TransactionRunID,
 		Linter:                    m.LinterResult(in.Linter),
@@ -412,7 +412,7 @@ func (m Model) Run(in openapi.TestRun) (*test.Run, error) {
 		Results:                   result,
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
-		Environment:               m.Environment(in.Environment),
+		VariableSet:               m.VariableSet(in.VariableSet),
 	}, nil
 }
 
@@ -500,19 +500,19 @@ func (m Model) Runs(in []openapi.TestRun) ([]test.Run, error) {
 	return runs, nil
 }
 
-func (m Model) Environment(in openapi.Environment) environment.Environment {
-	return environment.Environment{
+func (m Model) VariableSet(in openapi.VariableSet) variableset.VariableSet {
+	return variableset.VariableSet{
 		ID:          id.ID(in.Id),
 		Name:        in.Name,
 		Description: in.Description,
-		Values:      m.EnvironmentValue(in.Values),
+		Values:      m.VariableSetValue(in.Values),
 	}
 }
 
-func (m Model) EnvironmentValue(in []openapi.EnvironmentValue) []environment.EnvironmentValue {
-	values := make([]environment.EnvironmentValue, len(in))
+func (m Model) VariableSetValue(in []openapi.VariableSetValue) []variableset.VariableSetValue {
+	values := make([]variableset.VariableSetValue, len(in))
 	for i, h := range in {
-		values[i] = environment.EnvironmentValue{Key: h.Key, Value: h.Value}
+		values[i] = variableset.VariableSetValue{Key: h.Key, Value: h.Value}
 	}
 
 	return values

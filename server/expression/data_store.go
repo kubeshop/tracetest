@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 type DataStore interface {
@@ -85,7 +85,7 @@ func (ds VariableDataStore) Get(name string) (string, error) {
 }
 
 type EnvironmentDataStore struct {
-	Values []environment.EnvironmentValue
+	Values []variableset.VariableSetValue
 }
 
 func (ds EnvironmentDataStore) Source() string {
