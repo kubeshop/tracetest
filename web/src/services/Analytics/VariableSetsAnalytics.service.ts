@@ -2,8 +2,8 @@ import {Categories, Labels} from 'constants/Analytics.constants';
 import AnalyticsService from './Analytics.service';
 
 export enum Actions {
-  CreateVariableSetClick = 'create-VariableSet-button-click',
-  VariableSetClick = 'VariableSet-click',
+  CreateVariableSetClick = 'create-variableSet-button-click',
+  VariableSetClick = 'variableSet-click',
 }
 
 type TVariableSetsAnalytics = {
