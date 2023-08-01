@@ -171,18 +171,18 @@ export interface paths {
     delete: operations["deleteDataStore"];
   };
   "/variableSets": {
-    /** List variableSets available in Tracetest. */
+    /** List VariableSets available in Tracetest. */
     get: operations["listVariableSets"];
-    /** Create an VariableSet that can be used by tests and transactions */
+    /** Create a VariableSet that can be used by tests and transactions */
     post: operations["createVariableSet"];
   };
   "/variableSets/{variableSetId}": {
     /** Get one VariableSet by its id */
     get: operations["getVariableSet"];
-    /** Update an VariableSet used on Tracetest */
+    /** Update a VariableSet used on Tracetest */
     put: operations["updateVariableSet"];
-    /** Delete an VariableSet from Tracetest */
-    delete: operations["deleteVariableSet"];
+    /** Delete an environment from Tracetest */
+    delete: operations["deleteEnvironment"];
   };
   "/version": {
     /** Get the version of the API */
@@ -924,7 +924,7 @@ export interface operations {
       204: never;
     };
   };
-  /** List variableSets available in Tracetest. */
+  /** List VariableSets available in Tracetest. */
   listVariableSets: {
     parameters: {};
     responses: {
@@ -944,7 +944,7 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Create an VariableSet that can be used by tests and transactions */
+  /** Create a VariableSet that can be used by tests and transactions */
   createVariableSet: {
     responses: {
       /** successful operation */
@@ -981,7 +981,7 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Update an VariableSet used on Tracetest */
+  /** Update a VariableSet used on Tracetest */
   updateVariableSet: {
     parameters: {};
     responses: {
@@ -1006,8 +1006,8 @@ export interface operations {
       };
     };
   };
-  /** Delete an VariableSet from Tracetest */
-  deleteVariableSet: {
+  /** Delete an environment from Tracetest */
+  deleteEnvironment: {
     parameters: {};
     responses: {
       /** successful operation */
@@ -1016,7 +1016,7 @@ export interface operations {
       400: unknown;
       /** VariableSet not found */
       404: unknown;
-      /** problem deleting an VariableSet */
+      /** problem deleting an environment */
       500: unknown;
     };
   };
@@ -1601,7 +1601,7 @@ export interface external {
         pollingProfileId: string;
         /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
         dataStoreId: string;
-        /** @description ID of an VariableSet used on Tracetest to inject values into tests and transactions */
+        /** @description ID of a VariableSet used on Tracetest to inject values into tests and transactions */
         variableSetId: string;
         /** @description ID of an Linter */
         LinterId: string;
@@ -2026,7 +2026,7 @@ export interface external {
           count?: number;
           items?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetResource"][];
         };
-        /** @description Represents an VariableSet structured into the Resources format. */
+        /** @description Represents a VariableSet structured into the Resources format. */
         VariableSetResource: {
           /**
            * @description Represents the type of this resource. It should always be set as 'VariableSet'.
