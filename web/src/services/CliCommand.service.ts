@@ -46,7 +46,7 @@ const CliCommandService = () => ({
       return enabled ? `${command} --server-url ${baseUrl}` : command;
     },
     [CliCommandOption.UseCurrentVariableSet]: ({command, enabled, variableSetId}) =>
-      enabled && variableSetId ? `${command} --variable_set ${variableSetId}` : command,
+      enabled && variableSetId ? `${command} --vars ${variableSetId}` : command,
     [CliCommandOption.GeneratesJUnit]: ({command, enabled}) => (enabled ? `${command} --junit result.junit` : command),
     [CliCommandOption.useDocker]: ({enabled, command}) =>
       `${

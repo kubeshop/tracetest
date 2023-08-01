@@ -63,7 +63,7 @@ func TestRunTestWithHttpTriggerAndVariableSetFile(t *testing.T) {
 		environmentFile := env.GetTestResourcePath(t, "variableSet-file")
 		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
 
-		command := fmt.Sprintf("run test -f %s --variable-set %s", testFile, environmentFile)
+		command := fmt.Sprintf("run test -f %s --vars %s", testFile, environmentFile)
 		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
@@ -112,7 +112,7 @@ func TestRunTestWithHttpTriggerAndVariableSetFile(t *testing.T) {
 
 		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
 
-		command := fmt.Sprintf("run test -f %s --variable-set pokeapi-env", testFile)
+		command := fmt.Sprintf("run test -f %s --vars pokeapi-env", testFile)
 		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")

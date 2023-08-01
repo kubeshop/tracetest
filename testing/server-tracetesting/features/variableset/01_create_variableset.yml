@@ -36,7 +36,7 @@ spec:
         - attr:tracetest.response.status = 201
         # ensure we can reference outputs declared in the same test
         - attr:tracetest.response.body | json_path '$.spec.id' = env:VARIABLE_SET_ID
-    - selector: span[name="POST /api/variableset" tracetest.span.type="http"]
+    - selector: span[name="POST /api/variablesets" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count  =  1
     - selector: span[name = "exec INSERT"]
@@ -44,7 +44,7 @@ spec:
         - attr:tracetest.selected_spans.count = 1
     - selector: span[name = "exec INSERT"]:first
       assertions:
-        - attr:sql.query contains "INSERT INTO variablesets"
+        - attr:sql.query contains "INSERT INTO variable_sets"
   outputs:
     - name: VARIABLE_SET_ID
       selector: span[name = "Tracetest trigger"]
