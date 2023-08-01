@@ -26,7 +26,7 @@ type TransactionRun struct {
 	CompletedAt                 *time.Time         `json:"completedAt,omitempty"`
 	State                       *string            `json:"state,omitempty"`
 	Steps                       []TestRun          `json:"steps,omitempty"`
-	Environment                 *Environment       `json:"environment,omitempty"`
+	VariableSet                 *VariableSet       `json:"variableSet,omitempty"`
 	Metadata                    *map[string]string `json:"metadata,omitempty"`
 	Pass                        *int32             `json:"pass,omitempty"`
 	Fail                        *int32             `json:"fail,omitempty"`
@@ -242,36 +242,36 @@ func (o *TransactionRun) SetSteps(v []TestRun) {
 	o.Steps = v
 }
 
-// GetEnvironment returns the Environment field value if set, zero value otherwise.
-func (o *TransactionRun) GetEnvironment() Environment {
-	if o == nil || isNil(o.Environment) {
-		var ret Environment
+// GetVariableSet returns the VariableSet field value if set, zero value otherwise.
+func (o *TransactionRun) GetVariableSet() VariableSet {
+	if o == nil || isNil(o.VariableSet) {
+		var ret VariableSet
 		return ret
 	}
-	return *o.Environment
+	return *o.VariableSet
 }
 
-// GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
+// GetVariableSetOk returns a tuple with the VariableSet field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TransactionRun) GetEnvironmentOk() (*Environment, bool) {
-	if o == nil || isNil(o.Environment) {
+func (o *TransactionRun) GetVariableSetOk() (*VariableSet, bool) {
+	if o == nil || isNil(o.VariableSet) {
 		return nil, false
 	}
-	return o.Environment, true
+	return o.VariableSet, true
 }
 
-// HasEnvironment returns a boolean if a field has been set.
-func (o *TransactionRun) HasEnvironment() bool {
-	if o != nil && !isNil(o.Environment) {
+// HasVariableSet returns a boolean if a field has been set.
+func (o *TransactionRun) HasVariableSet() bool {
+	if o != nil && !isNil(o.VariableSet) {
 		return true
 	}
 
 	return false
 }
 
-// SetEnvironment gets a reference to the given Environment and assigns it to the Environment field.
-func (o *TransactionRun) SetEnvironment(v Environment) {
-	o.Environment = &v
+// SetVariableSet gets a reference to the given VariableSet and assigns it to the VariableSet field.
+func (o *TransactionRun) SetVariableSet(v VariableSet) {
+	o.VariableSet = &v
 }
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
@@ -426,8 +426,8 @@ func (o TransactionRun) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.Steps) {
 		toSerialize["steps"] = o.Steps
 	}
-	if !isNil(o.Environment) {
-		toSerialize["environment"] = o.Environment
+	if !isNil(o.VariableSet) {
+		toSerialize["variableSet"] = o.VariableSet
 	}
 	if !isNil(o.Metadata) {
 		toSerialize["metadata"] = o.Metadata

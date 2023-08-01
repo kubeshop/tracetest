@@ -1,12 +1,12 @@
 type: Test
 spec:
   id: TCkN6vwVRN
-  name: List Environment
-  description: Test step of 'Environment Feature - Test Suite'
+  name: List Variable Set
+  description: Test step of 'Variable Set Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/environments
+      url: ${env:TARGET_URL}/api/variablesets
       method: GET
       headers:
         - key: Content-Type
@@ -16,8 +16,8 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 200
-        - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains env:ENVIRONMENT_ID # check if the environment is listed
-    - selector: span[name="GET /api/environments" tracetest.span.type="http"]
+        - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains env:VARIABLE_SET_ID # check if the variable set is listed
+    - selector: span[name="GET /api/variablesets" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count   =   1
     - selector: span[name = "query SELECT"]

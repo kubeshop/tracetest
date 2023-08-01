@@ -14,36 +14,36 @@ import (
 	"encoding/json"
 )
 
-// checks if the Environment type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &Environment{}
+// checks if the VariableSet type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VariableSet{}
 
-// Environment struct for Environment
-type Environment struct {
+// VariableSet struct for VariableSet
+type VariableSet struct {
 	Id          *string            `json:"id,omitempty"`
 	Name        *string            `json:"name,omitempty"`
 	Description *string            `json:"description,omitempty"`
-	Values      []EnvironmentValue `json:"values,omitempty"`
+	Values      []VariableSetValue `json:"values,omitempty"`
 }
 
-// NewEnvironment instantiates a new Environment object
+// NewVariableSet instantiates a new VariableSet object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEnvironment() *Environment {
-	this := Environment{}
+func NewVariableSet() *VariableSet {
+	this := VariableSet{}
 	return &this
 }
 
-// NewEnvironmentWithDefaults instantiates a new Environment object
+// NewVariableSetWithDefaults instantiates a new VariableSet object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewEnvironmentWithDefaults() *Environment {
-	this := Environment{}
+func NewVariableSetWithDefaults() *VariableSet {
+	this := VariableSet{}
 	return &this
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *Environment) GetId() string {
+func (o *VariableSet) GetId() string {
 	if o == nil || isNil(o.Id) {
 		var ret string
 		return ret
@@ -53,7 +53,7 @@ func (o *Environment) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Environment) GetIdOk() (*string, bool) {
+func (o *VariableSet) GetIdOk() (*string, bool) {
 	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
@@ -61,7 +61,7 @@ func (o *Environment) GetIdOk() (*string, bool) {
 }
 
 // HasId returns a boolean if a field has been set.
-func (o *Environment) HasId() bool {
+func (o *VariableSet) HasId() bool {
 	if o != nil && !isNil(o.Id) {
 		return true
 	}
@@ -70,12 +70,12 @@ func (o *Environment) HasId() bool {
 }
 
 // SetId gets a reference to the given string and assigns it to the Id field.
-func (o *Environment) SetId(v string) {
+func (o *VariableSet) SetId(v string) {
 	o.Id = &v
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
-func (o *Environment) GetName() string {
+func (o *VariableSet) GetName() string {
 	if o == nil || isNil(o.Name) {
 		var ret string
 		return ret
@@ -85,7 +85,7 @@ func (o *Environment) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Environment) GetNameOk() (*string, bool) {
+func (o *VariableSet) GetNameOk() (*string, bool) {
 	if o == nil || isNil(o.Name) {
 		return nil, false
 	}
@@ -93,7 +93,7 @@ func (o *Environment) GetNameOk() (*string, bool) {
 }
 
 // HasName returns a boolean if a field has been set.
-func (o *Environment) HasName() bool {
+func (o *VariableSet) HasName() bool {
 	if o != nil && !isNil(o.Name) {
 		return true
 	}
@@ -102,12 +102,12 @@ func (o *Environment) HasName() bool {
 }
 
 // SetName gets a reference to the given string and assigns it to the Name field.
-func (o *Environment) SetName(v string) {
+func (o *VariableSet) SetName(v string) {
 	o.Name = &v
 }
 
 // GetDescription returns the Description field value if set, zero value otherwise.
-func (o *Environment) GetDescription() string {
+func (o *VariableSet) GetDescription() string {
 	if o == nil || isNil(o.Description) {
 		var ret string
 		return ret
@@ -117,7 +117,7 @@ func (o *Environment) GetDescription() string {
 
 // GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Environment) GetDescriptionOk() (*string, bool) {
+func (o *VariableSet) GetDescriptionOk() (*string, bool) {
 	if o == nil || isNil(o.Description) {
 		return nil, false
 	}
@@ -125,7 +125,7 @@ func (o *Environment) GetDescriptionOk() (*string, bool) {
 }
 
 // HasDescription returns a boolean if a field has been set.
-func (o *Environment) HasDescription() bool {
+func (o *VariableSet) HasDescription() bool {
 	if o != nil && !isNil(o.Description) {
 		return true
 	}
@@ -134,14 +134,14 @@ func (o *Environment) HasDescription() bool {
 }
 
 // SetDescription gets a reference to the given string and assigns it to the Description field.
-func (o *Environment) SetDescription(v string) {
+func (o *VariableSet) SetDescription(v string) {
 	o.Description = &v
 }
 
 // GetValues returns the Values field value if set, zero value otherwise.
-func (o *Environment) GetValues() []EnvironmentValue {
+func (o *VariableSet) GetValues() []VariableSetValue {
 	if o == nil || isNil(o.Values) {
-		var ret []EnvironmentValue
+		var ret []VariableSetValue
 		return ret
 	}
 	return o.Values
@@ -149,7 +149,7 @@ func (o *Environment) GetValues() []EnvironmentValue {
 
 // GetValuesOk returns a tuple with the Values field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Environment) GetValuesOk() ([]EnvironmentValue, bool) {
+func (o *VariableSet) GetValuesOk() ([]VariableSetValue, bool) {
 	if o == nil || isNil(o.Values) {
 		return nil, false
 	}
@@ -157,7 +157,7 @@ func (o *Environment) GetValuesOk() ([]EnvironmentValue, bool) {
 }
 
 // HasValues returns a boolean if a field has been set.
-func (o *Environment) HasValues() bool {
+func (o *VariableSet) HasValues() bool {
 	if o != nil && !isNil(o.Values) {
 		return true
 	}
@@ -165,12 +165,12 @@ func (o *Environment) HasValues() bool {
 	return false
 }
 
-// SetValues gets a reference to the given []EnvironmentValue and assigns it to the Values field.
-func (o *Environment) SetValues(v []EnvironmentValue) {
+// SetValues gets a reference to the given []VariableSetValue and assigns it to the Values field.
+func (o *VariableSet) SetValues(v []VariableSetValue) {
 	o.Values = v
 }
 
-func (o Environment) MarshalJSON() ([]byte, error) {
+func (o VariableSet) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -178,7 +178,7 @@ func (o Environment) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o Environment) ToMap() (map[string]interface{}, error) {
+func (o VariableSet) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Id) {
 		toSerialize["id"] = o.Id
@@ -195,38 +195,38 @@ func (o Environment) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableEnvironment struct {
-	value *Environment
+type NullableVariableSet struct {
+	value *VariableSet
 	isSet bool
 }
 
-func (v NullableEnvironment) Get() *Environment {
+func (v NullableVariableSet) Get() *VariableSet {
 	return v.value
 }
 
-func (v *NullableEnvironment) Set(val *Environment) {
+func (v *NullableVariableSet) Set(val *VariableSet) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableEnvironment) IsSet() bool {
+func (v NullableVariableSet) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableEnvironment) Unset() {
+func (v *NullableVariableSet) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableEnvironment(val *Environment) *NullableEnvironment {
-	return &NullableEnvironment{value: val, isSet: true}
+func NewNullableVariableSet(val *VariableSet) *NullableVariableSet {
+	return &NullableVariableSet{value: val, isSet: true}
 }
 
-func (v NullableEnvironment) MarshalJSON() ([]byte, error) {
+func (v NullableVariableSet) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableEnvironment) UnmarshalJSON(src []byte) error {
+func (v *NullableVariableSet) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

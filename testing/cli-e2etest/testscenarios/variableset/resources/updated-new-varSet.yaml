@@ -1,4 +1,4 @@
-type: Environment
+type: VariableSet
 spec:
   id: .env
   name: .env
@@ -6,4 +6,6 @@ spec:
   - key: FIRST_VAR
     value: some-value
   - key: SECOND_VAR
-    value: another_value
+    value: updated_value
+  - key: THIRD_VAR
+    value: hello

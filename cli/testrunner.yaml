@@ -1,0 +1,9 @@
+type: TestRunner
+spec:
+  id: current
+  name: default
+  requiredGates:
+  - test-specs
+  - analyzer-rules
+  - analyzer-score
+

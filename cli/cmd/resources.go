@@ -35,9 +35,9 @@ var (
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
-	environmentClient = resourcemanager.NewClient(
+	variableSetClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"environment", "environments",
+		"variableset", "variablesets",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
@@ -45,6 +45,7 @@ var (
 				{Header: "DESCRIPTION", Path: "spec.description"},
 			},
 		}),
+		resourcemanager.WithResourceType("VariableSet"),
 	)
 
 	testPreprocessor = preprocessor.Test(cliLogger)
@@ -228,7 +229,7 @@ var (
 				resourcemanager.WithResourceType("TestRunner"),
 			),
 		).
-		Register(environmentClient).
+		Register(variableSetClient).
 		Register(transactionClient).
 		Register(testClient)
 )

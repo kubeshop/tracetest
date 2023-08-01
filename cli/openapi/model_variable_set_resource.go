@@ -14,35 +14,35 @@ import (
 	"encoding/json"
 )
 
-// checks if the EnvironmentResource type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &EnvironmentResource{}
+// checks if the VariableSetResource type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VariableSetResource{}
 
-// EnvironmentResource Represents an environment structured into the Resources format.
-type EnvironmentResource struct {
-	// Represents the type of this resource. It should always be set as 'Environment'.
+// VariableSetResource Represents an VariableSet structured into the Resources format.
+type VariableSetResource struct {
+	// Represents the type of this resource. It should always be set as 'VariableSet'.
 	Type *string      `json:"type,omitempty"`
-	Spec *Environment `json:"spec,omitempty"`
+	Spec *VariableSet `json:"spec,omitempty"`
 }
 
-// NewEnvironmentResource instantiates a new EnvironmentResource object
+// NewVariableSetResource instantiates a new VariableSetResource object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEnvironmentResource() *EnvironmentResource {
-	this := EnvironmentResource{}
+func NewVariableSetResource() *VariableSetResource {
+	this := VariableSetResource{}
 	return &this
 }
 
-// NewEnvironmentResourceWithDefaults instantiates a new EnvironmentResource object
+// NewVariableSetResourceWithDefaults instantiates a new VariableSetResource object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewEnvironmentResourceWithDefaults() *EnvironmentResource {
-	this := EnvironmentResource{}
+func NewVariableSetResourceWithDefaults() *VariableSetResource {
+	this := VariableSetResource{}
 	return &this
 }
 
 // GetType returns the Type field value if set, zero value otherwise.
-func (o *EnvironmentResource) GetType() string {
+func (o *VariableSetResource) GetType() string {
 	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
@@ -52,7 +52,7 @@ func (o *EnvironmentResource) GetType() string {
 
 // GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *EnvironmentResource) GetTypeOk() (*string, bool) {
+func (o *VariableSetResource) GetTypeOk() (*string, bool) {
 	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
@@ -60,7 +60,7 @@ func (o *EnvironmentResource) GetTypeOk() (*string, bool) {
 }
 
 // HasType returns a boolean if a field has been set.
-func (o *EnvironmentResource) HasType() bool {
+func (o *VariableSetResource) HasType() bool {
 	if o != nil && !isNil(o.Type) {
 		return true
 	}
@@ -69,14 +69,14 @@ func (o *EnvironmentResource) HasType() bool {
 }
 
 // SetType gets a reference to the given string and assigns it to the Type field.
-func (o *EnvironmentResource) SetType(v string) {
+func (o *VariableSetResource) SetType(v string) {
 	o.Type = &v
 }
 
 // GetSpec returns the Spec field value if set, zero value otherwise.
-func (o *EnvironmentResource) GetSpec() Environment {
+func (o *VariableSetResource) GetSpec() VariableSet {
 	if o == nil || isNil(o.Spec) {
-		var ret Environment
+		var ret VariableSet
 		return ret
 	}
 	return *o.Spec
@@ -84,7 +84,7 @@ func (o *EnvironmentResource) GetSpec() Environment {
 
 // GetSpecOk returns a tuple with the Spec field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *EnvironmentResource) GetSpecOk() (*Environment, bool) {
+func (o *VariableSetResource) GetSpecOk() (*VariableSet, bool) {
 	if o == nil || isNil(o.Spec) {
 		return nil, false
 	}
@@ -92,7 +92,7 @@ func (o *EnvironmentResource) GetSpecOk() (*Environment, bool) {
 }
 
 // HasSpec returns a boolean if a field has been set.
-func (o *EnvironmentResource) HasSpec() bool {
+func (o *VariableSetResource) HasSpec() bool {
 	if o != nil && !isNil(o.Spec) {
 		return true
 	}
@@ -100,12 +100,12 @@ func (o *EnvironmentResource) HasSpec() bool {
 	return false
 }
 
-// SetSpec gets a reference to the given Environment and assigns it to the Spec field.
-func (o *EnvironmentResource) SetSpec(v Environment) {
+// SetSpec gets a reference to the given VariableSet and assigns it to the Spec field.
+func (o *VariableSetResource) SetSpec(v VariableSet) {
 	o.Spec = &v
 }
 
-func (o EnvironmentResource) MarshalJSON() ([]byte, error) {
+func (o VariableSetResource) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -113,7 +113,7 @@ func (o EnvironmentResource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o EnvironmentResource) ToMap() (map[string]interface{}, error) {
+func (o VariableSetResource) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Type) {
 		toSerialize["type"] = o.Type
@@ -124,38 +124,38 @@ func (o EnvironmentResource) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableEnvironmentResource struct {
-	value *EnvironmentResource
+type NullableVariableSetResource struct {
+	value *VariableSetResource
 	isSet bool
 }
 
-func (v NullableEnvironmentResource) Get() *EnvironmentResource {
+func (v NullableVariableSetResource) Get() *VariableSetResource {
 	return v.value
 }
 
-func (v *NullableEnvironmentResource) Set(val *EnvironmentResource) {
+func (v *NullableVariableSetResource) Set(val *VariableSetResource) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableEnvironmentResource) IsSet() bool {
+func (v NullableVariableSetResource) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableEnvironmentResource) Unset() {
+func (v *NullableVariableSetResource) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableEnvironmentResource(val *EnvironmentResource) *NullableEnvironmentResource {
-	return &NullableEnvironmentResource{value: val, isSet: true}
+func NewNullableVariableSetResource(val *VariableSetResource) *NullableVariableSetResource {
+	return &NullableVariableSetResource{value: val, isSet: true}
 }
 
-func (v NullableEnvironmentResource) MarshalJSON() ([]byte, error) {
+func (v NullableVariableSetResource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableEnvironmentResource) UnmarshalJSON(src []byte) error {
+func (v *NullableVariableSetResource) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

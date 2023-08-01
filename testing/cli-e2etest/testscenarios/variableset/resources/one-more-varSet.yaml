@@ -1,4 +1,4 @@
-type: Environment
+type: VariableSet
 spec:
   id: one-more-env
   name: one-more-env

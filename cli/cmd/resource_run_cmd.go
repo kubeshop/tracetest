@@ -35,13 +35,13 @@ func init() {
 			orchestrator := runner.Orchestrator(
 				cliLogger,
 				utils.GetAPIClient(cliConfig),
-				environmentClient,
+				variableSetClient,
 			)
 
 			runParams := runner.RunOptions{
 				ID:              runParams.ID,
 				DefinitionFile:  runParams.DefinitionFile,
-				EnvID:           runParams.EnvID,
+				VarsID:          runParams.VarsID,
 				SkipResultWait:  runParams.SkipResultWait,
 				JUnitOuptutFile: runParams.JUnitOuptutFile,
 				RequiredGates:   runParams.RequriedGates,
@@ -63,7 +63,7 @@ func init() {
 
 	runCmd.Flags().StringVarP(&runParams.DefinitionFile, "file", "f", "", "path to the definition file")
 	runCmd.Flags().StringVar(&runParams.ID, "id", "", "id of the resource to run")
-	runCmd.Flags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
+	runCmd.Flags().StringVarP(&runParams.VarsID, "variable-set", "e", "", "variable set file or ID to be used")
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
 	runCmd.Flags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
 	runCmd.Flags().StringSliceVar(&runParams.RequriedGates, "required-gates", []string{}, "override default required gate. "+validRequiredGatesMsg())
@@ -82,7 +82,7 @@ func validRequiredGatesMsg() string {
 type runParameters struct {
 	ID              string
 	DefinitionFile  string
-	EnvID           string
+	VarsID          string
 	SkipResultWait  bool
 	JUnitOuptutFile string
 	RequriedGates   []string

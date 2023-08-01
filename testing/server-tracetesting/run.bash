@@ -31,7 +31,7 @@ echo "DEMO_APP_URL:       $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL:  $DEMO_APP_GRPC_URL"
 
 cat << EOF > tracetesting-env.yaml
-type: Environment
+type: VariableSet
 spec:
   id: tracetesting-env
   name: tracetesting-env
@@ -68,7 +68,7 @@ run_test_suite_for_feature() {
   # junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --environment ./tracetesting-env.yaml"
+  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --variable-set ./tracetesting-env.yaml"
   echo $testCMD
   $testCMD
   return $?

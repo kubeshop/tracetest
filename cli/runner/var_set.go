@@ -7,11 +7,11 @@ import (
 	"github.com/kubeshop/tracetest/cli/ui"
 )
 
-func askForMissingVars(missingVars []envVar) []envVar {
+func askForMissingVars(missingVars []varSet) []varSet {
 	ui.DefaultUI.Warning("Some variables are required by one or more tests")
 	ui.DefaultUI.Info("Fill the values for each variable:")
 
-	filledVariables := make([]envVar, 0, len(missingVars))
+	filledVariables := make([]varSet, 0, len(missingVars))
 
 	for _, missingVar := range missingVars {
 		answer := missingVar
@@ -22,13 +22,13 @@ func askForMissingVars(missingVars []envVar) []envVar {
 	return filledVariables
 }
 
-type envVar struct {
+type varSet struct {
 	Name         string
 	DefaultValue string
 	UserValue    string
 }
 
-func (ev envVar) value() string {
+func (ev varSet) value() string {
 	if ev.UserValue != "" {
 		return ev.UserValue
 	}
@@ -36,12 +36,12 @@ func (ev envVar) value() string {
 	return ev.DefaultValue
 }
 
-type envVars []envVar
+type varSets []varSet
 
-func (evs envVars) toOpenapi() []openapi.EnvironmentValue {
-	vars := make([]openapi.EnvironmentValue, len(evs))
+func (evs varSets) toOpenapi() []openapi.VariableSetValue {
+	vars := make([]openapi.VariableSetValue, len(evs))
 	for i, ev := range evs {
-		vars[i] = openapi.EnvironmentValue{
+		vars[i] = openapi.VariableSetValue{
 			Key:   openapi.PtrString(ev.Name),
 			Value: openapi.PtrString(ev.value()),
 		}
@@ -50,9 +50,9 @@ func (evs envVars) toOpenapi() []openapi.EnvironmentValue {
 	return vars
 }
 
-func (evs envVars) unique() envVars {
+func (evs varSets) unique() varSets {
 	seen := make(map[string]bool)
-	vars := make(envVars, 0, len(evs))
+	vars := make(varSets, 0, len(evs))
 	for _, ev := range evs {
 		if seen[ev.Name] {
 			continue
@@ -65,34 +65,34 @@ func (evs envVars) unique() envVars {
 	return vars
 }
 
-type missingEnvVarsError envVars
+type missingVarsError varSets
 
-func (e missingEnvVarsError) Error() string {
-	return fmt.Sprintf("missing env vars: %v", []envVar(e))
+func (e missingVarsError) Error() string {
+	return fmt.Sprintf("missing variables: %v", []varSet(e))
 }
 
-func (e missingEnvVarsError) Is(target error) bool {
-	_, ok := target.(missingEnvVarsError)
+func (e missingVarsError) Is(target error) bool {
+	_, ok := target.(missingVarsError)
 	return ok
 }
 
-func buildMissingEnvVarsError(body []byte) error {
+func buildMissingVarsError(body []byte) error {
 	var missingVarsErrResp openapi.MissingVariablesError
 	err := jsonFormat.Unmarshal(body, &missingVarsErrResp)
 	if err != nil {
 		return fmt.Errorf("could not unmarshal response body: %w", err)
 	}
 
-	missingVars := envVars{}
+	missingVars := varSets{}
 
 	for _, missingVarErr := range missingVarsErrResp.MissingVariables {
 		for _, missingVar := range missingVarErr.Variables {
-			missingVars = append(missingVars, envVar{
+			missingVars = append(missingVars, varSet{
 				Name:         missingVar.GetKey(),
 				DefaultValue: missingVar.GetDefaultValue(),
 			})
 		}
 	}
 
-	return missingEnvVarsError(missingVars.unique())
+	return missingVarsError(missingVars.unique())
 }
