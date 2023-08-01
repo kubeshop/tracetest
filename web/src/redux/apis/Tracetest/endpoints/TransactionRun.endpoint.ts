@@ -1,7 +1,7 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
 import TransactionRun, {TRawTransactionResourceRun} from 'models/TransactionRun.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
@@ -12,12 +12,12 @@ const transactionRunEndpoints = TraceTestAPI.injectEndpoints({
   endpoints: builder => ({
     runTransaction: builder.mutation<
       TransactionRun,
-      {transactionId: string; environmentId?: string; variables?: TEnvironmentValue[]}
+      {transactionId: string; variableSetId?: string; variables?: TVariableSetValue[]}
     >({
-      query: ({transactionId, environmentId, variables = []}) => ({
+      query: ({transactionId, variableSetId, variables = []}) => ({
         url: `/transactions/${transactionId}/run`,
         method: HTTP_METHOD.POST,
-        body: {environmentId, variables},
+        body: {variableSetId, variables},
       }),
       invalidatesTags: (result, error, {transactionId}) => [
         {type: TracetestApiTags.TRANSACTION_RUN, id: `${transactionId}-LIST`},

@@ -16,8 +16,8 @@ const TestRunGateway = () => ({
   dryRun(testId: string, runId: string, testDefinition: Partial<TRawTestSpecs>) {
     return dryRun.initiate({testId, runId, testDefinition});
   },
-  runTest(testId: string, environmentId = '') {
-    return runTest.initiate({testId, environmentId});
+  runTest(testId: string, variableSetId = '') {
+    return runTest.initiate({testId, variableSetId});
   },
 });
 

@@ -3,7 +3,7 @@ import {noop, uniqBy} from 'lodash';
 import {Completion, CompletionContext} from '@codemirror/autocomplete';
 import {useAppStore} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
-import EnvironmentSelectors from 'selectors/Environment.selectors';
+import VariableSetSelectors from 'selectors/VariableSet.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
 import EditorService from 'services/Editor.service';
 import {SupportedEditors} from 'constants/Editor.constants';
@@ -26,16 +26,16 @@ const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValu
     return uniqBy(attributeList, 'key');
   }, [getState, runId, testId]);
 
-  const getSelectedEnvironmentEntryList = useCallback(() => {
+  const getSelectedVariableSetEntryList = useCallback(() => {
     const state = getState();
 
-    return EnvironmentSelectors.selectSelectedEnvironmentValues(state, true);
+    return VariableSetSelectors.selectSelectedVariableSetValues(state, true);
   }, [getState]);
 
   return useCallback(
     async (context: CompletionContext) => {
       const attributeList = getAttributeList();
-      const envEntryList = getSelectedEnvironmentEntryList();
+      const envEntryList = getSelectedVariableSetEntryList();
 
       return EditorService.getAutocomplete({
         type: SupportedEditors.Expression,
@@ -46,7 +46,7 @@ const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValu
         onSelect,
       });
     },
-    [autocompleteCustomValues, getAttributeList, getSelectedEnvironmentEntryList, onSelect]
+    [autocompleteCustomValues, getAttributeList, getSelectedVariableSetEntryList, onSelect]
   );
 };
 

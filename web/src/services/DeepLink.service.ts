@@ -1,22 +1,22 @@
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import Test from 'models/Test.model';
 import {getServerBaseUrl} from '../utils/Common';
 
 export type TDeepLinkConfig = {
-  variables: TEnvironmentValue[];
-  useEnvironmentId: boolean;
+  variables: TVariableSetValue[];
+  useVariableSetId: boolean;
   test: Test;
-  environmentId?: string;
+  variableSetId?: string;
 };
 
 const DeepLinkService = () => ({
-  getLink({variables, useEnvironmentId, test: {id: testId}, environmentId}: TDeepLinkConfig) {
+  getLink({variables, useVariableSetId, test: {id: testId}, variableSetId}: TDeepLinkConfig) {
     const baseUrl = getServerBaseUrl();
     const filteredVariables = variables.filter(variable => !!variable && variable.key);
     const stringVariables = encodeURI(JSON.stringify(filteredVariables));
 
     const url = `${baseUrl}test/${testId}/run?${filteredVariables.length ? `variables=${stringVariables}` : ''}${
-      useEnvironmentId && environmentId ? `&environmentId=${environmentId}` : ''
+      useVariableSetId && variableSetId ? `&variableSetId=${variableSetId}` : ''
     }`;
 
     return url;

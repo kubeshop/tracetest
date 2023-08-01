@@ -3,7 +3,7 @@
 	"name": "TracetestDEV",
 	"values": [
 		{
-			"key": "CESCO",
+			"key": "HOST",
 			"value": "From Environment",
 			"type": "default",
 			"enabled": true

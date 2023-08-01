@@ -3,13 +3,13 @@ import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import MissingVariablesModal from 'components/MissingVariablesModal';
 import VariablesService from 'services/Variables.service';
 import MissingVariables from 'models/MissingVariables.model';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import Test from 'models/Test.model';
 
 type TOnOPenProps = {
   missingVariables: MissingVariables;
   name: string;
-  onSubmit(draft: TEnvironmentValue[]): void;
+  onSubmit(draft: TVariableSetValue[]): void;
   onCancel?(): void;
   testList: Test[];
 };
@@ -44,7 +44,7 @@ const MissingVariablesModalProvider = ({children}: IProps) => {
   }, []);
 
   const handleSubmit = useCallback(
-    (draft: TEnvironmentValue[]) => {
+    (draft: TVariableSetValue[]) => {
       onSubmit(draft);
       setIsOpen(false);
     },

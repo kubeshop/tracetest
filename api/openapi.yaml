@@ -1148,10 +1148,10 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/variableSetId"
-      summary: "Delete a VariableSet"
-      description: "Delete a VariableSet from Tracetest"
-      operationId: deleteVariableSet
+        - $ref: "./parameters.yaml#/components/parameters/environmentId"
+      summary: "Delete an environment"
+      description: "Delete an environment from Tracetest"
+      operationId: deleteEnvironment
       responses:
         204:
           description: successful operation
@@ -1160,7 +1160,7 @@ paths:
         404:
           description: "VariableSet not found"
         500:
-          description: "problem deleting a VariableSet"
+          description: "problem deleting an environment"
 
   /version:
     get:
