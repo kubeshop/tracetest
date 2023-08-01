@@ -130,7 +130,7 @@ components:
       in: path
       name: variableSetId
       required: true
-      description: "ID of an VariableSet used on Tracetest to inject values into tests and transactions"
+      description: "ID of a VariableSet used on Tracetest to inject values into tests and transactions"
       schema:
         type: string
 

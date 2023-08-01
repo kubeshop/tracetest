@@ -1033,8 +1033,8 @@ paths:
     get:
       tags:
         - resource-api
-      summary: "List variableSets"
-      description: "List variableSets available in Tracetest."
+      summary: "List VariableSets"
+      description: "List VariableSets available in Tracetest."
       operationId: listVariableSets
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/take"
@@ -1065,8 +1065,8 @@ paths:
     post:
       tags:
         - resource-api
-      summary: "Create an VariableSet"
-      description: "Create an VariableSet that can be used by tests and transactions"
+      summary: "Create a VariableSet"
+      description: "Create a VariableSet that can be used by tests and transactions"
       operationId: createVariableSet
       requestBody:
         content:
@@ -1117,8 +1117,8 @@ paths:
         - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/variableSetId"
-      summary: "Update an VariableSet"
-      description: "Update an VariableSet used on Tracetest"
+      summary: "Update a VariableSet"
+      description: "Update a VariableSet used on Tracetest"
       operationId: updateVariableSet
       requestBody:
         content:
@@ -1149,8 +1149,8 @@ paths:
         - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/variableSetId"
-      summary: "Delete an VariableSet"
-      description: "Delete an VariableSet from Tracetest"
+      summary: "Delete a VariableSet"
+      description: "Delete a VariableSet from Tracetest"
       operationId: deleteVariableSet
       responses:
         204:
@@ -1160,7 +1160,7 @@ paths:
         404:
           description: "VariableSet not found"
         500:
-          description: "problem deleting an VariableSet"
+          description: "problem deleting a VariableSet"
 
   /version:
     get:

@@ -13,7 +13,7 @@ components:
             $ref: "#/components/schemas/VariableSetResource"
     VariableSetResource:
       type: object
-      description: "Represents an VariableSet structured into the Resources format."
+      description: "Represents a VariableSet structured into the Resources format."
       properties:
         type:
           type: string
