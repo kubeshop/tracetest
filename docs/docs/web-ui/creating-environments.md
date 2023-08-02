@@ -3,7 +3,7 @@
 This page showcases how to create and edit environments in the Web UI.
 
 :::tip
-[To read more about environments check out environment concepts.](../concepts/environments.md)
+[To read more about environments check out environment concepts.](../concepts/variable-sets.md)
 :::
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1685967319/docs/demo.tracetest.io_transaction_QZ3ejgl4R_run_2_oproo4.png)
