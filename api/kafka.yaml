@@ -31,8 +31,6 @@ components:
           type: string
         offset:
           type: string
-        error:
-          type: string
 
     KafkaMessageHeader:
       type: object

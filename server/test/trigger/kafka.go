@@ -12,6 +12,16 @@ type KafkaRequest struct {
 	SSLVerification bool                 `json:"sslVerification,omitempty"`
 }
 
+func (r KafkaRequest) GetHeaderAsMap() map[string]string {
+	headerAsMap := make(map[string]string, len(r.Headers))
+
+	for _, item := range r.Headers {
+		headerAsMap[item.Key] = item.Value
+	}
+
+	return headerAsMap
+}
+
 type KafkaMessageHeader struct {
 	Key   string `expr_enabled:"true" json:"key,omitempty"`
 	Value string `expr_enabled:"true" json:"value,omitempty"`
@@ -30,5 +40,4 @@ type KafkaPlainAuthenticator struct {
 type KafkaResponse struct {
 	Partition string
 	Offset    string
-	Error     string
 }

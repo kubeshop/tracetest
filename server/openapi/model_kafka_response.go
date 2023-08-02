@@ -13,8 +13,6 @@ type KafkaResponse struct {
 	Partition string `json:"partition,omitempty"`
 
 	Offset string `json:"offset,omitempty"`
-
-	Error string `json:"error,omitempty"`
 }
 
 // AssertKafkaResponseRequired checks if the required fields are not zero-ed
