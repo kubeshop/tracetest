@@ -1,0 +1,22 @@
+type: Test
+spec:
+  id: jFpHiL34R
+  name: Test Kafka Message Publishing
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: http://producer-api:8080/publish
+      body: "{\n  \"hello\": \"kafka!\"\n}"
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="messaging" name="messaging publish" messaging.system="kafka" messaging.operation="publish"]
+    name: It published a message to Kafka
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[tracetest.span.type="messaging" name="messaging receive" messaging.system="kafka" messaging.operation="receive"]
+    name: It processed a message from Kafka
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
