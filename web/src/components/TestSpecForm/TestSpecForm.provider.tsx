@@ -147,10 +147,11 @@ const TestSpecFormProvider: React.FC<PropsWithChildren<{}>> = ({children}) => {
         await add(definition);
       }
 
-      setIsOpen(false);
-      onClearMatchedSpans();
+      // setIsOpen(false);
+      // onClearMatchedSpans();
+      close();
     },
-    [formProps, onClearMatchedSpans, update, add]
+    [formProps, update, add, close]
   );
 
   const contextValue = useMemo(

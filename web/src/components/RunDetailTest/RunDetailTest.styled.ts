@@ -38,6 +38,18 @@ export const TabsContainer = styled.div`
   .ant-tabs-small > .ant-tabs-nav .ant-tabs-tab {
     padding: 0 0 8px;
   }
+
+  > .ant-tabs {
+    height: 100%;
+
+    .ant-tabs-content {
+      height: 100%;
+
+      .ant-tabs-tabpane {
+        height: 100%;
+      }
+    }
+  }
 `;
 
 export const CountBadge = styled(Badge)`

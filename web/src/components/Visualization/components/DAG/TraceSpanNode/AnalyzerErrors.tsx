@@ -13,7 +13,13 @@ const AnalyzerErrors = ({errors}: IProps) => {
 
   return (
     <>
-      <S.ErrorIcon onClick={() => setIsOpen(true)} $isClickable />
+      <S.ErrorIcon
+        onClick={e => {
+          e.stopPropagation();
+          setIsOpen(true);
+        }}
+        $isClickable
+      />
       {isOpen && <AnalyzerErrorsPopover errors={errors} onClose={() => setIsOpen(false)} />}
     </>
   );

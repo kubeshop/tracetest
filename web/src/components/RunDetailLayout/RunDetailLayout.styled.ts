@@ -11,9 +11,16 @@ export const BackIcon = styled(LeftOutlined)`
 export const Container = styled.div`
   height: 100%;
 
-  .ant-tabs,
-  .ant-tabs-content {
+  > .ant-tabs {
     height: 100%;
+
+    .ant-tabs-content {
+      height: 100%;
+
+      .ant-tabs-tabpane {
+        height: 100%;
+      }
+    }
   }
 `;
 

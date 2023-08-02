@@ -29,7 +29,9 @@ const Header = ({selectedSpan, totalFailedSpecs, totalPassedSpecs}: IProps) => (
       </div>
     </S.Row>
 
-    <AddTestSpecButton selectedSpan={selectedSpan} />
+    <div>
+      <AddTestSpecButton selectedSpan={selectedSpan} />
+    </div>
   </S.HeaderContainer>
 );
 

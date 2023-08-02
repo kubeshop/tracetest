@@ -163,15 +163,16 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       const parsedExpression = await parseExpressionMutation(props).unwrap();
       const valueRunDraft = parsedExpression?.[0] ?? '';
 
-      setIsOpen(false);
+      // setIsOpen(false);
       if (isEditing) {
         setIsEditing(false);
         dispatch(outputUpdated({output: {...values, spanId, valueRunDraft, id: draft?.id ?? -1}}));
-        return;
+      } else {
+        dispatch(outputAdded({...values, valueRunDraft, spanId}));
       }
-      dispatch(outputAdded({...values, valueRunDraft, spanId}));
+      onClose();
     },
-    [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId]
+    [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId, onClose]
   );
 
   const onNavigateAndOpen = useCallback(

@@ -56,7 +56,7 @@ const TestOutputForm = ({
 
   useEffect(() => {
     return () => {
-      onCancel();
+      // onCancel();
     };
   }, []);
 

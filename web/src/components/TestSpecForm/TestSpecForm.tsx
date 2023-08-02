@@ -68,10 +68,12 @@ const TestSpecForm = ({
   const onFieldsChange = useOnFieldsChange();
 
   useEffect(() => {
+    console.log('running the effect');
     onValuesChange(null, {assertions, selector, name});
 
     return () => {
-      onCancel();
+      console.log('cleaning the effect');
+      // onCancel();
     };
   }, []);
 
