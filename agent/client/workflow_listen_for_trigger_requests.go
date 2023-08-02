@@ -10,19 +10,26 @@ import (
 )
 
 func (c *Client) startTriggerListener() error {
-	ctx := context.Background()
+	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	client := proto.NewOrchestratorClient(c.conn)
 
 	request, err := c.getConnectionRequest()
 	if err != nil {
+		cancelCtx()
 		return err
 	}
 
 	stream, err := client.RegisterTriggerAgent(ctx, request)
 	if err != nil {
+		cancelCtx()
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}
+
+	go func() {
+		<-c.done
+		cancelCtx()
+	}()
 
 	go func() {
 		for {

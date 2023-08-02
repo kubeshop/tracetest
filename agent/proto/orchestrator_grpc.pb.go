@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Orchestrator_Connect_FullMethodName              = "/proto.Orchestrator/Connect"
-	Orchestrator_RegisterTriggerAgent_FullMethodName = "/proto.Orchestrator/RegisterTriggerAgent"
-	Orchestrator_SendTriggerResult_FullMethodName    = "/proto.Orchestrator/SendTriggerResult"
-	Orchestrator_RegisterPollerAgent_FullMethodName  = "/proto.Orchestrator/RegisterPollerAgent"
-	Orchestrator_SendPolledSpans_FullMethodName      = "/proto.Orchestrator/SendPolledSpans"
+	Orchestrator_Connect_FullMethodName                  = "/proto.Orchestrator/Connect"
+	Orchestrator_RegisterTriggerAgent_FullMethodName     = "/proto.Orchestrator/RegisterTriggerAgent"
+	Orchestrator_SendTriggerResult_FullMethodName        = "/proto.Orchestrator/SendTriggerResult"
+	Orchestrator_RegisterPollerAgent_FullMethodName      = "/proto.Orchestrator/RegisterPollerAgent"
+	Orchestrator_SendPolledSpans_FullMethodName          = "/proto.Orchestrator/SendPolledSpans"
+	Orchestrator_RegisterShutdownListener_FullMethodName = "/proto.Orchestrator/RegisterShutdownListener"
 )
 
 // OrchestratorClient is the client API for Orchestrator service.
@@ -42,6 +43,8 @@ type OrchestratorClient interface {
 	RegisterPollerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error)
 	// Sends polled spans to the server
 	SendPolledSpans(ctx context.Context, in *PollingResponse, opts ...grpc.CallOption) (*Empty, error)
+	// Register an agent to listen for shutdown commands
+	RegisterShutdownListener(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error)
 }
 
 type orchestratorClient struct {
@@ -143,6 +146,38 @@ func (c *orchestratorClient) SendPolledSpans(ctx context.Context, in *PollingRes
 	return out, nil
 }
 
+func (c *orchestratorClient) RegisterShutdownListener(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[2], Orchestrator_RegisterShutdownListener_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &orchestratorRegisterShutdownListenerClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Orchestrator_RegisterShutdownListenerClient interface {
+	Recv() (*ShutdownRequest, error)
+	grpc.ClientStream
+}
+
+type orchestratorRegisterShutdownListenerClient struct {
+	grpc.ClientStream
+}
+
+func (x *orchestratorRegisterShutdownListenerClient) Recv() (*ShutdownRequest, error) {
+	m := new(ShutdownRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
@@ -159,6 +194,8 @@ type OrchestratorServer interface {
 	RegisterPollerAgent(*ConnectRequest, Orchestrator_RegisterPollerAgentServer) error
 	// Sends polled spans to the server
 	SendPolledSpans(context.Context, *PollingResponse) (*Empty, error)
+	// Register an agent to listen for shutdown commands
+	RegisterShutdownListener(*ConnectRequest, Orchestrator_RegisterShutdownListenerServer) error
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -180,6 +217,9 @@ func (UnimplementedOrchestratorServer) RegisterPollerAgent(*ConnectRequest, Orch
 }
 func (UnimplementedOrchestratorServer) SendPolledSpans(context.Context, *PollingResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPolledSpans not implemented")
+}
+func (UnimplementedOrchestratorServer) RegisterShutdownListener(*ConnectRequest, Orchestrator_RegisterShutdownListenerServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegisterShutdownListener not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -290,6 +330,27 @@ func _Orchestrator_SendPolledSpans_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Orchestrator_RegisterShutdownListener_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ConnectRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OrchestratorServer).RegisterShutdownListener(m, &orchestratorRegisterShutdownListenerServer{stream})
+}
+
+type Orchestrator_RegisterShutdownListenerServer interface {
+	Send(*ShutdownRequest) error
+	grpc.ServerStream
+}
+
+type orchestratorRegisterShutdownListenerServer struct {
+	grpc.ServerStream
+}
+
+func (x *orchestratorRegisterShutdownListenerServer) Send(m *ShutdownRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -319,6 +380,11 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "RegisterPollerAgent",
 			Handler:       _Orchestrator_RegisterPollerAgent_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RegisterShutdownListener",
+			Handler:       _Orchestrator_RegisterShutdownListener_Handler,
 			ServerStreams: true,
 		},
 	},

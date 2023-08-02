@@ -25,8 +25,9 @@ type Client struct {
 	sessionConfig *SessionConfig
 	done          chan bool
 
-	triggerListener func(context.Context, *proto.TriggerRequest) error
-	pollListener    func(context.Context, *proto.PollingRequest) error
+	triggerListener  func(context.Context, *proto.TriggerRequest) error
+	pollListener     func(context.Context, *proto.PollingRequest) error
+	shutdownListener func(context.Context, *proto.ShutdownRequest) error
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -41,6 +42,11 @@ func (c *Client) Start(ctx context.Context) error {
 	}
 
 	err = c.startPollerListener()
+	if err != nil {
+		return err
+	}
+
+	err = c.startShutdownListener()
 	if err != nil {
 		return err
 	}
@@ -68,6 +74,10 @@ func (c *Client) OnTriggerRequest(listener func(context.Context, *proto.TriggerR
 
 func (c *Client) OnPollingRequest(listener func(context.Context, *proto.PollingRequest) error) {
 	c.pollListener = listener
+}
+
+func (c *Client) OnConnectionClosed(listener func(context.Context, *proto.ShutdownRequest) error) {
+	c.shutdownListener = listener
 }
 
 func (c *Client) getConnectionRequest() (*proto.ConnectRequest, error) {
