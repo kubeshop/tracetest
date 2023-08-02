@@ -3,6 +3,7 @@ package executor
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -74,6 +75,46 @@ type Job struct {
 
 	PollingProfile pollingprofile.PollingProfile
 	DataStore      datastore.DataStore
+}
+
+type jsonJob struct {
+	Headers          *headers `json:"headers"`
+	TransactionID    string   `json:"transaction_id"`
+	TransactionRunID int      `json:"transaction_run_id"`
+	TestID           string   `json:"test_id"`
+	RunID            int      `json:"run_id"`
+	PollingProfileID string   `json:"polling_profile_id"`
+	DataStoreID      string   `json:"data_store_id"`
+}
+
+func (job Job) MarshalJSON() ([]byte, error) {
+	return json.Marshal(jsonJob{
+		Headers:          job.Headers,
+		TransactionID:    job.Transaction.ID.String(),
+		TransactionRunID: job.TransactionRun.ID,
+		TestID:           job.Test.ID.String(),
+		RunID:            job.Run.ID,
+		PollingProfileID: job.PollingProfile.ID.String(),
+		DataStoreID:      job.DataStore.ID.String(),
+	})
+}
+
+func (job *Job) UnmarshalJSON(data []byte) error {
+	var jj jsonJob
+	err := json.Unmarshal(data, &jj)
+	if err != nil {
+		return err
+	}
+
+	job.Headers = jj.Headers
+	job.Transaction.ID = id.ID(jj.TransactionID)
+	job.TransactionRun.ID = jj.TransactionRunID
+	job.Test.ID = id.ID(jj.TestID)
+	job.Run.ID = jj.RunID
+	job.PollingProfile.ID = id.ID(jj.PollingProfileID)
+	job.DataStore.ID = id.ID(jj.DataStoreID)
+
+	return nil
 }
 
 func NewJob() Job {
@@ -251,7 +292,7 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		Headers: job.Headers,
 
 		Test: test.Test{ID: job.Test.ID},
-		Run:  job.Run,
+		Run:  test.Run{ID: job.Run.ID},
 
 		Transaction:    transaction.Transaction{ID: job.Transaction.ID},
 		TransactionRun: transaction.TransactionRun{ID: job.TransactionRun.ID},
@@ -276,8 +317,9 @@ func (q Queue) Listen(job Job) {
 	}
 	newJob.Test = q.resolveTest(ctx, job)
 	// todo: revert when using actual queues
-	// newJob.Run = q.resolveTestRun(ctx, job)
-	newJob.Run = job.Run
+	newJob.Run = q.resolveTestRun(ctx, job)
+	// todo: change the otlp server to have its own table
+	// newJob.Run = job.Run
 
 	newJob.Transaction = q.resolveTransaction(ctx, job)
 	newJob.TransactionRun = q.resolveTransactionRun(ctx, job)

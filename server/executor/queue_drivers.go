@@ -90,7 +90,7 @@ func (qd *PostgresQueueDriver) SetQueue(q *Queue) {
 
 func (qd *PostgresQueueDriver) Enqueue(job Job) {
 	qd.log("enqueue")
-	jsonJob, err := json.Marshal(job)
+	jj, err := json.Marshal(job)
 	if err != nil {
 		qd.log("error marshalling job: %s", err.Error())
 	}
@@ -98,7 +98,7 @@ func (qd *PostgresQueueDriver) Enqueue(job Job) {
 	ctx, cancelCtx := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancelCtx()
 
-	_, err = qd.pool.Query(ctx, fmt.Sprintf(`select pg_notify('%s', $1)`, qd.name), jsonJob)
+	_, err = qd.pool.Query(ctx, fmt.Sprintf(`select pg_notify('%s', $1)`, qd.name), jj)
 	if err != nil {
 		qd.log("error notifying postgres: %s", err.Error())
 		return
