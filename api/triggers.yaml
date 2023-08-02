@@ -6,20 +6,22 @@ components:
       properties:
         type:
           type: string
-          enum: ["http", "grpc", "traceid"]
+          enum: ["http", "grpc", "traceid", "kafka"]
         httpRequest:
           $ref: "./http.yaml#/components/schemas/HTTPRequest"
         grpc:
           $ref: "./grpc.yaml#/components/schemas/GRPCRequest"
         traceid:
           $ref: "./traceid.yaml#/components/schemas/TRACEIDRequest"
+        kafka:
+          $ref: "./kafka.yaml#/components/schemas/KafkaRequest"
 
     TriggerResult:
       type: object
       properties:
         type:
           type: string
-          enum: ["http", "grpc", "traceid"]
+          enum: ["http", "grpc", "traceid", "kafka"]
         triggerResult:
           type: object
           properties:
@@ -29,3 +31,5 @@ components:
               $ref: "./grpc.yaml#/components/schemas/GRPCResponse"
             traceid:
               $ref: "./traceid.yaml#/components/schemas/TRACEIDResponse"
+            kafka:
+              $ref: "./kafka.yaml#/components/schemas/KafkaResponse"

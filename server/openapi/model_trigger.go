@@ -17,6 +17,8 @@ type Trigger struct {
 	Grpc GrpcRequest `json:"grpc,omitempty"`
 
 	Traceid TraceidRequest `json:"traceid,omitempty"`
+
+	Kafka KafkaRequest `json:"kafka,omitempty"`
 }
 
 // AssertTriggerRequired checks if the required fields are not zero-ed
@@ -28,6 +30,9 @@ func AssertTriggerRequired(obj Trigger) error {
 		return err
 	}
 	if err := AssertTraceidRequestRequired(obj.Traceid); err != nil {
+		return err
+	}
+	if err := AssertKafkaRequestRequired(obj.Kafka); err != nil {
 		return err
 	}
 	return nil
