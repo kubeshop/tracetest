@@ -35,7 +35,8 @@ var (
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
-	variableSetClient = resourcemanager.NewClient(
+	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
+	variableSetClient       = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"variableset", "variablesets",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
@@ -46,6 +47,8 @@ var (
 			},
 		}),
 		resourcemanager.WithResourceType("VariableSet"),
+		resourcemanager.WithApplyPreProcessor(variableSetPreprocessor.Preprocess),
+		resourcemanager.WithDeprecatedAlias("Environment"),
 	)
 
 	testPreprocessor = preprocessor.Test(cliLogger)
@@ -119,6 +122,13 @@ var (
 			},
 		}),
 		resourcemanager.WithApplyPreProcessor(transactionPreprocessor.Preprocess),
+	)
+
+	// deprecated resources
+	deprecatedEnvironmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environment", "environments",
+		resourcemanager.WithProxyResource("variableset"),
 	)
 
 	resources = resourcemanager.NewRegistry().
@@ -231,7 +241,10 @@ var (
 		).
 		Register(variableSetClient).
 		Register(transactionClient).
-		Register(testClient)
+		Register(testClient).
+
+		// deprecated resources
+		Register(deprecatedEnvironmentClient)
 )
 
 func resourceList() string {

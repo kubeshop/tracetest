@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/agnivade/levenshtein"
@@ -30,13 +31,33 @@ func (r *Registry) Get(resourceName string) (Client, error) {
 		return Client{}, ErrResourceNotFound
 	}
 
+	if c.options.proxyResource != "" {
+		c.logger.Warn(fmt.Sprintf("The resource `%s` is deprecated and will be removed in a future version. Please use `%s` instead.", c.resourceName, c.options.proxyResource))
+		return r.Get(c.options.proxyResource)
+	}
+
 	return c, nil
+}
+
+func (r *Registry) Exists(resourceName string) bool {
+	c, ok := r.resources[resourceName]
+	if !ok {
+		return false
+	}
+
+	if c.options.proxyResource != "" {
+		return r.Exists(c.options.proxyResource)
+	}
+
+	return true
 }
 
 func (r *Registry) List() []string {
 	var resources []string
-	for k := range r.resources {
-		resources = append(resources, k)
+	for k, c := range r.resources {
+		if c.options.proxyResource == "" {
+			resources = append(resources, k)
+		}
 	}
 
 	sort.Strings(resources)

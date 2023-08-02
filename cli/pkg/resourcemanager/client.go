@@ -86,6 +86,7 @@ func (c Client) resourceType() string {
 	if c.options.resourceType != "" {
 		return c.options.resourceType
 	}
+
 	// language.Und means Undefined
 	caser := cases.Title(language.Und, cases.NoLower)
 	return caser.String(c.resourceName)

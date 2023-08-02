@@ -1,4 +1,4 @@
-package environment
+package variableset
 
 import (
 	"fmt"
@@ -110,5 +110,14 @@ func TestGetVariableSet(t *testing.T) {
 		require.Equal(".env", singleLine["ID"])
 		require.Equal(".env", singleLine["NAME"])
 		require.Equal("", singleLine["DESCRIPTION"])
+	})
+
+	t.Run("getting a variable set using the deprecated environment command", func(t *testing.T) {
+		result := tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "The resource `environment` is deprecated and will be removed in a future version. Please use `variableset` instead.")
+		require.Contains(result.StdOut, "VariableSet")
+		require.Contains(result.StdOut, ".env")
 	})
 }

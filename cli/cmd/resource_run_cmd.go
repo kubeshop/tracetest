@@ -38,6 +38,10 @@ func init() {
 				variableSetClient,
 			)
 
+			if runParams.EnvID != "" {
+				runParams.VarsID = runParams.EnvID
+			}
+
 			runParams := runner.RunOptions{
 				ID:              runParams.ID,
 				DefinitionFile:  runParams.DefinitionFile,
@@ -67,6 +71,12 @@ func init() {
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
 	runCmd.Flags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
 	runCmd.Flags().StringSliceVar(&runParams.RequriedGates, "required-gates", []string{}, "override default required gate. "+validRequiredGatesMsg())
+
+	//deprecated
+	runCmd.Flags().StringVarP(&runParams.EnvID, "env", "e", "", "environment file or ID to be used")
+	runCmd.Flags().MarkDeprecated("env", "use --vars instead")
+	runCmd.Flags().MarkShorthandDeprecated("e", "use --vars instead")
+
 	rootCmd.AddCommand(runCmd)
 }
 
@@ -83,6 +93,7 @@ type runParameters struct {
 	ID              string
 	DefinitionFile  string
 	VarsID          string
+	EnvID           string
 	SkipResultWait  bool
 	JUnitOuptutFile string
 	RequriedGates   []string

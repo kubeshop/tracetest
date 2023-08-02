@@ -85,6 +85,33 @@ func TestRunTestWithHttpTriggerAndVariableSetFile(t *testing.T) {
 		require.Equal("https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png", environmentVars.Spec.Values[1].Value)
 	})
 
+	t.Run("should pass when using the deprecated environment definition file", func(t *testing.T) {
+		result := tracetestcli.Exec(t, "get environment --id deprecated-pokeapi-env", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "The resource `environment` is deprecated and will be removed in a future version. Please use `variableset` instead.")
+		require.Contains(result.StdOut, "Resource variableset with ID deprecated-pokeapi-env not found")
+
+		// When I try to run a test with a http trigger and a variable set file
+		// Then it should pass
+		environmentFile := env.GetTestResourcePath(t, "deprecated-environment")
+		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
+
+		command := fmt.Sprintf("run test -f %s --env %s", testFile, environmentFile)
+		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
+		require.Contains(result.StdOut, "✔ It should save the correct data")
+
+		// When I try to get the variable set created on the previous step
+		// Then it should retrieve it correctly
+		result = tracetestcli.Exec(t, "get environment --id deprecated-pokeapi-env", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		require.Contains(result.StdOut, "The resource `environment` is deprecated and will be removed in a future version. Please use `variableset` instead.")
+		require.Contains(result.StdOut, "VariableSet")
+		require.Contains(result.StdOut, "https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png")
+	})
+
 	t.Run("should pass when using variable set id", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
