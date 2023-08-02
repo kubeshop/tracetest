@@ -77,18 +77,18 @@ func (p *Producer) Close() {
 	p.internalProducer.Close()
 }
 
-func getSaramaConfig(kafkaConfig Config) sarama.Config {
+func getSaramaConfig(kafkaConfig Config) *sarama.Config {
 	saramaConfig := sarama.NewConfig()
 	saramaConfig.Producer.Return.Successes = true
 	saramaConfig.Producer.RequiredAcks = sarama.WaitForAll
 	saramaConfig.Producer.Retry.Max = producerMaxRetries
 
 	if kafkaConfig.SSLVerification {
-		saramaConfig.Net.TLS.Enabled = true
+		saramaConfig.Net.TLS.Enable = true
 	}
 
 	if kafkaConfig.Authentication != nil {
-		saramaConfig.Net.SASL.Enabled = true
+		saramaConfig.Net.SASL.Enable = true
 		saramaConfig.Net.SASL.Mechanism = sarama.SASLTypePlaintext
 		saramaConfig.Net.SASL.User = kafkaConfig.Authentication.Username
 		saramaConfig.Net.SASL.Password = kafkaConfig.Authentication.Password
