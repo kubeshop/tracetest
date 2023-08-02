@@ -9,9 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
-func (c *Client) startPollerListener() error {
-	ctx := context.Background()
-
+func (c *Client) startPollerListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
 	request, err := c.getConnectionRequest()

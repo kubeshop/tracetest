@@ -13,9 +13,10 @@ import (
 
 type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
-	port           int
-	triggerChannel chan *proto.TriggerRequest
-	pollingChannel chan *proto.PollingRequest
+	port               int
+	triggerChannel     chan *proto.TriggerRequest
+	pollingChannel     chan *proto.PollingRequest
+	terminationChannel chan *proto.ShutdownRequest
 
 	lastTriggerResponse *proto.TriggerResponse
 	lastPollingResponse *proto.PollingResponse
@@ -23,8 +24,9 @@ type GrpcServerMock struct {
 
 func NewGrpcServer() *GrpcServerMock {
 	server := &GrpcServerMock{
-		triggerChannel: make(chan *proto.TriggerRequest),
-		pollingChannel: make(chan *proto.PollingRequest),
+		triggerChannel:     make(chan *proto.TriggerRequest),
+		pollingChannel:     make(chan *proto.PollingRequest),
+		terminationChannel: make(chan *proto.ShutdownRequest),
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -70,6 +72,7 @@ func (s *GrpcServerMock) RegisterTriggerAgent(_ *proto.ConnectRequest, stream pr
 		if err != nil {
 			log.Println("could not send trigger request to agent: %w", err)
 		}
+
 	}
 }
 
@@ -93,6 +96,16 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 	return &proto.Empty{}, nil
 }
 
+func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.ConnectRequest, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
+	for {
+		shutdownRequest := <-s.terminationChannel
+		err := stream.Send(shutdownRequest)
+		if err != nil {
+			log.Println("could not send polling request to agent: %w", err)
+		}
+	}
+}
+
 // Test methods
 
 func (s *GrpcServerMock) SendTriggerRequest(request *proto.TriggerRequest) {
@@ -109,4 +122,10 @@ func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
 
 func (s *GrpcServerMock) GetLastPollingResponse() *proto.PollingResponse {
 	return s.lastPollingResponse
+}
+
+func (s *GrpcServerMock) TerminateConnection(reason string) {
+	s.terminationChannel <- &proto.ShutdownRequest{
+		Reason: reason,
+	}
 }

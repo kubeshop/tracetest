@@ -22,6 +22,9 @@ service Orchestrator {
 
     // Sends polled spans to the server
     rpc SendPolledSpans(PollingResponse) returns (Empty) {}
+
+    // Register an agent to listen for shutdown commands
+    rpc RegisterShutdownListener(ConnectRequest) returns (stream ShutdownRequest) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -46,7 +49,12 @@ message ConnectResponse {
 // communicating with the Orchestrator in the current session.
 message SessionConfiguration {
     // Milliseconds to wait for spans before sending batch
-    int32 BatchTimeout = 1;
+    int32 batchTimeout = 1;
+}
+
+// ShutdownRequest is a request sent by the server to an agent so it should shut down
+message ShutdownRequest {
+    string reason = 1;
 }
 
 
