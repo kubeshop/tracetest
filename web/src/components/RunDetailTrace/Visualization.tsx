@@ -2,7 +2,7 @@ import RunEvents from 'components/RunEvents';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
-import {useCallback, useEffect} from 'react';
+import {MouseEvent, useCallback, useEffect} from 'react';
 import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
@@ -44,7 +44,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(changeNodes({changes})), [dispatch]);
 
   const onNodeClick = useCallback(
-    (event, {id}: Node) => {
+    (event: MouseEvent, {id}: Node) => {
       TraceDiagramAnalyticsService.onClickSpan(id);
       dispatch(selectSpan({spanId: id}));
     },

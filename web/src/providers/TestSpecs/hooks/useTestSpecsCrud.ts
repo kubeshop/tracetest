@@ -41,7 +41,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   const {showNotification} = useNotification();
 
   const setSelectedSpec = useCallback(
-    selector => {
+    (selector: string) => {
       const resultList = assertionResults?.resultList || [];
       const positionIndex = resultList.findIndex(result => result.selector === selector);
 
@@ -126,7 +126,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
   );
 
   const updateIsInitialized = useCallback(
-    isInitialized => {
+    (isInitialized: boolean) => {
       dispatch(setIsInitialized({isInitialized}));
     },
     [dispatch]

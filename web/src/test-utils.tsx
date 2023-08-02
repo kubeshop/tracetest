@@ -1,4 +1,4 @@
-import {FC, ReactElement} from 'react';
+import {FC, PropsWithChildren, ReactElement} from 'react';
 import {render, RenderOptions} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import {ThemeProvider} from 'styled-components';
@@ -6,7 +6,7 @@ import {ThemeProvider} from 'styled-components';
 import {theme} from 'constants/Theme.constants';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
 
-const Providers: FC = ({children}) => {
+const Providers: FC<PropsWithChildren<{}>> = ({children}) => {
   return (
     <ThemeProvider theme={theme}>
       <ReduxWrapperProvider>

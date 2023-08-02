@@ -1,5 +1,7 @@
 import {useCallback, useState} from 'react';
 
+type SizeUnit = number | string | undefined;
+
 export type TPanel = {
   name: string;
   isDefaultOpen?: boolean;
@@ -45,7 +47,7 @@ const useResizablePanel = ({panel}: IProps) => {
   }, [size]);
 
   const onStopResize = useCallback(
-    newSize => {
+    (newSize: SizeUnit) => {
       const currentSize = Number(newSize);
 
       setSize({

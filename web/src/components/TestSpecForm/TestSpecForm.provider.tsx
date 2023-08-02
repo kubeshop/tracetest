@@ -1,5 +1,5 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import {PropsWithChildren, createContext, useCallback, useContext, useMemo, useState} from 'react';
 
 import VersionMismatchModal from 'components/VersionMismatchModal/VersionMismatchModal';
 import {RouterSearchFields} from 'constants/Common.constants';
@@ -48,7 +48,7 @@ export const Context = createContext<IContext>({
 
 export const useTestSpecForm = () => useContext<IContext>(Context);
 
-const TestSpecFormProvider: React.FC<{testId: string}> = ({children}) => {
+const TestSpecFormProvider: React.FC<PropsWithChildren<{}>> = ({children}) => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);

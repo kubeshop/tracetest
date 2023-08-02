@@ -14,7 +14,7 @@ const AutomatedTestRun = () => {
   return (
     <Layout hasMenu>
       <TestProvider testId={testId} version={version}>
-        <TestSpecFormProvider testId={testId}>
+        <TestSpecFormProvider>
           <Content />
         </TestSpecFormProvider>
       </TestProvider>

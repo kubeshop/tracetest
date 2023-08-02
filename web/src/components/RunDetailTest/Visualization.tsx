@@ -1,4 +1,4 @@
-import {useCallback, useEffect} from 'react';
+import {MouseEvent, useCallback, useEffect} from 'react';
 import {Node, NodeChange} from 'react-flow-renderer';
 
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
@@ -47,7 +47,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(onNodesChangeAction({changes})), [dispatch]);
 
   const onNodeClick = useCallback(
-    (event, {id}: Node) => {
+    (event: MouseEvent, {id}: Node) => {
       TraceDiagramAnalyticsService.onClickSpan(id);
       onSelectSpan(id);
     },

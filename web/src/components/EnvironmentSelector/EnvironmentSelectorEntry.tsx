@@ -11,7 +11,7 @@ interface IProps {
 
 const EnvironmentSelectorEntry = ({environment: {name}, environment, isHovering, onEditClick}: IProps) => {
   const handleClick = useCallback(
-    event => {
+    (event: React.MouseEvent<HTMLSpanElement>) => {
       event.stopPropagation();
       onEditClick(environment);
     },

@@ -1,5 +1,13 @@
 import {useCallback, useEffect, useState} from 'react';
-import {closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Col, Row, Select} from 'antd';
 import {noop} from 'lodash';
@@ -49,10 +57,10 @@ const TestsSelectionInput = ({value = [], onChange = noop, testList}: IProps) =>
   );
 
   const onSortEnd = useCallback(
-    ({active, over}) => {
-      if (active.id !== over.id) {
+    ({active, over}: DragEndEvent) => {
+      if (active.id !== over?.id) {
         const oldIndex = selectedTestList.findIndex(({id}) => id === active.id);
-        const newIndex = selectedTestList.findIndex(({id}) => id === over.id);
+        const newIndex = selectedTestList.findIndex(({id}) => id === over?.id);
         const updatedList = arrayMove(selectedTestList, oldIndex, newIndex);
 
         setSelectedTestList(updatedList);
