@@ -18,6 +18,8 @@ import (
 )
 
 const (
+	QueueWorkerCount = 5
+
 	JobCountHeader string = "X-Tracetest-Job-Count"
 )
 

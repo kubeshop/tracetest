@@ -88,14 +88,14 @@ func buildTestPipeline(
 		WithTestGetter(testRepo).
 		WithRunGetter(runRepo)
 
-	pipeline := executor.NewPipeline(queueBuilder,
-		executor.PipelineStep{Processor: runner, Driver: executor.NewPostgresQueueDriver(pool, "runner")},
-		executor.PipelineStep{Processor: tracePoller, Driver: executor.NewPostgresQueueDriver(pool, "tracePoller")},
-		executor.PipelineStep{Processor: linterRunner, Driver: executor.NewPostgresQueueDriver(pool, "linterRunner")},
-		executor.PipelineStep{Processor: assertionRunner, Driver: executor.NewPostgresQueueDriver(pool, "assertionRunner")},
-	)
+	pgQueue := executor.NewPostgresQueueDriver(pool)
 
-	pipeline.Start()
+	pipeline := executor.NewPipeline(queueBuilder,
+		executor.PipelineStep{Processor: runner, Driver: pgQueue.Channel("runner")},
+		executor.PipelineStep{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
+		executor.PipelineStep{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
+		executor.PipelineStep{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
+	)
 
 	const assertionRunnerStepIndex = 3
 

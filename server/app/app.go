@@ -146,10 +146,6 @@ func (app *App) Start(opts ...appOption) error {
 		return err
 	}
 
-	// when using postgres queues, we need one connection per listener
-	// so we need to make sure we allow enough connections
-	poolcfg.MaxConns = 20
-
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolcfg)
 	if err != nil {
 		return err
