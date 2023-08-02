@@ -39,7 +39,3 @@ func Start(config config.Config) {
 		log.Fatal(err)
 	}
 }
-
-func onConnectionClosed(ctx context.Context, sr *proto.ShutdownRequest) error {
-	fmt.Println("Server terminated the connection with the agent. Exiting")
-}
