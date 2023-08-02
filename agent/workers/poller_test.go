@@ -56,9 +56,20 @@ func TestPollerWorker(t *testing.T) {
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
 
-	assert.Len(t, pollingResponse.Spans, 2)
-	assert.Equal(t, "", pollingResponse.Spans[0].ParentId)
-	assert.Equal(t, pollingResponse.Spans[0].Id, pollingResponse.Spans[1].ParentId)
+	// Very rudimentar sorting algorithm for only two items in the array
+	// first item is always the root span, second is it's child
+	var spans = make([]*proto.Span, 2)
+	for _, span := range pollingResponse.Spans {
+		if span.ParentId == "" {
+			spans[0] = span
+		} else {
+			spans[1] = span
+		}
+	}
+
+	assert.Len(t, spans, 2)
+	assert.Equal(t, "", spans[0].ParentId)
+	assert.Equal(t, spans[0].Id, spans[1].ParentId)
 }
 
 func createTempoFakeApi() *httptest.Server {
