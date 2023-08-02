@@ -9,27 +9,18 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
-func (c *Client) startTriggerListener() error {
-	ctx, cancelCtx := context.WithCancel(context.Background())
-
+func (c *Client) startTriggerListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
 	request, err := c.getConnectionRequest()
 	if err != nil {
-		cancelCtx()
 		return err
 	}
 
 	stream, err := client.RegisterTriggerAgent(ctx, request)
 	if err != nil {
-		cancelCtx()
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}
-
-	go func() {
-		<-c.done
-		cancelCtx()
-	}()
 
 	go func() {
 		for {

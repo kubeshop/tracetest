@@ -9,9 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
-func (c *Client) startShutdownListener() error {
-	ctx := context.Background()
-
+func (c *Client) startShutdownListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
 	request, err := c.getConnectionRequest()

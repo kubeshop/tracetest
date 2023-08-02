@@ -36,17 +36,26 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
-	err = c.startTriggerListener()
+	ctx, cancel := context.WithCancel(ctx)
+	go func() {
+		<-c.done
+		// We cannot `defer cancel()` in this case because the start listener functions
+		// start one goroutine each and don't block the execution of this function.
+		// Thus, if we cancel the context, all those goroutines will fail.
+		cancel()
+	}()
+
+	err = c.startTriggerListener(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = c.startPollerListener()
+	err = c.startPollerListener(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = c.startShutdownListener()
+	err = c.startShutdownListener(ctx)
 	if err != nil {
 		return err
 	}
