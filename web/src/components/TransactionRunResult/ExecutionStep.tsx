@@ -69,9 +69,11 @@ const ExecutionStep = ({
         </S.AssertionResultContainer>
         <S.ExecutionStepStatus>
           <Tooltip title="Go to Run">
-            <S.ExecutionStepRunLink to={toLink} target="_blank" data-cy="execution-step-run-link">
-              <LinkOutlined />
-            </S.ExecutionStepRunLink>
+            <div>
+              <S.ExecutionStepRunLink to={toLink} target="_blank" data-cy="execution-step-run-link">
+                <LinkOutlined />
+              </S.ExecutionStepRunLink>
+            </div>
           </Tooltip>
         </S.ExecutionStepStatus>
       </S.Content>

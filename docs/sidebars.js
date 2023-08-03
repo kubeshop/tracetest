@@ -267,48 +267,13 @@ const sidebars = {
           items: [
             {
               type: "doc",
-              id: "configuration/connecting-to-data-stores/opentelemetry-collector",
-              label: "OpenTelemetry Collector",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/jaeger",
-              label: "Jaeger",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/opensearch",
-              label: "OpenSearch",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/elasticapm",
-              label: "Elastic APM",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/signalfx",
-              label: "SignalFX",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/tempo",
-              label: "Tempo",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/lightstep",
-              label: "Lightstep",
-            },
-            {
-              type: "doc",
-              id: "configuration/connecting-to-data-stores/new-relic",
-              label: "New Relic",
-            },
-            {
-              type: "doc",
               id: "configuration/connecting-to-data-stores/awsxray",
               label: "AWS X-Ray",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/azure-app-insights",
+              label: "Azure App Insights",
             },
             {
               type: "doc",
@@ -322,13 +287,53 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "configuration/connecting-to-data-stores/elasticapm",
+              label: "Elastic APM",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/tempo",
+              label: "Grafana Tempo",
+            },
+            {
+              type: "doc",
               id: "configuration/connecting-to-data-stores/honeycomb",
               label: "Honeycomb",
             },
             {
               type: "doc",
-              id: "configuration/connecting-to-data-stores/azure-app-insights",
-              label: "Azure App Insights",
+              id: "configuration/connecting-to-data-stores/jaeger",
+              label: "Jaeger",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/lightstep",
+              label: "Lightstep",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/new-relic",
+              label: "New Relic",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/opensearch",
+              label: "OpenSearch",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/opentelemetry-collector",
+              label: "OpenTelemetry Collector",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/signalfx",
+              label: "SignalFX",
+            },
+            {
+              type: "doc",
+              id: "configuration/connecting-to-data-stores/signoz",
+              label: "Signoz",
             },
           ],
         },
@@ -356,7 +361,7 @@ const sidebars = {
           type: "doc",
           id: "configuration/test-runner",
           label: "Test Runner",
-        }, 
+        },
         {
           type: "doc",
           id: "configuration/demo",
