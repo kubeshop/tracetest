@@ -1,9 +1,0 @@
-type: Environment
-spec:
-  id: another-env
-  name: another-env
-  values:
-  - key: Here
-    value: We
-  - key: Come
-    value: Again

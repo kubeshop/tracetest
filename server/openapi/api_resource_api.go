@@ -57,12 +57,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateDemo,
 		},
 		{
-			"CreateEnvironment",
-			strings.ToUpper("Post"),
-			"/api/environments",
-			c.CreateEnvironment,
-		},
-		{
 			"CreateLinter",
 			strings.ToUpper("Post"),
 			"/api/linters",
@@ -81,6 +75,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateTransaction,
 		},
 		{
+			"CreateVariableSet",
+			strings.ToUpper("Post"),
+			"/api/variableSets",
+			c.CreateVariableSet,
+		},
+		{
 			"DeleteDataStore",
 			strings.ToUpper("Delete"),
 			"/api/datastores/{dataStoreId}",
@@ -91,12 +91,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/demos/{demoId}",
 			c.DeleteDemo,
-		},
-		{
-			"DeleteEnvironment",
-			strings.ToUpper("Delete"),
-			"/api/environments/{environmentId}",
-			c.DeleteEnvironment,
 		},
 		{
 			"DeleteLinter",
@@ -117,6 +111,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.DeleteTransaction,
 		},
 		{
+			"DeleteVariableSet",
+			strings.ToUpper("Delete"),
+			"/api/variableSets/{variableSetId}",
+			c.DeleteVariableSet,
+		},
+		{
 			"GetConfiguration",
 			strings.ToUpper("Get"),
 			"/api/configs/{configId}",
@@ -133,12 +133,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/demos/{demoId}",
 			c.GetDemo,
-		},
-		{
-			"GetEnvironment",
-			strings.ToUpper("Get"),
-			"/api/environments/{environmentId}",
-			c.GetEnvironment,
 		},
 		{
 			"GetLinter",
@@ -171,6 +165,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetTransactions,
 		},
 		{
+			"GetVariableSet",
+			strings.ToUpper("Get"),
+			"/api/variableSets/{variableSetId}",
+			c.GetVariableSet,
+		},
+		{
 			"ListConfiguration",
 			strings.ToUpper("Get"),
 			"/api/configs",
@@ -189,12 +189,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.ListDemos,
 		},
 		{
-			"ListEnvironments",
-			strings.ToUpper("Get"),
-			"/api/environments",
-			c.ListEnvironments,
-		},
-		{
 			"ListLinters",
 			strings.ToUpper("Get"),
 			"/api/linters",
@@ -205,6 +199,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/pollingprofiles",
 			c.ListPollingProfile,
+		},
+		{
+			"ListVariableSets",
+			strings.ToUpper("Get"),
+			"/api/variableSets",
+			c.ListVariableSets,
 		},
 		{
 			"TestsTestIdGet",
@@ -231,12 +231,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.UpdateDemo,
 		},
 		{
-			"UpdateEnvironment",
-			strings.ToUpper("Put"),
-			"/api/environments/{environmentId}",
-			c.UpdateEnvironment,
-		},
-		{
 			"UpdateLinter",
 			strings.ToUpper("Put"),
 			"/api/linters/{LinterId}",
@@ -260,6 +254,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			"/api/transactions/{transactionId}",
 			c.UpdateTransaction,
 		},
+		{
+			"UpdateVariableSet",
+			strings.ToUpper("Put"),
+			"/api/variableSets/{variableSetId}",
+			c.UpdateVariableSet,
+		},
 	}
 }
 
@@ -277,30 +277,6 @@ func (c *ResourceApiApiController) CreateDemo(w http.ResponseWriter, r *http.Req
 		return
 	}
 	result, err := c.service.CreateDemo(r.Context(), demoParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// CreateEnvironment - Create an environment
-func (c *ResourceApiApiController) CreateEnvironment(w http.ResponseWriter, r *http.Request) {
-	environmentResourceParam := EnvironmentResource{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&environmentResourceParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.CreateEnvironment(r.Context(), environmentResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -383,6 +359,30 @@ func (c *ResourceApiApiController) CreateTransaction(w http.ResponseWriter, r *h
 
 }
 
+// CreateVariableSet - Create an VariableSet
+func (c *ResourceApiApiController) CreateVariableSet(w http.ResponseWriter, r *http.Request) {
+	variableSetResourceParam := VariableSetResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&variableSetResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertVariableSetResourceRequired(variableSetResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateVariableSet(r.Context(), variableSetResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // DeleteDataStore - Delete a Data Store
 func (c *ResourceApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -405,22 +405,6 @@ func (c *ResourceApiApiController) DeleteDemo(w http.ResponseWriter, r *http.Req
 	demoIdParam := params["demoId"]
 
 	result, err := c.service.DeleteDemo(r.Context(), demoIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// DeleteEnvironment - Delete an environment
-func (c *ResourceApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.DeleteEnvironment(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -479,6 +463,22 @@ func (c *ResourceApiApiController) DeleteTransaction(w http.ResponseWriter, r *h
 
 }
 
+// DeleteVariableSet - Delete an VariableSet
+func (c *ResourceApiApiController) DeleteVariableSet(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	variableSetIdParam := params["variableSetId"]
+
+	result, err := c.service.DeleteVariableSet(r.Context(), variableSetIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetConfiguration - Get Tracetest configuration
 func (c *ResourceApiApiController) GetConfiguration(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -517,22 +517,6 @@ func (c *ResourceApiApiController) GetDemo(w http.ResponseWriter, r *http.Reques
 	demoIdParam := params["demoId"]
 
 	result, err := c.service.GetDemo(r.Context(), demoIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetEnvironment - Get a specific environment
-func (c *ResourceApiApiController) GetEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	result, err := c.service.GetEnvironment(r.Context(), environmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -645,6 +629,22 @@ func (c *ResourceApiApiController) GetTransactions(w http.ResponseWriter, r *htt
 
 }
 
+// GetVariableSet - Get a specific VariableSet
+func (c *ResourceApiApiController) GetVariableSet(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	variableSetIdParam := params["variableSetId"]
+
+	result, err := c.service.GetVariableSet(r.Context(), variableSetIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // ListConfiguration - List Tracetest configuration
 func (c *ResourceApiApiController) ListConfiguration(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -723,32 +723,6 @@ func (c *ResourceApiApiController) ListDemos(w http.ResponseWriter, r *http.Requ
 
 }
 
-// ListEnvironments - List environments
-func (c *ResourceApiApiController) ListEnvironments(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.ListEnvironments(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
 // ListLinters - List Linters
 func (c *ResourceApiApiController) ListLinters(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -791,6 +765,32 @@ func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.ListPollingProfile(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ListVariableSets - List variableSets
+func (c *ResourceApiApiController) ListVariableSets(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListVariableSets(r.Context(), takeParam, skipParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -888,33 +888,6 @@ func (c *ResourceApiApiController) UpdateDemo(w http.ResponseWriter, r *http.Req
 		return
 	}
 	result, err := c.service.UpdateDemo(r.Context(), demoIdParam, demoParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// UpdateEnvironment - Update an environment
-func (c *ResourceApiApiController) UpdateEnvironment(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	environmentIdParam := params["environmentId"]
-
-	environmentResourceParam := EnvironmentResource{}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&environmentResourceParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
-		c.errorHandler(w, r, err, nil)
-		return
-	}
-	result, err := c.service.UpdateEnvironment(r.Context(), environmentIdParam, environmentResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1023,6 +996,33 @@ func (c *ResourceApiApiController) UpdateTransaction(w http.ResponseWriter, r *h
 		return
 	}
 	result, err := c.service.UpdateTransaction(r.Context(), transactionIdParam, transactionResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateVariableSet - Update an VariableSet
+func (c *ResourceApiApiController) UpdateVariableSet(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	variableSetIdParam := params["variableSetId"]
+
+	variableSetResourceParam := VariableSetResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&variableSetResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertVariableSetResourceRequired(variableSetResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateVariableSet(r.Context(), variableSetIdParam, variableSetResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -123,8 +123,8 @@ type (
 
 		Metadata RunMetadata
 
-		// environment
-		Environment environment.Environment
+		// variable set
+		VariableSet variableset.VariableSet
 
 		// transaction
 

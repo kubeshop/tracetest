@@ -39,7 +39,7 @@ func (c Client) validType(inputFile fileutil.File) error {
 	}
 	c.logger.Debug("Parsed type", zap.String("type", t))
 
-	if t != c.resourceType() {
+	if t != c.resourceType() && t != c.options.deprecatedAlias {
 		return fmt.Errorf("cannot apply %s to %s resource", t, c.resourceType())
 	}
 

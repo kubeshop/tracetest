@@ -38,7 +38,7 @@ type TestRun struct {
 	ServiceTriggerCompletedAt *time.Time            `json:"serviceTriggerCompletedAt,omitempty"`
 	ObtainedTraceAt           *time.Time            `json:"obtainedTraceAt,omitempty"`
 	CompletedAt               *time.Time            `json:"completedAt,omitempty"`
-	Environment               *Environment          `json:"environment,omitempty"`
+	VariableSet               *VariableSet          `json:"variableSet,omitempty"`
 	TriggerResult             *TriggerResult        `json:"triggerResult,omitempty"`
 	Trace                     *Trace                `json:"trace,omitempty"`
 	Result                    *AssertionResults     `json:"result,omitempty"`
@@ -483,36 +483,36 @@ func (o *TestRun) SetCompletedAt(v time.Time) {
 	o.CompletedAt = &v
 }
 
-// GetEnvironment returns the Environment field value if set, zero value otherwise.
-func (o *TestRun) GetEnvironment() Environment {
-	if o == nil || isNil(o.Environment) {
-		var ret Environment
+// GetVariableSet returns the VariableSet field value if set, zero value otherwise.
+func (o *TestRun) GetVariableSet() VariableSet {
+	if o == nil || isNil(o.VariableSet) {
+		var ret VariableSet
 		return ret
 	}
-	return *o.Environment
+	return *o.VariableSet
 }
 
-// GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
+// GetVariableSetOk returns a tuple with the VariableSet field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetEnvironmentOk() (*Environment, bool) {
-	if o == nil || isNil(o.Environment) {
+func (o *TestRun) GetVariableSetOk() (*VariableSet, bool) {
+	if o == nil || isNil(o.VariableSet) {
 		return nil, false
 	}
-	return o.Environment, true
+	return o.VariableSet, true
 }
 
-// HasEnvironment returns a boolean if a field has been set.
-func (o *TestRun) HasEnvironment() bool {
-	if o != nil && !isNil(o.Environment) {
+// HasVariableSet returns a boolean if a field has been set.
+func (o *TestRun) HasVariableSet() bool {
+	if o != nil && !isNil(o.VariableSet) {
 		return true
 	}
 
 	return false
 }
 
-// SetEnvironment gets a reference to the given Environment and assigns it to the Environment field.
-func (o *TestRun) SetEnvironment(v Environment) {
-	o.Environment = &v
+// SetVariableSet gets a reference to the given VariableSet and assigns it to the VariableSet field.
+func (o *TestRun) SetVariableSet(v VariableSet) {
+	o.VariableSet = &v
 }
 
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
@@ -846,8 +846,8 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.CompletedAt) {
 		toSerialize["completedAt"] = o.CompletedAt
 	}
-	if !isNil(o.Environment) {
-		toSerialize["environment"] = o.Environment
+	if !isNil(o.VariableSet) {
+		toSerialize["variableSet"] = o.VariableSet
 	}
 	if !isNil(o.TriggerResult) {
 		toSerialize["triggerResult"] = o.TriggerResult

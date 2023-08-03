@@ -121,7 +121,7 @@ func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
 	r.handleDBError(run, r.updater.Update(ctx, run))
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
-		Values: run.Environment.Values,
+		Values: run.VariableSet.Values,
 	}}
 
 	executor := expression.NewExecutor(ds...)

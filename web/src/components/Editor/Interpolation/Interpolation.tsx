@@ -3,7 +3,7 @@ import {uniq} from 'lodash';
 import {Tooltip} from 'antd';
 import {autocompletion} from '@codemirror/autocomplete';
 import {useCallback, useMemo} from 'react';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet';
 import EditorService from 'services/Editor.service';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {interpolationQL} from './grammar';
@@ -21,11 +21,11 @@ const Interpolation = ({
   extensions = [],
   indentWithTab = false,
 }: IEditorProps) => {
-  const {selectedEnvironment} = useEnvironment();
+  const {selectedVariableSet} = useVariableSet();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete();
   const {onHover, resolvedValues} = useTooltip({
-    environmentId: selectedEnvironment?.id,
+    variableSetId: selectedVariableSet?.id,
   });
 
   const extensionList = useMemo(

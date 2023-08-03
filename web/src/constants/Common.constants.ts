@@ -26,7 +26,7 @@ export const ANALYZER_DOCUMENTATION_URL = 'https://docs.tracetest.io/analyzer/co
 export const TEST_RUNNER_DOCUMENTATION_URL = 'https://docs.tracetest.io/configuration/test-runner';
 export const ANALYZER_RULES_DOCUMENTATION_URL = 'https://docs.tracetest.io/analyzer/rules';
 export const EXPRESSIONS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/expressions';
-export const ENVIRONMENTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/environments';
+export const VARIABLE_SET_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/variable-sets';
 
 export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 

@@ -2,7 +2,7 @@ export enum Categories {
   Home = 'home',
   Test = 'test',
   TestRun = 'test-run',
-  Environments = 'environments',
+  VariableSet = 'variable-set',
   TraceDetail = 'trace-detail',
   TestResults = 'test-results',
   SpanDetail = 'span-detail',

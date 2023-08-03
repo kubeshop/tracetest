@@ -2,7 +2,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
 import AssertionResults, {TRawAssertionResults} from 'models/AssertionResults.model';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
 import SelectedSpans, {TRawSelectedSpans} from 'models/SelectedSpans.model';
 import Test from 'models/Test.model';
@@ -18,12 +18,12 @@ function getTotalCountFromHeaders(meta: any) {
 
 const testRunEndpoints = TraceTestAPI.injectEndpoints({
   endpoints: builder => ({
-    runTest: builder.mutation<TestRun, {testId: string; environmentId?: string; variables?: TEnvironmentValue[]}>({
-      query: ({testId, environmentId, variables = []}) => ({
+    runTest: builder.mutation<TestRun, {testId: string; variableSetId?: string; variables?: TVariableSetValue[]}>({
+      query: ({testId, variableSetId, variables = []}) => ({
         url: `/tests/${testId}/run`,
         method: HTTP_METHOD.POST,
         body: {
-          environmentId,
+          variableSetId,
           variables,
         },
       }),

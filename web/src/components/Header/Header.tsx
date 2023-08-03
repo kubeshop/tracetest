@@ -1,7 +1,7 @@
 import {Space} from 'antd';
 
 import Logo from 'assets/Logo.svg';
-import EnvironmentSelector from 'components/EnvironmentSelector';
+import VariableSetSelector from 'components/VariableSetSelector';
 import Link from 'components/Link';
 import NoTracingPopover from 'components/NoTracingPopover';
 import * as S from './Header.styled';
@@ -24,7 +24,7 @@ const Header = ({hasLogo = false, isNoTracingMode}: IProps) => (
 
     <Space>
       {isNoTracingMode && <NoTracingPopover />}
-      <EnvironmentSelector />
+      <VariableSetSelector />
       <HelpMenu />
     </Space>
   </S.Header>

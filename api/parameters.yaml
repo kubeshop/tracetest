@@ -126,11 +126,11 @@ components:
       schema:
         type: string
 
-    environmentId:
+    variableSetId:
       in: path
-      name: environmentId
+      name: variableSetId
       required: true
-      description: "ID of an environment used on Tracetest to inject values into tests and transactions"
+      description: "ID of a VariableSet used on Tracetest to inject values into tests and transactions"
       schema:
         type: string
 

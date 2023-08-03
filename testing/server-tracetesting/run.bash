@@ -23,7 +23,7 @@ export EXAMPLE_TEST_ID="w2ON-RVVg"
 echo "Preparing to run tests on API..."
 echo ""
 
-echo "Environment variables considered on this run:"
+echo "Variable set considered on this run:"
 echo "TRACETEST_CLI:      $TRACETEST_CLI"
 echo "TARGET_URL:         $TARGET_URL"
 echo "TRACETEST_ENDPOINT: $TRACETEST_ENDPOINT"
@@ -31,7 +31,7 @@ echo "DEMO_APP_URL:       $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL:  $DEMO_APP_GRPC_URL"
 
 cat << EOF > tracetesting-env.yaml
-type: Environment
+type: VariableSet
 spec:
   id: tracetesting-env
   name: tracetesting-env
@@ -46,7 +46,7 @@ spec:
       value: $EXAMPLE_TEST_ID
 EOF
 
-echo "Environment variables set:"
+echo "variables set created:"
 cat tracetesting-env.yaml
 
 echo "Setting up tracetest CLI configuration..."
@@ -68,7 +68,7 @@ run_test_suite_for_feature() {
   # junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --environment ./tracetesting-env.yaml"
+  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --vars ./tracetesting-env.yaml"
   echo $testCMD
   $testCMD
   return $?
@@ -84,7 +84,7 @@ EXIT_STATUS=0
 # add more test suites here
 run_test_suite_for_feature 'http_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'grpc_test' || EXIT_STATUS=$?
-run_test_suite_for_feature 'environment' || EXIT_STATUS=$?
+run_test_suite_for_feature 'variableset' || EXIT_STATUS=$?
 run_test_suite_for_feature 'transaction' || EXIT_STATUS=$?
 
 echo ""

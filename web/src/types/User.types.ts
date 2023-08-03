@@ -1,6 +1,6 @@
 export interface IUserPreferences {
   lang: string;
-  environmentId: string;
+  variableSetId: string;
   initConfigSetup: boolean;
   initConfigSetupFromTest: boolean;
   showGuidedTourNotification: boolean;

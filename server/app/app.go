@@ -16,7 +16,6 @@ import (
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/demo"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
@@ -38,6 +37,7 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -196,7 +196,7 @@ func (app *App) Start(opts ...appOption) error {
 	demoRepo := demo.NewRepository(db)
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastore.NewRepository(db)
-	environmentRepo := environment.NewRepository(db)
+	variableSetRepo := variableset.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
 	runRepo := test.NewRunRepository(db)
@@ -255,7 +255,7 @@ func (app *App) Start(opts ...appOption) error {
 		transactionRunRepository,
 		testRepo,
 		runRepo,
-		environmentRepo,
+		variableSetRepo,
 	)
 	registerWSHandler(router, mappers, subscriptionManager)
 
@@ -273,7 +273,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
 	registerConfigResource(configRepo, apiRouter, provisioner, tracer)
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, provisioner, tracer)
-	registerEnvironmentResource(environmentRepo, apiRouter, provisioner, tracer)
+	registerVariableSetResource(variableSetRepo, apiRouter, provisioner, tracer)
 	registerDemosResource(demoRepo, apiRouter, provisioner, tracer)
 	registerDataStoreResource(dataStoreRepo, apiRouter, provisioner, tracer)
 	registerAnalyzer(linterRepo, apiRouter, provisioner, tracer)
@@ -426,10 +426,10 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerEnvironmentResource(repository *environment.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[environment.Environment](
-		environment.ResourceName,
-		environment.ResourceNamePlural,
+func registerVariableSetResource(repository *variableset.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[variableset.VariableSet](
+		variableset.ResourceName,
+		variableset.ResourceNamePlural,
 		repository,
 		resourcemanager.WithTracer(tracer),
 	)
@@ -509,7 +509,7 @@ func controller(
 	transactionRunRepo *transaction.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
-	environmentRepo *environment.Repository,
+	variablesetRepo *variableset.Repository,
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry())
 
@@ -526,7 +526,7 @@ func controller(
 		transactionRunRepo,
 		testRepo,
 		testRunRepo,
-		environmentRepo,
+		variablesetRepo,
 
 		mappers,
 	))
@@ -547,7 +547,7 @@ func httpRouter(
 	transactionRunRepo *transaction.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
-	environmentRepo *environment.Repository,
+	variableSetRepo *variableset.Repository,
 
 	mappers mappings.Mappings,
 ) openapi.Router {
@@ -562,7 +562,7 @@ func httpRouter(
 		transactionRunRepo,
 		testRepo,
 		testRunRepo,
-		environmentRepo,
+		variableSetRepo,
 
 		tracedb.Factory(testRunRepo),
 		mappers,

@@ -1,4 +1,4 @@
-import {endpoints as environmentEndpoints} from './endpoints/Environment.endpoint';
+import {endpoints as variableSetEndpoints} from './endpoints/VariableSet.endpoint';
 import {endpoints as testEndpoints} from './endpoints/Test.endpoint';
 import {endpoints as testRunEndpoints} from './endpoints/TestRun.endpoint';
 
@@ -13,11 +13,11 @@ export {
 } from './endpoints/DataStore.endpoint';
 
 export {
-  useGetEnvironmentsQuery,
-  useCreateEnvironmentMutation,
-  useUpdateEnvironmentMutation,
-  useDeleteEnvironmentMutation,
-} from './endpoints/Environment.endpoint';
+  useCreateVariableSetMutation,
+  useDeleteVariableSetMutation,
+  useGetVariableSetsQuery,
+  useUpdateVariableSetMutation,
+} from './endpoints/VariableSet.endpoint';
 
 export {useParseExpressionMutation} from './endpoints/Expression.endpoint';
 
@@ -79,4 +79,4 @@ export {
   useRunTransactionMutation,
 } from './endpoints/TransactionRun.endpoint';
 
-export const endpoints = {...environmentEndpoints, ...testEndpoints, ...testRunEndpoints};
+export const endpoints = {...variableSetEndpoints, ...testEndpoints, ...testRunEndpoints};

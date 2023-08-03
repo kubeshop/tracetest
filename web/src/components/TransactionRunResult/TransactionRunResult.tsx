@@ -10,7 +10,7 @@ interface IProps {
   transactionRun: TransactionRun;
 }
 
-const TransactionRunResult = ({transactionRun: {steps, environment, state}, transaction}: IProps) => {
+const TransactionRunResult = ({transactionRun: {steps, variableSet, state}, transaction}: IProps) => {
   const hasRunFailed = state === TestState.FAILED;
 
   return (
@@ -28,7 +28,7 @@ const TransactionRunResult = ({transactionRun: {steps, environment, state}, tran
       </div>
       <div>
         <S.Title>Variables</S.Title>
-        {environment?.values?.map(value => (
+        {variableSet?.values?.map(value => (
           <KeyValueRow key={value.key} keyName={value.key} value={value.value} />
         ))}
       </div>

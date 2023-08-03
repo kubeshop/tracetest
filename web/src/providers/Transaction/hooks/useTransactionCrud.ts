@@ -1,9 +1,9 @@
 import {useCallback} from 'react';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
 import Transaction from 'models/Transaction.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet/VariableSet.provider';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {
   useDeleteTransactionByIdMutation,
@@ -21,19 +21,19 @@ const useTransactionCrud = () => {
   const [getTransaction] = useLazyGetTransactionVersionByIdQuery();
   const [deleteTransactionAction] = useDeleteTransactionByIdMutation();
   const isEditLoading = isTransactionEditLoading || isLoadingRunTransaction;
-  const {selectedEnvironment} = useEnvironment();
+  const {selectedVariableSet} = useVariableSet();
   const {onOpen} = useMissingVariablesModal();
 
   const runTransaction = useCallback(
-    async (transaction: Transaction, runId?: string, environmentId = selectedEnvironment?.id) => {
+    async (transaction: Transaction, runId?: string, variableSetId = selectedVariableSet?.id) => {
       const {fullSteps: testList} = await getTransaction({
         transactionId: transaction.id,
         version: transaction.version,
       }).unwrap();
 
-      const run = async (variables: TEnvironmentValue[] = []) => {
+      const run = async (variables: TVariableSetValue[] = []) => {
         try {
-          const {id} = await runTransactionAction({transactionId: transaction.id, environmentId, variables}).unwrap();
+          const {id} = await runTransactionAction({transactionId: transaction.id, variableSetId, variables}).unwrap();
 
           navigate(`/transaction/${transaction.id}/run/${id}`);
         } catch (error) {
@@ -53,7 +53,7 @@ const useTransactionCrud = () => {
 
       run();
     },
-    [getTransaction, navigate, onOpen, runTransactionAction, selectedEnvironment?.id]
+    [getTransaction, navigate, onOpen, runTransactionAction, selectedVariableSet?.id]
   );
 
   const edit = useCallback(

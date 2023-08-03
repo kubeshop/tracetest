@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -438,7 +438,7 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
-				Values: []environment.EnvironmentValue{},
+				Values: []variableset.VariableSetValue{},
 			},
 		},
 		{
@@ -469,7 +469,7 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: at index 1 of array: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
-				Values: []environment.EnvironmentValue{},
+				Values: []variableset.VariableSetValue{},
 			},
 		},
 	}
