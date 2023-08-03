@@ -32,6 +32,7 @@ func (vs variableSet) Preprocess(ctx context.Context, input fileutil.File) (file
 		return input, fmt.Errorf("could not unmarshal test yaml: %w", err)
 	}
 
+	// TODO: This should be removed at some point as the Environment type is deprecated
 	if resource.Type == "Environment" {
 		resource.Type = "VariableSet"
 	}
