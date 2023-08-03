@@ -19,7 +19,7 @@ If you are running Tracetest with Docker, and Tracetest's service name is `trace
 
 Additionally, add another config:
 
-- Set the `exporter` to `otlp/dynatrace`
+- Set the `exporter` to `otlphttp/dynatrace`
 - Set the `endpoint` to your Dynatrace tenant and include the: `https://{your-environment-id}.live.dynatrace.com/api/v2/otlp`
 
 ```yaml
@@ -46,7 +46,7 @@ exporters:
     tls:
       insecure: true
   # OTLP for Dynatrace
-  otlp/dynatrace:
+  otlphttp/dynatrace:
     endpoint: https://abc123.live.dynatrace.com/api/v2/otlp # Send traces to Dynatrace. Read more in docs here: https://www.dynatrace.com/support/help/extend-dynatrace/opentelemetry/collector#configuration
     headers:
       Authorization: "Api-Token dt0c01.sample.secret" # Requires "openTelemetryTrace.ingest" permission
@@ -59,7 +59,7 @@ service:
     traces/Dynatrace: # Pipeline to send data to Dynatrace
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/dynatrace]
+      exporters: [logging, otlphttp/dynatrace]
 ```
 
 ## Configure Tracetest to Use Dynatrace as a Trace Data Store
