@@ -11,18 +11,20 @@ Tracetest is designed to work with different trace data stores. To enable Tracet
 
 Currently, Tracetest supports the following data stores. Click on the respective data store to view configuration examples:
 
-- [Jaeger](./connecting-to-data-stores/jaeger)
-- [OpenSearch](./connecting-to-data-stores/opensearch)
-- [Elastic](./connecting-to-data-stores/elasticapm)
-- [SignalFX](./connecting-to-data-stores/signalfx)
+- [AWS X-Ray](./connecting-to-data-stores/awsxray)
+- [Azure App Insights](./connecting-to-data-stores/azure-app-insights.md)
+- [Datadog](./connecting-to-data-stores/datadog)
+- [Dynatrace](./connecting-to-data-stores/dynatrace)
+- [Elastic APM](./connecting-to-data-stores/elasticapm)
 - [Grafana Tempo](./connecting-to-data-stores/tempo)
+- [Honeycomb](./connecting-to-data-stores/honeycomb)
+- [Jaeger](./connecting-to-data-stores/jaeger)
 - [Lightstep](./connecting-to-data-stores/lightstep)
 - [New Relic](./connecting-to-data-stores/new-relic)
-- [AWS X-Ray](./connecting-to-data-stores/awsxray)
-- [Datadog](./connecting-to-data-stores/datadog)
-- [Honeycomb](./connecting-to-data-stores/honeycomb)
-- [Azure App Insights](./connecting-to-data-stores/azure-app-insights.md)
-- [Dynatrace](./connecting-to-data-stores/dynatrace)
+- [OpenSearch](./connecting-to-data-stores/opensearch)
+- [OpenTelemetry Collector](./connecting-to-data-stores/opentelemetry-collector)
+- [SignalFX](./connecting-to-data-stores/signalfx)
+- [Signoz](./connecting-to-data-stores/signoz)
 
 ## Using Tracetest without a Trace Data Store
 
