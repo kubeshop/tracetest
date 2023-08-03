@@ -85,7 +85,7 @@ func (s *ResourceApiApiService) CreateTransaction(ctx context.Context, transacti
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateTransaction method not implemented")
 }
 
-// CreateVariableSet - Create an VariableSet
+// CreateVariableSet - Create a VariableSet
 func (s *ResourceApiApiService) CreateVariableSet(ctx context.Context, variableSetResource VariableSetResource) (ImplResponse, error) {
 	// TODO - update CreateVariableSet with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -178,7 +178,7 @@ func (s *ResourceApiApiService) DeleteTransaction(ctx context.Context, transacti
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteTransaction method not implemented")
 }
 
-// DeleteVariableSet - Delete an VariableSet
+// DeleteVariableSet - Delete a variableSet
 func (s *ResourceApiApiService) DeleteVariableSet(ctx context.Context, variableSetId string) (ImplResponse, error) {
 	// TODO - update DeleteVariableSet with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -424,7 +424,7 @@ func (s *ResourceApiApiService) ListPollingProfile(ctx context.Context, take int
 	return Response(http.StatusNotImplemented, nil), errors.New("ListPollingProfile method not implemented")
 }
 
-// ListVariableSets - List variableSets
+// ListVariableSets - List VariableSets
 func (s *ResourceApiApiService) ListVariableSets(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
 	// TODO - update ListVariableSets with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
@@ -580,7 +580,7 @@ func (s *ResourceApiApiService) UpdateTransaction(ctx context.Context, transacti
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateTransaction method not implemented")
 }
 
-// UpdateVariableSet - Update an VariableSet
+// UpdateVariableSet - Update a VariableSet
 func (s *ResourceApiApiService) UpdateVariableSet(ctx context.Context, variableSetId string, variableSetResource VariableSetResource) (ImplResponse, error) {
 	// TODO - update UpdateVariableSet with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.

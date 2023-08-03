@@ -17,7 +17,7 @@ import (
 // checks if the VariableSetResource type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &VariableSetResource{}
 
-// VariableSetResource Represents an VariableSet structured into the Resources format.
+// VariableSetResource Represents a VariableSet structured into the Resources format.
 type VariableSetResource struct {
 	// Represents the type of this resource. It should always be set as 'VariableSet'.
 	Type *string      `json:"type,omitempty"`

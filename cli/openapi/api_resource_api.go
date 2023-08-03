@@ -470,9 +470,9 @@ func (r ApiCreateVariableSetRequest) Execute() (*VariableSetResource, *http.Resp
 }
 
 /*
-CreateVariableSet Create an VariableSet
+CreateVariableSet Create a VariableSet
 
-Create an VariableSet that can be used by tests and transactions
+Create a VariableSet that can be used by tests and transactions
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiCreateVariableSetRequest
@@ -1033,12 +1033,12 @@ func (r ApiDeleteVariableSetRequest) Execute() (*http.Response, error) {
 }
 
 /*
-DeleteVariableSet Delete an VariableSet
+DeleteVariableSet Delete a variableSet
 
-Delete an VariableSet from Tracetest
+Delete a variableSet from Tracetest
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param variableSetId ID of an VariableSet used on Tracetest to inject values into tests and transactions
+	@param variableSetId ID of a VariableSet used on Tracetest to inject values into tests and transactions
 	@return ApiDeleteVariableSetRequest
 */
 func (a *ResourceApiApiService) DeleteVariableSet(ctx context.Context, variableSetId string) ApiDeleteVariableSetRequest {
@@ -2054,7 +2054,7 @@ GetVariableSet Get a specific VariableSet
 Get one VariableSet by its id
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param variableSetId ID of an VariableSet used on Tracetest to inject values into tests and transactions
+	@param variableSetId ID of a VariableSet used on Tracetest to inject values into tests and transactions
 	@return ApiGetVariableSetRequest
 */
 func (a *ResourceApiApiService) GetVariableSet(ctx context.Context, variableSetId string) ApiGetVariableSetRequest {
@@ -2880,9 +2880,9 @@ func (r ApiListVariableSetsRequest) Execute() (*VariableSetResourceList, *http.R
 }
 
 /*
-ListVariableSets List variableSets
+ListVariableSets List VariableSets
 
-List variableSets available in Tracetest.
+List VariableSets available in Tracetest.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiListVariableSetsRequest
@@ -3863,12 +3863,12 @@ func (r ApiUpdateVariableSetRequest) Execute() (*VariableSetResource, *http.Resp
 }
 
 /*
-UpdateVariableSet Update an VariableSet
+UpdateVariableSet Update a VariableSet
 
-Update an VariableSet used on Tracetest
+Update a VariableSet used on Tracetest
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param variableSetId ID of an VariableSet used on Tracetest to inject values into tests and transactions
+	@param variableSetId ID of a VariableSet used on Tracetest to inject values into tests and transactions
 	@return ApiUpdateVariableSetRequest
 */
 func (a *ResourceApiApiService) UpdateVariableSet(ctx context.Context, variableSetId string) ApiUpdateVariableSetRequest {

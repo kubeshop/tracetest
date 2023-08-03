@@ -23,6 +23,7 @@ type Trigger struct {
 	HttpRequest *HTTPRequest    `json:"httpRequest,omitempty"`
 	Grpc        *GRPCRequest    `json:"grpc,omitempty"`
 	Traceid     *TRACEIDRequest `json:"traceid,omitempty"`
+	Kafka       *KafkaRequest   `json:"kafka,omitempty"`
 }
 
 // NewTrigger instantiates a new Trigger object
@@ -170,6 +171,38 @@ func (o *Trigger) SetTraceid(v TRACEIDRequest) {
 	o.Traceid = &v
 }
 
+// GetKafka returns the Kafka field value if set, zero value otherwise.
+func (o *Trigger) GetKafka() KafkaRequest {
+	if o == nil || isNil(o.Kafka) {
+		var ret KafkaRequest
+		return ret
+	}
+	return *o.Kafka
+}
+
+// GetKafkaOk returns a tuple with the Kafka field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Trigger) GetKafkaOk() (*KafkaRequest, bool) {
+	if o == nil || isNil(o.Kafka) {
+		return nil, false
+	}
+	return o.Kafka, true
+}
+
+// HasKafka returns a boolean if a field has been set.
+func (o *Trigger) HasKafka() bool {
+	if o != nil && !isNil(o.Kafka) {
+		return true
+	}
+
+	return false
+}
+
+// SetKafka gets a reference to the given KafkaRequest and assigns it to the Kafka field.
+func (o *Trigger) SetKafka(v KafkaRequest) {
+	o.Kafka = &v
+}
+
 func (o Trigger) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o Trigger) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Traceid) {
 		toSerialize["traceid"] = o.Traceid
+	}
+	if !isNil(o.Kafka) {
+		toSerialize["kafka"] = o.Kafka
 	}
 	return toSerialize, nil
 }
