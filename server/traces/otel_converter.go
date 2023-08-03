@@ -13,10 +13,10 @@ import (
 )
 
 func FromOtel(input *v1.TracesData) model.Trace {
-	return fromOtelResourceSpans(input.ResourceSpans)
+	return FromOtelResourceSpans(input.ResourceSpans)
 }
 
-func fromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) model.Trace {
+func FromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) model.Trace {
 	flattenSpans := make([]*v1.Span, 0)
 	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {

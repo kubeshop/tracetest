@@ -2,8 +2,9 @@ package otlp
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -13,20 +14,29 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
-	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-type ingester struct {
-	runRepository test.RunRepository
-	eventEmitter  executor.EventEmitter
-	dsRepo        *datastore.Repository
+type runGetter interface {
+	GetRunByTraceID(context.Context, trace.TraceID) (test.Run, error)
 }
 
-func NewIngester(runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
+type tracePersister interface {
+	SaveTrace(context.Context, model.Trace) error
+}
+
+type ingester struct {
+	tracePersister tracePersister
+	runGetter      runGetter
+	eventEmitter   executor.EventEmitter
+	dsRepo         *datastore.Repository
+}
+
+func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
 	return ingester{
-		runRepository: runRepository,
-		eventEmitter:  eventEmitter,
-		dsRepo:        dsRepo,
+		tracePersister: tracePersister,
+		runGetter:      runRepository,
+		eventEmitter:   eventEmitter,
+		dsRepo:         dsRepo,
 	}
 }
 
@@ -42,82 +52,41 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 		return &pb.ExportTraceServiceResponse{}, nil
 	}
 
-	spansByTrace := i.getSpansByTrace(request)
-
-	for traceID, spans := range spansByTrace {
-		i.saveSpansIntoTest(ctx, traceID, spans, requestType)
+	modelTrace := traces.FromOtelResourceSpans(request.ResourceSpans)
+	err = i.tracePersister.SaveTrace(ctx, modelTrace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save trace: %w", err)
 	}
 
-	return &pb.ExportTraceServiceResponse{
-		PartialSuccess: &pb.ExportTracePartialSuccess{
-			RejectedSpans: 0,
-		},
-	}, nil
+	err = i.notify(ctx, modelTrace, requestType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to notify: %w", err)
+	}
+
+	return &pb.ExportTraceServiceResponse{}, nil
 }
 
-func (i ingester) getSpansByTrace(request *pb.ExportTraceServiceRequest) map[trace.TraceID][]model.Span {
-	otelSpans := make([]*v1.Span, 0)
-	for _, resourceSpan := range request.ResourceSpans {
-		for _, spans := range resourceSpan.ScopeSpans {
-			otelSpans = append(otelSpans, spans.Spans...)
-		}
-	}
-
-	spansByTrace := make(map[trace.TraceID][]model.Span)
-
-	for _, span := range otelSpans {
-		traceID := traces.CreateTraceID(span.TraceId)
-		var existingArray []model.Span
-		if spansArray, ok := spansByTrace[traceID]; ok {
-			existingArray = spansArray
-		} else {
-			existingArray = make([]model.Span, 0)
-		}
-
-		existingArray = append(existingArray, *traces.ConvertOtelSpanIntoSpan(span))
-		spansByTrace[traceID] = existingArray
-	}
-
-	return spansByTrace
-}
-
-func (e ingester) saveSpansIntoTest(ctx context.Context, traceID trace.TraceID, spans []model.Span, requestType string) error {
-	run, err := e.runRepository.GetRunByTraceID(ctx, traceID)
-	if err != nil && strings.Contains(err.Error(), "record not found") {
-		// span is not part of any known test run. So it will be ignored
+func (i ingester) notify(ctx context.Context, trace model.Trace, requestType string) error {
+	run, err := i.runGetter.GetRunByTraceID(ctx, trace.ID)
+	if errors.Is(err, sql.ErrNoRows) {
+		// trace is not part of any known test run, so no need to notify
 		return nil
 	}
-
 	if err != nil {
-		return fmt.Errorf("could not find test run with traceID %s: %w", traceID.String(), err)
+		// there was an actual error accessing the DB
+		return fmt.Errorf("error getting run by traceID: %w", err)
 	}
 
-	if run.State != test.RunStateAwaitingTrace {
-		// test is not waiting for trace, so we can completely ignore those as they might
-		// mess up with the test integrity.
-		//
-		// For example:
-		// Imagine that a test failed because Span A wasn't available in the trace and one minute
-		// later, the span is received and added to the span. When investigating the issue,
-		// one might be confused and maybe think it's a bug in our assertion engine
-		// because the assertion failed, but the span is there. However, it wasn't at
-		// the moment the assertion ran.
-		//
-		// So, to reduce friction and prevent long debugging hours, we can just disable this.
-
-		return nil
-	}
-
-	existingSpans := run.Trace.Spans()
-	newSpans := append(existingSpans, spans...)
-	newTrace := model.NewTrace(traceID.String(), newSpans)
-
-	e.eventEmitter.Emit(ctx, events.TraceOtlpServerReceivedSpans(run.TestID, run.ID, len(newSpans), requestType))
-	run.Trace = &newTrace
-
-	err = e.runRepository.UpdateRun(ctx, run)
+	evt := events.TraceOtlpServerReceivedSpans(
+		run.TestID,
+		run.ID,
+		len(trace.Flat),
+		requestType,
+	)
+	err = i.eventEmitter.Emit(ctx, evt)
 	if err != nil {
-		return fmt.Errorf("could not update run: %w", err)
+		// there was an actual error accessing the DB
+		return fmt.Errorf("error getting run by traceID: %w", err)
 	}
 
 	return nil
