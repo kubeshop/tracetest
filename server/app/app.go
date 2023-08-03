@@ -472,10 +472,11 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 }
 
 func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
-	triggerReg := trigger.NewRegsitry(tracer, appTracer)
+	triggerReg := trigger.NewRegistry(tracer, appTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
 	triggerReg.Add(trigger.TRACEID())
+	triggerReg.Add(trigger.Kafka())
 
 	return triggerReg
 }
