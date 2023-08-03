@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configcompression"
@@ -75,7 +76,7 @@ func (client *GrpcClient) Ready() bool {
 	return client.conn != nil
 }
 
-func (client *GrpcClient) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (client *GrpcClient) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	return client.callback(ctx, traceID, client.conn)
 }
 

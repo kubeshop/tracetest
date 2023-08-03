@@ -6,7 +6,7 @@ import (
 	"regexp"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type ensuresDnsUsage struct{}
@@ -24,7 +24,7 @@ func (r ensuresDnsUsage) ID() string {
 	return analyzer.EnforceDnsRuleID
 }
 
-func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace traces.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	passed := true
 	res := make([]analyzer.Result, 0)
 
@@ -41,7 +41,7 @@ func (r ensuresDnsUsage) Evaluate(ctx context.Context, trace model.Trace, config
 	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: passed, Results: res}), nil
 }
 
-func (r ensuresDnsUsage) validate(span *model.Span) analyzer.Result {
+func (r ensuresDnsUsage) validate(span *traces.Span) analyzer.Result {
 	ipFields := make([]analyzer.Error, 0)
 	ipRegexp := regexp.MustCompile(`(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`)
 
@@ -55,7 +55,7 @@ func (r ensuresDnsUsage) validate(span *model.Span) analyzer.Result {
 	}
 
 	for _, field := range clientDnsFields {
-		if span.Kind == model.SpanKindClient && span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
+		if span.Kind == traces.SpanKindClient && span.Attributes.Get(field) != "" && ipRegexp.MatchString(span.Attributes.Get(field)) {
 			ipFields = append(ipFields, analyzer.Error{
 				Value:       field,
 				Description: fmt.Sprintf("Usage of a IP endpoint instead of DNS found for attribute: %s. Value: %s", field, span.Attributes.Get(field)),

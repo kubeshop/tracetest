@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/model"
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
@@ -50,7 +49,7 @@ type httpSpanAttribute struct {
 	Value map[string]interface{} `json:"value"`
 }
 
-func FromHttpOtelResourceSpans(resourceSpans []*HttpResourceSpans) model.Trace {
+func FromHttpOtelResourceSpans(resourceSpans []*HttpResourceSpans) Trace {
 	flattenSpans := make([]*httpSpan, 0)
 	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {
@@ -63,18 +62,18 @@ func FromHttpOtelResourceSpans(resourceSpans []*HttpResourceSpans) model.Trace {
 	}
 
 	traceID := ""
-	spans := make([]model.Span, 0)
+	spans := make([]Span, 0)
 	for _, span := range flattenSpans {
 		newSpan := convertHttpOtelSpanIntoSpan(span)
 		traceID = hex.EncodeToString(span.TraceId)
 		spans = append(spans, *newSpan)
 	}
 
-	return model.NewTrace(traceID, spans)
+	return NewTrace(traceID, spans)
 }
 
-func convertHttpOtelSpanIntoSpan(span *httpSpan) *model.Span {
-	attributes := make(model.Attributes, 0)
+func convertHttpOtelSpanIntoSpan(span *httpSpan) *Span {
+	attributes := make(Attributes, 0)
 	for _, attribute := range span.Attributes {
 		attributes[attribute.Key] = getHttpAttributeValue(attribute.Value)
 	}
@@ -92,24 +91,24 @@ func convertHttpOtelSpanIntoSpan(span *httpSpan) *model.Span {
 	}
 
 	spanID := createSpanID([]byte(span.SpanId))
-	attributes[model.TracetestMetadataFieldParentID] = createSpanID([]byte(span.ParentSpanId)).String()
+	attributes[TracetestMetadataFieldParentID] = createSpanID([]byte(span.ParentSpanId)).String()
 
-	return &model.Span{
+	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Parent:     nil,
-		Children:   make([]*model.Span, 0),
+		Children:   make([]*Span, 0),
 		Attributes: attributes,
 		Events:     extractEventsFromHttpSpan(span),
 	}
 }
 
-func extractEventsFromHttpSpan(span *httpSpan) []model.SpanEvent {
-	output := make([]model.SpanEvent, 0, len(span.Events))
+func extractEventsFromHttpSpan(span *httpSpan) []SpanEvent {
+	output := make([]SpanEvent, 0, len(span.Events))
 	for _, event := range span.Events {
-		attributes := make(model.Attributes, 0)
+		attributes := make(Attributes, 0)
 		for _, attribute := range event.Attributes {
 			attributes[attribute.Key] = getHttpAttributeValue(attribute.Value)
 		}
@@ -120,7 +119,7 @@ func extractEventsFromHttpSpan(span *httpSpan) []model.SpanEvent {
 			timestamp = time.Unix(0, timestampNs)
 		}
 
-		output = append(output, model.SpanEvent{
+		output = append(output, SpanEvent{
 			Name:       event.Name,
 			Timestamp:  timestamp,
 			Attributes: attributes,

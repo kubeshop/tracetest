@@ -7,8 +7,8 @@ import (
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/linter/plugins"
 	"github.com/kubeshop/tracetest/server/linter/rules"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -64,9 +64,9 @@ func TestAnalyzerEntities(t *testing.T) {
 	})
 }
 
-func spanWithAttributes(spanType string, attributes map[string]string) model.Span {
-	span := model.Span{
-		Attributes: make(model.Attributes, 0),
+func spanWithAttributes(spanType string, attributes map[string]string) traces.Span {
+	span := traces.Span{
+		Attributes: make(traces.Attributes, 0),
 	}
 
 	for name, value := range attributes {
@@ -78,9 +78,9 @@ func spanWithAttributes(spanType string, attributes map[string]string) model.Spa
 	return span
 }
 
-func traceWithSpans(spans ...model.Span) model.Trace {
-	trace := model.Trace{
-		Flat: make(map[trace.SpanID]*model.Span, 0),
+func traceWithSpans(spans ...traces.Span) traces.Trace {
+	trace := traces.Trace{
+		Flat: make(map[trace.SpanID]*traces.Span, 0),
 	}
 
 	for _, span := range spans {

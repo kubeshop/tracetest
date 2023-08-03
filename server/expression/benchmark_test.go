@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 func BenchmarkSimpleExpressions(b *testing.B) {
@@ -21,8 +21,8 @@ func BenchmarkJSONPathExpressions(b *testing.B) {
 	statement := `attr:my_json | json_path '[*].id' | count = 3`
 
 	attributeDataStore := expression.AttributeDataStore{
-		Span: model.Span{
-			Attributes: model.Attributes{
+		Span: traces.Span{
+			Attributes: traces.Attributes{
 				"my_json": getJSON(),
 			},
 		},

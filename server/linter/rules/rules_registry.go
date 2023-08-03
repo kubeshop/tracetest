@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type Rule interface {
 	ID() string
-	Evaluate(context.Context, model.Trace, analyzer.LinterRule) (analyzer.RuleResult, error)
+	Evaluate(context.Context, traces.Trace, analyzer.LinterRule) (analyzer.RuleResult, error)
 }
 
 type RuleRegistry struct {

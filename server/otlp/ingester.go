@@ -8,7 +8,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -21,7 +20,7 @@ type runGetter interface {
 }
 
 type tracePersister interface {
-	SaveTrace(context.Context, model.Trace) error
+	SaveTrace(context.Context, traces.Trace) error
 }
 
 type ingester struct {
@@ -66,7 +65,7 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	return &pb.ExportTraceServiceResponse{}, nil
 }
 
-func (i ingester) notify(ctx context.Context, trace model.Trace, requestType string) error {
+func (i ingester) notify(ctx context.Context, trace traces.Trace, requestType string) error {
 	run, err := i.runGetter.GetRunByTraceID(ctx, trace.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		// trace is not part of any known test run, so no need to notify

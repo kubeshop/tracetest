@@ -7,15 +7,15 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type OutputsProcessorFn func(context.Context, test.Outputs, model.Trace, []expression.DataStore) (maps.Ordered[string, test.RunOutput], error)
+type OutputsProcessorFn func(context.Context, test.Outputs, traces.Trace, []expression.DataStore) (maps.Ordered[string, test.RunOutput], error)
 
 func InstrumentedOutputProcessor(tracer trace.Tracer) OutputsProcessorFn {
 	op := instrumentedOutputProcessor{tracer}
@@ -26,7 +26,7 @@ type instrumentedOutputProcessor struct {
 	tracer trace.Tracer
 }
 
-func (op instrumentedOutputProcessor) process(ctx context.Context, outputs test.Outputs, t model.Trace, ds []expression.DataStore) (maps.Ordered[string, test.RunOutput], error) {
+func (op instrumentedOutputProcessor) process(ctx context.Context, outputs test.Outputs, t traces.Trace, ds []expression.DataStore) (maps.Ordered[string, test.RunOutput], error) {
 	ctx, span := op.tracer.Start(ctx, "Process outputs")
 	defer span.End()
 
@@ -51,7 +51,7 @@ func (op instrumentedOutputProcessor) process(ctx context.Context, outputs test.
 	return result, err
 }
 
-func outputProcessor(ctx context.Context, outputs test.Outputs, tr model.Trace, ds []expression.DataStore) (maps.Ordered[string, test.RunOutput], error) {
+func outputProcessor(ctx context.Context, outputs test.Outputs, tr traces.Trace, ds []expression.DataStore) (maps.Ordered[string, test.RunOutput], error) {
 	res := maps.Ordered[string, test.RunOutput]{}
 
 	parsed, err := parseOutputs(outputs)
@@ -84,7 +84,7 @@ func outputProcessor(ctx context.Context, outputs test.Outputs, tr model.Trace, 
 		resolved := false
 		var outputError error = nil
 		spans.
-			ForEach(func(_ int, span model.Span) bool {
+			ForEach(func(_ int, span traces.Span) bool {
 				value = extractAttr(span, stores, out.expr)
 				spanId = span.ID.String()
 				resolved = true
@@ -92,7 +92,7 @@ func outputProcessor(ctx context.Context, outputs test.Outputs, tr model.Trace, 
 				return false
 			}).
 			OrEmpty(func() {
-				value = extractAttr(model.Span{}, stores, out.expr)
+				value = extractAttr(traces.Span{}, stores, out.expr)
 				resolved = false
 				outputError = fmt.Errorf(`cannot find matching spans for output "%s"`, key)
 			})
@@ -118,7 +118,7 @@ func outputProcessor(ctx context.Context, outputs test.Outputs, tr model.Trace, 
 	return res, nil
 }
 
-func extractAttr(span model.Span, ds []expression.DataStore, expr expression.Expr) string {
+func extractAttr(span traces.Span, ds []expression.DataStore, expr expression.Expr) string {
 	ds = append([]expression.DataStore{expression.AttributeDataStore{Span: span}}, ds...)
 
 	expressionExecutor := expression.NewExecutor(ds...)

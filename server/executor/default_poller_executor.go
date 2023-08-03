@@ -11,6 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -144,7 +145,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, job *Job) (P
 		newRoot := test.NewTracetestRootSpan(job.Run)
 		job.Run.Trace = job.Run.Trace.InsertRootSpan(newRoot)
 	} else {
-		job.Run.Trace.RootSpan = model.AugmentRootSpan(job.Run.Trace.RootSpan, job.Run.TriggerResult)
+		job.Run.Trace.RootSpan = traces.AugmentRootSpan(job.Run.Trace.RootSpan, job.Run.TriggerResult)
 	}
 	job.Run = job.Run.SuccessfullyPolledTraces(job.Run.Trace)
 
@@ -196,7 +197,7 @@ func (pe DefaultPollerExecutor) testConnection(ctx context.Context, traceDB trac
 	return nil
 }
 
-func (pe DefaultPollerExecutor) donePollingTraces(job *Job, traceDB tracedb.TraceDB, trace model.Trace) (bool, string) {
+func (pe DefaultPollerExecutor) donePollingTraces(job *Job, traceDB tracedb.TraceDB, trace traces.Trace) (bool, string) {
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}

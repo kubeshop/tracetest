@@ -5,7 +5,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/linter/rules"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type BasePlugin struct {
@@ -25,7 +25,7 @@ func (p BasePlugin) RuleRegistry() *rules.RuleRegistry {
 	return p.ruleRegistry
 }
 
-func (p BasePlugin) Execute(ctx context.Context, trace model.Trace, config analyzer.LinterPlugin) (analyzer.PluginResult, error) {
+func (p BasePlugin) Execute(ctx context.Context, trace traces.Trace, config analyzer.LinterPlugin) (analyzer.PluginResult, error) {
 	res := make([]analyzer.RuleResult, 0, len(config.Rules))
 
 	for _, cfgRule := range config.Rules {
