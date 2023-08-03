@@ -121,6 +121,11 @@ func (i ingester) notify(ctx context.Context, trace traces.Trace, requestType st
 		return fmt.Errorf("error getting run by traceID: %w", err)
 	}
 
+	if run.State != test.RunStateAwaitingTrace {
+		// run is not awaiting trace, no need to notify
+		return nil
+	}
+
 	evt := events.TraceOtlpServerReceivedSpans(
 		run.TestID,
 		run.ID,
