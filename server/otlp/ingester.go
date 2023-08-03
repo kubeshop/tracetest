@@ -76,7 +76,11 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 		}
 	}
 
-	return &pb.ExportTraceServiceResponse{}, nil
+	return &pb.ExportTraceServiceResponse{
+		PartialSuccess: &pb.ExportTracePartialSuccess{
+			RejectedSpans: 0,
+		},
+	}, nil
 }
 
 func (i ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
