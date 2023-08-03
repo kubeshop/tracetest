@@ -30,7 +30,7 @@ type Response struct {
 	SpanID         trace.SpanID
 }
 
-func NewRegsitry(tracer, triggerSpanTracer trace.Tracer) *Registry {
+func NewRegistry(tracer, triggerSpanTracer trace.Tracer) *Registry {
 	return &Registry{
 		tracer:            tracer,
 		triggerSpanTracer: triggerSpanTracer,

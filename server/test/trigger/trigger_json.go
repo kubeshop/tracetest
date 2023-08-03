@@ -12,6 +12,7 @@ type triggerJSONV3 struct {
 	HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
 	GRPC    *GRPCRequest    `json:"grpc,omitempty"`
 	TraceID *TraceIDRequest `json:"traceid,omitempty"`
+	Kafka   *KafkaRequest   `json:"kafka,omitempty"`
 }
 
 func (v3 triggerJSONV3) valid() bool {
@@ -19,7 +20,8 @@ func (v3 triggerJSONV3) valid() bool {
 	return v3.Type != "" &&
 		(v3.HTTP != nil ||
 			v3.GRPC != nil ||
-			v3.TraceID != nil)
+			v3.TraceID != nil ||
+			v3.Kafka != nil)
 }
 
 type triggerJSONV2 struct {
@@ -117,6 +119,7 @@ type triggerResultV2 struct {
 	HTTP    *HTTPResponse    `json:"httpRequest,omitempty"`
 	GRPC    *GRPCResponse    `json:"grpc,omitempty"`
 	TraceID *TraceIDResponse `json:"traceid,omitempty"`
+	Kafka   *KafkaResponse   `json:"kafka,omitempty"`
 }
 
 func (tr *triggerResultV2) valid() bool {
@@ -132,6 +135,7 @@ func (t *TriggerResult) UnmarshalJSON(data []byte) error {
 		t.HTTP = v2.HTTP
 		t.GRPC = v2.GRPC
 		t.TraceID = v2.TraceID
+		t.Kafka = v2.Kafka
 
 		return nil
 	}

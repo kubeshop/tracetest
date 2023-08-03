@@ -1,0 +1,20 @@
+type: Test
+spec:
+  id: qZ5WCR64g
+  name: Test Consumer API by sending message through Kafka
+  trigger:
+    type: kafka
+    kafka:
+      brokerUrls:
+      - localhost:9092
+      topic: messaging
+      headers:
+      - key: my-header
+        value: my-value
+      messageKey: "message-key"
+      messageValue: "{\n  \"hello\": \"kafka!\"\n}"
+  specs:
+  - selector: span[tracetest.span.type="messaging" name="messaging receive" messaging.system="kafka" messaging.operation="receive"]
+    name: It processed a message from Kafka
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
