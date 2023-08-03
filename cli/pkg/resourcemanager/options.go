@@ -5,6 +5,8 @@ type options struct {
 	tableConfig       TableConfig
 	deleteSuccessMsg  string
 	resourceType      string
+	deprecatedAlias   string
+	proxyResource     string
 }
 
 type option func(*options)
@@ -30,5 +32,17 @@ func WithTableConfig(tableConfig TableConfig) option {
 func WithResourceType(resourceType string) option {
 	return func(o *options) {
 		o.resourceType = resourceType
+	}
+}
+
+func WithDeprecatedAlias(resourceType string) option {
+	return func(o *options) {
+		o.deprecatedAlias = resourceType
+	}
+}
+
+func WithProxyResource(proxyResource string) option {
+	return func(o *options) {
+		o.proxyResource = proxyResource
 	}
 }

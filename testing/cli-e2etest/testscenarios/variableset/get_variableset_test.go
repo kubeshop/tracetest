@@ -1,4 +1,4 @@
-package environment
+package variableset
 
 import (
 	"fmt"
@@ -11,21 +11,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func addGetEnvironmentPreReqs(t *testing.T, env environment.Manager) {
+func addGetVariableSetPreReqs(t *testing.T, env environment.Manager) {
 	cliConfig := env.GetCLIConfigPath(t)
 
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
-	// When I try to set up a new environment
+	// When I try to set up a new variable set
 	// Then it should be applied with success
-	newEnvironmentPath := env.GetTestResourcePath(t, "new-environment")
+	newEnvironmentPath := env.GetTestResourcePath(t, "new-varSet")
 
-	result := tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
+	result := tracetestcli.Exec(t, fmt.Sprintf("apply variableset --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 0)
 }
 
-func TestGetEnvironment(t *testing.T) {
+func TestGetVariableSet(t *testing.T) {
 	// instantiate require with testing helper
 	require := require.New(t)
 
@@ -34,33 +34,33 @@ func TestGetEnvironment(t *testing.T) {
 
 	cliConfig := env.GetCLIConfigPath(t)
 
-	t.Run("get with no environment initialized", func(t *testing.T) {
+	t.Run("get with no variable set initialized", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 		// And no environment registered
 
 		// When I try to get a environment on yaml mode
 		// Then it should return a error message
-		result := tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		result := tracetestcli.Exec(t, "get variableset --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
-		require.Contains(result.StdOut, "Resource environment with ID .env not found")
+		require.Contains(result.StdOut, "Resource variableset with ID .env not found")
 	})
 
-	addGetEnvironmentPreReqs(t, env)
+	addGetVariableSetPreReqs(t, env)
 
 	t.Run("get with YAML format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have an environment already set
+		// And I have an variable set already set
 
-		// When I try to get an environment on yaml mode
+		// When I try to get an variable set on yaml mode
 		// Then it should print a YAML
-		result := tracetestcli.Exec(t, "get environment --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+		result := tracetestcli.Exec(t, "get variableset --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		environmentVars := helpers.UnmarshalYAML[types.EnvironmentResource](t, result.StdOut)
+		environmentVars := helpers.UnmarshalYAML[types.VariableSetResource](t, result.StdOut)
 
-		require.Equal("Environment", environmentVars.Type)
+		require.Equal("VariableSet", environmentVars.Type)
 		require.Equal(".env", environmentVars.Spec.ID)
 		require.Equal(".env", environmentVars.Spec.Name)
 		require.Len(environmentVars.Spec.Values, 2)
@@ -73,16 +73,16 @@ func TestGetEnvironment(t *testing.T) {
 	t.Run("get with JSON format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have an environment already set
+		// And I have an variable set already set
 
-		// When I try to get an environment on json mode
+		// When I try to get an variable set on json mode
 		// Then it should print a json
-		result := tracetestcli.Exec(t, "get environment --id .env --output json", tracetestcli.WithCLIConfig(cliConfig))
+		result := tracetestcli.Exec(t, "get variableset --id .env --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
-		environmentVars := helpers.UnmarshalJSON[types.EnvironmentResource](t, result.StdOut)
+		environmentVars := helpers.UnmarshalJSON[types.VariableSetResource](t, result.StdOut)
 
-		require.Equal("Environment", environmentVars.Type)
+		require.Equal("VariableSet", environmentVars.Type)
 		require.Equal(".env", environmentVars.Spec.ID)
 		require.Equal(".env", environmentVars.Spec.Name)
 		require.Len(environmentVars.Spec.Values, 2)
@@ -95,11 +95,11 @@ func TestGetEnvironment(t *testing.T) {
 	t.Run("get with pretty format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have an environment already set
+		// And I have an variable set already set
 
-		// When I try to get an environment on pretty mode
-		// Then it should print a table with 4 lines printed: header, separator, environment item and empty line
-		result := tracetestcli.Exec(t, "get environment --id .env --output pretty", tracetestcli.WithCLIConfig(cliConfig))
+		// When I try to get an variable set on pretty mode
+		// Then it should print a table with 4 lines printed: header, separator, variable set item and empty line
+		result := tracetestcli.Exec(t, "get variableset --id .env --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 
 		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
@@ -110,5 +110,14 @@ func TestGetEnvironment(t *testing.T) {
 		require.Equal(".env", singleLine["ID"])
 		require.Equal(".env", singleLine["NAME"])
 		require.Equal("", singleLine["DESCRIPTION"])
+	})
+
+	t.Run("getting a variable set using the deprecated environment command", func(t *testing.T) {
+		result := tracetestcli.Exec(t, "get environment --id .env", tracetestcli.WithCLIConfig(cliConfig))
+
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "The resource `environment` is deprecated and will be removed in a future version. Please use `variableset` instead.")
+		require.Contains(result.StdOut, "VariableSet")
+		require.Contains(result.StdOut, ".env")
 	})
 }

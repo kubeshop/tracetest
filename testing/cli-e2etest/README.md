@@ -31,11 +31,11 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
 | `run test -f [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
-| `run test -f [test-definition] -e [environment-id]`                | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
-| `run test -f [test-definition] -e [environment-definition]`        | [RunTestWithHttpTriggerAndEnvironmentFile](./testscenarios/test/run_test_with_http_trigger_and_environment_file_test.go) |
+| `run test -f [test-definition] --vars [variableset-id]`                | [RunTestWithHttpTriggerAndVariableSetFile](./testscenarios/test/run_test_with_http_trigger_and_variableset_file_test.go) |
+| `run test -f [test-definition] --vars [variableset-definition]`        | [RunTestWithHttpTriggerAndVariableSetFile](./testscenarios/test/run_test_with_http_trigger_and_variableset_file_test.go) |
 | `run transaction -f [transaction-definition]`                             | [RunTransaction](./testscenarios/transaction//run_transaction_test.go) |
-| `run transaction -f [transaction-definition] -e [environment-id]`         | |
-| `run transaction -f [transaction-definition] -e [environment-definition]` | |
+| `run transaction -f [transaction-definition] --vars [variableset-id]`         | |
+| `run transaction -f [transaction-definition] --vars [variableset-definition]` | |
 
 ### Resources: Config
 
@@ -81,23 +81,23 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `list demo --skip 1 --take 1`                        | [ListDemo](./testscenarios/demo/list_demos_test.go) |
 | `list demo --sortBy name --sortDirection asc`        | [ListDemo](./testscenarios/demo/list_demos_test.go) |
 
-### Resources: Environment
+### Resources: VariableSet
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply environment -f [new-environment-file]`               | [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
-| `apply environment -f [existing-environment-file]`          | [ApplyEnvironment](./testscenarios/environment/apply_environment_test.go) |
-| `delete environment --id [existing-id]`                     | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `delete environment --id [non-existing-id]`                 | [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `get environment --id [non-existing-id]`                    | [GetEnvironment](./testscenarios/environment/get_environment_test.go), [DeleteEnvironment](./testscenarios/environment/delete_environment_test.go) |
-| `get environment --id [existing-id] --output pretty`        | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
-| `get environment --id [existing-id] --output json`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
-| `get environment --id [existing-id] --output yaml`          | [GetEnvironment](./testscenarios/environment/get_environment_test.go) |
-| `list environment --output pretty`                          | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
-| `list environment --output json`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
-| `list environment --output yaml`                            | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
-| `list environment --skip 1 --take 2`                        | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
-| `list environment --sortBy name --sortDirection asc`        | [ListEnvironment](./testscenarios/environment/list_environments_test.go) |
+| `apply variableset -f [new-variableset-file]`               | [ApplyVariableSet](./testscenarios/variableset/apply_variableset_test.go) |
+| `apply variableset -f [existing-variableset-file]`          | [ApplyVariableSet](./testscenarios/variableset/apply_variableset_test.go) |
+| `delete variableset --id [existing-id]`                     | [DeleteVariableSet](./testscenarios/variableset/delete_variableset_test.go) |
+| `delete variableset --id [non-existing-id]`                 | [DeleteVariableSet](./testscenarios/variableset/delete_variableset_test.go) |
+| `get variableset --id [non-existing-id]`                    | [GetVariableSet](./testscenarios/variableset/get_variableset_test.go), [DeleteVariableSet](./testscenarios/variableset/delete_variableset_test.go) |
+| `get variableset --id [existing-id] --output pretty`        | [GetVariableSet](./testscenarios/variableset/get_variableset_test.go) |
+| `get variableset --id [existing-id] --output json`          | [GetVariableSet](./testscenarios/variableset/get_variableset_test.go) |
+| `get variableset --id [existing-id] --output yaml`          | [GetVariableSet](./testscenarios/variableset/get_variableset_test.go) |
+| `list variableset --output pretty`                          | [ListVariableSet](./testscenarios/variableset/list_variableset_test.go) |
+| `list variableset --output json`                            | [ListVariableSet](./testscenarios/variableset/list_variableset_test.go) |
+| `list variableset --output yaml`                            | [ListVariableSet](./testscenarios/variableset/list_variableset_test.go) |
+| `list variableset --skip 1 --take 2`                        | [ListVariableSet](./testscenarios/variableset/list_variableset_test.go) |
+| `list variableset --sortBy name --sortDirection asc`        | [ListVariableSet](./testscenarios/variableset/list_variableset_test.go) |
 
 ### Resources: PollingProfile
 

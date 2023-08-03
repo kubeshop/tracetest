@@ -1,0 +1,12 @@
+type: Transaction
+spec:
+  id: oCkH6vQ4gV
+  name: Variable Set Feature
+  description: Sequence of tests to validate if our Variable Set feature is working as expected
+  steps:
+    # create an variableset
+    - ./01_create_variableset.yml
+    # check if this variableset is listed on API
+    - ./02_list_variableset.yml
+    # delete variableset
+    - ./03_delete_variableset.yml

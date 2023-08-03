@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
@@ -84,8 +82,8 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 
 	p.ResourceName = args[0]
 
-	_, err := resources.Get(p.ResourceName)
-	if errors.Is(err, resourcemanager.ErrResourceNotFound) {
+	exists := resources.Exists(p.ResourceName)
+	if !exists {
 		suggestion := resources.Suggest(p.ResourceName)
 		if suggestion != "" {
 			return []error{

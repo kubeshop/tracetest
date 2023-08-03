@@ -1,4 +1,4 @@
-type: Environment
+type: VariableSet
 spec:
   id: another-env
   name: another-env

@@ -14,34 +14,34 @@ import (
 	"encoding/json"
 )
 
-// checks if the ListEnvironments200Response type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ListEnvironments200Response{}
+// checks if the VariableSetResourceList type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VariableSetResourceList{}
 
-// ListEnvironments200Response struct for ListEnvironments200Response
-type ListEnvironments200Response struct {
+// VariableSetResourceList struct for VariableSetResourceList
+type VariableSetResourceList struct {
 	Count *int32                `json:"count,omitempty"`
-	Items []EnvironmentResource `json:"items,omitempty"`
+	Items []VariableSetResource `json:"items,omitempty"`
 }
 
-// NewListEnvironments200Response instantiates a new ListEnvironments200Response object
+// NewVariableSetResourceList instantiates a new VariableSetResourceList object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewListEnvironments200Response() *ListEnvironments200Response {
-	this := ListEnvironments200Response{}
+func NewVariableSetResourceList() *VariableSetResourceList {
+	this := VariableSetResourceList{}
 	return &this
 }
 
-// NewListEnvironments200ResponseWithDefaults instantiates a new ListEnvironments200Response object
+// NewVariableSetResourceListWithDefaults instantiates a new VariableSetResourceList object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewListEnvironments200ResponseWithDefaults() *ListEnvironments200Response {
-	this := ListEnvironments200Response{}
+func NewVariableSetResourceListWithDefaults() *VariableSetResourceList {
+	this := VariableSetResourceList{}
 	return &this
 }
 
 // GetCount returns the Count field value if set, zero value otherwise.
-func (o *ListEnvironments200Response) GetCount() int32 {
+func (o *VariableSetResourceList) GetCount() int32 {
 	if o == nil || isNil(o.Count) {
 		var ret int32
 		return ret
@@ -51,7 +51,7 @@ func (o *ListEnvironments200Response) GetCount() int32 {
 
 // GetCountOk returns a tuple with the Count field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ListEnvironments200Response) GetCountOk() (*int32, bool) {
+func (o *VariableSetResourceList) GetCountOk() (*int32, bool) {
 	if o == nil || isNil(o.Count) {
 		return nil, false
 	}
@@ -59,7 +59,7 @@ func (o *ListEnvironments200Response) GetCountOk() (*int32, bool) {
 }
 
 // HasCount returns a boolean if a field has been set.
-func (o *ListEnvironments200Response) HasCount() bool {
+func (o *VariableSetResourceList) HasCount() bool {
 	if o != nil && !isNil(o.Count) {
 		return true
 	}
@@ -68,14 +68,14 @@ func (o *ListEnvironments200Response) HasCount() bool {
 }
 
 // SetCount gets a reference to the given int32 and assigns it to the Count field.
-func (o *ListEnvironments200Response) SetCount(v int32) {
+func (o *VariableSetResourceList) SetCount(v int32) {
 	o.Count = &v
 }
 
 // GetItems returns the Items field value if set, zero value otherwise.
-func (o *ListEnvironments200Response) GetItems() []EnvironmentResource {
+func (o *VariableSetResourceList) GetItems() []VariableSetResource {
 	if o == nil || isNil(o.Items) {
-		var ret []EnvironmentResource
+		var ret []VariableSetResource
 		return ret
 	}
 	return o.Items
@@ -83,7 +83,7 @@ func (o *ListEnvironments200Response) GetItems() []EnvironmentResource {
 
 // GetItemsOk returns a tuple with the Items field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ListEnvironments200Response) GetItemsOk() ([]EnvironmentResource, bool) {
+func (o *VariableSetResourceList) GetItemsOk() ([]VariableSetResource, bool) {
 	if o == nil || isNil(o.Items) {
 		return nil, false
 	}
@@ -91,7 +91,7 @@ func (o *ListEnvironments200Response) GetItemsOk() ([]EnvironmentResource, bool)
 }
 
 // HasItems returns a boolean if a field has been set.
-func (o *ListEnvironments200Response) HasItems() bool {
+func (o *VariableSetResourceList) HasItems() bool {
 	if o != nil && !isNil(o.Items) {
 		return true
 	}
@@ -99,12 +99,12 @@ func (o *ListEnvironments200Response) HasItems() bool {
 	return false
 }
 
-// SetItems gets a reference to the given []EnvironmentResource and assigns it to the Items field.
-func (o *ListEnvironments200Response) SetItems(v []EnvironmentResource) {
+// SetItems gets a reference to the given []VariableSetResource and assigns it to the Items field.
+func (o *VariableSetResourceList) SetItems(v []VariableSetResource) {
 	o.Items = v
 }
 
-func (o ListEnvironments200Response) MarshalJSON() ([]byte, error) {
+func (o VariableSetResourceList) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -112,7 +112,7 @@ func (o ListEnvironments200Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o ListEnvironments200Response) ToMap() (map[string]interface{}, error) {
+func (o VariableSetResourceList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Count) {
 		toSerialize["count"] = o.Count
@@ -123,38 +123,38 @@ func (o ListEnvironments200Response) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableListEnvironments200Response struct {
-	value *ListEnvironments200Response
+type NullableVariableSetResourceList struct {
+	value *VariableSetResourceList
 	isSet bool
 }
 
-func (v NullableListEnvironments200Response) Get() *ListEnvironments200Response {
+func (v NullableVariableSetResourceList) Get() *VariableSetResourceList {
 	return v.value
 }
 
-func (v *NullableListEnvironments200Response) Set(val *ListEnvironments200Response) {
+func (v *NullableVariableSetResourceList) Set(val *VariableSetResourceList) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableListEnvironments200Response) IsSet() bool {
+func (v NullableVariableSetResourceList) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableListEnvironments200Response) Unset() {
+func (v *NullableVariableSetResourceList) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableListEnvironments200Response(val *ListEnvironments200Response) *NullableListEnvironments200Response {
-	return &NullableListEnvironments200Response{value: val, isSet: true}
+func NewNullableVariableSetResourceList(val *VariableSetResourceList) *NullableVariableSetResourceList {
+	return &NullableVariableSetResourceList{value: val, isSet: true}
 }
 
-func (v NullableListEnvironments200Response) MarshalJSON() ([]byte, error) {
+func (v NullableVariableSetResourceList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableListEnvironments200Response) UnmarshalJSON(src []byte) error {
+func (v *NullableVariableSetResourceList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

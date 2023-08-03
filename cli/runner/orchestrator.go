@@ -30,8 +30,8 @@ type RunOptions struct {
 	// the file will be applied before running
 	DefinitionFile string
 
-	// environmentID or path to the file with environment definition
-	EnvID string
+	// varsID or path to the file with environment definition
+	VarsID string
 
 	// By default the runner will wait for the result of the run
 	// if this option is true, the wait will be skipped
@@ -89,12 +89,12 @@ type Runner interface {
 func Orchestrator(
 	logger *zap.Logger,
 	openapiClient *openapi.APIClient,
-	environments resourcemanager.Client,
+	variableSets resourcemanager.Client,
 ) orchestrator {
 	return orchestrator{
 		logger:        logger,
 		openapiClient: openapiClient,
-		environments:  environments,
+		variableSets:  variableSets,
 	}
 }
 
@@ -102,7 +102,7 @@ type orchestrator struct {
 	logger *zap.Logger
 
 	openapiClient *openapi.APIClient
-	environments  resourcemanager.Client
+	variableSets  resourcemanager.Client
 }
 
 var (
@@ -122,17 +122,17 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		"Running test from definition",
 		zap.String("definitionFile", opts.DefinitionFile),
 		zap.String("ID", opts.ID),
-		zap.String("envID", opts.EnvID),
+		zap.String("varSetID", opts.VarsID),
 		zap.Bool("skipResultsWait", opts.SkipResultWait),
 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
 		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
-	envID, err := o.resolveEnvID(ctx, opts.EnvID)
+	varsID, err := o.resolveVarsID(ctx, opts.VarsID)
 	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot resolve environment id: %w", err)
+		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
 	}
-	o.logger.Debug("env resolved", zap.String("ID", envID))
+	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
 	var resource any
 	if opts.DefinitionFile != "" {
@@ -163,13 +163,13 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 	}
 
 	var result RunResult
-	var ev envVars
+	var ev varSets
 
 	// iterate until we have all env vars,
 	// or the server returns an actual error
 	for {
 		runInfo := openapi.RunInformation{
-			EnvironmentId: &envID,
+			VariableSetId: &varsID,
 			Variables:     ev.toOpenapi(),
 			Metadata:      getMetadata(),
 			RequiredGates: getRequiredGates(opts.RequiredGates),
@@ -179,13 +179,13 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		if err == nil {
 			break
 		}
-		if !errors.Is(err, missingEnvVarsError{}) {
+		if !errors.Is(err, missingVarsError{}) {
 			// actual error, return
 			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
 		}
 
 		// missing vars error
-		ev = askForMissingVars([]envVar(err.(missingEnvVarsError)))
+		ev = askForMissingVars([]varSet(err.(missingVarsError)))
 		o.logger.Debug("filled variables", zap.Any("variables", ev))
 	}
 
@@ -214,43 +214,43 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 	return exitCode, nil
 }
 
-func (o orchestrator) resolveEnvID(ctx context.Context, envID string) (string, error) {
-	if !fileutil.IsFilePath(envID) {
-		o.logger.Debug("envID is not a file path", zap.String("envID", envID))
+func (o orchestrator) resolveVarsID(ctx context.Context, varsID string) (string, error) {
+	if !fileutil.IsFilePath(varsID) {
+		o.logger.Debug("varsID is not a file path", zap.String("vars", varsID))
 
 		// validate that env exists
-		_, err := o.environments.Get(ctx, envID, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
+		_, err := o.variableSets.Get(ctx, varsID, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if errors.Is(err, resourcemanager.ErrNotFound) {
-			return "", fmt.Errorf("environment '%s' not found", envID)
+			return "", fmt.Errorf("variable set '%s' not found", varsID)
 		}
 		if err != nil {
-			return "", fmt.Errorf("cannot get environment '%s': %w", envID, err)
+			return "", fmt.Errorf("cannot get variable set '%s': %w", varsID, err)
 		}
 
 		o.logger.Debug("envID is valid")
 
-		return envID, nil
+		return varsID, nil
 	}
 
-	f, err := fileutil.Read(envID)
+	f, err := fileutil.Read(varsID)
 	if err != nil {
-		return "", fmt.Errorf("cannot read environment file %s: %w", envID, err)
+		return "", fmt.Errorf("cannot read environment set file %s: %w", varsID, err)
 	}
 
-	o.logger.Debug("envID is a file path", zap.String("filePath", envID), zap.Any("file", f))
-	updatedEnv, err := o.environments.Apply(ctx, f, yamlFormat)
+	o.logger.Debug("envID is a file path", zap.String("filePath", varsID), zap.Any("file", f))
+	updatedEnv, err := o.variableSets.Apply(ctx, f, yamlFormat)
 	if err != nil {
-		return "", fmt.Errorf("could not read environment file: %w", err)
+		return "", fmt.Errorf("could not read environment set file: %w", err)
 	}
 
-	var env openapi.EnvironmentResource
-	err = yaml.Unmarshal([]byte(updatedEnv), &env)
+	var vars openapi.VariableSetResource
+	err = yaml.Unmarshal([]byte(updatedEnv), &vars)
 	if err != nil {
 		o.logger.Error("error parsing json", zap.String("content", updatedEnv), zap.Error(err))
-		return "", fmt.Errorf("could not unmarshal environment json: %w", err)
+		return "", fmt.Errorf("could not unmarshal variable set json: %w", err)
 	}
 
-	return env.Spec.GetId(), nil
+	return vars.Spec.GetId(), nil
 }
 
 func (o orchestrator) injectLocalEnvVars(ctx context.Context, df fileutil.File) (fileutil.File, error) {
@@ -260,7 +260,7 @@ func (o orchestrator) injectLocalEnvVars(ctx context.Context, df fileutil.File) 
 
 	injected, err := variableInjector.ReplaceInString(string(df.Contents()))
 	if err != nil {
-		return df, fmt.Errorf("cannot inject local environment variables: %w", err)
+		return df, fmt.Errorf("cannot inject local variable set: %w", err)
 	}
 
 	df = fileutil.New(df.AbsPath(), []byte(injected))
@@ -382,7 +382,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if resp.StatusCode == http.StatusUnprocessableEntity {
-		return buildMissingEnvVarsError(body)
+		return buildMissingVarsError(body)
 	}
 
 	if reqErr != nil {
