@@ -6,7 +6,7 @@ spec:
     type: kafka
     kafka:
       brokerUrls:
-      - localhost:9092
+      - localhost:29092
       topic: messaging
       headers:
       - key: my-header
