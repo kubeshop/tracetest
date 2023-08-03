@@ -47,12 +47,14 @@ func (db *noopTraceDB) TestConnection(ctx context.Context) model.ConnectionResul
 }
 
 type traceDBFactory struct {
-	runRepository traceGetter
+	traceGetter traceGetter
 }
 
-func Factory(runRepository traceGetter) func(ds datastore.DataStore) (TraceDB, error) {
+type FactoryFunc func(ds datastore.DataStore) (TraceDB, error)
+
+func Factory(tg traceGetter) FactoryFunc {
 	f := traceDBFactory{
-		runRepository: runRepository,
+		traceGetter: tg,
 	}
 
 	return f.New
@@ -63,7 +65,7 @@ func (f *traceDBFactory) getTraceDBInstance(ds datastore.DataStore) (TraceDB, er
 	var err error
 
 	if ds.IsOTLPBasedProvider() {
-		tdb, err = newCollectorDB(f.runRepository)
+		tdb, err = newCollectorDB(f.traceGetter)
 		return tdb, err
 	}
 

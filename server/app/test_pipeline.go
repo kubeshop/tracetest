@@ -25,6 +25,7 @@ func buildTestPipeline(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
+	tracedbFactory tracedb.FactoryFunc,
 ) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
@@ -51,7 +52,7 @@ func buildTestPipeline(
 		executor.NewPollerExecutor(
 			tracer,
 			execTestUpdater,
-			tracedb.Factory(runRepo),
+			tracedbFactory,
 			dsRepo,
 			eventEmitter,
 		),
@@ -70,7 +71,7 @@ func buildTestPipeline(
 		execTestUpdater,
 		tracer,
 		subscriptionManager,
-		tracedb.Factory(runRepo),
+		tracedbFactory,
 		dsRepo,
 		eventEmitter,
 	)

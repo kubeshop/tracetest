@@ -2,7 +2,10 @@ package tracedb
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -41,6 +44,11 @@ func (tdb *OTLPTraceDB) GetEndpoints() string {
 
 // GetTraceByID implements TraceDB
 func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (traces.Trace, error) {
-	return tdb.traceGetter.Get(ctx, traces.DecodeTraceID(id))
+	t, err := tdb.traceGetter.Get(ctx, traces.DecodeTraceID(id))
+	if errors.Is(err, sql.ErrNoRows) {
+		err = connection.ErrTraceNotFound
+	}
+
+	return t, err
 
 }

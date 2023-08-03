@@ -16,11 +16,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type traceDBFactoryFn func(ds datastore.DataStore) (tracedb.TraceDB, error)
-
 type DefaultPollerExecutor struct {
 	updater      RunUpdater
-	newTraceDBFn traceDBFactoryFn
+	newTraceDBFn tracedb.FactoryFunc
 	dsRepo       resourcemanager.Current[datastore.DataStore]
 	eventEmitter EventEmitter
 }
@@ -65,7 +63,7 @@ func (pe InstrumentedPollerExecutor) ExecuteRequest(ctx context.Context, job *Jo
 func NewPollerExecutor(
 	tracer trace.Tracer,
 	updater RunUpdater,
-	newTraceDBFn traceDBFactoryFn,
+	newTraceDBFn tracedb.FactoryFunc,
 	dsRepo resourcemanager.Current[datastore.DataStore],
 	eventEmitter EventEmitter,
 ) *InstrumentedPollerExecutor {
@@ -119,10 +117,14 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, job *Job) (P
 		return PollResult{}, err
 	}
 
-	trace.ID = job.Run.TraceID
 	done, reason := pe.donePollingTraces(job, traceDB, trace)
 	// we need both values to be different to check for done, but after we want to have an updated job
 	job.Run.Trace = &trace
+	err = pe.updater.Update(ctx, job.Run)
+	if err != nil {
+		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s", job.Test.ID, job.Run.ID, err.Error())
+		return PollResult{}, err
+	}
 
 	if !done {
 		pe.emit(ctx, job, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
@@ -205,7 +207,7 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *Job, traceDB tracedb.Trac
 	maxTracePollRetry := job.PollingProfile.Periodic.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	log.Printf("[PollerExecutor] Test %s Run %d: Job count %d, max retries: %d", job.Test.ID, job.Run.ID, job.EnqueueCount(), maxTracePollRetry)
-	if job.EnqueueCount() == maxTracePollRetry {
+	if job.EnqueueCount() >= maxTracePollRetry {
 		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
 	}
 

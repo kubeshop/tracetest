@@ -23,11 +23,15 @@ func FromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
 		}
 	}
 
+	return FromSpanList(flattenSpans)
+}
+
+func FromSpanList(input []*v1.Span) Trace {
 	traceID := ""
 	spans := make([]Span, 0)
-	for _, span := range flattenSpans {
+	for _, span := range input {
 		newSpan := ConvertOtelSpanIntoSpan(span)
-		traceID = hex.EncodeToString(span.TraceId)
+		traceID = CreateTraceID(span.TraceId).String()
 		spans = append(spans, *newSpan)
 	}
 
