@@ -11,13 +11,15 @@ import (
 )
 
 const (
-	TracetestMetadataFieldStartTime string = "tracetest.span.start_time"
-	TracetestMetadataFieldEndTime   string = "tracetest.span.end_time"
-	TracetestMetadataFieldDuration  string = "tracetest.span.duration"
-	TracetestMetadataFieldType      string = "tracetest.span.type"
-	TracetestMetadataFieldName      string = "tracetest.span.name"
-	TracetestMetadataFieldParentID  string = "tracetest.span.parent_id"
-	TracetestMetadataFieldKind      string = "tracetest.span.kind"
+	TracetestMetadataFieldStartTime         string = "tracetest.span.start_time"
+	TracetestMetadataFieldEndTime           string = "tracetest.span.end_time"
+	TracetestMetadataFieldDuration          string = "tracetest.span.duration"
+	TracetestMetadataFieldType              string = "tracetest.span.type"
+	TracetestMetadataFieldName              string = "tracetest.span.name"
+	TracetestMetadataFieldParentID          string = "tracetest.span.parent_id"
+	TracetestMetadataFieldKind              string = "tracetest.span.kind"
+	TracetestMetadataFieldStatusCode        string = "tracetest.span.status_code"
+	TracetestMetadataFieldStatusDescription string = "tracetest.span.status_description"
 )
 
 type Attributes map[string]string
@@ -74,9 +76,15 @@ type Span struct {
 	Attributes Attributes
 	Kind       SpanKind
 	Events     []SpanEvent
+	Status     *SpanStatus
 
 	Parent   *Span   `json:"-"`
 	Children []*Span `json:"-"`
+}
+
+type SpanStatus struct {
+	Code        string
+	Description string
 }
 
 func (s *Span) injectEventsIntoAttributes() {
@@ -216,6 +224,11 @@ func (span Span) setMetadataAttributes() Span {
 	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
 	span.Attributes[TracetestMetadataFieldStartTime] = fmt.Sprintf("%d", span.StartTime.UnixNano())
 	span.Attributes[TracetestMetadataFieldEndTime] = fmt.Sprintf("%d", span.EndTime.UnixNano())
+
+	if span.Status != nil {
+		span.Attributes[TracetestMetadataFieldStatusCode] = span.Status.Code
+		span.Attributes[TracetestMetadataFieldStatusDescription] = span.Status.Description
+	}
 
 	return span
 }
