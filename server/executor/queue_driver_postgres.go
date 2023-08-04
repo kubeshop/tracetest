@@ -75,11 +75,6 @@ func (qd *PostgresQueueDriver) Start() {
 				qd.log("exit")
 				return
 			default:
-
-				qd.log("current AcquireCount: %d", qd.pool.Stat().AcquireCount())
-				qd.log("current AcquiredConns: %d", qd.pool.Stat().AcquiredConns())
-				qd.log("current IdleConns: %d", qd.pool.Stat().IdleConns())
-
 				qd.worker(conn)
 			}
 		}
