@@ -149,6 +149,8 @@ func (ch *channel) SetQueue(q *Queue) {
 	ch.q = q
 }
 
+const enqueueTimeout = 500 * time.Millisecond
+
 func (ch *channel) Enqueue(job Job) {
 	ch.log("enqueue")
 
@@ -162,7 +164,7 @@ func (ch *channel) Enqueue(job Job) {
 		return
 	}
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(context.Background(), enqueueTimeout)
 	defer cancelCtx()
 
 	conn, err := ch.pool.Acquire(context.Background())
