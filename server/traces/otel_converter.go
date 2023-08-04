@@ -51,6 +51,14 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *model.Span {
 		endTime = time.Unix(0, int64(span.GetEndTimeUnixNano()))
 	}
 
+	var spanStatus *model.SpanStatus
+	if span.Status != nil {
+		spanStatus = &model.SpanStatus{
+			Code:        span.Status.Code.String(),
+			Description: span.Status.Message,
+		}
+	}
+
 	spanID := createSpanID(span.SpanId)
 	attributes[model.TracetestMetadataFieldParentID] = createSpanID(span.ParentSpanId).String()
 	return &model.Span{
@@ -61,6 +69,7 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *model.Span {
 		EndTime:    endTime,
 		Parent:     nil,
 		Events:     extractEvents(span),
+		Status:     spanStatus,
 		Children:   make([]*model.Span, 0),
 		Attributes: attributes,
 	}
