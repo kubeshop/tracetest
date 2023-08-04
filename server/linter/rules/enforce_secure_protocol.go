@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type enforceHttpsProtocolRule struct{}
@@ -23,7 +23,7 @@ func (r enforceHttpsProtocolRule) ID() string {
 	return analyzer.EnforceHttpsProtocolRuleID
 }
 
-func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace traces.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	passed := true
 	res := make([]analyzer.Result, 0)
 
@@ -42,7 +42,7 @@ func (r enforceHttpsProtocolRule) Evaluate(ctx context.Context, trace model.Trac
 	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: passed, Results: res}), nil
 }
 
-func (r enforceHttpsProtocolRule) validate(span *model.Span) analyzer.Result {
+func (r enforceHttpsProtocolRule) validate(span *traces.Span) analyzer.Result {
 	insecureFields := make([]analyzer.Error, 0)
 	for _, field := range httpFields {
 		if !strings.HasPrefix(span.Attributes.Get(field), "https") {

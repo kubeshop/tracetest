@@ -6,7 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/linter/plugins"
 	"github.com/kubeshop/tracetest/server/linter/rules"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var (
@@ -39,7 +39,7 @@ var (
 )
 
 type Linter interface {
-	Run(context.Context, model.Trace, analyzer.Linter) (analyzer.LinterResult, error)
+	Run(context.Context, traces.Trace, analyzer.Linter) (analyzer.LinterResult, error)
 }
 
 type linter struct {
@@ -54,7 +54,7 @@ func NewLinter(registry *plugins.Registry) Linter {
 
 var _ Linter = &linter{}
 
-func (l linter) Run(ctx context.Context, trace model.Trace, config analyzer.Linter) (analyzer.LinterResult, error) {
+func (l linter) Run(ctx context.Context, trace traces.Trace, config analyzer.Linter) (analyzer.LinterResult, error) {
 	cfgPlugins := config.EnabledPlugins()
 	pluginResults := make([]analyzer.PluginResult, len(cfgPlugins))
 

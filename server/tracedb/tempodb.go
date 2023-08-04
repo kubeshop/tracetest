@@ -72,7 +72,7 @@ func (ttd *tempoTraceDB) Ready() bool {
 	return ttd.dataSource.Ready()
 }
 
-func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (ttd *tempoTraceDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	trace, err := ttd.dataSource.GetTraceByID(ctx, traceID)
 	return trace, err
 }
@@ -81,27 +81,27 @@ func (ttd *tempoTraceDB) Close() error {
 	return ttd.dataSource.Close()
 }
 
-func grpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (model.Trace, error) {
+func grpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (traces.Trace, error) {
 	query := tempopb.NewQuerierClient(conn)
 
 	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
 	resp, err := query.FindTraceByID(ctx, &tempopb.TraceByIDRequest{
 		TraceID: []byte(trID[:]),
 	})
 	if err != nil {
-		return model.Trace{}, handleError(err)
+		return traces.Trace{}, handleError(err)
 	}
 
 	if resp.Trace == nil {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
 	if len(resp.Trace.Batches) == 0 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
 	trace := &v1.TracesData{
@@ -115,19 +115,19 @@ type HttpTempoTraceByIDResponse struct {
 	Batches []*traces.HttpResourceSpans `json:"batches"`
 }
 
-func httpGetTraceByID(ctx context.Context, traceID string, client *datasource.HttpClient) (model.Trace, error) {
+func httpGetTraceByID(ctx context.Context, traceID string, client *datasource.HttpClient) (traces.Trace, error) {
 	trID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 	resp, err := client.Request(ctx, fmt.Sprintf("/api/traces/%s", trID), http.MethodGet, "")
 
 	if err != nil {
-		return model.Trace{}, handleError(err)
+		return traces.Trace{}, handleError(err)
 	}
 
 	if resp.StatusCode == 404 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
 	var body []byte
@@ -138,13 +138,13 @@ func httpGetTraceByID(ctx context.Context, traceID string, client *datasource.Ht
 	}
 
 	if resp.StatusCode == 401 {
-		return model.Trace{}, fmt.Errorf("tempo err: %w %s", errors.New("authentication handshake failed"), string(body))
+		return traces.Trace{}, fmt.Errorf("tempo err: %w %s", errors.New("authentication handshake failed"), string(body))
 	}
 
 	var trace HttpTempoTraceByIDResponse
 	err = json.Unmarshal(body, &trace)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
 	return traces.FromHttpOtelResourceSpans(trace.Batches), nil

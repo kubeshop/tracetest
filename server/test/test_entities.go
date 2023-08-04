@@ -6,10 +6,10 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -115,7 +115,7 @@ type (
 		// result info
 		TriggerResult trigger.TriggerResult
 		Results       *RunResults
-		Trace         *model.Trace
+		Trace         *traces.Trace
 		Outputs       maps.Ordered[string, RunOutput]
 		LastError     error
 		Pass          int

@@ -18,6 +18,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
@@ -170,6 +171,9 @@ func runnerSetup(t *testing.T) runnerFixture {
 	processorMock := new(mockProcessor)
 	processorMock.Test(t)
 
+	tracesMock := new(mockTraces)
+	tracesMock.Test(t)
+
 	sm := subscription.NewManager()
 	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New()))
 	eventEmitter := executor.NewEventEmitter(getTestRunEventRepositoryMock(t, false), sm)
@@ -182,7 +186,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 		executor.NewDBUpdater(runsMock),
 		tracer,
 		sm,
-		tracedb.Factory(runsMock),
+		tracedb.Factory(tracesMock),
 		dsMock,
 		eventEmitter,
 	)
@@ -218,6 +222,20 @@ func runnerSetup(t *testing.T) runnerFixture {
 		triggererMock: triggererMock,
 		processorMock: processorMock,
 	}
+}
+
+type mockTraces struct {
+	mock.Mock
+}
+
+func (r *mockTraces) Get(ctx context.Context, id trace.TraceID) (traces.Trace, error) {
+	args := r.Called(id)
+	return args.Get(0).(traces.Trace), args.Error(1)
+}
+
+func (r *mockTraces) SaveTrace(ctx context.Context, trace *traces.Trace) error {
+	args := r.Called(trace)
+	return args.Error(0)
 }
 
 type mockProcessor struct {

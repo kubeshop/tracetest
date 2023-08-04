@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -68,22 +69,22 @@ func (db *signalfxDB) TestConnection(ctx context.Context) model.ConnectionResult
 	return tester.TestConnection(ctx)
 }
 
-func (db *signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *signalfxDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	timestamps, err := db.getSegmentsTimestamps(ctx, traceID)
 	if err != nil {
-		return model.Trace{}, fmt.Errorf("coult not get trace segment timestamps: %w", err)
+		return traces.Trace{}, fmt.Errorf("coult not get trace segment timestamps: %w", err)
 	}
 
 	if len(timestamps) == 0 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
-	traceSpans := make([]model.Span, 0)
+	traceSpans := make([]traces.Span, 0)
 
 	for _, timestamp := range timestamps {
 		segmentSpans, err := db.getSegmentSpans(ctx, traceID, timestamp)
 		if err != nil {
-			return model.Trace{}, fmt.Errorf("could not get segment spans: %w", err)
+			return traces.Trace{}, fmt.Errorf("could not get segment spans: %w", err)
 		}
 
 		for _, signalFxSpan := range segmentSpans {
@@ -93,10 +94,10 @@ func (db *signalfxDB) GetTraceByID(ctx context.Context, traceID string) (model.T
 	}
 
 	if len(traceSpans) == 0 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
-	return model.NewTrace(traceID, traceSpans), nil
+	return traces.NewTrace(traceID, traceSpans), nil
 }
 
 func (db signalfxDB) getSegmentsTimestamps(ctx context.Context, traceID string) ([]int64, error) {
@@ -167,8 +168,8 @@ func (db signalfxDB) getSegmentSpans(ctx context.Context, traceID string, timest
 	return spans, nil
 }
 
-func convertSignalFXSpan(in signalFXSpan) model.Span {
-	attributes := make(model.Attributes, 0)
+func convertSignalFXSpan(in signalFXSpan) traces.Span {
+	attributes := make(traces.Attributes, 0)
 	for name, value := range in.Tags {
 		attributes[name] = value
 	}
@@ -177,15 +178,15 @@ func convertSignalFXSpan(in signalFXSpan) model.Span {
 		attributes[name] = value
 	}
 
-	attributes[model.TracetestMetadataFieldParentID] = in.ParentID
-	attributes[model.TracetestMetadataFieldKind] = attributes["span.kind"]
+	attributes[traces.TracetestMetadataFieldParentID] = in.ParentID
+	attributes[traces.TracetestMetadataFieldKind] = attributes["span.kind"]
 	delete(attributes, "span.kind")
 
 	spanID, _ := trace.SpanIDFromHex(in.SpanID)
 	startTime, _ := time.Parse(time.RFC3339, in.StartTime)
 	endTime := startTime.Add(time.Duration(in.Duration) * time.Microsecond)
 
-	return model.Span{
+	return traces.Span{
 		ID:         spanID,
 		Name:       in.Name,
 		StartTime:  startTime,

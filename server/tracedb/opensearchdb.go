@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/opensearch-project/opensearch-go"
 	"github.com/opensearch-project/opensearch-go/opensearchapi"
 	"go.opentelemetry.io/otel/trace"
@@ -63,9 +64,9 @@ func (db *opensearchDB) Ready() bool {
 	return db.client != nil
 }
 
-func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	if !db.Ready() {
-		return model.Trace{}, fmt.Errorf("OpenSearch dataStore not ready")
+		return traces.Trace{}, fmt.Errorf("OpenSearch dataStore not ready")
 	}
 	content := strings.NewReader(fmt.Sprintf(`{
 		"query": { "match": { "traceId": "%s" } }
@@ -78,22 +79,22 @@ func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (model
 
 	response, err := searchRequest.Do(ctx, db.client)
 	if err != nil {
-		return model.Trace{}, fmt.Errorf("could not execute search request: %w", err)
+		return traces.Trace{}, fmt.Errorf("could not execute search request: %w", err)
 	}
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return model.Trace{}, fmt.Errorf("could not read response body")
+		return traces.Trace{}, fmt.Errorf("could not read response body")
 	}
 
 	var searchResponse searchResponse
 	err = json.Unmarshal(responseBody, &searchResponse)
 	if err != nil {
-		return model.Trace{}, fmt.Errorf("could not unmarshal search response into struct: %w", err)
+		return traces.Trace{}, fmt.Errorf("could not unmarshal search response into struct: %w", err)
 	}
 
 	if len(searchResponse.Hits.Results) == 0 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return convertOpensearchFormatIntoTrace(traceID, searchResponse), nil
@@ -127,23 +128,23 @@ func newOpenSearchDB(cfg *datastore.ElasticSearchConfig) (TraceDB, error) {
 	}, nil
 }
 
-func convertOpensearchFormatIntoTrace(traceID string, searchResponse searchResponse) model.Trace {
-	spans := make([]model.Span, 0)
+func convertOpensearchFormatIntoTrace(traceID string, searchResponse searchResponse) traces.Trace {
+	spans := make([]traces.Span, 0)
 	for _, result := range searchResponse.Hits.Results {
 		span := convertOpensearchSpanIntoSpan(result.Source)
 		spans = append(spans, span)
 	}
 
-	return model.NewTrace(traceID, spans)
+	return traces.NewTrace(traceID, spans)
 }
 
-func convertOpensearchSpanIntoSpan(input map[string]interface{}) model.Span {
+func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
 	spanId, _ := trace.SpanIDFromHex(input["spanId"].(string))
 
 	startTime, _ := time.Parse(time.RFC3339, input["startTime"].(string))
 	endTime, _ := time.Parse(time.RFC3339, input["endTime"].(string))
 
-	attributes := make(model.Attributes, 0)
+	attributes := make(traces.Attributes, 0)
 
 	for attrName, attrValue := range input {
 		if !strings.HasPrefix(attrName, "span.attributes.") && !strings.HasPrefix(attrName, "resource.attributes.") {
@@ -160,17 +161,17 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) model.Span {
 		attributes[name] = fmt.Sprintf("%v", attrValue)
 	}
 
-	attributes[model.TracetestMetadataFieldKind] = input["kind"].(string)
-	attributes[model.TracetestMetadataFieldKind] = input["parentSpanId"].(string)
+	attributes[traces.TracetestMetadataFieldKind] = input["kind"].(string)
+	attributes[traces.TracetestMetadataFieldKind] = input["parentSpanId"].(string)
 
-	return model.Span{
+	return traces.Span{
 		ID:         spanId,
 		Name:       input["name"].(string),
 		StartTime:  startTime,
 		EndTime:    endTime,
 		Attributes: attributes,
 		Parent:     nil,
-		Children:   []*model.Span{},
+		Children:   []*traces.Span{},
 	}
 }
 

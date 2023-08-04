@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type ensureAttributeNamingRule struct{}
@@ -20,7 +20,7 @@ func (r ensureAttributeNamingRule) ID() string {
 	return analyzer.EnsureAttributeNamingRuleID
 }
 
-func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace traces.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	regex := regexp.MustCompile(`^([a-z0-9_]+\.)+[a-z0-9_]+$`)
 	res := make([]analyzer.Result, 0)
 	passed := true
