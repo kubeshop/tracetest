@@ -5,6 +5,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 	"google.golang.org/grpc"
 )
 
@@ -15,8 +16,8 @@ var (
 	HTTP SupportedDataSource = "http"
 )
 
-type HttpCallback func(ctx context.Context, traceID string, client *HttpClient) (model.Trace, error)
-type GrpcCallback func(ctx context.Context, traceID string, connection *grpc.ClientConn) (model.Trace, error)
+type HttpCallback func(ctx context.Context, traceID string, client *HttpClient) (traces.Trace, error)
+type GrpcCallback func(ctx context.Context, traceID string, connection *grpc.ClientConn) (traces.Trace, error)
 
 type Callbacks struct {
 	GRPC GrpcCallback
@@ -27,15 +28,15 @@ type DataSource interface {
 	Endpoint() string
 	Connect(ctx context.Context) error
 	Ready() bool
-	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
+	GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error)
 	TestConnection(ctx context.Context) model.ConnectionTestStep
 	Close() error
 }
 
 type noopDataSource struct{}
 
-func (dataSource *noopDataSource) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
-	return model.Trace{}, nil
+func (dataSource *noopDataSource) GetTraceByID(ctx context.Context, traceID string) (t traces.Trace, err error) {
+	return traces.Trace{}, nil
 }
 func (db *noopDataSource) Endpoint() string                  { return "" }
 func (db *noopDataSource) Connect(ctx context.Context) error { return nil }

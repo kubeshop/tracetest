@@ -6,11 +6,11 @@ import (
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/linter/rules"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type Plugin interface {
-	Execute(context.Context, model.Trace, analyzer.LinterPlugin) (analyzer.PluginResult, error)
+	Execute(context.Context, traces.Trace, analyzer.LinterPlugin) (analyzer.PluginResult, error)
 	ID() string
 	RuleRegistry() *rules.RuleRegistry
 }

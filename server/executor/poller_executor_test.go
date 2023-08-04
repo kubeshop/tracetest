@@ -17,6 +17,7 @@ import (
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -44,7 +45,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
 	retryDelay := 1 * time.Second
 	maxWaitTimeForTrace := 30 * time.Second
 
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		{},
 	}
@@ -81,7 +82,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 	retryDelay := 1 * time.Second
 	maxWaitTimeForTrace := 30 * time.Second
 
-	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
+	trace := traces.NewTrace(randomIDGenerator.TraceID().String(), []traces.Span{
 		{
 			ID:        randomIDGenerator.SpanID(),
 			Name:      "HTTP API",
@@ -90,12 +91,12 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 			Attributes: map[string]string{
 				"testSpan": "true",
 			},
-			Children: []*model.Span{},
+			Children: []*traces.Span{},
 		},
 	})
 
 	// test
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		trace,
 		trace,
@@ -133,7 +134,7 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 
 	traceID := randomIDGenerator.TraceID().String()
 
-	firstSpan := model.Span{
+	firstSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "HTTP API",
 		StartTime: time.Now(),
@@ -141,26 +142,26 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	secondSpan := model.Span{
+	secondSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "Database query",
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":                           "true",
-			model.TracetestMetadataFieldParentID: firstSpan.ID.String(),
+			"testSpan":                            "true",
+			traces.TracetestMetadataFieldParentID: firstSpan.ID.String(),
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	traceWithOneSpan := model.NewTrace(traceID, []model.Span{firstSpan})
-	traceWithTwoSpans := model.NewTrace(traceID, []model.Span{firstSpan, secondSpan})
+	traceWithOneSpan := traces.NewTrace(traceID, []traces.Span{firstSpan})
+	traceWithTwoSpans := traces.NewTrace(traceID, []traces.Span{firstSpan, secondSpan})
 
 	// test
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		traceWithOneSpan,
 		traceWithTwoSpans,
@@ -196,20 +197,20 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 	retryDelay := 1 * time.Second
 	maxWaitTimeForTrace := 3 * time.Second
 
-	rootSpan := model.Span{
+	rootSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
-		Name:      model.TriggerSpanName,
+		Name:      traces.TriggerSpanName,
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan})
+	trace := traces.NewTrace(randomIDGenerator.TraceID().String(), []traces.Span{rootSpan})
 
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		trace,
 		trace,
@@ -249,16 +250,16 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 
 	rootSpanID := randomIDGenerator.SpanID()
 
-	trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
+	trace := traces.NewTrace(randomIDGenerator.TraceID().String(), []traces.Span{
 		{
 			ID:        rootSpanID,
-			Name:      model.TriggerSpanName,
+			Name:      traces.TriggerSpanName,
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
 			Attributes: map[string]string{
 				"testSpan": "true",
 			},
-			Children: []*model.Span{},
+			Children: []*traces.Span{},
 		},
 		{
 			ID:        randomIDGenerator.SpanID(),
@@ -266,15 +267,15 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
 			Attributes: map[string]string{
-				"testSpan":                           "true",
-				model.TracetestMetadataFieldParentID: rootSpanID.String(),
+				"testSpan":                            "true",
+				traces.TracetestMetadataFieldParentID: rootSpanID.String(),
 			},
-			Children: []*model.Span{},
+			Children: []*traces.Span{},
 		},
 	})
 
 	// test
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		trace,
 		trace,
@@ -310,34 +311,34 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 	retryDelay := 1 * time.Second
 	maxWaitTimeForTrace := 30 * time.Second
 
-	rootSpan := model.Span{
+	rootSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
-		Name:      model.TriggerSpanName,
+		Name:      traces.TriggerSpanName,
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	apiSpan := model.Span{
+	apiSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "HTTP API",
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":                           "true",
-			model.TracetestMetadataFieldParentID: rootSpan.ID.String(),
+			"testSpan":                            "true",
+			traces.TracetestMetadataFieldParentID: rootSpan.ID.String(),
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	traceWithOnlyRoot := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan})
-	completeTrace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{rootSpan, apiSpan})
+	traceWithOnlyRoot := traces.NewTrace(randomIDGenerator.TraceID().String(), []traces.Span{rootSpan})
+	completeTrace := traces.NewTrace(randomIDGenerator.TraceID().String(), []traces.Span{rootSpan, apiSpan})
 
 	// test
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		traceWithOnlyRoot,
 		traceWithOnlyRoot,
@@ -379,46 +380,46 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 
 	traceID := randomIDGenerator.TraceID().String()
 
-	rootSpan := model.Span{
+	rootSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
-		Name:      model.TriggerSpanName,
+		Name:      traces.TriggerSpanName,
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
 			"testSpan": "true",
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	firstSpan := model.Span{
+	firstSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "HTTP API",
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":                           "true",
-			model.TracetestMetadataFieldParentID: rootSpan.ID.String(),
+			"testSpan":                            "true",
+			traces.TracetestMetadataFieldParentID: rootSpan.ID.String(),
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	secondSpan := model.Span{
+	secondSpan := traces.Span{
 		ID:        randomIDGenerator.SpanID(),
 		Name:      "Database query",
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
 		Attributes: map[string]string{
-			"testSpan":                           "true",
-			model.TracetestMetadataFieldParentID: firstSpan.ID.String(),
+			"testSpan":                            "true",
+			traces.TracetestMetadataFieldParentID: firstSpan.ID.String(),
 		},
-		Children: []*model.Span{},
+		Children: []*traces.Span{},
 	}
 
-	traceWithOneSpan := model.NewTrace(traceID, []model.Span{rootSpan, firstSpan})
-	traceWithTwoSpans := model.NewTrace(traceID, []model.Span{rootSpan, firstSpan, secondSpan})
+	traceWithOneSpan := traces.NewTrace(traceID, []traces.Span{rootSpan, firstSpan})
+	traceWithTwoSpans := traces.NewTrace(traceID, []traces.Span{rootSpan, firstSpan, secondSpan})
 
 	// test
-	tracePerIteration := []model.Trace{
+	tracePerIteration := []traces.Trace{
 		{},
 		traceWithOneSpan,
 		traceWithTwoSpans,
@@ -505,7 +506,7 @@ func executeAndValidatePollingRequests(t *testing.T, retryDelay, maxWaitTimeForT
 	}
 }
 
-func getPollerExecutorWithMocks(t *testing.T, tracePerIteration []model.Trace) *executor.InstrumentedPollerExecutor {
+func getPollerExecutorWithMocks(t *testing.T, tracePerIteration []traces.Trace) *executor.InstrumentedPollerExecutor {
 	updater := getRunUpdaterMock(t)
 	tracer := getTracerMock(t)
 	testDB := getRunRepositoryMock(t)
@@ -583,11 +584,11 @@ func getTracerMock(t *testing.T) trace.Tracer {
 
 // TraceDB
 type traceDBMock struct {
-	tracePerIteration []model.Trace
+	tracePerIteration []traces.Trace
 	state             *traceDBState
 }
 
-func (db *traceDBMock) GetTraceByID(_ context.Context, _ string) (t model.Trace, err error) {
+func (db *traceDBMock) GetTraceByID(_ context.Context, _ string) (t traces.Trace, err error) {
 	trace := db.tracePerIteration[db.state.currentIteration]
 	db.state.currentIteration += 1
 
@@ -619,7 +620,7 @@ type traceDBState struct {
 	currentIteration int
 }
 
-func getTraceDBMockFactory(t *testing.T, tracePerIteration []model.Trace, state *traceDBState) func(datastore.DataStore) (tracedb.TraceDB, error) {
+func getTraceDBMockFactory(t *testing.T, tracePerIteration []traces.Trace, state *traceDBState) func(datastore.DataStore) (tracedb.TraceDB, error) {
 	t.Helper()
 
 	return func(ds datastore.DataStore) (tracedb.TraceDB, error) {

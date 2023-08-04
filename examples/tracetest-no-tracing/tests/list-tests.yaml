@@ -11,10 +11,6 @@ spec:
       headers:
       - key: Content-Type
         value: application/json
-    grpc:
-      protobufFile: ""
-      address: ""
-      method: ""
   specs:
   - selector: span[name = "Tracetest trigger"]
     assertions:

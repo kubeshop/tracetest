@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type notEmptyRuleAttributesRule struct{}
@@ -18,7 +18,7 @@ func (r notEmptyRuleAttributesRule) ID() string {
 	return analyzer.NotEmptyAttributesRuleID
 }
 
-func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace traces.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	res := make([]analyzer.Result, 0, len(trace.Flat))
 	passed := true
 
