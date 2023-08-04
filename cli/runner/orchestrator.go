@@ -117,7 +117,6 @@ const (
 )
 
 func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
-
 	o.logger.Debug(
 		"Running test from definition",
 		zap.String("definitionFile", opts.DefinitionFile),
@@ -128,11 +127,17 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
-	varsID, err := o.resolveVarsID(ctx, opts.VarsID)
-	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
+	var err error
+
+	varsID := ""
+
+	if opts.VarsID != "" {
+		varsID, err = o.resolveVarsID(ctx, opts.VarsID)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
+		}
+		o.logger.Debug("env resolved", zap.String("ID", varsID))
 	}
-	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
 	var resource any
 	if opts.DefinitionFile != "" {
