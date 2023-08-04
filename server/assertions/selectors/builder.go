@@ -5,7 +5,7 @@ import (
 
 	"github.com/alecthomas/participle/v2"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 var defaultParser *SelectorParser
@@ -108,7 +108,7 @@ func getOperatorFunction(operator string) (FilterFunction, error) {
 
 	return FilterFunction{
 		Name: operator,
-		Filter: func(span model.Span, attribute string, value Value) error {
+		Filter: func(span traces.Span, attribute string, value Value) error {
 			var attrValue string
 			if attribute == "name" {
 				attrValue = span.Name

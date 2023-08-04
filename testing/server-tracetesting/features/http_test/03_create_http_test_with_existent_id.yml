@@ -41,3 +41,5 @@ spec:
   - selector: span[name="POST /api/tests" tracetest.span.type="http"]
     assertions:
     - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.span.status_code = "STATUS_CODE_ERROR"
+    - attr:tracetest.span.status_description contains "test with same ID already exists"

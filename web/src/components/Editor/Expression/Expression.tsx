@@ -5,7 +5,7 @@ import {Extension} from '@codemirror/state';
 import {autocompletion} from '@codemirror/autocomplete';
 import CodeMirror, {ReactCodeMirrorRef} from '@uiw/react-codemirror';
 import {useCallback, useMemo, useRef, useState} from 'react';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet';
 import EditorService from 'services/Editor.service';
 import {SupportedEditors} from 'constants/Editor.constants';
 
@@ -32,10 +32,10 @@ const Expression = ({
 }: IEditorProps) => {
   const {testId = '', runId = ''} = context;
   const [isHovering, setIsHovering] = useState(false);
-  const {selectedEnvironment} = useEnvironment();
+  const {selectedVariableSet} = useVariableSet();
   const editorTheme = useEditorTheme();
   const completionFn = useAutoComplete({testId, runId, onSelect: onSelectAutocompleteOption, autocompleteCustomValues});
-  const {onHover, resolvedValues, isLoading} = useTooltip({environmentId: selectedEnvironment?.id, ...context});
+  const {onHover, resolvedValues, isLoading} = useTooltip({variableSetId: selectedVariableSet?.id, ...context});
   const ref = useRef<ReactCodeMirrorRef>(null);
   const isValidQuery = useMemo(() => EditorService.getIsQueryValid(SupportedEditors.Expression, value), [value]);
 

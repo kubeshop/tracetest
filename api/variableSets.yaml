@@ -1,0 +1,44 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    VariableSetResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/VariableSetResource"
+    VariableSetResource:
+      type: object
+      description: "Represents a VariableSet structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'VariableSet'."
+          enum:
+            - VariableSet
+        spec:
+          $ref: "#/components/schemas/VariableSet"
+    VariableSet:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/VariableSetValue"
+    VariableSetValue:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string

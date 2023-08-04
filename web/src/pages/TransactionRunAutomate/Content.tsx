@@ -5,7 +5,7 @@ import RunDetailAutomateMethods from 'components/RunDetailAutomateMethods';
 import CliCommand from 'components/RunDetailAutomateMethods/methods/CLICommand';
 import {CLI_RUNNING_TRANSACTIONS_URL} from 'constants/Common.constants';
 import useDocumentTitle from 'hooks/useDocumentTitle';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet';
 import {useTransaction} from 'providers/Transaction/Transaction.provider';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './TransactionRunAutomate.styled';
@@ -14,7 +14,7 @@ const Content = () => {
   const {transaction} = useTransaction();
   useDocumentTitle(`${transaction.name} - Automate`);
   const [fileName, setFileName] = useState<string>(`${snakeCase(transaction.name)}.yaml`);
-  const {selectedEnvironment: {id: environmentId} = {}} = useEnvironment();
+  const {selectedVariableSet: {id: variableSetId} = {}} = useVariableSet();
 
   return (
     <S.Container>
@@ -37,7 +37,7 @@ const Content = () => {
               children: (
                 <CliCommand
                   id={transaction.id}
-                  environmentId={environmentId}
+                  variableSetId={variableSetId}
                   fileName={fileName}
                   resourceType={ResourceType.Transaction}
                   docsUrl={CLI_RUNNING_TRANSACTIONS_URL}

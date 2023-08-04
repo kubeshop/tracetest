@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression/linting"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 var ErrMissingVariables = errors.New("variables are missing")
@@ -19,9 +19,9 @@ type augmentedTestGetter interface {
 	GetAugmented(context.Context, id.ID) (test.Test, error)
 }
 
-func ValidateMissingVariables(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, test test.Test, env environment.Environment) (openapi.MissingVariablesError, error) {
+func ValidateMissingVariables(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, test test.Test, env variableset.VariableSet) (openapi.MissingVariablesError, error) {
 	missingVariables := getMissingVariables(test, env)
-	previousValues := map[string]environment.EnvironmentValue{}
+	previousValues := map[string]variableset.VariableSetValue{}
 	var err error
 	if len(missingVariables) > 0 {
 		previousValues, err = getPreviousEnvironmentValues(ctx, testRepo, runRepo, test)
@@ -32,7 +32,7 @@ func ValidateMissingVariables(ctx context.Context, testRepo augmentedTestGetter,
 	return buildErrorObject(test, missingVariables, previousValues)
 }
 
-func getMissingVariables(test test.Test, environment environment.Environment) []string {
+func getMissingVariables(test test.Test, environment variableset.VariableSet) []string {
 	availableTestVariables := getAvailableVariables(test, environment)
 	expectedVariables := linting.DetectMissingVariables(test, availableTestVariables)
 
@@ -52,7 +52,7 @@ func getMissingVariables(test test.Test, environment environment.Environment) []
 	return missingVariables
 }
 
-func getAvailableVariables(test test.Test, environment environment.Environment) []string {
+func getAvailableVariables(test test.Test, environment variableset.VariableSet) []string {
 	availableVariables := make([]string, 0)
 	for _, env := range environment.Values {
 		availableVariables = append(availableVariables, env.Key)
@@ -65,10 +65,10 @@ func getAvailableVariables(test test.Test, environment environment.Environment) 
 	return availableVariables
 }
 
-func getPreviousEnvironmentValues(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, test test.Test) (map[string]environment.EnvironmentValue, error) {
+func getPreviousEnvironmentValues(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, test test.Test) (map[string]variableset.VariableSetValue, error) {
 	latestTestVersion, err := testRepo.GetAugmented(ctx, test.ID)
 	if err != nil {
-		return map[string]environment.EnvironmentValue{}, err
+		return map[string]variableset.VariableSetValue{}, err
 	}
 
 	previousTestRun, err := runRepo.GetLatestRunByTestVersion(ctx, test.ID, *latestTestVersion.Version)
@@ -76,21 +76,21 @@ func getPreviousEnvironmentValues(ctx context.Context, testRepo augmentedTestGet
 		// If error is not found, it means this is the first run. So just ignore this error
 		// and provide empty values in the default values for the missing variables
 		if err != sql.ErrNoRows {
-			return map[string]environment.EnvironmentValue{}, err
+			return map[string]variableset.VariableSetValue{}, err
 		}
 	} else {
-		envMap := make(map[string]environment.EnvironmentValue, len(previousTestRun.Environment.Values))
-		for _, envVar := range previousTestRun.Environment.Values {
+		envMap := make(map[string]variableset.VariableSetValue, len(previousTestRun.VariableSet.Values))
+		for _, envVar := range previousTestRun.VariableSet.Values {
 			envMap[envVar.Key] = envVar
 		}
 
 		return envMap, nil
 	}
 
-	return map[string]environment.EnvironmentValue{}, nil
+	return map[string]variableset.VariableSetValue{}, nil
 }
 
-func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, transaction transaction.Transaction, env environment.Environment) (openapi.MissingVariablesError, error) {
+func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, transaction transaction.Transaction, env variableset.VariableSet) (openapi.MissingVariablesError, error) {
 	missingVariables := make([]openapi.MissingVariable, 0)
 	for _, step := range transaction.Steps {
 		stepValidationResult, err := ValidateMissingVariables(ctx, testRepo, runRepo, step, env)
@@ -101,9 +101,9 @@ func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augme
 		missingVariables = append(missingVariables, stepValidationResult.MissingVariables...)
 
 		// update env with this test outputs
-		outputs := make([]environment.EnvironmentValue, 0)
+		outputs := make([]variableset.VariableSetValue, 0)
 		for _, output := range step.Outputs {
-			outputs = append(outputs, environment.EnvironmentValue{Key: output.Name})
+			outputs = append(outputs, variableset.VariableSetValue{Key: output.Name})
 		}
 
 		env.Values = append(env.Values, outputs...)
@@ -116,7 +116,7 @@ func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augme
 	return openapi.MissingVariablesError{}, nil
 }
 
-func buildErrorObject(test test.Test, missingVariables []string, previousValues map[string]environment.EnvironmentValue) (openapi.MissingVariablesError, error) {
+func buildErrorObject(test test.Test, missingVariables []string, previousValues map[string]variableset.VariableSetValue) (openapi.MissingVariablesError, error) {
 	if len(missingVariables) > 0 {
 		missingVariableObjects := make([]openapi.Variable, 0, len(missingVariables))
 		for _, variable := range missingVariables {

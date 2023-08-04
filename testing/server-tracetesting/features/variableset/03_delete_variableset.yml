@@ -1,0 +1,25 @@
+---
+type: Test
+spec:
+  id: ojzN6vwVRv
+  name: Delete Variable Set
+  description: Test step of 'Variable Set Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/variablesets/${env:VARIABLE_SET_ID}
+      method: DELETE
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 204
+    - selector: span[tracetest.span.type="http" http.method = "DELETE"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec DELETE"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1

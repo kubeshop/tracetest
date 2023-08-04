@@ -12,9 +12,9 @@ package openapi
 type RunInformation struct {
 	Metadata *map[string]string `json:"metadata,omitempty"`
 
-	EnvironmentId string `json:"environmentId,omitempty"`
+	VariableSetId string `json:"variableSetId,omitempty"`
 
-	Variables []EnvironmentValue `json:"variables,omitempty"`
+	Variables []VariableSetValue `json:"variables,omitempty"`
 
 	RequiredGates *[]SupportedGates `json:"requiredGates,omitempty"`
 }
@@ -22,7 +22,7 @@ type RunInformation struct {
 // AssertRunInformationRequired checks if the required fields are not zero-ed
 func AssertRunInformationRequired(obj RunInformation) error {
 	for _, el := range obj.Variables {
-		if err := AssertEnvironmentValueRequired(el); err != nil {
+		if err := AssertVariableSetValueRequired(el); err != nil {
 			return err
 		}
 	}

@@ -9,7 +9,7 @@ export const defaultOptions: TCliCommandEnabledOptions = {
   [CliCommandOption.UseId]: false,
   [CliCommandOption.SkipResultWait]: false,
   [CliCommandOption.UseHostname]: false,
-  [CliCommandOption.UseCurrentEnvironment]: false,
+  [CliCommandOption.UseCurrentVariableSet]: false,
   [CliCommandOption.GeneratesJUnit]: false,
   [CliCommandOption.useDocker]: false,
 };

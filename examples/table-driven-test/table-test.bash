@@ -27,7 +27,7 @@ while IFS=, read -ra fields; do
 
   # create the env file
   cat <<EOF > "$envFile"
-type: Environment
+type: VariableSet
 spec:
   name: ${environmentID}
   values:
@@ -43,8 +43,8 @@ EOF
   # run test
   echo "Running test"
 
-  $TRACETEST apply environment --file "${envFile}" > /dev/null
-  $TRACETEST run test --file "${TEST_DEFINITION}" --environment "${envFile}"
+  $TRACETEST apply variableset --file "${envFile}" > /dev/null
+  $TRACETEST run test --file "${TEST_DEFINITION}" --vars "${envFile}"
 
 
   ((line=line+1))

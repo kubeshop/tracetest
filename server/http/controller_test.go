@@ -7,7 +7,6 @@ import (
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/http/mappings"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
@@ -25,12 +24,12 @@ var (
 		ID:      1,
 		TestID:  id.ID("abc123"),
 		TraceID: id.NewRandGenerator().TraceID(),
-		Trace: &model.Trace{
+		Trace: &traces.Trace{
 			ID: id.NewRandGenerator().TraceID(),
-			RootSpan: model.Span{
+			RootSpan: traces.Span{
 				ID:   id.NewRandGenerator().SpanID(),
 				Name: "POST /pokemon/import",
-				Attributes: model.Attributes{
+				Attributes: traces.Attributes{
 					"tracetest.span.type": "http",
 					"service.name":        "pokeshop",
 					"http.response.body":  `{"id":52}`,

@@ -5,7 +5,7 @@ export enum CliCommandOption {
   UseId = 'useId',
   SkipResultWait = 'skipWait',
   UseHostname = 'useHostname',
-  UseCurrentEnvironment = 'useCurrentEnvironment',
+  UseCurrentVariableSet = 'useCurrentVariableSet',
   GeneratesJUnit = 'generateJUnit',
   useDocker = 'useDocker',
 }
@@ -20,7 +20,7 @@ export type TCliCommandEnabledOptions = Record<CliCommandOption, boolean>;
 export type TCliCommandConfig = {
   options: TCliCommandEnabledOptions;
   id: string;
-  environmentId?: string;
+  variableSetId?: string;
   fileName: string;
   format: CliCommandFormat;
   requiredGates: string[];
@@ -30,7 +30,7 @@ export type TCliCommandConfig = {
 type TApplyProps = {
   command: string;
   id: string;
-  environmentId?: string;
+  variableSetId?: string;
   enabled: boolean;
   fileName: string;
 };
@@ -45,8 +45,8 @@ const CliCommandService = () => ({
       const baseUrl = getServerBaseUrl();
       return enabled ? `${command} --server-url ${baseUrl}` : command;
     },
-    [CliCommandOption.UseCurrentEnvironment]: ({command, enabled, environmentId}) =>
-      enabled && environmentId ? `${command} --environment ${environmentId}` : command,
+    [CliCommandOption.UseCurrentVariableSet]: ({command, enabled, variableSetId}) =>
+      enabled && variableSetId ? `${command} --vars ${variableSetId}` : command,
     [CliCommandOption.GeneratesJUnit]: ({command, enabled}) => (enabled ? `${command} --junit result.junit` : command),
     [CliCommandOption.useDocker]: ({enabled, command}) =>
       `${
@@ -59,10 +59,10 @@ const CliCommandService = () => ({
   applyRequiredGates: (command: string, requiredGates: string[]) =>
     requiredGates?.length ? `${command} --required-gates ${requiredGates.join(',')}` : command,
 
-  getCommand({options, format, id, environmentId, fileName, requiredGates, resourceType}: TCliCommandConfig) {
+  getCommand({options, format, id, variableSetId, fileName, requiredGates, resourceType}: TCliCommandConfig) {
     let command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
-        this.applyOptions[option as CliCommandOption]({command: acc, enabled, id, environmentId, fileName}),
+        this.applyOptions[option as CliCommandOption]({command: acc, enabled, id, variableSetId, fileName}),
       `run ${resourceType}`
     );
 

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 type TransactionRun struct {
@@ -35,8 +35,8 @@ type TransactionRun struct {
 
 	Metadata test.RunMetadata
 
-	// environment
-	Environment   environment.Environment
+	// variable set
+	VariableSet   variableset.VariableSet
 	RequiredGates *[]testrunner.RequiredGate
 }
 

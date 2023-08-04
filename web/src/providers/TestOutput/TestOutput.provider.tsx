@@ -19,7 +19,7 @@ import SpanSelectors from 'selectors/Span.selectors';
 import useValidateOutput from './hooks/useValidateOutput';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useDashboard} from '../Dashboard/Dashboard.provider';
-import {useEnvironment} from '../Environment/Environment.provider';
+import {useVariableSet} from '../VariableSet';
 import {useTest} from '../Test/Test.provider';
 import {useTestRun} from '../TestRun/TestRun.provider';
 
@@ -77,7 +77,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const {onOpen: onOpenConfirmationModal} = useConfirmationModal();
   const {navigate} = useDashboard();
-  const {selectedEnvironment} = useEnvironment();
+  const {selectedVariableSet} = useVariableSet();
   const {
     test: {outputs: testOutputs = []},
   } = useTest();
@@ -129,7 +129,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
     setDraft(undefined);
     setIsOpen(false);
     onValidate(undefined, TestOutput({}));
-  }, []);
+  }, [onValidate]);
 
   const onCancel = useCallback(() => {
     dispatch(outputsReverted());
@@ -157,7 +157,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
           runId,
           spanId,
           selector: values.selector,
-          environmentId: selectedEnvironment?.id,
+          variableSetId: selectedVariableSet?.id,
         },
       };
       const parsedExpression = await parseExpressionMutation(props).unwrap();
@@ -171,7 +171,7 @@ const TestOutputProvider = ({children, runId, testId}: IProps) => {
       }
       dispatch(outputAdded({...values, valueRunDraft, spanId}));
     },
-    [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedEnvironment?.id, testId]
+    [dispatch, draft?.id, isEditing, parseExpressionMutation, runId, selectedVariableSet?.id, testId]
   );
 
   const onNavigateAndOpen = useCallback(

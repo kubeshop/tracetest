@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type requiredAttributesRule struct{}
@@ -17,7 +17,7 @@ func (r requiredAttributesRule) ID() string {
 	return analyzer.RequiredAttributesRuleID
 }
 
-func (r requiredAttributesRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+func (r requiredAttributesRule) Evaluate(ctx context.Context, trace traces.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	res := make([]analyzer.Result, 0)
 	var allPassed bool = true
 

@@ -3,7 +3,7 @@ package integration_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sync"
 	"testing"
@@ -61,7 +61,7 @@ func getTests(t *testing.T, endpoint string) resourcemanager.ResourceList[test.T
 	require.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
 
-	bodyJsonBytes, err := ioutil.ReadAll(resp.Body)
+	bodyJsonBytes, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 
 	var tests resourcemanager.ResourceList[test.Test]
@@ -77,7 +77,7 @@ func getDatastores(t *testing.T, endpoint string) resourcemanager.ResourceList[d
 	require.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
 
-	bodyJsonBytes, err := ioutil.ReadAll(resp.Body)
+	bodyJsonBytes, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 
 	var dataStores resourcemanager.ResourceList[datastore.DataStore]

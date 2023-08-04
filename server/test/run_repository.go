@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -69,8 +69,8 @@ INSERT INTO test_runs (
 
 	"metadata",
 
-	-- environment
-	"environment",
+	-- variable set
+	"variable_set",
 
 	-- linter
 	"linter",
@@ -106,7 +106,7 @@ INSERT INTO test_runs (
 	0,    -- fail
 
 	$12, -- metadata
-	$13, -- environment
+	$13, -- variable_set
 	$14, -- linter
 	$15,  -- required_gates_result
 	$16  -- tenant_id
@@ -136,9 +136,9 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		return Run{}, fmt.Errorf("metadata encoding error: %w", err)
 	}
 
-	jsonEnvironment, err := json.Marshal(run.Environment)
+	jsonVariableSet, err := json.Marshal(run.VariableSet)
 	if err != nil {
-		return Run{}, fmt.Errorf("environment encoding error: %w", err)
+		return Run{}, fmt.Errorf("VariableSet encoding error: %w", err)
 	}
 
 	jsonlinter, err := json.Marshal(run.Linter)
@@ -180,7 +180,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		jsonTriggerResults,
 		jsonTrace,
 		jsonMetadata,
-		jsonEnvironment,
+		jsonVariableSet,
 		jsonlinter,
 		jsonGatesResult,
 		tenantID,
@@ -219,7 +219,7 @@ UPDATE test_runs SET
 	"fail" = $14,
 
 	"metadata" = $15,
-	"environment" = $18,
+	"variable_set" = $18,
 
 	--- linter
 	"linter" = $19,
@@ -256,7 +256,7 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		return fmt.Errorf("encoding error: %w", err)
 	}
 
-	jsonEnvironment, err := json.Marshal(run.Environment)
+	jsonVariableSet, err := json.Marshal(run.VariableSet)
 	if err != nil {
 		return fmt.Errorf("encoding error: %w", err)
 	}
@@ -299,7 +299,7 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		jsonMetadata,
 		run.ID,
 		run.TestID,
-		jsonEnvironment,
+		jsonVariableSet,
 		jsonLinter,
 		jsonGatesResult,
 	)
@@ -369,7 +369,7 @@ SELECT
 	"outputs",
 	"last_error",
 	"metadata",
-	"environment",
+	"variable_set",
 
 	-- transaction run
 	transaction_run_steps.transaction_run_id,
@@ -467,7 +467,7 @@ func readRunRow(row scanner) (Run, error) {
 		jsonTestResults,
 		jsonTrace,
 		jsonOutputs,
-		jsonEnvironment,
+		jsonVariableSet,
 		jsonLinter,
 		jsonGatesResult,
 		jsonMetadata []byte
@@ -498,7 +498,7 @@ func readRunRow(row scanner) (Run, error) {
 		&jsonOutputs,
 		&lastError,
 		&jsonMetadata,
-		&jsonEnvironment,
+		&jsonVariableSet,
 		&transactionRunID,
 		&transactionID,
 		&jsonLinter,
@@ -536,7 +536,7 @@ func readRunRow(row scanner) (Run, error) {
 	err = json.Unmarshal(jsonOutputs, &r.Outputs)
 	if err != nil {
 		// try with raw outputs
-		var rawOutputs []environment.EnvironmentValue
+		var rawOutputs []variableset.VariableSetValue
 		err = json.Unmarshal(jsonOutputs, &rawOutputs)
 
 		for _, value := range rawOutputs {
@@ -557,9 +557,9 @@ func readRunRow(row scanner) (Run, error) {
 		return Run{}, fmt.Errorf("cannot parse Metadata: %w", err)
 	}
 
-	err = json.Unmarshal(jsonEnvironment, &r.Environment)
+	err = json.Unmarshal(jsonVariableSet, &r.VariableSet)
 	if err != nil {
-		return Run{}, fmt.Errorf("cannot parse Environment: %w", err)
+		return Run{}, fmt.Errorf("cannot parse VariableSet: %w", err)
 	}
 
 	if jsonGatesResult != nil {

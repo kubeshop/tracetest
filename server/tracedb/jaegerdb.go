@@ -68,7 +68,7 @@ func (jtd *jaegerTraceDB) TestConnection(ctx context.Context) model.ConnectionRe
 	return tester.TestConnection(ctx)
 }
 
-func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (jtd *jaegerTraceDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	trace, err := jtd.dataSource.GetTraceByID(ctx, traceID)
 	return trace, err
 }
@@ -81,14 +81,14 @@ func (jtd *jaegerTraceDB) Close() error {
 	return jtd.dataSource.Close()
 }
 
-func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (model.Trace, error) {
+func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (traces.Trace, error) {
 	query := pb.NewQueryServiceClient(conn)
 
 	stream, err := query.GetTrace(ctx, &pb.GetTraceRequest{
 		TraceId: traceID,
 	})
 	if err != nil {
-		return model.Trace{}, fmt.Errorf("jaeger get trace: %w", err)
+		return traces.Trace{}, fmt.Errorf("jaeger get trace: %w", err)
 	}
 
 	// jaeger-query v3 API returns otel spans
@@ -102,12 +102,12 @@ func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.Clie
 		if err != nil {
 			st, ok := status.FromError(err)
 			if !ok {
-				return model.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
+				return traces.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
 			}
 			if st.Message() == "trace not found" {
-				return model.Trace{}, connection.ErrTraceNotFound
+				return traces.Trace{}, connection.ErrTraceNotFound
 			}
-			return model.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)
+			return traces.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)
 		}
 
 		spans = append(spans, in.ResourceSpans...)

@@ -11,12 +11,12 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/config/demo"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
@@ -38,6 +38,7 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -140,6 +141,16 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
+	poolcfg, err := pgxpool.ParseConfig(app.cfg.PostgresConnString())
+	if err != nil {
+		return err
+	}
+
+	pool, err := pgxpool.NewWithConfig(context.Background(), poolcfg)
+	if err != nil {
+		return err
+	}
+
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
 		return err
@@ -196,19 +207,23 @@ func (app *App) Start(opts ...appOption) error {
 	demoRepo := demo.NewRepository(db)
 	pollingProfileRepo := pollingprofile.NewRepository(db)
 	dataStoreRepo := datastore.NewRepository(db)
-	environmentRepo := environment.NewRepository(db)
+	variableSetRepo := variableset.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
 	runRepo := test.NewRunRepository(db)
 	testRunnerRepo := testrunner.NewRepository(db)
+	tracesRepo := traces.NewTraceRepository(db)
 
 	transactionsRepository := transaction.NewRepository(db, testRepo)
 	transactionRunRepository := transaction.NewRunRepository(db, runRepo)
 
+	tracedbFactory := tracedb.Factory(tracesRepo)
+
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
-	registerOtlpServer(app, runRepo, eventEmitter, dataStoreRepo)
+	registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo)
 
 	testPipeline := buildTestPipeline(
+		pool,
 		pollingProfileRepo,
 		dataStoreRepo,
 		linterRepo,
@@ -219,6 +234,7 @@ func (app *App) Start(opts ...appOption) error {
 		tracer,
 		subscriptionManager,
 		triggerRegistry,
+		tracedbFactory,
 	)
 	testPipeline.Start()
 	app.registerStopFn(func() {
@@ -255,7 +271,8 @@ func (app *App) Start(opts ...appOption) error {
 		transactionRunRepository,
 		testRepo,
 		runRepo,
-		environmentRepo,
+		variableSetRepo,
+		tracedbFactory,
 	)
 	registerWSHandler(router, mappers, subscriptionManager)
 
@@ -273,7 +290,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
 	registerConfigResource(configRepo, apiRouter, provisioner, tracer)
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, provisioner, tracer)
-	registerEnvironmentResource(environmentRepo, apiRouter, provisioner, tracer)
+	registerVariableSetResource(variableSetRepo, apiRouter, provisioner, tracer)
 	registerDemosResource(demoRepo, apiRouter, provisioner, tracer)
 	registerDataStoreResource(dataStoreRepo, apiRouter, provisioner, tracer)
 	registerAnalyzer(linterRepo, apiRouter, provisioner, tracer)
@@ -350,8 +367,8 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) {
-	ingester := otlp.NewIngester(runRepository, eventEmitter, dsRepo)
+func registerOtlpServer(app *App, tracesRepo *traces.TraceRepository, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) {
+	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
@@ -426,10 +443,10 @@ func registerPollingProfilesResource(repository *pollingprofile.Repository, rout
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerEnvironmentResource(repository *environment.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[environment.Environment](
-		environment.ResourceName,
-		environment.ResourceNamePlural,
+func registerVariableSetResource(repository *variableset.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[variableset.VariableSet](
+		variableset.ResourceName,
+		variableset.ResourceNamePlural,
 		repository,
 		resourcemanager.WithTracer(tracer),
 	)
@@ -509,7 +526,8 @@ func controller(
 	transactionRunRepo *transaction.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
-	environmentRepo *environment.Repository,
+	variablesetRepo *variableset.Repository,
+	tracedbFactory tracedb.FactoryFunc,
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry())
 
@@ -526,7 +544,8 @@ func controller(
 		transactionRunRepo,
 		testRepo,
 		testRunRepo,
-		environmentRepo,
+		variablesetRepo,
+		tracedbFactory,
 
 		mappers,
 	))
@@ -547,7 +566,8 @@ func httpRouter(
 	transactionRunRepo *transaction.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
-	environmentRepo *environment.Repository,
+	variableSetRepo *variableset.Repository,
+	tracedbFactory tracedb.FactoryFunc,
 
 	mappers mappings.Mappings,
 ) openapi.Router {
@@ -562,9 +582,9 @@ func httpRouter(
 		transactionRunRepo,
 		testRepo,
 		testRunRepo,
-		environmentRepo,
+		variableSetRepo,
 
-		tracedb.Factory(testRunRepo),
+		tracedbFactory,
 		mappers,
 		Version,
 	)

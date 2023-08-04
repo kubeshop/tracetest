@@ -5,13 +5,13 @@ import (
 	"math"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 var (
@@ -99,7 +99,7 @@ func (r Run) SuccessfullyTriggered() Run {
 	return r
 }
 
-func (r Run) SuccessfullyPolledTraces(t *model.Trace) Run {
+func (r Run) SuccessfullyPolledTraces(t *traces.Trace) Run {
 	r.State = RunStateAnalyzingTrace
 	r.Trace = t
 	r.ObtainedTraceAt = time.Now()
@@ -108,12 +108,12 @@ func (r Run) SuccessfullyPolledTraces(t *model.Trace) Run {
 
 func (r Run) SuccessfullyAsserted(
 	outputs maps.Ordered[string, RunOutput],
-	environment environment.Environment,
+	variableSet variableset.VariableSet,
 	res maps.Ordered[SpanQuery, []AssertionResult],
 	allPassed bool,
 ) Run {
 	r.Outputs = outputs
-	r.Environment = environment
+	r.VariableSet = variableSet
 	r.Results = &RunResults{
 		AllPassed: allPassed,
 		Results:   res,
@@ -203,13 +203,13 @@ func (r Run) GenerateRequiredGateResult(gates []testrunner.RequiredGate) testrun
 	return requiredGatesResult
 }
 
-func NewTracetestRootSpan(run Run) model.Span {
-	return model.AugmentRootSpan(model.Span{
+func NewTracetestRootSpan(run Run) traces.Span {
+	return traces.AugmentRootSpan(traces.Span{
 		ID:         id.NewRandGenerator().SpanID(),
-		Name:       model.TriggerSpanName,
+		Name:       traces.TriggerSpanName,
 		StartTime:  run.ServiceTriggeredAt,
 		EndTime:    run.ServiceTriggerCompletedAt,
-		Attributes: model.Attributes{},
-		Children:   []*model.Span{},
+		Attributes: traces.Attributes{},
+		Children:   []*traces.Span{},
 	}, run.TriggerResult)
 }

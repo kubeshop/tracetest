@@ -2,7 +2,7 @@ import {TDraftVariables, TTestVariablesMap} from 'types/Variables.types';
 import {uniqBy} from 'lodash';
 import MissingVariables from 'models/MissingVariables.model';
 import Test from 'models/Test.model';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 
 const VariablesService = () => ({
   getVariableEntries(missingVariables: MissingVariables, testList: Test[]): TTestVariablesMap {
@@ -33,7 +33,7 @@ const VariablesService = () => ({
     };
   },
 
-  getSubmitValues({variables}: TDraftVariables): TEnvironmentValue[] {
+  getSubmitValues({variables}: TDraftVariables): TVariableSetValue[] {
     return Object.entries(variables).map(([key, value]) => ({
       key,
       value,

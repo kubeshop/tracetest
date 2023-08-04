@@ -53,8 +53,8 @@ INSERT INTO transaction_runs (
 
 	"metadata",
 
-	-- environment
-	"environment",
+	-- variable_set
+	"variable_set",
 
 	"tenant_id"
 ) VALUES (
@@ -77,7 +77,7 @@ INSERT INTO transaction_runs (
 	TRUE, -- all_steps_required_gates_passed
 
 	$6, -- metadata
-	$7, -- environment
+	$7, -- variable_set
 	$8 -- tenant_id
 )
 RETURNING "id"`
@@ -108,9 +108,9 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run metadata: %w", err)
 	}
 
-	jsonEnvironment, err := json.Marshal(tr.Environment)
+	jsonVariableSet, err := json.Marshal(tr.VariableSet)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run environment: %w", err)
+		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run variable set: %w", err)
 	}
 
 	tx, err := td.db.BeginTx(ctx, nil)
@@ -136,7 +136,7 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 		tr.State,
 		tr.CurrentTest,
 		jsonMetadata,
-		jsonEnvironment,
+		jsonVariableSet,
 		tenantID,
 	).Scan(&runID)
 	if err != nil {
@@ -172,8 +172,8 @@ UPDATE transaction_runs SET
 
 	"metadata" = $8,
 
-	-- environment
-	"environment" = $9
+	-- variable_set
+	"variable_set" = $9
 
 WHERE id = $10 AND transaction_id = $11
 `
@@ -189,9 +189,9 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		return fmt.Errorf("failed to marshal transaction run metadata: %w", err)
 	}
 
-	jsonEnvironment, err := json.Marshal(tr.Environment)
+	jsonVariableSet, err := json.Marshal(tr.VariableSet)
 	if err != nil {
-		return fmt.Errorf("failed to marshal transaction run environment: %w", err)
+		return fmt.Errorf("failed to marshal transaction run variableSet: %w", err)
 	}
 	var lastError *string
 	if tr.LastError != nil {
@@ -213,7 +213,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		fail,
 		allStepsRequiredGatesPassed,
 		jsonMetadata,
-		jsonEnvironment,
+		jsonVariableSet,
 		strconv.Itoa(tr.ID),
 		tr.TransactionID,
 	)
@@ -322,7 +322,7 @@ SELECT
 
 	"metadata",
 
-	"environment"
+	"variable_set"
 FROM transaction_runs
 `
 
@@ -398,7 +398,7 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 	r := TransactionRun{}
 
 	var (
-		jsonEnvironment,
+		jsonVariableSet,
 		jsonMetadata []byte
 
 		lastError *string
@@ -421,7 +421,7 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 		&fail,
 		&allStepsRequiredGatesPassed,
 		&jsonMetadata,
-		&jsonEnvironment,
+		&jsonVariableSet,
 	)
 	if err != nil {
 		return TransactionRun{}, fmt.Errorf("cannot read row: %w", err)
@@ -432,9 +432,9 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 		return TransactionRun{}, fmt.Errorf("cannot parse Metadata: %w", err)
 	}
 
-	err = json.Unmarshal(jsonEnvironment, &r.Environment)
+	err = json.Unmarshal(jsonVariableSet, &r.VariableSet)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("cannot parse Environment: %w", err)
+		return TransactionRun{}, fmt.Errorf("cannot parse VariableSet: %w", err)
 	}
 
 	if lastError != nil && *lastError != "" {

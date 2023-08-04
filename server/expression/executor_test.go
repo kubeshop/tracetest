@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -101,8 +101,8 @@ func TestAttributeExecution(t *testing.T) {
 			ShouldPass: true,
 
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"my_attribute": "42",
 					},
 				},
@@ -114,8 +114,8 @@ func TestAttributeExecution(t *testing.T) {
 			ShouldPass: true,
 
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"dapr-app-id": "42",
 					},
 				},
@@ -133,8 +133,8 @@ func TestStringInterpolationExecution(t *testing.T) {
 			Query:      `attr:text = 'this run took ${"25ms"}'`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"text": "this run took 25ms",
 					},
 				},
@@ -157,8 +157,8 @@ func TestFilterExecution(t *testing.T) {
 			Query:      `attr:tracetest.response.body | json_path '.id' = 8`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					},
 				},
@@ -197,7 +197,7 @@ func TestMetaAttributesExecution(t *testing.T) {
 			ShouldPass:         true,
 			AttributeDataStore: expression.AttributeDataStore{},
 			MetaAttributesDataStore: expression.MetaAttributesDataStore{
-				SelectedSpans: []model.Span{
+				SelectedSpans: []traces.Span{
 					// We don't have to fill the spans details to make the meta attribute work
 					{},
 					{},
@@ -211,7 +211,7 @@ func TestMetaAttributesExecution(t *testing.T) {
 			ShouldPass:         true,
 			AttributeDataStore: expression.AttributeDataStore{},
 			MetaAttributesDataStore: expression.MetaAttributesDataStore{
-				SelectedSpans: []model.Span{
+				SelectedSpans: []traces.Span{
 					{},
 					{},
 				},
@@ -354,8 +354,8 @@ func TestResolveStatementAttributeExecution(t *testing.T) {
 			ShouldPass: true,
 
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"my_attribute": "42",
 					},
 				},
@@ -373,8 +373,8 @@ func TestResolveStatementStringInterpolationExecution(t *testing.T) {
 			Query:      `'this run took ${"25ms"}'`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"text": "this run took 25ms",
 					},
 				},
@@ -397,8 +397,8 @@ func TestResolveStatementFilterExecution(t *testing.T) {
 			Query:      `attr:tracetest.response.body`,
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					},
 				},
@@ -438,7 +438,7 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
-				Values: []environment.EnvironmentValue{},
+				Values: []variableset.VariableSetValue{},
 			},
 		},
 		{
@@ -448,8 +448,8 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: attribute "my_attribute" not found`,
 
 			AttributeDataStore: expression.AttributeDataStore{
-				Span: model.Span{
-					Attributes: model.Attributes{
+				Span: traces.Span{
+					Attributes: traces.Attributes{
 						"attr1": "1",
 						"attr2": "2",
 					},
@@ -469,7 +469,7 @@ func TestFailureCases(t *testing.T) {
 			ExpectedErrorMessage: `resolution error: at index 1 of array: environment variable "test" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
-				Values: []environment.EnvironmentValue{},
+				Values: []variableset.VariableSetValue{},
 			},
 		},
 	}

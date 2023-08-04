@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -15,6 +16,7 @@ import (
 )
 
 func buildTestPipeline(
+	pool *pgxpool.Pool,
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastore.Repository,
 	lintRepo *analyzer.Repository,
@@ -25,6 +27,7 @@ func buildTestPipeline(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
+	tracedbFactory tracedb.FactoryFunc,
 ) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
@@ -51,7 +54,7 @@ func buildTestPipeline(
 		executor.NewPollerExecutor(
 			tracer,
 			execTestUpdater,
-			tracedb.Factory(runRepo),
+			tracedbFactory,
 			dsRepo,
 			eventEmitter,
 		),
@@ -70,7 +73,7 @@ func buildTestPipeline(
 		execTestUpdater,
 		tracer,
 		subscriptionManager,
-		tracedb.Factory(runRepo),
+		tracedbFactory,
 		dsRepo,
 		eventEmitter,
 	)
@@ -85,14 +88,14 @@ func buildTestPipeline(
 		WithTestGetter(testRepo).
 		WithRunGetter(runRepo)
 
-	pipeline := executor.NewPipeline(queueBuilder,
-		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
-		executor.PipelineStep{Processor: tracePoller, Driver: executor.NewInMemoryQueueDriver("tracePoller")},
-		executor.PipelineStep{Processor: linterRunner, Driver: executor.NewInMemoryQueueDriver("linterRunner")},
-		executor.PipelineStep{Processor: assertionRunner, Driver: executor.NewInMemoryQueueDriver("assertionRunner")},
-	)
+	pgQueue := executor.NewPostgresQueueDriver(pool)
 
-	pipeline.Start()
+	pipeline := executor.NewPipeline(queueBuilder,
+		executor.PipelineStep{Processor: runner, Driver: pgQueue.Channel("runner")},
+		executor.PipelineStep{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
+		executor.PipelineStep{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
+		executor.PipelineStep{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
+	)
 
 	const assertionRunnerStepIndex = 3
 

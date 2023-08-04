@@ -1,0 +1,51 @@
+type: Test
+spec:
+  id: oCzNeDQVRI
+  name: Create Variable Set
+  description: Test step of 'Variable Set Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/variablesets
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+          "type": "VariableSet",
+          "spec": {
+            "name": "test-variable-set",
+            "description": "test-variable-set",
+            "values": [
+                {
+                    "key": "HOST",
+                    "value": "localhost"
+                },
+                {
+                    "key": "PORT",
+                    "value": "3000"
+                }
+            ]
+          }
+        }
+  specs:
+    - selector: span[name = "Tracetest trigger"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+        - attr:tracetest.response.status = 201
+        # ensure we can reference outputs declared in the same test
+        - attr:tracetest.response.body | json_path '$.spec.id' = env:VARIABLE_SET_ID
+    - selector: span[name="POST /api/variablesets" tracetest.span.type="http"]
+      assertions:
+        - attr:tracetest.selected_spans.count  =  1
+    - selector: span[name = "exec INSERT"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[name = "exec INSERT"]:first
+      assertions:
+        - attr:sql.query contains "INSERT INTO variable_sets"
+  outputs:
+    - name: VARIABLE_SET_ID
+      selector: span[name = "Tracetest trigger"]
+      value: attr:tracetest.response.body | json_path '$.spec.id'

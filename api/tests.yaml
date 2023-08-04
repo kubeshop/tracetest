@@ -195,8 +195,8 @@ components:
         completedAt:
           type: string
           format: date-time
-        environment:
-          $ref: "./environments.yaml#/components/schemas/Environment"
+        variableSet:
+          $ref: "./variableSets.yaml#/components/schemas/VariableSet"
         triggerResult:
           $ref: "./triggers.yaml#/components/schemas/TriggerResult"
         trace:
@@ -238,12 +238,12 @@ components:
           nullable: true
           additionalProperties:
             type: string
-        environmentId:
+        variableSetId:
           type: string
         variables:
           type: array
           items:
-            $ref: "./environments.yaml#/components/schemas/EnvironmentValue"
+            $ref: "./variableSets.yaml#/components/schemas/VariableSetValue"
         requiredGates:
           type: array
           nullable: true

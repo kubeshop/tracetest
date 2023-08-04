@@ -26,7 +26,7 @@ type TransactionRun struct {
 
 	Steps []TestRun `json:"steps,omitempty"`
 
-	Environment Environment `json:"environment,omitempty"`
+	VariableSet VariableSet `json:"variableSet,omitempty"`
 
 	Metadata map[string]string `json:"metadata,omitempty"`
 
@@ -44,7 +44,7 @@ func AssertTransactionRunRequired(obj TransactionRun) error {
 			return err
 		}
 	}
-	if err := AssertEnvironmentRequired(obj.Environment); err != nil {
+	if err := AssertVariableSetRequired(obj.VariableSet); err != nil {
 		return err
 	}
 	return nil

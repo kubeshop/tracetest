@@ -1,5 +1,5 @@
 import {Model, TTransactionsSchemas} from 'types/Common.types';
-import Environment from './Environment.model';
+import VariableSet from './VariableSet.model';
 import TestRun from './TestRun.model';
 
 export type TRawTransactionResourceRun = TTransactionsSchemas['TransactionRun'];
@@ -7,7 +7,7 @@ type TransactionRun = Model<
   TRawTransactionResourceRun,
   {
     steps: TestRun[];
-    environment?: Environment;
+    variableSet?: VariableSet;
     metadata?: {[key: string]: string};
   }
 >;
@@ -18,7 +18,7 @@ const TransactionRun = ({
   completedAt = '',
   state = 'CREATED',
   steps = [],
-  environment = {},
+  variableSet = {},
   metadata = {},
   version = 1,
   pass = 0,
@@ -31,7 +31,7 @@ const TransactionRun = ({
     completedAt,
     state,
     steps: steps.map(step => TestRun(step)),
-    environment: Environment.fromRun(environment),
+    variableSet: VariableSet.fromRun(variableSet),
     allStepsRequiredGatesPassed,
     metadata,
     version,

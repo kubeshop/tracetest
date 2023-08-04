@@ -8,7 +8,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
@@ -19,7 +18,9 @@ import (
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -107,7 +108,7 @@ func (f runnerFixture) run(tests []test.Test, ttl time.Duration) {
 	f.runner.Start()
 	time.Sleep(10 * time.Millisecond)
 	for _, testObj := range tests {
-		newRun := f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, environment.Environment{}, nil)
+		newRun := f.runner.Run(context.TODO(), testObj, test.RunMetadata{}, variableset.VariableSet{}, nil)
 		// readd this when using not-in-memory queues
 		// f.runsMock.
 		// 	On("GetRun", testObj.ID, newRun.ID).
@@ -170,6 +171,9 @@ func runnerSetup(t *testing.T) runnerFixture {
 	processorMock := new(mockProcessor)
 	processorMock.Test(t)
 
+	tracesMock := new(mockTraces)
+	tracesMock.Test(t)
+
 	sm := subscription.NewManager()
 	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New()))
 	eventEmitter := executor.NewEventEmitter(getTestRunEventRepositoryMock(t, false), sm)
@@ -182,7 +186,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 		executor.NewDBUpdater(runsMock),
 		tracer,
 		sm,
-		tracedb.Factory(runsMock),
+		tracedb.Factory(tracesMock),
 		dsMock,
 		eventEmitter,
 	)
@@ -218,6 +222,20 @@ func runnerSetup(t *testing.T) runnerFixture {
 		triggererMock: triggererMock,
 		processorMock: processorMock,
 	}
+}
+
+type mockTraces struct {
+	mock.Mock
+}
+
+func (r *mockTraces) Get(ctx context.Context, id trace.TraceID) (traces.Trace, error) {
+	args := r.Called(id)
+	return args.Get(0).(traces.Trace), args.Error(1)
+}
+
+func (r *mockTraces) SaveTrace(ctx context.Context, trace *traces.Trace) error {
+	args := r.Called(trace)
+	return args.Error(0)
 }
 
 type mockProcessor struct {
@@ -298,6 +316,10 @@ func (m *runsRepoMock) UpdateRun(_ context.Context, run test.Run) error {
 }
 
 func (r *runsRepoMock) GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error) {
+	if run, ok := r.runs[testID]; ok && run.ID == runID {
+		return run, nil
+	}
+
 	args := r.Called(testID, runID)
 	return args.Get(0).(test.Run), args.Error(1)
 }

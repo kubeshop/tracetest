@@ -11,7 +11,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/environment"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/expression"
@@ -24,6 +23,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -39,7 +39,7 @@ type controller struct {
 	transactionRepository    transactionsRepository
 	transactionRunRepository transactionRunRepository
 
-	environmentGetter environmentGetter
+	variableSetGetter variableSetGetter
 	newTraceDBFn      func(ds datastore.DataStore) (tracedb.TraceDB, error)
 	mappers           mappings.Mappings
 	version           string
@@ -69,16 +69,16 @@ type transactionRunRepository interface {
 
 type testRunner interface {
 	StopTest(_ context.Context, testID id.ID, runID int)
-	Run(context.Context, test.Test, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) test.Run
+	Run(context.Context, test.Test, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) test.Run
 	Rerun(_ context.Context, _ test.Test, runID int) test.Run
 }
 
 type transactionRunner interface {
-	Run(context.Context, transaction.Transaction, test.RunMetadata, environment.Environment, *[]testrunner.RequiredGate) transaction.TransactionRun
+	Run(context.Context, transaction.Transaction, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) transaction.TransactionRun
 }
 
-type environmentGetter interface {
-	Get(context.Context, id.ID) (environment.Environment, error)
+type variableSetGetter interface {
+	Get(context.Context, id.ID) (variableset.VariableSet, error)
 }
 
 func NewController(
@@ -92,7 +92,7 @@ func NewController(
 	transactionRunRepository transactionRunRepository,
 	testRepository testsRepository,
 	testRunRepository test.RunRepository,
-	environmentGetter environmentGetter,
+	variableSetGetter variableSetGetter,
 
 	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error),
 	mappers mappings.Mappings,
@@ -104,7 +104,7 @@ func NewController(
 		transactionRunRepository: transactionRunRepository,
 		testRepository:           testRepository,
 		testRunRepository:        testRunRepository,
-		environmentGetter:        environmentGetter,
+		variableSetGetter:        variableSetGetter,
 
 		testRunner:        testRunner,
 		transactionRunner: transactionRunner,
@@ -240,11 +240,11 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInfo openapi
 		return handleDBError(err), err
 	}
 
-	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+	variablesEnv := c.mappers.In.VariableSet(openapi.VariableSet{
 		Values: runInfo.Variables,
 	})
 
-	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentId, variablesEnv)
+	environment, err := c.getVariableSet(ctx, runInfo.VariableSetId, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -284,7 +284,7 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID string, runID i
 	definition := c.mappers.In.Definition(def.Specs)
 
 	ds := []expression.DataStore{expression.EnvironmentDataStore{
-		Values: run.Environment.Values,
+		Values: run.VariableSet.Values,
 	}}
 
 	assertionExecutor := executor.NewAssertionExecutor(c.tracer)
@@ -389,12 +389,12 @@ func metadata(in *map[string]string) test.RunMetadata {
 	return test.RunMetadata(*in)
 }
 
-func (c *controller) getEnvironment(ctx context.Context, environmentID string, variablesEnv environment.Environment) (environment.Environment, error) {
+func (c *controller) getVariableSet(ctx context.Context, environmentID string, variablesEnv variableset.VariableSet) (variableset.VariableSet, error) {
 	if environmentID == "" {
 		return variablesEnv, nil
 	}
 
-	environment, err := c.environmentGetter.Get(ctx, id.ID(environmentID))
+	environment, err := c.variableSetGetter.Get(ctx, id.ID(environmentID))
 
 	if err != nil {
 		return variablesEnv, err
@@ -431,8 +431,8 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 
 	ds := []expression.DataStore{}
 
-	if context.EnvironmentId != "" {
-		environment, err := c.environmentGetter.Get(ctx, id.ID(context.EnvironmentId))
+	if context.VariableSetId != "" {
+		environment, err := c.variableSetGetter.Get(ctx, id.ID(context.VariableSetId))
 
 		if err != nil {
 			return [][]expression.DataStore{}, err
@@ -513,11 +513,11 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 	}
 
 	metadata := metadata(runInfo.Metadata)
-	variablesEnv := c.mappers.In.Environment(openapi.Environment{
+	variablesEnv := c.mappers.In.VariableSet(openapi.VariableSet{
 		Values: runInfo.Variables,
 	})
 
-	environment, err := c.getEnvironment(ctx, runInfo.EnvironmentId, variablesEnv)
+	environment, err := c.getVariableSet(ctx, runInfo.VariableSetId, variablesEnv)
 	if err != nil {
 		return handleDBError(err), err
 	}

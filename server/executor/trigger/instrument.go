@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/contrib/propagators/jaeger"
@@ -59,7 +59,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test, opt
 
 	triggerCtx := trace.ContextWithSpanContext(context.Background(), spanContext)
 
-	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(triggerCtx, model.TriggerSpanName)
+	triggerSpanCtx, triggerSpan := t.triggerSpanTracer.Start(triggerCtx, traces.TriggerSpanName)
 	defer triggerSpan.End()
 
 	triggerSpan.SpanContext().TraceState().Insert("tracetest", "true")

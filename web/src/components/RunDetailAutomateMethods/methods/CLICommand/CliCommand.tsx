@@ -7,13 +7,13 @@ import useCliCommand from './hooks/useCliCommand';
 
 interface IProps {
   id: string;
-  environmentId?: string;
+  variableSetId?: string;
   fileName?: string;
   resourceType: ResourceType;
   docsUrl?: string;
 }
 
-const CLiCommand = ({id, environmentId, fileName = '', resourceType, docsUrl}: IProps) => {
+const CLiCommand = ({id, variableSetId, fileName = '', resourceType, docsUrl}: IProps) => {
   const {command, onGetCommand} = useCliCommand();
 
   return (
@@ -35,7 +35,7 @@ const CLiCommand = ({id, environmentId, fileName = '', resourceType, docsUrl}: I
         onChange={onGetCommand}
         id={id}
         fileName={fileName}
-        environmentId={environmentId}
+        variableSetId={variableSetId}
         resourceType={resourceType}
       />
     </S.Container>

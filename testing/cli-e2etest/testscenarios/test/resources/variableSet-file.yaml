@@ -1,0 +1,9 @@
+type: VariableSet
+spec:
+  id: pokeapi-env
+  name: pokeapi-env
+  values:
+    - key: POKEMON_NAME
+      value: snorlax
+    - key: POKEMON_URL
+      value: https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png

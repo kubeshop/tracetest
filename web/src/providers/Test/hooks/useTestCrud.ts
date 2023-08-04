@@ -3,11 +3,11 @@ import {noop} from 'lodash';
 import {useMatch} from 'react-router-dom';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
-import {TEnvironmentValue} from 'models/Environment.model';
+import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
 import Test from 'models/Test.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import {useEnvironment} from 'providers/Environment/Environment.provider';
+import {useVariableSet} from 'providers/VariableSet';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import {useEditTestMutation, useRunTestMutation} from 'redux/apis/Tracetest';
@@ -20,8 +20,8 @@ import {RunErrorTypes} from 'types/TestRun.types';
 
 export type TTestRunRequest = {
   test: Test;
-  environmentId?: string;
-  variables?: TEnvironmentValue[];
+  variableSetId?: string;
+  variables?: TVariableSetValue[];
   onCancel?(): void;
 };
 
@@ -33,15 +33,15 @@ const useTestCrud = () => {
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;
   const match = useMatch('/test/:testId/run/:runId/:mode');
-  const {selectedEnvironment} = useEnvironment();
+  const {selectedVariableSet} = useVariableSet();
   const {onOpen} = useMissingVariablesModal();
 
   const runTest = useCallback(
-    async ({test, environmentId = selectedEnvironment?.id, variables = [], onCancel = noop}: TTestRunRequest) => {
-      const run = async (updatedVars: TEnvironmentValue[] = variables) => {
+    async ({test, variableSetId = selectedVariableSet?.id, variables = [], onCancel = noop}: TTestRunRequest) => {
+      const run = async (updatedVars: TVariableSetValue[] = variables) => {
         try {
           TestAnalyticsService.onRunTest();
-          const {id} = await runTestAction({testId: test.id, environmentId, variables: updatedVars}).unwrap();
+          const {id} = await runTestAction({testId: test.id, variableSetId, variables: updatedVars}).unwrap();
           dispatch(reset());
 
           const mode = match?.params.mode || 'trigger';
@@ -64,7 +64,7 @@ const useTestCrud = () => {
 
       run();
     },
-    [dispatch, match?.params.mode, navigate, onOpen, runTestAction, selectedEnvironment?.id]
+    [dispatch, match?.params.mode, navigate, onOpen, runTestAction, selectedVariableSet?.id]
   );
 
   const edit = useCallback(
