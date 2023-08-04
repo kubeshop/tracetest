@@ -117,9 +117,11 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, job *Job) (P
 		return PollResult{}, err
 	}
 
+	trace.ID = job.Run.TraceID
 	done, reason := pe.donePollingTraces(job, traceDB, trace)
 	// we need both values to be different to check for done, but after we want to have an updated job
 	job.Run.Trace = &trace
+
 	// we need to update at this point to persist the updated trace
 	// otherwise we end up thingking every iteration is the first
 	err = pe.updater.Update(ctx, job.Run)
