@@ -123,7 +123,7 @@ func (pe DefaultPollerExecutor) ExecuteRequest(ctx context.Context, job *Job) (P
 	job.Run.Trace = &trace
 
 	// we need to update at this point to persist the updated trace
-	// otherwise we end up thingking every iteration is the first
+	// otherwise we end up thinking every iteration is the first
 	err = pe.updater.Update(ctx, job.Run)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s", job.Test.ID, job.Run.ID, err.Error())
