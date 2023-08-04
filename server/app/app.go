@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
@@ -140,6 +141,16 @@ func (app *App) Start(opts ...appOption) error {
 	fmt.Println("Starting")
 	ctx := context.Background()
 
+	poolcfg, err := pgxpool.ParseConfig(app.cfg.PostgresConnString())
+	if err != nil {
+		return err
+	}
+
+	pool, err := pgxpool.NewWithConfig(context.Background(), poolcfg)
+	if err != nil {
+		return err
+	}
+
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
 		return err
@@ -212,6 +223,7 @@ func (app *App) Start(opts ...appOption) error {
 	registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo)
 
 	testPipeline := buildTestPipeline(
+		pool,
 		pollingProfileRepo,
 		dataStoreRepo,
 		linterRepo,
