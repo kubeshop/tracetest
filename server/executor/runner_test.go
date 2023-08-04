@@ -316,6 +316,10 @@ func (m *runsRepoMock) UpdateRun(_ context.Context, run test.Run) error {
 }
 
 func (r *runsRepoMock) GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error) {
+	if run, ok := r.runs[testID]; ok && run.ID == runID {
+		return run, nil
+	}
+
 	args := r.Called(testID, runID)
 	return args.Get(0).(test.Run), args.Error(1)
 }
