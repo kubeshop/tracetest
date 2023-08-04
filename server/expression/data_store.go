@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 )
 
@@ -18,7 +18,7 @@ var attributeAlias = map[string]string{
 }
 
 type AttributeDataStore struct {
-	Span model.Span
+	Span traces.Span
 }
 
 func (ds AttributeDataStore) Source() string {
@@ -50,7 +50,7 @@ func (ds AttributeDataStore) Get(name string) (string, error) {
 }
 
 type MetaAttributesDataStore struct {
-	SelectedSpans []model.Span
+	SelectedSpans []traces.Span
 }
 
 func (ds MetaAttributesDataStore) Source() string {

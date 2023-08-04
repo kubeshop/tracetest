@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -72,7 +73,7 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		}
 		testObj := test.Test{Specs: specs}
 
-		trace := model.NewTrace(randomIDGenerator.TraceID().String(), make([]model.Span, 0))
+		trace := traces.NewTrace(randomIDGenerator.TraceID().String(), make([]traces.Span, 0))
 		run := test.Run{Trace: &trace}
 
 		request := createRequest(testObj, run)
@@ -94,7 +95,7 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		}
 		testObj := test.Test{Specs: specs}
 
-		trace := model.NewTrace(randomIDGenerator.TraceID().String(), make([]model.Span, 0))
+		trace := traces.NewTrace(randomIDGenerator.TraceID().String(), make([]traces.Span, 0))
 		run := test.Run{Trace: &trace}
 
 		request := createRequest(testObj, run)
@@ -132,10 +133,10 @@ func TestSelectorBasedPollerExecutor(t *testing.T) {
 		}
 		testObj := test.Test{Specs: specs}
 
-		rootSpan := model.Span{ID: randomIDGenerator.SpanID(), Name: "Tracetest trigger", Attributes: make(model.Attributes)}
-		trace := model.NewTrace(randomIDGenerator.TraceID().String(), []model.Span{
+		rootSpan := traces.Span{ID: randomIDGenerator.SpanID(), Name: "Tracetest trigger", Attributes: make(traces.Attributes)}
+		trace := traces.NewTrace(randomIDGenerator.TraceID().String(), []traces.Span{
 			rootSpan,
-			{ID: randomIDGenerator.SpanID(), Name: "GET /api/tests", Attributes: model.Attributes{model.TracetestMetadataFieldParentID: rootSpan.ID.String()}},
+			{ID: randomIDGenerator.SpanID(), Name: "GET /api/tests", Attributes: traces.Attributes{traces.TracetestMetadataFieldParentID: rootSpan.ID.String()}},
 		})
 		run := test.Run{Trace: &trace}
 

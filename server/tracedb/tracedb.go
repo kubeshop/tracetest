@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -17,7 +18,7 @@ type TraceDB interface {
 	Ready() bool
 	ShouldRetry() bool
 	GetTraceID() trace.TraceID
-	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
+	GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error)
 	Close() error
 	GetEndpoints() string
 }
@@ -29,8 +30,8 @@ type TestableTraceDB interface {
 
 type noopTraceDB struct{}
 
-func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
-	return model.Trace{}, nil
+func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t traces.Trace, err error) {
+	return traces.Trace{}, nil
 }
 
 func (db *noopTraceDB) GetTraceID() trace.TraceID {
@@ -46,12 +47,14 @@ func (db *noopTraceDB) TestConnection(ctx context.Context) model.ConnectionResul
 }
 
 type traceDBFactory struct {
-	runRepository runByTraceIDGetter
+	traceGetter traceGetter
 }
 
-func Factory(runRepository runByTraceIDGetter) func(ds datastore.DataStore) (TraceDB, error) {
+type FactoryFunc func(ds datastore.DataStore) (TraceDB, error)
+
+func Factory(tg traceGetter) FactoryFunc {
 	f := traceDBFactory{
-		runRepository: runRepository,
+		traceGetter: tg,
 	}
 
 	return f.New
@@ -62,7 +65,7 @@ func (f *traceDBFactory) getTraceDBInstance(ds datastore.DataStore) (TraceDB, er
 	var err error
 
 	if ds.IsOTLPBasedProvider() {
-		tdb, err = newCollectorDB(f.runRepository)
+		tdb, err = newCollectorDB(f.traceGetter)
 		return tdb, err
 	}
 

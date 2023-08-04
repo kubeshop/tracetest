@@ -37,7 +37,7 @@ func NewPersistentRunner(
 	updater RunUpdater,
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
-	newTraceDBFn traceDBFactoryFn,
+	newTraceDBFn tracedb.FactoryFunc,
 	dsRepo currentDataStoreGetter,
 	eventEmitter EventEmitter,
 ) *persistentRunner {
@@ -61,7 +61,7 @@ type persistentRunner struct {
 	updater             RunUpdater
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
-	newTraceDBFn        traceDBFactoryFn
+	newTraceDBFn        tracedb.FactoryFunc
 	dsRepo              currentDataStoreGetter
 	eventEmitter        EventEmitter
 	outputQueue         Enqueuer

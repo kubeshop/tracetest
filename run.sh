@@ -13,6 +13,7 @@ help_message() {
 restart() {
   docker compose $opts kill tracetest
   docker compose $opts up -d tracetest
+  docker compose $opts restart otel-collector
 }
 
 logs() {

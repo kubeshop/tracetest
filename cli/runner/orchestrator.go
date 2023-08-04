@@ -386,7 +386,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if reqErr != nil {
-		return fmt.Errorf("could not run transaction: %w", err)
+		return fmt.Errorf("could not run transaction: %w", reqErr)
 	}
 
 	return nil

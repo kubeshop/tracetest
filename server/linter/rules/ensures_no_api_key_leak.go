@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type ensuresNoApiKeyLeakRule struct{}
@@ -24,7 +24,7 @@ func (r ensuresNoApiKeyLeakRule) ID() string {
 	return analyzer.EnsuresNoApiKeyLeakRuleID
 }
 
-func (r ensuresNoApiKeyLeakRule) Evaluate(ctx context.Context, trace model.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
+func (r ensuresNoApiKeyLeakRule) Evaluate(ctx context.Context, trace traces.Trace, config analyzer.LinterRule) (analyzer.RuleResult, error) {
 	passed := true
 	res := make([]analyzer.Result, 0)
 
@@ -43,7 +43,7 @@ func (r ensuresNoApiKeyLeakRule) Evaluate(ctx context.Context, trace model.Trace
 	return analyzer.NewRuleResult(config, analyzer.EvalRuleResult{Passed: passed, Results: res}), nil
 }
 
-func (r ensuresNoApiKeyLeakRule) validate(span *model.Span) analyzer.Result {
+func (r ensuresNoApiKeyLeakRule) validate(span *traces.Span) analyzer.Result {
 	leakedFields := make([]analyzer.Error, 0)
 	for _, field := range httpHeadersFields {
 		requestHeader := fmt.Sprintf("%s%s", httpRequestHeader, field)

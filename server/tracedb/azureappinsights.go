@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -96,7 +97,7 @@ func (db *azureAppInsightsDB) TestConnection(ctx context.Context) model.Connecti
 	return tester.TestConnection(ctx)
 }
 
-func (db *azureAppInsightsDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *azureAppInsightsDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	query := fmt.Sprintf("union * | where operation_Id == '%s'", traceID)
 	body := azquery.Body{
 		Query: &query,
@@ -104,12 +105,12 @@ func (db *azureAppInsightsDB) GetTraceByID(ctx context.Context, traceID string) 
 
 	res, err := db.client.QueryResource(ctx, db.resourceArmId, body, nil)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
 	table := res.Tables[0]
 	if len(table.Rows) == 0 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return parseAzureAppInsightsTrace(traceID, table)
@@ -182,16 +183,16 @@ func newSpanRow(row azquery.Row, columns []*azquery.Column) spanRow {
 	return spanRow{values}
 }
 
-func parseAzureAppInsightsTrace(traceID string, table *azquery.Table) (model.Trace, error) {
+func parseAzureAppInsightsTrace(traceID string, table *azquery.Table) (traces.Trace, error) {
 	spans, err := parseSpans(table)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
-	return model.NewTrace(traceID, spans), nil
+	return traces.NewTrace(traceID, spans), nil
 }
 
-func parseSpans(table *azquery.Table) ([]model.Span, error) {
+func parseSpans(table *azquery.Table) ([]traces.Span, error) {
 	spanTable := newSpanTable(table)
 	spanRows := spanTable.Spans()
 	eventRows := spanTable.Events()
@@ -201,11 +202,11 @@ func parseSpans(table *azquery.Table) ([]model.Span, error) {
 		spanEventsMap[eventRow.ParentID()] = append(spanEventsMap[eventRow.ParentID()], eventRow)
 	}
 
-	spanMap := make(map[string]*model.Span)
+	spanMap := make(map[string]*traces.Span)
 	for _, spanRow := range spanRows {
 		span, err := parseRowToSpan(spanRow)
 		if err != nil {
-			return []model.Span{}, err
+			return []traces.Span{}, err
 		}
 
 		spanMap[span.ID.String()] = &span
@@ -215,13 +216,13 @@ func parseSpans(table *azquery.Table) ([]model.Span, error) {
 		parentSpan := spanMap[eventRow.ParentID()]
 		event, err := parseEvent(eventRow)
 		if err != nil {
-			return []model.Span{}, err
+			return []traces.Span{}, err
 		}
 
 		parentSpan.Events = append(parentSpan.Events, event)
 	}
 
-	spans := make([]model.Span, 0, len(spanMap))
+	spans := make([]traces.Span, 0, len(spanMap))
 	for _, span := range spanMap {
 		spans = append(spans, *span)
 	}
@@ -229,8 +230,8 @@ func parseSpans(table *azquery.Table) ([]model.Span, error) {
 	return spans, nil
 }
 
-func parseEvent(row spanRow) (model.SpanEvent, error) {
-	event := model.SpanEvent{
+func parseEvent(row spanRow) (traces.SpanEvent, error) {
+	event := traces.SpanEvent{
 		Name: row.Get("message").(string),
 	}
 
@@ -241,7 +242,7 @@ func parseEvent(row spanRow) (model.SpanEvent, error) {
 
 	event.Timestamp = timestamp
 
-	attributes := make(model.Attributes, 0)
+	attributes := make(traces.Attributes, 0)
 	rawAttributes := row.Get("customDimensions").(string)
 	err = json.Unmarshal([]byte(rawAttributes), &attributes)
 	if err != nil {
@@ -253,9 +254,9 @@ func parseEvent(row spanRow) (model.SpanEvent, error) {
 	return event, nil
 }
 
-func parseRowToSpan(row spanRow) (model.Span, error) {
-	attributes := make(model.Attributes, 0)
-	span := model.Span{
+func parseRowToSpan(row spanRow) (traces.Span, error) {
+	attributes := make(traces.Attributes, 0)
+	span := traces.Span{
 		Attributes: attributes,
 	}
 	var duration time.Duration
@@ -301,7 +302,7 @@ func parseRowToSpan(row spanRow) (model.Span, error) {
 	return span, nil
 }
 
-func parseSpanID(span *model.Span, value any) error {
+func parseSpanID(span *traces.Span, value any) error {
 	spanID, err := trace.SpanIDFromHex(value.(string))
 	if err != nil {
 		return fmt.Errorf("failed to parse spanId: %w", err)
@@ -311,8 +312,8 @@ func parseSpanID(span *model.Span, value any) error {
 	return nil
 }
 
-func parseAttributes(span *model.Span, value any) error {
-	attributes := make(model.Attributes, 0)
+func parseAttributes(span *traces.Span, value any) error {
+	attributes := make(traces.Attributes, 0)
 	rawAttributes := value.(string)
 	err := json.Unmarshal([]byte(rawAttributes), &attributes)
 	if err != nil {
@@ -325,17 +326,17 @@ func parseAttributes(span *model.Span, value any) error {
 	return nil
 }
 
-func parseParentID(span *model.Span, value any) error {
+func parseParentID(span *traces.Span, value any) error {
 	rawParentID, ok := value.(string)
 	if ok {
-		span.Attributes[model.TracetestMetadataFieldParentID] = rawParentID
+		span.Attributes[traces.TracetestMetadataFieldParentID] = rawParentID
 	} else {
-		span.Attributes[model.TracetestMetadataFieldParentID] = ""
+		span.Attributes[traces.TracetestMetadataFieldParentID] = ""
 	}
 	return nil
 }
 
-func parseName(span *model.Span, value any) error {
+func parseName(span *traces.Span, value any) error {
 	rawName, ok := value.(string)
 	if ok {
 		span.Name = rawName
@@ -345,7 +346,7 @@ func parseName(span *model.Span, value any) error {
 	return nil
 }
 
-func parseStartTime(span *model.Span, value any) error {
+func parseStartTime(span *traces.Span, value any) error {
 	rawStartTime := value.(string)
 	startTime, err := time.Parse(time.RFC3339Nano, rawStartTime)
 	if err != nil {
