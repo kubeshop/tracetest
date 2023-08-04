@@ -246,7 +246,7 @@ func (m *manager[T]) create(w http.ResponseWriter, r *http.Request) {
 	targetResource := Resource[T]{}
 	err := encoder.DecodeRequestBody(&targetResource)
 	if err != nil {
-		writeError(r.Context(), w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
+		writeError(ctx, w, encoder, http.StatusBadRequest, fmt.Errorf("cannot parse body: %w", err))
 		return
 	}
 
@@ -269,7 +269,7 @@ func (m *manager[T]) doCreate(ctx context.Context, w http.ResponseWriter, r *htt
 		writeError(ctx, w, encoder, http.StatusBadRequest, err)
 	}
 
-	created, err := m.rh.Create(r.Context(), specs)
+	created, err := m.rh.Create(ctx, specs)
 	if err != nil {
 		m.handleResourceHandlerError(ctx, w, "creating", err, encoder)
 		return
@@ -359,7 +359,7 @@ func (m *manager[T]) doUpdate(ctx context.Context, w http.ResponseWriter, r *htt
 		writeError(ctx, w, encoder, http.StatusBadRequest, err)
 	}
 
-	updated, err := m.rh.Update(r.Context(), specs)
+	updated, err := m.rh.Update(ctx, specs)
 	if err != nil {
 		m.handleResourceHandlerError(ctx, w, "updating", err, encoder)
 		return
@@ -498,7 +498,7 @@ func (m *manager[T]) get(w http.ResponseWriter, r *http.Request) {
 		getterFn = m.rh.GetAugmented
 	}
 
-	item, err := getterFn(r.Context(), id)
+	item, err := getterFn(ctx, id)
 	if err != nil {
 		m.handleResourceHandlerError(ctx, w, "getting", err, encoder)
 		return
@@ -522,7 +522,7 @@ func (m *manager[T]) delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := id.ID(vars["id"])
 
-	err := m.rh.Delete(r.Context(), id)
+	err := m.rh.Delete(ctx, id)
 	if err != nil {
 		m.handleResourceHandlerError(ctx, w, "deleting", err, encoder)
 		return
