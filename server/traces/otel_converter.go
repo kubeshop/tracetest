@@ -54,9 +54,9 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
 		endTime = time.Unix(0, int64(span.GetEndTimeUnixNano()))
 	}
 
-	var spanStatus *model.SpanStatus
+	var spanStatus *SpanStatus
 	if span.Status != nil {
-		spanStatus = &model.SpanStatus{
+		spanStatus = &SpanStatus{
 			Code:        span.Status.Code.String(),
 			Description: span.Status.Message,
 		}
