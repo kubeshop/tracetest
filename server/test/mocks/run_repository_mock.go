@@ -49,7 +49,7 @@ func (m *RunRepository) GetLatestRunByTestVersion(ctx context.Context, id id.ID,
 	return args.Get(0).(test.Run), args.Error(1)
 }
 
-func (m *RunRepository) GetTransactionRunSteps(ctx context.Context, id id.ID, runID int) ([]test.Run, error) {
+func (m *RunRepository) GetTestSuiteRunSteps(ctx context.Context, id id.ID, runID int) ([]test.Run, error) {
 	args := m.Called(ctx, id, runID)
 	return args.Get(0).([]test.Run), args.Error(1)
 }

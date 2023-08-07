@@ -24,7 +24,7 @@ type RunRepository interface {
 	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
 	GetLatestRunByTestVersion(context.Context, id.ID, int) (Run, error)
 
-	GetTransactionRunSteps(_ context.Context, _ id.ID, runID int) ([]Run, error)
+	GetTestSuiteRunSteps(_ context.Context, _ id.ID, runID int) ([]Run, error)
 }
 
 type runRepository struct {
@@ -318,7 +318,7 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 
 func (r *runRepository) DeleteRun(ctx context.Context, run Run) error {
 	queries := []string{
-		"DELETE FROM transaction_run_steps WHERE test_run_id = $1 AND test_run_test_id = $2",
+		"DELETE FROM test_suite_run_steps WHERE test_run_id = $1 AND test_run_test_id = $2",
 		"DELETE FROM test_runs WHERE id = $1 AND test_id = $2",
 	}
 
@@ -371,16 +371,16 @@ SELECT
 	"metadata",
 	"variable_set",
 
-	-- transaction run
-	transaction_run_steps.transaction_run_id,
-	transaction_run_steps.transaction_run_transaction_id,
+	-- test_suite run
+	test_suite_run_steps.test_suite_run_id,
+	test_suite_run_steps.test_suite_run_test_suite_id,
 	"linter",
 	"required_gates_result"
 
 FROM
 	test_runs
-		LEFT OUTER JOIN transaction_run_steps
-		ON transaction_run_steps.test_run_id = test_runs.id AND transaction_run_steps.test_run_test_id = test_runs.test_id
+		LEFT OUTER JOIN test_suite_run_steps
+		ON test_suite_run_steps.test_run_id = test_runs.id AND test_suite_run_steps.test_run_test_id = test_runs.test_id
 `
 
 func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Run, error) {
@@ -476,8 +476,8 @@ func readRunRow(row scanner) (Run, error) {
 		traceID,
 		spanID string
 
-		transactionID,
-		transactionRunID sql.NullString
+		testSuiteID,
+		testSuiteRunID sql.NullString
 	)
 
 	err := row.Scan(
@@ -499,8 +499,8 @@ func readRunRow(row scanner) (Run, error) {
 		&lastError,
 		&jsonMetadata,
 		&jsonVariableSet,
-		&transactionRunID,
-		&transactionID,
+		&testSuiteRunID,
+		&testSuiteID,
 		&jsonLinter,
 		&jsonGatesResult,
 	)
@@ -590,17 +590,17 @@ func readRunRow(row scanner) (Run, error) {
 		r.LastError = fmt.Errorf(*lastError)
 	}
 
-	if transactionID.Valid && transactionRunID.Valid {
-		r.TransactionID = transactionID.String
-		r.TransactionRunID = transactionRunID.String
+	if testSuiteID.Valid && testSuiteRunID.Valid {
+		r.TestSuiteID = testSuiteID.String
+		r.TestSuiteRunID = testSuiteRunID.String
 	}
 
 	return r, nil
 }
 
-func (r *runRepository) GetTransactionRunSteps(ctx context.Context, id id.ID, runID int) ([]Run, error) {
+func (r *runRepository) GetTestSuiteRunSteps(ctx context.Context, id id.ID, runID int) ([]Run, error) {
 	query := selectRunQuery + `
-WHERE transaction_run_steps.transaction_run_id = $1 AND transaction_run_steps.transaction_run_transaction_id = $2
+WHERE test_suite_run_steps.test_suite_run_id = $1 AND test_suite_run_steps.test_suite_run_test_suite_id = $2
 ORDER BY test_runs.completed_at ASC
 `
 	query, params := sqlutil.Tenant(ctx, query, strconv.Itoa(runID), id)

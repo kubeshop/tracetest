@@ -175,13 +175,13 @@ func randomInt() int {
 func DropDatabase(db *sql.DB) error {
 	return dropTables(
 		db,
-		"transaction_run_steps",
-		"transaction_runs",
-		"transaction_steps",
-		"transactions",
+		"test_suite_run_steps",
+		"test_suite_runs",
+		"test_suite_steps",
+		"test_suites",
 		"test_runs",
 		"tests",
-		"environments",
+		"variable_sets",
 		"data_stores",
 		"server",
 		"schema_migrations",

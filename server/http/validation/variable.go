@@ -9,7 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/variableset"
 )
 
@@ -90,9 +90,9 @@ func getPreviousEnvironmentValues(ctx context.Context, testRepo augmentedTestGet
 	return map[string]variableset.VariableSetValue{}, nil
 }
 
-func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, transaction transaction.Transaction, env variableset.VariableSet) (openapi.MissingVariablesError, error) {
+func ValidateMissingVariablesFromTransaction(ctx context.Context, testRepo augmentedTestGetter, runRepo test.RunRepository, suite testsuite.TestSuite, env variableset.VariableSet) (openapi.MissingVariablesError, error) {
 	missingVariables := make([]openapi.MissingVariable, 0)
-	for _, step := range transaction.Steps {
+	for _, step := range suite.Steps {
 		stepValidationResult, err := ValidateMissingVariables(ctx, testRepo, runRepo, step, env)
 		if err != ErrMissingVariables {
 			return openapi.MissingVariablesError{}, err

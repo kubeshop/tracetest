@@ -66,7 +66,7 @@ func (c *customController) GetTransactionVersion(w http.ResponseWriter, r *http.
 		return
 	}
 
-	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
+	result, err := c.service.GetTestSuiteVersion(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

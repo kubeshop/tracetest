@@ -21,8 +21,8 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -33,11 +33,11 @@ type controller struct {
 	testRunner        testRunner
 	transactionRunner transactionRunner
 
-	testRunEvents            model.TestRunEventRepository
-	testRunRepository        test.RunRepository
-	testRepository           testsRepository
-	transactionRepository    transactionsRepository
-	transactionRunRepository transactionRunRepository
+	testRunEvents          model.TestRunEventRepository
+	testRunRepository      test.RunRepository
+	testRepository         testsRepository
+	testSuiteRepository    testSuiteRepository
+	testSuiteRunRepository testSuiteRunRepository
 
 	variableSetGetter variableSetGetter
 	newTraceDBFn      func(ds datastore.DataStore) (tracedb.TraceDB, error)
@@ -45,11 +45,11 @@ type controller struct {
 	version           string
 }
 
-type transactionsRepository interface {
-	GetAugmented(context.Context, id.ID) (transaction.Transaction, error)
-	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]transaction.Transaction, error)
+type testSuiteRepository interface {
+	GetAugmented(context.Context, id.ID) (testsuite.TestSuite, error)
+	ListAugmented(ctx context.Context, take, skip int, query, sortBy, sortDirection string) ([]testsuite.TestSuite, error)
 	Count(ctx context.Context, query string) (int, error)
-	GetVersion(context.Context, id.ID, int) (transaction.Transaction, error)
+	GetVersion(context.Context, id.ID, int) (testsuite.TestSuite, error)
 }
 
 type testsRepository interface {
@@ -61,10 +61,10 @@ type testsRepository interface {
 	Create(context.Context, test.Test) (test.Test, error)
 }
 
-type transactionRunRepository interface {
-	GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (transaction.TransactionRun, error)
-	GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]transaction.TransactionRun, error)
-	DeleteTransactionRun(ctx context.Context, tr transaction.TransactionRun) error
+type testSuiteRunRepository interface {
+	GetTestSuiteRun(ctx context.Context, transactionID id.ID, runID int) (testsuite.TestSuiteRun, error)
+	GetTestSuiteRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]testsuite.TestSuiteRun, error)
+	DeleteTestSuiteRun(ctx context.Context, tr testsuite.TestSuiteRun) error
 }
 
 type testRunner interface {
@@ -74,7 +74,7 @@ type testRunner interface {
 }
 
 type transactionRunner interface {
-	Run(context.Context, transaction.Transaction, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) transaction.TransactionRun
+	Run(context.Context, testsuite.TestSuite, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) testsuite.TestSuiteRun
 }
 
 type variableSetGetter interface {
@@ -88,8 +88,8 @@ func NewController(
 	transactionRunner transactionRunner,
 
 	testRunEvents model.TestRunEventRepository,
-	transactionRepository transactionsRepository,
-	transactionRunRepository transactionRunRepository,
+	transactionRepository testSuiteRepository,
+	transactionRunRepository testSuiteRunRepository,
 	testRepository testsRepository,
 	testRunRepository test.RunRepository,
 	variableSetGetter variableSetGetter,
@@ -99,12 +99,12 @@ func NewController(
 	version string,
 ) openapi.ApiApiServicer {
 	return &controller{
-		testRunEvents:            testRunEvents,
-		transactionRepository:    transactionRepository,
-		transactionRunRepository: transactionRunRepository,
-		testRepository:           testRepository,
-		testRunRepository:        testRunRepository,
-		variableSetGetter:        variableSetGetter,
+		testRunEvents:          testRunEvents,
+		testSuiteRepository:    transactionRepository,
+		testSuiteRunRepository: transactionRunRepository,
+		testRepository:         testRepository,
+		testRunRepository:      testRunRepository,
+		variableSetGetter:      variableSetGetter,
 
 		testRunner:        testRunner,
 		transactionRunner: transactionRunner,
@@ -495,8 +495,8 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 	return [][]expression.DataStore{ds}, nil
 }
 
-func (c *controller) GetTransactionVersion(ctx context.Context, tID string, version int32) (openapi.ImplResponse, error) {
-	transaction, err := c.transactionRepository.GetVersion(ctx, id.ID(tID), int(version))
+func (c *controller) GetTestSuiteVersion(ctx context.Context, tID string, version int32) (openapi.ImplResponse, error) {
+	transaction, err := c.testSuiteRepository.GetVersion(ctx, id.ID(tID), int(version))
 
 	if err != nil {
 		return handleDBError(err), err
@@ -506,8 +506,8 @@ func (c *controller) GetTransactionVersion(ctx context.Context, tID string, vers
 }
 
 // RunTransaction implements openapi.ApiApiServicer
-func (c *controller) RunTransaction(ctx context.Context, transactionID string, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
-	transaction, err := c.transactionRepository.GetAugmented(ctx, id.ID(transactionID))
+func (c *controller) RunTestSuite(ctx context.Context, transactionID string, runInfo openapi.RunInformation) (openapi.ImplResponse, error) {
+	transaction, err := c.testSuiteRepository.GetAugmented(ctx, id.ID(transactionID))
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -535,40 +535,40 @@ func (c *controller) RunTransaction(ctx context.Context, transactionID string, r
 
 	run := c.transactionRunner.Run(ctx, transaction, metadata, environment, requiredGates)
 
-	return openapi.Response(http.StatusOK, c.mappers.Out.TransactionRun(run)), nil
+	return openapi.Response(http.StatusOK, c.mappers.Out.TestSuiteRun(run)), nil
 }
 
-func (c *controller) GetTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.transactionRunRepository.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
+func (c *controller) GetTestSuiteRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
+	run, err := c.testSuiteRunRepository.GetTestSuiteRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	openapiRun := c.mappers.Out.TransactionRun(run)
+	openapiRun := c.mappers.Out.TestSuiteRun(run)
 	return openapi.Response(http.StatusOK, openapiRun), nil
 }
 
-func (c *controller) GetTransactionRuns(ctx context.Context, transactionId string, take, skip int32) (openapi.ImplResponse, error) {
-	runs, err := c.transactionRunRepository.GetTransactionsRuns(ctx, id.ID(transactionId), take, skip)
+func (c *controller) GetTestSuiteRuns(ctx context.Context, transactionId string, take, skip int32) (openapi.ImplResponse, error) {
+	runs, err := c.testSuiteRunRepository.GetTestSuiteRuns(ctx, id.ID(transactionId), take, skip)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	openapiRuns := make([]openapi.TransactionRun, 0, len(runs))
+	openapiRuns := make([]openapi.TestSuiteRun, 0, len(runs))
 	for _, run := range runs {
-		openapiRuns = append(openapiRuns, c.mappers.Out.TransactionRun(run))
+		openapiRuns = append(openapiRuns, c.mappers.Out.TestSuiteRun(run))
 	}
 
 	return openapi.Response(http.StatusOK, openapiRuns), nil
 }
 
-func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
-	run, err := c.transactionRunRepository.GetTransactionRun(ctx, id.ID(transactionId), int(runId))
+func (c *controller) DeleteTestSuiteRun(ctx context.Context, transactionId string, runId int32) (openapi.ImplResponse, error) {
+	run, err := c.testSuiteRunRepository.GetTestSuiteRun(ctx, id.ID(transactionId), int(runId))
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	err = c.transactionRunRepository.DeleteTransactionRun(ctx, run)
+	err = c.testSuiteRunRepository.DeleteTestSuiteRun(ctx, run)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -579,7 +579,7 @@ func (c *controller) DeleteTransactionRun(ctx context.Context, transactionId str
 func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	// TODO: this is endpoint is a hack to unblock the team quickly.
 	// This is not production ready because it might take too long to respond if there are numerous
-	// transactions and transaction.
+	// transactions and testsuite.
 
 	if take == 0 {
 		take = 20
@@ -587,12 +587,12 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 
 	newTake := take + skip
 
-	transactions, err := c.transactionRepository.ListAugmented(ctx, int(newTake), 0, query, sortBy, sortDirection)
+	transactions, err := c.testSuiteRepository.ListAugmented(ctx, int(newTake), 0, query, sortBy, sortDirection)
 	if err != nil {
 		return handleDBError(err), err
 	}
 
-	transactionCount, err := c.transactionRepository.Count(ctx, query)
+	transactionCount, err := c.testSuiteRepository.Count(ctx, query)
 	if err != nil {
 		return handleDBError(err), err
 	}
@@ -619,7 +619,7 @@ func (c *controller) GetResources(ctx context.Context, take, skip int32, query, 
 	return openapi.Response(http.StatusOK, paginatedResponse), nil
 }
 
-func takeResources(transactions []transaction.Transaction, tests []test.Test, take, skip int32) []openapi.Resource {
+func takeResources(transactions []testsuite.TestSuite, tests []test.Test, take, skip int32) []openapi.Resource {
 	numItems := len(transactions) + len(tests)
 	items := make([]openapi.Resource, numItems)
 	maxNumItems := len(transactions) + len(tests)
@@ -639,7 +639,7 @@ func takeResources(transactions []transaction.Transaction, tests []test.Test, ta
 		if j >= len(tests) {
 			transaction := transactions[i]
 			transactionInterface := any(transaction)
-			items[currentNumberItens] = openapi.Resource{Type: "transaction", Item: &transactionInterface}
+			items[currentNumberItens] = openapi.Resource{Type: "testsuite", Item: &transactionInterface}
 			i++
 			currentNumberItens++
 			continue
@@ -651,7 +651,7 @@ func takeResources(transactions []transaction.Transaction, tests []test.Test, ta
 		testInterface := any(test)
 
 		if transaction.CreatedAt.After(*test.CreatedAt) {
-			items[currentNumberItens] = openapi.Resource{Type: "transaction", Item: &transactionInterface}
+			items[currentNumberItens] = openapi.Resource{Type: "testsuite", Item: &transactionInterface}
 			i++
 		} else {
 			items[currentNumberItens] = openapi.Resource{Type: "test", Item: &testInterface}
