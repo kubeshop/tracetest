@@ -9,6 +9,7 @@ export enum TriggerTypes {
   http = 'http',
   grpc = 'grpc',
   traceid = 'traceid',
+  kafka = 'kafka',
 }
 
 export enum SortBy {

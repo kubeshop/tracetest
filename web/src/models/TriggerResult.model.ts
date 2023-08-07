@@ -34,6 +34,13 @@ const ResponseData = {
       statusCode: 200,
     };
   },
+  [TriggerTypes.kafka](response: object) {
+    return {
+      body: get(response, 'offset', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
 };
 
 const TriggerResult = ({

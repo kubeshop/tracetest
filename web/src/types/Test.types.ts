@@ -6,14 +6,18 @@ import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
 import GRPCRequest from 'models/GrpcRequest.model';
 import HttpRequest from 'models/HttpRequest.model';
 import TraceIDRequest from 'models/TraceIDRequest.model';
-import {Model, TGrpcSchemas, THttpSchemas} from './Common.types';
+import {Model, TGrpcSchemas, THttpSchemas, TKafkaSchemas} from './Common.types';
 import {ICreateTestStep, IPlugin} from './Plugins.types';
+import KafkaRequest from 'models/KafkaRequest.model';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
 export type TRawHeader = THttpSchemas['HTTPHeader'];
 export type TRawGRPCHeader = TGrpcSchemas['GRPCHeader'];
 export type THeader = Model<TRawHeader, {}>;
+
+export type TKafkaRequestAuth = TKafkaSchemas['KafkaRequest']['authentication'];
+export type TRawKafkaMessageHeader = TKafkaSchemas['KafkaMessageHeader'];
 
 export interface IRpcValues {
   message: string;
@@ -31,6 +35,16 @@ export interface IHttpValues {
   method: HTTP_METHOD;
   url: string;
   sslVerification: boolean;
+}
+
+export interface IKafkaValues {
+  brokerUrls: string[];
+  topic: string;
+  authentication: TKafkaRequestAuth;
+  sslVerification: boolean;
+  headers: KafkaRequest["headers"];
+  messageKey: string;
+  messageValue: string;
 }
 
 export interface RequestDefinitionExtended extends Request {
@@ -64,7 +78,7 @@ export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValue
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 
-export type TTriggerRequest = HttpRequest | GRPCRequest | TraceIDRequest;
+export type TTriggerRequest = HttpRequest | GRPCRequest | TraceIDRequest | KafkaRequest;
 export interface ITriggerService {
   getRequest(values: TDraftTest): Promise<TTriggerRequest>;
   validateDraft(draft: TDraftTest): Promise<boolean>;

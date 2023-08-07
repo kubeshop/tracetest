@@ -73,14 +73,14 @@ const GRPC: IPlugin = {
   ],
 };
 
-const Messaging: IPlugin = {
-  name: SupportedPlugins.Messaging,
-  title: 'Message Queue',
-  description: 'Put a message on a queue to initiate a Tracetest',
-  isActive: false,
+const Kafka: IPlugin = {
+  name: SupportedPlugins.Kafka,
+  title: 'Kafka',
+  description: 'Test consumers with Kafka messages',
+  isActive: true,
   stepList: [],
   demoList: [],
-  type: TriggerTypes.http,
+  type: TriggerTypes.kafka,
 };
 
 const Postman: IPlugin = {
@@ -159,7 +159,7 @@ export const Plugins: Record<SupportedPlugins, IPlugin> = {
   [SupportedPlugins.CURL]: Curl,
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.TraceID]: TraceID,
-  [SupportedPlugins.Messaging]: Messaging,
+  [SupportedPlugins.Kafka]: Kafka,
   [SupportedPlugins.OpenAPI]: OpenAPI,
 };
 
@@ -167,4 +167,5 @@ export const TriggerTypeToPlugin = {
   [TriggerTypes.http]: Plugins.REST,
   [TriggerTypes.grpc]: Plugins.GRPC,
   [TriggerTypes.traceid]: Plugins.TraceID,
+  [TriggerTypes.kafka]: Plugins.Kafka,
 } as const;
