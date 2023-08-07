@@ -3,11 +3,13 @@ import {TDraftTestForm, TTriggerRequest} from 'types/Test.types';
 import EditRequestDetailsHttp from './Http';
 import EditRequestDetailsGrpc from './Grpc';
 import EditDetailsTraceID from './TraceID';
+import EditDetailsKafka from './Kafka';
 
 const EditRequestDetailsMap = {
   [TriggerTypes.http]: EditRequestDetailsHttp,
   [TriggerTypes.grpc]: EditRequestDetailsGrpc,
   [TriggerTypes.traceid]: EditDetailsTraceID,
+  [TriggerTypes.kafka]: EditDetailsKafka,
 };
 
 export interface IFormProps {
