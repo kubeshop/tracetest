@@ -22,9 +22,17 @@ Next, select which tests to run in the transaction and click **Create & Run**:
 
 The transaction will start:
 
-![Running Transaction](https://res.cloudinary.com/djwdcmwdz/image/upload/v1685713352/docs/beta.tracetest.io__page_1_2_oqwazx.png)
+![Running Transaction](../img/running-transaction.png)
+    
+ <!---   https://res.cloudinary.com/djwdcmwdz/image/upload/v1685713352/docs/beta.tracetest.io__page_1_2_oqwazx.png) -->
 
-When the transaction is finished, you will get the following results:
+ On the automate tab, you find methods to automate the current transaction, including the YAML test file and the CLI command for Tracetest.
+
+ ![Automate Tab](../img/automate-tab.png)
+
+ With all of the toggles `Off`, each criteria is tested. Toggle individual criteria `On`, to select on certain checks for the selected test.
+
+When the transaction is finished, you will get the following result:
 
 ![Finished Transaction](https://res.cloudinary.com/djwdcmwdz/image/upload/v1685713712/docs/demo.tracetest.io__x0o1gu.png)
 

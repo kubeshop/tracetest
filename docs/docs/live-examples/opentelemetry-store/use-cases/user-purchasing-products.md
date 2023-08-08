@@ -18,9 +18,9 @@ So in this case, we need to trigger four tests in sequence to achieve test the e
 
 ## Building a Transaction for This Scenario
 
-Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [transactions](../../../web-ui/creating-transactions.md) that have an [environment](../../../concepts/environments.md)](../../../concepts/environments.md).
+Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [transactions](../../../web-ui/creating-transactions.md) that have an [variable set](../../../concepts/variable-sets.md)](../../../concepts/variable-sets.md).
  
-We can do that by creating the tests and transactions through the Web UI or using the CLI. In this example, we will use the CLI to create an environment and then create the transaction with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
+We can do that by creating the tests and transactions through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the transaction with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
 
 ### Mapping Environment Variables 
 
