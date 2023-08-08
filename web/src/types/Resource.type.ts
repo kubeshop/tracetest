@@ -1,5 +1,5 @@
 export enum ResourceType {
   Test = 'test',
-  TestSuite = 'testsuite',
+  Transaction = 'transaction',
   VariableSet = 'variableset',
 }

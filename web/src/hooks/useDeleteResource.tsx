@@ -2,14 +2,14 @@ import {useCallback} from 'react';
 import {capitalize} from 'lodash';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import {useDeleteTestByIdMutation, useDeleteTestSuiteByIdMutation} from 'redux/apis/Tracetest';
+import {useDeleteTestByIdMutation, useDeleteTransactionByIdMutation} from 'redux/apis/Tracetest';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useNotification} from 'providers/Notification/Notification.provider';
 
 const useDeleteResource = () => {
   const [deleteTestMutation] = useDeleteTestByIdMutation();
-  const [deleteTestSuiteMutation] = useDeleteTestSuiteByIdMutation();
+  const [deleteTransactionMutation] = useDeleteTransactionByIdMutation();
   const {navigate} = useDashboard();
   const {showNotification} = useNotification();
 
@@ -21,8 +21,8 @@ const useDeleteResource = () => {
         if (type === ResourceType.Test) {
           TestAnalyticsService.onDeleteTest();
           await deleteTestMutation({testId: id}).unwrap();
-        } else if (type === ResourceType.TestSuite) {
-          await deleteTestSuiteMutation({testSuiteId: id}).unwrap();
+        } else if (type === ResourceType.Transaction) {
+          await deleteTransactionMutation({transactionId: id}).unwrap();
         }
 
         showNotification({
@@ -38,7 +38,7 @@ const useDeleteResource = () => {
         });
       }
     },
-    [deleteTestMutation, deleteTestSuiteMutation, navigate, showNotification]
+    [deleteTestMutation, deleteTransactionMutation, navigate, showNotification]
   );
 
   return useCallback(

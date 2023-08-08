@@ -2,10 +2,10 @@ import {ResourceType} from 'types/Resource.type';
 import {Model, TResourceSchemas} from '../types/Common.types';
 
 import Test, {TRawTest} from './Test.model';
-import TestSuite, {TRawTestSuite} from './TestSuite.model';
+import Transaction, {TRawTransaction} from './Transaction.model';
 
 export type TRawResource = TResourceSchemas['Resource'];
-type Resource = Model<TRawResource, {type: ResourceType; item: Test | TestSuite}>;
+type Resource = Model<TRawResource, {type: ResourceType; item: Test | Transaction}>;
 
 function Resource({item, type}: TRawResource): Resource {
   if (type === ResourceType.Test) {
@@ -16,8 +16,8 @@ function Resource({item, type}: TRawResource): Resource {
   }
 
   return {
-    type: ResourceType.TestSuite,
-    item: TestSuite.FromRawTestSuite(item as TRawTestSuite),
+    type: ResourceType.Transaction,
+    item: Transaction.FromRawTransaction(item as TRawTransaction),
   };
 }
 

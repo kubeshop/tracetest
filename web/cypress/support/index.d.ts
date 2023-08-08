@@ -25,9 +25,9 @@ declare namespace Cypress {
     setCreateFormUrl(method: string, url: string): Chainable<Element>;
     selectRunDetailMode(index: number): Chainable<Element>;
     interceptEditTestCall(): Chainable<Element>;
-    deleteTestSuiteTests(): Chainable<Element>;
-    openTestSuiteCreationModal(): Chainable<Element>;
-    deleteTestSuite(): Chainable<Element>;
+    deleteTransactionTests(): Chainable<Element>;
+    openTransactionCreationModal(): Chainable<Element>;
+    deleteTransaction(): Chainable<Element>;
     enableDemo(): Chainable<Element>;
   }
 }

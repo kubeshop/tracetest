@@ -1,7 +1,7 @@
 import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {POKEMON_HTTP_ENDPOINT, PokeshopDemo} from '../e2e/constants/Test';
-import {getTestId, getTestSuiteId} from '../e2e/utils/Common';
+import {getTestId, getTransactionId} from '../e2e/utils/Common';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id$=-${number}]`;
@@ -66,8 +66,8 @@ Cypress.Commands.add('interceptHomeApiCall', () => {
   cy.intercept({method: 'GET', url: '/api/resources?take=20&skip=0*'}).as('testList');
   cy.intercept({method: 'DELETE', url: '/api/tests/**'}).as('testDelete');
   cy.intercept({method: 'POST', url: '/api/tests'}).as('testCreation');
-  cy.intercept({method: 'DELETE', url: '/api/testsuites/**'}).as('testSuiteDelete');
-  cy.intercept({method: 'POST', url: '/api/testsuites'}).as('testSuiteCreation');
+  cy.intercept({method: 'DELETE', url: '/api/transactions/**'}).as('transactionDelete');
+  cy.intercept({method: 'POST', url: '/api/transactions'}).as('transactionCreation');
 });
 
 Cypress.Commands.add('waitForTracePageApiCalls', () => {
@@ -132,7 +132,7 @@ Cypress.Commands.add('cancelOnBoarding', () => {
 Cypress.Commands.add('submitCreateForm', (mode = 'CreateTestFactory') => {
   cy.get(`[data-cy=${mode}-create-create-button]`).last().click();
   if (mode === 'CreateTestFactory') cy.wait('@testCreation');
-  if (mode === 'CreateTestSuiteFactory') cy.wait('@testSuiteCreation');
+  if (mode === 'CreateTransactionFactory') cy.wait('@transactionCreation');
 });
 
 Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: string, mode = 'CreateTestFactory') => {
@@ -230,15 +230,15 @@ Cypress.Commands.add('selectRunDetailMode', (index: number) => {
   cy.get(`[data-cy=run-detail-header] .ant-tabs-nav-list div:nth-child(${index})`).click();
 });
 
-Cypress.Commands.add('openTestSuiteCreationModal', () => {
+Cypress.Commands.add('openTransactionCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
   cy.get('.ant-dropdown-menu-item').last().click();
-  cy.get('[data-cy=create-test-steps-CreateTestSuiteFactory]').should('be.visible');
+  cy.get('[data-cy=create-test-steps-CreateTransactionFactory]').should('be.visible');
 });
 
-Cypress.Commands.add('deleteTestSuite', () => {
+Cypress.Commands.add('deleteTransaction', () => {
   cy.location('pathname').then(pathname => {
-    const localTestId = getTestSuiteId(pathname);
+    const localTestId = getTransactionId(pathname);
 
     cy.visit(`/`);
     cy.wait('@testList');
@@ -247,7 +247,7 @@ Cypress.Commands.add('deleteTestSuite', () => {
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
     cy.get('[data-cy=test-card-delete]').click();
     cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
-    cy.wait('@testSuiteDelete');
+    cy.wait('@transactionDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
     cy.wait('@testList');
     cy.clearLocalStorage();

@@ -11,11 +11,11 @@ interface IProps {
   resultId: string;
   testId: string;
   isRunView?: boolean;
-  testSuiteId?: string;
-  testSuiteRunId: string;
+  transactionId?: string;
+  transactionRunId: string;
 }
 
-const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunView = false}: IProps) => {
+const RunActionsMenu = ({resultId, testId, transactionId, transactionRunId, isRunView = false}: IProps) => {
   const {onJUnit} = useFileViewerModal();
   const {navigate} = useDashboard();
   const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
@@ -25,15 +25,15 @@ const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunVie
       <Dropdown
         overlay={
           <Menu>
-            {!!testSuiteId && !!testSuiteRunId && (
+            {!!transactionId && !!transactionRunId && (
               <Menu.Item
-                data-cy="testsuite-run-button"
-                key="testsuite-run"
+                data-cy="transaction-run-button"
+                key="transaction-run"
                 onClick={() => {
-                  navigate(`/testsuite/${testSuiteId}/run/${testSuiteRunId}`);
+                  navigate(`/transaction/${transactionId}/run/${transactionRunId}`);
                 }}
               >
-                Test Suite Run
+                Transaction Run
               </Menu.Item>
             )}
             <Menu.Item

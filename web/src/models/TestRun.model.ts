@@ -109,8 +109,8 @@ const TestRun = ({
   metadata = {},
   outputs = [],
   variableSet = {},
-  testSuiteId = '',
-  testSuiteRunId = '',
+  transactionId = '',
+  transactionRunId = '',
   linter = {},
   requiredGatesResult = {required: [], failed: [], passed: true},
 }: TRawTestRun): TestRun => {
@@ -137,8 +137,8 @@ const TestRun = ({
     metadata,
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
     variableSet: VariableSet.fromRun(variableSet),
-    testSuiteId,
-    testSuiteRunId,
+    transactionId,
+    transactionRunId,
     linter: LinterResult(linter),
     requiredGatesResult: RequiredGatesResult(requiredGatesResult),
   };

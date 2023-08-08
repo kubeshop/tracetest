@@ -1,7 +1,7 @@
 import Layout from 'components/Layout';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
-import CreateTestSuiteProvider from 'providers/CreateTestSuite';
+import CreateTransactionProvider from 'providers/CreateTransaction';
 import CreateTestProvider from 'providers/CreateTest';
 import Content from './Content';
 
@@ -10,7 +10,7 @@ const Home = () => {
 
   return (
     <Layout hasMenu>
-      <CreateTestSuiteProvider>
+      <CreateTransactionProvider>
         <CreateTestProvider>
           <Content
             isLoading={isLoading}
@@ -18,7 +18,7 @@ const Home = () => {
             skipConfigSetup={skipConfigSetup}
           />
         </CreateTestProvider>
-      </CreateTestSuiteProvider>
+      </CreateTransactionProvider>
     </Layout>
   );
 };

@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import {useDeleteRunByIdMutation, useDeleteTestSuiteRunByIdMutation} from 'redux/apis/Tracetest';
+import {useDeleteRunByIdMutation, useDeleteTransactionRunByIdMutation} from 'redux/apis/Tracetest';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
@@ -14,7 +14,7 @@ interface IProps {
 
 const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
   const [deleteTestRunById] = useDeleteRunByIdMutation();
-  const [deleteTestSuiteRunById] = useDeleteTestSuiteRunByIdMutation();
+  const [deleteTransactionRunById] = useDeleteTransactionRunByIdMutation();
   const {navigate} = useDashboard();
   const {onOpen} = useConfirmationModal();
 
@@ -24,12 +24,12 @@ const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
         TestAnalyticsService.onDeleteTestRun();
         deleteTestRunById({testId: id, runId});
         if (isRunView) navigate(`/test/${id}`);
-      } else if (type === ResourceType.TestSuite) {
-        deleteTestSuiteRunById({testSuiteId: id, runId});
-        if (isRunView) navigate(`/testsuite/${id}`);
+      } else if (type === ResourceType.Transaction) {
+        deleteTransactionRunById({transactionId: id, runId});
+        if (isRunView) navigate(`/transaction/${id}`);
       }
     },
-    [deleteTestRunById, deleteTestSuiteRunById, id, isRunView, navigate, type]
+    [deleteTestRunById, deleteTransactionRunById, id, isRunView, navigate, type]
   );
 
   return useCallback(

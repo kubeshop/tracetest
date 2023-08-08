@@ -1,7 +1,7 @@
 Cypress.on('uncaught:exception', err => !err.message.includes('ResizeObserver loop limit exceeded'));
 
 const testIdRegex = /\/test\/([\w-]+)/;
-const testSuiteIdRegex = /\/testsuite\/([\w-]+)/;
+const transactionIdRegex = /\/transaction\/([\w-]+)/;
 const runIdRegex = /\/run\/(\w+)/;
 
 export const getTestId = (pathname: string) => {
@@ -12,12 +12,12 @@ export const getTestId = (pathname: string) => {
   return testId;
 };
 
-export const getTestSuiteId = (pathname: string) => {
+export const getTransactionId = (pathname: string) => {
   cy.log(pathname);
-  const result = pathname.match(testSuiteIdRegex);
-  const testSuiteId = result.length > 1 ? result[1] : '';
-  cy.log(testSuiteId);
-  return testSuiteId;
+  const result = pathname.match(transactionIdRegex);
+  const transactionId = result.length > 1 ? result[1] : '';
+  cy.log(transactionId);
+  return transactionId;
 };
 
 export const getResultId = (pathname: string) => {

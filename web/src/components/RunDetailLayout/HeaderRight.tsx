@@ -65,8 +65,8 @@ const HeaderRight = ({testId}: IProps) => {
         isRunView
         resultId={run.id}
         testId={testId}
-        testSuiteRunId={run.testSuiteRunId}
-        testSuiteId={run.testSuiteId}
+        transactionId={run.transactionId}
+        transactionRunId={run.transactionRunId}
       />
     </S.Section>
   );

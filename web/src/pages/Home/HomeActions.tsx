@@ -8,18 +8,18 @@ const {onCreateTestClick} = HomeAnalyticsService;
 
 interface IProps {
   onCreateTest(): void;
-  onCreateTestSuite(): void;
+  onCreateTransaction(): void;
 }
 
-const HomeActions = ({onCreateTest, onCreateTestSuite}: IProps) => {
+const HomeActions = ({onCreateTest, onCreateTransaction}: IProps) => {
   const onClick = useCallback(
     (key: string) => {
       onCreateTestClick();
       if (key === 'test') return onCreateTest();
 
-      onCreateTestSuite();
+      onCreateTransaction();
     },
-    [onCreateTest, onCreateTestSuite]
+    [onCreateTest, onCreateTransaction]
   );
 
   const createMenu = useMemo(
@@ -32,8 +32,8 @@ const HomeActions = ({onCreateTest, onCreateTestSuite}: IProps) => {
             key: 'test',
           },
           {
-            label: 'Create New Test Suite',
-            key: 'testsuite',
+            label: 'Create New Transaction',
+            key: 'transaction',
           },
         ]}
       />

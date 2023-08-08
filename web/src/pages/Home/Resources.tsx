@@ -1,9 +1,9 @@
 import CreateTestModal from 'components/CreateTestModal/CreateTestModal';
-import CreateTestSuiteModal from 'components/CreateTestSuiteModal/CreateTestSuiteModal';
+import CreateTransactionModal from 'components/CreateTransactionModal/CreateTransactionModal';
 import Empty from 'components/Empty';
 import Pagination from 'components/Pagination';
 import TestCard from 'components/ResourceCard/TestCard';
-import TestSuiteCard from 'components/ResourceCard/TestSuiteCard';
+import TransactionCard from 'components/ResourceCard/TransactionCard';
 import {SortBy, SortDirection, sortOptions} from 'constants/Test.constants';
 import useDeleteResource from 'hooks/useDeleteResource';
 import usePagination from 'hooks/usePagination';
@@ -14,9 +14,9 @@ import {ADD_TEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import useTestSuiteCrud from 'providers/TestSuite/hooks/useTestSuiteCrud';
+import useTransactionCrud from 'providers/Transaction/hooks/useTransactionCrud';
 import Resource from 'models/Resource.model';
-import TestSuite from 'models/TestSuite.model';
+import Transaction from 'models/Transaction.model';
 import Test from 'models/Test.model';
 import * as S from './Home.styled';
 import HomeActions from './HomeActions';
@@ -28,22 +28,22 @@ type TParameters = {sortBy: SortBy; sortDirection: SortDirection};
 const [{params: defaultSort}] = sortOptions;
 
 const Resources = () => {
-  const [isCreateTestSuiteOpen, setIsCreateTestSuiteOpen] = useState(false);
+  const [isCreateTransactionOpen, setIsCreateTransactionOpen] = useState(false);
   const [isCreateTestOpen, setIsCreateTestOpen] = useState(false);
   const [parameters, setParameters] = useState<TParameters>(defaultSort);
 
   const pagination = usePagination<Resource, TParameters>(useGetResourcesQuery, parameters);
   const onDeleteResource = useDeleteResource();
   const {runTest} = useTestCrud();
-  const {runTestSuite} = useTestSuiteCrud();
+  const {runTransaction} = useTransactionCrud();
   const {navigate} = useDashboard();
 
   const handleOnRun = useCallback(
-    (resource: TestSuite | Test, type: ResourceType) => {
+    (resource: Transaction | Test, type: ResourceType) => {
       if (type === ResourceType.Test) runTest({test: resource as Test});
-      else if (type === ResourceType.TestSuite) runTestSuite(resource as TestSuite);
+      else if (type === ResourceType.Transaction) runTransaction(resource as Transaction);
     },
-    [runTest, runTestSuite]
+    [runTest, runTransaction]
   );
 
   const handleOnViewAll = useCallback((id: string) => {
@@ -53,7 +53,7 @@ const Resources = () => {
   const handleOnEdit = useCallback(
     (id: string, lastRunId: number, type: ResourceType) => {
       if (type === ResourceType.Test) navigate(`/test/${id}/run/${lastRunId}`);
-      else if (type === ResourceType.TestSuite) navigate(`/testsuite/${id}/run/${lastRunId}`);
+      else if (type === ResourceType.Transaction) navigate(`/transaction/${id}/run/${lastRunId}`);
     },
     [navigate]
   );
@@ -72,7 +72,7 @@ const Resources = () => {
             isEmpty={pagination.list?.length === 0}
           />
           <HomeActions
-            onCreateTestSuite={() => setIsCreateTestSuiteOpen(true)}
+            onCreateTransaction={() => setIsCreateTransactionOpen(true)}
             onCreateTest={() => setIsCreateTestOpen(true)}
           />
         </S.ActionsContainer>
@@ -83,7 +83,7 @@ const Resources = () => {
               title="You have not created any tests yet"
               message={
                 <>
-                  Use the Create button to create your first test. Learn more about test or test suites{' '}
+                  Use the Create button to create your first test. Learn more about test or transactions{' '}
                   <a href={ADD_TEST_URL} target="_blank">
                     here.
                   </a>
@@ -106,13 +106,13 @@ const Resources = () => {
                   test={resource.item as Test}
                 />
               ) : (
-                <TestSuiteCard
+                <TransactionCard
                   key={resource.item.id}
                   onEdit={handleOnEdit}
                   onDelete={onDeleteResource}
                   onRun={handleOnRun}
                   onViewAll={handleOnViewAll}
-                  testSuite={resource.item as TestSuite}
+                  transaction={resource.item as Transaction}
                 />
               )
             )}
@@ -121,7 +121,7 @@ const Resources = () => {
       </S.Wrapper>
 
       <CreateTestModal isOpen={isCreateTestOpen} onClose={() => setIsCreateTestOpen(false)} />
-      <CreateTestSuiteModal isOpen={isCreateTestSuiteOpen} onClose={() => setIsCreateTestSuiteOpen(false)} />
+      <CreateTransactionModal isOpen={isCreateTransactionOpen} onClose={() => setIsCreateTransactionOpen(false)} />
     </>
   );
 };
