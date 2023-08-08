@@ -117,7 +117,7 @@ func TestRunTestWithHttpTriggerAndVariableSetFile(t *testing.T) {
 		// And I have my server recently created
 		// And the datasource is already set
 
-		// When I create an variable set
+		// When I create a variable set
 		// Then it should be created correctly
 		environmentFile := env.GetTestResourcePath(t, "variableSet-file")
 

@@ -29,7 +29,7 @@ function getOptionsMetadata({
     [CliCommandOption.UseHostname]: {label: 'Specify Tracetest server hostname'},
     [CliCommandOption.UseCurrentVariableSet]: {
       label: 'Use selected variable set',
-      help: !isVariableSetSelected ? 'This option is only available when an variable set is selected' : undefined,
+      help: !isVariableSetSelected ? 'This option is only available when a variable set is selected' : undefined,
       disabled: !isVariableSetSelected,
     },
     [CliCommandOption.GeneratesJUnit]: {label: 'Generate JUnit report'},

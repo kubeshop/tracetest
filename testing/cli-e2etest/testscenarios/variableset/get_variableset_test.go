@@ -51,9 +51,9 @@ func TestGetVariableSet(t *testing.T) {
 	t.Run("get with YAML format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have an variable set already set
+		// And I have a variable set already set
 
-		// When I try to get an variable set on yaml mode
+		// When I try to get a variable set on yaml mode
 		// Then it should print a YAML
 		result := tracetestcli.Exec(t, "get variableset --id .env --output yaml", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
@@ -73,9 +73,9 @@ func TestGetVariableSet(t *testing.T) {
 	t.Run("get with JSON format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have an variable set already set
+		// And I have a variable set already set
 
-		// When I try to get an variable set on json mode
+		// When I try to get a variable set on json mode
 		// Then it should print a json
 		result := tracetestcli.Exec(t, "get variableset --id .env --output json", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
@@ -95,9 +95,9 @@ func TestGetVariableSet(t *testing.T) {
 	t.Run("get with pretty format", func(t *testing.T) {
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
-		// And I have an variable set already set
+		// And I have a variable set already set
 
-		// When I try to get an variable set on pretty mode
+		// When I try to get a variable set on pretty mode
 		// Then it should print a table with 4 lines printed: header, separator, variable set item and empty line
 		result := tracetestcli.Exec(t, "get variableset --id .env --output pretty", tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
