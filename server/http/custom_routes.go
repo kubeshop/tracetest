@@ -58,7 +58,7 @@ func (c *customController) Routes() openapi.Routes {
 // GetTransactionVersion - get a transaction specific version
 func (c *customController) GetTestSuiteVersion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
+	transactionIdParam := params["testsuiteId"]
 
 	versionParam, err := parseInt32Parameter(params["version"], true)
 	if err != nil {
