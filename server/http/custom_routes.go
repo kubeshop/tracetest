@@ -33,7 +33,7 @@ func (c *customController) Routes() openapi.Routes {
 
 	routes := c.router.Routes()
 
-	routes[c.getRouteIndex("GetTransactionVersion")].HandlerFunc = c.GetTransactionVersion
+	routes[c.getRouteIndex("GetTestSuiteVersion")].HandlerFunc = c.GetTestSuiteVersion
 
 	routes[c.getRouteIndex("GetRunResultJUnit")].HandlerFunc = c.GetRunResultJUnit
 
@@ -56,7 +56,7 @@ func (c *customController) Routes() openapi.Routes {
 }
 
 // GetTransactionVersion - get a transaction specific version
-func (c *customController) GetTransactionVersion(w http.ResponseWriter, r *http.Request) {
+func (c *customController) GetTestSuiteVersion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	transactionIdParam := params["transactionId"]
 
