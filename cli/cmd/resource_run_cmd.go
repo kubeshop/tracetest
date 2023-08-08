@@ -73,7 +73,7 @@ func init() {
 	runCmd.Flags().StringSliceVar(&runParams.RequriedGates, "required-gates", []string{}, "override default required gate. "+validRequiredGatesMsg())
 
 	//deprecated
-	runCmd.Flags().StringVarP(&runParams.EnvID, "env", "e", "", "environment file or ID to be used")
+	runCmd.Flags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
 	runCmd.Flags().MarkDeprecated("env", "use --vars instead")
 	runCmd.Flags().MarkShorthandDeprecated("e", "use --vars instead")
 
