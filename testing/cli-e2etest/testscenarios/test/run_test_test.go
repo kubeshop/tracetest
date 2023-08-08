@@ -96,7 +96,7 @@ func TestRunTestWithHttpTriggerAndVariableSetFile(t *testing.T) {
 		environmentFile := env.GetTestResourcePath(t, "deprecated-environment")
 		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
 
-		command := fmt.Sprintf("run test -f %s --env %s", testFile, environmentFile)
+		command := fmt.Sprintf("run test -f %s --environment %s", testFile, environmentFile)
 		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
@@ -140,6 +140,40 @@ func TestRunTestWithHttpTriggerAndVariableSetFile(t *testing.T) {
 		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
 
 		command := fmt.Sprintf("run test -f %s --vars pokeapi-env", testFile)
+		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
+		require.Contains(result.StdOut, "✔ It should save the correct data")
+	})
+
+	t.Run("should pass when using variable set id but using the old environment flag", func(t *testing.T) {
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I create a variable set
+		// Then it should be created correctly
+		environmentFile := env.GetTestResourcePath(t, "variableSet-file")
+
+		result := tracetestcli.Exec(t, fmt.Sprintf("apply variableset --file %s", environmentFile), tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		environmentVars := helpers.UnmarshalYAML[types.VariableSetResource](t, result.StdOut)
+		require.Equal("VariableSet", environmentVars.Type)
+		require.Equal("pokeapi-env", environmentVars.Spec.ID)
+		require.Equal("pokeapi-env", environmentVars.Spec.Name)
+		require.Len(environmentVars.Spec.Values, 2)
+		require.Equal("POKEMON_NAME", environmentVars.Spec.Values[0].Key)
+		require.Equal("snorlax", environmentVars.Spec.Values[0].Value)
+		require.Equal("POKEMON_URL", environmentVars.Spec.Values[1].Key)
+		require.Equal("https://assets.pokemon.com/assets/cms2/img/pokedex/full/143.png", environmentVars.Spec.Values[1].Value)
+
+		// When I try to run a test with a http trigger and a variable set id
+		// Then it should pass
+
+		testFile := env.GetTestResourcePath(t, "http-trigger-with-environment-file")
+
+		command := fmt.Sprintf("run test -f %s --environment pokeapi-env", testFile)
 		result = tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 0)
 		require.Contains(result.StdOut, "✔ It should add a Pokemon correctly")
