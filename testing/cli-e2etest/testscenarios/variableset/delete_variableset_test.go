@@ -24,7 +24,7 @@ func TestDeleteVariableSet(t *testing.T) {
 	// Given I am a Tracetest CLI user
 	// And I have my server recently created
 
-	// When I try to delete an variable set that don't exist
+	// When I try to delete a variable set that don't exist
 	// Then it should return an error and say that this resource does not exist
 	result := tracetestcli.Exec(t, "delete variableset --id .env", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
