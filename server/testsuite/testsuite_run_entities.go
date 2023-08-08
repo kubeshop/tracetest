@@ -41,7 +41,7 @@ type TestSuiteRun struct {
 }
 
 func (tr TestSuiteRun) ResourceID() string {
-	return fmt.Sprintf("transaction/%s/run/%d", tr.TestSuiteID, tr.ID)
+	return fmt.Sprintf("testsuites/%s/run/%d", tr.TestSuiteID, tr.ID)
 }
 
 func (tr TestSuiteRun) ResultsCount() (pass, fail int) {

@@ -47,8 +47,8 @@ export const sortOptions = [
 
 export enum TracetestApiTags {
   VARIABLE_SET = 'variableSet',
-  TRANSACTION = 'transaction',
-  TRANSACTION_RUN = 'transactionRun',
+  TESTSUITE = 'testSuite',
+  TESTSUITE_RUN = 'testSuiteRun',
   TEST = 'test',
   TEST_DEFINITION = 'testDefinition',
   TEST_RUN = 'testRun',
