@@ -74,7 +74,7 @@ func init() {
 
 	//deprecated
 	runCmd.Flags().StringVarP(&runParams.EnvID, "environment", "e", "", "environment file or ID to be used")
-	runCmd.Flags().MarkDeprecated("env", "use --vars instead")
+	runCmd.Flags().MarkDeprecated("environment", "use --vars instead")
 	runCmd.Flags().MarkShorthandDeprecated("e", "use --vars instead")
 
 	rootCmd.AddCommand(runCmd)
