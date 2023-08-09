@@ -435,7 +435,17 @@ func TestFailureCases(t *testing.T) {
 			Name:                 "should_report_missing_environment_variable",
 			Query:                `env:test = "abc"`,
 			ShouldPass:           false,
-			ExpectedErrorMessage: `resolution error: environment variable "test" not found`,
+			ExpectedErrorMessage: `resolution error: variable "test" not found`,
+
+			EnvironmentDataStore: expression.EnvironmentDataStore{
+				Values: []variableset.VariableSetValue{},
+			},
+		},
+		{
+			Name:                 "should_report_missing_environment_variable",
+			Query:                `var:host = "abc"`,
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: variable "host" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
 				Values: []variableset.VariableSetValue{},
@@ -466,7 +476,17 @@ func TestFailureCases(t *testing.T) {
 			Name:                 "should_report_problem_resolving_array_item",
 			Query:                `["value", env:test, "anotherValue"] | get_index 0`,
 			ShouldPass:           false,
-			ExpectedErrorMessage: `resolution error: at index 1 of array: environment variable "test" not found`,
+			ExpectedErrorMessage: `resolution error: at index 1 of array: variable "test" not found`,
+
+			EnvironmentDataStore: expression.EnvironmentDataStore{
+				Values: []variableset.VariableSetValue{},
+			},
+		},
+		{
+			Name:                 "should_report_problem_resolving_array_item",
+			Query:                `["value", var:host, "anotherValue"] | get_index 0`,
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: at index 1 of array: variable "host" not found`,
 
 			EnvironmentDataStore: expression.EnvironmentDataStore{
 				Values: []variableset.VariableSetValue{},

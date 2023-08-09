@@ -99,5 +99,5 @@ func (ds EnvironmentDataStore) Get(name string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf(`environment variable "%s" not found`, name)
+	return "", fmt.Errorf(`variable "%s" not found`, name)
 }

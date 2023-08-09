@@ -28,6 +28,7 @@ type Term struct {
 	Number       *string       `| @Number `
 	Attribute    *Attribute    `| @Attribute `
 	Environment  *Environment  `| @Environment `
+	Variable     *Variable     `| @Variable `
 	Str          *Str          `| @(QuotedString|SingleQuotedString) )`
 }
 
@@ -57,6 +58,7 @@ var languageLexer = lexer.MustStateful(lexer.Rules{
 		{Name: "Number", Pattern: `([0-9]+(\.[0-9]+)?)`},
 		{Name: "Attribute", Pattern: `attr:[a-zA-Z_0-9][a-zA-Z_0-9.-]*`, Action: nil},
 		{Name: "Environment", Pattern: `env:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
+		{Name: "Variable", Pattern: `var:[a-zA-Z_0-9][a-zA-Z_0-9.]*`, Action: nil},
 		{Name: "QuotedString", Pattern: `"(\\"|[^"])*"`, Action: nil},
 		{Name: "SingleQuotedString", Pattern: `'(\\'|[^'])*'`, Action: nil},
 
@@ -73,12 +75,17 @@ const (
 	NumberType       TermType = "Number"
 	AttributeType    TermType = "Attribute"
 	EnvironmentType  TermType = "Environment"
+	VariableType     TermType = "Variable"
 	StrType          TermType = "Str"
 )
 
 func (term *Term) Type() TermType {
 	if term.Attribute != nil {
 		return AttributeType
+	}
+
+	if term.Variable != nil {
+		return VariableType
 	}
 
 	if term.Environment != nil {

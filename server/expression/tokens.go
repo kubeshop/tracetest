@@ -81,6 +81,10 @@ func extractIdentifierFromTerm(term *Term) string {
 		return term.Environment.name
 	}
 
+	if term.Type() == VariableType {
+		return term.Variable.name
+	}
+
 	// all other types don't have names, so return an empty string
 	return ""
 }

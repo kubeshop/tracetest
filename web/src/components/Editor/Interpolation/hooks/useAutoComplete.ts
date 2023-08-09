@@ -16,9 +16,9 @@ const useAutoComplete = () => {
 
   return useCallback(
     async (context: CompletionContext) => {
-      const envEntryList = getSelectedVariableSetEntryList();
+      const varEntryList = getSelectedVariableSetEntryList();
 
-      return EditorService.getAutocomplete({type: SupportedEditors.Interpolation, context, envEntryList});
+      return EditorService.getAutocomplete({type: SupportedEditors.Interpolation, context, varEntryList});
     },
     [getSelectedVariableSetEntryList]
   );
