@@ -52,4 +52,4 @@ Here, you can also set the thresholds for `Otel Semantic Conventions`, `Common P
 
 ## Tracetest Analyzer in the CLI
 
-You can use Tracetest Analyzer in the CLI to analyze per individual test. Visit the [Creating Transactions](/docs/docs/web-ui/creating-transactions.md) page for details.
+You can use Tracetest Analyzer in the CLI to analyze per individual test. Visit the [Creating Transactions](../web-ui/creating-transactions.md) page for details.

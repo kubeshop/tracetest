@@ -23,8 +23,6 @@ Next, select which tests to run in the transaction and click **Create & Run**:
 The transaction will start:
 
 ![Running Transaction](../img/running-transaction.png)
-    
- <!---   https://res.cloudinary.com/djwdcmwdz/image/upload/v1685713352/docs/beta.tracetest.io__page_1_2_oqwazx.png) -->
 
  On the automate tab, you find methods to automate the current transaction, including the YAML test file and the CLI command for Tracetest.
 
