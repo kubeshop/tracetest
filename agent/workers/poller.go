@@ -11,7 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers/datastores"
 	"github.com/kubeshop/tracetest/agent/workers/datastores/connection"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -71,7 +71,7 @@ func convertProtoToDataStore(request *proto.DataStore) (*datastore.DataStore, er
 	return &ds, nil
 }
 
-func convertTraceInToProtoSpans(trace model.Trace) []*proto.Span {
+func convertTraceInToProtoSpans(trace traces.Trace) []*proto.Span {
 	spans := make([]*proto.Span, 0, len(trace.Flat))
 	for _, span := range trace.Flat {
 		attributes := make([]*proto.KeyValuePair, 0, len(span.Attributes))
@@ -97,7 +97,7 @@ func convertTraceInToProtoSpans(trace model.Trace) []*proto.Span {
 	return spans
 }
 
-func getParentID(span *model.Span) string {
+func getParentID(span *traces.Span) string {
 	if span.Parent != nil {
 		return span.Parent.ID.String()
 	}

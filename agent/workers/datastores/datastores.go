@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -17,7 +18,7 @@ type DataStore interface {
 	Ready() bool
 	ShouldRetry() bool
 	GetTraceID() trace.TraceID
-	GetTraceByID(ctx context.Context, traceID string) (model.Trace, error)
+	GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error)
 	Close() error
 	GetEndpoints() string
 }
@@ -29,8 +30,8 @@ type TestableDataStore interface {
 
 type noopDataStore struct{}
 
-func (db *noopDataStore) GetTraceByID(ctx context.Context, traceID string) (t model.Trace, err error) {
-	return model.Trace{}, nil
+func (db *noopDataStore) GetTraceByID(ctx context.Context, traceID string) (t traces.Trace, err error) {
+	return traces.Trace{}, nil
 }
 
 func (db *noopDataStore) GetTraceID() trace.TraceID {

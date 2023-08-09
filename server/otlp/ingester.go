@@ -18,6 +18,17 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
+type RequestType string
+
+var (
+	RequestTypeHTTP RequestType = "HTTP"
+	RequestTypeGRPC RequestType = "gRPC"
+)
+
+type Ingester interface {
+	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error)
+}
+
 type runGetter interface {
 	GetRunByTraceID(context.Context, trace.TraceID) (test.Run, error)
 }
@@ -26,16 +37,8 @@ type tracePersister interface {
 	UpdateTraceSpans(context.Context, *traces.Trace) error
 }
 
-type Ingester struct {
-	log            func(string, ...interface{})
-	tracePersister tracePersister
-	runGetter      runGetter
-	eventEmitter   executor.EventEmitter
-	dsRepo         *datastore.Repository
-}
-
-func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) Ingester {
-	return Ingester{
+func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
+	return ingester{
 		log: func(format string, args ...interface{}) {
 			log.Printf("[OTLP] "+format, args...)
 		},
@@ -46,14 +49,15 @@ func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEm
 	}
 }
 
-type RequestType string
+type ingester struct {
+	log            func(string, ...interface{})
+	tracePersister tracePersister
+	runGetter      runGetter
+	eventEmitter   executor.EventEmitter
+	dsRepo         *datastore.Repository
+}
 
-var (
-	RequestTypeHTTP RequestType = "HTTP"
-	RequestTypeGRPC RequestType = "gRPC"
-)
-
-func (i Ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
+func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := i.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
@@ -101,7 +105,7 @@ func (i Ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	}, nil
 }
 
-func (i Ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
+func (i ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 	spansByTrace := map[string][]*v1.Span{}
 
 	for _, rs := range input {
@@ -130,7 +134,7 @@ func (i Ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 
 var errNoTestRun = errors.New("no test run")
 
-func (i Ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
+func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
 	run, err := i.runGetter.GetRunByTraceID(ctx, trace.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		// trace is not part of any known test run, no need to notify
@@ -148,7 +152,7 @@ func (i Ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tra
 	return run, nil
 }
 
-func (i Ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
+func (i ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
 	evt := events.TraceOtlpServerReceivedSpans(
 		run.TestID,
 		run.ID,
