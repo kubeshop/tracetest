@@ -16,11 +16,11 @@ Something interesting about this process is that it is a composition of many of 
 
 So in this case, we need to trigger four tests in sequence to achieve test the entire scenario and make these tests share data.
 
-## Building a Transaction for This Scenario
+## Building a Test Suite for This Scenario
 
-Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [transactions](../../../web-ui/creating-transactions.md) that have an [variable set](../../../concepts/variable-sets.md)](../../../concepts/variable-sets.md).
+Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [test suites](../../../web-ui/creating-test-suites.md) that have an [variable set](../../../concepts/variable-sets.md)].
  
-We can do that by creating the tests and transactions through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the transaction with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
+We can do that by creating the tests and test suites through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the test suite with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
 
 ### Mapping Environment Variables 
 
@@ -156,12 +156,12 @@ spec:
     - attr:tracetest.selected_spans.count >= 1
 ```
 
-### Creating the Transaction
+### Creating the Test Suite
 
-Now we wrap these files and create a transaction that will run these tests in sequence and will fail if any of the tests fail. We will call it `transaction.yaml`:
+Now we wrap these files and create a test suite that will run these tests in sequence and will fail if any of the tests fail. We will call it `testsuite.yaml`:
 
 ```yml
-type: Transaction
+type: TestSuite
 spec:
   name: User purchasing products
   description: Simulate a process of a user purchasing products on Astronomy store
@@ -172,16 +172,16 @@ spec:
   - ./checkout.yaml
 ```
 
-By having the test, transaction and environment files in the same directory, we can call the CLI and execute this transaction:
+By having the test, test suite and environment files in the same directory, we can call the CLI and execute this test suite:
 
 ```sh
-tracetest run transaction -f transaction.yaml -e user-buying-products.env
+tracetest run testsuite -f testsuite.yaml -e user-buying-products.env
 ```
 
 The result should be an output like this:
 
 ```sh
-✔ User purchasing products (http://localhost:11633/transaction/kRDUir0VR/run/1)
+✔ User purchasing products (http://localhost:11633/testsuite/kRDUir0VR/run/1)
         ✔ Get recommended products (http://localhost:11633/test/XxH8irA4R/run/1/test)
         ✔ Add product into shopping cart (http://localhost:11633/test/j_N8i9AVR/run/1/test)
         ✔ Check shopping cart contents (http://localhost:11633/test/Y2jim9AVg/run/1/test)
