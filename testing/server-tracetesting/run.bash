@@ -68,7 +68,7 @@ run_test_suite_for_feature() {
   # junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run transaction --file $definition --vars ./tracetesting-env.yaml"
+  testCMD="$TRACETEST_CLI  --config ./config.yml run testsuite --file $definition --vars ./tracetesting-env.yaml"
   echo $testCMD
   $testCMD
   return $?
@@ -85,7 +85,7 @@ EXIT_STATUS=0
 run_test_suite_for_feature 'http_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'grpc_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'variableset' || EXIT_STATUS=$?
-run_test_suite_for_feature 'transaction' || EXIT_STATUS=$?
+run_test_suite_for_feature 'testsuite' || EXIT_STATUS=$?
 
 echo ""
 echo "Tests done! Exit code: $EXIT_STATUS"

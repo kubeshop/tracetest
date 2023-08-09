@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   id: ojkNeDwVgO
   name: gRPC Test Feature

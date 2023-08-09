@@ -1,0 +1,40 @@
+---
+type: Test
+spec:
+  id: TCzH6vw4R
+  name: Create testsuite
+  description: Test step of 'TestSuite Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/testsuites
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+          "type": "TestSuite",
+          "spec": {
+            "name": "test-testsuite",
+            "description": "a testsuite",
+            "steps": [ "${env:TRANSACTION_STEP_ID}" ]
+          }
+        }
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+      - attr:tracetest.response.status = 201
+      - attr:tracetest.response.body | json_path '$.spec.id' = env:TRANSACTION_ID
+  - selector: span[name="POST /api/testsuites" tracetest.span.type="http"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 2
+
+  outputs:
+  - name: TRANSACTION_ID
+    selector: span[name = "Tracetest trigger"]
+    value: attr:tracetest.response.body | json_path '$.spec.id'

@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   id: oCkH6vQ4gV
   name: Variable Set Feature
