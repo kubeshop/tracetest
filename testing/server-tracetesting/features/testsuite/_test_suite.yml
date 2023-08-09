@@ -1,0 +1,20 @@
+type: TestSuite
+spec:
+  id: ILYjqDQ4g
+  name: TestSuite Feature
+  description: Sequence of tests to validate if our TestSuite feature is working as expected
+  steps:
+    # create test that will be added to a testsuite
+    - ./create_testsuite_step.yml
+    # create testsuite that will group these steps
+    - ./create_testsuite.yml
+    # check if this testsuite is listed on API
+    - ./list_testsuite.yml
+    # check if this testsuite is listed on API as a resource
+    - ./list_testsuite_as_resource.yml
+    # udpate testsuite
+    - ./update_testsuite.yml
+    # delete testsuite
+    - ./delete_testsuite.yml
+    # delete testsuite steps
+    - ./delete_testsuite_step.yml

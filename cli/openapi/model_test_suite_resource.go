@@ -14,35 +14,35 @@ import (
 	"encoding/json"
 )
 
-// checks if the VariableSetResource type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &VariableSetResource{}
+// checks if the TestSuiteResource type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TestSuiteResource{}
 
-// VariableSetResource Represents a VariableSet structured into the Resources format.
-type VariableSetResource struct {
-	// Represents the type of this resource. It should always be set as 'VariableSet'.
-	Type *string      `json:"type,omitempty"`
-	Spec *VariableSet `json:"spec,omitempty"`
+// TestSuiteResource Represents a TestSuite structured into the Resources format.
+type TestSuiteResource struct {
+	// Represents the type of this resource. It should always be set as 'TestSuite'.
+	Type *string    `json:"type,omitempty"`
+	Spec *TestSuite `json:"spec,omitempty"`
 }
 
-// NewVariableSetResource instantiates a new VariableSetResource object
+// NewTestSuiteResource instantiates a new TestSuiteResource object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewVariableSetResource() *VariableSetResource {
-	this := VariableSetResource{}
+func NewTestSuiteResource() *TestSuiteResource {
+	this := TestSuiteResource{}
 	return &this
 }
 
-// NewVariableSetResourceWithDefaults instantiates a new VariableSetResource object
+// NewTestSuiteResourceWithDefaults instantiates a new TestSuiteResource object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewVariableSetResourceWithDefaults() *VariableSetResource {
-	this := VariableSetResource{}
+func NewTestSuiteResourceWithDefaults() *TestSuiteResource {
+	this := TestSuiteResource{}
 	return &this
 }
 
 // GetType returns the Type field value if set, zero value otherwise.
-func (o *VariableSetResource) GetType() string {
+func (o *TestSuiteResource) GetType() string {
 	if o == nil || isNil(o.Type) {
 		var ret string
 		return ret
@@ -52,7 +52,7 @@ func (o *VariableSetResource) GetType() string {
 
 // GetTypeOk returns a tuple with the Type field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *VariableSetResource) GetTypeOk() (*string, bool) {
+func (o *TestSuiteResource) GetTypeOk() (*string, bool) {
 	if o == nil || isNil(o.Type) {
 		return nil, false
 	}
@@ -60,7 +60,7 @@ func (o *VariableSetResource) GetTypeOk() (*string, bool) {
 }
 
 // HasType returns a boolean if a field has been set.
-func (o *VariableSetResource) HasType() bool {
+func (o *TestSuiteResource) HasType() bool {
 	if o != nil && !isNil(o.Type) {
 		return true
 	}
@@ -69,14 +69,14 @@ func (o *VariableSetResource) HasType() bool {
 }
 
 // SetType gets a reference to the given string and assigns it to the Type field.
-func (o *VariableSetResource) SetType(v string) {
+func (o *TestSuiteResource) SetType(v string) {
 	o.Type = &v
 }
 
 // GetSpec returns the Spec field value if set, zero value otherwise.
-func (o *VariableSetResource) GetSpec() VariableSet {
+func (o *TestSuiteResource) GetSpec() TestSuite {
 	if o == nil || isNil(o.Spec) {
-		var ret VariableSet
+		var ret TestSuite
 		return ret
 	}
 	return *o.Spec
@@ -84,7 +84,7 @@ func (o *VariableSetResource) GetSpec() VariableSet {
 
 // GetSpecOk returns a tuple with the Spec field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *VariableSetResource) GetSpecOk() (*VariableSet, bool) {
+func (o *TestSuiteResource) GetSpecOk() (*TestSuite, bool) {
 	if o == nil || isNil(o.Spec) {
 		return nil, false
 	}
@@ -92,7 +92,7 @@ func (o *VariableSetResource) GetSpecOk() (*VariableSet, bool) {
 }
 
 // HasSpec returns a boolean if a field has been set.
-func (o *VariableSetResource) HasSpec() bool {
+func (o *TestSuiteResource) HasSpec() bool {
 	if o != nil && !isNil(o.Spec) {
 		return true
 	}
@@ -100,12 +100,12 @@ func (o *VariableSetResource) HasSpec() bool {
 	return false
 }
 
-// SetSpec gets a reference to the given VariableSet and assigns it to the Spec field.
-func (o *VariableSetResource) SetSpec(v VariableSet) {
+// SetSpec gets a reference to the given TestSuite and assigns it to the Spec field.
+func (o *TestSuiteResource) SetSpec(v TestSuite) {
 	o.Spec = &v
 }
 
-func (o VariableSetResource) MarshalJSON() ([]byte, error) {
+func (o TestSuiteResource) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -113,7 +113,7 @@ func (o VariableSetResource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o VariableSetResource) ToMap() (map[string]interface{}, error) {
+func (o TestSuiteResource) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Type) {
 		toSerialize["type"] = o.Type
@@ -124,38 +124,38 @@ func (o VariableSetResource) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableVariableSetResource struct {
-	value *VariableSetResource
+type NullableTestSuiteResource struct {
+	value *TestSuiteResource
 	isSet bool
 }
 
-func (v NullableVariableSetResource) Get() *VariableSetResource {
+func (v NullableTestSuiteResource) Get() *TestSuiteResource {
 	return v.value
 }
 
-func (v *NullableVariableSetResource) Set(val *VariableSetResource) {
+func (v *NullableTestSuiteResource) Set(val *TestSuiteResource) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableVariableSetResource) IsSet() bool {
+func (v NullableTestSuiteResource) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableVariableSetResource) Unset() {
+func (v *NullableTestSuiteResource) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableVariableSetResource(val *VariableSetResource) *NullableVariableSetResource {
-	return &NullableVariableSetResource{value: val, isSet: true}
+func NewNullableTestSuiteResource(val *TestSuiteResource) *NullableTestSuiteResource {
+	return &NullableTestSuiteResource{value: val, isSet: true}
 }
 
-func (v NullableVariableSetResource) MarshalJSON() ([]byte, error) {
+func (v NullableTestSuiteResource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableVariableSetResource) UnmarshalJSON(src []byte) error {
+func (v *NullableTestSuiteResource) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

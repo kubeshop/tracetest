@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRunTransactionInsteadOfTest(t *testing.T) {
-	t.Run("should fail if transaction resource is selected", func(t *testing.T) {
+func TestRunTestSuiteInsteadOfTest(t *testing.T) {
+	t.Run("should fail if test suite resource is selected", func(t *testing.T) {
 		// setup isolated e2e environment
 		env := environment.CreateAndStart(t)
 		defer env.Close(t)
@@ -26,14 +26,14 @@ func TestRunTransactionInsteadOfTest(t *testing.T) {
 		// And I have my server recently created
 		// And the datasource is already set
 
-		// When I try to run a transaction
+		// When I try to run a test suite
 		// Then it should pass
 		testFil := env.GetTestResourcePath(t, "import")
 
-		command := fmt.Sprintf("run transaction -f %s", testFil)
+		command := fmt.Sprintf("run testsuite -f %s", testFil)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
 		helpers.RequireExitCodeEqual(t, result, 1)
-		require.Contains(result.StdErr, "cannot apply Test to Transaction resource")
+		require.Contains(result.StdErr, "cannot apply Test to TestSuite resource")
 	})
 }
 

@@ -1,0 +1,39 @@
+---
+type: Test
+spec:
+  id: TjkNeDQ4R7
+  name: Update testsuite
+  description: Test step of 'TestSuite Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${env:TARGET_URL}/api/testsuites/${env:TRANSACTION_ID}
+      method: PUT
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+          "type": "TestSuite",
+          "spec": {
+              "name": "test-testsuite-updated",
+              "description": "a testsuite",
+              "steps": [ "${env:TRANSACTION_STEP_ID}" ]
+          }
+        }
+  specs:
+  - selector: span[name = "Tracetest trigger"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+      - attr:tracetest.response.status = 200
+      - attr:tracetest.response.body | json_path '$.spec.name' = "test-testsuite-updated"
+  - selector: span[name="PUT /api/testsuites/{id}" tracetest.span.type="http"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 1
+  - selector: span[name = "exec INSERT"]
+    assertions:
+      - attr:tracetest.selected_spans.count = 2
+  - selector: span[name = "exec INSERT"]:first
+    assertions:
+      - attr:sql.query contains "INSERT INTO test_suites"
+
