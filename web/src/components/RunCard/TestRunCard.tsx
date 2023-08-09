@@ -28,8 +28,8 @@ const TestRunCard = ({
     createdAt,
     testVersion,
     metadata,
-    transactionId,
-    transactionRunId,
+    testSuiteId,
+    testSuiteRunId,
     linter,
     requiredGatesResult,
   },
@@ -74,7 +74,7 @@ const TestRunCard = ({
           </S.Row>
         </S.Info>
 
-        {!!transactionId && !!transactionRunId && <S.Text>Part of transaction</S.Text>}
+        {!!testSuiteId && !!testSuiteRunId && <S.Text>Part of test suite</S.Text>}
 
         {!isRunStateFinished(state) && (
           <div data-cy={`test-run-result-status-${runId}`}>
@@ -111,8 +111,8 @@ const TestRunCard = ({
           <RunActionsMenu
             resultId={runId}
             testId={testId}
-            transactionRunId={transactionRunId}
-            transactionId={transactionId}
+            testSuiteRunId={testSuiteRunId}
+            testSuiteId={testSuiteId}
           />
         </div>
       </S.Container>

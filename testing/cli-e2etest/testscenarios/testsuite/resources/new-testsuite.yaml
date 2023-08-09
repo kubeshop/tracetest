@@ -1,0 +1,8 @@
+type: TestSuite
+spec:
+  id: Qti5R3_VR
+  name: New TestSuite
+  description: a TestSuite
+  steps:
+  - ./testsuite-step-1.yaml
+  - ./testsuite-step-2.yaml

@@ -9,7 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 )
 
 type subscriptionMessage struct {
@@ -64,10 +64,10 @@ func (e subscribeCommandExecutor) ResourceUpdatedEvent(resource interface{}) Eve
 		mapped = e.mappers.Out.Run(&v)
 	case *test.Run:
 		mapped = e.mappers.Out.Run(v)
-	case transaction.TransactionRun:
-		mapped = e.mappers.Out.TransactionRun(v)
-	case *transaction.TransactionRun:
-		mapped = e.mappers.Out.TransactionRun(*v)
+	case testsuite.TestSuiteRun:
+		mapped = e.mappers.Out.TestSuiteRun(v)
+	case *testsuite.TestSuiteRun:
+		mapped = e.mappers.Out.TestSuiteRun(*v)
 	case model.TestRunEvent:
 		mapped = e.mappers.Out.TestRunEvent(v)
 	default:

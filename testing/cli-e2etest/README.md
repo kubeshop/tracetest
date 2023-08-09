@@ -26,16 +26,16 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `--help`, `-h` | [HelpCommand](./testscenarios/help_test.go)       |
 | `--config`     | All scenarios                                     |
 
-### Run Tests and Transactions
+### Run Tests and TestSuites
 
 | CLI Command                                                        | Test scenarios |
 | ------------------------------------------------------------------ | -------------- |
 | `run test -f [test-definition]`                                    | [RunTestWithGrpcTrigger](./testscenarios/test/run_test_with_grpc_trigger_test.go) |
 | `run test -f [test-definition] --vars [variableset-id]`                | [RunTestWithHttpTriggerAndVariableSetFile](./testscenarios/test/run_test_with_http_trigger_and_variableset_file_test.go) |
 | `run test -f [test-definition] --vars [variableset-definition]`        | [RunTestWithHttpTriggerAndVariableSetFile](./testscenarios/test/run_test_with_http_trigger_and_variableset_file_test.go) |
-| `run transaction -f [transaction-definition]`                             | [RunTransaction](./testscenarios/transaction//run_transaction_test.go) |
-| `run transaction -f [transaction-definition] --vars [variableset-id]`         | |
-| `run transaction -f [transaction-definition] --vars [variableset-definition]` | |
+| `run testsuite -f [testsuite-definition]`                             | [RunTestSuite](./testscenarios/testsuite//run_testsuite_test.go) |
+| `run testsuite -f [testsuite-definition] --vars [variableset-id]`         | |
+| `run testsuite -f [testsuite-definition] --vars [variableset-definition]` | |
 
 ### Resources: Config
 
@@ -138,23 +138,23 @@ The main idea is to test every CLI command against the Tracetest server with dif
 | `list analyzer --output json`                           | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
 | `list analyzer --output yaml`                           | [ListAnalyzer](./testscenarios/analyzer/list_analyzer_test.go) |
 
-### Resources: Transactions
+### Resources: TestSuites
 
 | CLI Command                                                 | Test scenarios |
 | ----------------------------------------------------------- | -------------- |
-| `apply transaction -f [new-transaction-file]`               | [ApplyTransaction](./testscenarios/transaction/apply_transaction_test.go) |
-| `apply transaction -f [existing-transaction-file]`          | [ApplyTransaction](./testscenarios/transaction/apply_transaction_test.go) |
-| `delete transaction --id [existing-id]`                     | [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
-| `delete transaction --id [non-existing-id]`                 | [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
-| `get transaction --id [non-existing-id]`                    | [GetTransaction](./testscenarios/transaction/get_transaction_test.go), [DeleteTransaction](./testscenarios/transaction/delete_transaction_test.go) |
-| `get transaction --id [existing-id] --output pretty`        | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
-| `get transaction --id [existing-id] --output json`          | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
-| `get transaction --id [existing-id] --output yaml`          | [GetTransaction](./testscenarios/transaction/get_transaction_test.go) |
-| `list transaction --output pretty`                          | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
-| `list transaction --output json`                            | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
-| `list transaction --output yaml`                            | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
-| `list transaction --skip 1 --take 2`                        | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
-| `list transaction --sortBy name --sortDirection asc`        | [ListTransaction](./testscenarios/transaction/list_transactions_test.go) |
+| `apply testsuite -f [new-testsuite-file]`               | [ApplyTestSuite](./testscenarios/testsuite/apply_testsuite_test.go) |
+| `apply testsuite -f [existing-testsuite-file]`          | [ApplyTestSuite](./testscenarios/testsuite/apply_testsuite_test.go) |
+| `delete testsuite --id [existing-id]`                     | [DeleteTestSuite](./testscenarios/testsuite/delete_testsuite_test.go) |
+| `delete testsuite --id [non-existing-id]`                 | [DeleteTestSuite](./testscenarios/testsuite/delete_testsuite_test.go) |
+| `get testsuite --id [non-existing-id]`                    | [GetTestSuite](./testscenarios/testsuite/get_testsuite_test.go), [DeleteTestSuite](./testscenarios/testsuite/delete_testsuite_test.go) |
+| `get testsuite --id [existing-id] --output pretty`        | [GetTestSuite](./testscenarios/testsuite/get_testsuite_test.go) |
+| `get testsuite --id [existing-id] --output json`          | [GetTestSuite](./testscenarios/testsuite/get_testsuite_test.go) |
+| `get testsuite --id [existing-id] --output yaml`          | [GetTestSuite](./testscenarios/testsuite/get_testsuite_test.go) |
+| `list testsuite --output pretty`                          | [ListTestSuite](./testscenarios/testsuite/list_testsuites_test.go) |
+| `list testsuite --output json`                            | [ListTestSuite](./testscenarios/testsuite/list_testsuites_test.go) |
+| `list testsuite --output yaml`                            | [ListTestSuite](./testscenarios/testsuite/list_testsuites_test.go) |
+| `list testsuite --skip 1 --take 2`                        | [ListTestSuite](./testscenarios/testsuite/list_testsuites_test.go) |
+| `list testsuite --sortBy name --sortDirection asc`        | [ListTestSuite](./testscenarios/testsuite/list_testsuites_test.go) |
 
 ### Resources: Tests
 

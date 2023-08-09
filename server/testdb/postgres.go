@@ -58,10 +58,10 @@ func (p *postgresDB) ensureLatestMigration() error {
 func (td *postgresDB) Drop() error {
 	return dropTables(
 		td,
-		"transaction_run_steps",
-		"transaction_runs",
-		"transaction_steps",
-		"transactions",
+		"test_suite_run_steps",
+		"test_suite_runs",
+		"test_suite_steps",
+		"test_suites",
 		"test_runs",
 		"tests",
 		"environments",

@@ -57,10 +57,10 @@ func (c *ApiApiController) Routes() Routes {
 			c.DeleteTestRun,
 		},
 		{
-			"DeleteTransactionRun",
+			"DeleteTestSuiteRun",
 			strings.ToUpper("Delete"),
-			"/api/transactions/{transactionId}/run/{runId}",
-			c.DeleteTransactionRun,
+			"/api/testsuites/{testSuiteId}/run/{runId}",
+			c.DeleteTestSuiteRun,
 		},
 		{
 			"DryRunAssertion",
@@ -123,28 +123,28 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetTestSpecs,
 		},
 		{
+			"GetTestSuiteRun",
+			strings.ToUpper("Get"),
+			"/api/testsuites/{testSuiteId}/run/{runId}",
+			c.GetTestSuiteRun,
+		},
+		{
+			"GetTestSuiteRuns",
+			strings.ToUpper("Get"),
+			"/api/testsuites/{testSuiteId}/run",
+			c.GetTestSuiteRuns,
+		},
+		{
+			"GetTestSuiteVersion",
+			strings.ToUpper("Get"),
+			"/api/testsuites/{testSuiteId}/version/{version}",
+			c.GetTestSuiteVersion,
+		},
+		{
 			"GetTestVersion",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/version/{version}",
 			c.GetTestVersion,
-		},
-		{
-			"GetTransactionRun",
-			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/run/{runId}",
-			c.GetTransactionRun,
-		},
-		{
-			"GetTransactionRuns",
-			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/run",
-			c.GetTransactionRuns,
-		},
-		{
-			"GetTransactionVersion",
-			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}/version/{version}",
-			c.GetTransactionVersion,
 		},
 		{
 			"GetVersion",
@@ -171,10 +171,10 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTest,
 		},
 		{
-			"RunTransaction",
+			"RunTestSuite",
 			strings.ToUpper("Post"),
-			"/api/transactions/{transactionId}/run",
-			c.RunTransaction,
+			"/api/testsuites/{testSuiteId}/run",
+			c.RunTestSuite,
 		},
 		{
 			"StopTestRun",
@@ -213,10 +213,10 @@ func (c *ApiApiController) DeleteTestRun(w http.ResponseWriter, r *http.Request)
 
 }
 
-// DeleteTransactionRun - Delete a specific run from a particular transaction
-func (c *ApiApiController) DeleteTransactionRun(w http.ResponseWriter, r *http.Request) {
+// DeleteTestSuiteRun - Delete a specific run from a particular TestSuite
+func (c *ApiApiController) DeleteTestSuiteRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	runIdParam, err := parseInt32Parameter(params["runId"], true)
 	if err != nil {
@@ -224,7 +224,7 @@ func (c *ApiApiController) DeleteTransactionRun(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	result, err := c.service.DeleteTransactionRun(r.Context(), transactionIdParam, runIdParam)
+	result, err := c.service.DeleteTestSuiteRun(r.Context(), testSuiteIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -474,6 +474,77 @@ func (c *ApiApiController) GetTestSpecs(w http.ResponseWriter, r *http.Request) 
 
 }
 
+// GetTestSuiteRun - Get a specific run from a particular TestSuite
+func (c *ApiApiController) GetTestSuiteRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testSuiteIdParam := params["testSuiteId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTestSuiteRun(r.Context(), testSuiteIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestSuiteRuns - Get all runs from a particular TestSuite
+func (c *ApiApiController) GetTestSuiteRuns(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	query := r.URL.Query()
+	testSuiteIdParam := params["testSuiteId"]
+
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetTestSuiteRuns(r.Context(), testSuiteIdParam, takeParam, skipParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestSuiteVersion - get a TestSuite specific version
+func (c *ApiApiController) GetTestSuiteVersion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testSuiteIdParam := params["testSuiteId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetTestSuiteVersion(r.Context(), testSuiteIdParam, versionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetTestVersion - get a test specific version
 func (c *ApiApiController) GetTestVersion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -486,77 +557,6 @@ func (c *ApiApiController) GetTestVersion(w http.ResponseWriter, r *http.Request
 	}
 
 	result, err := c.service.GetTestVersion(r.Context(), testIdParam, versionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransactionRun - Get a specific run from a particular transaction
-func (c *ApiApiController) GetTransactionRun(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
-
-	runIdParam, err := parseInt32Parameter(params["runId"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTransactionRun(r.Context(), transactionIdParam, runIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransactionRuns - Get all runs from a particular transaction
-func (c *ApiApiController) GetTransactionRuns(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	query := r.URL.Query()
-	transactionIdParam := params["transactionId"]
-
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetTransactionRuns(r.Context(), transactionIdParam, takeParam, skipParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransactionVersion - get a transaction specific version
-func (c *ApiApiController) GetTransactionVersion(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
-
-	versionParam, err := parseInt32Parameter(params["version"], true)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-
-	result, err := c.service.GetTransactionVersion(r.Context(), transactionIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -653,10 +653,10 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// RunTransaction - run transaction
-func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request) {
+// RunTestSuite - run TestSuite
+func (c *ApiApiController) RunTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	runInformationParam := RunInformation{}
 	d := json.NewDecoder(r.Body)
@@ -669,7 +669,7 @@ func (c *ApiApiController) RunTransaction(w http.ResponseWriter, r *http.Request
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.RunTransaction(r.Context(), transactionIdParam, runInformationParam)
+	result, err := c.service.RunTestSuite(r.Context(), testSuiteIdParam, runInformationParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

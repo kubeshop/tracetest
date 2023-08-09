@@ -13,7 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"go.opentelemetry.io/otel/propagation"
 )
 
@@ -69,8 +69,8 @@ func (h headers) SetBool(key string, value bool) {
 type Job struct {
 	Headers *headers
 
-	Transaction    transaction.Transaction
-	TransactionRun transaction.TransactionRun
+	TestSuite    testsuite.TestSuite
+	TestSuiteRun testsuite.TestSuiteRun
 
 	Test test.Test
 	Run  test.Run
@@ -81,8 +81,8 @@ type Job struct {
 
 type jsonJob struct {
 	Headers          *headers `json:"headers"`
-	TransactionID    string   `json:"transaction_id"`
-	TransactionRunID int      `json:"transaction_run_id"`
+	TestSuiteID      string   `json:"test_suite_id"`
+	TestSuiteRunID   int      `json:"test_suite_run_id"`
 	TestID           string   `json:"test_id"`
 	RunID            int      `json:"run_id"`
 	PollingProfileID string   `json:"polling_profile_id"`
@@ -92,8 +92,8 @@ type jsonJob struct {
 func (job Job) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jsonJob{
 		Headers:          job.Headers,
-		TransactionID:    job.Transaction.ID.String(),
-		TransactionRunID: job.TransactionRun.ID,
+		TestSuiteID:      job.TestSuite.ID.String(),
+		TestSuiteRunID:   job.TestSuiteRun.ID,
 		TestID:           job.Test.ID.String(),
 		RunID:            job.Run.ID,
 		PollingProfileID: job.PollingProfile.ID.String(),
@@ -109,8 +109,8 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	}
 
 	job.Headers = jj.Headers
-	job.Transaction.ID = id.ID(jj.TransactionID)
-	job.TransactionRun.ID = jj.TransactionRunID
+	job.TestSuite.ID = id.ID(jj.TestSuiteID)
+	job.TestSuiteRun.ID = jj.TestSuiteRunID
 	job.Test.ID = id.ID(jj.TestID)
 	job.Run.ID = jj.RunID
 	job.PollingProfile.ID = id.ID(jj.PollingProfileID)
@@ -157,12 +157,12 @@ type testRunGetter interface {
 	GetRun(_ context.Context, testID id.ID, runID int) (test.Run, error)
 }
 
-type transactionGetter interface {
-	GetAugmented(context.Context, id.ID) (transaction.Transaction, error)
+type testSuiteGetter interface {
+	GetAugmented(context.Context, id.ID) (testsuite.TestSuite, error)
 }
 
-type transactionRunGetter interface {
-	GetTransactionRun(_ context.Context, transactionID id.ID, runID int) (transaction.TransactionRun, error)
+type testSuiteRunGetter interface {
+	GetTestSuiteRun(_ context.Context, transactionID id.ID, runID int) (testsuite.TestSuiteRun, error)
 }
 
 type subscriptor interface {
@@ -181,8 +181,8 @@ type QueueBuilder struct {
 	runs  testRunGetter
 	tests testGetter
 
-	transactionRuns transactionRunGetter
-	transactions    transactionGetter
+	testSuiteRuns testSuiteRunGetter
+	testSuites    testSuiteGetter
 
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
@@ -222,13 +222,13 @@ func (qb *QueueBuilder) WithDataStoreGetter(dataStore dataStoreGetter) *QueueBui
 	return qb
 }
 
-func (qb *QueueBuilder) WithTransactionGetter(transactions transactionGetter) *QueueBuilder {
-	qb.transactions = transactions
+func (qb *QueueBuilder) WithTestSuiteGetter(suites testSuiteGetter) *QueueBuilder {
+	qb.testSuites = suites
 	return qb
 }
 
-func (qb *QueueBuilder) WithTransactionRunGetter(transactionRuns transactionRunGetter) *QueueBuilder {
-	qb.transactionRuns = transactionRuns
+func (qb *QueueBuilder) WithTestSuiteRunGetter(suiteRuns testSuiteRunGetter) *QueueBuilder {
+	qb.testSuiteRuns = suiteRuns
 	return qb
 }
 
@@ -240,8 +240,8 @@ func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcess
 		runs:  qb.runs,
 		tests: qb.tests,
 
-		transactionRuns: qb.transactionRuns,
-		transactions:    qb.transactions,
+		testSuiteRuns: qb.testSuiteRuns,
+		testSuites:    qb.testSuites,
 
 		pollingProfiles: qb.pollingProfiles,
 		dataStores:      qb.dataStores,
@@ -262,8 +262,8 @@ type Queue struct {
 	runs  testRunGetter
 	tests testGetter
 
-	transactionRuns transactionRunGetter
-	transactions    transactionGetter
+	testSuiteRuns testSuiteRunGetter
+	testSuites    testSuiteGetter
 
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
@@ -296,8 +296,8 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		Test: test.Test{ID: job.Test.ID},
 		Run:  test.Run{ID: job.Run.ID},
 
-		Transaction:    transaction.Transaction{ID: job.Transaction.ID},
-		TransactionRun: transaction.TransactionRun{ID: job.TransactionRun.ID},
+		TestSuite:    testsuite.TestSuite{ID: job.TestSuite.ID},
+		TestSuiteRun: testsuite.TestSuiteRun{ID: job.TestSuiteRun.ID},
 
 		PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
 		DataStore:      datastore.DataStore{ID: job.DataStore.ID},
@@ -323,8 +323,8 @@ func (q Queue) Listen(job Job) {
 	// todo: change the otlp server to have its own table
 	// newJob.Run = job.Run
 
-	newJob.Transaction = q.resolveTransaction(ctx, job)
-	newJob.TransactionRun = q.resolveTransactionRun(ctx, job)
+	newJob.TestSuite = q.resolveTestSuite(ctx, job)
+	newJob.TestSuiteRun = q.resolveTestSuiteRun(ctx, job)
 
 	newJob.PollingProfile = q.resolvePollingProfile(ctx, job)
 	newJob.DataStore = q.resolveDataStore(ctx, job)
@@ -376,14 +376,14 @@ func (q Queue) listenForStopRequests(ctx context.Context, cancelCtx context.Canc
 	q.subscriptor.Subscribe((StopRequest{job.Test.ID, job.Run.ID}).ResourceID(), sfn)
 }
 
-func (q Queue) resolveTransaction(ctx context.Context, job Job) transaction.Transaction {
-	if q.transactions == nil {
-		return transaction.Transaction{}
+func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuite {
+	if q.testSuites == nil {
+		return testsuite.TestSuite{}
 	}
 
-	tran, err := q.transactions.GetAugmented(ctx, job.Transaction.ID)
+	tran, err := q.testSuites.GetAugmented(ctx, job.TestSuite.ID)
 	if errors.Is(err, sql.ErrNoRows) {
-		return transaction.Transaction{}
+		return testsuite.TestSuite{}
 	}
 	if err != nil {
 		panic(err)
@@ -391,14 +391,14 @@ func (q Queue) resolveTransaction(ctx context.Context, job Job) transaction.Tran
 
 	return tran
 }
-func (q Queue) resolveTransactionRun(ctx context.Context, job Job) transaction.TransactionRun {
-	if q.transactionRuns == nil {
-		return transaction.TransactionRun{}
+func (q Queue) resolveTestSuiteRun(ctx context.Context, job Job) testsuite.TestSuiteRun {
+	if q.testSuiteRuns == nil {
+		return testsuite.TestSuiteRun{}
 	}
 
-	tranRun, err := q.transactionRuns.GetTransactionRun(ctx, job.Transaction.ID, job.TransactionRun.ID)
+	tranRun, err := q.testSuiteRuns.GetTestSuiteRun(ctx, job.TestSuite.ID, job.TestSuiteRun.ID)
 	if errors.Is(err, sql.ErrNoRows) {
-		return transaction.TransactionRun{}
+		return testsuite.TestSuiteRun{}
 	}
 	if err != nil {
 		panic(err)

@@ -14,7 +14,7 @@ func (ft FileType) String() string {
 
 const (
 	FileTypeTest           FileType = "Test"
-	FileTypeTransaction    FileType = "Transaction"
+	FileTypeTestSuite      FileType = "TestSuite"
 	FileTypeEnvironment    FileType = "Environment"
 	FileTypeDataStore      FileType = "DataStore"
 	FileTypeConfig         FileType = "Config"
@@ -40,8 +40,8 @@ func (f File) Validate() error {
 			return err
 		}
 		return test.Validate()
-	case FileTypeTransaction:
-		transaction, err := f.Transaction()
+	case FileTypeTestSuite:
+		transaction, err := f.TestSuite()
 		if err != nil {
 			return err
 		}
@@ -63,14 +63,14 @@ func (f File) Test() (Test, error) {
 	return test, nil
 }
 
-func (f File) Transaction() (Transaction, error) {
-	if f.Type != FileTypeTransaction {
-		return Transaction{}, fmt.Errorf("file is not a transaction")
+func (f File) TestSuite() (TestSuite, error) {
+	if f.Type != FileTypeTestSuite {
+		return TestSuite{}, fmt.Errorf("file is not a testsuite")
 	}
 
-	transaction, ok := f.Spec.(Transaction)
+	transaction, ok := f.Spec.(TestSuite)
 	if !ok {
-		return Transaction{}, fmt.Errorf("file spec cannot be casted to a transaction")
+		return TestSuite{}, fmt.Errorf("file spec cannot be casted to a testsuite")
 	}
 
 	return transaction, nil

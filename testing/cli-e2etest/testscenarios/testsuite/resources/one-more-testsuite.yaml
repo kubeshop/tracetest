@@ -1,0 +1,9 @@
+type: TestSuite
+spec:
+  id: i2ug34j
+  name: One More TestSuite
+  description: one more TestSuite
+  steps:
+  - ./testsuite-step-1.yaml
+  - ./testsuite-step-1.yaml
+  - ./testsuite-step-2.yaml
