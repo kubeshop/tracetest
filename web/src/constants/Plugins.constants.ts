@@ -78,7 +78,15 @@ const Kafka: IPlugin = {
   title: 'Kafka',
   description: 'Test consumers with Kafka messages',
   isActive: true,
-  stepList: [],
+  stepList: [
+    ...Default.stepList,
+    {
+      id: 'request-details',
+      name: 'Request Details',
+      title: 'Provide additional information',
+      component: ComponentNames.RequestDetails,
+    },
+  ],
   demoList: [],
   type: TriggerTypes.kafka,
 };

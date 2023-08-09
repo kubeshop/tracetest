@@ -10,15 +10,17 @@ export const Label = styled(Typography.Text).attrs({as: 'div'})`
   margin-bottom: 8px;
 `;
 
-export const BrokerURLInputContainer = styled.div`
+export const BrokerURLInputContainer = styled.div<{$firstItem: boolean}>`
   display: grid;
   align-items: flex-start;
-  grid-template-columns: 100%;
+  grid-template-columns: ${({$firstItem}) => (!$firstItem ? '90% 10%' : '100%')};
+  margin-bottom: 8px;
 
   .ant-form-item {
     margin: 0;
   }
 `;
+
 
 export const HeaderContainer = styled.div`
   align-items: center;

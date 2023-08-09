@@ -13,17 +13,13 @@ export const PlainFields = ({baseName}: IProps) => (
   <S.Row>
     <R.FlexContainer>
       <Form.Item
-        style={{flexBasis: '49%', marginTop: '26px'}}
+        style={{flexBasis: '49%', marginTop: '26px', marginRight: '2px'}}
         name={[...baseName, 'basic', 'username']}
         data-cy="basic-username"
         label="Username"
         rules={[{required: true}]}
       >
         <Editor type={SupportedEditors.Interpolation} />
-      </Form.Item>
-      <Form.Item
-        style={{flexBasis: '2%', marginTop: '26px'}}>
-        <div />
       </Form.Item>
       <Form.Item
         style={{flexBasis: '49%', marginTop: '26px'}}

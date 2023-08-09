@@ -18,7 +18,7 @@ const RequestDetailsHeadersInput = ({
         <>
           {fields.map((field, index) => (
             <S.HeaderContainer key={field.name}>
-              <Form.Item name={[field.name, 'key']} noStyle>
+              <Form.Item name={[field.name, 'key']} style={{marginRight: '2px'}}>
                 <Editor type={SupportedEditors.Interpolation} placeholder={`Header Key ${index + 1}`} />
               </Form.Item>
 
