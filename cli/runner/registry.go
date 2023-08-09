@@ -5,33 +5,33 @@ import (
 )
 
 type Registry struct {
-	registry map[string]Runner
-	proxy    map[string]string
+	runners map[string]Runner
+	proxies map[string]string
 }
 
 func NewRegistry() Registry {
 	return Registry{
-		registry: map[string]Runner{},
-		proxy:    map[string]string{},
+		runners: map[string]Runner{},
+		proxies: map[string]string{},
 	}
 }
 
 func (r Registry) Register(runner Runner) Registry {
-	r.registry[runner.Name()] = runner
+	r.runners[runner.Name()] = runner
 	return r
 }
 
 func (r Registry) RegisterProxy(proxyName, runnerName string) Registry {
-	r.proxy[proxyName] = runnerName
+	r.proxies[proxyName] = runnerName
 	return r
 }
 
 var ErrNotFound = fmt.Errorf("runner not found")
 
 func (r Registry) Get(name string) (Runner, error) {
-	runner, ok := r.registry[name]
+	runner, ok := r.runners[name]
 	if !ok {
-		if runnerName, ok := r.proxy[name]; ok {
+		if runnerName, ok := r.proxies[name]; ok {
 			if !ok {
 				return nil, ErrNotFound
 			}
@@ -45,7 +45,7 @@ func (r Registry) Get(name string) (Runner, error) {
 
 func (r Registry) List() []string {
 	var list []string
-	for name := range r.registry {
+	for name := range r.runners {
 		list = append(list, name)
 	}
 
