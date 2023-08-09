@@ -1,6 +1,6 @@
 # Ad-hoc Testing
 
-This page showcases use-cases for undefined variables and how to enable ad-hoc testing by utilizing environments and undefined variabled.
+This page showcases use-cases for undefined variables and how to enable ad-hoc testing by utilizing variable sets and undefined variables.
 
 :::tip
 [Check out how to configure ad-hoc testing with undefined variables with the **Web UI** here.](../web-ui/undefined-variables.md)
@@ -24,15 +24,15 @@ In Tracetest, undefined variables can be used in both the UI and CLI.
 
 ## **Undefined Variables Transaction with Multiple Tests Example**
 
-1. Create an HTTP Pokemon list test that uses environment variables for hostname and the SKIP query parameter:
+1. Create an HTTP Pokemon list test that uses variables for hostname and the SKIP query parameter:
 
 ![Create Pokemon List](../img/pokeshop-list.png)
 
-2. Within the test, create test spec assertions that use environment variables for comparators, something like: `http.status_code = "${env:STATUS_CODE}"`:
+1. Within the test, create test spec assertions that use variables for comparators, something like: `http.status_code = "${env:STATUS_CODE}"`:
 
 ![Create Test Spec Assertionsl](../img/create-test-spec-assertions.png)
 
-3. Create a GRPC Pokemon add test that uses environment variables for hostname and Pokemon name:
+1. Create a GRPC Pokemon add test that uses variables for hostname and Pokemon name:
 
 ![Create GRPC](../img/create-grpc.png)
 

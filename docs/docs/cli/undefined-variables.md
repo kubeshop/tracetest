@@ -13,29 +13,29 @@ POKEID:
 POKENAME:
 ```
 
-Undefined variables are dependent on the environment selected and whether or not the variable is defined in the current environment. Select the environment to run the test or transaction by passing it into the test run command.
+Undefined variables are dependent on the variable set selected and whether or not the variable is defined in the current variable set. Select the variable set to run the test or transaction by passing it into the test run command.
 
 ```sh
-tracetest list environment
+tracetest list variableset
 ```
 
 ```text title="Output:"
  ID        NAME      DESCRIPTION
 --------- --------- -------------
- testenv   testenv   testenv
+ testvars   testvars   testvars
 ```
 
 ```sh
-tracetest get environment --id testenv
+tracetest get variableset --id testvars
 ```
 
 ```text title="Output:"
 ---
-type: Environment
+type: VariableSet
 spec:
-  id: testenv
-  name: testenv
-  description: testenv
+  id: testvars
+  name: testvars
+  description: testvars
   values:
   - key: POKEID
     value: "42"
@@ -44,7 +44,7 @@ spec:
 ```
 
 ```sh
-tracetest run test -f path/to/test.yaml -e testenv
+tracetest run test -f path/to/test.yaml --vars testvars
 ```
 
 ```text title="Output:"

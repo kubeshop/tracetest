@@ -8,7 +8,7 @@ Variable sets are objects containing variables that can be referenced by tests. 
 
 ```yaml
 # dev.env
-type: Environment
+type: VariableSet
 spec:
   name: dev.env
   id: dev.env
@@ -21,7 +21,7 @@ spec:
 
 ```yaml
 # staging.env
-type: Environment
+type: VariableSet
 spec:
   name: staging.env
   id: staging.env
@@ -34,7 +34,7 @@ spec:
 
 ```yaml
 # production.env
-type: Environment
+type: VariableSet
 spec:
   name: production.env
   id: production.env
@@ -63,4 +63,4 @@ specs:
             token: "${env:API_TOKEN}"
 ```
 
-Both `env:URL` and `env:API_TOKEN` would be replaced by the variables defined in the chosen environment where the test will run. So, if the chosen environment was `dev.env`, its values would be replaced by `https://app-dev.com` and `dev-key`, respectively.
+Both `env:URL` and `env:API_TOKEN` would be replaced by the variables defined in the chosen variable set where the test will run. So, if the chosen variable set was `dev.env`, its values would be replaced by `https://app-dev.com` and `dev-key`, respectively.

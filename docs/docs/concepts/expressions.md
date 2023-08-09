@@ -32,7 +32,7 @@ attr:product.stock = attr:product.stok_before_purchase - attr:product.number_bou
 
 ### **String Interpolation**
 
-Some tests might require strings to be compared, but maybe you need to generate a dynamic string that relies on a dynamic value. This might be used in an assertion or even in the request body referencing an environment variable.
+Some tests might require strings to be compared, but maybe you need to generate a dynamic string that relies on a dynamic value. This might be used in an assertion or even in the request body referencing a variable.
 
 ```css
 attr:error.message = "Could not withdraw ${attr:withdraw.amount}, your balance is insufficient."

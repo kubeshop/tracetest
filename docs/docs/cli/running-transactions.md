@@ -21,24 +21,24 @@ tracetest run transaction -f path/to/transaction.yaml
 	✔ Pokeshop - List (http://localhost:11633/test/QvPjBH_4g/run/4/test)
 ```
 
-## Running a Transaction That Uses Environment Variables
+## Running a Transaction That Uses Variable Sets
 
-There are two ways of referencing an environment when running a transaction.
+There are two ways of referencing a variable set when running a transaction.
 
-You can reference an existing environment using its id. For example, given this defined environment with an id of `'testenv'`:
+You can reference an existing variable set using its id. For example, given this defined variable set with an id of `'testenv'`:
 
 ![testenv](../img/show-environment-definition.png)
 
-We can run a transaction and specify that environment with this command:
+We can run a transaction and specify that variable set with this command:
 
 ```sh
-tracetest run transaction -f path/to/transaction.yaml -e testenv
+tracetest run transaction -f path/to/transaction.yaml --vars testenv
 ```
 
-You can also reference an environment resource file which will be used to create a new environment or update an existing one. For example, if you have a file named `local.env` with this content:
+You can also reference a variable set resource file which will be used to create a new variable set or update an existing one. For example, if you have a file named `local.env` with this content:
 
 ```yaml
-type: Environment
+type: VariableSet
 spec:
   id: local.env
   name: local.env
@@ -50,9 +50,9 @@ spec:
 ```
 
 ```sh
-tracetest run test -f path/to/transaction.yaml -e path/to/local.env
+tracetest run test -f path/to/transaction.yaml --vars path/to/local.env
 ```
 
-If you use the environment resource approach, a new environment will be created in Tracetest.
+If you use the variable set resource approach, a new variable set will be created in Tracetest.
 
 The second approach is very useful if you are running tests from a CI pipeline.

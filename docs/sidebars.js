@@ -614,8 +614,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "web-ui/creating-environments",
-          label: "Creating Environments",
+          id: "web-ui/creating-variable-sets",
+          label: "Creating Variable Sets",
         },
       ],
     },
@@ -692,8 +692,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "cli/creating-environments",
-          label: "Creating Environments",
+          id: "cli/creating-variable-sets",
+          label: "Creating Variable Sets",
         },
         {
           type: "category",
