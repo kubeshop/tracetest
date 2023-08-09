@@ -8,7 +8,7 @@ import Spans from 'redux/slices/Span.slice';
 import CreateTest from 'redux/slices/CreateTest.slice';
 import DAG from 'redux/slices/DAG.slice';
 import Trace from 'redux/slices/Trace.slice';
-import CreateTransaction from 'redux/slices/CreateTransaction.slice';
+import CreateTestSuite from 'redux/slices/CreateTestSuite.slice';
 import User from 'redux/slices/User.slice';
 import TestOutputs from 'redux/testOutputs/slice';
 import RouterMiddleware from './Router.middleware';
@@ -28,7 +28,7 @@ export const reducers = {
   trace: Trace,
   testSpecs: TestSpecs,
   createTest: CreateTest,
-  createTransaction: CreateTransaction,
+  createTestSuite: CreateTestSuite,
   user: User,
   testOutputs: TestOutputs,
 };

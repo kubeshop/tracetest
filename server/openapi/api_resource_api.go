@@ -450,9 +450,9 @@ func (c *ResourceApiApiController) DeleteTest(w http.ResponseWriter, r *http.Req
 // DeleteTestSuite - delete a TestSuite
 func (c *ResourceApiApiController) DeleteTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
-	result, err := c.service.DeleteTestSuite(r.Context(), testsuiteIdParam)
+	result, err := c.service.DeleteTestSuite(r.Context(), testSuiteIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -562,9 +562,9 @@ func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *h
 // GetTestSuite - get TestSuite
 func (c *ResourceApiApiController) GetTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
-	result, err := c.service.GetTestSuite(r.Context(), testsuiteIdParam)
+	result, err := c.service.GetTestSuite(r.Context(), testSuiteIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -982,7 +982,7 @@ func (c *ResourceApiApiController) UpdateTest(w http.ResponseWriter, r *http.Req
 // UpdateTestSuite - update TestSuite
 func (c *ResourceApiApiController) UpdateTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	testSuiteResourceParam := TestSuiteResource{}
 	d := json.NewDecoder(r.Body)
@@ -995,7 +995,7 @@ func (c *ResourceApiApiController) UpdateTestSuite(w http.ResponseWriter, r *htt
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateTestSuite(r.Context(), testsuiteIdParam, testSuiteResourceParam)
+	result, err := c.service.UpdateTestSuite(r.Context(), testSuiteIdParam, testSuiteResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

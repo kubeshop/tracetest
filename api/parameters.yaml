@@ -29,9 +29,9 @@ components:
         type: integer
 
     # TestSuite
-    testsuiteId:
+    testSuiteId:
       in: path
-      name: testsuiteId
+      name: testSuiteId
       required: true
       description: id of the TestSuite
       schema:

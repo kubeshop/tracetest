@@ -5,9 +5,9 @@ import Home from 'pages/Home';
 import RunDetail from 'pages/RunDetail';
 import Settings from 'pages/Settings';
 import Test from 'pages/Test';
-import Transaction from 'pages/Transaction';
-import TransactionRunOverview from 'pages/TransactionRunOverview';
-import TransactionRunAutomate from 'pages/TransactionRunAutomate';
+import TestSuite from 'pages/TestSuite';
+import TestSuiteRunOverview from 'pages/TestSuiteRunOverview';
+import TestSuiteRunAutomate from 'pages/TestSuiteRunAutomate';
 import AutomatedTestRun from 'pages/AutomatedTestRun';
 
 const Router = () => (
@@ -23,10 +23,10 @@ const Router = () => (
     <Route path="/test/:testId/run/:runId/:mode" element={<RunDetail />} />
     <Route path="/test/:testId/run" element={<AutomatedTestRun />} />
 
-    <Route path="/transaction/:transactionId" element={<Transaction />} />
-    <Route path="/transaction/:transactionId/run/:runId" element={<TransactionRunOverview />} />
-    <Route path="/transaction/:transactionId/run/:runId/overview" element={<TransactionRunOverview />} />
-    <Route path="/transaction/:transactionId/run/:runId/automate" element={<TransactionRunAutomate />} />
+    <Route path="/testsuite/:testSuiteId" element={<TestSuite />} />
+    <Route path="/testsuite/:testSuiteId/run/:runId" element={<TestSuiteRunOverview />} />
+    <Route path="/testsuite/:testSuiteId/run/:runId/overview" element={<TestSuiteRunOverview />} />
+    <Route path="/testsuite/:testSuiteId/run/:runId/automate" element={<TestSuiteRunAutomate />} />
 
     <Route path="*" element={<Navigate to="" />} />
   </Routes>

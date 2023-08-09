@@ -74,7 +74,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
       summary: "get TestSuite"
       description: "get TestSuite"
       operationId: getTestSuite
@@ -96,7 +96,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
       summary: "update TestSuite"
       description: "update TestSuite action"
       operationId: updateTestSuite
@@ -128,7 +128,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
       summary: "delete a TestSuite"
       description: "delete a TestSuite"
       operationId: deleteTestSuite
@@ -139,12 +139,12 @@ paths:
           description: "TestSuite not found"
         500:
           description: "problem deleting a TestSuite"
-  /testsuites/{testsuiteId}/version/{version}:
+  /testsuites/{testSuiteId}/version/{version}:
     get:
       tags:
         - api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
         - $ref: "./parameters.yaml#/components/parameters/version"
       summary: "get a TestSuite specific version"
       description: "get a TestSuite specific version"
@@ -159,12 +159,12 @@ paths:
         500:
           description: "problem with getting a test"
 
-  /testsuites/{testsuiteId}/run:
+  /testsuites/{testSuiteId}/run:
     post:
       tags:
         - api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
       summary: "run TestSuite"
       description: "run a particular TestSuite"
       operationId: runTestSuite
@@ -184,7 +184,7 @@ paths:
       tags:
         - api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
         - $ref: "./parameters.yaml#/components/parameters/take"
         - $ref: "./parameters.yaml#/components/parameters/skip"
       summary: "Get all runs from a particular TestSuite"
@@ -199,12 +199,12 @@ paths:
                 type: array
                 items:
                   $ref: "./testsuites.yaml#/components/schemas/TestSuiteRun"
-  /testsuites/{testsuiteId}/run/{runId}:
+  /testsuites/{testSuiteId}/run/{runId}:
     get:
       tags:
         - api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
         - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "Get a specific run from a particular TestSuite"
       description: "Get a specific run from a particular TestSuite"
@@ -223,7 +223,7 @@ paths:
       tags:
         - api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/testsuiteId"
+        - $ref: "./parameters.yaml#/components/parameters/testSuiteId"
         - $ref: "./parameters.yaml#/components/parameters/runId"
       summary: "Delete a specific run from a particular TestSuite"
       description: "Delete a specific run from a particular TestSuite"
