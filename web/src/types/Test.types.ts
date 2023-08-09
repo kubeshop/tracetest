@@ -6,9 +6,9 @@ import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
 import GRPCRequest from 'models/GrpcRequest.model';
 import HttpRequest from 'models/HttpRequest.model';
 import TraceIDRequest from 'models/TraceIDRequest.model';
+import KafkaRequest from 'models/KafkaRequest.model';
 import {Model, TGrpcSchemas, THttpSchemas, TKafkaSchemas} from './Common.types';
 import {ICreateTestStep, IPlugin} from './Plugins.types';
-import KafkaRequest from 'models/KafkaRequest.model';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
