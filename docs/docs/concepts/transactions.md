@@ -29,7 +29,7 @@ outputs:
       expression: attr:tracetest.time.start
 ```
 
-This would create an output called `TIME_CANCEL_SUBSCRIPTION_MESSAGE_OBTAINED` that is obtained by reading the attribute `tracetest.time.start` from the span with `name` equal to `Process request from cancel subscription queue`. This value would would then be injected into the variables of that transaction to be accessed by other tests within the same transaction run.
+This would create an output called `TIME_CANCEL_SUBSCRIPTION_MESSAGE_OBTAINED` that is obtained by reading the attribute `tracetest.time.start` from the span with `name` equal to `Process request from cancel subscription queue`. This value would then be injected into the variables of that transaction to be accessed by other tests within the same transaction run.
 
 ### Transactions Execution Flow
 

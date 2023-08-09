@@ -28,4 +28,4 @@ In order to apply this configuration to your Tracetest instance, make sure to ha
 tracetest apply variableset -f <variableset.yaml>
 ```
 
-> If the file contains the property `spec.id`, the operation will be considered a variable set update. If you try to apply a variable set and you get an error: `could not apply variableset: 404 Not Found`, it means the provided id doesn't exist. Either update the id to reference an existing variable set, or just remove the property from the file, so Tracetest will create a new variable set and a new id.
+> If the file contains the property `spec.id`, the operation will be considered a variable set update. If you try to apply a variable set and you get the error: `could not apply variableset: 404 Not Found`, it means the provided ID doesn't exist. Either update the ID to reference an existing variable set or remove the property from the file. Tracetest will create a new variable set and a new ID.
