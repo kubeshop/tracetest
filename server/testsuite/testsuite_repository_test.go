@@ -1,4 +1,4 @@
-package transaction_test
+package testsuite_test
 
 import (
 	"context"
@@ -14,12 +14,12 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-type transactionFixture struct {
+type testSuiteFixture struct {
 	t1      test.Test
 	t2      test.Test
 	testRun test.Run
@@ -61,11 +61,11 @@ func createRun(runRepository test.RunRepository, t test.Test) test.Run {
 	return run
 }
 
-func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
+func setupTestSuiteFixture(t *testing.T, db *sql.DB) testSuiteFixture {
 	testsDB := test.NewRepository(db)
 	runDB := test.NewRunRepository(db)
 
-	fixture := transactionFixture{}
+	fixture := testSuiteFixture{}
 
 	createdTest := test.Test{
 		ID:          "ezMn7bE4g",
@@ -132,35 +132,35 @@ func setupTransactionFixture(t *testing.T, db *sql.DB) transactionFixture {
 }
 
 func setupTests(t *testing.T, db *sql.DB) test.Run {
-	f := setupTransactionFixture(t, db)
+	f := setupTestSuiteFixture(t, db)
 
 	return f.testRun
 }
 
-func TestDeleteTestsRelatedToTransactions(t *testing.T) {
+func TestDeleteTestsRelatedToTestSuite(t *testing.T) {
 	db := testmock.CreateMigratedDatabase()
 	defer db.Close()
 
 	testRepository := test.NewRepository(db)
 	runRepository := test.NewRunRepository(db)
-	transactionRepo := transaction.NewRepository(db, testRepository)
-	transactionRunRepo := transaction.NewRunRepository(db, runRepository)
+	testSuiteRepo := testsuite.NewRepository(db, testRepository)
+	testSuiteRunRepo := testsuite.NewRunRepository(db, runRepository)
 
-	transactionRepo.Create(context.TODO(), transactionSample)
+	testSuiteRepo.Create(context.TODO(), testSuiteSample)
 
-	f := setupTransactionFixture(t, db)
-	createTransactionRun(transactionRepo, transactionRunRepo, transactionSample, f.testRun)
+	f := setupTestSuiteFixture(t, db)
+	createTransactionRun(testSuiteRepo, testSuiteRunRepo, testSuiteSample, f.testRun)
 
 	testRepository.Delete(context.TODO(), f.t1.ID)
 	testRepository.Delete(context.TODO(), f.t2.ID)
 
-	actual, err := transactionRepo.Get(context.TODO(), transactionSample.ID)
+	actual, err := testSuiteRepo.Get(context.TODO(), testSuiteSample.ID)
 	assert.NoError(t, err)
 	assert.Len(t, actual.StepIDs, 0)
 
 }
 
-var transactionSample = transaction.Transaction{
+var testSuiteSample = testsuite.TestSuite{
 	ID:          "NiWVnxP4R",
 	Name:        "Verify Import",
 	Description: "check the working of the import flow",
@@ -170,19 +170,19 @@ var transactionSample = transaction.Transaction{
 	},
 }
 
-func TestTransactions(t *testing.T) {
-	// sample2 := transaction.Transaction{
+func TestTestSuites(t *testing.T) {
+	// sample2 := testsuite.TestSuite{
 	// 	ID:          "sample2",
-	// 	Name:        "Some Transaction",
+	// 	Name:        "Some testsuite",
 	// 	Description: "Do important stuff",
 	// 	StepIDs: []id.ID{
 	// 		"ezMn7bE4g",
 	// 	},
 	// }
 
-	// sample3 := transaction.Transaction{
+	// sample3 := testsuite.TestSuite{
 	// 	ID:          "sample3",
-	// 	Name:        "Some Transaction",
+	// 	Name:        "Some testsuite",
 	// 	Description: "Do important stuff",
 	// 	StepIDs: []id.ID{
 	// 		"ezMn7bE4g",
@@ -190,15 +190,15 @@ func TestTransactions(t *testing.T) {
 	// }
 
 	rmtests.TestResourceType(t, rmtests.ResourceTypeTest{
-		ResourceTypeSingular: transaction.TransactionResourceName,
-		ResourceTypePlural:   transaction.TransactionResourceNamePlural,
+		ResourceTypeSingular: testsuite.TestSuiteResourceName,
+		ResourceTypePlural:   testsuite.TestSuiteResourceNamePlural,
 		RegisterManagerFn: func(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 			testsDB := test.NewRepository(db)
-			transactionsRepo := transaction.NewRepository(db, testsDB)
+			transactionsRepo := testsuite.NewRepository(db, testsDB)
 
-			manager := resourcemanager.New[transaction.Transaction](
-				transaction.TransactionResourceName,
-				transaction.TransactionResourceNamePlural,
+			manager := resourcemanager.New[testsuite.TestSuite](
+				testsuite.TestSuiteResourceName,
+				testsuite.TestSuiteResourceNamePlural,
 				transactionsRepo,
 				resourcemanager.CanBeAugmented(),
 			)
@@ -207,32 +207,32 @@ func TestTransactions(t *testing.T) {
 			return manager
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
-			transactionRepo := manager.Handler().(*transaction.Repository)
+			transactionRepo := manager.Handler().(*testsuite.Repository)
 			runRepository := test.NewRunRepository(transactionRepo.DB())
-			runRepo := transaction.NewRunRepository(transactionRepo.DB(), runRepository)
+			runRepo := testsuite.NewRunRepository(transactionRepo.DB(), runRepository)
 
 			switch op {
 			case rmtests.OperationGetSuccess,
 				rmtests.OperationUpdateSuccess,
 				rmtests.OperationListSuccess:
-				transactionRepo.Create(context.TODO(), transactionSample)
+				transactionRepo.Create(context.TODO(), testSuiteSample)
 
 			case rmtests.OperationDeleteSuccess:
-				transactionRepo.Create(context.TODO(), transactionSample)
+				transactionRepo.Create(context.TODO(), testSuiteSample)
 
 				// test delete with more than 1 run
 				run := setupTests(t, transactionRepo.DB())
-				createTransactionRun(transactionRepo, runRepo, transactionSample, run)
+				createTransactionRun(transactionRepo, runRepo, testSuiteSample, run)
 
 				run = copyRun(runRepository, run)
-				createTransactionRun(transactionRepo, runRepo, transactionSample, run)
+				createTransactionRun(transactionRepo, runRepo, testSuiteSample, run)
 
 			case rmtests.OperationListAugmentedSuccess,
 				rmtests.OperationGetAugmentedSuccess:
 
-				transactionRepo.Create(context.TODO(), transactionSample)
+				transactionRepo.Create(context.TODO(), testSuiteSample)
 				run := setupTests(t, transactionRepo.DB())
-				createTransactionRun(transactionRepo, runRepo, transactionSample, run)
+				createTransactionRun(transactionRepo, runRepo, testSuiteSample, run)
 
 				// TODO: reenable this tests when we figure out how to test it
 				// problems:
@@ -245,7 +245,7 @@ func TestTransactions(t *testing.T) {
 			}
 		},
 		SampleJSON: `{
-			"type": "Transaction",
+			"type": "TestSuite",
 			"spec": {
 				"id": "NiWVnxP4R",
 				"name": "Verify Import",
@@ -257,7 +257,7 @@ func TestTransactions(t *testing.T) {
 			}
 		}`,
 		SampleJSONAugmented: `{
-			"type": "Transaction",
+			"type": "TestSuite",
 			"spec": {
 				"id": "NiWVnxP4R",
 				"createdAt": "REMOVEME",
@@ -358,7 +358,7 @@ func TestTransactions(t *testing.T) {
 			}
 		}`,
 		SampleJSONUpdated: `{
-			"type": "Transaction",
+			"type": "TestSuite",
 			"spec": {
 				"id": "NiWVnxP4R",
 				"name": "Verify Import Updated",
@@ -394,7 +394,7 @@ func compareJSON(t require.TestingT, operation rmtests.Operation, firstValue, se
 	require.JSONEq(t, expected, actual)
 }
 
-func createTransactionRun(transactionRepo *transaction.Repository, runRepo *transaction.RunRepository, tran transaction.Transaction, run test.Run) {
+func createTransactionRun(transactionRepo *testsuite.Repository, runRepo *testsuite.RunRepository, tran testsuite.TestSuite, run test.Run) {
 	updated, err := transactionRepo.GetAugmented(context.TODO(), tran.ID)
 	if err != nil {
 		panic(err)

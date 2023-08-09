@@ -16,7 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -66,11 +66,11 @@ func (r *fakeTestRunner) Run(ctx context.Context, testObj test.Test, metadata te
 	return newRun
 }
 
-func TestTransactionRunner(t *testing.T) {
+func TestTestSuiteRunner(t *testing.T) {
 
 	t.Run("NoErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, false, func(t *testing.T, actual transaction.TransactionRun) {
-			assert.Equal(t, transaction.TransactionRunStateFinished, actual.State)
+		runTestSuiteRunnerTest(t, false, func(t *testing.T, actual testsuite.TestSuiteRun) {
+			assert.Equal(t, testsuite.TestSuiteStateFinished, actual.State)
 			require.Len(t, actual.Steps, 2)
 			assert.Equal(t, actual.Steps[0].State, test.RunStateFinished)
 			assert.Equal(t, actual.Steps[1].State, test.RunStateFinished)
@@ -92,8 +92,8 @@ func TestTransactionRunner(t *testing.T) {
 	})
 
 	t.Run("WithErrors", func(t *testing.T) {
-		runTransactionRunnerTest(t, true, func(t *testing.T, actual transaction.TransactionRun) {
-			assert.Equal(t, transaction.TransactionRunStateFailed, actual.State)
+		runTestSuiteRunnerTest(t, true, func(t *testing.T, actual testsuite.TestSuiteRun) {
+			assert.Equal(t, testsuite.TestSuiteStateFailed, actual.State)
 			require.Len(t, actual.Steps, 1)
 			assert.Equal(t, test.RunStateTriggerFailed, actual.Steps[0].State)
 		})
@@ -108,7 +108,7 @@ func getDB() (model.Repository, *sql.DB) {
 	return db, rawDB
 }
 
-func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual transaction.TransactionRun)) {
+func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testing.T, actual testsuite.TestSuiteRun)) {
 	ctx := context.Background()
 	_, rawDB := getDB()
 
@@ -129,11 +129,11 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	test2, err := testRepo.Create(ctx, test.Test{Name: "Test 2"})
 	require.NoError(t, err)
 
-	transactionsRepo := transaction.NewRepository(rawDB, testRepo)
-	transactionRunRepo := transaction.NewRunRepository(rawDB, runRepo)
-	tran, err := transactionsRepo.Create(ctx, transaction.Transaction{
+	transactionsRepo := testsuite.NewRepository(rawDB, testRepo)
+	transactionRunRepo := testsuite.NewRunRepository(rawDB, runRepo)
+	tran, err := transactionsRepo.Create(ctx, testsuite.TestSuite{
 		ID:      id.ID("tran1"),
-		Name:    "transaction",
+		Name:    "test_suite",
 		StepIDs: []id.ID{test1.ID, test2.ID},
 	})
 	require.NoError(t, err)
@@ -158,17 +158,17 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 	})
 	require.NoError(t, err)
 
-	runner := executor.NewTransactionRunner(testRunner, transactionRunRepo, subscriptionManager)
+	runner := executor.NewTestSuiteRunner(testRunner, transactionRunRepo, subscriptionManager)
 
 	queueBuilder := executor.NewQueueBuilder().
-		WithTransactionGetter(transactionsRepo).
-		WithTransactionRunGetter(transactionRunRepo)
+		WithTestSuiteGetter(transactionsRepo).
+		WithTestSuiteRunGetter(transactionRunRepo)
 
 	pipeline := executor.NewPipeline(queueBuilder,
 		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
 	)
 
-	transactionPipeline := executor.NewTransactionPipeline(pipeline, transactionRunRepo)
+	transactionPipeline := executor.NewTestSuitePipeline(pipeline, transactionRunRepo)
 	transactionPipeline.Start()
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 1*time.Second)
@@ -176,9 +176,9 @@ func runTransactionRunnerTest(t *testing.T, withErrors bool, assert func(t *test
 
 	transactionRun := transactionPipeline.Run(ctxWithTimeout, tran, metadata, env, nil)
 
-	done := make(chan transaction.TransactionRun, 1)
+	done := make(chan testsuite.TestSuiteRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		tr := m.Content.(transaction.TransactionRun)
+		tr := m.Content.(testsuite.TestSuiteRun)
 		if tr.State.IsFinal() {
 			done <- tr
 		}

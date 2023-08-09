@@ -1,7 +1,7 @@
 openapi: 3.0.0
 components:
   schemas:
-    TransactionResourceList:
+    TestSuiteResourceList:
       type: object
       properties:
         count:
@@ -9,21 +9,21 @@ components:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/TransactionResource"
+            $ref: "#/components/schemas/TestSuiteResource"
 
-    TransactionResource:
+    TestSuiteResource:
       type: object
-      description: "Represents a transaction structured into the Resources format."
+      description: "Represents a TestSuite structured into the Resources format."
       properties:
         type:
           type: string
-          description: "Represents the type of this resource. It should always be set as 'Transaction'."
+          description: "Represents the type of this resource. It should always be set as 'TestSuite'."
           enum:
-            - Transaction
+            - TestSuite
         spec:
-          $ref: "#/components/schemas/Transaction"
+          $ref: "#/components/schemas/TestSuite"
 
-    Transaction:
+    TestSuite:
       type: object
       properties:
         id:
@@ -37,12 +37,12 @@ components:
           description: version number of the test
         steps:
           type: array
-          description: list of steps of the transaction containing just each test id
+          description: list of steps of the TestSuite containing just each test id
           items:
             type: string
         fullSteps:
           type: array
-          description: list of steps of the transaction containing the whole test object
+          description: list of steps of the TestSuite containing the whole test object
           items:
             $ref: "./tests.yaml#/components/schemas/Test"
         createdAt:
@@ -50,10 +50,10 @@ components:
           format: date-time
         summary:
           $ref: "./tests.yaml#/components/schemas/TestSummary"
-          description: summary of transaction
+          description: summary of TestSuite
           readOnly: true
 
-    TransactionRun:
+    TestSuiteRun:
       type: object
       properties:
         id:

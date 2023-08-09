@@ -69,10 +69,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateTest,
 		},
 		{
-			"CreateTransaction",
+			"CreateTestSuite",
 			strings.ToUpper("Post"),
-			"/api/transactions",
-			c.CreateTransaction,
+			"/api/testsuites",
+			c.CreateTestSuite,
 		},
 		{
 			"CreateVariableSet",
@@ -105,10 +105,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.DeleteTest,
 		},
 		{
-			"DeleteTransaction",
+			"DeleteTestSuite",
 			strings.ToUpper("Delete"),
-			"/api/transactions/{transactionId}",
-			c.DeleteTransaction,
+			"/api/testsuites/{testSuiteId}",
+			c.DeleteTestSuite,
 		},
 		{
 			"DeleteVariableSet",
@@ -147,22 +147,22 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.GetPollingProfile,
 		},
 		{
+			"GetTestSuite",
+			strings.ToUpper("Get"),
+			"/api/testsuites/{testSuiteId}",
+			c.GetTestSuite,
+		},
+		{
+			"GetTestSuites",
+			strings.ToUpper("Get"),
+			"/api/testsuites",
+			c.GetTestSuites,
+		},
+		{
 			"GetTests",
 			strings.ToUpper("Get"),
 			"/api/tests",
 			c.GetTests,
-		},
-		{
-			"GetTransaction",
-			strings.ToUpper("Get"),
-			"/api/transactions/{transactionId}",
-			c.GetTransaction,
-		},
-		{
-			"GetTransactions",
-			strings.ToUpper("Get"),
-			"/api/transactions",
-			c.GetTransactions,
 		},
 		{
 			"GetVariableSet",
@@ -249,10 +249,10 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.UpdateTest,
 		},
 		{
-			"UpdateTransaction",
+			"UpdateTestSuite",
 			strings.ToUpper("Put"),
-			"/api/transactions/{transactionId}",
-			c.UpdateTransaction,
+			"/api/testsuites/{testSuiteId}",
+			c.UpdateTestSuite,
 		},
 		{
 			"UpdateVariableSet",
@@ -335,20 +335,20 @@ func (c *ResourceApiApiController) CreateTest(w http.ResponseWriter, r *http.Req
 
 }
 
-// CreateTransaction - Create new transaction
-func (c *ResourceApiApiController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
-	transactionResourceParam := TransactionResource{}
+// CreateTestSuite - Create new TestSuite
+func (c *ResourceApiApiController) CreateTestSuite(w http.ResponseWriter, r *http.Request) {
+	testSuiteResourceParam := TestSuiteResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&transactionResourceParam); err != nil {
+	if err := d.Decode(&testSuiteResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTransactionResourceRequired(transactionResourceParam); err != nil {
+	if err := AssertTestSuiteResourceRequired(testSuiteResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateTransaction(r.Context(), transactionResourceParam)
+	result, err := c.service.CreateTestSuite(r.Context(), testSuiteResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -359,7 +359,7 @@ func (c *ResourceApiApiController) CreateTransaction(w http.ResponseWriter, r *h
 
 }
 
-// CreateVariableSet - Create an VariableSet
+// CreateVariableSet - Create a VariableSet
 func (c *ResourceApiApiController) CreateVariableSet(w http.ResponseWriter, r *http.Request) {
 	variableSetResourceParam := VariableSetResource{}
 	d := json.NewDecoder(r.Body)
@@ -447,12 +447,12 @@ func (c *ResourceApiApiController) DeleteTest(w http.ResponseWriter, r *http.Req
 
 }
 
-// DeleteTransaction - delete a transaction
-func (c *ResourceApiApiController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
+// DeleteTestSuite - delete a TestSuite
+func (c *ResourceApiApiController) DeleteTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
+	testsuiteIdParam := params["testsuiteId"]
 
-	result, err := c.service.DeleteTransaction(r.Context(), transactionIdParam)
+	result, err := c.service.DeleteTestSuite(r.Context(), testsuiteIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -463,7 +463,7 @@ func (c *ResourceApiApiController) DeleteTransaction(w http.ResponseWriter, r *h
 
 }
 
-// DeleteVariableSet - Delete an VariableSet
+// DeleteVariableSet - Delete an variable set
 func (c *ResourceApiApiController) DeleteVariableSet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	variableSetIdParam := params["variableSetId"]
@@ -559,6 +559,49 @@ func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *h
 
 }
 
+// GetTestSuite - get TestSuite
+func (c *ResourceApiApiController) GetTestSuite(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testsuiteIdParam := params["testsuiteId"]
+
+	result, err := c.service.GetTestSuite(r.Context(), testsuiteIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTestSuites - Get testsuites
+func (c *ResourceApiApiController) GetTestSuites(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetTestSuites(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetTests - Get tests
 func (c *ResourceApiApiController) GetTests(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -576,49 +619,6 @@ func (c *ResourceApiApiController) GetTests(w http.ResponseWriter, r *http.Reque
 	sortByParam := query.Get("sortBy")
 	sortDirectionParam := query.Get("sortDirection")
 	result, err := c.service.GetTests(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransaction - get transaction
-func (c *ResourceApiApiController) GetTransaction(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
-
-	result, err := c.service.GetTransaction(r.Context(), transactionIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetTransactions - Get transactions
-func (c *ResourceApiApiController) GetTransactions(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	queryParam := query.Get("query")
-	sortByParam := query.Get("sortBy")
-	sortDirectionParam := query.Get("sortDirection")
-	result, err := c.service.GetTransactions(r.Context(), takeParam, skipParam, queryParam, sortByParam, sortDirectionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -775,7 +775,7 @@ func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *
 
 }
 
-// ListVariableSets - List variableSets
+// ListVariableSets - List VariableSets
 func (c *ResourceApiApiController) ListVariableSets(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	takeParam, err := parseInt32Parameter(query.Get("take"), false)
@@ -979,23 +979,23 @@ func (c *ResourceApiApiController) UpdateTest(w http.ResponseWriter, r *http.Req
 
 }
 
-// UpdateTransaction - update transaction
-func (c *ResourceApiApiController) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
+// UpdateTestSuite - update TestSuite
+func (c *ResourceApiApiController) UpdateTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	transactionIdParam := params["transactionId"]
+	testsuiteIdParam := params["testsuiteId"]
 
-	transactionResourceParam := TransactionResource{}
+	testSuiteResourceParam := TestSuiteResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&transactionResourceParam); err != nil {
+	if err := d.Decode(&testSuiteResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTransactionResourceRequired(transactionResourceParam); err != nil {
+	if err := AssertTestSuiteResourceRequired(testSuiteResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateTransaction(r.Context(), transactionIdParam, transactionResourceParam)
+	result, err := c.service.UpdateTestSuite(r.Context(), testsuiteIdParam, testSuiteResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1006,7 +1006,7 @@ func (c *ResourceApiApiController) UpdateTransaction(w http.ResponseWriter, r *h
 
 }
 
-// UpdateVariableSet - Update an VariableSet
+// UpdateVariableSet - Update a VariableSet
 func (c *ResourceApiApiController) UpdateVariableSet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	variableSetIdParam := params["variableSetId"]

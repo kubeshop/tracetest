@@ -1,4 +1,4 @@
-package transaction
+package testsuite
 
 import (
 	"fmt"
@@ -10,10 +10,10 @@ import (
 	"github.com/kubeshop/tracetest/server/variableset"
 )
 
-type TransactionRun struct {
-	ID                 int
-	TransactionID      id.ID
-	TransactionVersion int
+type TestSuiteRun struct {
+	ID               int
+	TestSuiteID      id.ID
+	TestSuiteVersion int
 
 	// Timestamps
 	CreatedAt   time.Time
@@ -24,7 +24,7 @@ type TransactionRun struct {
 	Steps   []test.Run
 
 	// trigger params
-	State       TransactionRunState
+	State       TestSuiteRunState
 	CurrentTest int
 
 	// result info
@@ -40,11 +40,11 @@ type TransactionRun struct {
 	RequiredGates *[]testrunner.RequiredGate
 }
 
-func (tr TransactionRun) ResourceID() string {
-	return fmt.Sprintf("transaction/%s/run/%d", tr.TransactionID, tr.ID)
+func (tr TestSuiteRun) ResourceID() string {
+	return fmt.Sprintf("transaction/%s/run/%d", tr.TestSuiteID, tr.ID)
 }
 
-func (tr TransactionRun) ResultsCount() (pass, fail int) {
+func (tr TestSuiteRun) ResultsCount() (pass, fail int) {
 	if tr.Steps == nil {
 		return
 	}
@@ -59,7 +59,7 @@ func (tr TransactionRun) ResultsCount() (pass, fail int) {
 	return
 }
 
-func (tr TransactionRun) StepsGatesValidation() bool {
+func (tr TestSuiteRun) StepsGatesValidation() bool {
 	for _, step := range tr.Steps {
 		if !step.RequiredGatesResult.Passed {
 			return false

@@ -9,22 +9,22 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/variableset"
 )
 
-type transactionRunRepository interface {
+type testSuiteRunRepository interface {
 	transactionUpdater
-	CreateRun(context.Context, transaction.TransactionRun) (transaction.TransactionRun, error)
+	CreateRun(context.Context, testsuite.TestSuiteRun) (testsuite.TestSuiteRun, error)
 }
 
 type testRunner interface {
 	Run(context.Context, test.Test, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) test.Run
 }
 
-func NewTransactionRunner(
+func NewTestSuiteRunner(
 	testRunner testRunner,
-	transactionRuns transactionRunRepository,
+	transactionRuns testSuiteRunRepository,
 	subscriptionManager *subscription.Manager,
 ) *persistentTransactionRunner {
 	updater := (CompositeTransactionUpdater{}).
@@ -41,8 +41,8 @@ func NewTransactionRunner(
 
 type persistentTransactionRunner struct {
 	testRunner          testRunner
-	transactionRuns     transactionRunRepository
-	updater             TransactionRunUpdater
+	transactionRuns     testSuiteRunRepository
+	updater             TestSuiteRunUpdater
 	subscriptionManager *subscription.Manager
 }
 
@@ -51,25 +51,25 @@ func (r *persistentTransactionRunner) SetOutputQueue(_ Enqueuer) {
 }
 
 func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
-	tran := job.Transaction
-	run := job.TransactionRun
+	tran := job.TestSuite
+	run := job.TestSuiteRun
 
-	run.State = transaction.TransactionRunStateExecuting
+	run.State = testsuite.TestSuiteStateExecuting
 	err := r.updater.Update(ctx, run)
 	if err != nil {
 		log.Printf("[TransactionRunner] could not update transaction run: %s", err.Error())
 		return
 	}
 
-	log.Printf("[TransactionRunner] running transaction %s with %d steps", run.TransactionID, len(tran.Steps))
+	log.Printf("[TransactionRunner] running transaction %s with %d steps", run.TestSuiteID, len(tran.Steps))
 	for step, test := range tran.Steps {
 		run, err = r.runTransactionStep(ctx, run, step, test)
 		if err != nil {
-			log.Printf("[TransactionRunner] could not execute step %d of transaction %s: %s", step, run.TransactionID, err.Error())
+			log.Printf("[TransactionRunner] could not execute step %d of transaction %s: %s", step, run.TestSuiteID, err.Error())
 			return
 		}
 
-		if run.State == transaction.TransactionRunStateFailed {
+		if run.State == testsuite.TestSuiteStateFailed {
 			break
 		}
 
@@ -81,8 +81,8 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 		}
 	}
 
-	if run.State != transaction.TransactionRunStateFailed {
-		run.State = transaction.TransactionRunStateFinished
+	if run.State != testsuite.TestSuiteStateFailed {
+		run.State = testsuite.TestSuiteStateFinished
 	}
 
 	err = r.updater.Update(ctx, run)
@@ -92,11 +92,11 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 	}
 }
 
-func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr transaction.TransactionRun, step int, testObj test.Test) (transaction.TransactionRun, error) {
+func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr testsuite.TestSuiteRun, step int, testObj test.Test) (testsuite.TestSuiteRun, error) {
 	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.VariableSet, tr.RequiredGates)
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
-		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
+		return testsuite.TestSuiteRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
 	done := make(chan bool)
@@ -105,7 +105,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 		func(m subscription.Message) error {
 			testRun := m.Content.(test.Run)
 			if testRun.LastError != nil {
-				tr.State = transaction.TransactionRunStateFailed
+				tr.State = testsuite.TestSuiteStateFailed
 				tr.LastError = testRun.LastError
 			}
 
@@ -134,7 +134,7 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 	return tr, err
 }
 
-func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr transaction.TransactionRun, step int, run test.Run) (transaction.TransactionRun, error) {
+func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr testsuite.TestSuiteRun, step int, run test.Run) (testsuite.TestSuiteRun, error) {
 	if len(tr.Steps) <= step {
 		tr.Steps = append(tr.Steps, test.Run{})
 	}
@@ -142,7 +142,7 @@ func (r persistentTransactionRunner) updateStepRun(ctx context.Context, tr trans
 	tr.Steps[step] = run
 	err := r.updater.Update(ctx, tr)
 	if err != nil {
-		return transaction.TransactionRun{}, fmt.Errorf("could not update transaction run: %w", err)
+		return testsuite.TestSuiteRun{}, fmt.Errorf("could not update transaction run: %w", err)
 	}
 
 	return tr, nil

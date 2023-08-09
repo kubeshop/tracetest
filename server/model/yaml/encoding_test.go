@@ -58,11 +58,11 @@ func TestDecode(t *testing.T) {
 		},
 
 		{
-			name: "Transaction",
-			yaml: readFile("./testdata/transaction.yaml"),
+			name: "TestSuite",
+			yaml: readFile("./testdata/test-suite.yaml"),
 			file: yaml.File{
-				Type: yaml.FileTypeTransaction,
-				Spec: yaml.Transaction{
+				Type: yaml.FileTypeTestSuite,
+				Spec: yaml.TestSuite{
 					ID:   "ZsoMdf44R",
 					Name: "Get example",
 					Steps: []string{
@@ -72,9 +72,9 @@ func TestDecode(t *testing.T) {
 				},
 			},
 			testSpecFn: func(t *testing.T, expected, actual yaml.File) {
-				test, err := actual.Transaction()
+				test, err := actual.TestSuite()
 				require.NoError(t, err)
-				assert.Equal(t, expected.Spec.(yaml.Transaction), test)
+				assert.Equal(t, expected.Spec.(yaml.TestSuite), test)
 			},
 		},
 	}

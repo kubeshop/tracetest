@@ -32,7 +32,7 @@ type TestRun struct {
 	// time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	ExecutionTime int32 `json:"executionTime,omitempty"`
 
-	// time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	// time in milliseconds it took for the triggering testSuite to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	TriggerTime int32 `json:"triggerTime,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
@@ -61,9 +61,9 @@ type TestRun struct {
 
 	Metadata map[string]string `json:"metadata,omitempty"`
 
-	TransactionId string `json:"transactionId,omitempty"`
+	TestSuiteId string `json:"testSuiteId,omitempty"`
 
-	TransactionRunId string `json:"transactionRunId,omitempty"`
+	TestSuiteRunId string `json:"testSuiteRunId,omitempty"`
 }
 
 // AssertTestRunRequired checks if the required fields are not zero-ed

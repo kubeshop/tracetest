@@ -1,4 +1,4 @@
-package transaction
+package testsuite
 
 import (
 	"context"
@@ -15,11 +15,11 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 )
 
-type transactionStepRunRepository interface {
-	GetTransactionRunSteps(_ context.Context, _ id.ID, runID int) ([]test.Run, error)
+type testSuiteStepRunRepository interface {
+	GetTestSuiteRunSteps(_ context.Context, _ id.ID, runID int) ([]test.Run, error)
 }
 
-func NewRunRepository(db *sql.DB, stepsRepository transactionStepRunRepository) *RunRepository {
+func NewRunRepository(db *sql.DB, stepsRepository testSuiteStepRunRepository) *RunRepository {
 	return &RunRepository{
 		db:              db,
 		stepsRepository: stepsRepository,
@@ -28,14 +28,14 @@ func NewRunRepository(db *sql.DB, stepsRepository transactionStepRunRepository) 
 
 type RunRepository struct {
 	db              *sql.DB
-	stepsRepository transactionStepRunRepository
+	stepsRepository testSuiteStepRunRepository
 }
 
-const createTransactionRunQuery = `
-INSERT INTO transaction_runs (
+const createTestSuiteRunQuery = `
+INSERT INTO test_suite_runs (
 	"id",
-	"transaction_id",
-	"transaction_version",
+	"test_suite_id",
+	"test_suite_version",
 
 	-- timestamps
 	"created_at",
@@ -59,8 +59,8 @@ INSERT INTO transaction_runs (
 	"tenant_id"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
-	$1,   -- transaction_id
-	$2,   -- transaction_version
+	$1,   -- test_suite_id
+	$2,   -- test_suite_version
 
 	-- timestamps
 	$3,              -- created_at
@@ -93,35 +93,35 @@ func md5Hash(text string) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func replaceTransactionRunSequenceName(sql string, transactionID id.ID) string {
+func replaceTestSuiteRunSequenceName(sql string, ID id.ID) string {
 	// postgres doesn't like uppercase chars in sequence names.
 	// transactionID might contain uppercase chars, and we cannot lowercase them
 	// because they might lose their uniqueness.
 	// md5 creates a unique, lowercase hash.
-	seqName := "runs_transaction_" + md5Hash(transactionID.String()) + "_seq"
+	seqName := "runs_test_suite_" + md5Hash(ID.String()) + "_seq"
 	return strings.ReplaceAll(sql, runSequenceName, seqName)
 }
 
-func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (TransactionRun, error) {
+func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSuiteRun, error) {
 	jsonMetadata, err := json.Marshal(tr.Metadata)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run metadata: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("failed to marshal test_suite run metadata: %w", err)
 	}
 
 	jsonVariableSet, err := json.Marshal(tr.VariableSet)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("failed to marshal transaction run variable set: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("failed to marshal test_suite run variable set: %w", err)
 	}
 
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("sql beginTx: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, replaceTransactionRunSequenceName(createSequenceQuery, tr.TransactionID))
+	_, err = tx.ExecContext(ctx, replaceTestSuiteRunSequenceName(createSequenceQuery, tr.TestSuiteID))
 	if err != nil {
 		tx.Rollback()
-		return TransactionRun{}, fmt.Errorf("sql exec: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
 	tenantID := sqlutil.TenantID(ctx)
@@ -129,9 +129,9 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 	var runID int
 	err = tx.QueryRowContext(
 		ctx,
-		replaceTransactionRunSequenceName(createTransactionRunQuery, tr.TransactionID),
-		tr.TransactionID,
-		tr.TransactionVersion,
+		replaceTestSuiteRunSequenceName(createTestSuiteRunQuery, tr.TestSuiteID),
+		tr.TestSuiteID,
+		tr.TestSuiteVersion,
 		tr.CreatedAt,
 		tr.State,
 		tr.CurrentTest,
@@ -141,12 +141,12 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
-		return TransactionRun{}, fmt.Errorf("sql exec: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("commit: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("commit: %w", err)
 	}
 
 	tr.ID = runID
@@ -154,8 +154,8 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TransactionRun) (Tran
 	return tr, nil
 }
 
-const updateTransactionRunQuery = `
-UPDATE transaction_runs SET
+const updateTestSuiteRunQuery = `
+UPDATE test_suite_runs SET
 
 	-- timestamps
 	"completed_at" = $1,
@@ -175,10 +175,10 @@ UPDATE transaction_runs SET
 	-- variable_set
 	"variable_set" = $9
 
-WHERE id = $10 AND transaction_id = $11
+WHERE id = $10 AND test_suite_id = $11
 `
 
-func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error {
+func (td *RunRepository) UpdateRun(ctx context.Context, tr TestSuiteRun) error {
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
@@ -186,12 +186,12 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 
 	jsonMetadata, err := json.Marshal(tr.Metadata)
 	if err != nil {
-		return fmt.Errorf("failed to marshal transaction run metadata: %w", err)
+		return fmt.Errorf("failed to marshal test_suite run metadata: %w", err)
 	}
 
 	jsonVariableSet, err := json.Marshal(tr.VariableSet)
 	if err != nil {
-		return fmt.Errorf("failed to marshal transaction run variableSet: %w", err)
+		return fmt.Errorf("failed to marshal test_suite run variableSet: %w", err)
 	}
 	var lastError *string
 	if tr.LastError != nil {
@@ -204,7 +204,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 
 	query, params := sqlutil.Tenant(
 		ctx,
-		updateTransactionRunQuery,
+		updateTestSuiteRunQuery,
 		tr.CompletedAt,
 		tr.State,
 		tr.CurrentTest,
@@ -215,7 +215,7 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		jsonMetadata,
 		jsonVariableSet,
 		strconv.Itoa(tr.ID),
-		tr.TransactionID,
+		tr.TestSuiteID,
 	)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -230,12 +230,12 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TransactionRun) error
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
-	return td.setTransactionRunSteps(ctx, tx, tr)
+	return td.setTestSuiteRunSteps(ctx, tx, tr)
 }
 
-func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx, tr TransactionRun) error {
+func (td *RunRepository) setTestSuiteRunSteps(ctx context.Context, tx *sql.Tx, tr TestSuiteRun) error {
 	// delete existing steps
-	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", strconv.Itoa(tr.ID), tr.TransactionID)
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM test_suite_run_steps WHERE test_suite_run_id = $1 AND test_suite_run_test_suite_id = $2", strconv.Itoa(tr.ID), tr.TestSuiteID)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -243,7 +243,7 @@ func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx,
 
 	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
-		return fmt.Errorf("cannot reset transaction run steps: %w", err)
+		return fmt.Errorf("cannot reset test_suite run steps: %w", err)
 	}
 
 	if len(tr.Steps) == 0 {
@@ -262,52 +262,52 @@ func (td *RunRepository) setTransactionRunSteps(ctx context.Context, tx *sql.Tx,
 		if tenantID == nil {
 			values = append(
 				values,
-				fmt.Sprintf("('%d', '%s', %d, '%s', NULL)", tr.ID, tr.TransactionID, run.ID, run.TestID),
+				fmt.Sprintf("('%d', '%s', %d, '%s', NULL)", tr.ID, tr.TestSuiteID, run.ID, run.TestID),
 			)
 		} else {
 			values = append(
 				values,
-				fmt.Sprintf("('%d', '%s', %d, '%s', '%s')", tr.ID, tr.TransactionID, run.ID, run.TestID, *tenantID),
+				fmt.Sprintf("('%d', '%s', %d, '%s', '%s')", tr.ID, tr.TestSuiteID, run.ID, run.TestID, *tenantID),
 			)
 		}
 	}
 
-	sql := "INSERT INTO transaction_run_steps VALUES " + strings.Join(values, ", ")
+	sql := "INSERT INTO test_suite_run_steps VALUES " + strings.Join(values, ", ")
 	_, err = tx.ExecContext(ctx, sql)
 	if err != nil {
-		return fmt.Errorf("cannot save transaction run steps: %w", err)
+		return fmt.Errorf("cannot save test_suite run steps: %w", err)
 	}
 	return tx.Commit()
 }
 
-func (td *RunRepository) DeleteTransactionRun(ctx context.Context, tr TransactionRun) error {
+func (td *RunRepository) DeleteTestSuiteRun(ctx context.Context, tr TestSuiteRun) error {
 	tx, err := td.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	query, params := sqlutil.Tenant(ctx, "DELETE FROM transaction_run_steps WHERE transaction_run_id = $1 AND transaction_run_transaction_id = $2", tr.ID, tr.TransactionID)
+	query, params := sqlutil.Tenant(ctx, "DELETE FROM test_suite_run_steps WHERE test_suite_run_id = $1 AND test_suite_run_test_suite_id = $2", tr.ID, tr.TestSuiteID)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("delete transaction run steps: %w", err)
+		return fmt.Errorf("delete test_suite run steps: %w", err)
 	}
 
-	query, params = sqlutil.Tenant(ctx, "DELETE FROM transaction_runs WHERE id = $1 AND transaction_id = $2", tr.ID, tr.TransactionID)
+	query, params = sqlutil.Tenant(ctx, "DELETE FROM test_suite_runs WHERE id = $1 AND test_suite_id = $2", tr.ID, tr.TestSuiteID)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("delete transaction runs: %w", err)
+		return fmt.Errorf("delete test_suite runs: %w", err)
 	}
 
 	return tx.Commit()
 }
 
-const selectTransactionRunQuery = `
+const selectTestSuiteRunQuery = `
 SELECT
 	"id",
-	"transaction_id",
-	"transaction_version",
+	"test_suite_id",
+	"test_suite_version",
 
 	"created_at",
 	"completed_at",
@@ -323,69 +323,69 @@ SELECT
 	"metadata",
 
 	"variable_set"
-FROM transaction_runs
+FROM test_suite_runs
 `
 
-func (td *RunRepository) GetTransactionRun(ctx context.Context, transactionID id.ID, runID int) (TransactionRun, error) {
-	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE id = $1 AND transaction_id = $2", strconv.Itoa(runID), transactionID)
+func (td *RunRepository) GetTestSuiteRun(ctx context.Context, ID id.ID, runID int) (TestSuiteRun, error) {
+	query, params := sqlutil.Tenant(ctx, selectTestSuiteRunQuery+" WHERE id = $1 AND test_suite_id = $2", strconv.Itoa(runID), ID)
 	stmt, err := td.db.Prepare(query)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
 	run, err := td.readRunRow(stmt.QueryRowContext(ctx, params...))
 	if err != nil {
-		return TransactionRun{}, err
+		return TestSuiteRun{}, err
 	}
-	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run.TransactionID, run.ID)
+	run.Steps, err = td.stepsRepository.GetTestSuiteRunSteps(ctx, run.TestSuiteID, run.ID)
 	if err != nil {
-		return TransactionRun{}, err
+		return TestSuiteRun{}, err
 	}
 	return run, nil
 }
 
-func (td *RunRepository) GetLatestRunByTransactionVersion(ctx context.Context, transactionID id.ID, version int) (TransactionRun, error) {
+func (td *RunRepository) GetLatestRunByTestSuiteVersion(ctx context.Context, ID id.ID, version int) (TestSuiteRun, error) {
 	sortQuery := "ORDER BY created_at DESC LIMIT 1"
-	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE transaction_id = $1 AND transaction_version = $2", transactionID, version)
+	query, params := sqlutil.Tenant(ctx, selectTestSuiteRunQuery+" WHERE test_suite_id = $1 AND test_suite_version = $2", ID, version)
 	stmt, err := td.db.Prepare(query + sortQuery)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("prepare: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
 	run, err := td.readRunRow(stmt.QueryRowContext(ctx, params...))
 	if err != nil {
-		return TransactionRun{}, err
+		return TestSuiteRun{}, err
 	}
-	run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run.TransactionID, run.ID)
+	run.Steps, err = td.stepsRepository.GetTestSuiteRunSteps(ctx, run.TestSuiteID, run.ID)
 	if err != nil {
-		return TransactionRun{}, err
+		return TestSuiteRun{}, err
 	}
 	return run, nil
 }
 
-func (td *RunRepository) GetTransactionsRuns(ctx context.Context, transactionID id.ID, take, skip int32) ([]TransactionRun, error) {
+func (td *RunRepository) GetTestSuiteRuns(ctx context.Context, ID id.ID, take, skip int32) ([]TestSuiteRun, error) {
 	sortQuery := "ORDER BY created_at DESC LIMIT $2 OFFSET $3"
-	query, params := sqlutil.Tenant(ctx, selectTransactionRunQuery+" WHERE transaction_id = $1", transactionID.String(), take, skip)
+	query, params := sqlutil.Tenant(ctx, selectTestSuiteRunQuery+" WHERE test_suite_id = $1", ID.String(), take, skip)
 	stmt, err := td.db.Prepare(query + sortQuery)
 	if err != nil {
-		return []TransactionRun{}, fmt.Errorf("prepare: %w", err)
+		return []TestSuiteRun{}, fmt.Errorf("prepare: %w", err)
 	}
 
 	rows, err := stmt.QueryContext(ctx, params...)
 	if err != nil {
-		return []TransactionRun{}, fmt.Errorf("query: %w", err)
+		return []TestSuiteRun{}, fmt.Errorf("query: %w", err)
 	}
 
-	var runs []TransactionRun
+	var runs []TestSuiteRun
 	for rows.Next() {
 		run, err := td.readRunRow(rows)
 		if err != nil {
-			return []TransactionRun{}, err
+			return []TestSuiteRun{}, err
 		}
 
-		run.Steps, err = td.stepsRepository.GetTransactionRunSteps(ctx, run.TransactionID, run.ID)
+		run.Steps, err = td.stepsRepository.GetTestSuiteRunSteps(ctx, run.TestSuiteID, run.ID)
 		if err != nil {
-			return []TransactionRun{}, err
+			return []TestSuiteRun{}, err
 		}
 
 		runs = append(runs, run)
@@ -394,8 +394,8 @@ func (td *RunRepository) GetTransactionsRuns(ctx context.Context, transactionID 
 	return runs, nil
 }
 
-func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
-	r := TransactionRun{}
+func (td *RunRepository) readRunRow(row scanner) (TestSuiteRun, error) {
+	r := TestSuiteRun{}
 
 	var (
 		jsonVariableSet,
@@ -410,8 +410,8 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 
 	err := row.Scan(
 		&r.ID,
-		&r.TransactionID,
-		&r.TransactionVersion,
+		&r.TestSuiteID,
+		&r.TestSuiteVersion,
 		&r.CreatedAt,
 		&r.CompletedAt,
 		&r.State,
@@ -424,17 +424,17 @@ func (td *RunRepository) readRunRow(row scanner) (TransactionRun, error) {
 		&jsonVariableSet,
 	)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("cannot read row: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
 	err = json.Unmarshal(jsonMetadata, &r.Metadata)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("cannot parse Metadata: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("cannot parse Metadata: %w", err)
 	}
 
 	err = json.Unmarshal(jsonVariableSet, &r.VariableSet)
 	if err != nil {
-		return TransactionRun{}, fmt.Errorf("cannot parse VariableSet: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("cannot parse VariableSet: %w", err)
 	}
 
 	if lastError != nil && *lastError != "" {

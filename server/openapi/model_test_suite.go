@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-type Transaction struct {
+type TestSuite struct {
 	Id string `json:"id,omitempty"`
 
 	Name string `json:"name,omitempty"`
@@ -23,10 +23,10 @@ type Transaction struct {
 	// version number of the test
 	Version int32 `json:"version,omitempty"`
 
-	// list of steps of the transaction containing just each test id
+	// list of steps of the TestSuite containing just each test id
 	Steps []string `json:"steps,omitempty"`
 
-	// list of steps of the transaction containing the whole test object
+	// list of steps of the TestSuite containing the whole test object
 	FullSteps []Test `json:"fullSteps,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
@@ -34,8 +34,8 @@ type Transaction struct {
 	Summary TestSummary `json:"summary,omitempty"`
 }
 
-// AssertTransactionRequired checks if the required fields are not zero-ed
-func AssertTransactionRequired(obj Transaction) error {
+// AssertTestSuiteRequired checks if the required fields are not zero-ed
+func AssertTestSuiteRequired(obj TestSuite) error {
 	for _, el := range obj.FullSteps {
 		if err := AssertTestRequired(el); err != nil {
 			return err
@@ -47,14 +47,14 @@ func AssertTransactionRequired(obj Transaction) error {
 	return nil
 }
 
-// AssertRecurseTransactionRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of Transaction (e.g. [][]Transaction), otherwise ErrTypeAssertionError is thrown.
-func AssertRecurseTransactionRequired(objSlice interface{}) error {
+// AssertRecurseTestSuiteRequired recursively checks if required fields are not zero-ed in a nested slice.
+// Accepts only nested slice of TestSuite (e.g. [][]TestSuite), otherwise ErrTypeAssertionError is thrown.
+func AssertRecurseTestSuiteRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aTransaction, ok := obj.(Transaction)
+		aTestSuite, ok := obj.(TestSuite)
 		if !ok {
 			return ErrTypeAssertionError
 		}
-		return AssertTransactionRequired(aTransaction)
+		return AssertTestSuiteRequired(aTestSuite)
 	})
 }

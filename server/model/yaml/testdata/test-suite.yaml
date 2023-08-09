@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   id: ZsoMdf44R
   name: Get example

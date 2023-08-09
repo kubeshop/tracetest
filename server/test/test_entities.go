@@ -128,8 +128,8 @@ type (
 
 		// transaction
 
-		TransactionID       string
-		TransactionRunID    string
+		TestSuiteID         string
+		TestSuiteRunID      string
 		Linter              analyzer.LinterResult
 		RequiredGatesResult testrunner.RequiredGatesResult
 	}

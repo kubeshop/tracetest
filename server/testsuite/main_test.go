@@ -1,4 +1,4 @@
-package transaction_test
+package testsuite_test
 
 import (
 	"os"

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-type TransactionRun struct {
+type TestSuiteRun struct {
 	Id string `json:"id,omitempty"`
 
 	Version int32 `json:"version,omitempty"`
@@ -37,8 +37,8 @@ type TransactionRun struct {
 	AllStepsRequiredGatesPassed bool `json:"allStepsRequiredGatesPassed,omitempty"`
 }
 
-// AssertTransactionRunRequired checks if the required fields are not zero-ed
-func AssertTransactionRunRequired(obj TransactionRun) error {
+// AssertTestSuiteRunRequired checks if the required fields are not zero-ed
+func AssertTestSuiteRunRequired(obj TestSuiteRun) error {
 	for _, el := range obj.Steps {
 		if err := AssertTestRunRequired(el); err != nil {
 			return err
@@ -50,14 +50,14 @@ func AssertTransactionRunRequired(obj TransactionRun) error {
 	return nil
 }
 
-// AssertRecurseTransactionRunRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of TransactionRun (e.g. [][]TransactionRun), otherwise ErrTypeAssertionError is thrown.
-func AssertRecurseTransactionRunRequired(objSlice interface{}) error {
+// AssertRecurseTestSuiteRunRequired recursively checks if required fields are not zero-ed in a nested slice.
+// Accepts only nested slice of TestSuiteRun (e.g. [][]TestSuiteRun), otherwise ErrTypeAssertionError is thrown.
+func AssertRecurseTestSuiteRunRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aTransactionRun, ok := obj.(TransactionRun)
+		aTestSuiteRun, ok := obj.(TestSuiteRun)
 		if !ok {
 			return ErrTypeAssertionError
 		}
-		return AssertTransactionRunRequired(aTransactionRun)
+		return AssertTestSuiteRunRequired(aTestSuiteRun)
 	})
 }

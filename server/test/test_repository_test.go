@@ -14,7 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testmock"
-	"github.com/kubeshop/tracetest/server/transaction"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -166,7 +166,7 @@ func TestIfDeleteTestsCascadeDeletes(t *testing.T) {
 		Outputs: test.Outputs{},
 	}
 
-	var transactionSample = transaction.Transaction{
+	var transactionSample = testsuite.TestSuite{
 		ID:          "a98s76de",
 		Name:        "Verify Import",
 		Description: "check the working of the import flow",
@@ -181,8 +181,8 @@ func TestIfDeleteTestsCascadeDeletes(t *testing.T) {
 
 	testRepository := test.NewRepository(db)
 	runRepository := test.NewRunRepository(db)
-	transactionRepository := transaction.NewRepository(db, testRepository)
-	transactionRunRepository := transaction.NewRunRepository(db, runRepository)
+	transactionRepository := testsuite.NewRepository(db, testRepository)
+	transactionRunRepository := testsuite.NewRunRepository(db, runRepository)
 
 	_, err := testRepository.Create(context.TODO(), testSample)
 	require.NoError(t, err)
@@ -213,7 +213,7 @@ func TestIfDeleteTestsCascadeDeletes(t *testing.T) {
 	err = testRepository.Delete(context.TODO(), testSample.ID)
 	require.NoError(t, err)
 
-	recentTransactionRun, err := transactionRunRepository.GetTransactionRun(context.TODO(), transactionSample.ID, transactionRun.ID)
+	recentTransactionRun, err := transactionRunRepository.GetTestSuiteRun(context.TODO(), transactionSample.ID, transactionRun.ID)
 	require.NoError(t, err)
 	assert.Len(t, recentTransactionRun.Steps, 1)
 
