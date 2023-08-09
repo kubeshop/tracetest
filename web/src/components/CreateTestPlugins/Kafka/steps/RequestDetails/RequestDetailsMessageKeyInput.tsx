@@ -7,7 +7,7 @@ const RequestDetailsMessageKey = () => {
   return (
     <div>
       <S.Label>Message Key</S.Label>
-      <Form.Item data-cy="message-key" name="messageKey" rules={[{required: true, message: 'Please enter a message key'}]}>
+      <Form.Item data-cy="message-key" name="messageKey">
         <Editor type={SupportedEditors.Interpolation} placeholder="Enter a message key / identifier (Optional)" />
       </Form.Item>
     </div>

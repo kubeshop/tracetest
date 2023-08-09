@@ -19,7 +19,7 @@ export const PlainFields = ({baseName}: IProps) => (
         label="Username"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} />
+        <Editor type={SupportedEditors.Interpolation} placeholder='Kafka Plain Username' />
       </Form.Item>
       <Form.Item
         style={{flexBasis: '49%', marginTop: '26px'}}
@@ -28,7 +28,7 @@ export const PlainFields = ({baseName}: IProps) => (
         data-cy="plain-password"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} />
+        <Editor type={SupportedEditors.Interpolation} placeholder='Kafka Plain Password' />
       </Form.Item>
     </R.FlexContainer>
   </S.Row>

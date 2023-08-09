@@ -15,7 +15,7 @@ function isFirstItem(index: number) {
 const RequestDetailsUrlInput = ({
   name = ['brokerUrls'],
 }: IProps) => (
-  <Form.Item className="input-url" label="Broker URLs" shouldUpdate>
+  <Form.Item className="input-url" label="Broker URLs" rules={[{required: true, min: 1, message: 'Please enter a Broker URL'}]} shouldUpdate>
     <Form.List name={name.length === 1 ? name[0] : name}>
       {(fields, {add, remove}) => (
         <>
