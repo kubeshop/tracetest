@@ -162,7 +162,7 @@ func (s *ResourceApiApiService) DeleteTest(ctx context.Context, testId string) (
 }
 
 // DeleteTestSuite - delete a TestSuite
-func (s *ResourceApiApiService) DeleteTestSuite(ctx context.Context, testsuiteId string) (ImplResponse, error) {
+func (s *ResourceApiApiService) DeleteTestSuite(ctx context.Context, testSuiteId string) (ImplResponse, error) {
 	// TODO - update DeleteTestSuite with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -281,7 +281,7 @@ func (s *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 }
 
 // GetTestSuite - get TestSuite
-func (s *ResourceApiApiService) GetTestSuite(ctx context.Context, testsuiteId string) (ImplResponse, error) {
+func (s *ResourceApiApiService) GetTestSuite(ctx context.Context, testSuiteId string) (ImplResponse, error) {
 	// TODO - update GetTestSuite with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -561,7 +561,7 @@ func (s *ResourceApiApiService) UpdateTest(ctx context.Context, testId string, t
 }
 
 // UpdateTestSuite - update TestSuite
-func (s *ResourceApiApiService) UpdateTestSuite(ctx context.Context, testsuiteId string, testSuiteResource TestSuiteResource) (ImplResponse, error) {
+func (s *ResourceApiApiService) UpdateTestSuite(ctx context.Context, testSuiteId string, testSuiteResource TestSuiteResource) (ImplResponse, error) {
 	// TODO - update UpdateTestSuite with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 

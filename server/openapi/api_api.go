@@ -59,7 +59,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"DeleteTestSuiteRun",
 			strings.ToUpper("Delete"),
-			"/api/testsuites/{testsuiteId}/run/{runId}",
+			"/api/testsuites/{testSuiteId}/run/{runId}",
 			c.DeleteTestSuiteRun,
 		},
 		{
@@ -125,19 +125,19 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetTestSuiteRun",
 			strings.ToUpper("Get"),
-			"/api/testsuites/{testsuiteId}/run/{runId}",
+			"/api/testsuites/{testSuiteId}/run/{runId}",
 			c.GetTestSuiteRun,
 		},
 		{
 			"GetTestSuiteRuns",
 			strings.ToUpper("Get"),
-			"/api/testsuites/{testsuiteId}/run",
+			"/api/testsuites/{testSuiteId}/run",
 			c.GetTestSuiteRuns,
 		},
 		{
 			"GetTestSuiteVersion",
 			strings.ToUpper("Get"),
-			"/api/testsuites/{testsuiteId}/version/{version}",
+			"/api/testsuites/{testSuiteId}/version/{version}",
 			c.GetTestSuiteVersion,
 		},
 		{
@@ -173,7 +173,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"RunTestSuite",
 			strings.ToUpper("Post"),
-			"/api/testsuites/{testsuiteId}/run",
+			"/api/testsuites/{testSuiteId}/run",
 			c.RunTestSuite,
 		},
 		{
@@ -216,7 +216,7 @@ func (c *ApiApiController) DeleteTestRun(w http.ResponseWriter, r *http.Request)
 // DeleteTestSuiteRun - Delete a specific run from a particular TestSuite
 func (c *ApiApiController) DeleteTestSuiteRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	runIdParam, err := parseInt32Parameter(params["runId"], true)
 	if err != nil {
@@ -224,7 +224,7 @@ func (c *ApiApiController) DeleteTestSuiteRun(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	result, err := c.service.DeleteTestSuiteRun(r.Context(), testsuiteIdParam, runIdParam)
+	result, err := c.service.DeleteTestSuiteRun(r.Context(), testSuiteIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -477,7 +477,7 @@ func (c *ApiApiController) GetTestSpecs(w http.ResponseWriter, r *http.Request) 
 // GetTestSuiteRun - Get a specific run from a particular TestSuite
 func (c *ApiApiController) GetTestSuiteRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	runIdParam, err := parseInt32Parameter(params["runId"], true)
 	if err != nil {
@@ -485,7 +485,7 @@ func (c *ApiApiController) GetTestSuiteRun(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	result, err := c.service.GetTestSuiteRun(r.Context(), testsuiteIdParam, runIdParam)
+	result, err := c.service.GetTestSuiteRun(r.Context(), testSuiteIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -500,7 +500,7 @@ func (c *ApiApiController) GetTestSuiteRun(w http.ResponseWriter, r *http.Reques
 func (c *ApiApiController) GetTestSuiteRuns(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	query := r.URL.Query()
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	takeParam, err := parseInt32Parameter(query.Get("take"), false)
 	if err != nil {
@@ -512,7 +512,7 @@ func (c *ApiApiController) GetTestSuiteRuns(w http.ResponseWriter, r *http.Reque
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetTestSuiteRuns(r.Context(), testsuiteIdParam, takeParam, skipParam)
+	result, err := c.service.GetTestSuiteRuns(r.Context(), testSuiteIdParam, takeParam, skipParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -526,7 +526,7 @@ func (c *ApiApiController) GetTestSuiteRuns(w http.ResponseWriter, r *http.Reque
 // GetTestSuiteVersion - get a TestSuite specific version
 func (c *ApiApiController) GetTestSuiteVersion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	versionParam, err := parseInt32Parameter(params["version"], true)
 	if err != nil {
@@ -534,7 +534,7 @@ func (c *ApiApiController) GetTestSuiteVersion(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	result, err := c.service.GetTestSuiteVersion(r.Context(), testsuiteIdParam, versionParam)
+	result, err := c.service.GetTestSuiteVersion(r.Context(), testSuiteIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -656,7 +656,7 @@ func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 // RunTestSuite - run TestSuite
 func (c *ApiApiController) RunTestSuite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	testsuiteIdParam := params["testsuiteId"]
+	testSuiteIdParam := params["testSuiteId"]
 
 	runInformationParam := RunInformation{}
 	d := json.NewDecoder(r.Body)
@@ -669,7 +669,7 @@ func (c *ApiApiController) RunTestSuite(w http.ResponseWriter, r *http.Request) 
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.RunTestSuite(r.Context(), testsuiteIdParam, runInformationParam)
+	result, err := c.service.RunTestSuite(r.Context(), testSuiteIdParam, runInformationParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

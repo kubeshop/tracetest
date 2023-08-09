@@ -579,7 +579,7 @@ func (c *controller) DeleteTestSuiteRun(ctx context.Context, transactionId strin
 func (c *controller) GetResources(ctx context.Context, take, skip int32, query, sortBy, sortDirection string) (openapi.ImplResponse, error) {
 	// TODO: this is endpoint is a hack to unblock the team quickly.
 	// This is not production ready because it might take too long to respond if there are numerous
-	// transactions and testsuite.
+	// tests and testsuite.
 
 	if take == 0 {
 		take = 20
