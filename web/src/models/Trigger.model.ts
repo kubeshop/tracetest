@@ -35,8 +35,15 @@ const EntryData = {
     };
   },
   [TriggerTypes.kafka](request: object) {
+    let entryPoint = '';
+
+    const kafkaRequest = request as KafkaRequest;
+    if (kafkaRequest) {
+      entryPoint = kafkaRequest.brokerUrls.join(', ');
+    }
+
     return {
-      entryPoint: get(request, 'brokerUrls[0]', ''),
+      entryPoint,
       method: 'Kafka',
     };
   },
@@ -55,11 +62,6 @@ const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid =
   } else if (type === TriggerTypes.kafka) {
     request = KafkaRequest(kafka);
   }
-
-  console.log('----------------------------------------');
-  console.log(kafka);
-  console.log(request);
-  console.log('----------------------------------------');
 
   const {entryPoint, method} = EntryData[type || TriggerTypes.http](request);
 
