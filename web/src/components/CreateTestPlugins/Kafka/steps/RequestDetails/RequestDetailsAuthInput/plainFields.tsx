@@ -14,8 +14,8 @@ export const PlainFields = ({baseName}: IProps) => (
     <R.FlexContainer>
       <Form.Item
         style={{flexBasis: '49%', marginTop: '26px', marginRight: '2px'}}
-        name={[...baseName, 'basic', 'username']}
-        data-cy="basic-username"
+        name={[...baseName, 'plain', 'username']}
+        data-cy="plain-username"
         label="Username"
         rules={[{required: true}]}
       >
@@ -23,9 +23,9 @@ export const PlainFields = ({baseName}: IProps) => (
       </Form.Item>
       <Form.Item
         style={{flexBasis: '49%', marginTop: '26px'}}
-        name={[...baseName, 'basic', 'password']}
+        name={[...baseName, 'plain', 'password']}
         label="Password"
-        data-cy="basic-password"
+        data-cy="plain-password"
         rules={[{required: true}]}
       >
         <Editor type={SupportedEditors.Interpolation} />

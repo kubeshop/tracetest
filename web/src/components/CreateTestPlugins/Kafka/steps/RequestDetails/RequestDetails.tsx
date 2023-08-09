@@ -47,6 +47,7 @@ const RequestDetails = () => {
           onFinish={handleSubmit}
           onValuesChange={onValidate}
           initialValues={{
+            brokerUrls: [''],
             headers: [{key: '', value: ''}],
           }}
         >

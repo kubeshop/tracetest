@@ -3,11 +3,7 @@ import {SupportedEditors} from 'constants/Editor.constants';
 import Editor from 'components/Editor';
 import * as S from './RequestDetails.styled';
 
-interface IProps {
-
-}
-
-const RequestDetailsTopic = (form: IProps) => {
+const RequestDetailsTopic = () => {
   return (
     <div>
       <S.Label>Topic</S.Label>

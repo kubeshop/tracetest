@@ -6,7 +6,7 @@ interface IProps {
   name?: string[];
 }
 
-const RequestDetailsAuthInput = ({name = ['auth']}: IProps) => (
+const RequestDetailsAuthInput = ({name = ['authentication']}: IProps) => (
   <div>
     <TypeInput baseName={name} />
     <Form.Item noStyle shouldUpdate style={{marginBottom: 0, width: '100%'}}>

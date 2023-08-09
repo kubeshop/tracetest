@@ -21,7 +21,6 @@ export const BrokerURLInputContainer = styled.div<{$firstItem: boolean}>`
   }
 `;
 
-
 export const HeaderContainer = styled.div`
   align-items: center;
   display: grid;

@@ -13,7 +13,7 @@ function isFirstItem(index: number) {
 }
 
 const RequestDetailsUrlInput = ({
-  name = ['urls'],
+  name = ['brokerUrls'],
 }: IProps) => (
   <Form.Item className="input-url" label="Broker URLs" shouldUpdate>
     <Form.List name={name.length === 1 ? name[0] : name}>
