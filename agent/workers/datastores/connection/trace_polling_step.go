@@ -5,11 +5,12 @@ import (
 	"errors"
 
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type DataStore interface {
-	GetTraceByID(context.Context, string) (model.Trace, error)
+	GetTraceByID(context.Context, string) (traces.Trace, error)
 	GetTraceID() trace.TraceID
 }
 

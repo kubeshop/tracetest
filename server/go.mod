@@ -2,8 +2,6 @@ module github.com/kubeshop/tracetest/server
 
 go 1.20
 
-replace k8s.io/client-go => k8s.io/client-go v0.18.0
-
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.0

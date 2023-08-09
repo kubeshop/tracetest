@@ -20,6 +20,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+	"github.com/kubeshop/tracetest/server/traces"
 	conventions "go.opentelemetry.io/collector/semconv/v1.6.1"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -110,15 +111,15 @@ func (db *awsxrayDB) TestConnection(ctx context.Context) model.ConnectionResult 
 	return tester.TestConnection(ctx)
 }
 
-func (db *awsxrayDB) GetTraceByID(ctx context.Context, traceID string) (model.Trace, error) {
+func (db *awsxrayDB) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	hexTraceID, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
 	parsedTraceID, err := convertToAmazonTraceID(hexTraceID)
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
 	res, err := db.service.BatchGetTraces(&xray.BatchGetTracesInput{
@@ -126,58 +127,58 @@ func (db *awsxrayDB) GetTraceByID(ctx context.Context, traceID string) (model.Tr
 	})
 
 	if err != nil {
-		return model.Trace{}, err
+		return traces.Trace{}, err
 	}
 
 	if len(res.Traces) == 0 {
-		return model.Trace{}, connection.ErrTraceNotFound
+		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
 	return parseXRayTrace(traceID, res.Traces[0])
 }
 
-func parseXRayTrace(traceID string, rawTrace *xray.Trace) (model.Trace, error) {
+func parseXRayTrace(traceID string, rawTrace *xray.Trace) (traces.Trace, error) {
 	if len(rawTrace.Segments) == 0 {
-		return model.Trace{}, nil
+		return traces.Trace{}, nil
 	}
 
-	spans := []model.Span{}
+	spans := []traces.Span{}
 
 	for _, segment := range rawTrace.Segments {
 		newSpans, err := parseSegmentToSpans([]byte(*segment.Document), traceID)
 
 		if err != nil {
-			return model.Trace{}, err
+			return traces.Trace{}, err
 		}
 
 		spans = append(spans, newSpans...)
 	}
 
-	return model.NewTrace(traceID, spans), nil
+	return traces.NewTrace(traceID, spans), nil
 }
 
-func parseSegmentToSpans(rawSeg []byte, traceID string) ([]model.Span, error) {
+func parseSegmentToSpans(rawSeg []byte, traceID string) ([]traces.Span, error) {
 	var seg segment
 	err := json.Unmarshal(rawSeg, &seg)
 	if err != nil {
-		return []model.Span{}, err
+		return []traces.Span{}, err
 	}
 
 	err = seg.Validate()
 	if err != nil {
-		return []model.Span{}, err
+		return []traces.Span{}, err
 	}
 
 	return segToSpans(seg, traceID, nil)
 }
 
-func segToSpans(seg segment, traceID string, parent *model.Span) ([]model.Span, error) {
+func segToSpans(seg segment, traceID string, parent *traces.Span) ([]traces.Span, error) {
 	span, err := generateSpan(&seg, parent)
 	if err != nil {
-		return []model.Span{}, err
+		return []traces.Span{}, err
 	}
 
-	spans := []model.Span{span}
+	spans := []traces.Span{span}
 
 	for _, s := range seg.Subsegments {
 		nestedSpans, err := segToSpans(s, traceID, &span)
@@ -192,9 +193,9 @@ func segToSpans(seg segment, traceID string, parent *model.Span) ([]model.Span, 
 	return spans, nil
 }
 
-func generateSpan(seg *segment, parent *model.Span) (model.Span, error) {
-	attributes := make(model.Attributes, 0)
-	span := model.Span{
+func generateSpan(seg *segment, parent *traces.Span) (traces.Span, error) {
+	attributes := make(traces.Attributes, 0)
+	span := traces.Span{
 		Parent: parent,
 		Name:   *seg.Name,
 	}
@@ -205,9 +206,9 @@ func generateSpan(seg *segment, parent *model.Span) (model.Span, error) {
 			return span, err
 		}
 
-		attributes[model.TracetestMetadataFieldParentID] = parentID.String()
+		attributes[traces.TracetestMetadataFieldParentID] = parentID.String()
 	} else if parent != nil {
-		attributes[model.TracetestMetadataFieldParentID] = parent.ID.String()
+		attributes[traces.TracetestMetadataFieldParentID] = parent.ID.String()
 	}
 
 	// decode span id
@@ -219,7 +220,7 @@ func generateSpan(seg *segment, parent *model.Span) (model.Span, error) {
 
 	err = addNamespace(seg, attributes)
 	if err != nil {
-		return model.Span{}, err
+		return traces.Span{}, err
 	}
 
 	span.StartTime = floatSecToTime(seg.StartTime)
@@ -236,7 +237,7 @@ func generateSpan(seg *segment, parent *model.Span) (model.Span, error) {
 	addAWSToSpan(seg.AWS, attributes)
 	err = addSQLToSpan(seg.SQL, attributes)
 	if err != nil {
-		return model.Span{}, err
+		return traces.Span{}, err
 	}
 
 	if seg.Traced != nil {
@@ -258,7 +259,7 @@ const (
 	validRemoteNamespace = "remote"
 )
 
-func addNamespace(seg *segment, attributes model.Attributes) error {
+func addNamespace(seg *segment, attributes traces.Attributes) error {
 	if seg.Namespace != nil {
 		switch *seg.Namespace {
 		case validAWSNamespace:
@@ -275,7 +276,7 @@ func addNamespace(seg *segment, attributes model.Attributes) error {
 	return nil
 }
 
-func addHTTP(seg *segment, attributes model.Attributes) {
+func addHTTP(seg *segment, attributes traces.Attributes) {
 	if seg.HTTP == nil {
 		return
 	}
@@ -306,7 +307,7 @@ func addHTTP(seg *segment, attributes model.Attributes) {
 	}
 }
 
-func addAWSToSpan(aws *aWSData, attrs model.Attributes) {
+func addAWSToSpan(aws *aWSData, attrs traces.Attributes) {
 	if aws != nil {
 		attrs.SetPointerValue(AWSAccountAttribute, aws.AccountID)
 		attrs.SetPointerValue(AWSOperationAttribute, aws.Operation)
@@ -321,7 +322,7 @@ func addAWSToSpan(aws *aWSData, attrs model.Attributes) {
 	}
 }
 
-func addSQLToSpan(sql *sQLData, attrs model.Attributes) error {
+func addSQLToSpan(sql *sQLData, attrs traces.Attributes) error {
 	if sql == nil {
 		return nil
 	}
@@ -343,7 +344,7 @@ func addSQLToSpan(sql *sQLData, attrs model.Attributes) error {
 	return nil
 }
 
-func addAnnotations(annos map[string]interface{}, attrs model.Attributes) {
+func addAnnotations(annos map[string]interface{}, attrs traces.Attributes) {
 	if len(annos) > 0 {
 		for k, v := range annos {
 			switch t := v.(type) {
@@ -367,7 +368,7 @@ func addAnnotations(annos map[string]interface{}, attrs model.Attributes) {
 	}
 }
 
-func addMetadata(meta map[string]map[string]interface{}, attrs model.Attributes) error {
+func addMetadata(meta map[string]map[string]interface{}, attrs traces.Attributes) error {
 	for k, v := range meta {
 		val, err := json.Marshal(v)
 		if err != nil {
