@@ -21,7 +21,7 @@ const RequestDetailsUrlInput = ({
         <>
           {fields.map((field, index) => (
             <S.BrokerURLInputContainer $firstItem={isFirstItem(index)} key={field.name}>
-              <Form.Item name={[field.name, 'url']} noStyle>
+              <Form.Item name={[field.name]} noStyle>
                 <Editor type={SupportedEditors.Interpolation} placeholder={`Enter a broker URL (${index + 1})`} />
               </Form.Item>
 

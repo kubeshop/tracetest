@@ -12,7 +12,6 @@ interface IProps {
   form: TDraftTestForm<IKafkaValues>;
 }
 
-// TODO daniel
 const RequestDetailsForm = ({form}: IProps) => {
   return (
     <S.InputContainer>

@@ -36,7 +36,7 @@ const EntryData = {
   },
   [TriggerTypes.kafka](request: object) {
     return {
-      entryPoint: get(request, 'brokerUrls', ''), // TODO (daniel)
+      entryPoint: get(request, 'brokerUrls[0]', ''),
       method: 'Kafka',
     };
   },
@@ -55,6 +55,11 @@ const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid =
   } else if (type === TriggerTypes.kafka) {
     request = KafkaRequest(kafka);
   }
+
+  console.log('----------------------------------------');
+  console.log(kafka);
+  console.log(request);
+  console.log('----------------------------------------');
 
   const {entryPoint, method} = EntryData[type || TriggerTypes.http](request);
 

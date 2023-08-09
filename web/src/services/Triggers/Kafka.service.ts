@@ -26,6 +26,7 @@ const KafkaTriggerService = (): ITriggerService => ({
   },
 
   getInitialValues(request) {
+    console.log(request);
     const { brokerUrls, topic, authentication, sslVerification, headers, messageKey, messageValue } = request as KafkaRequest;
 
     return {
