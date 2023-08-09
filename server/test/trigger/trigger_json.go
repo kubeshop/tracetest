@@ -123,7 +123,7 @@ type triggerResultV2 struct {
 }
 
 func (tr *triggerResultV2) valid() bool {
-	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil
+	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil || tr.Kafka != nil
 }
 
 func (t *TriggerResult) UnmarshalJSON(data []byte) error {
