@@ -445,8 +445,8 @@ const sidebars = {
         // },
         {
           type: "doc",
-          id: "concepts/environments",
-          label: "Environments",
+          id: "concepts/variable-sets",
+          label: "Variable Sets",
         },
         {
           type: "doc",

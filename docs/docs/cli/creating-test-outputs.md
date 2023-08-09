@@ -1,6 +1,6 @@
 # Defining Test Outputs in Text Files
 
-Outputs are really useful when running [Transactions](../concepts/transactions). They allow for exporting values from a test so they become available in the [Environment Variables](../concepts/environments.md) of the current transaction.
+Outputs are really useful when running [Transactions](../concepts/transactions). They allow for exporting values from a test so they become available in the [Environment Variables](../concepts/variable-sets.md) of the current transaction.
 
 ## Outputs are Expression Results
 

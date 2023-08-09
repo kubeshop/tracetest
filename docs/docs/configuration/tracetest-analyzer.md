@@ -44,4 +44,12 @@ In the Tracetest UI, go to **Settings** and the **Analyzer** tab:
 
 ![Analyzer Settings](../img/analyzer-settings.png)
 
-This feature will be available in the CLI very soon. Stay tuned!
+Toggle `Enable Analyzer for All Tests` off to disable the Analyzer.
+
+Here, you can also set the thresholds for `Otel Semantic Conventions`, `Common Problems` and `Security` analyzer settings.
+
+![Analyzer Settings 2](../img/analyzer-settings-2.png)
+
+## Tracetest Analyzer in the CLI
+
+You can use Tracetest Analyzer in the CLI to analyze per individual test. Visit the [Creating Transactions](/docs/docs/web-ui/creating-transactions.md) page for details.
