@@ -1,9 +1,9 @@
-import styled, {DefaultTheme, keyframes} from 'styled-components';
+import styled, {DefaultTheme, css, keyframes} from 'styled-components';
 
-const getPulseAnimation = (theme: DefaultTheme) =>
+export const getPulseAnimation = (theme: DefaultTheme) =>
   keyframes`
   0% {
-    transform: scale(.7);
+    transform: scale(.9);
     box-shadow: 0 0 0 0 ${theme.color.primaryLight};
   }
   70% {
@@ -11,9 +11,15 @@ const getPulseAnimation = (theme: DefaultTheme) =>
     box-shadow: 0 0 0 2px ${theme.color.primaryLight};
   }
   100% {
-    transform: scale(.7);
+    transform: scale(.9);
     box-shadow: 0 0 0 0 ${theme.color.primaryLight};
   }
+`;
+
+export const withPulseAnimation = (theme: DefaultTheme) => css`
+  animation-name: ${getPulseAnimation(theme)};
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
 `;
 
 export const PulseButton = styled.button`
@@ -25,7 +31,5 @@ export const PulseButton = styled.button`
   cursor: pointer;
   background: ${({theme}) => theme.color.primary};
 
-  animation-name: ${({theme}) => getPulseAnimation(theme)};
-  animation-duration: 1.5s;
-  animation-iteration-count: infinite;
+  ${({theme}) => withPulseAnimation(theme)}
 `;

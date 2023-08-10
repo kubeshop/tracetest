@@ -8,6 +8,7 @@ interface IProps {
   id?: string;
   className?: string;
   name: string;
+  isToolTipVisible?: boolean;
   tooltip?: string;
   tooltipPlacement?: TooltipProps['placement'];
   onMouseDown(e: React.MouseEvent<HTMLElement, MouseEvent>): void;
@@ -24,24 +25,36 @@ const Splitter = ({
   onTouchStart,
   tooltip,
   tooltipPlacement = 'right',
-}: IProps) => (
-  <S.SplitterContainer id={id} key={id} className={className} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
-    <S.ButtonContainer>
-      <Tooltip title={tooltip} trigger="hover" placement={tooltipPlacement} overlayClassName="splitter">
-        <S.SplitterButton
-          data-cy={`toggle-drawer-${name}`}
-          icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
-          onClick={event => {
-            event.stopPropagation();
-            onClick();
-          }}
-          onMouseDown={event => event.stopPropagation()}
-          shape="circle"
-          type="primary"
-        />
-      </Tooltip>
-    </S.ButtonContainer>
-  </S.SplitterContainer>
-);
+  isToolTipVisible = false,
+}: IProps) => {
+  const button = (
+    <S.SplitterButton
+      $isPulsing={isToolTipVisible}
+      data-cy={`toggle-drawer-${name}`}
+      icon={isOpen ? <DoubleLeftOutlined /> : <DoubleRightOutlined />}
+      onClick={event => {
+        event.stopPropagation();
+        onClick();
+      }}
+      onMouseDown={event => event.stopPropagation()}
+      shape="circle"
+      type="primary"
+    />
+  );
+
+  return (
+    <S.SplitterContainer id={id} key={id} className={className} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
+      <S.ButtonContainer>
+        {isToolTipVisible ? (
+          <Tooltip title={tooltip} visible trigger={[]} placement={tooltipPlacement} overlayClassName="splitter">
+            {button}
+          </Tooltip>
+        ) : (
+          button
+        )}
+      </S.ButtonContainer>
+    </S.SplitterContainer>
+  );
+};
 
 export default Splitter;
