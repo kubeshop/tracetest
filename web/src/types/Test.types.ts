@@ -42,7 +42,7 @@ export interface IKafkaValues {
   topic: string;
   authentication: TKafkaRequestAuth;
   sslVerification: boolean;
-  headers: KafkaRequest["headers"];
+  headers: KafkaRequest['headers'];
   messageKey: string;
   messageValue: string;
 }

@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import {PlainFields} from './plainFields';
+import {PlainFields} from './PlainFields';
 import TypeInput from './TypeInput';
 
 interface IProps {

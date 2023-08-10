@@ -12,24 +12,24 @@ interface IProps {
 export const PlainFields = ({baseName}: IProps) => (
   <S.Row>
     <R.FlexContainer>
-      <Form.Item
-        style={{flexBasis: '49%', marginTop: '26px', marginRight: '2px'}}
-        name={[...baseName, 'plain', 'username']}
-        data-cy="plain-username"
-        label="Username"
-        rules={[{required: true}]}
-      >
-        <Editor type={SupportedEditors.Interpolation} placeholder='Kafka Plain Username' />
-      </Form.Item>
-      <Form.Item
-        style={{flexBasis: '49%', marginTop: '26px'}}
-        name={[...baseName, 'plain', 'password']}
-        label="Password"
-        data-cy="plain-password"
-        rules={[{required: true}]}
-      >
-        <Editor type={SupportedEditors.Interpolation} placeholder='Kafka Plain Password' />
-      </Form.Item>
+      <R.PlainFieldUsername>
+        <Form.Item
+          name={[...baseName, 'plain', 'username']}
+          data-cy="plain-username"
+          label="Username"
+          rules={[{required: true}]}>
+          <Editor type={SupportedEditors.Interpolation} placeholder='Kafka Plain Username' />
+        </Form.Item>
+      </R.PlainFieldUsername>
+      <R.PlainFieldPassword>
+        <Form.Item
+          name={[...baseName, 'plain', 'password']}
+          label="Password"
+          data-cy="plain-password"
+          rules={[{required: true}]}>
+          <Editor type={SupportedEditors.Interpolation} placeholder='Kafka Plain Password' />
+        </Form.Item>
+      </R.PlainFieldPassword>
     </R.FlexContainer>
   </S.Row>
 );

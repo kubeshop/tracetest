@@ -127,17 +127,11 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
-	var err error
-
-	varsID := ""
-
-	if opts.VarsID != "" {
-		varsID, err = o.resolveVarsID(ctx, opts.VarsID)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
-		}
-		o.logger.Debug("env resolved", zap.String("ID", varsID))
+	varsID, err := o.resolveVarsID(ctx, opts.VarsID)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
 	}
+	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
 	var resource any
 	if opts.DefinitionFile != "" {
@@ -220,6 +214,10 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 }
 
 func (o orchestrator) resolveVarsID(ctx context.Context, varsID string) (string, error) {
+	if varsID == "" {
+		return "", nil // user have not defined variables, skipping it
+	}
+
 	if !fileutil.IsFilePath(varsID) {
 		o.logger.Debug("varsID is not a file path", zap.String("vars", varsID))
 
