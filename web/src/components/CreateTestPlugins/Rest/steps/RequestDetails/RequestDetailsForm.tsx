@@ -1,9 +1,10 @@
 import {Form} from 'antd';
 import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
 import {IHttpValues, TDraftTestForm} from 'types/Test.types';
+import {DEFAULT_HEADERS} from 'constants/Test.constants';
+import KeyValueListInput from 'components/KeyValueListInput';
 import {BodyField} from './BodyField/BodyField';
 import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
-import RequestDetailsHeadersInput from './RequestDetailsHeadersInput';
 import RequestDetailsUrlInput from './RequestDetailsUrlInput';
 import SSLVerification from './SSLVerification';
 
@@ -18,7 +19,7 @@ const RequestDetailsForm = ({form}: IProps) => {
     <S.InputContainer>
       <RequestDetailsUrlInput />
       <RequestDetailsAuthInput />
-      <RequestDetailsHeadersInput />
+      <KeyValueListInput name='headers' label='Header list' addButtonLabel='Add Header' keyPlaceholder='Header' valuePlaceholder='Header' initialValue={DEFAULT_HEADERS} />
       <BodyField setBody={body => form.setFieldsValue({body})} body={Form.useWatch('body', form)} />
       <SSLVerification />
     </S.InputContainer>

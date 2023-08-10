@@ -2,6 +2,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
+import {IKeyValue} from 'constants/Test.constants';
 import * as S from './KeyValueListInput.styled';
 
 interface IProps {
@@ -11,6 +12,7 @@ interface IProps {
   addButtonLabel?: string
   keyPlaceholder?: string
   valuePlaceholder?: string
+  initialValue?: IKeyValue[]
 }
 const KeyValueInputList = ({
   name = 'headers',
@@ -19,9 +21,10 @@ const KeyValueInputList = ({
   addButtonLabel = '',
   keyPlaceholder = '',
   valuePlaceholder = '',
+  initialValue = [],
 }: IProps) => (
   <Form.Item className={`input-headers ${className}`} label={label} shouldUpdate>
-    <Form.List name={name}>
+    <Form.List name={name} initialValue={initialValue}>
       {(fields, {add, remove}) => (
         <>
           {fields.map((field, index) => (
