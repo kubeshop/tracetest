@@ -1148,10 +1148,10 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/environmentId"
-      summary: "Delete an environment"
-      description: "Delete an environment from Tracetest"
-      operationId: deleteEnvironment
+        - $ref: "./parameters.yaml#/components/parameters/variableSetId"
+      summary: "Delete a variableSet"
+      description: "Delete a variableSet from Tracetest"
+      operationId: deleteVariableSet
       responses:
         204:
           description: successful operation

@@ -359,7 +359,7 @@ func (c *ResourceApiApiController) CreateTransaction(w http.ResponseWriter, r *h
 
 }
 
-// CreateVariableSet - Create an VariableSet
+// CreateVariableSet - Create a VariableSet
 func (c *ResourceApiApiController) CreateVariableSet(w http.ResponseWriter, r *http.Request) {
 	variableSetResourceParam := VariableSetResource{}
 	d := json.NewDecoder(r.Body)
@@ -463,7 +463,7 @@ func (c *ResourceApiApiController) DeleteTransaction(w http.ResponseWriter, r *h
 
 }
 
-// DeleteVariableSet - Delete an VariableSet
+// DeleteVariableSet - Delete a variableSet
 func (c *ResourceApiApiController) DeleteVariableSet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	variableSetIdParam := params["variableSetId"]
@@ -775,7 +775,7 @@ func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *
 
 }
 
-// ListVariableSets - List variableSets
+// ListVariableSets - List VariableSets
 func (c *ResourceApiApiController) ListVariableSets(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	takeParam, err := parseInt32Parameter(query.Get("take"), false)
@@ -1006,7 +1006,7 @@ func (c *ResourceApiApiController) UpdateTransaction(w http.ResponseWriter, r *h
 
 }
 
-// UpdateVariableSet - Update an VariableSet
+// UpdateVariableSet - Update a VariableSet
 func (c *ResourceApiApiController) UpdateVariableSet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	variableSetIdParam := params["variableSetId"]

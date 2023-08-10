@@ -22,6 +22,7 @@ type TriggerResultTriggerResult struct {
 	Http    *HTTPResponse    `json:"http,omitempty"`
 	Grpc    *GRPCResponse    `json:"grpc,omitempty"`
 	Traceid *TRACEIDResponse `json:"traceid,omitempty"`
+	Kafka   *KafkaResponse   `json:"kafka,omitempty"`
 }
 
 // NewTriggerResultTriggerResult instantiates a new TriggerResultTriggerResult object
@@ -137,6 +138,38 @@ func (o *TriggerResultTriggerResult) SetTraceid(v TRACEIDResponse) {
 	o.Traceid = &v
 }
 
+// GetKafka returns the Kafka field value if set, zero value otherwise.
+func (o *TriggerResultTriggerResult) GetKafka() KafkaResponse {
+	if o == nil || isNil(o.Kafka) {
+		var ret KafkaResponse
+		return ret
+	}
+	return *o.Kafka
+}
+
+// GetKafkaOk returns a tuple with the Kafka field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TriggerResultTriggerResult) GetKafkaOk() (*KafkaResponse, bool) {
+	if o == nil || isNil(o.Kafka) {
+		return nil, false
+	}
+	return o.Kafka, true
+}
+
+// HasKafka returns a boolean if a field has been set.
+func (o *TriggerResultTriggerResult) HasKafka() bool {
+	if o != nil && !isNil(o.Kafka) {
+		return true
+	}
+
+	return false
+}
+
+// SetKafka gets a reference to the given KafkaResponse and assigns it to the Kafka field.
+func (o *TriggerResultTriggerResult) SetKafka(v KafkaResponse) {
+	o.Kafka = &v
+}
+
 func (o TriggerResultTriggerResult) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o TriggerResultTriggerResult) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Traceid) {
 		toSerialize["traceid"] = o.Traceid
+	}
+	if !isNil(o.Kafka) {
+		toSerialize["kafka"] = o.Kafka
 	}
 	return toSerialize, nil
 }

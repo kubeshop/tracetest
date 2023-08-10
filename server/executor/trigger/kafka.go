@@ -31,6 +31,7 @@ func (t *KafkaTriggerer) Trigger(ctx context.Context, test test.Test, opts *Trig
 	if err != nil {
 		return response, fmt.Errorf("error when creating kafka producer: %w", err)
 	}
+	defer kafkaProducer.Close()
 
 	messageHeaders := kafkaTriggerRequest.GetHeaderAsMap()
 	propagators().Inject(ctx, propagation.MapCarrier(messageHeaders))
