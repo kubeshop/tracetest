@@ -2,28 +2,36 @@ import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
-import * as S from './RequestDetails.styled';
+import * as S from './KeyValueListInput.styled';
 
 interface IProps {
-  name?: string[];
+  name?: string;
   className?: string;
+  label?: string;
+  addButtonLabel?: string
+  keyPlaceholder?: string
+  valuePlaceholder?: string
 }
-const RequestDetailsHeadersInput = ({
-  name = ['headers'],
+const KeyValueInputList = ({
+  name = 'headers',
   className = '',
+  label = '',
+  addButtonLabel = '',
+  keyPlaceholder = '',
+  valuePlaceholder = '',
 }: IProps) => (
-  <Form.Item className={`input-headers ${className}`} label="Message Headers" shouldUpdate>
-    <Form.List name={name.length === 1 ? name[0] : name}>
+  <Form.Item className={`input-headers ${className}`} label={label} shouldUpdate>
+    <Form.List name={name}>
       {(fields, {add, remove}) => (
         <>
           {fields.map((field, index) => (
-            <S.HeaderContainer key={field.name}>
+            <S.KeyValueContainer key={field.name}>
               <Form.Item name={[field.name, 'key']} style={{marginRight: '2px'}}>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Header Key ${index + 1}`} />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`${keyPlaceholder} ${index + 1}`} />
               </Form.Item>
 
               <Form.Item name={[field.name, 'value']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Header Value ${index + 1}`} />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`${valuePlaceholder} ${index + 1}`} />
               </Form.Item>
 
               <Form.Item noStyle>
@@ -34,7 +42,7 @@ const RequestDetailsHeadersInput = ({
                   type="link"
                 />
               </Form.Item>
-            </S.HeaderContainer>
+            </S.KeyValueContainer>
           ))}
 
           <Button
@@ -44,7 +52,7 @@ const RequestDetailsHeadersInput = ({
             style={{fontWeight: 600, height: 'auto', padding: 0}}
             type="link"
           >
-            Add Header
+            {addButtonLabel}
           </Button>
         </>
       )}
@@ -52,4 +60,4 @@ const RequestDetailsHeadersInput = ({
   </Form.Item>
 );
 
-export default RequestDetailsHeadersInput;
+export default KeyValueInputList;
