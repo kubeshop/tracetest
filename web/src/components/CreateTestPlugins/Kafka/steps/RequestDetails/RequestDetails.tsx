@@ -51,7 +51,7 @@ const RequestDetails = () => {
             headers: [{key: '', value: ''}],
           }}
         >
-          <RequestDetailsForm form={form} />
+          <RequestDetailsForm />
         </Form>
       </Step.FormContainer>
     </Step.Step>

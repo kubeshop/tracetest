@@ -1,4 +1,3 @@
-import {IKafkaValues, TDraftTestForm} from 'types/Test.types';
 import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
 import KeyValueListInput from 'components/KeyValueListInput';
 import RequestDetailsBrokerUrlInput from './RequestDetailsBrokerUrlInput';
@@ -8,11 +7,7 @@ import RequestDetailsMessageKeyInput from './RequestDetailsMessageKeyInput';
 import RequestDetailsMessageValueInput from './RequestDetailsMessageValueInput';
 import SSLVerification from './SSLVerification';
 
-interface IProps {
-  form: TDraftTestForm<IKafkaValues>;
-}
-
-const RequestDetailsForm = ({form}: IProps) => {
+const RequestDetailsForm = () => {
   return (
     <S.InputContainer>
       <RequestDetailsBrokerUrlInput />
