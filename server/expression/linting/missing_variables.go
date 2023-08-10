@@ -15,7 +15,6 @@ func DetectMissingVariables(target interface{}, availableVariables []string) []s
 		tokens := getTokens(f, value)
 		variables := make([]string, 0)
 		for _, token := range tokens {
-			fmt.Println("@@@TOKEN", token, token.Identifier)
 			if token.Type == expression.EnvironmentType {
 				variables = append(variables, token.Identifier)
 			}
