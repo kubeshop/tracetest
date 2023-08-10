@@ -9,7 +9,7 @@ interface IProps {
   baseName: string[];
 }
 
-export const PlainFields = ({baseName}: IProps) => (
+export const PlainUserPasswordFields = ({baseName}: IProps) => (
   <S.Row>
     <R.FlexContainer>
       <R.PlainFieldUsername>

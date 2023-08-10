@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import {PlainFields} from './PlainFields';
+import {PlainUserPasswordFields} from './PlainUserPasswordFields';
 import TypeInput from './TypeInput';
 
 interface IProps {
@@ -14,7 +14,7 @@ const RequestDetailsAuthInput = ({name = ['authentication']}: IProps) => (
         const method = getFieldValue(name)?.type;
         switch (method) {
           case 'plain':
-            return <PlainFields baseName={name} />;
+            return <PlainUserPasswordFields baseName={name} />;
           default:
             return null;
         }
