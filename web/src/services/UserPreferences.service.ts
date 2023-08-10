@@ -11,6 +11,7 @@ const initialUserPreferences: IUserPreferences = {
   initConfigSetup: true,
   initConfigSetupFromTest: true,
   showGuidedTourNotification: true,
+  showAttributeTooltip: true,
 };
 
 const UserPreferencesService = () => ({

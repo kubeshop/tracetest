@@ -1,4 +1,6 @@
 import * as Spaces from 'react-spaces';
+import {useLayoutEffect} from 'react';
+import {noop} from 'lodash';
 import useResizablePanel, {TPanel, TSize} from '../ResizablePanels/hooks/useResizablePanel';
 import Splitter from '../ResizablePanels/Splitter';
 
@@ -7,10 +9,16 @@ interface IProps {
   order?: number;
   children(size: TSize): React.ReactNode;
   tooltip?: string;
+  isToolTipVisible?: boolean;
+  onOpen?(): void;
 }
 
-const LeftPanel = ({panel, order = 1, tooltip, children}: IProps) => {
+const LeftPanel = ({panel, order = 1, tooltip, isToolTipVisible = false, children, onOpen = noop}: IProps) => {
   const {size, toggle, onStopResize} = useResizablePanel({panel});
+
+  useLayoutEffect(() => {
+    if (size.isOpen) onOpen();
+  }, [onOpen, size.isOpen]);
 
   return (
     <Spaces.LeftResizable
@@ -25,8 +33,9 @@ const LeftPanel = ({panel, order = 1, tooltip, children}: IProps) => {
           {...props}
           name={size.name}
           isOpen={size.isOpen}
-          onClick={() => toggle()}
-          tooltip={!size.isOpen ? tooltip : ''}
+          onClick={toggle}
+          tooltip={tooltip}
+          isToolTipVisible={isToolTipVisible}
           tooltipPlacement="right"
         />
       )}
