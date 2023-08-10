@@ -169,7 +169,7 @@ spec:
   trigger:
     type: traceid # MUST BE traceide
     traceid:
-      id: ${env:asd} # MUST BE in line 8
+      id: ${var:asd} # MUST BE in line 8
   # the rest of the file can be modified as needed
   specs:
   - name: List span exists

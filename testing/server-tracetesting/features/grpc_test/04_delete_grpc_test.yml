@@ -7,7 +7,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/tests/${env:GRPC_TEST_ID}
+      url: ${var:TARGET_URL}/api/tests/${var:GRPC_TEST_ID}
       method: DELETE
       headers:
         - key: Content-Type

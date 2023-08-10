@@ -7,7 +7,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/tests/${env:TRANSACTION_STEP_ID}
+      url: ${var:TARGET_URL}/api/tests/${var:TRANSACTION_STEP_ID}
       method: DELETE
       headers:
         - key: Content-Type
