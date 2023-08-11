@@ -471,6 +471,7 @@ func (r ApiCreateVariableSetRequest) Execute() (*VariableSetResource, *http.Resp
 
 /*
 CreateVariableSet Create a VariableSet
+CreateVariableSet Create a VariableSet
 
 Create a VariableSet that can be used by tests and test suites
 

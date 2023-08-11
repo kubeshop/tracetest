@@ -1,7 +1,7 @@
 type: Test
 spec:
   id: jFpHiL34R
-  name: Test Kafka Message Publishing
+  name: Test Producer API that does Kafka Message Publishing
   trigger:
     type: http
     httpRequest:

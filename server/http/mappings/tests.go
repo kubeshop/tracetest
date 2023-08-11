@@ -115,6 +115,7 @@ func (m OpenAPI) Trigger(in trigger.Trigger) openapi.Trigger {
 		HttpRequest: m.HTTPRequest(in.HTTP),
 		Grpc:        m.GRPCRequest(in.GRPC),
 		Traceid:     m.TraceIDRequest(in.TraceID),
+		Kafka:       m.KafkaRequest(in.Kafka),
 	}
 }
 
@@ -126,6 +127,7 @@ func (m OpenAPI) TriggerResult(in trigger.TriggerResult) openapi.TriggerResult {
 			Http:    m.HTTPResponse(in.HTTP),
 			Grpc:    m.GRPCResponse(in.GRPC),
 			Traceid: m.TraceIDResponse(in.TraceID),
+			Kafka:   m.KafkaResponse(in.Kafka),
 		},
 	}
 }
