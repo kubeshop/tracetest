@@ -59,7 +59,8 @@ Once the images are built and containers are started you can access:
 ## Running Tracetests
 
 The Tracetest tests for the OpenTelemetry Demo can be found in the official repo here:
-- **Instructions to run (also shown below in this recipe)**: [Rnning Tracetest Tests](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test#testing-services-with-trace-based-tests)
+
+- **Instructions to run (also shown below in this recipe)**: [Running Tracetest Tests](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test#testing-services-with-trace-based-tests)
 - **Full source of all tests**: [Source](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting)
 
 To run the entire test suite of trace-based tests, run the command:
