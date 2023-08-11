@@ -72,7 +72,7 @@ docker compose run traceBasedTests
 ```
 
 To run tests for specific services, pass the name of the service as a
-parameter (using the folder names located [here](./tracetesting/)):
+parameter (using the folder names located [here](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting):
 
 ```sh
 make run-tracetesting SERVICES_TO_TEST="service-1 service-2 ..."
