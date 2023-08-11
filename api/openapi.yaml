@@ -1149,8 +1149,8 @@ paths:
         - resource-api
       parameters:
         - $ref: "./parameters.yaml#/components/parameters/variableSetId"
-      summary: "Delete a variableSet"
-      description: "Delete a variableSet from Tracetest"
+      summary: "Delete a variable set"
+      description: "Delete a variable set from Tracetest"
       operationId: deleteVariableSet
       responses:
         204:
