@@ -19,17 +19,20 @@ import (
 var resourceParams = &resourceParameters{}
 
 var (
+	testSuiteRunner = runner.TestSuiteRunner(
+		testSuiteClient,
+		openapiClient,
+		formatters.TestSuiteRun(func() string { return cliConfig.URL() }, true),
+	)
+
 	runnerRegistry = runner.NewRegistry().
-		Register(runner.TestRunner(
+			Register(runner.TestRunner(
 			testClient,
 			openapiClient,
 			formatters.TestRun(func() string { return cliConfig.URL() }, true),
 		)).
-		Register(runner.TransactionRunner(
-			transactionClient,
-			openapiClient,
-			formatters.TransactionRun(func() string { return cliConfig.URL() }, true),
-		))
+		Register(testSuiteRunner).
+		RegisterProxy("transaction", testSuiteRunner.Name())
 )
 
 var (
@@ -68,7 +71,7 @@ var (
 				{Header: "URL", Path: "spec.url"},
 			},
 			ItemModifier: func(item *gabs.Container) error {
-				// set spec.summary.steps to the number of steps in the transaction
+				// set spec.summary.steps to the number of steps in the test suite
 				id, ok := item.Path("spec.id").Data().(string)
 				if !ok {
 					return fmt.Errorf("test id '%s' is not a string", id)
@@ -87,7 +90,7 @@ var (
 		resourcemanager.WithApplyPreProcessor(testPreprocessor.Preprocess),
 	)
 
-	transactionPreprocessor = preprocessor.Transaction(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+	testSuitePreprocessor = preprocessor.TestSuite(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
 		updated, err := testClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
 			return input, fmt.Errorf("cannot apply test: %w", err)
@@ -96,9 +99,9 @@ var (
 		return fileutil.New(input.AbsPath(), []byte(updated)), nil
 	})
 
-	transactionClient = resourcemanager.NewClient(
+	testSuiteClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"transaction", "transactions",
+		"testsuite", "testsuites",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
@@ -111,7 +114,7 @@ var (
 				{Header: "LAST RUN FAILURES", Path: "spec.summary.lastRun.fails"},
 			},
 			ItemModifier: func(item *gabs.Container) error {
-				// set spec.summary.steps to the number of steps in the transaction
+				// set spec.summary.steps to the number of steps in the test suite
 				item.SetP(len(item.Path("spec.steps").Children()), "spec.summary.steps")
 
 				if err := formatItemDate(item, "spec.summary.lastRun.time"); err != nil {
@@ -121,7 +124,9 @@ var (
 				return nil
 			},
 		}),
-		resourcemanager.WithApplyPreProcessor(transactionPreprocessor.Preprocess),
+		resourcemanager.WithResourceType("TestSuite"),
+		resourcemanager.WithApplyPreProcessor(testSuitePreprocessor.Preprocess),
+		resourcemanager.WithDeprecatedAlias("Transaction"),
 	)
 
 	// deprecated resources
@@ -129,6 +134,12 @@ var (
 		httpClient, cliLogger,
 		"environment", "environments",
 		resourcemanager.WithProxyResource("variableset"),
+	)
+
+	deprecatedTransactionsClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"transaction", "transactions",
+		resourcemanager.WithProxyResource("testsuite"),
 	)
 
 	resources = resourcemanager.NewRegistry().
@@ -240,11 +251,12 @@ var (
 			),
 		).
 		Register(variableSetClient).
-		Register(transactionClient).
+		Register(testSuiteClient).
 		Register(testClient).
 
 		// deprecated resources
-		Register(deprecatedEnvironmentClient)
+		Register(deprecatedEnvironmentClient).
+		Register(deprecatedTransactionsClient)
 )
 
 func resourceList() string {

@@ -1,28 +1,94 @@
 # OpenTelemetry Astronomy Shop Demo
 
-This system implements an Astronomy shop in a set of microservices in different languages with OpenTelemetry enabled, intended to be used as an example of OpenTelemetry instrumentation and observability.
+The OpenTelemetry Demo is an example application published by the OpenTelemtry CNCF project. It implements an Astronomy shop in a set of microservices in different languages with OpenTelemetry enabled, intended to be used as an example of OpenTelemetry instrumentation and observability. The Tracetest team has made several key contributions to this project, including providing a full suite of end to end tests.
+
+We will provide a full recipe below for running the full demo as well as running the associated Tracetests via Docker. Here are other references you may find useful:
 
 - **Source Code**: https://github.com/open-telemetry/opentelemetry-demo
-- **Running it Locally**: [Instructions](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/docker_deployment.md#run-docker-compose)
-- **Running on Kubernetes**: [Instructions](https://github.com/open-telemetry/opentelemetry-demo/blob/main/docs/kubernetes_deployment.md)
+- **Running it locally in Docker**: [Instructions](https://opentelemetry.io/docs/demo/docker-deployment/)
+- **Running on Kubernetes**: [Instructions](https://opentelemetry.io/docs/demo/kubernetes-deployment/)
 
-## Running with Tracetest
+## Running the OpenTelemetry Astronomy Shop Demo in Docker
 
-To run the this demo locally with Tracetest, first clone OpenTelemetry demo repo in your machine in any folder:
+### Prerequisites
+
+- Docker
+- Docker Compose v2.0.0+
+- 4 GB of RAM for the application
+ 
+### Get and run the demo
+
+1.  Clone the Demo repository:
+
+    ```shell
+    git clone https://github.com/open-telemetry/opentelemetry-demo.git
+    ```
+
+2.  Change to the demo folder:
+
+    ```shell
+    cd opentelemetry-demo/
+    ```
+
+3.  Run docker compose[^1] to start the demo:
+
+    ```shell
+    docker compose up --no-build
+    ```
+
+    > **Notes:**
+    >
+    > - The `--no-build` flag is used to fetch released docker images from
+    >   [ghcr](https://ghcr.io/open-telemetry/demo) instead of building from
+    >   source. Removing the `--no-build` command line option will rebuild all
+    >   images from source. It may take more than 20 minutes to build if the
+    >   flag is omitted.
+    > - If you're running on Apple Silicon, run `docker compose build`[^1] in
+    >   order to create local images vs. pulling them from the repository.
+
+## Verify the web store and Telemetry
+
+Once the images are built and containers are started you can access:
+
+- Web store: <http://localhost:8080/>
+- Grafana: <http://localhost:8080/grafana/>
+- Feature Flags UI: <http://localhost:8080/feature/>
+- Load Generator UI: <http://localhost:8080/loadgen/>
+- Jaeger UI: <http://localhost:8080/jaeger/ui/>
+
+## Running Tracetests
+
+The Tracetest tests for the OpenTelemetry Demo can be found in the official repo here:
+
+- **Instructions to run (also shown below in this recipe)**: [Running Tracetest Tests](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test#testing-services-with-trace-based-tests)
+- **Full source of all tests**: [Source](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting)
+
+To run the entire test suite of trace-based tests, run the command:
+
 ```sh
-git clone https://github.com/open-telemetry/opentelemetry-demo.git
+make run-tracetesting
+#or
+docker compose run traceBasedTests
 ```
 
-And then, run in that folder:
+To run tests for specific services, pass the name of the service as a
+parameter (using the folder names located [here](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting):
+
 ```sh
-docker compose up --no-build
+make run-tracetesting SERVICES_TO_TEST="service-1 service-2 ..."
+#or
+docker compose run traceBasedTests "service-1 service-2 ..."
 ```
 
-After a few minutes, the store should be running normally in your machine, to test it go to a browser and access: [http://localhost:8080](http://localhost:8080)
+For instance, if you need to run the tests for `ad-service` and
+`payment-service`, you can run them with:
 
-Now, to start Tracetest connected with this demo, download the contents of the [Running Tracetest with OpenTelemetry store demo](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-open-telemetry-store-demo) in any folder, and then run `docker compose up`.
+```sh
+make run-tracetesting SERVICES_TO_TEST="ad-service payment-service"
+```
 
-After that, Tracetest will start on [http://localhost:11633](http://localhost:11633) and you can start creating tests.
+Tracetest will be started on [http://localhost:11633](http://localhost:11633) as part of running these tests and you can view any of the tests, test suites, prior runs, or create and run your own tests. It is a great testbed to explore Tracetest!
+
 
 ## Use Cases
 

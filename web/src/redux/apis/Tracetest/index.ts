@@ -63,20 +63,22 @@ export {
 } from './endpoints/TestRun.endpoint';
 
 export {
-  useCreateTransactionMutation,
-  useGetTransactionByIdQuery,
-  useDeleteTransactionByIdMutation,
-  useEditTransactionMutation,
-  useGetTransactionVersionByIdQuery,
-  useLazyGetTransactionVersionByIdQuery,
-} from './endpoints/Transaction.endpoint';
+  useCreateTestSuiteMutation,
+  useGetTestSuiteByIdQuery,
+  useGetTestSuiteVersionByIdQuery,
+  useLazyGetTestSuiteByIdQuery,
+  useDeleteTestSuiteByIdMutation,
+  useEditTestSuiteMutation,
+  useLazyGetTestSuiteVersionByIdQuery,
+} from './endpoints/TestSuite.endpoint';
 
 export {
-  useGetTransactionRunsQuery,
-  useLazyGetTransactionRunsQuery,
-  useGetTransactionRunByIdQuery,
-  useDeleteTransactionRunByIdMutation,
-  useRunTransactionMutation,
-} from './endpoints/TransactionRun.endpoint';
+  useDeleteTestSuiteRunByIdMutation,
+  useGetTestSuiteRunByIdQuery,
+  useGetTestSuiteRunsQuery,
+  useRunTestSuiteMutation,
+  useLazyGetTestSuiteRunsQuery,
+  useLazyGetTestSuiteRunByIdQuery,
+} from './endpoints/TestSuiteRun.endpoint';
 
 export const endpoints = {...variableSetEndpoints, ...testEndpoints, ...testRunEndpoints};

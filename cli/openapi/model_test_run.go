@@ -31,7 +31,7 @@ type TestRun struct {
 	LastErrorState *string `json:"lastErrorState,omitempty"`
 	// time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	ExecutionTime *int32 `json:"executionTime,omitempty"`
-	// time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+	// time in milliseconds it took for the triggering testSuite to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
 	TriggerTime               *int32                `json:"triggerTime,omitempty"`
 	CreatedAt                 *time.Time            `json:"createdAt,omitempty"`
 	ServiceTriggeredAt        *time.Time            `json:"serviceTriggeredAt,omitempty"`
@@ -46,8 +46,8 @@ type TestRun struct {
 	Outputs                   []TestRunOutputsInner `json:"outputs,omitempty"`
 	RequiredGatesResult       *RequiredGatesResult  `json:"requiredGatesResult,omitempty"`
 	Metadata                  *map[string]string    `json:"metadata,omitempty"`
-	TransactionId             *string               `json:"transactionId,omitempty"`
-	TransactionRunId          *string               `json:"transactionRunId,omitempty"`
+	TestSuiteId               *string               `json:"testSuiteId,omitempty"`
+	TestSuiteRunId            *string               `json:"testSuiteRunId,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -739,68 +739,68 @@ func (o *TestRun) SetMetadata(v map[string]string) {
 	o.Metadata = &v
 }
 
-// GetTransactionId returns the TransactionId field value if set, zero value otherwise.
-func (o *TestRun) GetTransactionId() string {
-	if o == nil || isNil(o.TransactionId) {
+// GetTestSuiteId returns the TestSuiteId field value if set, zero value otherwise.
+func (o *TestRun) GetTestSuiteId() string {
+	if o == nil || isNil(o.TestSuiteId) {
 		var ret string
 		return ret
 	}
-	return *o.TransactionId
+	return *o.TestSuiteId
 }
 
-// GetTransactionIdOk returns a tuple with the TransactionId field value if set, nil otherwise
+// GetTestSuiteIdOk returns a tuple with the TestSuiteId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetTransactionIdOk() (*string, bool) {
-	if o == nil || isNil(o.TransactionId) {
+func (o *TestRun) GetTestSuiteIdOk() (*string, bool) {
+	if o == nil || isNil(o.TestSuiteId) {
 		return nil, false
 	}
-	return o.TransactionId, true
+	return o.TestSuiteId, true
 }
 
-// HasTransactionId returns a boolean if a field has been set.
-func (o *TestRun) HasTransactionId() bool {
-	if o != nil && !isNil(o.TransactionId) {
+// HasTestSuiteId returns a boolean if a field has been set.
+func (o *TestRun) HasTestSuiteId() bool {
+	if o != nil && !isNil(o.TestSuiteId) {
 		return true
 	}
 
 	return false
 }
 
-// SetTransactionId gets a reference to the given string and assigns it to the TransactionId field.
-func (o *TestRun) SetTransactionId(v string) {
-	o.TransactionId = &v
+// SetTestSuiteId gets a reference to the given string and assigns it to the TestSuiteId field.
+func (o *TestRun) SetTestSuiteId(v string) {
+	o.TestSuiteId = &v
 }
 
-// GetTransactionRunId returns the TransactionRunId field value if set, zero value otherwise.
-func (o *TestRun) GetTransactionRunId() string {
-	if o == nil || isNil(o.TransactionRunId) {
+// GetTestSuiteRunId returns the TestSuiteRunId field value if set, zero value otherwise.
+func (o *TestRun) GetTestSuiteRunId() string {
+	if o == nil || isNil(o.TestSuiteRunId) {
 		var ret string
 		return ret
 	}
-	return *o.TransactionRunId
+	return *o.TestSuiteRunId
 }
 
-// GetTransactionRunIdOk returns a tuple with the TransactionRunId field value if set, nil otherwise
+// GetTestSuiteRunIdOk returns a tuple with the TestSuiteRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetTransactionRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.TransactionRunId) {
+func (o *TestRun) GetTestSuiteRunIdOk() (*string, bool) {
+	if o == nil || isNil(o.TestSuiteRunId) {
 		return nil, false
 	}
-	return o.TransactionRunId, true
+	return o.TestSuiteRunId, true
 }
 
-// HasTransactionRunId returns a boolean if a field has been set.
-func (o *TestRun) HasTransactionRunId() bool {
-	if o != nil && !isNil(o.TransactionRunId) {
+// HasTestSuiteRunId returns a boolean if a field has been set.
+func (o *TestRun) HasTestSuiteRunId() bool {
+	if o != nil && !isNil(o.TestSuiteRunId) {
 		return true
 	}
 
 	return false
 }
 
-// SetTransactionRunId gets a reference to the given string and assigns it to the TransactionRunId field.
-func (o *TestRun) SetTransactionRunId(v string) {
-	o.TransactionRunId = &v
+// SetTestSuiteRunId gets a reference to the given string and assigns it to the TestSuiteRunId field.
+func (o *TestRun) SetTestSuiteRunId(v string) {
+	o.TestSuiteRunId = &v
 }
 
 func (o TestRun) MarshalJSON() ([]byte, error) {
@@ -870,11 +870,11 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	if !isNil(o.Metadata) {
 		toSerialize["metadata"] = o.Metadata
 	}
-	if !isNil(o.TransactionId) {
-		toSerialize["transactionId"] = o.TransactionId
+	if !isNil(o.TestSuiteId) {
+		toSerialize["testSuiteId"] = o.TestSuiteId
 	}
-	if !isNil(o.TransactionRunId) {
-		toSerialize["transactionRunId"] = o.TransactionRunId
+	if !isNil(o.TestSuiteRunId) {
+		toSerialize["testSuiteRunId"] = o.TestSuiteRunId
 	}
 	return toSerialize, nil
 }

@@ -12,7 +12,7 @@ interface IProps {
 }
 
 const HeaderLeft = ({name, triggerType}: IProps) => {
-  const {run: {createdAt, transactionId, transactionRunId, executionTime, trace, traceId, testVersion} = {}, run} =
+  const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {}, run} =
     useTestRun();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
@@ -21,18 +21,18 @@ const HeaderLeft = ({name, triggerType}: IProps) => {
     return (
       <>
         {triggerType} • Ran {createdTimeAgo}
-        {transactionId && transactionRunId && (
+        {testSuiteId && testSuiteRunId && (
           <>
             {' '}
             •{' '}
-            <S.TransactionLink to={`/transaction/${transactionId}/run/${transactionRunId}`} target="_blank">
-              Part of transaction <LinkOutlined />
+            <S.TransactionLink to={`/testsuite/${testSuiteId}/run/${testSuiteRunId}`} target="_blank">
+              Part of test suite <LinkOutlined />
             </S.TransactionLink>
           </>
         )}
       </>
     );
-  }, [createdTimeAgo, transactionId, transactionRunId, triggerType]);
+  }, [triggerType, createdTimeAgo, testSuiteId, testSuiteRunId]);
 
   return (
     <S.Section $justifyContent="flex-start">

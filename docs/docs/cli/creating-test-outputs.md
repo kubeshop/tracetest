@@ -1,10 +1,10 @@
 # Defining Test Outputs in Text Files
 
-Outputs are really useful when running [Transactions](../concepts/transactions). They allow for exporting values from a test so they become available in the [Environment Variables](../concepts/environments.md) of the current transaction.
+Outputs are really useful when running [Transactions](../concepts/transactions). They allow for exporting values from a test so they become available in the [Variable Sets](../concepts/variable-sets.md) of the current transaction.
 
 ## Outputs are Expression Results
 
-An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the environment variables of a running transaction.
+An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running transaction.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
 
 It can be defined using the following YAML definition:

@@ -25,7 +25,7 @@ const Info = ({date, executionTime, state, totalSpans, traceId}: IProps) => {
         <Typography.Text>{traceId}</Typography.Text>
       </div>
       <div>
-        <Typography.Text strong>Trace transaction occurred: </Typography.Text>
+        <Typography.Text strong>Trace test suite occurred: </Typography.Text>
         <Typography.Text>{Date.format(date, "yyyy/MM/dd 'at' HH:mm:ss")}</Typography.Text>
       </div>
       <div>

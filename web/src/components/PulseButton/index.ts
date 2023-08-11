@@ -1,3 +1,4 @@
-import {PulseButton} from './PulseButton.styled';
+import {PulseButton, withPulseAnimation} from './PulseButton.styled';
 
 export default PulseButton;
+export {withPulseAnimation};

@@ -1,0 +1,10 @@
+type: TestSuite
+spec:
+  id: asuhfdkj
+  name: Another TestSuite
+  description: another TestSuite
+  steps:
+    - ./testsuite-step-1.yaml
+    - ./testsuite-step-1.yaml
+    - ./testsuite-step-2.yaml
+    - ./testsuite-step-2.yaml

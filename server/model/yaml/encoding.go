@@ -30,8 +30,8 @@ func Decode(contents []byte) (File, error) {
 			return File{}, fmt.Errorf("cannot decode test: %w", err)
 		}
 		f.Spec = test
-	case FileTypeTransaction:
-		var transaction Transaction
+	case FileTypeTestSuite:
+		var transaction TestSuite
 		err := mapstructure.Decode(f.Spec, &transaction)
 		if err != nil {
 			return File{}, fmt.Errorf("cannot decode transaction: %w", err)

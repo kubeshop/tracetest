@@ -118,51 +118,51 @@ func (a *ApiApiService) DeleteTestRunExecute(r ApiDeleteTestRunRequest) (*http.R
 	return localVarHTTPResponse, nil
 }
 
-type ApiDeleteTransactionRunRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	transactionId string
-	runId         int32
+type ApiDeleteTestSuiteRunRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	testSuiteId string
+	runId       int32
 }
 
-func (r ApiDeleteTransactionRunRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DeleteTransactionRunExecute(r)
+func (r ApiDeleteTestSuiteRunRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteTestSuiteRunExecute(r)
 }
 
 /*
-DeleteTransactionRun Delete a specific run from a particular transaction
+DeleteTestSuiteRun Delete a specific run from a particular TestSuite
 
-Delete a specific run from a particular transaction
+Delete a specific run from a particular TestSuite
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param transactionId id of the transaction
+	@param testSuiteId id of the TestSuite
 	@param runId id of the run
-	@return ApiDeleteTransactionRunRequest
+	@return ApiDeleteTestSuiteRunRequest
 */
-func (a *ApiApiService) DeleteTransactionRun(ctx context.Context, transactionId string, runId int32) ApiDeleteTransactionRunRequest {
-	return ApiDeleteTransactionRunRequest{
-		ApiService:    a,
-		ctx:           ctx,
-		transactionId: transactionId,
-		runId:         runId,
+func (a *ApiApiService) DeleteTestSuiteRun(ctx context.Context, testSuiteId string, runId int32) ApiDeleteTestSuiteRunRequest {
+	return ApiDeleteTestSuiteRunRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		testSuiteId: testSuiteId,
+		runId:       runId,
 	}
 }
 
 // Execute executes the request
-func (a *ApiApiService) DeleteTransactionRunExecute(r ApiDeleteTransactionRunRequest) (*http.Response, error) {
+func (a *ApiApiService) DeleteTestSuiteRunExecute(r ApiDeleteTestSuiteRunRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTransactionRun")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.DeleteTestSuiteRun")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/transactions/{transactionId}/run/{runId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterValueToString(r.transactionId, "transactionId")), -1)
+	localVarPath := localBasePath + "/testsuites/{testSuiteId}/run/{runId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"testSuiteId"+"}", url.PathEscape(parameterValueToString(r.testSuiteId, "testSuiteId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterValueToString(r.runId, "runId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1366,162 +1366,54 @@ func (a *ApiApiService) GetTestSpecsExecute(r ApiGetTestSpecsRequest) ([]TestSpe
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetTestVersionRequest struct {
-	ctx        context.Context
-	ApiService *ApiApiService
-	testId     string
-	version    int32
+type ApiGetTestSuiteRunRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	testSuiteId string
+	runId       int32
 }
 
-func (r ApiGetTestVersionRequest) Execute() (*Test, *http.Response, error) {
-	return r.ApiService.GetTestVersionExecute(r)
-}
-
-/*
-GetTestVersion get a test specific version
-
-get a test specific version
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param testId id of the test
-	@param version version of the test
-	@return ApiGetTestVersionRequest
-*/
-func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, version int32) ApiGetTestVersionRequest {
-	return ApiGetTestVersionRequest{
-		ApiService: a,
-		ctx:        ctx,
-		testId:     testId,
-		version:    version,
-	}
-}
-
-// Execute executes the request
-//
-//	@return Test
-func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test, *http.Response, error) {
-	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Test
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersion")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/tests/{testId}/version/{version}"
-	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterValueToString(r.testId, "testId")), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"version"+"}", url.PathEscape(parameterValueToString(r.version, "version")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiGetTransactionRunRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	transactionId string
-	runId         int32
-}
-
-func (r ApiGetTransactionRunRequest) Execute() (*TransactionRun, *http.Response, error) {
-	return r.ApiService.GetTransactionRunExecute(r)
+func (r ApiGetTestSuiteRunRequest) Execute() (*TestSuiteRun, *http.Response, error) {
+	return r.ApiService.GetTestSuiteRunExecute(r)
 }
 
 /*
-GetTransactionRun Get a specific run from a particular transaction
+GetTestSuiteRun Get a specific run from a particular TestSuite
 
-Get a specific run from a particular transaction
+Get a specific run from a particular TestSuite
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param transactionId id of the transaction
+	@param testSuiteId id of the TestSuite
 	@param runId id of the run
-	@return ApiGetTransactionRunRequest
+	@return ApiGetTestSuiteRunRequest
 */
-func (a *ApiApiService) GetTransactionRun(ctx context.Context, transactionId string, runId int32) ApiGetTransactionRunRequest {
-	return ApiGetTransactionRunRequest{
-		ApiService:    a,
-		ctx:           ctx,
-		transactionId: transactionId,
-		runId:         runId,
+func (a *ApiApiService) GetTestSuiteRun(ctx context.Context, testSuiteId string, runId int32) ApiGetTestSuiteRunRequest {
+	return ApiGetTestSuiteRunRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		testSuiteId: testSuiteId,
+		runId:       runId,
 	}
 }
 
 // Execute executes the request
 //
-//	@return TransactionRun
-func (a *ApiApiService) GetTransactionRunExecute(r ApiGetTransactionRunRequest) (*TransactionRun, *http.Response, error) {
+//	@return TestSuiteRun
+func (a *ApiApiService) GetTestSuiteRunExecute(r ApiGetTestSuiteRunRequest) (*TestSuiteRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *TransactionRun
+		localVarReturnValue *TestSuiteRun
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionRun")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestSuiteRun")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/transactions/{transactionId}/run/{runId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterValueToString(r.transactionId, "transactionId")), -1)
+	localVarPath := localBasePath + "/testsuites/{testSuiteId}/run/{runId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"testSuiteId"+"}", url.PathEscape(parameterValueToString(r.testSuiteId, "testSuiteId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterValueToString(r.runId, "runId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1582,65 +1474,65 @@ func (a *ApiApiService) GetTransactionRunExecute(r ApiGetTransactionRunRequest) 
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetTransactionRunsRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	transactionId string
-	take          *int32
-	skip          *int32
+type ApiGetTestSuiteRunsRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	testSuiteId string
+	take        *int32
+	skip        *int32
 }
 
 // indicates how many resources can be returned by each page
-func (r ApiGetTransactionRunsRequest) Take(take int32) ApiGetTransactionRunsRequest {
+func (r ApiGetTestSuiteRunsRequest) Take(take int32) ApiGetTestSuiteRunsRequest {
 	r.take = &take
 	return r
 }
 
 // indicates how many resources will be skipped when paginating
-func (r ApiGetTransactionRunsRequest) Skip(skip int32) ApiGetTransactionRunsRequest {
+func (r ApiGetTestSuiteRunsRequest) Skip(skip int32) ApiGetTestSuiteRunsRequest {
 	r.skip = &skip
 	return r
 }
 
-func (r ApiGetTransactionRunsRequest) Execute() ([]TransactionRun, *http.Response, error) {
-	return r.ApiService.GetTransactionRunsExecute(r)
+func (r ApiGetTestSuiteRunsRequest) Execute() ([]TestSuiteRun, *http.Response, error) {
+	return r.ApiService.GetTestSuiteRunsExecute(r)
 }
 
 /*
-GetTransactionRuns Get all runs from a particular transaction
+GetTestSuiteRuns Get all runs from a particular TestSuite
 
-Get all runs from a particular transaction
+Get all runs from a particular TestSuite
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param transactionId id of the transaction
-	@return ApiGetTransactionRunsRequest
+	@param testSuiteId id of the TestSuite
+	@return ApiGetTestSuiteRunsRequest
 */
-func (a *ApiApiService) GetTransactionRuns(ctx context.Context, transactionId string) ApiGetTransactionRunsRequest {
-	return ApiGetTransactionRunsRequest{
-		ApiService:    a,
-		ctx:           ctx,
-		transactionId: transactionId,
+func (a *ApiApiService) GetTestSuiteRuns(ctx context.Context, testSuiteId string) ApiGetTestSuiteRunsRequest {
+	return ApiGetTestSuiteRunsRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		testSuiteId: testSuiteId,
 	}
 }
 
 // Execute executes the request
 //
-//	@return []TransactionRun
-func (a *ApiApiService) GetTransactionRunsExecute(r ApiGetTransactionRunsRequest) ([]TransactionRun, *http.Response, error) {
+//	@return []TestSuiteRun
+func (a *ApiApiService) GetTestSuiteRunsExecute(r ApiGetTestSuiteRunsRequest) ([]TestSuiteRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue []TransactionRun
+		localVarReturnValue []TestSuiteRun
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionRuns")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestSuiteRuns")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/transactions/{transactionId}/run"
-	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterValueToString(r.transactionId, "transactionId")), -1)
+	localVarPath := localBasePath + "/testsuites/{testSuiteId}/run"
+	localVarPath = strings.Replace(localVarPath, "{"+"testSuiteId"+"}", url.PathEscape(parameterValueToString(r.testSuiteId, "testSuiteId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -1706,54 +1598,162 @@ func (a *ApiApiService) GetTransactionRunsExecute(r ApiGetTransactionRunsRequest
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetTransactionVersionRequest struct {
-	ctx           context.Context
-	ApiService    *ApiApiService
-	transactionId string
-	version       int32
+type ApiGetTestSuiteVersionRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	testSuiteId string
+	version     int32
 }
 
-func (r ApiGetTransactionVersionRequest) Execute() (*Transaction, *http.Response, error) {
-	return r.ApiService.GetTransactionVersionExecute(r)
+func (r ApiGetTestSuiteVersionRequest) Execute() (*TestSuite, *http.Response, error) {
+	return r.ApiService.GetTestSuiteVersionExecute(r)
 }
 
 /*
-GetTransactionVersion get a transaction specific version
+GetTestSuiteVersion get a TestSuite specific version
 
-get a transaction specific version
+get a TestSuite specific version
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param transactionId id of the transaction
+	@param testSuiteId id of the TestSuite
 	@param version version of the test
-	@return ApiGetTransactionVersionRequest
+	@return ApiGetTestSuiteVersionRequest
 */
-func (a *ApiApiService) GetTransactionVersion(ctx context.Context, transactionId string, version int32) ApiGetTransactionVersionRequest {
-	return ApiGetTransactionVersionRequest{
-		ApiService:    a,
-		ctx:           ctx,
-		transactionId: transactionId,
-		version:       version,
+func (a *ApiApiService) GetTestSuiteVersion(ctx context.Context, testSuiteId string, version int32) ApiGetTestSuiteVersionRequest {
+	return ApiGetTestSuiteVersionRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		testSuiteId: testSuiteId,
+		version:     version,
 	}
 }
 
 // Execute executes the request
 //
-//	@return Transaction
-func (a *ApiApiService) GetTransactionVersionExecute(r ApiGetTransactionVersionRequest) (*Transaction, *http.Response, error) {
+//	@return TestSuite
+func (a *ApiApiService) GetTestSuiteVersionExecute(r ApiGetTestSuiteVersionRequest) (*TestSuite, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *Transaction
+		localVarReturnValue *TestSuite
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTransactionVersion")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestSuiteVersion")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/transactions/{transactionId}/version/{version}"
-	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterValueToString(r.transactionId, "transactionId")), -1)
+	localVarPath := localBasePath + "/testsuites/{testSuiteId}/version/{version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"testSuiteId"+"}", url.PathEscape(parameterValueToString(r.testSuiteId, "testSuiteId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"version"+"}", url.PathEscape(parameterValueToString(r.version, "version")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetTestVersionRequest struct {
+	ctx        context.Context
+	ApiService *ApiApiService
+	testId     string
+	version    int32
+}
+
+func (r ApiGetTestVersionRequest) Execute() (*Test, *http.Response, error) {
+	return r.ApiService.GetTestVersionExecute(r)
+}
+
+/*
+GetTestVersion get a test specific version
+
+get a test specific version
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId id of the test
+	@param version version of the test
+	@return ApiGetTestVersionRequest
+*/
+func (a *ApiApiService) GetTestVersion(ctx context.Context, testId string, version int32) ApiGetTestVersionRequest {
+	return ApiGetTestVersionRequest{
+		ApiService: a,
+		ctx:        ctx,
+		testId:     testId,
+		version:    version,
+	}
+}
+
+// Execute executes the request
+//
+//	@return Test
+func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Test
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetTestVersion")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/tests/{testId}/version/{version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterValueToString(r.testId, "testId")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"version"+"}", url.PathEscape(parameterValueToString(r.version, "version")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -2252,57 +2252,57 @@ func (a *ApiApiService) RunTestExecute(r ApiRunTestRequest) (*TestRun, *http.Res
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiRunTransactionRequest struct {
+type ApiRunTestSuiteRequest struct {
 	ctx            context.Context
 	ApiService     *ApiApiService
-	transactionId  string
+	testSuiteId    string
 	runInformation *RunInformation
 }
 
-func (r ApiRunTransactionRequest) RunInformation(runInformation RunInformation) ApiRunTransactionRequest {
+func (r ApiRunTestSuiteRequest) RunInformation(runInformation RunInformation) ApiRunTestSuiteRequest {
 	r.runInformation = &runInformation
 	return r
 }
 
-func (r ApiRunTransactionRequest) Execute() (*TransactionRun, *http.Response, error) {
-	return r.ApiService.RunTransactionExecute(r)
+func (r ApiRunTestSuiteRequest) Execute() (*TestSuiteRun, *http.Response, error) {
+	return r.ApiService.RunTestSuiteExecute(r)
 }
 
 /*
-RunTransaction run transaction
+RunTestSuite run TestSuite
 
-run a particular transaction
+run a particular TestSuite
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param transactionId id of the transaction
-	@return ApiRunTransactionRequest
+	@param testSuiteId id of the TestSuite
+	@return ApiRunTestSuiteRequest
 */
-func (a *ApiApiService) RunTransaction(ctx context.Context, transactionId string) ApiRunTransactionRequest {
-	return ApiRunTransactionRequest{
-		ApiService:    a,
-		ctx:           ctx,
-		transactionId: transactionId,
+func (a *ApiApiService) RunTestSuite(ctx context.Context, testSuiteId string) ApiRunTestSuiteRequest {
+	return ApiRunTestSuiteRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		testSuiteId: testSuiteId,
 	}
 }
 
 // Execute executes the request
 //
-//	@return TransactionRun
-func (a *ApiApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*TransactionRun, *http.Response, error) {
+//	@return TestSuiteRun
+func (a *ApiApiService) RunTestSuiteExecute(r ApiRunTestSuiteRequest) (*TestSuiteRun, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *TransactionRun
+		localVarReturnValue *TestSuiteRun
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RunTransaction")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.RunTestSuite")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/transactions/{transactionId}/run"
-	localVarPath = strings.Replace(localVarPath, "{"+"transactionId"+"}", url.PathEscape(parameterValueToString(r.transactionId, "transactionId")), -1)
+	localVarPath := localBasePath + "/testsuites/{testSuiteId}/run"
+	localVarPath = strings.Replace(localVarPath, "{"+"testSuiteId"+"}", url.PathEscape(parameterValueToString(r.testSuiteId, "testSuiteId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
