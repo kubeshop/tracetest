@@ -5,7 +5,7 @@ The OpenTelemetry Demo is an example application published by the OpenTelemtry C
 We will provide a full recipe below for running the full demo as well as running the associated Tracetests via Docker. Here are other references you may find useful:
 
 - **Source Code**: https://github.com/open-telemetry/opentelemetry-demo
-- **Running it locally in DOcker**: [Instructions](https://opentelemetry.io/docs/demo/docker-deployment/)
+- **Running it locally in Docker**: [Instructions](https://opentelemetry.io/docs/demo/docker-deployment/)
 - **Running on Kubernetes**: [Instructions](https://opentelemetry.io/docs/demo/kubernetes-deployment/)
 
 ## Running the OpenTelemetry Astronomy Shop Demo in Docker
