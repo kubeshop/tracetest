@@ -1,4 +1,16 @@
 ---
+type: Demo
+spec:
+  name: "OpenTelemetry Shop"
+  enabled: true
+  type: otelstore
+  opentelemetryStore:
+    frontendEndpoint: http://frontend:8084
+    productCatalogEndpoint: productcatalogservice:3550
+    cartEndpoint: cartservice:7070
+    checkoutEndpoint: checkoutservice:5050
+
+---
 type: PollingProfile
 spec:
   name: Default
@@ -13,6 +25,7 @@ type: DataStore
 spec:
   name: Dynatrace
   type: dynatrace
+
 ---
 type: TestRunner
 spec:
