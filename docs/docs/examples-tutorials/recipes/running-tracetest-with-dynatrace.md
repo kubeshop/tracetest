@@ -286,7 +286,11 @@ To start both OpenTelemetry and Tracetest, run this command:
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`. 
+:::note Heads up!
+Please note starting the demo for the first time will take a few minutes.
+:::
+
+This will start your Tracetest instance on `http://localhost:11633/`.
 
 Open the URL and [start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the endpoints within your Docker network like `http://frontend:8084/` when creating tests.
 
@@ -360,17 +364,21 @@ tracetest run test -f ./http-test.yaml
 This test will fail just like the sample above due to the `attr:tracetest.span.duration  <  10ms` assertion.
 
 ```bash
-✘ OpenTelemetry Shop - List Products (http://localhost:11633/test/JBYAfKJ4R/run/3/test)
-        ✘ span[tracetest.span.type="general" name="Tracetest trigger"]
-                ✘ #2d1b0dcbd75b3a42
-                        ✔ attr:tracetest.response.status   =   200 (200)
-                        ✘ attr:tracetest.span.duration  <  10ms (24ms) (http://localhost:11633/test/JBYAfKJ4R/run/3/test?selectedAssertion=0&selectedSpan=2d1b0dcbd75b3a42)
-        ✔ span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
-                ✔ #90aeab1e9db4617b
-                        ✔ attr:rpc.grpc.status_code = 0 (http://localhost:11633/test/JBYAfKJ4R/run/3/test?selectedAssertion=1)
-        ✔ span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts" rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
-                ✔ #44b836b092b4d708
-                        ✔ attr:rpc.grpc.status_code = 0 (http://localhost:11633/test/JBYAfKJ4R/run/3/test?selectedAssertion=2)
+✘ OpenTelemetry Shop - List Products (http://localhost:11633/test/JBYAfKJ4R/run/1/test) - trace id: b9db3e805490f6e1d9aff7c48100d367
+	✘ span[tracetest.span.type="general" name="Tracetest trigger"]
+		✘ #bf9abd7861371975
+			✔ attr:tracetest.response.status   =   200 (200)
+			✘ attr:tracetest.span.duration  <  10ms (1.3s) (http://localhost:11633/test/JBYAfKJ4R/run/1/test?selectedAssertion=0&selectedSpan=bf9abd7861371975)
+	✔ span[tracetest.span.type="rpc" name="grpc.hipstershop.ProductCatalogService/ListProducts"]
+		✔ #52a4bd4cbace9c4b
+			✔ attr:rpc.grpc.status_code = 0 (0)
+	✔ span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/ListProducts" rpc.system="grpc" rpc.method="ListProducts" rpc.service="hipstershop.ProductCatalogService"]
+		✔ #533d2199d7e26437
+			✔ attr:rpc.grpc.status_code = 0 (0)
+
+	✘ Required gates
+		✔ analyzer-score
+		✘ test-specs
 ```
 
 If you edit the duration as in the Web UI example above, the test will pass!
