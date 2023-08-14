@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/goccy/go-yaml"
@@ -85,7 +86,7 @@ func (p Provisioner) do(data []byte) error {
 		}
 
 		if err != nil {
-			return fmt.Errorf("cannot unmarshal yaml: %w", err)
+			return fmt.Errorf("cannot unmarshal yaml for provisioning file: %w", err)
 		}
 
 		if rawYaml == nil {
@@ -99,13 +100,14 @@ func (p Provisioner) do(data []byte) error {
 				continue
 			}
 			if err != nil {
-				return fmt.Errorf("cannot provision resource from yaml: %w", err)
+				return fmt.Errorf("cannot provision resource from yaml for provisioner %T: %w", p, err)
 			}
+			log.Printf("[provisioning] provisioner %T executed with success", p)
 			success = true
 		}
 
 		if !success {
-			return fmt.Errorf("invalid resource type from yaml")
+			return fmt.Errorf("all resource types from provisioning yaml don't support provisioning")
 		}
 	}
 	return nil
