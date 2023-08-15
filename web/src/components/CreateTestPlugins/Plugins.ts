@@ -5,13 +5,14 @@ import Rest from './Rest';
 import Grpc from './Grpc';
 import Curl from './Curl';
 import TraceID from './TraceID';
+import Kafka from './Kafka';
 
 export const PluginsComponentMap: Record<SupportedPlugins, IPluginComponentMap> = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: Grpc,
   [SupportedPlugins.Postman]: Postman,
   [SupportedPlugins.CURL]: Curl,
-  [SupportedPlugins.Messaging]: {},
+  [SupportedPlugins.Kafka]: Kafka,
   [SupportedPlugins.OpenAPI]: {},
   [SupportedPlugins.TraceID]: TraceID,
 };

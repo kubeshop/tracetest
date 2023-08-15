@@ -178,7 +178,7 @@ func runnerSetup(t *testing.T) runnerFixture {
 	tracer, _ := tracing.NewTracer(context.Background(), config.Must(config.New()))
 	eventEmitter := executor.NewEventEmitter(getTestRunEventRepositoryMock(t, false), sm)
 
-	registry := triggerer.NewRegsitry(tracer, tracer)
+	registry := triggerer.NewRegistry(tracer, tracer)
 	registry.Add(triggererMock)
 
 	runner := executor.NewPersistentRunner(

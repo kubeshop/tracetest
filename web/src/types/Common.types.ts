@@ -26,6 +26,7 @@ export type TTestSchemas = external['tests.yaml']['components']['schemas'];
 export type TTriggerSchemas = external['triggers.yaml']['components']['schemas'];
 export type TGrpcSchemas = external['grpc.yaml']['components']['schemas'];
 export type TTraceIDSchemas = external['traceid.yaml']['components']['schemas'];
+export type TKafkaSchemas = external['kafka.yaml']['components']['schemas'];
 export type TVariableSetSchemas = external['variableSets.yaml']['components']['schemas'];
 export type TExpressionsSchemas = external['expressions.yaml']['components']['schemas'];
 export type TTestSuiteSchemas = external['testsuites.yaml']['components']['schemas'];

@@ -1,23 +1,48 @@
 receivers:
   otlp:
     protocols:
-      grpc:
       http:
+      grpc:
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      paging:
+        metrics:
+          system.paging.utilization:
+            enabled: true
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+      disk:
+      filesystem:
+        metrics:
+          system.filesystem.utilization:
+            enabled: true
+      load:
+      memory:
+      network:
+      processes:
+  # The prometheus receiver scrapes metrics needed for the OpenTelemetry Collector Dashboard.
+  prometheus:
+    config:
+      scrape_configs:
+      - job_name: 'otelcol'
+        scrape_interval: 10s
+        static_configs:
+        - targets: ['0.0.0.0:8888']
 
 processors:
-  batch:
-    timeout: 100ms
-
-  # Data sources: traces
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 100
+  batch: # this configuration is needed to guarantee that the data is sent correctly to Datadog
+    send_batch_max_size: 100
+    send_batch_size: 10
+    timeout: 10s
 
 exporters:
   # OTLP for Tracetest
   otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest.
-                             # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
     tls:
       insecure: true
   # OTLP for Dynatrace
@@ -28,7 +53,15 @@ exporters:
 
 service:
   pipelines:
-    traces:
+    traces/tracetest:
       receivers: [otlp]
-      processors: [probabilistic_sampler, batch]
-      exporters: [otlphttp/dynatrace, otlp/tracetest]
+      processors: [batch]
+      exporters: [otlp/tracetest]
+    traces/dynatrace:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/dynatrace]
+    metrics:
+      receivers: [hostmetrics, otlp]
+      processors: [batch]
+      exporters: [otlphttp/dynatrace]

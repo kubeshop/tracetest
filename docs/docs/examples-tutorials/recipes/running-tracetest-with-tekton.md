@@ -250,6 +250,10 @@ spec:
     emptyDir: {}
 ```
 
+```bash
+kubectl apply -f ./install-and-run-tracetest.yaml
+```
+
 Make sure to use the Tracetest service as the endpoint for your `tracetest configure` command. This may vary depending on your installation.
 
 ```bash
@@ -260,7 +264,7 @@ http://tracetest.tracetest.svc.cluster.local:11633/
 
 Finally, to run the test, create a `TaskRun`.
 
-Create a file called `install-and-run-tracetest-run-yaml`.
+Create a file called `install-and-run-tracetest-run.yaml`.
 
 ```yaml
 apiVersion: tekton.dev/v1beta1
@@ -273,7 +277,7 @@ spec:
 ```
 
 ```bash
-kubectl apply -f ./install-and-run-tracetest-run-yaml
+kubectl apply -f ./install-and-run-tracetest-run.yaml
 ```
 
 Here's how to check the logs:
@@ -290,9 +294,16 @@ tkn task start install-and-run-tracetest
 
 ```text title="Expected output"
 TaskRun started: install-and-run-tracetest-run-xmhfg
+```
 
 In order to track the TaskRun progress run:
-tkn taskrun logs install-and-run-tracetest-run-xmhfg -f -n default
+
+```bash
+tkn taskrun logs install-and-run-tracetest-run-gccjk -f -n default
+
+[install-and-run-tracetest] ✔ Pokeshop - List (http://tracetest.tracetest.svc.cluster.local:11633/test/RUkKQ_aVR/run/3/test) - trace id: 0549641531d3221ded696f2fd3b20ce6
+[install-and-run-tracetest] 	✔ Database queries less than 500 ms
+[install-and-run-tracetest]
 ```
 
 To preview which tasks failed or succeeded, use this command:
@@ -350,11 +361,11 @@ kubectl apply -f install-and-run-tracetest-trigger-template.yaml
 
 ### Create an EventListener
 
-```yaml title="install-and-run-tracetest-listener.yaml"
+```yaml title="install-and-run-tracetest-event-listener.yaml"
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: install-and-run-tracetest-listener
+  name: install-and-run-tracetest-event-listener
 spec:
   serviceAccountName: tekton-robot
   triggers:
@@ -401,13 +412,13 @@ roleRef:
 
 ```bash
 kubectl apply -f tekton-robot-rbac.yaml
-kubectl apply -f install-and-run-tracetest-listener.yaml
+kubectl apply -f install-and-run-tracetest-event-listener.yaml
 ```
 
 Enable port forwarding.
 
 ```bash
-kubectl port-forward service/el-hello-listener 8080
+kubectl port-forward service/el-install-and-run-tracetest-event-listener 8080
 ```
 
 Hitting the port forwarded endpoint will trigger the task.
@@ -419,7 +430,7 @@ curl -v \
    http://localhost:8080
 ```
 
-Checking the taskruns will confirm this.
+Checking the `taskruns` will confirm this.
 
 ```bash
 tkn taskrun list

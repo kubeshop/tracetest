@@ -43,7 +43,7 @@ services:
     build: ./kafka
     restart: unless-stopped
     environment:
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://127.0.0.1:29092
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=cumulative
       - OTEL_RESOURCE_ATTRIBUTES="service.namespace=quick-start-go-and-kafka"
@@ -58,9 +58,11 @@ services:
     depends_on:
       otel-collector:
         condition: service_started
+    ports:
+      - 29092:29092
 
   tracetest:
-    image: kubeshop/tracetest:latest
+    image: kubeshop/tracetest:${TAG:-latest}
     platform: linux/amd64
     volumes:
       - type: bind
@@ -97,6 +99,8 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+    ports:
+      - 5432:5432
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.59.0
@@ -105,12 +109,18 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+    ports:
+      - 4317:4317
+    depends_on:
+      jaeger:
+        condition: service_started
 
   jaeger:
     image: jaegertracing/all-in-one:latest
     restart: unless-stopped
     ports:
       - 16686:16686
+      - 16685:16685
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     healthcheck:

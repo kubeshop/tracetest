@@ -5,6 +5,7 @@ import TestRun from 'models/TestRun.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
+import useAttributePanelTooltip from 'hooks/useAttributePanelTooltip';
 import {LeftPanel, PanelContainer} from '../ResizablePanels';
 
 interface IProps {
@@ -23,16 +24,14 @@ const SpanDetailsPanel = ({run, testId}: IProps) => {
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const {navigate} = useDashboard();
   const span = useAppSelector(state => SpanSelectors.selectSpanById(state, selectedSpan, testId, run.id));
+  const {onClose, tooltip, isVisible} = useAttributePanelTooltip();
 
   const handleOnCreateSpec = useCallback(() => {
     navigate(`/test/${testId}/run/${run.id}/test`);
   }, [navigate, run.id, testId]);
 
   return (
-    <LeftPanel
-      panel={panel}
-      tooltip="A certain span contains an attribute and this attribute has a specific value. You can check it here."
-    >
+    <LeftPanel panel={panel} tooltip={tooltip} onOpen={onClose} isToolTipVisible={isVisible}>
       {size => (
         <PanelContainer $isOpen={size.isOpen}>
           <SpanDetail

@@ -12,6 +12,7 @@ import HttpService from './Triggers/Http.service';
 import PostmanService from './Triggers/Postman.service';
 import CurlService from './Triggers/Curl.service';
 import TraceIDService from './Triggers/TraceID.service';
+import KafkaService from './Triggers/Kafka.service';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
   switch (auth?.type) {
@@ -33,7 +34,7 @@ const basicDetailsValidation = ({name}: TDraftTest): boolean => {
 const TriggerServiceMap = {
   [SupportedPlugins.GRPC]: GrpcService,
   [SupportedPlugins.REST]: HttpService,
-  [SupportedPlugins.Messaging]: HttpService,
+  [SupportedPlugins.Kafka]: KafkaService,
   [SupportedPlugins.OpenAPI]: HttpService,
   [SupportedPlugins.Postman]: PostmanService,
   [SupportedPlugins.CURL]: CurlService,
@@ -44,6 +45,7 @@ const TriggerServiceByTypeMap = {
   [TriggerTypes.grpc]: GrpcService,
   [TriggerTypes.http]: HttpService,
   [TriggerTypes.traceid]: TraceIDService,
+  [TriggerTypes.kafka]: KafkaService,
 } as const;
 
 const TestService = () => ({

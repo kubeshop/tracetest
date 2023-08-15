@@ -1490,6 +1490,39 @@ export interface external {
     };
     operations: {};
   };
+  "kafka.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        KafkaRequest: {
+          brokerUrls?: string[];
+          topic?: string;
+          authentication?: external["kafka.yaml"]["components"]["schemas"]["KafkaAuthentication"];
+          sslVerification?: boolean;
+          headers?: external["kafka.yaml"]["components"]["schemas"]["KafkaMessageHeader"][];
+          messageKey?: string;
+          messageValue?: string;
+        };
+        KafkaResponse: {
+          partition?: string;
+          offset?: string;
+        };
+        KafkaMessageHeader: {
+          key?: string;
+          value?: string;
+        };
+        KafkaAuthentication: {
+          /** @enum {string} */
+          type?: "plain";
+          plain?: {
+            username?: string;
+            password?: string;
+          };
+        };
+      };
+    };
+    operations: {};
+  };
   "linters.yaml": {
     paths: {};
     components: {
@@ -1981,18 +2014,20 @@ export interface external {
       schemas: {
         Trigger: {
           /** @enum {string} */
-          type?: "http" | "grpc" | "traceid";
+          type?: "http" | "grpc" | "traceid" | "kafka";
           httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
+          kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
-          type?: "http" | "grpc" | "traceid";
+          type?: "http" | "grpc" | "traceid" | "kafka";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
             traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDResponse"];
+            kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaResponse"];
           };
         };
       };
