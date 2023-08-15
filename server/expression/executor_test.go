@@ -21,7 +21,7 @@ type executorTestCase struct {
 
 	AttributeDataStore      expression.DataStore
 	MetaAttributesDataStore expression.DataStore
-	EnvironmentDataStore    expression.DataStore
+	VariableDataStore       expression.DataStore
 }
 
 func TestBasicExpressionExecution(t *testing.T) {
@@ -437,7 +437,7 @@ func TestFailureCases(t *testing.T) {
 			ShouldPass:           false,
 			ExpectedErrorMessage: `resolution error: variable "test" not found`,
 
-			EnvironmentDataStore: expression.EnvironmentDataStore{
+			VariableDataStore: expression.VariableDataStore{
 				Values: []variableset.VariableSetValue{},
 			},
 		},
@@ -447,7 +447,7 @@ func TestFailureCases(t *testing.T) {
 			ShouldPass:           false,
 			ExpectedErrorMessage: `resolution error: variable "host" not found`,
 
-			EnvironmentDataStore: expression.EnvironmentDataStore{
+			VariableDataStore: expression.VariableDataStore{
 				Values: []variableset.VariableSetValue{},
 			},
 		},
@@ -478,7 +478,7 @@ func TestFailureCases(t *testing.T) {
 			ShouldPass:           false,
 			ExpectedErrorMessage: `resolution error: at index 1 of array: variable "test" not found`,
 
-			EnvironmentDataStore: expression.EnvironmentDataStore{
+			VariableDataStore: expression.VariableDataStore{
 				Values: []variableset.VariableSetValue{},
 			},
 		},
@@ -488,7 +488,7 @@ func TestFailureCases(t *testing.T) {
 			ShouldPass:           false,
 			ExpectedErrorMessage: `resolution error: at index 1 of array: variable "host" not found`,
 
-			EnvironmentDataStore: expression.EnvironmentDataStore{
+			VariableDataStore: expression.VariableDataStore{
 				Values: []variableset.VariableSetValue{},
 			},
 		},
@@ -503,7 +503,7 @@ func executeResolveStatementTestCases(t *testing.T, testCases []executorTestCase
 			executor := expression.NewExecutor(
 				testCase.AttributeDataStore,
 				testCase.MetaAttributesDataStore,
-				testCase.EnvironmentDataStore,
+				testCase.VariableDataStore,
 			)
 			left, err := executor.ResolveStatement(testCase.Query)
 			debugMessage := fmt.Sprintf("left value: %s", left)

@@ -283,7 +283,7 @@ func (c *controller) DryRunAssertion(ctx context.Context, testID string, runID i
 
 	definition := c.mappers.In.Definition(def.Specs)
 
-	ds := []expression.DataStore{expression.EnvironmentDataStore{
+	ds := []expression.DataStore{expression.VariableDataStore{
 		Values: run.VariableSet.Values,
 	}}
 
@@ -438,7 +438,7 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 			return [][]expression.DataStore{}, err
 		}
 
-		ds = append([]expression.DataStore{expression.EnvironmentDataStore{
+		ds = append([]expression.DataStore{expression.VariableDataStore{
 			Values: environment.Values,
 		}}, ds...)
 	}

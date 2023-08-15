@@ -120,7 +120,7 @@ func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
 	run.TraceID = traceID
 	r.handleDBError(run, r.updater.Update(ctx, run))
 
-	ds := []expression.DataStore{expression.EnvironmentDataStore{
+	ds := []expression.DataStore{expression.VariableDataStore{
 		Values: run.VariableSet.Values,
 	}}
 
