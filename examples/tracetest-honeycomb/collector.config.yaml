@@ -10,7 +10,7 @@ processors:
 
 exporters:
   logging:
-    logLevel: debug
+    loglevel: debug
   # OTLP for Tracetest
   otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
@@ -20,7 +20,7 @@ exporters:
   otlp/honeycomb:
     endpoint: "api.honeycomb.io:443"
     headers:
-      "x-honeycomb-team": <HONEYCOMB_API_KEY>
+      "x-honeycomb-team": JxS9O6mHbdml8Mi3x2JWwB
       # "x-honeycomb-dataset": "<HONEYCOMB_DATASET>" # optional
       # Read more in docs here: https://docs.honeycomb.io/getting-data-in/otel-collector/
 
