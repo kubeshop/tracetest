@@ -12,8 +12,8 @@ spec:
       - key: Content-Type
         value: application/json
       - key: X-Some-Header
-        value: ${env:someValue}
-      body: '{"id":${env:pokeid}}'
+        value: ${var:someValue}
+      body: '{"id":${var:pokeid}}'
 
   specs:
   - name: 'All Database Spans: Processing time is less than 100ms'

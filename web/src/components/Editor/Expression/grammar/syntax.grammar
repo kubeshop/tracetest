@@ -32,7 +32,7 @@ JsonPath {"json_path '$" Word "'"}
   OpenInterpolation { "${" }
   CloseInterpolation { "}" }
   Colon { ":" }
-  Source { ("env" | "attr") Colon }
+  Source { ("env" | "attr" | "var") Colon }
 
   @precedence { OpenInterpolation, String }
   @precedence { String, space }

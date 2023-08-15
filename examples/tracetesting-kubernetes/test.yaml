@@ -5,7 +5,7 @@ spec:
   trigger:
     type: traceid
     traceid:
-      id: ${env:asd}
+      id: ${var:asd}
   specs:
   - name: List span exists
     selector: span[tracetest.span.type="general" name="List"]

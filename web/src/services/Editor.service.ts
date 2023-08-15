@@ -30,12 +30,13 @@ interface IAutoCompleteProps {
   type: SupportedEditors.Interpolation | SupportedEditors.Expression;
   context: CompletionContext;
   attributeList?: TSpanFlatAttribute[];
-  envEntryList?: IKeyValue[];
+  varEntryList?: IKeyValue[];
   customValueList?: string[];
   onSelect?(option: Completion): void;
 }
 
-const CUSTOM_SYNTAX_ERRORS_WHITE_LIST = [/Unexpected token \'\$\'/, /\${env:([\w-]+)}/];
+const CUSTOM_SYNTAX_ERRORS_WHITE_LIST = [/Unexpected token \'\$\'/, /\${env:([\w-]+)}/, /\${var:([\w-]+)}/];
+const varSource = ['env', 'var'];
 
 function getJsonErrorPosition(error: SyntaxError, doc: Text): number {
   let m;
@@ -103,16 +104,15 @@ const EditorService = () => ({
 
       return {
         from: node.to,
-        options:
-          sourceText === 'env'
-            ? variableList.map(({key}) => ({
-                label: key,
-                type: 'variableName',
-              }))
-            : attributeList.map(({key}) => ({
-                label: key,
-                type: 'variableName',
-              })),
+        options: varSource.includes(sourceText)
+          ? variableList.map(({key}) => ({
+              label: key,
+              type: 'variableName',
+            }))
+          : attributeList.map(({key}) => ({
+              label: key,
+              type: 'variableName',
+            })),
       };
     }
 
@@ -123,16 +123,15 @@ const EditorService = () => ({
       return {
         to: node.to,
         from: node.from,
-        options:
-          sourceText === 'env'
-            ? variableList.map(({key}) => ({
-                label: key,
-                type: 'variableName',
-              }))
-            : attributeList.map(({key}) => ({
-                label: key,
-                type: 'variableName',
-              })),
+        options: varSource.includes(sourceText)
+          ? variableList.map(({key}) => ({
+              label: key,
+              type: 'variableName',
+            }))
+          : attributeList.map(({key}) => ({
+              label: key,
+              type: 'variableName',
+            })),
       };
     }
 
@@ -162,7 +161,7 @@ const EditorService = () => ({
     type,
     context,
     attributeList = [],
-    envEntryList = [],
+    varEntryList = [],
     customValueList = [],
     onSelect = noop,
   }: IAutoCompleteProps): CompletionResult | null {
@@ -176,7 +175,7 @@ const EditorService = () => ({
     const operatorAutocomplete = this.getOperatorAutocomplete(node);
     if (operatorAutocomplete) return operatorAutocomplete;
 
-    return this.getSourceAutocomplete(type, node, state, envEntryList, attributeList, customValueList, onSelect);
+    return this.getSourceAutocomplete(type, node, state, varEntryList, attributeList, customValueList, onSelect);
   },
 
   getIsQueryValid(

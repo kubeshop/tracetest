@@ -50,7 +50,7 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "no_missing_variables_if_variable_exists",
 			availableVariables: []string{"SERVER_URL", "PORT", "TOKEN"},
 			object: HTTPRequest{
-				URL:    `${env:SERVER_URL}:${PORT}`,
+				URL:    `${env:SERVER_URL}:${var:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
 					Token: "abc",
@@ -62,7 +62,7 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variables_if_variable_doesnt_exists",
 			availableVariables: []string{"SERVER_URL"},
 			object: HTTPRequest{
-				URL:    `${env:SERVER_URL}:${env:PORT}`,
+				URL:    `${env:SERVER_URL}:${var:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
 					Token: "abc",
@@ -86,7 +86,7 @@ func TestMissingVariableDetection(t *testing.T) {
 			name:               "missing_variables_in_inner_struct",
 			availableVariables: []string{"SERVER_URL", "PORT"},
 			object: HTTPRequest{
-				URL:    `${env:SERVER_URL}:${env:PORT}`,
+				URL:    `${env:SERVER_URL}:${var:PORT}`,
 				Method: "GET",
 				Auth: HTTPAuth{
 					Token: "${env:TOKEN}",
@@ -104,8 +104,8 @@ func TestMissingVariableDetection(t *testing.T) {
 					Token: "abc",
 				},
 				Assertions: []Assertion{
-					{Name: "test", Queries: []string{"env:ABC = env:ABC2"}},
-					{Name: "test2", Queries: []string{"env:CDE = env:CDE"}},
+					{Name: "test", Queries: []string{"env:ABC = var:ABC2"}},
+					{Name: "test2", Queries: []string{"env:CDE = var:CDE"}},
 				},
 			},
 			expectedMissingVariables: []string{"ABC", "ABC2", "CDE"},
@@ -127,7 +127,7 @@ func TestMissingVariableDetection(t *testing.T) {
 				},
 				Assertions: []Assertion{
 					{Name: "test", Queries: []string{"env:ABC = env:ABC2"}},
-					{Name: "test2", Queries: []string{"env:CDE = env:CDE"}},
+					{Name: "test2", Queries: []string{"env:CDE = var:CDE"}},
 				},
 			},
 			expectedMissingVariables: []string{"ABC", "ABC2", "CDE"},
@@ -139,11 +139,11 @@ func TestMissingVariableDetection(t *testing.T) {
 				Trigger: trigger.Trigger{
 					Type: trigger.TriggerTypeHTTP,
 					HTTP: &trigger.HTTPRequest{
-						Body: `{"id": ${env:pokemonId}}`,
+						Body: `{"id": ${env:pokemonId},"name": "${var:pokemonName}"}`,
 					},
 				},
 			},
-			expectedMissingVariables: []string{"pokemonId"},
+			expectedMissingVariables: []string{"pokemonId", "pokemonName"},
 		},
 	}
 

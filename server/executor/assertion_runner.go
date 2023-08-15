@@ -111,7 +111,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 		return test.Run{}, fmt.Errorf("trace not available")
 	}
 
-	ds := []expression.DataStore{expression.EnvironmentDataStore{
+	ds := []expression.DataStore{expression.VariableDataStore{
 		Values: req.Run.VariableSet.Values,
 	}}
 
@@ -123,7 +123,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 
 	newVariableSet := createVariableSet(req.Run.VariableSet, outputs)
 
-	ds = []expression.DataStore{expression.EnvironmentDataStore{Values: newVariableSet.Values}}
+	ds = []expression.DataStore{expression.VariableDataStore{Values: newVariableSet.Values}}
 
 	assertionResult, allPassed := e.assertionExecutor.Assert(ctx, req.Test.Specs, *run.Trace, ds)
 

@@ -7,7 +7,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/variablesets/${env:VARIABLE_SET_ID}
+      url: ${var:TARGET_URL}/api/variablesets/${var:VARIABLE_SET_ID}
       method: DELETE
       headers:
         - key: Content-Type

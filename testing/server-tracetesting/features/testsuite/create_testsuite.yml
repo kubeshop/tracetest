@@ -7,7 +7,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/testsuites
+      url: ${var:TARGET_URL}/api/testsuites
       method: POST
       headers:
         - key: Content-Type
@@ -18,7 +18,7 @@ spec:
           "spec": {
             "name": "test-testsuite",
             "description": "a testsuite",
-            "steps": [ "${env:TRANSACTION_STEP_ID}" ]
+            "steps": [ "${var:TRANSACTION_STEP_ID}" ]
           }
         }
   specs:
@@ -26,7 +26,7 @@ spec:
     assertions:
       - attr:tracetest.selected_spans.count = 1
       - attr:tracetest.response.status = 201
-      - attr:tracetest.response.body | json_path '$.spec.id' = env:TRANSACTION_ID
+      - attr:tracetest.response.body | json_path '$.spec.id' = var:TRANSACTION_ID
   - selector: span[name="POST /api/testsuites" tracetest.span.type="http"]
     assertions:
       - attr:tracetest.selected_spans.count = 1

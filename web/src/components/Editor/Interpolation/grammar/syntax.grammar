@@ -28,7 +28,7 @@ JsonPath {"json_path '" Identifier "'"}
   String { "'" (!["\\] | "\\" _)* "'" }
   OpenInterpolation { "${" }
   CloseInterpolation { "}" }
-  Source { "env" Colon }
+  Source { ("env" | "var") Colon }
   Colon { ":" }
   space { @whitespace+ }
 

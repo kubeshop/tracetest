@@ -12,9 +12,9 @@ spec:
           value: application/json
       body: |-
         {
-            "TaskToken": "${env:TASK_TOKEN}",
-            "ExamId": "${env:EXAM_ID}",
-            "IncidentId": "${env:INCIDENT_ID}",
+            "TaskToken": "${var:TASK_TOKEN}",
+            "ExamId": "${var:EXAM_ID}",
+            "IncidentId": "${var:INCIDENT_ID}",
             "Score": "80"
         }
   specs:
