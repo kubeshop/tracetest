@@ -1,0 +1,8 @@
+type: TestSuite
+spec:
+  id: k1ug23k
+  name: TestSuite To Run
+  description: a TestSuite to run
+  steps:
+    - ./testsuite-step-1.yaml
+    - ./testsuite-step-2.yaml

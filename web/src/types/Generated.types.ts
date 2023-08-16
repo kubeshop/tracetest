@@ -4,35 +4,35 @@
  */
 
 export interface paths {
-  "/transactions": {
-    /** get transactions */
-    get: operations["getTransactions"];
-    /** Create new transaction */
-    post: operations["createTransaction"];
+  "/testsuites": {
+    /** get testsuites */
+    get: operations["getTestSuites"];
+    /** Create new TestSuite */
+    post: operations["createTestSuite"];
   };
-  "/transactions/{transactionId}": {
-    /** get transaction */
-    get: operations["getTransaction"];
-    /** update transaction action */
-    put: operations["updateTransaction"];
-    /** delete a transaction */
-    delete: operations["deleteTransaction"];
+  "/testsuites/{testSuiteId}": {
+    /** get TestSuite */
+    get: operations["getTestSuite"];
+    /** update TestSuite action */
+    put: operations["updateTestSuite"];
+    /** delete a TestSuite */
+    delete: operations["deleteTestSuite"];
   };
-  "/transactions/{transactionId}/version/{version}": {
-    /** get a transaction specific version */
-    get: operations["getTransactionVersion"];
+  "/testsuites/{testsuiteId}/version/{version}": {
+    /** get a TestSuite specific version */
+    get: operations["getTestSuiteVersion"];
   };
-  "/transactions/{transactionId}/run": {
-    /** Get all runs from a particular transaction */
-    get: operations["getTransactionRuns"];
-    /** run a particular transaction */
-    post: operations["runTransaction"];
+  "/testsuites/{testsuiteId}/run": {
+    /** Get all runs from a particular TestSuite */
+    get: operations["getTestSuiteRuns"];
+    /** run a particular TestSuite */
+    post: operations["runTestSuite"];
   };
-  "/transactions/{transactionId}/run/{runId}": {
-    /** Get a specific run from a particular transaction */
-    get: operations["getTransactionRun"];
-    /** Delete a specific run from a particular transaction */
-    delete: operations["deleteTransactionRun"];
+  "/testsuites/{testsuiteId}/run/{runId}": {
+    /** Get a specific run from a particular TestSuite */
+    get: operations["getTestSuiteRun"];
+    /** Delete a specific run from a particular TestSuite */
+    delete: operations["deleteTestSuiteRun"];
   };
   "/tests": {
     /** get tests */
@@ -173,7 +173,7 @@ export interface paths {
   "/variableSets": {
     /** List VariableSets available in Tracetest. */
     get: operations["listVariableSets"];
-    /** Create a VariableSet that can be used by tests and transactions */
+    /** Create a VariableSet that can be used by tests and test suites */
     post: operations["createVariableSet"];
   };
   "/variableSets/{variableSetId}": {
@@ -181,8 +181,8 @@ export interface paths {
     get: operations["getVariableSet"];
     /** Update a VariableSet used on Tracetest */
     put: operations["updateVariableSet"];
-    /** Delete an environment from Tracetest */
-    delete: operations["deleteEnvironment"];
+    /** Delete an variable set from Tracetest */
+    delete: operations["deleteVariableSet"];
   };
   "/version": {
     /** Get the version of the API */
@@ -207,136 +207,136 @@ export interface paths {
 export interface components {}
 
 export interface operations {
-  /** get transactions */
-  getTransactions: {
+  /** get testsuites */
+  getTestSuites: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResourceList"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResourceList"];
           "text/yaml": {
             count?: number;
-            items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
+            items?: external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"][];
           };
         };
       };
-      /** invalid query for transactions, some data was sent in incorrect format. */
+      /** invalid query for testsuites, some data was sent in incorrect format. */
       400: unknown;
-      /** problem with getting transactions */
+      /** problem with getting testsuites */
       500: unknown;
     };
   };
-  /** Create new transaction */
-  createTransaction: {
+  /** Create new TestSuite */
+  createTestSuite: {
     responses: {
       /** successful operation */
       201: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
+          "text/yaml": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
         };
       };
-      /** trying to create a transaction with an already existing ID */
+      /** trying to create a TestSuite with an already existing ID */
       400: unknown;
-      /** problem creating a transaction */
+      /** problem creating a TestSuite */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
+        "text/yaml": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
       };
     };
   };
-  /** get transaction */
-  getTransaction: {
+  /** get TestSuite */
+  getTestSuite: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
+          "text/yaml": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
         };
       };
-      /** transaction not found */
+      /** TestSuite not found */
       404: unknown;
-      /** problem getting an transaction */
+      /** problem getting an TestSuite */
       500: unknown;
     };
   };
-  /** update transaction action */
-  updateTransaction: {
+  /** update TestSuite action */
+  updateTestSuite: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-          "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
+          "text/yaml": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
         };
       };
-      /** invalid transaction, some data was sent in incorrect format. */
+      /** invalid TestSuite, some data was sent in incorrect format. */
       400: unknown;
-      /** transaction not found */
+      /** TestSuite not found */
       404: unknown;
-      /** problem updating a transaction */
+      /** problem updating a TestSuite */
       500: unknown;
     };
     requestBody: {
       content: {
-        "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
-        "text/yaml": external["transactions.yaml"]["components"]["schemas"]["TransactionResource"];
+        "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
+        "text/yaml": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"];
       };
     };
   };
-  /** delete a transaction */
-  deleteTransaction: {
+  /** delete a TestSuite */
+  deleteTestSuite: {
     parameters: {};
     responses: {
       /** successful operation */
       204: never;
-      /** transaction not found */
+      /** TestSuite not found */
       404: unknown;
-      /** problem deleting a transaction */
+      /** problem deleting a TestSuite */
       500: unknown;
     };
   };
-  /** get a transaction specific version */
-  getTransactionVersion: {
+  /** get a TestSuite specific version */
+  getTestSuiteVersion: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["Transaction"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuite"];
         };
       };
       /** problem with getting a test */
       500: unknown;
     };
   };
-  /** Get all runs from a particular transaction */
-  getTransactionRuns: {
+  /** Get all runs from a particular TestSuite */
+  getTestSuiteRuns: {
     parameters: {};
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionRun"][];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteRun"][];
         };
       };
     };
   };
-  /** run a particular transaction */
-  runTransaction: {
+  /** run a particular TestSuite */
+  runTestSuite: {
     parameters: {};
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionRun"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteRun"];
         };
       };
     };
@@ -346,27 +346,27 @@ export interface operations {
       };
     };
   };
-  /** Get a specific run from a particular transaction */
-  getTransactionRun: {
+  /** Get a specific run from a particular TestSuite */
+  getTestSuiteRun: {
     parameters: {};
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": external["transactions.yaml"]["components"]["schemas"]["TransactionRun"];
+          "application/json": external["testsuites.yaml"]["components"]["schemas"]["TestSuiteRun"];
         };
       };
-      /** transaction run not found */
+      /** TestSuite run not found */
       404: unknown;
     };
   };
-  /** Delete a specific run from a particular transaction */
-  deleteTransactionRun: {
+  /** Delete a specific run from a particular TestSuite */
+  deleteTestSuiteRun: {
     parameters: {};
     responses: {
       /** OK */
       204: never;
-      /** transaction run not found */
+      /** TestSuite run not found */
       404: unknown;
     };
   };
@@ -944,7 +944,7 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Create a VariableSet that can be used by tests and transactions */
+  /** Create a VariableSet that can be used by tests and test suites */
   createVariableSet: {
     responses: {
       /** successful operation */
@@ -1006,8 +1006,8 @@ export interface operations {
       };
     };
   };
-  /** Delete an environment from Tracetest */
-  deleteEnvironment: {
+  /** Delete an variable set from Tracetest */
+  deleteVariableSet: {
     parameters: {};
     responses: {
       /** successful operation */
@@ -1016,7 +1016,7 @@ export interface operations {
       400: unknown;
       /** VariableSet not found */
       404: unknown;
-      /** problem deleting an environment */
+      /** problem deleting an variable set */
       500: unknown;
     };
   };
@@ -1490,6 +1490,39 @@ export interface external {
     };
     operations: {};
   };
+  "kafka.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        KafkaRequest: {
+          brokerUrls?: string[];
+          topic?: string;
+          authentication?: external["kafka.yaml"]["components"]["schemas"]["KafkaAuthentication"];
+          sslVerification?: boolean;
+          headers?: external["kafka.yaml"]["components"]["schemas"]["KafkaMessageHeader"][];
+          messageKey?: string;
+          messageValue?: string;
+        };
+        KafkaResponse: {
+          partition?: string;
+          offset?: string;
+        };
+        KafkaMessageHeader: {
+          key?: string;
+          value?: string;
+        };
+        KafkaAuthentication: {
+          /** @enum {string} */
+          type?: "plain";
+          plain?: {
+            username?: string;
+            password?: string;
+          };
+        };
+      };
+    };
+    operations: {};
+  };
   "linters.yaml": {
     paths: {};
     components: {
@@ -1577,8 +1610,8 @@ export interface external {
         runId: number;
         /** @description version of the test */
         version: number;
-        /** @description id of the transaction */
-        transactionId: string;
+        /** @description id of the TestSuite */
+        testsuiteId: string;
         /** @description indicates how many resources can be returned by each page */
         take: number;
         /** @description indicates how many resources will be skipped when paginating */
@@ -1601,7 +1634,7 @@ export interface external {
         pollingProfileId: string;
         /** @description ID of a datastore used on Tracetest to configure how to fetch traces in a test */
         dataStoreId: string;
-        /** @description ID of a VariableSet used on Tracetest to inject values into tests and transactions */
+        /** @description ID of a VariableSet used on Tracetest to inject values into tests and TestSuites */
         variableSetId: string;
         /** @description ID of an Linter */
         LinterId: string;
@@ -1779,7 +1812,7 @@ export interface external {
           lastErrorState?: string;
           /** @description time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
           executionTime?: number;
-          /** @description time in milliseconds it took for the triggering transaction to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
+          /** @description time in milliseconds it took for the triggering testSuite to complete, either success or fail. If the test is still running, it will show the time up to the time of the request */
           triggerTime?: number;
           /** Format: date-time */
           createdAt?: string;
@@ -1804,8 +1837,8 @@ export interface external {
           }[];
           requiredGatesResult?: external["testRunner.yaml"]["components"]["schemas"]["RequiredGatesResult"];
           metadata?: { [key: string]: string };
-          transactionId?: string;
-          transactionRunId?: string;
+          testSuiteId?: string;
+          testSuiteRunId?: string;
         };
         RunInformation: {
           metadata?: { [key: string]: string } | null;
@@ -1867,6 +1900,58 @@ export interface external {
     };
     operations: {};
   };
+  "testsuites.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        TestSuiteResourceList: {
+          count?: number;
+          items?: external["testsuites.yaml"]["components"]["schemas"]["TestSuiteResource"][];
+        };
+        /** @description Represents a TestSuite structured into the Resources format. */
+        TestSuiteResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'TestSuite'.
+           * @enum {string}
+           */
+          type?: "TestSuite";
+          spec?: external["testsuites.yaml"]["components"]["schemas"]["TestSuite"];
+        };
+        TestSuite: {
+          id?: string;
+          name?: string;
+          description?: string;
+          /** @description version number of the test */
+          version?: number;
+          /** @description list of steps of the TestSuite containing just each test id */
+          steps?: string[];
+          /** @description list of steps of the TestSuite containing the whole test object */
+          fullSteps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          /** Format: date-time */
+          createdAt?: string;
+          /** @description summary of TestSuite */
+          summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
+        };
+        TestSuiteRun: {
+          id?: string;
+          version?: number;
+          /** Format: date-time */
+          createdAt?: string;
+          /** Format: date-time */
+          completedAt?: string;
+          /** @enum {string} */
+          state?: "CREATED" | "EXECUTING" | "FINISHED" | "FAILED";
+          steps?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
+          variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
+          metadata?: { [key: string]: string };
+          pass?: number;
+          fail?: number;
+          allStepsRequiredGatesPassed?: boolean;
+        };
+      };
+    };
+    operations: {};
+  };
   "trace.yaml": {
     paths: {};
     components: {
@@ -1923,76 +2008,26 @@ export interface external {
     };
     operations: {};
   };
-  "transactions.yaml": {
-    paths: {};
-    components: {
-      schemas: {
-        TransactionResourceList: {
-          count?: number;
-          items?: external["transactions.yaml"]["components"]["schemas"]["TransactionResource"][];
-        };
-        /** @description Represents a transaction structured into the Resources format. */
-        TransactionResource: {
-          /**
-           * @description Represents the type of this resource. It should always be set as 'Transaction'.
-           * @enum {string}
-           */
-          type?: "Transaction";
-          spec?: external["transactions.yaml"]["components"]["schemas"]["Transaction"];
-        };
-        Transaction: {
-          id?: string;
-          name?: string;
-          description?: string;
-          /** @description version number of the test */
-          version?: number;
-          /** @description list of steps of the transaction containing just each test id */
-          steps?: string[];
-          /** @description list of steps of the transaction containing the whole test object */
-          fullSteps?: external["tests.yaml"]["components"]["schemas"]["Test"][];
-          /** Format: date-time */
-          createdAt?: string;
-          /** @description summary of transaction */
-          summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
-        };
-        TransactionRun: {
-          id?: string;
-          version?: number;
-          /** Format: date-time */
-          createdAt?: string;
-          /** Format: date-time */
-          completedAt?: string;
-          /** @enum {string} */
-          state?: "CREATED" | "EXECUTING" | "FINISHED" | "FAILED";
-          steps?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
-          variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
-          metadata?: { [key: string]: string };
-          pass?: number;
-          fail?: number;
-          allStepsRequiredGatesPassed?: boolean;
-        };
-      };
-    };
-    operations: {};
-  };
   "triggers.yaml": {
     paths: {};
     components: {
       schemas: {
         Trigger: {
           /** @enum {string} */
-          type?: "http" | "grpc" | "traceid";
+          type?: "http" | "grpc" | "traceid" | "kafka";
           httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
+          kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
-          type?: "http" | "grpc" | "traceid";
+          type?: "http" | "grpc" | "traceid" | "kafka";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
             traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDResponse"];
+            kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaResponse"];
           };
         };
       };

@@ -15,4 +15,4 @@ spec:
   - name: Database queries less than 500 ms
     selector: span[tracetest.span.type="database"]
     assertions:
-    - attr:tracetest.span.duration  <  10ms
+    - attr:tracetest.span.duration  <  500ms

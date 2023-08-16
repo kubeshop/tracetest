@@ -42,10 +42,25 @@ func TestGetTokens(t *testing.T) {
 			},
 		},
 		{
+			Statement: `var:url = "http://localhost"`,
+			ExpectedTokens: []expression.Token{
+				{Identifier: "url", Type: expression.VariableType},
+				{Type: expression.StrType},
+			},
+		},
+		{
 			Statement: `"the server is ${env:url}" = "http://localhost"`,
 			ExpectedTokens: []expression.Token{
 				{Type: expression.StrType},
 				{Identifier: "url", Type: expression.EnvironmentType},
+				{Type: expression.StrType},
+			},
+		},
+		{
+			Statement: `"the server is ${var:url}" = "http://localhost"`,
+			ExpectedTokens: []expression.Token{
+				{Type: expression.StrType},
+				{Identifier: "url", Type: expression.VariableType},
 				{Type: expression.StrType},
 			},
 		},
@@ -65,6 +80,16 @@ func TestGetTokens(t *testing.T) {
 				{Identifier: "names", Type: expression.EnvironmentType},
 				{Identifier: "get_index", Type: expression.FunctionCallType},
 				{Identifier: "name_index", Type: expression.EnvironmentType},
+				{Type: expression.StrType},
+			},
+		},
+		{
+			Statement: `"test ${var:names | get_index var:name_index}" = "John Doe"`,
+			ExpectedTokens: []expression.Token{
+				{Type: expression.StrType},
+				{Identifier: "names", Type: expression.VariableType},
+				{Identifier: "get_index", Type: expression.FunctionCallType},
+				{Identifier: "name_index", Type: expression.VariableType},
 				{Type: expression.StrType},
 			},
 		},

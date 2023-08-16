@@ -6,7 +6,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/tests
+      url: ${var:TARGET_URL}/api/tests
       method: POST
       headers:
         - key: Content-Type
@@ -20,7 +20,7 @@ spec:
               "type": "grpc",
               "grpc": {
                 "protobufFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_outer_classname = \"PokeshopProto\";\noption objc_class_prefix = \"PKS\";\n\npackage pokeshop;\n\nservice Pokeshop {\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\n  rpc createPokemon (Pokemon) returns (Pokemon) {}\n  rpc importPokemon (ImportPokemonRequest) returns (ImportPokemonRequest) {}\n}\n\nmessage ImportPokemonRequest {\n  int32 id = 1;\n  optional bool isFixed = 2;\n}\n\nmessage GetPokemonRequest {\n  optional int32 skip = 1;\n  optional int32 take = 2;\n  optional bool isFixed = 3;\n}\n\nmessage GetPokemonListResponse {\n  repeated Pokemon items = 1;\n  int32 totalCount = 2;\n}\n\nmessage Pokemon {\n  optional int32 id = 1;\n  string name = 2;\n  string type = 3;\n  bool isFeatured = 4;\n  optional string imageUrl = 5;\n}",
-                "address": "${env:DEMO_APP_GRPC_URL}",
+                "address": "${var:DEMO_APP_GRPC_URL}",
                 "method": "pokeshop.Pokeshop.importPokemon",
                 "request": "{\"id\": 52}"
               }

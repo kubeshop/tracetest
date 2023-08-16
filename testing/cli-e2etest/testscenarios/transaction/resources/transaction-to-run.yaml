@@ -1,8 +1,0 @@
-type: Transaction
-spec:
-  id: k1ug23k
-  name: Transaction To Run
-  description: a transaction to run
-  steps:
-  - ./transaction-step-1.yaml
-  - ./transaction-step-2.yaml

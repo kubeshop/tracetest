@@ -28,12 +28,12 @@ components:
       schema:
         type: integer
 
-    # transaction
-    transactionId:
+    # TestSuite
+    testSuiteId:
       in: path
-      name: transactionId
+      name: testSuiteId
       required: true
-      description: id of the transaction
+      description: id of the TestSuite
       schema:
         type: string
 
@@ -130,7 +130,7 @@ components:
       in: path
       name: variableSetId
       required: true
-      description: "ID of a VariableSet used on Tracetest to inject values into tests and transactions"
+      description: "ID of a VariableSet used on Tracetest to inject values into tests and TestSuites"
       schema:
         type: string
 

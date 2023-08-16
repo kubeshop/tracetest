@@ -98,14 +98,14 @@ func Copy(source, dst string) {
 	}
 }
 
-func RemoveIDFromTransactionFile(t *testing.T, filePath string) {
+func RemoveIDFromTestSuiteFile(t *testing.T, filePath string) {
 	fileContent, err := os.ReadFile(filePath)
 	require.NoError(t, err)
 
-	transaction := UnmarshalYAML[types.TransactionResource](t, string(fileContent))
-	transaction.Spec.ID = ""
+	suite := UnmarshalYAML[types.TestSuiteResource](t, string(fileContent))
+	suite.Spec.ID = ""
 
-	newFileContent, err := yaml.Marshal(transaction)
+	newFileContent, err := yaml.Marshal(suite)
 	require.NoError(t, err)
 
 	err = os.WriteFile(filePath, newFileContent, os.ModeAppend)

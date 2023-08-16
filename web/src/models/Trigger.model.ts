@@ -5,6 +5,7 @@ import {TTriggerRequest} from 'types/Test.types';
 import GrpcRequest from './GrpcRequest.model';
 import HttpRequest from './HttpRequest.model';
 import TraceIDRequest from './TraceIDRequest.model';
+import KafkaRequest from './KafkaRequest.model';
 
 export type TRawTrigger = TTriggerSchemas['Trigger'];
 type Trigger = {
@@ -33,9 +34,22 @@ const EntryData = {
       method: 'TraceID',
     };
   },
+  [TriggerTypes.kafka](request: object) {
+    let entryPoint = '';
+
+    const kafkaRequest = request as KafkaRequest;
+    if (kafkaRequest) {
+      entryPoint = kafkaRequest.brokerUrls.join(', ');
+    }
+
+    return {
+      entryPoint,
+      method: 'Kafka',
+    };
+  },
 };
 
-const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid = {}}: TRawTrigger): Trigger => {
+const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid = {}, kafka = {}}: TRawTrigger): Trigger => {
   const type = rawType as TriggerTypes;
 
   let request = {} as TTriggerRequest;
@@ -45,6 +59,8 @@ const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid =
     request = GrpcRequest(grpc);
   } else if (type === TriggerTypes.traceid) {
     request = TraceIDRequest(traceid);
+  } else if (type === TriggerTypes.kafka) {
+    request = KafkaRequest(kafka);
   }
 
   const {entryPoint, method} = EntryData[type || TriggerTypes.http](request);

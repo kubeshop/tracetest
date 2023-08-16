@@ -47,7 +47,7 @@ services:
       - 5432:5432
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.82.0
     command:
       - "--config"
       - "/otel-local-config.yaml"

@@ -35,13 +35,13 @@ const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValu
   return useCallback(
     async (context: CompletionContext) => {
       const attributeList = getAttributeList();
-      const envEntryList = getSelectedVariableSetEntryList();
+      const varEntryList = getSelectedVariableSetEntryList();
 
       return EditorService.getAutocomplete({
         type: SupportedEditors.Expression,
         context,
         attributeList,
-        envEntryList,
+        varEntryList,
         customValueList: autocompleteCustomValues,
         onSelect,
       });

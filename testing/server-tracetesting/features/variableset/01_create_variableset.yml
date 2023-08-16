@@ -6,7 +6,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/variablesets
+      url: ${var:TARGET_URL}/api/variablesets
       method: POST
       headers:
         - key: Content-Type
@@ -35,7 +35,7 @@ spec:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 201
         # ensure we can reference outputs declared in the same test
-        - attr:tracetest.response.body | json_path '$.spec.id' = env:VARIABLE_SET_ID
+        - attr:tracetest.response.body | json_path '$.spec.id' = var:VARIABLE_SET_ID
     - selector: span[name="POST /api/variablesets" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count  =  1

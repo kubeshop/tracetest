@@ -1,0 +1,89 @@
+openapi: 3.0.0
+components:
+  schemas:
+    TestSuiteResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestSuiteResource"
+
+    TestSuiteResource:
+      type: object
+      description: "Represents a TestSuite structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'TestSuite'."
+          enum:
+            - TestSuite
+        spec:
+          $ref: "#/components/schemas/TestSuite"
+
+    TestSuite:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: integer
+          description: version number of the test
+        steps:
+          type: array
+          description: list of steps of the TestSuite containing just each test id
+          items:
+            type: string
+        fullSteps:
+          type: array
+          description: list of steps of the TestSuite containing the whole test object
+          items:
+            $ref: "./tests.yaml#/components/schemas/Test"
+        createdAt:
+          type: string
+          format: date-time
+        summary:
+          $ref: "./tests.yaml#/components/schemas/TestSummary"
+          description: summary of TestSuite
+          readOnly: true
+
+    TestSuiteRun:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum: [CREATED, EXECUTING, FINISHED, FAILED]
+        steps:
+          type: array
+          items:
+            $ref: "./tests.yaml#/components/schemas/TestRun"
+        variableSet:
+          $ref: "./variableSets.yaml#/components/schemas/VariableSet"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        pass:
+          type: integer
+        fail:
+          type: integer
+        allStepsRequiredGatesPassed:
+          type: boolean

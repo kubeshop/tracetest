@@ -9,7 +9,7 @@
 
 package openapi
 
-// VariableSetResource - Represents an VariableSet structured into the Resources format.
+// VariableSetResource - Represents a VariableSet structured into the Resources format.
 type VariableSetResource struct {
 
 	// Represents the type of this resource. It should always be set as 'VariableSet'.

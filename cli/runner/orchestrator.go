@@ -117,7 +117,6 @@ const (
 )
 
 func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
-
 	o.logger.Debug(
 		"Running test from definition",
 		zap.String("definitionFile", opts.DefinitionFile),
@@ -215,6 +214,10 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 }
 
 func (o orchestrator) resolveVarsID(ctx context.Context, varsID string) (string, error) {
+	if varsID == "" {
+		return "", nil // user have not defined variables, skipping it
+	}
+
 	if !fileutil.IsFilePath(varsID) {
 		o.logger.Debug("varsID is not a file path", zap.String("vars", varsID))
 
@@ -386,7 +389,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if reqErr != nil {
-		return fmt.Errorf("could not run transaction: %w", reqErr)
+		return fmt.Errorf("could not run test suite: %w", reqErr)
 	}
 
 	return nil

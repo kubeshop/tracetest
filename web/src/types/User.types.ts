@@ -4,6 +4,7 @@ export interface IUserPreferences {
   initConfigSetup: boolean;
   initConfigSetupFromTest: boolean;
   showGuidedTourNotification: boolean;
+  showAttributeTooltip: boolean;
 }
 
 export type TUserPreferenceKey = keyof IUserPreferences;

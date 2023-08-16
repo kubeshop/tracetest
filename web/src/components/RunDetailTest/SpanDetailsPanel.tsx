@@ -1,5 +1,6 @@
 import SpanDetail, {TestAttributeRow, TestSubHeader} from 'components/SpanDetail';
 import {useSpan} from 'providers/Span/Span.provider';
+import useAttributePanelTooltip from 'hooks/useAttributePanelTooltip';
 import {LeftPanel, PanelContainer} from '../ResizablePanels';
 
 const panel = {
@@ -10,12 +11,10 @@ const panel = {
 
 const SpanDetailsPanel = () => {
   const {selectedSpan} = useSpan();
+  const {tooltip, isVisible, onClose} = useAttributePanelTooltip();
 
   return (
-    <LeftPanel
-      panel={panel}
-      tooltip="A certain span contains an attribute and this attribute has a specific value. You can check it here."
-    >
+    <LeftPanel panel={panel} tooltip={tooltip} isToolTipVisible={isVisible} onOpen={onClose}>
       {size => (
         <PanelContainer $isOpen={size.isOpen}>
           <SpanDetail span={selectedSpan} AttributeRowComponent={TestAttributeRow} SubHeaderComponent={TestSubHeader} />

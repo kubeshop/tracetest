@@ -267,7 +267,7 @@ export function getDemoByPluginMap(demos: Demo[]) {
     [SupportedPlugins.Postman]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Postman]) || [],
     [SupportedPlugins.CURL]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.CURL]) || [],
     [SupportedPlugins.TraceID]: [],
-    [SupportedPlugins.Messaging]: [],
+    [SupportedPlugins.Kafka]: [],
     [SupportedPlugins.OpenAPI]: [],
   };
 }

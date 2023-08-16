@@ -166,6 +166,10 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 		return e.resolveEnvironment(term.Environment)
 	}
 
+	if term.Variable != nil {
+		return e.resolveEnvironment((*Environment)(term.Variable))
+	}
+
 	if term.FunctionCall != nil {
 		return e.resolveFunctionCall(term.FunctionCall)
 	}

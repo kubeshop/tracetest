@@ -1,5 +1,6 @@
 import {Button} from 'antd';
 import styled, {createGlobalStyle, css} from 'styled-components';
+import {withPulseAnimation} from '../PulseButton';
 
 export const GlobalStyle = createGlobalStyle`
   .spaces-resize-handle {
@@ -24,7 +25,7 @@ export const ButtonContainer = styled.div`
   z-index: 100;
 `;
 
-export const SplitterButton = styled(Button)`
+export const SplitterButton = styled(Button)<{$isPulsing: boolean}>`
   && {
     border: 3px solid ${({theme}) => theme.color.primaryLight};
     background-clip: padding-box;
@@ -32,6 +33,8 @@ export const SplitterButton = styled(Button)`
       font-size: ${({theme}) => theme.size.md};
     }
   }
+
+  ${({theme, $isPulsing}) => $isPulsing && withPulseAnimation(theme)}
 `;
 
 export const SplitterContainer = styled.div``;

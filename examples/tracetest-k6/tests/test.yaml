@@ -6,7 +6,7 @@ spec:
   trigger:
     type: traceid
     traceid:
-      id: ${env:TRACE_ID}
+      id: ${var:TRACE_ID}
   specs:
     - selector: span[tracetest.span.type="general" name="import pokemon"]
       assertions:

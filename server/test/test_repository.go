@@ -33,7 +33,7 @@ type Repository interface {
 	Update(context.Context, Test) (Test, error)
 	Delete(context.Context, id.ID) error
 
-	GetTransactionSteps(_ context.Context, _ id.ID, version int) ([]Test, error)
+	GetTestSuiteSteps(_ context.Context, _ id.ID, version int) ([]Test, error)
 	DB() *sql.DB
 }
 
@@ -203,10 +203,10 @@ func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
 	return test, nil
 }
 
-func (r *repository) GetTransactionSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
+func (r *repository) GetTestSuiteSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
 	sortQuery := `ORDER BY ts.step_number ASC`
-	query, params := sqlutil.Tenant(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN transaction_steps ts ON t.id = ts.test_id
-	WHERE ts.transaction_id = $1 AND ts.transaction_version = $2`, id, version)
+	query, params := sqlutil.Tenant(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN test_suite_steps ts ON t.id = ts.test_id
+	WHERE ts.test_suite_id = $1 AND ts.test_suite_version = $2`, id, version)
 	stmt, err := r.db.Prepare(query + sortQuery)
 	if err != nil {
 		return []Test{}, fmt.Errorf("prepare 2: %w", err)
@@ -493,8 +493,8 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 	}
 
 	queries := []string{
-		"DELETE FROM transaction_run_steps WHERE test_run_test_id = $1",
-		"DELETE FROM transaction_steps WHERE test_id = $1",
+		"DELETE FROM test_suite_run_steps WHERE test_run_test_id = $1",
+		"DELETE FROM test_suite_steps WHERE test_id = $1",
 		"DELETE FROM test_runs WHERE test_id = $1",
 		"DELETE FROM tests WHERE id = $1",
 	}

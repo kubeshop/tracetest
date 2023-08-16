@@ -11,7 +11,7 @@ spec:
       headers:
         - key: Content-Type
           value: application/json
-      body: '{"name":"${env:POKEMON_NAME}","type":"normal","imageUrl":"${env:POKEMON_URL}","isFeatured":true}'
+      body: '{"name":"${var:POKEMON_NAME}","type":"normal","imageUrl":"${var:POKEMON_URL}","isFeatured":true}'
   specs:
     - name: It should add a Pokemon correctly
       selector: span[tracetest.span.type="http" name="POST /pokemon" http.method="POST"]
@@ -22,5 +22,5 @@ spec:
         span[tracetest.span.type="database" name="create postgres.pokemon" db.system="postgres"
         db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]
       assertions:
-        - attr:db.result  contains  '"imageUrl":"${env:POKEMON_URL}"'
-        - attr:db.result contains '"name":"${env:POKEMON_NAME}"'
+        - attr:db.result  contains  '"imageUrl":"${var:POKEMON_URL}"'
+        - attr:db.result contains '"name":"${var:POKEMON_NAME}"'

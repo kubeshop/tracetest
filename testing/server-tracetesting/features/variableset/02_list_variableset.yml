@@ -6,7 +6,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:TARGET_URL}/api/variablesets
+      url: ${var:TARGET_URL}/api/variablesets
       method: GET
       headers:
         - key: Content-Type
@@ -16,7 +16,7 @@ spec:
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 200
-        - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains env:VARIABLE_SET_ID # check if the variable set is listed
+        - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains var:VARIABLE_SET_ID # check if the variable set is listed
     - selector: span[name="GET /api/variablesets" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count   =   1

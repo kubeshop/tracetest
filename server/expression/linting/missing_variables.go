@@ -18,6 +18,10 @@ func DetectMissingVariables(target interface{}, availableVariables []string) []s
 			if token.Type == expression.EnvironmentType {
 				variables = append(variables, token.Identifier)
 			}
+
+			if token.Type == expression.VariableType {
+				variables = append(variables, token.Identifier)
+			}
 		}
 
 		missingVariables = append(missingVariables, getSetDifference(variables, availableVariables)...)

@@ -69,35 +69,20 @@ func (ds MetaAttributesDataStore) count() string {
 	return strconv.Itoa(len(ds.SelectedSpans))
 }
 
-type VariableDataStore map[string]string
-
-func (ds VariableDataStore) Source() string {
-	return "var"
-}
-
-func (ds VariableDataStore) Get(name string) (string, error) {
-	value, found := ds[name]
-	if !found {
-		return "", fmt.Errorf(`variable "%s" is not set`, name)
-	}
-
-	return value, nil
-}
-
-type EnvironmentDataStore struct {
+type VariableDataStore struct {
 	Values []variableset.VariableSetValue
 }
 
-func (ds EnvironmentDataStore) Source() string {
+func (ds VariableDataStore) Source() string {
 	return "env"
 }
 
-func (ds EnvironmentDataStore) Get(name string) (string, error) {
+func (ds VariableDataStore) Get(name string) (string, error) {
 	for _, v := range ds.Values {
 		if v.Key == name {
 			return v.Value, nil
 		}
 	}
 
-	return "", fmt.Errorf(`environment variable "%s" not found`, name)
+	return "", fmt.Errorf(`variable "%s" not found`, name)
 }

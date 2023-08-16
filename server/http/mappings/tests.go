@@ -12,8 +12,8 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/traces"
-	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -32,16 +32,16 @@ func optionalTime(in time.Time) *time.Time {
 	return &in
 }
 
-func (m OpenAPI) TransactionRun(in transaction.TransactionRun) openapi.TransactionRun {
+func (m OpenAPI) TestSuiteRun(in testsuite.TestSuiteRun) openapi.TestSuiteRun {
 	steps := make([]openapi.TestRun, 0, len(in.Steps))
 
 	for _, step := range in.Steps {
 		steps = append(steps, m.Run(&step))
 	}
 
-	return openapi.TransactionRun{
+	return openapi.TestSuiteRun{
 		Id:                          strconv.Itoa(in.ID),
-		Version:                     int32(in.TransactionVersion),
+		Version:                     int32(in.TestSuiteVersion),
 		CreatedAt:                   in.CreatedAt,
 		CompletedAt:                 in.CompletedAt,
 		State:                       string(in.State),
@@ -115,6 +115,7 @@ func (m OpenAPI) Trigger(in trigger.Trigger) openapi.Trigger {
 		HttpRequest: m.HTTPRequest(in.HTTP),
 		Grpc:        m.GRPCRequest(in.GRPC),
 		Traceid:     m.TraceIDRequest(in.TraceID),
+		Kafka:       m.KafkaRequest(in.Kafka),
 	}
 }
 
@@ -126,6 +127,7 @@ func (m OpenAPI) TriggerResult(in trigger.TriggerResult) openapi.TriggerResult {
 			Http:    m.HTTPResponse(in.HTTP),
 			Grpc:    m.GRPCResponse(in.GRPC),
 			Traceid: m.TraceIDResponse(in.TraceID),
+			Kafka:   m.KafkaResponse(in.Kafka),
 		},
 	}
 }
@@ -286,8 +288,8 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		Outputs:                   m.RunOutputs(in.Outputs),
 		Metadata:                  in.Metadata,
 		VariableSet:               m.VariableSet(in.VariableSet),
-		TransactionId:             in.TransactionID,
-		TransactionRunId:          in.TransactionRunID,
+		TestSuiteId:               in.TestSuiteID,
+		TestSuiteRunId:            in.TestSuiteRunID,
 		Linter:                    m.LinterResult(in.Linter),
 		RequiredGatesResult:       m.RequiredGatesResult(in.RequiredGatesResult),
 	}

@@ -34,10 +34,10 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testdb"
+	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
-	"github.com/kubeshop/tracetest/server/transaction"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -214,8 +214,8 @@ func (app *App) Start(opts ...appOption) error {
 	testRunnerRepo := testrunner.NewRepository(db)
 	tracesRepo := traces.NewTraceRepository(db)
 
-	transactionsRepository := transaction.NewRepository(db, testRepo)
-	transactionRunRepository := transaction.NewRunRepository(db, runRepo)
+	testSuiteRepository := testsuite.NewRepository(db, testRepo)
+	testSuiteRunRepository := testsuite.NewRunRepository(db, runRepo)
 
 	tracedbFactory := tracedb.Factory(tracesRepo)
 
@@ -241,16 +241,16 @@ func (app *App) Start(opts ...appOption) error {
 		testPipeline.Stop()
 	})
 
-	transactionPipeline := buildTransactionPipeline(
-		transactionsRepository,
-		transactionRunRepository,
+	testSuitePipeline := buildTestSuitePipeline(
+		testSuiteRepository,
+		testSuiteRunRepository,
 		testPipeline,
 		subscriptionManager,
 	)
 
-	transactionPipeline.Start()
+	testSuitePipeline.Start()
 	app.registerStopFn(func() {
-		transactionPipeline.Stop()
+		testSuitePipeline.Stop()
 	})
 
 	err = analytics.SendEvent("Server Started", "beacon", "", nil)
@@ -264,11 +264,11 @@ func (app *App) Start(opts ...appOption) error {
 		tracer,
 
 		testPipeline,
-		transactionPipeline,
+		testSuitePipeline,
 
 		testDB,
-		transactionsRepository,
-		transactionRunRepository,
+		testSuiteRepository,
+		testSuiteRunRepository,
 		testRepo,
 		runRepo,
 		variableSetRepo,
@@ -287,7 +287,7 @@ func (app *App) Start(opts ...appOption) error {
 		PathPrefix("/api").
 		Subrouter()
 
-	registerTransactionResource(transactionsRepository, apiRouter, provisioner, tracer)
+	registerTestSuiteResource(testSuiteRepository, apiRouter, provisioner, tracer)
 	registerConfigResource(configRepo, apiRouter, provisioner, tracer)
 	registerPollingProfilesResource(pollingProfileRepo, apiRouter, provisioner, tracer)
 	registerVariableSetResource(variableSetRepo, apiRouter, provisioner, tracer)
@@ -407,10 +407,10 @@ func registerTestRunner(testRunnerRepo *testrunner.Repository, router *mux.Route
 	provisioner.AddResourceProvisioner(manager)
 }
 
-func registerTransactionResource(repo *transaction.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
-	manager := resourcemanager.New[transaction.Transaction](
-		transaction.TransactionResourceName,
-		transaction.TransactionResourceNamePlural,
+func registerTestSuiteResource(repo *testsuite.Repository, router *mux.Router, provisioner *provisioning.Provisioner, tracer trace.Tracer) {
+	manager := resourcemanager.New[testsuite.TestSuite](
+		testsuite.TestSuiteResourceName,
+		testsuite.TestSuiteResourceNamePlural,
 		repo,
 		resourcemanager.CanBeAugmented(),
 		resourcemanager.WithTracer(tracer),
@@ -489,10 +489,11 @@ func registerTestResource(repository test.Repository, router *mux.Router, provis
 }
 
 func getTriggerRegistry(tracer, appTracer trace.Tracer) *trigger.Registry {
-	triggerReg := trigger.NewRegsitry(tracer, appTracer)
+	triggerReg := trigger.NewRegistry(tracer, appTracer)
 	triggerReg.Add(trigger.HTTP())
 	triggerReg.Add(trigger.GRPC())
 	triggerReg.Add(trigger.TRACEID())
+	triggerReg.Add(trigger.Kafka())
 
 	return triggerReg
 }
@@ -519,11 +520,11 @@ func controller(
 	tracer trace.Tracer,
 
 	testRunner *executor.TestPipeline,
-	transactionRunner *executor.TransactionPipeline,
+	testSuitesRunner *executor.TestSuitesPipeline,
 
 	testRunEvents model.TestRunEventRepository,
-	transactionRepo *transaction.Repository,
-	transactionRunRepo *transaction.RunRepository,
+	transactionRepo *testsuite.Repository,
+	transactionRunRepo *testsuite.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
 	variablesetRepo *variableset.Repository,
@@ -537,7 +538,7 @@ func controller(
 		tracer,
 
 		testRunner,
-		transactionRunner,
+		testSuitesRunner,
 
 		testRunEvents,
 		transactionRepo,
@@ -559,11 +560,11 @@ func httpRouter(
 	tracer trace.Tracer,
 
 	testRunner *executor.TestPipeline,
-	transactionRunner *executor.TransactionPipeline,
+	testSuitesRunner *executor.TestSuitesPipeline,
 
 	testRunEvents model.TestRunEventRepository,
-	transactionRepo *transaction.Repository,
-	transactionRunRepo *transaction.RunRepository,
+	testSuiteRepo *testsuite.Repository,
+	testSuiteRunRepo *testsuite.RunRepository,
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
 	variableSetRepo *variableset.Repository,
@@ -575,11 +576,11 @@ func httpRouter(
 		tracer,
 
 		testRunner,
-		transactionRunner,
+		testSuitesRunner,
 
 		testRunEvents,
-		transactionRepo,
-		transactionRunRepo,
+		testSuiteRepo,
+		testSuiteRunRepo,
 		testRepo,
 		testRunRepo,
 		variableSetRepo,

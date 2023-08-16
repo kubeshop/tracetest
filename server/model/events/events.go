@@ -60,7 +60,7 @@ func TriggerResolveStart(testID id.ID, runID int) model.TestRunEvent {
 		Stage:               model.StageTrigger,
 		Type:                "RESOLVE_START",
 		Title:               "Resolving trigger details started",
-		Description:         "The resolution of trigger details based on environment variables has started",
+		Description:         "The resolution of trigger details based on variables has started",
 		CreatedAt:           time.Now(),
 		DataStoreConnection: model.ConnectionResult{},
 		Polling:             model.PollingInfo{},
