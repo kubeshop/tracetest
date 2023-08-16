@@ -28,7 +28,7 @@ In Tracetest, undefined variables can be used in both the UI and CLI.
 
 ![Create Pokemon List](../img/pokeshop-list.png)
 
-1. Within the test, create test spec assertions that use variables for comparators, something like: `http.status_code = "${env:STATUS_CODE}"`:
+1. Within the test, create test spec assertions that use variables for comparators, something like: `http.status_code = "${var:STATUS_CODE}"`:
 
 ![Create Test Spec Assertionsl](../img/create-test-spec-assertions.png)
 

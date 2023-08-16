@@ -28,4 +28,4 @@ In order to apply this Test Suite to your Tracetest instance, make sure to have 
 tracetest apply testsuite -f <testsuite.yaml>
 ```
 
-> If the file contains the property `spec.id`, the operation will be considered a Test Suite udpate.
+> If the file contains the property `spec.id`, the operation will be considered a Test Suite update.

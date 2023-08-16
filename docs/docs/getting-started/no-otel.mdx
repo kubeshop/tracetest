@@ -130,7 +130,7 @@ template:
     instrumentation.opentelemetry.io/inject-nodejs: 'true'
 spec:
     containers:
-      env:
+      var:
         - name: SERVICE_NAME
           value: 'your-service'
 ```

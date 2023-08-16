@@ -33,7 +33,7 @@ outputs:
 
 - name: INTERPOLATE_STRING
   # assume PRE_EXISTING_VALUE=someValue from env vars
-  value: "the value ${env:PRE_EXISTING_VALUE} comes from the env var PRE_EXISTING_VALUE"
+  value: "the value ${var:PRE_EXISTING_VALUE} comes from the env var PRE_EXISTING_VALUE"
   # results in INTERPOLATE_STRING = "the value someValue comes from the env var PRE_EXISTING_VALUE
 ```
 
