@@ -25,7 +25,7 @@ var (
 		formatters.TestSuiteRun(func() string { return cliConfig.URL() }, true),
 	)
 
-	runnerRegistry = runner.NewRegistry().
+	runnerRegistry = runner.NewRegistry(cliLogger).
 			Register(runner.TestRunner(
 			testClient,
 			openapiClient,
