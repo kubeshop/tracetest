@@ -11,10 +11,11 @@ func (c *Client) SendTrace(ctx context.Context, request *proto.PollingRequest, s
 	client := proto.NewOrchestratorClient(c.conn)
 
 	pollingResponse := &proto.PollingResponse{
-		TestID:  request.TestID,
-		RunID:   request.RunID,
-		TraceID: request.TraceID,
-		Spans:   spans,
+		TestID:              request.TestID,
+		RunID:               request.RunID,
+		TraceID:             request.TraceID,
+		Spans:               spans,
+		AgentIdentification: c.sessionConfig.AgentIdentification,
 	}
 
 	_, err := client.SendPolledSpans(ctx, pollingResponse)

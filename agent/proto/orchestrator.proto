@@ -7,18 +7,18 @@ option go_package = "github.com/kubeshop/tracetest/agent/proto";
 // requests to the agent
 service Orchestrator {
     // Connects an agent and returns the configuration that must be used by that agent
-    rpc Connect(ConnectRequest) returns (ConnectResponse) {}
+    rpc Connect(ConnectRequest) returns (AgentConfiguration) {}
 
     // Register an agent as a trigger agent, once connected, the server will be able to send
     // multiple trigger requests to the agent.
-    rpc RegisterTriggerAgent(ConnectRequest) returns (stream TriggerRequest) {}
+    rpc RegisterTriggerAgent(AgentIdentification) returns (stream TriggerRequest) {}
 
     // Sends the trigger result back to the server
     rpc SendTriggerResult(TriggerResponse) returns (Empty) {}
 
     // Register an agent as a poller agent, once connected, the server will be able to send
     // multiple polling requests to the agent
-    rpc RegisterPollerAgent(ConnectRequest) returns (stream PollingRequest) {}
+    rpc RegisterPollerAgent(AgentIdentification) returns (stream PollingRequest) {}
 
     // Sends polled spans to the server
     rpc SendPolledSpans(PollingResponse) returns (Empty) {}
@@ -41,8 +41,9 @@ message ConnectRequest {
 
 // ConnectResponse is the Orchestrator response to the ConnectRequest. It contains
 // configuration that must be used by the agent while working with this Orchestrator.
-message ConnectResponse {
+message AgentConfiguration {
     SessionConfiguration configuration = 1;
+    AgentIdentification identification = 2;
 }
 
 // SessionConfiguration is a set of configuration values that must be used by the agent while
@@ -57,6 +58,10 @@ message ShutdownRequest {
     string reason = 1;
 }
 
+// AgentIdentification contains data used by the server to validate an agent identity
+message AgentIdentification {
+    string token = 1;
+}
 
 message TriggerRequest{
     string testID = 1;
@@ -129,9 +134,10 @@ message TraceIDRequest {
 }
 
 message TriggerResponse {
-    string testID = 1;
-    int32 runID = 2;
-    TriggerResult triggerResult = 3;
+    AgentIdentification agentIdentification = 1;
+    string testID = 2;
+    int32 runID = 3;
+    TriggerResult triggerResult = 4;
 }
 
 message TriggerResult {
@@ -250,10 +256,11 @@ message TLSSetting {
 }
 
 message PollingResponse {
-    string testID = 1;
-    int32 runID = 2;
-    string traceID = 3;
-    repeated Span spans = 4;
+    AgentIdentification agentIdentification = 1;
+    string testID = 2;
+    int32 runID = 3;
+    string traceID = 4;
+    repeated Span spans = 5;
 }
 
 message Span {

@@ -12,12 +12,7 @@ import (
 func (c *Client) startTriggerListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
-	request, err := c.getConnectionRequest()
-	if err != nil {
-		return err
-	}
-
-	stream, err := client.RegisterTriggerAgent(ctx, request)
+	stream, err := client.RegisterTriggerAgent(ctx, c.sessionConfig.AgentIdentification)
 	if err != nil {
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}

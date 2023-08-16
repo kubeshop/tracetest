@@ -27,7 +27,8 @@ func (c *Client) startup(ctx context.Context) error {
 	}
 
 	c.sessionConfig = &SessionConfig{
-		BatchTimeout: time.Duration(response.Configuration.BatchTimeout) * time.Millisecond,
+		BatchTimeout:        time.Duration(response.Configuration.BatchTimeout) * time.Millisecond,
+		AgentIdentification: response.Identification,
 	}
 
 	return nil
