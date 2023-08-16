@@ -19,6 +19,10 @@ const KafkaRequest = ({
   messageKey = '',
   messageValue = '',
 }: TRawKafkaRequest): KafkaRequest => {
+  if (!headers) {
+    headers = []; // guard clause to avoid null header
+  }
+
   return {
     brokerUrls,
     topic,
