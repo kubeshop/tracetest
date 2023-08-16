@@ -19,10 +19,6 @@ const KafkaRequest = ({
   messageKey = '',
   messageValue = '',
 }: TRawKafkaRequest): KafkaRequest => {
-  if (!headers) {
-    headers = []; // guard clause to avoid null header
-  }
-
   return {
     brokerUrls,
     topic,
@@ -30,7 +26,7 @@ const KafkaRequest = ({
     sslVerification,
     messageKey,
     messageValue,
-    headers: headers.map(({key = '', value = ''}) => ({
+    headers: (headers || []).map(({key = '', value = ''}) => ({
       key,
       value,
     })),
