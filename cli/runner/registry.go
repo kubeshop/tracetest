@@ -2,17 +2,21 @@ package runner
 
 import (
 	"fmt"
+
+	"go.uber.org/zap"
 )
 
 type Registry struct {
 	runners map[string]Runner
 	proxies map[string]string
+	logger  *zap.Logger
 }
 
-func NewRegistry() Registry {
+func NewRegistry(logger *zap.Logger) Registry {
 	return Registry{
 		runners: map[string]Runner{},
 		proxies: map[string]string{},
+		logger:  logger,
 	}
 }
 
@@ -30,17 +34,18 @@ var ErrNotFound = fmt.Errorf("runner not found")
 
 func (r Registry) Get(name string) (Runner, error) {
 	runner, ok := r.runners[name]
-	if !ok {
-		if runnerName, ok := r.proxies[name]; ok {
-			if !ok {
-				return nil, ErrNotFound
-			}
-
-			return r.Get(runnerName)
-		}
+	if ok {
+		return runner, nil // found runner, return it to the user
 	}
 
-	return runner, nil
+	// fallback, check if the runner has a proxy
+	runnerName, ok := r.proxies[name]
+	if !ok {
+		return nil, ErrNotFound
+	}
+
+	r.logger.Warn(fmt.Sprintf("The resource `%s` is deprecated and will be removed in a future version. Please use `%s` instead.", name, runnerName))
+	return r.Get(runnerName)
 }
 
 func (r Registry) List() []string {
