@@ -12,12 +12,7 @@ import (
 func (c *Client) startShutdownListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
-	request, err := c.getConnectionRequest()
-	if err != nil {
-		return err
-	}
-
-	stream, err := client.RegisterShutdownListener(ctx, request)
+	stream, err := client.RegisterShutdownListener(ctx, c.sessionConfig.AgentIdentification)
 	if err != nil {
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}

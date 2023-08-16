@@ -117,7 +117,7 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 	return &proto.Empty{}, nil
 }
 
-func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.ConnectRequest, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
+func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
 	for {
 		shutdownRequest := <-s.terminationChannel
 		err := stream.Send(shutdownRequest)
