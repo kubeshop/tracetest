@@ -32,15 +32,15 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrchestratorClient interface {
 	// Connects an agent and returns the configuration that must be used by that agent
-	Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*ConnectResponse, error)
+	Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*AgentConfiguration, error)
 	// Register an agent as a trigger agent, once connected, the server will be able to send
 	// multiple trigger requests to the agent.
-	RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
+	RegisterTriggerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
 	// Sends the trigger result back to the server
 	SendTriggerResult(ctx context.Context, in *TriggerResponse, opts ...grpc.CallOption) (*Empty, error)
 	// Register an agent as a poller agent, once connected, the server will be able to send
 	// multiple polling requests to the agent
-	RegisterPollerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error)
+	RegisterPollerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error)
 	// Sends polled spans to the server
 	SendPolledSpans(ctx context.Context, in *PollingResponse, opts ...grpc.CallOption) (*Empty, error)
 	// Register an agent to listen for shutdown commands
@@ -55,8 +55,8 @@ func NewOrchestratorClient(cc grpc.ClientConnInterface) OrchestratorClient {
 	return &orchestratorClient{cc}
 }
 
-func (c *orchestratorClient) Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*ConnectResponse, error) {
-	out := new(ConnectResponse)
+func (c *orchestratorClient) Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*AgentConfiguration, error) {
+	out := new(AgentConfiguration)
 	err := c.cc.Invoke(ctx, Orchestrator_Connect_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (c *orchestratorClient) Connect(ctx context.Context, in *ConnectRequest, op
 	return out, nil
 }
 
-func (c *orchestratorClient) RegisterTriggerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error) {
+func (c *orchestratorClient) RegisterTriggerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[0], Orchestrator_RegisterTriggerAgent_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func (c *orchestratorClient) SendTriggerResult(ctx context.Context, in *TriggerR
 	return out, nil
 }
 
-func (c *orchestratorClient) RegisterPollerAgent(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error) {
+func (c *orchestratorClient) RegisterPollerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[1], Orchestrator_RegisterPollerAgent_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
@@ -183,15 +183,15 @@ func (x *orchestratorRegisterShutdownListenerClient) Recv() (*ShutdownRequest, e
 // for forward compatibility
 type OrchestratorServer interface {
 	// Connects an agent and returns the configuration that must be used by that agent
-	Connect(context.Context, *ConnectRequest) (*ConnectResponse, error)
+	Connect(context.Context, *ConnectRequest) (*AgentConfiguration, error)
 	// Register an agent as a trigger agent, once connected, the server will be able to send
 	// multiple trigger requests to the agent.
-	RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error
+	RegisterTriggerAgent(*AgentIdentification, Orchestrator_RegisterTriggerAgentServer) error
 	// Sends the trigger result back to the server
 	SendTriggerResult(context.Context, *TriggerResponse) (*Empty, error)
 	// Register an agent as a poller agent, once connected, the server will be able to send
 	// multiple polling requests to the agent
-	RegisterPollerAgent(*ConnectRequest, Orchestrator_RegisterPollerAgentServer) error
+	RegisterPollerAgent(*AgentIdentification, Orchestrator_RegisterPollerAgentServer) error
 	// Sends polled spans to the server
 	SendPolledSpans(context.Context, *PollingResponse) (*Empty, error)
 	// Register an agent to listen for shutdown commands
@@ -203,16 +203,16 @@ type OrchestratorServer interface {
 type UnimplementedOrchestratorServer struct {
 }
 
-func (UnimplementedOrchestratorServer) Connect(context.Context, *ConnectRequest) (*ConnectResponse, error) {
+func (UnimplementedOrchestratorServer) Connect(context.Context, *ConnectRequest) (*AgentConfiguration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
 }
-func (UnimplementedOrchestratorServer) RegisterTriggerAgent(*ConnectRequest, Orchestrator_RegisterTriggerAgentServer) error {
+func (UnimplementedOrchestratorServer) RegisterTriggerAgent(*AgentIdentification, Orchestrator_RegisterTriggerAgentServer) error {
 	return status.Errorf(codes.Unimplemented, "method RegisterTriggerAgent not implemented")
 }
 func (UnimplementedOrchestratorServer) SendTriggerResult(context.Context, *TriggerResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendTriggerResult not implemented")
 }
-func (UnimplementedOrchestratorServer) RegisterPollerAgent(*ConnectRequest, Orchestrator_RegisterPollerAgentServer) error {
+func (UnimplementedOrchestratorServer) RegisterPollerAgent(*AgentIdentification, Orchestrator_RegisterPollerAgentServer) error {
 	return status.Errorf(codes.Unimplemented, "method RegisterPollerAgent not implemented")
 }
 func (UnimplementedOrchestratorServer) SendPolledSpans(context.Context, *PollingResponse) (*Empty, error) {
@@ -253,7 +253,7 @@ func _Orchestrator_Connect_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _Orchestrator_RegisterTriggerAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ConnectRequest)
+	m := new(AgentIdentification)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -292,7 +292,7 @@ func _Orchestrator_SendTriggerResult_Handler(srv interface{}, ctx context.Contex
 }
 
 func _Orchestrator_RegisterPollerAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ConnectRequest)
+	m := new(AgentIdentification)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}

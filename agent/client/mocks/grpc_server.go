@@ -59,13 +59,22 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup) {
 	}
 }
 
-func (s *GrpcServerMock) Connect(ctx context.Context, req *proto.ConnectRequest) (*proto.ConnectResponse, error) {
-	return &proto.ConnectResponse{Configuration: &proto.SessionConfiguration{
-		BatchTimeout: 1000,
-	}}, nil
+func (s *GrpcServerMock) Connect(ctx context.Context, req *proto.ConnectRequest) (*proto.AgentConfiguration, error) {
+	return &proto.AgentConfiguration{
+		Configuration: &proto.SessionConfiguration{
+			BatchTimeout: 1000,
+		},
+		Identification: &proto.AgentIdentification{
+			Token: "token",
+		},
+	}, nil
 }
 
-func (s *GrpcServerMock) RegisterTriggerAgent(_ *proto.ConnectRequest, stream proto.Orchestrator_RegisterTriggerAgentServer) error {
+func (s *GrpcServerMock) RegisterTriggerAgent(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterTriggerAgentServer) error {
+	if id.Token != "token" {
+		return fmt.Errorf("could not validate token")
+	}
+
 	for {
 		triggerRequest := <-s.triggerChannel
 		err := stream.Send(triggerRequest)
@@ -77,11 +86,19 @@ func (s *GrpcServerMock) RegisterTriggerAgent(_ *proto.ConnectRequest, stream pr
 }
 
 func (s *GrpcServerMock) SendTriggerResult(ctx context.Context, result *proto.TriggerResponse) (*proto.Empty, error) {
+	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
+		return nil, fmt.Errorf("could not validate token")
+	}
+
 	s.lastTriggerResponse = result
 	return &proto.Empty{}, nil
 }
 
-func (s *GrpcServerMock) RegisterPollerAgent(_ *proto.ConnectRequest, stream proto.Orchestrator_RegisterPollerAgentServer) error {
+func (s *GrpcServerMock) RegisterPollerAgent(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterPollerAgentServer) error {
+	if id.Token != "token" {
+		return fmt.Errorf("could not validate token")
+	}
+
 	for {
 		pollerRequest := <-s.pollingChannel
 		err := stream.Send(pollerRequest)
@@ -92,6 +109,10 @@ func (s *GrpcServerMock) RegisterPollerAgent(_ *proto.ConnectRequest, stream pro
 }
 
 func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.PollingResponse) (*proto.Empty, error) {
+	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
+		return nil, fmt.Errorf("could not validate token")
+	}
+
 	s.lastPollingResponse = result
 	return &proto.Empty{}, nil
 }
