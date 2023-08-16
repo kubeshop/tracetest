@@ -14,11 +14,11 @@ This page showcases use-cases for undefined variables and how to enable ad-hoc t
 
 ### **Supply Variable Value at Runtime**
 
-A user wants a test or test suite they can run on a particular user, order id, etc. that is configurable at run time. This makes running an adhoc test in an environment, even production, very easy and convenient. In this case, the user references the variable, but doesn't add it to the environment. Each time they run the test or test suite, they will be prompted for the unspecified variables.
+A user wants a test or Test Suite they can run on a particular user, order id, etc. that is configurable at run time. This makes running an adhoc test in an environment, even production, very easy and convenient. In this case, the user references the variable, but doesn't add it to the environment. Each time they run the test or Test Suite, they will be prompted for the unspecified variables.
 
 ### **Supply Variable Value from a Previous Test**
 
-A user wants to define 3 tests as part of a test suite. The first test has an output variable and this output is used by the second test. They define the first test. They then define the second test and reference the variable value that is output from the first test. 
+A user wants to define 3 tests as part of a Test Suite. The first test has an output variable and this output is used by the second test. They define the first test. They then define the second test and reference the variable value that is output from the first test. 
 
 In Tracetest, undefined variables can be used in both the UI and CLI. 
 
@@ -40,7 +40,7 @@ In Tracetest, undefined variables can be used in both the UI and CLI.
 
 ![Test Output](../img/test-output.png)
 
-5. Now, you can create a test suite with the two tests - first, add the list test, then the add test, and then the list test again:
+5. Now, you can create a Test Suite with the two tests - first, add the list test, then the add test, and then the list test again:
 
 ![Create Test Suite](../img/create-testsuite.png)
 

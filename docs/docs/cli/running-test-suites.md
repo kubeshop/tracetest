@@ -1,8 +1,8 @@
 # Running Test Suites From the Command Line Interface (CLI)
 
-Once you have created a test suite, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
+Once you have created a Test Suite, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
 
-The command to run a test suite is the same as running a test from the CLI.
+The command to run a Test Suite is the same as running a test from the CLI.
 
 The documentation for running a test via the CLI can be found here:
 
@@ -10,7 +10,7 @@ The documentation for running a test via the CLI can be found here:
 
 ## Running Your First Test Suite
 
-To run a test suite, give the path to the test suite definition file with the `'-f'` option. This will launch a test suite, providing us with a link to the created test suite run.
+To run a Test Suite, give the path to the Test Suite definition file with the `'-f'` option. This will launch a Test Suite, providing us with a link to the created Test Suite run.
 
 ```sh
 tracetest run testsuite -f path/to/testsuite.yaml
@@ -23,13 +23,13 @@ tracetest run testsuite -f path/to/testsuite.yaml
 
 ## Running a Test Suite That Uses Variable Sets
 
-There are two ways of referencing a variable set when running a test suite.
+There are two ways of referencing a variable set when running a Test Suite.
 
 You can reference an existing variable set using its id. For example, given this defined variable set with an id of `'testenv'`:
 
 ![testenv](../img/show-environment-definition.png)
 
-We can run a test suite and specify that variable set with this command:
+We can run a Test Suite and specify that variable set with this command:
 
 ```sh
 tracetest run testsuite -f path/to/testsuite.yaml --vars testenv

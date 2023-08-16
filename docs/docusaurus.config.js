@@ -189,6 +189,18 @@ const config = {
             to: '/cli/cli-installation-reference',
             from: ['/getting-started/cli-installation-reference'],
           },
+          {
+            to: '/cli/creating-test-suites',
+            from: ['/cli/creating-transactions'],
+          },
+          {
+            to: '/concepts/test-suites',
+            from: ['/concepts/transactions'],
+          },
+          {
+            to: '/web-ui/creating-test-suites',
+            from: ['/web-ui/creating-transactions'],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {

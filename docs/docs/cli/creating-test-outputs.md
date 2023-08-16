@@ -1,10 +1,10 @@
 # Defining Test Outputs in Text Files
 
-Outputs are really useful when running [Test Suites](../concepts/test-suites). They allow for exporting values from a test so they become available in the [Variable Sets](../concepts/variable-sets.md) of the current test suite.
+Outputs are really useful when running [Test Suites](../concepts/test-suites). They allow for exporting values from a test so they become available in the [Variable Sets](../concepts/variable-sets.md) of the current Test Suite.
 
 ## Outputs are Expression Results
 
-An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running test suite.
+An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running Test Suite.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
 
 It can be defined using the following YAML definition:

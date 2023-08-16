@@ -1,10 +1,10 @@
 # Undefined Variables
 
-When a user runs a test or a test suite, any variables that will be needed but are not defined will be prompted for:
+When a user runs a test or a Test Suite, any variables that will be needed but are not defined will be prompted for:
 
 ![Undefined Variables Modal](../img/undefined-variables-modal.png)
 
-Undefined variables are dependent on the environment selected and whether or not the variable is defined in the current environment. Select the environment to run the test or test suite in from the dropdown list at the top right of the page:
+Undefined variables are dependent on the environment selected and whether or not the variable is defined in the current environment. Select the environment to run the test or Test Suite in from the dropdown list at the top right of the page:
 
 ![Select Environment Drop Down](../img/select-environment-drop-down.png)
 

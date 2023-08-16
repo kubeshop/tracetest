@@ -1,6 +1,6 @@
 # Creating Test Outputs
 
-A Test Output allows you to define a variable based on the information contained in a particular span's attributes. This variable can be referenced in the same test or in later tests in a test suite. If test outputs have already been added to a test, they will be on the **Test** screen under the **Test Outputs** tab:
+A Test Output allows you to define a variable based on the information contained in a particular span's attributes. This variable can be referenced in the same test or in later tests in a Test Suite. If test outputs have already been added to a test, they will be on the **Test** screen under the **Test Outputs** tab:
 
 ![Test Output List](../img/test-outputs-01.png)
 

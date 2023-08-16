@@ -18,9 +18,9 @@ So in this case, we need to trigger four tests in sequence to achieve test the e
 
 ## Building a Test Suite for This Scenario
 
-Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [test suites](../../../web-ui/creating-test-suites.md) that have an [variable set](../../../concepts/variable-sets.md)].
+Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [Test Suites](../../../web-ui/creating-test-suites.md) that have an [variable set](../../../concepts/variable-sets.md)].
  
-We can do that by creating the tests and test suites through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the test suite with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
+We can do that by creating the tests and Test Suites through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the Test Suite with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
 
 ### Mapping Environment Variables 
 
@@ -158,7 +158,7 @@ spec:
 
 ### Creating the Test Suite
 
-Now we wrap these files and create a test suite that will run these tests in sequence and will fail if any of the tests fail. We will call it `testsuite.yaml`:
+Now we wrap these files and create a Test Suite that will run these tests in sequence and will fail if any of the tests fail. We will call it `testsuite.yaml`:
 
 ```yml
 type: TestSuite
@@ -172,7 +172,7 @@ spec:
   - ./checkout.yaml
 ```
 
-By having the test, test suite and environment files in the same directory, we can call the CLI and execute this test suite:
+By having the test, Test Suite and environment files in the same directory, we can call the CLI and execute this Test Suite:
 
 ```sh
 tracetest run testsuite -f testsuite.yaml -e user-buying-products.env

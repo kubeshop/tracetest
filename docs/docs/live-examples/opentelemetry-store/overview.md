@@ -63,7 +63,7 @@ The Tracetest tests for the OpenTelemetry Demo can be found in the official repo
 - **Instructions to run (also shown below in this recipe)**: [Running Tracetest Tests](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test#testing-services-with-trace-based-tests)
 - **Full source of all tests**: [Source](https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting)
 
-To run the entire test suite of trace-based tests, run the command:
+To run the entire Test Suite of trace-based tests, run the command:
 
 ```sh
 make run-tracetesting
@@ -87,7 +87,7 @@ For instance, if you need to run the tests for `ad-service` and
 make run-tracetesting SERVICES_TO_TEST="ad-service payment-service"
 ```
 
-Tracetest will be started on [http://localhost:11633](http://localhost:11633) as part of running these tests and you can view any of the tests, test suites, prior runs, or create and run your own tests. It is a great testbed to explore Tracetest!
+Tracetest will be started on [http://localhost:11633](http://localhost:11633) as part of running these tests and you can view any of the tests, Test Suites, prior runs, or create and run your own tests. It is a great testbed to explore Tracetest!
 
 
 ## Use Cases
