@@ -44,7 +44,7 @@ type OrchestratorClient interface {
 	// Sends polled spans to the server
 	SendPolledSpans(ctx context.Context, in *PollingResponse, opts ...grpc.CallOption) (*Empty, error)
 	// Register an agent to listen for shutdown commands
-	RegisterShutdownListener(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error)
+	RegisterShutdownListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error)
 }
 
 type orchestratorClient struct {
@@ -146,7 +146,7 @@ func (c *orchestratorClient) SendPolledSpans(ctx context.Context, in *PollingRes
 	return out, nil
 }
 
-func (c *orchestratorClient) RegisterShutdownListener(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error) {
+func (c *orchestratorClient) RegisterShutdownListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[2], Orchestrator_RegisterShutdownListener_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ type OrchestratorServer interface {
 	// Sends polled spans to the server
 	SendPolledSpans(context.Context, *PollingResponse) (*Empty, error)
 	// Register an agent to listen for shutdown commands
-	RegisterShutdownListener(*ConnectRequest, Orchestrator_RegisterShutdownListenerServer) error
+	RegisterShutdownListener(*AgentIdentification, Orchestrator_RegisterShutdownListenerServer) error
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -218,7 +218,7 @@ func (UnimplementedOrchestratorServer) RegisterPollerAgent(*AgentIdentification,
 func (UnimplementedOrchestratorServer) SendPolledSpans(context.Context, *PollingResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPolledSpans not implemented")
 }
-func (UnimplementedOrchestratorServer) RegisterShutdownListener(*ConnectRequest, Orchestrator_RegisterShutdownListenerServer) error {
+func (UnimplementedOrchestratorServer) RegisterShutdownListener(*AgentIdentification, Orchestrator_RegisterShutdownListenerServer) error {
 	return status.Errorf(codes.Unimplemented, "method RegisterShutdownListener not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
@@ -331,7 +331,7 @@ func _Orchestrator_SendPolledSpans_Handler(srv interface{}, ctx context.Context,
 }
 
 func _Orchestrator_RegisterShutdownListener_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ConnectRequest)
+	m := new(AgentIdentification)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
