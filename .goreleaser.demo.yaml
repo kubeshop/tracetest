@@ -49,8 +49,7 @@ builds:
     - amd64
 
 dockers:
-- skip_push: '{{ .Env.PUBLISH_DOCKER }}'
-  image_templates:
+- image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}'
   extra_files:
     - web/build

@@ -26,7 +26,7 @@ const KafkaRequest = ({
     sslVerification,
     messageKey,
     messageValue,
-    headers: headers.map(({key = '', value = ''}) => ({
+    headers: (headers || []).map(({key = '', value = ''}) => ({
       key,
       value,
     })),
