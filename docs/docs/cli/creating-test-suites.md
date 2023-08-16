@@ -3,7 +3,7 @@
 This page showcases how to create and edit Test Suites with the CLI.
 
 :::tip
-[To read more about Test Suites check out Test Suites concepts.](../concepts/test-suites.md)
+[To read more about Test Suites check out Test Suites concepts page.](../concepts/test-suites.md)
 :::
 
 Just like other structures of Tracetest, you can also manage your Test Suites using the CLI and definition files.

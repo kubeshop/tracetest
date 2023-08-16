@@ -13,7 +13,7 @@ POKEID:
 POKENAME:
 ```
 
-Undefined variables are dependent on the variable set selected and whether or not the variable is defined in the current variable set. Select the variable set to run the test or Test Suite by passing it into the test run command.
+Undefined variables are dependent on the variable set selected and whether or not the variable is defined in the current variable set. Select the variable set to run the Test or Test Suite by passing it into the test run command.
 
 ```sh
 tracetest list variableset

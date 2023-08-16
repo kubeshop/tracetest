@@ -3,7 +3,7 @@
 This page showcases how to create and edit Test Suites in the Web UI.
 
 :::tip
-[To read more about Test Suites check out Test Suites concepts.](../concepts/test-suites.md)
+[To read more about Test Suites check out Test Suites concepts page.](../concepts/test-suites.md)
 :::
 
 ![Main Screen](../img/main-screen-0.11.png)

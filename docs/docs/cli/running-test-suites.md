@@ -1,6 +1,6 @@
 # Running Test Suites From the Command Line Interface (CLI)
 
-Once you have created a Test Suite, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
+Once you have created a Test Suite, whether from the Tracetest UI or via a text editor, you will need the capability to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
 
 The command to run a Test Suite is the same as running a test from the CLI.
 

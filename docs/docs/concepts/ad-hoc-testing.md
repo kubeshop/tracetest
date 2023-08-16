@@ -14,7 +14,7 @@ This page showcases use-cases for undefined variables and how to enable ad-hoc t
 
 ### **Supply Variable Value at Runtime**
 
-A user wants a test or Test Suite they can run on a particular user, order id, etc. that is configurable at run time. This makes running an adhoc test in an environment, even production, very easy and convenient. In this case, the user references the variable, but doesn't add it to the environment. Each time they run the test or Test Suite, they will be prompted for the unspecified variables.
+A user wants a Test or Test Suite they can run on a particular user, order id, etc. that is configurable at run time. This makes running an adhoc test in an environment, even production, very easy and convenient. In this case, the user references the variable, but doesn't add it to the environment. Each time they run the Test or Test Suite, they will be prompted for the unspecified variables.
 
 ### **Supply Variable Value from a Previous Test**
 
