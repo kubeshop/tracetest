@@ -10,7 +10,7 @@ processors:
 
 exporters:
   logging:
-    logLevel: debug
+    loglevel: debug
   # OTLP for Tracetest
   otlp/tracetest:
     endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
