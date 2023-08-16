@@ -1,10 +1,10 @@
 # Defining Test Outputs in Text Files
 
-Outputs are really useful when running [Transactions](../concepts/transactions). They allow for exporting values from a test so they become available in the [Variable Sets](../concepts/variable-sets.md) of the current transaction.
+Outputs are really useful when running [Test Suites](../concepts/test-suites). They allow for exporting values from a test so they become available in the [Variable Sets](../concepts/variable-sets.md) of the current Test Suite.
 
 ## Outputs are Expression Results
 
-An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running transaction.
+An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running Test Suite.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
 
 It can be defined using the following YAML definition:
@@ -33,7 +33,7 @@ outputs:
 
 - name: INTERPOLATE_STRING
   # assume PRE_EXISTING_VALUE=someValue from env vars
-  value: "the value ${env:PRE_EXISTING_VALUE} comes from the env var PRE_EXISTING_VALUE"
+  value: "the value ${var:PRE_EXISTING_VALUE} comes from the env var PRE_EXISTING_VALUE"
   # results in INTERPOLATE_STRING = "the value someValue comes from the env var PRE_EXISTING_VALUE
 ```
 

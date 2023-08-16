@@ -465,8 +465,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "concepts/transactions",
-          label: "Transactions",
+          id: "concepts/test-suites",
+          label: "Test Suites",
         },
         {
           type: "doc",
@@ -609,8 +609,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "web-ui/creating-transactions",
-          label: "Creating Transactions",
+          id: "web-ui/creating-test-suites",
+          label: "Creating Test Suites",
         },
         {
           type: "doc",
@@ -676,17 +676,17 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Configuring Transactions",
+          label: "Configuring Test Suites",
           items: [
             {
               type: "doc",
-              id: "cli/creating-transactions",
-              label: "Creating Transactions",
+              id: "cli/creating-test-suites",
+              label: "Creating Test Suites",
             },
             {
               type: "doc",
-              id: "cli/running-transactions",
-              label: "Running Transactions",
+              id: "cli/running-test-suites",
+              label: "Running Test Suites",
             },
           ],
         },

@@ -1,6 +1,6 @@
 # Undefined Variables
 
-When a user runs a test or a transaction, any variables that will be needed but are not defined will be prompted for:
+When a user runs a test or a Test Suite, any variables that will be needed but are not defined will be prompted for:
 
 ```sh
 tracetest run test -f path/to/test.yaml
@@ -13,7 +13,7 @@ POKEID:
 POKENAME:
 ```
 
-Undefined variables are dependent on the variable set selected and whether or not the variable is defined in the current variable set. Select the variable set to run the test or transaction by passing it into the test run command.
+Undefined variables are dependent on the variable set selected and whether or not the variable is defined in the current variable set. Select the variable set to run the Test or Test Suite by passing it into the test run command.
 
 ```sh
 tracetest list variableset

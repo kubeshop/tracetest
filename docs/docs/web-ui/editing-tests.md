@@ -16,7 +16,7 @@ In any of these pages you'll find a dropdown menu that indicates there are more 
 
 The edit form is composed by the basic details and the request details sections.
 
-The basic details section includes the information regarding the test metadata like **name, description, test suite (future)**.
+The basic details section includes the information regarding the test metadata like **name, description, Test Suite (future)**.
 Request details is a changing section depending on which triggering method was used to create the request. For example, if the test was created using the RPC triggering method instead of HTTP, the request details will show different inputs like **method, message and metadata**.
 
 ![Edit Test Form](../img/edit-test-form.png)

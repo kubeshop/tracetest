@@ -16,11 +16,11 @@ Something interesting about this process is that it is a composition of many of 
 
 So in this case, we need to trigger four tests in sequence to achieve test the entire scenario and make these tests share data.
 
-## Building a Transaction for This Scenario
+## Building a Test Suite for This Scenario
 
-Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [transactions](../../../web-ui/creating-transactions.md) that have an [variable set](../../../concepts/variable-sets.md)](../../../concepts/variable-sets.md).
+Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [Test Suites](../../../web-ui/creating-test-suites.md) that have an [variable set](../../../concepts/variable-sets.md)].
  
-We can do that by creating the tests and transactions through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the transaction with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
+We can do that by creating the tests and Test Suites through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the Test Suite with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
 
 ### Mapping Environment Variables 
 
@@ -43,7 +43,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:OTEL_API_URL}/recommendations?productIds=&sessionId=${env:USER_ID}&currencyCode=
+      url: ${var:OTEL_API_URL}/recommendations?productIds=&sessionId=${var:USER_ID}&currencyCode=
       method: GET
       headers:
       - key: Content-Type
@@ -61,7 +61,7 @@ spec:
     value: attr:tracetest.response.body | json_path '$[0].id'
 ```
 
-Note that we have one important changes here: we are now using environment variables on the definition, like `${env:OTEL_API_URL}` and `${env:USER_ID}` on the trigger section and an output to fetch the first `${env:PRODUCT_ID}` that the user chose. This new environment variable will be used in the next tests.
+Note that we have one important changes here: we are now using environment variables on the definition, like `${var:OTEL_API_URL}` and `${var:USER_ID}` on the trigger section and an output to fetch the first `${var:PRODUCT_ID}` that the user chose. This new environment variable will be used in the next tests.
 
 The next step is to define the [Add Item into Shopping Cart](./add-item-into-shopping-cart.md) test, which will be saved as `add-product-into-shopping-cart.yaml`:
 
@@ -73,17 +73,17 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:OTEL_API_URL}/cart
+      url: ${var:OTEL_API_URL}/cart
       method: POST
       headers:
       - key: Content-Type
         value: application/json
-      body: '{"item":{"productId":"${env:PRODUCT_ID}","quantity":1},"userId":"${env:USER_ID}"}'
+      body: '{"item":{"productId":"${var:PRODUCT_ID}","quantity":1},"userId":"${var:USER_ID}"}'
   specs:
   - selector: span[tracetest.span.type="http" name="hipstershop.CartService/AddItem"]
     # The correct ProductID was sent to the Product Catalog API.
     assertions:
-    - attr:app.product.id = "${env:PRODUCT_ID}"
+    - attr:app.product.id = "${var:PRODUCT_ID}"
   - selector: span[tracetest.span.type="database" name="HMSET" db.system="redis" db.redis.database_index="0"]
     # The product persisted correctly on the shopping cart.
     assertions:
@@ -99,7 +99,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:OTEL_API_URL}/cart?sessionId=${env:USER_ID}&currencyCode=
+      url: ${var:OTEL_API_URL}/cart?sessionId=${var:USER_ID}&currencyCode=
       method: GET
       headers:
       - key: Content-Type
@@ -108,7 +108,7 @@ spec:
   - selector: span[tracetest.span.type="rpc" name="hipstershop.ProductCatalogService/GetProduct" rpc.system="grpc" rpc.method="GetProduct" rpc.service="hipstershop.ProductCatalogService"]
     # The product previously added exists in the cart.
     assertions:
-    - attr:app.product.id = "${env:PRODUCT_ID}"
+    - attr:app.product.id = "${var:PRODUCT_ID}"
   - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
     # The size of the shopping cart should be at least 1.
     assertions:
@@ -125,18 +125,18 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: ${env:OTEL_API_URL}/checkout
+      url: ${var:OTEL_API_URL}/checkout
       method: POST
       headers:
       - key: Content-Type
         value: application/json
-      body: '{"userId":"${env:USER_ID}","email":"someone@example.com","address":{"streetAddress":"1600 Amphitheatre Parkway","state":"CA","country":"United States","city":"Mountain View","zipCode":"94043"},"userCurrency":"USD","creditCard":{"creditCardCvv":672,"creditCardExpirationMonth":1,"creditCardExpirationYear":2030,"creditCardNumber":"4432-8015-6152-0454"}}'
+      body: '{"userId":"${var:USER_ID}","email":"someone@example.com","address":{"streetAddress":"1600 Amphitheatre Parkway","state":"CA","country":"United States","city":"Mountain View","zipCode":"94043"},"userCurrency":"USD","creditCard":{"creditCardCvv":672,"creditCardExpirationMonth":1,"creditCardExpirationYear":2030,"creditCardNumber":"4432-8015-6152-0454"}}'
   specs:
   - selector: span[tracetest.span.type="rpc" name="hipstershop.CheckoutService/PlaceOrder"
       rpc.system="grpc" rpc.method="PlaceOrder" rpc.service="hipstershop.CheckoutService"]
     assertions: 
     # An order was placed.
-    - attr:app.user.id = "${env:USER_ID}"
+    - attr:app.user.id = "${var:USER_ID}"
     - attr:app.order.items.count = 1
   - selector: span[tracetest.span.type="rpc" name="hipstershop.PaymentService/Charge" rpc.system="grpc" rpc.method="Charge" rpc.service="hipstershop.PaymentService"]
     assertions: 
@@ -156,12 +156,12 @@ spec:
     - attr:tracetest.selected_spans.count >= 1
 ```
 
-### Creating the Transaction
+### Creating the Test Suite
 
-Now we wrap these files and create a transaction that will run these tests in sequence and will fail if any of the tests fail. We will call it `transaction.yaml`:
+Now we wrap these files and create a Test Suite that will run these tests in sequence and will fail if any of the tests fail. We will call it `testsuite.yaml`:
 
 ```yml
-type: Transaction
+type: TestSuite
 spec:
   name: User purchasing products
   description: Simulate a process of a user purchasing products on Astronomy store
@@ -172,16 +172,16 @@ spec:
   - ./checkout.yaml
 ```
 
-By having the test, transaction and environment files in the same directory, we can call the CLI and execute this transaction:
+By having the test, Test Suite and environment files in the same directory, we can call the CLI and execute this Test Suite:
 
 ```sh
-tracetest run transaction -f transaction.yaml -e user-buying-products.env
+tracetest run testsuite -f testsuite.yaml -e user-buying-products.env
 ```
 
 The result should be an output like this:
 
 ```sh
-✔ User purchasing products (http://localhost:11633/transaction/kRDUir0VR/run/1)
+✔ User purchasing products (http://localhost:11633/testsuite/kRDUir0VR/run/1)
         ✔ Get recommended products (http://localhost:11633/test/XxH8irA4R/run/1/test)
         ✔ Add product into shopping cart (http://localhost:11633/test/j_N8i9AVR/run/1/test)
         ✔ Check shopping cart contents (http://localhost:11633/test/Y2jim9AVg/run/1/test)

@@ -1,6 +1,6 @@
 # Running Tests From the Command Line Interface (CLI)
 
-Once you have created a test, whether from the Tracetest UI or via a text editor, you will need the capabity to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
+Once you have created a test, whether from the Tracetest UI or via a text editor, you will need the capability to run it via the Command Line Interface (CLI) to integrate it into your CI/CD process or your local development workflow.
 
 The documentation for running a test via the CLI can be found here:
 

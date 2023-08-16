@@ -56,7 +56,7 @@ jobs:
       run: |
         tracetest run test -f ./tracetest/tests/test-api.yaml
         tracetest run test -f ./tracetest/tests/test-api-and-av.yaml
-        tracetest run transaction -f ./tracetest/tests/transaction-api.yaml
+        tracetest run testsuite -f ./tracetest/tests/testsuite-api.yaml
 
     - name: Stop containers
       if: always()
@@ -96,7 +96,7 @@ jobs:
       run: |
         tracetest run test -f ./tracetest/tests/test-api.yaml
         tracetest run test -f ./tracetest/tests/test-api-and-av.yaml
-        tracetest run transaction -f ./tracetest/tests/transaction-api.yaml
+        tracetest run testsuite -f ./tracetest/tests/testsuite-api.yaml
 
     - name: Stop containers
       if: always()
@@ -479,12 +479,12 @@ spec:
     - attr:isAvailable = "true"
 ```
 
-The transaction `transaction-api.yaml` will run both the tests above.
+The testsuite `testsuite-api.yaml` will run both the tests above.
 
 ```yaml
-# ./tracetest/tests/transaction-api.yaml
+# ./tracetest/tests/testsuite-api.yaml
 
-type: Transaction
+type: TestSuite
 spec:
   id: 3YIB7rPVg
   name: All Tests for the Books List API

@@ -99,7 +99,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: http://demo-pokemon-api.demo/pokemon/${env:POKEMON_ID}
+      url: http://demo-pokemon-api.demo/pokemon/${var:POKEMON_ID}
       method: GET
       headers:
       - key: Content-Type
@@ -108,13 +108,13 @@ spec:
   - selector: span[tracetest.span.type="http" http.method="GET"]
     assertions:
     - attr:http.status_code  =  200
-    - attr:http.response.body | json_path '$.id'  =  '${env:POKEMON_ID}'
+    - attr:http.response.body | json_path '$.id'  =  '${var:POKEMON_ID}'
   - selector: span[tracetest.span.type="database" db.system="redis" db.operation="get"]
     assertions:
-    - attr:name  =  "get pokemon-${env:POKEMON_ID}"
+    - attr:name  =  "get pokemon-${var:POKEMON_ID}"
   - selector: span[tracetest.span.type="database" db.system="redis" db.operation="set"]
     assertions:
-    - attr:name = "set pokemon-${env:POKEMON_ID}"
+    - attr:name = "set pokemon-${var:POKEMON_ID}"
   - selector: |-
       span[tracetest.span.type="database" name="findOne pokeshop.pokemon"
             db.system="postgres" db.name="pokeshop" db.operation="findOne" db.sql.table="pokemon"]
@@ -131,7 +131,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: http://demo-pokemon-api.demo/pokemon/${env:POKEMON_ID}
+      url: http://demo-pokemon-api.demo/pokemon/${var:POKEMON_ID}
       method: GET
       headers:
       - key: Content-Type
@@ -140,11 +140,11 @@ spec:
   - selector: span[tracetest.span.type="http" http.method="GET"]
     assertions:
     - attr:http.status_code  =  200
-    - attr:http.response.body | json_path '$.id'  =  "${env:POKEMON_ID}"
+    - attr:http.response.body | json_path '$.id'  =  "${var:POKEMON_ID}"
   - selector: span[tracetest.span.type="database" db.system="redis" db.operation="get"]
     assertions:
-    - attr:name = "get pokemon-${env:POKEMON_ID}"
-    - attr:db.result | json_path '$.id' = "${env:POKEMON_ID}"
+    - attr:name = "get pokemon-${var:POKEMON_ID}"
+    - attr:db.result | json_path '$.id' = "${var:POKEMON_ID}"
   - selector: |-
       span[tracetest.span.type="database" name="findOne pokeshop.pokemon"
             db.system="postgres" db.name="pokeshop" db.operation="findOne" db.sql.table="pokemon"]

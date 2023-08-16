@@ -54,13 +54,13 @@ specs:
   trigger:
     type: http
     httpRequest:
-        url: "${env:URL}/api/users"
+        url: "${var:URL}/api/users"
         method: POST
         body: '{}'
         authentication:
           type: bearer
           bearer:
-            token: "${env:API_TOKEN}"
+            token: "${var:API_TOKEN}"
 ```
 
-Both `env:URL` and `env:API_TOKEN` would be replaced by the variables defined in the chosen variable set where the test will run. So, if the chosen variable set was `dev.env`, its values would be replaced by `https://app-dev.com` and `dev-key`, respectively.
+Both `var:URL` and `var:API_TOKEN` would be replaced by the variables defined in the chosen variable set where the test will run. So, if the chosen variable set was `dev.env`, its values would be replaced by `https://app-dev.com` and `dev-key`, respectively.
