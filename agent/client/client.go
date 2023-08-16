@@ -16,7 +16,8 @@ type Config struct {
 }
 
 type SessionConfig struct {
-	BatchTimeout time.Duration
+	BatchTimeout        time.Duration
+	AgentIdentification *proto.AgentIdentification
 }
 
 type Client struct {

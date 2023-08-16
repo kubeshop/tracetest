@@ -12,12 +12,7 @@ import (
 func (c *Client) startPollerListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
-	request, err := c.getConnectionRequest()
-	if err != nil {
-		return err
-	}
-
-	stream, err := client.RegisterPollerAgent(ctx, request)
+	stream, err := client.RegisterPollerAgent(ctx, c.sessionConfig.AgentIdentification)
 	if err != nil {
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}
