@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/pkg/validation"
@@ -380,7 +381,7 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		return Test{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	_, err = stmt.ExecContext(
 		ctx,

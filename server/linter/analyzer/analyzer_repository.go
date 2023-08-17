@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
@@ -90,7 +91,7 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		}
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 	_, err = tx.ExecContext(
 		ctx,
 		insertQuery,

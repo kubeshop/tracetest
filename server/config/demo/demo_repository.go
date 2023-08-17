@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
@@ -51,7 +52,7 @@ func (r *Repository) Create(ctx context.Context, demo Demo) (Demo, error) {
 		return Demo{}, fmt.Errorf("could not get JSON data from opentelemetry store example: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	_, err = tx.ExecContext(ctx, insertQuery,
 		demo.ID,

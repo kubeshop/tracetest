@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -92,7 +93,7 @@ func (r *TraceRepository) UpdateTraceSpans(ctx context.Context, trace *Trace) er
 	_, err = tx.ExecContext(
 		ctx,
 		`INSERT INTO otlp_traces (tenant_id, trace_id, trace) VALUES ($1, $2, $3)`,
-		sqlutil.TenantID(ctx),
+		middleware.TenantIDFromContext(ctx),
 		trace.ID.String(),
 		jsonTrace,
 	)

@@ -34,6 +34,16 @@ func TenantMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func TenantIDFromContext(ctx context.Context) string {
+	tenantID := ctx.Value(TenantIDKey)
+
+	if tenantID == nil {
+		return ""
+	}
+
+	return tenantID.(string)
+}
+
 func getTenantIDFromRequest(r *http.Request) string {
 	return r.Header.Get(HeaderTenantID)
 }

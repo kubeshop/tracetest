@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/test"
@@ -124,7 +125,7 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 		return TestSuiteRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	var runID int
 	err = tx.QueryRowContext(
@@ -250,7 +251,7 @@ func (td *RunRepository) setTestSuiteRunSteps(ctx context.Context, tx *sql.Tx, t
 		return tx.Commit()
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	values := []string{}
 	for _, run := range tr.Steps {

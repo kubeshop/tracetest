@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
@@ -259,7 +260,7 @@ func (r *Repository) insertIntoEnvironments(ctx context.Context, variableSet Var
 		return VariableSet{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	_, err = stmt.ExecContext(
 		ctx,

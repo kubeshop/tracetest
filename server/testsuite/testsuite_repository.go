@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/test"
@@ -353,7 +354,7 @@ func (r *Repository) insertIntoTestSuites(ctx context.Context, suite TestSuite) 
 	}
 	defer stmt.Close()
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	_, err = stmt.ExecContext(
 		ctx,
@@ -388,7 +389,7 @@ func (r *Repository) setTestSuiteSteps(ctx context.Context, tx *sql.Tx, suite Te
 		return suite, tx.Commit()
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	values := []string{}
 	for i, testID := range suite.StepIDs {

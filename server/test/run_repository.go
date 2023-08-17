@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/variableset"
@@ -162,7 +163,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		return Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	var runID int
 	err = tx.QueryRowContext(

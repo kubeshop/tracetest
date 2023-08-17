@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
@@ -101,7 +102,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		return DataStore{}, fmt.Errorf("could not marshal values field configuration: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
+	tenantID := middleware.TenantIDFromContext(ctx)
 
 	_, err = tx.ExecContext(ctx, insertQuery,
 		dataStore.ID,

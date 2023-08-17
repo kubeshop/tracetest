@@ -9,8 +9,8 @@ import (
 )
 
 func Tenant(ctx context.Context, query string, params ...any) (string, []any) {
-	tenantID := TenantID(ctx)
-	if tenantID == nil {
+	tenantID := middleware.TenantIDFromContext(ctx)
+	if tenantID == "" {
 		return query, params
 	}
 
@@ -23,8 +23,8 @@ func Tenant(ctx context.Context, query string, params ...any) (string, []any) {
 }
 
 func TenantWithPrefix(ctx context.Context, query string, prefix string, params ...any) (string, []any) {
-	tenantID := TenantID(ctx)
-	if tenantID == nil {
+	tenantID := middleware.TenantIDFromContext(ctx)
+	if tenantID == "" {
 		return query, params
 	}
 
@@ -33,17 +33,6 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 	condition := fmt.Sprintf(" %s %stenant_id = $%d)", queryPrefix, prefix, paramNumber)
 
 	return query + condition, append(params, tenantID)
-}
-
-func TenantID(ctx context.Context) *string {
-	tenantID := ctx.Value(middleware.TenantIDKey)
-
-	if tenantID == "" || tenantID == nil {
-		return nil
-	}
-
-	tenantIDString := tenantID.(string)
-	return &tenantIDString
 }
 
 func getQueryPrefix(query string) string {

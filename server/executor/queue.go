@@ -10,6 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
@@ -277,6 +278,10 @@ func (q *Queue) SetDriver(driver QueueDriver) {
 	driver.SetQueue(q)
 }
 
+func propagator() propagation.TextMapPropagator {
+	return propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}, tenantPropagator{})
+}
+
 func (q Queue) Enqueue(ctx context.Context, job Job) {
 	select {
 	default:
@@ -287,8 +292,7 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 	if job.Headers == nil {
 		job.Headers = &headers{}
 	}
-	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-	propagator.Inject(ctx, propagation.MapCarrier(*job.Headers))
+	propagator().Inject(ctx, propagation.MapCarrier(*job.Headers))
 
 	newJob := Job{
 		Headers: job.Headers,
@@ -308,8 +312,7 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 
 func (q Queue) Listen(job Job) {
 	// this is called when a new job is put in the queue and we need to process it
-	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
-	ctx := propagator.Extract(context.Background(), propagation.MapCarrier(*job.Headers))
+	ctx := propagator().Extract(context.Background(), propagation.MapCarrier(*job.Headers))
 
 	ctx, cancelCtx := context.WithCancel(ctx)
 	q.listenForStopRequests(context.Background(), cancelCtx, job)
@@ -469,4 +472,31 @@ func (q Queue) resolveDataStore(ctx context.Context, job Job) datastore.DataStor
 	}
 
 	return ds
+}
+
+type tenantPropagator struct{}
+
+var _ propagation.TextMapPropagator = tenantPropagator{}
+
+// Inject sets baggage key-values from ctx into the carrier.
+func (b tenantPropagator) Inject(ctx context.Context, carrier propagation.TextMapCarrier) {
+	tenantID := middleware.TenantIDFromContext(ctx)
+	if tenantID != "" {
+		carrier.Set(string(middleware.TenantIDKey), tenantID)
+	}
+}
+
+// Extract returns a copy of parent with the baggage from the carrier added.
+func (b tenantPropagator) Extract(parent context.Context, carrier propagation.TextMapCarrier) context.Context {
+	tenantID := carrier.Get(string(middleware.TenantIDKey))
+	if tenantID == "" {
+		return parent
+	}
+
+	return context.WithValue(parent, middleware.TenantIDKey, tenantID)
+}
+
+// Fields returns the keys who's values are set with Inject.
+func (b tenantPropagator) Fields() []string {
+	return []string{string(middleware.TenantIDKey)}
 }
