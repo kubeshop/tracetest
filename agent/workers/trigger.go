@@ -165,10 +165,10 @@ func convertResponseToProtoResponse(request *proto.TriggerRequest, response agen
 		TestID: request.TestID,
 		RunID:  request.RunID,
 		TriggerResult: &proto.TriggerResult{
-			Type:            string(response.Result.Type),
-			Http:            convertHttpResponseToProto(response.Result.HTTP),
-			Grpc:            convertGrpcResponseToProto(response.Result.GRPC),
-			TraceIDResponse: convertTraceIDResponseToProto(response.Result.TraceID),
+			Type:    string(response.Result.Type),
+			Http:    convertHttpResponseToProto(response.Result.HTTP),
+			Grpc:    convertGrpcResponseToProto(response.Result.GRPC),
+			TraceID: convertTraceIDResponseToProto(response.Result.TraceID),
 		},
 	}
 }

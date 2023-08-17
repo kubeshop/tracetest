@@ -144,7 +144,7 @@ message TriggerResult {
     string type = 1;
     HttpResponse http = 2;
     GrpcResponse grpc = 3;
-    TraceIdResponse traceIDResponse = 4;
+    TraceIdResponse traceID = 4;
 }
 
 message HttpResponse {
