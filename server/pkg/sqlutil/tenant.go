@@ -30,7 +30,7 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 
 	queryPrefix := getQueryPrefix(query)
 	paramNumber := len(params) + 1
-	condition := fmt.Sprintf(" %s %stenant_id = $%d)", queryPrefix, prefix, paramNumber)
+	condition := fmt.Sprintf(" %s %stenant_id = $%d", queryPrefix, prefix, paramNumber)
 
 	return query + condition, append(params, tenantID)
 }

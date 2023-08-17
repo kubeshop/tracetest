@@ -17,10 +17,11 @@ const {createReduxHistory, routerMiddleware, routerReducer} = createReduxHistory
   history: createBrowserHistory(),
 });
 
-export const middlewares: Middleware[] = [TracetestAPI.middleware, OtelRepoAPI.middleware];
+TracetestAPI.create();
+
+export const middlewares: Middleware[] = [OtelRepoAPI.middleware];
 
 export const reducers = {
-  [TracetestAPI.reducerPath]: TracetestAPI.reducer,
   [OtelRepoAPI.reducerPath]: OtelRepoAPI.reducer,
 
   spans: Spans,
@@ -36,12 +37,13 @@ export const reducers = {
 export const store = configureStore({
   reducer: {
     ...reducers,
+    [TracetestAPI.instance.reducerPath]: TracetestAPI.instance.reducer,
     router: routerReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware()
       .prepend(RouterMiddleware.middleware)
-      .concat(...middlewares, routerMiddleware),
+      .concat(TracetestAPI.instance.middleware, ...middlewares, routerMiddleware),
 });
 
 export const history = createReduxHistory(store);

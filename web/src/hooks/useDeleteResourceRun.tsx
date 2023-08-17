@@ -1,10 +1,12 @@
 import {useCallback} from 'react';
 
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import {useDeleteRunByIdMutation, useDeleteTestSuiteRunByIdMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+
+const {useDeleteRunByIdMutation, useDeleteTestSuiteRunByIdMutation} = TracetestAPI.instance;
 
 interface IProps {
   id: string;

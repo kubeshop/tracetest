@@ -1,7 +1,9 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {RootState} from 'redux/store';
-import {endpoints} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import UserSelectors from './User.selectors';
+
+const {endpoints} = TracetestAPI.instance;
 
 const stateSelector = (state: RootState) => state;
 const withOutputsSelector = (state: RootState, withOutputs: boolean) => withOutputs;

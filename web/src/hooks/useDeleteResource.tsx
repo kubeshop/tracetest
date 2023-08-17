@@ -2,10 +2,12 @@ import {useCallback} from 'react';
 import {capitalize} from 'lodash';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
-import {useDeleteTestByIdMutation, useDeleteTestSuiteByIdMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
 import {useNotification} from 'providers/Notification/Notification.provider';
+
+const {useDeleteTestByIdMutation, useDeleteTestSuiteByIdMutation} = TracetestAPI.instance;
 
 const useDeleteResource = () => {
   const [deleteTestMutation] = useDeleteTestByIdMutation();

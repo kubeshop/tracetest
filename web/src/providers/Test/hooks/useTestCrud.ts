@@ -10,13 +10,15 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useVariableSet} from 'providers/VariableSet';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
-import {useEditTestMutation, useRunTestMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch} from 'redux/hooks';
 import {reset} from 'redux/slices/TestSpecs.slice';
 import TestAnalyticsService from 'services/Analytics/TestAnalytics.service';
 import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
 import {RunErrorTypes} from 'types/TestRun.types';
+
+const {useEditTestMutation, useRunTestMutation} = TracetestAPI.instance;
 
 export type TTestRunRequest = {
   test: Test;

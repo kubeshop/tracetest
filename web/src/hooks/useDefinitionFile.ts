@@ -1,6 +1,8 @@
 import {useCallback, useState} from 'react';
-import {useLazyGetResourceDefinitionQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
+
+const {useLazyGetResourceDefinitionQuery} = TracetestAPI.instance;
 
 const useDefinitionFile = () => {
   const [definition, setDefinition] = useState<string>('');

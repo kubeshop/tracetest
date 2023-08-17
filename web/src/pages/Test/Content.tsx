@@ -9,9 +9,11 @@ import TestRun from 'models/TestRun.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTest} from 'providers/Test/Test.provider';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
-import {useGetRunListQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './Test.styled';
+
+const {useGetRunListQuery} = TracetestAPI.instance;
 
 const Content = () => {
   const {test} = useTest();

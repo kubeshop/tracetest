@@ -1,7 +1,6 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
-
-import {useParseExpressionMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {selectIsPending, selectSelectedOutputs, selectTestOutputs} from 'redux/testOutputs/selectors';
 import {
@@ -22,6 +21,8 @@ import {useDashboard} from '../Dashboard/Dashboard.provider';
 import {useVariableSet} from '../VariableSet';
 import {useTest} from '../Test/Test.provider';
 import {useTestRun} from '../TestRun/TestRun.provider';
+
+const {useParseExpressionMutation} = TracetestAPI.instance;
 
 interface IContext {
   isDraftMode: boolean;

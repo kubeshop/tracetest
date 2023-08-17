@@ -1,6 +1,6 @@
 import {noop} from 'lodash';
 import {createContext, useContext, useMemo, useCallback, useState} from 'react';
-import {useGetVariableSetsQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import VariableSetSelectors from 'selectors/VariableSet.selectors';
@@ -8,6 +8,8 @@ import VariableSet from 'models/VariableSet.model';
 import VariableSetModal from 'components/VariableSetModal';
 import VariableSetService from 'services/VariableSet.service';
 import useVariableSetCrud from './hooks/useVariableSetCrud';
+
+const {useGetVariableSetsQuery} = TracetestAPI.instance;
 
 interface IContext {
   variableSetList: VariableSet[];

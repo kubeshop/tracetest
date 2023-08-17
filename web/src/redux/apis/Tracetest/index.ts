@@ -1,33 +1,25 @@
-import {endpoints as variableSetEndpoints} from './endpoints/VariableSet.endpoint';
-import {endpoints as testEndpoints} from './endpoints/Test.endpoint';
-import {endpoints as testRunEndpoints} from './endpoints/TestRun.endpoint';
+import TracetestAPI from './Tracetest.api';
 
 // eslint-disable-next-line no-restricted-exports
 export {default} from './Tracetest.api';
 
-export {
-  useGetDataStoreQuery,
-  useUpdateDataStoreMutation,
+const {
   useDeleteDataStoreMutation,
+  useGetDataStoreQuery,
   useTestConnectionMutation,
-} from './endpoints/DataStore.endpoint';
+  useUpdateDataStoreMutation,
 
-export {
   useCreateVariableSetMutation,
   useDeleteVariableSetMutation,
   useGetVariableSetsQuery,
   useUpdateVariableSetMutation,
-} from './endpoints/VariableSet.endpoint';
 
-export {useParseExpressionMutation} from './endpoints/Expression.endpoint';
+  useParseExpressionMutation,
 
-export {
   useGetResourcesQuery,
   useGetResourceDefinitionQuery,
   useLazyGetResourceDefinitionQuery,
-} from './endpoints/Resource.endpoint';
 
-export {
   useGetConfigQuery,
   useGetPollingQuery,
   useGetDemoQuery,
@@ -35,18 +27,14 @@ export {
   useGetTestRunnerQuery,
   useCreateSettingMutation,
   useUpdateSettingMutation,
-} from './endpoints/Setting.endpoint';
 
-export {
   useCreateTestMutation,
   useGetTestByIdQuery,
   useGetTestVersionByIdQuery,
   useGetTestListQuery,
   useDeleteTestByIdMutation,
   useEditTestMutation,
-} from './endpoints/Test.endpoint';
 
-export {
   useGetRunByIdQuery,
   useGetRunEventsQuery,
   useGetRunListQuery,
@@ -60,9 +48,7 @@ export {
   useStopRunMutation,
   useGetJUnitByRunIdQuery,
   useLazyGetJUnitByRunIdQuery,
-} from './endpoints/TestRun.endpoint';
 
-export {
   useCreateTestSuiteMutation,
   useGetTestSuiteByIdQuery,
   useGetTestSuiteVersionByIdQuery,
@@ -70,15 +56,68 @@ export {
   useDeleteTestSuiteByIdMutation,
   useEditTestSuiteMutation,
   useLazyGetTestSuiteVersionByIdQuery,
-} from './endpoints/TestSuite.endpoint';
 
-export {
   useDeleteTestSuiteRunByIdMutation,
   useGetTestSuiteRunByIdQuery,
   useGetTestSuiteRunsQuery,
   useRunTestSuiteMutation,
   useLazyGetTestSuiteRunsQuery,
   useLazyGetTestSuiteRunByIdQuery,
-} from './endpoints/TestSuiteRun.endpoint';
 
-export const endpoints = {...variableSetEndpoints, ...testEndpoints, ...testRunEndpoints};
+  endpoints,
+} = TracetestAPI.instance;
+
+export {
+  useDeleteDataStoreMutation,
+  useGetDataStoreQuery,
+  useTestConnectionMutation,
+  useUpdateDataStoreMutation,
+  useCreateVariableSetMutation,
+  useDeleteVariableSetMutation,
+  useGetVariableSetsQuery,
+  useUpdateVariableSetMutation,
+  useParseExpressionMutation,
+  useGetResourcesQuery,
+  useGetResourceDefinitionQuery,
+  useLazyGetResourceDefinitionQuery,
+  useGetConfigQuery,
+  useGetPollingQuery,
+  useGetDemoQuery,
+  useGetLinterQuery,
+  useGetTestRunnerQuery,
+  useCreateSettingMutation,
+  useUpdateSettingMutation,
+  useCreateTestMutation,
+  useGetTestByIdQuery,
+  useGetTestVersionByIdQuery,
+  useGetTestListQuery,
+  useDeleteTestByIdMutation,
+  useEditTestMutation,
+  useGetRunByIdQuery,
+  useGetRunEventsQuery,
+  useGetRunListQuery,
+  useGetSelectedSpansQuery,
+  useLazyGetSelectedSpansQuery,
+  useRunTestMutation,
+  useReRunMutation,
+  useLazyGetRunListQuery,
+  useDryRunMutation,
+  useDeleteRunByIdMutation,
+  useStopRunMutation,
+  useGetJUnitByRunIdQuery,
+  useLazyGetJUnitByRunIdQuery,
+  useCreateTestSuiteMutation,
+  useGetTestSuiteByIdQuery,
+  useGetTestSuiteVersionByIdQuery,
+  useLazyGetTestSuiteByIdQuery,
+  useDeleteTestSuiteByIdMutation,
+  useEditTestSuiteMutation,
+  useLazyGetTestSuiteVersionByIdQuery,
+  useDeleteTestSuiteRunByIdMutation,
+  useGetTestSuiteRunByIdQuery,
+  useGetTestSuiteRunsQuery,
+  useRunTestSuiteMutation,
+  useLazyGetTestSuiteRunsQuery,
+  useLazyGetTestSuiteRunByIdQuery,
+  endpoints,
+};

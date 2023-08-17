@@ -7,20 +7,22 @@ import Demo from 'models/Demo.model';
 import Linter from 'models/Linter.model';
 import Polling from 'models/Polling.model';
 import TestRunner from 'models/TestRunner.model';
-import {
-  useGetDataStoreQuery,
-  useGetConfigQuery,
-  useGetDemoQuery,
-  useGetPollingQuery,
-  useGetLinterQuery,
-  useGetTestRunnerQuery,
-} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
 import UserSelectors from 'selectors/User.selectors';
 import AnalyticsService from 'services/Analytics/Analytics.service';
 import {ConfigMode} from 'types/DataStore.types';
 import Env from 'utils/Env';
+
+const {
+  useGetDataStoreQuery,
+  useGetConfigQuery,
+  useGetDemoQuery,
+  useGetPollingQuery,
+  useGetLinterQuery,
+  useGetTestRunnerQuery,
+} = TracetestAPI.instance;
 
 interface IContext {
   dataStoreConfig: DataStoreConfig;

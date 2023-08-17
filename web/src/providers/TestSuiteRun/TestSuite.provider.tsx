@@ -1,7 +1,9 @@
 import {createContext, useContext, useMemo} from 'react';
-import {useGetTestSuiteRunByIdQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestSuiteRun from 'models/TestSuiteRun.model';
 import TestSuiteProvider from '../TestSuite/TestSuite.provider';
+
+const {useGetTestSuiteRunByIdQuery} = TracetestAPI.instance;
 
 interface IContext {
   run: TestSuiteRun;

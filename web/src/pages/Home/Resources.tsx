@@ -9,7 +9,7 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
-import {useGetResourcesQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {ADD_TEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
@@ -22,6 +22,8 @@ import * as S from './Home.styled';
 import HomeActions from './HomeActions';
 import HomeFilters from './HomeFilters';
 import Loading from './Loading';
+
+const {useGetResourcesQuery} = TracetestAPI.instance;
 
 const {onTestClick} = HomeAnalyticsService;
 type TParameters = {sortBy: SortBy; sortDirection: SortDirection};

@@ -1,5 +1,7 @@
 import {useCallback, useState} from 'react';
-import {useLazyGetJUnitByRunIdQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
+
+const {useLazyGetJUnitByRunIdQuery} = TracetestAPI.instance;
 
 const useJUnitResult = () => {
   const [getJUnit] = useLazyGetJUnitByRunIdQuery();

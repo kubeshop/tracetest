@@ -7,8 +7,10 @@ import SpanSelectors from 'selectors/Span.selectors';
 import {RouterSearchFields} from 'constants/Common.constants';
 import Span from 'models/Span.model';
 import RouterActions from 'redux/actions/Router.actions';
-import {useLazyGetSelectedSpansQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import SelectedSpans from 'models/SelectedSpans.model';
+
+const {useLazyGetSelectedSpansQuery} = TracetestAPI.instance;
 
 interface IContext {
   selectedSpan?: Span;

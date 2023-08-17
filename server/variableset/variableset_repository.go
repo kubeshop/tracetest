@@ -142,10 +142,10 @@ func (r *Repository) List(ctx context.Context, take, skip int, query, sortBy, so
 		"name":    "e.name",
 	}
 
+	sql, params = sqlutil.TenantWithPrefix(ctx, sql, "e.", params...)
 	sql = sqlutil.Sort(sql, sortBy, sortDirection, "created", sortingFields)
 	sql += ` LIMIT $1 OFFSET $2 `
 
-	sql, params = sqlutil.Tenant(ctx, sql, params...)
 	stmt, err := r.db.Prepare(sql)
 	if err != nil {
 		return []VariableSet{}, err

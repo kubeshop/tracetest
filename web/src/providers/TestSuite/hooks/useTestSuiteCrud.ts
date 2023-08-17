@@ -5,14 +5,16 @@ import TestSuite from 'models/TestSuite.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useVariableSet} from 'providers/VariableSet/VariableSet.provider';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
-import {
-  useDeleteTestSuiteByIdMutation,
-  useEditTestSuiteMutation,
-  useLazyGetTestSuiteVersionByIdQuery,
-  useRunTestSuiteMutation,
-} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {RunErrorTypes} from 'types/TestRun.types';
 import {TDraftTestSuite} from 'types/TestSuite.types';
+
+const {
+  useEditTestSuiteMutation,
+  useRunTestSuiteMutation,
+  useLazyGetTestSuiteVersionByIdQuery,
+  useDeleteTestSuiteByIdMutation,
+} = TracetestAPI.instance;
 
 const useTestSuiteCrud = () => {
   const {navigate} = useDashboard();

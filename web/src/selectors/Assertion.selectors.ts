@@ -1,11 +1,13 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {sortBy} from 'lodash';
 
-import {endpoints} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {RootState} from 'redux/store';
 import SpanAttributeService from '../services/SpanAttribute.service';
 import {TSpanSelector} from '../types/Assertion.types';
 import SpanSelectors from './Span.selectors';
+
+const {endpoints} = TracetestAPI.instance;
 
 const stateSelector = (state: RootState) => state;
 const paramsSelector = (state: RootState, testId: string, runId: string, spanIdList: string[] = []) => ({

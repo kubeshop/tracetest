@@ -1,7 +1,7 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
 import TestRunCard from 'components/RunCard/TestRunCard';
-import {useLazyGetRunListQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
@@ -10,6 +10,8 @@ import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
 import ResourceCardSummary from './ResourceCardSummary';
 import useRuns from './useRuns';
+
+const {useLazyGetRunListQuery} = TracetestAPI.instance;
 
 interface IProps {
   onEdit(id: string, lastRunId: number, type: ResourceType): void;

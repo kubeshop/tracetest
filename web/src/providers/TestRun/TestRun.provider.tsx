@@ -3,8 +3,10 @@ import {createContext, useCallback, useContext, useEffect, useMemo, useState} fr
 
 import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
-import {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestProvider from '../Test';
+
+const {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} = TracetestAPI.instance;
 
 interface IContext {
   run: TestRun;

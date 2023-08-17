@@ -193,7 +193,7 @@ func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
 const sortQuery = `ORDER BY t.version DESC LIMIT 1`
 
 func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
-	query, params := sqlutil.Tenant(ctx, getTestSQL+" WHERE t.id = $1", id)
+	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+" WHERE t.id = $1", "t.", id)
 
 	test, err := r.readRow(ctx, r.db.QueryRowContext(ctx, query+sortQuery, params...))
 	if err != nil {
@@ -382,6 +382,7 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 
 	tenantID := sqlutil.TenantID(ctx)
 
+	fmt.Println("@@@HERE?", err)
 	_, err = stmt.ExecContext(
 		ctx,
 		test.ID,

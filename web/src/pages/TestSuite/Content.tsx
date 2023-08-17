@@ -8,8 +8,10 @@ import TestSuiteRun from 'models/TestSuiteRun.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestSuite} from 'providers/TestSuite/TestSuite.provider';
 import {useTestSuiteCrud} from 'providers/TestSuite';
-import {useGetTestSuiteRunsQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import * as S from './TestSuite.styled';
+
+const {useGetTestSuiteRunsQuery} = TracetestAPI.instance;
 
 const Content = () => {
   const {onDelete, testSuite} = useTestSuite();
