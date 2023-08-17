@@ -205,8 +205,8 @@ func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
 
 func (r *repository) GetTestSuiteSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
 	sortQuery := `ORDER BY ts.step_number ASC`
-	query, params := sqlutil.Tenant(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN test_suite_steps ts ON t.id = ts.test_id
-	WHERE ts.test_suite_id = $1 AND ts.test_suite_version = $2`, id, version)
+	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN test_suite_steps ts ON t.id = ts.test_id
+	WHERE ts.test_suite_id = $1 AND ts.test_suite_version = $2`, "t.", id, version)
 	stmt, err := r.db.Prepare(query + sortQuery)
 	if err != nil {
 		return []Test{}, fmt.Errorf("prepare 2: %w", err)
@@ -382,7 +382,6 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 
 	tenantID := sqlutil.TenantID(ctx)
 
-	fmt.Println("@@@HERE?", err)
 	_, err = stmt.ExecContext(
 		ctx,
 		test.ID,
@@ -567,7 +566,7 @@ func (r *repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 }
 
 func (r *repository) GetVersion(ctx context.Context, id id.ID, version int) (Test, error) {
-	query, params := sqlutil.Tenant(ctx, getTestSQL+" WHERE t.id = $1 AND t.version = $2", id, version)
+	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+" WHERE t.id = $1 AND t.version = $2", "t.", id, version)
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return Test{}, fmt.Errorf("prepare: %w", err)

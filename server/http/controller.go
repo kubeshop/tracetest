@@ -261,7 +261,6 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInfo openapi
 	requiredGates := c.mappers.In.RequiredGates(runInfo.RequiredGates)
 
 	run := c.testRunner.Run(ctx, test, metadata(runInfo.Metadata), environment, requiredGates)
-
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 

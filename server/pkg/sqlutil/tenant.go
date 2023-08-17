@@ -19,7 +19,7 @@ func Tenant(ctx context.Context, query string, params ...any) (string, []any) {
 	paramNumber := len(params) + 1
 	condition := fmt.Sprintf(" %s tenant_id = $%d", prefix, paramNumber)
 
-	return query + condition, append(params, tenantID)
+	return query + condition, append(params, *tenantID)
 }
 
 func TenantWithPrefix(ctx context.Context, query string, prefix string, params ...any) (string, []any) {
@@ -32,7 +32,7 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 	paramNumber := len(params) + 1
 	condition := fmt.Sprintf(" %s %stenant_id = $%d", queryPrefix, prefix, paramNumber)
 
-	return query + condition, append(params, tenantID)
+	return query + condition, append(params, *tenantID)
 }
 
 func TenantID(ctx context.Context) *string {
