@@ -21,6 +21,7 @@ export const TRACE_DOCUMENTATION_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md';
 
 export const ADD_TEST_URL = 'https://docs.tracetest.io/web-ui/creating-tests';
+export const ADD_TEST_SUITE_URL = 'https://docs.tracetest.io/web-ui/creating-test-suites';
 export const ADD_TEST_OUTPUTS_DOCUMENTATION_URL = 'https://docs.tracetest.io/web-ui/creating-test-outputs';
 export const ANALYZER_DOCUMENTATION_URL = 'https://docs.tracetest.io/analyzer/concepts';
 export const TEST_RUNNER_DOCUMENTATION_URL = 'https://docs.tracetest.io/configuration/test-runner';

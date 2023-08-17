@@ -10,10 +10,10 @@ const defaultHeaders = {'content-type': 'application/json', 'X-Tracetest-Augment
 export const resourceEndpoints = (builder: TTestApiEndpointBuilder) => ({
   getResources: builder.query<
     PaginationResponse<Resource>,
-    {take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
+    {resourceType: ResourceType, take?: number; skip?: number; query?: string; sortBy?: SortBy; sortDirection?: SortDirection}
   >({
-    query: ({take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) => ({
-      url: `/resources?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
+    query: ({resourceType, take = 25, skip = 0, query = '', sortBy = '', sortDirection = ''}) => ({
+      url: `/${resourceType}?take=${take}&skip=${skip}&query=${query}&sortBy=${sortBy}&sortDirection=${sortDirection}`,
       headers: defaultHeaders,
     }),
     providesTags: () => [{type: TracetestApiTags.RESOURCE, id: 'LIST'}],
@@ -26,7 +26,7 @@ export const resourceEndpoints = (builder: TTestApiEndpointBuilder) => ({
   }),
   getResourceDefinition: builder.query<string, {resourceId: string; version?: number; resourceType: ResourceType}>({
     query: ({resourceId, resourceType}) => ({
-      url: `/${resourceType}s/${resourceId}`,
+      url: `/${resourceType}/${resourceId}`,
       responseHandler: 'text',
       headers: {
         'content-type': 'text/yaml',

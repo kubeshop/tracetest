@@ -1,5 +1,5 @@
-import ConfigCTA from './ConfigCTA';
-import Tests from './TestsList';
+import ConfigCTA from '../Home/ConfigCTA';
+import TestSuites from './TestSuitesList';
 
 interface IProps {
   isLoading: boolean;
@@ -10,7 +10,7 @@ interface IProps {
 const Content = ({isLoading, shouldDisplayConfigSetup, skipConfigSetup}: IProps) => {
   if (isLoading) return null;
 
-  return shouldDisplayConfigSetup ? <ConfigCTA onSkip={skipConfigSetup} /> : <Tests />;
+  return shouldDisplayConfigSetup ? <ConfigCTA onSkip={skipConfigSetup} /> : <TestSuites />;
 };
 
 export default Content;

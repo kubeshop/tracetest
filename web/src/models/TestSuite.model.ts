@@ -1,8 +1,9 @@
-import { Model, TTestSuiteSchemas } from 'types/Common.types';
+import {Model, TTestSuiteSchemas} from 'types/Common.types';
 import Summary from './Summary.model';
 import Test from './Test.model';
 
 export type TRawTestSuiteResource = TTestSuiteSchemas['TestSuiteResource'];
+export type TRawTestSuiteResourceList = TTestSuiteSchemas['TestSuiteResourceList'];
 export type TRawTestSuite = TTestSuiteSchemas['TestSuite'];
 type TestSuite = Model<
   TTestSuiteSchemas['TestSuite'],
@@ -13,7 +14,7 @@ type TestSuite = Model<
   }
 >;
 
-function TestSuite({ spec: raw = {} }: TRawTestSuiteResource): TestSuite {
+function TestSuite({spec: raw = {}}: TRawTestSuiteResource): TestSuite {
   return TestSuite.FromRawTestSuite(raw);
 }
 

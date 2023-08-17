@@ -14,6 +14,7 @@ export const Content = styled(LayoutAntd.Content)<{$hasMenu: boolean}>`
 `;
 
 export const Layout = styled(LayoutAntd)`
+  min-height: 100%;
   background: ${({theme}) => theme.color.background};
 `;
 

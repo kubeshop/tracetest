@@ -26,10 +26,16 @@ const menuItems = [
     key: '0',
     icon: <ClusterOutlined />,
     label: <Link to="/">Tests</Link>,
-    path: '/',
+    path: '/tests',
   },
   {
     key: '1',
+    icon: <ClusterOutlined />,
+    label: <Link to="/testsuites">Test Suites</Link>,
+    path: '/testsuites',
+  },
+  {
+    key: '2',
     icon: <GlobalOutlined />,
     label: <Link to="/variablesets">Variable Sets</Link>,
     path: '/variablesets',

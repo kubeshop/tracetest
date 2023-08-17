@@ -3,8 +3,6 @@ import {RootState} from 'redux/store';
 import TracetestAPI from 'redux/apis/Tracetest';
 import UserSelectors from './User.selectors';
 
-const {endpoints} = TracetestAPI.instance;
-
 const stateSelector = (state: RootState) => state;
 const withOutputsSelector = (state: RootState, withOutputs: boolean) => withOutputs;
 const selectOutputs = createSelector(stateSelector, ({testOutputs: {outputs}}) => {
@@ -12,7 +10,7 @@ const selectOutputs = createSelector(stateSelector, ({testOutputs: {outputs}}) =
 });
 
 const selectVariableSetList = createSelector(stateSelector, state => {
-  const {data: {items = []} = {}} = endpoints.getVariableSets.select({})(state);
+  const {data: {items = []} = {}} = TracetestAPI.instance.endpoints.getVariableSets.select({})(state);
 
   return items;
 });

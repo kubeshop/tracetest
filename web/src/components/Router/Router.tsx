@@ -2,6 +2,7 @@ import {Navigate, Route, Routes} from 'react-router-dom';
 
 import VariableSet from 'pages/VariableSet';
 import Home from 'pages/Home';
+import TestSuites from 'pages/TestSuites';
 import RunDetail from 'pages/RunDetail';
 import Settings from 'pages/Settings';
 import Test from 'pages/Test';
@@ -13,6 +14,7 @@ import AutomatedTestRun from 'pages/AutomatedTestRun';
 const Router = () => (
   <Routes>
     <Route path="/" element={<Home />} />
+    <Route path="/testsuites" element={<TestSuites />} />
 
     <Route path="/variablesets" element={<VariableSet />} />
 
@@ -28,7 +30,7 @@ const Router = () => (
     <Route path="/testsuite/:testSuiteId/run/:runId/overview" element={<TestSuiteRunOverview />} />
     <Route path="/testsuite/:testSuiteId/run/:runId/automate" element={<TestSuiteRunAutomate />} />
 
-    <Route path="*" element={<Navigate to="" />} />
+    <Route path="*" element={<Navigate to="/" />} />
   </Routes>
 );
 
