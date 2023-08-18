@@ -2,14 +2,14 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import Span from 'models/Span.model';
 import TestRun from 'models/TestRun.model';
-import {endpoints} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestRunService from 'services/TestRun.service';
 import {RootState} from '../redux/store';
 
 const selectParams = (state: RootState, params: {testId: string; runId: string; spanId: string}) => params;
 
 const selectTestRun = (state: RootState, params: {testId: string; runId: string; spanId: string}) => {
-  const {data} = endpoints.getRunById.select({testId: params.testId, runId: params.runId})(state);
+  const {data} = TracetestAPI.instance.endpoints.getRunById.select({testId: params.testId, runId: params.runId})(state);
   return data ?? TestRun({});
 };
 

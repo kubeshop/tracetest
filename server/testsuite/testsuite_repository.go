@@ -272,7 +272,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (TestSuite, error) {
 }
 
 func (r *Repository) get(ctx context.Context, id id.ID, augmented bool) (TestSuite, error) {
-	query, params := sqlutil.Tenant(ctx, querySelect()+" WHERE t.id = $1", id)
+	query, params := sqlutil.TenantWithPrefix(ctx, querySelect()+" WHERE t.id = $1", "t.", id)
 	stmt, err := r.db.Prepare(query + "ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return TestSuite{}, fmt.Errorf("prepare: %w", err)
@@ -288,7 +288,7 @@ func (r *Repository) get(ctx context.Context, id id.ID, augmented bool) (TestSui
 }
 
 func (r *Repository) GetVersion(ctx context.Context, id id.ID, version int) (TestSuite, error) {
-	query, params := sqlutil.Tenant(ctx, querySelect()+" WHERE t.id = $1 AND t.version = $2", id, version)
+	query, params := sqlutil.TenantWithPrefix(ctx, querySelect()+" WHERE t.id = $1 AND t.version = $2", "t.", id, version)
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return TestSuite{}, fmt.Errorf("prepare 1: %w", err)
@@ -309,13 +309,13 @@ func listQuery(ctx context.Context, baseSQL, query string, params []any) (string
 
 	sql := baseSQL + testSuiteMaxVersionQuery
 	sql, params = sqlutil.Search(sql, condition, query, params)
-	sql, params = sqlutil.Tenant(ctx, sql, params...)
+	sql, params = sqlutil.TenantWithPrefix(ctx, sql, "t.", params...)
 
 	return sql, params
 }
 
 func (r *Repository) GetLatestVersion(ctx context.Context, id id.ID) (TestSuite, error) {
-	query, params := sqlutil.Tenant(ctx, querySelect()+" WHERE t.id = $1", id)
+	query, params := sqlutil.TenantWithPrefix(ctx, querySelect()+" WHERE t.id = $1", "t.", id)
 	stmt, err := r.db.Prepare(query + " ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return TestSuite{}, fmt.Errorf("prepare: %w", err)

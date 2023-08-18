@@ -1,7 +1,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {sortBy} from 'lodash';
 
-import {endpoints} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {RootState} from 'redux/store';
 import SpanAttributeService from '../services/SpanAttribute.service';
 import {TSpanSelector} from '../types/Assertion.types';
@@ -26,7 +26,7 @@ const attributeKeySelector = (state: RootState, testId: string, runId: string, s
   key;
 
 const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (state, {spanIdList, testId, runId}) => {
-  const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
+  const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
   if (!spanIdList.length) return trace?.spans || [];
 
   return trace?.spans.filter(({id}) => spanIdList.includes(id)) || [];
@@ -44,7 +44,7 @@ const AssertionSelectors = () => {
           .concat(SpanAttributeService.getPseudoAttributeList(matchedSpans.length))
     ),
     selectAllAttributeList: createSelector(stateSelector, paramsSelector, (state, {testId, runId}) => {
-      const {data: {trace} = {}} = endpoints.getRunById.select({testId, runId})(state);
+      const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
 
       const spanList = trace?.spans || [];
 

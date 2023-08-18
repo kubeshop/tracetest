@@ -2,7 +2,7 @@ import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
 
 import TestSuiteRunCard from 'components/RunCard/TestSuiteRunCard';
-import {useLazyGetTestSuiteRunsQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import TestSuite from 'models/TestSuite.model';
 import TestSuiteRun from 'models/TestSuiteRun.model';
@@ -11,6 +11,8 @@ import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
 import ResourceCardSummary from './ResourceCardSummary';
 import useRuns from './useRuns';
+
+const {useLazyGetTestSuiteRunsQuery} = TracetestAPI.instance;
 
 interface IProps {
   onEdit(id: string, lastRunId: number, type: ResourceType): void;

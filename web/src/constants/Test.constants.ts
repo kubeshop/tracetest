@@ -59,3 +59,5 @@ export enum TracetestApiTags {
   DATA_STORE = 'dataStore',
   SETTING = 'setting',
 }
+
+export const TracetestApiTagsList = Object.values(TracetestApiTags);

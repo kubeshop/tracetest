@@ -1,12 +1,14 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo} from 'react';
-import {useCreateTestSuiteMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {initialState, reset, setDraft, setIsFormValid, setStepNumber} from 'redux/slices/CreateTestSuite.slice';
 import CreateTestSuitesSelectors from 'selectors/CreateTestSuite.selectors';
 import {ICreateTestStep} from 'types/Plugins.types';
 import {ICreateTestSuiteState, TDraftTestSuite} from 'types/TestSuite.types';
 import {useTestSuiteCrud} from '../TestSuite';
+
+const {useCreateTestSuiteMutation} = TracetestAPI.instance;
 
 interface IContext extends ICreateTestSuiteState {
   isLoading: boolean;

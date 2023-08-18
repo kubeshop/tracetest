@@ -6,13 +6,15 @@ import {useCallback, useMemo, useState} from 'react';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {useLazyGetSelectedSpansQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {matchSpans, selectSpan, setSearchText} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
 import SpanService from 'services/Span.service';
 import EditorService from 'services/Editor.service';
 import * as S from './RunDetailTrace.styled';
+
+const {useLazyGetSelectedSpansQuery} = TracetestAPI.instance;
 
 interface IProps {
   runId: string;

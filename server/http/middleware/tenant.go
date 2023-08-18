@@ -42,3 +42,13 @@ func isValidUUID(value string) bool {
 	_, err := uuid.Parse(value)
 	return err == nil
 }
+
+func TenantIDFromContext(ctx context.Context) string {
+	tenantID := ctx.Value(TenantIDKey)
+
+	if tenantID == nil {
+		return ""
+	}
+
+	return tenantID.(string)
+}

@@ -384,7 +384,7 @@ FROM
 `
 
 func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Run, error) {
-	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE id = $1 AND test_id = $2", runID, testID)
+	query, params := sqlutil.TenantWithPrefix(ctx, selectRunQuery+" WHERE id = $1 AND test_id = $2", "test_runs.", runID, testID)
 
 	run, err := readRunRow(r.db.QueryRowContext(ctx, query, params...))
 	if err != nil {
@@ -394,7 +394,7 @@ func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Ru
 }
 
 func (r *runRepository) GetTestRuns(ctx context.Context, test Test, take, skip int32) ([]Run, error) {
-	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE test_id = $1", test.ID, take, skip)
+	query, params := sqlutil.TenantWithPrefix(ctx, selectRunQuery+" WHERE test_id = $1", "test_runs.", test.ID, take, skip)
 	stmt, err := r.db.Prepare(query + " ORDER BY created_at DESC LIMIT $2 OFFSET $3")
 	if err != nil {
 		return []Run{}, err
@@ -430,8 +430,8 @@ func (r *runRepository) GetRunByTraceID(ctx context.Context, traceID trace.Trace
 }
 
 func (r *runRepository) GetLatestRunByTestVersion(ctx context.Context, testID id.ID, version int) (Run, error) {
-	query, params := sqlutil.Tenant(ctx, selectRunQuery+" WHERE test_id = $1 AND test_version = $2 ORDER BY created_at DESC LIMIT 1", testID.String(), version)
-	stmt, err := r.db.Prepare(query)
+	query, params := sqlutil.TenantWithPrefix(ctx, selectRunQuery+" WHERE test_id = $1 AND test_version = $2", "test_runs.", testID.String(), version)
+	stmt, err := r.db.Prepare(query + " ORDER BY created_at DESC LIMIT 1")
 
 	if err != nil {
 		return Run{}, err
@@ -601,9 +601,9 @@ func readRunRow(row scanner) (Run, error) {
 func (r *runRepository) GetTestSuiteRunSteps(ctx context.Context, id id.ID, runID int) ([]Run, error) {
 	query := selectRunQuery + `
 WHERE test_suite_run_steps.test_suite_run_id = $1 AND test_suite_run_steps.test_suite_run_test_suite_id = $2
-ORDER BY test_runs.completed_at ASC
 `
-	query, params := sqlutil.Tenant(ctx, query, strconv.Itoa(runID), id)
+	query, params := sqlutil.TenantWithPrefix(ctx, query, "test_runs.", strconv.Itoa(runID), id)
+	query += ` ORDER BY test_runs.completed_at ASC`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

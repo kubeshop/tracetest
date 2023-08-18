@@ -193,7 +193,7 @@ func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
 const sortQuery = `ORDER BY t.version DESC LIMIT 1`
 
 func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
-	query, params := sqlutil.Tenant(ctx, getTestSQL+" WHERE t.id = $1", id)
+	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+" WHERE t.id = $1", "t.", id)
 
 	test, err := r.readRow(ctx, r.db.QueryRowContext(ctx, query+sortQuery, params...))
 	if err != nil {
@@ -205,8 +205,8 @@ func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
 
 func (r *repository) GetTestSuiteSteps(ctx context.Context, id id.ID, version int) ([]Test, error) {
 	sortQuery := `ORDER BY ts.step_number ASC`
-	query, params := sqlutil.Tenant(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN test_suite_steps ts ON t.id = ts.test_id
-	WHERE ts.test_suite_id = $1 AND ts.test_suite_version = $2`, id, version)
+	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+testMaxVersionQuery+` INNER JOIN test_suite_steps ts ON t.id = ts.test_id
+	WHERE ts.test_suite_id = $1 AND ts.test_suite_version = $2`, "t.", id, version)
 	stmt, err := r.db.Prepare(query + sortQuery)
 	if err != nil {
 		return []Test{}, fmt.Errorf("prepare 2: %w", err)
@@ -566,7 +566,7 @@ func (r *repository) Exists(ctx context.Context, id id.ID) (bool, error) {
 }
 
 func (r *repository) GetVersion(ctx context.Context, id id.ID, version int) (Test, error) {
-	query, params := sqlutil.Tenant(ctx, getTestSQL+" WHERE t.id = $1 AND t.version = $2", id, version)
+	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+" WHERE t.id = $1 AND t.version = $2", "t.", id, version)
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return Test{}, fmt.Errorf("prepare: %w", err)

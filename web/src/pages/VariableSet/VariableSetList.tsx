@@ -2,11 +2,13 @@ import Empty from 'components/Empty';
 import Pagination from 'components/Pagination';
 import usePagination from 'hooks/usePagination';
 import Loading from 'pages/Home/Loading';
-import {useGetVariableSetsQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import VariableSet from 'models/VariableSet.model';
 import {VARIABLE_SET_DOCUMENTATION_URL} from 'constants/Common.constants';
 import * as S from './VariableSet.styled';
 import VariableSetCard from './VariableSetCard';
+
+const {useGetVariableSetsQuery} = TracetestAPI.instance;
 
 interface IProps {
   onDelete(id: string): void;

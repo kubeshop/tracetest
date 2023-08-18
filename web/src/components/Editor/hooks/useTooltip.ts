@@ -1,6 +1,8 @@
 import {useCallback, useState} from 'react';
 import {TResolveExpressionContext, TResolveRequestInfo} from 'types/Expression.types';
-import {useParseExpressionMutation} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
+
+const {useParseExpressionMutation} = TracetestAPI.instance;
 
 const useTooltip = (context: TResolveExpressionContext = {}) => {
   const [parseExpressionMutation, {isLoading}] = useParseExpressionMutation();

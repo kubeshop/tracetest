@@ -1,12 +1,11 @@
 import {useCallback} from 'react';
-import {
-  useCreateVariableSetMutation,
-  useUpdateVariableSetMutation,
-  useDeleteVariableSetMutation,
-} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {useNotification} from 'providers/Notification/Notification.provider';
 import {TRawVariableSet} from 'models/VariableSet.model';
+
+const {useCreateVariableSetMutation, useUpdateVariableSetMutation, useDeleteVariableSetMutation} =
+  TracetestAPI.instance;
 
 const useVariableSetCrud = () => {
   const [deleteVariableSet] = useDeleteVariableSetMutation();

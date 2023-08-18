@@ -7,97 +7,85 @@ import Polling, {TRawPolling} from 'models/Polling.model';
 import TestRunner, {TRawTestRunnerResource} from 'models/TestRunner.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {ResourceType, TDraftResource, TListResponse} from 'types/Settings.types';
-import TraceTestAPI from '../Tracetest.api';
+import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
-const settingsEndpoints = TraceTestAPI.injectEndpoints({
-  endpoints: builder => ({
-    getConfig: builder.query<Config, unknown>({
-      query: () => ({
-        url: '/configs/current',
-        method: HTTP_METHOD.GET,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }),
-      providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.ConfigType}],
-      transformResponse: (rawConfig: TRawConfig) => Config(rawConfig),
-      async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-        const listener: IListenerFunction<TRawLiveConfig> = data => {
-          updateCachedData(() => Config.FromLiveUpdate(data.event));
-        };
-        await WebSocketService.initWebSocketSubscription({
-          listener,
-          resource: '/app/config/update',
-          waitToCleanSubscription: cacheEntryRemoved,
-          waitToInitSubscription: cacheDataLoaded,
-        });
+export const settingsEndpoints = (builder: TTestApiEndpointBuilder) => ({
+  getConfig: builder.query<Config, unknown>({
+    query: () => ({
+      url: '/configs/current',
+      method: HTTP_METHOD.GET,
+      headers: {
+        'content-type': 'application/json',
       },
     }),
-    getPolling: builder.query<Polling, unknown>({
-      query: () => ({
-        url: '/pollingprofiles/current',
-        method: HTTP_METHOD.GET,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }),
-      providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.PollingProfileType}],
-      transformResponse: (rawPolling: TRawPolling) => Polling(rawPolling),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.ConfigType}],
+    transformResponse: (rawConfig: TRawConfig) => Config(rawConfig),
+    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
+      const listener: IListenerFunction<TRawLiveConfig> = data => {
+        updateCachedData(() => Config.FromLiveUpdate(data.event));
+      };
+      await WebSocketService.initWebSocketSubscription({
+        listener,
+        resource: '/app/config/update',
+        waitToCleanSubscription: cacheEntryRemoved,
+        waitToInitSubscription: cacheDataLoaded,
+      });
+    },
+  }),
+  getPolling: builder.query<Polling, unknown>({
+    query: () => ({
+      url: '/pollingprofiles/current',
+      method: HTTP_METHOD.GET,
+      headers: {
+        'content-type': 'application/json',
+      },
     }),
-    getDemo: builder.query<Demo[], unknown>({
-      query: () => ({
-        url: '/demos',
-        method: HTTP_METHOD.GET,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }),
-      providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.DemoType}],
-      transformResponse: ({items = []}: TListResponse<TRawDemo>) => items.map(rawDemo => Demo(rawDemo)),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.PollingProfileType}],
+    transformResponse: (rawPolling: TRawPolling) => Polling(rawPolling),
+  }),
+  getDemo: builder.query<Demo[], unknown>({
+    query: () => ({
+      url: '/demos',
+      method: HTTP_METHOD.GET,
+      headers: {
+        'content-type': 'application/json',
+      },
     }),
-    getLinter: builder.query<Linter, unknown>({
-      query: () => ({
-        url: '/analyzers/current',
-        method: HTTP_METHOD.GET,
-        headers: {'content-type': 'application/json'},
-      }),
-      providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.AnalyzerType}],
-      transformResponse: (rawLinter: TRawLinter) => Linter(rawLinter),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.DemoType}],
+    transformResponse: ({items = []}: TListResponse<TRawDemo>) => items.map(rawDemo => Demo(rawDemo)),
+  }),
+  getLinter: builder.query<Linter, unknown>({
+    query: () => ({
+      url: '/analyzers/current',
+      method: HTTP_METHOD.GET,
+      headers: {'content-type': 'application/json'},
     }),
-    getTestRunner: builder.query<TestRunner, unknown>({
-      query: () => ({
-        url: '/testrunners/current',
-        method: HTTP_METHOD.GET,
-        headers: {'content-type': 'application/json'},
-      }),
-      providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.TestRunnerType}],
-      transformResponse: (rawTestRunner: TRawTestRunnerResource) => TestRunner(rawTestRunner),
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.AnalyzerType}],
+    transformResponse: (rawLinter: TRawLinter) => Linter(rawLinter),
+  }),
+  getTestRunner: builder.query<TestRunner, unknown>({
+    query: () => ({
+      url: '/testrunners/current',
+      method: HTTP_METHOD.GET,
+      headers: {'content-type': 'application/json'},
     }),
-    createSetting: builder.mutation<undefined, {resource: TDraftResource}>({
-      query: ({resource}) => ({
-        url: `/${resource.typePlural?.toLowerCase()}`,
-        method: HTTP_METHOD.POST,
-        body: resource,
-      }),
-      invalidatesTags: (result, error, args) => [{type: TracetestApiTags.SETTING, id: args.resource.type}],
+    providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.TestRunnerType}],
+    transformResponse: (rawTestRunner: TRawTestRunnerResource) => TestRunner(rawTestRunner),
+  }),
+  createSetting: builder.mutation<undefined, {resource: TDraftResource}>({
+    query: ({resource}) => ({
+      url: `/${resource.typePlural?.toLowerCase()}`,
+      method: HTTP_METHOD.POST,
+      body: resource,
     }),
-    updateSetting: builder.mutation<undefined, {resource: TDraftResource}>({
-      query: ({resource}) => ({
-        url: `/${resource.typePlural?.toLowerCase()}/${resource.spec.id}`,
-        method: HTTP_METHOD.PUT,
-        body: resource,
-      }),
-      invalidatesTags: (result, error, args) => [{type: TracetestApiTags.SETTING, id: args.resource.type}],
+    invalidatesTags: (result, error, args) => [{type: TracetestApiTags.SETTING, id: args.resource.type}],
+  }),
+  updateSetting: builder.mutation<undefined, {resource: TDraftResource}>({
+    query: ({resource}) => ({
+      url: `/${resource.typePlural?.toLowerCase()}/${resource.spec.id}`,
+      method: HTTP_METHOD.PUT,
+      body: resource,
     }),
+    invalidatesTags: (result, error, args) => [{type: TracetestApiTags.SETTING, id: args.resource.type}],
   }),
 });
-
-export const {
-  useGetConfigQuery,
-  useGetPollingQuery,
-  useGetDemoQuery,
-  useGetLinterQuery,
-  useGetTestRunnerQuery,
-  useCreateSettingMutation,
-  useUpdateSettingMutation,
-} = settingsEndpoints;

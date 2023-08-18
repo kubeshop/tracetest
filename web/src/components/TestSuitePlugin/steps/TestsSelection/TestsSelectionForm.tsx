@@ -1,6 +1,8 @@
 import {Col, Form, Row} from 'antd';
-import {useGetTestListQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestsSelectionInput from './TestsSelectionInput/TestsSelectionInput';
+
+const {useGetTestListQuery} = TracetestAPI.instance;
 
 const TestsSelectionForm = () => {
   const {data} = useGetTestListQuery({take: 1000, skip: 0});

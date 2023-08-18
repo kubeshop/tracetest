@@ -4,11 +4,13 @@ import {createContext, ReactNode, useCallback, useContext, useMemo, useState} fr
 import VersionMismatchModal from 'components/VersionMismatchModal';
 import TestSuite from 'models/TestSuite.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import {useGetTestSuiteByIdQuery, useGetTestSuiteVersionByIdQuery} from 'redux/apis/Tracetest';
+import TracetestAPI from 'redux/apis/Tracetest';
 import TestSuiteService from 'services/TestSuite.service';
 import {TDraftTestSuite} from 'types/TestSuite.types';
 import useTestSuiteCrud from './hooks/useTestSuiteCrud';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
+
+const {useGetTestSuiteByIdQuery, useGetTestSuiteVersionByIdQuery} = TracetestAPI.instance;
 
 interface IContext {
   isError: boolean;
