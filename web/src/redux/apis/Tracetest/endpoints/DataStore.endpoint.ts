@@ -4,7 +4,7 @@ import ConnectionResult from 'models/ConnectionResult.model';
 import {TRawDataStore} from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {TConnectionResult, TRawConnectionResult, TTestConnectionRequest} from 'types/DataStore.types';
-import {TTestApiEndpointBuilder} from '../types';
+import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
 export const dataStoreEndpoints = (builder: TTestApiEndpointBuilder) => ({
   getDataStore: builder.query<DataStoreConfig, unknown>({

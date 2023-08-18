@@ -3,7 +3,7 @@ import {TracetestApiTags} from 'constants/Test.constants';
 import {PaginationResponse} from 'hooks/usePagination';
 import VariableSet, {TRawVariableSet} from 'models/VariableSet.model';
 import {TListResponse} from 'types/Settings.types';
-import {TTestApiEndpointBuilder} from '../types';
+import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
 export const variableSetEndpoints = (builder: TTestApiEndpointBuilder) => ({
   getVariableSets: builder.query<PaginationResponse<VariableSet>, {take?: number; skip?: number; query?: string}>({

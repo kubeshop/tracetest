@@ -478,7 +478,6 @@ type tenantPropagator struct{}
 
 var _ propagation.TextMapPropagator = tenantPropagator{}
 
-// Inject sets baggage key-values from ctx into the carrier.
 func (b tenantPropagator) Inject(ctx context.Context, carrier propagation.TextMapCarrier) {
 	tenantID := middleware.TenantIDFromContext(ctx)
 	if tenantID != "" {

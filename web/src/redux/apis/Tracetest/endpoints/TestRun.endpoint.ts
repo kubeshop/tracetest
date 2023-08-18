@@ -10,7 +10,7 @@ import TestRun, {TRawTestRun} from 'models/TestRun.model';
 import TestRunEvent, {TRawTestRunEvent} from 'models/TestRunEvent.model';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
-import {TTestApiEndpointBuilder} from '../types';
+import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
 function getTotalCountFromHeaders(meta: any) {
   return Number(meta?.response?.headers.get('x-total-count') || 0);

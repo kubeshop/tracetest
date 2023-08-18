@@ -3,7 +3,7 @@ import {PaginationResponse} from 'hooks/usePagination';
 import Resource, {TRawResource} from 'models/Resource.model';
 import {ResourceType} from 'types/Resource.type';
 import {getTotalCountFromHeaders} from 'utils/Common';
-import { TTestApiEndpointBuilder } from '../types';
+import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
 const defaultHeaders = {'content-type': 'application/json', 'X-Tracetest-Augmented': 'true'};
 

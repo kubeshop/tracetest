@@ -48,7 +48,6 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
 
 Cypress.Commands.add('openTestCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
-  cy.get('.test-create-selector-items ul li').first().click();
   cy.get('[data-cy=create-test-steps-CreateTestFactory]').should('be.visible');
 });
 
@@ -63,7 +62,8 @@ Cypress.Commands.add('interceptEditTestCall', () => {
 });
 
 Cypress.Commands.add('interceptHomeApiCall', () => {
-  cy.intercept({method: 'GET', url: '/api/resources?take=20&skip=0*'}).as('testList');
+  cy.intercept({method: 'GET', url: '/api/tests?take=20&skip=0*'}).as('testList');
+  cy.intercept({method: 'GET', url: '/api/testsuites?take=20&skip=0*'}).as('testSuitesList');
   cy.intercept({method: 'DELETE', url: '/api/tests/**'}).as('testDelete');
   cy.intercept({method: 'POST', url: '/api/tests'}).as('testCreation');
   cy.intercept({method: 'DELETE', url: '/api/testsuites/**'}).as('testSuiteDelete');
@@ -232,7 +232,6 @@ Cypress.Commands.add('selectRunDetailMode', (index: number) => {
 
 Cypress.Commands.add('openTestSuiteCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
-  cy.get('.ant-dropdown-menu-item').last().click();
   cy.get('[data-cy=create-test-steps-CreateTestSuiteFactory]').should('be.visible');
 });
 
@@ -240,8 +239,8 @@ Cypress.Commands.add('deleteTestSuite', () => {
   cy.location('pathname').then(pathname => {
     const localTestId = getTestSuiteId(pathname);
 
-    cy.visit(`/`);
-    cy.wait('@testList');
+    cy.visit(`/testsuites`);
+    cy.wait('@testSuitesList');
     cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).click({force: true});
@@ -249,7 +248,7 @@ Cypress.Commands.add('deleteTestSuite', () => {
     cy.get('[data-cy=confirmation-modal] .ant-btn-primary').click();
     cy.wait('@testSuiteDelete');
     cy.get(`[data-cy=test-actions-button-${localTestId}]`).should('not.exist');
-    cy.wait('@testList');
+    cy.wait('@testSuitesList');
     cy.clearLocalStorage();
   });
 });

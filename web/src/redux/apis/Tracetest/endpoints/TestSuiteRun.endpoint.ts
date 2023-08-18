@@ -6,7 +6,7 @@ import RunError from 'models/RunError.model';
 import TestSuiteRun, {TRawTestSuiteRunResourceRun} from 'models/TestSuiteRun.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {getTotalCountFromHeaders} from 'utils/Common';
-import {TTestApiEndpointBuilder} from '../types';
+import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
 export const testSuiteRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
   runTestSuite: builder.mutation<

@@ -7,7 +7,7 @@ import Polling, {TRawPolling} from 'models/Polling.model';
 import TestRunner, {TRawTestRunnerResource} from 'models/TestRunner.model';
 import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {ResourceType, TDraftResource, TListResponse} from 'types/Settings.types';
-import {TTestApiEndpointBuilder} from '../types';
+import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
 export const settingsEndpoints = (builder: TTestApiEndpointBuilder) => ({
   getConfig: builder.query<Config, unknown>({

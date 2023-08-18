@@ -1,7 +1,7 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import AssertionService from 'services/Assertion.service';
 import {TResolveRequestInfo, TResolveResponseInfo} from 'types/Expression.types';
-import { TTestApiEndpointBuilder } from '../types';
+import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
 export const expressionEndpoints = (builder: TTestApiEndpointBuilder) => ({
   parseExpression: builder.mutation<string[], TResolveRequestInfo>({

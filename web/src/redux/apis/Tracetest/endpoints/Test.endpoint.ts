@@ -2,7 +2,7 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {SortBy, SortDirection, TracetestApiTags} from 'constants/Test.constants';
 import Test, {TRawTest, TRawTestResource, TRawTestResourceList} from 'models/Test.model';
 import {PaginationResponse} from 'hooks/usePagination';
-import {TTestApiEndpointBuilder} from '../types';
+import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
 const defaultHeaders = {'content-type': 'application/json', 'X-Tracetest-Augmented': 'true'};
 

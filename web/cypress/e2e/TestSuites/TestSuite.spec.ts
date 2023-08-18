@@ -4,7 +4,7 @@ const testSuiteUtils = TestSuite();
 
 describe('TestSuites', () => {
   beforeEach(() => {
-    cy.visit('/');
+    cy.visit('/testsuites');
     cy.wrap(testSuiteUtils.createTests());
   });
 

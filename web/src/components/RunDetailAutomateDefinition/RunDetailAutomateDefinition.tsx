@@ -1,11 +1,10 @@
 import {DownloadOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import {capitalize} from 'lodash';
 import {useCallback, useEffect} from 'react';
 import {FramedCodeBlock} from 'components/CodeBlock';
 import InputOverlay from 'components/InputOverlay/InputOverlay';
 import useDefinitionFile from 'hooks/useDefinitionFile';
-import {ResourceType} from 'types/Resource.type';
+import {ResourceName, ResourceType} from 'types/Resource.type';
 import {downloadFile} from 'utils/Common';
 import * as S from './RunDetailAutomateDefinition.styled';
 
@@ -30,7 +29,7 @@ const RunDetailAutomateDefinition = ({id, version, resourceType, fileName, onFil
 
   return (
     <S.Container>
-      <S.Title>{capitalize(resourceType)} Definition</S.Title>
+      <S.Title>{ResourceName[resourceType]} Definition</S.Title>
       <S.FileName>
         <InputOverlay value={fileName} onChange={onFileNameChange} />
       </S.FileName>

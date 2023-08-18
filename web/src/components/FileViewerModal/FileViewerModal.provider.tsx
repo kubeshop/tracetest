@@ -1,7 +1,7 @@
-import {capitalize, noop} from 'lodash';
+import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import FileViewerModal from 'components/FileViewerModal';
-import {ResourceType} from 'types/Resource.type';
+import {ResourceName, ResourceType} from 'types/Resource.type';
 import useDefinitionFile from 'hooks/useDefinitionFile';
 import useJUnitResult from 'hooks/useJUnitResult';
 
@@ -61,7 +61,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
       setIsFileViewerOpen(true);
       loadDefinition(resourceType, resourceId, version);
       setProps({
-        title: `${capitalize(resourceType)} Definition`,
+        title: `${ResourceName[resourceType]} Definition`,
         language: 'yaml',
         subtitle: 'Preview your YAML file',
         fileName: `${resourceType}-${resourceId}-${version || 0}-definition.yaml`,
