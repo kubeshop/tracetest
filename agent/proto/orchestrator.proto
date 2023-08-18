@@ -75,8 +75,8 @@ message Trigger {
     HttpRequest http = 2;
     GrpcRequest grpc = 3;
     TraceIDRequest traceID = 4;
+    KafkaRequest kafka = 5;
 }
-
 
 message HttpRequest {
     string method = 1;
@@ -145,6 +145,7 @@ message TriggerResult {
     HttpResponse http = 2;
     GrpcResponse grpc = 3;
     TraceIdResponse traceID = 4;
+    KafkaResponse kafka = 5;
 }
 
 message HttpResponse {
@@ -276,4 +277,29 @@ message Span {
 message KeyValuePair {
     string key = 1;
     string value = 2;
+}
+
+message KafkaRequest {
+    repeated string brokerUrls = 1;
+    string topic = 2;
+    KafkaAuthentication authentication = 3;
+    bool sslVerification = 4;
+    repeated KeyValuePair headers = 5;
+    string messageKey = 6;
+    string messageValue = 7;
+}
+
+message KafkaAuthentication {
+    string type = 1;
+    KafkaPlainAuthentication plain = 2;
+}
+
+message KafkaPlainAuthentication {
+    string username = 1;
+    string password = 2;
+}
+
+message KafkaResponse {
+    string partition = 1;
+    string offset = 2;
 }
