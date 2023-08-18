@@ -10,7 +10,7 @@ This examples' objective is to show how you can:
 
 ## Steps
 
-1. [Install the tracetest CLI](https://docs.tracetest.io/installing/)
+1. [Install the tracetest CLI.](https://docs.tracetest.io/installing/)
 2. Run `tracetest configure --endpoint http://localhost:11633` on a terminal
 3. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac)
 4. Test if it works by running: `tracetest run test -f tests/test.yaml`. This would trigger a test that will send trace spans to both the SigNoz instance and Tracetest instance that are running on your machine. View the test on `http://localhost:11633`.
