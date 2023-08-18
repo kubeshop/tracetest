@@ -6,7 +6,7 @@ This examples' objective is to show how you can:
 
 1. Configure Tracetest to ingest traces.
 2. Configure SigNoz and use it as a trace data store.
-3. Configure SigNoz to query traces
+3. Configure SigNoz to query traces.
 
 ## Steps
 
