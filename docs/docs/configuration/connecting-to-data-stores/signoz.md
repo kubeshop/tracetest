@@ -91,9 +91,6 @@ Proceed to run this command in the terminal and specify the file above.
 tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
-<!-- 
-TODO: create a tutorial for signoz
 :::tip
-To learn more, [read the recipe on running a sample app with Signoz and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-signoz.md).
-::: 
--->
+To learn more, [read the recipe on running a sample app with Signoz and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-signoz-pokeshop.md).
+:::

@@ -173,7 +173,7 @@ const sidebars = {
     {
       type: "doc",
       id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
-      label: "X-Ray, AWS Distro for OpenTelemetry & Pokeshop API",
+      label: "X-Ray, AWS Distro for OpenTelemetry and Pokeshop API",
     },
     {
       type: "doc",
@@ -202,6 +202,11 @@ const sidebars = {
     },
     {
       type: "doc",
+      id: "examples-tutorials/recipes/running-tracetest-with-signoz-pokeshop",
+      label: "SigNoz and Pokeshop API",
+    },
+    {
+      type: "doc",
       id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights",
       label: "Azure App Insights",
     },
@@ -213,7 +218,7 @@ const sidebars = {
     {
       type: "doc",
       id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop",
-      label: "Azure App Insights, The OpenTelemetry Collector & Pokeshop API",
+      label: "Azure App Insights, The OpenTelemetry Collector and Pokeshop API",
     },
   ],
 
