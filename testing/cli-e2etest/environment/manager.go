@@ -219,10 +219,15 @@ func (m *internalManager) Close(t *testing.T) {
 	}
 
 	if m.pokeshopEnabled {
+		pokeshopDockerComposeFile := m.dockerComposePokeshopFilePath
+		if m.pokeshopStreamEnabled {
+			pokeshopDockerComposeFile = m.dockerComposePokeshopWithStreamFilepath
+		}
+
 		args = []string{
 			"compose",
 			"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
-			"--file", m.dockerComposePokeshopFilePath, // choose docker compose relative to the chosen environment
+			"--file", pokeshopDockerComposeFile, // choose docker compose relative to the chosen environment
 			"--project-name", m.dockerProjectName, // choose isolated project name
 			"rm",
 			"--force",   // bypass removal question
