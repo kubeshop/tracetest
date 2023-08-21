@@ -38,9 +38,9 @@ func (d Demo) Validate() error {
 }
 
 type PokeshopDemo struct {
-	HTTPEndpoint  string `json:"httpEndpoint,omitempty"`
-	GRPCEndpoint  string `json:"grpcEndpoint,omitempty"`
-	KafkaEndpoint string `json:"kafkaEndpoint,omitempty"`
+	HTTPEndpoint string `json:"httpEndpoint,omitempty"`
+	GRPCEndpoint string `json:"grpcEndpoint,omitempty"`
+	KafkaBroker  string `json:"kafkaBroker,omitempty"`
 }
 
 type OpenTelemetryStoreDemo struct {
