@@ -299,7 +299,7 @@ GEM
       opentelemetry-semantic_conventions
     opentelemetry-semantic_conventions (1.8.0)
       opentelemetry-api (~> 1.0)
-    puma (5.6.5)
+    puma (5.6.7)
       nio4r (~> 2.0)
     racc (1.6.2)
     rack (2.2.6.4)
@@ -358,7 +358,7 @@ DEPENDENCIES
   opentelemetry-exporter-otlp
   opentelemetry-instrumentation-all
   opentelemetry-sdk
-  puma (~> 5.0)
+  puma (~> 5.6)
   rails (~> 7.0.4, >= 7.0.4.3)
   sqlite3 (~> 1.4)
   tzinfo-data
