@@ -18,17 +18,17 @@ export interface paths {
     /** delete a TestSuite */
     delete: operations["deleteTestSuite"];
   };
-  "/testsuites/{testsuiteId}/version/{version}": {
+  "/testsuites/{testSuiteId}/version/{version}": {
     /** get a TestSuite specific version */
     get: operations["getTestSuiteVersion"];
   };
-  "/testsuites/{testsuiteId}/run": {
+  "/testsuites/{testSuiteId}/run": {
     /** Get all runs from a particular TestSuite */
     get: operations["getTestSuiteRuns"];
     /** run a particular TestSuite */
     post: operations["runTestSuite"];
   };
-  "/testsuites/{testsuiteId}/run/{runId}": {
+  "/testsuites/{testSuiteId}/run/{runId}": {
     /** Get a specific run from a particular TestSuite */
     get: operations["getTestSuiteRun"];
     /** Delete a specific run from a particular TestSuite */
@@ -181,7 +181,7 @@ export interface paths {
     get: operations["getVariableSet"];
     /** Update a VariableSet used on Tracetest */
     put: operations["updateVariableSet"];
-    /** Delete an variable set from Tracetest */
+    /** Delete a variable set from Tracetest */
     delete: operations["deleteVariableSet"];
   };
   "/version": {
@@ -1006,7 +1006,7 @@ export interface operations {
       };
     };
   };
-  /** Delete an variable set from Tracetest */
+  /** Delete a variable set from Tracetest */
   deleteVariableSet: {
     parameters: {};
     responses: {
@@ -1216,6 +1216,8 @@ export interface external {
           httpEndpoint?: string;
           /** @description gRPC endpoint for Pokeshop API */
           grpcEndpoint?: string;
+          /** @description kafka broker for Pokeshop API */
+          kafkaBroker?: string;
         };
         /** @description Represents the settings of the Open Telemetry Store demonstration. */
         DemoOpenTelemetryStore: {
@@ -1611,7 +1613,7 @@ export interface external {
         /** @description version of the test */
         version: number;
         /** @description id of the TestSuite */
-        testsuiteId: string;
+        testSuiteId: string;
         /** @description indicates how many resources can be returned by each page */
         take: number;
         /** @description indicates how many resources will be skipped when paginating */

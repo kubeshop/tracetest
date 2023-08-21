@@ -463,7 +463,7 @@ func (c *ResourceApiApiController) DeleteTestSuite(w http.ResponseWriter, r *htt
 
 }
 
-// DeleteVariableSet - Delete an variable set
+// DeleteVariableSet - Delete a variable set
 func (c *ResourceApiApiController) DeleteVariableSet(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	variableSetIdParam := params["variableSetId"]

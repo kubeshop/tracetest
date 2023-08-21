@@ -178,7 +178,7 @@ func (s *ResourceApiApiService) DeleteTestSuite(ctx context.Context, testSuiteId
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteTestSuite method not implemented")
 }
 
-// DeleteVariableSet - Delete an variable set
+// DeleteVariableSet - Delete a variable set
 func (s *ResourceApiApiService) DeleteVariableSet(ctx context.Context, variableSetId string) (ImplResponse, error) {
 	// TODO - update DeleteVariableSet with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
