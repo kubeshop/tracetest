@@ -1,6 +1,7 @@
 import ResourceCardActions from 'components/ResourceCard/ResourceCardActions';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import * as S from './TestHeader.styled';
+import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
 
 interface IProps {
   description: string;
@@ -27,6 +28,7 @@ const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, title, runBu
         </div>
       </S.Section>
       <S.Section>
+        <VariableSetSelector />
         {runButton}
         <ResourceCardActions id={id} onDelete={onDelete} onEdit={onEdit} shouldEdit={shouldEdit} />
       </S.Section>

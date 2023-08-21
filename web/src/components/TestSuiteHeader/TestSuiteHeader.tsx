@@ -8,6 +8,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestSuite} from 'providers/TestSuite/TestSuite.provider';
 import {useTestSuiteRun} from 'providers/TestSuiteRun/TestSuite.provider';
 import * as S from './TestSuiteHeader.styled';
+import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
 
 const testSuiteLastPathRegex = /\/testsuite\/[\w-]+\/run\/[\d-]+\/([\w-]+)/;
 
@@ -67,6 +68,7 @@ const TestSuiteHeader = () => {
             <TestState testState={state} />
           </S.StateContainer>
         )}
+        <VariableSetSelector />
         {state && state === TestStateEnum.FINISHED && (
           <>
             <TestSuiteRunStatusIcon state={state!} hasFailedTests={!allStepsRequiredGatesPassed} />

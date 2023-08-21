@@ -1,9 +1,14 @@
 import Router from 'components/Router';
 import SettingsValuesProvider from 'providers/SettingsValues';
+import {TCustomHeader} from 'components/Layout/Layout';
 
-const BaseApp = () => (
+interface IProps {
+  customHeader?: TCustomHeader;
+}
+
+const BaseApp = ({customHeader}: IProps) => (
   <SettingsValuesProvider>
-    <Router />
+    <Router customHeader={customHeader} />
   </SettingsValuesProvider>
 );
 
