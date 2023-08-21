@@ -50,7 +50,8 @@ spec:
   enabled: true
   pokeshop:
     httpEndpoint: {{ .pokeshopHttp }}
-    grpcEndpoint: {{ .pokeshopGrpc }}{{end}}{{ if eq .enableOtelDemo "true" }}
+    grpcEndpoint: {{ .pokeshopGrpc }}
+    kafkaBroker: {{ .pokeshopKafka }}{{end}}{{ if eq .enableOtelDemo "true" }}
 ---
 type: Demo
 spec:
