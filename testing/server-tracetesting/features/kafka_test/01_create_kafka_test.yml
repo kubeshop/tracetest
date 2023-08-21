@@ -1,8 +1,8 @@
 type: Test
 spec:
-  id: ojzHeDQ4gF
-  name: Create gRPC Test
-  description: Test step of 'gRPC Test Feature - Test Suite'
+  id: dvsf860sdv
+  name: Create Kafka Test
+  description: Test step of 'Kafka Test Feature - Test Suite'
   trigger:
     type: http
     httpRequest:
@@ -15,39 +15,50 @@ spec:
         {
           "type": "Test",
           "spec": {
-            "name": "gRPC pokemon list",
+            "name": "Import a Pokemon reading a Stream",
             "trigger": {
-              "type": "grpc",
-              "grpc": {
-                "protobufFile": "syntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_outer_classname = \"PokeshopProto\";\noption objc_class_prefix = \"PKS\";\n\npackage pokeshop;\n\nservice Pokeshop {\n  rpc getPokemonList (GetPokemonRequest) returns (GetPokemonListResponse) {}\n  rpc createPokemon (Pokemon) returns (Pokemon) {}\n  rpc importPokemon (ImportPokemonRequest) returns (ImportPokemonRequest) {}\n}\n\nmessage ImportPokemonRequest {\n  int32 id = 1;\n  optional bool isFixed = 2;\n}\n\nmessage GetPokemonRequest {\n  optional int32 skip = 1;\n  optional int32 take = 2;\n  optional bool isFixed = 3;\n}\n\nmessage GetPokemonListResponse {\n  repeated Pokemon items = 1;\n  int32 totalCount = 2;\n}\n\nmessage Pokemon {\n  optional int32 id = 1;\n  string name = 2;\n  string type = 3;\n  bool isFeatured = 4;\n  optional string imageUrl = 5;\n}",
-                "address": "${var:DEMO_APP_GRPC_URL}",
-                "method": "pokeshop.Pokeshop.importPokemon",
-                "request": "{\"id\": 52}"
+              "type": "kafka",
+              "kafka": {
+                "brokerUrls": ["${var:DEMO_APP_KAFKA_BROKER}"],
+                "topic": "pokemon",
+                "headers": [],
+                "messageKey": "snorlax-key",
+                "messageValue": "{\"id\": 143}"
               }
             },
             "specs": [
               {
-                "selector":"span[name = \"queue.synchronizePokemon publish\"]",
-                "assertions": ["attr:tracetest.selected_spans.count > 0"]
+                "selector":"span[tracetest.span.type=\"messaging\" name=\"pokemon process\" messaging.system=\"kafka\" messaging.destination=\"pokemon\" messaging.destination_kind=\"topic\" messaging.operation=\"process\"]",
+                "assertions": ["attr:messaging.system = \"kafka\""],
+                "name": "A message was received from Kafka stream"
+              },
+              {
+                "selector":"span[tracetest.span.type=\"general\" name=\"import pokemon\"]",
+                "assertions": ["attr:name = \"import pokemon\""],
+                "name": "Import Pokemon use case was triggered"
               }
             ]
           }
         }
   specs:
-    - selector: span[name = "Tracetest trigger"]
+    - name: Tracetest API returned a valid HTTP code for test creation
+      selector: span[name = "Tracetest trigger"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
         - attr:tracetest.response.status = 201
-    - selector: span[name="POST /api/tests" tracetest.span.type="http"]
+    - name: Tracetest API endpoint 'POST /api/tests' was called once
+      selector: span[name="POST /api/tests" tracetest.span.type="http"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
-    - selector: span[name = "exec INSERT"]
+    - name: Just one test was added into the database
+      selector: span[name = "exec INSERT"]
       assertions:
         - attr:tracetest.selected_spans.count = 1
-    - selector: span[name = "exec INSERT"]:first
+    - name: The test was added on the correct database table
+      selector: span[name = "exec INSERT"]:first
       assertions:
         - attr:sql.query contains "INSERT INTO tests"
   outputs:
-    - name: GRPC_TEST_ID
+    - name: KAFKA_TEST_ID
       selector: span[name = "Tracetest trigger"]
       value: attr:tracetest.response.body | json_path '$.spec.id'
