@@ -310,7 +310,7 @@ spec:
 
 ```
 
-This file defines the a test the same way you would through the Web UI.
+This file defines a test the same way you would through the Web UI.
 
 To run the test, run this command in the terminal:
 
