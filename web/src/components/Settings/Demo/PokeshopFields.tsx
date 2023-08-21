@@ -17,6 +17,12 @@ const PokeshopFields = () => {
           <Input placeholder="demo-pokemon-api.demo:8082" />
         </Form.Item>
       </Col>
+
+      <Col span={12}>
+        <Form.Item label="Kafka Broker" name={[...baseName, 'kafkaBroker']}>
+          <Input placeholder="stream.demo:9092" />
+        </Form.Item>
+      </Col>
     </Row>
   );
 };
