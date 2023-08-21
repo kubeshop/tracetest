@@ -37,12 +37,14 @@ type Manager interface {
 type option func(*internalManager)
 
 type internalManager struct {
-	environmentType               string
-	dockerComposeNoApiFilePath    string
-	dockerComposePokeshopFilePath string
-	dockerProjectName             string
-	pokeshopEnabled               bool
-	datastoreEnabled              bool
+	environmentType                         string
+	dockerComposeNoApiFilePath              string
+	dockerComposePokeshopFilePath           string
+	dockerComposePokeshopWithStreamFilepath string
+	dockerProjectName                       string
+	pokeshopEnabled                         bool
+	pokeshopStreamEnabled                   bool
+	datastoreEnabled                        bool
 }
 
 func CreateAndStart(t *testing.T, options ...option) Manager {
@@ -64,6 +66,13 @@ func CreateAndStart(t *testing.T, options ...option) Manager {
 func WithPokeshop() option {
 	return func(im *internalManager) {
 		im.pokeshopEnabled = true
+	}
+}
+
+func WithPokeshopWithStream() option {
+	return func(im *internalManager) {
+		im.pokeshopEnabled = true
+		im.pokeshopStreamEnabled = true
 	}
 }
 
@@ -90,14 +99,16 @@ func GetManager(environmentType string, options ...option) Manager {
 	currentDir := getExecutingDir()
 	dockerComposeNoApiFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose-no-api.yaml", currentDir, environmentType)
 	dockerComposePokeshopFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose-pokeshop.yaml", currentDir, environmentType)
+	dockerComposePokeshopWithStreamFilepath := fmt.Sprintf("%s/%s/server-setup/docker-compose-pokeshop-with-stream.yaml", currentDir, environmentType)
 
 	atomic.AddInt64(&envCounter, 1)
 
 	manager := &internalManager{
-		environmentType:               environmentType,
-		dockerComposeNoApiFilePath:    dockerComposeNoApiFilepath,
-		dockerComposePokeshopFilePath: dockerComposePokeshopFilepath,
-		dockerProjectName:             fmt.Sprintf("tracetest-env-%d", envCounter),
+		environmentType:                         environmentType,
+		dockerComposeNoApiFilePath:              dockerComposeNoApiFilepath,
+		dockerComposePokeshopFilePath:           dockerComposePokeshopFilepath,
+		dockerComposePokeshopWithStreamFilepath: dockerComposePokeshopWithStreamFilepath,
+		dockerProjectName:                       fmt.Sprintf("tracetest-env-%d", envCounter),
 	}
 
 	for _, option := range options {
@@ -120,10 +131,15 @@ func (m *internalManager) Start(t *testing.T) {
 	}
 
 	if m.pokeshopEnabled {
+		pokeshopDockerComposeFile := m.dockerComposePokeshopFilePath
+		if m.pokeshopStreamEnabled {
+			pokeshopDockerComposeFile = m.dockerComposePokeshopWithStreamFilepath
+		}
+
 		args = []string{
 			"compose",
 			"--file", m.dockerComposeNoApiFilePath, // choose docker compose relative to the chosen environment
-			"--file", m.dockerComposePokeshopFilePath, // choose docker compose relative to the chosen environment
+			"--file", pokeshopDockerComposeFile, // choose docker compose relative to the chosen environment
 			"--project-name", m.dockerProjectName, // create a project name to isolate this scenario
 			"up", "--detach",
 		}
@@ -138,10 +154,15 @@ func (m *internalManager) Start(t *testing.T) {
 	waitForPort("11633")
 
 	if m.pokeshopEnabled {
+		sleepTime := 10 * time.Second
+		if m.pokeshopStreamEnabled {
+			sleepTime = 30 * time.Second
+		}
+
 		// wait for pokeshop services
 		waitForPort("8081")
 		waitForPort("8082")
-		time.Sleep(10 * time.Second)
+		time.Sleep(sleepTime)
 	}
 
 	if m.datastoreEnabled {
