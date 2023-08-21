@@ -19,8 +19,9 @@ func TestPokeshopDemoResource(t *testing.T) {
 		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
 		Pokeshop: &demo.PokeshopDemo{
-			HTTPEndpoint: "http://dev-endpoint:1234",
-			GRPCEndpoint: "dev-grpc:9091",
+			HTTPEndpoint:  "http://dev-endpoint:1234",
+			GRPCEndpoint:  "dev-grpc:9091",
+			KafkaEndpoint: "dev-kafka:9092",
 		},
 	}
 
@@ -30,8 +31,9 @@ func TestPokeshopDemoResource(t *testing.T) {
 		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
 		Pokeshop: &demo.PokeshopDemo{
-			HTTPEndpoint: "http://stg-endpoint:1234",
-			GRPCEndpoint: "stg-grpc:9091",
+			HTTPEndpoint:  "http://stg-endpoint:1234",
+			GRPCEndpoint:  "stg-grpc:9091",
+			KafkaEndpoint: "stg-kafka:9092",
 		},
 	}
 
@@ -41,8 +43,9 @@ func TestPokeshopDemoResource(t *testing.T) {
 		Type:    demo.DemoTypePokeshop,
 		Enabled: true,
 		Pokeshop: &demo.PokeshopDemo{
-			HTTPEndpoint: "http://prod-endpoint:1234",
-			GRPCEndpoint: "prod-grpc:9091",
+			HTTPEndpoint:  "http://prod-endpoint:1234",
+			GRPCEndpoint:  "prod-grpc:9091",
+			KafkaEndpoint: "prod-kafka:9092",
 		},
 	}
 
@@ -85,7 +88,8 @@ func TestPokeshopDemoResource(t *testing.T) {
 				"type": "pokeshop",
 				"pokeshop": {
 					"httpEndpoint": "http://dev-endpoint:1234",
-					"grpcEndpoint": "dev-grpc:9091"
+					"grpcEndpoint": "dev-grpc:9091",
+					"kafkaBroker": "dev-kafka:9092"
 				}
 			}
 		}`,
@@ -98,7 +102,8 @@ func TestPokeshopDemoResource(t *testing.T) {
 				"type": "pokeshop",
 				"pokeshop": {
 					"httpEndpoint": "http://new-dev-endpoint:1234",
-					"grpcEndpoint": "new-dev-grpc:9091"
+					"grpcEndpoint": "new-dev-grpc:9091",
+					"kafkaBroker": "new-dev-kafka:9092"
 				}
 			}
 		}`,
