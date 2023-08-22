@@ -1,0 +1,29 @@
+---
+type: Test
+spec:
+  id: asd978dfg
+  name: Delete Kafka Test
+  description: Test step of 'Kafka Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${var:TARGET_URL}/api/tests/${var:KAFKA_TEST_ID}
+      method: DELETE
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+  - name: Tracetest API deleted the test last test created
+    selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 204
+  - name: Tracetest API endpoint 'DELETE /api/tests/{id}' was called once
+    selector: span[name="DELETE /api/tests/{id}" tracetest.span.type="http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - name: All test entities were deleted
+    selector: span[name = "exec DELETE"]
+    assertions:
+    # must delete test and runs. That's why we need 2 deletes
+    - attr:tracetest.selected_spans.count = 4
