@@ -69,7 +69,7 @@ func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource
 
 func (t test) isValidGrpcFilePath(grpcFilePath, testFile string) bool {
 	if fileutil.LooksLikeRelativeFilePath(grpcFilePath) {
-		// if looks like a relative file path, test is it exists
+		// if looks like a relative file path, test if it exists
 		return fileutil.IsFilePathToRelativeDir(grpcFilePath, testFile)
 	}
 
