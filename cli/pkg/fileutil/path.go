@@ -27,7 +27,11 @@ func LooksLikeFilePath(path string) bool {
 	return strings.HasPrefix(path, "./") ||
 		strings.HasPrefix(path, "../") ||
 		strings.HasPrefix(path, "/")
+}
 
+func LooksLikeRelativeFilePath(path string) bool {
+	return strings.HasPrefix(path, "./") ||
+		strings.HasPrefix(path, "../")
 }
 
 func IsFilePath(path string) bool {
@@ -47,4 +51,10 @@ func IsFilePath(path string) bool {
 	// if the string is empty the absolute path will the entire dir
 	// otherwise the user also could send a directory by mistake
 	return info != nil && !info.IsDir()
+}
+
+func IsFilePathToRelativeDir(path, dir string) bool {
+	fullPath := filepath.Join(dir, path)
+
+	return IsFilePath(fullPath)
 }
