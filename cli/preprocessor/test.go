@@ -48,7 +48,7 @@ func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource
 	}
 
 	definedPBFile := test.Spec.Trigger.Grpc.GetProtobufFile()
-	if !fileutil.IsFilePathToRelativeDir(definedPBFile, input.AbsDir()) {
+	if !t.isValidGrpcFilePath(definedPBFile, input.AbsDir()) {
 		t.logger.Debug("protobuf file is not a file path", zap.String("protobufFile", definedPBFile))
 		return test, nil
 	}
@@ -65,4 +65,14 @@ func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource
 	test.Spec.Trigger.Grpc.SetProtobufFile(string(pbFile.Contents()))
 
 	return test, nil
+}
+
+func (t test) isValidGrpcFilePath(grpcFilePath, testFile string) bool {
+	if fileutil.LooksLikeRelativeFilePath(grpcFilePath) {
+		// if looks like a relative file path, test is it exists
+		return fileutil.IsFilePathToRelativeDir(grpcFilePath, testFile)
+	}
+
+	// it could be an absolute file path, test it
+	return fileutil.IsFilePath(grpcFilePath)
 }

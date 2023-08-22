@@ -1,6 +1,6 @@
 type: Test
 spec:
-  id: create-pokemon
+  id: create-pokemon-embedded
   name: "Create Pokemon"
   description: Create a single pokemon on Pokeshop
   trigger:

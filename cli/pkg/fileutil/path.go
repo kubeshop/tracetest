@@ -29,6 +29,11 @@ func LooksLikeFilePath(path string) bool {
 		strings.HasPrefix(path, "/")
 }
 
+func LooksLikeRelativeFilePath(path string) bool {
+	return strings.HasPrefix(path, "./") ||
+		strings.HasPrefix(path, "../")
+}
+
 func IsFilePath(path string) bool {
 	// for the current working dir, check if the file exists
 	// by finding its absolute path and executing a stat command
