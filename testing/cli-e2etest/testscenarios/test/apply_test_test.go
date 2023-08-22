@@ -89,4 +89,42 @@ func TestApplyTest(t *testing.T) {
 		assert.Equal("grpc", listTest.Spec.Trigger.Type)
 		assert.Equal(string(proto), listTest.Spec.Trigger.GRPCRequest.ProtobufFile)
 	})
+
+	t.Run("GRPC With Embedded Protobuf starting on comment", func(t *testing.T) {
+		// comments on first line on a embedded protobuf can be confused with a relative path
+
+		// instantiate require with testing helper
+		require := require.New(t)
+		assert := assert.New(t)
+
+		proto, err := os.ReadFile("./resources/api.proto")
+		require.NoError(err)
+
+		// setup isolated e2e environment
+		env := environment.CreateAndStart(t)
+		defer env.Close(t)
+
+		cliConfig := env.GetCLIConfigPath(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+
+		// When I try to set up a new test
+		// Then it should be applied with success
+		testPath := env.GetTestResourcePath(t, "grpc-trigger-embedded-protobuf-with-comment")
+
+		result := tracetestcli.Exec(t, fmt.Sprintf("apply test --file %s", testPath), tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		// When I try to get a test
+		// Then it should return the test applied on the last step
+		result = tracetestcli.Exec(t, "get test --id create-pokemon-embedded", tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		listTest := helpers.UnmarshalYAML[types.TestResource](t, result.StdOut)
+		assert.Equal("Test", listTest.Type)
+		assert.Equal("create-pokemon", listTest.Spec.ID)
+		assert.Equal("grpc", listTest.Spec.Trigger.Type)
+		assert.Equal(string(proto), listTest.Spec.Trigger.GRPCRequest.ProtobufFile)
+	})
 }

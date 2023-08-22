@@ -48,7 +48,7 @@ func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource
 	}
 
 	definedPBFile := test.Spec.Trigger.Grpc.GetProtobufFile()
-	if !fileutil.LooksLikeFilePath(definedPBFile) {
+	if !fileutil.IsFilePathToRelativeDir(definedPBFile, input.AbsDir()) {
 		t.logger.Debug("protobuf file is not a file path", zap.String("protobufFile", definedPBFile))
 		return test, nil
 	}
