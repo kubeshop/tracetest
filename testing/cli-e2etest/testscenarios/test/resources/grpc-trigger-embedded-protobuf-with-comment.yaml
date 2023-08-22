@@ -45,7 +45,6 @@ spec:
           bool isFeatured = 4;
           optional string imageUrl = 5;
         }
-
       address: demo-rpc:8082
       method: pokeshop.Pokeshop.createPokemon
       request: |-
