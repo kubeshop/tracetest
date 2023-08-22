@@ -1,4 +1,4 @@
-package agent
+package main
 
 import (
 	"github.com/kubeshop/tracetest/agent/cmd"
