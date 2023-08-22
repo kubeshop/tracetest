@@ -97,7 +97,7 @@ func TestApplyTest(t *testing.T) {
 		require := require.New(t)
 		assert := assert.New(t)
 
-		proto, err := os.ReadFile("./resources/api.proto")
+		proto, err := os.ReadFile("./resources/api-with-comment.proto")
 		require.NoError(err)
 
 		// setup isolated e2e environment
