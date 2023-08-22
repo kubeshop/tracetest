@@ -123,7 +123,7 @@ func TestApplyTest(t *testing.T) {
 
 		listTest := helpers.UnmarshalYAML[types.TestResource](t, result.StdOut)
 		assert.Equal("Test", listTest.Type)
-		assert.Equal("create-pokemon", listTest.Spec.ID)
+		assert.Equal("create-pokemon-embedded", listTest.Spec.ID)
 		assert.Equal("grpc", listTest.Spec.Trigger.Type)
 		assert.Equal(string(proto), listTest.Spec.Trigger.GRPCRequest.ProtobufFile)
 	})
