@@ -16,7 +16,6 @@ func TestConfigDefaults(t *testing.T) {
 
 	assert.Equal(t, "", cfg.APIKey)
 	assert.Equal(t, "", cfg.Name)
-	assert.Equal(t, false, cfg.DevMode)
 	assert.Equal(t, "https://cloud.tracetest.io", cfg.ServerURL)
 }
 
@@ -39,6 +38,5 @@ func TestConfigWithEnvs(t *testing.T) {
 
 	assert.Equal(t, "my-agent-api-key", cfg.APIKey)
 	assert.Equal(t, "my-agent-name", cfg.Name)
-	assert.Equal(t, true, cfg.DevMode)
 	assert.Equal(t, "https://custom.server.com", cfg.ServerURL)
 }

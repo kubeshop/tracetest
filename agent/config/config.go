@@ -10,7 +10,6 @@ import (
 )
 
 type Config struct {
-	DevMode   bool   `mapstructure:"dev_mode"`
 	APIKey    string `mapstructure:"api_key"`
 	Name      string `mapstructure:"agent_name"`
 	ServerURL string `mapstructure:"server_url"`
