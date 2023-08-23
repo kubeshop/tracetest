@@ -1,12 +1,12 @@
-# Quick Start - Trace-based tests with Tail Sampling configuration
+# Quick Start - Trace-based Tests with Tail Sampling Configuration
 
-> [Read the detailed recipe for setting up OpenTelemetry Collector with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-without-a-trace-data-store)
+> [Read the detailed recipe for setting up OpenTelemetry Collector with Tracetest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-without-a-trace-data-store)
 
 This is a simple quick start example on how to set up `tail_sampling` into OTel Collector, allowing Tracetest to run tests in environments where we have a probabilistic sampler enabled and a percentage of the traces are not sent to the final data store.
 
 ## Scenario
 
-In this scenario, we have on [Go API](./simple-go-service/) that sends Trace data to one instance of [OTel Collector](https://opentelemetry.io/docs/collector/), which samples 50% of the traces and sends it to [Jaeger](https://www.jaegertracing.io/) data store.
+In this scenario, we have [Go API](./simple-go-service/) that sends Trace data to one instance of [OTel Collector](https://opentelemetry.io/docs/collector/), which samples 50% of the traces and sends it to the [Jaeger](https://www.jaegertracing.io/) data store.
 
 ```mermaid
 ---
@@ -39,7 +39,7 @@ processors:
 
 exporters:
   otlp/jaeger:
-    endpoint: jaeger:4317 # Send traces to Jager
+    endpoint: jaeger:4317 # Send traces to Jaeger
     tls:
       insecure: true
 
@@ -52,13 +52,13 @@ service:
 
 ```
 
-However, to run a Trace-based test on this scenario and validate if the API is ok, we need to have the testing trace collected by our OTelCollector, how can we do that?
+However, to run a Trace-based test on this scenario and validate if the API is ok, we need to have the testing trace collected by our OTelCollector. How can we do that?
 
-Since Tracetest always starts a trace by adding a `tracetest=true` key/value to [TraceState](https://opentelemetry.io/docs/specs/otel/trace/api/#tracestate), that is [propagated](https://opentelemetry.io/docs/instrumentation/js/propagation/), we can filter these traces on the collector and send them to Tracetest.
+Since Tracetest always starts a trace by adding a `tracetest=true` key/value to [TraceState](https://opentelemetry.io/docs/specs/otel/trace/api/#tracestate) that is [propagated](https://opentelemetry.io/docs/instrumentation/js/propagation/), we can filter these traces on the collector and send them to Tracetest.
 
-To do it we need to set up Tracetest to use an OTLP Data Store on its provision ([here](./tracetest/tracetest.provision.yaml)) and also set up another pipeline with a [Tail Sampling](https://opentelemetry.io/docs/concepts/sampling/#tail-sampling) processor on OTel Collector, filtering by TraceState `tracetest=true` value.
+To do this we need to set up Tracetest to use an OTLP Data Store on its provision ([here](./tracetest/tracetest.provision.yaml)) and also set up another pipeline with a [Tail Sampling](https://opentelemetry.io/docs/concepts/sampling/#tail-sampling) processor on the OTel Collector, filtering by TraceState `tracetest=true` value.
 
-We can do that by adding the following configuration to OTel Collector (the entire collector config YAML is [here](./tracetest/collector.config.yaml)):
+We can do that by adding the following configuration to the OTel Collector (the entire collector config YAML is [here](./tracetest/collector.config.yaml)):
 ```yaml
 #...
 
@@ -97,7 +97,7 @@ service:
 
 ```
 
-With this configuration, we can run Trace-based tests even with a sampling into the main data store, having the following structure:
+With this configuration, we can run Trace-based tests, even with a sampling, into the main data store, having the following structure:
 
 ```mermaid
 ---
@@ -116,8 +116,8 @@ flowchart LR
 
 ## Running the example
 
-If you want to run this example, just execute `docker compose up` on this folder.
+If you want to run this example, execute `docker compose up` on this folder.
 
-To execute a Trace-based test with Tracetest against this structure just run `tracetest run test -f test-api-working.yaml`.
+To execute a Trace-based test with Tracetest against this structure, run `tracetest run test -f test-api-working.yaml`.
 
 Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
