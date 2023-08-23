@@ -1,7 +1,4 @@
-import {Space} from 'antd';
-
 import Logo from 'assets/Logo.svg';
-import VariableSetSelector from 'components/VariableSetSelector';
 import Link from 'components/Link';
 import NoTracingPopover from 'components/NoTracingPopover';
 import * as S from './Header.styled';
@@ -22,11 +19,10 @@ const Header = ({hasLogo = false, isNoTracingMode}: IProps) => (
       )}
     </div>
 
-    <Space>
+    <S.MenuContainer>
       {isNoTracingMode && <NoTracingPopover />}
-      <VariableSetSelector />
       <HelpMenu />
-    </Space>
+    </S.MenuContainer>
   </S.Header>
 );
 

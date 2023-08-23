@@ -11,6 +11,7 @@ import {ADD_TEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import useDeleteResource from 'hooks/useDeleteResource';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
 import Test from 'models/Test.model';
 import * as S from './Home.styled';
 import CreateButton from './CreateButton';
@@ -57,6 +58,7 @@ const Tests = () => {
       <S.Wrapper>
         <S.HeaderContainer>
           <S.TitleText>All Tests</S.TitleText>
+          <VariableSetSelector />
         </S.HeaderContainer>
 
         <S.ActionsContainer>

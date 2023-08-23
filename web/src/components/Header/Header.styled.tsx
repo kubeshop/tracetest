@@ -12,6 +12,7 @@ export const Header = styled(Layout.Header)`
   line-height: 48px;
   padding: 0;
   padding-left: 24px;
+  padding-right: 24px;
 
   .ant-dropdown-trigger {
     display: block;
@@ -29,13 +30,12 @@ export const Header = styled(Layout.Header)`
 
 export const Logo = styled.img`
   height: 24px;
-  margin-right: 24px;
+  margin-right: 12px;
 `;
 
 export const QuestionIcon = styled(QuestionCircleOutlined)`
   color: ${({theme}) => theme.color.primary};
   font-size: ${({theme}) => theme.size.lg};
-  margin: 0 24px;
 `;
 
 export const AppVersion = styled(Typography.Text)`
@@ -43,4 +43,11 @@ export const AppVersion = styled(Typography.Text)`
     color: ${({theme}) => theme.color.textLight};
     font-size: ${({theme}) => theme.size.sm};
   }
+`;
+
+export const MenuContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  flex-direction: row;
+  align-items: center;
 `;

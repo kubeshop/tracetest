@@ -1,6 +1,5 @@
 import {useParams} from 'react-router-dom';
 
-import Layout from 'components/Layout';
 import TestSpecFormProvider from 'components/TestSpecForm/TestSpecForm.provider';
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import GuidedTourProvider from 'providers/GuidedTour';
@@ -15,19 +14,17 @@ const RunDetail = () => {
 
   return (
     <GuidedTourProvider>
-      <Layout>
-        <TestRunProvider testId={testId} runId={runId}>
-          <TestSpecsProvider testId={testId} runId={runId}>
-            <TestSpecFormProvider testId={testId}>
-              <SpanProvider>
-                <TestOutputProvider testId={testId} runId={runId}>
-                  <Content />
-                </TestOutputProvider>
-              </SpanProvider>
-            </TestSpecFormProvider>
-          </TestSpecsProvider>
-        </TestRunProvider>
-      </Layout>
+      <TestRunProvider testId={testId} runId={runId}>
+        <TestSpecsProvider testId={testId} runId={runId}>
+          <TestSpecFormProvider testId={testId}>
+            <SpanProvider>
+              <TestOutputProvider testId={testId} runId={runId}>
+                <Content />
+              </TestOutputProvider>
+            </SpanProvider>
+          </TestSpecFormProvider>
+        </TestSpecsProvider>
+      </TestRunProvider>
     </GuidedTourProvider>
   );
 };

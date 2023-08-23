@@ -11,6 +11,7 @@ import {ADD_TEST_SUITE_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import useTestSuiteCrud from 'providers/TestSuite/hooks/useTestSuiteCrud';
+import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
 import TestSuite from 'models/TestSuite.model';
 import * as S from './TestSuites.styled';
 import CreateButton from '../Home/CreateButton';
@@ -55,6 +56,7 @@ const Resources = () => {
       <S.Wrapper>
         <S.HeaderContainer>
           <S.TitleText>All Test Suites</S.TitleText>
+          <VariableSetSelector />
         </S.HeaderContainer>
 
         <S.ActionsContainer>

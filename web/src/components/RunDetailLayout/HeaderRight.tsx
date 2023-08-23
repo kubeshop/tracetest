@@ -12,6 +12,7 @@ import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import * as S from './RunDetailLayout.styled';
 import EventLogPopover from '../EventLogPopover/EventLogPopover';
 import RunStatusIcon from '../RunStatusIcon/RunStatusIcon';
+import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
 
 interface IProps {
   testId: string;
@@ -55,6 +56,7 @@ const HeaderRight = ({testId}: IProps) => {
       {(isRunStateSucceeded(state) || isRunStateStopped(state)) && (
         <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
       )}
+      <VariableSetSelector />
       {!isDraftMode && state && isRunStateFinished(state) && (
         <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
           Run Test
