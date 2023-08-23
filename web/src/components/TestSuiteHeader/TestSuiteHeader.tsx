@@ -68,14 +68,14 @@ const TestSuiteHeader = () => {
             <TestState testState={state} />
           </S.StateContainer>
         )}
+        {state && state === TestStateEnum.FINISHED && (
+          <TestSuiteRunStatusIcon state={state!} hasFailedTests={!allStepsRequiredGatesPassed} />
+        )}
         <VariableSetSelector />
         {state && state === TestStateEnum.FINISHED && (
-          <>
-            <TestSuiteRunStatusIcon state={state!} hasFailedTests={!allStepsRequiredGatesPassed} />
-            <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="testsuite-run-button">
-              Run Test Suite
-            </Button>
-          </>
+          <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="testsuite-run-button">
+            Run Test Suite
+          </Button>
         )}
         <TestSuiteRunActionsMenu testSuiteId={testSuiteId} runId={runId} isRunView />
       </S.SectionRight>
