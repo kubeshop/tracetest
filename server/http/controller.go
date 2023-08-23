@@ -217,9 +217,14 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		return handleDBError(err), err
 	}
 
+	count, err := c.testRunRepository.Count(ctx, test)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
 	return openapi.Response(200, paginated[openapi.TestRun]{
 		items: c.mappers.Out.Runs(runs),
-		count: len(runs), // TODO: find a way of returning the proper number
+		count: count, // TODO: find a way of returning the proper number
 	}), nil
 }
 
