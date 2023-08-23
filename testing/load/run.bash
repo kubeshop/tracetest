@@ -18,7 +18,7 @@ fi
 DOCKER_COMPOSE="docker compose -f infra/docker-compose.yaml -f ../../examples/docker-compose.demo.yaml"
 TRACETEST="tracetest -s $TARGET_URL"
 
-DOCKER_LOG=/tmp/load-test.log
+DOCKER_LOG=/tmp/docker-log
 # printDockerLog() {
 #   $DOCKER_COMPOSE kill
 #   echo
