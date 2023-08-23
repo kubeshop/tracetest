@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/alitto/pond"
+
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/http/middleware"
@@ -19,7 +21,8 @@ import (
 )
 
 const (
-	QueueWorkerCount = 5
+	QueueWorkerCount      = 5
+	QueueWorkerBufferSize = 100
 
 	JobCountHeader string = "X-Tracetest-Job-Count"
 )
@@ -170,9 +173,13 @@ type subscriptor interface {
 	Subscribe(string, subscription.Subscriber)
 }
 
+type Listener interface {
+	Listen(Job)
+}
+
 type QueueDriver interface {
 	Enqueue(Job)
-	SetQueue(*Queue)
+	SetListener(Listener)
 }
 
 type QueueBuilder struct {
@@ -249,9 +256,10 @@ func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcess
 
 		driver:        driver,
 		itemProcessor: itemProcessor,
+		workerPool:    pond.New(QueueWorkerCount, QueueWorkerBufferSize),
 	}
 
-	driver.SetQueue(queue)
+	driver.SetListener(queue)
 
 	return queue
 }
@@ -271,11 +279,12 @@ type Queue struct {
 
 	itemProcessor QueueItemProcessor
 	driver        QueueDriver
+	workerPool    *pond.WorkerPool
 }
 
 func (q *Queue) SetDriver(driver QueueDriver) {
 	q.driver = driver
-	driver.SetQueue(q)
+	driver.SetListener(q)
 }
 
 func propagator() propagation.TextMapPropagator {
@@ -338,7 +347,14 @@ func (q Queue) Listen(job Job) {
 	case <-ctx.Done():
 		return
 	}
-	q.itemProcessor.ProcessItem(ctx, newJob)
+
+	q.workerPool.Submit(func() {
+		q.itemProcessor.ProcessItem(ctx, newJob)
+	})
+}
+
+func (q *Queue) Stop() {
+	q.workerPool.StopAndWait()
 }
 
 type StopRequest struct {

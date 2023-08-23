@@ -111,7 +111,7 @@ func (qd *PostgresQueueDriver) worker(conn *pgxpool.Conn) {
 	}
 
 	// spin off so we can keep listening for jobs
-	go channel.q.Listen(job.Job)
+	channel.listener.Listen(job.Job)
 	qd.log("spun off job for channel: %s, runID: %d", job.Channel, job.Job.Run.ID)
 }
 
@@ -140,14 +140,14 @@ func (qd *PostgresQueueDriver) Channel(name string) *channel {
 
 type channel struct {
 	*PostgresQueueDriver
-	name string
-	log  loggerFn
-	pool *pgxpool.Pool
-	q    *Queue
+	name     string
+	log      loggerFn
+	pool     *pgxpool.Pool
+	listener Listener
 }
 
-func (ch *channel) SetQueue(q *Queue) {
-	ch.q = q
+func (ch *channel) SetListener(l Listener) {
+	ch.listener = l
 }
 
 const enqueueTimeout = 500 * time.Millisecond
