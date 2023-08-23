@@ -1,0 +1,20 @@
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 1s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: Jaeger
+  type: jaeger
+  default: true
+  jaeger:
+    endpoint: jaeger:16685
+    tls:
+      insecure: true
