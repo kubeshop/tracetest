@@ -14,8 +14,10 @@ func TestConfigDefaults(t *testing.T) {
 
 	require.NoError(t, err)
 
+	hostname, _ := os.Hostname()
+
 	assert.Equal(t, "", cfg.APIKey)
-	assert.Equal(t, "", cfg.Name)
+	assert.Equal(t, hostname, cfg.Name)
 	assert.Equal(t, "https://cloud.tracetest.io", cfg.ServerURL)
 }
 
