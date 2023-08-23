@@ -338,6 +338,30 @@ jobs:
           cd ./testing/cli-e2etest
           make test
 
+  k6-test:
+    name: k6 Load Test
+    needs: [build-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-dist
+          path: dist/
+
+      - name: Import image
+        run: |
+          docker load --input dist/image.tar
+      - name: Run tests
+        run: |
+          chmod +x ./dist/tracetest ./testing/load/run.bash
+
+          cd ./testing/load
+
+          TRACETEST_CLI="../../dist/tracetest" \
+          ./run.bash || (cat /tmp/docker-log; exit 1)
+
   config-e2e:
     runs-on: ubuntu-latest
     outputs:
