@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	QueueWorkerCount      = 5
-	QueueWorkerBufferSize = 100
+	QueueWorkerCount      = 10
+	QueueWorkerBufferSize = QueueWorkerCount * 100 // 100 jobs per worker
 
 	JobCountHeader string = "X-Tracetest-Job-Count"
 )
