@@ -15,10 +15,9 @@ import (
 func Start(config config.Config) {
 	fmt.Println("Starting agent")
 	ctx := context.Background()
-
 	client, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
-		client.WithAgentName(config.AgentName),
+		client.WithAgentName(config.Name),
 	)
 	if err != nil {
 		log.Fatal(err)

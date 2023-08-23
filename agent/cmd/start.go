@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/kubeshop/tracetest/agent/config"
@@ -24,6 +25,8 @@ var StartCmd = cobra.Command{
 			fmt.Fprintln(os.Stderr, err)
 			ExitCLI(1)
 		}
+
+		log.Printf("starting agent [%s] connecting to %s", cfg.Name, cfg.ServerURL)
 
 		initialization.Start(cfg)
 	},
