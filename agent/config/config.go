@@ -31,7 +31,7 @@ func LoadConfig() (Config, error) {
 	vp.AutomaticEnv()
 
 	vp.SetDefault("DEV_MODE", false)
-	vp.SetDefault("AGENT_NAME", "")
+	vp.SetDefault("AGENT_NAME", getHostname())
 	vp.SetDefault("API_KEY", "")
 	vp.SetDefault("SERVER_URL", "https://cloud.tracetest.io")
 
@@ -42,6 +42,10 @@ func LoadConfig() (Config, error) {
 	err := vp.Unmarshal(&config)
 	if err != nil {
 		return Config{}, fmt.Errorf("could not load config: %w", err)
+	}
+
+	if config.Name == "" {
+		return Config{}, fmt.Errorf("invalid host name, use the environment variable TRACETEST_AGENT_NAME to name your agent")
 	}
 
 	return config, nil
@@ -55,4 +59,15 @@ func getTracetestFolder() string {
 	}
 
 	return path.Join(homeFolder, ".tracetest")
+}
+
+func getHostname() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		// Don't fail yet because user still can name the agent using the TRACETEST_AGENT_NAME
+		// env variable.
+		return ""
+	}
+
+	return hostname
 }
