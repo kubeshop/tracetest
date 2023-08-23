@@ -11,6 +11,7 @@ require (
 	github.com/IBM/sarama v1.40.1
 	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
+	github.com/alitto/pond v1.8.3
 	github.com/aws/aws-sdk-go v1.44.196
 	github.com/brianvoe/gofakeit/v6 v6.17.0
 	github.com/denisbrodbeck/machineid v1.0.1
@@ -72,7 +73,6 @@ require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/alitto/pond v1.8.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
