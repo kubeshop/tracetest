@@ -133,6 +133,9 @@ components:
         grpcEndpoint:
           type: string
           description: "gRPC endpoint for Pokeshop API"
+        kafkaBroker:
+          type: string
+          description: "kafka broker for Pokeshop API"
     DemoOpenTelemetryStore:
       type: object
       description: "Represents the settings of the Open Telemetry Store demonstration."

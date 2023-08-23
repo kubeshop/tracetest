@@ -23,6 +23,8 @@ type DemoPokeshop struct {
 	HttpEndpoint *string `json:"httpEndpoint,omitempty"`
 	// gRPC endpoint for Pokeshop API
 	GrpcEndpoint *string `json:"grpcEndpoint,omitempty"`
+	// kafka broker for Pokeshop API
+	KafkaBroker *string `json:"kafkaBroker,omitempty"`
 }
 
 // NewDemoPokeshop instantiates a new DemoPokeshop object
@@ -106,6 +108,38 @@ func (o *DemoPokeshop) SetGrpcEndpoint(v string) {
 	o.GrpcEndpoint = &v
 }
 
+// GetKafkaBroker returns the KafkaBroker field value if set, zero value otherwise.
+func (o *DemoPokeshop) GetKafkaBroker() string {
+	if o == nil || isNil(o.KafkaBroker) {
+		var ret string
+		return ret
+	}
+	return *o.KafkaBroker
+}
+
+// GetKafkaBrokerOk returns a tuple with the KafkaBroker field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DemoPokeshop) GetKafkaBrokerOk() (*string, bool) {
+	if o == nil || isNil(o.KafkaBroker) {
+		return nil, false
+	}
+	return o.KafkaBroker, true
+}
+
+// HasKafkaBroker returns a boolean if a field has been set.
+func (o *DemoPokeshop) HasKafkaBroker() bool {
+	if o != nil && !isNil(o.KafkaBroker) {
+		return true
+	}
+
+	return false
+}
+
+// SetKafkaBroker gets a reference to the given string and assigns it to the KafkaBroker field.
+func (o *DemoPokeshop) SetKafkaBroker(v string) {
+	o.KafkaBroker = &v
+}
+
 func (o DemoPokeshop) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -121,6 +155,9 @@ func (o DemoPokeshop) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.GrpcEndpoint) {
 		toSerialize["grpcEndpoint"] = o.GrpcEndpoint
+	}
+	if !isNil(o.KafkaBroker) {
+		toSerialize["kafkaBroker"] = o.KafkaBroker
 	}
 	return toSerialize, nil
 }

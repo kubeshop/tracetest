@@ -18,6 +18,34 @@ services:
       timeout: 5s
       retries: 60
 
+  stream:
+    image: confluentinc/cp-kafka:latest-ubi8
+    ports:
+      - 29092:29092
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://stream:9092,PLAINTEXT_HOST://127.0.0.1:29092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://:29092
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@0.0.0.0:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_PROCESS_ROLES=controller,broker
+      - KAFKA_NODE_ID=1
+      - KAFKA_METADATA_LOG_SEGMENT_MS=15000
+      - KAFKA_METADATA_MAX_RETENTION_MS=60000
+      - KAFKA_METADATA_LOG_MAX_RECORD_BYTES_BETWEEN_SNAPSHOTS=2800
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS=-Xmx200m -Xms200m
+      - CLUSTER_ID=ckjPoprWQzOf0-FuNkGfFQ
+    healthcheck:
+      test: nc -z stream 9092
+      start_period: 10s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
   demo-api:
     image: kubeshop/demo-pokemon-api:latest
     restart: unless-stopped
@@ -88,3 +116,25 @@ services:
         condition: service_healthy
       queue:
         condition: service_healthy
+
+  demo-streaming-worker:
+    image: kubeshop/demo-pokemon-api:latest
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      ZIPKIN_URL: http://localhost:9411
+      NPM_RUN_COMMAND: stream-worker
+      KAFKA_BROKER: 'stream:9092'
+      KAFKA_TOPIC: 'pokemon'
+      KAFKA_CLIENT_ID: 'streaming-worker'
+      REDIS_URL: cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+      stream:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started

@@ -1,0 +1,28 @@
+type: Test
+spec:
+  id: jkbd86ads
+  name: List Kafka Test
+  description: Test step of 'Kafka Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${var:TARGET_URL}/api/tests
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - name: Tracetest API listed the test last test created
+    selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
+    - attr:tracetest.response.body | json_path '$.items[*].spec.id' contains var:KAFKA_TEST_ID # check if the test is listed
+  - name: Tracetest API endpoint 'GET /api/tests' was called once
+    selector: span[name="GET /api/tests" tracetest.span.type="http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - name: Two queries were executed on the database, one for counting and another for listing
+    selector: span[name = "query SELECT"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 2

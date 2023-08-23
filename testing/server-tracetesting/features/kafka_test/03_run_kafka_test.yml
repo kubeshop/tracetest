@@ -1,0 +1,44 @@
+type: Test
+spec:
+  id: as8d7da8s6
+  name: Run Kafka Test
+  description: Test step of 'Kafka Test Feature - Test Suite'
+  trigger:
+    type: http
+    httpRequest:
+      url: ${var:TARGET_URL}/api/tests/${var:KAFKA_TEST_ID}/run
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{}'
+  specs:
+  - name: Tracetest API started to run the test correctly
+    selector: span[name = "Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.response.status = 200
+  - name: Tracetest API endpoint 'POST /api/tests/{testId}/run' was called once
+    selector: span[name = "POST /api/tests/{testId}/run" tracetest.span.type = "http"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - name: The test trigger was executed correctly
+    selector: span[name = "Trigger test"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.run.trigger.test_id = "${var:KAFKA_TEST_ID}"
+    - attr:tracetest.run.trigger.type = "kafka"
+  - name: The trace poller was started
+    selector: span[name = "Fetch trace"]
+    assertions:
+    - attr:tracetest.selected_spans.count > 0
+    - attr:tracetest.run.trace_poller.test_id = "${var:KAFKA_TEST_ID}"
+  - name: The trace poller finished with success
+    selector: span[name = "Fetch trace"]:last
+    assertions:
+    - attr:tracetest.run.trace_poller.succesful = "true"
+  - name: All assertions were validated and passed
+    selector: span[name = "Execute assertions"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:tracetest.run.assertion_runner.all_assertions_passed = "true"
