@@ -19,23 +19,17 @@ DOCKER_COMPOSE="docker compose -f infra/docker-compose.yaml -f ../../examples/do
 TRACETEST="tracetest -s $TARGET_URL"
 
 DOCKER_LOG=/tmp/docker-log
-# printDockerLog() {
-#   $DOCKER_COMPOSE kill
-#   echo
-#   echo "Error occured. Printing docker log ($DOCKER_LOG):"
-#   cat $DOCKER_LOG
-# }
-
-# print docker log on any error
-# trap 'printDockerLog' ERR
 
 $DOCKER_COMPOSE up > $DOCKER_LOG 2>&1 &
-../../scripts/wait-for-port.sh 11633
+TIMEOUT=2m ../../scripts/wait-for-port.sh 11633
 ../../scripts/wait-for-port.sh 8081
 sleep 5
 $TRACETEST apply test -f tracetest-test.yaml
 
 rm -f ./k6
+
+# this build needs to happen outside the tracetest dir
+# otherwise go compiler complains about go.mod in parent dir
 currentDir=$(pwd)
 dir=$(mktemp -d)
 cd $dir
@@ -48,4 +42,4 @@ cd $currentDir
 
 ./k6 run load-test.js -o xk6-tracetest
 
-$DOCKER_COMPOSE down
+# $DOCKER_COMPOSE down
