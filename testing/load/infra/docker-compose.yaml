@@ -26,6 +26,8 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres:14
