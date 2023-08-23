@@ -1,0 +1,9 @@
+type: Test
+spec:
+  id: jFpHiL34R
+  name: Test Business Logic on Simple Go Service
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://simple-go-service:8080/businessLogic
