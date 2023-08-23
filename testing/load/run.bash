@@ -21,7 +21,7 @@ TRACETEST="tracetest -s $TARGET_URL"
 DOCKER_LOG=/tmp/docker-log
 
 $DOCKER_COMPOSE up > $DOCKER_LOG 2>&1 &
-TIMEOUT=2m ../../scripts/wait-for-port.sh 11633
+TIMEOUT=5m ../../scripts/wait-for-port.sh 11633
 ../../scripts/wait-for-port.sh 8081
 sleep 5
 $TRACETEST apply test -f tracetest-test.yaml
