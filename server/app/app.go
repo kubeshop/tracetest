@@ -145,6 +145,7 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
+	poolcfg.MaxConns = 20
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolcfg)
 	if err != nil {
@@ -155,7 +156,7 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
-	db.SetMaxOpenConns(50)
+	db.SetMaxOpenConns(80)
 
 	testDB, err := testdb.Postgres(
 		testdb.WithDB(db),

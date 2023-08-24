@@ -150,10 +150,10 @@ func (ch *channel) SetListener(l Listener) {
 	ch.listener = l
 }
 
-const enqueueTimeout = 500 * time.Millisecond
+const enqueueTimeout = 5 * time.Second
 
 func (ch *channel) Enqueue(job Job) {
-	ch.log("enqueue")
+	ch.log("enqueue job for run %d", job.Run.ID)
 
 	jj, err := json.Marshal(pgJob{
 		Channel: ch.name,
@@ -173,6 +173,7 @@ func (ch *channel) Enqueue(job Job) {
 		ch.log("error acquiring connection: %s", err.Error())
 		return
 	}
+	ch.log("aquired connection for run %d", job.Run.ID)
 	defer conn.Release()
 
 	_, err = conn.Query(ctx, fmt.Sprintf(`select pg_notify('%s', $1)`, pgChannelName), jj)
@@ -181,5 +182,5 @@ func (ch *channel) Enqueue(job Job) {
 		return
 	}
 
-	ch.log("notified postgres")
+	ch.log("notified postgres for run %d", job.Run.ID)
 }

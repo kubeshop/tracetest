@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/alitto/pond"
@@ -21,8 +22,8 @@ import (
 )
 
 const (
-	QueueWorkerCount      = 10
-	QueueWorkerBufferSize = QueueWorkerCount * 100 // 100 jobs per worker
+	QueueWorkerCount      = 1
+	QueueWorkerBufferSize = QueueWorkerCount * 10000 // 100 jobs per worker
 
 	JobCountHeader string = "X-Tracetest-Job-Count"
 )
@@ -315,11 +316,13 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
 		DataStore:      datastore.DataStore{ID: job.DataStore.ID},
 	}
+	log.Printf("queue: enqueuing job for run %d", job.Run.ID)
 
 	q.driver.Enqueue(newJob)
 }
 
 func (q Queue) Listen(job Job) {
+	log.Printf("queue: received job for run %d", job.Run.ID)
 	// this is called when a new job is put in the queue and we need to process it
 	ctx := propagator().Extract(context.Background(), propagation.MapCarrier(*job.Headers))
 
@@ -349,6 +352,7 @@ func (q Queue) Listen(job Job) {
 	}
 
 	q.workerPool.Submit(func() {
+		log.Printf("queue: submit to processItem fn for run %d", job.Run.ID)
 		q.itemProcessor.ProcessItem(ctx, newJob)
 	})
 }
