@@ -97,6 +97,7 @@ func loadConfig(configFile string) (Config, error) {
 		return Config{}, fmt.Errorf("could not unmarshal config: %w", err)
 	}
 
+	config.FrontendEndpoint = FrontendEndpoint
 	return config, nil
 }
 
