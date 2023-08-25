@@ -18,7 +18,11 @@ type ListOption struct {
 const VerbList Verb = "list"
 
 func (c Client) List(ctx context.Context, opt ListOption, format Format) (string, error) {
-	url := c.client.url(c.resourceNamePlural)
+	prefix := ""
+	if c.options.prefixGetterFn != nil {
+		prefix = c.options.prefixGetterFn()
+	}
+	url := c.client.url(c.resourceNamePlural, prefix)
 
 	q := url.Query()
 	q.Add("skip", fmt.Sprintf("%d", opt.Skip))
@@ -42,6 +46,8 @@ func (c Client) List(ctx context.Context, opt ListOption, format Format) (string
 	if err != nil {
 		return "", fmt.Errorf("cannot execute List request: %w", err)
 	}
+
+	fmt.Println("@@@", resp.Status, resp.StatusCode, req.URL.String())
 	defer resp.Body.Close()
 
 	if !isSuccessResponse(resp) {
@@ -55,5 +61,5 @@ func (c Client) List(ctx context.Context, opt ListOption, format Format) (string
 		return "", fmt.Errorf("cannot read List response: %w", err)
 	}
 
-	return format.Format(string(body), c.options.tableConfig)
+	return format.Format(string(body), c.options.tableConfig, c.options.listPath)
 }
