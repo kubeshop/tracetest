@@ -156,8 +156,7 @@ func (app *App) Start(opts ...appOption) error {
 	if err != nil {
 		return err
 	}
-	db.SetMaxOpenConns(100)
-	db.SetMaxIdleConns(20)
+	db.SetMaxOpenConns(80)
 
 	testDB, err := testdb.Postgres(
 		testdb.WithDB(db),
