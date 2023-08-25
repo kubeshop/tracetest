@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
+	"github.com/kubeshop/tracetest/server/http"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -33,6 +34,7 @@ func buildTestPipeline(
 
 	execTestUpdater := (executor.CompositeUpdater{}).
 		Add(executor.NewDBUpdater(runRepo)).
+		Add(http.TestRunCache).
 		Add(executor.NewSubscriptionUpdater(subscriptionManager))
 
 	assertionRunner := executor.NewAssertionRunner(

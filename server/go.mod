@@ -33,10 +33,12 @@ require (
 	github.com/jackc/pgx/v5 v5.4.2
 	github.com/jhump/protoreflect v1.12.0
 	github.com/json-iterator/go v1.1.12
+	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/ohler55/ojg v1.14.4
 	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/orlangure/gnomock v0.20.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/segmentio/analytics-go/v3 v3.2.1
@@ -133,6 +135,8 @@ require (
 	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasttemplate v1.2.1 // indirect
 	go.opentelemetry.io/collector/model v0.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.10.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0 // indirect
