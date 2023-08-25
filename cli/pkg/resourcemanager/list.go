@@ -46,8 +46,6 @@ func (c Client) List(ctx context.Context, opt ListOption, format Format) (string
 	if err != nil {
 		return "", fmt.Errorf("cannot execute List request: %w", err)
 	}
-
-	fmt.Println("@@@", resp.Status, resp.StatusCode, req.URL.String())
 	defer resp.Body.Close()
 
 	if !isSuccessResponse(resp) {

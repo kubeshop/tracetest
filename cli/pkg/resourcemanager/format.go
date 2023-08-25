@@ -147,12 +147,16 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 		return "", fmt.Errorf("expected option to be a []TableCellConfig, got %T", opts[0])
 	}
 
-	listPath := "items"
+	listPath := ""
 	if len(opts) > 1 {
 		listPath, ok = opts[1].(string)
 		if !ok {
 			return "", fmt.Errorf("expected option to be a string, got %T", opts[1])
 		}
+	}
+
+	if listPath == "" {
+		listPath = "items"
 	}
 
 	parsed, err := gabs.ParseJSON([]byte(data))
