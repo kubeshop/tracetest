@@ -47,7 +47,7 @@ func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
 }
 
 func (c HTTPClient) url(resourceName string, extra ...string) *url.URL {
-	urlStr := c.baseURL + path.Join("/api", resourceName, strings.Join(extra, "/"))
+	urlStr := c.baseURL + path.Join("/", resourceName, strings.Join(extra, "/"))
 	url, _ := url.Parse(urlStr)
 	return url
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/oauth"
 	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -22,6 +23,7 @@ var (
 	openapiClient  = &openapi.APIClient{}
 	versionText    string
 	isVersionMatch bool
+	oauthServer    = oauth.NewOAuthServer(&cliConfig)
 )
 
 type setupConfig struct {

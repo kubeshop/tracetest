@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
@@ -20,6 +21,10 @@ func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
 	config := openapi.NewConfiguration()
 	config.AddDefaultHeader("x-client-id", analytics.ClientID())
 	config.AddDefaultHeader("x-source", "cli")
+	config.AddDefaultHeader("x-organization-id", cliConfig.OrganizationID)
+	config.AddDefaultHeader("x-environment-id", cliConfig.EnvironmentID)
+	config.AddDefaultHeader("Authorization", fmt.Sprintf("Bearer %s", cliConfig.Jwt))
+
 	config.Scheme = cliConfig.Scheme
 	config.Host = strings.TrimSuffix(cliConfig.Endpoint, "/")
 	if cliConfig.ServerPath != nil {
