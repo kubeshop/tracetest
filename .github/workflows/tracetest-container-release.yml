@@ -1,0 +1,58 @@
+name: tracetest-release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+jobs:
+  push_to_registry:
+    name: Build and push Docker image github container registry.
+    runs-on: ubuntu-20.04
+    permissions:
+      packages: write
+      id-token: write
+      contents: read
+      actions: read
+      security-events: write
+    env:
+      REGISTRY: ghcr.io
+      GH_URL: https://github.com
+    steps:
+      - name: Set environment variable
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+      - name: Test environment variable
+        run: echo ${{ env.RELEASE_VERSION }}
+      - name: Check out GitHub repo
+        uses: actions/checkout@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image and push to GitHub Container Registry
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: ./
+          file: ./Dockerfile
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ env.RELEASE_VERSION }}
+      - name: Install cosign
+        uses: sigstore/cosign-installer@main
+      - name: Sign the images
+        run: |
+          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}:${{ env.RELEASE_VERSION }}
+        env:
+          COSIGN_EXPERIMENTAL: 1
+      - name: Verify the pushed tags
+        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}:${{ env.RELEASE_VERSION }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/tracetest-container-release.yml@refs/tags/${{ env.RELEASE_VERSION }}  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        env:
+          COSIGN_EXPERIMENTAL: 1
+      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: '.'
+          github-pat: ${{ secrets.GITHUB_TOKEN }} # or ${{ secrets.github_pat_name }} if you're using a PAT
