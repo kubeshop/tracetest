@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/patrickmn/go-cache"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -28,12 +30,56 @@ type RunRepository interface {
 	GetTestSuiteRunSteps(_ context.Context, _ id.ID, runID int) ([]Run, error)
 }
 
-type runRepository struct {
-	db *sql.DB
+type Cache struct {
+	cache      *cache.Cache
+	instanceID string
 }
 
-func NewRunRepository(db *sql.DB) RunRepository {
-	return &runRepository{db}
+func NewCache(instanceID string) *Cache {
+	return &Cache{
+		cache:      cache.New(5*time.Minute, 10*time.Minute),
+		instanceID: instanceID,
+	}
+}
+
+func (c *Cache) thisInstanceCacheKey(run Run) string {
+	return fmt.Sprintf("%s-%s-%d", c.instanceID, run.TestID, run.ID)
+}
+
+func (c *Cache) lastInstanceCacheKey(ctx context.Context, run Run) string {
+	instanceID := c.instanceID
+	if instanceID := ctx.Value("LastInstanceID"); instanceID != nil {
+		instanceID = instanceID.(string)
+	}
+
+	return fmt.Sprintf("%s-%s-%d", instanceID, run.TestID, run.ID)
+}
+
+func (c *Cache) Set(_ context.Context, run Run) error {
+	log.Printf("testRunCache Update %s %d", run.TestID, run.ID)
+	c.cache.Set(c.thisInstanceCacheKey(run), run, cache.DefaultExpiration)
+	return nil
+}
+
+func (c *Cache) Get(ctx context.Context, testID id.ID, runID int) (Run, bool) {
+	cached, found := c.cache.Get(c.lastInstanceCacheKey(ctx, Run{ID: runID, TestID: testID}))
+	if !found {
+		return Run{}, false
+	}
+
+	return cached.(Run), true
+}
+
+type runRepository struct {
+	db    *sql.DB
+	cache *Cache
+}
+
+func NewRunRepository(db *sql.DB, cache *Cache) RunRepository {
+	return &runRepository{
+		db:    db,
+		cache: cache,
+	}
 }
 
 const (
@@ -314,6 +360,8 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
+	r.cache.Set(ctx, run)
+
 	return nil
 }
 
@@ -395,12 +443,19 @@ var (
 )
 
 func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Run, error) {
+	cached, found := r.cache.Get(ctx, testID, runID)
+	if found {
+		return cached, nil
+	}
+
 	query, params := sqlutil.TenantWithPrefix(ctx, selectRunQuery+" WHERE id = $1 AND test_id = $2", "test_runs.", runID, testID)
 
 	run, err := readRunRow(r.db.QueryRowContext(ctx, query, params...))
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
+
+	r.cache.Set(ctx, run)
 	return run, nil
 }
 

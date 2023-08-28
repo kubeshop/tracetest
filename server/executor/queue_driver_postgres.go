@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jdvr/go-again"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
@@ -168,7 +169,11 @@ func (ch *channel) Enqueue(job Job) {
 	ctx, cancelCtx := context.WithTimeout(context.Background(), enqueueTimeout)
 	defer cancelCtx()
 
-	conn, err := ch.pool.Acquire(context.Background())
+	conn, err := again.Retry[*pgxpool.Conn](ctx, func(ctx context.Context) (*pgxpool.Conn, error) {
+		ch.log("trying to acquire connection for run %d", job.Run.ID)
+		return ch.pool.Acquire(context.Background())
+	})
+
 	if err != nil {
 		ch.log("error acquiring connection: %s", err.Error())
 		return

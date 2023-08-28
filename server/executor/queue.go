@@ -195,6 +195,8 @@ type QueueBuilder struct {
 
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
+
+	instanceID string
 }
 
 func NewQueueBuilder() *QueueBuilder {
@@ -213,6 +215,11 @@ func (qb *QueueBuilder) WithSubscriptor(subscriptor subscriptor) *QueueBuilder {
 
 func (qb *QueueBuilder) WithRunGetter(runs testRunGetter) *QueueBuilder {
 	qb.runs = runs
+	return qb
+}
+
+func (qb *QueueBuilder) WithInstanceID(id string) *QueueBuilder {
+	qb.instanceID = id
 	return qb
 }
 
@@ -258,6 +265,8 @@ func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcess
 		driver:        driver,
 		itemProcessor: itemProcessor,
 		workerPool:    pond.New(QueueWorkerCount, QueueWorkerBufferSize),
+
+		instanceID: qb.instanceID,
 	}
 
 	driver.SetListener(queue)
@@ -281,6 +290,8 @@ type Queue struct {
 	itemProcessor QueueItemProcessor
 	driver        QueueDriver
 	workerPool    *pond.WorkerPool
+
+	instanceID string
 }
 
 func (q *Queue) SetDriver(driver QueueDriver) {
@@ -303,6 +314,7 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		job.Headers = &headers{}
 	}
 	propagator().Inject(ctx, propagation.MapCarrier(*job.Headers))
+	job.Headers.Set("InstanceID", q.instanceID)
 
 	newJob := Job{
 		Headers: job.Headers,
@@ -325,6 +337,8 @@ func (q Queue) Listen(job Job) {
 	log.Printf("queue: received job for run %d", job.Run.ID)
 	// this is called when a new job is put in the queue and we need to process it
 	ctx := propagator().Extract(context.Background(), propagation.MapCarrier(*job.Headers))
+
+	ctx = context.WithValue(ctx, "LastInstanceID", job.Headers.Get("InstanceID"))
 
 	ctx, cancelCtx := context.WithCancel(ctx)
 	q.listenForStopRequests(context.Background(), cancelCtx, job)
@@ -503,6 +517,11 @@ func (b tenantPropagator) Inject(ctx context.Context, carrier propagation.TextMa
 	if tenantID != "" {
 		carrier.Set(string(middleware.TenantIDKey), tenantID)
 	}
+
+	instanceID := ctx.Value("instanceID")
+	if instanceID != nil {
+		carrier.Set("instanceID", instanceID.(string))
+	}
 }
 
 // Extract returns a copy of parent with the baggage from the carrier added.
@@ -512,7 +531,15 @@ func (b tenantPropagator) Extract(parent context.Context, carrier propagation.Te
 		return parent
 	}
 
-	return context.WithValue(parent, middleware.TenantIDKey, tenantID)
+	resultingCtx := context.WithValue(parent, middleware.TenantIDKey, tenantID)
+
+	instanceID := carrier.Get("instanceID")
+	if instanceID != "" {
+		resultingCtx = context.WithValue(resultingCtx, "instanceID", instanceID)
+	}
+
+	return resultingCtx
+
 }
 
 // Fields returns the keys who's values are set with Inject.

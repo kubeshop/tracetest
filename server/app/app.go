@@ -29,6 +29,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -133,7 +134,11 @@ func (app *App) initAnalytics(configFromDB config.Config) error {
 	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env)
 }
 
+var instanceID = id.GenerateID().String()
+
 func (app *App) Start(opts ...appOption) error {
+	// instanceID is a temprary ID for this instance of the server
+	// it is regenerated on every start intentionally
 	for _, opt := range opts {
 		opt(app)
 	}
@@ -213,7 +218,7 @@ func (app *App) Start(opts ...appOption) error {
 	variableSetRepo := variableset.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
-	runRepo := test.NewRunRepository(db)
+	runRepo := test.NewRunRepository(db, test.NewCache(instanceID))
 	testRunnerRepo := testrunner.NewRepository(db)
 	tracesRepo := traces.NewTraceRepository(db)
 

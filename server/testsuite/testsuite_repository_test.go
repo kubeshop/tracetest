@@ -63,7 +63,7 @@ func createRun(runRepository test.RunRepository, t test.Test) test.Run {
 
 func setupTestSuiteFixture(t *testing.T, db *sql.DB) testSuiteFixture {
 	testsDB := test.NewRepository(db)
-	runDB := test.NewRunRepository(db)
+	runDB := test.NewRunRepository(db, test.NewCache("test"))
 
 	fixture := testSuiteFixture{}
 
@@ -142,7 +142,7 @@ func TestDeleteTestsRelatedToTestSuite(t *testing.T) {
 	defer db.Close()
 
 	testRepository := test.NewRepository(db)
-	runRepository := test.NewRunRepository(db)
+	runRepository := test.NewRunRepository(db, test.NewCache("test"))
 	testSuiteRepo := testsuite.NewRepository(db, testRepository)
 	testSuiteRunRepo := testsuite.NewRunRepository(db, runRepository)
 
@@ -208,7 +208,7 @@ func TestTestSuites(t *testing.T) {
 		},
 		Prepare: func(t *testing.T, op rmtests.Operation, manager resourcemanager.Manager) {
 			transactionRepo := manager.Handler().(*testsuite.Repository)
-			runRepository := test.NewRunRepository(transactionRepo.DB())
+			runRepository := test.NewRunRepository(transactionRepo.DB(), test.NewCache("test"))
 			runRepo := testsuite.NewRunRepository(transactionRepo.DB(), runRepository)
 
 			switch op {

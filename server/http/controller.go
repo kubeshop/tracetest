@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
@@ -26,7 +25,6 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/labstack/gommon/log"
-	"github.com/patrickmn/go-cache"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -168,44 +166,11 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 	return openapi.Response(http.StatusOK, res), nil
 }
 
-type testRunCache struct {
-	c *cache.Cache
-}
-
-func (c testRunCache) key(run test.Run) string {
-	return fmt.Sprintf("%s-%d", run.TestID, run.ID)
-}
-
-func (c testRunCache) Update(_ context.Context, run test.Run) error {
-	log.Printf("testRunCache Update %s %d", run.TestID, run.ID)
-	c.c.Set(c.key(run), run, cache.DefaultExpiration)
-	return nil
-}
-
-func (c testRunCache) Get(testID string, runID int32) (test.Run, bool) {
-	cached, found := c.c.Get(fmt.Sprintf("%s-%d", testID, runID))
-	if !found {
-		return test.Run{}, false
-	}
-
-	return cached.(test.Run), true
-}
-
-var TestRunCache = testRunCache{c: cache.New(10*time.Minute, 11*time.Minute)}
-
 func (c *controller) GetTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
 	log.Printf("GetTestRun %s %d", testID, runID)
-	run, found := TestRunCache.Get(testID, runID)
-	if found {
-		log.Printf("GetTestRun %s %d - cache hit", testID, runID)
-	} else {
-		log.Printf("GetTestRun %s %d - cache miss", testID, runID)
-		var err error
-		run, err = c.testRunRepository.GetRun(ctx, id.ID(testID), int(runID))
-		if err != nil {
-			return handleDBError(err), err
-		}
-		TestRunCache.Update(ctx, run)
+	run, err := c.testRunRepository.GetRun(ctx, id.ID(testID), int(runID))
+	if err != nil {
+		return handleDBError(err), err
 	}
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
@@ -260,7 +225,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 
 	return openapi.Response(200, paginated[openapi.TestRun]{
 		items: c.mappers.Out.Runs(runs),
-		count: count, // TODO: find a way of returning the proper number
+		count: count,
 	}), nil
 }
 

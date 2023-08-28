@@ -31,6 +31,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/j2gg0s/otsql v0.14.0
 	github.com/jackc/pgx/v5 v5.4.2
+	github.com/jdvr/go-again v1.0.0
 	github.com/jhump/protoreflect v1.12.0
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/gommon v0.3.0
