@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/kubeshop/tracetest/cli/actions"
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,7 @@ var configureCmd = &cobra.Command{
 		ctx := context.Background()
 		action := actions.NewConfigureAction(cliConfig)
 
-		actionConfig := actions.ConfigureConfig{
+		actionConfig := config.ConfigureConfig{
 			Global: configParams.Global,
 		}
 

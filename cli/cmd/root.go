@@ -70,6 +70,11 @@ var (
 		ID:    "misc",
 		Title: "Misc",
 	}
+
+	cmdGroupCloud = &cobra.Group{
+		ID:    "cloud",
+		Title: "Cloud",
+	}
 )
 
 func init() {
@@ -84,6 +89,7 @@ func init() {
 		cmdGroupResources,
 		cmdGroupTests,
 		cmdGroupMisc,
+		cmdGroupCloud,
 	)
 
 	rootCmd.SetCompletionCommandGroupID(cmdGroupConfig.ID)

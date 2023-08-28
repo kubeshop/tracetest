@@ -271,6 +271,9 @@ func setupResources() {
 	extraHeaders := http.Header{}
 	extraHeaders.Set("x-client-id", analytics.ClientID())
 	extraHeaders.Set("x-source", "cli")
+	extraHeaders.Set("x-organization-id", cliConfig.OrganizationID)
+	extraHeaders.Set("x-environment-id", cliConfig.EnvironmentID)
+	extraHeaders.Set("Authorization", fmt.Sprintf("Bearer %s", cliConfig.Jwt))
 
 	// To avoid a ciruclar reference initialization when setting up the registry and its resources,
 	// we create the resources with a pointer to an unconfigured HTTPClient.
