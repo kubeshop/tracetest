@@ -44,7 +44,12 @@ func (c Config) URL() string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s://%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"))
+	pathPrefix := "/api"
+	if c.ServerPath != nil {
+		pathPrefix = *c.ServerPath
+	}
+
+	return fmt.Sprintf("%s://%s%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"), pathPrefix)
 }
 
 func (c Config) Path() string {
