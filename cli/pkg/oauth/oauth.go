@@ -61,7 +61,7 @@ type JWTResponse struct {
 }
 
 func (s *OAuthServer) ExchangeToken(token string) (string, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/tokens/%s/exchange", s.config.URL(), token), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s/tokens/%s/exchange", s.config.URL(), s.config.Path(), token), nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}

@@ -11,8 +11,8 @@ import (
 var loginCmd = &cobra.Command{
 	GroupID: cmdGroupCloud.ID,
 	Use:     "login",
-	Short:   "Tracetst Cloud Login",
-	Long:    "Initializes the Tracetst Cloud Login process",
+	Short:   "Tracetest Cloud Login",
+	Long:    "Initializes the Tracetest Cloud Login process",
 	PreRun:  setupCommand(),
 	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()

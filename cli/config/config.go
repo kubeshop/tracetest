@@ -44,12 +44,16 @@ func (c Config) URL() string {
 		return ""
 	}
 
+	return fmt.Sprintf("%s://%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"))
+}
+
+func (c Config) Path() string {
 	pathPrefix := "/api"
 	if c.ServerPath != nil {
 		pathPrefix = *c.ServerPath
 	}
 
-	return fmt.Sprintf("%s://%s%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"), pathPrefix)
+	return pathPrefix
 }
 
 func (c Config) IsEmpty() bool {
