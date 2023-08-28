@@ -11,7 +11,12 @@ import (
 const VerbDelete Verb = "delete"
 
 func (c Client) Delete(ctx context.Context, id string, format Format) (string, error) {
-	url := c.client.url(c.resourceNamePlural, id)
+	prefix := ""
+	if c.options.prefixGetterFn != nil {
+		prefix = c.options.prefixGetterFn()
+	}
+
+	url := c.client.url(c.resourceNamePlural, prefix, id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url.String(), nil)
 	if err != nil {
 		return "", fmt.Errorf("cannot build Delete request: %w", err)
