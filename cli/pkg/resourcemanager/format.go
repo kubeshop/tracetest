@@ -138,13 +138,25 @@ func (p prettyFormat) String() string {
 // The path is a dot-separated list of keys, e.g. "metadata.name". See github.com/Jeffail/gabs.
 func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	// we expect only one option - TableConfig
-	if len(opts) != 1 {
-		return "", fmt.Errorf("expected 1 option, got %d", len(opts))
+	if len(opts) != 2 {
+		return "", fmt.Errorf("expected 2 options, got %d", len(opts))
 	}
 
 	tableConfig, ok := opts[0].(TableConfig)
 	if !ok {
 		return "", fmt.Errorf("expected option to be a []TableCellConfig, got %T", opts[0])
+	}
+
+	listPath := ""
+	if len(opts) > 1 {
+		listPath, ok = opts[1].(string)
+		if !ok {
+			return "", fmt.Errorf("expected option to be a string, got %T", opts[1])
+		}
+	}
+
+	if listPath == "" {
+		listPath = "items"
 	}
 
 	parsed, err := gabs.ParseJSON([]byte(data))
@@ -161,7 +173,7 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	}
 
 	// iterate over parsed data and build table body
-	body := buildTableBody(parsed, tableConfig)
+	body := buildTableBody(parsed, tableConfig, listPath)
 
 	// configure output table
 	table := simpletable.New()
@@ -172,8 +184,8 @@ func (p prettyFormat) Format(data string, opts ...any) (string, error) {
 	return table.String(), nil
 }
 
-func buildTableBody(parsed *gabs.Container, tableConfig TableConfig) [][]*simpletable.Cell {
-	items := parsed.Path("items")
+func buildTableBody(parsed *gabs.Container, tableConfig TableConfig, listPath string) [][]*simpletable.Cell {
+	items := parsed.Path(listPath)
 	// if items is nil, we assume that the parsed data is a single item
 	if items == nil {
 		body := make([][]*simpletable.Cell, 0, 1)

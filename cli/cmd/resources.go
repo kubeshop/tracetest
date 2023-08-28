@@ -38,6 +38,33 @@ var (
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
+	organizationsClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"organization", "organizations",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "id"},
+				{Header: "NAME", Path: "name"},
+			},
+		}),
+		resourcemanager.WithListPath("elements"),
+	)
+
+	environmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environment", "environments",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "id"},
+				{Header: "NAME", Path: "name"},
+			},
+		}),
+		resourcemanager.WithPrefixGetter(func() string { return fmt.Sprintf("/organizations/%s/", cliConfig.OrganizationID) }),
+		resourcemanager.WithListPath("elements"),
+	)
+
+	// resourcemanager.WithPrefixGetter(func() string { return cliConfig.EnvironmentID }),
+
 	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
 	variableSetClient       = resourcemanager.NewClient(
 		httpClient, cliLogger,
@@ -127,13 +154,6 @@ var (
 		resourcemanager.WithResourceType("TestSuite"),
 		resourcemanager.WithApplyPreProcessor(testSuitePreprocessor.Preprocess),
 		resourcemanager.WithDeprecatedAlias("Transaction"),
-	)
-
-	// deprecated resources
-	deprecatedEnvironmentClient = resourcemanager.NewClient(
-		httpClient, cliLogger,
-		"environment", "environments",
-		resourcemanager.WithProxyResource("variableset"),
 	)
 
 	deprecatedTransactionsClient = resourcemanager.NewClient(
@@ -253,9 +273,11 @@ var (
 		Register(variableSetClient).
 		Register(testSuiteClient).
 		Register(testClient).
+		Register(organizationsClient).
+		Register(environmentClient).
 
 		// deprecated resources
-		Register(deprecatedEnvironmentClient).
+		// Register(deprecatedEnvironmentClient).
 		Register(deprecatedTransactionsClient)
 )
 
