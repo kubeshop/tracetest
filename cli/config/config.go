@@ -16,7 +16,7 @@ import (
 var (
 	Version          = "dev"
 	Env              = "dev"
-	FrontendEndpoint = "http://localhost:3001"
+	FrontendEndpoint = "http://localhost:3000"
 )
 
 type ConfigureConfig struct {
