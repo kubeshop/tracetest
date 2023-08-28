@@ -1,0 +1,68 @@
+name: Build and publish qt CLI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*' # Only build on tags that match the 'vX.Y.Z' pattern
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      
+      - name: Build my CLI for Linux
+        run: cd cli && go mod download && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o qt-linux main.go
+      
+      - name: Build my CLI for macOS
+        run: cd cli && go mod download && GOOS=darwin GOARCH=amd64 go build -o qt-macos
+      
+      - name: Build my CLI for Windows
+        run: cd cli && go mod download && GOOS=windows GOARCH=amd64 go build -o qt-windows.exe
+       
+      - name: Get release name from tag
+        id: release
+        run: echo "::set-output name=name::$(echo ${GITHUB_REF#refs/tags/})"
+        env:
+          GITHUB_REF: ${{ github.ref }}
+      
+      - name: Create release for Linux
+        uses: softprops/action-gh-release@v1
+        with:
+          files: cli/qt-linux
+          tag_name: ${{ github.ref }}
+          name: ${{ steps.release.outputs.name }} - Linux
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release for macOS
+        uses: softprops/action-gh-release@v1
+        with:
+          files: cli/qt-macos
+          tag_name: ${{ github.ref }}
+          name: ${{ steps.release.outputs.name }} - macOS
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release for Windows
+        uses: softprops/action-gh-release@v1
+        with:
+          files: cli/qt-windows.exe
+          tag_name: ${{ github.ref }}
+          name: ${{ steps.release.outputs.name }} - Windows
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
