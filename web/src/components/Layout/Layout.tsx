@@ -1,7 +1,6 @@
-import {ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
+import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
-import React from 'react';
-import {useLocation} from 'react-router-dom';
+import {Outlet, useLocation} from 'react-router-dom';
 
 import logoAsset from 'assets/logo-white.svg';
 import FileViewerModalProvider from 'components/FileViewerModal/FileViewerModal.provider';
@@ -16,8 +15,10 @@ import NotificationProvider from 'providers/Notification/Notification.provider';
 import {ConfigMode} from 'types/DataStore.types';
 import * as S from './Layout.styled';
 
+export type TCustomHeader = typeof Header;
+
 interface IProps {
-  children?: React.ReactNode;
+  customHeader?: TCustomHeader;
   hasMenu?: boolean;
 }
 
@@ -30,7 +31,7 @@ const menuItems = [
   },
   {
     key: '1',
-    icon: <ClusterOutlined />,
+    icon: <AppstoreAddOutlined />,
     label: <Link to="/testsuites">Test Suites</Link>,
     path: '/testsuites',
   },
@@ -51,7 +52,7 @@ const footerMenuItems = [
   },
 ];
 
-const Layout = ({children, hasMenu = false}: IProps) => {
+const Layout = ({hasMenu = false, customHeader: CustomHeader = Header}: IProps) => {
   useRouterSync();
   const {dataStoreConfig, isLoading} = useSettingsValues();
   const pathname = useLocation().pathname;
@@ -99,8 +100,10 @@ const Layout = ({children, hasMenu = false}: IProps) => {
                 )}
 
                 <S.Layout>
-                  <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
-                  <S.Content $hasMenu={hasMenu}>{children}</S.Content>
+                  <CustomHeader hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
+                  <S.Content $hasMenu={hasMenu}>
+                    <Outlet />
+                  </S.Content>
                 </S.Layout>
               </S.Layout>
             </VariableSetProvider>

@@ -16,6 +16,7 @@ fi
 export TRACETEST_ENDPOINT=${TRACETEST_ENDPOINT:-"localhost:11633"}
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo"}
 export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo:8082"}
+export DEMO_APP_KAFKA_BROKER=${DEMO_APP_KAFKA_BROKER-"stream:9092"}
 
 # TODO: think how to move this id generation to HTTP Test suite
 export EXAMPLE_TEST_ID="w2ON-RVVg"
@@ -24,17 +25,18 @@ echo "Preparing to run tests on API..."
 echo ""
 
 echo "Variable set considered on this run:"
-echo "TRACETEST_CLI:      $TRACETEST_CLI"
-echo "TARGET_URL:         $TARGET_URL"
-echo "TRACETEST_ENDPOINT: $TRACETEST_ENDPOINT"
-echo "DEMO_APP_URL:       $DEMO_APP_URL"
-echo "DEMO_APP_GRPC_URL:  $DEMO_APP_GRPC_URL"
+echo "TRACETEST_CLI:          $TRACETEST_CLI"
+echo "TARGET_URL:             $TARGET_URL"
+echo "TRACETEST_ENDPOINT:     $TRACETEST_ENDPOINT"
+echo "DEMO_APP_URL:           $DEMO_APP_URL"
+echo "DEMO_APP_GRPC_URL:      $DEMO_APP_GRPC_URL"
+echo "DEMO_APP_KAFKA_BROKER:  $DEMO_APP_KAFKA_BROKER"
 
-cat << EOF > tracetesting-env.yaml
+cat << EOF > tracetesting-vars.yaml
 type: VariableSet
 spec:
-  id: tracetesting-env
-  name: tracetesting-env
+  id: tracetesting-vars
+  name: tracetesting-vars
   values:
     - key: TARGET_URL
       value: $TARGET_URL
@@ -42,12 +44,14 @@ spec:
       value: $DEMO_APP_URL
     - key: DEMO_APP_GRPC_URL
       value: $DEMO_APP_GRPC_URL
+    - key: DEMO_APP_KAFKA_BROKER
+      value: $DEMO_APP_KAFKA_BROKER
     - key: EXAMPLE_TEST_ID
       value: $EXAMPLE_TEST_ID
 EOF
 
 echo "variables set created:"
-cat tracetesting-env.yaml
+cat tracetesting-vars.yaml
 
 echo "Setting up tracetest CLI configuration..."
 cat << EOF > config.yml
@@ -65,10 +69,9 @@ mkdir -p results/responses
 run_test_suite_for_feature() {
   feature=$1
 
-  # junit_output='results/'$feature'_test_suite.xml'
   definition='./features/'$feature'/_test_suite.yml'
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run testsuite --file $definition --vars ./tracetesting-env.yaml"
+  testCMD="$TRACETEST_CLI  --config ./config.yml run testsuite --file $definition --vars ./tracetesting-vars.yaml"
   echo $testCMD
   $testCMD
   return $?
@@ -84,13 +87,14 @@ EXIT_STATUS=0
 # add more test suites here
 run_test_suite_for_feature 'http_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'grpc_test' || EXIT_STATUS=$?
+run_test_suite_for_feature 'kafka_test' || EXIT_STATUS=$?
 run_test_suite_for_feature 'variableset' || EXIT_STATUS=$?
 run_test_suite_for_feature 'testsuite' || EXIT_STATUS=$?
 
 echo ""
 echo "Tests done! Exit code: $EXIT_STATUS"
 
-rm tracetesting-env.yaml
+rm tracetesting-vars.yaml
 
 exit $EXIT_STATUS
 

@@ -18,6 +18,7 @@ func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
 	case "docker-compose":
 		conf.set("demo.endpoint.pokeshop.http", "http://demo-api:8081")
 		conf.set("demo.endpoint.pokeshop.grpc", "demo-rpc:8082")
+		conf.set("demo.endpoint.pokeshop.kafka", "stream:9092")
 		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend:8084")
 		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice:3550")
 		conf.set("demo.endpoint.otel.cart", "otel-cartservice:7070")
@@ -25,6 +26,7 @@ func configureDemoApp(conf configuration, ui cliUI.UI) configuration {
 	case "kubernetes":
 		conf.set("demo.endpoint.pokeshop.http", "http://demo-pokemon-api.demo")
 		conf.set("demo.endpoint.pokeshop.grpc", "demo-pokemon-api.demo:8082")
+		conf.set("demo.endpoint.pokeshop.kafka", "stream.demo:9092")
 		conf.set("demo.endpoint.otel.frontend", "http://otel-frontend.otel-demo:8084")
 		conf.set("demo.endpoint.otel.product_catalog", "otel-productcatalogservice.otel-demo:3550")
 		conf.set("demo.endpoint.otel.cart", "otel-cartservice.otel-demo:7070")
@@ -111,6 +113,7 @@ func getTracetestProvisionFileContents(ui cliUI.UI, config configuration) []byte
 		"enableOtelDemo":     fmt.Sprintf("%t", config.Bool("demo.enable.otel")),
 		"pokeshopHttp":       config.String("demo.endpoint.pokeshop.http"),
 		"pokeshopGrpc":       config.String("demo.endpoint.pokeshop.grpc"),
+		"pokeshopKafka":      config.String("demo.endpoint.pokeshop.kafka"),
 		"otelFrontend":       config.String("demo.endpoint.otel.frontend"),
 		"otelProductCatalog": config.String("demo.endpoint.otel.product_catalog"),
 		"otelCart":           config.String("demo.endpoint.otel.cart"),

@@ -8,6 +8,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestSuite} from 'providers/TestSuite/TestSuite.provider';
 import {useTestSuiteRun} from 'providers/TestSuiteRun/TestSuite.provider';
 import * as S from './TestSuiteHeader.styled';
+import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
 
 const testSuiteLastPathRegex = /\/testsuite\/[\w-]+\/run\/[\d-]+\/([\w-]+)/;
 
@@ -68,12 +69,13 @@ const TestSuiteHeader = () => {
           </S.StateContainer>
         )}
         {state && state === TestStateEnum.FINISHED && (
-          <>
-            <TestSuiteRunStatusIcon state={state!} hasFailedTests={!allStepsRequiredGatesPassed} />
-            <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="testsuite-run-button">
-              Run Test Suite
-            </Button>
-          </>
+          <TestSuiteRunStatusIcon state={state!} hasFailedTests={!allStepsRequiredGatesPassed} />
+        )}
+        <VariableSetSelector />
+        {state && state === TestStateEnum.FINISHED && (
+          <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="testsuite-run-button">
+            Run Test Suite
+          </Button>
         )}
         <TestSuiteRunActionsMenu testSuiteId={testSuiteId} runId={runId} isRunView />
       </S.SectionRight>

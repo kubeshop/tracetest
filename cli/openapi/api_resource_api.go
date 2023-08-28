@@ -471,7 +471,6 @@ func (r ApiCreateVariableSetRequest) Execute() (*VariableSetResource, *http.Resp
 
 /*
 CreateVariableSet Create a VariableSet
-CreateVariableSet Create a VariableSet
 
 Create a VariableSet that can be used by tests and test suites
 
@@ -1034,9 +1033,9 @@ func (r ApiDeleteVariableSetRequest) Execute() (*http.Response, error) {
 }
 
 /*
-DeleteVariableSet Delete an variable set
+DeleteVariableSet Delete a variable set
 
-Delete an variable set from Tracetest
+Delete a variable set from Tracetest
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param variableSetId ID of a VariableSet used on Tracetest to inject values into tests and TestSuites

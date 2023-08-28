@@ -1,0 +1,14 @@
+type: Test
+spec:
+  id: jFpHiL34R
+  name: Test Business Logic on Simple Go Service
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://simple-go-service:8080/businessLogic
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /businessLogic" http.method="GET"]
+    name: Our BusinessLogic endpoint was executed with success
+    assertions:
+    - attr:http.status_code = 200

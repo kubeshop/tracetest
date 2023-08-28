@@ -9,7 +9,7 @@ const Demo = ({
     name = '',
     type = 'pokeshop',
     enabled,
-    pokeshop: {httpEndpoint = '', grpcEndpoint = ''} = {},
+    pokeshop: {httpEndpoint = '', grpcEndpoint = '', kafkaBroker = ''} = {},
     opentelemetryStore: {
       frontendEndpoint = '',
       productCatalogEndpoint = '',
@@ -26,6 +26,7 @@ const Demo = ({
     pokeshop: {
       httpEndpoint,
       grpcEndpoint,
+      kafkaBroker,
     },
     opentelemetryStore: {
       frontendEndpoint,

@@ -17,6 +17,9 @@ type DemoPokeshop struct {
 
 	// gRPC endpoint for Pokeshop API
 	GrpcEndpoint string `json:"grpcEndpoint,omitempty"`
+
+	// kafka broker for Pokeshop API
+	KafkaBroker string `json:"kafkaBroker,omitempty"`
 }
 
 // AssertDemoPokeshopRequired checks if the required fields are not zero-ed

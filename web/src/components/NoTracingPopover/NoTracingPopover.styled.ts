@@ -58,7 +58,7 @@ export const Trigger = styled.div`
   gap: 6px;
   align-items: center;
   cursor: pointer;
-  margin-right: 24px;
+  margin-right: 8px;
   border-radius: 12px;
   padding: 4px 7px;
   background: ${({theme}) => theme.color.backgroundDark};

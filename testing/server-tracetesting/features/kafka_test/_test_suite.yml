@@ -1,0 +1,14 @@
+type: TestSuite
+spec:
+  id: kajwb6asd
+  name: Kafka Test Feature
+  description: Sequence of tests to validate if our Kafka Test feature is working as expected
+  steps:
+    # create a Kafka Test
+    - ./01_create_kafka_test.yml
+    # check if this test is listed on API
+    - ./02_list_kafka_test.yml
+    # run test
+    - ./03_run_kafka_test.yml
+    # delete test
+    - ./04_delete_kafka_test.yml

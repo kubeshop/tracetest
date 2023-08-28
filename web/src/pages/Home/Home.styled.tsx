@@ -40,6 +40,9 @@ export const TestListContainer = styled.div`
 `;
 
 export const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   padding: 23px 0;
   width: 100%;

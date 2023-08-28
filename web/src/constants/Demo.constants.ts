@@ -14,7 +14,11 @@ const userId = '2491f868-88f1-4345-8836-d5d8511a9f83';
 
 export function getPokeshopDemo(demoSettings: Demo) {
   const {
-    pokeshop: {httpEndpoint: pokeshopHttp = '', grpcEndpoint: pokeshopGrpc = ''},
+    pokeshop: {
+      httpEndpoint: pokeshopHttp = '',
+      grpcEndpoint: pokeshopGrpc = '',
+      kafkaBroker: pokeshopKafka = '',
+    },
   } = demoSettings;
 
   return {
@@ -114,6 +118,17 @@ export function getPokeshopDemo(demoSettings: Demo) {
         command: `curl -XPOST -H "Content-type: application/json" --data '{"id":52}' '${pokeshopHttp}/pokemon/import'`,
       },
     ],
+    [SupportedPlugins.Kafka]: [
+      {
+        name: 'Pokeshop - Import from Stream',
+        brokerUrls: [ `${pokeshopKafka}` ],
+        topic: 'pokemon',
+        headers: [],
+        messageKey: 'snorlax-key',
+        messageValue: '{"id":143}',
+        description: 'Import a Pokemon via Stream',
+      }
+    ]
   };
 }
 
@@ -267,7 +282,7 @@ export function getDemoByPluginMap(demos: Demo[]) {
     [SupportedPlugins.Postman]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Postman]) || [],
     [SupportedPlugins.CURL]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.CURL]) || [],
     [SupportedPlugins.TraceID]: [],
-    [SupportedPlugins.Kafka]: [],
+    [SupportedPlugins.Kafka]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Kafka]) || [],
     [SupportedPlugins.OpenAPI]: [],
   };
 }
