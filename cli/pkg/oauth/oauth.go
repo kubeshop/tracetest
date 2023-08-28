@@ -71,7 +71,7 @@ func (s *OAuthServer) ExchangeToken(token string) (string, error) {
 		return "", fmt.Errorf("failed to exchange token: %w", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusCreated {
 		return "", fmt.Errorf("failed to exchange token: %s", res.Status)
 	}
 
