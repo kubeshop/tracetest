@@ -345,6 +345,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.work"
+          cache: true
+          cache-dependency-path: go.work
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-dist

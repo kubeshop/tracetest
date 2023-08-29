@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
 cmdExitCode=$("$TRACETEST_CLI" &> /dev/null; echo $?)
