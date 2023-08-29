@@ -6,9 +6,7 @@ import { sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: "5m", target: 5 },
-    { duration: "5m", target: 20 },
-    { duration: "5m", target: 5 },
+    { duration: "5m", target: 30 },
   ],
   thresholds: {
     http_req_duration: ["p(95)<500"],
@@ -20,7 +18,7 @@ const tracetest = Tracetest({
 });
 const testId = "kc_MgKoVR";
 const http = new Http();
-const url = "http://localhost:8081/pokemon/import";
+const url = "http://localhost:8081/pokemon?take=5";
 
 export default function () {
   const params = {

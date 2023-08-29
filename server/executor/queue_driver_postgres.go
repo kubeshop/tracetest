@@ -151,7 +151,7 @@ func (ch *channel) SetListener(l Listener) {
 	ch.listener = l
 }
 
-const enqueueTimeout = 5 * time.Second
+const enqueueTimeout = 5 * time.Minute
 
 func (ch *channel) Enqueue(job Job) {
 	ch.log("enqueue job for run %d", job.Run.ID)

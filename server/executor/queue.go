@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	QueueWorkerCount      = 1
-	QueueWorkerBufferSize = QueueWorkerCount * 10000 // 100 jobs per worker
+	QueueWorkerCount      = 20
+	QueueWorkerBufferSize = QueueWorkerCount * 1_000 // 1k jobs per worker
 
 	JobCountHeader string = "X-Tracetest-Job-Count"
 )
@@ -310,27 +310,31 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		return
 	}
 
-	if job.Headers == nil {
-		job.Headers = &headers{}
-	}
-	propagator().Inject(ctx, propagation.MapCarrier(*job.Headers))
-	job.Headers.Set("InstanceID", q.instanceID)
+	// use a worker to enqueue the job in case the driver takes a bit to actually enqueue
+	// this way we release the caller as soon as possible
+	q.workerPool.Submit(func() {
+		if job.Headers == nil {
+			job.Headers = &headers{}
+		}
+		propagator().Inject(ctx, propagation.MapCarrier(*job.Headers))
+		job.Headers.Set("InstanceID", q.instanceID)
 
-	newJob := Job{
-		Headers: job.Headers,
+		newJob := Job{
+			Headers: job.Headers,
 
-		Test: test.Test{ID: job.Test.ID},
-		Run:  test.Run{ID: job.Run.ID},
+			Test: test.Test{ID: job.Test.ID},
+			Run:  test.Run{ID: job.Run.ID},
 
-		TestSuite:    testsuite.TestSuite{ID: job.TestSuite.ID},
-		TestSuiteRun: testsuite.TestSuiteRun{ID: job.TestSuiteRun.ID},
+			TestSuite:    testsuite.TestSuite{ID: job.TestSuite.ID},
+			TestSuiteRun: testsuite.TestSuiteRun{ID: job.TestSuiteRun.ID},
 
-		PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
-		DataStore:      datastore.DataStore{ID: job.DataStore.ID},
-	}
-	log.Printf("queue: enqueuing job for run %d", job.Run.ID)
+			PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
+			DataStore:      datastore.DataStore{ID: job.DataStore.ID},
+		}
+		log.Printf("queue: enqueuing job for run %d", job.Run.ID)
 
-	q.driver.Enqueue(newJob)
+		q.driver.Enqueue(newJob)
+	})
 }
 
 func (q Queue) Listen(job Job) {
