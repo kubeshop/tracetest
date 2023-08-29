@@ -16,7 +16,7 @@ if [  "$TARGET_URL" = "" ]; then
 fi
 
 DOCKER_COMPOSE="docker compose -f infra/docker-compose.yaml -f ../../examples/docker-compose.demo.yaml"
-TRACETEST="tracetest -s $TARGET_URL"
+TRACETEST="$TRACETEST_CLI -s $TARGET_URL"
 
 DOCKER_LOG=/tmp/docker-log
 
