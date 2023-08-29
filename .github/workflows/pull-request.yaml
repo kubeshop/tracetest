@@ -359,7 +359,7 @@ jobs:
 
           cd ./testing/load
 
-          TRACETEST_CLI="../../dist/tracetest" \
+          export TRACETEST_CLI="../../dist/tracetest"
           ./run.bash || (cat /tmp/docker-log; exit 1)
 
   config-e2e:
