@@ -1,4 +1,4 @@
-name: Build and publish qt CLI
+name: Build and publish tracetest CLI
 
 on:
   push:
@@ -20,13 +20,13 @@ jobs:
           go-version: 1.16
       
       - name: Build my CLI for Linux
-        run: cd cli && go mod download && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o qt-linux main.go
+        run: cd cli && go mod download && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o tracetest-linux main.go
       
       - name: Build my CLI for macOS
-        run: cd cli && go mod download && GOOS=darwin GOARCH=amd64 go build -o qt-macos
+        run: cd cli && go mod download && GOOS=darwin GOARCH=amd64 go build -o tracetest-macos
       
       - name: Build my CLI for Windows
-        run: cd cli && go mod download && GOOS=windows GOARCH=amd64 go build -o qt-windows.exe
+        run: cd cli && go mod download && GOOS=windows GOARCH=amd64 go build -o tracetest-windows.exe
        
       - name: Get release name from tag
         id: release
@@ -37,7 +37,7 @@ jobs:
       - name: Create release for Linux
         uses: softprops/action-gh-release@v1
         with:
-          files: cli/qt-linux
+          files: cli/tracetest-linux
           tag_name: ${{ github.ref }}
           name: ${{ steps.release.outputs.name }} - Linux
           draft: false
@@ -48,7 +48,7 @@ jobs:
       - name: Create release for macOS
         uses: softprops/action-gh-release@v1
         with:
-          files: cli/qt-macos
+          files: cli/tracetest-macos
           tag_name: ${{ github.ref }}
           name: ${{ steps.release.outputs.name }} - macOS
           draft: false
@@ -59,7 +59,7 @@ jobs:
       - name: Create release for Windows
         uses: softprops/action-gh-release@v1
         with:
-          files: cli/qt-windows.exe
+          files: cli/tracetest-windows.exe
           tag_name: ${{ github.ref }}
           name: ${{ steps.release.outputs.name }} - Windows
           draft: false
