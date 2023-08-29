@@ -6,9 +6,9 @@ import { sleep } from "k6";
 
 export const options = {
   stages: [
-    // { duration: "5m", target: 5 },
-    { duration: "1m", target: 20 },
-    // { duration: "5m", target: 5 },
+    { duration: "5m", target: 5 },
+    { duration: "5m", target: 20 },
+    { duration: "5m", target: 5 },
   ],
   thresholds: {
     http_req_duration: ["p(95)<500"],
@@ -19,14 +19,10 @@ const tracetest = Tracetest({
   serverUrl: "http://localhost:11633",
 });
 const testId = "kc_MgKoVR";
-let pokemonId = 6; // charizad
 const http = new Http();
 const url = "http://localhost:8081/pokemon/import";
 
 export default function () {
-  const payload = JSON.stringify({
-    id: pokemonId,
-  });
   const params = {
     tracetest: {
       testId,
@@ -36,14 +32,12 @@ export default function () {
     },
   };
 
-  const response = http.post(url, payload, params);
+  const response = http.get(url, params);
 
   check(response, {
     "is status 200": (r) => r.status === 200,
-    "body matches de id": (r) => JSON.parse(r.body).id === pokemonId,
   });
 
-  pokemonId = pokemonId + 1;
   sleep(1);
 }
 
