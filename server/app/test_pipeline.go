@@ -86,7 +86,8 @@ func buildTestPipeline(
 		WithDataStoreGetter(dsRepo).
 		WithPollingProfileGetter(ppRepo).
 		WithTestGetter(testRepo).
-		WithRunGetter(runRepo)
+		WithRunGetter(runRepo).
+		WithInstanceID(instanceID)
 
 	pgQueue := executor.NewPostgresQueueDriver(pool)
 
