@@ -49,6 +49,10 @@ func (c Config) Path() string {
 		pathPrefix = *c.ServerPath
 	}
 
+	if pathPrefix == "/" {
+		return ""
+	}
+
 	return pathPrefix
 }
 
@@ -109,13 +113,18 @@ func ValidateServerURL(serverURL string) error {
 	return nil
 }
 
-func ParseServerURL(serverURL string) (scheme, endpoint, serverPath string, err error) {
+func ParseServerURL(serverURL string) (scheme, endpoint string, serverPath *string, err error) {
 	url, err := urlx.Parse(serverURL)
 	if err != nil {
-		return "", "", "", fmt.Errorf("could not parse server URL: %w", err)
+		return "", "", nil, fmt.Errorf("could not parse server URL: %w", err)
 	}
 
-	return url.Scheme, url.Host, url.Path, nil
+	var path *string
+	if url.Path != "" {
+		path = &url.Path
+	}
+
+	return url.Scheme, url.Host, path, nil
 }
 
 func Save(ctx context.Context, config Config) error {

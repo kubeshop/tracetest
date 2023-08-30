@@ -22,8 +22,6 @@ func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 }
 
 func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
-	c.ui.Banner(Version)
-
 	var serverURL string
 	if flags.Endpoint != "" {
 		serverURL = flags.Endpoint
@@ -43,7 +41,7 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 	cfg := Config{
 		Scheme:     scheme,
 		Endpoint:   endpoint,
-		ServerPath: &path,
+		ServerPath: path,
 	}
 
 	client := GetAPIClient(cfg)
@@ -52,13 +50,14 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return fmt.Errorf("cannot get version metadata: %w", err)
 	}
 
-	serverType := version.GetVersion()
+	serverType := version.GetType()
 	if serverType == "oss" {
 		err := Save(ctx, cfg)
 		if err != nil {
 			return fmt.Errorf("could not save configuration: %w", err)
 		}
 
+		c.ui.Success("Successfully configured Tracetest CLI")
 		return nil
 	}
 
@@ -67,7 +66,7 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		cfg.Token = prev.Token
 		cfg.FrontendEndpoint = FrontendEndpoint
 
-		c.showSelectors(ctx, cfg)
+		c.ShowOrganizationSelector(ctx, cfg)
 		return nil
 	}
 
@@ -84,7 +83,7 @@ func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token
 		cfg.Jwt = jwt
 		cfg.Token = token
 
-		c.showSelectors(ctx, cfg)
+		c.ShowOrganizationSelector(ctx, cfg)
 	}
 }
 
@@ -92,14 +91,31 @@ func (c Configurator) onOAuthFailure(err error) {
 	c.ui.Exit(err.Error())
 }
 
-func (c Configurator) showSelectors(ctx context.Context, cfg Config) {
-	cfg, err := c.OrganizationSelector(ctx, cfg)
+func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config) {
+	cfg, err := c.organizationSelector(ctx, cfg)
 	if err != nil {
 		c.ui.Exit(err.Error())
 		return
 	}
 
-	cfg, err = c.EnvironmentSelector(ctx, cfg)
+	cfg, err = c.environmentSelector(ctx, cfg)
+	if err != nil {
+		c.ui.Exit(err.Error())
+		return
+	}
+
+	err = Save(ctx, cfg)
+	if err != nil {
+		c.ui.Exit(err.Error())
+		return
+	}
+
+	c.ui.Success("Successfully configured Tracetest CLI")
+	c.ui.Finish()
+}
+
+func (c Configurator) ShowEnvironmentSelector(ctx context.Context, cfg Config) {
+	cfg, err := c.environmentSelector(ctx, cfg)
 	if err != nil {
 		c.ui.Exit(err.Error())
 		return

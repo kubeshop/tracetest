@@ -14,7 +14,7 @@ type entry struct {
 	Name string `json:"name"`
 }
 
-func (c Configurator) OrganizationSelector(ctx context.Context, cfg Config) (Config, error) {
+func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (Config, error) {
 	resource, err := c.resources.Get("organization")
 	if err != nil {
 		return cfg, err
@@ -42,7 +42,7 @@ func (c Configurator) OrganizationSelector(ctx context.Context, cfg Config) (Con
 	return cfg, nil
 }
 
-func (c Configurator) EnvironmentSelector(ctx context.Context, cfg Config) (Config, error) {
+func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (Config, error) {
 	resource, err := c.resources.Get("env")
 	if err != nil {
 		return cfg, err

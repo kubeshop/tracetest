@@ -26,12 +26,10 @@ func GetAPIClient(cliConfig Config) *openapi.APIClient {
 
 	config.Scheme = cliConfig.Scheme
 	config.Host = strings.TrimSuffix(cliConfig.Endpoint, "/")
-	if cliConfig.ServerPath != nil {
-		config.Servers = []openapi.ServerConfiguration{
-			{
-				URL: *cliConfig.ServerPath,
-			},
-		}
+	config.Servers = []openapi.ServerConfiguration{
+		{
+			URL: cliConfig.Path(),
+		},
 	}
 
 	return openapi.NewAPIClient(config)
