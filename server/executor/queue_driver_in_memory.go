@@ -23,15 +23,15 @@ func NewInMemoryQueueDriver(name string) *InMemoryQueueDriver {
 }
 
 type InMemoryQueueDriver struct {
-	log   loggerFn
-	queue chan Job
-	exit  chan bool
-	q     *Queue
-	name  string
+	log      loggerFn
+	queue    chan Job
+	exit     chan bool
+	listener Listener
+	name     string
 }
 
-func (qd *InMemoryQueueDriver) SetQueue(q *Queue) {
-	qd.q = q
+func (qd *InMemoryQueueDriver) SetListener(l Listener) {
+	qd.listener = l
 }
 
 func (qd InMemoryQueueDriver) Enqueue(job Job) {
@@ -39,20 +39,18 @@ func (qd InMemoryQueueDriver) Enqueue(job Job) {
 }
 
 func (qd InMemoryQueueDriver) Start() {
-	for i := 0; i < QueueWorkerCount; i++ {
-		go func() {
-			qd.log("start")
-			for {
-				select {
-				case <-qd.exit:
-					qd.log("exit")
-					return
-				case job := <-qd.queue:
-					qd.q.Listen(job)
-				}
+	go func() {
+		qd.log("start")
+		for {
+			select {
+			case <-qd.exit:
+				qd.log("exit")
+				return
+			case job := <-qd.queue:
+				qd.listener.Listen(job)
 			}
-		}()
-	}
+		}
+	}()
 }
 
 func (qd InMemoryQueueDriver) Stop() {

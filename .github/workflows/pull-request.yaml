@@ -357,6 +357,39 @@ jobs:
           cd ./testing/cli-e2etest
           make test
 
+  # TODO: this would be a great idea but it doesn't work on GHA with docker
+  # it can probablly be implemented with k8s in a separated job
+  # I'm leaving this as a reference and as a reminder to do it
+  # k6-test:
+  #   name: k6 Load Test
+  #   needs: [build-docker]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup go
+  #       uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: "go.work"
+  #         cache: true
+  #         cache-dependency-path: go.work
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: tracetest-dist
+  #         path: dist/
+
+  #     - name: Import image
+  #       run: |
+  #         docker load --input dist/image.tar
+  #     - name: Run tests
+  #       run: |
+  #         chmod +x ./dist/tracetest ./testing/load/run.bash
+
+  #         cd ./testing/load
+
+  #         export TRACETEST_CLI="../../dist/tracetest"
+  #         ./run.bash || (cat /tmp/docker-log; exit 1)
+
   config-e2e:
     runs-on: ubuntu-latest
     outputs:

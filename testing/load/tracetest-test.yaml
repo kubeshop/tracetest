@@ -1,0 +1,9 @@
+type: Test
+spec:
+  id: kc_MgKoVR
+  name: K6
+  description: K6
+  trigger:
+    type: traceid
+    traceid:
+      id: ${var:TRACE_ID}

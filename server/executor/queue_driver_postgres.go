@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jdvr/go-again"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
@@ -111,7 +112,7 @@ func (qd *PostgresQueueDriver) worker(conn *pgxpool.Conn) {
 	}
 
 	// spin off so we can keep listening for jobs
-	go channel.q.Listen(job.Job)
+	channel.listener.Listen(job.Job)
 	qd.log("spun off job for channel: %s, runID: %d", job.Channel, job.Job.Run.ID)
 }
 
@@ -140,20 +141,20 @@ func (qd *PostgresQueueDriver) Channel(name string) *channel {
 
 type channel struct {
 	*PostgresQueueDriver
-	name string
-	log  loggerFn
-	pool *pgxpool.Pool
-	q    *Queue
+	name     string
+	log      loggerFn
+	pool     *pgxpool.Pool
+	listener Listener
 }
 
-func (ch *channel) SetQueue(q *Queue) {
-	ch.q = q
+func (ch *channel) SetListener(l Listener) {
+	ch.listener = l
 }
 
-const enqueueTimeout = 500 * time.Millisecond
+const enqueueTimeout = 5 * time.Minute
 
 func (ch *channel) Enqueue(job Job) {
-	ch.log("enqueue")
+	ch.log("enqueue job for run %d", job.Run.ID)
 
 	jj, err := json.Marshal(pgJob{
 		Channel: ch.name,
@@ -168,11 +169,16 @@ func (ch *channel) Enqueue(job Job) {
 	ctx, cancelCtx := context.WithTimeout(context.Background(), enqueueTimeout)
 	defer cancelCtx()
 
-	conn, err := ch.pool.Acquire(context.Background())
+	conn, err := again.Retry[*pgxpool.Conn](ctx, func(ctx context.Context) (*pgxpool.Conn, error) {
+		ch.log("trying to acquire connection for run %d", job.Run.ID)
+		return ch.pool.Acquire(context.Background())
+	})
+
 	if err != nil {
 		ch.log("error acquiring connection: %s", err.Error())
 		return
 	}
+	ch.log("aquired connection for run %d", job.Run.ID)
 	defer conn.Release()
 
 	_, err = conn.Query(ctx, fmt.Sprintf(`select pg_notify('%s', $1)`, pgChannelName), jj)
@@ -181,5 +187,5 @@ func (ch *channel) Enqueue(job Job) {
 		return
 	}
 
-	ch.log("notified postgres")
+	ch.log("notified postgres for run %d", job.Run.ID)
 }

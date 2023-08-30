@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/patrickmn/go-cache"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -21,18 +23,63 @@ type RunRepository interface {
 	DeleteRun(context.Context, Run) error
 	GetRun(_ context.Context, testID id.ID, runID int) (Run, error)
 	GetTestRuns(_ context.Context, _ Test, take, skip int32) ([]Run, error)
+	Count(context.Context, Test) (int, error)
 	GetRunByTraceID(context.Context, trace.TraceID) (Run, error)
 	GetLatestRunByTestVersion(context.Context, id.ID, int) (Run, error)
 
 	GetTestSuiteRunSteps(_ context.Context, _ id.ID, runID int) ([]Run, error)
 }
 
-type runRepository struct {
-	db *sql.DB
+type Cache struct {
+	cache      *cache.Cache
+	instanceID string
 }
 
-func NewRunRepository(db *sql.DB) RunRepository {
-	return &runRepository{db}
+func NewCache(instanceID string) *Cache {
+	return &Cache{
+		cache:      cache.New(5*time.Minute, 10*time.Minute),
+		instanceID: instanceID,
+	}
+}
+
+func (c *Cache) thisInstanceCacheKey(run Run) string {
+	return fmt.Sprintf("%s-%s-%d", c.instanceID, run.TestID, run.ID)
+}
+
+func (c *Cache) lastInstanceCacheKey(ctx context.Context, run Run) string {
+	instanceID := c.instanceID
+	if instanceID := ctx.Value("LastInstanceID"); instanceID != nil {
+		instanceID = instanceID.(string)
+	}
+
+	return fmt.Sprintf("%s-%s-%d", instanceID, run.TestID, run.ID)
+}
+
+func (c *Cache) Set(_ context.Context, run Run) error {
+	log.Printf("testRunCache Update %s %d", run.TestID, run.ID)
+	c.cache.Set(c.thisInstanceCacheKey(run), run, cache.DefaultExpiration)
+	return nil
+}
+
+func (c *Cache) Get(ctx context.Context, testID id.ID, runID int) (Run, bool) {
+	cached, found := c.cache.Get(c.lastInstanceCacheKey(ctx, Run{ID: runID, TestID: testID}))
+	if !found {
+		return Run{}, false
+	}
+
+	return cached.(Run), true
+}
+
+type runRepository struct {
+	db    *sql.DB
+	cache *Cache
+}
+
+func NewRunRepository(db *sql.DB, cache *Cache) RunRepository {
+	return &runRepository{
+		db:    db,
+		cache: cache,
+	}
 }
 
 const (
@@ -313,6 +360,8 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
+	r.cache.Set(ctx, run)
+
 	return nil
 }
 
@@ -344,8 +393,8 @@ func (r *runRepository) DeleteRun(ctx context.Context, run Run) error {
 	return nil
 }
 
-const selectRunQuery = `
-SELECT
+const (
+	fields = `
 	"id",
 	"test_id",
 	"test_version",
@@ -376,20 +425,37 @@ SELECT
 	test_suite_run_steps.test_suite_run_test_suite_id,
 	"linter",
 	"required_gates_result"
-
-FROM
-	test_runs
-		LEFT OUTER JOIN test_suite_run_steps
-		ON test_suite_run_steps.test_run_id = test_runs.id AND test_suite_run_steps.test_run_test_id = test_runs.test_id
 `
 
+	baseSql = `
+SELECT
+	%s
+FROM
+	test_runs
+LEFT OUTER JOIN test_suite_run_steps
+ON test_suite_run_steps.test_run_id = test_runs.id AND test_suite_run_steps.test_run_test_id = test_runs.test_id
+`
+)
+
+var (
+	selectRunQuery = fmt.Sprintf(baseSql, fields)
+	countRunQuery  = fmt.Sprintf(baseSql, "COUNT(*)")
+)
+
 func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Run, error) {
+	cached, found := r.cache.Get(ctx, testID, runID)
+	if found {
+		return cached, nil
+	}
+
 	query, params := sqlutil.TenantWithPrefix(ctx, selectRunQuery+" WHERE id = $1 AND test_id = $2", "test_runs.", runID, testID)
 
 	run, err := readRunRow(r.db.QueryRowContext(ctx, query, params...))
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
+
+	r.cache.Set(ctx, run)
 	return run, nil
 }
 
@@ -412,6 +478,21 @@ func (r *runRepository) GetTestRuns(ctx context.Context, test Test, take, skip i
 	}
 
 	return runs, nil
+}
+
+func (r *runRepository) Count(ctx context.Context, test Test) (int, error) {
+	query, params := sqlutil.TenantWithPrefix(ctx, countRunQuery+" WHERE test_id = $1", "test_runs.", test.ID)
+	count := 0
+
+	err := r.db.
+		QueryRowContext(ctx, query, params...).
+		Scan(&count)
+
+	if err != nil {
+		return 0, fmt.Errorf("sql query: %w", err)
+	}
+
+	return count, nil
 }
 
 func (r *runRepository) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (Run, error) {
