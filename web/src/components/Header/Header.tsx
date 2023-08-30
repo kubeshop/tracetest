@@ -1,6 +1,7 @@
 import Logo from 'assets/Logo.svg';
 import Link from 'components/Link';
 import NoTracingPopover from 'components/NoTracingPopover';
+import withCustomization from 'providers/CustomizationProvider/WithCustomization';
 import * as S from './Header.styled';
 import HelpMenu from './HelpMenu';
 
@@ -26,4 +27,4 @@ const Header = ({hasLogo = false, isNoTracingMode}: IProps) => (
   </S.Header>
 );
 
-export default Header;
+export default withCustomization(Header, 'header');

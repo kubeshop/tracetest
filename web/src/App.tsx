@@ -10,6 +10,7 @@ import {ThemeProvider} from 'styled-components';
 import Env from 'utils/Env';
 import './App.css';
 import BaseApp from './BaseApp';
+import CustomizationWrapper from './components/CustomizationWrapper/CustomizationWrapper';
 
 const serverPathPrefix = Env.get('serverPathPrefix');
 
@@ -18,9 +19,11 @@ const App = () => (
     <Sentry.ErrorBoundary fallback={({error}) => <ErrorBoundary error={error} />}>
       <ReduxWrapperProvider>
         <HistoryRouter history={history} basename={serverPathPrefix}>
-          <DashboardWrapper>
-            <BaseApp />
-          </DashboardWrapper>
+          <CustomizationWrapper>
+            <DashboardWrapper>
+              <BaseApp />
+            </DashboardWrapper>
+          </CustomizationWrapper>
         </HistoryRouter>
       </ReduxWrapperProvider>
     </Sentry.ErrorBoundary>
