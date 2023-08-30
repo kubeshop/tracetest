@@ -26,7 +26,11 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 	if flags.Endpoint != "" {
 		serverURL = flags.Endpoint
 	} else {
-		serverURL = c.ui.TextInput("Enter your Tracetest server URL", prev.URL())
+		path := ""
+		if prev.ServerPath != nil {
+			path = *prev.ServerPath
+		}
+		serverURL = c.ui.TextInput("Enter your Tracetest server URL", fmt.Sprintf("%s%s", prev.URL(), path))
 	}
 
 	if err := ValidateServerURL(serverURL); err != nil {
