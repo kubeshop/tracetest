@@ -37,4 +37,6 @@ func Start(config config.Config) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	client.WaitUntilDisconnected()
 }

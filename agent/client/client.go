@@ -64,6 +64,10 @@ func (c *Client) Start(ctx context.Context) error {
 	return nil
 }
 
+func (c *Client) WaitUntilDisconnected() {
+	<-c.done
+}
+
 func (c *Client) SessionConfiguration() *SessionConfig {
 	if c.sessionConfig == nil {
 		return nil
