@@ -8,25 +8,25 @@ import (
 	"net/http"
 	"os/exec"
 	"runtime"
-
-	"github.com/kubeshop/tracetest/cli/config"
 )
 
 type OnAuthSuccess func(token string, jwt string)
 type OnAuthFailure func(err error)
 
 type OAuthServer struct {
-	config    *config.Config
-	onSuccess OnAuthSuccess
-	onFailure OnAuthFailure
-	port      int
+	endpoint         string
+	frontendEndpoint string
+	onSuccess        OnAuthSuccess
+	onFailure        OnAuthFailure
+	port             int
 }
 
 type Option func(*OAuthServer)
 
-func NewOAuthServer(config *config.Config) *OAuthServer {
+func NewOAuthServer(endpoint, frontendEndpoint string) *OAuthServer {
 	return &OAuthServer{
-		config: config,
+		endpoint:         endpoint,
+		frontendEndpoint: frontendEndpoint,
 	}
 }
 
@@ -40,13 +40,13 @@ func (s *OAuthServer) WithOnFailure(onFailure OnAuthFailure) *OAuthServer {
 	return s
 }
 
-func (s *OAuthServer) GetAuthCookie() error {
+func (s *OAuthServer) GetAuthJWT() error {
 	url, err := s.getUrl()
 	if err != nil {
 		return fmt.Errorf("failed to start oauth server: %w", err)
 	}
 
-	loginUrl := fmt.Sprintf("%s/oauth?callback=%s", s.config.FrontendEndpoint, url)
+	loginUrl := fmt.Sprintf("%s/oauth?callback=%s", s.frontendEndpoint, url)
 
 	err = openBrowser(loginUrl)
 	if err != nil {
@@ -61,7 +61,7 @@ type JWTResponse struct {
 }
 
 func (s *OAuthServer) ExchangeToken(token string) (string, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s/tokens/%s/exchange", s.config.URL(), s.config.Path(), token), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/tokens/%s/exchange", s.endpoint, token), nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
@@ -107,7 +107,7 @@ func (s *OAuthServer) start() error {
 
 func (s *OAuthServer) callback(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", s.config.FrontendEndpoint)
+	w.Header().Set("Access-Control-Allow-Origin", s.frontendEndpoint)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": true}`))

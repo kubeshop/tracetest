@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/actions"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/pkg/oauth"
-	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -23,7 +20,6 @@ var (
 	openapiClient  = &openapi.APIClient{}
 	versionText    string
 	isVersionMatch bool
-	oauthServer    = oauth.NewOAuthServer(&cliConfig)
 )
 
 type setupConfig struct {
@@ -77,7 +73,7 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 func overrideConfig() {
 	if overrideEndpoint != "" {
-		scheme, endpoint, err := config.ParseServerURL(overrideEndpoint)
+		scheme, endpoint, _, err := config.ParseServerURL(overrideEndpoint)
 		if err != nil {
 			msg := fmt.Sprintf("cannot parse endpoint %s", overrideEndpoint)
 			cliLogger.Error(msg, zap.Error(err))
@@ -89,7 +85,7 @@ func overrideConfig() {
 }
 
 func setupRunners() {
-	c := utils.GetAPIClient(cliConfig)
+	c := config.GetAPIClient(cliConfig)
 	*openapiClient = *c
 }
 
@@ -156,10 +152,10 @@ func teardownCommand(cmd *cobra.Command, args []string) {
 }
 
 func setupVersion() {
-	versionText, isVersionMatch = actions.GetVersion(
+	versionText, isVersionMatch = config.GetVersion(
 		context.Background(),
 		cliConfig,
-		utils.GetAPIClient(cliConfig),
+		config.GetAPIClient(cliConfig),
 	)
 }
 

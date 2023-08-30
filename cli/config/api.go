@@ -1,11 +1,10 @@
-package utils
+package config
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
@@ -17,7 +16,7 @@ type ListArgs struct {
 	All           bool
 }
 
-func GetAPIClient(cliConfig config.Config) *openapi.APIClient {
+func GetAPIClient(cliConfig Config) *openapi.APIClient {
 	config := openapi.NewConfiguration()
 	config.AddDefaultHeader("x-client-id", analytics.ClientID())
 	config.AddDefaultHeader("x-source", "cli")

@@ -52,7 +52,7 @@ var (
 
 	environmentClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"environment", "environments",
+		"env", "environments",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "id"},
