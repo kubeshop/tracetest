@@ -36,6 +36,7 @@ func Start(ctx context.Context, config config.Config) error {
 		return err
 	}
 
+	fmt.Println("Agent started! Do not close the terminal.")
 	client.WaitUntilDisconnected()
 	return nil
 }

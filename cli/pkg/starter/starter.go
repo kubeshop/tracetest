@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
+	agentConfig "github.com/kubeshop/tracetest/agent/config"
+	"github.com/kubeshop/tracetest/agent/initialization"
+
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/ui"
-
-	agentConfig "github.com/kubeshop/tracetest/agent/config"
-	"github.com/kubeshop/tracetest/agent/initialization"
 )
 
 type Starter struct {
@@ -40,12 +40,10 @@ func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
 	}
 
 	s.ui.Println(fmt.Sprintf("Connecting Agent to environment %s...", env.Name))
-	err = startAgent(ctx, env.AgentApiKey, "localhost:8091")
+	err = startAgent(ctx, "localhost:8091", env.AgentApiKey)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
-
-	s.ui.Finish()
 }
 
 type environment struct {
@@ -86,11 +84,11 @@ func (s *Starter) getEnvironment(ctx context.Context, cfg config.Config) (enviro
 	return env, nil
 }
 
-func startAgent(ctx context.Context, apiKey, controlPanelUrl string) error {
+func startAgent(ctx context.Context, endpoint, agentApiKey string) error {
 	cfg := agentConfig.Config{
+		ServerURL: endpoint,
+		APIKey:    agentApiKey,
 		Name:      "local",
-		APIKey:    apiKey,
-		ServerURL: controlPanelUrl,
 	}
 
 	return initialization.Start(ctx, cfg)
