@@ -1,7 +1,8 @@
 import * as Sentry from '@sentry/react';
 import {HistoryRouter} from 'redux-first-history/rr6';
 
-import DashboardWrapper from 'components/DashboardWrapper/DashboardWrapper';
+import CustomizationWrapper from 'components/CustomizationWrapper';
+import DashboardWrapper from 'components/DashboardWrapper';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {theme} from 'constants/Theme.constants';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
@@ -18,9 +19,11 @@ const App = () => (
     <Sentry.ErrorBoundary fallback={({error}) => <ErrorBoundary error={error} />}>
       <ReduxWrapperProvider>
         <HistoryRouter history={history} basename={serverPathPrefix}>
-          <DashboardWrapper>
-            <BaseApp />
-          </DashboardWrapper>
+          <CustomizationWrapper>
+            <DashboardWrapper>
+              <BaseApp />
+            </DashboardWrapper>
+          </CustomizationWrapper>
         </HistoryRouter>
       </ReduxWrapperProvider>
     </Sentry.ErrorBoundary>

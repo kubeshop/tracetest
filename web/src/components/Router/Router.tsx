@@ -10,22 +10,18 @@ import TestSuite from 'pages/TestSuite';
 import TestSuiteRunOverview from 'pages/TestSuiteRunOverview';
 import TestSuiteRunAutomate from 'pages/TestSuiteRunAutomate';
 import AutomatedTestRun from 'pages/AutomatedTestRun';
-import Layout, {TCustomHeader} from 'components/Layout/Layout';
+import Layout from 'components/Layout/Layout';
 
-interface IProps {
-  customHeader?: TCustomHeader;
-}
-
-const Router = ({customHeader}: IProps) => (
+const Router = () => (
   <Routes>
-    <Route element={<Layout hasMenu customHeader={customHeader} />}>
+    <Route element={<Layout hasMenu />}>
       <Route path="/" element={<Home />} />
       <Route path="/testsuites" element={<TestSuites />} />
       <Route path="/variablesets" element={<VariableSet />} />
       <Route path="/settings" element={<Settings />} />
     </Route>
 
-    <Route element={<Layout customHeader={customHeader} />}>
+    <Route element={<Layout />}>
       <Route path="/test/:testId" element={<Test />} />
       <Route path="/test/:testId/run/:runId" element={<RunDetail />} />
       <Route path="/test/:testId/run/:runId/:mode" element={<RunDetail />} />

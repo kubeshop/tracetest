@@ -18,7 +18,6 @@ import * as S from './Layout.styled';
 export type TCustomHeader = typeof Header;
 
 interface IProps {
-  customHeader?: TCustomHeader;
   hasMenu?: boolean;
 }
 
@@ -52,7 +51,7 @@ const footerMenuItems = [
   },
 ];
 
-const Layout = ({hasMenu = false, customHeader: CustomHeader = Header}: IProps) => {
+const Layout = ({hasMenu = false}: IProps) => {
   useRouterSync();
   const {dataStoreConfig, isLoading} = useSettingsValues();
   const pathname = useLocation().pathname;
@@ -100,7 +99,7 @@ const Layout = ({hasMenu = false, customHeader: CustomHeader = Header}: IProps) 
                 )}
 
                 <S.Layout>
-                  <CustomHeader hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
+                  <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
                   <S.Content $hasMenu={hasMenu}>
                     <Outlet />
                   </S.Content>
