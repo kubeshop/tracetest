@@ -319,11 +319,16 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 		propagator().Inject(ctx, propagation.MapCarrier(*job.Headers))
 		job.Headers.Set("InstanceID", q.instanceID)
 
+		version := 1
+		if job.Test.Version != nil {
+			version = *job.Test.Version
+		}
+
 		newJob := Job{
 			Headers: job.Headers,
 
 			Test: test.Test{ID: job.Test.ID},
-			Run:  test.Run{ID: job.Run.ID},
+			Run:  test.Run{ID: job.Run.ID, TestVersion: version},
 
 			TestSuite:    testsuite.TestSuite{ID: job.TestSuite.ID},
 			TestSuiteRun: testsuite.TestSuiteRun{ID: job.TestSuiteRun.ID},
