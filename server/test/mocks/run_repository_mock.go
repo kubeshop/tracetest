@@ -39,6 +39,11 @@ func (m *RunRepository) GetTestRuns(ctx context.Context, t test.Test, take, skip
 	return args.Get(0).([]test.Run), args.Error(1)
 }
 
+func (m *RunRepository) Count(ctx context.Context, t test.Test) (int, error) {
+	args := m.Called(ctx, t)
+	return args.Int(0), args.Error(1)
+}
+
 func (m *RunRepository) GetRunByTraceID(ctx context.Context, traceID trace.TraceID) (test.Run, error) {
 	args := m.Called(ctx, traceID)
 	return args.Get(0).(test.Run), args.Error(1)

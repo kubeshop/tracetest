@@ -4,54 +4,51 @@ import "sync"
 
 type Manager struct {
 	subscriptions map[string][]Subscriber
-	mutex         sync.RWMutex
+	mutex         sync.Mutex
 }
 
 func NewManager() *Manager {
 	return &Manager{
 		subscriptions: make(map[string][]Subscriber),
-		mutex:         sync.RWMutex{},
+		mutex:         sync.Mutex{},
 	}
+}
+
+func (m *Manager) getSubscribers(resourceID string) []Subscriber {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.subscriptions[resourceID]
+}
+
+func (m *Manager) setSubscribers(resourceID string, subscribers []Subscriber) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.subscriptions[resourceID] = subscribers
 }
 
 func (m *Manager) Subscribe(resourceID string, subscriber Subscriber) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	array := make([]Subscriber, 0)
-
-	if existingArray, ok := m.subscriptions[resourceID]; ok {
-		array = existingArray
-	}
-
-	array = append(array, subscriber)
-	m.subscriptions[resourceID] = array
+	subscribers := append(m.getSubscribers(resourceID), subscriber)
+	m.setSubscribers(resourceID, subscribers)
 }
 
 func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
+	subscribers := m.getSubscribers(resourceID)
 
-	array, exists := m.subscriptions[resourceID]
-	if !exists {
-		return
-	}
-
-	newArray := make([]Subscriber, 0, len(array)-1)
-	for _, item := range array {
+	updated := make([]Subscriber, 0, len(subscribers)-1)
+	for _, item := range subscribers {
 		if item.ID() != subscriptionID {
-			newArray = append(newArray, item)
+			updated = append(updated, item)
 		}
 	}
 
-	m.subscriptions[resourceID] = newArray
+	m.setSubscribers(resourceID, updated)
 }
 
 func (m *Manager) PublishUpdate(message Message) {
-	if subscribers, ok := m.subscriptions[message.ResourceID]; ok {
-		for _, subscriber := range subscribers {
-			subscriber.Notify(message)
-		}
+	subscribers := m.getSubscribers(message.ResourceID)
+
+	for _, subscriber := range subscribers {
+		subscriber.Notify(message)
 	}
 }
 

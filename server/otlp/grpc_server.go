@@ -13,12 +13,12 @@ type grpcServer struct {
 	pb.UnimplementedTraceServiceServer
 
 	addr     string
-	ingester ingester
+	ingester Ingester
 
 	gServer *grpc.Server
 }
 
-func NewGrpcServer(addr string, ingester ingester) *grpcServer {
+func NewGrpcServer(addr string, ingester Ingester) *grpcServer {
 	return &grpcServer{
 		addr:     addr,
 		ingester: ingester,
