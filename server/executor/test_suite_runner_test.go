@@ -114,7 +114,7 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	subscriptionManager := subscription.NewManager()
 	testRepo := test.NewRepository(rawDB)
-	runRepo := test.NewRunRepository(rawDB)
+	runRepo := test.NewRunRepository(rawDB, test.NewCache("test"))
 
 	testRunner := &fakeTestRunner{
 		runRepo,

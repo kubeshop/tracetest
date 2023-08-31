@@ -18,20 +18,23 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
+type RequestType string
+
+var (
+	RequestTypeHTTP RequestType = "HTTP"
+	RequestTypeGRPC RequestType = "gRPC"
+)
+
+type Ingester interface {
+	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error)
+}
+
 type runGetter interface {
 	GetRunByTraceID(context.Context, trace.TraceID) (test.Run, error)
 }
 
 type tracePersister interface {
 	UpdateTraceSpans(context.Context, *traces.Trace) error
-}
-
-type ingester struct {
-	log            func(string, ...interface{})
-	tracePersister tracePersister
-	runGetter      runGetter
-	eventEmitter   executor.EventEmitter
-	dsRepo         *datastore.Repository
 }
 
 func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) ingester {
@@ -46,7 +49,15 @@ func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEm
 	}
 }
 
-func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType string) (*pb.ExportTraceServiceResponse, error) {
+type ingester struct {
+	log            func(string, ...interface{})
+	tracePersister tracePersister
+	runGetter      runGetter
+	eventEmitter   executor.EventEmitter
+	dsRepo         *datastore.Repository
+}
+
+func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := i.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
@@ -141,12 +152,12 @@ func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tra
 	return run, nil
 }
 
-func (i ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType string) error {
+func (i ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
 	evt := events.TraceOtlpServerReceivedSpans(
 		run.TestID,
 		run.ID,
 		len(trace.Flat),
-		requestType,
+		string(requestType),
 	)
 	err := i.eventEmitter.Emit(ctx, evt)
 	if err != nil {

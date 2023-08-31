@@ -1,6 +1,7 @@
 go 1.20
 
 use (
+	./agent
 	./cli
 	./server
 	./testing/cli-e2etest

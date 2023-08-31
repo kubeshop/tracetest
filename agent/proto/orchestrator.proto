@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/kubeshop/tracetest/agent/proto";
+
+// Orchestrator is the piece of software that will orchestrate the work and send
+// requests to the agent
+service Orchestrator {
+    // Connects an agent and returns the configuration that must be used by that agent
+    rpc Connect(ConnectRequest) returns (AgentConfiguration) {}
+
+    // Register an agent as a trigger agent, once connected, the server will be able to send
+    // multiple trigger requests to the agent.
+    rpc RegisterTriggerAgent(AgentIdentification) returns (stream TriggerRequest) {}
+
+    // Sends the trigger result back to the server
+    rpc SendTriggerResult(TriggerResponse) returns (Empty) {}
+
+    // Register an agent as a poller agent, once connected, the server will be able to send
+    // multiple polling requests to the agent
+    rpc RegisterPollerAgent(AgentIdentification) returns (stream PollingRequest) {}
+
+    // Sends polled spans to the server
+    rpc SendPolledSpans(PollingResponse) returns (Empty) {}
+
+    // Register an agent to listen for shutdown commands
+    rpc RegisterShutdownListener(AgentIdentification) returns (stream ShutdownRequest) {}
+}
+
+// Empty message for endpoints that don't return anything
+message Empty {}
+
+// ConnectRequest is the initial request sent by the agent to the orchestrator
+// it contains all necessary information for authentication and identification
+// of the agent.
+// An established connection is called a "session".
+message ConnectRequest {
+    string apiKey = 1;
+    string name = 2;
+}
+
+// ConnectResponse is the Orchestrator response to the ConnectRequest. It contains
+// configuration that must be used by the agent while working with this Orchestrator.
+message AgentConfiguration {
+    SessionConfiguration configuration = 1;
+    AgentIdentification identification = 2;
+}
+
+// SessionConfiguration is a set of configuration values that must be used by the agent while
+// communicating with the Orchestrator in the current session.
+message SessionConfiguration {
+    // Milliseconds to wait for spans before sending batch
+    int32 batchTimeout = 1;
+}
+
+// ShutdownRequest is a request sent by the server to an agent so it should shut down
+message ShutdownRequest {
+    string reason = 1;
+}
+
+// AgentIdentification contains data used by the server to validate an agent identity
+message AgentIdentification {
+    string token = 1;
+}
+
+message TriggerRequest{
+    string testID = 1;
+    int32 runID = 2;
+    string traceID = 3;
+    Trigger trigger = 4;
+}
+
+message Trigger {
+    string type = 1;
+    HttpRequest http = 2;
+    GrpcRequest grpc = 3;
+    TraceIDRequest traceID = 4;
+    KafkaRequest kafka = 5;
+}
+
+message HttpRequest {
+    string method = 1;
+    string url = 2;
+    string body = 3;
+    repeated HttpHeader headers = 4;
+    HttpAuthentication authentication = 5;
+    bool SSLVerification = 6;
+}
+
+message HttpHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message HttpAuthentication {
+    string type = 1;
+    ApiKeyAuthentication apiKey = 2;
+    BasicAuthentication basic = 3;
+    BearerAuthentication bearer = 4;
+}
+
+message ApiKeyAuthentication{
+    string key = 1;
+    string value = 2;
+    string in = 3;
+}
+
+message BasicAuthentication{
+    string username = 1;
+    string password = 2;
+}
+
+message BearerAuthentication{
+    string token = 1;
+}
+
+message GrpcRequest {
+    string protobufFile = 1;
+    string address = 2;
+    string service = 3;
+    string method = 4;
+    string request = 5;
+    HttpAuthentication authentication = 6;
+    repeated GrpcHeader metadata = 7;
+}
+
+message GrpcHeader {
+    string key = 1;
+    string value = 2;
+}
+
+message TraceIDRequest {
+    string id = 1;
+}
+
+message TriggerResponse {
+    AgentIdentification agentIdentification = 1;
+    string testID = 2;
+    int32 runID = 3;
+    TriggerResult triggerResult = 4;
+}
+
+message TriggerResult {
+    string type = 1;
+    HttpResponse http = 2;
+    GrpcResponse grpc = 3;
+    TraceIdResponse traceID = 4;
+    KafkaResponse kafka = 5;
+}
+
+message HttpResponse {
+    int32 statusCode = 1;
+    string status = 2;
+    repeated HttpHeader headers = 3;
+    string body = 4;
+}
+
+message GrpcResponse {
+    int32 statusCode = 1;
+    repeated GrpcHeader metadata = 2;
+    string body = 3;
+}
+
+message TraceIdResponse {
+    string id = 1;
+}
+
+message PollingRequest {
+    string testID = 1;
+    int32 runID = 2;
+    string traceID = 3;
+    DataStore datastore = 4;
+}
+
+message DataStore {
+    string type = 1;
+    JaegerConfig jaeger = 2;
+    TempoConfig tempo = 3;
+    ElasticConfig opensearch = 4;
+    ElasticConfig elasticapm = 5;
+    SignalfxConfig signalfx = 6;
+    AwsXRayConfig awsxray = 7;
+    AzureAppInsightsConfig azureappinsights = 8;
+}
+
+message JaegerConfig {
+    GrpcClientSettings grpc = 1;
+}
+
+message TempoConfig{
+    string type = 1;
+    HttpClientSettings http = 2;
+    GrpcClientSettings grpc = 3;
+}
+
+message ElasticConfig{
+    repeated string addresses = 1;
+    string username = 2;
+    string password = 3;
+    string index = 4;
+    string certificate = 5;
+    bool insecureSkipVerify = 6;
+}
+
+message SignalfxConfig{
+    string realm = 1;
+    string token = 2;
+}
+
+message AwsXRayConfig{
+    string region = 1;
+    string accessKeyId = 2;
+    string secretAccessKey = 3;
+    string sessionToken = 4;
+    bool useDefaultAuth = 5;
+}
+
+message AzureAppInsightsConfig{
+    bool useAzureActiveDirectoryAuth = 1;
+    string accessToken = 2;
+    string connectionType = 3;
+    string resourceArmId = 4;
+}
+
+message HttpClientSettings {
+    string url = 1;
+    repeated HttpHeader headers = 2;
+    TLS tls = 3;
+    HttpAuthentication authentication = 4;
+}
+
+message GrpcClientSettings {
+    string endpoint = 1;
+    int64 readBufferSize = 2;
+    int64 writeBufferSize = 3;
+    bool waitForReady = 4;
+    HttpHeader headers = 5;
+    string balancerName = 6;
+    string compression = 7;
+    TLS tls = 8;
+    HttpAuthentication auth = 9;
+}
+
+message TLS {
+    bool insecure = 1;
+    bool insecureSkipVerify = 2;
+    string serverName = 3;
+    TLSSetting settings = 4;
+}
+
+message TLSSetting {
+    string cAFile = 1;
+    string certFile = 2;
+    string keyFile = 3;
+    string minVersion = 4;
+    string maxVersion = 5;
+}
+
+message PollingResponse {
+    AgentIdentification agentIdentification = 1;
+    string testID = 2;
+    int32 runID = 3;
+    string traceID = 4;
+    repeated Span spans = 5;
+}
+
+message Span {
+    string id = 1;
+    string parentId = 2;
+    string name = 3;
+    string kind = 4;
+    int64 startTime = 5;
+    int64 endTime = 6;
+    repeated KeyValuePair attributes = 7;
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
+}
+
+message KafkaRequest {
+    repeated string brokerUrls = 1;
+    string topic = 2;
+    KafkaAuthentication authentication = 3;
+    bool sslVerification = 4;
+    repeated KeyValuePair headers = 5;
+    string messageKey = 6;
+    string messageValue = 7;
+}
+
+message KafkaAuthentication {
+    string type = 1;
+    KafkaPlainAuthentication plain = 2;
+}
+
+message KafkaPlainAuthentication {
+    string username = 1;
+    string password = 2;
+}
+
+message KafkaResponse {
+    string partition = 1;
+    string offset = 2;
+}
