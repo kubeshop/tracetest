@@ -1,7 +1,7 @@
 import Logo from 'assets/Logo.svg';
 import Link from 'components/Link';
 import NoTracingPopover from 'components/NoTracingPopover';
-import withCustomization from 'providers/CustomizationProvider/WithCustomization';
+import {withCustomization} from 'providers/Customization';
 import * as S from './Header.styled';
 import HelpMenu from './HelpMenu';
 

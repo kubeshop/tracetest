@@ -1,11 +1,10 @@
 import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
+import AllowButton, {Operation} from 'components/AllowButton';
 import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreConfig from 'models/DataStoreConfig.model';
-import AwareButton from 'components/AwareButton';
-import {Operation} from 'providers/CustomizationProvider/Customization.provider';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 import DataStoreSelectionInput from './DataStoreSelectionInput';
@@ -92,7 +91,7 @@ const DataStoreForm = ({
               <Button loading={isTestConnectionLoading} type="primary" ghost onClick={onTestConnection}>
                 Test Connection
               </Button>
-              <AwareButton
+              <AllowButton
                 operation={Operation.Configure}
                 disabled={!isFormValid}
                 loading={isLoading}
@@ -100,7 +99,7 @@ const DataStoreForm = ({
                 onClick={() => form.submit()}
               >
                 Save and Set as DataStore
-              </AwareButton>
+              </AllowButton>
             </S.SaveContainer>
           </S.ButtonsContainer>
         </S.FactoryContainer>
