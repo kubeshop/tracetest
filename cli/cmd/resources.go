@@ -156,6 +156,13 @@ var (
 		resourcemanager.WithDeprecatedAlias("Transaction"),
 	)
 
+	// deprecated resources
+	deprecatedEnvironmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environment", "environments",
+		resourcemanager.WithProxyResource("variableset"),
+	)
+
 	deprecatedTransactionsClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"transaction", "transactions",
@@ -277,7 +284,7 @@ var (
 		Register(environmentClient).
 
 		// deprecated resources
-		// Register(deprecatedEnvironmentClient).
+		Register(deprecatedEnvironmentClient).
 		Register(deprecatedTransactionsClient)
 )
 

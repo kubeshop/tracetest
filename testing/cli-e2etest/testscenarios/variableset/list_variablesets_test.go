@@ -231,4 +231,12 @@ func TestListVariableSets(t *testing.T) {
 		require.Equal("The", oneMoreEnvironmentVars.Spec.Values[1].Key)
 		require.Equal("Third", oneMoreEnvironmentVars.Spec.Values[1].Value)
 	})
+
+	t.Run("list using deprecated environment command", func(t *testing.T) {
+		result := tracetestcli.Exec(t, "list environment --sortBy name --sortDirection asc --skip 1 --take 2 --output yaml", tracetestcli.WithCLIConfig(cliConfig))
+
+		helpers.RequireExitCodeEqual(t, result, 0)
+		require.Contains(result.StdOut, "The resource `environment` is deprecated and will be removed in a future version. Please use `variableset` instead.")
+		require.Contains(result.StdOut, "VariableSet")
+	})
 }

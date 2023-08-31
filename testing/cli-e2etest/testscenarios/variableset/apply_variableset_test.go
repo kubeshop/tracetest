@@ -95,4 +95,15 @@ func TestApplyVariableSet(t *testing.T) {
 		require.Equal("THIRD_VAR", updatedEnvironmentVars.Spec.Values[2].Key)
 		require.Equal("hello", updatedEnvironmentVars.Spec.Values[2].Value) // this value was added
 	})
+
+	t.Run("using the deprecated environment command to apply a variable set", func(t *testing.T) {
+		newEnvironmentPath := env.GetTestResourcePath(t, "deprecated-environment")
+
+		result := tracetestcli.Exec(t, fmt.Sprintf("apply environment --file %s", newEnvironmentPath), tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 0)
+
+		require.Contains(result.StdOut, "The resource `environment` is deprecated and will be removed in a future version. Please use `variableset` instead.")
+		require.Contains(result.StdOut, "VariableSet")
+		require.Contains(result.StdOut, "deprecated-env")
+	})
 }

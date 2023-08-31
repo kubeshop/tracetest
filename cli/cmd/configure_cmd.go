@@ -43,12 +43,14 @@ func flagProvided(cmd *cobra.Command, name string) bool {
 }
 
 func init() {
+	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
 	configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
 	rootCmd.AddCommand(configureCmd)
 }
 
 type configureParameters struct {
 	Endpoint string
+	Global   bool
 }
 
 func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error {
