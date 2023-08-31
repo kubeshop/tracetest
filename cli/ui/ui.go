@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
 )
@@ -12,7 +11,7 @@ import (
 var DefaultUI UI = &ptermUI{}
 
 type UI interface {
-	Banner()
+	Banner(version string)
 
 	Panic(error)
 	Exit(string)
@@ -21,6 +20,7 @@ type UI interface {
 	Warning(string)
 	Info(string)
 	Success(string)
+	Finish()
 
 	Println(string)
 	Title(string)
@@ -40,14 +40,14 @@ type Option struct {
 
 type ptermUI struct{}
 
-func (ui ptermUI) Banner() {
+func (ui ptermUI) Banner(version string) {
 	pterm.Print("\n\n")
 
 	pterm.DefaultBigText.
 		WithLetters(putils.LettersFromString("TraceTest")).
 		Render()
 
-	pterm.Print(fmt.Sprintf("Version: %s", config.Version))
+	pterm.Print(fmt.Sprintf("Version: %s", version))
 
 	pterm.Print("\n\n")
 
@@ -55,6 +55,10 @@ func (ui ptermUI) Banner() {
 
 func (ui ptermUI) Panic(err error) {
 	pterm.Error.WithFatal(true).Println(err)
+}
+
+func (ui ptermUI) Finish() {
+	os.Exit(0)
 }
 
 func (ui ptermUI) Exit(msg string) {

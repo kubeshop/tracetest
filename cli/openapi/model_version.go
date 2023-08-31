@@ -20,6 +20,7 @@ var _ MappedNullable = &Version{}
 // Version struct for Version
 type Version struct {
 	Version *string `json:"version,omitempty"`
+	Type    *string `json:"type,omitempty"`
 }
 
 // NewVersion instantiates a new Version object
@@ -71,6 +72,38 @@ func (o *Version) SetVersion(v string) {
 	o.Version = &v
 }
 
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *Version) GetType() string {
+	if o == nil || isNil(o.Type) {
+		var ret string
+		return ret
+	}
+	return *o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Version) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
+		return nil, false
+	}
+	return o.Type, true
+}
+
+// HasType returns a boolean if a field has been set.
+func (o *Version) HasType() bool {
+	if o != nil && !isNil(o.Type) {
+		return true
+	}
+
+	return false
+}
+
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *Version) SetType(v string) {
+	o.Type = &v
+}
+
 func (o Version) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -83,6 +116,9 @@ func (o Version) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Version) {
 		toSerialize["version"] = o.Version
+	}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
 	return toSerialize, nil
 }

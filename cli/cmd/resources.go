@@ -52,7 +52,7 @@ var (
 
 	environmentClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"environment", "environments",
+		"env", "environments",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "id"},
@@ -154,6 +154,13 @@ var (
 		resourcemanager.WithResourceType("TestSuite"),
 		resourcemanager.WithApplyPreProcessor(testSuitePreprocessor.Preprocess),
 		resourcemanager.WithDeprecatedAlias("Transaction"),
+	)
+
+	// deprecated resources
+	deprecatedEnvironmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environment", "environments",
+		resourcemanager.WithProxyResource("variableset"),
 	)
 
 	deprecatedTransactionsClient = resourcemanager.NewClient(
@@ -277,7 +284,7 @@ var (
 		Register(environmentClient).
 
 		// deprecated resources
-		// Register(deprecatedEnvironmentClient).
+		Register(deprecatedEnvironmentClient).
 		Register(deprecatedTransactionsClient)
 )
 
@@ -303,7 +310,7 @@ func setupResources() {
 	// We take this chance to configure the HTTPClient with the correct URL and headers.
 	// To make this configuration propagate to all the resources, we need to replace the pointer to the HTTPClient.
 	// For more details, see https://github.com/kubeshop/tracetest/pull/2832#discussion_r1245616804
-	hc := resourcemanager.NewHTTPClient(cliConfig.URL(), extraHeaders)
+	hc := resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cliConfig.URL(), cliConfig.Path()), extraHeaders)
 	*httpClient = *hc
 }
 

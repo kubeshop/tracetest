@@ -704,6 +704,7 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 func (c *controller) GetVersion(ctx context.Context) (openapi.ImplResponse, error) {
 	version := openapi.Version{
 		Version: c.version,
+		Type:    "oss",
 	}
 
 	return openapi.Response(http.StatusOK, version), nil

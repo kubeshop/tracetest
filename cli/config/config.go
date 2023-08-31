@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/goware/urlx"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
@@ -16,15 +17,10 @@ import (
 var (
 	Version          = "dev"
 	Env              = "dev"
-	FrontendEndpoint = "http://localhost:3001"
+	FrontendEndpoint = "http://localhost:3000"
 )
 
-type ConfigureConfig struct {
-	Global    bool
-	SetValues ConfigureConfigSetValues
-}
-
-type ConfigureConfigSetValues struct {
+type ConfigFlags struct {
 	Endpoint string
 }
 
@@ -44,12 +40,20 @@ func (c Config) URL() string {
 		return ""
 	}
 
+	return fmt.Sprintf("%s://%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"))
+}
+
+func (c Config) Path() string {
 	pathPrefix := "/api"
 	if c.ServerPath != nil {
 		pathPrefix = *c.ServerPath
 	}
 
-	return fmt.Sprintf("%s://%s%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"), pathPrefix)
+	if pathPrefix == "/" {
+		return ""
+	}
+
+	return pathPrefix
 }
 
 func (c Config) IsEmpty() bool {
@@ -109,20 +113,22 @@ func ValidateServerURL(serverURL string) error {
 	return nil
 }
 
-func ParseServerURL(serverURL string) (scheme, endpoint string, err error) {
-	urlParts := strings.Split(serverURL, "://")
-	if len(urlParts) != 2 {
-		return "", "", fmt.Errorf("invalid server url")
+func ParseServerURL(serverURL string) (scheme, endpoint string, serverPath *string, err error) {
+	url, err := urlx.Parse(serverURL)
+	if err != nil {
+		return "", "", nil, fmt.Errorf("could not parse server URL: %w", err)
 	}
 
-	scheme = urlParts[0]
-	endpoint = strings.TrimSuffix(urlParts[1], "/")
+	var path *string
+	if url.Path != "" {
+		path = &url.Path
+	}
 
-	return scheme, endpoint, nil
+	return url.Scheme, url.Host, path, nil
 }
 
-func Save(ctx context.Context, config Config, args ConfigureConfig) error {
-	configPath, err := GetConfigurationPath(args)
+func Save(ctx context.Context, config Config) error {
+	configPath, err := GetConfigurationPath()
 	if err != nil {
 		return fmt.Errorf("could not get configuration path: %w", err)
 	}
@@ -143,15 +149,13 @@ func Save(ctx context.Context, config Config, args ConfigureConfig) error {
 	return nil
 }
 
-func GetConfigurationPath(args ConfigureConfig) (string, error) {
-	configPath := "./config.yml"
-	if args.Global {
-		homePath, err := os.UserHomeDir()
-		if err != nil {
-			return "", fmt.Errorf("could not get user home dir: %w", err)
-		}
-		configPath = path.Join(homePath, ".tracetest/config.yml")
+func GetConfigurationPath() (string, error) {
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("could not get user home dir: %w", err)
 	}
+
+	configPath := path.Join(homePath, ".tracetest/config.yml")
 
 	return configPath, nil
 }
