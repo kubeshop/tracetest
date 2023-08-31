@@ -106,7 +106,7 @@ func getDockerComposeFileContents(ui cliUI.UI, config configuration) []byte {
 	include := []string{"tracetest", "postgres"}
 
 	if config.Bool("demo.enable.pokeshop") {
-		include = append(include, "cache", "queue", "demo-api", "demo-worker", "demo-rpc", "otel-collector")
+		include = append(include, "cache", "queue", "stream", "demo-api", "demo-worker", "demo-rpc", "demo-streaming-worker", "otel-collector")
 	}
 
 	// filter and update project

@@ -24,6 +24,7 @@ import (
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/labstack/gommon/log"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -166,11 +167,11 @@ func (c *controller) GetTestResultSelectedSpans(ctx context.Context, testID stri
 }
 
 func (c *controller) GetTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	log.Printf("GetTestRun %s %d", testID, runID)
 	run, err := c.testRunRepository.GetRun(ctx, id.ID(testID), int(runID))
 	if err != nil {
 		return handleDBError(err), err
 	}
-
 	return openapi.Response(200, c.mappers.Out.Run(&run)), nil
 }
 
@@ -217,9 +218,14 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 		return handleDBError(err), err
 	}
 
+	count, err := c.testRunRepository.Count(ctx, test)
+	if err != nil {
+		return handleDBError(err), err
+	}
+
 	return openapi.Response(200, paginated[openapi.TestRun]{
 		items: c.mappers.Out.Runs(runs),
-		count: len(runs), // TODO: find a way of returning the proper number
+		count: count,
 	}), nil
 }
 

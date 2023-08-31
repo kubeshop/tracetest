@@ -37,7 +37,7 @@ func getRepos() (*testsuite.Repository, *testsuite.RunRepository, test.Repositor
 	db := testmock.CreateMigratedDatabase()
 
 	testRepo := test.NewRepository(db)
-	testRunRepo := test.NewRunRepository(db)
+	testRunRepo := test.NewRunRepository(db, test.NewCache("test"))
 
 	transactionRepo := testsuite.NewRepository(db, testRepo)
 	runRepo := testsuite.NewRunRepository(db, testRunRepo)

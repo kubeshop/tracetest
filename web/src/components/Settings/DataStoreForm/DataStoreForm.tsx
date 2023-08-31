@@ -1,5 +1,6 @@
 import {Button, Form} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
+import AllowButton, {Operation} from 'components/AllowButton';
 import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
@@ -90,9 +91,15 @@ const DataStoreForm = ({
               <Button loading={isTestConnectionLoading} type="primary" ghost onClick={onTestConnection}>
                 Test Connection
               </Button>
-              <Button disabled={!isFormValid} loading={isLoading} type="primary" onClick={() => form.submit()}>
+              <AllowButton
+                operation={Operation.Configure}
+                disabled={!isFormValid}
+                loading={isLoading}
+                type="primary"
+                onClick={() => form.submit()}
+              >
                 Save and Set as DataStore
-              </Button>
+              </AllowButton>
             </S.SaveContainer>
           </S.ButtonsContainer>
         </S.FactoryContainer>

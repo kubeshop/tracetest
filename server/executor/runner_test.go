@@ -58,12 +58,16 @@ func TestPersistentRunner(t *testing.T) {
 		f.expectSuccessExecLong(test1)
 		f.expectSuccessExec(test2)
 
-		f.run([]test.Test{test1, test2}, 100*time.Millisecond)
+		// the worker pool lib reverses the order of this test for some reason
+		// but this doesn't matter, as long as both tests run,
+		// we only care about the completion time in this test
+		f.run([]test.Test{test2, test1}, 100*time.Millisecond)
 
 		run1 := f.runsMock.runs[test1.ID]
 		run2 := f.runsMock.runs[test2.ID]
 
 		assert.Greater(t, run1.ServiceTriggerCompletedAt.UnixNano(), run2.ServiceTriggerCompletedAt.UnixNano(), "test1 did not complete after test2")
+		f.assert(t)
 	})
 
 }
