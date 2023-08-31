@@ -11,14 +11,27 @@ import (
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
+type onFinishFn func(context.Context, Config)
+
 type Configurator struct {
 	resources *resourcemanager.Registry
 	ui        cliUI.UI
+	onFinish  onFinishFn
 }
 
 func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 	ui := cliUI.DefaultUI
-	return Configurator{resources, ui}
+	onFinish := func(_ context.Context, _ Config) {
+		ui.Success("Successfully configured Tracetest CLI")
+		ui.Finish()
+	}
+
+	return Configurator{resources, ui, onFinish}
+}
+
+func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
+	c.onFinish = onFinish
+	return c
 }
 
 func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
@@ -114,8 +127,7 @@ func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config) 
 		return
 	}
 
-	c.ui.Success("Successfully configured Tracetest CLI")
-	c.ui.Finish()
+	c.onFinish(ctx, cfg)
 }
 
 func (c Configurator) ShowEnvironmentSelector(ctx context.Context, cfg Config) {
@@ -131,11 +143,10 @@ func (c Configurator) ShowEnvironmentSelector(ctx context.Context, cfg Config) {
 		return
 	}
 
-	c.ui.Success("Successfully configured Tracetest CLI")
-	c.ui.Finish()
+	c.onFinish(ctx, cfg)
 }
 
-func setupHttpClient(cfg Config) *resourcemanager.HTTPClient {
+func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {
 	extraHeaders := http.Header{}
 	extraHeaders.Set("x-client-id", analytics.ClientID())
 	extraHeaders.Set("x-source", "cli")

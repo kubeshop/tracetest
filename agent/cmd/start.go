@@ -20,6 +20,7 @@ var StartCmd = cobra.Command{
 	Short: "Start the local agent",
 	Long:  "Start the local agent",
 	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
 		cfg, err := config.LoadConfig()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -28,7 +29,7 @@ var StartCmd = cobra.Command{
 
 		log.Printf("starting agent [%s] connecting to %s", cfg.Name, cfg.ServerURL)
 
-		initialization.Start(cfg)
+		initialization.Start(ctx, cfg)
 	},
 }
 

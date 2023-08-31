@@ -25,6 +25,12 @@ func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (Con
 		return cfg, err
 	}
 
+	if len(elements) == 1 {
+		cfg.OrganizationID = elements[0].ID
+		c.ui.Println(fmt.Sprintf("Defaulting to only available Organization: %s", elements[0].Name))
+		return cfg, nil
+	}
+
 	options := make([]cliUI.Option, len(elements))
 	for i, org := range elements {
 		options[i] = cliUI.Option{
@@ -39,6 +45,7 @@ func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (Con
 
 	option := c.ui.Select("What Organization do you want to use?", options, 0)
 	option.Fn(c.ui)
+
 	return cfg, nil
 }
 
@@ -54,6 +61,12 @@ func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (Conf
 	elements, err := getElements(ctx, resource, cfg)
 	if err != nil {
 		return cfg, err
+	}
+
+	if len(elements) == 1 {
+		cfg.EnvironmentID = elements[0].ID
+		c.ui.Println(fmt.Sprintf("Defaulting to only available Environment: %s", elements[0].Name))
+		return cfg, nil
 	}
 
 	options := make([]cliUI.Option, len(elements))
@@ -78,7 +91,7 @@ type entryList struct {
 }
 
 func getElements(ctx context.Context, resource resourcemanager.Client, cfg Config) ([]entry, error) {
-	resource = resource.WithHttpClient(setupHttpClient(cfg))
+	resource = resource.WithHttpClient(SetupHttpClient(cfg))
 
 	var list entryList
 	resultFormat, err := resourcemanager.Formats.GetWithFallback("json", "json")
