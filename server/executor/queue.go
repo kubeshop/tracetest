@@ -19,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -84,31 +85,40 @@ type Job struct {
 	DataStore      datastore.DataStore
 }
 
-type jsonJob struct {
+type JsonJob struct {
 	Headers          *headers `json:"headers"`
 	TestSuiteID      string   `json:"test_suite_id"`
 	TestSuiteRunID   int      `json:"test_suite_run_id"`
 	TestID           string   `json:"test_id"`
+	TestVersion      int      `json:"test_version"`
 	RunID            int      `json:"run_id"`
+	TraceID          string   `json:"trace_id"`
 	PollingProfileID string   `json:"polling_profile_id"`
 	DataStoreID      string   `json:"data_store_id"`
 }
 
 func (job Job) MarshalJSON() ([]byte, error) {
-	return json.Marshal(jsonJob{
+	return json.Marshal(JsonJob{
 		Headers:          job.Headers,
 		TestSuiteID:      job.TestSuite.ID.String(),
 		TestSuiteRunID:   job.TestSuiteRun.ID,
 		TestID:           job.Test.ID.String(),
+		TestVersion:      job.Run.TestVersion,
 		RunID:            job.Run.ID,
+		TraceID:          job.Run.TraceID.String(),
 		PollingProfileID: job.PollingProfile.ID.String(),
 		DataStoreID:      job.DataStore.ID.String(),
 	})
 }
 
 func (job *Job) UnmarshalJSON(data []byte) error {
-	var jj jsonJob
+	var jj JsonJob
 	err := json.Unmarshal(data, &jj)
+	if err != nil {
+		return err
+	}
+
+	traceID, err := trace.TraceIDFromHex(jj.TraceID)
 	if err != nil {
 		return err
 	}
@@ -118,6 +128,8 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	job.TestSuiteRun.ID = jj.TestSuiteRunID
 	job.Test.ID = id.ID(jj.TestID)
 	job.Run.ID = jj.RunID
+	job.Run.TestVersion = jj.TestVersion
+	job.Run.TraceID = traceID
 	job.PollingProfile.ID = id.ID(jj.PollingProfileID)
 	job.DataStore.ID = id.ID(jj.DataStoreID)
 
@@ -328,7 +340,7 @@ func (q Queue) Enqueue(ctx context.Context, job Job) {
 			Headers: job.Headers,
 
 			Test: test.Test{ID: job.Test.ID},
-			Run:  test.Run{ID: job.Run.ID, TestVersion: version},
+			Run:  test.Run{ID: job.Run.ID, TestVersion: version, TraceID: job.Run.TraceID},
 
 			TestSuite:    testsuite.TestSuite{ID: job.TestSuite.ID},
 			TestSuiteRun: testsuite.TestSuiteRun{ID: job.TestSuiteRun.ID},
