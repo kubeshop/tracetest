@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -28,12 +27,12 @@ const (
 
 type httpServer struct {
 	addr     string
-	ingester ingester
+	ingester Ingester
 
 	hServer *http.Server
 }
 
-func NewHttpServer(addr string, ingester ingester) *httpServer {
+func NewHttpServer(addr string, ingester Ingester) *httpServer {
 	return &httpServer{
 		addr:     addr,
 		ingester: ingester,
@@ -107,10 +106,8 @@ func (s httpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error
 }
 
 func (s httpServer) parseBody(reqBody io.ReadCloser, contentType string) (*pb.ExportTraceServiceRequest, error) {
-	var body []byte
-	if b, err := io.ReadAll(reqBody); err == nil {
-		body = b
-	} else {
+	body, err := io.ReadAll(reqBody)
+	if err != nil {
 		return nil, err
 	}
 
@@ -140,7 +137,7 @@ func newHttpResponse(w http.ResponseWriter, contentType string) httpResponse {
 func (r httpResponse) send(statusCode int, message proto.Message) error {
 	body, err := r.paseResponseBody(message)
 	if err != nil {
-		fmt.Println("Could not attach body to response", err.Error())
+		fmt.Println("could not attach body to response: %w", err)
 		return err
 	}
 
@@ -196,7 +193,7 @@ func decompressBody(reqBody io.ReadCloser) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	output, err := ioutil.ReadAll(gzReader)
+	output, err := io.ReadAll(gzReader)
 	if err != nil {
 		return nil, err
 	}
