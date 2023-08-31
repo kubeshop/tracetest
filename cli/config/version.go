@@ -1,15 +1,14 @@
-package actions
+package config
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
-func GetVersion(ctx context.Context, cfg config.Config, client *openapi.APIClient) (string, bool) {
-	result := fmt.Sprintf(`CLI: %s`, config.Version)
+func GetVersion(ctx context.Context, cfg Config, client *openapi.APIClient) (string, bool) {
+	result := fmt.Sprintf(`CLI: %s`, Version)
 
 	if cfg.IsEmpty() {
 		return result + `
@@ -22,7 +21,7 @@ Server: Not Configured`, false
 Server: Failed to get the server version - %s`, err.Error()), false
 	}
 
-	isVersionMatch := version == config.Version
+	isVersionMatch := version == Version
 	if isVersionMatch {
 		version += `
 ✔️ Version match`
@@ -41,4 +40,15 @@ func getServerVersion(ctx context.Context, client *openapi.APIClient) (string, e
 	}
 
 	return resp.GetVersion(), nil
+}
+
+func getVersionMetadata(ctx context.Context, client *openapi.APIClient) (*openapi.Version, error) {
+	resp, _, err := client.ApiApi.
+		GetVersion(ctx).
+		Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

@@ -82,6 +82,19 @@ func NewClient(
 	return c
 }
 
+func (c Client) WithHttpClient(HTTPClient *HTTPClient) Client {
+	c.client = HTTPClient
+	return c
+}
+
+func (c Client) WithOptions(opts ...option) Client {
+	for _, opt := range opts {
+		opt(&c.options)
+	}
+
+	return c
+}
+
 func (c Client) resourceType() string {
 	if c.options.resourceType != "" {
 		return c.options.resourceType

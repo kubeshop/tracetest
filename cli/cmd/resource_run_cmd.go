@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/runner"
-	"github.com/kubeshop/tracetest/cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +34,7 @@ func init() {
 
 			orchestrator := runner.Orchestrator(
 				cliLogger,
-				utils.GetAPIClient(cliConfig),
+				config.GetAPIClient(cliConfig),
 				variableSetClient,
 			)
 

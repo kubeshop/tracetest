@@ -76,7 +76,12 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 		zap.String("contents", string(inputFile.Contents())),
 	)
 
-	url := c.client.url(c.resourceNamePlural, "")
+	prefix := ""
+	if c.options.prefixGetterFn != nil {
+		prefix = c.options.prefixGetterFn()
+	}
+
+	url := c.client.url(c.resourceNamePlural, prefix, "")
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url.String(), inputFile.Reader())
 	if err != nil {
 		return "", fmt.Errorf("cannot build Apply request: %w", err)

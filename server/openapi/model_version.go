@@ -11,6 +11,8 @@ package openapi
 
 type Version struct {
 	Version string `json:"version,omitempty"`
+
+	Type string `json:"type,omitempty"`
 }
 
 // AssertVersionRequired checks if the required fields are not zero-ed

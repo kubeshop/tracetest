@@ -11,20 +11,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type selectableFn func(config config.Config, ID string) config.Config
+type selectableFn func(ctx context.Context, cfg config.Config)
 
 var (
 	selectParams  = &resourceIDParameters{}
 	selectCmd     *cobra.Command
 	selectable    = strings.Join([]string{"environment", "organization"}, "|")
 	selectableMap = map[string]selectableFn{
-		"environment": func(config config.Config, ID string) config.Config {
-			config.EnvironmentID = ID
-			return config
+		"env": func(ctx context.Context, cfg config.Config) {
+			configurator.ShowEnvironmentSelector(ctx, cfg)
 		},
-		"organization": func(config config.Config, ID string) config.Config {
-			config.OrganizationID = ID
-			return config
+		"organization": func(ctx context.Context, cfg config.Config) {
+			configurator.ShowOrganizationSelector(ctx, cfg)
 		}}
 )
 
@@ -62,17 +60,11 @@ func init() {
 				return "", err
 			}
 
-			cliConfig = selectableFn(cliConfig, selectParams.ResourceID)
-			err = config.Save(ctx, cliConfig, config.ConfigureConfig{})
-			if err != nil {
-				return "", err
-			}
-
-			return fmt.Sprintf("✔ Resource %s of type %s has been stored to your configuration file", selectParams.ResourceID, resourceType), nil
-		}, selectParams),
+			selectableFn(ctx, cliConfig)
+			return "", nil
+		}),
 		PostRun: teardownCommand,
 	}
 
-	selectCmd.Flags().StringVar(&selectParams.ResourceID, "id", "", "id of the resource to select")
 	rootCmd.AddCommand(selectCmd)
 }

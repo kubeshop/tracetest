@@ -7,3 +7,7 @@ components:
         version:
           type: string
           example: 1.0.0
+        type:
+          type: string
+          enum:
+            - oss
