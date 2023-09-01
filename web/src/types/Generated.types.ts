@@ -1846,6 +1846,7 @@ export interface external {
           /** Format: date-time */
           completedAt?: string;
           variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
+          resolvedTrigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];

@@ -146,6 +146,9 @@ func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
 		r.handleError(job.Run, err)
 	}
 
+	run.ResolvedTrigger = resolvedTest.Trigger
+	r.handleDBError(run, r.updater.Update(ctx, run))
+
 	err = r.eventEmitter.Emit(ctx, events.TriggerResolveSuccess(job.Run.TestID, job.Run.ID))
 	if err != nil {
 		r.handleError(job.Run, err)

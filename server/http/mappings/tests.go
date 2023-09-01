@@ -281,6 +281,7 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		ServiceTriggerCompletedAt: in.ServiceTriggerCompletedAt,
 		ObtainedTraceAt:           in.ObtainedTraceAt,
 		CompletedAt:               in.CompletedAt,
+		ResolvedTrigger:           m.Trigger(in.ResolvedTrigger),
 		TriggerResult:             m.TriggerResult(in.TriggerResult),
 		TestVersion:               int32(in.TestVersion),
 		Trace:                     m.Trace(in.Trace),
