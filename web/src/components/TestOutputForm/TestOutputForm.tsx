@@ -4,6 +4,7 @@ import {Button, Form, Input, Tag} from 'antd';
 import {delay} from 'lodash';
 import {useEffect} from 'react';
 
+import AllowButton, {Operation} from 'components/AllowButton';
 import Editor from 'components/Editor';
 import {EXPRESSIONS_DOCUMENTATION_URL, SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {SupportedEditors} from 'constants/Editor.constants';
@@ -131,9 +132,16 @@ const TestOutputForm = ({
           <Button data-cy="output-modal-cancel-button" onClick={onCancel}>
             Cancel
           </Button>
-          <Button data-cy="output-save-button" disabled={!isValid} htmlType="submit" loading={isLoading} type="primary">
+          <AllowButton
+            operation={Operation.Edit}
+            data-cy="output-save-button"
+            disabled={!isValid}
+            htmlType="submit"
+            loading={isLoading}
+            type="primary"
+          >
             Save Test Output
-          </Button>
+          </AllowButton>
         </S.Footer>
       </Form>
     </S.Container>

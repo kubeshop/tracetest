@@ -1,5 +1,6 @@
 import {useCallback, useState} from 'react';
 
+import AllowButton, {Operation} from 'components/AllowButton';
 import SearchInput from 'components/SearchInput';
 import VariableSetsAnalytics from 'services/Analytics/VariableSetsAnalytics.service';
 import VariableSet from 'models/VariableSet.model';
@@ -35,9 +36,9 @@ const VariableSetContent = () => {
       <S.PageHeader>
         <SearchInput onSearch={onSearch} placeholder="Search variable set" />
         <S.ActionContainer>
-          <S.CreateVarsButton onClick={handleOnClickCreate} type="primary">
+          <AllowButton operation={Operation.Edit} onClick={handleOnClickCreate} type="primary">
             Create Variable Set
-          </S.CreateVarsButton>
+          </AllowButton>
         </S.ActionContainer>
       </S.PageHeader>
 

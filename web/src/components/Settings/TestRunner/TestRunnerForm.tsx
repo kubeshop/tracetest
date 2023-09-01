@@ -1,5 +1,6 @@
 import {useCallback, useEffect} from 'react';
-import {Button, Form} from 'antd';
+import {Form} from 'antd';
+import AllowButton, {Operation} from 'components/AllowButton';
 import {ResourceType, TDraftTestRunner} from 'types/Settings.types';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import SettingService from 'services/Setting.service';
@@ -42,9 +43,9 @@ const TestRunnerForm = () => {
       </Form.Item>
 
       <S.FooterContainer>
-        <Button htmlType="submit" loading={isLoading} type="primary">
+        <AllowButton operation={Operation.Configure} htmlType="submit" loading={isLoading} type="primary">
           Save
-        </Button>
+        </AllowButton>
       </S.FooterContainer>
     </Form>
   );

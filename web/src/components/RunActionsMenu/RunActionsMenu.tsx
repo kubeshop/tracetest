@@ -2,6 +2,7 @@ import {Dropdown, Menu} from 'antd';
 
 import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
+import {Operation, useCustomization} from 'providers/Customization';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {ResourceType} from 'types/Resource.type';
@@ -16,6 +17,7 @@ interface IProps {
 }
 
 const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunView = false}: IProps) => {
+  const {getIsAllowed} = useCustomization();
   const {onJUnit} = useFileViewerModal();
   const {navigate} = useDashboard();
   const onDelete = useDeleteResourceRun({id: testId, isRunView, type: ResourceType.Test});
@@ -62,6 +64,7 @@ const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunVie
                 navigate(`/test/${testId}/run/${resultId}`);
               }}
               key="edit"
+              disabled={!getIsAllowed(Operation.Edit)}
             >
               Edit
             </Menu.Item>
@@ -72,6 +75,7 @@ const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunVie
                 onDelete(resultId);
               }}
               key="delete"
+              disabled={!getIsAllowed(Operation.Edit)}
             >
               Delete
             </Menu.Item>

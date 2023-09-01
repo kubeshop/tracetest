@@ -1,8 +1,6 @@
 import {CheckCircleOutlined} from '@ant-design/icons';
-import {Button, Typography} from 'antd';
+import {Typography} from 'antd';
 import styled from 'styled-components';
-
-export const CreateVarsButton = styled(Button)``;
 
 export const PageHeader = styled.div`
   display: flex;

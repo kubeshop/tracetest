@@ -1,5 +1,6 @@
-import {Button, Col, Form, Input, Row, Switch} from 'antd';
+import {Col, Form, Input, Row, Switch} from 'antd';
 import {useEffect} from 'react';
+import AllowButton, {Operation} from 'components/AllowButton';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import SettingService from 'services/Setting.service';
@@ -80,9 +81,9 @@ const LinterForm = () => {
       </Row>
 
       <S.FooterContainer>
-        <Button htmlType="submit" loading={isLoading} type="primary">
+        <AllowButton operation={Operation.Configure} htmlType="submit" loading={isLoading} type="primary">
           Save
-        </Button>
+        </AllowButton>
       </S.FooterContainer>
     </Form>
   );

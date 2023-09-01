@@ -1,5 +1,6 @@
 import {Button, Form} from 'antd';
 import {useCallback, useState} from 'react';
+import AllowButton, {Operation} from 'components/AllowButton';
 import {TDraftTestSuite} from 'types/TestSuite.types';
 import {useTestSuite} from 'providers/TestSuite';
 import useValidateTestSuiteDraft from 'hooks/useValidateTestSuiteDraft';
@@ -37,7 +38,8 @@ const EditTestSuite = ({testSuite, testSuiteRun}: IProps) => {
           <Button data-cy="edit-testsuite-reset" onClick={() => form.resetFields()}>
             Reset
           </Button>
-          <Button
+          <AllowButton
+            operation={Operation.Edit}
             data-cy="edit-testsuite-submit"
             loading={isEditLoading}
             disabled={!isFormValid || !stateIsFinished}
@@ -45,7 +47,7 @@ const EditTestSuite = ({testSuite, testSuiteRun}: IProps) => {
             onClick={() => form.submit()}
           >
             Save & Run
-          </Button>
+          </AllowButton>
         </S.ButtonsContainer>
       </S.FormContainer>
     </S.Wrapper>
