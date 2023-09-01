@@ -708,3 +708,25 @@ func (c *controller) GetVersion(ctx context.Context) (openapi.ImplResponse, erro
 
 	return openapi.Response(http.StatusOK, version), nil
 }
+
+func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int32, testRun openapi.TestRun) (openapi.ImplResponse, error) {
+	existingRun, err := c.testRunRepository.GetRun(ctx, id.ID(testID), int(runID))
+	if err != nil {
+		return openapi.Response(http.StatusNotFound, err.Error()), err
+	}
+
+	run, err := c.mappers.In.Run(testRun)
+	if err != nil {
+		return openapi.Response(http.StatusBadRequest, err.Error()), err
+	}
+
+	// Prevents bad data in other fields to override correct data
+	existingRun.TriggerResult = run.TriggerResult
+
+	err = c.testRunRepository.UpdateRun(ctx, existingRun)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(http.StatusOK, run), err
+}

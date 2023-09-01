@@ -518,6 +518,29 @@ paths:
       responses:
         "204":
           description: OK
+    # TODO: remove this as soon as we refactor our queues
+    patch:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
+      summary: "update a test run"
+      description: "update a test run"
+      operationId: updateTestRun
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./tests.yaml#/components/schemas/TestRun"
+      responses:
+        200:
+          description: successfuly updated the test run
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/TestRun"
+
   /tests/{testId}/definition:
     get:
       tags:
