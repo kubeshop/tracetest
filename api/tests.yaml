@@ -197,6 +197,8 @@ components:
           format: date-time
         variableSet:
           $ref: "./variableSets.yaml#/components/schemas/VariableSet"
+        resolvedTrigger:
+          $ref: "./triggers.yaml#/components/schemas/Trigger"
         triggerResult:
           $ref: "./triggers.yaml#/components/schemas/TriggerResult"
         trace:

@@ -39,6 +39,7 @@ type TestRun struct {
 	ObtainedTraceAt           *time.Time            `json:"obtainedTraceAt,omitempty"`
 	CompletedAt               *time.Time            `json:"completedAt,omitempty"`
 	VariableSet               *VariableSet          `json:"variableSet,omitempty"`
+	ResolvedTrigger           *Trigger              `json:"resolvedTrigger,omitempty"`
 	TriggerResult             *TriggerResult        `json:"triggerResult,omitempty"`
 	Trace                     *Trace                `json:"trace,omitempty"`
 	Result                    *AssertionResults     `json:"result,omitempty"`
@@ -515,6 +516,38 @@ func (o *TestRun) SetVariableSet(v VariableSet) {
 	o.VariableSet = &v
 }
 
+// GetResolvedTrigger returns the ResolvedTrigger field value if set, zero value otherwise.
+func (o *TestRun) GetResolvedTrigger() Trigger {
+	if o == nil || isNil(o.ResolvedTrigger) {
+		var ret Trigger
+		return ret
+	}
+	return *o.ResolvedTrigger
+}
+
+// GetResolvedTriggerOk returns a tuple with the ResolvedTrigger field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetResolvedTriggerOk() (*Trigger, bool) {
+	if o == nil || isNil(o.ResolvedTrigger) {
+		return nil, false
+	}
+	return o.ResolvedTrigger, true
+}
+
+// HasResolvedTrigger returns a boolean if a field has been set.
+func (o *TestRun) HasResolvedTrigger() bool {
+	if o != nil && !isNil(o.ResolvedTrigger) {
+		return true
+	}
+
+	return false
+}
+
+// SetResolvedTrigger gets a reference to the given Trigger and assigns it to the ResolvedTrigger field.
+func (o *TestRun) SetResolvedTrigger(v Trigger) {
+	o.ResolvedTrigger = &v
+}
+
 // GetTriggerResult returns the TriggerResult field value if set, zero value otherwise.
 func (o *TestRun) GetTriggerResult() TriggerResult {
 	if o == nil || isNil(o.TriggerResult) {
@@ -848,6 +881,9 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.VariableSet) {
 		toSerialize["variableSet"] = o.VariableSet
+	}
+	if !isNil(o.ResolvedTrigger) {
+		toSerialize["resolvedTrigger"] = o.ResolvedTrigger
 	}
 	if !isNil(o.TriggerResult) {
 		toSerialize["triggerResult"] = o.TriggerResult
