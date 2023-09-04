@@ -3,7 +3,6 @@ package initialization
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/config"
@@ -12,15 +11,14 @@ import (
 )
 
 // Start the agent with given configuration
-func Start(config config.Config) {
+func Start(ctx context.Context, config config.Config) error {
 	fmt.Println("Starting agent")
-	ctx := context.Background()
 	client, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
 	)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	triggerWorker := workers.NewTriggerWorker(client)
@@ -35,8 +33,10 @@ func Start(config config.Config) {
 
 	err = client.Start(ctx)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
+	fmt.Println("Agent started! Do not close the terminal.")
 	client.WaitUntilDisconnected()
+	return nil
 }

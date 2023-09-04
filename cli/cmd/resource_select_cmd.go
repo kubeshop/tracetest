@@ -16,11 +16,8 @@ type selectableFn func(ctx context.Context, cfg config.Config)
 var (
 	selectParams  = &resourceIDParameters{}
 	selectCmd     *cobra.Command
-	selectable    = strings.Join([]string{"environment", "organization"}, "|")
+	selectable    = strings.Join([]string{"organization"}, "|")
 	selectableMap = map[string]selectableFn{
-		"env": func(ctx context.Context, cfg config.Config) {
-			configurator.ShowEnvironmentSelector(ctx, cfg)
-		},
 		"organization": func(ctx context.Context, cfg config.Config) {
 			configurator.ShowOrganizationSelector(ctx, cfg)
 		}}
