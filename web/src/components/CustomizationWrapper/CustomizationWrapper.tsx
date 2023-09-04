@@ -6,10 +6,11 @@ interface IProps {
 }
 
 const getComponent = <T,>(id: string, fallback: React.ComponentType<T>) => fallback;
+const getFlag = () => true;
 const getIsAllowed = () => true;
 
 const CustomizationWrapper = ({children}: IProps) => {
-  const customizationProviderValue = useMemo(() => ({getComponent, getIsAllowed}), []);
+  const customizationProviderValue = useMemo(() => ({getComponent, getFlag, getIsAllowed}), []);
 
   return <CustomizationProvider value={customizationProviderValue}>{children}</CustomizationProvider>;
 };

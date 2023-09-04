@@ -29,7 +29,7 @@ export const theme: DefaultTheme = {
     xxxl: '24px',
   },
   font: {
-    family: 'SFPro',
+    family: 'SFPro, Inter',
   },
   notification: {
     success: {
