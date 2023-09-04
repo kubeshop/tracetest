@@ -113,13 +113,14 @@ type (
 		SpanID  trace.SpanID
 
 		// result info
-		TriggerResult trigger.TriggerResult
-		Results       *RunResults
-		Trace         *traces.Trace
-		Outputs       maps.Ordered[string, RunOutput]
-		LastError     error
-		Pass          int
-		Fail          int
+		ResolvedTrigger trigger.Trigger
+		TriggerResult   trigger.TriggerResult
+		Results         *RunResults
+		Trace           *traces.Trace
+		Outputs         maps.Ordered[string, RunOutput]
+		LastError       error
+		Pass            int
+		Fail            int
 
 		Metadata RunMetadata
 

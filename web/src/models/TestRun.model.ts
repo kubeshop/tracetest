@@ -27,6 +27,7 @@ type TestRun = Model<
     triggerTime: number;
     lastErrorState?: string;
     trigger?: TTriggerSchemas['Trigger'];
+    resolvedTrigger?: TTriggerSchemas['Trigger'];
     triggerResult?: TriggerResult;
     outputs?: TestRunOutput[];
     variableSet?: VariableSet;

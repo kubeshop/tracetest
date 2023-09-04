@@ -106,6 +106,7 @@ INSERT INTO test_runs (
 	"span_id",
 
 	-- result info
+	"resolved_trigger",
 	"trigger_results",
 	"test_results",
 	"trace",
@@ -144,19 +145,20 @@ INSERT INTO test_runs (
 	$9, -- span_id
 
 	-- result info
-	$10,  -- trigger_results
+	$10, -- resolved_trigger
+	$11,  -- trigger_results
 	'{}', -- test_results
-	$11,  -- trace
+	$12,  -- trace
 	'[]', -- outputs
 	NULL, -- last_error
 	0,    -- pass
 	0,    -- fail
 
-	$12, -- metadata
-	$13, -- variable_set
-	$14, -- linter
-	$15,  -- required_gates_result
-	$16  -- tenant_id
+	$13, -- metadata
+	$14, -- variable_set
+	$15, -- linter
+	$16,  -- required_gates_result
+	$17  -- tenant_id
 )
 RETURNING "id"`
 
@@ -166,6 +168,11 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 	run.TestVersion = test.SafeVersion()
 	if run.CreatedAt.IsZero() {
 		run.CreatedAt = time.Now()
+	}
+
+	jsonResolvedTrigger, err := json.Marshal(run.ResolvedTrigger)
+	if err != nil {
+		return Run{}, fmt.Errorf("resolved trigger encoding error: %w", err)
 	}
 
 	jsonTriggerResults, err := json.Marshal(run.TriggerResult)
@@ -224,6 +231,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		run.State,
 		run.TraceID.String(),
 		run.SpanID.String(),
+		jsonResolvedTrigger,
 		jsonTriggerResults,
 		jsonTrace,
 		jsonMetadata,
@@ -257,27 +265,33 @@ UPDATE test_runs SET
 	"span_id" = $7,
 
 	-- result info
-	"trigger_results" = $8,
-	"test_results" = $9,
-	"trace" = $10,
-	"outputs" = $11,
-	"last_error" = $12,
-	"pass" = $13,
-	"fail" = $14,
+	"resolved_trigger" = $8,
+	"trigger_results" = $9,
+	"test_results" = $10,
+	"trace" = $11,
+	"outputs" = $12,
+	"last_error" = $13,
+	"pass" = $14,
+	"fail" = $15,
 
-	"metadata" = $15,
-	"variable_set" = $18,
+	"metadata" = $16,
+	"variable_set" = $19,
 
 	--- linter
-	"linter" = $19,
+	"linter" = $20,
 
 	--- required gates
-	"required_gates_result" = $20
+	"required_gates_result" = $21
 
-WHERE id = $16 AND test_id = $17
+WHERE id = $17 AND test_id = $18
 `
 
 func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
+	jsonResolvedTrigger, err := json.Marshal(run.ResolvedTrigger)
+	if err != nil {
+		return fmt.Errorf("resolved trigger encoding error: %w", err)
+	}
+
 	jsonTriggerResults, err := json.Marshal(run.TriggerResult)
 	if err != nil {
 		return fmt.Errorf("trigger results encoding error: %w", err)
@@ -336,6 +350,7 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		run.State,
 		run.TraceID.String(),
 		run.SpanID.String(),
+		jsonResolvedTrigger,
 		jsonTriggerResults,
 		jsonTestResults,
 		jsonTrace,
@@ -412,6 +427,7 @@ const (
 	"span_id",
 
 	-- result info
+	"resolved_trigger",
 	"trigger_results",
 	"test_results",
 	"trace",
@@ -544,6 +560,7 @@ func readRunRow(row scanner) (Run, error) {
 	r := Run{}
 
 	var (
+		jsonResolvedTrigger,
 		jsonTriggerResults,
 		jsonTestResults,
 		jsonTrace,
@@ -573,6 +590,7 @@ func readRunRow(row scanner) (Run, error) {
 		&r.State,
 		&traceID,
 		&spanID,
+		&jsonResolvedTrigger,
 		&jsonTriggerResults,
 		&jsonTestResults,
 		&jsonTrace,

@@ -95,6 +95,8 @@ export interface paths {
     get: operations["getTestRun"];
     /** delete a test run */
     delete: operations["deleteTestRun"];
+    /** update a test run */
+    patch: operations["updateTestRun"];
   };
   "/tests/{testId}/definition": {
     /** Gets definition for a test */
@@ -566,6 +568,23 @@ export interface operations {
     responses: {
       /** OK */
       204: never;
+    };
+  };
+  /** update a test run */
+  updateTestRun: {
+    parameters: {};
+    responses: {
+      /** successfuly updated the test run */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestRun"];
+      };
     };
   };
   /** Gets definition for a test */
@@ -1425,7 +1444,7 @@ export interface external {
           request?: string;
         };
         GRPCResponse: {
-          statusCode: number;
+          statusCode?: number;
           metadata?: external["grpc.yaml"]["components"]["schemas"]["GRPCHeader"][];
           body?: string;
         };
@@ -1827,6 +1846,7 @@ export interface external {
           /** Format: date-time */
           completedAt?: string;
           variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
+          resolvedTrigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           triggerResult?: external["triggers.yaml"]["components"]["schemas"]["TriggerResult"];
           trace?: external["trace.yaml"]["components"]["schemas"]["Trace"];
           result?: external["tests.yaml"]["components"]["schemas"]["AssertionResults"];

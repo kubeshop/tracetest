@@ -41,6 +41,7 @@ type ApiApiRouter interface {
 	RunTestSuite(http.ResponseWriter, *http.Request)
 	StopTestRun(http.ResponseWriter, *http.Request)
 	TestConnection(http.ResponseWriter, *http.Request)
+	UpdateTestRun(http.ResponseWriter, *http.Request)
 }
 
 // ResourceApiApiRouter defines the required methods for binding the api requests to a responses for the ResourceApiApi
@@ -112,6 +113,7 @@ type ApiApiServicer interface {
 	RunTestSuite(context.Context, string, RunInformation) (ImplResponse, error)
 	StopTestRun(context.Context, string, int32) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
+	UpdateTestRun(context.Context, string, int32, TestRun) (ImplResponse, error)
 }
 
 // ResourceApiApiServicer defines the api actions for the ResourceApiApi service
