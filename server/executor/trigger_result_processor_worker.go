@@ -23,38 +23,38 @@ func NewTriggerResultProcessorWorker(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
-) *persistentRunner {
-	return &persistentRunner{
+) *triggerResultProcessorWorker {
+	return &triggerResultProcessorWorker{
 		tracer:              tracer,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
 	}
 }
 
-type persistentRunner struct {
+type triggerResultProcessorWorker struct {
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
 	outputQueue         Enqueuer
 }
 
-func (r *persistentRunner) SetOutputQueue(queue Enqueuer) {
+func (r *triggerResultProcessorWorker) SetOutputQueue(queue Enqueuer) {
 	r.outputQueue = queue
 }
 
-func (r persistentRunner) handleDBError(run test.Run, err error) {
+func (r triggerResultProcessorWorker) handleDBError(run test.Run, err error) {
 	if err != nil {
 		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
 }
 
-func (r persistentRunner) handleError(run test.Run, err error) {
+func (r triggerResultProcessorWorker) handleError(run test.Run, err error) {
 	if err != nil {
 		fmt.Printf("test %s run #%d trigger DB error: %s\n", run.TestID, run.ID, err.Error())
 	}
 }
 
-func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
+func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) {
 	ctx, pollingSpan := r.tracer.Start(ctx, "Start processing trigger response")
 	defer pollingSpan.End()
 
@@ -90,7 +90,7 @@ func (r persistentRunner) ProcessItem(ctx context.Context, job Job) {
 	r.outputQueue.Enqueue(ctx, job)
 }
 
-func (r persistentRunner) emitUnreachableEndpointEvent(ctx context.Context, job Job, err error) {
+func (r triggerResultProcessorWorker) emitUnreachableEndpointEvent(ctx context.Context, job Job, err error) {
 	var event model.TestRunEvent
 	switch job.Test.Trigger.Type {
 	case trigger.TriggerTypeHTTP:
@@ -105,7 +105,7 @@ func (r persistentRunner) emitUnreachableEndpointEvent(ctx context.Context, job 
 	}
 }
 
-func (r persistentRunner) emitMismatchEndpointEvent(ctx context.Context, job Job, err error) {
+func (r triggerResultProcessorWorker) emitMismatchEndpointEvent(ctx context.Context, job Job, err error) {
 	emitErr := r.eventEmitter.Emit(ctx, events.TriggerDockerComposeHostMismatchError(job.Run.TestID, job.Run.ID))
 	if emitErr != nil {
 		r.handleError(job.Run, emitErr)
