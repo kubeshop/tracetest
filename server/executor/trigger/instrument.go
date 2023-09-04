@@ -38,7 +38,7 @@ func (t *instrumentedTriggerer) Resolve(ctx context.Context, test test.Test, opt
 	return t.triggerer.Resolve(ctx, test, opts)
 }
 
-func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
+func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test) (Response, error) {
 	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
@@ -49,10 +49,6 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test, opt
 
 	spanContextConfig := trace.SpanContextConfig{
 		TraceState: tracestate,
-	}
-
-	if opts != nil {
-		spanContextConfig.TraceID = opts.TraceID
 	}
 
 	spanContext := trace.NewSpanContext(spanContextConfig)
@@ -67,7 +63,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test, opt
 	tid := triggerSpan.SpanContext().TraceID()
 	sid := triggerSpan.SpanContext().SpanID()
 
-	resp, err := t.triggerer.Trigger(triggerSpanCtx, test, opts)
+	resp, err := t.triggerer.Trigger(triggerSpanCtx, test)
 
 	resp.TraceID = tid
 	resp.SpanID = sid

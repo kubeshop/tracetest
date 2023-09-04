@@ -17,7 +17,6 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/kubeshop/tracetest/server/variableset"
@@ -185,13 +184,9 @@ func runnerSetup(t *testing.T) runnerFixture {
 	registry := triggerer.NewRegistry(tracer, tracer)
 	registry.Add(triggererMock)
 
-	runner := executor.NewPersistentRunner(
-		registry,
-		executor.NewDBUpdater(runsMock),
+	runner := executor.NewTriggerResultProcessorWorker(
 		tracer,
 		sm,
-		tracedb.Factory(tracesMock),
-		dsMock,
 		eventEmitter,
 	)
 
@@ -349,7 +344,7 @@ func (m *mockTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerTypeHTTP
 }
 
-func (m *mockTriggerer) Trigger(_ context.Context, test test.Test, opts *triggerer.TriggerOptions) (triggerer.Response, error) {
+func (m *mockTriggerer) Trigger(_ context.Context, test test.Test) (triggerer.Response, error) {
 	args := m.Called(test.ID)
 	return args.Get(0).(triggerer.Response), args.Error(1)
 }
