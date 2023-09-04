@@ -20,13 +20,13 @@ jobs:
           go-version: 1.16
       
       - name: Build my CLI for Linux
-        run: cd cli && go mod download && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o tracetest-linux main.go
+        run: go mod download && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o tracetest-linux cli/main.go
       
       - name: Build my CLI for macOS
-        run: cd cli && go mod download && GOOS=darwin GOARCH=amd64 go build -o tracetest-macos
+        run: go mod download && GOOS=darwin GOARCH=amd64 go build -o tracetest-macos cli/main.go
       
       - name: Build my CLI for Windows
-        run: cd cli && go mod download && GOOS=windows GOARCH=amd64 go build -o tracetest-windows.exe
+        run: go mod download && GOOS=windows GOARCH=amd64 go build -o tracetest-windows.exe cli/main.go
        
       - name: Get release name from tag
         id: release
