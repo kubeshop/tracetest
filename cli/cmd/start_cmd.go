@@ -15,7 +15,7 @@ var startCmd = &cobra.Command{
 	GroupID: cmdGroupCloud.ID,
 	Use:     "start",
 	Short:   "Start Tracetest",
-	Long:    "Start Tracetest",
+	Long:    "Start using Tracetest",
 	PreRun:  setupCommand(),
 	Run: WithResultHandler((func(_ *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
@@ -27,5 +27,7 @@ var startCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(startCmd)
+	if isCloudEnabled {
+		rootCmd.AddCommand(startCmd)
+	}
 }

@@ -20,6 +20,9 @@ var (
 	openapiClient  = &openapi.APIClient{}
 	versionText    string
 	isVersionMatch bool
+
+	// only available in dev mode
+	isCloudEnabled = os.Getenv("TRACETEST_DEV") == "true"
 )
 
 type setupConfig struct {

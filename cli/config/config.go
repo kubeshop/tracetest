@@ -15,9 +15,9 @@ import (
 )
 
 var (
-	Version          = "dev"
-	Env              = "dev"
-	FrontendEndpoint = "http://localhost:3000"
+	Version                 = "dev"
+	Env                     = "dev"
+	DefaultCloudAPIEndpoint = "http://localhost:8090"
 )
 
 type ConfigFlags struct {
@@ -25,14 +25,18 @@ type ConfigFlags struct {
 }
 
 type Config struct {
-	Scheme           string  `yaml:"scheme"`
-	Endpoint         string  `yaml:"endpoint"`
-	ServerPath       *string `yaml:"serverPath,omitempty"`
-	FrontendEndpoint string  `yaml:"-"`
-	OrganizationID   string  `yaml:"organizationID,omitempty"`
-	EnvironmentID    string  `yaml:"environmentID,omitempty"`
-	Token            string  `yaml:"token,omitempty"`
-	Jwt              string  `yaml:"jwt,omitempty"`
+	Scheme         string  `yaml:"scheme"`
+	Endpoint       string  `yaml:"endpoint"`
+	ServerPath     *string `yaml:"serverPath,omitempty"`
+	OrganizationID string  `yaml:"organizationID,omitempty"`
+	EnvironmentID  string  `yaml:"environmentID,omitempty"`
+	Token          string  `yaml:"token,omitempty"`
+	Jwt            string  `yaml:"jwt,omitempty"`
+
+	// cloud config
+	CloudAPIEndpoint string `yaml:"-"`
+	AgentEndpoint    string `yaml:"agentEndpoint,omitempty"`
+	UIEndpoint       string `yaml:"uIEndpoint,omitempty"`
 }
 
 func (c Config) URL() string {
@@ -73,7 +77,9 @@ func LoadConfig(configFile string) (Config, error) {
 		return config, nil
 	}
 
-	config.FrontendEndpoint = FrontendEndpoint
+	if config.CloudAPIEndpoint == "" {
+		config.CloudAPIEndpoint = DefaultCloudAPIEndpoint
+	}
 
 	homePath, err := os.UserHomeDir()
 	if err != nil {
@@ -101,7 +107,6 @@ func loadConfig(configFile string) (Config, error) {
 		return Config{}, fmt.Errorf("could not unmarshal config: %w", err)
 	}
 
-	config.FrontendEndpoint = FrontendEndpoint
 	return config, nil
 }
 

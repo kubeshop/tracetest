@@ -26,7 +26,7 @@ func NewStarter(configurator config.Configurator, resources *resourcemanager.Reg
 
 func (s *Starter) Run(ctx context.Context, cfg config.Config) error {
 	flags := config.ConfigFlags{
-		Endpoint: "http://localhost:8090/",
+		Endpoint: cfg.CloudAPIEndpoint,
 	}
 	s.ui.Banner(config.Version)
 
@@ -40,7 +40,7 @@ func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
 	}
 
 	s.ui.Println(fmt.Sprintf("Connecting Agent to environment %s...", env.Name))
-	err = startAgent(ctx, "localhost:8091", env.AgentApiKey)
+	err = startAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
