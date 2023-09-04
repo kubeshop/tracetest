@@ -1,4 +1,5 @@
-import {Button, Form, Switch} from 'antd';
+import {Form, Switch} from 'antd';
+import AllowButton, {Operation} from 'components/AllowButton';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {useCallback} from 'react';
@@ -40,9 +41,9 @@ const AnalyticsForm = () => {
       </S.SwitchContainer>
 
       <S.FooterContainer>
-        <Button htmlType="submit" loading={isLoading} type="primary">
+        <AllowButton operation={Operation.Configure} htmlType="submit" loading={isLoading} type="primary">
           Save
-        </Button>
+        </AllowButton>
       </S.FooterContainer>
     </Form>
   );

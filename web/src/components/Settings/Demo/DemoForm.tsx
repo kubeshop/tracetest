@@ -1,6 +1,7 @@
-import {Button, Form, Switch} from 'antd';
+import {Form, Switch} from 'antd';
 import {useCallback} from 'react';
 
+import AllowButton, {Operation} from 'components/AllowButton';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import SettingService from 'services/Setting.service';
@@ -63,9 +64,15 @@ const DemoForm = () => {
       {otelEnabled && <OtelFields />}
 
       <S.FooterContainer>
-        <Button htmlType="submit" loading={isLoading} type="primary" data-cy="demo-form-save-button">
+        <AllowButton
+          operation={Operation.Configure}
+          htmlType="submit"
+          loading={isLoading}
+          type="primary"
+          data-cy="demo-form-save-button"
+        >
           Save
-        </Button>
+        </AllowButton>
       </S.FooterContainer>
     </Form>
   );

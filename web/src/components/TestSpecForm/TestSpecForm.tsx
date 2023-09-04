@@ -2,6 +2,7 @@ import {Button, Form, Input, Tag} from 'antd';
 import {LoadingOutlined} from '@ant-design/icons';
 import {useEffect} from 'react';
 
+import AllowButton, {Operation} from 'components/AllowButton';
 import {SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {CompareOperator} from 'constants/Operator.constants';
 import {useAppSelector} from 'redux/hooks';
@@ -184,9 +185,15 @@ const TestSpecForm = ({
 
         <S.AssertionFromActions>
           <Button onClick={onCancel}>Cancel</Button>
-          <Button type="primary" disabled={!isValid} onClick={form.submit} data-cy="assertion-form-submit-button">
+          <AllowButton
+            operation={Operation.Edit}
+            type="primary"
+            disabled={!isValid}
+            onClick={form.submit}
+            data-cy="assertion-form-submit-button"
+          >
             Save Test Spec
-          </Button>
+          </AllowButton>
         </S.AssertionFromActions>
       </Form>
     </S.AssertionForm>

@@ -1,6 +1,7 @@
 import {Dropdown, Menu} from 'antd';
 
 import useDeleteResourceRun from 'hooks/useDeleteResourceRun';
+import {Operation, useCustomization} from 'providers/Customization';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './TestSuiteRunActionsMenu.styled';
@@ -12,6 +13,7 @@ interface IProps {
 }
 
 const TestSuiteRunActionsMenu = ({runId, testSuiteId, isRunView = false}: IProps) => {
+  const {getIsAllowed} = useCustomization();
   const {navigate} = useDashboard();
   const onDelete = useDeleteResourceRun({id: testSuiteId, isRunView, type: ResourceType.TestSuite});
 
@@ -29,6 +31,7 @@ const TestSuiteRunActionsMenu = ({runId, testSuiteId, isRunView = false}: IProps
                 domEvent.stopPropagation();
                 navigate(`/testsuite/${testSuiteId}/run/${runId}`);
               }}
+              disabled={!getIsAllowed(Operation.Edit)}
             >
               Edit
             </Menu.Item>
@@ -38,6 +41,7 @@ const TestSuiteRunActionsMenu = ({runId, testSuiteId, isRunView = false}: IProps
                 domEvent.stopPropagation();
                 onDelete(runId);
               }}
+              disabled={!getIsAllowed(Operation.Edit)}
             >
               Delete
             </Menu.Item>

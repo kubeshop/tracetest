@@ -5,11 +5,12 @@ import * as S from './VariableSetSelector.styled';
 
 interface IProps {
   variableSet: VariableSet;
+  isAllowed: boolean;
   isHovering: boolean;
   onEditClick(variableSet: VariableSet): void;
 }
 
-const VariableSetSelectorEntry = ({variableSet: {name}, variableSet, isHovering, onEditClick}: IProps) => {
+const VariableSetSelectorEntry = ({variableSet: {name}, variableSet, isAllowed, isHovering, onEditClick}: IProps) => {
   const handleClick = useCallback(
     event => {
       event.stopPropagation();
@@ -21,7 +22,7 @@ const VariableSetSelectorEntry = ({variableSet: {name}, variableSet, isHovering,
   return (
     <S.VarsSelectorEntryContainer>
       {name}
-      {isHovering && (
+      {isAllowed && isHovering && (
         <Tooltip title="Edit Variable Set">
           <S.VarsSelectorEntryIcon onClick={handleClick} />
         </Tooltip>
