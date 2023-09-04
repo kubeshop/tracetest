@@ -540,7 +540,7 @@ func getRunRepositoryMock(t *testing.T) *testdb.MockRepository {
 
 	testDB := new(testdb.MockRepository)
 	testDB.Test(t)
-	testDB.On("CreateTestRunEvent", mock.Anything).Return(noError)
+	testDB.On("CreateTestRunEvent", mock.Anything).Return(nil)
 
 	return testDB
 }
