@@ -38,33 +38,6 @@ var (
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
-	organizationsClient = resourcemanager.NewClient(
-		httpClient, cliLogger,
-		"organization", "organizations",
-		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-			Cells: []resourcemanager.TableCellConfig{
-				{Header: "ID", Path: "id"},
-				{Header: "NAME", Path: "name"},
-			},
-		}),
-		resourcemanager.WithListPath("elements"),
-	)
-
-	environmentClient = resourcemanager.NewClient(
-		httpClient, cliLogger,
-		"env", "environments",
-		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-			Cells: []resourcemanager.TableCellConfig{
-				{Header: "ID", Path: "id"},
-				{Header: "NAME", Path: "name"},
-			},
-		}),
-		resourcemanager.WithPrefixGetter(func() string { return fmt.Sprintf("/organizations/%s/", cliConfig.OrganizationID) }),
-		resourcemanager.WithListPath("elements"),
-	)
-
-	// resourcemanager.WithPrefixGetter(func() string { return cliConfig.EnvironmentID }),
-
 	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
 	variableSetClient       = resourcemanager.NewClient(
 		httpClient, cliLogger,
@@ -286,6 +259,31 @@ var (
 		// deprecated resources
 		Register(deprecatedEnvironmentClient).
 		Register(deprecatedTransactionsClient)
+
+	organizationsClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"organization", "organizations",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "id"},
+				{Header: "NAME", Path: "name"},
+			},
+		}),
+		resourcemanager.WithListPath("elements"),
+	)
+
+	environmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"env", "environments",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "id"},
+				{Header: "NAME", Path: "name"},
+			},
+		}),
+		resourcemanager.WithPrefixGetter(func() string { return fmt.Sprintf("/organizations/%s/", cliConfig.OrganizationID) }),
+		resourcemanager.WithListPath("elements"),
+	)
 )
 
 func resourceList() string {

@@ -11,3 +11,7 @@ components:
           type: string
           enum:
             - oss
+        uiEndpoint:
+          type: string
+        agentEndpoint:
+          type: string

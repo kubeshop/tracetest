@@ -61,11 +61,6 @@ var (
 		Title: "Resources",
 	}
 
-	cmdGroupTests = &cobra.Group{
-		ID:    "tests",
-		Title: "Tests",
-	}
-
 	cmdGroupMisc = &cobra.Group{
 		ID:    "misc",
 		Title: "Misc",
@@ -81,16 +76,15 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
-
 	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
 
-	rootCmd.AddGroup(
-		cmdGroupConfig,
-		cmdGroupResources,
-		cmdGroupTests,
-		cmdGroupMisc,
-		cmdGroupCloud,
-	)
+	groups := []*cobra.Group{cmdGroupConfig, cmdGroupResources, cmdGroupMisc}
+
+	if isCloudEnabled {
+		groups = append(groups, cmdGroupCloud)
+	}
+
+	rootCmd.AddGroup(groups...)
 
 	rootCmd.SetCompletionCommandGroupID(cmdGroupConfig.ID)
 	rootCmd.SetHelpCommandGroupID(cmdGroupMisc.ID)

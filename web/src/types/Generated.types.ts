@@ -2113,6 +2113,10 @@ export interface external {
         Version: {
           /** @example 1.0.0 */
           version?: string;
+          /** @enum {string} */
+          type?: "oss";
+          uiEndpoint?: string;
+          agentEndpoint?: string;
         };
       };
     };

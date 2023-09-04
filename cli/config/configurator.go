@@ -67,6 +67,9 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return fmt.Errorf("cannot get version metadata: %w", err)
 	}
 
+	cfg.AgentEndpoint = version.GetAgentEndpoint()
+	cfg.UIEndpoint = version.GetUiEndpoint()
+
 	serverType := version.GetType()
 	if serverType == "oss" {
 		err := Save(ctx, cfg)
@@ -81,13 +84,12 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 	if prev.Jwt != "" {
 		cfg.Jwt = prev.Jwt
 		cfg.Token = prev.Token
-		cfg.FrontendEndpoint = FrontendEndpoint
 
 		c.ShowOrganizationSelector(ctx, cfg)
 		return nil
 	}
 
-	oauthServer := oauth.NewOAuthServer(cfg.URL(), FrontendEndpoint)
+	oauthServer := oauth.NewOAuthServer(cfg.URL(), cfg.UIEndpoint)
 	err = oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
 		GetAuthJWT()

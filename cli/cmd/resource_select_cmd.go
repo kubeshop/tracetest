@@ -27,7 +27,7 @@ func init() {
 	selectCmd = &cobra.Command{
 		GroupID: cmdGroupCloud.ID,
 		Use:     "select " + selectable,
-		Short:   "select resources",
+		Short:   "Select resources",
 		Long:    "Select resources to your Tracetest CLI config",
 		PreRun:  setupCommand(),
 		Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
@@ -63,5 +63,7 @@ func init() {
 		PostRun: teardownCommand,
 	}
 
-	rootCmd.AddCommand(selectCmd)
+	if isCloudEnabled {
+		rootCmd.AddCommand(selectCmd)
+	}
 }
