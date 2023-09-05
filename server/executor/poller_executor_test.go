@@ -26,7 +26,8 @@ import (
 )
 
 var (
-	randomIDGenerator = id.NewRandGenerator()
+	randomIDGenerator       = id.NewRandGenerator()
+	noError           error = nil
 )
 
 func Test_PollerExecutor_ExecuteRequest_NoRootSpan_NoSpanCase(t *testing.T) {
@@ -540,7 +541,7 @@ func getRunRepositoryMock(t *testing.T) *testdb.MockRepository {
 
 	testDB := new(testdb.MockRepository)
 	testDB.Test(t)
-	testDB.On("CreateTestRunEvent", mock.Anything).Return(nil)
+	testDB.On("CreateTestRunEvent", mock.Anything).Return(noError)
 
 	return testDB
 }
