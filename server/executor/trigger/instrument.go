@@ -34,7 +34,7 @@ func (t *instrumentedTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerType("instrumented")
 }
 
-func (t *instrumentedTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+func (t *instrumentedTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
 	return t.triggerer.Resolve(ctx, test, opts)
 }
 

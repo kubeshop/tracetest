@@ -105,7 +105,7 @@ func (t *grpcTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerTypeGRPC
 }
 
-func (t *grpcTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+func (t *grpcTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
 	grpc := test.Trigger.GRPC
 
 	if grpc == nil {

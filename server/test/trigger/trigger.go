@@ -1,5 +1,7 @@
 package trigger
 
+import "errors"
+
 type (
 	TriggerType string
 
@@ -17,5 +19,16 @@ type (
 		GRPC    *GRPCResponse    `json:"grpc,omitempty"`
 		TraceID *TraceIDResponse `json:"traceid,omitempty"`
 		Kafka   *KafkaResponse   `json:"kafka,omitempty"`
+		Error   *TriggerError    `json:"error,omitempty"`
+	}
+
+	TriggerError struct {
+		ConnectionError    bool   `json:"connectionError"`
+		RunningOnContainer bool   `json:"runningOnContainer"`
+		ErrorMessage       string `json:"message"`
 	}
 )
+
+func (e TriggerError) Error() error {
+	return errors.New(e.ErrorMessage)
+}

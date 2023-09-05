@@ -58,7 +58,7 @@ func (t *KafkaTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerTypeKafka
 }
 
-func (t *KafkaTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+func (t *KafkaTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
 	kafkaConfig := test.Trigger.Kafka
 	if kafkaConfig == nil {
 		return test, fmt.Errorf("no settings provided for kafka triggerer")

@@ -68,13 +68,25 @@ func buildTestPipeline(
 		eventEmitter,
 	)
 
-	runner := executor.NewPersistentRunner(
+	triggerResolverWorker := executor.NewTriggerResolverWorker(
 		triggerRegistry,
 		execTestUpdater,
 		tracer,
-		subscriptionManager,
 		tracedbFactory,
 		dsRepo,
+		eventEmitter,
+	)
+
+	triggerExecuterWorker := executor.NewTriggerExecuterWorker(
+		triggerRegistry,
+		execTestUpdater,
+		tracer,
+		eventEmitter,
+	)
+
+	triggerResultProcessorWorker := executor.NewTriggerResultProcessorWorker(
+		tracer,
+		subscriptionManager,
 		eventEmitter,
 	)
 
@@ -92,7 +104,9 @@ func buildTestPipeline(
 	pgQueue := executor.NewPostgresQueueDriver(pool)
 
 	pipeline := executor.NewPipeline(queueBuilder,
-		executor.PipelineStep{Processor: runner, Driver: pgQueue.Channel("runner")},
+		executor.PipelineStep{Processor: triggerResolverWorker, Driver: pgQueue.Channel("trigger_resolve")},
+		executor.PipelineStep{Processor: triggerExecuterWorker, Driver: pgQueue.Channel("trigger_execute")},
+		executor.PipelineStep{Processor: triggerResultProcessorWorker, Driver: pgQueue.Channel("trigger_result")},
 		executor.PipelineStep{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
 		executor.PipelineStep{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
 		executor.PipelineStep{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
