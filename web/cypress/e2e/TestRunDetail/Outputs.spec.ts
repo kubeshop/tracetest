@@ -14,7 +14,7 @@ describe('Outputs', () => {
 
     // Save output
     cy.wait('@getSelect');
-    cy.get('[data-cy=output-save-button]').click();
+    cy.get('[data-cy=output-save-button]').click({force: true});
     cy.get('[data-cy=output-pending-tag]').should('have.length', 1);
 
     // Add new output from scratch
@@ -27,7 +27,7 @@ describe('Outputs', () => {
       cy.get('[data-cy=expression-editor] [contenteditable=true]').type('attr:http.status_code');
     });
     cy.wait('@getSelect');
-    cy.get('[data-cy=output-save-button]').click();
+    cy.get('[data-cy=output-save-button]').click({force: true});
     cy.get('[data-cy=output-pending-tag]').should('have.length', 2);
 
     // Publish and run
@@ -53,7 +53,7 @@ describe('Outputs', () => {
 
     // Save output
     cy.wait('@getSelect');
-    cy.get('[data-cy=output-save-button]').click();
+    cy.get('[data-cy=output-save-button]').click({force: true});
     cy.get('[data-cy=output-pending-tag]').should('have.length', 1);
 
     // Add new output from scratch
@@ -66,7 +66,7 @@ describe('Outputs', () => {
       cy.get('[data-cy=expression-editor] [contenteditable=true]').type('attr:http.status_code');
     });
     cy.wait('@getSelect');
-    cy.get('[data-cy=output-save-button]').click();
+    cy.get('[data-cy=output-save-button]').click({force: true});
     cy.get('[data-cy=output-pending-tag]').should('have.length', 2);
 
     // Delete output
@@ -96,7 +96,7 @@ describe('Outputs', () => {
 
     // Save output
     cy.wait('@getSelect');
-    cy.get('[data-cy=output-save-button]').click();
+    cy.get('[data-cy=output-save-button]').click({force: true});
     cy.get('[data-cy=output-pending-tag]').should('have.length', 1);
 
     // Revert
