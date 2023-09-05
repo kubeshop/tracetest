@@ -16,15 +16,7 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 		res, err := runFn(cmd, args)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, `
-Version
-%s
-
-An error ocurred when executing the command
-
-%s
-`, versionText, err.Error())
-			ExitCLI(1)
+			OnError(err)
 			return
 		}
 
@@ -32,6 +24,18 @@ An error ocurred when executing the command
 			fmt.Println(res)
 		}
 	}
+}
+
+func OnError(err error) {
+	fmt.Fprintf(os.Stderr, `
+Version
+%s
+
+An error ocurred when executing the command
+
+%s
+`, versionText, err.Error())
+	ExitCLI(1)
 }
 
 func WithParamsHandler(validators ...Validator) MiddlewareWrapper {

@@ -1,6 +1,7 @@
 package installer
 
 import (
+	cliConfig "github.com/kubeshop/tracetest/cli/config"
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
@@ -16,7 +17,7 @@ const createIssueMsg = "If you need help, please create an issue: https://github
 func Start() {
 	ui := cliUI.DefaultUI
 
-	ui.Banner()
+	ui.Banner(cliConfig.Version)
 
 	ui.Println(`
 Hi! Welcome to the TraceTest server installer. I'll help you set up your TraceTest server by asking you a few questions

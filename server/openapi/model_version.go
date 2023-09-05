@@ -11,6 +11,12 @@ package openapi
 
 type Version struct {
 	Version string `json:"version,omitempty"`
+
+	Type string `json:"type,omitempty"`
+
+	UiEndpoint string `json:"uiEndpoint,omitempty"`
+
+	AgentEndpoint string `json:"agentEndpoint,omitempty"`
 }
 
 // AssertVersionRequired checks if the required fields are not zero-ed

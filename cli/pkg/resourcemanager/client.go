@@ -46,8 +46,8 @@ func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
 	}
 }
 
-func (c HTTPClient) url(resourceName string, extra ...string) *url.URL {
-	urlStr := c.baseURL + path.Join("/api", resourceName, strings.Join(extra, "/"))
+func (c HTTPClient) url(resourceName, prefix string, extra ...string) *url.URL {
+	urlStr := c.baseURL + path.Join("/", prefix, resourceName, strings.Join(extra, "/"))
 	url, _ := url.Parse(urlStr)
 	return url
 }
@@ -75,6 +75,19 @@ func NewClient(
 		logger:             logger,
 	}
 
+	for _, opt := range opts {
+		opt(&c.options)
+	}
+
+	return c
+}
+
+func (c Client) WithHttpClient(HTTPClient *HTTPClient) Client {
+	c.client = HTTPClient
+	return c
+}
+
+func (c Client) WithOptions(opts ...option) Client {
 	for _, opt := range opts {
 		opt(&c.options)
 	}

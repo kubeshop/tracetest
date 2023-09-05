@@ -30,6 +30,7 @@ func NewTriggerWorker(client *client.Client) *TriggerWorker {
 }
 
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
+	fmt.Println("Trigger handled by agent")
 	triggerConfig := convertProtoToTrigger(triggerRequest.Trigger)
 	triggerer, err := w.registry.Get(triggerConfig.Type)
 	if err != nil {

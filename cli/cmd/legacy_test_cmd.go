@@ -9,7 +9,7 @@ import (
 )
 
 var testCmd = &cobra.Command{
-	GroupID:    cmdGroupTests.ID,
+	GroupID:    cmdGroupResources.ID,
 	Use:        "test",
 	Short:      "Manage your tracetest tests",
 	Long:       "Manage your tracetest tests",

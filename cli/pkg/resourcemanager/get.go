@@ -13,8 +13,14 @@ import (
 
 const VerbGet Verb = "get"
 
+type prefixGetterFn func() string
+
 func (c Client) Get(ctx context.Context, id string, format Format) (string, error) {
-	url := c.client.url(c.resourceNamePlural, id)
+	prefix := ""
+	if c.options.prefixGetterFn != nil {
+		prefix = c.options.prefixGetterFn()
+	}
+	url := c.client.url(c.resourceNamePlural, prefix, id)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
 		return "", fmt.Errorf("cannot build Get request: %w", err)
@@ -47,7 +53,6 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 		}
 
 		return "", fmt.Errorf("could not Get resource: %w", err)
-
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -55,5 +60,5 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 		return "", fmt.Errorf("cannot read Get response: %w", err)
 	}
 
-	return format.Format(string(body), c.options.tableConfig)
+	return format.Format(string(body), c.options.tableConfig, c.options.listPath)
 }

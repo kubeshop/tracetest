@@ -11,6 +11,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/goccy/go-yaml v1.11.0
+	github.com/goware/urlx v0.3.2
 	github.com/kubeshop/tracetest/server v0.0.0-20230512142545-cb5e526e06f9
 	github.com/pterm/pterm v0.12.55
 	github.com/spf13/cobra v1.7.0
@@ -27,6 +28,8 @@ require (
 require (
 	atomicgo.dev/cursor v0.1.1 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
+	github.com/PuerkitoBio/purell v1.1.1 // indirect
+	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect

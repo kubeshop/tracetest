@@ -4,11 +4,15 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/kubeshop/tracetest/cli/actions"
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/spf13/cobra"
 )
 
 var configParams = &configureParameters{}
+
+var (
+	configurator = config.NewConfigurator(resources)
+)
 
 var configureCmd = &cobra.Command{
 	GroupID: cmdGroupConfig.ID,
@@ -18,17 +22,17 @@ var configureCmd = &cobra.Command{
 	PreRun:  setupLogger,
 	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
-		action := actions.NewConfigureAction(cliConfig)
-
-		actionConfig := actions.ConfigureConfig{
-			Global: configParams.Global,
+		flags := config.ConfigFlags{}
+		config, err := config.LoadConfig("")
+		if err != nil {
+			return "", err
 		}
 
 		if flagProvided(cmd, "endpoint") {
-			actionConfig.SetValues.Endpoint = configParams.Endpoint
+			flags.Endpoint = configParams.Endpoint
 		}
 
-		err := action.Run(ctx, actionConfig)
+		err = configurator.Start(ctx, config, flags)
 		return "", err
 	})),
 	PostRun: teardownCommand,
