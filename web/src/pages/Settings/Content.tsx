@@ -7,6 +7,7 @@ import Linter from 'components/Settings/Linter';
 import Polling from 'components/Settings/Polling';
 import TestRunner from 'components/Settings/TestRunner';
 import BetaBadge from 'components/BetaBadge/BetaBadge';
+import {Flag, useCustomization} from 'providers/Customization';
 import * as S from './Settings.styled';
 
 const TabsKeys = {
@@ -19,6 +20,7 @@ const TabsKeys = {
 };
 
 const Content = () => {
+  const {getFlag} = useCustomization();
   const [query, setQuery] = useSearchParams();
 
   return (
@@ -38,9 +40,11 @@ const Content = () => {
           <Tabs.TabPane key={TabsKeys.DataStore} tab="Configure Data Store">
             <DataStore />
           </Tabs.TabPane>
-          <Tabs.TabPane key={TabsKeys.Analytics} tab="Analytics">
-            <Analytics />
-          </Tabs.TabPane>
+          {getFlag(Flag.IsAnalyticsPageEnabled) && (
+            <Tabs.TabPane key={TabsKeys.Analytics} tab="Analytics">
+              <Analytics />
+            </Tabs.TabPane>
+          )}
           <Tabs.TabPane key={TabsKeys.Polling} tab="Trace Polling">
             <Polling />
           </Tabs.TabPane>

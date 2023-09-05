@@ -6,13 +6,19 @@ export enum Operation {
   View = 'view',
 }
 
+export enum Flag {
+  IsAnalyticsPageEnabled = 'isAnalyticsPageEnabled',
+}
+
 interface IContext {
   getComponent<T>(name: string, fallback: React.ComponentType<T>): React.ComponentType<T>;
+  getFlag(flag: Flag): boolean;
   getIsAllowed(operation: Operation): boolean;
 }
 
 export const Context = createContext<IContext>({
   getComponent: (name, fallback) => fallback,
+  getFlag: () => true,
   getIsAllowed: () => true,
 });
 
