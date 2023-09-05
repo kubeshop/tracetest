@@ -75,6 +75,7 @@ func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 		response.Result.Error = &trigger.TriggerError{
 			ConnectionError:    isConnectionError(err),
 			RunningOnContainer: isServerRunningInsideContainer(),
+			TargetsLocalhost:   isTargetLocalhost(job.Test.Trigger),
 			ErrorMessage:       err.Error(),
 		}
 	}
@@ -121,13 +122,13 @@ func isConnectionError(err error) bool {
 	return false
 }
 
-func isTargetLocalhost(job Job) bool {
+func isTargetLocalhost(t trigger.Trigger) bool {
 	var endpoint string
-	switch job.Test.Trigger.Type {
+	switch t.Type {
 	case trigger.TriggerTypeHTTP:
-		endpoint = job.Test.Trigger.HTTP.URL
+		endpoint = t.HTTP.URL
 	case trigger.TriggerTypeGRPC:
-		endpoint = job.Test.Trigger.GRPC.Address
+		endpoint = t.GRPC.Address
 	}
 
 	url, err := url.Parse(endpoint)

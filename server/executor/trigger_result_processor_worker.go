@@ -62,7 +62,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 		if triggerResult.Error.ConnectionError {
 			r.emitUnreachableEndpointEvent(ctx, job, err)
 
-			if isTargetLocalhost(job) && triggerResult.Error.RunningOnContainer {
+			if triggerResult.Error.TargetsLocalhost && triggerResult.Error.RunningOnContainer {
 				r.emitMismatchEndpointEvent(ctx, job, err)
 			}
 		}
