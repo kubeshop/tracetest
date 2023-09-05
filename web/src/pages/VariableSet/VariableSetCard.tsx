@@ -6,6 +6,7 @@ import * as T from 'components/ResourceCard/ResourceCard.styled';
 import {useFileViewerModal} from 'components/FileViewerModal/FileViewerModal.provider';
 import {ResourceType} from 'types/Resource.type';
 import VariableSet from 'models/VariableSet.model';
+import {Operation, useCustomization} from 'providers/Customization';
 import {useVariableSet} from 'providers/VariableSet';
 import * as E from './VariableSet.styled';
 
@@ -16,6 +17,7 @@ interface IProps {
 }
 
 const VariableSetCard = ({variableSet: {description, id, name, values}, variableSet, onDelete, onEdit}: IProps) => {
+  const {getIsAllowed} = useCustomization();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const {onDefinition} = useFileViewerModal();
   const {selectedVariableSet} = useVariableSet();
@@ -47,6 +49,7 @@ const VariableSetCard = ({variableSet: {description, id, name, values}, variable
                 {
                   key: 'edit',
                   label: <span data-cy="variableSet-actions-edit">Edit</span>,
+                  disabled: !getIsAllowed(Operation.Edit),
                   onClick: e => {
                     e.domEvent.stopPropagation();
                     onEdit(variableSet);
@@ -63,6 +66,7 @@ const VariableSetCard = ({variableSet: {description, id, name, values}, variable
                 {
                   key: 'delete',
                   label: <span data-cy="variableSet-actions-delete">Delete</span>,
+                  disabled: !getIsAllowed(Operation.Edit),
                   onClick: e => {
                     e.domEvent.stopPropagation();
                     onDelete(id);

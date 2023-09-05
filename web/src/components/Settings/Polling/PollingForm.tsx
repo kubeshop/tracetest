@@ -1,8 +1,9 @@
 import {useEffect} from 'react';
-import {Button, Col, Form, Input, Row} from 'antd';
+import {Col, Form, Input, Row} from 'antd';
+
+import AllowButton, {Operation} from 'components/AllowButton';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
-
 import {ResourceType, TDraftPollingProfiles} from 'types/Settings.types';
 import SettingService from 'services/Setting.service';
 import * as S from '../common/Settings.styled';
@@ -58,9 +59,9 @@ const PollingForm = () => {
       </Row>
 
       <S.FooterContainer>
-        <Button htmlType="submit" loading={isLoading} type="primary">
+        <AllowButton operation={Operation.Configure} htmlType="submit" loading={isLoading} type="primary">
           Save
-        </Button>
+        </AllowButton>
       </S.FooterContainer>
     </Form>
   );

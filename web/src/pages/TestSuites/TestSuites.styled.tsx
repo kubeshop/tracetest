@@ -1,7 +1,8 @@
-import {Button, Dropdown, Row, Space, Typography} from 'antd';
+import {Dropdown, Row, Space, Typography} from 'antd';
+import AllowButton from 'components/AllowButton';
 import styled from 'styled-components';
 
-export const CreateTestButton = styled(Button)`
+export const CreateTestButton = styled(AllowButton)`
   font-weight: 600;
 `;
 

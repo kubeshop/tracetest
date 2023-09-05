@@ -26,7 +26,7 @@ const VariableSetList = ({onDelete, onEdit, query}: IProps) => {
           title="You have not created any variable sets yet"
           message={
             <>
-              Use the Create button to create your first variable set. Learn more about test or test suites{' '}
+              Use the Create button to create your first variable set. Learn more about variable sets{' '}
               <a href={VARIABLE_SET_DOCUMENTATION_URL}>here.</a>
             </>
           }

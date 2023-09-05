@@ -81,9 +81,16 @@ const DataStoreForm = ({
           </S.TopContainer>
           <S.ButtonsContainer>
             {isConfigReady ? (
-              <Button disabled={isLoading} type="primary" ghost onClick={onDeleteConfig} danger>
+              <AllowButton
+                operation={Operation.Configure}
+                disabled={isLoading}
+                type="primary"
+                ghost
+                onClick={onDeleteConfig}
+                danger
+              >
                 {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
-              </Button>
+              </AllowButton>
             ) : (
               <div />
             )}

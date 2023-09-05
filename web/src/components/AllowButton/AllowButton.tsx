@@ -11,7 +11,7 @@ const AllowButton = ({operation, ...props}: IProps) => {
 
   return (
     <Tooltip title={!isAllowed ? 'You are not allowed to perform this operation' : ''}>
-      <Button {...props} disabled={!isAllowed} />
+      <Button {...props} disabled={!isAllowed || props.disabled} />
     </Tooltip>
   );
 };
