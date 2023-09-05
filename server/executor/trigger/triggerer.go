@@ -13,14 +13,17 @@ import (
 )
 
 type TriggerOptions struct {
-	TraceID  trace.TraceID
+	TraceID trace.TraceID
+}
+
+type ResolveOptions struct {
 	Executor expression.Executor
 }
 
 type Triggerer interface {
-	Trigger(context.Context, test.Test) (Response, error)
+	Trigger(context.Context, test.Test, *TriggerOptions) (Response, error)
 	Type() trigger.TriggerType
-	Resolve(context.Context, test.Test, *TriggerOptions) (test.Test, error)
+	Resolve(context.Context, test.Test, *ResolveOptions) (test.Test, error)
 }
 
 type Response struct {

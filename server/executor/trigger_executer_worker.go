@@ -66,7 +66,9 @@ func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 	job.Test.Trigger = job.Run.ResolvedTrigger
 	run := job.Run
 
-	response, err := triggererObj.Trigger(ctx, job.Test)
+	response, err := triggererObj.Trigger(ctx, job.Test, &triggerer.TriggerOptions{
+		TraceID: run.TraceID,
+	})
 	run = r.handleExecutionResult(run, response, err)
 	run.SpanID = response.SpanID
 

@@ -14,7 +14,7 @@ func TRACEID() Triggerer {
 
 type traceidTriggerer struct{}
 
-func (t *traceidTriggerer) Trigger(ctx context.Context, test test.Test) (Response, error) {
+func (t *traceidTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
 		Result: trigger.TriggerResult{
 			Type:    t.Type(),
@@ -29,7 +29,7 @@ func (t *traceidTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerTypeTraceID
 }
 
-func (t *traceidTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+func (t *traceidTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
 	traceid := test.Trigger.TraceID
 	if traceid == nil {
 		return test, fmt.Errorf("no settings provided for TRACEID triggerer")

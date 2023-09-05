@@ -62,7 +62,7 @@ func newSpanContext(ctx context.Context) trace.SpanContext {
 	})
 }
 
-func (te *httpTriggerer) Trigger(ctx context.Context, test test.Test) (Response, error) {
+func (te *httpTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
 	response := Response{
 		Result: trigger.TriggerResult{
 			Type: te.Type(),
@@ -120,7 +120,7 @@ func (t *httpTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerTypeHTTP
 }
 
-func (t *httpTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+func (t *httpTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
 	http := test.Trigger.HTTP
 
 	if http == nil {

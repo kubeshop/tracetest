@@ -108,8 +108,7 @@ func (r triggerResolverWorker) ProcessItem(ctx context.Context, job Job) {
 
 	executor := expression.NewExecutor(ds...)
 
-	triggerOptions := &triggerer.TriggerOptions{
-		TraceID:  traceID,
+	triggerOptions := &triggerer.ResolveOptions{
 		Executor: executor,
 	}
 

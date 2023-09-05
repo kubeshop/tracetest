@@ -34,11 +34,11 @@ func (t *instrumentedTriggerer) Type() trigger.TriggerType {
 	return trigger.TriggerType("instrumented")
 }
 
-func (t *instrumentedTriggerer) Resolve(ctx context.Context, test test.Test, opts *TriggerOptions) (test.Test, error) {
+func (t *instrumentedTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
 	return t.triggerer.Resolve(ctx, test, opts)
 }
 
-func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test) (Response, error) {
+func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test, opts *TriggerOptions) (Response, error) {
 	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
@@ -49,6 +49,10 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test) (Re
 
 	spanContextConfig := trace.SpanContextConfig{
 		TraceState: tracestate,
+	}
+
+	if opts != nil {
+		spanContextConfig.TraceID = opts.TraceID
 	}
 
 	spanContext := trace.NewSpanContext(spanContextConfig)
@@ -63,7 +67,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, test test.Test) (Re
 	tid := triggerSpan.SpanContext().TraceID()
 	sid := triggerSpan.SpanContext().SpanID()
 
-	resp, err := t.triggerer.Trigger(triggerSpanCtx, test)
+	resp, err := t.triggerer.Trigger(triggerSpanCtx, test, opts)
 
 	resp.TraceID = tid
 	resp.SpanID = sid
