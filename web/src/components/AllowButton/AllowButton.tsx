@@ -9,9 +9,12 @@ const AllowButton = ({operation, ...props}: IProps) => {
   const {getIsAllowed} = useCustomization();
   const isAllowed = getIsAllowed(operation);
 
-  return (
-    <Tooltip title={!isAllowed ? 'You are not allowed to perform this operation' : ''}>
-      <Button {...props} disabled={!isAllowed || props.disabled} />
+  // the tooltip unmounts and remounts the children, detaching it from the DOM
+  return isAllowed ? (
+    <Button {...props} disabled={props.disabled} />
+  ) : (
+    <Tooltip title="You are not allowed to perform this operation">
+      <Button {...props} disabled />
     </Tooltip>
   );
 };

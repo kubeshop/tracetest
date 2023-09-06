@@ -190,6 +190,7 @@ const TestSpecForm = ({
             type="primary"
             disabled={!isValid}
             onClick={form.submit}
+            htmlType="submit"
             data-cy="assertion-form-submit-button"
           >
             Save Test Spec
