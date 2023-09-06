@@ -23,6 +23,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/labstack/gommon/log"
 	"go.opentelemetry.io/otel/trace"
@@ -725,6 +726,8 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 
 	// Prevents bad data in other fields to override correct data
 	existingRun.TriggerResult = run.TriggerResult
+	newTrace := traces.MergeTraces(existingRun.Trace, run.Trace)
+	existingRun.Trace = &newTrace
 
 	err = c.testRunRepository.UpdateRun(ctx, existingRun)
 	if err != nil {
