@@ -203,6 +203,25 @@ func TestEventsAreInjectedIntoAttributes(t *testing.T) {
 	assert.Equal(t, "value", events[1].Attributes["attribute2"])
 }
 
+func TestMergingZeroTraces(t *testing.T) {
+	trace := traces.MergeTraces()
+	assert.NotEmpty(t, trace.ID)
+}
+
+func TestMergingFragmentsFromSameTrace(t *testing.T) {
+	traceID := id.NewRandGenerator().TraceID().String()
+	rootSpan := newSpan("Root")
+	childSpan1 := newSpan("child 1", withParent(&rootSpan))
+	childSpan2 := newSpan("child 2", withParent(&rootSpan))
+
+	firstFragment := traces.NewTrace(traceID, []traces.Span{childSpan2})
+	secondFragment := traces.NewTrace(traceID, []traces.Span{rootSpan, childSpan1})
+
+	trace := traces.MergeTraces(&firstFragment, &secondFragment)
+	assert.NotEmpty(t, trace.ID)
+	assert.Len(t, trace.Flat, 3)
+}
+
 type option func(*traces.Span)
 
 func withParent(parent *traces.Span) option {
