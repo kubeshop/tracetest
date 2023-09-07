@@ -62,7 +62,11 @@ func buildTestPipeline(
 		eventEmitter,
 	)
 
-	tracePoller := executor.NewTracePoller(
+	tracePollerStartWorker := executor.NewTracePollerStartWorker(
+		eventEmitter,
+	)
+
+	tracePollerWorker := executor.NewTracePoller(
 		pollerExecutor,
 		execTestUpdater,
 		subscriptionManager,
@@ -109,12 +113,13 @@ func buildTestPipeline(
 		pipeline.Step[executor.Job]{Processor: triggerResolverWorker, Driver: pgQueue.Channel("trigger_resolve")},
 		pipeline.Step[executor.Job]{Processor: triggerExecuterWorker, Driver: pgQueue.Channel("trigger_execute")},
 		pipeline.Step[executor.Job]{Processor: triggerResultProcessorWorker, Driver: pgQueue.Channel("trigger_result")},
-		pipeline.Step[executor.Job]{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
+		pipeline.Step[executor.Job]{Processor: tracePollerStartWorker, Driver: pgQueue.Channel("tracePoller_start")},
+		pipeline.Step[executor.Job]{Processor: tracePollerWorker, Driver: pgQueue.Channel("tracePoller")},
 		pipeline.Step[executor.Job]{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
 		pipeline.Step[executor.Job]{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
 	)
 
-	const assertionRunnerStepIndex = 5
+	const assertionRunnerStepIndex = 6
 
 	return executor.NewTestPipeline(
 		pipeline,
