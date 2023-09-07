@@ -89,7 +89,7 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return nil
 	}
 
-	oauthServer := oauth.NewOAuthServer(cfg.URL(), cfg.UIEndpoint)
+	oauthServer := oauth.NewOAuthServer(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), cfg.UIEndpoint)
 	err = oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
 		GetAuthJWT()
