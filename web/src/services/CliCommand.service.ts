@@ -63,7 +63,7 @@ const CliCommandService = () => ({
     let command = Object.entries(options).reduce(
       (acc, [option, enabled]) =>
         this.applyOptions[option as CliCommandOption]({command: acc, enabled, id, variableSetId, fileName}),
-      `run ${resourceType}`
+      `run ${resourceType.slice(0, -1)}`
     );
 
     command = this.applyRequiredGates(command, requiredGates);
