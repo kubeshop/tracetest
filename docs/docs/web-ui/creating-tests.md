@@ -8,7 +8,7 @@ Click the **Create** button and select **Create New Test** in the drop down:
 
 The "Create New Test" dialog appears:
 
-![Create a Test](../img/create-test-0.11.png)
+![Create a Test](../img/create-test-0.13.png)
 
 The option to choose the kind of trigger to initiate the trace is presented:
 
@@ -16,11 +16,12 @@ The option to choose the kind of trigger to initiate the trace is presented:
 - GRPC Request - Test and debug your GRPC request.
 - cURL Command - Define your HTTP test via a cURL command.
 - Postman Collection - Define your HTTP request via a Postman collection.
-- TraceID - Define you test via a TraceID.
+- TraceID - Define your test via a TraceID.
+- Kafka - Test consumers with Kafka messages
 
 Choose the trigger and click **Next**:
 
-![Choose Trigger](../img/choose-trigger-0.11.png)
+![Choose Trigger](../img/choose-trigger-0.13.png)
 
 In this example, HTTP Request has been chosen.
 

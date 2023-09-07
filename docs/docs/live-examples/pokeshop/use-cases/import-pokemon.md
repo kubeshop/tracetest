@@ -1,4 +1,4 @@
-# Pokeshop API - Import Pokemon from Queue
+# Pokeshop API - Import Pokemon
 
 This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 

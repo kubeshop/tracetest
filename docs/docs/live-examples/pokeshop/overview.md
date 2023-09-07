@@ -17,7 +17,7 @@ We have three use cases that use each component of this structure and that can b
 - [Add Pokemon](./use-cases/add-pokemon.md): Add a new Pokemon only relying on user input into the database.
 - [Get Pokemon by ID](./use-cases/get-pokemon-by-id.md): Given a Pokemon ID, this endpoint returns the data of a Pokemon. If the same Pokemon was queried, the API will use its cache to return it.
 - [List Pokemon](./use-cases/list-pokemon.md): Lists all Pokemons registered into Pokeshop.
-- [Import Pokemon from Queue](./use-cases/import-pokemon.md): Given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
+- [Import Pokemon](./use-cases/import-pokemon.md): Given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
 - [Import Pokemon from Stream](./use-cases/import-pokemon-from-stream.md): Listening to a Stream, this usecase also does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
 
 ## System Architecture

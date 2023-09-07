@@ -37,22 +37,23 @@ Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that 
 
 Running these tests for the first time will create an Observability trace like the image below, where you can see spans for the stream messaging, the PokeAPI (external API) call and database calls.
 
-<!-- ![](../images/import-pokemon-trace.png) -->
+![](../images/import-pokemon-from-stream-trace.png)
 
 ### Assertions
 
 With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
 
 - **A message was received from Kafka stream:**
-<!-- ![](../images/import-pokemon-message-dequeue-test-spec.png) -->
+![](../images/import-pokemon-from-stream-message-received.png)
 
 - **Import Pokemon use case was triggered**:
+- ![](../images/import-pokemon-from-stream-use-case-executed.png)
 
 - **PokeAPI should return a valid response:**
-<!-- ![](../images/import-pokemon-pokeapi-call-test-spec.png) -->
+![](../images/import-pokemon-from-stream-get-pokeapi.png)
 
 - **The database should respond with low latency (< 200ms):**
-<!-- ![](../images/import-pokemon-db-latency-test-spec.png) -->
+![](../images/import-pokemon-from-stream-database-latency.png)
 
 Now you can validate this entire use case.
 
@@ -88,7 +89,7 @@ spec:
     name: Import Pokemon use case was triggered
     assertions:
     - attr:name = "import pokemon"
-  - selector: span[tracetest.span.type="http" name="HTTP GET pokeapi.pokemon" http.method="GET"]
+  - selector: span[tracetest.span.type="http" name="GET" http.method="GET"]
     name: PokeAPI should return a valid response
     assertions:
     - attr:http.response.body  =  '{"name":"snorlax"}'
