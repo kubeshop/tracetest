@@ -350,11 +350,10 @@ jobs:
       - name: Import image
         run: |
           docker load --input dist/image.tar
-      - name: Install gotesplit
-        run: |
-          go get github.com/Songmu/gotesplit/cmd/gotesplit
       - name: Run tests
         run: |
+          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
+
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
@@ -363,7 +362,8 @@ jobs:
           export TRACETEST_CLI=$PWD/dist/tracetest
           export TEST_ENVIRONMENT=jaeger
 
-          gotesplit -total ${{ matrix.total_splits }} -index ${{ matrix.index }} ./... -- -v -timeout 300s -p 1
+          ls .
+          bin/gotesplit -total ${{ matrix.total_splits }} -index ${{ matrix.index }} ./... -- -v -timeout 300s -p 1
 
   # TODO: this would be a great idea but it doesn't work on GHA with docker
   # it can probablly be implemented with k8s in a separated job
