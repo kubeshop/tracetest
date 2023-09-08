@@ -25,6 +25,7 @@ type (
 	TriggerError struct {
 		ConnectionError    bool   `json:"connectionError"`
 		RunningOnContainer bool   `json:"runningOnContainer"`
+		TargetsLocalhost   bool   `json:"targetsLocalhost"`
 		ErrorMessage       string `json:"message"`
 	}
 )

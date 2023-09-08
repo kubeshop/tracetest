@@ -3,8 +3,6 @@ package executor
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -64,7 +62,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 		if triggerResult.Error.ConnectionError {
 			r.emitUnreachableEndpointEvent(ctx, job, err)
 
-			if isTargetLocalhost(job) && triggerResult.Error.RunningOnContainer {
+			if triggerResult.Error.TargetsLocalhost && triggerResult.Error.RunningOnContainer {
 				r.emitMismatchEndpointEvent(ctx, job, err)
 			}
 		}
@@ -110,28 +108,4 @@ func (r triggerResultProcessorWorker) emitMismatchEndpointEvent(ctx context.Cont
 	if emitErr != nil {
 		r.handleError(job.Run, emitErr)
 	}
-}
-
-func isTargetLocalhost(job Job) bool {
-	var endpoint string
-	switch job.Test.Trigger.Type {
-	case trigger.TriggerTypeHTTP:
-		endpoint = job.Test.Trigger.HTTP.URL
-	case trigger.TriggerTypeGRPC:
-		endpoint = job.Test.Trigger.GRPC.Address
-	}
-
-	url, err := url.Parse(endpoint)
-	if err != nil {
-		return false
-	}
-
-	// removes port
-	host := url.Host
-	colonPosition := strings.Index(url.Host, ":")
-	if colonPosition >= 0 {
-		host = host[0:colonPosition]
-	}
-
-	return host == "localhost" || host == "127.0.0.1"
 }

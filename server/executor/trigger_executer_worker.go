@@ -2,12 +2,17 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/url"
+	"os"
+	"strings"
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -66,6 +71,15 @@ func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 	response, err := triggererObj.Trigger(ctx, job.Test, &triggerer.TriggerOptions{
 		TraceID: run.TraceID,
 	})
+	if err != nil {
+		response.Result.Error = &trigger.TriggerError{
+			ConnectionError:    isConnectionError(err),
+			RunningOnContainer: isServerRunningInsideContainer(),
+			TargetsLocalhost:   isTargetLocalhost(job.Test.Trigger),
+			ErrorMessage:       err.Error(),
+		}
+	}
+
 	run = r.handleExecutionResult(run, response, err)
 	run.SpanID = response.SpanID
 
@@ -88,4 +102,61 @@ func (r triggerExecuterWorker) handleExecutionResult(run test.Run, response trig
 	}
 
 	return run.SuccessfullyTriggered()
+}
+
+func isConnectionError(err error) bool {
+	for err != nil {
+		// a dial error means we couldn't open a TCP connection (either host is not available or DNS doesn't exist)
+		if strings.HasPrefix(err.Error(), "dial ") {
+			return true
+		}
+
+		// it means a trigger timeout
+		if errors.Is(err, context.DeadlineExceeded) {
+			return true
+		}
+
+		err = errors.Unwrap(err)
+	}
+
+	return false
+}
+
+func isTargetLocalhost(t trigger.Trigger) bool {
+	var endpoint string
+	switch t.Type {
+	case trigger.TriggerTypeHTTP:
+		endpoint = t.HTTP.URL
+	case trigger.TriggerTypeGRPC:
+		endpoint = t.GRPC.Address
+	}
+
+	url, err := url.Parse(endpoint)
+	if err != nil {
+		return false
+	}
+
+	// removes port
+	host := url.Host
+	colonPosition := strings.Index(url.Host, ":")
+	if colonPosition >= 0 {
+		host = host[0:colonPosition]
+	}
+
+	return host == "localhost" || host == "127.0.0.1"
+}
+
+func isServerRunningInsideContainer() bool {
+	// Check if running on Docker
+	// Reference: https://paulbradley.org/indocker/
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return true
+	}
+
+	// Check if running on k8s
+	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
+		return true
+	}
+
+	return false
 }
