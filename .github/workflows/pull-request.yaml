@@ -357,10 +357,10 @@ jobs:
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
-          cd ./testing/cli-e2etest
-
           export TRACETEST_CLI=$PWD/dist/tracetest
           export TEST_ENVIRONMENT=jaeger
+
+          cd ./testing/cli-e2etest
 
           ../../bin/gotesplit -total ${{ matrix.total_splits }} -index ${{ matrix.index }} ./... -- -v -timeout 300s -p 1
 
