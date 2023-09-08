@@ -14,7 +14,7 @@ func buildTestSuitePipeline(
 	subscriptionManager *subscription.Manager,
 ) *executor.TestSuitesPipeline {
 	tranRunner := executor.NewTestSuiteRunner(testRunner, runRepo, subscriptionManager)
-	queueBuilder := executor.NewQueueBuilder().
+	queueBuilder := executor.NewQueueConfigurer().
 		WithTestSuiteGetter(tranRepo).
 		WithTestSuiteRunGetter(runRepo)
 

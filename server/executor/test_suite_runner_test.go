@@ -161,7 +161,7 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	runner := executor.NewTestSuiteRunner(testRunner, transactionRunRepo, subscriptionManager)
 
-	queueBuilder := executor.NewQueueBuilder().
+	queueBuilder := executor.NewQueueConfigurer().
 		WithTestSuiteGetter(transactionsRepo).
 		WithTestSuiteRunGetter(transactionRunRepo)
 

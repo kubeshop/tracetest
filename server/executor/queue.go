@@ -174,7 +174,7 @@ type subscriptor interface {
 	Subscribe(string, subscription.Subscriber)
 }
 
-type QueueBuilder[T any] struct {
+type queueConfigurer[T any] struct {
 	cancelRunHandlerFn func(ctx context.Context, run test.Run) error
 	subscriptor        subscriptor
 
@@ -190,56 +190,56 @@ type QueueBuilder[T any] struct {
 	instanceID string
 }
 
-func NewQueueBuilder() *QueueBuilder[Job] {
-	return &QueueBuilder[Job]{}
+func NewQueueConfigurer() *queueConfigurer[Job] {
+	return &queueConfigurer[Job]{}
 }
 
-func (qb *QueueBuilder[T]) WithCancelRunHandlerFn(fn func(ctx context.Context, run test.Run) error) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithCancelRunHandlerFn(fn func(ctx context.Context, run test.Run) error) *queueConfigurer[T] {
 	qb.cancelRunHandlerFn = fn
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithSubscriptor(subscriptor subscriptor) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithSubscriptor(subscriptor subscriptor) *queueConfigurer[T] {
 	qb.subscriptor = subscriptor
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithRunGetter(runs testRunGetter) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithRunGetter(runs testRunGetter) *queueConfigurer[T] {
 	qb.runs = runs
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithInstanceID(id string) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithInstanceID(id string) *queueConfigurer[T] {
 	qb.instanceID = id
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithTestGetter(tests testGetter) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithTestGetter(tests testGetter) *queueConfigurer[T] {
 	qb.tests = tests
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithPollingProfileGetter(pollingProfiles pollingProfileGetter) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithPollingProfileGetter(pollingProfiles pollingProfileGetter) *queueConfigurer[T] {
 	qb.pollingProfiles = pollingProfiles
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithDataStoreGetter(dataStore dataStoreGetter) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithDataStoreGetter(dataStore dataStoreGetter) *queueConfigurer[T] {
 	qb.dataStores = dataStore
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithTestSuiteGetter(suites testSuiteGetter) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithTestSuiteGetter(suites testSuiteGetter) *queueConfigurer[T] {
 	qb.testSuites = suites
 	return qb
 }
 
-func (qb *QueueBuilder[T]) WithTestSuiteRunGetter(suiteRuns testSuiteRunGetter) *QueueBuilder[T] {
+func (qb *queueConfigurer[T]) WithTestSuiteRunGetter(suiteRuns testSuiteRunGetter) *queueConfigurer[T] {
 	qb.testSuiteRuns = suiteRuns
 	return qb
 }
 
-func (qb *QueueBuilder[T]) Configure(queue *pipeline.Queue[Job]) {
+func (qb *queueConfigurer[T]) Configure(queue *pipeline.Queue[Job]) {
 	q := &Queue{
 		cancelRunHandlerFn: qb.cancelRunHandlerFn,
 		subscriptor:        qb.subscriptor,

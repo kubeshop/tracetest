@@ -94,7 +94,7 @@ func buildTestPipeline(
 
 	cancelRunHandlerFn := executor.HandleRunCancelation(execTestUpdater, tracer, eventEmitter)
 
-	queueBuilder := executor.NewQueueBuilder().
+	queueBuilder := executor.NewQueueConfigurer().
 		WithCancelRunHandlerFn(cancelRunHandlerFn).
 		WithSubscriptor(subscriptionManager).
 		WithDataStoreGetter(dsRepo).

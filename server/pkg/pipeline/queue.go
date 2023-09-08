@@ -39,12 +39,11 @@ const (
 
 func NewQueue[T any](driver QueueDriver[T], itemProcessor QueueItemProcessor[T]) *Queue[T] {
 	queue := &Queue[T]{
-		driver:        driver,
 		itemProcessor: itemProcessor,
 		workerPool:    pond.New(QueueWorkerCount, QueueWorkerBufferSize),
 	}
 
-	driver.SetListener(queue)
+	queue.SetDriver(driver)
 
 	return queue
 }
@@ -64,12 +63,21 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 	// use a worker to enqueue the job in case the driver takes a bit to actually enqueue
 	// this way we release the caller as soon as possible
 	q.workerPool.Submit(func() {
+		if q.EnqueuePreprocessorFn != nil {
+			item = q.EnqueuePreprocessorFn(ctx, item)
+		}
+
 		q.driver.Enqueue(item)
 	})
 }
 
 func (q Queue[T]) Listen(item T) {
 	ctx := context.Background()
+
+	if q.ListenPreprocessorFn != nil {
+		ctx, item = q.ListenPreprocessorFn(ctx, item)
+	}
+
 	// Process the item with cancellation monitoring
 	select {
 	default:
