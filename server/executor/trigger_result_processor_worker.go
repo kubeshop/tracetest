@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -21,11 +22,13 @@ func NewTriggerResultProcessorWorker(
 	tracer trace.Tracer,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,
+	updater RunUpdater,
 ) *triggerResultProcessorWorker {
 	return &triggerResultProcessorWorker{
 		tracer:              tracer,
 		subscriptionManager: subscriptionManager,
 		eventEmitter:        eventEmitter,
+		updater:             updater,
 	}
 }
 
@@ -34,6 +37,7 @@ type triggerResultProcessorWorker struct {
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
 	outputQueue         Enqueuer
+	updater             RunUpdater
 }
 
 func (r *triggerResultProcessorWorker) SetOutputQueue(queue Enqueuer) {
@@ -56,6 +60,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 	ctx, pollingSpan := r.tracer.Start(ctx, "Start processing trigger response")
 	defer pollingSpan.End()
 
+	job.Run = r.handleExecutionResult(job.Run)
 	triggerResult := job.Run.TriggerResult
 	if triggerResult.Error != nil {
 		err := triggerResult.Error.Error()
@@ -85,6 +90,8 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 		}
 	}
 
+	r.handleDBError(job.Run, r.updater.Update(ctx, job.Run))
+
 	r.outputQueue.Enqueue(ctx, job)
 }
 
@@ -108,4 +115,18 @@ func (r triggerResultProcessorWorker) emitMismatchEndpointEvent(ctx context.Cont
 	if emitErr != nil {
 		r.handleError(job.Run, emitErr)
 	}
+}
+
+func (r triggerResultProcessorWorker) handleExecutionResult(run test.Run) test.Run {
+	if run.TriggerResult.Error != nil {
+		run = run.TriggerFailed(fmt.Errorf(run.TriggerResult.Error.ErrorMessage))
+
+		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+			"finalState": string(run.State),
+		})
+
+		return run
+	}
+
+	return run.SuccessfullyTriggered()
 }

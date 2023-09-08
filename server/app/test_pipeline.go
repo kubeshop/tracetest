@@ -88,6 +88,7 @@ func buildTestPipeline(
 		tracer,
 		subscriptionManager,
 		eventEmitter,
+		execTestUpdater,
 	)
 
 	cancelRunHandlerFn := executor.HandleRunCancelation(execTestUpdater, tracer, eventEmitter)

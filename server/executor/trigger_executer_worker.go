@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kubeshop/tracetest/server/analytics"
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/test"
@@ -80,28 +79,13 @@ func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 		}
 	}
 
-	run = r.handleExecutionResult(run, response, err)
 	run.SpanID = response.SpanID
-
+	run.TriggerResult = response.Result
+	run = run.TriggerCompleted(run.TriggerResult)
 	r.handleDBError(run, r.updater.Update(ctx, run))
 
 	job.Run = run
 	r.outputQueue.Enqueue(ctx, job)
-}
-
-func (r triggerExecuterWorker) handleExecutionResult(run test.Run, response triggerer.Response, err error) test.Run {
-	run = run.TriggerCompleted(response.Result)
-	if err != nil {
-		run = run.TriggerFailed(err)
-
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-		})
-
-		return run
-	}
-
-	return run.SuccessfullyTriggered()
 }
 
 func isConnectionError(err error) bool {
