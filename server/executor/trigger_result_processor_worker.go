@@ -7,6 +7,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
@@ -36,11 +37,11 @@ type triggerResultProcessorWorker struct {
 	tracer              trace.Tracer
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
-	outputQueue         Enqueuer
+	outputQueue         pipeline.Enqueuer[Job]
 	updater             RunUpdater
 }
 
-func (r *triggerResultProcessorWorker) SetOutputQueue(queue Enqueuer) {
+func (r *triggerResultProcessorWorker) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	r.outputQueue = queue
 }
 

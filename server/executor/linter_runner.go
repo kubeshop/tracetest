@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/linter"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 )
@@ -22,7 +23,7 @@ type defaultLinterRunner struct {
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
 	analyzerGetter      AnalyzerGetter
-	outputQueue         Enqueuer
+	outputQueue         pipeline.Enqueuer[Job]
 }
 
 func NewlinterRunner(
@@ -39,7 +40,7 @@ func NewlinterRunner(
 	}
 }
 
-func (e *defaultLinterRunner) SetOutputQueue(queue Enqueuer) {
+func (e *defaultLinterRunner) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	e.outputQueue = queue
 }
 

@@ -46,6 +46,8 @@ import (
 var (
 	Version = "dev"
 	Env     = "dev"
+
+	pgChannelName = "tracetest_queue"
 )
 
 var EmptyDemoEnabled []string

@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 type TestSuitesPipeline struct {
-	*Pipeline
+	*pipeline.Pipeline[Job]
 	runs testSuiteRunRepo
 }
 
@@ -19,7 +20,7 @@ type testSuiteRunRepo interface {
 }
 
 func NewTestSuitePipeline(
-	pipeline *Pipeline,
+	pipeline *pipeline.Pipeline[Job],
 	runs testSuiteRunRepo,
 ) *TestSuitesPipeline {
 	return &TestSuitesPipeline{

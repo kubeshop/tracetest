@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/variableset"
@@ -39,7 +40,7 @@ func NewAssertionRunner(
 	}
 }
 
-func (e *defaultAssertionRunner) SetOutputQueue(Enqueuer) {
+func (e *defaultAssertionRunner) SetOutputQueue(pipeline.Enqueuer[Job]) {
 	// this is a no-op, as assertion runner does not need to enqueue anything
 }
 
