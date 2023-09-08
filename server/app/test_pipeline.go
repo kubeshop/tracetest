@@ -114,7 +114,7 @@ func buildTestPipeline(
 		pipeline.Step[executor.Job]{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
 	)
 
-	const assertionRunnerStepIndex = 3
+	const assertionRunnerStepIndex = 5
 
 	return executor.NewTestPipeline(
 		pipeline,
