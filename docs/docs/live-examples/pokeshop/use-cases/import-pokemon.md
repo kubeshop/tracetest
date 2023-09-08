@@ -26,7 +26,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Queue as RabbitMQ
-    participant Worker as Worker
+    participant Worker as Queue Worker
     participant ExternalAPI as PokeAPI
     participant Database as Postgres
     

@@ -56,6 +56,11 @@ const sidebars = {
               id: "live-examples/pokeshop/use-cases/import-pokemon",
               label: "Import Pokemon",
             },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/import-pokemon-from-stream",
+              label: "Import Pokemon from Stream",
+            },
           ],
         },
       ],
