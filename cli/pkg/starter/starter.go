@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/golang-jwt/jwt/v4"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/initialization"
 
@@ -33,14 +34,17 @@ func (s *Starter) Run(ctx context.Context, cfg config.Config) error {
 	return s.configurator.WithOnFinish(s.onStartAgent).Start(ctx, cfg, flags)
 }
 
-func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
+func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config, sOrg config.Entry, sEnv config.Entry) {
 	env, err := s.getEnvironment(ctx, cfg)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
 
-	s.ui.Println(fmt.Sprintf("Connecting Agent to environment %s...", env.Name))
-	err = startAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey)
+	s.ui.Info(fmt.Sprintf(`
+Connecting Agent with name %s to Organization %s and Environment %s
+`, "local", sOrg.Name, env.Name))
+
+	err = s.StartAgent(ctx, cfg.AgentEndpoint, "local", env.AgentApiKey, cfg.UIEndpoint)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
@@ -84,12 +88,61 @@ func (s *Starter) getEnvironment(ctx context.Context, cfg config.Config) (enviro
 	return env, nil
 }
 
-func startAgent(ctx context.Context, endpoint, agentApiKey string) error {
+func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, uiEndpoint string) error {
 	cfg := agentConfig.Config{
 		ServerURL: endpoint,
 		APIKey:    agentApiKey,
-		Name:      "local",
+		Name:      name,
 	}
 
-	return initialization.Start(ctx, cfg)
+	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", name))
+	client, err := initialization.NewClient(ctx, cfg)
+	if err != nil {
+		return err
+	}
+
+	err = client.Start(ctx)
+	if err != nil {
+		return err
+	}
+
+	claims, err := s.getTokenClaims(client.SessionConfiguration().AgentIdentification.Token)
+	if err != nil {
+		return err
+	}
+
+	isOpen := true
+	message := fmt.Sprintf("Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment (%s). You can:", claims["environment_id"])
+	for isOpen {
+		options := []ui.Option{{
+			Text: "Open Tracetest in a browser to this environment",
+			Fn: func(_ ui.UI) {
+				s.ui.OpenBrowser(fmt.Sprintf("%s/organizations/%s/environments/%s/dashboard", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+			},
+		}, {
+			Text: "Stop this agent",
+			Fn: func(_ ui.UI) {
+				isOpen = false
+				go client.Close()
+			},
+		}}
+
+		selected := s.ui.Select(message, options, 0)
+		selected.Fn(s.ui)
+	}
+	return nil
+}
+
+func (s *Starter) getTokenClaims(tokenString string) (jwt.MapClaims, error) {
+	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
+	if err != nil {
+		return jwt.MapClaims{}, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return jwt.MapClaims{}, fmt.Errorf("invalid token claims")
+	}
+
+	return claims, nil
 }

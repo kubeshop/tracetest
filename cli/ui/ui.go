@@ -3,6 +3,8 @@ package ui
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 
 	"github.com/pterm/pterm"
 	"github.com/pterm/pterm/putils"
@@ -24,6 +26,7 @@ type UI interface {
 
 	Println(string)
 	Title(string)
+	OpenBrowser(string) error
 
 	Green(string) string
 	Red(string) string
@@ -169,4 +172,17 @@ func (ui ptermUI) Select(prompt string, options []Option, defaultIndex int) (sel
 
 	selectedIx := lookupMap[selectedText]
 	return options[selectedIx]
+}
+
+func (ui ptermUI) OpenBrowser(u string) error {
+	switch runtime.GOOS {
+	case "linux":
+		return exec.Command("xdg-open", u).Start()
+	case "windows":
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", u).Start()
+	case "darwin":
+		return exec.Command("open", u).Start()
+	default:
+		return fmt.Errorf("unsupported platform")
+	}
 }

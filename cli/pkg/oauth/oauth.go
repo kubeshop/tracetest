@@ -1,13 +1,15 @@
 package oauth
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
-	"os/exec"
-	"runtime"
+	"sync"
+
+	"github.com/kubeshop/tracetest/cli/ui"
 )
 
 type OnAuthSuccess func(token string, jwt string)
@@ -19,6 +21,8 @@ type OAuthServer struct {
 	onSuccess        OnAuthSuccess
 	onFailure        OnAuthFailure
 	port             int
+	server           *http.Server
+	mutex            sync.Mutex
 }
 
 type Option func(*OAuthServer)
@@ -48,7 +52,8 @@ func (s *OAuthServer) GetAuthJWT() error {
 
 	loginUrl := fmt.Sprintf("%s/oauth?callback=%s", s.frontendEndpoint, url)
 
-	err = openBrowser(loginUrl)
+	ui := ui.DefaultUI
+	err = ui.OpenBrowser(loginUrl)
 	if err != nil {
 		return fmt.Errorf("failed to open the oauth url: %s", loginUrl)
 	}
@@ -101,8 +106,11 @@ func (s *OAuthServer) getUrl() (string, error) {
 }
 
 func (s *OAuthServer) start() error {
+	srv := &http.Server{Addr: fmt.Sprintf(":%d", s.port)}
+	s.server = srv
+
 	http.HandleFunc("/", s.callback)
-	return http.ListenAndServe(fmt.Sprintf(":%d", s.port), nil)
+	return srv.ListenAndServe()
 }
 
 func (s *OAuthServer) callback(w http.ResponseWriter, r *http.Request) {
@@ -116,6 +124,9 @@ func (s *OAuthServer) callback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *OAuthServer) handleResult(r *http.Request) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	tokenId := r.URL.Query().Get("tokenId")
 	if tokenId == "" {
 		s.onFailure(fmt.Errorf("tokenId not found"))
@@ -129,6 +140,11 @@ func (s *OAuthServer) handleResult(r *http.Request) {
 	}
 
 	s.onSuccess(tokenId, jwt)
+	err = s.server.Shutdown(context.Background())
+	if err != nil {
+		s.onFailure(fmt.Errorf("failed to shutdown oauth server: %w", err))
+		return
+	}
 }
 
 func getFreePort() (port int, err error) {
@@ -141,17 +157,4 @@ func getFreePort() (port int, err error) {
 		}
 	}
 	return
-}
-
-func openBrowser(u string) error {
-	switch runtime.GOOS {
-	case "linux":
-		return exec.Command("xdg-open", u).Start()
-	case "windows":
-		return exec.Command("rundll32", "url.dll,FileProtocolHandler", u).Start()
-	case "darwin":
-		return exec.Command("open", u).Start()
-	default:
-		return fmt.Errorf("unsupported platform")
-	}
 }

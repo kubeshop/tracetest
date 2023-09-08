@@ -10,15 +10,13 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 )
 
-// Start the agent with given configuration
-func Start(ctx context.Context, config config.Config) error {
-	fmt.Println("Starting agent")
+func NewClient(ctx context.Context, config config.Config) (*client.Client, error) {
 	client, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	triggerWorker := workers.NewTriggerWorker(client)
@@ -31,12 +29,21 @@ func Start(ctx context.Context, config config.Config) error {
 		return client.Close()
 	})
 
+	return client, nil
+}
+
+// Start the agent with given configuration
+func Start(ctx context.Context, config config.Config) error {
+	client, err := NewClient(ctx, config)
+	if err != nil {
+		return err
+	}
+
 	err = client.Start(ctx)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Agent started! Do not close the terminal.")
 	client.WaitUntilDisconnected()
 	return nil
 }
