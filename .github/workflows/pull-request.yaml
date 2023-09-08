@@ -352,7 +352,7 @@ jobs:
           docker load --input dist/image.tar
       - name: Run tests
         run: |
-          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
+          go get github.com/Songmu/gotesplit/cmd/gotesplit
 
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
