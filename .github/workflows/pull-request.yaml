@@ -337,9 +337,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    matrix:
-      parallelism: [4]
-      index: [0,1,2,3]
+      matrix:
+        total_splits: [4]
+        index: [0,1,2,3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -350,7 +350,7 @@ jobs:
       - name: Import image
         run: |
           docker load --input dist/image.tar
-      - name: Run tests parallelly
+      - name: Install gotesplit to run tests parallelly
         run: |
           curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
       - name: Run tests
@@ -365,7 +365,7 @@ jobs:
           export ENABLE_CLI_DEBUG=false
           export TAG=$(TAG)
 
-          bin/gotesplit -total ${{ matrix.parallelism }} -index ${{ matrix.index }} ./... -- -v -timeout 300s -p 1
+          bin/gotesplit -total ${{ matrix.total_splits }} -index ${{ matrix.index }} ./... -- -v -timeout 300s -p 1
 
   # TODO: this would be a great idea but it doesn't work on GHA with docker
   # it can probablly be implemented with k8s in a separated job
