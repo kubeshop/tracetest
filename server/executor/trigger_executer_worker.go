@@ -80,6 +80,7 @@ func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 	}
 
 	run.SpanID = response.SpanID
+	run.TriggerResult = response.Result
 	run = run.TriggerCompleted(run.TriggerResult)
 	r.handleDBError(run, r.updater.Update(ctx, run))
 
