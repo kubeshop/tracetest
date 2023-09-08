@@ -1,8 +1,8 @@
 # Pokeshop API - Import Pokemon from Stream
 
-This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
+This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously. For example, when triggering a user notification, generating reports or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
-Here the process listens to a stream, and whenever an event is read from it it triggers the following process:
+Here the process listens to a stream, and whenever an event is read from it, the following process is triggered:
 ```mermaid
 sequenceDiagram
     participant Stream as Kafka
@@ -35,13 +35,13 @@ Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that 
 
 ### Traces
 
-Running these tests for the first time will create an Observability trace like the image below, where you can see spans for the stream messaging, the PokeAPI (external API) call and database calls.
+Running these tests for the first time will create a distributed trace like the image below, where you can see spans for the stream messaging, the PokeAPI (external API) call and database calls.
 
 ![](../images/import-pokemon-from-stream-trace.png)
 
 ### Assertions
 
-With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
+With this trace, we can build [assertions](../../../concepts/assertions.md) with Tracetest and validate the API and Worker behavior:
 
 - **A message was received from Kafka stream:**
 ![](../images/import-pokemon-from-stream-message-received.png)
@@ -59,7 +59,7 @@ Now you can validate this entire use case.
 
 ### Test Definition
 
-If you want to replicate this entire test on Tracetest, you can replicate these steps on our Web UI or using our CLI, saving the following test definition as the file `test-definition.yml` and later running:
+If you want to replicate this entire test with Tracetest, you can replicate these steps in the Web UI or using the CLI, saving the following test definition as the file `test-definition.yml` and running:
 
 ```sh
 tracetest run test -f test-definition.yml

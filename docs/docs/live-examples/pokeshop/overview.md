@@ -18,7 +18,7 @@ We have three use cases that use each component of this structure and that can b
 - [Get Pokemon by ID](./use-cases/get-pokemon-by-id.md): Given a Pokemon ID, this endpoint returns the data of a Pokemon. If the same Pokemon was queried, the API will use its cache to return it.
 - [List Pokemon](./use-cases/list-pokemon.md): Lists all Pokemons registered into Pokeshop.
 - [Import Pokemon](./use-cases/import-pokemon.md): Given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
-- [Import Pokemon from Stream](./use-cases/import-pokemon-from-stream.md): Listening to a Stream, this usecase also does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
+- [Import Pokemon from Stream](./use-cases/import-pokemon-from-stream.md): Listening to a Stream, this use case also does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
 
 ## System Architecture
 
@@ -28,7 +28,7 @@ The system is divided into two components:
 - a **Queue Worker** who deals with background processes, receiving data from the API
 - a **Stream Worker** who handles import events sent from a stream
 
-The communication between the API and Queue Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to Jaeger and communicate with a Postgres database. Additionaly, a Stream Worker listens to a `Kafka` stream to see if there is any import event sent on it to execute.
+The communication between the API and Queue Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to Jaeger and communicate with a Postgres database. Additionally, a Stream Worker listens to a `Kafka` stream to see if there is any import event sent on it to execute.
 
 A diagram of the system structure can be seen here:
 
