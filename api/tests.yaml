@@ -28,7 +28,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           readOnly: true
         name:
           type: string
