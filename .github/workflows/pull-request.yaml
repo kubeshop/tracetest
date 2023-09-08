@@ -108,7 +108,6 @@ jobs:
       - name: Run unit tests
         run: cd agent; make test -B
 
-
   unit-test-web:
     name: WebUI unit tests
     runs-on: ubuntu-latest
@@ -336,6 +335,11 @@ jobs:
     name: CLI e2e tests
     needs: [build-docker]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    matrix:
+      parallelism: [4]
+      index: [0,1,2,3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -346,16 +350,22 @@ jobs:
       - name: Import image
         run: |
           docker load --input dist/image.tar
+      - name: Run tests parallelly
+        run: |
+          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
       - name: Run tests
         run: |
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest
 
+          cd ./testing/cli-e2etest
+
           export TRACETEST_CLI=$PWD/dist/tracetest
           export TEST_ENVIRONMENT=jaeger
+          export ENABLE_CLI_DEBUG=false
+          export TAG=$(TAG)
 
-          cd ./testing/cli-e2etest
-          make test
+          bin/gotesplit -total ${{ matrix.parallelism }} -index ${{ matrix.index }} ./... -- -v -timeout 300s -p 1
 
   # TODO: this would be a great idea but it doesn't work on GHA with docker
   # it can probablly be implemented with k8s in a separated job
