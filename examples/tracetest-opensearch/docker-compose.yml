@@ -57,11 +57,10 @@ services:
         condition: service_healthy
 
   data-prepper:
-    restart: unless-stopped
-    image: opensearchproject/data-prepper:1.5.1
+    image: opensearchproject/data-prepper:latest
     volumes:
-      - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
-      - ./opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
+      - ./opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml
+      - ./opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml
     healthcheck:
       test: ["CMD", "bash", "-c", "printf 'GET / HTTP/1.1\n\n' > /dev/tcp/127.0.0.1/21890"]
       interval: 1s
@@ -72,7 +71,7 @@ services:
         condition: service_healthy
 
   opensearch:
-    image: opensearchproject/opensearch:2.4.1
+    image: opensearchproject/opensearch:latest
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
@@ -89,7 +88,7 @@ services:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
     healthcheck:
-      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health?wait_for_status=yellow", "-ku admin:admin"]
       interval: 5s
-      timeout: 10s
-      retries: 5
+      timeout: 25s
+      retries: 4
