@@ -36,7 +36,9 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 
 func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
 	var serverURL string
-	if flags.Endpoint != "" {
+	if prev.UIEndpoint != "" {
+		serverURL = prev.UIEndpoint
+	} else if flags.Endpoint != "" {
 		serverURL = flags.Endpoint
 	} else {
 		path := ""
@@ -67,9 +69,6 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return fmt.Errorf("cannot get version metadata: %w", err)
 	}
 
-	cfg.AgentEndpoint = version.GetAgentEndpoint()
-	cfg.UIEndpoint = version.GetUiEndpoint()
-
 	serverType := version.GetType()
 	if serverType == "oss" {
 		err := Save(cfg)
@@ -79,6 +78,13 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 
 		c.ui.Success("Successfully configured Tracetest CLI")
 		return nil
+	}
+
+	cfg.AgentEndpoint = version.GetAgentEndpoint()
+	cfg.UIEndpoint = version.GetUiEndpoint()
+	cfg.Scheme, cfg.Endpoint, cfg.ServerPath, err = ParseServerURL(version.GetApiEndpoint())
+	if err != nil {
+		return fmt.Errorf("cannot parse server url: %w", err)
 	}
 
 	if prev.Jwt != "" {

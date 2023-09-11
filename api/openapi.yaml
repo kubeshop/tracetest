@@ -1185,10 +1185,12 @@ paths:
         500:
           description: "problem deleting an variable set"
 
-  /version:
+  /version.{fileExtension}:
     get:
       tags:
         - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/fileExtension"
       summary: "Get the version of the API"
       description: "Get the version of the API"
       operationId: getVersion

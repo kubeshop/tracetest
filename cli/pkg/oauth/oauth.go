@@ -50,7 +50,7 @@ func (s *OAuthServer) GetAuthJWT() error {
 		return fmt.Errorf("failed to start oauth server: %w", err)
 	}
 
-	loginUrl := fmt.Sprintf("%s/oauth?callback=%s", s.frontendEndpoint, url)
+	loginUrl := fmt.Sprintf("%soauth?callback=%s", s.frontendEndpoint, url)
 
 	ui := ui.DefaultUI
 	err = ui.OpenBrowser(loginUrl)

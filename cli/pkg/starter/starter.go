@@ -117,7 +117,7 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, u
 		options := []ui.Option{{
 			Text: "Open Tracetest in a browser to this environment",
 			Fn: func(_ ui.UI) {
-				s.ui.OpenBrowser(fmt.Sprintf("%s/organizations/%s/environments/%s/dashboard", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+				s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s/dashboard", uiEndpoint, claims["organization_id"], claims["environment_id"]))
 			},
 		}, {
 			Text: "Stop this agent",

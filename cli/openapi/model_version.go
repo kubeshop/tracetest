@@ -23,6 +23,7 @@ type Version struct {
 	Type          *string `json:"type,omitempty"`
 	UiEndpoint    *string `json:"uiEndpoint,omitempty"`
 	AgentEndpoint *string `json:"agentEndpoint,omitempty"`
+	ApiEndpoint   *string `json:"apiEndpoint,omitempty"`
 }
 
 // NewVersion instantiates a new Version object
@@ -170,6 +171,38 @@ func (o *Version) SetAgentEndpoint(v string) {
 	o.AgentEndpoint = &v
 }
 
+// GetApiEndpoint returns the ApiEndpoint field value if set, zero value otherwise.
+func (o *Version) GetApiEndpoint() string {
+	if o == nil || isNil(o.ApiEndpoint) {
+		var ret string
+		return ret
+	}
+	return *o.ApiEndpoint
+}
+
+// GetApiEndpointOk returns a tuple with the ApiEndpoint field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Version) GetApiEndpointOk() (*string, bool) {
+	if o == nil || isNil(o.ApiEndpoint) {
+		return nil, false
+	}
+	return o.ApiEndpoint, true
+}
+
+// HasApiEndpoint returns a boolean if a field has been set.
+func (o *Version) HasApiEndpoint() bool {
+	if o != nil && !isNil(o.ApiEndpoint) {
+		return true
+	}
+
+	return false
+}
+
+// SetApiEndpoint gets a reference to the given string and assigns it to the ApiEndpoint field.
+func (o *Version) SetApiEndpoint(v string) {
+	o.ApiEndpoint = &v
+}
+
 func (o Version) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o Version) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.AgentEndpoint) {
 		toSerialize["agentEndpoint"] = o.AgentEndpoint
+	}
+	if !isNil(o.ApiEndpoint) {
+		toSerialize["apiEndpoint"] = o.ApiEndpoint
 	}
 	return toSerialize, nil
 }
