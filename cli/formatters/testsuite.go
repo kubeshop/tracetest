@@ -129,5 +129,5 @@ func (f testSuiteRun) getColoredText(passed bool, text string) string {
 }
 
 func (f testSuiteRun) getRunLink(tsID string, runID int32) string {
-	return fmt.Sprintf("%s/testsuite/%s/run/%s", f.baseURLFn(), tsID, runID)
+	return fmt.Sprintf("%s/testsuite/%s/run/%d", f.baseURLFn(), tsID, runID)
 }

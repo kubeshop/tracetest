@@ -19,7 +19,7 @@ func TestJSON(t *testing.T) {
 			Name: openapi.PtrString("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:    openapi.PtrString("1"),
+			Id:    openapi.PtrInt32(1),
 			State: openapi.PtrString("FINISHED"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(true),
@@ -43,7 +43,7 @@ func TestSuccessfulTestRunOutput(t *testing.T) {
 			Name: openapi.PtrString("Testcase 1"),
 		},
 		Run: openapi.TestRun{
-			Id:      openapi.PtrString("1"),
+			Id:      openapi.PtrInt32(1),
 			State:   openapi.PtrString("FINISHED"),
 			TraceId: openapi.PtrString("cb5e80748cc06f8a63f6b96c056defec"),
 			Result: &openapi.AssertionResults{
@@ -72,7 +72,7 @@ func TestSuccessfulTestRunOutputWithResult(t *testing.T) {
 			},
 		},
 		Run: openapi.TestRun{
-			Id:      openapi.PtrString("1"),
+			Id:      openapi.PtrInt32(1),
 			TraceId: openapi.PtrString("cb5e80748cc06f8a63f6b96c056defec"),
 			State:   openapi.PtrString("FINISHED"),
 			Result: &openapi.AssertionResults{
@@ -128,7 +128,7 @@ func TestFailingTestOutput(t *testing.T) {
 			},
 		},
 		Run: openapi.TestRun{
-			Id:      openapi.PtrString("1"),
+			Id:      openapi.PtrInt32(1),
 			TraceId: openapi.PtrString("cb5e80748cc06f8a63f6b96c056defec"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(false),
@@ -220,7 +220,7 @@ func TestFailingTestOutputWithPadding(t *testing.T) {
 			},
 		},
 		Run: openapi.TestRun{
-			Id:      openapi.PtrString("1"),
+			Id:      openapi.PtrInt32(1),
 			TraceId: openapi.PtrString("cb5e80748cc06f8a63f6b96c056defec"),
 			Result: &openapi.AssertionResults{
 				AllPassed: openapi.PtrBool(false),
