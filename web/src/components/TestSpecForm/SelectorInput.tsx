@@ -8,7 +8,7 @@ import {IValues} from './TestSpecForm';
 interface IProps {
   form: FormInstance<IValues>;
   testId: string;
-  runId: string;
+  runId: number;
   onValidSelector(isValid: boolean): void;
 }
 

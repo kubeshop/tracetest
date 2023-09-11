@@ -20,7 +20,7 @@ var _ MappedNullable = &TestSuiteRun{}
 
 // TestSuiteRun struct for TestSuiteRun
 type TestSuiteRun struct {
-	Id                          *string            `json:"id,omitempty"`
+	Id                          *int32             `json:"id,omitempty"`
 	Version                     *int32             `json:"version,omitempty"`
 	CreatedAt                   *time.Time         `json:"createdAt,omitempty"`
 	CompletedAt                 *time.Time         `json:"completedAt,omitempty"`
@@ -51,9 +51,9 @@ func NewTestSuiteRunWithDefaults() *TestSuiteRun {
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *TestSuiteRun) GetId() string {
+func (o *TestSuiteRun) GetId() int32 {
 	if o == nil || isNil(o.Id) {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.Id
@@ -61,7 +61,7 @@ func (o *TestSuiteRun) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestSuiteRun) GetIdOk() (*string, bool) {
+func (o *TestSuiteRun) GetIdOk() (*int32, bool) {
 	if o == nil || isNil(o.Id) {
 		return nil, false
 	}
@@ -77,8 +77,8 @@ func (o *TestSuiteRun) HasId() bool {
 	return false
 }
 
-// SetId gets a reference to the given string and assigns it to the Id field.
-func (o *TestSuiteRun) SetId(v string) {
+// SetId gets a reference to the given int32 and assigns it to the Id field.
+func (o *TestSuiteRun) SetId(v int32) {
 	o.Id = &v
 }
 

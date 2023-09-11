@@ -24,7 +24,7 @@ interface IProps {
   field: Pick<FormListFieldData, never>;
   name: number;
   attributeList: TSpanFlatAttribute[];
-  runId: string;
+  runId: number;
   testId: string;
   spanIdList: string[];
 }

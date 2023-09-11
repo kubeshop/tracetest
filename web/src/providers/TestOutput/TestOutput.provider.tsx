@@ -64,7 +64,7 @@ export const Context = createContext<IContext>({
 
 interface IProps {
   children: React.ReactNode;
-  runId: string;
+  runId: number;
   testId: string;
 }
 

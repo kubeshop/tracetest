@@ -8,7 +8,7 @@ const useJUnitResult = () => {
   const [jUnit, setJUnit] = useState<string>('');
 
   const loadJUnit = useCallback(
-    async (testId: string, runId: string) => {
+    async (testId: string, runId: number) => {
       const data = await getJUnit({runId, testId}).unwrap();
 
       setJUnit(data);

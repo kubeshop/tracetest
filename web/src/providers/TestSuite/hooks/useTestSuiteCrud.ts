@@ -27,7 +27,7 @@ const useTestSuiteCrud = () => {
   const {onOpen} = useMissingVariablesModal();
 
   const runTestSuite = useCallback(
-    async (suite: TestSuite, runId?: string, variableSetId = selectedVariableSet?.id) => {
+    async (suite: TestSuite, runId?: number, variableSetId = selectedVariableSet?.id) => {
       const {fullSteps: testList} = await getTestSuite({
         testSuiteId: suite.id,
         version: suite.version,

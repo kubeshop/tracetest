@@ -3,7 +3,6 @@ package runner
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -97,13 +96,9 @@ func (r testRunner) StartRun(ctx context.Context, resource any, runInfo openapi.
 func (r testRunner) UpdateResult(ctx context.Context, result RunResult) (RunResult, error) {
 	test := result.Resource.(openapi.TestResource)
 	run := result.Run.(openapi.TestRun)
-	runID, err := strconv.Atoi(run.GetId())
-	if err != nil {
-		return RunResult{}, fmt.Errorf("invalid test run id format: %w", err)
-	}
 
 	updated, _, err := r.openapiClient.ApiApi.
-		GetTestRun(ctx, test.Spec.GetId(), int32(runID)).
+		GetTestRun(ctx, test.Spec.GetId(), run.GetId()).
 		Execute()
 
 	if err != nil {
@@ -123,16 +118,12 @@ func (r testRunner) UpdateResult(ctx context.Context, result RunResult) (RunResu
 func (r testRunner) JUnitResult(ctx context.Context, result RunResult) (string, error) {
 	test := result.Resource.(openapi.TestResource)
 	run := result.Run.(openapi.TestRun)
-	runID, err := strconv.Atoi(run.GetId())
-	if err != nil {
-		return "", fmt.Errorf("invalid run id format: %w", err)
-	}
 
 	junit, _, err := r.openapiClient.ApiApi.
 		GetRunResultJUnit(
 			ctx,
 			test.Spec.GetId(),
-			int32(runID),
+			int32(run.GetId()),
 		).
 		Execute()
 	if err != nil {

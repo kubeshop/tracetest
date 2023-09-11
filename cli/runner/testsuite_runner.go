@@ -3,7 +3,6 @@ package runner
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -97,13 +96,9 @@ func (r testSuiteRunner) StartRun(ctx context.Context, resource any, runInfo ope
 func (r testSuiteRunner) UpdateResult(ctx context.Context, result RunResult) (RunResult, error) {
 	testSuite := result.Resource.(openapi.TestSuiteResource)
 	run := result.Run.(openapi.TestSuiteRun)
-	runID, err := strconv.Atoi(run.GetId())
-	if err != nil {
-		return RunResult{}, fmt.Errorf("invalid test suite run id format: %w", err)
-	}
 
 	updated, _, err := r.openapiClient.ApiApi.
-		GetTestSuiteRun(ctx, testSuite.Spec.GetId(), int32(runID)).
+		GetTestSuiteRun(ctx, testSuite.Spec.GetId(), *run.Id).
 		Execute()
 
 	if err != nil {

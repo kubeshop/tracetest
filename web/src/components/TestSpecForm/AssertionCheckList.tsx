@@ -14,7 +14,7 @@ interface IProps {
   fields: FormListFieldData[];
   form: FormInstance<IValues>;
   remove(name: number): void;
-  runId: string;
+  runId: number;
   testId: string;
   spanIdList: string[];
 }

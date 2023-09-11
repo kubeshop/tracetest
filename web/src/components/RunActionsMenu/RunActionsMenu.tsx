@@ -9,11 +9,11 @@ import {ResourceType} from 'types/Resource.type';
 import * as S from './RunActionsMenu.styled';
 
 interface IProps {
-  resultId: string;
+  resultId: number;
   testId: string;
   isRunView?: boolean;
   testSuiteId?: string;
-  testSuiteRunId: string;
+  testSuiteRunId: number;
 }
 
 const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunView = false}: IProps) => {

@@ -23,7 +23,7 @@ interface IProps {
   onValidate(_: any, output: TestOutput): void;
   isValid: boolean;
   output?: TestOutput;
-  runId: string;
+  runId: number;
   testId: string;
 }
 
