@@ -20,7 +20,7 @@ var _ MappedNullable = &ResolveContext{}
 // ResolveContext struct for ResolveContext
 type ResolveContext struct {
 	TestId        *string `json:"testId,omitempty"`
-	RunId         *string `json:"runId,omitempty"`
+	RunId         *int32  `json:"runId,omitempty"`
 	SpanId        *string `json:"spanId,omitempty"`
 	Selector      *string `json:"selector,omitempty"`
 	VariableSetId *string `json:"variableSetId,omitempty"`
@@ -76,9 +76,9 @@ func (o *ResolveContext) SetTestId(v string) {
 }
 
 // GetRunId returns the RunId field value if set, zero value otherwise.
-func (o *ResolveContext) GetRunId() string {
+func (o *ResolveContext) GetRunId() int32 {
 	if o == nil || isNil(o.RunId) {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.RunId
@@ -86,7 +86,7 @@ func (o *ResolveContext) GetRunId() string {
 
 // GetRunIdOk returns a tuple with the RunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ResolveContext) GetRunIdOk() (*string, bool) {
+func (o *ResolveContext) GetRunIdOk() (*int32, bool) {
 	if o == nil || isNil(o.RunId) {
 		return nil, false
 	}
@@ -102,8 +102,8 @@ func (o *ResolveContext) HasRunId() bool {
 	return false
 }
 
-// SetRunId gets a reference to the given string and assigns it to the RunId field.
-func (o *ResolveContext) SetRunId(v string) {
+// SetRunId gets a reference to the given int32 and assigns it to the RunId field.
+func (o *ResolveContext) SetRunId(v int32) {
 	o.RunId = &v
 }
 

@@ -128,6 +128,6 @@ func (f testSuiteRun) getColoredText(passed bool, text string) string {
 	return pterm.FgRed.Sprintf(text)
 }
 
-func (f testSuiteRun) getRunLink(tsID, runID string) string {
+func (f testSuiteRun) getRunLink(tsID string, runID int32) string {
 	return fmt.Sprintf("%s/testsuite/%s/run/%s", f.baseURLFn(), tsID, runID)
 }

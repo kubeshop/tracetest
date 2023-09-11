@@ -48,7 +48,7 @@ type TestRun struct {
 	RequiredGatesResult       *RequiredGatesResult  `json:"requiredGatesResult,omitempty"`
 	Metadata                  *map[string]string    `json:"metadata,omitempty"`
 	TestSuiteId               *string               `json:"testSuiteId,omitempty"`
-	TestSuiteRunId            *string               `json:"testSuiteRunId,omitempty"`
+	TestSuiteRunId            *int32                `json:"testSuiteRunId,omitempty"`
 }
 
 // NewTestRun instantiates a new TestRun object
@@ -805,9 +805,9 @@ func (o *TestRun) SetTestSuiteId(v string) {
 }
 
 // GetTestSuiteRunId returns the TestSuiteRunId field value if set, zero value otherwise.
-func (o *TestRun) GetTestSuiteRunId() string {
+func (o *TestRun) GetTestSuiteRunId() int32 {
 	if o == nil || isNil(o.TestSuiteRunId) {
-		var ret string
+		var ret int32
 		return ret
 	}
 	return *o.TestSuiteRunId
@@ -815,7 +815,7 @@ func (o *TestRun) GetTestSuiteRunId() string {
 
 // GetTestSuiteRunIdOk returns a tuple with the TestSuiteRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TestRun) GetTestSuiteRunIdOk() (*string, bool) {
+func (o *TestRun) GetTestSuiteRunIdOk() (*int32, bool) {
 	if o == nil || isNil(o.TestSuiteRunId) {
 		return nil, false
 	}
@@ -831,8 +831,8 @@ func (o *TestRun) HasTestSuiteRunId() bool {
 	return false
 }
 
-// SetTestSuiteRunId gets a reference to the given string and assigns it to the TestSuiteRunId field.
-func (o *TestRun) SetTestSuiteRunId(v string) {
+// SetTestSuiteRunId gets a reference to the given int32 and assigns it to the TestSuiteRunId field.
+func (o *TestRun) SetTestSuiteRunId(v int32) {
 	o.TestSuiteRunId = &v
 }
 
