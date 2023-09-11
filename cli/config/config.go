@@ -1,7 +1,6 @@
 package config
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -132,7 +131,7 @@ func ParseServerURL(serverURL string) (scheme, endpoint string, serverPath *stri
 	return url.Scheme, url.Host, path, nil
 }
 
-func Save(ctx context.Context, config Config) error {
+func Save(config Config) error {
 	configPath, err := GetConfigurationPath()
 	if err != nil {
 		return fmt.Errorf("could not get configuration path: %w", err)
@@ -155,12 +154,15 @@ func Save(ctx context.Context, config Config) error {
 }
 
 func GetConfigurationPath() (string, error) {
-	homePath, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("could not get user home dir: %w", err)
-	}
+	configPath := "./config.yml"
+	if _, err := os.Stat("config.yml"); os.IsNotExist(err) {
+		homePath, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("could not get user home dir: %w", err)
+		}
 
-	configPath := path.Join(homePath, ".tracetest/config.yml")
+		configPath = path.Join(homePath, ".tracetest/config.yml")
+	}
 
 	return configPath, nil
 }

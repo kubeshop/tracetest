@@ -2,9 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"os/exec"
-	"runtime"
 
+	"github.com/kubeshop/tracetest/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +18,8 @@ var dashboardCmd = &cobra.Command{
 			return "", fmt.Errorf("missing Tracetest endpoint configuration")
 		}
 
-		err := openBrowser(cliConfig.URL())
+		ui := ui.DefaultUI
+		err := ui.OpenBrowser(cliConfig.URL())
 		if err != nil {
 			return "", fmt.Errorf("failed to open the dashboard url: %s", cliConfig.URL())
 		}
@@ -31,17 +31,4 @@ var dashboardCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(dashboardCmd)
-}
-
-func openBrowser(u string) error {
-	switch runtime.GOOS {
-	case "linux":
-		return exec.Command("xdg-open", u).Start()
-	case "windows":
-		return exec.Command("rundll32", "url.dll,FileProtocolHandler", u).Start()
-	case "darwin":
-		return exec.Command("open", u).Start()
-	default:
-		return fmt.Errorf("unsupported platform")
-	}
 }

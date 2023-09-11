@@ -11,7 +11,7 @@ import (
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
-type onFinishFn func(context.Context, Config)
+type onFinishFn func(context.Context, Config, Entry, Entry)
 
 type Configurator struct {
 	resources *resourcemanager.Registry
@@ -21,7 +21,7 @@ type Configurator struct {
 
 func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 	ui := cliUI.DefaultUI
-	onFinish := func(_ context.Context, _ Config) {
+	onFinish := func(_ context.Context, _ Config, _ Entry, _ Entry) {
 		ui.Success("Successfully configured Tracetest CLI")
 		ui.Finish()
 	}
@@ -72,7 +72,7 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 
 	serverType := version.GetType()
 	if serverType == "oss" {
-		err := Save(ctx, cfg)
+		err := Save(cfg)
 		if err != nil {
 			return fmt.Errorf("could not save configuration: %w", err)
 		}
@@ -111,41 +111,25 @@ func (c Configurator) onOAuthFailure(err error) {
 }
 
 func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config) {
-	cfg, err := c.organizationSelector(ctx, cfg)
+	cfg, org, err := c.organizationSelector(ctx, cfg)
 	if err != nil {
 		c.ui.Exit(err.Error())
 		return
 	}
 
-	cfg, err = c.environmentSelector(ctx, cfg)
+	cfg, env, err := c.environmentSelector(ctx, cfg)
 	if err != nil {
 		c.ui.Exit(err.Error())
 		return
 	}
 
-	err = Save(ctx, cfg)
+	err = Save(cfg)
 	if err != nil {
 		c.ui.Exit(err.Error())
 		return
 	}
 
-	c.onFinish(ctx, cfg)
-}
-
-func (c Configurator) ShowEnvironmentSelector(ctx context.Context, cfg Config) {
-	cfg, err := c.environmentSelector(ctx, cfg)
-	if err != nil {
-		c.ui.Exit(err.Error())
-		return
-	}
-
-	err = Save(ctx, cfg)
-	if err != nil {
-		c.ui.Exit(err.Error())
-		return
-	}
-
-	c.onFinish(ctx, cfg)
+	c.onFinish(ctx, cfg, org, env)
 }
 
 func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {
