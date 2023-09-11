@@ -37,7 +37,7 @@ describe('TestDefinitionActions', () => {
       expect(setRequest.url).toEqual('http://localhost/api/tests/testId');
       expect(setRequest.method).toEqual(HTTP_METHOD.PUT);
 
-      expect(reRunRequest.url).toEqual('http://localhost/api/tests/testId/run/runId/rerun');
+      expect(reRunRequest.url).toEqual('http://localhost/api/tests/testId/run/1/rerun');
       expect(reRunRequest.method).toEqual(HTTP_METHOD.POST);
 
       expect(fetchMock.mock.calls.length).toBe(2);
@@ -59,7 +59,7 @@ describe('TestDefinitionActions', () => {
 
       const dryRunRequest = fetchMock.mock.calls[0][0] as Request;
 
-      expect(dryRunRequest.url).toEqual('http://localhost/api/tests/testId/run/runId/dry-run');
+      expect(dryRunRequest.url).toEqual('http://localhost/api/tests/testId/run/1/dry-run');
       expect(dryRunRequest.method).toEqual(HTTP_METHOD.PUT);
 
       expect(fetchMock.mock.calls.length).toBe(1);

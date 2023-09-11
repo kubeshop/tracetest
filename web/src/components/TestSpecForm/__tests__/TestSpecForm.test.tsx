@@ -8,7 +8,7 @@ const defaultProps = {
   onClearSelectorSuggestions: jest.fn(),
   onClickPrevSelector: jest.fn(),
   testId: 'testId',
-  runId: 'runId',
+  runId: 1,
   isValid: false,
   onIsValid: jest.fn(),
 };
