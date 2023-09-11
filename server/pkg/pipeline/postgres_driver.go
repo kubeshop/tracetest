@@ -103,7 +103,7 @@ func (qd *postgresQueueDriver[T]) worker(conn *pgxpool.Conn) {
 		return
 	}
 
-	qd.log("received job for channel: %s, Item: %+v", job.Item)
+	qd.log("received job for channel: %s")
 
 	channel, err := qd.getChannel(job.Channel)
 	if err != nil {
@@ -111,7 +111,7 @@ func (qd *postgresQueueDriver[T]) worker(conn *pgxpool.Conn) {
 		return
 	}
 
-	qd.log("processing job for channel: %s, Item: %+v", job.Channel, job.Item)
+	qd.log("processing job for channel: %s", job.Channel)
 	channel.listener.Listen(job.Item)
 }
 
