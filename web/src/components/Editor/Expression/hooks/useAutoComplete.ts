@@ -10,7 +10,7 @@ import {SupportedEditors} from 'constants/Editor.constants';
 
 interface IProps {
   testId: string;
-  runId: string;
+  runId: number;
   onSelect?(option: Completion): void;
   autocompleteCustomValues: string[];
 }

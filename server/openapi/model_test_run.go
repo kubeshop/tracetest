@@ -14,7 +14,7 @@ import (
 )
 
 type TestRun struct {
-	Id string `json:"id,omitempty"`
+	Id int32 `json:"id,omitempty"`
 
 	TraceId string `json:"traceId,omitempty"`
 
@@ -65,7 +65,7 @@ type TestRun struct {
 
 	TestSuiteId string `json:"testSuiteId,omitempty"`
 
-	TestSuiteRunId string `json:"testSuiteRunId,omitempty"`
+	TestSuiteRunId int32 `json:"testSuiteRunId,omitempty"`
 }
 
 // AssertTestRunRequired checks if the required fields are not zero-ed

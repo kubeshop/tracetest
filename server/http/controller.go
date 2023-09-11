@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
@@ -448,14 +447,8 @@ func (c *controller) buildDataStores(ctx context.Context, info openapi.ResolveRe
 		}}, ds...)
 	}
 
-	if context.RunId != "" && context.TestId != "" {
-		runId, err := strconv.Atoi(context.RunId)
-
-		if err != nil {
-			return [][]expression.DataStore{}, err
-		}
-
-		run, err := c.testRunRepository.GetRun(ctx, id.ID(context.TestId), runId)
+	if context.TestId != "" && context.RunId > 0 {
+		run, err := c.testRunRepository.GetRun(ctx, id.ID(context.TestId), int(context.RunId))
 		if err != nil {
 			return [][]expression.DataStore{}, err
 		}

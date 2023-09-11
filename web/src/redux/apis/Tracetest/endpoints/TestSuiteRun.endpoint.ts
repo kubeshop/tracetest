@@ -41,7 +41,7 @@ export const testSuiteRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     }),
   }),
 
-  getTestSuiteRunById: builder.query<TestSuiteRun, {testSuiteId: string; runId: string}>({
+  getTestSuiteRunById: builder.query<TestSuiteRun, {testSuiteId: string; runId: number}>({
     query: ({testSuiteId, runId}) => `/testsuites/${testSuiteId}/run/${runId}`,
     providesTags: result => [{type: TracetestApiTags.TESTSUITE_RUN, id: result?.id}],
     transformResponse: (raw: TRawTestSuiteRunResourceRun) => TestSuiteRun(raw),
@@ -59,7 +59,7 @@ export const testSuiteRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     },
   }),
 
-  deleteTestSuiteRunById: builder.mutation<TestSuiteRun, {testSuiteId: string; runId: string}>({
+  deleteTestSuiteRunById: builder.mutation<TestSuiteRun, {testSuiteId: string; runId: number}>({
     query: ({testSuiteId, runId}) => ({
       url: `/testsuites/${testSuiteId}/run/${runId}`,
       method: HTTP_METHOD.DELETE,

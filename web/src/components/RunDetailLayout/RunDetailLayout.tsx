@@ -28,7 +28,7 @@ const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
   </S.ContainerHeader>
 );
 
-const renderTab = (title: string, testId: string, runId: string, mode: string) => (
+const renderTab = (title: string, testId: string, runId: number, mode: string) => (
   <S.TabLink $isActive={mode === title.toLowerCase()} to={`/test/${testId}/run/${runId}/${title.toLowerCase()}`}>
     {title}
   </S.TabLink>

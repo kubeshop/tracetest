@@ -7,10 +7,10 @@ interface IProps {
 }
 
 const TestSuiteRunLayout = ({children}: IProps) => {
-  const {testSuiteId = '', runId = ''} = useParams();
+  const {testSuiteId = '', runId = 0} = useParams();
 
   return (
-    <TestSuiteRunProvider testSuiteId={testSuiteId} runId={runId}>
+    <TestSuiteRunProvider testSuiteId={testSuiteId} runId={Number(runId)}>
       <TestSuiteHeader />
       {children}
     </TestSuiteRunProvider>

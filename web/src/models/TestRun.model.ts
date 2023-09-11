@@ -34,6 +34,7 @@ type TestRun = Model<
     state: TTestRunState;
     linter: LinterResult;
     requiredGatesResult: RequiredGatesResult;
+    testSuiteRunId: number;
   }
 >;
 
@@ -91,7 +92,7 @@ export function isRunStateAnalyzingError(state: TTestRunState) {
 }
 
 const TestRun = ({
-  id = '',
+  id = 0,
   traceId = '',
   spanId = '',
   state = 'CREATED',
@@ -111,7 +112,7 @@ const TestRun = ({
   outputs = [],
   variableSet = {},
   testSuiteId = '',
-  testSuiteRunId = '',
+  testSuiteRunId = 0,
   linter = {},
   requiredGatesResult = {required: [], failed: [], passed: true},
 }: TRawTestRun): TestRun => {
@@ -139,7 +140,7 @@ const TestRun = ({
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
     variableSet: VariableSet.fromRun(variableSet),
     testSuiteId,
-    testSuiteRunId,
+    testSuiteRunId: testSuiteRunId ? Number(testSuiteRunId) : 0,
     linter: LinterResult(linter),
     requiredGatesResult: RequiredGatesResult(requiredGatesResult),
   };

@@ -30,7 +30,7 @@ const Expression = ({
   onSelectAutocompleteOption = noop,
   context = {},
 }: IEditorProps) => {
-  const {testId = '', runId = ''} = context;
+  const {testId = '', runId = 0} = context;
   const [isHovering, setIsHovering] = useState(false);
   const {selectedVariableSet} = useVariableSet();
   const editorTheme = useEditorTheme();

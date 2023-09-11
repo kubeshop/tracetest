@@ -12,7 +12,7 @@ package openapi
 type ResolveContext struct {
 	TestId string `json:"testId,omitempty"`
 
-	RunId string `json:"runId,omitempty"`
+	RunId int32 `json:"runId,omitempty"`
 
 	SpanId string `json:"spanId,omitempty"`
 

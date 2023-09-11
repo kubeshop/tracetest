@@ -21,7 +21,7 @@ const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
   const {onOpen} = useConfirmationModal();
 
   const onConfirmDelete = useCallback(
-    (runId: string) => {
+    (runId: number) => {
       if (type === ResourceType.Test) {
         TestAnalyticsService.onDeleteTestRun();
         deleteTestRunById({testId: id, runId});
@@ -35,7 +35,7 @@ const useDeleteResourceRun = ({id, isRunView = false, type}: IProps) => {
   );
 
   return useCallback(
-    (runId: string) => {
+    (runId: number) => {
       onOpen({
         title: `Are you sure you want to delete the Run?`,
         onConfirm: () => onConfirmDelete(runId),

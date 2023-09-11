@@ -40,7 +40,7 @@ func (m OpenAPI) TestSuiteRun(in testsuite.TestSuiteRun) openapi.TestSuiteRun {
 	}
 
 	return openapi.TestSuiteRun{
-		Id:                          strconv.Itoa(in.ID),
+		Id:                          int32(in.ID),
 		Version:                     int32(in.TestSuiteVersion),
 		CreatedAt:                   in.CreatedAt,
 		CompletedAt:                 in.CompletedAt,
@@ -268,8 +268,10 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		return openapi.TestRun{}
 	}
 
+	testSuiteID, _ := strconv.Atoi(in.TestSuiteID)
+
 	return openapi.TestRun{
-		Id:                        strconv.Itoa(in.ID),
+		Id:                        int32(in.ID),
 		TraceId:                   in.TraceID.String(),
 		SpanId:                    in.SpanID.String(),
 		State:                     string(in.State),
@@ -290,7 +292,7 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		Metadata:                  in.Metadata,
 		VariableSet:               m.VariableSet(in.VariableSet),
 		TestSuiteId:               in.TestSuiteID,
-		TestSuiteRunId:            in.TestSuiteRunID,
+		TestSuiteRunId:            int32(testSuiteID),
 		Linter:                    m.LinterResult(in.Linter),
 		RequiredGatesResult:       m.RequiredGatesResult(in.RequiredGatesResult),
 	}
@@ -391,7 +393,6 @@ func (m Model) Definition(in []openapi.TestSpec) test.Specs {
 func (m Model) Run(in openapi.TestRun) (*test.Run, error) {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
 	sid, _ := trace.SpanIDFromHex(in.SpanId)
-	id, _ := strconv.Atoi(in.Id)
 	result, err := m.Result(in.Result)
 
 	if err != nil {
@@ -399,7 +400,7 @@ func (m Model) Run(in openapi.TestRun) (*test.Run, error) {
 	}
 
 	return &test.Run{
-		ID:                        id,
+		ID:                        int(in.Id),
 		TraceID:                   tid,
 		SpanID:                    sid,
 		State:                     test.RunState(in.State),

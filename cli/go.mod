@@ -1,6 +1,6 @@
 module github.com/kubeshop/tracetest/cli
 
-go 1.20
+go 1.21
 
 require (
 	github.com/Jeffail/gabs/v2 v2.7.0
@@ -11,8 +11,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/goccy/go-yaml v1.11.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/goware/urlx v0.3.2
-	github.com/kubeshop/tracetest/agent v0.0.0-20230908143300-4e0515ca5ecb
+	github.com/kubeshop/tracetest/agent v0.0.0-20230907210810-84198fc9f4ef
 	github.com/kubeshop/tracetest/server v0.0.0-20230809150857-6314696222d3
 	github.com/pterm/pterm v0.12.55
 	github.com/spf13/cobra v1.7.0
@@ -51,7 +52,6 @@ require (
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect

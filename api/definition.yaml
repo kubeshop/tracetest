@@ -18,7 +18,7 @@ components:
           type: string
           description: resource ID
         runId:
-          type: string
+          type: integer
           description: run ID
         type:
           type: string

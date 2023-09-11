@@ -9,12 +9,11 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/alitto/pond"
-
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
@@ -23,9 +22,6 @@ import (
 )
 
 const (
-	QueueWorkerCount      = 20
-	QueueWorkerBufferSize = QueueWorkerCount * 1_000 // 1k jobs per worker
-
 	JobCountHeader string = "X-Tracetest-Job-Count"
 )
 
@@ -150,14 +146,6 @@ func (j *Job) IncreaseEnqueueCount() {
 	j.Headers.SetInt(JobCountHeader, j.EnqueueCount()+1)
 }
 
-type Enqueuer interface {
-	Enqueue(context.Context, Job)
-}
-
-type QueueItemProcessor interface {
-	ProcessItem(context.Context, Job)
-}
-
 type pollingProfileGetter interface {
 	Get(context.Context, id.ID) (pollingprofile.PollingProfile, error)
 }
@@ -186,16 +174,7 @@ type subscriptor interface {
 	Subscribe(string, subscription.Subscriber)
 }
 
-type Listener interface {
-	Listen(Job)
-}
-
-type QueueDriver interface {
-	Enqueue(Job)
-	SetListener(Listener)
-}
-
-type QueueBuilder struct {
+type queueConfigurer[T any] struct {
 	cancelRunHandlerFn func(ctx context.Context, run test.Run) error
 	subscriptor        subscriptor
 
@@ -211,57 +190,57 @@ type QueueBuilder struct {
 	instanceID string
 }
 
-func NewQueueBuilder() *QueueBuilder {
-	return &QueueBuilder{}
+func NewQueueConfigurer() *queueConfigurer[Job] {
+	return &queueConfigurer[Job]{}
 }
 
-func (qb *QueueBuilder) WithCancelRunHandlerFn(fn func(ctx context.Context, run test.Run) error) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithCancelRunHandlerFn(fn func(ctx context.Context, run test.Run) error) *queueConfigurer[T] {
 	qb.cancelRunHandlerFn = fn
 	return qb
 }
 
-func (qb *QueueBuilder) WithSubscriptor(subscriptor subscriptor) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithSubscriptor(subscriptor subscriptor) *queueConfigurer[T] {
 	qb.subscriptor = subscriptor
 	return qb
 }
 
-func (qb *QueueBuilder) WithRunGetter(runs testRunGetter) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithRunGetter(runs testRunGetter) *queueConfigurer[T] {
 	qb.runs = runs
 	return qb
 }
 
-func (qb *QueueBuilder) WithInstanceID(id string) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithInstanceID(id string) *queueConfigurer[T] {
 	qb.instanceID = id
 	return qb
 }
 
-func (qb *QueueBuilder) WithTestGetter(tests testGetter) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithTestGetter(tests testGetter) *queueConfigurer[T] {
 	qb.tests = tests
 	return qb
 }
 
-func (qb *QueueBuilder) WithPollingProfileGetter(pollingProfiles pollingProfileGetter) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithPollingProfileGetter(pollingProfiles pollingProfileGetter) *queueConfigurer[T] {
 	qb.pollingProfiles = pollingProfiles
 	return qb
 }
 
-func (qb *QueueBuilder) WithDataStoreGetter(dataStore dataStoreGetter) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithDataStoreGetter(dataStore dataStoreGetter) *queueConfigurer[T] {
 	qb.dataStores = dataStore
 	return qb
 }
 
-func (qb *QueueBuilder) WithTestSuiteGetter(suites testSuiteGetter) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithTestSuiteGetter(suites testSuiteGetter) *queueConfigurer[T] {
 	qb.testSuites = suites
 	return qb
 }
 
-func (qb *QueueBuilder) WithTestSuiteRunGetter(suiteRuns testSuiteRunGetter) *QueueBuilder {
+func (qb *queueConfigurer[T]) WithTestSuiteRunGetter(suiteRuns testSuiteRunGetter) *queueConfigurer[T] {
 	qb.testSuiteRuns = suiteRuns
 	return qb
 }
 
-func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcessor) *Queue {
-	queue := &Queue{
+func (qb *queueConfigurer[T]) Configure(queue *pipeline.Queue[Job]) {
+	q := &Queue{
 		cancelRunHandlerFn: qb.cancelRunHandlerFn,
 		subscriptor:        qb.subscriptor,
 
@@ -274,16 +253,12 @@ func (qb *QueueBuilder) Build(driver QueueDriver, itemProcessor QueueItemProcess
 		pollingProfiles: qb.pollingProfiles,
 		dataStores:      qb.dataStores,
 
-		driver:        driver,
-		itemProcessor: itemProcessor,
-		workerPool:    pond.New(QueueWorkerCount, QueueWorkerBufferSize),
-
 		instanceID: qb.instanceID,
 	}
 
-	driver.SetListener(queue)
+	queue.EnqueuePreprocessorFn = q.enqueuePreprocess
+	queue.ListenPreprocessorFn = q.listenPreprocess
 
-	return queue
 }
 
 type Queue struct {
@@ -299,101 +274,59 @@ type Queue struct {
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
 
-	itemProcessor QueueItemProcessor
-	driver        QueueDriver
-	workerPool    *pond.WorkerPool
-
 	instanceID string
-}
-
-func (q *Queue) SetDriver(driver QueueDriver) {
-	q.driver = driver
-	driver.SetListener(q)
 }
 
 func propagator() propagation.TextMapPropagator {
 	return propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}, tenantPropagator{})
 }
 
-func (q Queue) Enqueue(ctx context.Context, job Job) {
-	select {
-	default:
-	case <-ctx.Done():
-		return
+func (q Queue) enqueuePreprocess(ctx context.Context, input Job) Job {
+	if input.Headers == nil {
+		input.Headers = &headers{}
+	}
+	propagator().Inject(ctx, propagation.MapCarrier(*input.Headers))
+	input.Headers.Set("InstanceID", q.instanceID)
+
+	version := 1
+	if input.Test.Version != nil {
+		version = *input.Test.Version
 	}
 
-	// use a worker to enqueue the job in case the driver takes a bit to actually enqueue
-	// this way we release the caller as soon as possible
-	q.workerPool.Submit(func() {
-		if job.Headers == nil {
-			job.Headers = &headers{}
-		}
-		propagator().Inject(ctx, propagation.MapCarrier(*job.Headers))
-		job.Headers.Set("InstanceID", q.instanceID)
+	return Job{
+		Headers: input.Headers,
 
-		version := 1
-		if job.Test.Version != nil {
-			version = *job.Test.Version
-		}
+		Test: test.Test{ID: input.Test.ID},
+		Run:  test.Run{ID: input.Run.ID, TestVersion: version, TraceID: input.Run.TraceID},
 
-		newJob := Job{
-			Headers: job.Headers,
+		TestSuite:    testsuite.TestSuite{ID: input.TestSuite.ID},
+		TestSuiteRun: testsuite.TestSuiteRun{ID: input.TestSuiteRun.ID},
 
-			Test: test.Test{ID: job.Test.ID},
-			Run:  test.Run{ID: job.Run.ID, TestVersion: version, TraceID: job.Run.TraceID},
-
-			TestSuite:    testsuite.TestSuite{ID: job.TestSuite.ID},
-			TestSuiteRun: testsuite.TestSuiteRun{ID: job.TestSuiteRun.ID},
-
-			PollingProfile: pollingprofile.PollingProfile{ID: job.PollingProfile.ID},
-			DataStore:      datastore.DataStore{ID: job.DataStore.ID},
-		}
-		log.Printf("queue: enqueuing job for run %d", job.Run.ID)
-
-		q.driver.Enqueue(newJob)
-	})
+		PollingProfile: pollingprofile.PollingProfile{ID: input.PollingProfile.ID},
+		DataStore:      datastore.DataStore{ID: input.DataStore.ID},
+	}
 }
 
-func (q Queue) Listen(job Job) {
+func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, Job) {
 	log.Printf("queue: received job for run %d", job.Run.ID)
 	// this is called when a new job is put in the queue and we need to process it
-	ctx := propagator().Extract(context.Background(), propagation.MapCarrier(*job.Headers))
+	ctx = propagator().Extract(ctx, propagation.MapCarrier(*job.Headers))
 
 	ctx = context.WithValue(ctx, "LastInstanceID", job.Headers.Get("InstanceID"))
 
 	ctx, cancelCtx := context.WithCancel(ctx)
 	q.listenForStopRequests(context.Background(), cancelCtx, job)
 
-	newJob := Job{
-		Headers: job.Headers,
-	}
-	newJob.Test = q.resolveTest(ctx, job)
-	// todo: revert when using actual queues
-	newJob.Run = q.resolveTestRun(ctx, job)
-	// todo: change the otlp server to have its own table
-	// newJob.Run = job.Run
-
-	newJob.TestSuite = q.resolveTestSuite(ctx, job)
-	newJob.TestSuiteRun = q.resolveTestSuiteRun(ctx, job)
-
-	newJob.PollingProfile = q.resolvePollingProfile(ctx, job)
-	newJob.DataStore = q.resolveDataStore(ctx, job)
-
-	// Process the item with cancellation monitoring
-	select {
-	default:
-	case <-ctx.Done():
-		return
+	return ctx, Job{
+		Headers:        job.Headers,
+		Test:           q.resolveTest(ctx, job),
+		Run:            q.resolveTestRun(ctx, job),
+		TestSuite:      q.resolveTestSuite(ctx, job),
+		TestSuiteRun:   q.resolveTestSuiteRun(ctx, job),
+		PollingProfile: q.resolvePollingProfile(ctx, job),
+		DataStore:      q.resolveDataStore(ctx, job),
 	}
 
-	q.workerPool.Submit(func() {
-		log.Printf("queue: submit to processItem fn for run %d", job.Run.ID)
-		q.itemProcessor.ProcessItem(ctx, newJob)
-	})
-}
-
-func (q *Queue) Stop() {
-	q.workerPool.StopAndWait()
 }
 
 type StopRequest struct {

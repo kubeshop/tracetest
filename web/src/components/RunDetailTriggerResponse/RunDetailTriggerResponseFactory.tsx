@@ -5,7 +5,7 @@ import RunDetailTriggerData from './RunDetailTriggerData';
 import RunDetailTriggerResponse from './RunDetailTriggerResponse';
 
 export interface IPropsComponent {
-  runId: string;
+  runId: number;
   state: TTestRunState;
   testId: string;
   triggerResult?: TriggerResult;

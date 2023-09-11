@@ -6,7 +6,7 @@ import useDefinitionFile from 'hooks/useDefinitionFile';
 import useJUnitResult from 'hooks/useJUnitResult';
 
 interface IContext {
-  onJUnit(testId: string, runId: string): void;
+  onJUnit(testId: string, runId: number): void;
   onDefinition(resourceType: ResourceType, resourceId: string, version?: number): void;
 }
 
@@ -48,7 +48,7 @@ const FileViewerModalProvider = ({children}: IProps) => {
   });
 
   const onJUnit = useCallback(
-    async (testId: string, runId: string) => {
+    async (testId: string, runId: number) => {
       loadJUnit(testId, runId);
       setIsFileViewerOpen(true);
       setProps(propsMap.junit);

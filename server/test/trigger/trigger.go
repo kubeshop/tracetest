@@ -15,7 +15,7 @@ type (
 
 	TriggerResult struct {
 		Type    TriggerType      `json:"type"`
-		HTTP    *HTTPResponse    `json:"httpRequest,omitempty"`
+		HTTP    *HTTPResponse    `json:"http,omitempty"`
 		GRPC    *GRPCResponse    `json:"grpc,omitempty"`
 		TraceID *TraceIDResponse `json:"traceid,omitempty"`
 		Kafka   *KafkaResponse   `json:"kafka,omitempty"`

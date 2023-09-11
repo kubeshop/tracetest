@@ -7,7 +7,7 @@ import AssertionSelectors from 'selectors/Assertion.selectors';
 
 interface IProps {
   testId: string;
-  runId: string;
+  runId: number;
 }
 
 const useLint = ({runId, testId}: IProps): LintSource => {

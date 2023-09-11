@@ -26,7 +26,7 @@ import {
 import {ISuggestion} from 'types/TestSpecs.types';
 
 interface IProps {
-  runId: string;
+  runId: number;
   testId: string;
   test: Test;
   isDraftMode: boolean;

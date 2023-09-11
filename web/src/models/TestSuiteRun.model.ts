@@ -13,7 +13,7 @@ type TestSuiteRun = Model<
 >;
 
 const TestSuiteRun = ({
-  id = '',
+  id = 0,
   createdAt = '',
   completedAt = '',
   state = 'CREATED',

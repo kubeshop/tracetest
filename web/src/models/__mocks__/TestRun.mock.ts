@@ -8,7 +8,7 @@ import TraceMock from './Trace.mock';
 const TestRunMock: IMockFactory<TestRun, TRawTestRun> = () => ({
   raw(data = {}) {
     return {
-      id: faker.datatype.uuid(),
+      id: faker.datatype.number(),
       traceId: faker.datatype.uuid(),
       spanId: faker.datatype.uuid(),
       createdAt: faker.date.past().toISOString(),

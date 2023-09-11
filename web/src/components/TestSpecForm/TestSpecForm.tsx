@@ -34,7 +34,7 @@ interface IProps {
   onSubmit(values: IValues): void;
   isValid: boolean;
   onIsValid(isValid: boolean): void;
-  runId: string;
+  runId: number;
   testId: string;
 }
 

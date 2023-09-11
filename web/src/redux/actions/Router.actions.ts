@@ -39,10 +39,10 @@ const RouterActions = () => ({
   ),
   updateSelectedSpan: createAsyncThunk<void, IQuery>(
     'router/updateSelectedSpan',
-    async ({params: {testId = '', runId = ''}, search}, {getState, dispatch}) => {
+    async ({params: {testId = '', runId = '0'}, search}, {getState, dispatch}) => {
       const {[RouterSearchFields.SelectedSpan]: spanId = ''} = search;
       const state = getState() as RootState;
-      const span = SpanSelectors.selectSpanById(state, String(spanId), testId, runId);
+      const span = SpanSelectors.selectSpanById(state, String(spanId), testId, Number(runId));
 
       if (span) dispatch(setSelectedSpan({span}));
     }

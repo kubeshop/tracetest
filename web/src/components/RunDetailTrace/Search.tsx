@@ -17,7 +17,7 @@ import * as S from './RunDetailTrace.styled';
 const {useLazyGetSelectedSpansQuery} = TracetestAPI.instance;
 
 interface IProps {
-  runId: string;
+  runId: number;
   testId: string;
 }
 

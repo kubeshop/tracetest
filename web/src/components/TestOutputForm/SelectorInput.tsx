@@ -7,7 +7,7 @@ import TestOutput from 'models/TestOutput.model';
 
 interface IProps {
   form: FormInstance<TestOutput>;
-  runId: string;
+  runId: number;
   spanIdList: string[];
   testId: string;
 }

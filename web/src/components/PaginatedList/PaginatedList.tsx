@@ -19,7 +19,7 @@ interface IProps<T, P> {
 }
 
 interface IId {
-  id: string;
+  id: string | number;
 }
 
 const PaginatedList = <T extends IId, P>({dataCy, itemComponent: ItemComponent, params, query}: IProps<T, P>) => {

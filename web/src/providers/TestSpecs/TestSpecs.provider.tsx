@@ -50,7 +50,7 @@ export const Context = createContext<IContext>({
 
 interface IProps {
   testId: string;
-  runId: string;
+  runId: number;
   children: React.ReactNode;
 }
 

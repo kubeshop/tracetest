@@ -15,42 +15,44 @@ interface IProps {
   span: Span;
 }
 
-const BaseSpanNode = ({className, footer, id, isMatched, isSelected, span}: IProps) => (
-  <S.Container className={className} data-cy={`trace-node-${span.type}`} $matched={isMatched} $selected={isSelected}>
-    <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
+const BaseSpanNode = ({className, footer, id, isMatched, isSelected, span}: IProps) => {
+  return (
+    <S.Container className={className} data-cy={`trace-node-${span.type}`} $matched={isMatched} $selected={isSelected}>
+      <Handle id={id} position={Position.Top} style={{ top: 0, visibility: 'hidden' }} type="target" />
 
-    <S.TopLine $type={span.type} />
+      <S.TopLine $type={span.type} />
 
-    <S.Header>
-      <S.BadgeContainer>
-        <S.BadgeType count={SemanticGroupNamesToText[span.type]} $hasMargin $type={span.type} />
-      </S.BadgeContainer>
-      <S.HeaderText>{span.name}</S.HeaderText>
-    </S.Header>
+      <S.Header>
+        <S.BadgeContainer>
+          <S.BadgeType count={SemanticGroupNamesToText[span.type]} $hasMargin $type={span.type} />
+        </S.BadgeContainer>
+        <S.HeaderText>{span.name}</S.HeaderText>
+      </S.Header>
 
-    <S.Body>
-      <S.Item>
-        <SettingOutlined />
-        <S.ItemText>
-          {span.service} {SpanKindToText[span.kind]}
-        </S.ItemText>
-      </S.Item>
-      {Boolean(span.system) && (
+      <S.Body>
         <S.Item>
-          <ToolOutlined />
-          <S.ItemText>{span.system}</S.ItemText>
+          <SettingOutlined />
+          <S.ItemText>
+            {span.service} {SpanKindToText[span.kind]}
+          </S.ItemText>
         </S.Item>
-      )}
-      <S.Item>
-        <ClockCircleOutlined />
-        <S.ItemText>{span.duration}</S.ItemText>
-      </S.Item>
-    </S.Body>
+        {Boolean(span.system) && (
+          <S.Item>
+            <ToolOutlined />
+            <S.ItemText>{span.system}</S.ItemText>
+          </S.Item>
+        )}
+        <S.Item>
+          <ClockCircleOutlined />
+          <S.ItemText>{span.duration}</S.ItemText>
+        </S.Item>
+      </S.Body>
 
-    <S.Footer>{footer}</S.Footer>
+      <S.Footer>{footer}</S.Footer>
 
-    <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />
-  </S.Container>
-);
+      <Handle id={id} position={Position.Bottom} style={{ bottom: 0, visibility: 'hidden' }} type="source" />
+    </S.Container>
+  );
+};
 
 export default BaseSpanNode;

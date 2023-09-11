@@ -8,6 +8,7 @@ import (
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -43,10 +44,10 @@ type triggerResolverWorker struct {
 	newTraceDBFn tracedb.FactoryFunc
 	dsRepo       currentDataStoreGetter
 	eventEmitter EventEmitter
-	outputQueue  Enqueuer
+	outputQueue  pipeline.Enqueuer[Job]
 }
 
-func (r *triggerResolverWorker) SetOutputQueue(queue Enqueuer) {
+func (r *triggerResolverWorker) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	r.outputQueue = queue
 }
 
@@ -107,7 +108,6 @@ func (r triggerResolverWorker) ProcessItem(ctx context.Context, job Job) {
 	}}
 
 	executor := expression.NewExecutor(ds...)
-
 	triggerOptions := &triggerer.ResolveOptions{
 		Executor: executor,
 	}

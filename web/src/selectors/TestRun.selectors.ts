@@ -6,9 +6,9 @@ import TracetestAPI from 'redux/apis/Tracetest';
 import TestRunService from 'services/TestRun.service';
 import {RootState} from '../redux/store';
 
-const selectParams = (state: RootState, params: {testId: string; runId: string; spanId: string}) => params;
+const selectParams = (state: RootState, params: {testId: string; runId: number; spanId: string}) => params;
 
-const selectTestRun = (state: RootState, params: {testId: string; runId: string; spanId: string}) => {
+const selectTestRun = (state: RootState, params: {testId: string; runId: number; spanId: string}) => {
   const {data} = TracetestAPI.instance.endpoints.getRunById.select({testId: params.testId, runId: params.runId})(state);
   return data ?? TestRun({});
 };
