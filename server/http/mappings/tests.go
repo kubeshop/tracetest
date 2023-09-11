@@ -40,7 +40,7 @@ func (m OpenAPI) TestSuiteRun(in testsuite.TestSuiteRun) openapi.TestSuiteRun {
 	}
 
 	return openapi.TestSuiteRun{
-		Id:                          strconv.Itoa(in.ID),
+		Id:                          int32(in.ID),
 		Version:                     int32(in.TestSuiteVersion),
 		CreatedAt:                   in.CreatedAt,
 		CompletedAt:                 in.CompletedAt,
@@ -268,6 +268,8 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		return openapi.TestRun{}
 	}
 
+	testSuiteID, _ := strconv.Atoi(in.TestSuiteID)
+
 	return openapi.TestRun{
 		Id:                        int32(in.ID),
 		TraceId:                   in.TraceID.String(),
@@ -290,7 +292,7 @@ func (m OpenAPI) Run(in *test.Run) openapi.TestRun {
 		Metadata:                  in.Metadata,
 		VariableSet:               m.VariableSet(in.VariableSet),
 		TestSuiteId:               in.TestSuiteID,
-		TestSuiteRunId:            in.TestSuiteRunID,
+		TestSuiteRunId:            int32(testSuiteID),
 		Linter:                    m.LinterResult(in.Linter),
 		RequiredGatesResult:       m.RequiredGatesResult(in.RequiredGatesResult),
 	}
