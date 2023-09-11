@@ -14,7 +14,7 @@ import (
 )
 
 type TestRun struct {
-	Id string `json:"id,omitempty"`
+	Id int32 `json:"id,omitempty"`
 
 	TraceId string `json:"traceId,omitempty"`
 
