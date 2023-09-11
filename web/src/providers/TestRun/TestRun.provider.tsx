@@ -26,7 +26,7 @@ export const Context = createContext<IContext>({
 
 interface IProps {
   testId: string;
-  runId?: string;
+  runId?: number;
   children: React.ReactNode;
 }
 
@@ -34,7 +34,7 @@ export const useTestRun = () => useContext(Context);
 
 const POLLING_INTERVAL = 5000;
 
-const TestRunProvider = ({children, testId, runId = ''}: IProps) => {
+const TestRunProvider = ({children, testId, runId = 0}: IProps) => {
   const [pollingInterval, setPollingInterval] = useState<number | undefined>(POLLING_INTERVAL);
   const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId, pollingInterval});
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId});

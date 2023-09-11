@@ -7,7 +7,7 @@ import {ResourceType} from 'types/Resource.type';
 import * as S from './TestSuiteRunActionsMenu.styled';
 
 interface IProps {
-  runId: string;
+  runId: number;
   testSuiteId: string;
   isRunView?: boolean;
 }

@@ -19,7 +19,7 @@ interface IContext {
   isEditLoading: boolean;
   onDelete(id: string, name: string): void;
   onEdit(draft: TDraftTestSuite): void;
-  onRun(runId?: string): void;
+  onRun(runId?: number): void;
   testSuite: TestSuite;
   latestTestSuite: TestSuite;
 }
@@ -65,7 +65,7 @@ const TestSuiteProvider = ({children, testSuiteId, version = 0}: IProps) => {
   const {navigate} = useDashboard();
 
   const onRun = useCallback(
-    (runId?: string) => {
+    (runId?: number) => {
       if (isLatestVersion) runTestSuite(testSuite!, runId);
       else {
         setAction('run');

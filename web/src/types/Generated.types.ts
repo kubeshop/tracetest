@@ -1414,7 +1414,7 @@ export interface external {
         };
         ResolveContext: {
           testId?: string;
-          runId?: string;
+          runId?: number;
           spanId?: string;
           selector?: string;
           variableSetId?: string;
@@ -1860,7 +1860,7 @@ export interface external {
           requiredGatesResult?: external["testRunner.yaml"]["components"]["schemas"]["RequiredGatesResult"];
           metadata?: { [key: string]: string };
           testSuiteId?: string;
-          testSuiteRunId?: string;
+          testSuiteRunId?: number;
         };
         RunInformation: {
           metadata?: { [key: string]: string } | null;
@@ -1955,7 +1955,7 @@ export interface external {
           summary?: external["tests.yaml"]["components"]["schemas"]["TestSummary"];
         };
         TestSuiteRun: {
-          id?: string;
+          id?: number;
           version?: number;
           /** Format: date-time */
           createdAt?: string;

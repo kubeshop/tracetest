@@ -27,7 +27,7 @@ describe('TestDefinitionActions', () => {
         TestSpecsActions.publish({
           test: TestMock.model(),
           testId: 'testId',
-          runId: 'runId',
+          runId: 1,
         })
       );
 
@@ -52,7 +52,7 @@ describe('TestDefinitionActions', () => {
       await store.dispatch(
         TestSpecsActions.dryRun({
           testId: 'testId',
-          runId: 'runId',
+          runId: 1,
           definitionList: [],
         })
       );

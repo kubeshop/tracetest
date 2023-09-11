@@ -10,15 +10,15 @@ import TestRunProvider from 'providers/TestRun';
 import Content from './Content';
 
 const RunDetail = () => {
-  const {testId = '', runId = ''} = useParams();
+  const {testId = '', runId = 0} = useParams();
 
   return (
     <GuidedTourProvider>
-      <TestRunProvider testId={testId} runId={runId}>
-        <TestSpecsProvider testId={testId} runId={runId}>
+      <TestRunProvider testId={testId} runId={Number(runId)}>
+        <TestSpecsProvider testId={testId} runId={Number(runId)}>
           <TestSpecFormProvider testId={testId}>
             <SpanProvider>
-              <TestOutputProvider testId={testId} runId={runId}>
+              <TestOutputProvider testId={testId} runId={Number(runId)}>
                 <Content />
               </TestOutputProvider>
             </SpanProvider>

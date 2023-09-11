@@ -42,7 +42,7 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       items: rawTestResultList.map(rawTestResult => TestRun(rawTestResult)),
     }),
   }),
-  getRunById: builder.query<TestRun, {runId: string; testId: string}>({
+  getRunById: builder.query<TestRun, {runId: number; testId: string}>({
     query: ({testId, runId}) => `/tests/${testId}/run/${runId}`,
     providesTags: result => (result ? [{type: TracetestApiTags.TEST_RUN, id: result?.id}] : []),
     transformResponse: (rawTestResult: TRawTestRun) => TestRun(rawTestResult),
@@ -58,7 +58,7 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       });
     },
   }),
-  reRun: builder.mutation<TestRun, {testId: string; runId: string}>({
+  reRun: builder.mutation<TestRun, {testId: string; runId: number}>({
     query: ({testId, runId}) => ({
       url: `/tests/${testId}/run/${runId}/rerun`,
       method: HTTP_METHOD.POST,
@@ -70,7 +70,7 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
   }),
-  dryRun: builder.mutation<AssertionResults, {testId: string; runId: string; testDefinition: Partial<TRawTestSpecs>}>({
+  dryRun: builder.mutation<AssertionResults, {testId: string; runId: number; testDefinition: Partial<TRawTestSpecs>}>({
     query: ({testId, runId, testDefinition}) => ({
       url: `/tests/${testId}/run/${runId}/dry-run`,
       method: HTTP_METHOD.PUT,
@@ -78,7 +78,7 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     }),
     transformResponse: (rawTestResults: TRawAssertionResults) => AssertionResults(rawTestResults),
   }),
-  deleteRunById: builder.mutation<Test, {testId: string; runId: string}>({
+  deleteRunById: builder.mutation<Test, {testId: string; runId: number}>({
     query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}`, method: 'DELETE'}),
     invalidatesTags: (result, error, {testId}) => [
       {type: TracetestApiTags.TEST_RUN},
@@ -86,25 +86,25 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
     ],
   }),
-  stopRun: builder.mutation<null, {runId: string; testId: string}>({
+  stopRun: builder.mutation<null, {runId: number; testId: string}>({
     query: ({runId, testId}) => ({
       url: `/tests/${testId}/run/${runId}/stop`,
       method: HTTP_METHOD.POST,
     }),
   }),
-  getJUnitByRunId: builder.query<string, {testId: string; runId: string}>({
+  getJUnitByRunId: builder.query<string, {testId: string; runId: number}>({
     query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),
     providesTags: (result, error, {testId, runId}) => [
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-${runId}-junit`},
     ],
   }),
-  getSelectedSpans: builder.query<SelectedSpans, {testId: string; runId: string; query: string}>({
+  getSelectedSpans: builder.query<SelectedSpans, {testId: string; runId: number; query: string}>({
     query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
     providesTags: (result, error, {query}) => (result ? [{type: TracetestApiTags.SPAN, id: `${query}-LIST`}] : []),
     transformResponse: (rawSpanList: TRawSelectedSpans) => SelectedSpans(rawSpanList),
   }),
 
-  getRunEvents: builder.query<TestRunEvent[], {runId: string; testId: string}>({
+  getRunEvents: builder.query<TestRunEvent[], {runId: number; testId: string}>({
     query: ({runId, testId}) => `/tests/${testId}/run/${runId}/events`,
     providesTags: [{type: TracetestApiTags.TEST_RUN, id: 'EVENTS'}],
     transformResponse: (rawTestRunEvent: TRawTestRunEvent[]) => rawTestRunEvent.map(event => TestRunEvent(event)),

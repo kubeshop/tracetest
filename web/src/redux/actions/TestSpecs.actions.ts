@@ -20,7 +20,7 @@ export type TChange = {
 };
 
 const TestSpecsActions = () => ({
-  publish: createAsyncThunk<TestRun, {test: Test; testId: string; runId: string}>(
+  publish: createAsyncThunk<TestRun, {test: Test; testId: string; runId: number}>(
     'testDefinition/publish',
     async ({test, testId, runId}, {dispatch, getState}) => {
       const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
@@ -30,7 +30,7 @@ const TestSpecsActions = () => ({
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }
   ),
-  dryRun: createAsyncThunk<AssertionResults, {definitionList: TTestSpecEntry[]; testId: string; runId: string}>(
+  dryRun: createAsyncThunk<AssertionResults, {definitionList: TTestSpecEntry[]; testId: string; runId: number}>(
     'testDefinition/dryRun',
     ({definitionList, testId, runId}, {dispatch}) => {
       const specs = definitionList.map(def => TestDefinitionService.toRaw(def));

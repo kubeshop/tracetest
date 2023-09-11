@@ -5,7 +5,7 @@ import { TTestApiEndpointBuilder } from '../Tracetest.api';
 
 export const expressionEndpoints = (builder: TTestApiEndpointBuilder) => ({
   parseExpression: builder.mutation<string[], TResolveRequestInfo>({
-    query: ({expression, context: {spanId = '', runId = '', variableSetId = '', testId = '', selector = ''} = {}}) => ({
+    query: ({expression, context: {spanId = '', runId = 0, variableSetId = '', testId = '', selector = ''} = {}}) => ({
       url: '/expressions/resolve',
       method: HTTP_METHOD.POST,
       body: {

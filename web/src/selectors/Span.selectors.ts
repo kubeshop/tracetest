@@ -4,7 +4,7 @@ import TracetestAPI from 'redux/apis/Tracetest/Tracetest.api';
 
 const spansStateSelector = (state: RootState) => state.spans;
 const stateSelector = (state: RootState) => state;
-const paramsSelector = (state: RootState, spanId: string, testId: string, runId: string) => ({spanId, testId, runId});
+const paramsSelector = (state: RootState, spanId: string, testId: string, runId: number) => ({spanId, testId, runId});
 
 const selectMatchedSpans = createSelector(
   spansStateSelector,

@@ -10,7 +10,7 @@ import * as S from './TestSpecDetail.styled';
 interface IProps {
   check: ICheckResult;
   testId: string;
-  runId: string;
+  runId: number;
   selector: string;
 }
 

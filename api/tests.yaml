@@ -230,7 +230,7 @@ components:
         testSuiteId:
           type: string
         testSuiteRunId:
-          type: string
+          type: integer
 
     RunInformation:
       type: object

@@ -15,13 +15,13 @@ import {IValues} from '../TestSpecForm';
 
 interface IDebounceProps {
   q: string;
-  rId: string;
+  rId: number;
   tId: string;
 }
 
 interface IProps {
   form: FormInstance<IValues>;
-  runId: string;
+  runId: number;
   testId: string;
   onValidSelector(isValid: boolean): void;
 }

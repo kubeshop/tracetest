@@ -8,7 +8,7 @@ import {TSpanSelector} from '../types/Assertion.types';
 import SpanSelectors from './Span.selectors';
 
 const stateSelector = (state: RootState) => state;
-const paramsSelector = (state: RootState, testId: string, runId: string, spanIdList: string[] = []) => ({
+const paramsSelector = (state: RootState, testId: string, runId: number, spanIdList: string[] = []) => ({
   spanIdList,
   testId,
   runId,
@@ -17,12 +17,12 @@ const paramsSelector = (state: RootState, testId: string, runId: string, spanIdL
 const currentSelectorListSelector = (
   state: RootState,
   testId: string,
-  runId: string,
+  runId: number,
   spanIdList?: string[],
   currentSelectorList: TSpanSelector[] = []
 ) => currentSelectorList.map(({key}) => key);
 
-const attributeKeySelector = (state: RootState, testId: string, runId: string, spanIdList: string[], key: string) =>
+const attributeKeySelector = (state: RootState, testId: string, runId: number, spanIdList: string[], key: string) =>
   key;
 
 const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (state, {spanIdList, testId, runId}) => {

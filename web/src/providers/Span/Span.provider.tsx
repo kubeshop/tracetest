@@ -22,7 +22,7 @@ interface IContext {
   onSelectSpan(spanId: string): void;
   onSetMatchedSpans(spanIdList: string[]): void;
   onSetFocusedSpan(spanId: string): void;
-  onTriggerSelector(query: string, testId: string, runId: string): void;
+  onTriggerSelector(query: string, testId: string, runId: number): void;
   onClearMatchedSpans(): void;
   onClearSelectedSpan(): void;
 }
@@ -82,7 +82,7 @@ const SpanProvider = ({children}: IProps) => {
   );
 
   const onTriggerSelector = useCallback(
-    async (query: string, testId: string, runId: string) => {
+    async (query: string, testId: string, runId: number) => {
       const {spanIds = []} = await triggerSelector({
         query,
         testId,
