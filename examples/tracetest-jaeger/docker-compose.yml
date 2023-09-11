@@ -62,5 +62,7 @@ services:
             interval: 1s
             timeout: 3s
             retries: 60
+        environment:
+            - COLLECTOR_OTLP_ENABLED=true
         ports:
-            - 16685:16685
+            - 16686:16686

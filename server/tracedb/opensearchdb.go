@@ -68,9 +68,17 @@ func (db *opensearchDB) GetTraceByID(ctx context.Context, traceID string) (trace
 	if !db.Ready() {
 		return traces.Trace{}, fmt.Errorf("OpenSearch dataStore not ready")
 	}
+
 	content := strings.NewReader(fmt.Sprintf(`{
-		"query": { "match": { "traceId": "%s" } }
-	}`, traceID))
+		"query": {
+			"bool": {
+				"should": [
+					{ "match": { "traceId": "%s" } },
+					{ "match": { "traceID": "%s" } }
+				]
+			}
+		}
+	}`, traceID, traceID))
 
 	searchRequest := opensearchapi.SearchRequest{
 		Index: []string{db.config.Index},
