@@ -16,7 +16,7 @@ import {escapeString} from 'utils/Common';
 
 interface IProps {
   testId: string;
-  runId: string;
+  runId: number;
 }
 
 const useAutoComplete = ({testId, runId}: IProps) => {

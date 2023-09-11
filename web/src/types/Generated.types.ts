@@ -1808,7 +1808,7 @@ export interface external {
           assertions?: string[];
         };
         TestRun: {
-          id?: string;
+          id?: number;
           traceId?: string;
           spanId?: string;
           /** @description Test version used when running this test run */
