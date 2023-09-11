@@ -50,7 +50,7 @@ services:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
 
   jaeger:
-    image: jaegertracing/all-in-one:v1.48
+    image: jaegertracing/all-in-one:v1.48.0
     restart: unless-stopped
     ports:
       - "16686:16686"
