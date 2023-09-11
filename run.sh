@@ -29,6 +29,7 @@ ps() {
 }
 
 down() {
+  docker compose $opts kill
   docker compose $opts down
 }
 

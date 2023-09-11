@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -93,7 +94,7 @@ func buildTestPipeline(
 
 	cancelRunHandlerFn := executor.HandleRunCancelation(execTestUpdater, tracer, eventEmitter)
 
-	queueBuilder := executor.NewQueueBuilder().
+	queueBuilder := executor.NewQueueConfigurer().
 		WithCancelRunHandlerFn(cancelRunHandlerFn).
 		WithSubscriptor(subscriptionManager).
 		WithDataStoreGetter(dsRepo).
@@ -102,18 +103,18 @@ func buildTestPipeline(
 		WithRunGetter(runRepo).
 		WithInstanceID(instanceID)
 
-	pgQueue := executor.NewPostgresQueueDriver(pool)
+	pgQueue := pipeline.NewPostgresQueueDriver[executor.Job](pool, pgChannelName)
 
-	pipeline := executor.NewPipeline(queueBuilder,
-		executor.PipelineStep{Processor: triggerResolverWorker, Driver: pgQueue.Channel("trigger_resolve")},
-		executor.PipelineStep{Processor: triggerExecuterWorker, Driver: pgQueue.Channel("trigger_execute")},
-		executor.PipelineStep{Processor: triggerResultProcessorWorker, Driver: pgQueue.Channel("trigger_result")},
-		executor.PipelineStep{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
-		executor.PipelineStep{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
-		executor.PipelineStep{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
+	pipeline := pipeline.New(queueBuilder,
+		pipeline.Step[executor.Job]{Processor: triggerResolverWorker, Driver: pgQueue.Channel("trigger_resolve")},
+		pipeline.Step[executor.Job]{Processor: triggerExecuterWorker, Driver: pgQueue.Channel("trigger_execute")},
+		pipeline.Step[executor.Job]{Processor: triggerResultProcessorWorker, Driver: pgQueue.Channel("trigger_result")},
+		pipeline.Step[executor.Job]{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
+		pipeline.Step[executor.Job]{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
+		pipeline.Step[executor.Job]{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
 	)
 
-	const assertionRunnerStepIndex = 3
+	const assertionRunnerStepIndex = 5
 
 	return executor.NewTestPipeline(
 		pipeline,

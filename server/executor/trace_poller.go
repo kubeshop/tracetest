@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
@@ -80,8 +81,8 @@ type tracePoller struct {
 	pollerExecutor      pollerExecutor
 	subscriptionManager *subscription.Manager
 	eventEmitter        EventEmitter
-	inputQueue          Enqueuer
-	outputQueue         Enqueuer
+	inputQueue          pipeline.Enqueuer[Job]
+	outputQueue         pipeline.Enqueuer[Job]
 }
 
 func (tp tracePoller) handleDBError(err error) {
@@ -103,11 +104,11 @@ func (tp tracePoller) isFirstRequest(job Job) bool {
 	return job.EnqueueCount() == 0
 }
 
-func (tp *tracePoller) SetOutputQueue(queue Enqueuer) {
+func (tp *tracePoller) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	tp.outputQueue = queue
 }
 
-func (tp *tracePoller) SetInputQueue(queue Enqueuer) {
+func (tp *tracePoller) SetInputQueue(queue pipeline.Enqueuer[Job]) {
 	tp.inputQueue = queue
 }
 

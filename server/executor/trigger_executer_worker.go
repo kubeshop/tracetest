@@ -10,6 +10,7 @@ import (
 
 	triggerer "github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
@@ -34,10 +35,10 @@ type triggerExecuterWorker struct {
 	updater      RunUpdater
 	tracer       trace.Tracer
 	eventEmitter EventEmitter
-	outputQueue  Enqueuer
+	outputQueue  pipeline.Enqueuer[Job]
 }
 
-func (r *triggerExecuterWorker) SetOutputQueue(queue Enqueuer) {
+func (r *triggerExecuterWorker) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	r.outputQueue = queue
 }
 

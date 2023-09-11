@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
@@ -46,7 +47,7 @@ type persistentTransactionRunner struct {
 	subscriptionManager *subscription.Manager
 }
 
-func (r *persistentTransactionRunner) SetOutputQueue(_ Enqueuer) {
+func (r *persistentTransactionRunner) SetOutputQueue(_ pipeline.Enqueuer[Job]) {
 	// this is a no-op, as transaction runner does not need to enqueue anything
 }
 

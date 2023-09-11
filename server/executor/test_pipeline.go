@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/variableset"
@@ -16,9 +17,9 @@ import (
 )
 
 type TestPipeline struct {
-	*Pipeline
+	*pipeline.Pipeline[Job]
 	updatePublisher updatePublisher
-	assertionQueue  Enqueuer
+	assertionQueue  pipeline.Enqueuer[Job]
 	runs            runsRepo
 	trGetter        testRunnerGetter
 	ppGetter        defaultPollingProfileGetter
@@ -44,11 +45,11 @@ type updatePublisher interface {
 }
 
 func NewTestPipeline(
-	pipeline *Pipeline,
+	pipeline *pipeline.Pipeline[Job],
 
 	updatePublisher updatePublisher,
 
-	assertionQueue Enqueuer,
+	assertionQueue pipeline.Enqueuer[Job],
 	runs runsRepo,
 	trGetter testRunnerGetter,
 	ppGetter defaultPollingProfileGetter,

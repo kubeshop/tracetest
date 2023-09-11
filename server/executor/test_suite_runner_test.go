@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testmock"
@@ -160,12 +161,12 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	runner := executor.NewTestSuiteRunner(testRunner, transactionRunRepo, subscriptionManager)
 
-	queueBuilder := executor.NewQueueBuilder().
+	queueBuilder := executor.NewQueueConfigurer().
 		WithTestSuiteGetter(transactionsRepo).
 		WithTestSuiteRunGetter(transactionRunRepo)
 
-	pipeline := executor.NewPipeline(queueBuilder,
-		executor.PipelineStep{Processor: runner, Driver: executor.NewInMemoryQueueDriver("runner")},
+	pipeline := pipeline.New(queueBuilder,
+		pipeline.Step[executor.Job]{Processor: runner, Driver: pipeline.NewInMemoryQueueDriver[executor.Job]("testSuiteRunner")},
 	)
 
 	transactionPipeline := executor.NewTestSuitePipeline(pipeline, transactionRunRepo)
