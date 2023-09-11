@@ -57,7 +57,7 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: integer
           readOnly: true
         version:
           type: integer
