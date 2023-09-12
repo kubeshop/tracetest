@@ -9,7 +9,7 @@ services:
             timeout: 3s
             interval: 1s
             retries: 60
-        image: jaegertracing/all-in-one:1.48.0
+        image: jaegertracing/all-in-one:latest
         ports:
             - 16686:16686
         networks:
