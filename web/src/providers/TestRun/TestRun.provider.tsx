@@ -37,7 +37,7 @@ const POLLING_INTERVAL = 5000;
 const TestRunProvider = ({children, testId, runId = 0}: IProps) => {
   const [pollingInterval, setPollingInterval] = useState<number | undefined>(POLLING_INTERVAL);
   const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId, pollingInterval});
-  const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId});
+  const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId, pollingInterval});
   const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
 
   const stopRun = useCallback(async () => {
