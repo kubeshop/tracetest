@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/starter"
 	"github.com/spf13/cobra"
 )
@@ -20,7 +21,13 @@ var startCmd = &cobra.Command{
 	Run: WithResultHandler((func(_ *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
 
-		err := start.Run(ctx, cliConfig)
+		flags := config.ConfigFlags{
+			OrganizationID: selectParams.organizationID,
+			EnvironmentID:  selectParams.environmentID,
+			Endpoint:       selectParams.endpoint,
+		}
+
+		err := start.Run(ctx, cliConfig, flags)
 		return "", err
 	})),
 	PostRun: teardownCommand,
@@ -28,6 +35,9 @@ var startCmd = &cobra.Command{
 
 func init() {
 	if isCloudEnabled {
+		startCmd.Flags().StringVarP(&selectParams.organizationID, "organization", "", "", "organization id")
+		startCmd.Flags().StringVarP(&selectParams.environmentID, "environment", "", "", "environment id")
+		startCmd.Flags().StringVarP(&selectParams.endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
 		rootCmd.AddCommand(startCmd)
 	}
 }

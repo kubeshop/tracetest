@@ -25,16 +25,13 @@ func NewStarter(configurator config.Configurator, resources *resourcemanager.Reg
 	return &Starter{configurator, resources, ui}
 }
 
-func (s *Starter) Run(ctx context.Context, cfg config.Config) error {
-	flags := config.ConfigFlags{
-		Endpoint: cfg.CloudAPIEndpoint,
-	}
+func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.ConfigFlags) error {
 	s.ui.Banner(config.Version)
 
 	return s.configurator.WithOnFinish(s.onStartAgent).Start(ctx, cfg, flags)
 }
 
-func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config, sOrg config.Entry, sEnv config.Entry) {
+func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
 	env, err := s.getEnvironment(ctx, cfg)
 	if err != nil {
 		s.ui.Error(err.Error())
@@ -42,7 +39,7 @@ func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config, sOrg conf
 
 	s.ui.Info(fmt.Sprintf(`
 Connecting Agent with name %s to Organization %s and Environment %s
-`, "local", sOrg.Name, env.Name))
+`, "local", cfg.OrganizationID, env.Name))
 
 	err = s.StartAgent(ctx, cfg.AgentEndpoint, "local", env.AgentApiKey, cfg.UIEndpoint)
 	if err != nil {

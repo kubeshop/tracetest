@@ -11,22 +11,24 @@ import (
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
-type onFinishFn func(context.Context, Config, Entry, Entry)
+type onFinishFn func(context.Context, Config)
 
 type Configurator struct {
 	resources *resourcemanager.Registry
 	ui        cliUI.UI
 	onFinish  onFinishFn
+	flags     ConfigFlags
 }
 
 func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 	ui := cliUI.DefaultUI
-	onFinish := func(_ context.Context, _ Config, _ Entry, _ Entry) {
+	onFinish := func(_ context.Context, _ Config) {
 		ui.Success("Successfully configured Tracetest CLI")
 		ui.Finish()
 	}
+	flags := ConfigFlags{}
 
-	return Configurator{resources, ui, onFinish}
+	return Configurator{resources, ui, onFinish, flags}
 }
 
 func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
@@ -35,6 +37,7 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 }
 
 func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
+	c.flags = flags
 	var serverURL string
 	if prev.UIEndpoint != "" {
 		serverURL = prev.UIEndpoint
@@ -87,11 +90,15 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return fmt.Errorf("cannot parse server url: %w", err)
 	}
 
+	if flags.CI {
+		return Save(cfg)
+	}
+
 	if prev.Jwt != "" {
 		cfg.Jwt = prev.Jwt
 		cfg.Token = prev.Token
 
-		c.ShowOrganizationSelector(ctx, cfg)
+		c.ShowOrganizationSelector(ctx, cfg, flags)
 		return nil
 	}
 
@@ -108,7 +115,7 @@ func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token
 		cfg.Jwt = jwt
 		cfg.Token = token
 
-		c.ShowOrganizationSelector(ctx, cfg)
+		c.ShowOrganizationSelector(ctx, cfg, c.flags)
 	}
 }
 
@@ -116,26 +123,36 @@ func (c Configurator) onOAuthFailure(err error) {
 	c.ui.Exit(err.Error())
 }
 
-func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config) {
-	cfg, org, err := c.organizationSelector(ctx, cfg)
+func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags ConfigFlags) {
+	cfg.OrganizationID = flags.OrganizationID
+	if cfg.OrganizationID == "" {
+		orgID, err := c.organizationSelector(ctx, cfg)
+		if err != nil {
+			c.ui.Exit(err.Error())
+			return
+		}
+
+		cfg.OrganizationID = orgID
+	}
+
+	cfg.EnvironmentID = flags.EnvironmentID
+	if cfg.EnvironmentID == "" {
+		envID, err := c.environmentSelector(ctx, cfg)
+		if err != nil {
+			c.ui.Exit(err.Error())
+			return
+		}
+
+		cfg.EnvironmentID = envID
+	}
+
+	err := Save(cfg)
 	if err != nil {
 		c.ui.Exit(err.Error())
 		return
 	}
 
-	cfg, env, err := c.environmentSelector(ctx, cfg)
-	if err != nil {
-		c.ui.Exit(err.Error())
-		return
-	}
-
-	err = Save(cfg)
-	if err != nil {
-		c.ui.Exit(err.Error())
-		return
-	}
-
-	c.onFinish(ctx, cfg, org, env)
+	c.onFinish(ctx, cfg)
 }
 
 func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {

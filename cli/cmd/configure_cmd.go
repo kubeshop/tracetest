@@ -22,7 +22,9 @@ var configureCmd = &cobra.Command{
 	PreRun:  setupLogger,
 	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
-		flags := config.ConfigFlags{}
+		flags := config.ConfigFlags{
+			CI: configParams.CI,
+		}
 		config, err := config.LoadConfig("")
 		if err != nil {
 			return "", err
@@ -45,12 +47,17 @@ func flagProvided(cmd *cobra.Command, name string) bool {
 func init() {
 	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
 	configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
+
+	if isCloudEnabled {
+		configureCmd.PersistentFlags().BoolVarP(&configParams.CI, "ci", "", false, "if cloud is used, don't ask for authentication")
+	}
 	rootCmd.AddCommand(configureCmd)
 }
 
 type configureParameters struct {
 	Endpoint string
 	Global   bool
+	CI       bool
 }
 
 func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error {
