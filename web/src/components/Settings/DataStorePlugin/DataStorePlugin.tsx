@@ -8,6 +8,7 @@ import AwsXRay from './forms/AwsXRay';
 import AzureAppInsights from './forms/AzureAppInsights/AzureAppInsights';
 
 export const DataStoreComponentMap: IDataStorePluginMap = {
+  [SupportedDataStores.Agent]: OpenTelemetryCollector,
   [SupportedDataStores.JAEGER]: GrpcClient,
   [SupportedDataStores.TEMPO]: BaseClient,
   [SupportedDataStores.SignalFX]: SignalFx,

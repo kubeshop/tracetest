@@ -10,6 +10,7 @@ import AwsXRayService from './DataStores/AwsXRay.service';
 import AzureAppInsightsService from './DataStores/AzureAppInsights.service';
 
 const dataStoreServiceMap = {
+  [SupportedDataStores.Agent]: OtelCollectorService,
   [SupportedDataStores.JAEGER]: JaegerService,
   [SupportedDataStores.TEMPO]: BaseClientService,
   [SupportedDataStores.OpenSearch]: ElasticSearchService,

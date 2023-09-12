@@ -16,6 +16,7 @@ import Signoz from './Icons/Signoz';
 import Dynatrace from './Icons/Dynatrace';
 
 const iconMap = {
+  [SupportedDataStores.Agent]: Jaeger,
   [SupportedDataStores.JAEGER]: Jaeger,
   [SupportedDataStores.SignalFX]: SignalFx,
   [SupportedDataStores.ElasticApm]: Elastic,

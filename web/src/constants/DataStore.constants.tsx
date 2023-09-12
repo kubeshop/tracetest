@@ -1,6 +1,7 @@
 import {SupportedDataStores} from '../types/DataStore.types';
 
 export const SupportedDataStoresToName = {
+  [SupportedDataStores.Agent]: 'Agent',
   [SupportedDataStores.JAEGER]: 'Jaeger',
   [SupportedDataStores.OpenSearch]: 'OpenSearch',
   [SupportedDataStores.SignalFX]: 'SignalFX',
@@ -18,6 +19,7 @@ export const SupportedDataStoresToName = {
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
+  [SupportedDataStores.Agent]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/agent',
   [SupportedDataStores.JAEGER]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/jaeger',
   [SupportedDataStores.OpenSearch]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/opensearch',
   [SupportedDataStores.ElasticApm]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/elasticapm',
@@ -32,13 +34,12 @@ export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.Honeycomb]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/honeycomb',
   [SupportedDataStores.AzureAppInsights]:
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
-  [SupportedDataStores.Signoz]:
-    'https://docs.tracetest.io/configuration/connecting-to-data-stores/signoz',
-  [SupportedDataStores.Dynatrace]:
-    'https://docs.tracetest.io/configuration/connecting-to-data-stores/dynatrace',
+  [SupportedDataStores.Signoz]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/signoz',
+  [SupportedDataStores.Dynatrace]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/dynatrace',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
+  [SupportedDataStores.Agent]: '',
   [SupportedDataStores.JAEGER]: 'jaeger:16685',
   [SupportedDataStores.OpenSearch]: 'http://opensearch:9200',
   [SupportedDataStores.SignalFX]: '',

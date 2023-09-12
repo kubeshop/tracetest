@@ -14,6 +14,7 @@ type DataStore = Model<TRawDataStore, {}>['spec'] & {
   azureappinsights?: TRawAzureAppInsightsDataStore & TRawOtlpDataStore;
   signoz?: TRawOtlpDataStore;
   dynatrace?: TRawOtlpDataStore;
+  agent?: TRawOtlpDataStore;
 };
 
 const DataStore = ({
