@@ -3,7 +3,6 @@ package tracepollerworker
 import (
 	"context"
 	"log"
-	"fmt"
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -14,29 +13,40 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
+type PollingStopStrategy interface {
+	Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB, trace *traces.Trace) (bool, string)
+}
+
 type tracePollerEvaluatorWorker struct {
-	state *workerState
+	state        *workerState
 	outputQueue  pipeline.Enqueuer[executor.Job]
+	stopStrategy PollingStopStrategy
 }
 
 func NewEvaluatorWorker(
 	eventEmitter executor.EventEmitter,
 	newTraceDBFn tracedb.FactoryFunc,
 	dsRepo resourcemanager.Current[datastore.DataStore],
-	updater             executor.RunUpdater,
+	updater executor.RunUpdater,
 	subscriptionManager *subscription.Manager,
+	stopStrategy PollingStopStrategy,
+	tracer trace.Tracer,
 ) *tracePollerEvaluatorWorker {
 	state := &workerState{
-		eventEmitter: eventEmitter,
-		newTraceDBFn: newTraceDBFn,
-		dsRepo: dsRepo,
-		updater: updater,
+		eventEmitter:        eventEmitter,
+		newTraceDBFn:        newTraceDBFn,
+		dsRepo:              dsRepo,
+		updater:             updater,
 		subscriptionManager: subscriptionManager,
+		tracer:              tracer,
 	}
 
-	return &tracePollerEvaluatorWorker{state: state}
+	return &tracePollerEvaluatorWorker{state: state, stopStrategy: stopStrategy}
 }
 
 func (w *tracePollerEvaluatorWorker) SetInputQueue(queue pipeline.Enqueuer[executor.Job]) {
@@ -47,9 +57,10 @@ func (w *tracePollerEvaluatorWorker) SetOutputQueue(queue pipeline.Enqueuer[exec
 	w.outputQueue = queue
 }
 
-// TODO: add instrumentation and selector based features
-
 func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job executor.Job) {
+	_, span := w.state.tracer.Start(ctx, "Trace Evaluate")
+	defer span.End()
+
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
@@ -57,14 +68,37 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		return
 	}
 
-	done, reason := w.donePollingTraces(&job, traceDB, job.Run.Trace)
+	done, reason := w.stopStrategy.Evaluate(ctx, &job, traceDB, job.Run.Trace)
+
+	spanCount := 0
+	if job.Run.Trace != nil {
+		spanCount = len(job.Run.Trace.Flat)
+	}
+
+	attrs := []attribute.KeyValue{
+		attribute.String("tracetest.run.trace_poller.trace_id", job.Run.TraceID.String()),
+		attribute.String("tracetest.run.trace_poller.span_id", job.Run.SpanID.String()),
+		attribute.Bool("tracetest.run.trace_poller.succesful", done),
+		attribute.String("tracetest.run.trace_poller.test_id", string(job.Test.ID)),
+		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
+	}
+
+	if reason != "" {
+		attrs = append(attrs, attribute.String("tracetest.run.trace_poller.finish_reason", reason))
+	}
+
+	if err != nil {
+		attrs = append(attrs, attribute.String("tracetest.run.trace_poller.error", err.Error()))
+		span.RecordError(err)
+	}
+
+	span.SetAttributes(attrs...)
 
 	if !done {
 		err := w.state.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
 		if err != nil {
 			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s", job.Test.ID, job.Run.ID, err.Error())
 		}
-
 		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 
 		requeue(ctx, job, w.state)
@@ -110,36 +144,4 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	handleDBError(w.state.updater.Update(ctx, job.Run))
 
 	w.outputQueue.Enqueue(ctx, job)
-}
-
-func (w *tracePollerEvaluatorWorker) donePollingTraces(job *executor.Job, traceDB tracedb.TraceDB, trace *traces.Trace) (bool, string) {
-	if !traceDB.ShouldRetry() {
-		return true, "TraceDB is not retryable"
-	}
-
-	maxTracePollRetry := job.PollingProfile.Periodic.MaxTracePollRetry()
-	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	log.Printf("[PollerExecutor] Test %s Run %d: Job count %d, max retries: %d", job.Test.ID, job.Run.ID, job.EnqueueCount(), maxTracePollRetry)
-	if job.EnqueueCount() >= maxTracePollRetry {
-		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
-	}
-
-	if job.Run.Trace == nil {
-		return false, "First iteration"
-	}
-
-	haveNotCollectedSpansSinceLastPoll := len(trace.Flat) == len(job.Run.Trace.Flat)
-	haveCollectedSpansInTestRun := len(trace.Flat) > 0
-	haveCollectedOnlyRootNode := len(trace.Flat) == 1 && trace.HasRootSpan()
-
-	// Today we consider that we finished collecting traces
-	// if we haven't collected any new spans since our last poll
-	// and we have collected at least one span for this test run
-	// and we have not collected only the root span
-
-	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun && !haveCollectedOnlyRootNode {
-		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
-	}
-
-	return false, fmt.Sprintf("New spans found. Before: %d After: %d", len(job.Run.Trace.Flat), len(trace.Flat))
 }

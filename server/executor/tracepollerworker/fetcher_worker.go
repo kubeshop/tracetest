@@ -4,33 +4,36 @@ import (
 	"context"
 	"log"
 
+	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
-	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/subscription"
-	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/tracedb"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type traceFetcherWorker struct {
-	state *workerState
-	outputQueue  pipeline.Enqueuer[executor.Job]
+	state       *workerState
+	outputQueue pipeline.Enqueuer[executor.Job]
 }
 
 func NewFetcherWorker(
 	eventEmitter executor.EventEmitter,
 	newTraceDBFn tracedb.FactoryFunc,
 	dsRepo resourcemanager.Current[datastore.DataStore],
-	updater             executor.RunUpdater,
+	updater executor.RunUpdater,
 	subscriptionManager *subscription.Manager,
+	tracer trace.Tracer,
 ) *traceFetcherWorker {
 	state := &workerState{
-		eventEmitter: eventEmitter,
-		newTraceDBFn: newTraceDBFn,
-		dsRepo: dsRepo,
-		updater: updater,
+		eventEmitter:        eventEmitter,
+		newTraceDBFn:        newTraceDBFn,
+		dsRepo:              dsRepo,
+		updater:             updater,
 		subscriptionManager: subscriptionManager,
+		tracer:              tracer,
 	}
 
 	return &traceFetcherWorker{state: state}
@@ -45,6 +48,9 @@ func (w *traceFetcherWorker) SetOutputQueue(queue pipeline.Enqueuer[executor.Job
 }
 
 func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) {
+	_, span := w.state.tracer.Start(ctx, "Trace Fetch")
+	defer span.End()
+
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
 		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())

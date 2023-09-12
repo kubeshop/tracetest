@@ -4,9 +4,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/executor/tracepollerworker"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/executor/tracepollerworker"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
@@ -58,6 +58,7 @@ func buildTestPipeline(
 		dsRepo,
 		execTestUpdater,
 		subscriptionManager,
+		tracer,
 	)
 
 	traceFetcherWorker := tracepollerworker.NewFetcherWorker(
@@ -66,6 +67,7 @@ func buildTestPipeline(
 		dsRepo,
 		execTestUpdater,
 		subscriptionManager,
+		tracer,
 	)
 
 	tracePollerEvaluatorWorker := tracepollerworker.NewEvaluatorWorker(
@@ -74,6 +76,8 @@ func buildTestPipeline(
 		dsRepo,
 		execTestUpdater,
 		subscriptionManager,
+		tracepollerworker.NewSelectorBasedPollingStopStrategy(eventEmitter, tracepollerworker.NewSpanCountPollingStopStrategy()),
+		tracer,
 	)
 
 	triggerResolverWorker := executor.NewTriggerResolverWorker(

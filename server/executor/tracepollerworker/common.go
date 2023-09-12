@@ -2,9 +2,9 @@ package tracepollerworker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
-	"errors"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/analytics"
@@ -16,15 +16,18 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 type workerState struct {
-	eventEmitter executor.EventEmitter
-	newTraceDBFn tracedb.FactoryFunc
-	dsRepo resourcemanager.Current[datastore.DataStore]
+	eventEmitter        executor.EventEmitter
+	newTraceDBFn        tracedb.FactoryFunc
+	dsRepo              resourcemanager.Current[datastore.DataStore]
 	updater             executor.RunUpdater
 	subscriptionManager *subscription.Manager
-	inputQueue pipeline.Enqueuer[executor.Job]
+	tracer              trace.Tracer
+	inputQueue          pipeline.Enqueuer[executor.Job]
 }
 
 func getTraceDB(ctx context.Context, state *workerState) (tracedb.TraceDB, error) {
@@ -59,7 +62,6 @@ func handleError(ctx context.Context, job executor.Job, err error, state *worker
 		}
 	}
 }
-
 
 func handleTraceDBError(ctx context.Context, job executor.Job, err error, state *workerState) (bool, string) {
 	run := job.Run
@@ -117,9 +119,9 @@ func requeue(ctx context.Context, job executor.Job, state *workerState) {
 		job.Headers.SetBool("requeued", true)
 
 		select {
-			default:
-			case <-ctx.Done():
-				return
+		default:
+		case <-ctx.Done():
+			return
 		}
 
 		state.inputQueue.Enqueue(ctx, job)

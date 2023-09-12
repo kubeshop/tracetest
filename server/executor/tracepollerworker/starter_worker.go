@@ -2,36 +2,39 @@ package tracepollerworker
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
 
+	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
-	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/subscription"
-	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/tracedb"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type tracePollerStarterWorker struct {
-	state *workerState
-	outputQueue  pipeline.Enqueuer[executor.Job]
+	state       *workerState
+	outputQueue pipeline.Enqueuer[executor.Job]
 }
 
 func NewStarterWorker(
 	eventEmitter executor.EventEmitter,
 	newTraceDBFn tracedb.FactoryFunc,
 	dsRepo resourcemanager.Current[datastore.DataStore],
-	updater             executor.RunUpdater,
+	updater executor.RunUpdater,
 	subscriptionManager *subscription.Manager,
+	tracer trace.Tracer,
 ) *tracePollerStarterWorker {
 	state := &workerState{
-		eventEmitter: eventEmitter,
-		newTraceDBFn: newTraceDBFn,
-		dsRepo: dsRepo,
-		updater: updater,
+		eventEmitter:        eventEmitter,
+		newTraceDBFn:        newTraceDBFn,
+		dsRepo:              dsRepo,
+		updater:             updater,
 		subscriptionManager: subscriptionManager,
+		tracer:              tracer,
 	}
 
 	return &tracePollerStarterWorker{state: state}
@@ -46,10 +49,13 @@ func (w *tracePollerStarterWorker) SetOutputQueue(queue pipeline.Enqueuer[execut
 }
 
 func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor.Job) {
+	_, span := w.state.tracer.Start(ctx, "Trace Poller Start")
+	defer span.End()
+
 	select {
-		default:
-		case <-ctx.Done():
-			return
+	default:
+	case <-ctx.Done():
+		return
 	}
 
 	log.Println("[TracePoller] processJob", job.EnqueueCount())
