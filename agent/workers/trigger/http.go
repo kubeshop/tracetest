@@ -40,14 +40,8 @@ func httpClient(sslVerification bool) http.Client {
 
 func newSpanContext(ctx context.Context) trace.SpanContext {
 	spanCtx := trace.SpanContextFromContext(ctx)
-	var (
-		tid trace.TraceID
-		sid trace.SpanID
-	)
-	if spanCtx.IsValid() {
-		tid = spanCtx.TraceID()
-		sid = spanCtx.SpanID()
-	}
+	tid := spanCtx.TraceID()
+	sid := spanCtx.SpanID()
 
 	tracestate, _ := trace.ParseTraceState("tracetest=true")
 	var tf trace.TraceFlags
