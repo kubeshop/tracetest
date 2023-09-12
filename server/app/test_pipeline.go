@@ -118,7 +118,7 @@ func buildTestPipeline(
 		pipeline.Step[executor.Job]{Processor: triggerResultProcessorWorker, Driver: pgQueue.Channel("trigger_result")},
 		pipeline.Step[executor.Job]{Processor: tracePollerStarterWorker, Driver: pgQueue.Channel("tracePoller_start")},
 		pipeline.Step[executor.Job]{Processor: traceFetcherWorker, Driver: pgQueue.Channel("tracePoller_fetch")},
-		pipeline.Step[executor.Job]{Processor: tracePollerEvaluatorWorker, Driver: pgQueue.Channel("tracePoller_evaluate")},
+		pipeline.Step[executor.Job]{Processor: tracePollerEvaluatorWorker, Driver: pgQueue.Channel("tracePoller_evaluate"), InputQueueOffset: -1},
 		pipeline.Step[executor.Job]{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
 		pipeline.Step[executor.Job]{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
 	)
