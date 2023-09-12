@@ -100,7 +100,7 @@ func (tp tracePoller) enqueueJob(ctx context.Context, job Job) {
 	tp.inputQueue.Enqueue(ctx, job)
 }
 
-func (tp *tracePoller) SetOutputQueue(queue Enqueuer) {
+func (tp *tracePoller) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	tp.outputQueue = queue
 }
 

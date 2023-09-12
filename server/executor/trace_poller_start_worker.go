@@ -5,11 +5,12 @@ import (
 	"log"
 
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 )
 
 type tracePollerStartWorker struct {
 	eventEmitter EventEmitter
-	outputQueue  Enqueuer
+	outputQueue  pipeline.Enqueuer[Job]
 }
 
 func NewTracePollerStartWorker(
@@ -20,7 +21,7 @@ func NewTracePollerStartWorker(
 	}
 }
 
-func (w *tracePollerStartWorker) SetOutputQueue(queue Enqueuer) {
+func (w *tracePollerStartWorker) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	w.outputQueue = queue
 }
 
