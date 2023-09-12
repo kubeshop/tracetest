@@ -1,7 +1,6 @@
 version: 3.0.0
 components:
   parameters:
-
     # Test parameters
     testId:
       in: path
@@ -13,12 +12,12 @@ components:
 
     # versioning and runs
     runId:
-        in: path
-        name: runId
-        required: true
-        description: id of the run
-        schema:
-          type: integer
+      in: path
+      name: runId
+      required: true
+      description: id of the run
+      schema:
+        type: integer
 
     version:
       in: path
@@ -139,5 +138,12 @@ components:
       name: LinterId
       required: true
       description: "ID of an Linter"
+      schema:
+        type: string
+
+    fileExtension:
+      in: path
+      name: fileExtension
+      required: true
       schema:
         type: string

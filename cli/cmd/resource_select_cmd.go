@@ -2,24 +2,22 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
 
-type selectableFn func(ctx context.Context, cfg config.Config)
+type selectableFn func(ctx context.Context, cfg config.Config, flags config.ConfigFlags)
 
 var (
-	selectParams  = &resourceIDParameters{}
+	selectParams  = &selectParameters{}
 	selectCmd     *cobra.Command
 	selectable    = strings.Join([]string{"organization"}, "|")
 	selectableMap = map[string]selectableFn{
-		"organization": func(ctx context.Context, cfg config.Config) {
-			configurator.ShowOrganizationSelector(ctx, cfg)
+		"organization": func(ctx context.Context, cfg config.Config, flags config.ConfigFlags) {
+			configurator.ShowOrganizationSelector(ctx, cfg, flags)
 		}}
 )
 
@@ -39,31 +37,26 @@ func init() {
 				return "", fmt.Errorf("resource type %s not selectable. Selectable resources are %s", resourceType, selectable)
 			}
 
-			resourceClient, err := resources.Get(resourceType)
-			if err != nil {
-				return "", err
+			flags := config.ConfigFlags{
+				OrganizationID: selectParams.organizationID,
+				EnvironmentID:  selectParams.environmentID,
 			}
 
-			resultFormat, err := resourcemanager.Formats.GetWithFallback(output, "yaml")
-			if err != nil {
-				return "", err
-			}
-
-			result, err := resourceClient.Get(ctx, selectParams.ResourceID, resultFormat)
-			if errors.Is(err, resourcemanager.ErrNotFound) {
-				return result, nil
-			}
-			if err != nil {
-				return "", err
-			}
-
-			selectableFn(ctx, cliConfig)
+			selectableFn(ctx, cliConfig, flags)
 			return "", nil
 		}),
 		PostRun: teardownCommand,
 	}
 
 	if isCloudEnabled {
+		selectCmd.Flags().StringVarP(&selectParams.organizationID, "organization", "", "", "organization id")
+		selectCmd.Flags().StringVarP(&selectParams.environmentID, "environment", "", "", "environment id")
 		rootCmd.AddCommand(selectCmd)
 	}
+}
+
+type selectParameters struct {
+	organizationID string
+	environmentID  string
+	endpoint       string
 }

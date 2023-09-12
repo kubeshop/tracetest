@@ -15,3 +15,5 @@ components:
           type: string
         agentEndpoint:
           type: string
+        apiEndpoint:
+          type: string
