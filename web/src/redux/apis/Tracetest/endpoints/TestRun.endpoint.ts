@@ -9,7 +9,6 @@ import Test from 'models/Test.model';
 import TestRun, {TRawTestRun} from 'models/TestRun.model';
 import TestRunEvent, {TRawTestRunEvent} from 'models/TestRunEvent.model';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
-import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
 function getTotalCountFromHeaders(meta: any) {
@@ -46,17 +45,6 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     query: ({testId, runId}) => `/tests/${testId}/run/${runId}`,
     providesTags: result => (result ? [{type: TracetestApiTags.TEST_RUN, id: result?.id}] : []),
     transformResponse: (rawTestResult: TRawTestRun) => TestRun(rawTestResult),
-    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-      const listener: IListenerFunction<TRawTestRun> = data => {
-        updateCachedData(() => TestRun(data.event));
-      };
-      await WebSocketService.initWebSocketSubscription({
-        listener,
-        resource: `test/${arg.testId}/run/${arg.runId}`,
-        waitToCleanSubscription: cacheEntryRemoved,
-        waitToInitSubscription: cacheDataLoaded,
-      });
-    },
   }),
   reRun: builder.mutation<TestRun, {testId: string; runId: number}>({
     query: ({testId, runId}) => ({
@@ -108,18 +96,5 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     query: ({runId, testId}) => `/tests/${testId}/run/${runId}/events`,
     providesTags: [{type: TracetestApiTags.TEST_RUN, id: 'EVENTS'}],
     transformResponse: (rawTestRunEvent: TRawTestRunEvent[]) => rawTestRunEvent.map(event => TestRunEvent(event)),
-    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-      const listener: IListenerFunction<TRawTestRunEvent> = data => {
-        updateCachedData(draft => {
-          draft.push(TestRunEvent(data.event));
-        });
-      };
-      await WebSocketService.initWebSocketSubscription({
-        listener,
-        resource: `test/${arg.testId}/run/${arg.runId}/event`,
-        waitToCleanSubscription: cacheEntryRemoved,
-        waitToInitSubscription: cacheDataLoaded,
-      });
-    },
   }),
 });

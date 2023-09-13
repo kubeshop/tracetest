@@ -55,7 +55,7 @@ services:
             - 4317:4317
 
     jaeger:
-        image: jaegertracing/all-in-one:1.48.0
+        image: jaegertracing/all-in-one:latest
         restart: unless-stopped
         healthcheck:
             test: ["CMD", "wget", "--spider", "localhost:16686"]

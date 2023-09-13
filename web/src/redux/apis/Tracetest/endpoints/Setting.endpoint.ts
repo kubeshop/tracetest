@@ -1,13 +1,12 @@
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {TracetestApiTags} from 'constants/Test.constants';
-import Config, {TRawConfig, TRawLiveConfig} from 'models/Config.model';
+import Config, {TRawConfig} from 'models/Config.model';
 import Demo, {TRawDemo} from 'models/Demo.model';
 import Linter, {TRawLinter} from 'models/Linter.model';
 import Polling, {TRawPolling} from 'models/Polling.model';
 import TestRunner, {TRawTestRunnerResource} from 'models/TestRunner.model';
-import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {ResourceType, TDraftResource, TListResponse} from 'types/Settings.types';
-import { TTestApiEndpointBuilder } from '../Tracetest.api';
+import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
 export const settingsEndpoints = (builder: TTestApiEndpointBuilder) => ({
   getConfig: builder.query<Config, unknown>({
@@ -20,17 +19,6 @@ export const settingsEndpoints = (builder: TTestApiEndpointBuilder) => ({
     }),
     providesTags: () => [{type: TracetestApiTags.SETTING, id: ResourceType.ConfigType}],
     transformResponse: (rawConfig: TRawConfig) => Config(rawConfig),
-    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-      const listener: IListenerFunction<TRawLiveConfig> = data => {
-        updateCachedData(() => Config.FromLiveUpdate(data.event));
-      };
-      await WebSocketService.initWebSocketSubscription({
-        listener,
-        resource: '/app/config/update',
-        waitToCleanSubscription: cacheEntryRemoved,
-        waitToInitSubscription: cacheDataLoaded,
-      });
-    },
   }),
   getPolling: builder.query<Polling, unknown>({
     query: () => ({

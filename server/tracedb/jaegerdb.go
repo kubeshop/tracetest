@@ -104,7 +104,7 @@ func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.Clie
 			if !ok {
 				return traces.Trace{}, fmt.Errorf("jaeger stream recv: %w", err)
 			}
-			if st.Message() == "trace not found" {
+			if strings.Contains(st.Message(), "trace not found") {
 				return traces.Trace{}, connection.ErrTraceNotFound
 			}
 			return traces.Trace{}, fmt.Errorf("jaeger stream recv err: %w", err)

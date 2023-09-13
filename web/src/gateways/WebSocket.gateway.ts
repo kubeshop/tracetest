@@ -172,6 +172,7 @@ function getWebSocketURL() {
 }
 
 const webSocketGateway = WebSocketGateway({url: getWebSocketURL()});
-webSocketGateway.connect();
+// Disable websocket connection for now
+// webSocketGateway.connect();
 
 export default webSocketGateway;

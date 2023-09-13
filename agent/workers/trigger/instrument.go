@@ -45,6 +45,7 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigg
 
 	if opts != nil {
 		spanContextConfig.TraceID = opts.TraceID
+		spanContextConfig.SpanID = opts.SpanID
 	}
 
 	spanContext := trace.NewSpanContext(spanContextConfig)

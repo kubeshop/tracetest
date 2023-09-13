@@ -12,6 +12,10 @@ type TestSuiteRun = Model<
   }
 >;
 
+export function isRunStateFinished(state: string) {
+  return ['FINISHED', 'FAILED'].includes(state);
+}
+
 const TestSuiteRun = ({
   id = 0,
   createdAt = '',

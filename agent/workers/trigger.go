@@ -44,6 +44,7 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{
 		TraceID: traceID,
+		SpanID:  id.NewRandGenerator().SpanID(),
 		TestID:  id.ID(triggerRequest.TestID),
 	})
 
