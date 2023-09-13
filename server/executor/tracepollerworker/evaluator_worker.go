@@ -58,7 +58,7 @@ func (w *tracePollerEvaluatorWorker) SetOutputQueue(queue pipeline.Enqueuer[exec
 }
 
 func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job executor.Job) {
-	ctx, span := w.state.tracer.Start(ctx, "Trace Evaluate")
+	ctx, span := w.state.tracer.Start(ctx, "Trace Evaluation")
 	defer span.End()
 
 	traceDB, err := getTraceDB(ctx, w.state)

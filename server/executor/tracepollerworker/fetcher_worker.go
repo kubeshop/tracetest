@@ -48,7 +48,7 @@ func (w *traceFetcherWorker) SetOutputQueue(queue pipeline.Enqueuer[executor.Job
 }
 
 func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) {
-	ctx, span := w.state.tracer.Start(ctx, "Trace Fetch")
+	ctx, span := w.state.tracer.Start(ctx, "Trace Fetching")
 	defer span.End()
 
 	traceDB, err := getTraceDB(ctx, w.state)
