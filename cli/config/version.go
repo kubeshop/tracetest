@@ -7,6 +7,8 @@ import (
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
+const defaultVersionExtension = "json"
+
 func GetVersion(ctx context.Context, cfg Config, client *openapi.APIClient) (string, bool) {
 	result := fmt.Sprintf(`CLI: %s`, Version)
 
@@ -33,7 +35,7 @@ Server: %s`, version), isVersionMatch
 
 func getServerVersion(ctx context.Context, client *openapi.APIClient) (string, error) {
 	resp, _, err := client.ApiApi.
-		GetVersion(ctx).
+		GetVersion(ctx, defaultVersionExtension).
 		Execute()
 	if err != nil {
 		return "", err
@@ -44,7 +46,7 @@ func getServerVersion(ctx context.Context, client *openapi.APIClient) (string, e
 
 func getVersionMetadata(ctx context.Context, client *openapi.APIClient) (*openapi.Version, error) {
 	resp, _, err := client.ApiApi.
-		GetVersion(ctx).
+		GetVersion(ctx, defaultVersionExtension).
 		Execute()
 	if err != nil {
 		return nil, err

@@ -20,7 +20,10 @@ var (
 )
 
 type ConfigFlags struct {
-	Endpoint string
+	Endpoint       string
+	OrganizationID string
+	EnvironmentID  string
+	CI             bool
 }
 
 type Config struct {

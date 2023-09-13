@@ -1815,8 +1815,9 @@ func (a *ApiApiService) GetTestVersionExecute(r ApiGetTestVersionRequest) (*Test
 }
 
 type ApiGetVersionRequest struct {
-	ctx        context.Context
-	ApiService *ApiApiService
+	ctx           context.Context
+	ApiService    *ApiApiService
+	fileExtension string
 }
 
 func (r ApiGetVersionRequest) Execute() (*Version, *http.Response, error) {
@@ -1829,12 +1830,14 @@ GetVersion Get the version of the API
 Get the version of the API
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param fileExtension
 	@return ApiGetVersionRequest
 */
-func (a *ApiApiService) GetVersion(ctx context.Context) ApiGetVersionRequest {
+func (a *ApiApiService) GetVersion(ctx context.Context, fileExtension string) ApiGetVersionRequest {
 	return ApiGetVersionRequest{
-		ApiService: a,
-		ctx:        ctx,
+		ApiService:    a,
+		ctx:           ctx,
+		fileExtension: fileExtension,
 	}
 }
 
@@ -1854,7 +1857,8 @@ func (a *ApiApiService) GetVersionExecute(r ApiGetVersionRequest) (*Version, *ht
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/version"
+	localVarPath := localBasePath + "/version.{fileExtension}"
+	localVarPath = strings.Replace(localVarPath, "{"+"fileExtension"+"}", url.PathEscape(parameterValueToString(r.fileExtension, "fileExtension")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
