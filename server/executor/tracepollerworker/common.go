@@ -162,7 +162,3 @@ func populateSpan(span trace.Span, job executor.Job, reason string, done *bool) 
 
 	span.SetAttributes(attrs...)
 }
-
-// func isFirstRequest(job *executor.Job) bool {
-// 	return !job.Headers.GetBool("requeued")
-// }
