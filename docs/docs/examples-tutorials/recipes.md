@@ -18,6 +18,7 @@ This integration point uses the OpenTelemetry Collector as a router to send trac
 - [Sending traces to Datadog and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-datadog.md)
 - [Sending traces to Honeycomb and Tracetest from a Node.js app using the OpenTelemetry Collector](./recipes/running-tracetest-with-honeycomb.md)
 - [Sending traces to Dynatrace and Tracetest from the OpenTelemetry Demo with OpenTelemetry Collector](./recipes/running-tracetest-with-dynatrace.md)
+- [Sending traces to SigNoz and Tracetest from the Pokeshop API with OpenTelemetry Collector](./recipes/running-tracetest-with-signoz-pokeshop.md)
 
 ### Jaeger
 

@@ -25,48 +25,6 @@ const sidebars = {
   liveExamplesSidebar: [
     {
       type: "category",
-      label: "Pokemon API Demo",
-      items: [
-        {
-          type: "doc",
-          id: "live-examples/pokeshop/overview",
-          label: "Overview",
-        },
-        {
-          type: "category",
-          label: "Use Cases",
-          items: [
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/use-cases/add-pokemon",
-              label: "Add Pokemon",
-            },
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/use-cases/list-pokemon",
-              label: "List Pokemon",
-            },
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/use-cases/get-pokemon-by-id",
-              label: "Get Pokemon by ID",
-            },
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/use-cases/import-pokemon",
-              label: "Import Pokemon",
-            },
-            {
-              type: "doc",
-              id: "live-examples/pokeshop/use-cases/import-pokemon-from-stream",
-              label: "Import Pokemon from Stream",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "OpenTelemetry Store Demo",
       items: [
         {
@@ -102,6 +60,48 @@ const sidebars = {
               type: "doc",
               id: "live-examples/opentelemetry-store/use-cases/user-purchasing-products",
               label: "User Purchasing Products",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Pokemon API Demo",
+      items: [
+        {
+          type: "doc",
+          id: "live-examples/pokeshop/overview",
+          label: "Overview",
+        },
+        {
+          type: "category",
+          label: "Use Cases",
+          items: [
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/add-pokemon",
+              label: "Add Pokemon",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/list-pokemon",
+              label: "List Pokemon",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/get-pokemon-by-id",
+              label: "Get Pokemon by ID",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/import-pokemon",
+              label: "Import Pokemon",
+            },
+            {
+              type: "doc",
+              id: "live-examples/pokeshop/use-cases/import-pokemon-from-stream",
+              label: "Import Pokemon from Stream",
             },
           ],
         },
@@ -770,7 +770,7 @@ const sidebars = {
     {
       type: "link",
       label: "Live Examples",
-      href: "/live-examples/pokeshop/overview",
+      href: "/live-examples/opentelemetry-store/overview",
     },
     {
       type: "link",

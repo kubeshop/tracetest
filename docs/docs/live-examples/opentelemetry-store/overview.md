@@ -8,6 +8,15 @@ We will provide a full recipe below for running the full demo as well as running
 - **Running it locally in Docker**: [Instructions](https://opentelemetry.io/docs/demo/docker-deployment/)
 - **Running on Kubernetes**: [Instructions](https://opentelemetry.io/docs/demo/kubernetes-deployment/)
 
+:::info
+Tracetest is part of the official testing harness in the latest version of the OpenTelemetry Demo. Read more in the OpenTelemetry docs, [here](https://opentelemetry.io/docs/demo/tests/).
+
+Or, check out the hands-on workshop on YouTube!
+
+<iframe width="100%" height="250" src="https://www.youtube.com/embed/2MSDy3XHjtE?si=T0ItpwRyE7HbJu5V" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+:::
+
 ## Running the OpenTelemetry Astronomy Shop Demo in Docker
 
 ### Prerequisites
@@ -15,22 +24,22 @@ We will provide a full recipe below for running the full demo as well as running
 - Docker
 - Docker Compose v2.0.0+
 - 4 GB of RAM for the application
- 
+
 ### Get and run the demo
 
-1.  Clone the Demo repository:
+1. Clone the Demo repository:
 
     ```shell
     git clone https://github.com/open-telemetry/opentelemetry-demo.git
     ```
 
-2.  Change to the demo folder:
+2. Change to the demo folder:
 
     ```shell
     cd opentelemetry-demo/
     ```
 
-3.  Run docker compose[^1] to start the demo:
+3. Run docker compose[^1] to start the demo:
 
     ```shell
     docker compose up --no-build
@@ -88,7 +97,6 @@ make run-tracetesting SERVICES_TO_TEST="ad-service payment-service"
 ```
 
 Tracetest will be started on [http://localhost:11633](http://localhost:11633) as part of running these tests and you can view any of the tests, Test Suites, prior runs, or create and run your own tests. It is a great testbed to explore Tracetest!
-
 
 ## Use Cases
 
