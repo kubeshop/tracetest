@@ -49,7 +49,7 @@ func (w *tracePollerStarterWorker) SetOutputQueue(queue pipeline.Enqueuer[execut
 }
 
 func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor.Job) {
-	_, span := w.state.tracer.Start(ctx, "Trace Poller Start")
+	ctx, span := w.state.tracer.Start(ctx, "Trace Poller Start")
 	defer span.End()
 
 	select {
