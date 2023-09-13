@@ -20,6 +20,7 @@ type SupportedDataStores string
 
 // List of SupportedDataStores
 const (
+	AGENT            SupportedDataStores = "agent"
 	JAEGER           SupportedDataStores = "jaeger"
 	OPENSEARCH       SupportedDataStores = "opensearch"
 	TEMPO            SupportedDataStores = "tempo"
@@ -38,6 +39,7 @@ const (
 
 // All allowed values of SupportedDataStores enum
 var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
+	"agent",
 	"jaeger",
 	"opensearch",
 	"tempo",

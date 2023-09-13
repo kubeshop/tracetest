@@ -141,6 +141,7 @@ const (
 	DatastoreTypeAzureAppInsights DataStoreType = "azureappinsights"
 	DatastoreTypeSignoz           DataStoreType = "signoz"
 	DatastoreTypeDynatrace        DataStoreType = "dynatrace"
+	DatastoreTypeAgent            DataStoreType = "agent"
 )
 
 var validTypes = []DataStoreType{
@@ -158,6 +159,7 @@ var validTypes = []DataStoreType{
 	DatastoreTypeAzureAppInsights,
 	DatastoreTypeSignoz,
 	DatastoreTypeDynatrace,
+	DatastoreTypeAgent,
 }
 
 var otlpBasedDataStores = []DataStoreType{
@@ -168,6 +170,7 @@ var otlpBasedDataStores = []DataStoreType{
 	DataStoreTypeHoneycomb,
 	DatastoreTypeSignoz,
 	DatastoreTypeDynatrace,
+	DatastoreTypeAgent,
 }
 
 func (ds DataStore) Validate() error {

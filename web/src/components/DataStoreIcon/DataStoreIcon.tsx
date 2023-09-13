@@ -1,5 +1,6 @@
 import {useTheme} from 'styled-components';
 import {SupportedDataStores} from 'types/DataStore.types';
+import Agent from './Icons/Agent';
 import Elastic from './Icons/Elastic';
 import Jaeger from './Icons/Jaeger';
 import Lightstep from './Icons/Lightstep';
@@ -16,7 +17,7 @@ import Signoz from './Icons/Signoz';
 import Dynatrace from './Icons/Dynatrace';
 
 const iconMap = {
-  [SupportedDataStores.Agent]: Jaeger,
+  [SupportedDataStores.Agent]: Agent,
   [SupportedDataStores.JAEGER]: Jaeger,
   [SupportedDataStores.SignalFX]: SignalFx,
   [SupportedDataStores.ElasticApm]: Elastic,
