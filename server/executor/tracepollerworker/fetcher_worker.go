@@ -48,13 +48,15 @@ func (w *traceFetcherWorker) SetOutputQueue(queue pipeline.Enqueuer[executor.Job
 }
 
 func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) {
-	ctx, span := w.state.tracer.Start(ctx, "Trace Fetching")
+	ctx, span := w.state.tracer.Start(ctx, "Fetching trace")
 	defer span.End()
+
+	populateSpan(span, job, "", nil)
 
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 
@@ -65,7 +67,7 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
 
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 
@@ -74,7 +76,7 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 
 	err = w.state.updater.Update(ctx, job.Run)
 	if err != nil {
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 

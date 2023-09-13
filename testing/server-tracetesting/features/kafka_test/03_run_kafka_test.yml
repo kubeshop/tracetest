@@ -29,12 +29,12 @@ spec:
     - attr:tracetest.run.trigger.test_id = "${var:KAFKA_TEST_ID}"
     - attr:tracetest.run.trigger.type = "kafka"
   - name: The trace poller was started
-    selector: span[name = "Fetch trace"]
+    selector: span[name = "Fetching trace"]
     assertions:
     - attr:tracetest.selected_spans.count > 0
     - attr:tracetest.run.trace_poller.test_id = "${var:KAFKA_TEST_ID}"
   - name: The trace poller finished with success
-    selector: span[name = "Fetch trace"]:last
+    selector: span[name = "Evaluating trace"]:last
     assertions:
     - attr:tracetest.run.trace_poller.succesful = "true"
   - name: All assertions were validated and passed

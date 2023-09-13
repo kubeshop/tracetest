@@ -14,7 +14,6 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -58,41 +57,19 @@ func (w *tracePollerEvaluatorWorker) SetOutputQueue(queue pipeline.Enqueuer[exec
 }
 
 func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job executor.Job) {
-	ctx, span := w.state.tracer.Start(ctx, "Trace Evaluation")
+	ctx, span := w.state.tracer.Start(ctx, "Evaluating trace")
 	defer span.End()
 
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 
 	done, reason := w.stopStrategy.Evaluate(ctx, &job, traceDB, job.Run.Trace)
 
-	spanCount := 0
-	if job.Run.Trace != nil {
-		spanCount = len(job.Run.Trace.Flat)
-	}
-
-	attrs := []attribute.KeyValue{
-		attribute.String("tracetest.run.trace_poller.trace_id", job.Run.TraceID.String()),
-		attribute.String("tracetest.run.trace_poller.span_id", job.Run.SpanID.String()),
-		attribute.Bool("tracetest.run.trace_poller.succesful", done),
-		attribute.String("tracetest.run.trace_poller.test_id", string(job.Test.ID)),
-		attribute.Int("tracetest.run.trace_poller.amount_retrieved_spans", spanCount),
-	}
-
-	if reason != "" {
-		attrs = append(attrs, attribute.String("tracetest.run.trace_poller.finish_reason", reason))
-	}
-
-	if err != nil {
-		attrs = append(attrs, attribute.String("tracetest.run.trace_poller.error", err.Error()))
-		span.RecordError(err)
-	}
-
-	span.SetAttributes(attrs...)
+	populateSpan(span, job, reason, &done)
 
 	if !done {
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
@@ -123,7 +100,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	err = w.state.updater.Update(ctx, job.Run)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: Update error: %s", job.Test.ID, job.Run.ID, err.Error())
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 

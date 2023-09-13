@@ -27,11 +27,11 @@ spec:
     - attr:tracetest.run.trigger.type = "grpc"
     - attr:tracetest.run.trigger.grpc.response_status_code = 0
     - attr:tracetest.run.trigger.grpc.response_status = "OK"
-  - selector: span[name = "Fetch trace"]
+  - selector: span[name = "Fetching trace"]
     assertions:
     - attr:tracetest.selected_spans.count > 0
     - attr:tracetest.run.trace_poller.test_id = "${var:GRPC_TEST_INVALID_METADATA_ID}"
-  - selector: span[name = "Fetch trace"]:last
+  - selector: span[name = "Evaluating trace"]:last
     assertions:
     - attr:tracetest.run.trace_poller.succesful = "true"
   - selector: span[name = "Execute assertions"]

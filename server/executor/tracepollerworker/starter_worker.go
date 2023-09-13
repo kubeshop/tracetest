@@ -49,8 +49,10 @@ func (w *tracePollerStarterWorker) SetOutputQueue(queue pipeline.Enqueuer[execut
 }
 
 func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor.Job) {
-	ctx, span := w.state.tracer.Start(ctx, "Trace Polling")
+	ctx, span := w.state.tracer.Start(ctx, "Start polling trace")
 	defer span.End()
+
+	populateSpan(span, job, "", nil)
 
 	select {
 	default:
@@ -63,7 +65,7 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
 		log.Printf("[TracePoller] GetDataStore error: %s", err.Error())
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 
@@ -71,7 +73,7 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 
 	err = w.testConnection(ctx, traceDB, &job)
 	if err != nil {
-		handleError(ctx, job, err, w.state)
+		handleError(ctx, job, err, w.state, span)
 		return
 	}
 
