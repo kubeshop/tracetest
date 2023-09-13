@@ -64,6 +64,10 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: GetTraceByID (traceID %s) error: %s", job.Test.ID, job.Run.ID, traceID, err.Error())
 		job.Run.LastError = err
+
+		handleDBError(w.state.updater.Update(ctx, job.Run))
+		w.outputQueue.Enqueue(ctx, job)
+		return
 	}
 
 	spansBefore := 0
