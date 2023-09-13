@@ -1,32 +1,32 @@
 version: "3.2"
 services:
-  # tracetest:
-  #   restart: unless-stopped
-  #   image: kubeshop/tracetest:${TAG:-latest}
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   build:
-  #     context: .
-  #   volumes:
-  #     - type: bind
-  #       source: ./local-config/tracetest.config.yaml
-  #       target: /app/tracetest.yaml
-  #     - type: bind
-  #       source: ./local-config/tracetest.provision.yaml
-  #       target: /app/provisioning.yaml
-  #   ports:
-  #     - 11633:11633
-  #   command: --provisioning-file /app/provisioning.yaml
-  #   healthcheck:
-  #     test: ["CMD", "wget", "--spider", "localhost:11633"]
-  #     interval: 1s
-  #     timeout: 3s
-  #     retries: 60
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   environment:
-  #     TRACETEST_DEV: ${TRACETEST_DEV}
+  tracetest:
+    restart: unless-stopped
+    image: kubeshop/tracetest:${TAG:-latest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build:
+      context: .
+    volumes:
+      - type: bind
+        source: ./local-config/tracetest.config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./local-config/tracetest.provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
     image: postgres:14
@@ -54,5 +54,5 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./local-config/collector.config.yaml:/otel-local-config.yaml
-    # depends_on:
-    #   - tracetest
+    depends_on:
+      - tracetest
