@@ -24,7 +24,7 @@ func (s *SpanCountPollingStopStrategy) Evaluate(ctx context.Context, job *execut
 
 	maxTracePollRetry := job.PollingProfile.Periodic.MaxTracePollRetry()
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
-	log.Printf("[PollerExecutor] Test %s Run %d: Job count %d, max retries: %d", job.Test.ID, job.Run.ID, job.EnqueueCount(), maxTracePollRetry)
+	log.Printf("[TracePoller] Test %s Run %d: Job count %d, max retries: %d", job.Test.ID, job.Run.ID, job.EnqueueCount(), maxTracePollRetry)
 	if job.EnqueueCount() >= maxTracePollRetry {
 		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
 	}

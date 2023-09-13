@@ -1,0 +1,177 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    ports:
+      - 5432:5432
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    ports:
+      - 16685:16685
+      - 16686:16686
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.54.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+    depends_on:
+      - jaeger
+    ports:
+      - 4317:4317
+
+  cache:
+    image: redis:6
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  queue:
+    image: rabbitmq:3.8-management
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  stream:
+    image: confluentinc/cp-kafka:latest-ubi8
+    ports:
+      - 29092:29092
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://stream:9092,PLAINTEXT_HOST://127.0.0.1:29092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://:29092
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@0.0.0.0:9093
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_PROCESS_ROLES=controller,broker
+      - KAFKA_NODE_ID=1
+      - KAFKA_METADATA_LOG_SEGMENT_MS=15000
+      - KAFKA_METADATA_MAX_RETENTION_MS=60000
+      - KAFKA_METADATA_LOG_MAX_RECORD_BYTES_BETWEEN_SNAPSHOTS=2800
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS=-Xmx200m -Xms200m
+      - CLUSTER_ID=ckjPoprWQzOf0-FuNkGfFQ
+    healthcheck:
+      test: nc -z stream 9092
+      start_period: 10s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  demo-api:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: api
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  demo-worker:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  demo-rpc:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: rpc
+    ports:
+      - 8082:8082
+    healthcheck:
+      test: ["CMD", "lsof", "-i", "8082"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  demo-streaming-worker:
+    image: kubeshop/demo-pokemon-api:latest
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      ZIPKIN_URL: http://localhost:9411
+      NPM_RUN_COMMAND: stream-worker
+      KAFKA_BROKER: 'stream:9092'
+      KAFKA_TOPIC: 'pokemon'
+      KAFKA_CLIENT_ID: 'streaming-worker'
+      REDIS_URL: cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+      stream:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started

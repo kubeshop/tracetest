@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
@@ -28,6 +29,13 @@ type workerState struct {
 	subscriptionManager *subscription.Manager
 	tracer              trace.Tracer
 	inputQueue          pipeline.Enqueuer[executor.Job]
+}
+
+func emitEvent(ctx context.Context, state *workerState, event model.TestRunEvent) {
+	err := state.eventEmitter.Emit(ctx, event)
+	if err != nil {
+		log.Printf("[TracePoller] failed to emit %s event: error: %s", event.Type, err.Error())
+	}
 }
 
 func getTraceDB(ctx context.Context, state *workerState) (tracedb.TraceDB, error) {
@@ -51,15 +59,8 @@ func handleError(ctx context.Context, job executor.Job, err error, state *worker
 	jobFailed, reason := handleTraceDBError(ctx, job, err, state)
 
 	if jobFailed {
-		anotherErr := state.eventEmitter.Emit(ctx, events.TracePollingError(job.Test.ID, job.Run.ID, reason, err))
-		if anotherErr != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.Test.ID, job.Run.ID, err.Error())
-		}
-
-		anotherErr = state.eventEmitter.Emit(ctx, events.TraceFetchingError(job.Test.ID, job.Run.ID, err))
-		if anotherErr != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingError event: %s \n", job.Test.ID, job.Run.ID, err.Error())
-		}
+		emitEvent(ctx, state, events.TracePollingError(job.Test.ID, job.Run.ID, reason, err))
+		emitEvent(ctx, state, events.TraceFetchingError(job.Test.ID, job.Run.ID, err))
 	}
 }
 
@@ -134,6 +135,6 @@ func handleDBError(err error) {
 	}
 }
 
-func isFirstRequest(job *executor.Job) bool {
-	return !job.Headers.GetBool("requeued")
-}
+// func isFirstRequest(job *executor.Job) bool {
+// 	return !job.Headers.GetBool("requeued")
+// }

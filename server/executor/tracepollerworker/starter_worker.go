@@ -58,28 +58,21 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 		return
 	}
 
-	log.Println("[TracePoller] processJob", job.EnqueueCount())
-
-	log.Printf("[PollerExecutor] Test %s Run %d: ExecuteRequest", job.Test.ID, job.Run.ID)
+	log.Println("[TracePoller] Starting to poll traces", job.EnqueueCount())
 
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
+		log.Printf("[TracePoller] GetDataStore error: %s", err.Error())
 		handleError(ctx, job, err, w.state)
 		return
 	}
 
-	if isFirstRequest(&job) {
-		err := w.state.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
-		if err != nil {
-			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s", job.Test.ID, job.Run.ID, err.Error())
-		}
+	emitEvent(ctx, w.state, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 
-		err = w.testConnection(ctx, traceDB, &job)
-		if err != nil {
-			handleError(ctx, job, err, w.state)
-			return
-		}
+	err = w.testConnection(ctx, traceDB, &job)
+	if err != nil {
+		handleError(ctx, job, err, w.state)
+		return
 	}
 
 	w.outputQueue.Enqueue(ctx, job)
@@ -89,10 +82,7 @@ func (w *tracePollerStarterWorker) testConnection(ctx context.Context, traceDB t
 	if testableTraceDB, ok := traceDB.(tracedb.TestableTraceDB); ok {
 		connectionResult := testableTraceDB.TestConnection(ctx)
 
-		err := w.state.eventEmitter.Emit(ctx, events.TraceDataStoreConnectionInfo(job.Test.ID, job.Run.ID, connectionResult))
-		if err != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TraceDataStoreConnectionInfo event: error: %s", job.Test.ID, job.Run.ID, err.Error())
-		}
+		emitEvent(ctx, w.state, events.TraceDataStoreConnectionInfo(job.Test.ID, job.Run.ID, connectionResult))
 	}
 
 	endpoints := traceDB.GetEndpoints()
@@ -101,10 +91,7 @@ func (w *tracePollerStarterWorker) testConnection(ctx context.Context, traceDB t
 		return fmt.Errorf("could not get current datastore: %w", err)
 	}
 
-	err = w.state.eventEmitter.Emit(ctx, events.TracePollingStart(job.Test.ID, job.Run.ID, string(ds.Type), endpoints))
-	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingStart event: error: %s", job.Test.ID, job.Run.ID, err.Error())
-	}
+	emitEvent(ctx, w.state, events.TracePollingStart(job.Test.ID, job.Run.ID, string(ds.Type), endpoints))
 
 	return nil
 }

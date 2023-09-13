@@ -53,7 +53,7 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
+		log.Printf("[TracePoller] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
 		handleError(ctx, job, err, w.state)
 		return
 	}
@@ -61,11 +61,9 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 	traceID := job.Run.TraceID.String()
 	trace, err := traceDB.GetTraceByID(ctx, traceID)
 	if err != nil {
-		err := w.state.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
-		if err != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s", job.Test.ID, job.Run.ID, err.Error())
-		}
-		log.Printf("[PollerExecutor] Test %s Run %d: GetTraceByID (traceID %s) error: %s", job.Test.ID, job.Run.ID, traceID, err.Error())
+		log.Printf("[TracePoller] Test %s Run %d: GetTraceByID (traceID %s) error: %s", job.Test.ID, job.Run.ID, traceID, err.Error())
+
+		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
 
 		handleError(ctx, job, err, w.state)
 		return

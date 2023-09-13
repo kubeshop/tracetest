@@ -103,7 +103,7 @@ func (qd *postgresQueueDriver[T]) worker(conn *pgxpool.Conn) {
 		return
 	}
 
-	qd.log("received job for channel: %s")
+	qd.log("received job for channel: %s", job.Channel)
 
 	channel, err := qd.getChannel(job.Channel)
 	if err != nil {
@@ -177,7 +177,7 @@ func (ch *channel[T]) Enqueue(item T) {
 		ch.log("error acquiring connection: %s", err.Error())
 		return
 	}
-	ch.log("aquired connection for")
+	ch.log("acquired connection for")
 	defer conn.Release()
 
 	_, err = conn.Query(ctx, fmt.Sprintf(`select pg_notify('%s', $1)`, ch.postgresQueueDriver.channelName), jj)

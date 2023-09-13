@@ -63,7 +63,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
+		log.Printf("[TracePoller] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
 		handleError(ctx, job, err, w.state)
 		return
 	}
@@ -95,21 +95,19 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	span.SetAttributes(attrs...)
 
 	if !done {
-		err := w.state.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
-		if err != nil {
-			log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingIterationInfo event: error: %s", job.Test.ID, job.Run.ID, err.Error())
-		}
-		log.Printf("[PollerExecutor] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)
+		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
+
+		log.Printf("[TracePoller] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 
 		requeue(ctx, job, w.state)
 		return
 	}
-	log.Printf("[PollerExecutor] Test %s Run %d: Done polling. (%s)", job.Test.ID, job.Run.ID, reason)
+	log.Printf("[TracePoller] Test %s Run %d: Done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Start Sorting", job.Test.ID, job.Run.ID)
+	log.Printf("[TracePoller] Test %s Run %d: Start Sorting", job.Test.ID, job.Run.ID)
 	sorted := job.Run.Trace.Sort()
 	job.Run.Trace = &sorted
-	log.Printf("[PollerExecutor] Test %s Run %d: Sorting complete", job.Test.ID, job.Run.ID)
+	log.Printf("[TracePoller] Test %s Run %d: Sorting complete", job.Test.ID, job.Run.ID)
 
 	if !job.Run.Trace.HasRootSpan() {
 		newRoot := test.NewTracetestRootSpan(job.Run)
@@ -119,27 +117,21 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	}
 	job.Run = job.Run.SuccessfullyPolledTraces(job.Run.Trace)
 
-	log.Printf("[PollerExecutor] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d ", job.Run.ID, job.EnqueueCount()+1, len(job.Run.Trace.Flat))
+	log.Printf("[TracePoller] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d ", job.Run.ID, job.EnqueueCount()+1, len(job.Run.Trace.Flat))
 
-	log.Printf("[PollerExecutor] Test %s Run %d: Start updating", job.Test.ID, job.Run.ID)
+	log.Printf("[TracePoller] Test %s Run %d: Start updating", job.Test.ID, job.Run.ID)
 	err = w.state.updater.Update(ctx, job.Run)
 	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: Update error: %s", job.Test.ID, job.Run.ID, err.Error())
+		log.Printf("[TracePoller] Test %s Run %d: Update error: %s", job.Test.ID, job.Run.ID, err.Error())
 		handleError(ctx, job, err, w.state)
 		return
 	}
 
-	err = w.state.eventEmitter.Emit(ctx, events.TracePollingSuccess(job.Test.ID, job.Run.ID, reason))
-	if err != nil {
-		log.Printf("[PollerExecutor] Test %s Run %d: failed to emit TracePollingSuccess event: error: %s\n", job.Test.ID, job.Run.ID, err.Error())
-	}
+	emitEvent(ctx, w.state, events.TracePollingSuccess(job.Test.ID, job.Run.ID, reason))
 
 	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, reason, job.EnqueueCount()+1, len(job.Run.Trace.Flat))
 
-	err = w.state.eventEmitter.Emit(ctx, events.TraceFetchingSuccess(job.Test.ID, job.Run.ID))
-	if err != nil {
-		log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingSuccess event: %s \n", job.Test.ID, job.Run.ID, err.Error())
-	}
+	emitEvent(ctx, w.state, events.TraceFetchingSuccess(job.Test.ID, job.Run.ID))
 
 	handleDBError(w.state.updater.Update(ctx, job.Run))
 
