@@ -6,7 +6,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -64,21 +63,21 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 	trace, err := traceDB.GetTraceByID(ctx, traceID)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: GetTraceByID (traceID %s) error: %s", job.Test.ID, job.Run.ID, traceID, err.Error())
-
-		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
-
-		handleError(ctx, job, err, w.state, span)
-		return
+		job.Run.LastError = err
 	}
+
+	spansBefore := 0
+	if job.Run.Trace != nil {
+		spansBefore = len(job.Run.Trace.Flat)
+	}
+
+	collectedSpans := len(trace.Flat) - spansBefore
+	job.Headers.SetInt("collectedSpans", collectedSpans)
 
 	trace.ID = job.Run.TraceID
 	job.Run.Trace = &trace
 
-	err = w.state.updater.Update(ctx, job.Run)
-	if err != nil {
-		handleError(ctx, job, err, w.state, span)
-		return
-	}
+	handleDBError(w.state.updater.Update(ctx, job.Run))
 
 	w.outputQueue.Enqueue(ctx, job)
 }

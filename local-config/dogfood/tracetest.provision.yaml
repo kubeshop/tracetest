@@ -15,3 +15,12 @@ spec:
   requiredGates:
     - analyzer-score
     - test-specs
+---
+type: PollingProfile
+spec:
+  strategy: periodic
+  default: true
+  periodic:
+    timeout: 30s
+    retryDelay: 1s
+    selectorMatchRetries: 3

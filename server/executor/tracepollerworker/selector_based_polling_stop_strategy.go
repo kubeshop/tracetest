@@ -48,7 +48,6 @@ func (s *SelectorBasedPollingStopStrategy) Evaluate(ctx context.Context, job *ex
 
 	currentNumberTries := job.Headers.GetInt(selectorBasedPollerExecutorRetryHeader)
 	if currentNumberTries >= maxNumberRetries {
-
 		s.eventEmitter.Emit(ctx, events.TracePollingIterationInfo(
 			job.Test.ID,
 			job.Run.ID,

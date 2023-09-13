@@ -2,8 +2,12 @@ package tracepollerworker
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
+	"time"
 
+	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -12,6 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 
 	"go.opentelemetry.io/otel/trace"
@@ -60,6 +65,46 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	ctx, span := w.state.tracer.Start(ctx, "Evaluating trace")
 	defer span.End()
 
+	if job.Run.LastError != nil && isTraceNotFoundError(job.Run.LastError) && !tracePollerTimedOut(ctx, job) {
+		// Edge case: the trace still not available on Data Store during polling, we need to poll/fetch trace again
+		populateSpan(span, job, "", nil)
+
+		enqueueTraceFetchJob(ctx, job, w.state)
+		return
+	}
+
+	// if an error happened on last iteration validate it
+	if job.Run.LastError != nil {
+		err := job.Run.LastError
+
+		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
+
+		reason := handleTraceDBError(ctx, job, err, w.state)
+
+		emitEvent(ctx, w.state, events.TracePollingError(job.Test.ID, job.Run.ID, reason, err))
+		emitEvent(ctx, w.state, events.TraceFetchingError(job.Test.ID, job.Run.ID, err))
+
+		successful := false
+		populateSpan(span, job, reason, &successful)
+
+		run := job.Run.TraceFailed(err)
+		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
+			"finalState": string(run.State),
+		})
+
+		handleDBError(w.state.updater.Update(ctx, run))
+
+		w.state.subscriptionManager.PublishUpdate(subscription.Message{
+			ResourceID: run.TransactionStepResourceID(),
+			Type:       "update_run",
+			Content:    executor.RunResult{Run: run, Err: err},
+		})
+
+		handleError(ctx, job, err, w.state, span)
+		return
+	}
+
+	// otherwise, validate if the polling process should stop
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
 		log.Printf("[TracePoller] Test %s Run %d: GetDataStore error: %s", job.Test.ID, job.Run.ID, err.Error())
@@ -71,12 +116,12 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 
 	populateSpan(span, job, reason, &done)
 
-	if !done {
+	if !done { // trace polling is not done,
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
 
 		log.Printf("[TracePoller] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 
-		requeue(ctx, job, w.state)
+		enqueueTraceFetchJob(ctx, job, w.state)
 		return
 	}
 	log.Printf("[TracePoller] Test %s Run %d: Done polling. (%s)", job.Test.ID, job.Run.ID, reason)
@@ -113,4 +158,65 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	handleDBError(w.state.updater.Update(ctx, job.Run))
 
 	w.outputQueue.Enqueue(ctx, job)
+}
+
+func isTraceNotFoundError(err error) bool {
+	return errors.Is(err, connection.ErrTraceNotFound)
+}
+
+func tracePollerTimedOut(ctx context.Context, job executor.Job) bool {
+	if job.PollingProfile.Periodic == nil {
+		return false
+	}
+
+	pp := *job.PollingProfile.Periodic
+	timedOut := time.Since(job.Run.ServiceTriggeredAt) >= pp.TimeoutDuration()
+
+	return timedOut
+}
+
+func handleTraceDBError(ctx context.Context, job executor.Job, err error, state *workerState) string {
+	run := job.Run
+
+	if job.PollingProfile.Periodic == nil {
+		log.Println("[TracePoller] cannot get polling profile.")
+		return "Cannot get polling profile"
+	}
+
+	pp := *job.PollingProfile.Periodic
+
+	reason := ""
+
+	if isTraceNotFoundError(err) && tracePollerTimedOut(ctx, job) {
+		reason = fmt.Sprintf("Timed out without finding trace, trace id \"%s\"", run.TraceID.String())
+
+		err = fmt.Errorf("timed out waiting for traces after %s", pp.Timeout)
+		log.Println("[TracePoller] Timed-out", err)
+	} else {
+		reason = "Unexpected error"
+
+		err = fmt.Errorf("cannot fetch trace: %w", err)
+		log.Println("[TracePoller] Unknown error", err)
+	}
+
+	return reason
+}
+
+func enqueueTraceFetchJob(ctx context.Context, job executor.Job, state *workerState) {
+	go func() {
+		log.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.Run.ID, job.EnqueueCount())
+		time.Sleep(job.PollingProfile.Periodic.RetryDelayDuration())
+
+		job.IncreaseEnqueueCount()
+		job.Headers.SetBool("requeued", true)
+
+		select {
+		default:
+		case <-ctx.Done():
+			return // user requested to stop the process
+		}
+
+		// inputQueue is set as the trace fetch queue by our pipeline engine
+		state.inputQueue.Enqueue(ctx, job)
+	}()
 }

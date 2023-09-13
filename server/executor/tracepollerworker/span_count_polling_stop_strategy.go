@@ -33,7 +33,9 @@ func (s *SpanCountPollingStopStrategy) Evaluate(ctx context.Context, job *execut
 		return false, "First iteration"
 	}
 
-	haveNotCollectedSpansSinceLastPoll := len(trace.Flat) == len(job.Run.Trace.Flat)
+	collectedSpans := job.Headers.GetInt("collectedSpans")
+
+	haveNotCollectedSpansSinceLastPoll := collectedSpans > 0
 	haveCollectedSpansInTestRun := len(trace.Flat) > 0
 	haveCollectedOnlyRootNode := len(trace.Flat) == 1 && trace.HasRootSpan()
 
