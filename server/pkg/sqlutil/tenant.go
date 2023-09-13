@@ -35,6 +35,20 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 	return query + condition, append(params, *tenantID)
 }
 
+func TenantWithReplacedID(ctx context.Context, query string, params ...any) (string, []any) {
+	tenantID := TenantID(ctx)
+	if tenantID == nil {
+		return query, params
+	}
+
+	prefix := getQueryPrefix(query)
+	paramNumber := len(params) + 1
+	condition := fmt.Sprintf(" %s tenant_id = $%d", prefix, paramNumber)
+
+	var newParams []any
+	return query + condition, append(newParams, *tenantID, *tenantID)
+}
+
 func TenantID(ctx context.Context) *string {
 	tenantID := ctx.Value(middleware.TenantIDKey)
 

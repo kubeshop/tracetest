@@ -91,7 +91,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 	defer tx.Rollback()
 
-	query, params := sqlutil.Tenant(ctx, deleteQuery, DataStoreSingleID)
+	query, params := sqlutil.TenantWithReplacedID(ctx, deleteQuery, DataStoreSingleID)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
@@ -103,6 +103,9 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 
 	tenantID := sqlutil.TenantID(ctx)
+	if tenantID != nil {
+		dataStore.ID = id.ID(*tenantID)
+	}
 
 	_, err = tx.ExecContext(ctx, insertQuery,
 		dataStore.ID,
@@ -132,7 +135,7 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	}
 	defer tx.Rollback()
 
-	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
+	query, params := sqlutil.TenantWithReplacedID(ctx, deleteQuery, id)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return fmt.Errorf("datastore repository sql exec delete: %w", err)
@@ -167,7 +170,7 @@ func (r *Repository) Current(ctx context.Context) (DataStore, error) {
 }
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
-	query, params := sqlutil.Tenant(ctx, getQuery, id)
+	query, params := sqlutil.TenantWithReplacedID(ctx, getQuery, id)
 	row := r.db.QueryRowContext(ctx, query, params...)
 
 	dataStore, err := r.readRow(row)
