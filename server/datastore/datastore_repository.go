@@ -91,7 +91,8 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery, DataStoreSingleID)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, DataStoreSingleID)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
 	}
