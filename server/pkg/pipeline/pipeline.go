@@ -40,8 +40,8 @@ type InputQueueSetter[T any] interface {
 }
 
 type Step[T any] struct {
-	Driver    workerDriver[T]
-	Processor step[T]
+	Driver           workerDriver[T]
+	Processor        step[T]
 	InputQueueOffset int
 }
 
@@ -70,7 +70,7 @@ func New[T any](cfg queueConfigurer[T], steps ...Step[T]) *Pipeline[T] {
 		// a processor might need to have a reference to its input queue, to requeue items for example.
 		// This can be done if it implements the `InputQueueSetter` interace
 		if setter, ok := reflect.ValueOf(step.Processor).Interface().(InputQueueSetter[T]); ok {
-			setter.SetInputQueue(pipeline.queues[i - step.InputQueueOffset])
+			setter.SetInputQueue(pipeline.queues[i+step.InputQueueOffset])
 		}
 	}
 

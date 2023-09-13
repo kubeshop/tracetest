@@ -30,6 +30,10 @@ func NewSelectorBasedPollingStopStrategy(eventEmitter executor.EventEmitter, str
 
 // Evaluate implements PollingStopStrategy.
 func (s *SelectorBasedPollingStopStrategy) Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB, trace *traces.Trace) (bool, string) {
+	if !traceDB.ShouldRetry() {
+		return true, "TraceDB is not retryable"
+	}
+
 	finished, reason := s.wrappedStrategy.Evaluate(ctx, job, traceDB, trace)
 
 	if !finished {
