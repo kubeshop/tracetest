@@ -100,6 +100,10 @@ func (tp tracePoller) enqueueJob(ctx context.Context, job Job) {
 	tp.inputQueue.Enqueue(ctx, job)
 }
 
+func (tp tracePoller) isFirstRequest(job Job) bool {
+	return job.EnqueueCount() == 0
+}
+
 func (tp *tracePoller) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	tp.outputQueue = queue
 }
@@ -114,6 +118,15 @@ func (tp *tracePoller) ProcessItem(ctx context.Context, job Job) {
 	case <-ctx.Done():
 		return
 	}
+
+	if tp.isFirstRequest(job) {
+		err := tp.eventEmitter.Emit(ctx, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
+		if err != nil {
+			log.Printf("[TracePoller] Test %s Run %d: fail to emit TracePollingStart event: %s", job.Test.ID, job.Run.ID, err.Error())
+		}
+	}
+
+	log.Println("TracePoller] processJob", job.EnqueueCount())
 
 	result, err := tp.pollerExecutor.ExecuteRequest(ctx, &job)
 	run := result.run
@@ -213,4 +226,8 @@ func (tp tracePoller) requeue(ctx context.Context, job Job) {
 		job.Headers.SetBool("requeued", true)
 		tp.enqueueJob(ctx, job)
 	}()
+}
+
+func isFirstRequest(job *Job) bool {
+	return !job.Headers.GetBool("requeued")
 }

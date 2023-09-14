@@ -234,7 +234,3 @@ func (pe DefaultPollerExecutor) donePollingTraces(job *Job, traceDB tracedb.Trac
 
 	return false, fmt.Sprintf("New spans found. Before: %d After: %d", len(job.Run.Trace.Flat), len(trace.Flat))
 }
-
-func isFirstRequest(job *Job) bool {
-	return !job.Headers.GetBool("requeued")
-}
