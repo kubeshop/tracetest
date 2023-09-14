@@ -202,12 +202,13 @@ func sortSpanChildren(span Span) Span {
 
 func (t *Trace) UnmarshalJSON(data []byte) error {
 	resetCache()
-
-	aux := struct {
-		ID       string
-		RootSpan Span
-		Flat     map[trace.SpanID]*Span `json:"-"`
-	}{}
+	type Alias Trace
+	aux := &struct {
+		ID string
+		*Alias
+	}{
+		Alias: (*Alias)(t),
+	}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return fmt.Errorf("unmarshal trace: %w", err)
 	}
