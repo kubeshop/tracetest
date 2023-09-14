@@ -1,0 +1,5 @@
+ALTER TABLE data_stores
+DROP CONSTRAINT data_stores_pkey,
+ADD PRIMARY KEY (id),
+ALTER COLUMN tenant_id DROP DEFAULT,
+ALTER COLUMN tenant_id DROP NOT NULL;

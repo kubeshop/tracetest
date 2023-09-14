@@ -34,9 +34,9 @@ INSERT INTO data_stores (
 	"type",
 	"is_default",
 	"values",
-	"created_at",
-	"tenant_id"
-) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	"created_at"
+	%s
+) VALUES ($1, $2, $3, $4, $5, $6 %s)`
 
 const deleteQuery = `DELETE FROM data_stores WHERE "id" = $1`
 
@@ -91,7 +91,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 	defer tx.Rollback()
 
-	query, params := sqlutil.TenantWithReplacedID(ctx, deleteQuery, DataStoreSingleID)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, DataStoreSingleID)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
@@ -102,20 +102,13 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		return DataStore{}, fmt.Errorf("could not marshal values field configuration: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-	if tenantID != nil {
-		dataStore.ID = id.ID(*tenantID)
-	}
-
-	_, err = tx.ExecContext(ctx, insertQuery,
-		dataStore.ID,
+	query, params = sqlutil.TenantInsert(ctx, insertQuery, dataStore.ID,
 		dataStore.Name,
 		dataStore.Type,
 		dataStore.Default,
 		valuesJSON,
-		dataStore.CreatedAt,
-		tenantID,
-	)
+		dataStore.CreatedAt)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec create: %w", err)
 	}
@@ -135,7 +128,7 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	}
 	defer tx.Rollback()
 
-	query, params := sqlutil.TenantWithReplacedID(ctx, deleteQuery, id)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return fmt.Errorf("datastore repository sql exec delete: %w", err)
@@ -170,7 +163,7 @@ func (r *Repository) Current(ctx context.Context) (DataStore, error) {
 }
 
 func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
-	query, params := sqlutil.TenantWithReplacedID(ctx, getQuery, id)
+	query, params := sqlutil.Tenant(ctx, getQuery, id)
 	row := r.db.QueryRowContext(ctx, query, params...)
 
 	dataStore, err := r.readRow(row)

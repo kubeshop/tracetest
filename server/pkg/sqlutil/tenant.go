@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/http/middleware"
-	"github.com/kubeshop/tracetest/server/pkg/id"
 )
 
 func Tenant(ctx context.Context, query string, params ...any) (string, []any) {
@@ -36,17 +35,17 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 	return query + condition, append(params, *tenantID)
 }
 
-func TenantWithReplacedID(ctx context.Context, query string, id id.ID) (string, []any) {
-	var params []any
+func TenantInsert(ctx context.Context, query string, params ...any) (string, []any) {
 	tenantID := TenantID(ctx)
 	if tenantID == nil {
-		return query, append(params, id)
+		return fmt.Sprintf(query, "", ""), params
 	}
 
-	prefix := getQueryPrefix(query)
-	condition := fmt.Sprintf(" %s tenant_id = $%d", prefix, 2)
+	paramNumber := len(params) + 1
+	paramValue := fmt.Sprintf(", $%d", paramNumber)
+	formattedQuery := fmt.Sprintf(query, ", tenant_id", paramValue)
 
-	return query + condition, append(params, *tenantID, *tenantID)
+	return formattedQuery, append(params, *tenantID)
 }
 
 func TenantID(ctx context.Context) *string {
