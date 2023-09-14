@@ -63,12 +63,11 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	ctx, span := w.state.tracer.Start(ctx, "Evaluating trace")
 	defer span.End()
 
-	if isTraceNotFoundError(job.Run.LastError) && !tracePollerTimedOut(ctx, job) {
+	traceNotFound := job.Headers.GetBool("traceNotFound")
+
+	if traceNotFound && !tracePollerTimedOut(ctx, job) {
 		// Edge case: the trace still not available on Data Store during polling, we need to poll/fetch trace again
 		populateSpan(span, job, "", nil)
-
-		job.Run.LastError = nil // clear the error and try again
-		handleDBError(w.state.updater.Update(ctx, job.Run))
 
 		enqueueTraceFetchJob(ctx, job, w.state)
 		return
@@ -77,10 +76,17 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	// if an error happened on last iteration validate it
 	if job.Run.LastError != nil {
 		err := job.Run.LastError
-
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
 
-		reason := handleTraceDBError(ctx, job, err, w.state)
+		reason := ""
+
+		if traceNotFound && tracePollerTimedOut(ctx, job) {
+			reason = fmt.Sprintf("Timed out without finding trace, trace id \"%s\"", job.Run.TraceID.String())
+			log.Println("[TracePoller] Timed-out")
+		} else {
+			reason = "Unexpected error"
+			log.Println("[TracePoller] Unknown error", err)
+		}
 
 		emitEvent(ctx, w.state, events.TracePollingError(job.Test.ID, job.Run.ID, reason, err))
 		emitEvent(ctx, w.state, events.TraceFetchingError(job.Test.ID, job.Run.ID, err))
@@ -170,33 +176,6 @@ func tracePollerTimedOut(ctx context.Context, job executor.Job) bool {
 	timedOut := time.Since(job.Run.ServiceTriggeredAt) >= pp.TimeoutDuration()
 
 	return timedOut
-}
-
-func handleTraceDBError(ctx context.Context, job executor.Job, err error, state *workerState) string {
-	run := job.Run
-
-	if job.PollingProfile.Periodic == nil {
-		log.Println("[TracePoller] cannot get polling profile.")
-		return "Cannot get polling profile"
-	}
-
-	pp := *job.PollingProfile.Periodic
-
-	reason := ""
-
-	if isTraceNotFoundError(err) && tracePollerTimedOut(ctx, job) {
-		reason = fmt.Sprintf("Timed out without finding trace, trace id \"%s\"", run.TraceID.String())
-
-		err = fmt.Errorf("timed out waiting for traces after %s", pp.Timeout)
-		log.Println("[TracePoller] Timed-out", err)
-	} else {
-		reason = "Unexpected error"
-
-		err = fmt.Errorf("cannot fetch trace: %w", err)
-		log.Println("[TracePoller] Unknown error", err)
-	}
-
-	return reason
 }
 
 func enqueueTraceFetchJob(ctx context.Context, job executor.Job, state *workerState) {
