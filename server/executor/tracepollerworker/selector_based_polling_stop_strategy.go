@@ -9,7 +9,6 @@ import (
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type SelectorBasedPollingStopStrategy struct {
@@ -29,12 +28,12 @@ func NewSelectorBasedPollingStopStrategy(eventEmitter executor.EventEmitter, str
 }
 
 // Evaluate implements PollingStopStrategy.
-func (s *SelectorBasedPollingStopStrategy) Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB, trace *traces.Trace) (bool, string) {
+func (s *SelectorBasedPollingStopStrategy) Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB) (bool, string) {
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
 
-	finished, reason := s.wrappedStrategy.Evaluate(ctx, job, traceDB, trace)
+	finished, reason := s.wrappedStrategy.Evaluate(ctx, job, traceDB)
 
 	if !finished {
 		job.Headers.SetInt(selectorBasedPollerExecutorRetryHeader, 0)

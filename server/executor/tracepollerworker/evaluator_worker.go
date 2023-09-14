@@ -23,7 +23,7 @@ import (
 )
 
 type PollingStopStrategy interface {
-	Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB, trace *traces.Trace) (bool, string)
+	Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB) (bool, string)
 }
 
 type tracePollerEvaluatorWorker struct {
@@ -112,7 +112,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		return
 	}
 
-	done, reason := w.stopStrategy.Evaluate(ctx, &job, traceDB, job.Run.Trace)
+	done, reason := w.stopStrategy.Evaluate(ctx, &job, traceDB)
 
 	populateSpan(span, job, reason, &done)
 

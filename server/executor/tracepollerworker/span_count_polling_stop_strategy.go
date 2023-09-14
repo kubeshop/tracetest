@@ -7,7 +7,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/traces"
 )
 
 type SpanCountPollingStopStrategy struct{}
@@ -17,38 +16,43 @@ func NewSpanCountPollingStopStrategy() *SpanCountPollingStopStrategy {
 }
 
 // Evaluate implements PollingStopStrategy.
-func (s *SpanCountPollingStopStrategy) Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB, trace *traces.Trace) (bool, string) {
+func (s *SpanCountPollingStopStrategy) Evaluate(ctx context.Context, job *executor.Job, traceDB tracedb.TraceDB) (bool, string) {
 	if !traceDB.ShouldRetry() {
 		return true, "TraceDB is not retryable"
 	}
 
 	maxTracePollRetry := job.PollingProfile.Periodic.MaxTracePollRetry()
+
 	// we're done if we have the same amount of spans after polling or `maxTracePollRetry` times
 	log.Printf("[TracePoller] Test %s Run %d: Job count %d, max retries: %d", job.Test.ID, job.Run.ID, job.EnqueueCount(), maxTracePollRetry)
 	if job.EnqueueCount() >= maxTracePollRetry {
 		return true, fmt.Sprintf("Hit MaxRetry of %d", maxTracePollRetry)
 	}
 
-	if job.Run.Trace == nil {
-		return false, "First iteration"
-	}
+	trace := job.Run.Trace
 
 	collectedSpans := job.Headers.GetInt("collectedSpans")
 
-	haveNotCollectedSpansSinceLastPoll := collectedSpans == 0
-	haveCollectedSpansInTestRun := len(trace.Flat) > 0
-	haveCollectedOnlyRootNode := len(trace.Flat) == 1 && trace.HasRootSpan()
+	haveCollectedSpansInThisIteration := collectedSpans > 0
+	if haveCollectedSpansInThisIteration { // found spans on this iteration, continue the iterations
+		return false, fmt.Sprintf("Found %d new spans.", collectedSpans)
+	}
 
-	// Today we consider that we finished collecting traces
-	// if we haven't collected any new spans since our last poll
-	// and we have collected at least one span for this test run
-	// and we have not collected only the root span
+	totalSpans := len(trace.Flat)
+	haveCollectedOnlyRootNode := totalSpans == 1 && trace.HasRootSpan()
 
-	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun && !haveCollectedOnlyRootNode {
+	if haveCollectedOnlyRootNode { // found only "Tracetest trigger" span, continue the iterations
+		return false, "Found only Tracetest trigger span."
+	}
+
+	haveCollectedSpansInPreviousIterations := len(trace.Flat) > 0
+
+	if haveCollectedSpansInPreviousIterations && !haveCollectedSpansInThisIteration {
+		// found not found spans on this iteration, but it found it on previous iterations
 		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
 	}
 
-	return false, fmt.Sprintf("New spans found. Before: %d After: %d", len(job.Run.Trace.Flat), len(trace.Flat))
+	return false, "" // given the previous conditions, this code should not be reached
 }
 
 var _ PollingStopStrategy = &SpanCountPollingStopStrategy{}

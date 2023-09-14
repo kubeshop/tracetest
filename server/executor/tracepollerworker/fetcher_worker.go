@@ -82,6 +82,5 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 	job.Run.Trace = &trace
 
 	handleDBError(w.state.updater.Update(ctx, job.Run))
-
 	w.outputQueue.Enqueue(ctx, job)
 }
