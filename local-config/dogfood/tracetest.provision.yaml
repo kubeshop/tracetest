@@ -1,12 +1,10 @@
 ---
 type: DataStore
 spec:
-  name: jaeger
-  type: jaeger
-  jaeger:
-    endpoint: localhost:16685
-    tls:
-      insecure: true
+  name: OpenTelemetry Collector
+  type: otlp
+  default: true
+
 ---
 type: TestRunner
 spec:
@@ -15,6 +13,7 @@ spec:
   requiredGates:
     - analyzer-score
     - test-specs
+
 ---
 type: PollingProfile
 spec:

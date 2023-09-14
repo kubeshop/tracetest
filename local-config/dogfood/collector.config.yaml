@@ -8,14 +8,19 @@ processors:
   batch:
     timeout: 100ms
 
-  # Data sources: traces
   probabilistic_sampler:
     hash_seed: 22
     sampling_percentage: 100
 
 exporters:
+  logging:
+    loglevel: warn
   jaeger:
     endpoint: jaeger:14250
+    tls:
+      insecure: true
+  otlp/tracetest:
+    endpoint: host.docker.internal:4317
     tls:
       insecure: true
 
@@ -24,4 +29,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      exporters: [jaeger]
+      exporters: [jaeger, otlp/tracetest, logging]
