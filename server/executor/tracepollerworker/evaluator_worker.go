@@ -63,9 +63,12 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	ctx, span := w.state.tracer.Start(ctx, "Evaluating trace")
 	defer span.End()
 
-	if job.Run.LastError != nil && isTraceNotFoundError(job.Run.LastError) && !tracePollerTimedOut(ctx, job) {
+	if isTraceNotFoundError(job.Run.LastError) && !tracePollerTimedOut(ctx, job) {
 		// Edge case: the trace still not available on Data Store during polling, we need to poll/fetch trace again
 		populateSpan(span, job, "", nil)
+
+		job.Run.LastError = nil // clear the error and try again
+		handleDBError(w.state.updater.Update(ctx, job.Run))
 
 		enqueueTraceFetchJob(ctx, job, w.state)
 		return
@@ -114,7 +117,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 
 	populateSpan(span, job, reason, &done)
 
-	if !done { // trace polling is not done,
+	if !done { // trace polling is not done, try to fetch trace again
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
 
 		log.Printf("[TracePoller] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)

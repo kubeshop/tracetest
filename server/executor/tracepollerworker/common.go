@@ -90,5 +90,9 @@ func populateSpan(span trace.Span, job executor.Job, reason string, done *bool) 
 }
 
 func isTraceNotFoundError(err error) bool {
+	if err == nil {
+		return false
+	}
+
 	return errors.Is(err, connection.ErrTraceNotFound)
 }
