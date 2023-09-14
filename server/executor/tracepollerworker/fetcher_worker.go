@@ -81,6 +81,10 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 	trace.ID = job.Run.TraceID
 	job.Run.Trace = &trace
 
+	if job.Run.LastError != nil && isTraceNotFoundError(job.Run.LastError) {
+		job.Run.LastError = nil
+	}
+
 	handleDBError(w.state.updater.Update(ctx, job.Run))
 	w.outputQueue.Enqueue(ctx, job)
 }

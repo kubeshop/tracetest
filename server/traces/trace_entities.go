@@ -237,9 +237,7 @@ func flattenSpans(res map[trace.SpanID]*Span, root Span) {
 
 	res[root.ID] = rootPtr
 	for _, child := range root.Children {
-		if _, ok := res[root.ID]; !ok {
-			flattenSpans(res, *child)
-		}
+		flattenSpans(res, *child)
 	}
 
 	// Remove children and parent because they are now part of the flatten structure

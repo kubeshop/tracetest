@@ -2,6 +2,7 @@ package tracepollerworker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -85,4 +87,8 @@ func populateSpan(span trace.Span, job executor.Job, reason string, done *bool) 
 	}
 
 	span.SetAttributes(attrs...)
+}
+
+func isTraceNotFoundError(err error) bool {
+	return errors.Is(err, connection.ErrTraceNotFound)
 }

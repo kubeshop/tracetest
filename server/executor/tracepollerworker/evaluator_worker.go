@@ -2,7 +2,6 @@ package tracepollerworker
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -16,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 
 	"go.opentelemetry.io/otel/trace"
@@ -158,10 +156,6 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	handleDBError(w.state.updater.Update(ctx, job.Run))
 
 	w.outputQueue.Enqueue(ctx, job)
-}
-
-func isTraceNotFoundError(err error) bool {
-	return errors.Is(err, connection.ErrTraceNotFound)
 }
 
 func tracePollerTimedOut(ctx context.Context, job executor.Job) bool {
