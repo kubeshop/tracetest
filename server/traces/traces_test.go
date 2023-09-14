@@ -3,6 +3,7 @@ package traces_test
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -490,4 +491,16 @@ func TestSort(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedTrace.RootSpan, sortedTrace.RootSpan)
+}
+
+func TestUnmarshalLargeTrace(t *testing.T) {
+	bytes, err := os.ReadFile("./data/big-trace-json.json")
+	require.NoError(t, err)
+
+	trace := traces.Trace{}
+
+	err = json.Unmarshal(bytes, &trace)
+	require.NoError(t, err)
+
+	assert.Greater(t, len(trace.Flat), 0)
 }

@@ -695,7 +695,7 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
 }
 
-func (c *controller) GetVersion(ctx context.Context) (openapi.ImplResponse, error) {
+func (c *controller) GetVersion(ctx context.Context, fileExtension string) (openapi.ImplResponse, error) {
 	version := openapi.Version{
 		Version:       c.version,
 		Type:          "oss",

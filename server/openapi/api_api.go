@@ -149,7 +149,7 @@ func (c *ApiApiController) Routes() Routes {
 		{
 			"GetVersion",
 			strings.ToUpper("Get"),
-			"/api/version",
+			"/api/version.{fileExtension}",
 			c.GetVersion,
 		},
 		{
@@ -575,7 +575,10 @@ func (c *ApiApiController) GetTestVersion(w http.ResponseWriter, r *http.Request
 
 // GetVersion - Get the version of the API
 func (c *ApiApiController) GetVersion(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetVersion(r.Context())
+	params := mux.Vars(r)
+	fileExtensionParam := params["fileExtension"]
+
+	result, err := c.service.GetVersion(r.Context(), fileExtensionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

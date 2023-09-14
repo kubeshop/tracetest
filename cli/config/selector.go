@@ -14,30 +14,30 @@ type Entry struct {
 	Name string `json:"name"`
 }
 
-func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (Config, Entry, error) {
+func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (string, error) {
 	resource, err := c.resources.Get("organization")
 	if err != nil {
-		return cfg, Entry{}, err
+		return "", err
 	}
 
 	elements, err := getElements(ctx, resource, cfg)
 	if err != nil {
-		return cfg, Entry{}, err
+		return "", err
 	}
 
 	if len(elements) == 1 {
-		cfg.OrganizationID = elements[0].ID
 		c.ui.Println(fmt.Sprintf("Defaulting to only available Organization: %s", elements[0].Name))
-		return cfg, Entry{}, nil
+		return elements[0].ID, nil
 	}
 
+	orgID := ""
 	options := make([]cliUI.Option, len(elements))
 	for i, org := range elements {
 		options[i] = cliUI.Option{
 			Text: org.Name,
 			Fn: func(o Entry) func(ui cliUI.UI) {
 				return func(ui cliUI.UI) {
-					cfg.OrganizationID = o.ID
+					orgID = o.ID
 				}
 			}(org),
 		}
@@ -46,19 +46,13 @@ func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (Con
 	option := c.ui.Select("What Organization do you want to use?", options, 0)
 	option.Fn(c.ui)
 
-	for _, org := range elements {
-		if org.ID == cfg.OrganizationID {
-			return cfg, org, nil
-		}
-	}
-
-	return cfg, Entry{}, nil
+	return orgID, nil
 }
 
-func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (Config, Entry, error) {
+func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (string, error) {
 	resource, err := c.resources.Get("env")
 	if err != nil {
-		return cfg, Entry{}, err
+		return "", err
 	}
 	resource = resource.WithOptions(resourcemanager.WithPrefixGetter(func() string {
 		return fmt.Sprintf("/organizations/%s/", cfg.OrganizationID)
@@ -66,22 +60,22 @@ func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (Conf
 
 	elements, err := getElements(ctx, resource, cfg)
 	if err != nil {
-		return cfg, Entry{}, err
+		return "", err
 	}
 
 	if len(elements) == 1 {
-		cfg.EnvironmentID = elements[0].ID
 		c.ui.Println(fmt.Sprintf("Defaulting to only available Environment: %s", elements[0].Name))
-		return cfg, Entry{}, nil
+		return elements[0].ID, nil
 	}
 
+	envID := ""
 	options := make([]cliUI.Option, len(elements))
 	for i, env := range elements {
 		options[i] = cliUI.Option{
 			Text: env.Name,
 			Fn: func(e Entry) func(ui cliUI.UI) {
 				return func(ui cliUI.UI) {
-					cfg.EnvironmentID = e.ID
+					envID = e.ID
 				}
 			}(env),
 		}
@@ -89,13 +83,8 @@ func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (Conf
 
 	option := c.ui.Select("What Environment do you want to use?", options, 0)
 	option.Fn(c.ui)
-	for _, env := range elements {
-		if env.ID == cfg.EnvironmentID {
-			return cfg, env, nil
-		}
-	}
 
-	return cfg, Entry{}, err
+	return envID, err
 }
 
 type entryList struct {

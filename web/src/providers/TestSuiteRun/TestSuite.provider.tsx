@@ -1,6 +1,6 @@
-import {createContext, useContext, useMemo} from 'react';
+import {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import TracetestAPI from 'redux/apis/Tracetest';
-import TestSuiteRun from 'models/TestSuiteRun.model';
+import TestSuiteRun, {isRunStateFinished} from 'models/TestSuiteRun.model';
 import TestSuiteProvider from '../TestSuite/TestSuite.provider';
 
 const {useGetTestSuiteRunByIdQuery} = TracetestAPI.instance;
@@ -21,9 +21,17 @@ interface IProps {
 
 export const useTestSuiteRun = () => useContext(Context);
 
+const POLLING_INTERVAL = 5000;
+
 const TestSuiteRunProvider = ({children, testSuiteId, runId}: IProps) => {
-  const {data: run} = useGetTestSuiteRunByIdQuery({testSuiteId, runId});
+  const [pollingInterval, setPollingInterval] = useState<number | undefined>(POLLING_INTERVAL);
+  const {data: run} = useGetTestSuiteRunByIdQuery({testSuiteId, runId}, {pollingInterval});
   const value = useMemo<IContext>(() => ({run: run!}), [run]);
+
+  useEffect(() => {
+    const shouldStopPolling = run?.state && isRunStateFinished(run.state);
+    setPollingInterval(shouldStopPolling ? undefined : POLLING_INTERVAL);
+  }, [run?.state]);
 
   return run ? (
     <TestSuiteProvider testSuiteId={testSuiteId} version={run.version}>

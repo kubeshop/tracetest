@@ -4,7 +4,6 @@ import {PaginationResponse} from 'hooks/usePagination';
 import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
 import TestSuiteRun, {TRawTestSuiteRunResourceRun} from 'models/TestSuiteRun.model';
-import WebSocketService, {IListenerFunction} from 'services/WebSocket.service';
 import {getTotalCountFromHeaders} from 'utils/Common';
 import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
@@ -45,18 +44,6 @@ export const testSuiteRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     query: ({testSuiteId, runId}) => `/testsuites/${testSuiteId}/run/${runId}`,
     providesTags: result => [{type: TracetestApiTags.TESTSUITE_RUN, id: result?.id}],
     transformResponse: (raw: TRawTestSuiteRunResourceRun) => TestSuiteRun(raw),
-    async onCacheEntryAdded(arg, {cacheDataLoaded, cacheEntryRemoved, updateCachedData}) {
-      const listener: IListenerFunction<TRawTestSuiteRunResourceRun> = data => {
-        updateCachedData(() => TestSuiteRun(data.event));
-      };
-
-      await WebSocketService.initWebSocketSubscription({
-        listener,
-        resource: `testsuites/${arg.testSuiteId}/run/${arg.runId}`,
-        waitToCleanSubscription: cacheEntryRemoved,
-        waitToInitSubscription: cacheDataLoaded,
-      });
-    },
   }),
 
   deleteTestSuiteRunById: builder.mutation<TestSuiteRun, {testSuiteId: string; runId: number}>({

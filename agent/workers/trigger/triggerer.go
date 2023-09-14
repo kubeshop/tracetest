@@ -13,6 +13,7 @@ import (
 
 type Options struct {
 	TraceID trace.TraceID
+	SpanID  trace.SpanID
 	TestID  id.ID
 }
 

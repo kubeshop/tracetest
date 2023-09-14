@@ -224,6 +224,7 @@ func sortSpanChildren(span Span) Span {
 }
 
 func (t *Trace) UnmarshalJSON(data []byte) error {
+	resetCache()
 	type Alias Trace
 	aux := &struct {
 		ID string

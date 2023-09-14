@@ -109,7 +109,7 @@ services:
       - jaeger
 
   jaeger:
-    image: jaegertracing/all-in-one:1.48.0
+    image: jaegertracing/all-in-one:latest
     restart: unless-stopped
     ports:
       - 16686:16686
