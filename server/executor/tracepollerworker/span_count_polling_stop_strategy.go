@@ -33,26 +33,20 @@ func (s *SpanCountPollingStopStrategy) Evaluate(ctx context.Context, job *execut
 
 	collectedSpans := job.Headers.GetInt("collectedSpans")
 
-	haveCollectedSpansInThisIteration := collectedSpans > 0
-	if haveCollectedSpansInThisIteration { // found spans on this iteration, continue the iterations
-		return false, fmt.Sprintf("Found %d new spans.", collectedSpans)
-	}
+	haveNotCollectedSpansSinceLastPoll := collectedSpans == 0
+	haveCollectedSpansInTestRun := len(trace.Flat) > 0
+	haveCollectedOnlyRootNode := len(trace.Flat) == 1 && trace.HasRootSpan()
 
-	totalSpans := len(trace.Flat)
-	haveCollectedOnlyRootNode := totalSpans == 1 && trace.HasRootSpan()
+	// Today we consider that we finished collecting traces
+	// if we haven't collected any new spans since our last poll
+	// and we have collected at least one span for this test run
+	// and we have not collected only the root span
 
-	if haveCollectedOnlyRootNode { // found only "Tracetest trigger" span, continue the iterations
-		return false, "Found only Tracetest trigger span."
-	}
-
-	haveCollectedSpansInPreviousIterations := len(trace.Flat) > 0
-
-	if haveCollectedSpansInPreviousIterations && !haveCollectedSpansInThisIteration {
-		// found not found spans on this iteration, but it found it on previous iterations
+	if haveNotCollectedSpansSinceLastPoll && haveCollectedSpansInTestRun && !haveCollectedOnlyRootNode {
 		return true, fmt.Sprintf("Trace has no new spans. Spans found: %d", len(trace.Flat))
 	}
 
-	return false, "" // given the previous conditions, this code should not be reached
+	return false, fmt.Sprintf("New spans found. Before: %d After: %d", len(job.Run.Trace.Flat), len(trace.Flat))
 }
 
 var _ PollingStopStrategy = &SpanCountPollingStopStrategy{}
