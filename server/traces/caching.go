@@ -8,6 +8,9 @@ var cache spanCache = nil
 var cacheMutex sync.Mutex
 
 func getCache() spanCache {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
 	if cache == nil {
 		cache = spanCache{}
 	}
@@ -16,6 +19,9 @@ func getCache() spanCache {
 }
 
 func resetCache() {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
 	cache = nil
 }
 
