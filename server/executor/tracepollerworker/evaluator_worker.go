@@ -69,6 +69,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		// Edge case: the trace still not available on Data Store during polling, we need to poll/fetch trace again
 		populateSpan(span, job, "", nil)
 
+		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, "trace not found on data store"))
 		enqueueTraceFetchJob(ctx, job, w.state)
 		return
 	}
@@ -76,18 +77,17 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	// if an error happened on last iteration validate it
 	if job.Run.LastError != nil {
 		err := job.Run.LastError
-		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, err.Error()))
-
 		reason := ""
 
 		if traceNotFound && tracePollerTimedOut(ctx, job) {
 			reason = fmt.Sprintf("Timed out without finding trace, trace id \"%s\"", job.Run.TraceID.String())
 			log.Println("[TracePoller] Timed-out")
 		} else {
-			reason = "Unexpected error"
+			reason = fmt.Sprintf("Unexpected error: %s", err.Error())
 			log.Println("[TracePoller] Unknown error", err)
 		}
 
+		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, reason))
 		emitEvent(ctx, w.state, events.TracePollingError(job.Test.ID, job.Run.ID, reason, err))
 		emitEvent(ctx, w.state, events.TraceFetchingError(job.Test.ID, job.Run.ID, err))
 
@@ -149,20 +149,12 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	log.Printf("[TracePoller] Completed polling process for Test Run %d after %d iterations, number of spans collected: %d ", job.Run.ID, job.EnqueueCount()+1, len(job.Run.Trace.Flat))
 
 	log.Printf("[TracePoller] Test %s Run %d: Start updating", job.Test.ID, job.Run.ID)
-	err = w.state.updater.Update(ctx, job.Run)
-	if err != nil {
-		log.Printf("[TracePoller] Test %s Run %d: Update error: %s", job.Test.ID, job.Run.ID, err.Error())
-		handleError(ctx, job, err, w.state, span)
-		return
-	}
+	handleDBError(w.state.updater.Update(ctx, job.Run))
 
 	emitEvent(ctx, w.state, events.TracePollingSuccess(job.Test.ID, job.Run.ID, reason))
-
-	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, reason, job.EnqueueCount()+1, len(job.Run.Trace.Flat))
-
 	emitEvent(ctx, w.state, events.TraceFetchingSuccess(job.Test.ID, job.Run.ID))
 
-	handleDBError(w.state.updater.Update(ctx, job.Run))
+	log.Printf("[TracePoller] Test %s Run %d: Done polling (reason: %s). Completed polling after %d iterations, number of spans collected %d\n", job.Test.ID, job.Run.ID, reason, job.EnqueueCount()+1, len(job.Run.Trace.Flat))
 
 	w.outputQueue.Enqueue(ctx, job)
 }
