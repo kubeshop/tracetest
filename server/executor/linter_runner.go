@@ -26,7 +26,7 @@ type defaultLinterRunner struct {
 	outputQueue         pipeline.Enqueuer[Job]
 }
 
-func NewlinterRunner(
+func NewLinterRunner(
 	updater RunUpdater,
 	subscriptionManager *subscription.Manager,
 	eventEmitter EventEmitter,

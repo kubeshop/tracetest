@@ -21,12 +21,14 @@ func NewTriggerExecuterWorker(
 	updater RunUpdater,
 	tracer trace.Tracer,
 	eventEmitter EventEmitter,
+	enabled bool,
 ) *triggerExecuterWorker {
 	return &triggerExecuterWorker{
 		triggers:     triggers,
 		updater:      updater,
 		tracer:       tracer,
 		eventEmitter: eventEmitter,
+		enabled:      enabled,
 	}
 }
 
@@ -36,6 +38,7 @@ type triggerExecuterWorker struct {
 	tracer       trace.Tracer
 	eventEmitter EventEmitter
 	outputQueue  pipeline.Enqueuer[Job]
+	enabled      bool
 }
 
 func (r *triggerExecuterWorker) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
@@ -55,6 +58,11 @@ func (r triggerExecuterWorker) handleError(run test.Run, err error) {
 }
 
 func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
+	if !r.enabled {
+		r.outputQueue.Enqueue(ctx, job)
+		return
+	}
+
 	err := r.eventEmitter.Emit(ctx, events.TriggerExecutionStart(job.Run.TestID, job.Run.ID))
 	if err != nil {
 		r.handleError(job.Run, err)
