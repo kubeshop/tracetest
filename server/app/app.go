@@ -230,7 +230,7 @@ func (app *App) Start(opts ...appOption) error {
 	tracedbFactory := tracedb.Factory(tracesRepo)
 
 	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
-	registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo)
+	registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
 
 	testPipeline := buildTestPipeline(
 		pool,
@@ -377,9 +377,9 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, tracesRepo *traces.TraceRepository, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository) {
-	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo)
-	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester)
+func registerOtlpServer(app *App, tracesRepo *traces.TraceRepository, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository, tracer trace.Tracer) {
+	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo, tracer)
+	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester, tracer)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
 	go httpOtlpServer.Start()
