@@ -3,6 +3,9 @@ package initialization
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/config"
@@ -43,6 +46,14 @@ func Start(ctx context.Context, config config.Config) error {
 	if err != nil {
 		return err
 	}
+
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGTERM)
+
+	go func() {
+		<-ch
+		client.Close()
+	}()
 
 	client.WaitUntilDisconnected()
 	return nil

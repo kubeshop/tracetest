@@ -17,6 +17,8 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 		return fmt.Errorf("could not open agent stream: %w", err)
 	}
 
+	c.closeStreamWhenShuttingDown(stream)
+
 	go func() {
 		for {
 			resp := proto.TriggerRequest{}

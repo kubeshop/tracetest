@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -20,11 +21,16 @@ type SessionConfig struct {
 	AgentIdentification *proto.AgentIdentification
 }
 
+type closableStream interface {
+	CloseSend() error
+}
+
 type Client struct {
 	conn          *grpc.ClientConn
 	config        Config
 	sessionConfig *SessionConfig
 	done          chan bool
+	wg            sync.WaitGroup
 
 	triggerListener  func(context.Context, *proto.TriggerRequest) error
 	pollListener     func(context.Context, *proto.PollingRequest) error
@@ -68,6 +74,16 @@ func (c *Client) WaitUntilDisconnected() {
 	<-c.done
 }
 
+func (c *Client) closeStreamWhenShuttingDown(stream closableStream) {
+	c.wg.Add(1)
+	go func() {
+		c.WaitUntilDisconnected()
+		stream.CloseSend()
+		c.wg.Done()
+	}()
+
+}
+
 func (c *Client) SessionConfiguration() *SessionConfig {
 	if c.sessionConfig == nil {
 		return nil
@@ -79,6 +95,7 @@ func (c *Client) SessionConfiguration() *SessionConfig {
 
 func (c *Client) Close() error {
 	c.done <- true
+	c.wg.Wait()
 	return c.conn.Close()
 }
 
