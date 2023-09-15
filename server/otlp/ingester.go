@@ -173,8 +173,8 @@ func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tra
 		return test.Run{}, fmt.Errorf("error getting run by traceID: %w", err)
 	}
 
-	if run.State != test.RunStateAwaitingTrace {
-		return test.Run{}, fmt.Errorf("test run is not awaiting trace. Actual state: %s", run.State)
+	if run.State != test.RunStateAwaitingTrace && run.State != test.RunStateExecuting {
+		return test.Run{}, fmt.Errorf("test run is not awaiting trace nor executing. Actual state: %s", run.State)
 	}
 
 	return run, nil
