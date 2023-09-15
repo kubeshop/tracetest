@@ -194,11 +194,6 @@ func (t *Trace) Spans() []Span {
 		return []Span{}
 	}
 
-	if len(t.Flat) == 0 {
-		t.Flat = make(map[trace.SpanID]*Span)
-		flattenSpans(t.Flat, t.RootSpan)
-	}
-
 	spans := make([]Span, 0, len(t.Flat))
 	for _, span := range t.Flat {
 		spans = append(spans, *span)
