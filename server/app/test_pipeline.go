@@ -31,7 +31,7 @@ func buildTestPipeline(
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
 	tracedbFactory tracedb.FactoryFunc,
-	appConfig config.AppConfig,
+	appConfig *config.AppConfig,
 ) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
