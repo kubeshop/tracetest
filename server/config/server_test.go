@@ -36,6 +36,8 @@ func TestServerConfig(t *testing.T) {
 			"--experimentalFeatures", "b",
 			"--internalTelemetry.enabled", "true",
 			"--internalTelemetry.otelCollectorEndpoint", "otel-collector.tracetest",
+			"--testPipelines.triggerExecute.enabled", "false",
+			"--testPipelines.traceFetch.enabled", "false",
 		}
 
 		cfg := configWithFlags(t, flags)
@@ -49,6 +51,9 @@ func TestServerConfig(t *testing.T) {
 
 		assert.Equal(t, true, cfg.InternalTelemetryEnabled())
 		assert.Equal(t, "otel-collector.tracetest", cfg.InternalTelemetryOtelCollectorAddress())
+
+		assert.Equal(t, false, cfg.TestPipelineTriggerExecutionEnabled())
+		assert.Equal(t, false, cfg.TestPipelineTraceFetchingEnabled())
 	})
 
 	t.Run("EnvVars", func(t *testing.T) {
@@ -64,6 +69,8 @@ func TestServerConfig(t *testing.T) {
 			"TRACETEST_EXPERIMENTALFEATURES":                    "a b",
 			"TRACETEST_INTERNALTELEMETRY_ENABLED":               "true",
 			"TRACETEST_INTERNALTELEMETRY_OTELCOLLECTORENDPOINT": "otel-collector.tracetest",
+			"TRACETEST_TESTPIPELINES_TRIGGEREXECUTE_ENABLED":    "false",
+			"TRACETEST_TESTPIPELINES_TRACEFETCH_ENABLED":        "false",
 		}
 
 		cfg := configWithEnv(t, env)
@@ -77,5 +84,8 @@ func TestServerConfig(t *testing.T) {
 
 		assert.Equal(t, true, cfg.InternalTelemetryEnabled())
 		assert.Equal(t, "otel-collector.tracetest", cfg.InternalTelemetryOtelCollectorAddress())
+
+		assert.Equal(t, false, cfg.TestPipelineTriggerExecutionEnabled())
+		assert.Equal(t, false, cfg.TestPipelineTraceFetchingEnabled())
 	})
 }
