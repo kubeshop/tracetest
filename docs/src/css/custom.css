@@ -42,3 +42,20 @@
 html[data-theme='dark'] footer {
   background-color: #242526 !important;
 }
+
+
+/* Announcement Bar */
+div[class^='announcementBar'] {
+  background-color: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+}
+
+div[class^='announcementBar'] a {
+  color: var(--ifm-link-color);
+  text-decoration: inherit;
+}
+
+div[class^='announcementBar'] a:hover {
+  color: var(--ifm-link-color);
+  text-decoration: underline;
+}
