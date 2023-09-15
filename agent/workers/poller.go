@@ -45,17 +45,23 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 		return err
 	}
 
-	log.Printf("Getting spans for trace %s", request.TraceID)
-	trace, err := ds.GetTraceByID(ctx, request.TraceID)
-	if err == connection.ErrTraceNotFound {
-		// Nothing to send back
-		log.Printf("Trace %s was not found", request.TraceID)
-		return nil
+	pollingResponse := &proto.PollingResponse{
+		RequestID: request.RequestID,
+		TestID:    request.TestID,
+		RunID:     request.RunID,
+		TraceID:   request.TraceID,
 	}
 
-	spans := convertTraceInToProtoSpans(trace)
+	trace, err := ds.GetTraceByID(ctx, request.TraceID)
+	if err == connection.ErrTraceNotFound {
+		// let controlplane know we didn't find the trace
+		pollingResponse.TraceFound = false
+	} else {
+		pollingResponse.TraceFound = true
+		pollingResponse.Spans = convertTraceInToProtoSpans(trace)
+	}
 
-	err = w.client.SendTrace(ctx, request, spans...)
+	err = w.client.SendTrace(ctx, pollingResponse)
 	if err != nil {
 		log.Printf("cannot send trace to server: %s", err.Error())
 		return err

@@ -7,17 +7,10 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
-func (c *Client) SendTrace(ctx context.Context, request *proto.PollingRequest, spans ...*proto.Span) error {
+func (c *Client) SendTrace(ctx context.Context, pollingResponse *proto.PollingResponse) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
-	pollingResponse := &proto.PollingResponse{
-		RequestID:           request.RequestID,
-		TestID:              request.TestID,
-		RunID:               request.RunID,
-		TraceID:             request.TraceID,
-		Spans:               spans,
-		AgentIdentification: c.sessionConfig.AgentIdentification,
-	}
+	pollingResponse.AgentIdentification = c.sessionConfig.AgentIdentification
 
 	_, err := client.SendPolledSpans(ctx, pollingResponse)
 	if err != nil {

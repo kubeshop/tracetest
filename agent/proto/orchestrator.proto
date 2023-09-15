@@ -269,6 +269,7 @@ message PollingResponse {
     int32 runID = 4;
     string traceID = 5;
     repeated Span spans = 6;
+    bool traceFound = 7;
 }
 
 message Span {
