@@ -48,11 +48,13 @@ func Start(ctx context.Context, config config.Config) error {
 	}
 
 	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, syscall.SIGTERM)
+	signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
 
 	go func() {
 		<-ch
+		fmt.Println("SIGTERM received: closing grpc connection")
 		client.Close()
+		fmt.Println("client connection was closed")
 	}()
 
 	client.WaitUntilDisconnected()

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -26,6 +27,13 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 			if err == io.EOF {
 				return
 			}
+
+			if errors.Is(err, context.Canceled) {
+				// probably stream was closed, so just skip it
+				return
+			}
+
+			fmt.Println(err)
 
 			if err != nil {
 				log.Fatal("could not get message from trigger stream: %w", err)

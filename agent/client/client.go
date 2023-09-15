@@ -77,7 +77,7 @@ func (c *Client) WaitUntilDisconnected() {
 func (c *Client) closeStreamWhenShuttingDown(stream closableStream) {
 	c.wg.Add(1)
 	go func() {
-		c.WaitUntilDisconnected()
+		<-c.done
 		stream.CloseSend()
 		c.wg.Done()
 	}()

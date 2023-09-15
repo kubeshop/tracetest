@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -24,6 +25,11 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 			resp := proto.TriggerRequest{}
 			err := stream.RecvMsg(&resp)
 			if err == io.EOF {
+				return
+			}
+
+			if errors.Is(err, context.Canceled) {
+				// probably stream was closed, so just skip it
 				return
 			}
 

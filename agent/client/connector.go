@@ -15,7 +15,7 @@ func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, err
 		return nil, err
 	}
 
-	client := &Client{conn: conn}
+	client := &Client{conn: conn, done: make(chan bool)}
 	for _, opt := range opts {
 		opt(client)
 	}
