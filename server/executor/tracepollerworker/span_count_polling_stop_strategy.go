@@ -31,6 +31,10 @@ func (s *SpanCountPollingStopStrategy) Evaluate(ctx context.Context, job *execut
 
 	trace := job.Run.Trace
 
+	if trace == nil {
+		return false, "First iteration"
+	}
+
 	collectedSpans := job.Headers.GetInt("collectedSpans")
 
 	haveNotCollectedSpansSinceLastPoll := collectedSpans == 0

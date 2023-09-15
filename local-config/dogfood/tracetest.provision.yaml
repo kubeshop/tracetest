@@ -1,18 +1,9 @@
-# ---
-# type: DataStore
-# spec:
-#   name: OpenTelemetry Collector
-#   type: otlp
-#   default: true
 ---
 type: DataStore
 spec:
-  name: jaeger
-  type: jaeger
-  jaeger:
-    endpoint: localhost:16685
-    tls:
-      insecure: true
+  name: OpenTelemetry Collector
+  type: otlp
+  default: true
 
 ---
 type: TestRunner
@@ -29,6 +20,6 @@ spec:
   strategy: periodic
   default: true
   periodic:
-    timeout: 60s
-    retryDelay: 3s
+    timeout: 30s
+    retryDelay: 1s
     selectorMatchRetries: 3

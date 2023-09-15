@@ -82,6 +82,7 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 
 	collectedSpans := len(trace.Flat) - spansBefore
 	job.Headers.SetInt("collectedSpans", collectedSpans)
+	job.Headers.SetBool("traceNotFound", false)
 
 	trace.ID = job.Run.TraceID
 	job.Run.Trace = &trace

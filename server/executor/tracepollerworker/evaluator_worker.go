@@ -75,11 +75,12 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	}
 
 	// if an error happened on last iteration validate it
-	if job.Run.LastError != nil {
+	if job.Run.LastError != nil || traceNotFound {
 		err := job.Run.LastError
 		reason := ""
 
 		if traceNotFound && tracePollerTimedOut(ctx, job) {
+			err = fmt.Errorf("timeout")
 			reason = fmt.Sprintf("Timed out without finding trace, trace id \"%s\"", job.Run.TraceID.String())
 			log.Println("[TracePoller] Timed-out")
 		} else {
@@ -124,7 +125,12 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	populateSpan(span, job, reason, &done)
 
 	if !done { // trace polling is not done, try to fetch trace again
-		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, len(job.Run.Trace.Flat), job.EnqueueCount(), false, reason))
+		totalSpans := 0
+		if job.Run.Trace != nil {
+			totalSpans = len(job.Run.Trace.Flat)
+		}
+
+		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, totalSpans, job.EnqueueCount(), false, reason))
 
 		log.Printf("[TracePoller] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 

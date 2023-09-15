@@ -33,6 +33,10 @@ func (s *SelectorBasedPollingStopStrategy) Evaluate(ctx context.Context, job *ex
 		return true, "TraceDB is not retryable"
 	}
 
+	if job.Run.Trace == nil {
+		return false, "Trace not found"
+	}
+
 	finished, reason := s.wrappedStrategy.Evaluate(ctx, job, traceDB)
 
 	if !finished {
