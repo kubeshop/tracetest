@@ -61,6 +61,8 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
+	c.startHearthBeat(ctx)
+
 	return nil
 }
 
