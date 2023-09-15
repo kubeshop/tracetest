@@ -102,12 +102,14 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		return DataStore{}, fmt.Errorf("could not marshal values field configuration: %w", err)
 	}
 
-	query, params = sqlutil.TenantInsert(ctx, insertQuery, dataStore.ID,
+	query, params = sqlutil.TenantInsert(ctx, insertQuery,
+		dataStore.ID,
 		dataStore.Name,
 		dataStore.Type,
 		dataStore.Default,
 		valuesJSON,
-		dataStore.CreatedAt)
+		dataStore.CreatedAt,
+	)
 	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec create: %w", err)
