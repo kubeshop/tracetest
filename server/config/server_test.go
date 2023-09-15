@@ -20,6 +20,9 @@ func TestServerConfig(t *testing.T) {
 
 		assert.Equal(t, false, cfg.InternalTelemetryEnabled())
 		assert.Equal(t, "", cfg.InternalTelemetryOtelCollectorAddress())
+
+		assert.Equal(t, true, cfg.TestPipelineTriggerExecutionEnabled())
+		assert.Equal(t, true, cfg.TestPipelineTraceFetchingEnabled())
 	})
 
 	t.Run("Flags", func(t *testing.T) {

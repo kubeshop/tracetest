@@ -73,12 +73,12 @@ var serverOptions = options{
 	},
 	{
 		key:          "testPipelines.triggerExecute.enabled",
-		defaultValue: true,
+		defaultValue: "true",
 		description:  "enable local trigger execution",
 	},
 	{
 		key:          "testPipelines.traceFetch.enabled",
-		defaultValue: true,
+		defaultValue: "true",
 		description:  "enable local trace fetching",
 	},
 }
@@ -145,12 +145,15 @@ func (c *AppConfig) TestPipelineTriggerExecutionEnabled() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	return c.vp.GetBool("testPipelines.triggerExecute.enabled")
+	// this config needs to be a string because pflags
+	// has a strage bug that ignores this field when
+	// it is set as false
+	return c.vp.GetString("testPipelines.triggerExecute.enabled") == "true"
 }
 
 func (c *AppConfig) TestPipelineTraceFetchingEnabled() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	return c.vp.GetBool("testPipelines.traceFetch.enabled")
+	return c.vp.GetString("testPipelines.traceFetch.enabled") == "true"
 }
