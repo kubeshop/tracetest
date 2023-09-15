@@ -17,6 +17,8 @@ type Version struct {
 	UiEndpoint string `json:"uiEndpoint,omitempty"`
 
 	AgentEndpoint string `json:"agentEndpoint,omitempty"`
+
+	ApiEndpoint string `json:"apiEndpoint,omitempty"`
 }
 
 // AssertVersionRequired checks if the required fields are not zero-ed

@@ -18,10 +18,23 @@ type Trace struct {
 	Flat     map[trace.SpanID]*Span `json:"-"`
 }
 
+func nonNilTraces(traces []*Trace) []*Trace {
+	nonNil := make([]*Trace, 0)
+	for _, trace := range traces {
+		if trace == nil {
+			continue
+		}
+
+		nonNil = append(nonNil, trace)
+	}
+	return nonNil
+}
+
 func MergeTraces(traces ...*Trace) Trace {
 	if len(traces) == 0 {
 		return NewTrace(id.NewRandGenerator().TraceID().String(), []Span{})
 	}
+	traces = nonNilTraces(traces)
 
 	traceID := traces[0].ID
 	spans := make([]Span, 0)

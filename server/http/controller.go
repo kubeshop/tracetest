@@ -727,5 +727,5 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	return openapi.Response(http.StatusOK, run), err
+	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&existingRun)), err
 }
