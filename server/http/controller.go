@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -712,6 +713,7 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 		return openapi.Response(http.StatusNotFound, err.Error()), err
 	}
 
+	spew.Dump(testRun)
 	run, err := c.mappers.In.Run(testRun)
 	if err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
@@ -719,8 +721,9 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 
 	// Prevents bad data in other fields to override correct data
 	existingRun.TriggerResult = run.TriggerResult
-	newTrace := traces.MergeTraces(existingRun.Trace, run.Trace)
-	existingRun.Trace = &newTrace
+	existingRun.Trace = traces.MergeTraces(existingRun.Trace, run.Trace)
+
+	spew.Dump(existingRun.Trace.Flat)
 
 	err = c.testRunRepository.UpdateRun(ctx, existingRun)
 	if err != nil {

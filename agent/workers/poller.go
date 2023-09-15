@@ -77,7 +77,8 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 		newSpans := make([]*proto.Span, 0, len(pollingResponse.Spans))
 		for _, span := range pollingResponse.Spans {
 			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
-			if _, ok := w.sentSpanIDs.Get(runKey); !ok {
+			_, alreadySent := w.sentSpanIDs.Get(runKey)
+			if !alreadySent {
 				newSpans = append(newSpans, span)
 			}
 		}

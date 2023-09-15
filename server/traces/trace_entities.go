@@ -30,11 +30,11 @@ func nonNilTraces(traces []*Trace) []*Trace {
 	return nonNil
 }
 
-func MergeTraces(traces ...*Trace) Trace {
-	if len(traces) == 0 {
-		return NewTrace(id.NewRandGenerator().TraceID().String(), []Span{})
-	}
+func MergeTraces(traces ...*Trace) *Trace {
 	traces = nonNilTraces(traces)
+	if len(traces) == 0 {
+		return nil
+	}
 
 	traceID := traces[0].ID
 	spans := make([]Span, 0)
@@ -46,7 +46,9 @@ func MergeTraces(traces ...*Trace) Trace {
 		spans = append(spans, trace.Spans()...)
 	}
 
-	return NewTrace(traceID.String(), spans)
+	trace := NewTrace(traceID.String(), spans)
+
+	return &trace
 }
 
 func NewTrace(traceID string, spans []Span) Trace {
