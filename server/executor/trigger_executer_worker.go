@@ -59,7 +59,6 @@ func (r triggerExecuterWorker) handleError(run test.Run, err error) {
 
 func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 	if !r.enabled {
-		r.outputQueue.Enqueue(ctx, job)
 		return
 	}
 
