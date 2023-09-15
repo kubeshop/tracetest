@@ -11,6 +11,7 @@ func (c *Client) SendTrace(ctx context.Context, request *proto.PollingRequest, s
 	client := proto.NewOrchestratorClient(c.conn)
 
 	pollingResponse := &proto.PollingResponse{
+		RequestID:           request.RequestID,
 		TestID:              request.TestID,
 		RunID:               request.RunID,
 		TraceID:             request.TraceID,
@@ -20,7 +21,7 @@ func (c *Client) SendTrace(ctx context.Context, request *proto.PollingRequest, s
 
 	_, err := client.SendPolledSpans(ctx, pollingResponse)
 	if err != nil {
-		return fmt.Errorf("could not send trigger result request: %w", err)
+		return fmt.Errorf("could not send polled spans result request: %w", err)
 	}
 
 	return nil

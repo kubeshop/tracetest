@@ -1,7 +1,9 @@
 # Dependencies:
 # https://grpc.io/docs/protoc-installation/
+# go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31
+# go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3
 
-REQUIRED_BINS := protoc
+REQUIRED_BINS := protoc protoc-gen-go protoc-gen-go-grpc
 
 build-proto: ensure-dependencies clean-proto
 	@protoc \

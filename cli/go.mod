@@ -2,6 +2,8 @@ module github.com/kubeshop/tracetest/cli
 
 go 1.21
 
+replace github.com/kubeshop/tracetest/agent => ../agent
+
 require (
 	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/agnivade/levenshtein v1.1.1

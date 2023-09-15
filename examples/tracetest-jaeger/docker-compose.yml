@@ -1,33 +1,32 @@
 version: '3'
 services:
 
-    tracetest:
-        image: kubeshop/tracetest:${TAG:-latest}
-        platform: linux/amd64
-        volumes:
-            - type: bind
-              source: ./tracetest-config.yaml
-              target: /app/tracetest.yaml
-            - type: bind
-              source: ./tracetest-provision.yaml
-              target: /app/provision.yaml
-        command: --provisioning-file /app/provision.yaml
-        ports:
-            - 11633:11633
-        extra_hosts:
-          - "host.docker.internal:host-gateway"
-        depends_on:
-            postgres:
-                condition: service_healthy
-            otel-collector:
-                condition: service_started
-        healthcheck:
-            test: ["CMD", "wget", "--spider", "localhost:11633"]
-            interval: 1s
-            timeout: 3s
-            retries: 60
-        environment:
-            TRACETEST_DEV: ${TRACETEST_DEV}
+    # tracetest:
+    #     image: kubeshop/tracetest:${TAG:-latest}
+    #     volumes:
+    #         - type: bind
+    #           source: ./tracetest-config.yaml
+    #           target: /app/tracetest.yaml
+    #         - type: bind
+    #           source: ./tracetest-provision.yaml
+    #           target: /app/provision.yaml
+    #     command: --provisioning-file /app/provision.yaml
+    #     ports:
+    #         - 11633:11633
+    #     extra_hosts:
+    #       - "host.docker.internal:host-gateway"
+    #     depends_on:
+    #         postgres:
+    #             condition: service_healthy
+    #         otel-collector:
+    #             condition: service_started
+    #     healthcheck:
+    #         test: ["CMD", "wget", "--spider", "localhost:11633"]
+    #         interval: 1s
+    #         timeout: 3s
+    #         retries: 60
+    #     environment:
+    #         TRACETEST_DEV: ${TRACETEST_DEV}
 
     postgres:
         image: postgres:14

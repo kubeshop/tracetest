@@ -67,10 +67,11 @@ message AgentIdentification {
 }
 
 message TriggerRequest{
-    string testID = 1;
-    int32 runID = 2;
-    string traceID = 3;
-    Trigger trigger = 4;
+    string requestID = 1;
+    string testID = 2;
+    int32 runID = 3;
+    string traceID = 4;
+    Trigger trigger = 5;
 }
 
 message Trigger {
@@ -137,10 +138,11 @@ message TraceIDRequest {
 }
 
 message TriggerResponse {
-    AgentIdentification agentIdentification = 1;
-    string testID = 2;
-    int32 runID = 3;
-    TriggerResult triggerResult = 4;
+    string requestID = 1;
+    AgentIdentification agentIdentification = 2;
+    string testID = 3;
+    int32 runID = 4;
+    TriggerResult triggerResult = 5;
 }
 
 message TriggerResult {
@@ -169,10 +171,11 @@ message TraceIdResponse {
 }
 
 message PollingRequest {
-    string testID = 1;
-    int32 runID = 2;
-    string traceID = 3;
-    DataStore datastore = 4;
+    string requestID = 1;
+    string testID = 2;
+    int32 runID = 3;
+    string traceID = 4;
+    DataStore datastore = 5;
 }
 
 message DataStore {
@@ -260,11 +263,12 @@ message TLSSetting {
 }
 
 message PollingResponse {
-    AgentIdentification agentIdentification = 1;
-    string testID = 2;
-    int32 runID = 3;
-    string traceID = 4;
-    repeated Span spans = 5;
+    string requestID = 1;
+    AgentIdentification agentIdentification = 2;
+    string testID = 3;
+    int32 runID = 4;
+    string traceID = 5;
+    repeated Span spans = 6;
 }
 
 message Span {

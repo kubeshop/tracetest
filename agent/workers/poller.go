@@ -28,6 +28,7 @@ func NewPollerWorker(client *client.Client) *PollerWorker {
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
+	fmt.Println("Poll handled by agent")
 	datastoreConfig, err := convertProtoToDataStore(request.Datastore)
 	if err != nil {
 		return err
@@ -40,9 +41,11 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 	dsFactory := datastores.Factory()
 	ds, err := dsFactory(*datastoreConfig)
 	if err != nil {
+		log.Printf("Invalid datastore: %s", err.Error())
 		return err
 	}
 
+	log.Printf("Getting spans for trace %s", request.TraceID)
 	trace, err := ds.GetTraceByID(ctx, request.TraceID)
 	if err == connection.ErrTraceNotFound {
 		// Nothing to send back
@@ -54,20 +57,22 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 
 	err = w.client.SendTrace(ctx, request, spans...)
 	if err != nil {
+		log.Printf("cannot send trace to server: %s", err.Error())
 		return err
 	}
 
 	return nil
 }
 
-func convertProtoToDataStore(request *proto.DataStore) (*datastore.DataStore, error) {
+func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 	var ds datastore.DataStore
-	err := deepcopy.DeepCopy(request, &ds.Values)
-	if err != nil {
-		return nil, fmt.Errorf("could not deep copy datastore: %w", err)
+
+	if r.Jaeger != nil && r.Jaeger.Grpc != nil {
+		ds.Values.Jaeger = &datastore.GRPCClientSettings{}
+		deepcopy.DeepCopy(r.Jaeger.Grpc, &ds.Values.Jaeger)
 	}
 
-	ds.Type = datastore.DataStoreType(request.Type)
+	ds.Type = datastore.DataStoreType(r.Type)
 	return &ds, nil
 }
 
