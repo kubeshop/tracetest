@@ -2,10 +2,12 @@ package app
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/executor/tracepollerworker"
 	"github.com/kubeshop/tracetest/server/executor/trigger"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model"
@@ -29,6 +31,7 @@ func buildTestPipeline(
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
 	tracedbFactory tracedb.FactoryFunc,
+	appConfig *config.AppConfig,
 ) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
@@ -44,29 +47,40 @@ func buildTestPipeline(
 		eventEmitter,
 	)
 
-	linterRunner := executor.NewlinterRunner(
+	linterRunner := executor.NewLinterRunner(
 		execTestUpdater,
 		subscriptionManager,
 		eventEmitter,
 		lintRepo,
 	)
 
-	pollerExecutor := executor.NewSelectorBasedPoller(
-		executor.NewPollerExecutor(
-			tracer,
-			execTestUpdater,
-			tracedbFactory,
-			dsRepo,
-			eventEmitter,
-		),
+	tracePollerStarterWorker := tracepollerworker.NewStarterWorker(
 		eventEmitter,
-	)
-
-	tracePoller := executor.NewTracePoller(
-		pollerExecutor,
+		tracedbFactory,
+		dsRepo,
 		execTestUpdater,
 		subscriptionManager,
+		tracer,
+	)
+
+	traceFetcherWorker := tracepollerworker.NewFetcherWorker(
 		eventEmitter,
+		tracedbFactory,
+		dsRepo,
+		execTestUpdater,
+		subscriptionManager,
+		tracer,
+		appConfig.TestPipelineTraceFetchingEnabled(),
+	)
+
+	tracePollerEvaluatorWorker := tracepollerworker.NewEvaluatorWorker(
+		eventEmitter,
+		tracedbFactory,
+		dsRepo,
+		execTestUpdater,
+		subscriptionManager,
+		tracepollerworker.NewSelectorBasedPollingStopStrategy(eventEmitter, tracepollerworker.NewSpanCountPollingStopStrategy()),
+		tracer,
 	)
 
 	triggerResolverWorker := executor.NewTriggerResolverWorker(
@@ -83,6 +97,7 @@ func buildTestPipeline(
 		execTestUpdater,
 		tracer,
 		eventEmitter,
+		appConfig.TestPipelineTriggerExecutionEnabled(),
 	)
 
 	triggerResultProcessorWorker := executor.NewTriggerResultProcessorWorker(
@@ -109,12 +124,14 @@ func buildTestPipeline(
 		pipeline.Step[executor.Job]{Processor: triggerResolverWorker, Driver: pgQueue.Channel("trigger_resolve")},
 		pipeline.Step[executor.Job]{Processor: triggerExecuterWorker, Driver: pgQueue.Channel("trigger_execute")},
 		pipeline.Step[executor.Job]{Processor: triggerResultProcessorWorker, Driver: pgQueue.Channel("trigger_result")},
-		pipeline.Step[executor.Job]{Processor: tracePoller, Driver: pgQueue.Channel("tracePoller")},
+		pipeline.Step[executor.Job]{Processor: tracePollerStarterWorker, Driver: pgQueue.Channel("tracePoller_start")},
+		pipeline.Step[executor.Job]{Processor: traceFetcherWorker, Driver: pgQueue.Channel("tracePoller_fetch")},
+		pipeline.Step[executor.Job]{Processor: tracePollerEvaluatorWorker, Driver: pgQueue.Channel("tracePoller_evaluate"), InputQueueOffset: -1},
 		pipeline.Step[executor.Job]{Processor: linterRunner, Driver: pgQueue.Channel("linterRunner")},
 		pipeline.Step[executor.Job]{Processor: assertionRunner, Driver: pgQueue.Channel("assertionRunner")},
 	)
 
-	const assertionRunnerStepIndex = 5
+	const assertionRunnerStepIndex = 7
 
 	return executor.NewTestPipeline(
 		pipeline,

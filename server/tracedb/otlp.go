@@ -50,5 +50,4 @@ func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (traces.Tra
 	}
 
 	return t, err
-
 }

@@ -71,6 +71,16 @@ var serverOptions = options{
 		description:  "internal telemetry  otel collector (used for internal testing)",
 		validate:     nil,
 	},
+	{
+		key:          "testPipelines.triggerExecute.enabled",
+		defaultValue: "true",
+		description:  "enable local trigger execution",
+	},
+	{
+		key:          "testPipelines.traceFetch.enabled",
+		defaultValue: "true",
+		description:  "enable local trace fetching",
+	},
 }
 
 func init() {
@@ -129,4 +139,21 @@ func (c *AppConfig) InternalTelemetryOtelCollectorAddress() string {
 	defer c.mu.Unlock()
 
 	return c.vp.GetString("internalTelemetry.otelCollectorEndpoint")
+}
+
+func (c *AppConfig) TestPipelineTriggerExecutionEnabled() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// this config needs to be a string because pflags
+	// has a strage bug that ignores this field when
+	// it is set as false
+	return c.vp.GetString("testPipelines.triggerExecute.enabled") == "true"
+}
+
+func (c *AppConfig) TestPipelineTraceFetchingEnabled() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.vp.GetString("testPipelines.traceFetch.enabled") == "true"
 }
