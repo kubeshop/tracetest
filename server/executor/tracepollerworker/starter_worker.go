@@ -61,21 +61,20 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 	}
 
 	log.Println("[TracePoller] Starting to poll traces", job.EnqueueCount())
-
-	traceDB, err := getTraceDB(ctx, w.state)
-	if err != nil {
-		log.Printf("[TracePoller] GetDataStore error: %s", err.Error())
-		handleError(ctx, job, err, w.state, span)
-		return
-	}
-
 	emitEvent(ctx, w.state, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 
-	err = w.testConnection(ctx, traceDB, &job)
-	if err != nil {
-		handleError(ctx, job, err, w.state, span)
-		return
-	}
+	// traceDB, err := getTraceDB(ctx, w.state)
+	// if err != nil {
+	// 	log.Printf("[TracePoller] GetDataStore error: %s", err.Error())
+	// 	handleError(ctx, job, err, w.state, span)
+	// 	return
+	// }
+
+	// err = w.testConnection(ctx, traceDB, &job)
+	// if err != nil {
+	// 	handleError(ctx, job, err, w.state, span)
+	// 	return
+	// }
 
 	w.outputQueue.Enqueue(ctx, job)
 }

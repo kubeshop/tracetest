@@ -2,29 +2,36 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
+	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/agent/workers/datastores"
-	"github.com/kubeshop/tracetest/agent/workers/datastores/connection"
 	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type PollerWorker struct {
-	client *client.Client
-	tracer trace.Tracer
+	client      *client.Client
+	tracer      trace.Tracer
+	sentSpanIDs *gocache.Cache[string, bool]
 }
 
 func NewPollerWorker(client *client.Client) *PollerWorker {
 	// TODO: use a real tracer
 	tracer := trace.NewNoopTracerProvider().Tracer("noop")
 
-	return &PollerWorker{client, tracer}
+	return &PollerWorker{
+		client:      client,
+		tracer:      tracer,
+		sentSpanIDs: gocache.New[string, bool](),
+	}
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
@@ -38,7 +45,7 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 		return fmt.Errorf("invalid datastore: nil")
 	}
 
-	dsFactory := datastores.Factory()
+	dsFactory := tracedb.Factory(nil)
 	ds, err := dsFactory(*datastoreConfig)
 	if err != nil {
 		log.Printf("Invalid datastore: %s", err.Error())
@@ -53,18 +60,42 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 	}
 
 	trace, err := ds.GetTraceByID(ctx, request.TraceID)
-	if err == connection.ErrTraceNotFound {
-		// let controlplane know we didn't find the trace
+
+	if err != nil {
+		if !errors.Is(err, connection.ErrTraceNotFound) {
+			// let controlplane know we didn't find the trace
+			log.Printf("cannot get trace from datastore: %s", err.Error())
+			return err
+		}
+
 		pollingResponse.TraceFound = false
 	} else {
 		pollingResponse.TraceFound = true
 		pollingResponse.Spans = convertTraceInToProtoSpans(trace)
+
+		// remove sent spans
+		newSpans := make([]*proto.Span, 0, len(pollingResponse.Spans))
+		for _, span := range pollingResponse.Spans {
+			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
+			if _, ok := w.sentSpanIDs.Get(runKey); !ok {
+				newSpans = append(newSpans, span)
+			}
+		}
+		pollingResponse.Spans = newSpans
 	}
 
 	err = w.client.SendTrace(ctx, pollingResponse)
 	if err != nil {
 		log.Printf("cannot send trace to server: %s", err.Error())
 		return err
+	}
+
+	for _, span := range pollingResponse.Spans {
+		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
+		// TODO: we can set the expiration for this key to be
+		// 1 second after the pollingProfile max waiting time
+		// but we need to get that info here from controlplane
+		w.sentSpanIDs.Set(runKey, true)
 	}
 
 	return nil

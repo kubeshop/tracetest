@@ -20,27 +20,26 @@ func TestSendTrace(t *testing.T) {
 	err = client.Start(context.Background())
 	require.NoError(t, err)
 
-	pollingRequest := &proto.PollingRequest{
+	pollingRequest := &proto.PollingResponse{
 		TestID:  "test",
 		RunID:   1,
 		TraceID: "trace-id",
-	}
-
-	spans := []*proto.Span{
-		{
-			Name:      "GET /",
-			Id:        "id",
-			ParentId:  "parent-id",
-			Kind:      "internal",
-			StartTime: 0,
-			EndTime:   45,
-			Attributes: []*proto.KeyValuePair{
-				{Key: "http.status", Value: "200"},
+		Spans: []*proto.Span{
+			{
+				Name:      "GET /",
+				Id:        "id",
+				ParentId:  "parent-id",
+				Kind:      "internal",
+				StartTime: 0,
+				EndTime:   45,
+				Attributes: []*proto.KeyValuePair{
+					{Key: "http.status", Value: "200"},
+				},
 			},
 		},
 	}
 
-	err = client.SendTrace(context.Background(), pollingRequest, spans...)
+	err = client.SendTrace(context.Background(), pollingRequest)
 	require.NoError(t, err)
 
 	receivedPollingResponse := server.GetLastPollingResponse()
@@ -49,8 +48,8 @@ func TestSendTrace(t *testing.T) {
 	assert.Equal(t, pollingRequest.RunID, receivedPollingResponse.RunID)
 	assert.Equal(t, pollingRequest.TraceID, receivedPollingResponse.TraceID)
 
-	require.Len(t, receivedPollingResponse.Spans, len(spans))
-	for i, span := range spans {
+	require.Len(t, receivedPollingResponse.Spans, len(pollingRequest.Spans))
+	for i, span := range pollingRequest.Spans {
 		assert.Equal(t, span.Id, receivedPollingResponse.Spans[i].Id)
 		assert.Equal(t, span.Name, receivedPollingResponse.Spans[i].Name)
 		assert.Equal(t, span.Kind, receivedPollingResponse.Spans[i].Kind)
