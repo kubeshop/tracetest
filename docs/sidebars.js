@@ -117,113 +117,176 @@ const sidebars = {
     },
     {
       type: "doc",
-      id: "examples-tutorials/recipes",
+      id: "examples-tutorials/tutorials",
+      label: "Tutorials",
+    },
+    {
+      type: "category",
+      link: {
+        type: "doc",
+        id: "examples-tutorials/recipes"
+      },
       label: "Recipes",
+      items: [
+        {
+          type: "category",
+          label: "OpenTelemetry Collector",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
+              label: "Node.js and OpenTelemetry Collector",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
+              label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
+              label: "Python with Manual Instrumentation and OpenTelemetry Collector",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "OpenTelemetry Collector + Tracing Vendors",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
+              label: "OpenTelemetry Demo and Lightstep",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
+              label: "OpenTelemetry Demo and New Relic",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
+              label: "Node.js and Elastic APM",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-datadog",
+              label: "OpenTelemetry Demo and Datadog",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-dynatrace",
+              label: "OpenTelemetry Demo and Dynatrace",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
+              label: "Node.js and Honeycomb",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-signoz-pokeshop",
+              label: "SigNoz and Pokeshop API",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Jaeger",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
+              label: "Node.js and Jaeger",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
+              label: "AWS Fargate and Terraform",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "OpenSearch",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
+              label: "Node.js and OpenSearch",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Grafana Tempo",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-tempo",
+              label: "Node.js and Tempo",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "AWS X-Ray",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray",
+              label: "X-Ray (Node.js SDK)",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-adot",
+              label: "X-Ray and AWS Distro for OpenTelemetry",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
+              label: "X-Ray, AWS Distro for OpenTelemetry and Pokeshop API",
+            },
+            
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
+              label: "AWS Step Functions, AWS X-Ray and Terraform",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Azure App Insights",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights",
+              label: "Azure App Insights",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
+              label: "Azure App Insights and The OpenTelemetry Collector",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop",
+              label: "Azure App Insights, The OpenTelemetry Collector and Pokeshop API",
+            },
+          ],
+        },
+      ],
     },
     {
       type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
-      label: "Node.js and OpenTelemetry Collector",
+      id: "examples-tutorials/webinars",
+      label: "Webinars",
     },
     {
       type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
-      label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
-      label: "Python with Manual Instrumentation and OpenTelemetry Collector",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
-      label: "Node.js and Jaeger",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
-      label: "Node.js and OpenSearch",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-tempo",
-      label: "Node.js and Tempo",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-lightstep",
-      label: "OpenTelemetry Demo and Lightstep",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-new-relic",
-      label: "OpenTelemetry Demo and New Relic",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
-      label: "Node.js and Elastic APM",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray",
-      label: "X-Ray",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-adot",
-      label: "X-Ray and AWS Distro for OpenTelemetry",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
-      label: "X-Ray, AWS Distro for OpenTelemetry and Pokeshop API",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
-      label: "AWS Fargate and Terraform",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
-      label: "AWS Step Functions, AWS X-Ray and Terraform",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-datadog",
-      label: "OpenTelemetry Demo and Datadog",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-dynatrace",
-      label: "OpenTelemetry Demo and Dynatrace",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-honeycomb",
-      label: "Node.js and Honeycomb",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-signoz-pokeshop",
-      label: "SigNoz and Pokeshop API",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights",
-      label: "Azure App Insights",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
-      label: "Azure App Insights and The OpenTelemetry Collector",
-    },
-    {
-      type: "doc",
-      id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop",
-      label: "Azure App Insights, The OpenTelemetry Collector and Pokeshop API",
+      id: "examples-tutorials/videos",
+      label: "Videos",
     },
   ],
 
