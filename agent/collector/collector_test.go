@@ -10,18 +10,25 @@ import (
 	"github.com/kubeshop/tracetest/agent/collector/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func TestCollector(t *testing.T) {
 	targetServer, err := mocks.NewOTLPIngestionServer()
 	require.NoError(t, err)
 
-	collector.Start(context.Background(), collector.Config{
-		HTTPPort:        4318,
-		GRPCPort:        4317,
-		BatchTimeout:    2 * time.Second,
-		RemoteServerURL: targetServer.Addr(),
-	})
+	noopTracer := trace.NewNoopTracerProvider().Tracer("noop_tracer")
+
+	collector.Start(
+		context.Background(),
+		collector.Config{
+			HTTPPort:        4318,
+			GRPCPort:        4317,
+			BatchTimeout:    2 * time.Second,
+			RemoteServerURL: targetServer.Addr(),
+		},
+		noopTracer,
+	)
 
 	tracer, err := mocks.NewTracer(context.Background(), "localhost:4317")
 	require.NoError(t, err)

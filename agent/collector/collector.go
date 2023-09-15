@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/otlp"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Config struct {
@@ -20,7 +21,7 @@ type Config struct {
 	RemoteServerToken string
 }
 
-func Start(ctx context.Context, config Config) error {
+func Start(ctx context.Context, config Config, tracer trace.Tracer) error {
 	ingester, err := newForwardIngester(ctx, config.BatchTimeout, remoteIngesterConfig{
 		URL:   config.RemoteServerURL,
 		Token: config.RemoteServerToken,
@@ -29,7 +30,7 @@ func Start(ctx context.Context, config Config) error {
 		return fmt.Errorf("could not start local collector: %w", err)
 	}
 
-	grpcServer := otlp.NewGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester)
+	grpcServer := otlp.NewGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester, tracer)
 	httpServer := otlp.NewHttpServer(fmt.Sprintf("0.0.0.0:%d", config.HTTPPort), ingester)
 
 	onProcessTermination(func() {
