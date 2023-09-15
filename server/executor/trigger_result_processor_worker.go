@@ -91,6 +91,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 		}
 	}
 
+	job.Run.State = test.RunStateAwaitingTrace
 	r.handleDBError(job.Run, r.updater.Update(ctx, job.Run))
 
 	r.outputQueue.Enqueue(ctx, job)
