@@ -226,6 +226,10 @@ func decodeChildren(parent *Span, children []encodedSpan, cache spanCache) ([]*S
 }
 
 func (span Span) setMetadataAttributes() Span {
+	if span.Attributes == nil {
+		span.Attributes = Attributes{}
+	}
+
 	span.Attributes[TracetestMetadataFieldName] = span.Name
 	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
 	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
