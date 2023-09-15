@@ -16,6 +16,7 @@ import (
 type traceFetcherWorker struct {
 	state       *workerState
 	outputQueue pipeline.Enqueuer[executor.Job]
+	enabled     bool
 }
 
 func NewFetcherWorker(
@@ -25,6 +26,7 @@ func NewFetcherWorker(
 	updater executor.RunUpdater,
 	subscriptionManager *subscription.Manager,
 	tracer trace.Tracer,
+	enabled bool,
 ) *traceFetcherWorker {
 	state := &workerState{
 		eventEmitter:        eventEmitter,
@@ -35,7 +37,7 @@ func NewFetcherWorker(
 		tracer:              tracer,
 	}
 
-	return &traceFetcherWorker{state: state}
+	return &traceFetcherWorker{state: state, enabled: enabled}
 }
 
 func (w *traceFetcherWorker) SetInputQueue(queue pipeline.Enqueuer[executor.Job]) {
@@ -47,6 +49,10 @@ func (w *traceFetcherWorker) SetOutputQueue(queue pipeline.Enqueuer[executor.Job
 }
 
 func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) {
+	if !w.enabled {
+		return
+	}
+
 	ctx, span := w.state.tracer.Start(ctx, "Fetching trace")
 	defer span.End()
 

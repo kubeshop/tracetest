@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -30,6 +31,7 @@ func buildTestPipeline(
 	subscriptionManager *subscription.Manager,
 	triggerRegistry *trigger.Registry,
 	tracedbFactory tracedb.FactoryFunc,
+	appConfig *config.AppConfig,
 ) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
@@ -45,7 +47,7 @@ func buildTestPipeline(
 		eventEmitter,
 	)
 
-	linterRunner := executor.NewlinterRunner(
+	linterRunner := executor.NewLinterRunner(
 		execTestUpdater,
 		subscriptionManager,
 		eventEmitter,
@@ -68,6 +70,7 @@ func buildTestPipeline(
 		execTestUpdater,
 		subscriptionManager,
 		tracer,
+		appConfig.TestPipelineTraceFetchingEnabled(),
 	)
 
 	tracePollerEvaluatorWorker := tracepollerworker.NewEvaluatorWorker(
@@ -94,6 +97,7 @@ func buildTestPipeline(
 		execTestUpdater,
 		tracer,
 		eventEmitter,
+		appConfig.TestPipelineTriggerExecutionEnabled(),
 	)
 
 	triggerResultProcessorWorker := executor.NewTriggerResultProcessorWorker(

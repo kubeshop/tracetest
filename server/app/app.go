@@ -245,6 +245,7 @@ func (app *App) Start(opts ...appOption) error {
 		subscriptionManager,
 		triggerRegistry,
 		tracedbFactory,
+		app.cfg,
 	)
 	testPipeline.Start()
 	app.registerStopFn(func() {
