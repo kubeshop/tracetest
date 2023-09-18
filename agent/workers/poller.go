@@ -91,6 +91,7 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 		return err
 	}
 
+	// mark spans as sent
 	for _, span := range pollingResponse.Spans {
 		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
 		// TODO: we can set the expiration for this key to be
@@ -111,6 +112,7 @@ func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 	}
 
 	if r.Tempo != nil {
+		ds.Values.Tempo = &datastore.MultiChannelClientConfig{}
 		if r.Tempo.Grpc != nil {
 			ds.Values.Tempo.Grpc = &datastore.GRPCClientSettings{}
 			deepcopy.DeepCopy(r.Tempo.Grpc, &ds.Values.Tempo.Grpc)
