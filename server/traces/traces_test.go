@@ -206,7 +206,7 @@ func TestEventsAreInjectedIntoAttributes(t *testing.T) {
 
 func TestMergingZeroTraces(t *testing.T) {
 	trace := traces.MergeTraces()
-	assert.NotEmpty(t, trace.ID)
+	assert.Nil(t, trace)
 }
 
 func TestMergingFragmentsFromSameTrace(t *testing.T) {
