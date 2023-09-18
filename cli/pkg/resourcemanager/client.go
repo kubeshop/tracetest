@@ -1,6 +1,7 @@
 package resourcemanager
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -52,9 +53,31 @@ func (c HTTPClient) url(resourceName, prefix string, extra ...string) *url.URL {
 	return url
 }
 
+type ContextOption string
+
+const (
+	ContextHeadersKey ContextOption = "headers"
+)
+
+func SetRequestContextHeaders(ctx context.Context, headers map[string]string) context.Context {
+	httpHeaders := http.Header{}
+	for k, v := range headers {
+		httpHeaders.Set(k, v)
+	}
+
+	return context.WithValue(ctx, ContextHeadersKey, httpHeaders)
+}
+
 func (c HTTPClient) do(req *http.Request) (*http.Response, error) {
 	for k, v := range c.extraHeaders {
 		req.Header[k] = v
+	}
+
+	contextHeaders := req.Context().Value(ContextHeadersKey)
+	if contextHeaders != nil {
+		for k, v := range contextHeaders.(http.Header) {
+			req.Header[k] = v
+		}
 	}
 
 	return c.client.Do(req)
