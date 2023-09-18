@@ -1,12 +1,14 @@
 import {useMemo} from 'react';
-import CustomizationProvider from 'providers/Customization';
+import CustomizationProvider, {Flag} from 'providers/Customization';
 
 interface IProps {
   children: React.ReactNode;
 }
 
+const flagValues = {[Flag.IsAnalyticsPageEnabled]: true, [Flag.IsAgentDataStoreEnabled]: false};
+
 const getComponent = <T,>(id: string, fallback: React.ComponentType<T>) => fallback;
-const getFlag = () => true;
+const getFlag = (flag: Flag) => flagValues[flag];
 const getIsAllowed = () => true;
 
 const CustomizationWrapper = ({children}: IProps) => {

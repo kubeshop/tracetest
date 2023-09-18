@@ -51,8 +51,12 @@ const DataStoreForm = ({
 
   const onValidation = useCallback(
     async (_: any, draft: TDraftDataStore) => {
-      const isValid = await DataStoreService.validateDraft(draft);
-      onIsFormValid(isValid);
+      try {
+        const isValid = await DataStoreService.validateDraft(draft);
+        onIsFormValid(isValid);
+      } catch (e) {
+        onIsFormValid(false);
+      }
     },
     [onIsFormValid]
   );

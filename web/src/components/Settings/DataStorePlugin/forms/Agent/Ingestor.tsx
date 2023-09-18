@@ -1,8 +1,7 @@
 import {Form, Switch} from 'antd';
 import DocsBanner from 'components/DocsBanner/DocsBanner';
-import {INGESTOR_ENDPOINT_URL} from 'constants/Common.constants';
 import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
-import * as S from './OpenTelemetryCollector.styled';
+import * as S from './Agent.styled';
 
 const Ingestor = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
@@ -12,14 +11,13 @@ const Ingestor = () => {
   return (
     <S.Container>
       <S.Description>
-        Tracetest easily integrates with any distributed tracing solution via the OpenTelemetry Collector. It allows
-        your current tracing system to send only Tracetest spans while the rest go to your chosen backend.
+        The Tracetest Agent can be used to collect OpenTelemetry trace information from the host it is running on.
       </S.Description>
       <S.Title>Ingestor Endpoint</S.Title>
       <S.Description>
-        Tracetest exposes trace ingestion endpoints on ports 4317 for gRPC and 4318 for HTTP. Turn on the Tracetest
-        ingestion endpoint to start sending traces. Use the Tracetest Server’s hostname and port to connect. For
-        example, with Docker use tracetest:4317 for gRPC.
+        The Tracetest Agent exposes trace ingestion endpoints on ports 4317 for gRPC and 4318 for HTTP. Turn on the
+        Tracetest ingestion endpoint to start sending traces. Use your local hostname and port to connect. For example,
+        localhost:4317 for gRPC.
       </S.Description>
       <S.SwitchContainer>
         <Form.Item name={[...baseName, 'isIngestorEnabled']} valuePropName="checked">
@@ -30,8 +28,8 @@ const Ingestor = () => {
         </label>
       </S.SwitchContainer>
       <DocsBanner>
-        Need more information about setting up ingestion endpoint?{' '}
-        <a target="_blank" href={INGESTOR_ENDPOINT_URL}>
+        Need more information about setting up the agent ingestion endpoint?{' '}
+        <a target="_blank" href="">
           Go to our docs
         </a>
       </DocsBanner>

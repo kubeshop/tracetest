@@ -3,6 +3,7 @@ import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
 import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
+import {Flag, useCustomization} from 'providers/Customization';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 
 import DataStoreIcon from '../../DataStoreIcon/DataStoreIcon';
@@ -16,6 +17,7 @@ interface IProps {
 const supportedDataStoreList = Object.values(SupportedDataStores);
 
 const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.JAEGER}: IProps) => {
+  const {getFlag} = useCustomization();
   const {
     color: {text, primary},
   } = useTheme();
@@ -25,6 +27,10 @@ const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.J
   return (
     <S.DataStoreListContainer>
       {supportedDataStoreList.map(dataStore => {
+        if (dataStore === SupportedDataStores.Agent && !getFlag(Flag.IsAgentDataStoreEnabled)) {
+          return null;
+        }
+
         const isSelected = value === dataStore;
         const isConfigured = configuredDataStoreType === dataStore && dataStoreConfig.mode === ConfigMode.READY;
         return (

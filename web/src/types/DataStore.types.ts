@@ -1,7 +1,7 @@
 import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
 import ConnectionTestStep from 'models/ConnectionResultStep.model';
-import DataStore, { TRawOtlpDataStore } from 'models/DataStore.model';
+import DataStore, {TRawOtlpDataStore} from 'models/DataStore.model';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {THeader} from './Test.types';
 
@@ -16,6 +16,7 @@ export enum ConnectionTypes {
 }
 
 export enum SupportedDataStores {
+  Agent = 'agent',
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
   OtelCollector = 'otlp',
@@ -29,7 +30,7 @@ export enum SupportedDataStores {
   Honeycomb = 'honeycomb',
   AzureAppInsights = 'azureappinsights',
   Signoz = 'signoz',
-  Dynatrace = 'dynatrace'
+  Dynatrace = 'dynatrace',
 }
 
 export enum SupportedClientTypes {
@@ -88,6 +89,7 @@ export interface IElasticSearch extends TRawElasticSearch {
 }
 
 export type IDataStore = DataStore & {
+  agent?: TRawOtlpDataStore;
   jaeger?: IBaseClientSettings;
   tempo?: IBaseClientSettings;
   opensearch?: IElasticSearch;

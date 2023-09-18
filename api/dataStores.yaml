@@ -182,6 +182,7 @@ components:
       type: string
       enum:
         [
+          agent,
           jaeger,
           opensearch,
           tempo,
@@ -195,7 +196,7 @@ components:
           honeycomb,
           azureappinsights,
           signoz,
-          dynatrace
+          dynatrace,
         ]
     SupportedClients:
       type: string
