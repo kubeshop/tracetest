@@ -9,7 +9,7 @@ import Heading from '@theme/Heading';
 const ExamplesTutorialsOverview = [
   {
     name: '👨‍💻 Tutorials',
-    url: './tutorials',
+    url: '/examples-tutorials/tutorials',
     description: (
       <Translate >
         Check out the following blog posts with Tracetest-related content.
@@ -19,7 +19,7 @@ const ExamplesTutorialsOverview = [
   },
   {
     name: '🍱 Recipes',
-    url: './recipes',
+    url: '/examples-tutorials/recipes',
     description: (
       <Translate>
         Short, self-contained, and runnable solutions to popular use cases.
@@ -29,7 +29,7 @@ const ExamplesTutorialsOverview = [
   },
   {
     name: '🎙️ Webinars',
-    url: './webinars',
+    url: '/examples-tutorials/webinars',
     description: (
       <Translate >
         Watch on-demand live streams and community calls!
@@ -39,7 +39,7 @@ const ExamplesTutorialsOverview = [
   },
   {
     name: '📽️ Videos',
-    url: './videos',
+    url: '/examples-tutorials/videos',
     description: (
       <Translate>
         Check out Tracetest video guides and conference talks!
