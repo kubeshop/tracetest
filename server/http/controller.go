@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
@@ -20,6 +21,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/testconnection"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -39,6 +41,8 @@ type controller struct {
 	testRepository         testsRepository
 	testSuiteRepository    testSuiteRepository
 	testSuiteRunRepository testSuiteRunRepository
+
+	dsTestPipeline dataStoreTestRunner
 
 	variableSetGetter variableSetGetter
 	newTraceDBFn      func(ds datastore.DataStore) (tracedb.TraceDB, error)
@@ -78,6 +82,13 @@ type transactionRunner interface {
 	Run(context.Context, testsuite.TestSuite, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) testsuite.TestSuiteRun
 }
 
+type dataStoreTestRunner interface {
+	Run(context.Context, testconnection.Job)
+	NewJob(datastore.DataStore) testconnection.Job
+	Subscribe(string, testconnection.NotifierFn)
+	Unsubscribe(string)
+}
+
 type variableSetGetter interface {
 	Get(context.Context, id.ID) (variableset.VariableSet, error)
 }
@@ -87,6 +98,8 @@ func NewController(
 
 	testRunner testRunner,
 	transactionRunner transactionRunner,
+
+	dsTestPipeline dataStoreTestRunner,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepository testSuiteRepository,
@@ -106,6 +119,8 @@ func NewController(
 		testRepository:         testRepository,
 		testRunRepository:      testRunRepository,
 		variableSetGetter:      variableSetGetter,
+
+		dsTestPipeline: dsTestPipeline,
 
 		testRunner:        testRunner,
 		transactionRunner: transactionRunner,
@@ -672,27 +687,24 @@ func takeResources(transactions []testsuite.TestSuite, tests []test.Test, take, 
 func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
 	ds := c.mappers.In.DataStore(dataStore)
 
+	job := c.dsTestPipeline.NewJob(ds)
+
+	wg := sync.WaitGroup{}
+	c.dsTestPipeline.Subscribe(job.ID, func(result testconnection.Job) {
+		job = result
+		c.dsTestPipeline.Unsubscribe(job.ID)
+		wg.Done()
+	})
+
+	c.dsTestPipeline.Run(ctx, job)
+	wg.Add(1)
+	wg.Wait()
+
 	if err := ds.Validate(); err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err
 	}
 
-	tdb, err := c.newTraceDBFn(ds)
-	if err != nil {
-		return openapi.Response(http.StatusBadRequest, err.Error()), err
-	}
-
-	testResult := model.ConnectionResult{}
-	statusCode := http.StatusOK
-
-	if testableTraceDB, ok := tdb.(tracedb.TestableTraceDB); ok {
-		testResult = testableTraceDB.TestConnection(ctx)
-		statusCode = http.StatusOK
-		if !testResult.HasSucceed() {
-			statusCode = http.StatusUnprocessableEntity
-		}
-	}
-
-	return openapi.Response(statusCode, c.mappers.Out.ConnectionTestResult(testResult)), nil
+	return openapi.Response(http.StatusOK, c.mappers.Out.ConnectionTestResult(job.TestResult)), nil
 }
 
 func (c *controller) GetVersion(ctx context.Context, fileExtension string) (openapi.ImplResponse, error) {

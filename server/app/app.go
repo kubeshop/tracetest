@@ -34,6 +34,7 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/testconnection"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -264,6 +265,19 @@ func (app *App) Start(opts ...appOption) error {
 		testSuitePipeline.Stop()
 	})
 
+	dsTestListener := testconnection.NewListener()
+	dsTestPipeline := buildDataStoreTestPipeline(
+		dsTestListener,
+		tracer,
+		tracedbFactory,
+		dataStoreRepo,
+	)
+
+	dsTestPipeline.Start()
+	app.registerStopFn(func() {
+		dsTestPipeline.Stop()
+	})
+
 	err = analytics.SendEvent("Server Started", "beacon", "", nil)
 	if err != nil {
 		return err
@@ -276,6 +290,7 @@ func (app *App) Start(opts ...appOption) error {
 
 		testPipeline,
 		testSuitePipeline,
+		dsTestPipeline,
 
 		testDB,
 		testSuiteRepository,
@@ -533,6 +548,8 @@ func controller(
 	testRunner *executor.TestPipeline,
 	testSuitesRunner *executor.TestSuitesPipeline,
 
+	dsTestRunner *testconnection.DataStoreTestPipeline,
+
 	testRunEvents model.TestRunEventRepository,
 	transactionRepo *testsuite.Repository,
 	transactionRunRepo *testsuite.RunRepository,
@@ -550,6 +567,7 @@ func controller(
 
 		testRunner,
 		testSuitesRunner,
+		dsTestRunner,
 
 		testRunEvents,
 		transactionRepo,
@@ -572,6 +590,7 @@ func httpRouter(
 
 	testRunner *executor.TestPipeline,
 	testSuitesRunner *executor.TestSuitesPipeline,
+	dsTestRunner *testconnection.DataStoreTestPipeline,
 
 	testRunEvents model.TestRunEventRepository,
 	testSuiteRepo *testsuite.Repository,
@@ -588,6 +607,7 @@ func httpRouter(
 
 		testRunner,
 		testSuitesRunner,
+		dsTestRunner,
 
 		testRunEvents,
 		testSuiteRepo,
