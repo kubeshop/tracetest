@@ -35,17 +35,13 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 	return query + condition, append(params, *tenantID)
 }
 
-func TenantInsert(ctx context.Context, query string, params ...any) (string, []any) {
+func TenantInsert(ctx context.Context, params ...any) []any {
 	tenantID := TenantID(ctx)
 	if tenantID == nil {
-		return fmt.Sprintf(query, "", ""), params
+		return append(params, "")
 	}
 
-	paramNumber := len(params) + 1
-	paramValue := fmt.Sprintf(", $%d", paramNumber)
-	formattedQuery := fmt.Sprintf(query, ", tenant_id", paramValue)
-
-	return formattedQuery, append(params, *tenantID)
+	return append(params, *tenantID)
 }
 
 func TenantID(ctx context.Context) *string {

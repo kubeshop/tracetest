@@ -28,9 +28,9 @@ const (
 			"name",
 			"enabled",
 			"minimum_score",
-			"plugins"
-			%s
-		) VALUES ($1, $2, $3, $4, $5 %s)`
+			"plugins",
+			"tenant_id"
+		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	getQuery = `
 	SELECT
@@ -90,14 +90,14 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		}
 	}
 
-	query, params = sqlutil.TenantInsert(ctx, insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		updated.ID,
 		updated.Name,
 		updated.Enabled,
 		updated.MinimumScore,
 		pluginsJSON,
 	)
-	_, err = tx.ExecContext(ctx, query, params...)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return Linter{}, fmt.Errorf("sql exec insert: %w", err)
 	}

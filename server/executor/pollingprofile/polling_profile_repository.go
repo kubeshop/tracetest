@@ -36,10 +36,10 @@ const (
 		"name",
 		"default",
 		"strategy",
-		"periodic"
-		%s
+		"periodic",
+		"tenant_id"
 	)
-	VALUES ($1, $2, $3, $4, $5 %s)`
+	VALUES ($1, $2, $3, $4, $5, $6)`
 	deleteQuery = `DELETE FROM polling_profiles`
 )
 
@@ -68,14 +68,14 @@ func (r *Repository) Update(ctx context.Context, updated PollingProfile) (Pollin
 		}
 	}
 
-	query, params = sqlutil.TenantInsert(ctx, insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		updated.ID,
 		updated.Name,
 		updated.Default,
 		updated.Strategy,
 		periodicJSON,
 	)
-	_, err = tx.ExecContext(ctx, query, params...)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return PollingProfile{}, fmt.Errorf("sql exec insert: %w", err)
 	}

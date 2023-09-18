@@ -34,10 +34,10 @@ const (
 	INSERT INTO test_runners(
 		"id",
 		"name",
-		"required_gates"
-		%s
+		"required_gates",
+		"tenant_id"
 	)
-	VALUES ($1, $2, $3 %s)`
+	VALUES ($1, $2, $3, $4)`
 	deleteQuery = `DELETE FROM test_runners`
 )
 
@@ -66,12 +66,12 @@ func (r *Repository) Update(ctx context.Context, updated TestRunner) (TestRunner
 		}
 	}
 
-	query, params = sqlutil.TenantInsert(ctx, insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		updated.ID,
 		updated.Name,
 		requiredGatesJSON,
 	)
-	_, err = tx.ExecContext(ctx, query, params...)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return TestRunner{}, fmt.Errorf("sql exec insert: %w", err)
 	}

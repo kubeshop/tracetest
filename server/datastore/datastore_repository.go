@@ -34,9 +34,9 @@ INSERT INTO data_stores (
 	"type",
 	"is_default",
 	"values",
-	"created_at"
-	%s
-) VALUES ($1, $2, $3, $4, $5, $6 %s)`
+	"created_at",
+	"tenant_id"
+) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 const deleteQuery = `DELETE FROM data_stores WHERE "id" = $1`
 
@@ -102,7 +102,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		return DataStore{}, fmt.Errorf("could not marshal values field configuration: %w", err)
 	}
 
-	query, params = sqlutil.TenantInsert(ctx, insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		dataStore.ID,
 		dataStore.Name,
 		dataStore.Type,
@@ -110,7 +110,7 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		valuesJSON,
 		dataStore.CreatedAt,
 	)
-	_, err = tx.ExecContext(ctx, query, params...)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec create: %w", err)
 	}
