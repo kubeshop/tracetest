@@ -73,9 +73,18 @@ func (m OpenAPI) Spans(in []*traces.Span) []openapi.Span {
 
 func (m Model) Trace(in openapi.Trace) *traces.Trace {
 	tid, _ := trace.TraceIDFromHex(in.TraceId)
+
+	flat := make(map[trace.SpanID]*traces.Span, len(in.Flat))
+	for id, span := range in.Flat {
+		sid, _ := trace.SpanIDFromHex(id)
+		span := m.Span(span, nil)
+		flat[sid] = &span
+	}
+
 	return &traces.Trace{
 		ID:       tid,
 		RootSpan: m.Span(in.Tree, nil),
+		Flat:     flat,
 	}
 }
 
