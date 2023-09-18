@@ -124,7 +124,7 @@
     "@types/react-syntax-highlighter": "15.5.7",
     "@types/styled-components": "5.1.21",
     "concurrently": "7.2.1",
-    "cypress": "10.7.0",
+    "cypress": "13.2.0",
     "cypress-file-upload": "5.0.8",
     "eslint": "8.8.0",
     "eslint-config-airbnb": "19.0.4",
