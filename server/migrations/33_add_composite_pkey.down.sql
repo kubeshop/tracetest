@@ -13,6 +13,19 @@ WHERE tenant_id = '';
 ALTER TABLE data_stores ALTER COLUMN tenant_id TYPE uuid using tenant_id::uuid;
 
 
+ALTER TABLE demos
+DROP CONSTRAINT demos_pkey,
+ADD PRIMARY KEY (id),
+ALTER COLUMN tenant_id DROP DEFAULT,
+ALTER COLUMN tenant_id DROP NOT NULL;
+
+UPDATE demos
+SET tenant_id = null
+WHERE tenant_id = '';
+
+ALTER TABLE demos ALTER COLUMN tenant_id TYPE uuid using tenant_id::uuid;
+
+
 ALTER TABLE polling_profiles
 DROP CONSTRAINT polling_profiles_pkey,
 ADD PRIMARY KEY (id),
