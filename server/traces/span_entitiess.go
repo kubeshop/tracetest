@@ -154,7 +154,7 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
 
-	children, err := decodeChildren(s, aux.Children)
+	children, err := decodeChildren(s, aux.Children, getCache())
 	if err != nil {
 		return fmt.Errorf("unmarshal span: %w", err)
 	}
@@ -194,12 +194,17 @@ func getTimeFromString(value string) (time.Time, error) {
 	return time.UnixMilli(int64(milliseconds)), nil
 }
 
-func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
+func decodeChildren(parent *Span, children []encodedSpan, cache spanCache) ([]*Span, error) {
 	if len(children) == 0 {
 		return nil, nil
 	}
 	res := make([]*Span, len(children))
 	for i, c := range children {
+		if span, ok := cache.Get(c.ID); ok {
+			res[i] = span
+			continue
+		}
+
 		span := &Span{
 			Parent: parent,
 		}
@@ -207,18 +212,24 @@ func decodeChildren(parent *Span, children []encodedSpan) ([]*Span, error) {
 			return nil, fmt.Errorf("unmarshal children: %w", err)
 		}
 
-		children, err := decodeChildren(span, c.Children)
+		children, err := decodeChildren(span, c.Children, cache)
 		if err != nil {
 			return nil, fmt.Errorf("unmarshal children: %w", err)
 		}
 
 		span.Children = children
 		res[i] = span
+
+		cache.Set(span.ID.String(), span)
 	}
 	return res, nil
 }
 
 func (span Span) setMetadataAttributes() Span {
+	if span.Attributes == nil {
+		span.Attributes = Attributes{}
+	}
+
 	span.Attributes[TracetestMetadataFieldName] = span.Name
 	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
 	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)

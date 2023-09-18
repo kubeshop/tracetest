@@ -3,6 +3,7 @@ package traces_test
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -201,6 +202,25 @@ func TestEventsAreInjectedIntoAttributes(t *testing.T) {
 	assert.Equal(t, "value", events[0].Attributes["attribute1"])
 	assert.Equal(t, "event 2", events[1].Name)
 	assert.Equal(t, "value", events[1].Attributes["attribute2"])
+}
+
+func TestMergingZeroTraces(t *testing.T) {
+	trace := traces.MergeTraces()
+	assert.NotEmpty(t, trace.ID)
+}
+
+func TestMergingFragmentsFromSameTrace(t *testing.T) {
+	traceID := id.NewRandGenerator().TraceID().String()
+	rootSpan := newSpan("Root")
+	childSpan1 := newSpan("child 1", withParent(&rootSpan))
+	childSpan2 := newSpan("child 2", withParent(&rootSpan))
+
+	firstFragment := traces.NewTrace(traceID, []traces.Span{childSpan2})
+	secondFragment := traces.NewTrace(traceID, []traces.Span{rootSpan, childSpan1})
+
+	trace := traces.MergeTraces(&firstFragment, &secondFragment)
+	assert.NotEmpty(t, trace.ID)
+	assert.Len(t, trace.Flat, 3)
 }
 
 type option func(*traces.Span)
@@ -471,4 +491,16 @@ func TestSort(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedTrace.RootSpan, sortedTrace.RootSpan)
+}
+
+func TestUnmarshalLargeTrace(t *testing.T) {
+	bytes, err := os.ReadFile("./data/big-trace-json.json")
+	require.NoError(t, err)
+
+	trace := traces.Trace{}
+
+	err = json.Unmarshal(bytes, &trace)
+	require.NoError(t, err)
+
+	assert.Greater(t, len(trace.Flat), 0)
 }

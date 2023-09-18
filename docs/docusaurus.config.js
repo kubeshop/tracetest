@@ -229,6 +229,13 @@ const config = {
         disableSwitch: false,
         respectPrefersColorScheme: false,
       },
+      // Use this to add an announcement for a webinar or event.
+      announcementBar: {
+        id: 'announcement',
+        content:
+          '<a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/live/2MSDy3XHjtE?si=VlK7cxJOsgKi5QTE&t=1132">Tracetest is the official testing harness for the OpenTelemetry Demo! 🚀</a>',
+        isCloseable: false,
+      },  
       navbar: {
         hideOnScroll: true,
         logo: {

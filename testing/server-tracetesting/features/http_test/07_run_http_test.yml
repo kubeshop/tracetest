@@ -29,11 +29,11 @@ spec:
     - attr:tracetest.run.trigger.test_id = "${var:HTTP_TEST_ID}"
     - attr:tracetest.run.trigger.type = "http"
     - attr:tracetest.run.trigger.http.response_code = 200
-  - selector: span[name = "Fetch trace"]
+  - selector: span[name = "Fetching trace"]
     assertions:
     - attr:tracetest.selected_spans.count > 0
     - attr:tracetest.run.trace_poller.test_id = "${var:HTTP_TEST_ID}"
-  - selector: span[name = "Fetch trace"]:last
+  - selector: span[name = "Evaluating trace"]:last
     assertions:
     - attr:tracetest.run.trace_poller.succesful = "true"
   - selector: span[name = "Execute assertions"]

@@ -18,6 +18,24 @@ type Trace struct {
 	Flat     map[trace.SpanID]*Span `json:"-"`
 }
 
+func MergeTraces(traces ...*Trace) Trace {
+	if len(traces) == 0 {
+		return NewTrace(id.NewRandGenerator().TraceID().String(), []Span{})
+	}
+
+	traceID := traces[0].ID
+	spans := make([]Span, 0)
+	for _, trace := range traces {
+		if trace == nil {
+			continue
+		}
+
+		spans = append(spans, trace.Spans()...)
+	}
+
+	return NewTrace(traceID.String(), spans)
+}
+
 func NewTrace(traceID string, spans []Span) Trace {
 	spanMap := make(map[string]*Span, 0)
 	for _, span := range spans {
@@ -201,6 +219,7 @@ func sortSpanChildren(span Span) Span {
 }
 
 func (t *Trace) UnmarshalJSON(data []byte) error {
+	resetCache()
 	type Alias Trace
 	aux := &struct {
 		ID string

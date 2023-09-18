@@ -25,6 +25,9 @@ service Orchestrator {
 
     // Register an agent to listen for shutdown commands
     rpc RegisterShutdownListener(AgentIdentification) returns (stream ShutdownRequest) {}
+
+    // Ping is used to check if the agent is still connected
+    rpc Ping(AgentIdentification) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
