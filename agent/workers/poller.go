@@ -110,6 +110,42 @@ func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 		deepcopy.DeepCopy(r.Jaeger.Grpc, &ds.Values.Jaeger)
 	}
 
+	if r.Tempo != nil {
+		if r.Tempo.Grpc != nil {
+			ds.Values.Tempo.Grpc = &datastore.GRPCClientSettings{}
+			deepcopy.DeepCopy(r.Tempo.Grpc, &ds.Values.Tempo.Grpc)
+		}
+		if r.Tempo.Http != nil {
+			ds.Values.Tempo.Http = &datastore.HttpClientConfig{}
+			deepcopy.DeepCopy(r.Tempo.Http, &ds.Values.Tempo.Http)
+		}
+	}
+
+	if r.Opensearch != nil {
+		ds.Values.OpenSearch = &datastore.ElasticSearchConfig{}
+		deepcopy.DeepCopy(r.Opensearch, &ds.Values.OpenSearch)
+	}
+
+	if r.Elasticapm != nil {
+		ds.Values.ElasticApm = &datastore.ElasticSearchConfig{}
+		deepcopy.DeepCopy(r.Elasticapm, &ds.Values.ElasticApm)
+	}
+
+	if r.Signalfx != nil {
+		ds.Values.SignalFx = &datastore.SignalFXConfig{}
+		deepcopy.DeepCopy(r.Signalfx, &ds.Values.SignalFx)
+	}
+
+	if r.Awsxray != nil {
+		ds.Values.AwsXRay = &datastore.AWSXRayConfig{}
+		deepcopy.DeepCopy(r.Awsxray, &ds.Values.AwsXRay)
+	}
+
+	if r.Azureappinsights != nil {
+		ds.Values.AzureAppInsights = &datastore.AzureAppInsightsConfig{}
+		deepcopy.DeepCopy(r.Azureappinsights, &ds.Values.AzureAppInsights)
+	}
+
 	ds.Type = datastore.DataStoreType(r.Type)
 	return &ds, nil
 }
