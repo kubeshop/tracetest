@@ -53,6 +53,7 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	}
 
 	protoResponse := convertResponseToProtoResponse(triggerRequest, response)
+	protoResponse.RequestID = triggerRequest.RequestID
 	err = w.client.SendTriggerResponse(ctx, protoResponse)
 	if err != nil {
 		return fmt.Errorf("could not send trigger response to server: %w", err)

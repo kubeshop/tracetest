@@ -2,32 +2,40 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
+	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/agent/workers/datastores"
-	"github.com/kubeshop/tracetest/agent/workers/datastores/connection"
 	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/tracedb"
+	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type PollerWorker struct {
-	client *client.Client
-	tracer trace.Tracer
+	client      *client.Client
+	tracer      trace.Tracer
+	sentSpanIDs *gocache.Cache[string, bool]
 }
 
 func NewPollerWorker(client *client.Client) *PollerWorker {
 	// TODO: use a real tracer
 	tracer := trace.NewNoopTracerProvider().Tracer("noop")
 
-	return &PollerWorker{client, tracer}
+	return &PollerWorker{
+		client:      client,
+		tracer:      tracer,
+		sentSpanIDs: gocache.New[string, bool](),
+	}
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
+	fmt.Println("Poll handled by agent")
 	datastoreConfig, err := convertProtoToDataStore(request.Datastore)
 	if err != nil {
 		return err
@@ -37,37 +45,110 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 		return fmt.Errorf("invalid datastore: nil")
 	}
 
-	dsFactory := datastores.Factory()
+	dsFactory := tracedb.Factory(nil)
 	ds, err := dsFactory(*datastoreConfig)
 	if err != nil {
+		log.Printf("Invalid datastore: %s", err.Error())
 		return err
+	}
+
+	pollingResponse := &proto.PollingResponse{
+		RequestID: request.RequestID,
+		TestID:    request.TestID,
+		RunID:     request.RunID,
+		TraceID:   request.TraceID,
 	}
 
 	trace, err := ds.GetTraceByID(ctx, request.TraceID)
-	if err == connection.ErrTraceNotFound {
-		// Nothing to send back
-		log.Printf("Trace %s was not found", request.TraceID)
-		return nil
+
+	if err != nil {
+		if !errors.Is(err, connection.ErrTraceNotFound) {
+			// let controlplane know we didn't find the trace
+			log.Printf("cannot get trace from datastore: %s", err.Error())
+			return err
+		}
+
+		pollingResponse.TraceFound = false
+	} else {
+		pollingResponse.TraceFound = true
+		pollingResponse.Spans = convertTraceInToProtoSpans(trace)
+
+		// remove sent spans
+		newSpans := make([]*proto.Span, 0, len(pollingResponse.Spans))
+		for _, span := range pollingResponse.Spans {
+			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
+			_, alreadySent := w.sentSpanIDs.Get(runKey)
+			if !alreadySent {
+				newSpans = append(newSpans, span)
+			}
+		}
+		pollingResponse.Spans = newSpans
 	}
 
-	spans := convertTraceInToProtoSpans(trace)
-
-	err = w.client.SendTrace(ctx, request, spans...)
+	err = w.client.SendTrace(ctx, pollingResponse)
 	if err != nil {
+		log.Printf("cannot send trace to server: %s", err.Error())
 		return err
+	}
+
+	// mark spans as sent
+	for _, span := range pollingResponse.Spans {
+		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
+		// TODO: we can set the expiration for this key to be
+		// 1 second after the pollingProfile max waiting time
+		// but we need to get that info here from controlplane
+		w.sentSpanIDs.Set(runKey, true)
 	}
 
 	return nil
 }
 
-func convertProtoToDataStore(request *proto.DataStore) (*datastore.DataStore, error) {
+func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 	var ds datastore.DataStore
-	err := deepcopy.DeepCopy(request, &ds.Values)
-	if err != nil {
-		return nil, fmt.Errorf("could not deep copy datastore: %w", err)
+
+	if r.Jaeger != nil && r.Jaeger.Grpc != nil {
+		ds.Values.Jaeger = &datastore.GRPCClientSettings{}
+		deepcopy.DeepCopy(r.Jaeger.Grpc, &ds.Values.Jaeger)
 	}
 
-	ds.Type = datastore.DataStoreType(request.Type)
+	if r.Tempo != nil {
+		ds.Values.Tempo = &datastore.MultiChannelClientConfig{}
+		if r.Tempo.Grpc != nil {
+			ds.Values.Tempo.Grpc = &datastore.GRPCClientSettings{}
+			deepcopy.DeepCopy(r.Tempo.Grpc, &ds.Values.Tempo.Grpc)
+		}
+		if r.Tempo.Http != nil {
+			ds.Values.Tempo.Http = &datastore.HttpClientConfig{}
+			deepcopy.DeepCopy(r.Tempo.Http, &ds.Values.Tempo.Http)
+		}
+	}
+
+	if r.Opensearch != nil {
+		ds.Values.OpenSearch = &datastore.ElasticSearchConfig{}
+		deepcopy.DeepCopy(r.Opensearch, &ds.Values.OpenSearch)
+	}
+
+	if r.Elasticapm != nil {
+		ds.Values.ElasticApm = &datastore.ElasticSearchConfig{}
+		deepcopy.DeepCopy(r.Elasticapm, &ds.Values.ElasticApm)
+	}
+
+	if r.Signalfx != nil {
+		ds.Values.SignalFx = &datastore.SignalFXConfig{}
+		deepcopy.DeepCopy(r.Signalfx, &ds.Values.SignalFx)
+	}
+
+	if r.Awsxray != nil {
+		ds.Values.AwsXRay = &datastore.AWSXRayConfig{}
+		deepcopy.DeepCopy(r.Awsxray, &ds.Values.AwsXRay)
+	}
+
+	if r.Azureappinsights != nil {
+		ds.Values.AzureAppInsights = &datastore.AzureAppInsightsConfig{}
+		deepcopy.DeepCopy(r.Azureappinsights, &ds.Values.AzureAppInsights)
+	}
+
+	ds.Type = datastore.DataStoreType(r.Type)
 	return &ds, nil
 }
 

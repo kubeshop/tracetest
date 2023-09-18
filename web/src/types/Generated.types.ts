@@ -186,7 +186,7 @@ export interface paths {
     /** Delete a variable set from Tracetest */
     delete: operations["deleteVariableSet"];
   };
-  "/version": {
+  "/version.{fileExtension}": {
     /** Get the version of the API */
     get: operations["getVersion"];
   };
@@ -1041,6 +1041,7 @@ export interface operations {
   };
   /** Get the version of the API */
   getVersion: {
+    parameters: {};
     responses: {
       /** successful operation */
       200: {
@@ -1660,6 +1661,7 @@ export interface external {
         variableSetId: string;
         /** @description ID of an Linter */
         LinterId: string;
+        fileExtension: string;
       };
     };
     operations: {};
@@ -2118,6 +2120,7 @@ export interface external {
           type?: "oss";
           uiEndpoint?: string;
           agentEndpoint?: string;
+          apiEndpoint?: string;
         };
       };
     };
