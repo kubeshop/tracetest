@@ -51,17 +51,15 @@ func (r *Repository) Create(ctx context.Context, demo Demo) (Demo, error) {
 		return Demo{}, fmt.Errorf("could not get JSON data from opentelemetry store example: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = tx.ExecContext(ctx, insertQuery,
+	params := sqlutil.TenantInsert(ctx,
 		demo.ID,
 		demo.Name,
 		demo.Enabled,
 		demo.Type,
 		pokeshopJSONData,
 		openTelemetryStoreJSONData,
-		tenantID,
 	)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 
 	if err != nil {
 		tx.Rollback()

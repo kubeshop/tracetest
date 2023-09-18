@@ -90,17 +90,14 @@ func (r *Repository) Update(ctx context.Context, linter Linter) (Linter, error) 
 		}
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-	_, err = tx.ExecContext(
-		ctx,
-		insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		updated.ID,
 		updated.Name,
 		updated.Enabled,
 		updated.MinimumScore,
 		pluginsJSON,
-		tenantID,
 	)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return Linter{}, fmt.Errorf("sql exec insert: %w", err)
 	}
@@ -125,7 +122,8 @@ func (r *Repository) Delete(ctx context.Context, id id.ID) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery, id)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return fmt.Errorf("sql error: %w", err)
 	}

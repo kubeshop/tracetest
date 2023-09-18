@@ -35,6 +35,15 @@ func TenantWithPrefix(ctx context.Context, query string, prefix string, params .
 	return query + condition, append(params, *tenantID)
 }
 
+func TenantInsert(ctx context.Context, params ...any) []any {
+	tenantID := TenantID(ctx)
+	if tenantID == nil {
+		return append(params, "")
+	}
+
+	return append(params, *tenantID)
+}
+
 func TenantID(ctx context.Context) *string {
 	tenantID := ctx.Value(middleware.TenantIDKey)
 

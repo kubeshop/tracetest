@@ -91,7 +91,8 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	}
 	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, deleteQuery, DataStoreSingleID)
+	query, params := sqlutil.Tenant(ctx, deleteQuery, DataStoreSingleID)
+	_, err = tx.ExecContext(ctx, query, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec delete: %w", err)
 	}
@@ -101,17 +102,15 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 		return DataStore{}, fmt.Errorf("could not marshal values field configuration: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = tx.ExecContext(ctx, insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		dataStore.ID,
 		dataStore.Name,
 		dataStore.Type,
 		dataStore.Default,
 		valuesJSON,
 		dataStore.CreatedAt,
-		tenantID,
 	)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository sql exec create: %w", err)
 	}

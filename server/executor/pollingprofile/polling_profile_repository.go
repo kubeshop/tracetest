@@ -68,15 +68,14 @@ func (r *Repository) Update(ctx context.Context, updated PollingProfile) (Pollin
 		}
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-	_, err = tx.ExecContext(ctx, insertQuery,
+	params = sqlutil.TenantInsert(ctx,
 		updated.ID,
 		updated.Name,
 		updated.Default,
 		updated.Strategy,
 		periodicJSON,
-		tenantID,
 	)
+	_, err = tx.ExecContext(ctx, insertQuery, params...)
 	if err != nil {
 		return PollingProfile{}, fmt.Errorf("sql exec insert: %w", err)
 	}
