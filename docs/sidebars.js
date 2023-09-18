@@ -130,6 +130,17 @@ const sidebars = {
       items: [
         {
           type: "category",
+          label: "Streams and Message Queues",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/testing-kafka-go-api-with-opentelemetry-tracetest",
+              label: "Testing Kafka",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "OpenTelemetry Collector",
           items: [
             {
