@@ -61,7 +61,6 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 	}
 
 	log.Println("[TracePoller] Starting to poll traces", job.EnqueueCount())
-	emitEvent(ctx, w.state, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 
 	traceDB, err := getTraceDB(ctx, w.state)
 	if err != nil {
@@ -69,6 +68,8 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 		handleError(ctx, job, err, w.state, span)
 		return
 	}
+
+	emitEvent(ctx, w.state, events.TraceFetchingStart(job.Test.ID, job.Run.ID))
 
 	err = w.testConnection(ctx, traceDB, &job)
 	if err != nil {
