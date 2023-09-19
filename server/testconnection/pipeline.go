@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/distribution/distribution/v3/uuid"
+	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -39,7 +39,7 @@ func NewDataStoreTestPipeline(
 
 func (p *DataStoreTestPipeline) NewJob(datastore datastore.DataStore) Job {
 	return Job{
-		ID:        uuid.Generate().String(),
+		ID:        uuid.New().String(),
 		DataStore: datastore,
 	}
 }
