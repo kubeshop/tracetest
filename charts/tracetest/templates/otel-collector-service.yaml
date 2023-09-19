@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tracetest.fullname" . }}-otel-collector
+  labels:
+    {{- include "otelCollector.labels" . | nindent 4 }}
+  {{- with .Values.otelCollector.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.otelCollector.service.type }}
+  ports:
+    - port: {{ .Values.otelCollector.ports.grpc.containerPort }}
+      targetPort: grpc-otlp
+      protocol: TCP
+      name: grpc-otlp
+    - port: {{ .Values.otelCollector.ports.http.containerPort }}
+      targetPort: http-otlp
+      protocol: TCP
+      name: http-otlp
+  selector:
+    {{- include "otelCollector.selectorLabels" . | nindent 4 }}

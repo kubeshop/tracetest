@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tracetest.fullname" . }}-otel-collector
+  labels:
+    {{- include "otelCollector.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "otelCollector.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "otelCollector.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.otelCollector.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range . }}
+        - name: {{ . | quote }}
+      {{- end }}
+      {{- end }}
+      priorityClassName: {{ .Values.otelCollector.priorityClassName | quote }}
+      {{- with .Values.otelCollector.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.otelCollector.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.otelCollector.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.otelCollector.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.otelCollector.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.otelCollector.name  }}
+          image: "{{ .Values.otelCollector.image.repository }}:{{ .Values.otelCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.otelCollector.image.pullPolicy }} 
+          ports:
+          - containerPort: {{ .Values.otelCollector.ports.grpc.containerPort }}
+            name: grpc-otlp
+            protocol: TCP
+          - containerPort: {{ .Values.otelCollector.ports.http.containerPort }}
+            name: http-otlp
+            protocol: TCP
+          resources:
+            requests:
+              cpu: {{ .Values.otelCollector.resources.requests.cpu  }}
+              memory: {{ .Values.otelCollector.resources.requests.memory  }}
+          args:
+            {{- if .Values.otelCollector.configMap.create }}
+            - "--config=/conf/otel-collector-config.yaml"
+            {{- end }}
+          {{- with .Values.otelCollector.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: otel-collector-config-vol
+              mountPath: /conf
+            
+      volumes:
+        - name: otel-collector-config-vol
+          configMap:
+            items:
+              - key: otel-collector-config.yaml
+                path: otel-collector-config.yaml
+            name: {{ include "tracetest.fullname" . }}-collector-config

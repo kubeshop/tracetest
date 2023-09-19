@@ -1,0 +1,13 @@
+apiVersion: v2
+appVersion: v0.13.0
+dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.6
+description: A Helm chart for Trace Test
+home: https://github.com/kubeshop/helm-charts
+name: tracetest
+sources:
+- https://github.com/kubeshop/helm-charts/tree/main/charts
+type: application
+version: 1.0.0
