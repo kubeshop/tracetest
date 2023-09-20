@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/pkg/timing"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
@@ -49,37 +50,13 @@ func (r Run) Copy() Run {
 }
 
 func (r Run) ExecutionTime() int {
-	return durationInSeconds(
-		timeDiff(r.CreatedAt, r.CompletedAt),
-	)
+	diff := timing.TimeDiff(r.CreatedAt, r.CompletedAt)
+	return int(math.Ceil(diff.Seconds()))
 }
 
 func (r Run) TriggerTime() int {
-	return durationInMillieconds(
-		timeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt),
-	)
-}
-
-func timeDiff(start, end time.Time) time.Duration {
-	var endDate time.Time
-	if !dateIsZero(end) {
-		endDate = end
-	} else {
-		endDate = Now()
-	}
-	return endDate.Sub(start)
-}
-
-func durationInMillieconds(d time.Duration) int {
-	return int(d.Milliseconds())
-}
-
-func durationInSeconds(d time.Duration) int {
-	return int(math.Ceil(d.Seconds()))
-}
-
-func dateIsZero(in time.Time) bool {
-	return in.IsZero() || in.Unix() == 0
+	diff := timing.TimeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt)
+	return int(diff.Microseconds())
 }
 
 func (r Run) Start() Run {

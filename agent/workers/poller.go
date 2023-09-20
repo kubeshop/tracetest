@@ -168,8 +168,8 @@ func convertTraceInToProtoSpans(trace traces.Trace) []*proto.Span {
 			ParentId:   getParentID(span),
 			Name:       span.Name,
 			Kind:       string(span.Kind),
-			StartTime:  span.StartTime.UnixMicro(),
-			EndTime:    span.EndTime.UnixMicro(),
+			StartTime:  span.StartTime.UnixNano(),
+			EndTime:    span.EndTime.UnixNano(),
 			Attributes: attributes,
 		}
 		spans = append(spans, &protoSpan)

@@ -1,7 +1,6 @@
 package timing
 
 import (
-	"math"
 	"time"
 )
 
@@ -19,18 +18,21 @@ func TimeDiff(start, end time.Time) time.Duration {
 	return endDate.Sub(start)
 }
 
-func DurationInMillieconds(d time.Duration) int {
-	return int(d.Milliseconds())
-}
-
-func DurationInNanoseconds(d time.Duration) int {
-	return int(d.Nanoseconds())
-}
-
-func DurationInSeconds(d time.Duration) int {
-	return int(math.Ceil(d.Seconds()))
-}
-
 func dateIsZero(in time.Time) bool {
 	return in.IsZero() || in.Unix() == 0
+}
+
+// ParseUnix parses a unix timestamp into a time.Time
+// it accepts an integer which can be either milli or nano
+func ParseUnix(timestamp int64) time.Time {
+	// Determine the range of the timestamp to know if it is nano or milli
+	// we can assume that any timestamp less than this is milliq
+	const threshold = int64(1e12)
+
+	if timestamp < threshold {
+		// is milli
+		return time.Unix(0, timestamp*int64(time.Millisecond))
+	}
+	// is nano
+	return time.Unix(0, timestamp)
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -144,7 +145,7 @@ func spanType(attrs Attributes) string {
 
 func spanDuration(span Span) string {
 	timeDifference := timing.TimeDiff(span.StartTime, span.EndTime)
-	return fmt.Sprintf("%d", timing.DurationInNanoseconds(timeDifference))
+	return strconv.FormatInt(timeDifference.Nanoseconds(), 10)
 }
 
 func (t *Trace) Sort() Trace {
