@@ -3,17 +3,10 @@ package testconnection
 import (
 	"sync"
 
-	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/executor"
 )
 
-type Job struct {
-	ID         string
-	DataStore  datastore.DataStore
-	TestResult model.ConnectionResult
-}
-
-type NotifierFn func(Job)
+type NotifierFn func(executor.Job)
 
 type Listener struct {
 	subscriptions map[string][]NotifierFn
@@ -40,7 +33,7 @@ func (m *Listener) Unsubscribe(jobID string) {
 	delete(m.subscriptions, jobID)
 }
 
-func (m *Listener) Notify(job Job) {
+func (m *Listener) Notify(job executor.Job) {
 	for _, sub := range m.subscriptions[job.ID] {
 		sub(job)
 	}

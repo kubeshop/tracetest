@@ -6,6 +6,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
@@ -13,13 +15,13 @@ import (
 )
 
 type DsTestListener interface {
-	Notify(Job)
+	Notify(executor.Job)
 	Subscribe(jobID string, notifier NotifierFn)
 	Unsubscribe(jobID string)
 }
 
 type DataStoreTestPipeline struct {
-	*pipeline.Pipeline[Job]
+	*pipeline.Pipeline[executor.Job]
 	dsTestListener DsTestListener
 }
 
@@ -28,7 +30,7 @@ type Configurer[T any] struct{}
 func (c *Configurer[Job]) Configure(_ *pipeline.Queue[Job]) {}
 
 func NewDataStoreTestPipeline(
-	pipeline *pipeline.Pipeline[Job],
+	pipeline *pipeline.Pipeline[executor.Job],
 	listener DsTestListener,
 ) *DataStoreTestPipeline {
 	return &DataStoreTestPipeline{
@@ -37,14 +39,16 @@ func NewDataStoreTestPipeline(
 	}
 }
 
-func (p *DataStoreTestPipeline) NewJob(datastore datastore.DataStore) Job {
-	return Job{
-		ID:        uuid.New().String(),
-		DataStore: datastore,
-	}
+func (p *DataStoreTestPipeline) NewJob(datastore datastore.DataStore) executor.Job {
+	job := executor.NewJob()
+	job.ID = uuid.New().String()
+	job.MemoryDataStore = datastore
+	job.Run.TraceID = id.NewRandGenerator().TraceID()
+
+	return job
 }
 
-func (p *DataStoreTestPipeline) Run(ctx context.Context, job Job) {
+func (p *DataStoreTestPipeline) Run(ctx context.Context, job executor.Job) {
 	p.Pipeline.Begin(ctx, job)
 }
 
@@ -56,7 +60,7 @@ func (p *DataStoreTestPipeline) Unsubscribe(jobID string) {
 	p.dsTestListener.Unsubscribe(jobID)
 }
 
-func getTraceDB(ctx context.Context, ds datastore.DataStore, newTraceDBFn tracedb.FactoryFunc) (tracedb.TraceDB, error) {
+func getTraceDB(ds datastore.DataStore, newTraceDBFn tracedb.FactoryFunc) (tracedb.TraceDB, error) {
 	tdb, err := newTraceDBFn(ds)
 	if err != nil {
 		return nil, fmt.Errorf(`cannot get tracedb from DataStore config with ID "%s": %w`, ds.ID, err)

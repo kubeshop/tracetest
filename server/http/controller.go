@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/http/validation"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
@@ -83,8 +84,8 @@ type transactionRunner interface {
 }
 
 type dataStoreTestRunner interface {
-	Run(context.Context, testconnection.Job)
-	NewJob(datastore.DataStore) testconnection.Job
+	Run(context.Context, executor.Job)
+	NewJob(datastore.DataStore) executor.Job
 	Subscribe(string, testconnection.NotifierFn)
 	Unsubscribe(string)
 }
@@ -689,8 +690,10 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 
 	job := c.dsTestPipeline.NewJob(ds)
 
+	job.Headers.Set(string(middleware.TenantIDKey), middleware.TenantIDFromContext(ctx))
+
 	wg := sync.WaitGroup{}
-	c.dsTestPipeline.Subscribe(job.ID, func(result testconnection.Job) {
+	c.dsTestPipeline.Subscribe(job.ID, func(result executor.Job) {
 		job = result
 		c.dsTestPipeline.Unsubscribe(job.ID)
 		wg.Done()

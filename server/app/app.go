@@ -267,10 +267,11 @@ func (app *App) Start(opts ...appOption) error {
 
 	dsTestListener := testconnection.NewListener()
 	dsTestPipeline := buildDataStoreTestPipeline(
+		pool,
 		dsTestListener,
 		tracer,
 		tracedbFactory,
-		dataStoreRepo,
+		app.cfg,
 	)
 
 	dsTestPipeline.Start()

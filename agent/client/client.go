@@ -26,9 +26,10 @@ type Client struct {
 	sessionConfig *SessionConfig
 	done          chan bool
 
-	triggerListener  func(context.Context, *proto.TriggerRequest) error
-	pollListener     func(context.Context, *proto.PollingRequest) error
-	shutdownListener func(context.Context, *proto.ShutdownRequest) error
+	triggerListener             func(context.Context, *proto.TriggerRequest) error
+	pollListener                func(context.Context, *proto.PollingRequest) error
+	shutdownListener            func(context.Context, *proto.ShutdownRequest) error
+	dataStoreConnectionListener func(context.Context, *proto.DataStoreConnectionTestRequest) error
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -61,6 +62,11 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
+	err = c.startDataStoreConnectionTestListener(ctx)
+	if err != nil {
+		return err
+	}
+
 	c.startHearthBeat(ctx)
 
 	return nil
@@ -86,6 +92,10 @@ func (c *Client) Close() error {
 
 func (c *Client) OnTriggerRequest(listener func(context.Context, *proto.TriggerRequest) error) {
 	c.triggerListener = listener
+}
+
+func (c *Client) OnDataStoreTestConnectionRequest(listener func(context.Context, *proto.DataStoreConnectionTestRequest) error) {
+	c.dataStoreConnectionListener = listener
 }
 
 func (c *Client) OnPollingRequest(listener func(context.Context, *proto.PollingRequest) error) {

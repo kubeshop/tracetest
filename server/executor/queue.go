@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/http/middleware"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -69,6 +70,7 @@ func (h headers) SetBool(key string, value bool) {
 }
 
 type Job struct {
+	ID      string
 	Headers *headers
 
 	TestSuite    testsuite.TestSuite
@@ -79,23 +81,31 @@ type Job struct {
 
 	PollingProfile pollingprofile.PollingProfile
 	DataStore      datastore.DataStore
+
+	// for data store test
+	MemoryDataStore datastore.DataStore
+	TestResult      model.ConnectionResult
 }
 
 type JsonJob struct {
-	Headers          *headers `json:"headers"`
-	TestSuiteID      string   `json:"test_suite_id"`
-	TestSuiteRunID   int      `json:"test_suite_run_id"`
-	TestID           string   `json:"test_id"`
-	TestVersion      int      `json:"test_version"`
-	RunID            int      `json:"run_id"`
-	TraceID          string   `json:"trace_id"`
-	PollingProfileID string   `json:"polling_profile_id"`
-	DataStoreID      string   `json:"data_store_id"`
+	Headers          *headers               `json:"headers"`
+	ID               string                 `json:"id"`
+	TestSuiteID      string                 `json:"test_suite_id"`
+	TestSuiteRunID   int                    `json:"test_suite_run_id"`
+	TestID           string                 `json:"test_id"`
+	TestVersion      int                    `json:"test_version"`
+	RunID            int                    `json:"run_id"`
+	TraceID          string                 `json:"trace_id"`
+	PollingProfileID string                 `json:"polling_profile_id"`
+	DataStoreID      string                 `json:"data_store_id"`
+	MemoryDataStore  datastore.DataStore    `json:"memory_data_store"`
+	TestResult       model.ConnectionResult `json:"test_result"`
 }
 
 func (job Job) MarshalJSON() ([]byte, error) {
 	return json.Marshal(JsonJob{
 		Headers:          job.Headers,
+		ID:               job.ID,
 		TestSuiteID:      job.TestSuite.ID.String(),
 		TestSuiteRunID:   job.TestSuiteRun.ID,
 		TestID:           job.Test.ID.String(),
@@ -104,6 +114,8 @@ func (job Job) MarshalJSON() ([]byte, error) {
 		TraceID:          job.Run.TraceID.String(),
 		PollingProfileID: job.PollingProfile.ID.String(),
 		DataStoreID:      job.DataStore.ID.String(),
+		MemoryDataStore:  job.MemoryDataStore,
+		TestResult:       job.TestResult,
 	})
 }
 
@@ -128,6 +140,9 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	job.Run.TraceID = traceID
 	job.PollingProfile.ID = id.ID(jj.PollingProfileID)
 	job.DataStore.ID = id.ID(jj.DataStoreID)
+	job.MemoryDataStore = jj.MemoryDataStore
+	job.TestResult = jj.TestResult
+	job.ID = jj.ID
 
 	return nil
 }

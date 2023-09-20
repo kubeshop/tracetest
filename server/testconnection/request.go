@@ -3,44 +3,44 @@ package testconnection
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
-	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
 
+type dsTestConnectionRequest struct {
+	outputQueue  pipeline.Enqueuer[executor.Job]
+	tracer       trace.Tracer
+	newTraceDBFn tracedb.FactoryFunc
+	enabled      bool
+}
+
 func NewDsTestConnectionRequest(
-	dsTestListener *Listener,
 	tracer trace.Tracer,
 	newTraceDBFn tracedb.FactoryFunc,
-	dsRepo resourcemanager.Current[datastore.DataStore],
+	enabled bool,
 ) *dsTestConnectionRequest {
 	return &dsTestConnectionRequest{
-		dsTestListener: dsTestListener,
-		tracer:         tracer,
-		newTraceDBFn:   newTraceDBFn,
-		dsRepo:         dsRepo,
+		tracer:       tracer,
+		newTraceDBFn: newTraceDBFn,
+		enabled:      enabled,
 	}
 }
 
-type dsTestConnectionRequest struct {
-	dsTestListener *Listener
-	outputQueue    pipeline.Enqueuer[Job]
-	tracer         trace.Tracer
-	newTraceDBFn   tracedb.FactoryFunc
-	dsRepo         resourcemanager.Current[datastore.DataStore]
-}
-
-func (w *dsTestConnectionRequest) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
+func (w *dsTestConnectionRequest) SetOutputQueue(queue pipeline.Enqueuer[executor.Job]) {
 	w.outputQueue = queue
 }
 
-func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job Job) {
-	ctx, pollingSpan := w.tracer.Start(ctx, "triggerResolverWorker.ProcessItem")
+func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job executor.Job) {
+	if !w.enabled {
+		return
+	}
+
+	ctx, pollingSpan := w.tracer.Start(ctx, "dsTestConnectionRequest.ProcessItem")
 	defer pollingSpan.End()
 
-	traceDB, err := getTraceDB(ctx, job.DataStore, w.newTraceDBFn)
+	traceDB, err := getTraceDB(job.MemoryDataStore, w.newTraceDBFn)
 
 	if err != nil {
 		handleError(err, pollingSpan)
@@ -51,6 +51,7 @@ func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job Job) {
 		connectionResult := testableTraceDB.TestConnection(ctx)
 
 		job.TestResult = connectionResult
-		w.dsTestListener.Notify(job)
 	}
+
+	w.outputQueue.Enqueue(ctx, job)
 }
