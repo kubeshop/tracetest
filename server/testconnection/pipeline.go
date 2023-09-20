@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/http/middleware"
@@ -59,7 +58,6 @@ func (p *DataStoreTestPipeline) NewJob(ctx context.Context, datastore datastore.
 }
 
 func (p *DataStoreTestPipeline) Run(ctx context.Context, job Job) {
-	spew.Dump(job)
 	p.Pipeline.Begin(ctx, job)
 }
 
