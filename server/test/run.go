@@ -56,7 +56,7 @@ func (r Run) ExecutionTime() int {
 
 func (r Run) TriggerTime() int {
 	diff := timing.TimeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt)
-	return int(diff.Microseconds())
+	return int(diff.Milliseconds())
 }
 
 func (r Run) Start() Run {

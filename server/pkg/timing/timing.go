@@ -11,7 +11,7 @@ var Now = func() time.Time {
 func TimeDiff(start, end time.Time) time.Duration {
 	var endDate time.Time
 	if !dateIsZero(end) {
-		endDate = end
+		endDate = end.UTC()
 	} else {
 		endDate = Now()
 	}
