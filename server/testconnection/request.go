@@ -5,6 +5,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -42,7 +43,8 @@ func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job Job) {
 	traceDB, err := getTraceDB(job.DataStore, w.newTraceDBFn)
 
 	if err != nil {
-		handleError(err, pollingSpan)
+		pollingSpan.RecordError(err)
+		pollingSpan.SetAttributes(attribute.String("tracetest.run.trace_poller.error", err.Error()))
 		return
 	}
 

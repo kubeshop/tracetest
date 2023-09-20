@@ -1,27 +1,33 @@
 package testconnection
 
 import (
+	"fmt"
 	"sync"
 )
 
 type NotifierFn func(Job)
 
 type Listener struct {
-	subscriptions map[string][]NotifierFn
+	subscriptions map[string]NotifierFn
 	mutex         sync.Mutex
 }
 
 func NewListener() *Listener {
 	return &Listener{
-		subscriptions: make(map[string][]NotifierFn),
+		subscriptions: make(map[string]NotifierFn),
 	}
 }
 
-func (m *Listener) Subscribe(jobID string, notifier NotifierFn) {
+func (m *Listener) Subscribe(jobID string, notifier NotifierFn) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	m.subscriptions[jobID] = append(m.subscriptions[jobID], notifier)
+	if m.subscriptions[jobID] != nil {
+		return fmt.Errorf("already subscribed to job %s", jobID)
+	}
+
+	m.subscriptions[jobID] = notifier
+	return nil
 }
 
 func (m *Listener) Unsubscribe(jobID string) {
@@ -32,7 +38,12 @@ func (m *Listener) Unsubscribe(jobID string) {
 }
 
 func (m *Listener) Notify(job Job) {
-	for _, sub := range m.subscriptions[job.ID] {
-		sub(job)
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	notifierFn := m.subscriptions[job.ID]
+
+	if notifierFn != nil {
+		notifierFn(job)
 	}
 }

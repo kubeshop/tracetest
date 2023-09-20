@@ -42,7 +42,7 @@ type controller struct {
 	testSuiteRepository    testSuiteRepository
 	testSuiteRunRepository testSuiteRunRepository
 
-	dsTestPipeline dataStoreTestRunner
+	dsTestPipeline dataStoreTester
 
 	variableSetGetter variableSetGetter
 	newTraceDBFn      func(ds datastore.DataStore) (tracedb.TraceDB, error)
@@ -82,10 +82,10 @@ type transactionRunner interface {
 	Run(context.Context, testsuite.TestSuite, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) testsuite.TestSuiteRun
 }
 
-type dataStoreTestRunner interface {
+type dataStoreTester interface {
 	Run(context.Context, testconnection.Job)
 	NewJob(context.Context, datastore.DataStore) testconnection.Job
-	Subscribe(string, testconnection.NotifierFn)
+	Subscribe(string, testconnection.NotifierFn) error
 	Unsubscribe(string)
 }
 
@@ -99,7 +99,7 @@ func NewController(
 	testRunner testRunner,
 	transactionRunner transactionRunner,
 
-	dsTestPipeline dataStoreTestRunner,
+	dsTestPipeline dataStoreTester,
 
 	testRunEvents model.TestRunEventRepository,
 	transactionRepository testSuiteRepository,
@@ -689,11 +689,15 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	job := c.dsTestPipeline.NewJob(ctx, ds)
 
 	wg := sync.WaitGroup{}
-	c.dsTestPipeline.Subscribe(job.ID, func(result testconnection.Job) {
+	err := c.dsTestPipeline.Subscribe(job.ID, func(result testconnection.Job) {
 		job = result
 		c.dsTestPipeline.Unsubscribe(job.ID)
 		wg.Done()
 	})
+
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
 
 	c.dsTestPipeline.Run(ctx, job)
 	wg.Add(1)

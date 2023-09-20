@@ -10,12 +10,10 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type Job struct {
-	Headers    map[string]string      `json:"headers"`
+	TenantID   string                 `json:"tenantId"`
 	ID         string                 `json:"id"`
 	DataStore  datastore.DataStore    `json:"datastore"`
 	TestResult model.ConnectionResult `json:"testResult"`
@@ -23,7 +21,7 @@ type Job struct {
 
 type DsTestListener interface {
 	Notify(Job)
-	Subscribe(jobID string, notifier NotifierFn)
+	Subscribe(jobID string, notifier NotifierFn) error
 	Unsubscribe(jobID string)
 }
 
@@ -47,22 +45,19 @@ func NewDataStoreTestPipeline(
 }
 
 func (p *DataStoreTestPipeline) NewJob(ctx context.Context, datastore datastore.DataStore) Job {
-	job := Job{
-		Headers: make(map[string]string),
+	return Job{
+		ID:        uuid.New().String(),
+		DataStore: datastore,
+		TenantID:  middleware.TenantIDFromContext(ctx),
 	}
-	job.ID = uuid.New().String()
-	job.DataStore = datastore
-	job.Headers[string(middleware.TenantIDKey)] = middleware.TenantIDFromContext(ctx)
-
-	return job
 }
 
 func (p *DataStoreTestPipeline) Run(ctx context.Context, job Job) {
 	p.Pipeline.Begin(ctx, job)
 }
 
-func (p *DataStoreTestPipeline) Subscribe(jobID string, notifier NotifierFn) {
-	p.dsTestListener.Subscribe(jobID, notifier)
+func (p *DataStoreTestPipeline) Subscribe(jobID string, notifier NotifierFn) error {
+	return p.dsTestListener.Subscribe(jobID, notifier)
 }
 
 func (p *DataStoreTestPipeline) Unsubscribe(jobID string) {
@@ -76,9 +71,4 @@ func getTraceDB(ds datastore.DataStore, newTraceDBFn tracedb.FactoryFunc) (trace
 	}
 
 	return tdb, nil
-}
-
-func handleError(err error, span trace.Span) {
-	span.RecordError(err)
-	span.SetAttributes(attribute.String("tracetest.run.trace_poller.error", err.Error()))
 }
