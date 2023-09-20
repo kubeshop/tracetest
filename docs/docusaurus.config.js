@@ -182,6 +182,10 @@ const config = {
             from: ['/examples-tutorials/recipes/running-tracetest-with-testkube' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
+            to: '/ci-cd-automation/tekton-pipeline',
+            from: ['/examples-tutorials/recipes/running-tracetest-with-tekton' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
             to: '/analyzer/concepts',
             from: ['/concepts/tracetest-analyzer-concepts'],
           },

@@ -290,6 +290,56 @@ const sidebars = {
       ],
     },
     {
+      type: "category",
+      label: "CI/CD Automation",
+      link: {
+        type: "doc",
+        id: "ci-cd-automation/overview",
+      },
+      items: [
+        {
+          type: "doc",
+          id: "ci-cd-automation/github-actions-pipeline",
+          label: "GitHub Actions Pipeline",
+        },
+        {
+          type: "doc",
+          id: "ci-cd-automation/testkube-pipeline",
+          label: "Testkube Kubernetes-native Test Runner Pipeline",
+        },
+        {
+          type: "doc",
+          id: "ci-cd-automation/tekton-pipeline",
+          label: "Tekton Cloud-native Pipeline",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Tools & Integrations",
+      link: {
+        type: "doc",
+        id: "tools-and-integrations/overview",
+      },
+      items: [
+        {
+          type: "doc",
+          id: "tools-and-integrations/keptn",
+          label: "Keptn",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/k6",
+          label: "K6",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/testkube",
+          label: "Testkube",
+        },
+      ],
+    },
+    {
       type: "doc",
       id: "examples-tutorials/webinars",
       label: "Webinars",
@@ -787,54 +837,14 @@ const sidebars = {
       ],
     },
     {
-      type: "category",
+      type: "link",
       label: "CI/CD Automation",
-      link: {
-        type: "doc",
-        id: "ci-cd-automation/overview",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "ci-cd-automation/github-actions-pipeline",
-          label: "GitHub Actions Pipeline",
-        },
-        {
-          type: "doc",
-          id: "ci-cd-automation/testkube-pipeline",
-          label: "Testkube Kubernetes-native Test Runner Pipeline",
-        },
-        {
-          type: "doc",
-          id: "ci-cd-automation/tekton-pipeline",
-          label: "Tekton Cloud-native Pipeline",
-        },
-      ],
+      href: "/ci-cd-automation/overview",
     },
     {
-      type: "category",
+      type: "link",
       label: "Tools & Integrations",
-      link: {
-        type: "doc",
-        id: "tools-and-integrations/overview",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "tools-and-integrations/keptn",
-          label: "Keptn",
-        },
-        {
-          type: "doc",
-          id: "tools-and-integrations/k6",
-          label: "K6",
-        },
-        {
-          type: "doc",
-          id: "tools-and-integrations/testkube",
-          label: "Testkube",
-        },
-      ],
+      href: "/tools-and-integrations/overview",
     },
     {
       type: "link",
