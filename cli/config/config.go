@@ -17,6 +17,8 @@ var (
 	Version                 = "dev"
 	Env                     = "dev"
 	DefaultCloudAPIEndpoint = "http://localhost:8090"
+	DefaultCloudDomain      = "tracetest.io"
+	DefaultCloudPath        = "/"
 )
 
 type ConfigFlags struct {
@@ -126,8 +128,7 @@ func ParseServerURL(serverURL string) (scheme, endpoint string, serverPath *stri
 		return "", "", nil, fmt.Errorf("could not parse server URL: %w", err)
 	}
 
-	defaultPath := "/"
-	path := &defaultPath
+	var path *string
 	if url.Path != "" {
 		path = &url.Path
 	}

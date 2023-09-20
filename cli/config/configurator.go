@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/pkg/oauth"
@@ -58,6 +59,10 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 	scheme, endpoint, path, err := ParseServerURL(serverURL)
 	if err != nil {
 		return err
+	}
+
+	if strings.Contains(serverURL, DefaultCloudDomain) {
+		path = &DefaultCloudPath
 	}
 
 	cfg := Config{
