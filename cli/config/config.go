@@ -17,6 +17,8 @@ var (
 	Version                 = "dev"
 	Env                     = "dev"
 	DefaultCloudAPIEndpoint = "http://localhost:8090"
+	DefaultCloudDomain      = "tracetest.io"
+	DefaultCloudPath        = "/"
 )
 
 type ConfigFlags struct {

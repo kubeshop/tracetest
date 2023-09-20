@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/kubeshop/tracetest/cli/ui"
@@ -115,7 +116,7 @@ func (s *OAuthServer) start() error {
 
 func (s *OAuthServer) callback(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", s.frontendEndpoint)
+	w.Header().Set("Access-Control-Allow-Origin", strings.TrimSuffix(s.frontendEndpoint, "/"))
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": true}`))
