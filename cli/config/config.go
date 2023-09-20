@@ -126,7 +126,8 @@ func ParseServerURL(serverURL string) (scheme, endpoint string, serverPath *stri
 		return "", "", nil, fmt.Errorf("could not parse server URL: %w", err)
 	}
 
-	var path *string
+	defaultPath := "/"
+	path := &defaultPath
 	if url.Path != "" {
 		path = &url.Path
 	}
