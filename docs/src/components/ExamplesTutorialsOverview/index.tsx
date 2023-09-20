@@ -28,6 +28,26 @@ const ExamplesTutorialsOverview = [
     button: 'Start building',
   },
   {
+    name: '⚙️ CI/CD Automation',
+    url: '/ci-cd-automation/overview',
+    description: (
+      <Translate >
+        Run Tracetest in a CI/CD pipeline!
+      </Translate>
+    ),
+    button: 'Automate',
+  },
+  {
+    name: '🛠️ Tools & Integrations',
+    url: '/tools-and-integrations/overview',
+    description: (
+      <Translate>
+        Check out tools and integrations with Tracetest.
+      </Translate>
+    ),
+    button: 'Integrate',
+  },
+  {
     name: '🎙️ Webinars',
     url: '/examples-tutorials/webinars',
     description: (
