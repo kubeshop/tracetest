@@ -4,24 +4,32 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/google/uuid"
 	"github.com/kubeshop/tracetest/server/datastore"
-	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/http/middleware"
+	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
+type Job struct {
+	Headers    map[string]string      `json:"headers"`
+	ID         string                 `json:"id"`
+	DataStore  datastore.DataStore    `json:"datastore"`
+	TestResult model.ConnectionResult `json:"testResult"`
+}
+
 type DsTestListener interface {
-	Notify(executor.Job)
+	Notify(Job)
 	Subscribe(jobID string, notifier NotifierFn)
 	Unsubscribe(jobID string)
 }
 
 type DataStoreTestPipeline struct {
-	*pipeline.Pipeline[executor.Job]
+	*pipeline.Pipeline[Job]
 	dsTestListener DsTestListener
 }
 
@@ -30,7 +38,7 @@ type Configurer[T any] struct{}
 func (c *Configurer[Job]) Configure(_ *pipeline.Queue[Job]) {}
 
 func NewDataStoreTestPipeline(
-	pipeline *pipeline.Pipeline[executor.Job],
+	pipeline *pipeline.Pipeline[Job],
 	listener DsTestListener,
 ) *DataStoreTestPipeline {
 	return &DataStoreTestPipeline{
@@ -39,16 +47,19 @@ func NewDataStoreTestPipeline(
 	}
 }
 
-func (p *DataStoreTestPipeline) NewJob(datastore datastore.DataStore) executor.Job {
-	job := executor.NewJob()
+func (p *DataStoreTestPipeline) NewJob(ctx context.Context, datastore datastore.DataStore) Job {
+	job := Job{
+		Headers: make(map[string]string),
+	}
 	job.ID = uuid.New().String()
-	job.MemoryDataStore = datastore
-	job.Run.TraceID = id.NewRandGenerator().TraceID()
+	job.DataStore = datastore
+	job.Headers[string(middleware.TenantIDKey)] = middleware.TenantIDFromContext(ctx)
 
 	return job
 }
 
-func (p *DataStoreTestPipeline) Run(ctx context.Context, job executor.Job) {
+func (p *DataStoreTestPipeline) Run(ctx context.Context, job Job) {
+	spew.Dump(job)
 	p.Pipeline.Begin(ctx, job)
 }
 

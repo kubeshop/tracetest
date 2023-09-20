@@ -2,11 +2,9 @@ package testconnection
 
 import (
 	"sync"
-
-	"github.com/kubeshop/tracetest/server/executor"
 )
 
-type NotifierFn func(executor.Job)
+type NotifierFn func(Job)
 
 type Listener struct {
 	subscriptions map[string][]NotifierFn
@@ -33,7 +31,7 @@ func (m *Listener) Unsubscribe(jobID string) {
 	delete(m.subscriptions, jobID)
 }
 
-func (m *Listener) Notify(job executor.Job) {
+func (m *Listener) Notify(job Job) {
 	for _, sub := range m.subscriptions[job.ID] {
 		sub(job)
 	}

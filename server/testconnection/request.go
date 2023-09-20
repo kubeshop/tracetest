@@ -3,14 +3,13 @@ package testconnection
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type dsTestConnectionRequest struct {
-	outputQueue  pipeline.Enqueuer[executor.Job]
+	outputQueue  pipeline.Enqueuer[Job]
 	tracer       trace.Tracer
 	newTraceDBFn tracedb.FactoryFunc
 	enabled      bool
@@ -28,11 +27,11 @@ func NewDsTestConnectionRequest(
 	}
 }
 
-func (w *dsTestConnectionRequest) SetOutputQueue(queue pipeline.Enqueuer[executor.Job]) {
+func (w *dsTestConnectionRequest) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	w.outputQueue = queue
 }
 
-func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job executor.Job) {
+func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job Job) {
 	if !w.enabled {
 		return
 	}
@@ -40,7 +39,7 @@ func (w *dsTestConnectionRequest) ProcessItem(ctx context.Context, job executor.
 	ctx, pollingSpan := w.tracer.Start(ctx, "dsTestConnectionRequest.ProcessItem")
 	defer pollingSpan.End()
 
-	traceDB, err := getTraceDB(job.MemoryDataStore, w.newTraceDBFn)
+	traceDB, err := getTraceDB(job.DataStore, w.newTraceDBFn)
 
 	if err != nil {
 		handleError(err, pollingSpan)

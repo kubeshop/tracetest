@@ -15,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/mappings"
-	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/http/validation"
 	"github.com/kubeshop/tracetest/server/junit"
 	"github.com/kubeshop/tracetest/server/model"
@@ -84,8 +83,8 @@ type transactionRunner interface {
 }
 
 type dataStoreTestRunner interface {
-	Run(context.Context, executor.Job)
-	NewJob(datastore.DataStore) executor.Job
+	Run(context.Context, testconnection.Job)
+	NewJob(context.Context, datastore.DataStore) testconnection.Job
 	Subscribe(string, testconnection.NotifierFn)
 	Unsubscribe(string)
 }
@@ -687,13 +686,10 @@ func takeResources(transactions []testsuite.TestSuite, tests []test.Test, take, 
 // TestConnection implements openapi.ApiApiService
 func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataStore) (openapi.ImplResponse, error) {
 	ds := c.mappers.In.DataStore(dataStore)
-
-	job := c.dsTestPipeline.NewJob(ds)
-
-	job.Headers.Set(string(middleware.TenantIDKey), middleware.TenantIDFromContext(ctx))
+	job := c.dsTestPipeline.NewJob(ctx, ds)
 
 	wg := sync.WaitGroup{}
-	c.dsTestPipeline.Subscribe(job.ID, func(result executor.Job) {
+	c.dsTestPipeline.Subscribe(job.ID, func(result testconnection.Job) {
 		job = result
 		c.dsTestPipeline.Unsubscribe(job.ID)
 		wg.Done()

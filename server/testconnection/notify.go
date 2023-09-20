@@ -3,7 +3,6 @@ package testconnection
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -23,11 +22,11 @@ func NewDsTestConnectionNotify(
 	}
 }
 
-func (w *dsTestConnectionNotify) SetOutputQueue(queue pipeline.Enqueuer[executor.Job]) {
+func (w *dsTestConnectionNotify) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 	// noop
 }
 
-func (w *dsTestConnectionNotify) ProcessItem(ctx context.Context, job executor.Job) {
+func (w *dsTestConnectionNotify) ProcessItem(ctx context.Context, job Job) {
 	_, pollingSpan := w.tracer.Start(ctx, "dsTestConnectionNotify.ProcessItem")
 	defer pollingSpan.End()
 
