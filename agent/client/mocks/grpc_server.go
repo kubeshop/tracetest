@@ -13,10 +13,11 @@ import (
 
 type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
-	port               int
-	triggerChannel     chan *proto.TriggerRequest
-	pollingChannel     chan *proto.PollingRequest
-	terminationChannel chan *proto.ShutdownRequest
+	port                 int
+	triggerChannel       chan *proto.TriggerRequest
+	pollingChannel       chan *proto.PollingRequest
+	terminationChannel   chan *proto.ShutdownRequest
+	dataStoreTestChannel chan *proto.DataStoreConnectionTestRequest
 
 	lastTriggerResponse *proto.TriggerResponse
 	lastPollingResponse *proto.PollingResponse
@@ -24,9 +25,10 @@ type GrpcServerMock struct {
 
 func NewGrpcServer() *GrpcServerMock {
 	server := &GrpcServerMock{
-		triggerChannel:     make(chan *proto.TriggerRequest),
-		pollingChannel:     make(chan *proto.PollingRequest),
-		terminationChannel: make(chan *proto.ShutdownRequest),
+		triggerChannel:       make(chan *proto.TriggerRequest),
+		pollingChannel:       make(chan *proto.PollingRequest),
+		terminationChannel:   make(chan *proto.ShutdownRequest),
+		dataStoreTestChannel: make(chan *proto.DataStoreConnectionTestRequest),
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -102,6 +104,20 @@ func (s *GrpcServerMock) RegisterPollerAgent(id *proto.AgentIdentification, stre
 	for {
 		pollerRequest := <-s.pollingChannel
 		err := stream.Send(pollerRequest)
+		if err != nil {
+			log.Println("could not send polling request to agent: %w", err)
+		}
+	}
+}
+
+func (s *GrpcServerMock) RegisterDataStoreConnectionTestAgent(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterDataStoreConnectionTestAgentServer) error {
+	if id.Token != "token" {
+		return fmt.Errorf("could not validate token")
+	}
+
+	for {
+		dsTestRequest := <-s.dataStoreTestChannel
+		err := stream.Send(dsTestRequest)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
