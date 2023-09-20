@@ -28,6 +28,12 @@ service Orchestrator {
 
     // Ping is used to check if the agent is still connected
     rpc Ping(AgentIdentification) returns (Empty) {}
+
+    // Register an agent to listen for datastore connection test requests
+    rpc RegisterDataStoreConnectionTestAgent(AgentIdentification) returns (stream DataStoreConnectionTestRequest) {}
+
+    // Sends datastore connection test result back to the server
+    rpc SendDataStoreConnectionTestResult(DataStoreConnectionTestResponse) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -168,6 +174,32 @@ message GrpcResponse {
 
 message TraceIdResponse {
     string id = 1;
+}
+
+message DataStoreConnectionTestRequest {
+    string requestID = 1;
+    DataStore datastore = 5;
+}
+
+message DataStoreConnectionTestResponse {
+    string requestID = 1;
+    bool successful = 2;
+    AgentIdentification agentIdentification = 3;
+    DataStoreConnectionTestSteps steps = 4;
+}
+
+message DataStoreConnectionTestSteps {
+    DataStoreConnectionTestStep portCheck = 1;
+    DataStoreConnectionTestStep connectivity = 2;
+    DataStoreConnectionTestStep authentication = 3;
+    DataStoreConnectionTestStep fetchTraces = 4;
+}
+
+message DataStoreConnectionTestStep {
+    bool passed = 1;
+    string status = 2;
+    string message = 3;
+    string error = 4;
 }
 
 message PollingRequest {

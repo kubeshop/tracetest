@@ -21,7 +21,9 @@ func NewClient(ctx context.Context, config config.Config) (*client.Client, error
 
 	triggerWorker := workers.NewTriggerWorker(client)
 	pollingWorker := workers.NewPollerWorker(client)
+	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(client)
 
+	client.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
 	client.OnTriggerRequest(triggerWorker.Trigger)
 	client.OnPollingRequest(pollingWorker.Poll)
 	client.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {

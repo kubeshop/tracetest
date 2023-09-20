@@ -81,6 +81,11 @@ var serverOptions = options{
 		defaultValue: "true",
 		description:  "enable local trace fetching",
 	},
+	{
+		key:          "dataStorePipelines.testConnection.enabled",
+		defaultValue: "true",
+		description:  "enable local data store test connection",
+	},
 }
 
 func init() {
@@ -156,4 +161,11 @@ func (c *AppConfig) TestPipelineTraceFetchingEnabled() bool {
 	defer c.mu.Unlock()
 
 	return c.vp.GetString("testPipelines.traceFetch.enabled") == "true"
+}
+
+func (c *AppConfig) DataStorePipelineTestConnectionEnabled() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.vp.GetString("dataStorePipelines.testConnection.enabled") == "true"
 }
