@@ -9,16 +9,13 @@ import (
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
+	"github.com/kubeshop/tracetest/server/pkg/timing"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 )
 
 var (
-	Now = func() time.Time {
-		return time.Now().UTC()
-	}
-
 	IDGen = id.NewRandGenerator()
 )
 
@@ -28,7 +25,7 @@ func NewRun() Run {
 		TraceID:   IDGen.TraceID(),
 		SpanID:    IDGen.SpanID(),
 		State:     RunStateCreated,
-		CreatedAt: Now(),
+		CreatedAt: timing.Now(),
 	}
 }
 
@@ -43,53 +40,29 @@ func (r Run) TransactionStepResourceID() string {
 func (r Run) Copy() Run {
 	r.ID = 0
 	r.Results = nil
-	r.CreatedAt = Now()
+	r.CreatedAt = timing.Now()
 
 	return r
 }
 
 func (r Run) ExecutionTime() int {
-	return durationInSeconds(
-		timeDiff(r.CreatedAt, r.CompletedAt),
-	)
+	diff := timing.TimeDiff(r.CreatedAt, r.CompletedAt)
+	return int(math.Ceil(diff.Seconds()))
 }
 
 func (r Run) TriggerTime() int {
-	return durationInMillieconds(
-		timeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt),
-	)
-}
-
-func timeDiff(start, end time.Time) time.Duration {
-	var endDate time.Time
-	if !dateIsZero(end) {
-		endDate = end
-	} else {
-		endDate = Now()
-	}
-	return endDate.Sub(start)
-}
-
-func durationInMillieconds(d time.Duration) int {
-	return int(d.Milliseconds())
-}
-
-func durationInSeconds(d time.Duration) int {
-	return int(math.Ceil(d.Seconds()))
-}
-
-func dateIsZero(in time.Time) bool {
-	return in.IsZero() || in.Unix() == 0
+	diff := timing.TimeDiff(r.ServiceTriggeredAt, r.ServiceTriggerCompletedAt)
+	return int(diff.Milliseconds())
 }
 
 func (r Run) Start() Run {
 	r.State = RunStateExecuting
-	r.ServiceTriggeredAt = Now()
+	r.ServiceTriggeredAt = timing.Now()
 	return r
 }
 
 func (r Run) TriggerCompleted(tr trigger.TriggerResult) Run {
-	r.ServiceTriggerCompletedAt = Now()
+	r.ServiceTriggerCompletedAt = timing.Now()
 	r.TriggerResult = tr
 	return r
 }
@@ -128,7 +101,7 @@ func (r Run) SuccessfullyAsserted(
 }
 
 func (r Run) Finish() Run {
-	r.CompletedAt = Now()
+	r.CompletedAt = timing.Now()
 	return r
 }
 

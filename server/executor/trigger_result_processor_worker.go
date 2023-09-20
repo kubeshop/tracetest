@@ -92,6 +92,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 	}
 
 	job.Run.State = test.RunStateAwaitingTrace
+
 	r.handleDBError(job.Run, r.updater.Update(ctx, job.Run))
 
 	r.outputQueue.Enqueue(ctx, job)
@@ -120,6 +121,7 @@ func (r triggerResultProcessorWorker) emitMismatchEndpointEvent(ctx context.Cont
 }
 
 func (r triggerResultProcessorWorker) handleExecutionResult(run test.Run) test.Run {
+	run = run.TriggerCompleted(run.TriggerResult)
 	if run.TriggerResult.Error != nil {
 		run = run.TriggerFailed(fmt.Errorf(run.TriggerResult.Error.ErrorMessage))
 

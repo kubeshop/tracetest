@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kubeshop/tracetest/server/pkg/timing"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -124,8 +125,8 @@ func encodeSpan(s Span) encodedSpan {
 	return encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,
-		StartTime:  fmt.Sprintf("%d", s.StartTime.UnixMilli()),
-		EndTime:    fmt.Sprintf("%d", s.EndTime.UnixMilli()),
+		StartTime:  strconv.FormatInt(s.StartTime.UnixMilli(), 10),
+		EndTime:    strconv.FormatInt(s.EndTime.UnixMilli(), 10),
 		Attributes: s.Attributes,
 		Children:   encodeChildren(s.Children),
 	}
@@ -180,7 +181,7 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 }
 
 func getTimeFromString(value string) (time.Time, error) {
-	milliseconds, err := strconv.Atoi(value)
+	parsedValue, err := strconv.Atoi(value)
 	if err != nil {
 		// Maybe it is in RFC3339 format. Convert it for compatibility sake
 		output, err := time.Parse(time.RFC3339, value)
@@ -191,7 +192,7 @@ func getTimeFromString(value string) (time.Time, error) {
 		return output, nil
 	}
 
-	return time.UnixMilli(int64(milliseconds)), nil
+	return timing.ParseUnix(int64(parsedValue)), nil
 }
 
 func decodeChildren(parent *Span, children []encodedSpan, cache spanCache) ([]*Span, error) {
@@ -233,8 +234,8 @@ func (span Span) setMetadataAttributes() Span {
 	span.Attributes[TracetestMetadataFieldName] = span.Name
 	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
 	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
-	span.Attributes[TracetestMetadataFieldStartTime] = fmt.Sprintf("%d", span.StartTime.UnixNano())
-	span.Attributes[TracetestMetadataFieldEndTime] = fmt.Sprintf("%d", span.EndTime.UnixNano())
+	span.Attributes[TracetestMetadataFieldStartTime] = strconv.FormatInt(span.StartTime.UTC().UnixNano(), 10)
+	span.Attributes[TracetestMetadataFieldEndTime] = strconv.FormatInt(span.EndTime.UTC().UnixNano(), 10)
 
 	if span.Status != nil {
 		span.Attributes[TracetestMetadataFieldStatusCode] = span.Status.Code
@@ -249,13 +250,13 @@ func (span Span) setTriggerResultAttributes(result trigger.TriggerResult) Span {
 	case trigger.TriggerTypeHTTP:
 		resp := result.HTTP
 		jsonheaders, _ := json.Marshal(resp.Headers)
-		span.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+		span.Attributes["tracetest.response.status"] = strconv.Itoa(resp.StatusCode)
 		span.Attributes["tracetest.response.body"] = resp.Body
 		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
 	case trigger.TriggerTypeGRPC:
 		resp := result.GRPC
 		jsonheaders, _ := json.Marshal(resp.Metadata)
-		span.Attributes["tracetest.response.status"] = fmt.Sprintf("%d", resp.StatusCode)
+		span.Attributes["tracetest.response.status"] = strconv.Itoa(resp.StatusCode)
 		span.Attributes["tracetest.response.body"] = resp.Body
 		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
 	}
