@@ -16,10 +16,6 @@ import (
 )
 
 var (
-	Now = func() time.Time {
-		return time.Now().UTC()
-	}
-
 	IDGen = id.NewRandGenerator()
 )
 
@@ -29,7 +25,7 @@ func NewRun() Run {
 		TraceID:   IDGen.TraceID(),
 		SpanID:    IDGen.SpanID(),
 		State:     RunStateCreated,
-		CreatedAt: Now(),
+		CreatedAt: timing.Now(),
 	}
 }
 
@@ -44,7 +40,7 @@ func (r Run) TransactionStepResourceID() string {
 func (r Run) Copy() Run {
 	r.ID = 0
 	r.Results = nil
-	r.CreatedAt = Now()
+	r.CreatedAt = timing.Now()
 
 	return r
 }
@@ -61,12 +57,12 @@ func (r Run) TriggerTime() int {
 
 func (r Run) Start() Run {
 	r.State = RunStateExecuting
-	r.ServiceTriggeredAt = Now()
+	r.ServiceTriggeredAt = timing.Now()
 	return r
 }
 
 func (r Run) TriggerCompleted(tr trigger.TriggerResult) Run {
-	r.ServiceTriggerCompletedAt = Now()
+	r.ServiceTriggerCompletedAt = timing.Now()
 	r.TriggerResult = tr
 	return r
 }
@@ -105,7 +101,7 @@ func (r Run) SuccessfullyAsserted(
 }
 
 func (r Run) Finish() Run {
-	r.CompletedAt = Now()
+	r.CompletedAt = timing.Now()
 	return r
 }
 

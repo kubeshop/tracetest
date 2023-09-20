@@ -24,62 +24,54 @@ func TestRunExecutionTime(t *testing.T) {
 		{
 			name: "CompletedOk",
 			run: test.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
-				CompletedAt: time.Date(2022, 01, 25, 12, 45, 36, int(400*time.Millisecond), time.UTC),
+				CreatedAt:   timing.MustParse("2022-01-25T12:45:33.100000000Z"),
+				CompletedAt: timing.MustParse("2022-01-25T12:45:36.400000000Z"),
 			},
 			expected: 4,
 		},
 		{
 			name: "LessThan1Sec",
 			run: test.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
-				CompletedAt: time.Date(2022, 01, 25, 12, 45, 33, int(400*time.Millisecond), time.UTC),
+				CreatedAt:   timing.MustParse("2022-01-25T12:45:33.100000000Z"),
+				CompletedAt: timing.MustParse("2022-01-25T12:45:33.400000000Z"),
 			},
 			expected: 1,
 		},
 		{
 			name: "StillRunning",
 			run: test.Run{
-				CreatedAt: time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
+				CreatedAt: timing.MustParse("2022-01-25T12:45:33.100000000Z"),
 			},
-			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
+			now:      timing.MustParse("2022-01-25T12:45:34.300000000Z"),
 			expected: 2,
 		},
 		{
 			name: "ZeroedDate",
 			run: test.Run{
-				CreatedAt:   time.Date(2022, 01, 25, 12, 45, 33, int(100*time.Millisecond), time.UTC),
+				CreatedAt:   timing.MustParse("2022-01-25T12:45:33.100000000Z"),
 				CompletedAt: time.Unix(0, 0),
 			},
-			now:      time.Date(2022, 01, 25, 12, 45, 34, int(300*time.Millisecond), time.UTC),
+			now:      timing.MustParse("2022-01-25T12:45:34.300000000Z"),
 			expected: 2,
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			now := test.Now
+			now := timing.Now
 			if c.now.Unix() > 0 {
-				test.Now = func() time.Time {
+				timing.Now = func() time.Time {
 					return c.now
 				}
 			}
 
 			assert.Equal(t, c.expected, c.run.ExecutionTime())
-			test.Now = now
+			timing.Now = now
 		})
 	}
 }
 
 func TestRunTriggerTime(t *testing.T) {
-	parseDate := func(in string) time.Time {
-		date, err := time.Parse(time.RFC3339Nano, in)
-		if err != nil {
-			panic(fmt.Sprintf("error parsing date: %s", err))
-		}
-		return date
-	}
-	// 2006-01-02T15:04:05.999999999Z07:00
 	cases := []struct {
 		name     string
 		run      test.Run
@@ -89,34 +81,34 @@ func TestRunTriggerTime(t *testing.T) {
 		{
 			name: "CompletedOk",
 			run: test.Run{
-				ServiceTriggeredAt:        parseDate("2022-01-25T12:45:33.100000000Z"),
-				ServiceTriggerCompletedAt: parseDate("2022-01-25T12:45:36.400000000Z"),
+				ServiceTriggeredAt:        timing.MustParse("2022-01-25T12:45:33.100000000Z"),
+				ServiceTriggerCompletedAt: timing.MustParse("2022-01-25T12:45:36.400000000Z"),
 			},
 			expected: 3300,
 		},
 		{
 			name: "LessThan1Sec",
 			run: test.Run{
-				ServiceTriggeredAt:        parseDate("2022-01-25T12:45:33.100000000Z"),
-				ServiceTriggerCompletedAt: parseDate("2022-01-25T12:45:33.400000000Z"),
+				ServiceTriggeredAt:        timing.MustParse("2022-01-25T12:45:33.100000000Z"),
+				ServiceTriggerCompletedAt: timing.MustParse("2022-01-25T12:45:33.400000000Z"),
 			},
 			expected: 300,
 		},
 		{
 			name: "StillRunning",
 			run: test.Run{
-				ServiceTriggeredAt: parseDate("2022-01-25T12:45:33.100000000Z"),
+				ServiceTriggeredAt: timing.MustParse("2022-01-25T12:45:33.100000000Z"),
 			},
-			now:      parseDate("2022-01-25T12:45:34.300000000Z"),
+			now:      timing.MustParse("2022-01-25T12:45:34.300000000Z"),
 			expected: 1200,
 		},
 		{
 			name: "ZeroedDate",
 			run: test.Run{
-				ServiceTriggeredAt:        parseDate("2022-01-25T12:45:33.100000000Z"),
+				ServiceTriggeredAt:        timing.MustParse("2022-01-25T12:45:33.100000000Z"),
 				ServiceTriggerCompletedAt: time.Unix(0, 0),
 			},
-			now:      parseDate("2022-01-25T12:45:34.300000000Z"),
+			now:      timing.MustParse("2022-01-25T12:45:34.300000000Z"),
 			expected: 1200,
 		},
 	}
