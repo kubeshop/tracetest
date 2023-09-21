@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	Version                 = "dev"
-	Env                     = "dev"
-	DefaultCloudAPIEndpoint = "http://localhost:8090"
-	DefaultCloudDomain      = "tracetest.io"
-	DefaultCloudPath        = "/"
+	Version              = "dev"
+	Env                  = "dev"
+	DefaultCloudEndpoint = "http://localhost:3000/"
+	DefaultCloudDomain   = "tracetest.io"
+	DefaultCloudPath     = "/"
 )
 
 type ConfigFlags struct {
@@ -26,6 +26,7 @@ type ConfigFlags struct {
 	OrganizationID string
 	EnvironmentID  string
 	CI             bool
+	AgentApiKey    string
 }
 
 type Config struct {
@@ -36,6 +37,7 @@ type Config struct {
 	EnvironmentID  string  `yaml:"environmentID,omitempty"`
 	Token          string  `yaml:"token,omitempty"`
 	Jwt            string  `yaml:"jwt,omitempty"`
+	AgentApiKey    string  `yaml:"-"`
 
 	// cloud config
 	CloudAPIEndpoint string `yaml:"-"`
@@ -82,7 +84,7 @@ func LoadConfig(configFile string) (Config, error) {
 	}
 
 	if config.CloudAPIEndpoint == "" {
-		config.CloudAPIEndpoint = DefaultCloudAPIEndpoint
+		config.CloudAPIEndpoint = DefaultCloudEndpoint
 	}
 
 	homePath, err := os.UserHomeDir()
