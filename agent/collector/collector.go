@@ -3,7 +3,6 @@ package collector
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -41,19 +40,13 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer) error {
 		}
 	})
 
-	go func() {
-		err := grpcServer.Start()
-		if err != nil {
-			log.Println("ERROR: could not start gRPC OTLP listener: %w", err)
-		}
-	}()
+	if err = grpcServer.Start(); err != nil {
+		return fmt.Errorf("could not start gRPC OTLP listener: %w", err)
+	}
 
-	go func() {
-		err := httpServer.Start()
-		if err != nil {
-			log.Println("ERROR: could not start HTTP OTLP listener: %w", err)
-		}
-	}()
+	if err = httpServer.Start(); err != nil {
+		return fmt.Errorf("could not start HTTP OTLP listener: %w", err)
+	}
 
 	return nil
 }
