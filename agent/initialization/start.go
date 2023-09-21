@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/workers"
+	"github.com/kubeshop/tracetest/server/traces"
 )
 
 func NewClient(ctx context.Context, config config.Config) (*client.Client, error) {
@@ -19,7 +21,9 @@ func NewClient(ctx context.Context, config config.Config) (*client.Client, error
 		return nil, err
 	}
 
-	triggerWorker := workers.NewTriggerWorker(client)
+	tracesCache := gocache.New[string, []traces.Span]()
+
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(tracesCache))
 	pollingWorker := workers.NewPollerWorker(client)
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(client)
 
