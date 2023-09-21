@@ -691,7 +691,6 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	wg := sync.WaitGroup{}
 	err := c.dsTestPipeline.Subscribe(job.ID, func(result testconnection.Job) {
 		job = result
-		c.dsTestPipeline.Unsubscribe(job.ID)
 		wg.Done()
 	})
 
@@ -702,6 +701,7 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	c.dsTestPipeline.Run(ctx, job)
 	wg.Add(1)
 	wg.Wait()
+	c.dsTestPipeline.Unsubscribe(job.ID)
 
 	if err := ds.Validate(); err != nil {
 		return openapi.Response(http.StatusBadRequest, err.Error()), err

@@ -19,6 +19,8 @@ func TestConfigDefaults(t *testing.T) {
 	assert.Equal(t, "", cfg.APIKey)
 	assert.Equal(t, hostname, cfg.Name)
 	assert.Equal(t, "https://cloud.tracetest.io", cfg.ServerURL)
+	assert.Equal(t, 4317, cfg.OTLPServer.GRPCPort)
+	assert.Equal(t, 4318, cfg.OTLPServer.HTTPPort)
 }
 
 func TestConfigWithEnvs(t *testing.T) {
@@ -27,12 +29,16 @@ func TestConfigWithEnvs(t *testing.T) {
 		os.Unsetenv("TRACETEST_API_KEY")
 		os.Unsetenv("TRACETEST_DEV_MODE")
 		os.Unsetenv("TRACETEST_SERVER_URL")
+		os.Unsetenv("TRACETEST_OTLP_SERVER_GRPC_PORT")
+		os.Unsetenv("TRACETEST_OTLP_SERVER_HTTP_PORT")
 	})
 
 	os.Setenv("TRACETEST_AGENT_NAME", "my-agent-name")
 	os.Setenv("TRACETEST_API_KEY", "my-agent-api-key")
 	os.Setenv("TRACETEST_DEV_MODE", "true")
 	os.Setenv("TRACETEST_SERVER_URL", "https://custom.server.com")
+	os.Setenv("TRACETEST_OTLP_SERVER_GRPC_PORT", "1234")
+	os.Setenv("TRACETEST_OTLP_SERVER_HTTP_PORT", "1235")
 
 	cfg, err := config.LoadConfig()
 
@@ -41,4 +47,6 @@ func TestConfigWithEnvs(t *testing.T) {
 	assert.Equal(t, "my-agent-api-key", cfg.APIKey)
 	assert.Equal(t, "my-agent-name", cfg.Name)
 	assert.Equal(t, "https://custom.server.com", cfg.ServerURL)
+	assert.Equal(t, 1234, cfg.OTLPServer.GRPCPort)
+	assert.Equal(t, 1235, cfg.OTLPServer.HTTPPort)
 }

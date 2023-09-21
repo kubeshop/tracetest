@@ -35,7 +35,8 @@ func (s *grpcServer) Start() error {
 		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
 	}
 	pb.RegisterTraceServiceServer(s.gServer, s)
-	return s.gServer.Serve(listener)
+	go s.gServer.Serve(listener)
+	return nil
 }
 
 func (s *grpcServer) Stop() {

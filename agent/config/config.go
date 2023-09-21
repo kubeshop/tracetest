@@ -13,6 +13,13 @@ type Config struct {
 	APIKey    string `mapstructure:"api_key"`
 	Name      string `mapstructure:"agent_name"`
 	ServerURL string `mapstructure:"server_url"`
+
+	OTLPServer otlpServer `mapstructure:"otlp_server"`
+}
+
+type otlpServer struct {
+	GRPCPort int `mapstructure:"grpc_port"`
+	HTTPPort int `mapstructure:"http_port"`
 }
 
 func LoadConfig() (Config, error) {
@@ -29,10 +36,11 @@ func LoadConfig() (Config, error) {
 	vp.SetConfigType("env")
 	vp.AutomaticEnv()
 
-	vp.SetDefault("DEV_MODE", false)
 	vp.SetDefault("AGENT_NAME", getHostname())
 	vp.SetDefault("API_KEY", "")
 	vp.SetDefault("SERVER_URL", "https://cloud.tracetest.io")
+	vp.SetDefault("OTLP_SERVER.GRPC_PORT", 4317)
+	vp.SetDefault("OTLP_SERVER.HTTP_PORT", 4318)
 
 	config := Config{}
 
