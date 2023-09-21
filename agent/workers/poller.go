@@ -10,28 +10,43 @@ import (
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/workers/datastores/connection"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type PollerWorker struct {
-	client      *client.Client
-	tracer      trace.Tracer
-	sentSpanIDs *gocache.Cache[string, bool]
+	client            *client.Client
+	tracer            trace.Tracer
+	sentSpanIDs       *gocache.Cache[string, bool]
+	inmemoryDatastore tracedb.TraceDB
 }
 
-func NewPollerWorker(client *client.Client) *PollerWorker {
+type PollerOption func(*PollerWorker)
+
+func WithInMemoryDatastore(datastore tracedb.TraceDB) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.inmemoryDatastore = datastore
+	}
+}
+
+func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
 	// TODO: use a real tracer
 	tracer := trace.NewNoopTracerProvider().Tracer("noop")
 
-	return &PollerWorker{
+	pollerWorker := &PollerWorker{
 		client:      client,
 		tracer:      tracer,
 		sentSpanIDs: gocache.New[string, bool](),
 	}
+
+	for _, opt := range opts {
+		opt(pollerWorker)
+	}
+
+	return pollerWorker
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
@@ -50,6 +65,10 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 	if err != nil {
 		log.Printf("Invalid datastore: %s", err.Error())
 		return err
+	}
+
+	if datastoreConfig.IsOTLPBasedProvider() && w.inmemoryDatastore != nil {
+		ds = w.inmemoryDatastore
 	}
 
 	pollingResponse := &proto.PollingResponse{
@@ -114,10 +133,12 @@ func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 	if r.Tempo != nil {
 		ds.Values.Tempo = &datastore.MultiChannelClientConfig{}
 		if r.Tempo.Grpc != nil {
+			ds.Values.Tempo.Type = datastore.MultiChannelClientTypeGRPC
 			ds.Values.Tempo.Grpc = &datastore.GRPCClientSettings{}
 			deepcopy.DeepCopy(r.Tempo.Grpc, &ds.Values.Tempo.Grpc)
 		}
 		if r.Tempo.Http != nil {
+			ds.Values.Tempo.Type = datastore.MultiChannelClientTypeHTTP
 			ds.Values.Tempo.Http = &datastore.HttpClientConfig{}
 			deepcopy.DeepCopy(r.Tempo.Http, &ds.Values.Tempo.Http)
 		}

@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/workers"
+	"github.com/kubeshop/tracetest/agent/workers/poller"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -22,7 +23,9 @@ func NewClient(ctx context.Context, config config.Config, traceCache collector.T
 	}
 
 	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(traceCache))
-	pollingWorker := workers.NewPollerWorker(client)
+	pollingWorker := workers.NewPollerWorker(client, workers.WithInMemoryDatastore(
+		poller.NewInMemoryDatastore(traceCache),
+	))
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(client)
 
 	client.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
