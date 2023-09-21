@@ -11,6 +11,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/sync/semaphore"
 )
 
 type Config struct {
@@ -41,21 +42,32 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer) error {
 		}
 	})
 
+	var semaphore = semaphore.NewWeighted(2)
+	semaphore.Acquire(ctx, 2)
+
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
 	go func() {
-		err := grpcServer.Start()
+		semaphore.Release(1)
+		err = grpcServer.Start()
 		if err != nil {
 			log.Println("ERROR: could not start gRPC OTLP listener: %w", err)
 		}
 	}()
 
 	go func() {
-		err := httpServer.Start()
+		semaphore.Release(1)
+		err = httpServer.Start()
 		if err != nil {
 			log.Println("ERROR: could not start HTTP OTLP listener: %w", err)
 		}
 	}()
 
-	return nil
+	// Wait until semaphore is released
+	semaphore.Acquire(ctx, 2)
+
+	return err
 }
 
 func onProcessTermination(callback func()) {
