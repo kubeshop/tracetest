@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/kubeshop/tracetest/agent/collector"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/initialization"
 
@@ -102,7 +103,8 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, u
 	}
 
 	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", name))
-	client, err := initialization.NewClient(ctx, cfg)
+	cache := collector.NewTraceCache()
+	client, err := initialization.NewClient(ctx, cfg, cache)
 	if err != nil {
 		return err
 	}

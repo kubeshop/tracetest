@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/otlp"
+	"go.opencensus.io/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/grpc"
@@ -24,6 +25,7 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteI
 		RemoteIngester: remoteIngesterConfig,
 		buffer:         &buffer{},
 		done:           make(chan bool),
+		traceCache:     remoteIngesterConfig.traceCache,
 	}
 
 	err := ingester.connectToRemoteServer(ctx)
@@ -44,11 +46,13 @@ type forwardIngester struct {
 	client         pb.TraceServiceClient
 	buffer         *buffer
 	done           chan bool
+	traceCache     TraceCache
 }
 
 type remoteIngesterConfig struct {
-	URL   string
-	Token string
+	URL        string
+	Token      string
+	traceCache TraceCache
 }
 
 type buffer struct {
@@ -60,6 +64,12 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 	i.buffer.mutex.Lock()
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
 	i.buffer.mutex.Unlock()
+
+	if i.traceCache != nil {
+		// In case of OTLP datastore, those spans will be polled from this cache instead
+		// of a real datastore
+		i.cacheTestSpans(request.ResourceSpans)
+	}
 
 	return &pb.ExportTraceServiceResponse{
 		PartialSuccess: &pb.ExportTracePartialSuccess{
@@ -122,6 +132,27 @@ func (i *forwardIngester) forwardSpans(ctx context.Context, spans []*v1.Resource
 	}
 
 	return nil
+}
+
+func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
+	spans := make(map[string][]*v1.Span)
+	for _, resourceSpan := range resourceSpans {
+		for _, scopedSpan := range resourceSpan.ScopeSpans {
+			for _, span := range scopedSpan.Spans {
+				traceID := trace.TraceID(span.TraceId).String()
+				spans[traceID] = append(spans[traceID], span)
+			}
+		}
+	}
+
+	for traceID, spans := range spans {
+		if _, ok := i.traceCache.Get(traceID); !ok {
+			// traceID is not part of a test
+			continue
+		}
+
+		i.traceCache.Set(traceID, spans)
+	}
 }
 
 func (i *forwardIngester) Stop() {

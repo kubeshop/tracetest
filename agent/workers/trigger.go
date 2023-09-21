@@ -5,19 +5,30 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/client"
+	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/proto"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
+	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 type TriggerWorker struct {
-	client   *client.Client
-	registry *agentTrigger.Registry
+	client     *client.Client
+	registry   *agentTrigger.Registry
+	traceCache collector.TraceCache
 }
 
-func NewTriggerWorker(client *client.Client) *TriggerWorker {
+type TriggerOption func(*TriggerWorker)
+
+func WithTraceCache(cache collector.TraceCache) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.traceCache = cache
+	}
+}
+
+func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWorker {
 	// TODO: use a real tracer
 	tracer := trace.NewNoopTracerProvider().Tracer("noop")
 
@@ -26,7 +37,16 @@ func NewTriggerWorker(client *client.Client) *TriggerWorker {
 	registry.Add(agentTrigger.GRPC())
 	registry.Add(agentTrigger.TRACEID())
 
-	return &TriggerWorker{client, registry}
+	worker := &TriggerWorker{
+		client:   client,
+		registry: registry,
+	}
+
+	for _, opt := range opts {
+		opt(worker)
+	}
+
+	return worker
 }
 
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
@@ -40,6 +60,12 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	traceID, err := trace.TraceIDFromHex(triggerRequest.TraceID)
 	if err != nil {
 		return fmt.Errorf("invalid traceID was received in TriggerRequest: %w", err)
+	}
+
+	if w.traceCache != nil {
+		// Set traceID to cache so the collector starts watching for incoming traces
+		// with same id
+		w.traceCache.Set(triggerRequest.TraceID, []*v1.Span{})
 	}
 
 	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{

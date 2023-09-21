@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func NewClient(ctx context.Context, config config.Config) (*client.Client, error) {
+func NewClient(ctx context.Context, config config.Config, traceCache collector.TraceCache) (*client.Client, error) {
 	client, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
@@ -21,7 +21,7 @@ func NewClient(ctx context.Context, config config.Config) (*client.Client, error
 		return nil, err
 	}
 
-	triggerWorker := workers.NewTriggerWorker(client)
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(traceCache))
 	pollingWorker := workers.NewPollerWorker(client)
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(client)
 
@@ -38,7 +38,8 @@ func NewClient(ctx context.Context, config config.Config) (*client.Client, error
 
 // Start the agent with given configuration
 func Start(ctx context.Context, config config.Config) error {
-	client, err := NewClient(ctx, config)
+	traceCache := collector.NewTraceCache()
+	client, err := NewClient(ctx, config, traceCache)
 	if err != nil {
 		return err
 	}
@@ -48,7 +49,7 @@ func Start(ctx context.Context, config config.Config) error {
 		return err
 	}
 
-	err = startCollector(ctx, config)
+	err = startCollector(ctx, config, traceCache)
 	if err != nil {
 		return err
 	}
@@ -57,14 +58,14 @@ func Start(ctx context.Context, config config.Config) error {
 	return nil
 }
 
-func startCollector(ctx context.Context, config config.Config) error {
+func startCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop")
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,
 		GRPCPort: config.OTLPServer.GRPCPort,
 	}
 
-	err := collector.Start(ctx, collectorConfig, noopTracer)
+	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache))
 	if err != nil {
 		return err
 	}
