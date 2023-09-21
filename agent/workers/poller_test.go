@@ -10,14 +10,17 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/client/mocks"
+	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/workers"
+	"github.com/kubeshop/tracetest/agent/workers/poller"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 func TestPollerWorker(t *testing.T) {
-	t.Skip("this test needs rework")
 	ctx := context.Background()
 	controlPlane := mocks.NewGrpcServer()
 
@@ -112,4 +115,65 @@ func createTempoFakeApi() *httptest.Server {
 		}`))
 		w.WriteHeader(http.StatusOK)
 	}))
+}
+
+func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
+	ctx := context.Background()
+	controlPlane := mocks.NewGrpcServer()
+
+	client, err := client.Connect(ctx, controlPlane.Addr())
+	require.NoError(t, err)
+
+	cache := collector.NewTraceCache()
+
+	pollerWorker := workers.NewPollerWorker(client, workers.WithInMemoryDatastore(
+		poller.NewInMemoryDatastore(cache),
+	))
+
+	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
+		return pollerWorker.Poll(ctx, pr)
+	})
+
+	err = client.Start(ctx)
+	require.NoError(t, err)
+
+	traceID := id.NewRandGenerator().TraceID()
+	pollingRequest := proto.PollingRequest{
+		TestID:  "test",
+		RunID:   1,
+		TraceID: traceID.String(),
+		Datastore: &proto.DataStore{
+			Type: "datadog",
+		},
+	}
+
+	controlPlane.SendPollingRequest(&pollingRequest)
+
+	time.Sleep(1 * time.Second)
+
+	// expect traces to be sent to endpoint
+	pollingResponse := controlPlane.GetLastPollingResponse()
+	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
+
+	assert.False(t, pollingResponse.TraceFound)
+	assert.Len(t, pollingResponse.Spans, 0)
+
+	span1ID := id.NewRandGenerator().SpanID()
+	span2ID := id.NewRandGenerator().SpanID()
+
+	cache.Set(traceID.String(), []*v1.Span{
+		{Name: "span 1", ParentSpanId: nil, SpanId: span1ID[:], TraceId: traceID[:]},
+		{Name: "span 2", ParentSpanId: span1ID[:], SpanId: span2ID[:], TraceId: traceID[:]},
+	})
+
+	controlPlane.SendPollingRequest(&pollingRequest)
+
+	time.Sleep(1 * time.Second)
+
+	// expect traces to be sent to endpoint
+	pollingResponse = controlPlane.GetLastPollingResponse()
+	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
+
+	assert.True(t, pollingResponse.TraceFound)
+	assert.Len(t, pollingResponse.Spans, 2)
 }
