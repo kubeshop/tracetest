@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/client/mocks"
+	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/stretchr/testify/assert"
@@ -16,12 +17,13 @@ import (
 )
 
 func TestTrigger(t *testing.T) {
+	cache := collector.NewTraceCache()
 	controlPlane := mocks.NewGrpcServer()
 
 	client, err := client.Connect(context.Background(), controlPlane.Addr())
 	require.NoError(t, err)
 
-	triggerWorker := workers.NewTriggerWorker(client)
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache))
 
 	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
 		err := triggerWorker.Trigger(ctx, tr)
@@ -32,11 +34,12 @@ func TestTrigger(t *testing.T) {
 	client.Start(context.Background())
 
 	targetServer := createHelloWorldApi()
+	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
 
 	triggerRequest := &proto.TriggerRequest{
 		TestID:  "my test",
 		RunID:   1,
-		TraceID: "42a2c381da1a5b3a32bc4988bf2431b0",
+		TraceID: traceID,
 		Trigger: &proto.Trigger{
 			Type: "http",
 			Http: &proto.HttpRequest{
@@ -59,6 +62,9 @@ func TestTrigger(t *testing.T) {
 	assert.Equal(t, "http", response.TriggerResult.Type)
 	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
 	assert.JSONEq(t, `{"hello": "world"}`, response.TriggerResult.Http.Body)
+
+	_, traceIdIsWatched := cache.Get(traceID)
+	assert.True(t, traceIdIsWatched)
 }
 
 func createHelloWorldApi() *httptest.Server {

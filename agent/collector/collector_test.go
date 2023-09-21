@@ -22,7 +22,7 @@ func TestCollector(t *testing.T) {
 
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop_tracer")
 
-	err = collector.Start(
+	c, err := collector.Start(
 		context.Background(),
 		collector.Config{
 			HTTPPort:        4318,
@@ -33,6 +33,8 @@ func TestCollector(t *testing.T) {
 		noopTracer,
 	)
 	require.NoError(t, err)
+
+	defer c.Stop()
 
 	tracer, err := mocks.NewTracer(context.Background(), "localhost:4317")
 	require.NoError(t, err)
@@ -62,7 +64,7 @@ func TestCollectorWatchingSpansFromTest(t *testing.T) {
 	cache := collector.NewTraceCache()
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop_tracer")
 
-	err = collector.Start(
+	c, err := collector.Start(
 		context.Background(),
 		collector.Config{
 			HTTPPort:        4318,
@@ -74,6 +76,8 @@ func TestCollectorWatchingSpansFromTest(t *testing.T) {
 		collector.WithTraceCache(cache),
 	)
 	require.NoError(t, err)
+
+	defer c.Stop()
 
 	tracer, err := mocks.NewTracer(context.Background(), "localhost:4317")
 	require.NoError(t, err)

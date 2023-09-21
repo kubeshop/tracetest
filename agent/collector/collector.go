@@ -28,7 +28,18 @@ func WithTraceCache(traceCache TraceCache) CollectorOption {
 	}
 }
 
-func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) error {
+type collector struct {
+	grpcServer stoppable
+	httpServer stoppable
+}
+
+// Stop implements stoppable.
+func (c *collector) Stop() {
+	c.grpcServer.Stop()
+	c.httpServer.Stop()
+}
+
+func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (stoppable, error) {
 	ingesterConfig := remoteIngesterConfig{
 		URL:   config.RemoteServerURL,
 		Token: config.RemoteServerToken,
@@ -40,7 +51,7 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 
 	ingester, err := newForwardIngester(ctx, config.BatchTimeout, ingesterConfig)
 	if err != nil {
-		return fmt.Errorf("could not start local collector: %w", err)
+		return nil, fmt.Errorf("could not start local collector: %w", err)
 	}
 
 	grpcServer := otlp.NewGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester, tracer)
@@ -55,14 +66,14 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 	})
 
 	if err = grpcServer.Start(); err != nil {
-		return fmt.Errorf("could not start gRPC OTLP listener: %w", err)
+		return nil, fmt.Errorf("could not start gRPC OTLP listener: %w", err)
 	}
 
 	if err = httpServer.Start(); err != nil {
-		return fmt.Errorf("could not start HTTP OTLP listener: %w", err)
+		return nil, fmt.Errorf("could not start HTTP OTLP listener: %w", err)
 	}
 
-	return nil
+	return &collector{grpcServer: grpcServer, httpServer: httpServer}, nil
 }
 
 func onProcessTermination(callback func()) {

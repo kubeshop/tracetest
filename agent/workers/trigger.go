@@ -62,9 +62,11 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 		return fmt.Errorf("invalid traceID was received in TriggerRequest: %w", err)
 	}
 
-	// Set traceID to cache so the collector starts watching for incoming traces
-	// with same id
-	w.traceCache.Set(triggerRequest.TraceID, []*v1.Span{})
+	if w.traceCache != nil {
+		// Set traceID to cache so the collector starts watching for incoming traces
+		// with same id
+		w.traceCache.Set(triggerRequest.TraceID, []*v1.Span{})
+	}
 
 	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{
 		TraceID: traceID,

@@ -65,9 +65,11 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
 	i.buffer.mutex.Unlock()
 
-	// In case of OTLP datastore, those spans will be polled from this cache instead
-	// of a real datastore
-	i.cacheTestSpans(request.ResourceSpans)
+	if i.traceCache != nil {
+		// In case of OTLP datastore, those spans will be polled from this cache instead
+		// of a real datastore
+		i.cacheTestSpans(request.ResourceSpans)
+	}
 
 	return &pb.ExportTraceServiceResponse{
 		PartialSuccess: &pb.ExportTracePartialSuccess{
