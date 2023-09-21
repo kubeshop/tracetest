@@ -21,6 +21,7 @@ env:
   - TRACETEST_ENV={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
   - ANALYTICS_BE_KEY={{ if index .Env "ANALYTICS_BE_KEY"  }}{{ .Env.ANALYTICS_BE_KEY }}{{ else }}{{ end }}
   - ANALYTICS_FE_KEY={{ if index .Env "ANALYTICS_FE_KEY"  }}{{ .Env.ANALYTICS_FE_KEY }}{{ else }}{{ end }}
+  - TRACETEST_DEFAULT_CLOUD_ENDPOINT={{ if index .Env "TRACETEST_DEFAULT_CLOUD_ENDPOINT"  }}{{ .Env.TRACETEST_DEFAULT_CLOUD_ENDPOINT }}{{ else }}{{ end }}
 builds:
   - id: server
     binary: tracetest-server
@@ -49,6 +50,7 @@ builds:
     main: ./cli/main.go
     ldflags:
     - -X github.com/kubeshop/tracetest/cli/config.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/cli/config.DefaultCloudEndpoint={{ .Env.TRACETEST_DEFAULT_CLOUD_ENDPOINT }}
     - -X github.com/kubeshop/tracetest/cli/config.Env={{ .Env.TRACETEST_ENV }}
     - -X github.com/kubeshop/tracetest/cli/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
     env:

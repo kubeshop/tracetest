@@ -86,6 +86,7 @@ jobs:
           TRACETEST_ENV: demo
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
+          TRACETEST_DEFAULT_CLOUD_ENDPOINT: ${{ secrets.TRACETEST_DEFAULT_CLOUD_ENDPOINT }}
 
   demo-deploy:
     if: github.event_name == 'push'

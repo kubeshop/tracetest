@@ -25,6 +25,7 @@ var startCmd = &cobra.Command{
 			OrganizationID: selectParams.organizationID,
 			EnvironmentID:  selectParams.environmentID,
 			Endpoint:       selectParams.endpoint,
+			AgentApiKey:    selectParams.agentApiKey,
 		}
 
 		err := start.Run(ctx, cliConfig, flags)
@@ -37,7 +38,8 @@ func init() {
 	if isCloudEnabled {
 		startCmd.Flags().StringVarP(&selectParams.organizationID, "organization", "", "", "organization id")
 		startCmd.Flags().StringVarP(&selectParams.environmentID, "environment", "", "", "environment id")
-		startCmd.Flags().StringVarP(&selectParams.endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
+		startCmd.Flags().StringVarP(&selectParams.agentApiKey, "api-key", "", "", "agent api key")
+		startCmd.Flags().StringVarP(&selectParams.endpoint, "endpoint", "e", config.DefaultCloudEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 		rootCmd.AddCommand(startCmd)
 	}
 }

@@ -107,6 +107,12 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return nil
 	}
 
+	if flags.AgentApiKey != "" {
+		cfg.AgentApiKey = flags.AgentApiKey
+		c.ShowOrganizationSelector(ctx, cfg, flags)
+		return nil
+	}
+
 	oauthServer := oauth.NewOAuthServer(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), cfg.UIEndpoint)
 	err = oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
@@ -130,7 +136,7 @@ func (c Configurator) onOAuthFailure(err error) {
 
 func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags ConfigFlags) {
 	cfg.OrganizationID = flags.OrganizationID
-	if cfg.OrganizationID == "" {
+	if cfg.OrganizationID == "" && flags.AgentApiKey == "" {
 		orgID, err := c.organizationSelector(ctx, cfg)
 		if err != nil {
 			c.ui.Exit(err.Error())
@@ -141,7 +147,7 @@ func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, 
 	}
 
 	cfg.EnvironmentID = flags.EnvironmentID
-	if cfg.EnvironmentID == "" {
+	if cfg.EnvironmentID == "" && flags.AgentApiKey == "" {
 		envID, err := c.environmentSelector(ctx, cfg)
 		if err != nil {
 			c.ui.Exit(err.Error())

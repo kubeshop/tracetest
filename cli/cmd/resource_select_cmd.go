@@ -59,4 +59,5 @@ type selectParameters struct {
 	organizationID string
 	environmentID  string
 	endpoint       string
+	agentApiKey    string
 }

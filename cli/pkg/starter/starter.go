@@ -32,6 +32,15 @@ func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.Confi
 }
 
 func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
+	if cfg.AgentApiKey != "" {
+		err := s.StartAgent(ctx, cfg.AgentEndpoint, "local", cfg.AgentApiKey, cfg.UIEndpoint)
+		if err != nil {
+			s.ui.Error(err.Error())
+		}
+
+		return
+	}
+
 	env, err := s.getEnvironment(ctx, cfg)
 	if err != nil {
 		s.ui.Error(err.Error())
