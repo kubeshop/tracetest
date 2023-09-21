@@ -20,11 +20,25 @@ type Config struct {
 	RemoteServerToken string
 }
 
-func Start(ctx context.Context, config Config, tracer trace.Tracer) error {
-	ingester, err := newForwardIngester(ctx, config.BatchTimeout, remoteIngesterConfig{
+type CollectorOption func(*remoteIngesterConfig)
+
+func WithTraceCache(traceCache TraceCache) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.traceCache = traceCache
+	}
+}
+
+func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) error {
+	ingesterConfig := remoteIngesterConfig{
 		URL:   config.RemoteServerURL,
 		Token: config.RemoteServerToken,
-	})
+	}
+
+	for _, opt := range opts {
+		opt(&ingesterConfig)
+	}
+
+	ingester, err := newForwardIngester(ctx, config.BatchTimeout, ingesterConfig)
 	if err != nil {
 		return fmt.Errorf("could not start local collector: %w", err)
 	}

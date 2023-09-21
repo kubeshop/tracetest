@@ -4,25 +4,25 @@ import (
 	"context"
 	"fmt"
 
-	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/kubeshop/tracetest/agent/client"
+	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/proto"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
-	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
+	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 type TriggerWorker struct {
 	client     *client.Client
 	registry   *agentTrigger.Registry
-	traceCache *gocache.Cache[string, []traces.Span]
+	traceCache collector.TraceCache
 }
 
 type TriggerOption func(*TriggerWorker)
 
-func WithTraceCache(cache *gocache.Cache[string, []traces.Span]) TriggerOption {
+func WithTraceCache(cache collector.TraceCache) TriggerOption {
 	return func(tw *TriggerWorker) {
 		tw.traceCache = cache
 	}
@@ -64,7 +64,7 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 	// Set traceID to cache so the collector starts watching for incoming traces
 	// with same id
-	w.traceCache.Set(triggerRequest.TraceID, []traces.Span{})
+	w.traceCache.Set(triggerRequest.TraceID, []*v1.Span{})
 
 	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{
 		TraceID: traceID,
