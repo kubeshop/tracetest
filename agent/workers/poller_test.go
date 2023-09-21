@@ -151,7 +151,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 
-	// expect traces to be sent to endpoint
+	// expect traces to not be sent to endpoint
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
 
