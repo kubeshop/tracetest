@@ -19,7 +19,7 @@ func TestCollector(t *testing.T) {
 
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop_tracer")
 
-	collector.Start(
+	err = collector.Start(
 		context.Background(),
 		collector.Config{
 			HTTPPort:        4318,
@@ -29,6 +29,7 @@ func TestCollector(t *testing.T) {
 		},
 		noopTracer,
 	)
+	require.NoError(t, err)
 
 	tracer, err := mocks.NewTracer(context.Background(), "localhost:4317")
 	require.NoError(t, err)

@@ -52,7 +52,8 @@ func (s *httpServer) Start() error {
 		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
 	}
 
-	return s.hServer.Serve(listener)
+	go s.hServer.Serve(listener)
+	return nil
 }
 
 func (s *httpServer) Stop() {
