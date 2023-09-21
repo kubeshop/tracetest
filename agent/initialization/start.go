@@ -52,7 +52,7 @@ func Start(ctx context.Context, config config.Config) error {
 		return err
 	}
 
-	err = startCollector(ctx, config, traceCache)
+	err = StartCollector(ctx, config, traceCache)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func Start(ctx context.Context, config config.Config) error {
 	return nil
 }
 
-func startCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {
+func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop")
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,

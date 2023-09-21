@@ -14,10 +14,10 @@ type Config struct {
 	Name      string `mapstructure:"agent_name"`
 	ServerURL string `mapstructure:"server_url"`
 
-	OTLPServer otlpServer `mapstructure:"otlp_server"`
+	OTLPServer OtlpServer `mapstructure:"otlp_server"`
 }
 
-type otlpServer struct {
+type OtlpServer struct {
 	GRPCPort int `mapstructure:"grpc_port"`
 	HTTPPort int `mapstructure:"http_port"`
 }
