@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
@@ -98,6 +99,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		run := job.Run.TraceFailed(err)
 		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
 			"finalState": string(run.State),
+			"tenant_id":  middleware.TenantIDFromContext(ctx),
 		})
 
 		handleDBError(w.state.updater.Update(ctx, run))
