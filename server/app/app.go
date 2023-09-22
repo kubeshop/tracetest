@@ -230,8 +230,10 @@ func (app *App) Start(opts ...appOption) error {
 
 	tracedbFactory := tracedb.Factory(tracesRepo)
 
-	eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
-	registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
+	if app.cfg.OtlpServerEnabled() {
+		eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
+		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
+	}
 
 	testPipeline := buildTestPipeline(
 		pool,

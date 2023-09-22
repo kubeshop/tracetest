@@ -31,6 +31,7 @@ func TestCollector(t *testing.T) {
 			RemoteServerURL: targetServer.Addr(),
 		},
 		noopTracer,
+		collector.WithStartRemoteServer(true),
 	)
 	require.NoError(t, err)
 
@@ -74,6 +75,7 @@ func TestCollectorWatchingSpansFromTest(t *testing.T) {
 		},
 		noopTracer,
 		collector.WithTraceCache(cache),
+		collector.WithStartRemoteServer(true),
 	)
 	require.NoError(t, err)
 

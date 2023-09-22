@@ -100,6 +100,10 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, u
 		ServerURL: endpoint,
 		APIKey:    agentApiKey,
 		Name:      name,
+		OTLPServer: agentConfig.OtlpServer{
+			GRPCPort: 4317,
+			HTTPPort: 4318,
+		},
 	}
 
 	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", name))
@@ -110,6 +114,11 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, u
 	}
 
 	err = client.Start(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = initialization.StartCollector(ctx, cfg, cache)
 	if err != nil {
 		return err
 	}

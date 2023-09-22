@@ -19,9 +19,18 @@ exporters:
     tls:
       insecure: true
 
+  otlp/1:
+    endpoint: host.docker.internal:4317
+    tls:
+      insecure: true
+
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
       exporters: [otlp/jaeger]
+    traces/1:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/1]

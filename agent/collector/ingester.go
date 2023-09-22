@@ -19,7 +19,7 @@ type stoppable interface {
 	Stop()
 }
 
-func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteIngesterConfig remoteIngesterConfig) (otlp.Ingester, error) {
+func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteIngesterConfig remoteIngesterConfig, startRemoteServer bool) (otlp.Ingester, error) {
 	ingester := &forwardIngester{
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: remoteIngesterConfig,
@@ -28,12 +28,14 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteI
 		traceCache:     remoteIngesterConfig.traceCache,
 	}
 
-	err := ingester.connectToRemoteServer(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("could not connect to remote server: %w", err)
-	}
+	if startRemoteServer {
+		err := ingester.connectToRemoteServer(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("could not connect to remote server: %w", err)
+		}
 
-	go ingester.startBatchWorker()
+		go ingester.startBatchWorker()
+	}
 
 	return ingester, nil
 }
@@ -50,9 +52,10 @@ type forwardIngester struct {
 }
 
 type remoteIngesterConfig struct {
-	URL        string
-	Token      string
-	traceCache TraceCache
+	URL               string
+	Token             string
+	traceCache        TraceCache
+	startRemoteServer bool
 }
 
 type buffer struct {

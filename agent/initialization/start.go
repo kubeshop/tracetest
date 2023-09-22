@@ -52,7 +52,7 @@ func Start(ctx context.Context, config config.Config) error {
 		return err
 	}
 
-	err = startCollector(ctx, config, traceCache)
+	err = StartCollector(ctx, config, traceCache)
 	if err != nil {
 		return err
 	}
@@ -61,14 +61,14 @@ func Start(ctx context.Context, config config.Config) error {
 	return nil
 }
 
-func startCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {
+func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop")
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,
 		GRPCPort: config.OTLPServer.GRPCPort,
 	}
 
-	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache))
+	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache), collector.WithStartRemoteServer(false))
 	if err != nil {
 		return err
 	}
