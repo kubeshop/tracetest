@@ -190,7 +190,7 @@ func (r *repository) GetAugmented(ctx context.Context, id id.ID) (Test, error) {
 	return r.get(ctx, id)
 }
 
-const sortQuery = `ORDER BY t.version DESC LIMIT 1`
+const sortQuery = ` ORDER BY t.version DESC LIMIT 1`
 
 func (r *repository) get(ctx context.Context, id id.ID) (Test, error) {
 	query, params := sqlutil.TenantWithPrefix(ctx, getTestSQL+" WHERE t.id = $1", "t.", id)
