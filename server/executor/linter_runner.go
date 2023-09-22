@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/linter"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -131,6 +132,7 @@ func (e *defaultLinterRunner) onError(ctx context.Context, job Job, run test.Run
 
 	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
 		"finalState": string(run.State),
+		"tenant_id":  middleware.TenantIDFromContext(ctx),
 	})
 
 	run = run.LinterError(err)

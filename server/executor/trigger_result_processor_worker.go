@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
@@ -61,7 +62,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 	ctx, pollingSpan := r.tracer.Start(ctx, "Start processing trigger response")
 	defer pollingSpan.End()
 
-	job.Run = r.handleExecutionResult(job.Run)
+	job.Run = r.handleExecutionResult(job.Run, ctx)
 	triggerResult := job.Run.TriggerResult
 	if triggerResult.Error != nil {
 		err := triggerResult.Error.Error()
@@ -120,13 +121,14 @@ func (r triggerResultProcessorWorker) emitMismatchEndpointEvent(ctx context.Cont
 	}
 }
 
-func (r triggerResultProcessorWorker) handleExecutionResult(run test.Run) test.Run {
+func (r triggerResultProcessorWorker) handleExecutionResult(run test.Run, ctx context.Context) test.Run {
 	run = run.TriggerCompleted(run.TriggerResult)
 	if run.TriggerResult.Error != nil {
 		run = run.TriggerFailed(fmt.Errorf(run.TriggerResult.Error.ErrorMessage))
 
 		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
 			"finalState": string(run.State),
+			"tenant_id":  middleware.TenantIDFromContext(ctx),
 		})
 
 		return run

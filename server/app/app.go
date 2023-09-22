@@ -370,11 +370,15 @@ func analyticsMW(next http.Handler) http.Handler {
 		routeName := mux.CurrentRoute(r).GetName()
 		machineID := r.Header.Get("x-client-id")
 		source := r.Header.Get("x-source")
+		eventProperties := r.Header.Get("x-event-properties")
+
+		eventData := map[string]string{
+			"source": source,
+		}
+		eventData = analytics.InjectProperties(eventData, eventProperties)
 
 		if routeName != "" {
-			analytics.SendEvent(toWords(routeName), "test", machineID, &map[string]string{
-				"source": source,
-			})
+			analytics.SendEvent(toWords(routeName), "test", machineID, &eventData)
 		}
 
 		next.ServeHTTP(w, r)

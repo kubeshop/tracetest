@@ -1,6 +1,7 @@
 package analytics
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -66,4 +67,22 @@ func SendEvent(name, category, clientID string, data *map[string]string) error {
 	}
 
 	return err
+}
+
+func InjectProperties(data map[string]string, properties string) map[string]string {
+	if properties == "" {
+		return data
+	}
+
+	var p map[string]string
+	err := json.Unmarshal([]byte(properties), &p)
+	if err != nil {
+		return data
+	}
+
+	for k, v := range p {
+		data[k] = v
+	}
+
+	return data
 }

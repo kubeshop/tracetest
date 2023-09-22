@@ -8,6 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/expression"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
@@ -80,6 +81,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		run = run.AssertionFailed(err)
 		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
 			"finalState": string(run.State),
+			"tenant_id":  middleware.TenantIDFromContext(ctx),
 		})
 
 		return test.Run{}, e.updater.Update(ctx, run)
@@ -139,6 +141,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 
 	analytics.SendEvent("test_run_finished", "successful", "", &map[string]string{
 		"finalState": string(run.State),
+		"tenant_id":  middleware.TenantIDFromContext(ctx),
 	})
 
 	return run, nil
