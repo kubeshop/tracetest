@@ -100,10 +100,10 @@ replicaCount: 1
 # You don't have to change anything bellow this line.
 
 image:
-  repository: ghcr.io/kube-tarian/helmrepo-supporting-tools/tracetest
+  repository: ghcr.io/intelops/tracetest
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: v0.13.6
+  tag: latest
 
 env:
   tracetestDev: ""
@@ -182,7 +182,7 @@ affinity: {}
 otelCollector:
   name: "otel-collector"
   image:
-    repository: ghcr.io/kube-tarian/helmrepo-supporting-tools/opentelemetry-collector-contrib
+    repository: otel/opentelemetry-collector-contrib
     tag: 0.70.0
     pullPolicy: Always
 
