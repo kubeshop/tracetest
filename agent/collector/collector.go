@@ -28,6 +28,12 @@ func WithTraceCache(traceCache TraceCache) CollectorOption {
 	}
 }
 
+func WithStartRemoteServer(startRemoteServer bool) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.startRemoteServer = startRemoteServer
+	}
+}
+
 type collector struct {
 	grpcServer stoppable
 	httpServer stoppable
@@ -49,7 +55,7 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 		opt(&ingesterConfig)
 	}
 
-	ingester, err := newForwardIngester(ctx, config.BatchTimeout, ingesterConfig)
+	ingester, err := newForwardIngester(ctx, config.BatchTimeout, ingesterConfig, ingesterConfig.startRemoteServer)
 	if err != nil {
 		return nil, fmt.Errorf("could not start local collector: %w", err)
 	}

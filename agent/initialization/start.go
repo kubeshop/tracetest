@@ -68,7 +68,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 		GRPCPort: config.OTLPServer.GRPCPort,
 	}
 
-	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache))
+	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache), collector.WithStartRemoteServer(false))
 	if err != nil {
 		return err
 	}
