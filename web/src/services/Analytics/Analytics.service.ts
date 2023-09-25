@@ -8,6 +8,7 @@ const appVersion = Env.get('appVersion');
 const env = Env.get('env');
 const serverID = Env.get('serverID');
 const measurementId = Env.get('measurementId');
+const posthogKey = Env.get('posthogKey');
 
 export const analytics = new AnalyticsBrowser();
 
@@ -47,7 +48,7 @@ const AnalyticsService = (): TAnalyticsService => ({
       env,
     });
 
-    posthog.init('phc_Rg59ClPckoqa5p4onheukqHKJFPbTJkiNzECjIG4lMj', {
+    posthog.init(posthogKey, {
       api_host: 'https://app.posthog.com',
       loaded: ph => {
         ph.identify(serverID, {appVersion, env});
