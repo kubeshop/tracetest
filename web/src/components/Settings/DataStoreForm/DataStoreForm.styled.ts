@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 import {Typography} from 'antd';
 import {CheckCircleOutlined} from '@ant-design/icons';
 
@@ -34,13 +34,20 @@ export const DataStoreListContainer = styled.div`
   flex-direction: column;
 `;
 
-export const DataStoreItemContainer = styled.div<{$isSelected: boolean}>`
+export const DataStoreItemContainer = styled.div<{$isDisabled: boolean; $isSelected: boolean}>`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 22px;
   cursor: pointer;
   border-left: ${({theme, $isSelected}) => $isSelected && `2px solid ${theme.color.primary}`};
+
+  ${({$isDisabled}) =>
+    $isDisabled &&
+    css`
+      cursor: not-allowed;
+      opacity: 0.5;
+    `}
 `;
 
 export const Circle = styled.div`
