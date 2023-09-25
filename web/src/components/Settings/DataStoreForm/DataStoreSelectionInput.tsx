@@ -1,4 +1,4 @@
-import {Popover, Typography} from 'antd';
+import {Popover} from 'antd';
 import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
 import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
