@@ -134,7 +134,7 @@ func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
 }
 
 func (app *App) initAnalytics(configFromDB config.Config) error {
-	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env)
+	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env, app.cfg.AnalyticsServerKey(), app.cfg.AnalyticsFrontendKey())
 }
 
 var instanceID = id.GenerateID().String()

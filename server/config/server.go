@@ -91,6 +91,16 @@ var serverOptions = options{
 		defaultValue: "true",
 		description:  "enable otlp server",
 	},
+	{
+		key:          "analytics.serverKey",
+		defaultValue: "",
+		description:  "analytics server key",
+	},
+	{
+		key:          "analytics.frontendKey",
+		defaultValue: "",
+		description:  "analytics frontend key",
+	},
 }
 
 func init() {
@@ -180,4 +190,18 @@ func (c *AppConfig) OtlpServerEnabled() bool {
 	defer c.mu.Unlock()
 
 	return c.vp.GetString("otlpServer.enabled") == "true"
+}
+
+func (c *AppConfig) AnalyticsServerKey() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.vp.GetString("analytics.serverKey")
+}
+
+func (c *AppConfig) AnalyticsFrontendKey() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.vp.GetString("analytics.frontendKey")
 }
