@@ -28,7 +28,7 @@ services:
       TRACETEST_DEV: ${TRACETEST_DEV}
 
   postgres:
-    image: postgres:14
+    image: postgres:15.2
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
