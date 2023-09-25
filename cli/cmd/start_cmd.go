@@ -10,7 +10,7 @@ import (
 
 var (
 	start      = starter.NewStarter(configurator, resources)
-	saveParams = &selectParameters{}
+	saveParams = &saveParameters{}
 )
 
 var startCmd = &cobra.Command{
@@ -43,7 +43,7 @@ func init() {
 	rootCmd.AddCommand(startCmd)
 }
 
-type selectParameters struct {
+type saveParameters struct {
 	organizationID string
 	environmentID  string
 	endpoint       string
