@@ -65,11 +65,6 @@ var (
 		ID:    "misc",
 		Title: "Misc",
 	}
-
-	cmdGroupCloud = &cobra.Group{
-		ID:    "cloud",
-		Title: "Cloud",
-	}
 )
 
 func init() {
@@ -79,10 +74,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
 
 	groups := []*cobra.Group{cmdGroupConfig, cmdGroupResources, cmdGroupMisc}
-
-	if isCloudEnabled {
-		groups = append(groups, cmdGroupCloud)
-	}
 
 	rootCmd.AddGroup(groups...)
 

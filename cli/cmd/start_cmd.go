@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	start = starter.NewStarter(configurator, resources)
+	start      = starter.NewStarter(configurator, resources)
+	saveParams = &saveParameters{}
 )
 
 var startCmd = &cobra.Command{
-	GroupID: cmdGroupCloud.ID,
+	GroupID: cmdGroupConfig.ID,
 	Use:     "start",
 	Short:   "Start Tracetest",
 	Long:    "Start using Tracetest",
@@ -22,10 +23,10 @@ var startCmd = &cobra.Command{
 		ctx := context.Background()
 
 		flags := config.ConfigFlags{
-			OrganizationID: selectParams.organizationID,
-			EnvironmentID:  selectParams.environmentID,
-			Endpoint:       selectParams.endpoint,
-			AgentApiKey:    selectParams.agentApiKey,
+			OrganizationID: saveParams.organizationID,
+			EnvironmentID:  saveParams.environmentID,
+			Endpoint:       saveParams.endpoint,
+			AgentApiKey:    saveParams.agentApiKey,
 		}
 
 		err := start.Run(ctx, cliConfig, flags)
@@ -35,11 +36,16 @@ var startCmd = &cobra.Command{
 }
 
 func init() {
-	if isCloudEnabled {
-		startCmd.Flags().StringVarP(&selectParams.organizationID, "organization", "", "", "organization id")
-		startCmd.Flags().StringVarP(&selectParams.environmentID, "environment", "", "", "environment id")
-		startCmd.Flags().StringVarP(&selectParams.agentApiKey, "api-key", "", "", "agent api key")
-		startCmd.Flags().StringVarP(&selectParams.endpoint, "endpoint", "e", config.DefaultCloudEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
-		rootCmd.AddCommand(startCmd)
-	}
+	startCmd.Flags().StringVarP(&saveParams.organizationID, "organization", "", "", "organization id")
+	startCmd.Flags().StringVarP(&saveParams.environmentID, "environment", "", "", "environment id")
+	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", "", "agent api key")
+	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", config.DefaultCloudEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
+	rootCmd.AddCommand(startCmd)
+}
+
+type saveParameters struct {
+	organizationID string
+	environmentID  string
+	endpoint       string
+	agentApiKey    string
 }
