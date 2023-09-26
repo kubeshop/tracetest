@@ -16,7 +16,7 @@ type noopTracker struct{}
 func (t noopTracker) Track(event string, props map[string]string) error { return nil }
 func (t noopTracker) Ready() bool                                       { return true }
 
-func Init(enabled bool, serverID, appVersion, env string) error {
+func Init(enabled bool, serverID, appVersion, env, secretKey, frontendKey string) error {
 	// ga not enabled, use dumb settings
 	if !enabled {
 		defaultClient = noopTracker{}
@@ -29,7 +29,7 @@ func Init(enabled bool, serverID, appVersion, env string) error {
 		return fmt.Errorf("could not get hostname: %w", err)
 	}
 
-	defaultClient = newSegmentTracker(hostname, serverID, appVersion, env)
+	defaultClient = newSegmentTracker(hostname, serverID, appVersion, env, secretKey, frontendKey)
 
 	return nil
 }

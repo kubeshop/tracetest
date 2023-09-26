@@ -9,7 +9,15 @@ var (
 	FrontendKey = ""
 )
 
-func newSegmentTracker(hostname, serverID, appVersion, env string) Tracker {
+func newSegmentTracker(hostname, serverID, appVersion, env, secretKey, frontendKey string) Tracker {
+	if secretKey != "" {
+		SecretKey = secretKey
+	}
+
+	if frontendKey != "" {
+		FrontendKey = frontendKey
+	}
+
 	client, _ := segment.NewWithConfig(SecretKey, segment.Config{
 		BatchSize: 1,
 	})
