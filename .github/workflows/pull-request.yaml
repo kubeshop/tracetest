@@ -224,6 +224,18 @@ jobs:
           name: tracetest-dist
           path: dist/
 
+      # test build, remove before merging it
+      - name: Build and push agent
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          tags: kubeshop/tracetest-agent:$VERSION
+          file: agent/Dockerfile
+          build-args: |
+            TRACETEST_VERSION=${VERSION}
+        env:
+          VERSION: ${{ github.ref_name}}
+
   test-examples:
     name: Test examples
     needs: [build-docker]
