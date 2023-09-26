@@ -229,12 +229,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
-          tags: kubeshop/tracetest-agent:$VERSION
+          tags: kubeshop/tracetest-agent:${{ github.ref_name }}
           file: agent/Dockerfile
           build-args: |
-            TRACETEST_VERSION=${VERSION}
-        env:
-          VERSION: ${{ github.ref_name}}
+            TRACETEST_VERSION=${{ github.ref_name }}
 
   test-examples:
     name: Test examples
