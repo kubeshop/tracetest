@@ -1,4 +1,4 @@
-FROM kubeshop/tracetest:latest
+FROM kubeshop/tracetest:v0.13.9
 WORKDIR /app
 
 ENV TRACETEST_API_KEY ""
