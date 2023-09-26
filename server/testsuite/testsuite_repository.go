@@ -273,7 +273,7 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (TestSuite, error) {
 
 func (r *Repository) get(ctx context.Context, id id.ID, augmented bool) (TestSuite, error) {
 	query, params := sqlutil.TenantWithPrefix(ctx, querySelect()+" WHERE t.id = $1", "t.", id)
-	stmt, err := r.db.Prepare(query + "ORDER BY t.version DESC LIMIT 1")
+	stmt, err := r.db.Prepare(query + " ORDER BY t.version DESC LIMIT 1")
 	if err != nil {
 		return TestSuite{}, fmt.Errorf("prepare: %w", err)
 	}

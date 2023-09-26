@@ -32,7 +32,7 @@ services:
       TRACETEST_DATASTOREPIPELINES_TESTCONNECTION_ENABLED: ${TRACETEST_DATASTOREPIPELINES_TESTCONNECTION_ENABLED}
 
   postgres:
-    image: postgres:14
+    image: postgres:15.2
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
