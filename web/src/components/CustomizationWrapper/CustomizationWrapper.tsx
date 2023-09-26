@@ -5,7 +5,11 @@ interface IProps {
   children: React.ReactNode;
 }
 
-const flagValues = {[Flag.IsAnalyticsPageEnabled]: true, [Flag.IsAgentDataStoreEnabled]: false};
+const flagValues = {
+  [Flag.IsAnalyticsPageEnabled]: true,
+  [Flag.IsAgentDataStoreEnabled]: false,
+  [Flag.IsLocalModeEnabled]: false,
+};
 
 const getComponent = <T,>(id: string, fallback: React.ComponentType<T>) => fallback;
 const getFlag = (flag: Flag) => flagValues[flag];

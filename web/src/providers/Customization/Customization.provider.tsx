@@ -9,6 +9,7 @@ export enum Operation {
 export enum Flag {
   IsAnalyticsPageEnabled = 'isAnalyticsPageEnabled',
   IsAgentDataStoreEnabled = 'isAgentDataStoreEnabled',
+  IsLocalModeEnabled = 'isLocalModeEnabled',
 }
 
 interface IContext {
