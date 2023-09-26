@@ -68,6 +68,7 @@
           env: getTemplateValue('{{ .Env }}', '', parser.toString),
           experimentalFeatures: getTemplateValue('{{ .ExperimentalFeatures }}', '[]', parser.toArray),
           isTracetestDev: getTemplateValue('{{ .IsTracetestDev }}', 'false', parser.toBoolean),
+          posthogKey: 'phc_Rg59ClPckoqa5p4onheukqHKJFPbTJkiNzECjIG4lMj',
         };
 
         var base = document.createElement('base');

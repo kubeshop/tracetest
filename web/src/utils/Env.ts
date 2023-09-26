@@ -13,6 +13,7 @@ const emptyValues: IEnv = {
   serverPathPrefix: '/',
   segmentLoaded: false,
   isTracetestDev: false,
+  posthogKey: '',
 };
 
 const Env = {

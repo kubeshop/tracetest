@@ -11,6 +11,7 @@ export interface IEnv {
   serverPathPrefix: string;
   segmentLoaded: boolean;
   isTracetestDev: boolean;
+  posthogKey: string;
 }
 
 export interface IMockFactory<T, R> {
