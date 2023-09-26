@@ -77,18 +77,6 @@ jobs:
           name: tracetest-web
           path: web/build/
 
-      # release agent
-      - name: Build and push agent
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: kubeshop/tracetest-agent:${{ env.VERSION }}
-          file: agent/Dockerfile
-          build-args: |
-            TRACETEST_VERSION=${{ env.VERSION }}
-        env:
-          VERSION: ${{ github.ref_name }}
-
       # release
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache.outputs.cache-hit != 'true'
@@ -102,4 +90,16 @@ jobs:
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
           TRACETEST_DEFAULT_CLOUD_ENDPOINT: ${{ secrets.TRACETEST_DEFAULT_CLOUD_ENDPOINT }}
+
+      # release agent
+      - name: Build and push agent
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: kubeshop/tracetest-agent:${{ env.VERSION }}
+          file: agent/Dockerfile
+          build-args: |
+            TRACETEST_VERSION=${{ env.VERSION }}
+        env:
+          VERSION: ${{ github.ref_name }}
 
