@@ -1,7 +1,7 @@
 NAMESPACE=$1
 API_KEY=$2
 AGENT_VERSION="${3:-latest}"
-FILE_PATH="https://raw.githubusercontent.com/kubeshop/tracetest/k8s/agent/deploy-agent.yaml"
+FILE_PATH="https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.yaml"
 
 showUsageAndExit() {
     echo "Usage: ./script <namespace> <api-key> (<version>)?"
