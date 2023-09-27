@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracetest-agent
+  labels:
+    app: tracetest-agent
+spec:
+  selector:
+    matchLabels:
+      app: tracetest-agent
+  template:
+    metadata:
+      labels:
+        app: tracetest-agent
+    spec:
+      containers:
+        - name: tracetest-agent
+          image: kubeshop/tracetest-agent:TAG
+          env:
+            - name: TRACETEST_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tracetest-agent-secret
+                  key: api-key
+
+          ports:
+            - containerPort: 4317
+            - containerPort: 4318
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracetest-agent
+  labels:
+    app: tracetest-agent
+spec:
+  selector:
+    app: tracetest-agent
+  ports:
+    - name: grpc-collector-entrypoint
+      protocol: TCP
+      port: 4317
+      targetPort: 4317
+    - name: http-collector-entrypoint
+      protocol: TCP
+      port: 4318
+      targetPort: 4318
