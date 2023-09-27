@@ -40,25 +40,27 @@ func NewClient(ctx context.Context, config config.Config, traceCache collector.T
 }
 
 // Start the agent with given configuration
-func Start(ctx context.Context, config config.Config) error {
+func Start(ctx context.Context, config config.Config) (*Session, error) {
 	traceCache := collector.NewTraceCache()
 	client, err := NewClient(ctx, config, traceCache)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = client.Start(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = StartCollector(ctx, config, traceCache)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	client.WaitUntilDisconnected()
-	return nil
+	return &Session{
+		client: client,
+		Token:  client.SessionConfiguration().AgentIdentification.Token,
+	}, nil
 }
 
 func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {

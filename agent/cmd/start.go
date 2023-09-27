@@ -29,11 +29,14 @@ var StartCmd = cobra.Command{
 
 		log.Printf("starting agent [%s] connecting to %s", cfg.Name, cfg.ServerURL)
 
-		err = initialization.Start(ctx, cfg)
+		session, err := initialization.Start(ctx, cfg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			ExitCLI(1)
 		}
+
+		session.WaitUntilDisconnected()
+		session.Close()
 	},
 }
 
