@@ -23,7 +23,4 @@ if [ -z "${API_KEY}" ]; then
 fi
 
 kubectl create -n $NAMESPACE secret generic tracetest-agent-secret --from-literal=api-key=$API_KEY
-MANIFEST=$(curl $FILE_PATH)
-MANIFEST_WITH_VERSION=$(echo $MANIFEST | sed "s/:TAG/:$AGENT_VERSION/g")
-
-echo $MANIFEST_WITH_VERSION | kubectl apply -n $NAMESPACE
+curl $FILE_PATH | sed "s/:TAG/:$AGENT_VERSION/g" | kubectl apply -n $NAMESPACE -f -
