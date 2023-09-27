@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 
+	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/starter"
 	"github.com/spf13/cobra"
@@ -29,7 +30,16 @@ var startCmd = &cobra.Command{
 			AgentApiKey:    saveParams.agentApiKey,
 		}
 
-		err := start.Run(ctx, cliConfig, flags)
+		cfg, err := agentConfig.LoadConfig()
+		if err != nil {
+			return "", err
+		}
+
+		if cfg.APIKey != "" {
+			flags.AgentApiKey = cfg.APIKey
+		}
+
+		err = start.Run(ctx, cliConfig, flags)
 		return "", err
 	})),
 	PostRun: teardownCommand,

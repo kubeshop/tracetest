@@ -110,6 +110,9 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 
 	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", cfg.Name))
 	session, err := initialization.Start(ctx, cfg)
+	if err != nil {
+		return err
+	}
 
 	claims, err := s.getTokenClaims(session.Token)
 	if err != nil {
