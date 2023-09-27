@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: tracetest-agent
-          image: kubeshop/tracetest-agent:v0.13.9
+          image: kubeshop/tracetest-agent:TAG
           env:
             - name: TRACETEST_API_KEY
               valueFrom:
