@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/kubeshop/tracetest/agent/collector"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/initialization"
 
@@ -34,7 +33,7 @@ func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.Confi
 
 func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
 	if cfg.AgentApiKey != "" {
-		err := s.StartAgent(ctx, cfg.AgentEndpoint, "local", cfg.AgentApiKey, cfg.UIEndpoint)
+		err := s.StartAgent(ctx, cfg.AgentEndpoint, cfg.AgentApiKey, cfg.UIEndpoint)
 		if err != nil {
 			s.ui.Error(err.Error())
 		}
@@ -51,7 +50,7 @@ func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
 Connecting Agent with name %s to Organization %s and Environment %s
 `, "local", cfg.OrganizationID, env.Name))
 
-	err = s.StartAgent(ctx, cfg.AgentEndpoint, "local", env.AgentApiKey, cfg.UIEndpoint)
+	err = s.StartAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey, cfg.UIEndpoint)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
@@ -95,35 +94,24 @@ func (s *Starter) getEnvironment(ctx context.Context, cfg config.Config) (enviro
 	return env, nil
 }
 
-func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, uiEndpoint string) error {
-	cfg := agentConfig.Config{
-		ServerURL: endpoint,
-		APIKey:    agentApiKey,
-		Name:      name,
-		OTLPServer: agentConfig.OtlpServer{
-			GRPCPort: 4317,
-			HTTPPort: 4318,
-		},
-	}
-
-	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", name))
-	cache := collector.NewTraceCache()
-	client, err := initialization.NewClient(ctx, cfg, cache)
+func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoint string) error {
+	cfg, err := agentConfig.LoadConfig()
 	if err != nil {
 		return err
 	}
 
-	err = client.Start(ctx)
-	if err != nil {
-		return err
+	if endpoint != "" {
+		cfg.ServerURL = endpoint
 	}
 
-	err = initialization.StartCollector(ctx, cfg, cache)
-	if err != nil {
-		return err
+	if agentApiKey != "" {
+		cfg.APIKey = agentApiKey
 	}
 
-	claims, err := s.getTokenClaims(client.SessionConfiguration().AgentIdentification.Token)
+	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", cfg.Name))
+	session, err := initialization.Start(ctx, cfg)
+
+	claims, err := s.getTokenClaims(session.Token)
 	if err != nil {
 		return err
 	}
@@ -140,7 +128,7 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, name, agentApiKey, u
 			Text: "Stop this agent",
 			Fn: func(_ ui.UI) {
 				isOpen = false
-				go client.Close()
+				session.Close()
 			},
 		}}
 
