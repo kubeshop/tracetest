@@ -1,6 +1,6 @@
 import {Tabs, TabsProps} from 'antd';
 import {useEffect, useMemo, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 import RunDetailAutomate from 'components/RunDetailAutomate';
 import RunDetailTest from 'components/RunDetailTest';
 import RunDetailTrace from 'components/RunDetailTrace';
@@ -34,6 +34,10 @@ const renderTab = (title: string, testId: string, runId: number, mode: string) =
   </S.TabLink>
 );
 
+interface CustomizedState {
+  origin: string;
+}
+
 const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {showNotification} = useNotification();
@@ -41,6 +45,12 @@ const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
   const {dataStoreConfig} = useSettingsValues();
   const [prevState, setPrevState] = useState(run.state);
   useDocumentTitle(`${name} - ${run.state}`);
+
+  const location = useLocation();
+  const [origin] = useState(() => {
+    const state = location.state as CustomizedState;
+    return state?.origin || '/';
+  });
 
   useEffect(() => {
     const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
@@ -59,10 +69,10 @@ const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
 
   const tabBarExtraContent = useMemo(
     () => ({
-      left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} />,
+      left: <HeaderLeft name={name} origin={origin} triggerType={trigger.type.toUpperCase()} />,
       right: <HeaderRight testId={id} />,
     }),
-    [id, name, trigger.type]
+    [id, name, origin, trigger.type]
   );
 
   return (

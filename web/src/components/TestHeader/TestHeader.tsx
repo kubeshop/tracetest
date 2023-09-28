@@ -19,7 +19,7 @@ const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, title, runBu
   return (
     <S.Container $isWhite>
       <S.Section>
-        <a onClick={() => navigate(-1)} data-cy="test-header-back-button">
+        <a onClick={() => navigate('/')} data-cy="test-header-back-button">
           <S.BackIcon />
         </a>
         <div>

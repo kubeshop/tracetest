@@ -14,9 +14,10 @@ interface IProps {
   isRunView?: boolean;
   testSuiteId?: string;
   testSuiteRunId: number;
+  origin?: string;
 }
 
-const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunView = false}: IProps) => {
+const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunView = false, origin}: IProps) => {
   const {getIsAllowed} = useCustomization();
   const {onJUnit} = useFileViewerModal();
   const {navigate} = useDashboard();
@@ -52,7 +53,7 @@ const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunVie
               data-cy="automate-test-button"
               key="automate-test"
               onClick={() => {
-                navigate(`/test/${testId}/run/${resultId}/automate`);
+                navigate(`/test/${testId}/run/${resultId}/automate`, {state: {origin}});
               }}
             >
               Automate
@@ -61,7 +62,7 @@ const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunVie
               data-cy="test-edit-button"
               onClick={({domEvent}) => {
                 domEvent.stopPropagation();
-                navigate(`/test/${testId}/run/${resultId}`);
+                navigate(`/test/${testId}/run/${resultId}`, {state: {origin}});
               }}
               key="edit"
               disabled={!getIsAllowed(Operation.Edit)}

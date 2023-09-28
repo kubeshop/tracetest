@@ -16,6 +16,7 @@ interface IProps {
   run: TestRun;
   testId: string;
   linkTo: string;
+  origin?: string;
 }
 
 const TestRunCard = ({
@@ -35,6 +36,7 @@ const TestRunCard = ({
   },
   testId,
   linkTo,
+  origin,
 }: IProps) => {
   const {navigate} = useDashboard();
   const metadataName = metadata?.name;
@@ -47,11 +49,11 @@ const TestRunCard = ({
     type: typeof TEST_RUN_TRACE_TAB | typeof TEST_RUN_TEST_TAB
   ) => {
     event.preventDefault();
-    navigate(`${linkTo}/${type}`);
+    navigate(`${linkTo}/${type}`, {state: {origin}});
   };
 
   return (
-    <Link to={linkTo}>
+    <Link to={linkTo} state={{origin}}>
       <S.Container $isWhite data-cy={`run-card-${runId}`}>
         <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
         <S.Info>
@@ -113,6 +115,7 @@ const TestRunCard = ({
             testId={testId}
             testSuiteRunId={testSuiteRunId}
             testSuiteId={testSuiteId}
+            origin={origin}
           />
         </div>
       </S.Container>
