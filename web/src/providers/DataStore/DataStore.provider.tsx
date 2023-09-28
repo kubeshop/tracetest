@@ -12,8 +12,6 @@ import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useSettingsValues} from '../SettingsValues/SettingsValues.provider';
 
-const {useTestConnectionMutation, useUpdateDataStoreMutation, useDeleteDataStoreMutation} = TracetestAPI.instance;
-
 interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
@@ -41,6 +39,7 @@ interface IProps {
 export const useDataStore = () => useContext(Context);
 
 const DataStoreProvider = ({children}: IProps) => {
+  const {useTestConnectionMutation, useUpdateDataStoreMutation, useDeleteDataStoreMutation} = TracetestAPI.instance;
   const {isFetching} = useSettingsValues();
   const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
   const [deleteDataStore] = useDeleteDataStoreMutation();

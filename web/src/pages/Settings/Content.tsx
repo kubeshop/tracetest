@@ -7,7 +7,7 @@ import Linter from 'components/Settings/Linter';
 import Polling from 'components/Settings/Polling';
 import TestRunner from 'components/Settings/TestRunner';
 import BetaBadge from 'components/BetaBadge/BetaBadge';
-import {Flag, useCustomization} from 'providers/Customization';
+import {Flag, useCustomization, withCustomization} from 'providers/Customization';
 import * as S from './Settings.styled';
 
 const TabsKeys = {
@@ -71,4 +71,4 @@ const Content = () => {
   );
 };
 
-export default Content;
+export default withCustomization(Content, 'settings');
