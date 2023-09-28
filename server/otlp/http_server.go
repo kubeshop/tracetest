@@ -91,7 +91,7 @@ func (s httpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, e
 }
 
 func (s httpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error) {
-	exportRequest := ptraceotlp.NewRequest()
+	exportRequest := ptraceotlp.NewExportRequest()
 
 	err := exportRequest.UnmarshalJSON(body)
 	if err != nil {
