@@ -15,15 +15,6 @@ import AnalyticsService from 'services/Analytics/Analytics.service';
 import {ConfigMode} from 'types/DataStore.types';
 import Env from 'utils/Env';
 
-const {
-  useGetDataStoreQuery,
-  useGetConfigQuery,
-  useGetDemoQuery,
-  useGetPollingQuery,
-  useGetLinterQuery,
-  useGetTestRunnerQuery,
-} = TracetestAPI.instance;
-
 interface IContext {
   dataStoreConfig: DataStoreConfig;
   isLoading: boolean;
@@ -63,6 +54,15 @@ interface IProps {
 export const useSettingsValues = () => useContext(Context);
 
 const SettingsValuesProvider = ({children}: IProps) => {
+  const {
+    useGetDataStoreQuery,
+    useGetConfigQuery,
+    useGetDemoQuery,
+    useGetPollingQuery,
+    useGetLinterQuery,
+    useGetTestRunnerQuery,
+  } = TracetestAPI.instance;
+
   // DataStore
   const dispatch = useAppDispatch();
   const {data: dataStoreConfig = DataStoreConfig({}), isLoading, isError, isFetching} = useGetDataStoreQuery({});

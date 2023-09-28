@@ -5,8 +5,6 @@ import TracetestAPI from 'redux/apis/Tracetest';
 import {TDraftResource} from 'types/Settings.types';
 import {useNotification} from '../Notification/Notification.provider';
 
-const {useCreateSettingMutation, useUpdateSettingMutation} = TracetestAPI.instance;
-
 interface IContext {
   isLoading: boolean;
   onSubmit(resource: TDraftResource[]): void;
@@ -21,6 +19,8 @@ interface IProps {
 export const useSettings = () => useContext(Context);
 
 const SettingsProvider = ({children}: IProps) => {
+  const {useCreateSettingMutation, useUpdateSettingMutation} = TracetestAPI.instance;
+
   const {showNotification} = useNotification();
   const [createSetting, {isLoading: isLoadingCreate}] = useCreateSettingMutation();
   const [updateSetting, {isLoading: isLoadingUpdate}] = useUpdateSettingMutation();
