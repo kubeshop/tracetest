@@ -152,11 +152,7 @@ func teardownCommand(cmd *cobra.Command, args []string) {
 }
 
 func setupVersion() {
-	versionText, isVersionMatch = config.GetVersion(
-		context.Background(),
-		cliConfig,
-		config.GetAPIClient(cliConfig),
-	)
+	versionText, isVersionMatch = config.GetVersion(context.Background(), cliConfig)
 }
 
 func validateVersionMismatch() {
