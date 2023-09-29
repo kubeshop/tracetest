@@ -7,8 +7,13 @@
 /* You can override the default Infima variables here. */
 
 :root {
-  --ifm-code-font-size: 95%;
+  --ifm-code-font-size: 90%;
+  --ifm-font-size-base: 16px;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+nav {
+  font-size: 16px;
 }
 
 :root footer {
@@ -58,4 +63,25 @@ div[class^='announcementBar'] a {
 div[class^='announcementBar'] a:hover {
   color: var(--ifm-link-color);
   text-decoration: underline;
+}
+
+/* Card */
+div[class^='gs__card'] .card {
+  background-color: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  transition-duration: 500ms;
+}
+
+div[class^='gs__card'] .card:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+div[class^='gs__card'] .card a {
+  color: var(--ifm-font-color-base);
+  text-decoration: inherit;
+}
+
+div[class^='gs__card'] .card a:hover {
+  color: var(--ifm-font-color-base);
+  text-decoration: inherit;
 }

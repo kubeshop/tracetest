@@ -1,0 +1,140 @@
+---
+id: open
+title: Opening Tracetest
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to get started with creating tests once you open Tracetest.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
+
+This page showcases opening the Tracetest Web UI and creating a test against the [sample Pokeshop API](../live-examples/pokeshop/overview.md).
+
+Once you've installed Tracetest, as explained in the [installation guide](./installation.mdx), you access the Tracetest Web UI on [`cloud.tracetest.io`](https://cloud.tracetest.io). Here's what will greet you after a fresh install.
+
+![Landing page Tracetest](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688474565/docs/screely-1688474539641_kbhvvc.png)
+
+## Creating Trace-based Tests
+
+You can create tests in two ways:
+
+- Visually, in the Web UI
+- Programmatically, in YAML
+
+## Creating Trace-based Tests Visually
+
+This guide will show how to create end-to-end and integration tests in less than 5 minutes via the Web UI.
+
+:::note
+To view the in-depth guide on creating tests visually, [check out this docs page](../web-ui/creating-tests.md).
+:::
+
+### Create
+
+On the top right, click the **Create** button and select **Create New Test** in the drop down.
+
+![Create a new test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688475179/docs/screely-1688475174365_ckq3cn.png)
+
+Select an **HTTP Request** as the **test trigger**, and choose the **Pokeshop - Import** example.
+
+![Select Pokeshop example](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688475514/docs/screely-1688475510090_r6hqmx.png)
+
+This will populate a sample API test against a POST endpoint in the Pokeshop app demo. Clicking **Create & Run** will save and trigger the test.
+
+![API test against POST endpoint](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688475680/docs/screely-1688475676524_vvtxsu.png)
+
+### Trigger
+
+You'll be redirected to the test page where you can see four tabs and depending on which one you select you'll get access to:
+
+- Test trigger and results
+- The entire distributed trace and trace analysis
+- Test specification and assertions
+- How to automate the test
+
+:::note
+To view the in-depth guide on test results, [check out this docs page](http://localhost:3000/web-ui/test-results)
+:::
+
+The **Trigger** tab shows how the test was triggered and what the API response was.
+
+![test result](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476389/docs/screely-1688476384678_edcsgx.png)
+
+### Trace
+
+The **Trace** tab shows the entire distributed trace for debugging and a trace analysis score.
+
+![distributed trace and trace analysis score](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476460/docs/screely-1688476455986_q24aa2.png)
+
+### Test
+
+The **Test** tab shows span attributes. Here you add test specs and assertions on attribute values. You also get a test snippets out-of-the-box for common test cases.
+
+In the sample below, you see how to assert that all database spans return in less than `100ms`.
+
+![test specs](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688476657/docs/screely-1688476653521_omxe4r.png)
+
+### Automate
+
+The **Automate** tab shows how to automate the test run with the Tracetest CLI and other automation options.
+
+![automate](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688564019/docs/screely-1688564011617_n5pizv.png)
+
+From here you can download a YAML file test definition and run it with the CLI.
+
+## Creating Trace-based Tests Programatically
+
+The test definition will contain:
+
+- The **Trigger** for the test in the `trigger` section.
+- The **Test Specifications** in the`specs` section.
+
+You can either download the YAML file test definition, or write one from scratch.
+
+### Create
+
+Using the sample from above, create the Trace-based Test programatically.
+
+```yaml title="pokeshop_import.yaml"
+type: Test
+spec:
+  id: Yg9sN-94g
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon/import
+      method: POST
+      headers:
+      - key: Content-Type
+        value: application/json
+      body: '{"id":52}'
+  specs:
+  - name: 'All Database Spans: Processing time is less than 100ms'
+    selector: span[tracetest.span.type="database"]
+    assertions:
+    - attr:tracetest.span.duration < 100ms
+```
+
+### Trigger
+
+Using the CLI, trigger a test run.
+
+```bash title="Terminal"
+tracetest run test -f pokeshop_import.yaml -o pretty
+```
+
+### Output
+
+The test run will complete and show a result.
+
+```text title="Output"
+✔ Pokeshop - Import (http://localhost:11633/test/Yg9sN-94g/run/3/test)
+	✔ All Database Spans: Processing time is less than 100ms
+```
+
+The provided link in the test output will open the test run in the Tracetest Web UI.

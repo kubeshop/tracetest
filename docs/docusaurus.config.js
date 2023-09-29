@@ -259,6 +259,12 @@ const config = {
           {
             type: 'docSidebar',
             position: 'left',
+            sidebarId: 'coreSidebar',
+            label: 'Core'
+          },
+          {
+            type: 'docSidebar',
+            position: 'left',
             sidebarId: 'examplesTutorialsSidebar',
             label: 'Examples & Tutorials'
           },
@@ -269,24 +275,14 @@ const config = {
             label: 'Live Examples'
           },
           {
-            href: '/openapi',
-            // Only one of "to" or "href" should be used
-            // href: 'https://www.facebook.com',
-            label: 'Open API',
-            // Only one of "label" or "html" should be used
-            // html: '<b>Introduction</b>'
-            position: 'left',
-            target: '_self',
-          },
-          {
             href: "https://tracetest.io/community",
             label: "Community",
             position: "left",
           },
           {
             type: "html",
-            position: "left",
-            value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=medium" style='margin-top: 6px' frameborder="0" scrolling="0" width="150" height="20" title="GitHub"></iframe>`,
+            position: "right",
+            value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=medium" style='margin-top: 6px' frameborder="0" scrolling="0" width="90" height="20" title="GitHub"></iframe>`,
           },
           {
             type: "search",
