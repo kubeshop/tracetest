@@ -13,6 +13,8 @@ const UserSelectors = () => ({
       return user.preferences[key];
     }
   ),
+
+  selectRunOriginPath: (state: RootState) => state.user.runOriginPath,
 });
 
 export default UserSelectors();

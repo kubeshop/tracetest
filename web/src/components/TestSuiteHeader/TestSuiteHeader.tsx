@@ -7,6 +7,8 @@ import {TestState as TestStateEnum} from 'constants/TestRun.constants';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestSuite} from 'providers/TestSuite/TestSuite.provider';
 import {useTestSuiteRun} from 'providers/TestSuiteRun/TestSuite.provider';
+import {useAppSelector} from 'redux/hooks';
+import UserSelectors from 'selectors/User.selectors';
 import * as S from './TestSuiteHeader.styled';
 import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
 
@@ -34,11 +36,12 @@ const TestSuiteHeader = () => {
   const {id: testSuiteId, name, version, description} = testSuite;
   const {state, id: runId, allStepsRequiredGatesPassed} = run;
   const lastPath = getLastPath(pathname);
+  const runOriginPath = useAppSelector(UserSelectors.selectRunOriginPath);
 
   return (
     <S.Container>
       <S.Section>
-        <a onClick={() => navigate('/')} data-cy="testsuite-header-back-button">
+        <a onClick={() => navigate(runOriginPath)} data-cy="testsuite-header-back-button">
           <S.BackIcon />
         </a>
         <div>
