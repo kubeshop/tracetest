@@ -9,9 +9,10 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config/configcompression"
 	"go.opentelemetry.io/collector/config/configgrpc"
+	"go.opentelemetry.io/collector/config/configopaque"
 	"go.opentelemetry.io/collector/config/configtls"
 	"google.golang.org/grpc"
 )
@@ -24,13 +25,18 @@ type GrpcClient struct {
 }
 
 func convertDomainConfigToOpenTelemetryConfig(config *datastore.GRPCClientSettings) *configgrpc.GRPCClientSettings {
+	headers := make(map[string]configopaque.String)
+	for name, value := range config.Headers {
+		headers[name] = configopaque.String(value)
+	}
+
 	// manual map domain fields to OTel fields
 	otelConfig := &configgrpc.GRPCClientSettings{
 		Endpoint:        config.Endpoint,
 		ReadBufferSize:  config.ReadBufferSize,
 		WriteBufferSize: config.WriteBufferSize,
 		WaitForReady:    config.WaitForReady,
-		Headers:         config.Headers,
+		Headers:         headers,
 		BalancerName:    config.BalancerName,
 
 		Compression: configcompression.CompressionType(config.Compression),
@@ -84,12 +90,7 @@ func (client *GrpcClient) Endpoint() string {
 }
 
 func (client *GrpcClient) Connect(ctx context.Context) error {
-	opts, err := client.config.ToDialOptions(nil, componenttest.NewNopTelemetrySettings())
-	if err != nil {
-		return errors.Wrap(connection.ErrInvalidConfiguration, err.Error())
-	}
-
-	conn, err := grpc.DialContext(ctx, client.config.Endpoint, opts...)
+	conn, err := client.config.ToClientConn(ctx, nil, component.TelemetrySettings{})
 	if err != nil {
 		return errors.Wrap(connection.ErrConnectionFailed, err.Error())
 	}
