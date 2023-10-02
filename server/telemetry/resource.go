@@ -15,11 +15,16 @@ func getResource(cfg *config.TelemetryExporterOption) (*resource.Resource, error
 		return nil, fmt.Errorf("could not get OS hostname: %w", err)
 	}
 
+	serviceName := "tracetest"
+	if cfg != nil && cfg.ServiceName != "" {
+		serviceName = cfg.ServiceName
+	}
+
 	resource, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(cfg.ServiceName),
+			semconv.ServiceNameKey.String(serviceName),
 			semconv.HostName(hostname),
 		),
 	)
