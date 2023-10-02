@@ -1,0 +1,23 @@
+type: Test
+spec:
+  id: T7-delWIR
+  name: Pokemon Import
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: http://localhost:8081/pokemon/import
+      body: "{\"id\":6}"
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="database"]
+    name: "All Database Spans: Processing time is less than 100ms"
+    assertions:
+    - attr:tracetest.span.duration  <  100ms
+    - attr:db.system != ""
+  - selector: span[tracetest.span.type="http"]
+    name: "All HTTP Spans: Status code is 200"
+    assertions:
+    - attr:http.status_code = 200

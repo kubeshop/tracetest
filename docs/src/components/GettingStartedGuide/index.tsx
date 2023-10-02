@@ -8,7 +8,7 @@ import Heading from '@theme/Heading';
 
 const GettingStartedGuides = [
   {
-    name: '🌥️ Tracetest Cloud',
+    name: 'Tracetest 🚀',
     url: './installation',
     description: (
       <Translate >
@@ -18,11 +18,11 @@ const GettingStartedGuides = [
     button: 'Start',
   },
   {
-    name: '🪨 Tracetest Core',
+    name: 'Tracetest Core 🪨 ',
     url: '../core/getting-started/installation',
     description: (
       <Translate>
-        Use the open-source Tractest Core in your infrastructure.
+        Use the open-source Tracetest Core in your own infrastructure.
       </Translate>
     ),
     button: 'Go to Core',

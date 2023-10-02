@@ -122,16 +122,16 @@ const config = {
             from: ['/advanced-selectors' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
-            to: '/deployment/docker',
-            from: ['/deployment/overview/docker' /*, '/docs/legacyDocFrom2016'*/],
+            to: '/core/deployment/docker',
+            from: ['/deployment/overview/docker', '/deployment/docker' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
-            to: '/deployment/kubernetes',
-            from: ['/deployment/overview/kubernetes' /*, '/docs/legacyDocFrom2016'*/],
+            to: '/core/deployment/kubernetes',
+            from: ['/deployment/overview/kubernetes', '/deployment/kubernetes' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
-            to: '/getting-started/detailed-installation',
-            from: ['/getting-started/cli' /*, '/docs/legacyDocFrom2016'*/],
+            to: '/getting-started/installation',
+            from: ['/getting-started/cli', '/getting-started/detailed-installation' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
             to: '/configuration/overview',
@@ -204,6 +204,10 @@ const config = {
           {
             to: '/web-ui/creating-test-suites',
             from: ['/web-ui/creating-transactions'],
+          },
+          {
+            to: '/getting-started/installation',
+            from: ['/installing'],
           },
         ],
         // createRedirects(existingPath) {

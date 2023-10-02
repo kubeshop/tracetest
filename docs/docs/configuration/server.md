@@ -15,14 +15,28 @@ postgres:
   dbname: postgres
   params: sslmode=disable
 
-server: 
+telemetry:
+  exporters:
+    collector:
+      serviceName: tracetest
+      sampling: 100 # 100%
+      exporter:
+        type: collector
+        collector:
+          endpoint: otel-collector:4317
+
+server:
   httpPort: 11633
   pathPrefix: /
+  telemetry:
+    exporter: collector
+    applicationExporter: collector
 ```
 
 Alternatively, we support setting a series of environment variables which can contain the connection information for the Postgres instance. If these environment variables are set, they will be used by the Tracetest server to connect to the database.
 
 The list of environment variables and example values is:
+
 - `TRACETEST_POSTGRES_HOST: "postgres"`
 - `TRACETEST_POSTGRES_PORT: "5432"`
 - `TRACETEST_POSTGRES_DBNAME: "postgres"`
@@ -35,6 +49,4 @@ You can also change the defaults for the Tracetest server, altering the port and
 - `TRACETEST_SERVER_HTTPPORT=11633`
 - `TRACETEST_SERVER_PATHPREFIX="/"`
 
-
-You can also intitalize the server with a number of resources the first time it is launched by using [provisioning](./provisioning).
-
+You can also initialize the server with a number of resources the first time it is launched by using [provisioning](./provisioning).

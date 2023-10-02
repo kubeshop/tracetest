@@ -1,6 +1,6 @@
 ---
 id: installation
-title: Installing Tracetest
+title: Installing Tracetest Core
 description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
 keywords:
   - tracetest
@@ -16,21 +16,21 @@ import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
-This page showcases getting started with Tracetest by using the Tracetest CLI, Docker, or Kubernetes.
+This page showcases getting started with Tracetest Core by using the Tracetest CLI, Docker, or Kubernetes.
 
-This simple installation includes a demo app called [Pokeshop](../live-examples/pokeshop/overview.md) that will be installed alongside Tracetest. It shows how to configure OpenTelemetry and Tracetest and the architecture of the Pokeshop sample app.
+This simple installation includes a demo app called [Pokeshop](/live-examples/pokeshop/overview.md) that will be installed alongside Tracetest Core. It shows how to configure OpenTelemetry and Tracetest Core and the architecture of the Pokeshop sample app.
 
 ## Install the Tracetest CLI
 
 <GtagInstallCliTabs></GtagInstallCliTabs>
 
 :::tip Want more info?
-Read the CLI installation reference [here](../cli/cli-installation-reference.md).
+Read the CLI installation reference [here](/cli/cli-installation-reference.md).
 :::
 
 ## Install the Tracetest Server
 
-Tracetest runs as a standalone container. It runs a Server and exposes a Web UI on port `11633`.
+Tracetest Core runs as a standalone container. It runs a Server and exposes a Web UI on port `11633`.
 
 You have three options to install Tracetest Server:
 
@@ -51,12 +51,12 @@ tracetest server install
         language="text"
         title="Terminal"
     >
-    {`How do you want to run TraceTest? [type to search]:
+    {`How do you want to run Tracetest? [type to search]:
 > Using Docker Compose
   Using Kubernetes`}
     </CodeBlock>
 
-Choose to install Tracetest with the OpenTelemetry Collector and the [Pokeshop](../live-examples/pokeshop/overview.md) sample app.
+Choose to install Tracetest with the OpenTelemetry Collector and the [Pokeshop](/live-examples/pokeshop/overview.md) sample app.
 
 ```text title="Expected output:"
 Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
@@ -66,8 +66,8 @@ Do you have OpenTelemetry based tracing already set up, or would you like us to 
 
 Choosing any option, this installer will create a `tracetest` directory in the current directory and add a `docker-compose.yaml` file to it.
 
-- If you choose the first option, the `docker-compose.yaml` will have only Tracetest and its dependencies.
-- **By choosing the second option, a sample app called [Pokeshop](../live-examples/pokeshop/overview.md) will be installed with Tracetest, allowing you to create sample tests right away!**
+- If you choose the first option, the `docker-compose.yaml` will have only Tracetest Core and its dependencies.
+- **By choosing the second option, a sample app called [Pokeshop](/live-examples/pokeshop/overview.md) will be installed with Tracetest Core, allowing you to create sample tests right away!**
 
 <details>
   <summary>
@@ -129,7 +129,7 @@ This will start the Tracetest Server and expose the Web UI on [`http://localhost
 > Using Kubernetes`}
     </CodeBlock>
 
-Choose to install Tracetest with the OpenTelemetry Collector and the [Pokeshop](../live-examples/pokeshop/overview.md) sample app.
+Choose to install Tracetest Core with the OpenTelemetry Collector and the [Pokeshop](/live-examples/pokeshop/overview.md) sample app.
 
 ```text title="Expected output:"
 Do you have OpenTelemetry based tracing already set up, or would you like us to install a demo tracing environment and app? [type to search]: 
@@ -137,10 +137,10 @@ Do you have OpenTelemetry based tracing already set up, or would you like us to 
 > Just learning tracing! Install Tracetest, OpenTelemetry Collector and the sample app.
 ```
 
-Choosing any option, this installer will create a `tracetest` namespace in the Kubernetes context you choose and create deployments for Tracetest and its dependencies.
+Choosing any option, this installer will create a `tracetest` namespace in the Kubernetes context you choose and create deployments for Tracetest Core and its dependencies.
 
-- If you choose the first option, the `tracetest` namespace will only contain Tracetest and its dependencies.
-- **By choosing the second option, a sample app called [Pokeshop](../live-examples/pokeshop/overview.md) will be installed in a `demo` namespace alongside Tracetest, allowing you to create sample tests right away!**
+- If you choose the first option, the `tracetest` namespace will only contain Tracetest Core and its dependencies.
+- **By choosing the second option, a sample app called [Pokeshop](/live-examples/pokeshop/overview.md) will be installed in a `demo` namespace alongside Tracetest Core, allowing you to create sample tests right away!**
 
 <details>
   <summary>
@@ -239,7 +239,7 @@ First, be sure that you have [Docker](https://docker.com/) installed in your mac
 
 The Quick Start with the Pokeshop Sample App is located [here](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-pokeshop).
 
-**The [`docker-compose.yaml`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-pokeshop/docker-compose.yml) contains Tracetest, the OpenTelemetry Collector, and a sample app called [Pokeshop](../live-examples/pokeshop/overview.md). This allows you to create sample tests right away!**
+**The [`docker-compose.yaml`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-pokeshop/docker-compose.yml) contains Tracetest Core, the OpenTelemetry Collector, and a sample app called [Pokeshop](/live-examples/pokeshop/overview.md). This allows you to create sample tests right away!**
 
 <details>
   <summary>
@@ -294,7 +294,7 @@ This will start the Tracetest Server and expose the Web UI on [`http://localhost
 </Tabs>
 
 :::tip Don't have OpenTelemetry installed?
-Tracetest requires that you have [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) added in your code, and configured [sending traces to a trace data store](../configuration/connecting-to-data-stores/jaeger.md), or [Tracetest directly](../configuration/connecting-to-data-stores/opentelemetry-collector.md).
+Tracetest requires that you have [OpenTelemetry instrumentation](https://opentelemetry.io/docs/instrumentation/) added in your code, and configured [sending traces to a trace data store](/configuration/connecting-to-data-stores/jaeger.md), or [Tracetest directly](/configuration/connecting-to-data-stores/opentelemetry-collector.md).
 
-[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./no-otel.mdx)
+[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](/getting-started/no-otel.mdx)
 :::

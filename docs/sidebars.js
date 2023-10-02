@@ -353,6 +353,11 @@ const sidebars = {
 
   coreSidebar: [
     {
+      type: "link",
+      label: "Welcome! 👋",
+      href: "/",
+    },
+    {
       type: "category",
       label: "Getting Started",
       link: {
@@ -363,17 +368,12 @@ const sidebars = {
         {
           type: "doc",
           id: "core/getting-started/installation",
-          label: "Installing Tracetest",
+          label: "Installing Tracetest Core",
         },
         {
           type: "doc",
           id: "core/getting-started/open",
-          label: "Opening Tracetest",
-        },
-        {
-          type: "doc",
-          id: "core/getting-started/no-otel",
-          label: "What if I don't have OpenTelemetry installed?",
+          label: "Opening Tracetest Core",
         },
       ],
     },

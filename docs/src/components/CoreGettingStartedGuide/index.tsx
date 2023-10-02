@@ -29,7 +29,7 @@ const CoreGettingStartedGuides = [
   },
   {
     name: '🤔 Don\'t have OpenTelemetry?',
-    url: './no-otel',
+    url: '/getting-started/no-otel',
     description: (
       <Translate >
         Install OpenTelemetry in 5 minutes without any code changes!

@@ -1,0 +1,27 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+  # Data sources: traces
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+
+exporters:
+  otlp/tracetestagent:
+    endpoint: host.docker.internal:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces/tracetestagent:
+      receivers: [otlp]
+      processors: [probabilistic_sampler, batch]
+      exporters: [otlp/tracetestagent]
