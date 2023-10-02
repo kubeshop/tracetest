@@ -1,8 +1,9 @@
 import {MoreOutlined} from '@ant-design/icons';
 import {Button, Space, Typography} from 'antd';
+import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
-import styled from 'styled-components';
+import Link from 'components/Link';
 import {ResourceType} from 'types/Resource.type';
 
 export const ActionButton = styled(MoreOutlined)`
@@ -77,9 +78,7 @@ export const HeaderDetail = styled(Typography.Text)`
   margin-right: 8px;
 `;
 
-export const Link = styled(Button).attrs({
-  type: 'link',
-})`
+export const CustomLink = styled(Link)`
   color: ${({theme}) => theme.color.primary};
   font-weight: 600;
   padding: 0;

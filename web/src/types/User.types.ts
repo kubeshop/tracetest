@@ -12,4 +12,5 @@ export type TUserPreferenceValue<K extends TUserPreferenceKey = TUserPreferenceK
 
 export interface IUserState {
   preferences: IUserPreferences;
+  runOriginPath: string;
 }

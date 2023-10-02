@@ -1,9 +1,10 @@
-import {createAction, createSlice} from '@reduxjs/toolkit';
+import {PayloadAction, createAction, createSlice} from '@reduxjs/toolkit';
 import UserPreferencesService from 'services/UserPreferences.service';
 import {IUserState, TUserPreferenceKey, TUserPreferenceValue} from 'types/User.types';
 
 export const initialState: IUserState = {
   preferences: UserPreferencesService.get(),
+  runOriginPath: '/',
 };
 
 interface ISetUserPreferencesProps {
@@ -20,7 +21,11 @@ export const setUserPreference = createAction('user/setUserPreference', ({key, v
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    runOriginPathAdded(state, {payload}: PayloadAction<string>) {
+      state.runOriginPath = payload;
+    },
+  },
   extraReducers: builder => {
     builder.addCase(setUserPreference, (state, {payload: {preferences}}) => {
       state.preferences = preferences;
@@ -28,5 +33,5 @@ const userSlice = createSlice({
   },
 });
 
-// export const {} = testDefinitionSlice.actions;
+export const {runOriginPathAdded} = userSlice.actions;
 export default userSlice.reducer;
