@@ -33,14 +33,15 @@ import (
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/telemetry"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testconnection"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
-	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -180,13 +181,19 @@ func (app *App) Start(opts ...appOption) error {
 	configRepo := config.NewRepository(db, config.WithPublisher(subscriptionManager))
 	configFromDB := configRepo.Current(ctx)
 
-	tracer, err := tracing.NewTracer(ctx, app.cfg)
+	tracer, err := telemetry.NewTracer(ctx, app.cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	meter, err := telemetry.NewMeter(ctx, app.cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	app.registerStopFn(func() {
 		fmt.Println("stopping tracer")
-		tracing.ShutdownTracer(ctx)
+		telemetry.ShutdownTracer(ctx)
 	})
 
 	serverID, isNewInstall, err := testDB.ServerID()
@@ -208,7 +215,7 @@ func (app *App) Start(opts ...appOption) error {
 		}
 	}
 
-	applicationTracer, err := tracing.GetApplicationTracer(ctx, app.cfg)
+	applicationTracer, err := telemetry.GetApplicationTracer(ctx, app.cfg)
 	if err != nil {
 		return fmt.Errorf("could not create trigger span tracer: %w", err)
 	}
@@ -290,6 +297,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	router, mappers := controller(app.cfg,
 		tracer,
+		meter,
 
 		testPipeline,
 		testSuitePipeline,
@@ -304,6 +312,10 @@ func (app *App) Start(opts ...appOption) error {
 		tracedbFactory,
 	)
 	registerWSHandler(router, mappers, subscriptionManager)
+
+	// report metrics about endpoints, this is the first middleware to be run so
+	// it also accounts for the duration of all other middlewares
+	router.Use(middleware.NewMetricMiddleware(meter))
 
 	// use the analytics middleware on complete router
 	router.Use(analyticsMW)
@@ -551,6 +563,7 @@ func controller(
 	cfg httpServerConfig,
 
 	tracer trace.Tracer,
+	meter metric.Meter,
 
 	testRunner *executor.TestPipeline,
 	testSuitesRunner *executor.TestSuitesPipeline,
@@ -571,6 +584,7 @@ func controller(
 		cfg,
 
 		tracer,
+		meter,
 
 		testRunner,
 		testSuitesRunner,
@@ -594,6 +608,7 @@ func httpRouter(
 	cfg httpServerConfig,
 
 	tracer trace.Tracer,
+	meter metric.Meter,
 
 	testRunner *executor.TestPipeline,
 	testSuitesRunner *executor.TestSuitesPipeline,

@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 )
 
 type (
@@ -20,9 +21,10 @@ type (
 	}
 
 	TelemetryExporterOption struct {
-		ServiceName string         `yaml:",omitempty" mapstructure:"serviceName"`
-		Sampling    float64        `yaml:",omitempty" mapstructure:"sampling"`
-		Exporter    ExporterConfig `yaml:",omitempty" mapstructure:"exporter"`
+		ServiceName           string         `yaml:",omitempty" mapstructure:"serviceName"`
+		Sampling              float64        `yaml:",omitempty" mapstructure:"sampling"`
+		MetricsReaderInterval time.Duration  `yaml:",omitempty" mapstructure:"metricsReaderInterval"`
+		Exporter              ExporterConfig `yaml:",omitempty" mapstructure:"exporter"`
 	}
 
 	ExporterConfig struct {
