@@ -1,6 +1,15 @@
-import {Dropdown, Row, Space, Typography} from 'antd';
+import {Button as AntdButton, Dropdown, Row, Space, Typography} from 'antd';
 import AllowButton from 'components/AllowButton';
 import styled from 'styled-components';
+
+export const Button = styled(AntdButton)`
+  font-weight: 600;
+`;
+
+export const Link = styled.a`
+  color: ${({theme}) => theme.color.primary};
+  font-weight: 600;
+`;
 
 export const CreateTestButton = styled(AllowButton)`
   font-weight: 600;
