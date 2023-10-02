@@ -118,3 +118,8 @@ export const InfoIcon = styled(CheckCircleOutlined)`
   cursor: pointer;
   margin: 4px;
 `;
+
+export const Link = styled.a`
+  color: ${({theme}) => theme.color.primary};
+  font-weight: 600;
+`;
