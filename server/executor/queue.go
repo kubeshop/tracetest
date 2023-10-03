@@ -17,6 +17,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -187,6 +188,8 @@ type queueConfigurer[T any] struct {
 	pollingProfiles pollingProfileGetter
 	dataStores      dataStoreGetter
 
+	meter metric.Meter
+
 	instanceID string
 }
 
@@ -239,6 +242,11 @@ func (qb *queueConfigurer[T]) WithTestSuiteRunGetter(suiteRuns testSuiteRunGette
 	return qb
 }
 
+func (qb *queueConfigurer[T]) WithMetricMeter(meter metric.Meter) *queueConfigurer[T] {
+	qb.meter = meter
+	return qb
+}
+
 func (qb *queueConfigurer[T]) Configure(queue *pipeline.Queue[Job]) {
 	q := &Queue{
 		cancelRunHandlerFn: qb.cancelRunHandlerFn,
@@ -258,6 +266,8 @@ func (qb *queueConfigurer[T]) Configure(queue *pipeline.Queue[Job]) {
 
 	queue.EnqueuePreprocessorFn = q.enqueuePreprocess
 	queue.ListenPreprocessorFn = q.listenPreprocess
+
+	queue.InitializeMetrics(qb.meter)
 
 }
 
