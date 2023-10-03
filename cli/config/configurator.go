@@ -99,16 +99,16 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return Save(cfg)
 	}
 
-	if prev.Jwt != "" {
-		cfg.Jwt = prev.Jwt
-		cfg.Token = prev.Token
-
+	if flags.AgentApiKey != "" {
+		cfg.AgentApiKey = flags.AgentApiKey
 		c.ShowOrganizationSelector(ctx, cfg, flags)
 		return nil
 	}
 
-	if flags.AgentApiKey != "" {
-		cfg.AgentApiKey = flags.AgentApiKey
+	if prev.Jwt != "" {
+		cfg.Jwt = prev.Jwt
+		cfg.Token = prev.Token
+
 		c.ShowOrganizationSelector(ctx, cfg, flags)
 		return nil
 	}

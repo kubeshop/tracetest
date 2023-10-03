@@ -4,11 +4,12 @@ import * as S from '../TestSuites/TestSuites.styled';
 interface IProps {
   onCreate(): void;
   title?: string;
+  dataCy?: string;
 }
 
-const CreateButton = ({onCreate, title}: IProps) => (
+const CreateButton = ({onCreate, title, dataCy}: IProps) => (
   <S.ActionContainer>
-    <S.CreateTestButton operation={Operation.Edit} type="primary" data-cy="create-button" onClick={onCreate}>
+    <S.CreateTestButton operation={Operation.Edit} type="primary" data-cy={dataCy} onClick={onCreate}>
       {title || 'Create'}
     </S.CreateTestButton>
   </S.ActionContainer>
