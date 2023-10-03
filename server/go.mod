@@ -148,8 +148,11 @@ require (
 	go.opentelemetry.io/collector/extension v0.80.0 // indirect
 	go.opentelemetry.io/collector/extension/auth v0.80.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.0.0-rcv0015 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.42.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.42.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect

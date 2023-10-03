@@ -12,13 +12,13 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/subscription"
+	"github.com/kubeshop/tracetest/server/telemetry"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
-	"github.com/kubeshop/tracetest/server/tracing"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -577,7 +577,7 @@ func getEventEmitterMock(t *testing.T, db *testdb.MockRepository) executor.Event
 func getTracerMock(t *testing.T) trace.Tracer {
 	t.Helper()
 
-	tracer, err := tracing.NewTracer(context.TODO(), config.Must(config.New()))
+	tracer, err := telemetry.NewTracer(context.TODO(), config.Must(config.New()))
 	require.NoError(t, err)
 
 	return tracer
