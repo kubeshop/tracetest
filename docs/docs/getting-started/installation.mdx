@@ -36,7 +36,7 @@ Tracetest Agent runs as a standalone process. It runs either locally on your mac
 tracetest start
 </CodeBlock>
 
-The Agent will start and open a browser to prompt signing in to Tracetest.
+The Agent will start and open a browser. Sign in to Tracetest.
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1695990166/docs/screely-1695990151905_eb8yiw.png)
 
@@ -63,20 +63,102 @@ HTTP: `http://localhost:4318/v1/traces`
 
   </TabItem>
   <TabItem value="docker" label="Docker" default>
-    <CodeBlock
-        language="text"
-        title="Terminal"
-    >
-    TBD
-    </CodeBlock>
+
+<CodeBlock
+    language="text"
+    title="Terminal"
+>
+{`docker run \\\n-p 4317:4317 \\\n-p 4318:4318 \\\n-e TRACETEST_API_KEY="<your_api_key>" \\\nkubeshop/tracetest-agent`}
+</CodeBlock>
+
+The Agent will start and open a browser. Sign in to Tracetest.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1695990166/docs/screely-1695990151905_eb8yiw.png)
+
+Once signed in, return to the terminal.
+
+<CodeBlock
+  language="text"
+  title="Expected output:"
+>
+{`Defaulting to only available Environment: localMode
+  INFO Connecting Agent with name local to Organization org_name and Environment localMode
+  INFO Starting Agent with name local...
+Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment (env_name).
+You can: [type to search]:
+> Open Tracetest in a browser to this environment
+  Stop this agent`}
+</CodeBlock>
+
+The Tracetest Agent is running in Docker and ready to accept traces.
+
+gRPC: `http://<service-name>:4317`
+
+HTTP: `http://<service-name>:4318/v1/traces`
+
+:::note
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+To run tests against apps running on your local machine you have two options:
+
+1. Run Tracetest Agent locally with the `tracetest start` command.
+2. Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+You can reach services running on your local machine using:
+
+- Linux (docker version < 20.10.0): `172.17.0.1:8080`
+- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
+:::
+
   </TabItem>
   <TabItem value="kubernetes" label="Kubernetes" default>
-    <CodeBlock
-        language="text"
-        title="Terminal"
-    >
-    TBD
-    </CodeBlock>
+
+<CodeBlock
+    language="text"
+    title="Terminal"
+>
+{`curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <your_api_key>`}
+</CodeBlock>
+
+The Agent will start and open a browser. Sign in to Tracetest.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1695990166/docs/screely-1695990151905_eb8yiw.png)
+
+Once signed in, return to the terminal.
+
+<CodeBlock
+  language="text"
+  title="Expected output:"
+>
+{`Defaulting to only available Environment: localMode
+  INFO Connecting Agent with name local to Organization org_name and Environment localMode
+  INFO Starting Agent with name local...
+Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment (env_name).
+You can: [type to search]:
+> Open Tracetest in a browser to this environment
+  Stop this agent`}
+</CodeBlock>
+
+The Tracetest Agent is running in Kubernetes and ready to accept traces.
+
+gRPC: `http://<service-name>:4317`
+
+HTTP: `http://<service-name>:4318/v1/traces`
+
+:::note
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+To run tests against apps running on your local machine you have two options:
+
+1. Run Tracetest Agent locally with the `tracetest start` command.
+2. Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+You can reach services running on your local machine using:
+
+- Linux (docker version < 20.10.0): `172.17.0.1:8080`
+- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
+:::
+
   </TabItem>
 </Tabs>
 
