@@ -3,11 +3,13 @@ package telemetry
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/config"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/noop"
 	metricsdk "go.opentelemetry.io/otel/sdk/metric"
 )
 
@@ -24,6 +26,11 @@ func newMeterProvider(ctx context.Context, cfg exporterConfig) (metric.MeterProv
 	exporterConfig, err := cfg.Exporter()
 	if err != nil {
 		return nil, fmt.Errorf("could not get exporter config: %w", err)
+	}
+
+	if exporterConfig == nil {
+		log.Println("empty exporter config: falling back to noop meter provider")
+		return noop.NewMeterProvider(), nil
 	}
 
 	resource, err := getResource(exporterConfig)
