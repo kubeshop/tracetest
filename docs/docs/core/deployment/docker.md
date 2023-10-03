@@ -56,4 +56,4 @@ Starting tracetest ...
 
 Then launch a browser to [http://localhost:11633/](http://localhost:11633/).
 
-For more configuration options, read more in the [configuration docs](/configuration/overview.md).
+For more configuration options, visit the [configuration docs](/configuration/overview.md).
