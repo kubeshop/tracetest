@@ -66,7 +66,7 @@ const Resources = () => {
             onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})}
             isEmpty={pagination.list?.length === 0}
           />
-          <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} />
+          <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} dataCy="create-button" />
         </S.ActionsContainer>
 
         <Pagination<TestSuite>
