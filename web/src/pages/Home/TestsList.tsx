@@ -7,7 +7,7 @@ import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
 import TracetestAPI from 'redux/apis/Tracetest';
-import {ADD_TEST_URL} from 'constants/Common.constants';
+import {ADD_TEST_URL, OPENING_TRACETEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import useDeleteResource from 'hooks/useDeleteResource';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
@@ -73,15 +73,22 @@ const Tests = () => {
         <Pagination<Test>
           emptyComponent={
             <Empty
-              title="You have not created any Tests yet"
+              title="Haven't Created a Test Yet"
               message={
                 <>
-                  Use the Create button to create your first test. Learn more about test{' '}
-                  <a href={ADD_TEST_URL} target="_blank">
-                    here.
-                  </a>
+                  Hit the &apos;Create&apos; button below to kickstart your testing adventure. Want to learn more about
+                  tests? Just click{' '}
+                  <S.Link href={ADD_TEST_URL} target="_blank">
+                    here
+                  </S.Link>
+                  . If you don’t have an app that’s generating OpenTelemetry traces we have a demo for you. Follow these{' '}
+                  <S.Link href={OPENING_TRACETEST_URL} target="_blank">
+                    instructions
+                  </S.Link>
+                  !
                 </>
               }
+              action={<CreateButton onCreate={() => setIsCreateTestOpen(true)} title="Create Your First Test" />}
             />
           }
           loadingComponent={<Loading />}

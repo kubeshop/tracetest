@@ -1,7 +1,6 @@
 import TracetestAPI from 'redux/apis/Tracetest';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
 
-
 const TestRunGateway = () => ({
   get(testId: string, take = 25, skip = 0) {
     return TracetestAPI.instance.endpoints.getRunList.initiate({testId, take, skip});
