@@ -142,6 +142,11 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	log.Printf("[TracePoller] Test %s Run %d: Done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 
 	log.Printf("[TracePoller] Test %s Run %d: Start Sorting", job.Test.ID, job.Run.ID)
+	if job.Run.Trace == nil {
+		newTrace := traces.NewTrace(job.Run.TraceID.String(), []traces.Span{})
+		job.Run.Trace = &newTrace
+	}
+
 	sorted := job.Run.Trace.Sort()
 	job.Run.Trace = &sorted
 	log.Printf("[TracePoller] Test %s Run %d: Sorting complete", job.Test.ID, job.Run.ID)

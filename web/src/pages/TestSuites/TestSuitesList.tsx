@@ -18,7 +18,7 @@ import CreateButton from '../Home/CreateButton';
 import HomeFilters from '../Home/HomeFilters';
 import Loading from '../Home/Loading';
 
-const {useGetTestSuiteListQuery} = TracetestAPI.instance;
+const {useGetTestListQuery, useGetTestSuiteListQuery} = TracetestAPI.instance;
 
 const {onTestClick} = HomeAnalyticsService;
 type TParameters = {sortBy: SortBy; sortDirection: SortDirection};
@@ -28,6 +28,7 @@ const Resources = () => {
   const [isCreateTestSuiteOpen, setIsCreateTestSuiteOpen] = useState(false);
   const [parameters, setParameters] = useState<TParameters>(defaultSort);
 
+  const {data: testListData} = useGetTestListQuery({});
   const pagination = usePagination<TestSuite, TParameters>(useGetTestSuiteListQuery, parameters);
   const onDelete = useDeleteResource();
   const {runTestSuite} = useTestSuiteCrud();
@@ -65,22 +66,39 @@ const Resources = () => {
             onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})}
             isEmpty={pagination.list?.length === 0}
           />
-          <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} />
+          <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} dataCy="create-button" />
         </S.ActionsContainer>
 
         <Pagination<TestSuite>
           emptyComponent={
-            <Empty
-              title="You have not created any Test Suites yet"
-              message={
-                <>
-                  Use the Create button to create your first test. Learn more about test suites{' '}
-                  <a href={ADD_TEST_SUITE_URL} target="_blank">
-                    here.
-                  </a>
-                </>
-              }
-            />
+            !testListData?.total ? (
+              <Empty
+                title="No Test Suites to Display... Yet!"
+                message="To set up your test suits and experience the interconnected testing magic, let's kickstart by creating your first test. Ready to boost your test coverage and efficiency? Let's dive in!"
+                action={
+                  <S.Button onClick={() => navigate('/')} type="primary">
+                    Go To Tests Page
+                  </S.Button>
+                }
+              />
+            ) : (
+              <Empty
+                title="No Test Suits in Sight!"
+                message={
+                  <>
+                    It looks a bit empty here, doesn&apos;t it? Let&apos;s start by adding your first test suites. If
+                    you want to learn more about test suits just click{' '}
+                    <S.Link href={ADD_TEST_SUITE_URL} target="_blank">
+                      here
+                    </S.Link>
+                    .
+                  </>
+                }
+                action={
+                  <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} title="Create Your First Test Suite" />
+                }
+              />
+            )
           }
           loadingComponent={<Loading />}
           {...pagination}

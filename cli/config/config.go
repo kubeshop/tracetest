@@ -53,6 +53,14 @@ func (c Config) URL() string {
 	return fmt.Sprintf("%s://%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"))
 }
 
+func (c Config) UI() string {
+	if c.UIEndpoint != "" {
+		return fmt.Sprintf("%s/organizations/%s/environments/%s", strings.TrimSuffix(c.UIEndpoint, "/"), c.OrganizationID, c.EnvironmentID)
+	}
+
+	return c.URL()
+}
+
 func (c Config) Path() string {
 	pathPrefix := "/api"
 	if c.ServerPath != nil {

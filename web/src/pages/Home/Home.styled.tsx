@@ -74,3 +74,8 @@ export const ConfigIcon = styled.img`
 export const ConfigFooter = styled.div`
   margin: 20px 0;
 `;
+
+export const Link = styled.a`
+  color: ${({theme}) => theme.color.primary};
+  font-weight: 600;
+`;

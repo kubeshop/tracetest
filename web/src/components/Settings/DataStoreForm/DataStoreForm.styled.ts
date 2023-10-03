@@ -1,20 +1,23 @@
 import styled, {css} from 'styled-components';
-import {Typography} from 'antd';
+import {Tabs, Typography} from 'antd';
 import {CheckCircleOutlined} from '@ant-design/icons';
+
+const defaultHeight = 'calc(100vh - 106px - 48px);';
 
 export const FormContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 24px;
-  min-height: 750px;
+  height: ${defaultHeight};
+  overflow: hidden;
 `;
 
 export const FactoryContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 22px 0;
-  border-left: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   justify-content: space-between;
+  height: ${defaultHeight};
+  overflow-y: scroll;
 
   .ant-form-item {
     margin: 0;
@@ -28,10 +31,23 @@ export const TopContainer = styled.div`
   padding: 0 22px;
 `;
 
-export const DataStoreListContainer = styled.div`
-  display: flex;
-  gap: 16px;
-  flex-direction: column;
+export const DataStoreListContainer = styled(Tabs)`
+  height: calc(100vh - 25px - 106px - 48px);
+
+  && {
+    .ant-tabs-content-holder {
+      width: 1px;
+    }
+
+    .ant-tabs-tab {
+      margin: 0 !important;
+      padding: 0;
+    }
+
+    .ant-tabs-nav-list {
+      gap: 16px;
+    }
+  }
 `;
 
 export const DataStoreItemContainer = styled.div<{$isDisabled: boolean; $isSelected: boolean}>`
@@ -40,7 +56,6 @@ export const DataStoreItemContainer = styled.div<{$isDisabled: boolean; $isSelec
   gap: 10px;
   padding: 12px 22px;
   cursor: pointer;
-  border-left: ${({theme, $isSelected}) => $isSelected && `2px solid ${theme.color.primary}`};
 
   ${({$isDisabled}) =>
     $isDisabled &&
@@ -95,8 +110,11 @@ export const ButtonsContainer = styled.div`
   justify-content: space-between;
   gap: 8px;
   margin-top: 23px;
-  padding: 16px 22px 0;
+  padding: 16px 22px;
   border-top: 1px solid ${({theme}) => theme.color.borderLight};
+  position: sticky;
+  bottom: 0;
+  background: white;
 `;
 
 export const SaveContainer = styled.div`

@@ -8,6 +8,10 @@ const useRouterSync = () => {
   useEffect(() => {
     return RouterMiddleware.startListening({testId: params.testId, runId: params.runId});
   }, [params.runId, params.testId]);
+
+  useEffect(() => {
+    return RouterMiddleware.startListeningForLocationChange();
+  }, []);
 };
 
 export default useRouterSync;

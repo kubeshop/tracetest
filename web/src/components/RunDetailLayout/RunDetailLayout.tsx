@@ -12,6 +12,8 @@ import {isRunStateSucceeded} from 'models/TestRun.model';
 import {useNotification} from 'providers/Notification/Notification.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useAppSelector} from 'redux/hooks';
+import UserSelectors from 'selectors/User.selectors';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {ConfigMode} from 'types/DataStore.types';
 import HeaderLeft from './HeaderLeft';
@@ -41,6 +43,7 @@ const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
   const {dataStoreConfig} = useSettingsValues();
   const [prevState, setPrevState] = useState(run.state);
   useDocumentTitle(`${name} - ${run.state}`);
+  const runOriginPath = useAppSelector(UserSelectors.selectRunOriginPath);
 
   useEffect(() => {
     const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
@@ -59,10 +62,10 @@ const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
 
   const tabBarExtraContent = useMemo(
     () => ({
-      left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} />,
+      left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} origin={runOriginPath} />,
       right: <HeaderRight testId={id} />,
     }),
-    [id, name, trigger.type]
+    [id, name, trigger.type, runOriginPath]
   );
 
   return (

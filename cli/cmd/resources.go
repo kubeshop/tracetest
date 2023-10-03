@@ -22,14 +22,14 @@ var (
 	testSuiteRunner = runner.TestSuiteRunner(
 		testSuiteClient,
 		openapiClient,
-		formatters.TestSuiteRun(func() string { return cliConfig.URL() }, true),
+		formatters.TestSuiteRun(func() string { return cliConfig.UI() }, true),
 	)
 
 	runnerRegistry = runner.NewRegistry(cliLogger).
 			Register(runner.TestRunner(
 			testClient,
 			openapiClient,
-			formatters.TestRun(func() string { return cliConfig.URL() }, true),
+			formatters.TestRun(func() string { return cliConfig.UI() }, true),
 		)).
 		Register(testSuiteRunner).
 		RegisterProxy("transaction", testSuiteRunner.Name())

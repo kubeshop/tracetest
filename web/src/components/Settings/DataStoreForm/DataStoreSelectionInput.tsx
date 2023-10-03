@@ -1,4 +1,4 @@
-import {Popover} from 'antd';
+import {Popover, Tabs} from 'antd';
 import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
 import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
@@ -26,7 +26,7 @@ const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.J
   const configuredDataStoreType = dataStoreConfig.defaultDataStore.type;
 
   return (
-    <S.DataStoreListContainer>
+    <S.DataStoreListContainer tabPosition="left">
       {supportedDataStoreList.map(dataStore => {
         if (dataStore === SupportedDataStores.Agent && !getFlag(Flag.IsAgentDataStoreEnabled)) {
           return null;
@@ -35,37 +35,43 @@ const DataStoreSelectionInput = ({onChange = noop, value = SupportedDataStores.J
         const isSelected = value === dataStore;
         const isConfigured = configuredDataStoreType === dataStore && dataStoreConfig.mode === ConfigMode.READY;
         const isDisabled = isLocalModeEnabled && dataStore !== SupportedDataStores.Agent;
+
         return (
-          <S.DataStoreItemContainer
-            $isDisabled={isDisabled}
-            $isSelected={isSelected}
+          <Tabs.TabPane
             key={dataStore}
-            onClick={() => (isDisabled ? noop() : onChange(dataStore))}
-          >
-            <DataStoreIcon dataStoreType={dataStore} color={isSelected ? primary : text} width="22" height="22" />
-
-            {isDisabled ? (
-              <Popover
-                content={
-                  <div>
-                    In localMode only the Agent data store can be used. <br /> If you want to connect to a different
-                    data store <br /> please create a new environment
-                  </div>
-                }
-                placement="right"
+            tab={
+              <S.DataStoreItemContainer
+                $isDisabled={isDisabled}
+                $isSelected={isSelected}
+                key={dataStore}
+                onClick={() => (isDisabled ? noop() : onChange(dataStore))}
               >
-                <S.DataStoreName $isSelected={isSelected}>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
-              </Popover>
-            ) : (
-              <S.DataStoreName $isSelected={isSelected}>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
-            )}
+                <DataStoreIcon dataStoreType={dataStore} color={isSelected ? primary : text} width="22" height="22" />
 
-            {isConfigured && (
-              <Popover content="This data source is currently configured" placement="right">
-                <S.InfoIcon />
-              </Popover>
-            )}
-          </S.DataStoreItemContainer>
+                {isDisabled ? (
+                  <Popover
+                    content={
+                      <div>
+                        In localMode only the Agent data store can be used. <br /> If you want to connect to a different
+                        data store <br /> please create a new environment
+                      </div>
+                    }
+                    placement="right"
+                  >
+                    <S.DataStoreName $isSelected={isSelected}>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
+                  </Popover>
+                ) : (
+                  <S.DataStoreName $isSelected={isSelected}>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
+                )}
+
+                {isConfigured && (
+                  <Popover content="This data source is currently configured" placement="right">
+                    <S.InfoIcon />
+                  </Popover>
+                )}
+              </S.DataStoreItemContainer>
+            }
+          />
         );
       })}
     </S.DataStoreListContainer>

@@ -9,9 +9,10 @@ import * as S from './RunDetailLayout.styled';
 interface IProps {
   name: string;
   triggerType: string;
+  origin: string;
 }
 
-const HeaderLeft = ({name, triggerType}: IProps) => {
+const HeaderLeft = ({name, triggerType, origin}: IProps) => {
   const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {}, run} =
     useTestRun();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
@@ -36,7 +37,7 @@ const HeaderLeft = ({name, triggerType}: IProps) => {
 
   return (
     <S.Section $justifyContent="flex-start">
-      <a data-cy="test-header-back-button" onClick={() => navigate(-1)}>
+      <a data-cy="test-header-back-button" onClick={() => navigate(origin)}>
         <S.BackIcon />
       </a>
       <S.InfoContainer>

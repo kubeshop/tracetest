@@ -23,11 +23,14 @@ const VariableSetList = ({onDelete, onEdit, query}: IProps) => {
     <Pagination
       emptyComponent={
         <Empty
-          title="You have not created any variable sets yet"
+          title="Haven't Created a VariableSet Yet"
           message={
             <>
-              Use the Create button to create your first variable set. Learn more about variable sets{' '}
-              <a href={VARIABLE_SET_DOCUMENTATION_URL}>here.</a>
+              Hit the &apos;Create&apos; button to create your first variable set. Want to learn more about
+              VariableSets? Just click{' '}
+              <S.Link href={VARIABLE_SET_DOCUMENTATION_URL} target="_blank">
+                here.
+              </S.Link>
             </>
           }
         />
