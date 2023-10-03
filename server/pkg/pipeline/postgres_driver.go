@@ -100,25 +100,29 @@ func (qd *postgresQueueDriver[T]) worker(conn *pgxpool.Conn) error {
 	qd.log("listening for notifications")
 	_, err := conn.Exec(context.Background(), "listen "+qd.channelName)
 	if err != nil {
-		return fmt.Errorf("error listening for notifications: %s", err.Error())
+		return fmt.Errorf("error listening for notifications: %w", err)
 	}
 	qd.log("waiting for notification")
 	notification, err := conn.Conn().WaitForNotification(context.Background())
 	if err != nil {
-		return fmt.Errorf("error waiting for notification: %s", err.Error())
+		return fmt.Errorf("error waiting for notification: %w", err)
 	}
 
 	job := pgJob[T]{}
 	err = json.Unmarshal([]byte(notification.Payload), &job)
 	if err != nil {
-		return fmt.Errorf("error unmarshalling pgJob: %s", err.Error())
+		// this error is not fatal. we can ignore it and continue
+		qd.log("error unmarshalling pgJob: %s", err.Error())
+		return nil
 	}
 
 	qd.log("received job for channel: %s", job.Channel)
 
 	channel, err := qd.getChannel(job.Channel)
 	if err != nil {
-		return fmt.Errorf("error getting channel: %s", err.Error())
+		// this error is not fatal. we can ignore it and continue
+		qd.log("error getting channel: %s", err.Error())
+		return nil
 	}
 
 	qd.log("processing job for channel: %s", job.Channel)
