@@ -63,56 +63,67 @@ func (qd *postgresQueueDriver[T]) Start() {
 	go func(qd *postgresQueueDriver[T]) {
 		qd.log("start")
 
-		qd.log("acquiring connection")
-		conn, err := qd.pool.Acquire(context.Background())
-		if err != nil {
-			panic(fmt.Errorf("error acquiring connection: %w", err))
-		}
-		defer conn.Release()
-
 		for {
 			select {
 			case <-qd.exit:
 				qd.log("exit")
 				return
 			default:
-				qd.worker(conn)
+				_, err := again.Retry(context.Background(), func(_ context.Context) (bool, error) {
+					qd.log("acquiring connection")
+					conn, err := qd.pool.Acquire(context.Background())
+					if err != nil {
+						err = fmt.Errorf("error acquiring connection: %w", err)
+						qd.log("%s", err.Error())
+						return false, err
+					}
+					defer conn.Release()
+
+					err = qd.worker(conn)
+					if err != nil {
+						err = fmt.Errorf("error in worker: %w", err)
+						qd.log("%s", err.Error())
+						return false, err
+					}
+					return true, nil
+				})
+				if err != nil {
+					// this panic is intentional. forces the app to crash and restart
+					panic(err)
+				}
 			}
 		}
 	}(qd)
 }
 
-func (qd *postgresQueueDriver[T]) worker(conn *pgxpool.Conn) {
+func (qd *postgresQueueDriver[T]) worker(conn *pgxpool.Conn) error {
 	qd.log("listening for notifications")
 	_, err := conn.Exec(context.Background(), "listen "+qd.channelName)
 	if err != nil {
-		qd.log("error listening for notifications: %s", err.Error())
-		return
+		return fmt.Errorf("error listening for notifications: %s", err.Error())
 	}
 	qd.log("waiting for notification")
 	notification, err := conn.Conn().WaitForNotification(context.Background())
 	if err != nil {
-		qd.log("error waiting for notification: %s", err.Error())
-		return
+		return fmt.Errorf("error waiting for notification: %s", err.Error())
 	}
 
 	job := pgJob[T]{}
 	err = json.Unmarshal([]byte(notification.Payload), &job)
 	if err != nil {
-		qd.log("error unmarshalling pgJob: %s", err.Error())
-		return
+		return fmt.Errorf("error unmarshalling pgJob: %s", err.Error())
 	}
 
 	qd.log("received job for channel: %s", job.Channel)
 
 	channel, err := qd.getChannel(job.Channel)
 	if err != nil {
-		qd.log("error getting channel: %s", err.Error())
-		return
+		return fmt.Errorf("error getting channel: %s", err.Error())
 	}
 
 	qd.log("processing job for channel: %s", job.Channel)
 	channel.listener.Listen(job.Item)
+	return nil
 }
 
 func (qd *postgresQueueDriver[T]) Stop() {
