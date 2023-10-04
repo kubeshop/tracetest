@@ -49,6 +49,7 @@ func (m *metricWorkerMiddleware) ProcessItem(ctx context.Context, job Job) {
 	attributeSet := attribute.NewSet(
 		attribute.String("test_id", job.Test.ID.String()),
 		attribute.Int("run_id", job.Run.ID),
+		attribute.String("run_state", string(job.Run.State)),
 	)
 
 	m.requestCounter.Add(ctx, 1, metric.WithAttributeSet(attributeSet))
