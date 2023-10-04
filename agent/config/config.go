@@ -38,7 +38,7 @@ func LoadConfig() (Config, error) {
 
 	vp.SetDefault("AGENT_NAME", getHostname())
 	vp.SetDefault("API_KEY", "")
-	vp.SetDefault("SERVER_URL", "https://cloud.tracetest.io")
+	vp.SetDefault("SERVER_URL", "https://app.tracetest.io")
 	vp.SetDefault("OTLP_SERVER.GRPC_PORT", 4317)
 	vp.SetDefault("OTLP_SERVER.HTTP_PORT", 4318)
 

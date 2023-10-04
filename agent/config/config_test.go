@@ -18,7 +18,7 @@ func TestConfigDefaults(t *testing.T) {
 
 	assert.Equal(t, "", cfg.APIKey)
 	assert.Equal(t, hostname, cfg.Name)
-	assert.Equal(t, "https://cloud.tracetest.io", cfg.ServerURL)
+	assert.Equal(t, "https://app.tracetest.io", cfg.ServerURL)
 	assert.Equal(t, 4317, cfg.OTLPServer.GRPCPort)
 	assert.Equal(t, 4318, cfg.OTLPServer.HTTPPort)
 }
