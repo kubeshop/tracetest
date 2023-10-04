@@ -256,6 +256,7 @@ func (app *App) Start(opts ...appOption) error {
 		triggerRegistry,
 		tracedbFactory,
 		app.cfg,
+		meter,
 	)
 	testPipeline.Start()
 	app.registerStopFn(func() {
@@ -267,6 +268,7 @@ func (app *App) Start(opts ...appOption) error {
 		testSuiteRunRepository,
 		testPipeline,
 		subscriptionManager,
+		meter,
 	)
 
 	testSuitePipeline.Start()

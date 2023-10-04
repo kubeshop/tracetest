@@ -21,6 +21,7 @@ import (
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/metric/noop"
 )
 
 type fakeTestRunner struct {
@@ -163,7 +164,8 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	queueBuilder := executor.NewQueueConfigurer().
 		WithTestSuiteGetter(transactionsRepo).
-		WithTestSuiteRunGetter(transactionRunRepo)
+		WithTestSuiteRunGetter(transactionRunRepo).
+		WithMetricMeter(noop.NewMeterProvider().Meter("noop"))
 
 	pipeline := pipeline.New(queueBuilder,
 		pipeline.Step[executor.Job]{Processor: runner, Driver: pipeline.NewInMemoryQueueDriver[executor.Job]("testSuiteRunner")},

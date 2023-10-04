@@ -203,3 +203,7 @@ func (ch *channel[T]) Enqueue(item T) {
 
 	ch.log("notified postgres")
 }
+
+func (ch *channel[T]) Name() string {
+	return ch.name
+}

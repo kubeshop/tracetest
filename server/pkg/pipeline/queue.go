@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/alitto/pond"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 )
 
 type Enqueuer[T any] interface {
@@ -22,9 +24,16 @@ type QueueDriver[T any] interface {
 	SetListener(Listener[T])
 }
 
+type namedDriver interface {
+	Name() string
+}
+
 type Queue[T any] struct {
-	driver        QueueDriver[T]
-	itemProcessor QueueItemProcessor[T]
+	name           string
+	driver         QueueDriver[T]
+	itemProcessor  QueueItemProcessor[T]
+	enqueueCounter metric.Int64Counter
+	listenCounter  metric.Int64Counter
 
 	EnqueuePreprocessorFn func(context.Context, T) T
 	ListenPreprocessorFn  func(context.Context, T) (context.Context, T)
@@ -43,9 +52,18 @@ func NewQueue[T any](driver QueueDriver[T], itemProcessor QueueItemProcessor[T])
 		workerPool:    pond.New(QueueWorkerCount, QueueWorkerBufferSize),
 	}
 
+	if namedDriver, ok := driver.(namedDriver); ok {
+		queue.name = namedDriver.Name()
+	}
+
 	queue.SetDriver(driver)
 
 	return queue
+}
+
+func (q *Queue[T]) InitializeMetrics(meter metric.Meter) {
+	q.enqueueCounter, _ = meter.Int64Counter("messaging.enqueue.count")
+	q.listenCounter, _ = meter.Int64Counter("messaging.listen.count")
 }
 
 func (q *Queue[T]) SetDriver(driver QueueDriver[T]) {
@@ -67,6 +85,9 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 			item = q.EnqueuePreprocessorFn(ctx, item)
 		}
 
+		q.enqueueCounter.Add(ctx, 1, metric.WithAttributes(
+			attribute.String("queue.name", q.name),
+		))
 		q.driver.Enqueue(item)
 	})
 }
@@ -86,6 +107,9 @@ func (q Queue[T]) Listen(item T) {
 	}
 
 	q.workerPool.Submit(func() {
+		q.listenCounter.Add(ctx, 1, metric.WithAttributes(
+			attribute.String("queue.name", q.name),
+		))
 		q.itemProcessor.ProcessItem(ctx, item)
 	})
 }

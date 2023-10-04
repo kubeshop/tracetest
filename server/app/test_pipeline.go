@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -32,6 +33,7 @@ func buildTestPipeline(
 	triggerRegistry *trigger.Registry,
 	tracedbFactory tracedb.FactoryFunc,
 	appConfig *config.AppConfig,
+	meter metric.Meter,
 ) *executor.TestPipeline {
 	eventEmitter := executor.NewEventEmitter(treRepo, subscriptionManager)
 
@@ -116,7 +118,8 @@ func buildTestPipeline(
 		WithPollingProfileGetter(ppRepo).
 		WithTestGetter(testRepo).
 		WithRunGetter(runRepo).
-		WithInstanceID(instanceID)
+		WithInstanceID(instanceID).
+		WithMetricMeter(meter)
 
 	pgQueue := pipeline.NewPostgresQueueDriver[executor.Job](pool, pgChannelName)
 
