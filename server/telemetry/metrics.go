@@ -43,7 +43,7 @@ func newMeterProvider(ctx context.Context, cfg exporterConfig) (metric.MeterProv
 		return nil, fmt.Errorf("could not get collector exporter: %w", err)
 	}
 
-	interval := 60 * time.Second
+	interval := 10 * time.Second
 	if exporterConfig.MetricsReaderInterval != 0 {
 		interval = exporterConfig.MetricsReaderInterval
 	}

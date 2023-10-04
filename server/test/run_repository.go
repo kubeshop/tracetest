@@ -14,6 +14,9 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/patrickmn/go-cache"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -31,15 +34,44 @@ type RunRepository interface {
 }
 
 type Cache struct {
-	cache      *cache.Cache
-	instanceID string
+	cache                 *cache.Cache
+	instanceID            string
+	readRequestCounter    metric.Int64Counter
+	cacheLatencyHistogram metric.Int64Histogram
 }
 
-func NewCache(instanceID string) *Cache {
-	return &Cache{
-		cache:      cache.New(5*time.Minute, 10*time.Minute),
-		instanceID: instanceID,
+type CacheConfig struct {
+	meter metric.Meter
+}
+
+type CacheOption func(*CacheConfig)
+
+func WithMetricMeter(meter metric.Meter) CacheOption {
+	return func(c *CacheConfig) {
+		c.meter = meter
 	}
+}
+
+func NewCache(instanceID string, opts ...CacheOption) *Cache {
+	cacheConfig := &CacheConfig{
+		meter: noop.NewMeterProvider().Meter("noop"),
+	}
+
+	for _, opt := range opts {
+		opt(cacheConfig)
+	}
+
+	readRequestCounter, _ := cacheConfig.meter.Int64Counter("tracetest.cache.request.count")
+	cacheLatencyHistogram, _ := cacheConfig.meter.Int64Histogram("tracetest.cache.latency")
+
+	cache := &Cache{
+		cache:                 cache.New(5*time.Minute, 10*time.Minute),
+		instanceID:            instanceID,
+		readRequestCounter:    readRequestCounter,
+		cacheLatencyHistogram: cacheLatencyHistogram,
+	}
+
+	return cache
 }
 
 func (c *Cache) thisInstanceCacheKey(run Run) string {
@@ -62,7 +94,21 @@ func (c *Cache) Set(_ context.Context, run Run) error {
 }
 
 func (c *Cache) Get(ctx context.Context, testID id.ID, runID int) (Run, bool) {
-	cached, found := c.cache.Get(c.lastInstanceCacheKey(ctx, Run{ID: runID, TestID: testID}))
+	begin := time.Now()
+	key := c.lastInstanceCacheKey(ctx, Run{ID: runID, TestID: testID})
+	cached, found := c.cache.Get(key)
+
+	duration := time.Since(begin)
+
+	attributeSet := attribute.NewSet(
+		attribute.String("object_type", "test_run"),
+		attribute.String("key", key),
+		attribute.Bool("hit", found),
+	)
+
+	c.readRequestCounter.Add(ctx, 1, metric.WithAttributeSet(attributeSet))
+	c.cacheLatencyHistogram.Record(ctx, duration.Milliseconds(), metric.WithAttributeSet(attributeSet))
+
 	if !found {
 		return Run{}, false
 	}
