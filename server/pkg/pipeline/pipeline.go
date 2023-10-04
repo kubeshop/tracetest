@@ -30,7 +30,7 @@ type queueConfigurer[T any] interface {
 	Configure(*Queue[T])
 }
 
-type step[T any] interface {
+type StepProcessor[T any] interface {
 	QueueItemProcessor[T]
 	SetOutputQueue(Enqueuer[T])
 }
@@ -41,7 +41,7 @@ type InputQueueSetter[T any] interface {
 
 type Step[T any] struct {
 	Driver           workerDriver[T]
-	Processor        step[T]
+	Processor        StepProcessor[T]
 	InputQueueOffset int
 }
 
