@@ -8,21 +8,21 @@ import Heading from '@theme/Heading';
 
 const CoreGettingStartedGuides = [
   {
-    name: '👇 Install Tracetest',
+    name: '👇 Install Tracetest Core',
     url: './installation',
     description: (
       <Translate >
-        Set up Tracetest and start trace-based testing your distributed system.
+        Set up Tracetest Core and start trace-based testing your distributed system.
       </Translate>
     ),
-    button: 'Set up Tracetest',
+    button: 'Set up',
   },
   {
-    name: '🙌 Open Tracetest',
+    name: '🙌 Open Tracetest Core',
     url: './open',
     description: (
       <Translate>
-        After installing it, open Tracetest start to creating trace-based tests.
+        After installing it, open Tracetest Core start to creating trace-based tests.
       </Translate>
     ),
     button: 'Create tests',
@@ -35,7 +35,7 @@ const CoreGettingStartedGuides = [
         Install OpenTelemetry in 5 minutes without any code changes!
       </Translate>
     ),
-    button: 'Set up OTel',
+    button: 'Set up OpenTelemetry',
   },
   {
     name: '🤩 Open Source',
