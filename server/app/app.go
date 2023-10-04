@@ -228,7 +228,7 @@ func (app *App) Start(opts ...appOption) error {
 	variableSetRepo := variableset.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
-	runRepo := test.NewRunRepository(db, test.NewCache(instanceID))
+	runRepo := test.NewRunRepository(db, test.NewCache(instanceID, test.WithMetricMeter(meter)))
 	testRunnerRepo := testrunner.NewRepository(db)
 	tracesRepo := traces.NewTraceRepository(db)
 
