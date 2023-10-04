@@ -5,7 +5,7 @@ This section contains a general overview of deploying Tracetest in production. Y
 - [Docker](./docker)
 - [Kubernetes](./kubernetes)
 
-As shown in the diagram below, a typical production Tracetest deployment consists of Postgres, an OpenTelemetry Colletor and a [trace data store](../configuration/overview). But, if you do not want to use a trace data store, you can rely entirely on OpenTelemetry Collector.
+As shown in the diagram below, a typical production Tracetest deployment consists of Postgres, an OpenTelemetry Colletor and a [trace data store](/configuration/overview.md). But, if you do not want to use a trace data store, you can rely entirely on OpenTelemetry Collector.
 
 <!-- Add graph for Tracetest cluster -->
 
@@ -46,6 +46,6 @@ postgres:
   params: sslmode=disable
 ```
 
-Read more in the [configuration docs](../configuration/overview.md).
+Read more in the [configuration docs](/configuration/overview.md).
 
 Or, continue reading to see how to run Tracetest in production with [Docker](./docker) or [Kubernetes](./kubernetes).

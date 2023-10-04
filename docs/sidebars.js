@@ -351,6 +351,54 @@ const sidebars = {
     },
   ],
 
+  coreSidebar: [
+    {
+      type: "link",
+      label: "Welcome! 👋",
+      href: "/",
+    },
+    {
+      type: "category",
+      label: "Getting Started",
+      link: {
+        type: "doc",
+        id: "core/getting-started/overview"
+      },
+      items: [
+        {
+          type: "doc",
+          id: "core/getting-started/installation",
+          label: "Installing Tracetest Core",
+        },
+        {
+          type: "doc",
+          id: "core/getting-started/open",
+          label: "Opening Tracetest Core",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Deployment",
+      link: {
+        type: "doc",
+        id: "core/deployment/overview",
+      },
+      items: [
+        {
+          type: "doc",
+          id: "core/deployment/docker",
+          label: "Docker",
+        },
+        {
+          type: "doc",
+          id: "core/deployment/kubernetes",
+          label: "Kubernetes",
+        },
+      ],
+    },
+  ],
+
   tutorialSidebar: [
     {
       type: "doc",
@@ -520,31 +568,6 @@ const sidebars = {
           type: "doc",
           id: "configuration/opentelemetry-collector-configuration-file-reference",
           label: "OpenTelemetry Collector Configuration File Reference",
-        },
-      ],
-    },
-    {
-      type: "category",
-      label: "Deployment",
-      link: {
-        type: "doc",
-        id: "deployment/overview",
-      },
-      items: [
-        // {
-        //   type: "doc",
-        //   id: "deployment/production-checklist",
-        //   label: "Production checklist",
-        // },
-        {
-          type: "doc",
-          id: "deployment/docker",
-          label: "Docker",
-        },
-        {
-          type: "doc",
-          id: "deployment/kubernetes",
-          label: "Kubernetes",
         },
       ],
     },

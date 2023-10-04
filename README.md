@@ -264,7 +264,7 @@ tracetest run test --file /path/to/pokeshop_import.yaml
 
 Check out the [CI/CD docs](https://docs.tracetest.io/ci-cd-automation/overview) to learn more about test automation.
 
-# Tests
+# 🧪 Tests
 
 We strive to produce quality code and improve Tracetest rapidly and safely. Therefore, we have a full suite of both front-end and back-end tests. Cypress tests are running against the front-end code and (surprise, surprise) Tracetest against the back-end code. You can see the [test runs here](https://github.com/kubeshop/tracetest/actions/workflows/pull-request.yaml), and a blog post describing our [testing pipelines here](https://tracetest.io/blog/50-faster-ci-pipelines-with-github-actions).
 

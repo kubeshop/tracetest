@@ -8,34 +8,14 @@ import Heading from '@theme/Heading';
 
 const WelcomeGuides = [
   {
-    name: '👇 Install Tracetest',
-    url: './getting-started/installation',
+    name: '👇 Getting Started',
+    url: './getting-started/overview',
     description: (
       <Translate >
         Set up Tracetest and start trace-based testing your distributed system.
       </Translate>
     ),
     button: 'Set up Tracetest',
-  },
-  {
-    name: '🙌 Open Tracetest',
-    url: './getting-started/open',
-    description: (
-      <Translate>
-        After installing it, open Tracetest start to creating trace-based tests.
-      </Translate>
-    ),
-    button: 'Create tests',
-  },
-  {
-    name: '🤔 Don\'t have OpenTelemetry?',
-    url: './getting-started/no-otel',
-    description: (
-      <Translate >
-        Install OpenTelemetry in 5 minutes without any code changes!
-      </Translate>
-    ),
-    button: 'Set up OTel',
   },
   {
     name: '🤩 Open Source',

@@ -27,21 +27,27 @@ import {WelcomeGuideCardsRow} from '@site/src/components/WelcomeGuide';
 
 You can:
 
-- Define tests and assertions against every single microservice that a trace goes through.
-- Define **assertions against** both the **response and trace data**.
-- Ensure both your response and the underlying processes worked correctly, quickly, and without errors.
-- Work with your existing distributed tracing solution.
-- Build tests based on your already instrumented system.
-- Define multiple transaction triggers:
+- **Assert** against both the **response and trace data** at every point of a request transaction.
+- **Assert** on the **timing of trace spans**.
+  - Eg. A database span executes within `100ms`.
+- **Wildcard assertions** across common types of activities.
+  - Eg. All gRPC return codes should be `0`.
+  - Eg. All database calls should happen in less than `100ms`.
+- **Assert** against **side-effects** in your distributed system.
+  - Eg. Message queues, async API calls, external APIs, etc.
+- **Integrate** with your **existing distributed tracing solution**.
+- Define multiple test triggers:
   - HTTP requests
-  - GRPC requests
-  - trace IDs
+  - gRPC requests
+  - Trace IDs
   - and many more...
-- Save and run the tests manually or via CI build jobs.
+- Save and run tests manually and via CI build jobs.
+- Verify and analyze the quality of your OpenTelemetry instrumentation to enforce rules and standards.
+- Test long-running processes.
 - Write detailed trace-based tests as:
   - End-to-end tests
   - Integration tests
-- Build tests in minutes.
+- **Build tests in minutes**.
 
 <div className="row">
   <div className="col col--12 margin-bottom--lg">
