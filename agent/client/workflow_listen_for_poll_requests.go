@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -21,12 +22,12 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 		for {
 			resp := proto.PollingRequest{}
 			err := stream.RecvMsg(&resp)
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) || isCancelledError(err) {
 				return
 			}
 
 			if err != nil {
-				log.Fatal("could not get message from trigger stream: %w", err)
+				log.Fatal("could not get message from polling stream: %w", err)
 			}
 
 			// TODO: Get ctx from request
