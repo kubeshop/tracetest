@@ -2,12 +2,12 @@ import styled, {css} from 'styled-components';
 import {Tabs, Typography} from 'antd';
 import {CheckCircleOutlined} from '@ant-design/icons';
 
-const defaultHeight = 'calc(100vh - 106px - 48px);';
+const defaultHeight = '100vh - 106px - 60px - 40px';
 
 export const FormContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
-  height: ${defaultHeight};
+  height: calc(${defaultHeight} - 48px);
   overflow: hidden;
 `;
 
@@ -16,7 +16,7 @@ export const FactoryContainer = styled.div`
   flex-direction: column;
   padding: 22px 0;
   justify-content: space-between;
-  height: ${defaultHeight};
+  height: calc(${defaultHeight} - 25px);
   overflow-y: scroll;
 
   .ant-form-item {
@@ -32,7 +32,7 @@ export const TopContainer = styled.div`
 `;
 
 export const DataStoreListContainer = styled(Tabs)`
-  height: calc(100vh - 25px - 106px - 48px);
+  height: calc(${defaultHeight} - 50px);
 
   && {
     .ant-tabs-content-holder {
