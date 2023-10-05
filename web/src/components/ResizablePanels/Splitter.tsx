@@ -13,6 +13,7 @@ interface IProps {
   tooltipPlacement?: TooltipProps['placement'];
   onMouseDown(e: React.MouseEvent<HTMLElement, MouseEvent>): void;
   onTouchStart(e: React.TouchEvent<HTMLElement>): void;
+  dataTour?: string;
 }
 
 const Splitter = ({
@@ -26,6 +27,7 @@ const Splitter = ({
   tooltip,
   tooltipPlacement = 'right',
   isToolTipVisible = false,
+  dataTour,
 }: IProps) => {
   const button = (
     <S.SplitterButton
@@ -39,6 +41,7 @@ const Splitter = ({
       onMouseDown={event => event.stopPropagation()}
       shape="circle"
       type="primary"
+      data-tour={dataTour}
     />
   );
 
