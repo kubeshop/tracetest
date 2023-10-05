@@ -93,6 +93,11 @@ func (c *Cache) Set(_ context.Context, run Run) error {
 	return nil
 }
 
+func (c *Cache) Delete(ctx context.Context, run Run) {
+	key := c.lastInstanceCacheKey(ctx, Run{ID: run.ID, TestID: run.TestID})
+	c.cache.Delete(key)
+}
+
 func (c *Cache) Get(ctx context.Context, testID id.ID, runID int) (Run, bool) {
 	begin := time.Now()
 	key := c.lastInstanceCacheKey(ctx, Run{ID: runID, TestID: testID})
@@ -421,7 +426,7 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
-	r.cache.Set(ctx, run)
+	r.cache.Delete(ctx, run)
 
 	return nil
 }
@@ -450,6 +455,8 @@ func (r *runRepository) DeleteRun(ctx context.Context, run Run) error {
 	if err != nil {
 		return fmt.Errorf("sql Commit: %w", err)
 	}
+
+	r.cache.Delete(ctx, run)
 
 	return nil
 }
@@ -621,7 +628,7 @@ func readRunRow(row scanner) (Run, error) {
 		spanID string
 
 		testSuiteID,
-		testSuiteRunID sql.NullString
+		testSuiteRunID *string
 	)
 
 	err := row.Scan(
@@ -735,9 +742,9 @@ func readRunRow(row scanner) (Run, error) {
 		r.LastError = fmt.Errorf(*lastError)
 	}
 
-	if testSuiteID.Valid && testSuiteRunID.Valid {
-		r.TestSuiteID = testSuiteID.String
-		r.TestSuiteRunID = testSuiteRunID.String
+	if testSuiteID != nil && testSuiteRunID != nil {
+		r.TestSuiteID = *testSuiteID
+		r.TestSuiteRunID = *testSuiteRunID
 	}
 
 	return r, nil
