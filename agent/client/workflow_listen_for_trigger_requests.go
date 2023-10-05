@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -21,7 +22,7 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 		for {
 			resp := proto.TriggerRequest{}
 			err := stream.RecvMsg(&resp)
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) || isCancelledError(err) {
 				return
 			}
 
