@@ -34,7 +34,7 @@ func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (str
 	options := make([]cliUI.Option, len(elements))
 	for i, org := range elements {
 		options[i] = cliUI.Option{
-			Text: org.Name,
+			Text: fmt.Sprintf("%s (%s)", org.Name, org.ID),
 			Fn: func(o Entry) func(ui cliUI.UI) {
 				return func(ui cliUI.UI) {
 					orgID = o.ID
@@ -72,7 +72,7 @@ func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (stri
 	options := make([]cliUI.Option, len(elements))
 	for i, env := range elements {
 		options[i] = cliUI.Option{
-			Text: env.Name,
+			Text: fmt.Sprintf("%s (%s)", env.Name, env.ID),
 			Fn: func(e Entry) func(ui cliUI.UI) {
 				return func(ui cliUI.UI) {
 					envID = e.ID
