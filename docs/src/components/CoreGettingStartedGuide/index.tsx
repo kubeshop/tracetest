@@ -15,7 +15,7 @@ const CoreGettingStartedGuides = [
         Set up Tracetest Core and start trace-based testing your distributed system.
       </Translate>
     ),
-    button: 'Set up',
+    button: 'Start',
   },
   {
     name: '🙌 Open Tracetest Core',
@@ -35,7 +35,7 @@ const CoreGettingStartedGuides = [
         Install OpenTelemetry in 5 minutes without any code changes!
       </Translate>
     ),
-    button: 'Set up OpenTelemetry',
+    button: 'Configure OpenTelemetry',
   },
   {
     name: '🤩 Open Source',

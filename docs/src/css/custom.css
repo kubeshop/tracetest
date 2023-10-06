@@ -30,6 +30,7 @@ nav {
   --ifm-color-primary-lightest: #e71140;
 }
 
+/* dark docs mode */
 [data-theme='dark'] {
   --ifm-color-primary: #f27e9b;
   --ifm-color-primary-dark: #ef5d81;
@@ -40,12 +41,40 @@ nav {
   --ifm-color-primary-lightest: #fce2e9;
 }
 
+/* marketing website dark color */
 [data-theme='dark'] {
-  background-color: #242526 !important;
+  --ifm-color-primary: #fda622;
+  --ifm-color-primary-dark: #fd9b06;
+  --ifm-color-primary-darker: #f29302;
+  --ifm-color-primary-darkest: #c77902;
+  --ifm-color-primary-light: #fdb13e;
+  --ifm-color-primary-lighter: #fdb74d;
+  --ifm-color-primary-lightest: #fec877;
+  --ifm-background-color: #2e1623;
+}
+
+[data-theme='dark'] {
+  /* Docs color scheme */
+  /* background-color: #242526 !important; */
+
+  /* marketing website scheme */
+  background-color: #2e1623 !important;
 }
 
 html[data-theme='dark'] footer {
+  /* Docs color scheme */
+  /* background-color: #242526 !important; */
+
+  /* marketing website scheme */
+  background-color: #2e1623 !important;
+}
+
+html[data-theme='dark'] .footer {
+  /* Docs color scheme */
   background-color: #242526 !important;
+
+  /* marketing website scheme */
+  /* background-color: #2e1623 !important; */
 }
 
 
@@ -65,15 +94,38 @@ div[class^='announcementBar'] a:hover {
   text-decoration: underline;
 }
 
+/* Getting Started */
+
 /* Card */
+html[data-theme='dark'] .card {
+  background-color: #2e1623;
+  box-shadow: 0 2px 4px 2px rgba(255, 255, 255, 0.1);
+}
+html[data-theme='dark'] .card .button {
+  background-color: var(--ifm-background-surface-color);
+  color: var(--ifm-link-color);
+  border: transparent;
+}
+
+html[data-theme='dark'] .card .button:hover {
+  background-color: var(--ifm-color-emphasis-100);
+  color: var(--ifm-link-color);
+  border: transparent;
+}
+
 div[class^='gs__card'] .card {
   background-color: var(--ifm-background-surface-color);
   color: var(--ifm-font-color-base);
-  transition-duration: 500ms;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  transition: border-color var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+  /* box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1); */
+  box-shadow: none;
 }
 
 div[class^='gs__card'] .card:hover {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border: 1px solid var(--ifm-color-primary);
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1); */
+  box-shadow: none;
 }
 
 div[class^='gs__card'] .card a {
@@ -84,4 +136,47 @@ div[class^='gs__card'] .card a {
 div[class^='gs__card'] .card a:hover {
   color: var(--ifm-font-color-base);
   text-decoration: inherit;
+}
+
+html[data-theme='dark'] div[class^='gs__card'] .card {
+  background-color: #2e1623;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  /* box-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.1); */
+  box-shadow: none;
+}
+html[data-theme='dark'] div[class^='gs__card'] .card:hover {
+  border: 1px solid var(--ifm-color-primary);
+  /* box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.1), 0 6px 20px 0 rgba(255, 255, 255, 0.1); */
+  box-shadow: none;
+}
+
+/* nav sign in */
+
+.sign-in-button { 
+  margin: 0 6px 0 0;
+  transition: all var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+  align-items: center;
+  background: var(--docsearch-searchbox-background);
+  border: 0;
+  border-radius: 40px;
+  color: var(--docsearch-text-color);
+  cursor: pointer;
+  display: flex;
+  font-weight: 400;
+  height: 36px;
+  justify-content: space-between;
+  padding: 0 22px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.sign-in-button:hover {
+  background: var(--docsearch-searchbox-focus-background);
+  box-shadow: var(--docsearch-searchbox-shadow);
+  color: var(--docsearch-text-color);
+  outline: none;
+}
+
+.sign-in-button svg {
+  display: none;
 }

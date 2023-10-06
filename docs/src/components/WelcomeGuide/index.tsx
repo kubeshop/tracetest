@@ -15,7 +15,7 @@ const WelcomeGuides = [
         Set up Tracetest and start trace-based testing your distributed system.
       </Translate>
     ),
-    button: 'Set up Tracetest',
+    button: 'Start',
   },
   {
     name: '🤩 Open Source',
@@ -35,7 +35,7 @@ const WelcomeGuides = [
         Connect your existing trace data store or send traces to Tracetest directly!
       </Translate>
     ),
-    button: 'Configure Tracetest',
+    button: 'Configure',
   },
   {
     name: '🙄 New to Trace-based Testing?',

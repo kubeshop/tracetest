@@ -240,8 +240,10 @@ const config = {
       // Use this to add an announcement for a webinar or event.
       announcementBar: {
         id: 'announcement',
+        // content:
+        //   '<a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/live/2MSDy3XHjtE?si=VlK7cxJOsgKi5QTE&t=1132">Tracetest is the official testing harness for the OpenTelemetry Demo! 🚀</a>',
         content:
-          '<a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/live/2MSDy3XHjtE?si=VlK7cxJOsgKi5QTE&t=1132">Tracetest is the official testing harness for the OpenTelemetry Demo! 🚀</a>',
+          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/opentelemetry-is-not-just-for-monitoring-and-troubleshooting-any-longer-announcing-tracetest-open-beta">Tracetest Open Beta is Live. Try it! Give us feedback! 🙌</a>',
         isCloseable: false,
       },  
       navbar: {
@@ -285,12 +287,18 @@ const config = {
           },
           {
             type: "html",
-            position: "right",
+            position: "left",
             value: `<iframe src="https://ghbtns.com/github-btn.html?user=kubeshop&repo=tracetest&type=star&count=true&size=medium" style='margin-top: 6px' frameborder="0" scrolling="0" width="90" height="20" title="GitHub"></iframe>`,
           },
           {
             type: "search",
             position: "right",
+          },
+          {
+            href: "https://app.tracetest.io",
+            label: "Sign In",
+            position: "right",
+            className: "sign-in-button",
           },
         ],
       },
