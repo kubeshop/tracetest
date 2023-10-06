@@ -36,6 +36,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository }}
           tags: |
+            type=raw,value=latest
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
@@ -54,7 +55,9 @@ jobs:
         with:
           context: .
           file:  ./Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }},
+            ${{ env.REGISTRY }}/${{ github.repository }}:latest
           labels: ${{ steps.metadata.outputs.labels }}
         
           push: true
