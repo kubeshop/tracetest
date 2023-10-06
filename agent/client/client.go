@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -38,6 +39,7 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
+	c.done = make(chan bool)
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		<-c.done
@@ -137,4 +139,8 @@ func (c *Client) getName() (string, error) {
 	}
 
 	return hostname, nil
+}
+
+func isCancelledError(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "context canceled")
 }

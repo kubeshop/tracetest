@@ -1,13 +1,11 @@
 package oauth
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
-	"strings"
 	"sync"
 
 	"github.com/kubeshop/tracetest/cli/ui"
@@ -115,37 +113,41 @@ func (s *OAuthServer) start() error {
 }
 
 func (s *OAuthServer) callback(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", strings.TrimSuffix(s.frontendEndpoint, "/"))
+	tokenId, jwt, err := s.handleResult(r)
+	if err != nil {
+		redirect(w, r, false)
+		go s.onFailure(err)
+		return
+	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"success": true}`))
-
-	go s.handleResult(r)
+	redirect(w, r, true)
+	go s.onSuccess(tokenId, jwt)
 }
 
-func (s *OAuthServer) handleResult(r *http.Request) {
+func (s *OAuthServer) handleResult(r *http.Request) (string, string, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	tokenId := r.URL.Query().Get("tokenId")
 	if tokenId == "" {
-		s.onFailure(fmt.Errorf("tokenId not found"))
-		return
+		return "", "", fmt.Errorf("tokenId not found")
 	}
 
 	jwt, err := s.ExchangeToken(tokenId)
 	if err != nil {
-		s.onFailure(err)
-		return
+		return "", "", err
 	}
 
-	s.onSuccess(tokenId, jwt)
-	err = s.server.Shutdown(context.Background())
-	if err != nil {
-		s.onFailure(fmt.Errorf("failed to shutdown oauth server: %w", err))
-		return
+	return tokenId, jwt, nil
+}
+
+func redirect(w http.ResponseWriter, r *http.Request, success bool) {
+	returnUrl := r.URL.Query().Get("returnUrl")
+	if returnUrl != "" {
+		returnUrl = fmt.Sprintf("%s?success=%t", returnUrl, success)
 	}
+
+	http.Redirect(w, r, returnUrl, http.StatusMovedPermanently)
 }
 
 func getFreePort() (port int, err error) {
