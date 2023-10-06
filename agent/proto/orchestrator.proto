@@ -178,7 +178,7 @@ message TraceIdResponse {
 
 message DataStoreConnectionTestRequest {
     string requestID = 1;
-    DataStore datastore = 5;
+    DataStore datastore = 2;
 }
 
 message DataStoreConnectionTestResponse {
