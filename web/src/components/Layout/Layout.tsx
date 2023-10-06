@@ -14,6 +14,7 @@ import MissingVariablesModalProvider from 'providers/MissingVariablesModal/Missi
 import NotificationProvider from 'providers/Notification/Notification.provider';
 import {ConfigMode} from 'types/DataStore.types';
 import * as S from './Layout.styled';
+import MenuBottom from './MenuBottom';
 
 export type TCustomHeader = typeof Header;
 
@@ -85,6 +86,7 @@ const Layout = ({hasMenu = false}: IProps) => {
                       </S.MenuContainer>
 
                       <S.MenuContainer>
+                        <MenuBottom />
                         <Menu
                           defaultSelectedKeys={[
                             footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
