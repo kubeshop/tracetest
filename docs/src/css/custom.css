@@ -50,7 +50,8 @@ nav {
   --ifm-color-primary-light: #fdb13e;
   --ifm-color-primary-lighter: #fdb74d;
   --ifm-color-primary-lightest: #fec877;
-  --ifm-background-color: #2e1623;
+  --ifm-background-color: #2e1623 !important;
+  --ifm-background-surface-color: rgba(0,0,0,.92) !important;
 }
 
 [data-theme='dark'] {
@@ -58,7 +59,8 @@ nav {
   /* background-color: #242526 !important; */
 
   /* marketing website scheme */
-  background-color: #2e1623 !important;
+  /* background-color: #2e1623 !important; */
+  background-color: var(--ifm-background-color);
 }
 
 html[data-theme='dark'] footer {
@@ -66,15 +68,16 @@ html[data-theme='dark'] footer {
   /* background-color: #242526 !important; */
 
   /* marketing website scheme */
-  background-color: #2e1623 !important;
+  background-color: var(--ifm-background-color) !important;
+
 }
 
 html[data-theme='dark'] .footer {
   /* Docs color scheme */
-  background-color: #242526 !important;
+  /* background-color: #242526 !important; */
 
   /* marketing website scheme */
-  /* background-color: #2e1623 !important; */
+  background-color: var(--ifm-background-surface-color) !important;
 }
 
 
