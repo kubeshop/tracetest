@@ -287,7 +287,7 @@ func convertTraceIDResponseToProto(traceID *trigger.TraceIDResponse) *proto.Trac
 }
 
 func convertKafkaResponseToProto(kafka *trigger.KafkaResponse) *proto.KafkaResponse {
-	if kafka.Offset == "" {
+	if kafka == nil || kafka.Offset == "" {
 		return nil
 	}
 
