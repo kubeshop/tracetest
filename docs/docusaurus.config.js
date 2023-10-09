@@ -281,9 +281,39 @@ const config = {
             label: 'Live Examples'
           },
           {
-            href: "https://tracetest.io/community",
-            label: "Community",
-            position: "left",
+            type: 'dropdown',
+            label: 'Support',
+            position: 'left',
+            items: [
+              {
+                label: 'Overview',
+                href: 'https://tracetest.io/support',
+              },
+              {
+                label: 'Community',
+                href: 'https://tracetest.io/community',
+              },
+              {
+                label: 'Pricing',
+                href: 'https://tracetest.io/pricing',
+              },
+              {
+                label: 'Talk to us in Discord',
+                href: 'https://discord.gg/6zupCZFQbe',
+              },
+              {
+                label: 'Open an issue in GitHub',
+                href: 'https://github.com/kubeshop/tracetest/issues/new/choose',
+              },
+              {
+                label: 'Learn',
+                href: 'https://tracetest.io/learn',
+              },
+              {
+                label: 'Contact Us',
+                href: 'https://tracetest.io/contact',
+              },
+            ],
           },
           {
             type: "html",
