@@ -6,7 +6,6 @@ const posthogKey = Env.get('posthogKey');
 
 const options = {
   api_host: 'https://app.posthog.com',
-  debug: true,
   opt_out_capturing_by_default: true,
 };
 
