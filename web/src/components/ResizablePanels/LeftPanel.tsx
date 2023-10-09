@@ -11,9 +11,18 @@ interface IProps {
   tooltip?: string;
   isToolTipVisible?: boolean;
   onOpen?(): void;
+  dataTour?: string;
 }
 
-const LeftPanel = ({panel, order = 1, tooltip, isToolTipVisible = false, children, onOpen = noop}: IProps) => {
+const LeftPanel = ({
+  panel,
+  order = 1,
+  tooltip,
+  isToolTipVisible = false,
+  children,
+  onOpen = noop,
+  dataTour,
+}: IProps) => {
   const {size, toggle, onStopResize} = useResizablePanel({panel});
 
   useLayoutEffect(() => {
@@ -37,6 +46,7 @@ const LeftPanel = ({panel, order = 1, tooltip, isToolTipVisible = false, childre
           tooltip={tooltip}
           isToolTipVisible={isToolTipVisible}
           tooltipPlacement="right"
+          dataTour={dataTour}
         />
       )}
     >

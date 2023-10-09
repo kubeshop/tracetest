@@ -14,10 +14,10 @@ const StepContent = ({
   skipProps,
   isLastStep,
 }: TooltipRenderProps) => (
-  <S.Container {...tooltipProps}>
+  <S.Container {...tooltipProps} data-cy="onboarding-container">
     <S.Header>
       <S.Title>{step.title}</S.Title>
-      <S.TitleText>{` ${index + 1} of ${size}`}</S.TitleText>
+      <S.TitleText data-cy="onboarding-step">{` ${index + 1} of ${size}`}</S.TitleText>
     </S.Header>
 
     <S.Body>
@@ -40,7 +40,7 @@ const StepContent = ({
           </Button>
         )}
         {continuous && (
-          <Button {...primaryProps} type="link">
+          <Button {...primaryProps} type="link" data-cy="onboarding-next">
             {isLastStep ? 'Done' : 'Next'}
           </Button>
         )}

@@ -1,9 +1,8 @@
 # Configuration
 
-There are several configuration options with Tracetest:
+There is one configuration option with Tracetest:
 
-- [Server configuration](./server) to set database connection information needed to connect to required PostgreSQL instance.
-- [Provisioning configuration](./provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
+- [Agent configuration](./agent) to run it locally, in Docker, or Kubernetes.
 
 ## Supported Trace Data Stores
 
@@ -38,7 +37,14 @@ Examples of configuring Tracetest to access different data stores can be found i
 
 We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) any additional data stores you would like to see us support.
 
-## Configuring the Server
+## Tracetest Core
+
+There are several configuration options with Tracetest Core:
+
+- [Server configuration](./server) to set database connection information needed to connect to required PostgreSQL instance.
+- [Provisioning configuration](./provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
+
+### Configuring Tracetest Server
 
 Tracetest has a configuration file to contain the minimal information needed to start the Tracetest server. See more at [Tracetest Server Configuration](./server).
 

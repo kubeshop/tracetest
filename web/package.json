@@ -55,7 +55,6 @@
     "react-scripts": "5.0.1",
     "react-spaces": "0.3.8",
     "react-syntax-highlighter": "15.5.0",
-    "react-use": "17.4.0",
     "redux-first-history": "5.0.12",
     "styled-components": "5.3.3",
     "typescript": "5.0.2"

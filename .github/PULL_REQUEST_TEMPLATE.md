@@ -17,4 +17,4 @@ This PR...
 
 ## Loom video
 
-Add your loom video here if your work is can be visualized
+Add your loom video here if your work can be visualized

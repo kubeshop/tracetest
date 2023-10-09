@@ -49,7 +49,11 @@ function getMenuItems({
     },
     {
       key: '4',
-      label: <a onClick={onClickOnboarding}>Show Onboarding</a>,
+      label: (
+        <a data-cy="menu-onboarding" onClick={onClickOnboarding}>
+          Show Onboarding
+        </a>
+      ),
       icon: <BulbOutlined />,
       disabled: !isOnboardingActive,
     },

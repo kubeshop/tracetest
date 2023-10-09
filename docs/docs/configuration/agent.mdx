@@ -1,0 +1,20 @@
+---
+id: agent
+title: Configuring the Tracetest Agent
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
+
+Tracetest Agent is a lightweight, dependency-free, agent that runs locally in your development environment, or as a Docker container in your Cloud Native infrastructure.
+
+Once started, Tracetest Agent exposes OTLP ports `4317` and `4318` to ingest traces via gRCP and HTTP. Tracetest Agent connects to Tracetest via an API Key. 
+
+Unlike with Tracetest Core, you are not required to run a dedicated Tracetest Server. Running Tracetest Agent and using Tracetest as the remote server requires no configuration or infrastructure management.
+
+[Start Tracetest Agent](../getting-started/installation.mdx) in your environment to get started.
