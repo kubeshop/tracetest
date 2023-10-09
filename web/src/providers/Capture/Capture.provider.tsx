@@ -2,12 +2,12 @@ import noop from 'lodash/noop';
 import {createContext, useContext} from 'react';
 
 interface IContext {
-  identify(): void;
+  load(): void;
   pageView(): void;
 }
 
 export const Context = createContext<IContext>({
-  identify: noop,
+  load: noop,
   pageView: noop,
 });
 

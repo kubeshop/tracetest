@@ -96,14 +96,14 @@ const SettingsValuesProvider = ({children}: IProps) => {
 
   // Config
   const {data: config = Config()} = useGetConfigQuery({});
-  const {identify} = useCapture();
+  const {load} = useCapture();
 
   useEffect(() => {
     Env.set('analyticsEnabled', config.analyticsEnabled);
     AnalyticsService.load();
     AnalyticsService.identify();
-    identify();
-  }, [config, identify]);
+    load();
+  }, [config, load]);
 
   // Polling
   const {data: pollingProfile = Polling()} = useGetPollingQuery({});

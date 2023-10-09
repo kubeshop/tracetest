@@ -15,7 +15,7 @@ interface IProps {
 const Content = ({children}: IProps) => {
   const posthog = usePostHog();
 
-  const identify = useCallback(() => {
+  const load = useCallback(() => {
     if (!isAnalyticsEnabled()) {
       if (posthog?.has_opted_in_capturing()) {
         posthog?.opt_out_capturing();
@@ -35,7 +35,7 @@ const Content = ({children}: IProps) => {
     posthog?.capture('$pageview');
   }, [posthog]);
 
-  const captureProviderValue = useMemo(() => ({identify, pageView}), [identify, pageView]);
+  const captureProviderValue = useMemo(() => ({load, pageView}), [load, pageView]);
 
   return <CaptureProvider value={captureProviderValue}>{children}</CaptureProvider>;
 };
