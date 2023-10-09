@@ -19,7 +19,7 @@ export const SupportedDataStoresToName = {
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
-  [SupportedDataStores.Agent]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/agent',
+  [SupportedDataStores.Agent]: 'https://docs.tracetest.io/configuration/agent',
   [SupportedDataStores.JAEGER]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/jaeger',
   [SupportedDataStores.OpenSearch]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/opensearch',
   [SupportedDataStores.ElasticApm]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/elasticapm',
