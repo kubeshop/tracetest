@@ -18,6 +18,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var localSystemDockerComposeCommand = "docker compose"
+
 var dockerCompose = installer{
 	name: "docker-compose",
 	preChecks: []preChecker{
@@ -70,7 +72,8 @@ func dockerComposeInstaller(config configuration, ui cliUI.UI) {
 	dockerComposeFName := filepath.Join(dir, dockerComposeFilename)
 
 	dockerCmd := fmt.Sprintf(
-		"docker compose -f %s up -d",
+		"%s -f %s up -d",
+		localSystemDockerComposeCommand,
 		dockerComposeFName,
 	)
 
@@ -364,7 +367,14 @@ func dockerReadyChecker(ui cliUI.UI) {
 }
 
 func dockerComposeChecker(ui cliUI.UI) {
+	if commandSuccess("docker-compose") {
+		localSystemDockerComposeCommand = "docker-compose"
+		ui.Println(ui.Green("✔ docker-compose already installed"))
+		return
+	}
+
 	if commandSuccess("docker compose") {
+		localSystemDockerComposeCommand = "docker compose"
 		ui.Println(ui.Green("✔ docker compose already installed"))
 		return
 	}
