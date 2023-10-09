@@ -438,11 +438,6 @@ const sidebars = {
         id: "configuration/overview",
       },
       items: [
-        // {
-        //   type: "doc",
-        //   id: "configuration/config-file-reference",
-        //   label: "Config File Reference",
-        // },
         {
           type: "category",
           label: "Connecting to Data Stores",
@@ -518,6 +513,11 @@ const sidebars = {
               label: "Signoz",
             },
           ],
+        },
+        {
+          type: "doc",
+          id: "configuration/agent",
+          label: "Tracetest Agent Configuration",
         },
         {
           type: "doc",
