@@ -258,7 +258,7 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
               label: "X-Ray, AWS Distro for OpenTelemetry and Pokeshop API",
             },
-            
+
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
@@ -568,6 +568,11 @@ const sidebars = {
           type: "doc",
           id: "configuration/opentelemetry-collector-configuration-file-reference",
           label: "OpenTelemetry Collector Configuration File Reference",
+        },
+        {
+          type: "doc",
+          id: "configuration/sampling-tracetest-spans",
+          label: "Sampling tracetest spans",
         },
       ],
     },
