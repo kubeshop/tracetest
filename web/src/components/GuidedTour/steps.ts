@@ -27,7 +27,6 @@ export const CallbackByGuidedTour: Record<
       if (action === ACTIONS.NEXT && index === 2) {
         // Need to switch the page to Test mode. The Test mode page will update the step on mount.
         switchTestRunMode(2);
-        return;
       }
 
       // Move to the next step.

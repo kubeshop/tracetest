@@ -1,7 +1,6 @@
 import {Tabs} from 'antd';
 import {useCallback, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
-import {useMount} from 'react-use';
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import TestOutputs from 'components/TestOutputs';
 import TestOutputForm from 'components/TestOutputForm/TestOutputForm';
@@ -14,7 +13,6 @@ import {TestState} from 'constants/TestRun.constants';
 import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import TestRun from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
-import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import {useSpan} from 'providers/Span/Span.provider';
 import {useTestOutput} from 'providers/TestOutput/TestOutput.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
@@ -54,13 +52,6 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
     onValidate,
   } = useTestOutput();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
-  const {isGuidedTourRunning, setGuidedTourStep} = useGuidedTour();
-
-  useMount(() => {
-    if (isGuidedTourRunning) {
-      setGuidedTourStep(3);
-    }
-  });
 
   const handleClose = useCallback(() => {
     onSetFocusedSpan('');
