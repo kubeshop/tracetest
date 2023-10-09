@@ -1,5 +1,5 @@
 import {AnalyticsBrowser} from '@segment/analytics-next';
-import posthog from 'posthog-js';
+// import posthog from 'posthog-js';
 import {Categories} from 'constants/Analytics.constants';
 import Env from 'utils/Env';
 
@@ -8,7 +8,7 @@ const appVersion = Env.get('appVersion');
 const env = Env.get('env');
 const serverID = Env.get('serverID');
 const measurementId = Env.get('measurementId');
-const posthogKey = Env.get('posthogKey');
+// const posthogKey = Env.get('posthogKey');
 
 export const analytics = new AnalyticsBrowser();
 
@@ -38,7 +38,7 @@ const AnalyticsService = (): TAnalyticsService => ({
       env,
     });
 
-    posthog.capture('$pageview');
+    // posthog.capture('$pageview');
   },
   identify() {
     if (!isAnalyticsEnabled()) return;
@@ -48,7 +48,7 @@ const AnalyticsService = (): TAnalyticsService => ({
       env,
     });
 
-    posthog.init(posthogKey, {
+    /* posthog.init(posthogKey, {
       api_host: 'https://app.posthog.com',
       loaded: ph => {
         ph.identify(serverID, {appVersion, env});
@@ -57,7 +57,7 @@ const AnalyticsService = (): TAnalyticsService => ({
 
     if (posthog.has_opted_out_capturing()) {
       posthog.opt_in_capturing();
-    }
+    } */
   },
   load() {
     const isSegmentLoaded = Env.get('segmentLoaded');
@@ -70,7 +70,7 @@ const AnalyticsService = (): TAnalyticsService => ({
 
     if (!isAnalyticsEnabled() && isSegmentLoaded) {
       analytics.reset();
-      posthog.persistence && posthog.opt_out_capturing();
+      /* posthog.persistence && posthog.opt_out_capturing(); */
       Env.set('segmentLoaded', false);
     }
   },
