@@ -16,13 +16,15 @@ const Content = ({children}: IProps) => {
   const posthog = usePostHog();
 
   const identify = useCallback(() => {
-    console.log('identify', 'isAnalyticsEnabled', isAnalyticsEnabled());
     if (!isAnalyticsEnabled()) {
+      if (posthog?.has_opted_in_capturing()) {
+        posthog?.opt_out_capturing();
+      }
       return;
     }
 
     posthog?.opt_in_capturing();
-
+    posthog?._start_queue_if_opted_in();
     posthog?.identify(serverID, {
       appVersion,
       env,

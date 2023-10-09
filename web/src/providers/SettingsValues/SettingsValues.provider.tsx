@@ -102,7 +102,6 @@ const SettingsValuesProvider = ({children}: IProps) => {
     Env.set('analyticsEnabled', config.analyticsEnabled);
     AnalyticsService.load();
     AnalyticsService.identify();
-
     identify();
   }, [config, identify]);
 
