@@ -19,7 +19,7 @@ The Tracetest team uses an observability-driven development approach in developi
 
 You can configure an exporter to send the trace data to an OpenTelemetry Collector and then store it safely in your trace data store for further historical analysis. View the [supported trace data stores](./overview#supported-trace-data-stores) for more guidance on setting them up.
 
-In the `tracetest-config.yaml` file, alongside the [configuration](./server.md) of connecting Tracetest to the Postgres instance, you can also define a `telemetry` and `server` section.
+In the `tracetest-config.yaml` file, alongside the [configuration](./server.mdx) of connecting Tracetest to the Postgres instance, you can also define a `telemetry` and `server` section.
 
 With these two additional sections, you define an exporter where the Tracetest server's internal telemetry will be routed to. In the `telemetry` section, you define the endpoint of the OpenTelemetry Collector. And, in the `server` section you define which exporter the Tracetest server will use.
 

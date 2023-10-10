@@ -12,5 +12,4 @@ To help you configure the connection, you can use the **Test Connection** button
 
 ## Supported Trace Data Stores
 
-Select from the [list of available data stores](../configuration/overview.md) and configure the connection.
-
+Select from the [list of available data stores](../configuration/overview.mdx) and configure the connection.
