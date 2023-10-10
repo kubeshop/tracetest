@@ -12,7 +12,7 @@ You can find guides for:
 If you want to see more examples with other CI/CD tools, let us know by [opening an issue in GitHub](https://github.com/kubeshop/tracetest/issues/new/choose)!
 :::
 
-Tracetest is designed to work with all CI/CD platforms and automation tools. To enable Tracetest to run in CI/CD environments, make sure to [install the Tracetest CLI](../getting-started/installation.mdx) and configure it to access your [Tracetest server](../configuration/server.md).
+Tracetest is designed to work with all CI/CD platforms and automation tools. To enable Tracetest to run in CI/CD environments, make sure to [install the Tracetest CLI](../getting-started/installation.mdx) and configure it to access your [Tracetest server](../core/configuration/server.mdx).
 
 To read more about integrating Tracetest with CI/CD tools, check out tutorials in our blog:
 

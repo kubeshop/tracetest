@@ -209,6 +209,27 @@ const config = {
             to: '/getting-started/installation',
             from: ['/installing'],
           },
+          // SaaS to Core
+          {
+            to: '/core/configuration/server',
+            from: ['/configuration/server'],
+          },
+          {
+            to: '/core/configuration/provisioning',
+            from: ['/configuration/provisioning'],
+          },
+          {
+            to: '/core/configuration/analytics',
+            from: ['/configuration/analytics'],
+          },
+          {
+            to: '/core/configuration/telemetry',
+            from: ['/configuration/telemetry'],
+          },
+          {
+            to: '/core/configuration/upgrade',
+            from: ['/configuration/upgrade'],
+          },
         ],
         // createRedirects(existingPath) {
         //   if (existingPath.includes('/community')) {

@@ -379,6 +379,41 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Configuration",
+      link: {
+        type: "doc",
+        id: "core/configuration/overview",
+      },
+      items: [
+        {
+          type: "doc",
+          id: "core/configuration/server",
+          label: "Tracetest Server Configuration",
+        },
+        {
+          type: "doc",
+          id: "core/configuration/provisioning",
+          label: "Tracetest Server Provisioning",
+        },
+        {
+          type: "doc",
+          id: "core/configuration/analytics",
+          label: "Tracetest Server Analytics",
+        },
+        {
+          type: "doc",
+          id: "core/configuration/telemetry",
+          label: "Tracetest Server Telemetry",
+        },
+        {
+          type: "doc",
+          id: "core/configuration/upgrade",
+          label: "Upgrade Tracetest Version",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Deployment",
       link: {
         type: "doc",
@@ -512,6 +547,11 @@ const sidebars = {
               id: "configuration/connecting-to-data-stores/signoz",
               label: "Signoz",
             },
+            {
+              type: "doc",
+              id: "configuration/opentelemetry-collector-configuration-file-reference",
+              label: "OpenTelemetry Collector Configuration File Reference",
+            },
           ],
         },
         {
@@ -521,23 +561,13 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "configuration/server",
-          label: "Tracetest Server Configuration",
-        },
-        {
-          type: "doc",
-          id: "configuration/provisioning",
-          label: "Provisioning a Tracetest Server",
+          id: "configuration/tracetest-analyzer",
+          label: "Tracetest Analyzer",
         },
         {
           type: "doc",
           id: "configuration/trace-polling",
           label: "Trace Polling",
-        },
-        {
-          type: "doc",
-          id: "configuration/tracetest-analyzer",
-          label: "Tracetest Analyzer",
         },
         {
           type: "doc",
@@ -551,28 +581,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "configuration/analytics",
-          label: "Analytics",
-        },
-        {
-          type: "doc",
-          id: "configuration/telemetry",
-          label: "Telemetry",
-        },
-        {
-          type: "doc",
-          id: "configuration/upgrade",
-          label: "Upgrade Tracetest Version",
-        },
-        {
-          type: "doc",
-          id: "configuration/opentelemetry-collector-configuration-file-reference",
-          label: "OpenTelemetry Collector Configuration File Reference",
-        },
-        {
-          type: "doc",
           id: "configuration/sampling-tracetest-spans",
-          label: "Sampling tracetest spans",
+          label: "Sampling Tracetest Spans",
         },
       ],
     },

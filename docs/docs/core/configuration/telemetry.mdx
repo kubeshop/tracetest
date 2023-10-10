@@ -1,4 +1,15 @@
-# Telemetry
+---
+id: telemetry
+title: Telemetry
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to get started with creating tests once you open Tracetest.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
 
 The Tracetest server generates internal observability trace data. You can use this data to track Tracetest test runs over time and gain observability of how the Tracetest server is behaving.
 
@@ -8,7 +19,7 @@ The Tracetest team uses an observability-driven development approach in developi
 
 You can configure an exporter to send the trace data to an OpenTelemetry Collector and then store it safely in your trace data store for further historical analysis. View the [supported trace data stores](./overview#supported-trace-data-stores) for more guidance on setting them up.
 
-In the `tracetest-config.yaml` file, alongside the [configuration](./server.md) of connecting Tracetest to the Postgres instance, you can also define a `telemetry` and `server` section.
+In the `tracetest-config.yaml` file, alongside the [configuration](./server.mdx) of connecting Tracetest to the Postgres instance, you can also define a `telemetry` and `server` section.
 
 With these two additional sections, you define an exporter where the Tracetest server's internal telemetry will be routed to. In the `telemetry` section, you define the endpoint of the OpenTelemetry Collector. And, in the `server` section you define which exporter the Tracetest server will use.
 
