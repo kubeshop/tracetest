@@ -3,7 +3,7 @@
 Suppose you are considering Tracetest to run tests against a high-volume environment, such as production. In that case, you probably will hit some drawbacks, such as having
 your test spans not sampled by your probabilistic sampler. There are a couple of things that you can do to avoid those problems:
 
-## Add a separate pipeline for Tracetest in your OpenTelemetry Collector
+## Add a Separate Pipeline for Tracetest in your OpenTelemetry Collector
 
 > :warning: Note: This requires the [OpenTelemetry collector contrib](https://hub.docker.com/r/otel/opentelemetry-collector-contrib) instead of the core release
 > of the collector
@@ -88,7 +88,7 @@ service:
 With this configuration, you will still get 5% of all your traces, but you will also ensure that all your test traces are collected and sent to
 Jaeger.
 
-## Consider trace-related headers in your ingress endpoint
+## Consider Trace-related Headers in your Ingress Endpoint
 
 When exposing something to the internet, it's common to ignore all unknown headers from an HTTP request. This usually includes the `traceparent` and `tracestate` headers, which are the two headers defined in the [W3C specification](https://www.w3.org/TR/trace-context/#relationship-between-the-headers).
 
