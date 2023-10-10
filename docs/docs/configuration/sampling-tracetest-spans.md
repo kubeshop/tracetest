@@ -1,4 +1,4 @@
-# Sampling tracetest spans
+# Sampling Tracetest Spans
 
 Suppose you are considering Tracetest to run tests against a high-volume environment, such as production. In that case, you probably will hit some drawbacks, such as having
 your test spans not sampled by your probabilistic sampler. There are a couple of things that you can do to avoid those problems:
@@ -9,7 +9,6 @@ your test spans not sampled by your probabilistic sampler. There are a couple of
 > of the collector
 
 Your existing OpenTelemetry Collector already receives traces from your applications and sends them to your datastore and you have a set of processors configured to ensure the quality of the traces your datastore is receiving. It probably looks like this one:
-
 
 ```yaml
 receivers:

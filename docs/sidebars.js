@@ -572,7 +572,7 @@ const sidebars = {
         {
           type: "doc",
           id: "configuration/sampling-tracetest-spans",
-          label: "Sampling tracetest spans",
+          label: "Sampling Tracetest Spans",
         },
       ],
     },
