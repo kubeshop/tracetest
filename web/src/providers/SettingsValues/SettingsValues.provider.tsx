@@ -7,6 +7,7 @@ import Demo from 'models/Demo.model';
 import Linter from 'models/Linter.model';
 import Polling from 'models/Polling.model';
 import TestRunner from 'models/TestRunner.model';
+import {useCapture} from 'providers/Capture';
 import TracetestAPI from 'redux/apis/Tracetest';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {setUserPreference} from 'redux/slices/User.slice';
@@ -95,12 +96,14 @@ const SettingsValuesProvider = ({children}: IProps) => {
 
   // Config
   const {data: config = Config()} = useGetConfigQuery({});
+  const {load} = useCapture();
 
   useEffect(() => {
     Env.set('analyticsEnabled', config.analyticsEnabled);
     AnalyticsService.load();
     AnalyticsService.identify();
-  }, [config]);
+    load();
+  }, [config, load]);
 
   // Polling
   const {data: pollingProfile = Polling()} = useGetPollingQuery({});
