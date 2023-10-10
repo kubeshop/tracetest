@@ -6,7 +6,6 @@ interface IProps {
 }
 
 const flagValues = {
-  [Flag.IsAnalyticsPageEnabled]: true,
   [Flag.IsAgentDataStoreEnabled]: false,
   [Flag.IsLocalModeEnabled]: false,
 };
