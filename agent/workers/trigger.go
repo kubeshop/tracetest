@@ -36,6 +36,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	registry.Add(agentTrigger.HTTP())
 	registry.Add(agentTrigger.GRPC())
 	registry.Add(agentTrigger.TRACEID())
+	registry.Add(agentTrigger.KAFKA())
 
 	worker := &TriggerWorker{
 		client:   client,
@@ -94,6 +95,7 @@ func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
 		HTTP:    convertProtoHttpTriggerToHttpTrigger(pt.Http),
 		GRPC:    convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
 		TraceID: convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
+		Kafka:   convertProtoKafkaTriggerToKafkaTrigger(pt.Kafka),
 	}
 }
 
@@ -189,6 +191,42 @@ func convertProtoTraceIDTriggerToTraceIDTrigger(traceIDRequest *proto.TraceIDReq
 	}
 }
 
+func convertProtoKafkaTriggerToKafkaTrigger(kafkaRequest *proto.KafkaRequest) *trigger.KafkaRequest {
+	if kafkaRequest == nil {
+		return nil
+	}
+
+	headers := make([]trigger.KafkaMessageHeader, len(kafkaRequest.Headers))
+
+	for i, h := range headers {
+		headers[i] = trigger.KafkaMessageHeader{Key: h.Key, Value: h.Value}
+	}
+
+	return &trigger.KafkaRequest{
+		BrokerURLs:      kafkaRequest.BrokerUrls,
+		Topic:           kafkaRequest.Topic,
+		Headers:         headers,
+		Authentication:  convertProtoKafkaAuthToKafkaAuth(kafkaRequest.Authentication),
+		MessageKey:      kafkaRequest.MessageKey,
+		MessageValue:    kafkaRequest.MessageValue,
+		SSLVerification: kafkaRequest.SslVerification,
+	}
+}
+
+func convertProtoKafkaAuthToKafkaAuth(kafkaAuthentication *proto.KafkaAuthentication) *trigger.KafkaAuthenticator {
+	if kafkaAuthentication == nil {
+		return nil
+	}
+
+	return &trigger.KafkaAuthenticator{
+		Type: kafkaAuthentication.Type,
+		Plain: &trigger.KafkaPlainAuthenticator{
+			Username: kafkaAuthentication.Plain.Username,
+			Password: kafkaAuthentication.Plain.Password,
+		},
+	}
+}
+
 func convertResponseToProtoResponse(request *proto.TriggerRequest, response agentTrigger.Response) *proto.TriggerResponse {
 	return &proto.TriggerResponse{
 		TestID: request.TestID,
@@ -198,6 +236,7 @@ func convertResponseToProtoResponse(request *proto.TriggerRequest, response agen
 			Http:    convertHttpResponseToProto(response.Result.HTTP),
 			Grpc:    convertGrpcResponseToProto(response.Result.GRPC),
 			TraceID: convertTraceIDResponseToProto(response.Result.TraceID),
+			Kafka:   convertKafkaResponseToProto(response.Result.Kafka),
 		},
 	}
 }
@@ -244,5 +283,16 @@ func convertTraceIDResponseToProto(traceID *trigger.TraceIDResponse) *proto.Trac
 
 	return &proto.TraceIdResponse{
 		Id: traceID.ID,
+	}
+}
+
+func convertKafkaResponseToProto(kafka *trigger.KafkaResponse) *proto.KafkaResponse {
+	if kafka == nil || kafka.Offset == "" {
+		return nil
+	}
+
+	return &proto.KafkaResponse{
+		Partition: kafka.Partition,
+		Offset:    kafka.Offset,
 	}
 }
