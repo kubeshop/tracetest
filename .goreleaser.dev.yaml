@@ -28,8 +28,8 @@ builds:
     binary: tracetest-server
     main: ./server/main.go
     ldflags:
-    - -X github.com/kubeshop/tracetest/server/app.Version={{ .Env.VERSION }}
-    - -X github.com/kubeshop/tracetest/server/app.Env={{ .Env.TRACETEST_ENV }}
+    - -X github.com/kubeshop/tracetest/server/version.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/server/version.Env={{ .Env.TRACETEST_ENV }}
     - -X github.com/kubeshop/tracetest/server/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
     - -X github.com/kubeshop/tracetest/server/analytics.FrontendKey={{ .Env.ANALYTICS_FE_KEY }}
     env:

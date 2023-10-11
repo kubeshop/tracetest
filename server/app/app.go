@@ -41,14 +41,12 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/kubeshop/tracetest/server/version"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var (
-	Version = "dev"
-	Env     = "dev"
-
 	pgChannelName = "tracetest_queue"
 )
 
@@ -71,7 +69,7 @@ func New(config *config.AppConfig) (*App, error) {
 }
 
 func (app *App) Version() string {
-	return fmt.Sprintf("tracetest-server %s (%s)", Version, Env)
+	return fmt.Sprintf("tracetest-server %s (%s)", version.Version, version.Env)
 }
 
 func (app *App) Stop() {
@@ -135,7 +133,7 @@ func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
 }
 
 func (app *App) initAnalytics(configFromDB config.Config) error {
-	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, Version, Env, app.cfg.AnalyticsServerKey(), app.cfg.AnalyticsFrontendKey())
+	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, version.Version, version.Env, app.cfg.AnalyticsServerKey(), app.cfg.AnalyticsFrontendKey())
 }
 
 var instanceID = id.GenerateID().String()
@@ -407,8 +405,8 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 				cfg,
 				analyticsEnabled,
 				serverID,
-				Version,
-				Env,
+				version.Version,
+				version.Env,
 				isTracetestDev,
 			),
 		)
@@ -642,7 +640,7 @@ func httpRouter(
 
 		tracedbFactory,
 		mappers,
-		Version,
+		version.Version,
 	)
 	apiApiController := openapi.NewApiApiController(controller)
 	customController := httpServer.NewCustomController(controller, apiApiController, openapi.DefaultErrorHandler, tracer)
