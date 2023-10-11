@@ -9,9 +9,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -58,14 +56,7 @@ func NewTracerProvider(ctx context.Context, exporterConfig *config.TelemetryExpo
 		return sdktrace.NewTracerProvider(), nil
 	}
 
-	r, err := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(exporterConfig.ServiceName),
-		),
-	)
-
+	r, err := getResource(exporterConfig)
 	if err != nil {
 		return nil, fmt.Errorf("could not get provider resource: %w", err)
 	}
