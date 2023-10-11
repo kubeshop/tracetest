@@ -72,9 +72,14 @@ func WithResourceMiddleware(runFn RunFn, params ...Validator) CobraRunFn {
 
 type resourceParameters struct {
 	ResourceName string
+	optional     bool
 }
 
 func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error {
+	if p.optional {
+		return nil
+	}
+
 	if len(args) == 0 || args[0] == "" {
 		return []error{
 			paramError{

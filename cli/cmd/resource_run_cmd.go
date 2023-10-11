@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/runner"
 	"github.com/spf13/cobra"
 )
@@ -22,10 +23,13 @@ func init() {
 		Use:     "run " + runnableResourceList(),
 		Short:   "run resources",
 		Long:    "run resources",
-		PreRun:  setupCommand(),
+		PreRun:  setupCommand(WithOptionalResourceName()),
 		Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
-			resourceType := resourceParams.ResourceName
 			ctx := context.Background()
+			resourceType, err := getResourceType(runParams, resourceParams)
+			if err != nil {
+				return "", err
+			}
 
 			r, err := runnerRegistry.Get(resourceType)
 			if err != nil {
@@ -78,6 +82,25 @@ func init() {
 	runCmd.Flags().MarkShorthandDeprecated("e", "use --vars instead")
 
 	rootCmd.AddCommand(runCmd)
+}
+
+func getResourceType(runParams *runParameters, resourceParams *resourceParameters) (string, error) {
+	if resourceParams.ResourceName != "" {
+		return resourceParams.ResourceName, nil
+	}
+
+	if runParams.DefinitionFile != "" {
+		filePath := runParams.DefinitionFile
+		f, err := fileutil.Read(filePath)
+		if err != nil {
+			return "", fmt.Errorf("cannot read file %s: %w", filePath, err)
+		}
+
+		return strings.ToLower(f.Type()), nil
+	}
+
+	return "", fmt.Errorf("resourceName is empty and no definition file provided")
+
 }
 
 func validRequiredGatesMsg() string {
