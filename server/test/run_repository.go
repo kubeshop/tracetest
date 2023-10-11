@@ -36,7 +36,6 @@ type RunRepository interface {
 type Cache struct {
 	cache                 *cache.Cache
 	instanceID            string
-	readRequestCounter    metric.Int64Counter
 	cacheLatencyHistogram metric.Int64Histogram
 }
 
@@ -61,13 +60,11 @@ func NewCache(instanceID string, opts ...CacheOption) *Cache {
 		opt(cacheConfig)
 	}
 
-	readRequestCounter, _ := cacheConfig.meter.Int64Counter("tracetest.cache.request.count")
 	cacheLatencyHistogram, _ := cacheConfig.meter.Int64Histogram("tracetest.cache.latency")
 
 	cache := &Cache{
 		cache:                 cache.New(5*time.Minute, 10*time.Minute),
 		instanceID:            instanceID,
-		readRequestCounter:    readRequestCounter,
 		cacheLatencyHistogram: cacheLatencyHistogram,
 	}
 
@@ -106,7 +103,6 @@ func (c *Cache) Get(ctx context.Context, testID id.ID, runID int) (Run, bool) {
 		attribute.Bool("hit", found),
 	)
 
-	c.readRequestCounter.Add(ctx, 1, metric.WithAttributeSet(attributeSet))
 	c.cacheLatencyHistogram.Record(ctx, duration.Milliseconds(), metric.WithAttributeSet(attributeSet))
 
 	if !found {

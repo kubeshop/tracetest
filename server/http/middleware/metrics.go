@@ -13,7 +13,6 @@ import (
 type httpMetricMiddleware struct {
 	next                     http.Handler
 	requestDurationHistogram metric.Int64Histogram
-	requestCounter           metric.Int64Counter
 }
 
 func (m *httpMetricMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +35,6 @@ func (m *httpMetricMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	}
 
 	m.requestDurationHistogram.Record(r.Context(), duration.Milliseconds(), metric.WithAttributes(metricAttributes...))
-	m.requestCounter.Add(r.Context(), 1, metric.WithAttributes(metricAttributes...))
 }
 
 var _ http.Handler = &httpMetricMiddleware{}
@@ -57,13 +55,11 @@ func (lrw *responseWriter) WriteHeader(code int) {
 
 func NewMetricMiddleware(meter metric.Meter) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
-		durationHistogram, _ := meter.Int64Histogram("http.server.duration", metric.WithUnit("ms"))
-		requestCounter, _ := meter.Int64Counter("http.server.request.count")
+		durationHistogram, _ := meter.Int64Histogram("http.server.latency", metric.WithUnit("ms"))
 
 		return &httpMetricMiddleware{
 			next:                     next,
 			requestDurationHistogram: durationHistogram,
-			requestCounter:           requestCounter,
 		}
 	}
 }

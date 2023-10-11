@@ -19,13 +19,11 @@ type metricWorkerMiddlewareBuilder struct {
 }
 
 type metricWorkerMiddleware struct {
-	requestCounter   metric.Int64Counter
 	latencyHistogram metric.Int64Histogram
 	next             pipeline.StepProcessor[Job]
 }
 
 func NewWorkerMetricMiddlewareBuilder(meter metric.Meter) WorkerMiddlewareBuilder {
-	meter.Int64Counter("tracetest.worker.")
 	return &metricWorkerMiddlewareBuilder{
 		meter: meter,
 	}
@@ -34,11 +32,9 @@ func NewWorkerMetricMiddlewareBuilder(meter metric.Meter) WorkerMiddlewareBuilde
 func (b *metricWorkerMiddlewareBuilder) New(name string, next pipeline.StepProcessor[Job]) pipeline.StepProcessor[Job] {
 	metricPrefix := fmt.Sprintf("tracetest.worker.%s", name)
 
-	requestCounter, _ := b.meter.Int64Counter(fmt.Sprintf("%s.request.count", metricPrefix))
 	latencyHistogram, _ := b.meter.Int64Histogram(fmt.Sprintf("%s.latency", metricPrefix))
 
 	return &metricWorkerMiddleware{
-		requestCounter:   requestCounter,
 		latencyHistogram: latencyHistogram,
 		next:             next,
 	}
@@ -52,7 +48,6 @@ func (m *metricWorkerMiddleware) ProcessItem(ctx context.Context, job Job) {
 		attribute.String("run_state", string(job.Run.State)),
 	)
 
-	m.requestCounter.Add(ctx, 1, metric.WithAttributeSet(attributeSet))
 	start := time.Now()
 	m.next.ProcessItem(ctx, job)
 	latency := time.Since(start)
