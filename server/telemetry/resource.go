@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/version"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 )
@@ -26,6 +27,7 @@ func getResource(cfg *config.TelemetryExporterOption) (*resource.Resource, error
 			semconv.SchemaURL,
 			semconv.ServiceNameKey.String(serviceName),
 			semconv.HostName(hostname),
+			semconv.ServiceVersion(version.Version),
 		),
 	)
 
