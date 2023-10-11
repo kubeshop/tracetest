@@ -25,6 +25,7 @@ var (
 type setupConfig struct {
 	shouldValidateConfig          bool
 	shouldValidateVersionMismatch bool
+	optionalResourceName          bool
 }
 
 type setupOption func(*setupConfig)
@@ -41,10 +42,17 @@ func SkipVersionMismatchCheck() setupOption {
 	}
 }
 
+func WithOptionalResourceName() setupOption {
+	return func(sc *setupConfig) {
+		sc.optionalResourceName = true
+	}
+}
+
 func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string) {
 	config := setupConfig{
 		shouldValidateConfig:          true,
 		shouldValidateVersionMismatch: true,
+		optionalResourceName:          false,
 	}
 	for _, option := range options {
 		option(&config)
@@ -65,6 +73,10 @@ func setupCommand(options ...setupOption) func(cmd *cobra.Command, args []string
 
 		if config.shouldValidateVersionMismatch {
 			validateVersionMismatch()
+		}
+
+		if config.optionalResourceName {
+			resourceParams.optional = true
 		}
 
 		analytics.Init()

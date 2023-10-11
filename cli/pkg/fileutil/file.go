@@ -39,6 +39,18 @@ func (f File) Reader() io.Reader {
 }
 
 var (
+	fileTypeRegex = regexp.MustCompile(`(?m:^type:\s*(\w+))`)
+)
+
+func (f File) Type() string {
+	match := fileTypeRegex.FindSubmatch(f.contents)
+	if len(match) < 2 {
+		return ""
+	}
+	return string(match[1])
+}
+
+var (
 	hasIDRegex      = regexp.MustCompile(`(?m:^\s+id:\s*)`)
 	indentSizeRegex = regexp.MustCompile(`(?m:^(\s+)\w+)`)
 )
