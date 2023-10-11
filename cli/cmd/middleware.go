@@ -76,7 +76,13 @@ type resourceParameters struct {
 }
 
 func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error {
+	// if the resourceName is optional, skip validation.
 	if p.optional {
+		// we still need to bind it to the struct in case the user provided a value.
+		// we need to check the args has at least one element to avoid a panic.
+		if len(args) > 0 {
+			p.ResourceName = args[0]
+		}
 		return nil
 	}
 
