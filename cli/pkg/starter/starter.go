@@ -115,7 +115,7 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 		session, err = initialization.Start(ctx, cfg)
 		if err != nil && errors.Is(err, initialization.ErrOtlpServerStart) {
 			s.ui.Error("Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.")
-			shouldRetry := s.ui.Enter("Please stop the process currently listening on these ports and enter to try again.")
+			shouldRetry := s.ui.Enter("Please stop the process currently listening on these ports and press enter to try again.")
 
 			if !shouldRetry {
 				s.ui.Finish()
