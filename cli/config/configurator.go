@@ -113,6 +113,12 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return nil
 	}
 
+	confirmed := c.ui.Enter("Lets get to it! Press enter to launch a browser and authenticate:")
+	if !confirmed {
+		c.ui.Finish()
+		return nil
+	}
+
 	oauthServer := oauth.NewOAuthServer(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), cfg.UIEndpoint)
 	err = oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
