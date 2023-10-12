@@ -12,7 +12,7 @@ import (
 
 var (
 	start        = starter.NewStarter(configurator, resources)
-	defaultToken = os.Getenv("TRACETEST_TOKEN")
+	defaultToken = os.Getenv("TRACETEST_CLI_API_KEY")
 	saveParams   = &saveParameters{}
 )
 
