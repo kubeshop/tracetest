@@ -3,6 +3,8 @@ name: Code build and checks
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
   pull_request:
 
 env:
