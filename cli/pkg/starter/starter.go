@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang-jwt/jwt/v4"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/initialization"
 
@@ -31,7 +30,11 @@ func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.Confi
 	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
 
-	return s.configurator.WithOnFinish(s.onStartAgent).Start(ctx, cfg, flags)
+	if flags.TokenApiKey == "" || flags.AgentApiKey != "" {
+		s.configurator = s.configurator.WithOnFinish(s.onStartAgent)
+	}
+
+	return s.configurator.Start(ctx, cfg, flags)
 }
 
 func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
@@ -132,7 +135,7 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 		isStarted = true
 	}
 
-	claims, err := s.getTokenClaims(session.Token)
+	claims, err := config.GetTokenClaims(session.Token)
 	if err != nil {
 		return err
 	}
@@ -159,18 +162,4 @@ You can`
 		selected.Fn(s.ui)
 	}
 	return nil
-}
-
-func (s *Starter) getTokenClaims(tokenString string) (jwt.MapClaims, error) {
-	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
-	if err != nil {
-		return jwt.MapClaims{}, err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return jwt.MapClaims{}, fmt.Errorf("invalid token claims")
-	}
-
-	return claims, nil
 }

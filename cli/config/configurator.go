@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/pkg/oauth"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
@@ -99,32 +100,46 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		return Save(cfg)
 	}
 
+	oauthEndpoint := fmt.Sprintf("%s%s", cfg.URL(), cfg.Path())
+
+	if prev.Jwt != "" {
+		cfg.Jwt = prev.Jwt
+		cfg.Token = prev.Token
+	}
+
+	if flags.TokenApiKey != "" {
+		jwt, err := oauth.ExchangeToken(oauthEndpoint, flags.TokenApiKey)
+		if err != nil {
+			return err
+		}
+
+		cfg.Jwt = jwt
+		cfg.Token = flags.TokenApiKey
+
+		claims, err := GetTokenClaims(jwt)
+		if err != nil {
+			return err
+		}
+
+		flags.OrganizationID = claims["organization_id"].(string)
+		flags.EnvironmentID = claims["environment_id"].(string)
+	}
+
 	if flags.AgentApiKey != "" {
 		cfg.AgentApiKey = flags.AgentApiKey
 		c.ShowOrganizationSelector(ctx, cfg, flags)
 		return nil
 	}
 
-	if prev.Jwt != "" {
-		cfg.Jwt = prev.Jwt
-		cfg.Token = prev.Token
-
+	if cfg.Jwt != "" {
 		c.ShowOrganizationSelector(ctx, cfg, flags)
 		return nil
 	}
 
-	confirmed := c.ui.Enter("Lets get to it! Press enter to launch a browser and authenticate:")
-	if !confirmed {
-		c.ui.Finish()
-		return nil
-	}
-
-	oauthServer := oauth.NewOAuthServer(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), cfg.UIEndpoint)
-	err = oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
+	oauthServer := oauth.NewOAuthServer(oauthEndpoint, cfg.UIEndpoint)
+	return oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
 		GetAuthJWT()
-
-	return err
 }
 
 func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token, jwt string) {
@@ -181,4 +196,18 @@ func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {
 	extraHeaders.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.Jwt))
 
 	return resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), extraHeaders)
+}
+
+func GetTokenClaims(tokenString string) (jwt.MapClaims, error) {
+	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
+	if err != nil {
+		return jwt.MapClaims{}, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return jwt.MapClaims{}, fmt.Errorf("invalid token claims")
+	}
+
+	return claims, nil
 }

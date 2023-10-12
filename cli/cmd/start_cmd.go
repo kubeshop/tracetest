@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"os"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/cli/config"
@@ -10,8 +11,9 @@ import (
 )
 
 var (
-	start      = starter.NewStarter(configurator, resources)
-	saveParams = &saveParameters{}
+	start        = starter.NewStarter(configurator, resources)
+	defaultToken = os.Getenv("TRACETEST_TOKEN")
+	saveParams   = &saveParameters{}
 )
 
 var startCmd = &cobra.Command{
@@ -28,6 +30,7 @@ var startCmd = &cobra.Command{
 			EnvironmentID:  saveParams.environmentID,
 			Endpoint:       saveParams.endpoint,
 			AgentApiKey:    saveParams.agentApiKey,
+			TokenApiKey:    saveParams.tokenApiKey,
 		}
 
 		cfg, err := agentConfig.LoadConfig()
@@ -49,6 +52,7 @@ func init() {
 	startCmd.Flags().StringVarP(&saveParams.organizationID, "organization", "", "", "organization id")
 	startCmd.Flags().StringVarP(&saveParams.environmentID, "environment", "", "", "environment id")
 	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", "", "agent api key")
+	startCmd.Flags().StringVarP(&saveParams.tokenApiKey, "token", "", defaultToken, "token api key")
 	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", config.DefaultCloudEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	rootCmd.AddCommand(startCmd)
 }
@@ -58,4 +62,5 @@ type saveParameters struct {
 	environmentID  string
 	endpoint       string
 	agentApiKey    string
+	tokenApiKey    string
 }

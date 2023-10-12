@@ -22,6 +22,7 @@ type OAuthServer struct {
 	port             int
 	server           *http.Server
 	mutex            sync.Mutex
+	ui               ui.UI
 }
 
 type Option func(*OAuthServer)
@@ -30,6 +31,7 @@ func NewOAuthServer(endpoint, frontendEndpoint string) *OAuthServer {
 	return &OAuthServer{
 		endpoint:         endpoint,
 		frontendEndpoint: frontendEndpoint,
+		ui:               ui.DefaultUI,
 	}
 }
 
@@ -44,6 +46,12 @@ func (s *OAuthServer) WithOnFailure(onFailure OnAuthFailure) *OAuthServer {
 }
 
 func (s *OAuthServer) GetAuthJWT() error {
+	confirmed := s.ui.Enter("Lets get to it! Press enter to launch a browser and authenticate:")
+	if !confirmed {
+		s.ui.Finish()
+		return nil
+	}
+
 	url, err := s.getUrl()
 	if err != nil {
 		return fmt.Errorf("failed to start oauth server: %w", err)
@@ -64,8 +72,8 @@ type JWTResponse struct {
 	Jwt string `json:"jwt"`
 }
 
-func (s *OAuthServer) ExchangeToken(token string) (string, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/tokens/%s/exchange", s.endpoint, token), nil)
+func ExchangeToken(endpoint string, token string) (string, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/tokens/%s/exchange", endpoint, token), nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
@@ -133,7 +141,7 @@ func (s *OAuthServer) handleResult(r *http.Request) (string, string, error) {
 		return "", "", fmt.Errorf("tokenId not found")
 	}
 
-	jwt, err := s.ExchangeToken(tokenId)
+	jwt, err := ExchangeToken(s.endpoint, tokenId)
 	if err != nil {
 		return "", "", err
 	}
