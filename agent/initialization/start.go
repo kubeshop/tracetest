@@ -2,6 +2,7 @@ package initialization
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/client"
@@ -12,6 +13,8 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers/poller"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var ErrOtlpServerStart = errors.New("OTLP server start error")
 
 func NewClient(ctx context.Context, config config.Config, traceCache collector.TraceCache) (*client.Client, error) {
 	client, err := client.Connect(ctx, config.ServerURL,
@@ -72,7 +75,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 
 	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache), collector.WithStartRemoteServer(false))
 	if err != nil {
-		return err
+		return ErrOtlpServerStart
 	}
 
 	return nil

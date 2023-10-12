@@ -3,6 +3,7 @@ package starter
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -110,6 +111,14 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 
 	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", cfg.Name))
 	session, err := initialization.Start(ctx, cfg)
+
+	if err != nil && errors.Is(err, initialization.ErrOtlpServerStart) {
+		s.ui.Error("Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.")
+		s.ui.Error("Please stop the process currently listening on these ports and enter to try again.")
+
+		return nil
+	}
+
 	if err != nil {
 		return err
 	}
