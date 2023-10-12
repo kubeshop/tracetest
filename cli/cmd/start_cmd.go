@@ -19,7 +19,7 @@ var startCmd = &cobra.Command{
 	Use:     "start",
 	Short:   "Start Tracetest",
 	Long:    "Start using Tracetest",
-	PreRun:  setupCommand(SkipVersionMismatchCheck()),
+	PreRun:  setupCommand(SkipConfigValidation()),
 	Run: WithResultHandler((func(_ *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
 

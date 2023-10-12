@@ -50,7 +50,6 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
-	fmt.Println("Poll handled by agent")
 	datastoreConfig, err := convertProtoToDataStore(request.Datastore)
 	if err != nil {
 		return err

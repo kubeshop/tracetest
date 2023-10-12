@@ -26,7 +26,8 @@ func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (str
 	}
 
 	if len(elements) == 1 {
-		c.ui.Println(fmt.Sprintf("Defaulting to only available Organization: %s", elements[0].Name))
+		c.ui.Println(fmt.Sprintf(`
+Defaulting to only available Organization: %s`, elements[0].Name))
 		return elements[0].ID, nil
 	}
 
@@ -43,7 +44,8 @@ func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (str
 		}
 	}
 
-	option := c.ui.Select("What Organization do you want to use?", options, 0)
+	option := c.ui.Select(`
+What Organization do you want to use?`, options, 0)
 	option.Fn(c.ui)
 
 	return orgID, nil

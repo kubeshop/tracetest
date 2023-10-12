@@ -27,6 +27,8 @@ func NewStarter(configurator config.Configurator, resources *resourcemanager.Reg
 
 func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.ConfigFlags) error {
 	s.ui.Banner(config.Version)
+	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
+Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
 
 	return s.configurator.WithOnFinish(s.onStartAgent).Start(ctx, cfg, flags)
 }
@@ -45,10 +47,6 @@ func (s *Starter) onStartAgent(ctx context.Context, cfg config.Config) {
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
-
-	s.ui.Info(fmt.Sprintf(`
-Connecting Agent with name %s to Organization %s and Environment %s
-`, "local", cfg.OrganizationID, env.Name))
 
 	err = s.StartAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey, cfg.UIEndpoint)
 	if err != nil {
@@ -108,7 +106,8 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 		cfg.APIKey = agentApiKey
 	}
 
-	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", cfg.Name))
+	s.ui.Println(fmt.Sprintf(`
+Starting Agent with name %s...`, cfg.Name))
 	session, err := initialization.Start(ctx, cfg)
 	if err != nil {
 		return err
@@ -120,21 +119,23 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 	}
 
 	isOpen := true
-	message := fmt.Sprintf("Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment (%s). You can:", claims["environment_id"])
-	for isOpen {
-		options := []ui.Option{{
-			Text: "Open Tracetest in a browser to this environment",
-			Fn: func(_ ui.UI) {
-				s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s/dashboard", uiEndpoint, claims["organization_id"], claims["environment_id"]))
-			},
-		}, {
-			Text: "Stop this agent",
-			Fn: func(_ ui.UI) {
-				isOpen = false
-				session.Close()
-			},
-		}}
+	message := `Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment.
+You can`
+	options := []ui.Option{{
+		Text: "Open Tracetest in a browser to this environment",
+		Fn: func(_ ui.UI) {
+			s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s/dashboard", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+		},
+	}, {
+		Text: "Stop this agent",
+		Fn: func(_ ui.UI) {
+			isOpen = false
+			session.Close()
+			s.ui.Finish()
+		},
+	}}
 
+	for isOpen {
 		selected := s.ui.Select(message, options, 0)
 		selected.Fn(s.ui)
 	}
