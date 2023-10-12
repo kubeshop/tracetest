@@ -131,7 +131,11 @@ const config = {
           },
           {
             to: '/getting-started/installation',
-            from: ['/getting-started/cli', '/getting-started/detailed-installation' /*, '/docs/legacyDocFrom2016'*/],
+            from: ['/getting-started/cli', '/getting-started/detailed-installation', '/installing' /*, '/docs/legacyDocFrom2016'*/],
+          },
+          {
+            to: '/getting-started/open',
+            from: ['/accessing-dashboard' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
             to: '/configuration/overview',
@@ -155,7 +159,7 @@ const config = {
           },
           {
             to: '/cli/creating-tests',
-            from: ['/cli/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
+            from: ['/cli/test-definition-file', '/test-definition-file' /*, '/docs/legacyDocFrom2016'*/],
           },
           {
             to: '/cli/configuring-your-cli/',
@@ -206,8 +210,16 @@ const config = {
             from: ['/web-ui/creating-transactions'],
           },
           {
-            to: '/getting-started/installation',
-            from: ['/installing'],
+            to: '/web-ui/creating-tests',
+            from: ['/create-test'],
+          },
+          {
+            to: '/web-ui/creating-test-specifications',
+            from: ['/adding-assertions'],
+          },
+          {
+            to: '/web-ui/test-results',
+            from: ['/test-results'],
           },
           // SaaS to Core
           {
@@ -229,6 +241,19 @@ const config = {
           {
             to: '/core/configuration/upgrade',
             from: ['/configuration/upgrade'],
+          },
+          // Live Examples
+          {
+            to: '/live-examples/pokeshop/use-cases/add-pokemon',
+            from: ['/pokeshop/add-pokemon/'],
+          },
+          {
+            to: '/live-examples/pokeshop/use-cases/import-pokemon',
+            from: ['/pokeshop/import-pokemon/'],
+          },
+          {
+            to: '/live-examples/pokeshop/overview',
+            from: ['/pokeshop'],
           },
         ],
         // createRedirects(existingPath) {

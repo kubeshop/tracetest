@@ -607,6 +607,16 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/organizations",
+          label: "Organizations",
+        },
+        {
+          type: "doc",
+          id: "concepts/environments",
+          label: "Environments",
+        },
+        {
+          type: "doc",
           id: "concepts/assertions",
           label: "Assertions",
         },
