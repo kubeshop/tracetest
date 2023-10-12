@@ -169,7 +169,7 @@ message HttpResponse {
 message GrpcResponse {
     int32 statusCode = 1;
     repeated GrpcHeader metadata = 2;
-    string body = 3;
+    bytes body = 3;
 }
 
 message TraceIdResponse {

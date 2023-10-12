@@ -272,7 +272,7 @@ func convertGrpcResponseToProto(grpc *trigger.GRPCResponse) *proto.GrpcResponse 
 	return &proto.GrpcResponse{
 		StatusCode: int32(grpc.StatusCode),
 		Metadata:   headers,
-		Body:       grpc.Body,
+		Body:       []byte(grpc.Body),
 	}
 }
 
