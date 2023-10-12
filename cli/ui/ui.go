@@ -32,6 +32,7 @@ type UI interface {
 	Red(string) string
 
 	Confirm(prompt string, defaultValue bool) bool
+	Enter(msg string) bool
 	Select(prompt string, options []Option, defaultIndex int) (selected Option)
 	TextInput(msg, defaultValue string) string
 }
@@ -110,6 +111,25 @@ func (ui ptermUI) Confirm(msg string, defaultValue bool) bool {
 		ConfirmStyle: &pterm.ThemeDefault.SuccessMessageStyle,
 		RejectText:   "No",
 		RejectStyle:  &pterm.ThemeDefault.ErrorMessageStyle,
+		SuffixStyle:  &pterm.ThemeDefault.SecondaryStyle,
+	}).
+		Show()
+	if err != nil {
+		ui.Panic(err)
+	}
+
+	return confirm
+}
+
+func (ui ptermUI) Enter(msg string) bool {
+	confirm, err := (&pterm.InteractiveConfirmPrinter{
+		DefaultText:  msg,
+		DefaultValue: true,
+		TextStyle:    &pterm.ThemeDefault.DefaultText,
+		ConfirmText:  "Enter",
+		RejectText:   "Cancel",
+		RejectStyle:  &pterm.ThemeDefault.ErrorMessageStyle,
+		ConfirmStyle: &pterm.ThemeDefault.SuccessMessageStyle,
 		SuffixStyle:  &pterm.ThemeDefault.SecondaryStyle,
 	}).
 		Show()
