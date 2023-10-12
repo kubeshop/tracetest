@@ -255,7 +255,7 @@ func convertHttpResponseToProto(http *trigger.HTTPResponse) *proto.HttpResponse 
 		StatusCode: int32(http.StatusCode),
 		Status:     http.Status,
 		Headers:    headers,
-		Body:       http.Body,
+		Body:       []byte(http.Body),
 	}
 }
 

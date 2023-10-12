@@ -163,7 +163,7 @@ message HttpResponse {
     int32 statusCode = 1;
     string status = 2;
     repeated HttpHeader headers = 3;
-    string body = 4;
+    bytes body = 4;
 }
 
 message GrpcResponse {

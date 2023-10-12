@@ -29,7 +29,7 @@ func TestSendTriggerResult(t *testing.T) {
 				StatusCode: 200,
 				Status:     "OK",
 				Headers:    []*proto.HttpHeader{},
-				Body:       `{"ok": true}`,
+				Body:       []byte(`{"ok": true}`),
 			},
 		},
 	}
