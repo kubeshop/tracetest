@@ -107,19 +107,29 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 		cfg.APIKey = agentApiKey
 	}
 
-	s.ui.Println(fmt.Sprintf(`
-Starting Agent with name %s...`, cfg.Name))
-	session, err := initialization.Start(ctx, cfg)
+	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", cfg.Name))
 
-	if err != nil && errors.Is(err, initialization.ErrOtlpServerStart) {
-		s.ui.Error("Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.")
-		s.ui.Error("Please stop the process currently listening on these ports and enter to try again.")
+	isStarted := false
+	session := &initialization.Session{}
+	for !isStarted {
+		session, err = initialization.Start(ctx, cfg)
+		if err != nil && errors.Is(err, initialization.ErrOtlpServerStart) {
+			s.ui.Error("Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.")
+			shouldRetry := s.ui.Enter("Please stop the process currently listening on these ports and enter to try again.")
 
-		return nil
-	}
+			if !shouldRetry {
+				s.ui.Finish()
+				return err
+			}
 
-	if err != nil {
-		return err
+			continue
+		}
+
+		if err != nil {
+			return err
+		}
+
+		isStarted = true
 	}
 
 	claims, err := s.getTokenClaims(session.Token)
