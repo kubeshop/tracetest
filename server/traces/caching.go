@@ -26,10 +26,16 @@ func resetCache() {
 }
 
 func (c spanCache) Get(key string) (*Span, bool) {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
 	value, ok := c[key]
 	return value, ok
 }
 
 func (c spanCache) Set(key string, value *Span) {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
 	c[key] = value
 }
