@@ -167,7 +167,7 @@ publishers:
     cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
 brews:
-- tap:
+- repository:
     owner: kubeshop
     name: homebrew-tracetest
   commit_author:
