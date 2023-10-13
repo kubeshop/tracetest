@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/tracedb"
+	"go.opentelemetry.io/otel/metric"
 )
 
 type Job struct {
@@ -30,9 +31,17 @@ type DataStoreTestPipeline struct {
 	dsTestListener DsTestListener
 }
 
-type Configurer[T any] struct{}
+type Configurer[T any] struct {
+	meter metric.Meter
+}
 
-func (c *Configurer[Job]) Configure(_ *pipeline.Queue[Job]) {}
+func NewConfigurer(meter metric.Meter) *Configurer[Job] {
+	return &Configurer[Job]{meter: meter}
+}
+
+func (c *Configurer[Job]) Configure(queue *pipeline.Queue[Job]) {
+	queue.InitializeMetrics(c.meter)
+}
 
 func NewDataStoreTestPipeline(
 	pipeline *pipeline.Pipeline[Job],

@@ -281,6 +281,7 @@ func (app *App) Start(opts ...appOption) error {
 		tracer,
 		tracedbFactory,
 		app.cfg,
+		meter,
 	)
 
 	dsTestPipeline.Start()
