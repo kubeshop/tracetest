@@ -30,7 +30,7 @@ var startCmd = &cobra.Command{
 			EnvironmentID:  saveParams.environmentID,
 			Endpoint:       saveParams.endpoint,
 			AgentApiKey:    saveParams.agentApiKey,
-			TokenApiKey:    saveParams.tokenApiKey,
+			CLIApiKey:      saveParams.cliApiKey,
 		}
 
 		cfg, err := agentConfig.LoadConfig()
@@ -52,7 +52,7 @@ func init() {
 	startCmd.Flags().StringVarP(&saveParams.organizationID, "organization", "", "", "organization id")
 	startCmd.Flags().StringVarP(&saveParams.environmentID, "environment", "", "", "environment id")
 	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", "", "agent api key")
-	startCmd.Flags().StringVarP(&saveParams.tokenApiKey, "token", "", defaultToken, "token api key")
+	startCmd.Flags().StringVarP(&saveParams.cliApiKey, "cli-api-key", "", defaultToken, "CLI api key")
 	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", config.DefaultCloudEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	rootCmd.AddCommand(startCmd)
 }
@@ -62,5 +62,5 @@ type saveParameters struct {
 	environmentID  string
 	endpoint       string
 	agentApiKey    string
-	tokenApiKey    string
+	cliApiKey      string
 }
