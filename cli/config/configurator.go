@@ -107,14 +107,14 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 		cfg.Token = prev.Token
 	}
 
-	if flags.CLIApiKey != "" {
-		jwt, err := oauth.ExchangeToken(oauthEndpoint, flags.CLIApiKey)
+	if flags.Token != "" {
+		jwt, err := oauth.ExchangeToken(oauthEndpoint, flags.Token)
 		if err != nil {
 			return err
 		}
 
 		cfg.Jwt = jwt
-		cfg.Token = flags.CLIApiKey
+		cfg.Token = flags.Token
 
 		claims, err := GetTokenClaims(jwt)
 		if err != nil {

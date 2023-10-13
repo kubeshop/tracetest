@@ -30,7 +30,7 @@ func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.Confi
 	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
 
-	if flags.CLIApiKey == "" || flags.AgentApiKey != "" {
+	if flags.Token == "" || flags.AgentApiKey != "" {
 		s.configurator = s.configurator.WithOnFinish(s.onStartAgent)
 	}
 
