@@ -254,7 +254,7 @@ func convertHttpResponseToProto(http *trigger.HTTPResponse) *proto.HttpResponse 
 		StatusCode: int32(http.StatusCode),
 		Status:     http.Status,
 		Headers:    headers,
-		Body:       http.Body,
+		Body:       []byte(http.Body),
 	}
 }
 
@@ -271,7 +271,7 @@ func convertGrpcResponseToProto(grpc *trigger.GRPCResponse) *proto.GrpcResponse 
 	return &proto.GrpcResponse{
 		StatusCode: int32(grpc.StatusCode),
 		Metadata:   headers,
-		Body:       grpc.Body,
+		Body:       []byte(grpc.Body),
 	}
 }
 

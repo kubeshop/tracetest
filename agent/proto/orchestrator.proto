@@ -163,13 +163,13 @@ message HttpResponse {
     int32 statusCode = 1;
     string status = 2;
     repeated HttpHeader headers = 3;
-    string body = 4;
+    bytes body = 4;
 }
 
 message GrpcResponse {
     int32 statusCode = 1;
     repeated GrpcHeader metadata = 2;
-    string body = 3;
+    bytes body = 3;
 }
 
 message TraceIdResponse {
