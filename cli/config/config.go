@@ -27,6 +27,7 @@ type ConfigFlags struct {
 	EnvironmentID  string
 	CI             bool
 	AgentApiKey    string
+	Token          string
 }
 
 type Config struct {
