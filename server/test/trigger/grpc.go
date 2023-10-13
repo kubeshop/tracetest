@@ -5,8 +5,8 @@ import "google.golang.org/grpc/metadata"
 const TriggerTypeGRPC TriggerType = "grpc"
 
 type GRPCHeader struct {
-	Key   string `expr_enabled:"true"`
-	Value string `expr_enabled:"true"`
+	Key   string `expr_enabled:"true" json:"key"`
+	Value string `expr_enabled:"true" json:"value"`
 }
 
 type GRPCRequest struct {
