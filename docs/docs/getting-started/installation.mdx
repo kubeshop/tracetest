@@ -16,7 +16,7 @@ import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
-This page showcases getting started with Tracetest by using the Tracetest CLI and Agent.
+This page showcases getting started with [Tracetest](https://app.tracetest.io/) by using the Tracetest CLI and Tracetest Agent.
 
 ## Install the Tracetest CLI
 
@@ -24,7 +24,7 @@ This page showcases getting started with Tracetest by using the Tracetest CLI an
 
 ## Install the Tracetest Agent
 
-Tracetest Agent runs as a standalone process. It runs either locally on your machine or as a container. Once started the Agent exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion.
+[Tracetest Agent](../concepts/agent) runs as a standalone process. It runs either locally on your machine or as a container. Once started, Tracetest Agent exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. It executes tests in the environment where it is running and returns the response from triggered tests.
 
 <Tabs groupId="installation">
   <TabItem value="cli" label="Tracetest CLI" default>

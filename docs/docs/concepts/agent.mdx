@@ -1,0 +1,28 @@
+---
+id: agent
+title: Tracetest Agent
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+---
+
+Tracetest Agent is a lightweight, dependency-free, agent that runs locally in your development environment, or as a Docker container in your Cloud Native infrastructure.
+
+## How it works
+
+- Tracetest Agent listens for new tests you run from [Tracetest](https://app.tracetest.io). It executes tests in the environment where it is running and returns the response from the trigger. The environment can be either `localhost`, Docker, or Kubernetes.
+- Tracetest Agent listens on OTLP ports `4317` (gRPC) and `4318` (HTTP) for OpenTelemetry trace spans to capture distributed trace data and relay it to [Tracetest](https://app.tracetest.io).
+- With both the response and trace, you build tests and create assertions with data from either or both of them.
+
+## Architecture
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1697464028/docs/agent-saas-oct-16-whitebg_i4stow.png)
+
+:::note
+Want to start Tracetest Agent? Check out [this page to get started](../getting-started/installation).
+:::
