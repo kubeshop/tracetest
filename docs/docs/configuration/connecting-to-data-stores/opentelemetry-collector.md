@@ -87,5 +87,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with OpenTelemetry Collector and Tracetest](../../examples-tutorials/recipes/running-tracetest-without-a-trace-data-store.md).
+To learn more, [read the recipe on running a sample app with OpenTelemetry Collector and Tracetest](../../examples-tutorials/recipes/running-tracetest-without-a-trace-data-store.mdx).
 :::

@@ -141,12 +141,12 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "OpenTelemetry Collector",
+          label: "OpenTelemetry",
           items: [
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store",
-              label: "Node.js and OpenTelemetry Collector",
+              label: "Node.js and OpenTelemetry",
             },
             {
               type: "doc",

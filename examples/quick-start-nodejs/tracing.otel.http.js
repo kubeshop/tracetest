@@ -3,7 +3,9 @@ const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumenta
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http')
 
 const sdk = new opentelemetry.NodeSDK({
-  traceExporter: new OTLPTraceExporter({ url: 'http://otel-collector:4318/v1/traces' }),
+  // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is passed into "new OTLPTraceExporter" automatically
+  traceExporter: new OTLPTraceExporter(),
   instrumentations: [getNodeAutoInstrumentations()],
+  serviceName: 'quick-start-nodejs',
 })
 sdk.start()
