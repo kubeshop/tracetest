@@ -557,7 +557,7 @@ const sidebars = {
         {
           type: "doc",
           id: "configuration/agent",
-          label: "Tracetest Agent Configuration",
+          label: "Tracetest Agent",
         },
         {
           type: "doc",
@@ -600,6 +600,11 @@ const sidebars = {
         //   id: "concepts/what-is-tracing",
         //   label: "What is tracing",
         // },
+        {
+          type: "doc",
+          id: "concepts/agent",
+          label: "Agent",
+        },
         {
           type: "doc",
           id: "concepts/architecture",

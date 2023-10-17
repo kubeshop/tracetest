@@ -13,12 +13,20 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_T
 
 Tracetest Agent is a lightweight, dependency-free, agent that runs locally in your development environment, or as a Docker container in your Cloud Native infrastructure.
 
-Once started, Tracetest Agent exposes OTLP ports `4317` and `4318` to ingest traces via gRCP and HTTP. Tracetest Agent connects to Tracetest via an API Key. 
+## Start Tracetest Agent
 
-Unlike with Tracetest Core, you are not required to run a dedicated Tracetest Server. Running Tracetest Agent and using Tracetest as the remote server requires no configuration or infrastructure management.
+Tracetest Agent connects to Tracetest via an API Key.
 
-[Start Tracetest Agent](../getting-started/installation.mdx) in your environment to get started.
+[Start Tracetest Agent](../getting-started/installation.mdx) in your environment to begin testing!
 
-Or, [sign in to Tracetest](https://app.tracetest.io/) and follow the instructions on the Agent Settings page.
+Or, [sign in to Tracetest](https://app.tracetest.io/) and follow the instructions on the `Settings > Agent` page.
 
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1696941536/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_0e807879e2e38d28_settings_j4zt1b.png)
+
+## Configure Tracetest Agent
+
+Once started, Tracetest Agent exposes OTLP ports `4317` and `4318` to ingest traces via `gRPC` and `HTTP` and is responsible for running tests. Read the detailed concepts [here](../concepts/agent).
+
+:::note
+Unlike with [Tracetest Core](/core/getting-started/overview.mdx), you are not required to run a dedicated [Tracetest Server](/core/configuration/server.mdx). Running Tracetest Agent and using Tracetest as the remote server requires no configuration or infrastructure management.
+:::
