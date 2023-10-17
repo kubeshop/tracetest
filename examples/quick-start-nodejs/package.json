@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "with-grpc-tracer-and-env":"OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 node -r ./tracing.otel.grpc.js app.js",
     "with-grpc-tracer":"node -r ./tracing.otel.grpc.js app.js",
     "with-http-tracer":"node -r ./tracing.otel.http.js app.js"
   },
