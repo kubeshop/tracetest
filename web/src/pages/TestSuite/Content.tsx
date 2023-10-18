@@ -1,5 +1,5 @@
-import {Button} from 'antd';
 import {useCallback, useMemo} from 'react';
+import CreateButton from 'components/CreateButton';
 import PaginatedList from 'components/PaginatedList';
 import TestSuiteRunCard from 'components/RunCard/TestSuiteRunCard';
 import TestHeader from 'components/TestHeader';
@@ -39,9 +39,9 @@ const Content = () => {
         shouldEdit={shouldEdit}
         title={`${testSuite.name} (v${testSuite.version})`}
         runButton={
-          <Button onClick={handleRunTest} loading={isEditLoading} type="primary" ghost>
+          <CreateButton ghost loading={isEditLoading} onClick={handleRunTest} type="primary">
             Run Test Suite
-          </Button>
+          </CreateButton>
         }
       />
 

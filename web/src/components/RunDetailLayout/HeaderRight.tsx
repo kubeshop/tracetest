@@ -1,5 +1,6 @@
 import {CloseCircleOutlined} from '@ant-design/icons';
 import {Button, Tooltip} from 'antd';
+import CreateButton from 'components/CreateButton';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
@@ -58,9 +59,9 @@ const HeaderRight = ({testId}: IProps) => {
       )}
       <VariableSetSelector />
       {!isDraftMode && state && isRunStateFinished(state) && (
-        <Button data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
+        <CreateButton data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
           Run Test
-        </Button>
+        </CreateButton>
       )}
       <EventLogPopover runEvents={runEvents} />
       <RunActionsMenu

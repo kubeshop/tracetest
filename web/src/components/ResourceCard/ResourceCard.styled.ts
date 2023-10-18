@@ -112,10 +112,6 @@ export const Row = styled.div<{$gap?: number; $noWrap?: boolean}>`
   white-space: ${({$noWrap}) => $noWrap && 'nowrap'};
 `;
 
-export const RunButton = styled(Button)`
-  margin-right: 12px;
-`;
-
 export const RunsContainer = styled.div`
   padding: 0 24px 15px 64px;
 `;

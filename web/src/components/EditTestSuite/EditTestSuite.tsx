@@ -1,6 +1,7 @@
 import {Button, Form} from 'antd';
 import {useCallback, useState} from 'react';
 import AllowButton, {Operation} from 'components/AllowButton';
+import CreateButton from 'components/CreateButton';
 import {TDraftTestSuite} from 'types/TestSuite.types';
 import {useTestSuite} from 'providers/TestSuite';
 import useValidateTestSuiteDraft from 'hooks/useValidateTestSuiteDraft';
@@ -40,11 +41,12 @@ const EditTestSuite = ({testSuite, testSuiteRun}: IProps) => {
           </Button>
           <AllowButton
             operation={Operation.Edit}
+            ButtonComponent={CreateButton}
             data-cy="edit-testsuite-submit"
-            loading={isEditLoading}
             disabled={!isFormValid || !stateIsFinished}
-            type="primary"
+            loading={isEditLoading}
             onClick={() => form.submit()}
+            type="primary"
           >
             Save & Run
           </AllowButton>

@@ -1,3 +1,5 @@
+import AllowButton, {Operation} from 'components/AllowButton';
+import CreateButton from 'components/CreateButton';
 import CreateTestSuiteModal from 'components/CreateTestSuiteModal/CreateTestSuiteModal';
 import Empty from 'components/Empty';
 import Pagination from 'components/Pagination';
@@ -14,7 +16,6 @@ import useTestSuiteCrud from 'providers/TestSuite/hooks/useTestSuiteCrud';
 import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
 import TestSuite from 'models/TestSuite.model';
 import * as S from './TestSuites.styled';
-import CreateButton from '../Home/CreateButton';
 import HomeFilters from '../Home/HomeFilters';
 import Loading from '../Home/Loading';
 
@@ -66,7 +67,15 @@ const Resources = () => {
             onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})}
             isEmpty={pagination.list?.length === 0}
           />
-          <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} dataCy="create-button" />
+          <AllowButton
+            operation={Operation.Edit}
+            ButtonComponent={CreateButton}
+            data-cy="create-button"
+            onClick={() => setIsCreateTestSuiteOpen(true)}
+            type="primary"
+          >
+            Create
+          </AllowButton>
         </S.ActionsContainer>
 
         <Pagination<TestSuite>
@@ -95,7 +104,14 @@ const Resources = () => {
                   </>
                 }
                 action={
-                  <CreateButton onCreate={() => setIsCreateTestSuiteOpen(true)} title="Create Your First Test Suite" />
+                  <AllowButton
+                    operation={Operation.Edit}
+                    ButtonComponent={CreateButton}
+                    onClick={() => setIsCreateTestSuiteOpen(true)}
+                    type="primary"
+                  >
+                    Create Your First Test Suite
+                  </AllowButton>
                 }
               />
             )
