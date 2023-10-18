@@ -1,4 +1,3 @@
-import {Button} from 'antd';
 import {useLocation} from 'react-router-dom';
 import CreateButton from 'components/CreateButton';
 import {TestSuiteRunStatusIcon} from 'components/RunStatusIcon';

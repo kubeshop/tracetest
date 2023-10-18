@@ -7,7 +7,7 @@ import Linter from 'components/Settings/Linter';
 import Polling from 'components/Settings/Polling';
 import TestRunner from 'components/Settings/TestRunner';
 import BetaBadge from 'components/BetaBadge/BetaBadge';
-import {useCustomization, withCustomization} from 'providers/Customization';
+import {withCustomization} from 'providers/Customization';
 import * as S from './Settings.styled';
 
 const TabsKeys = {
@@ -20,7 +20,6 @@ const TabsKeys = {
 };
 
 const Content = () => {
-  const {getFlag} = useCustomization();
   const [query, setQuery] = useSearchParams();
 
   return (

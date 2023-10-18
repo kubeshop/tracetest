@@ -1,5 +1,5 @@
 import {MoreOutlined} from '@ant-design/icons';
-import {Button, Space, Typography} from 'antd';
+import {Space, Typography} from 'antd';
 import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
