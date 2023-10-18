@@ -1,4 +1,4 @@
-VERSION?="dev"
+VERSION?=dev
 TAG?=$(VERSION)
 GORELEASER_VERSION=1.21.2-pro
 
@@ -34,7 +34,7 @@ web/build: web/node_modules $(WEB_SRC_FILES)
 dist/tracetest-docker-$(TAG).tar dist/tracetest-agent-docker-$(TAG).tar: $(CLI_SRC_FILES) $(SERVER_SRC_FILES) $(WEB_SRC_FILES)
 	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
 	docker save --output dist/tracetest-docker-$(TAG).tar "kubeshop/tracetest:$(TAG)"
-	docker save --output dist/tracetest-agent-docker-$(TAG).tar "kubeshop/tracetest-agent-:$(TAG)"
+	docker save --output dist/tracetest-agent-docker-$(TAG).tar "kubeshop/tracetest-agent:$(TAG)"
 
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"

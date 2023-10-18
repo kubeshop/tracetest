@@ -72,7 +72,7 @@ dockers:
 
 - skip_push: true
   image_templates:
-  - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-amd64'
+  - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}'
   dockerfile: "Dockerfile.agent"
   build_flag_templates:
   - "--pull"
