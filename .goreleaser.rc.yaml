@@ -102,11 +102,48 @@ dockers:
   goarch: arm64
   use: buildx
 
+# agent
+- image_templates:
+  - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-amd64'
+  dockerfile: "Dockerfile.agent"
+  build_flag_templates:
+  - "--pull"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/amd64"
+  goos: linux
+  goarch: amd64
+  use: buildx
+
+- image_templates:
+  - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-arm64'
+  dockerfile: "Dockerfile.agent"
+  build_flag_templates:
+  - "--pull"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/arm64/v8"
+  goos: linux
+  goarch: arm64
+  use: buildx
+
 docker_manifests:
 - name_template: 'kubeshop/tracetest:{{ .Env.VERSION }}'
   image_templates:
   - 'kubeshop/tracetest:{{ .Env.VERSION }}-amd64'
   - 'kubeshop/tracetest:{{ .Env.VERSION }}-arm64'
+
+# agent
+- name_template: 'kubeshop/tracetest-agent:{{ .Env.VERSION }}'
+  image_templates:
+  - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-amd64'
+  - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-arm64'
 
 archives:
 - name_template: >-
