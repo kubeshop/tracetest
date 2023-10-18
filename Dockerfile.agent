@@ -1,0 +1,11 @@
+FROM alpine
+
+ENV PATH="$PATH:/app"
+ENV TRACETEST_API_KEY ""
+
+WORKDIR /app
+
+COPY ./tracetest /app/tracetest
+
+ENTRYPOINT [ "tracetest", "start", "--api-key", "$TRACETEST_API_KEY" ]
+

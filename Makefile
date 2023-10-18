@@ -31,9 +31,10 @@ WEB_SRC_FILES := $(shell find web -type f -not -path "*node_modules*" -not -path
 web/build: web/node_modules $(WEB_SRC_FILES)
 	cd web; npm run build
 
-dist/docker-image-$(TAG).tar: $(CLI_SRC_FILES) $(SERVER_SRC_FILES) $(WEB_SRC_FILES)
+dist/tracetest-docker-$(TAG).tar dist/tracetest-agent-docker-$(TAG).tar: $(CLI_SRC_FILES) $(SERVER_SRC_FILES) $(WEB_SRC_FILES)
 	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
-	docker save --output dist/docker-image-$(TAG).tar "kubeshop/tracetest:$(TAG)"
+	docker save --output dist/tracetest-docker-$(TAG).tar "kubeshop/tracetest:$(TAG)"
+	docker save --output dist/tracetest-agent-docker-$(TAG).tar "kubeshop/tracetest-agent-:$(TAG)"
 
 help: Makefile ## show list of commands
 	@echo "Choose a command run:"
@@ -51,7 +52,7 @@ run: build-docker ## build and run tracetest using docker compose
 	docker compose up
 build-go: dist/tracetest dist/tracetest-server ## build all go code
 build-web: web/build ## build web
-build-docker: goreleaser-version web/build .goreleaser.dev.yaml dist/docker-image-$(TAG).tar ## build and tag docker image as defined in .goreleaser.dev.yaml
+build-docker: goreleaser-version web/build .goreleaser.dev.yaml dist/tracetest-docker-$(TAG).tar dist/tracetest-agent-docker-$(TAG).tar ## build and tag docker image as defined in .goreleaser.dev.yaml
 
 .PHONY: generate generate-server generate-cli generate-web
 generate: generate-server generate-cli generate-web ## generate code entities from openapi definitions for all parts of the code
