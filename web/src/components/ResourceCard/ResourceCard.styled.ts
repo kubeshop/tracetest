@@ -1,5 +1,5 @@
 import {MoreOutlined} from '@ant-design/icons';
-import {Button, Space, Typography} from 'antd';
+import {Space, Typography} from 'antd';
 import styled from 'styled-components';
 
 import emptyStateIcon from 'assets/SpanAssertionsEmptyState.svg';
@@ -110,10 +110,6 @@ export const Row = styled.div<{$gap?: number; $noWrap?: boolean}>`
   column-gap: ${({$gap}) => $gap && `${$gap}px`};
   display: flex;
   white-space: ${({$noWrap}) => $noWrap && 'nowrap'};
-`;
-
-export const RunButton = styled(Button)`
-  margin-right: 12px;
 `;
 
 export const RunsContainer = styled.div`

@@ -1,5 +1,6 @@
 import {DownOutlined, RightOutlined} from '@ant-design/icons';
 import {useMemo} from 'react';
+import CreateButton from 'components/CreateButton';
 import TestRunCard from 'components/RunCard/TestRunCard';
 import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
@@ -47,18 +48,18 @@ const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
 
         <ResourceCardSummary summary={test.summary} />
 
-        <S.Row>
-          <S.RunButton
-            type="primary"
-            ghost
+        <S.Row $gap={12}>
+          <CreateButton
             data-cy={`test-run-button-${test.id}`}
+            ghost
             onClick={event => {
               event.stopPropagation();
               onRun(test, ResourceType.Test);
             }}
+            type="primary"
           >
             Run
-          </S.RunButton>
+          </CreateButton>
           <ResourceCardActions
             id={test.id}
             shouldEdit={shouldEdit}

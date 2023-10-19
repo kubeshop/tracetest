@@ -1,5 +1,6 @@
 import {Button, Form} from 'antd';
 import AllowButton, {Operation} from 'components/AllowButton';
+import CreateButton from 'components/CreateButton';
 import EditTestForm from 'components/EditTestForm';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
@@ -46,11 +47,12 @@ const EditTest = ({test}: IProps) => {
           </Button>
           <AllowButton
             operation={Operation.Edit}
+            ButtonComponent={CreateButton}
             data-cy="edit-test-submit"
-            loading={isEditLoading}
             disabled={!isValid || !stateIsFinished}
-            type="primary"
+            loading={isEditLoading}
             onClick={() => form.submit()}
+            type="primary"
           >
             Save & Run
           </AllowButton>

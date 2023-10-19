@@ -1,5 +1,6 @@
+import AllowButton, {Operation} from 'components/AllowButton';
+import CreateButton from 'components/CreateButton';
 import CreateTestModal from 'components/CreateTestModal/CreateTestModal';
-import Empty from 'components/Empty';
 import Pagination from 'components/Pagination';
 import TestCard from 'components/ResourceCard/TestCard';
 import {SortBy, SortDirection, sortOptions} from 'constants/Test.constants';
@@ -7,16 +8,15 @@ import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import {useCallback, useState} from 'react';
 import TracetestAPI from 'redux/apis/Tracetest';
-import {ADD_TEST_URL, OPENING_TRACETEST_URL} from 'constants/Common.constants';
 import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import useDeleteResource from 'hooks/useDeleteResource';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
 import Test from 'models/Test.model';
 import * as S from './Home.styled';
-import CreateButton from './CreateButton';
 import HomeFilters from './HomeFilters';
 import Loading from './Loading';
+import EmptyTestList from './EmptyTestList';
 
 const {useGetTestListQuery} = TracetestAPI.instance;
 
@@ -67,30 +67,19 @@ const Tests = () => {
             onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})}
             isEmpty={pagination.list?.length === 0}
           />
-          <CreateButton onCreate={() => setIsCreateTestOpen(true)} dataCy="create-button" />
+          <AllowButton
+            operation={Operation.Edit}
+            ButtonComponent={CreateButton}
+            data-cy="create-button"
+            onClick={() => setIsCreateTestOpen(true)}
+            type="primary"
+          >
+            Create
+          </AllowButton>
         </S.ActionsContainer>
 
         <Pagination<Test>
-          emptyComponent={
-            <Empty
-              title="Haven't Created a Test Yet"
-              message={
-                <>
-                  Hit the &apos;Create&apos; button below to kickstart your testing adventure. Want to learn more about
-                  tests? Just click{' '}
-                  <S.Link href={ADD_TEST_URL} target="_blank">
-                    here
-                  </S.Link>
-                  . If you don’t have an app that’s generating OpenTelemetry traces we have a demo for you. Follow these{' '}
-                  <S.Link href={OPENING_TRACETEST_URL} target="_blank">
-                    instructions
-                  </S.Link>
-                  !
-                </>
-              }
-              action={<CreateButton onCreate={() => setIsCreateTestOpen(true)} title="Create Your First Test" />}
-            />
-          }
+          emptyComponent={<EmptyTestList onClick={() => setIsCreateTestOpen(true)} />}
           loadingComponent={<Loading />}
           {...pagination}
         >

@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {Button} from 'antd';
+import CreateButton from 'components/CreateButton';
 import PaginatedList from 'components/PaginatedList';
 import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
@@ -39,7 +39,7 @@ const Content = () => {
         shouldEdit={shouldEdit}
         title={`${test.name} (v${test.version})`}
         runButton={
-          <Button
+          <CreateButton
             data-cy="test-details-run-test-button"
             ghost
             loading={isLoadingRunTest}
@@ -47,7 +47,7 @@ const Content = () => {
             type="primary"
           >
             Run Test
-          </Button>
+          </CreateButton>
         }
       />
 

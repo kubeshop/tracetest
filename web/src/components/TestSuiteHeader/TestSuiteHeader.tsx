@@ -1,5 +1,5 @@
-import {Button} from 'antd';
 import {useLocation} from 'react-router-dom';
+import CreateButton from 'components/CreateButton';
 import {TestSuiteRunStatusIcon} from 'components/RunStatusIcon';
 import TestState from 'components/TestState';
 import TestSuiteRunActionsMenu from 'components/TestSuiteRunActionsMenu';
@@ -76,9 +76,9 @@ const TestSuiteHeader = () => {
         )}
         <VariableSetSelector />
         {state && state === TestStateEnum.FINISHED && (
-          <Button ghost onClick={() => onRun(runId)} type="primary" data-cy="testsuite-run-button">
+          <CreateButton data-cy="testsuite-run-button" ghost onClick={() => onRun(runId)} type="primary">
             Run Test Suite
-          </Button>
+          </CreateButton>
         )}
         <TestSuiteRunActionsMenu testSuiteId={testSuiteId} runId={runId} isRunView />
       </S.SectionRight>
