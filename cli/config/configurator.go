@@ -41,10 +41,10 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
 	c.flags = flags
 	var serverURL string
-	if prev.UIEndpoint != "" {
-		serverURL = prev.UIEndpoint
-	} else if flags.Endpoint != "" {
+	if flags.Endpoint != "" {
 		serverURL = flags.Endpoint
+	} else if prev.UIEndpoint != "" {
+		serverURL = prev.UIEndpoint
 	} else {
 		path := ""
 		if prev.ServerPath != nil {

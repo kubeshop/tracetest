@@ -16,7 +16,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/goware/urlx v0.3.2
 	github.com/kubeshop/tracetest/agent v0.0.0-20230907210810-84198fc9f4ef
-	github.com/kubeshop/tracetest/server v0.0.0-20231010015728-ab7381aa0030
+	github.com/kubeshop/tracetest/server v0.0.0-20231013213457-a91e7a82c68b
 	github.com/pterm/pterm v0.12.55
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
