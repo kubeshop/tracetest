@@ -23,6 +23,9 @@ func (m *httpMetricMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	route := mux.CurrentRoute(r)
 	pathTemplate, _ := route.GetPathTemplate()
+	if pathTemplate == "" {
+		pathTemplate = "/"
+	}
 
 	metricAttributes := []attribute.KeyValue{
 		attribute.String(semconv.AttributeHTTPRoute, pathTemplate),
