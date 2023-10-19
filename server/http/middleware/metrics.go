@@ -37,7 +37,9 @@ func (m *httpMetricMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		metricAttributes = append(metricAttributes, attribute.String("tracetest.tenant_id", tenantID))
 	}
 
-	m.requestDurationHistogram.Record(r.Context(), duration.Milliseconds(), metric.WithAttributes(metricAttributes...))
+	m.requestDurationHistogram.Record(r.Context(), duration.Milliseconds(), metric.WithAttributeSet(
+		attribute.NewSet(metricAttributes...),
+	))
 }
 
 var _ http.Handler = &httpMetricMiddleware{}
