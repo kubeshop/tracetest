@@ -6,6 +6,8 @@ ENV TRACETEST_API_KEY ""
 WORKDIR /app
 
 COPY ./tracetest /app/tracetest
+COPY ./agent/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT [ "tracetest", "start", "--api-key", "$TRACETEST_API_KEY" ]
+ENTRYPOINT ["/app/entrypoint.sh"]
 

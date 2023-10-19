@@ -106,6 +106,8 @@ dockers:
 - image_templates:
   - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-amd64'
   dockerfile: "Dockerfile.agent"
+  extra_files:
+    - agent/
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"
@@ -121,6 +123,8 @@ dockers:
 - image_templates:
   - 'kubeshop/tracetest-agent:{{ .Env.VERSION }}-arm64'
   dockerfile: "Dockerfile.agent"
+  extra_files:
+    - agent/
   build_flag_templates:
   - "--pull"
   - "--label=org.opencontainers.image.created={{.Date}}"
