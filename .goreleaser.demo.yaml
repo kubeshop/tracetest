@@ -10,10 +10,7 @@ release:
   disable: true
 before:
   hooks:
-    - dir: ./server
-      cmd: go mod tidy
-    - dir: ./cli
-      cmd: go mod tidy
+    - go mod tidy
 env:
   - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}
   - TRACETEST_ENV={{ if index .Env "TRACETEST_ENV"  }}{{ .Env.TRACETEST_ENV }}{{ else }}dev{{ end }}
