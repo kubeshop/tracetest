@@ -17,8 +17,6 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
-    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure")
-    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
 
     // OpenTelemetry instrumentation
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.31.0-alpha"))

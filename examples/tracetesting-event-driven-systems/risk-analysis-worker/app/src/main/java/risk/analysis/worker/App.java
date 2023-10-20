@@ -12,14 +12,10 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.opentelemetry.sdk.OpenTelemetrySdk;
-import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.instrumentation.kafkaclients.v2_6.KafkaTelemetry;
-import io.opentelemetry.instrumentation.kafkaclients.v2_6.TracingConsumerInterceptor;
 
 public class App {
     public static void main(String[] args) {
@@ -34,22 +30,13 @@ public class App {
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        properties.setProperty(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingConsumerInterceptor.class.getName());
 
         System.out.println("Setting up worker...");
 
-        System.out.println("Initializing OpenTelemetry SDK...");
-        OpenTelemetrySdk openTelemetrySdk = AutoConfiguredOpenTelemetrySdk.builder()
-                                                                          .build().getOpenTelemetrySdk();
-        System.out.println("OpenTelemetry SDK initialized.");
-
         System.out.println("Initializing Kafka Consumer...");
-        KafkaTelemetry telemetry = KafkaTelemetry.create(openTelemetrySdk);
-        Consumer<String, String> consumer = telemetry.wrap(new KafkaConsumer<>(properties));
+        Consumer<String, String> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Arrays.asList(topic));
         System.out.println("Kafka Consumer initialized.");
-
-        Tracer tracer = openTelemetrySdk.getTracer(groupId);
 
         System.out.println("Polling for records on Kafka stream...");
 
@@ -60,12 +47,14 @@ public class App {
             System.out.println("Receiving message from Partition: " + record.partition() + ", Offset:" + record.offset());
 
             String paymentOrderAsJSON = record.value();
-            analyseOrder(paymentOrderAsJSON, tracer);
+            analyseOrder(paymentOrderAsJSON);
           }
       }
     }
 
-    private static void analyseOrder(String paymentOrderAsJSON, Tracer tracer) {
+    private static void analyseOrder(String paymentOrderAsJSON) {
+      Tracer tracer = GlobalOpenTelemetry.getTracer("analyze-order-tracer");
+
       Span span = tracer.spanBuilder("analyseOrder").startSpan();
 
       try (Scope scope = span.makeCurrent()) {

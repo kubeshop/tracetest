@@ -1,0 +1,40 @@
+type: Test
+spec:
+  id: payment-order-submit
+  name: Submit a payment order with a low value with Kafka Message and validate Risk Analysis
+  trigger:
+    type: kafka
+    kafka:
+      brokerUrls:
+      - kafka:9092
+      topic: paymentOrders
+      messageKey: "transaction-1"
+      messageValue: |-
+        {
+          "originCustomerID": "bob",
+          "destinationCustomerID": "alice",
+          "value": 100
+        }
+  specs:
+  - name: It published a message to Kafka
+    selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - name: It processed a message from Kafka using Golang
+    selector: span[tracetest.span.type="messaging" name="paymentOrders receive" messaging.system="kafka" messaging.operation="receive"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:messaging.destination.name = "paymentOrders"
+  - name: It processed a message from Kafka using Java
+    selector: span[tracetest.span.type="messaging" name="paymentOrders process" messaging.system="kafka" messaging.operation="process"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:messaging.destination.name = "paymentOrders"
+  - name: Order should be flagged as normal
+    selector: span[tracetest.span.type="general" name="analyseOrder" thread.name="main"]
+    assertions:
+    - attr:riskAnalysis.highRiskRate = "false"
+  - name: Order should be persisted
+    selector: span[tracetest.span.type="general" name="Storing paymentOrder"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
