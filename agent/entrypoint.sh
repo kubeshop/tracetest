@@ -7,5 +7,4 @@ if [ -z "$TRACETEST_API_KEY" ]; then
 fi
 
 # Execute tracetest with the API key and any additional arguments
-echo tracetest start --api-key "$TRACETEST_API_KEY" "$@"
 exec tracetest start --api-key "$TRACETEST_API_KEY" "$@"
