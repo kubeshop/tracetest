@@ -25,9 +25,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: 'go.mod'
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: go.mod
       - name: install graph tool
         run: |
           mkdir /tmp/go-arch
@@ -100,9 +100,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: 'go.mod'
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: go.mod
       - shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short=8 $GITHUB_SHA)" >> $GITHUB_ENV
@@ -158,9 +158,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: 'go.mod'
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: go.mod
 
       - shell: bash
         run: |

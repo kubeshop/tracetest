@@ -25,9 +25,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: 'go.mod'
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: go.mod
       # Node is required for npm
       - name: Set up Node
         uses: actions/setup-node@v2

@@ -32,9 +32,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: go.mod
       - name: install graph tool
         run: |
           mkdir /tmp/go-arch
@@ -67,9 +67,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd cli; make test
 
@@ -86,9 +86,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd server; make test -B
 
@@ -104,9 +104,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd agent; make test -B
 
@@ -201,9 +201,9 @@ jobs:
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         with:
@@ -379,9 +379,9 @@ jobs:
   #     - name: Setup go
   #       uses: actions/setup-go@v3
   #       with:
-  #         go-version-file: "go.work"
+  #         go-version-file: "go.mod"
   #         cache: true
-  #         cache-dependency-path: go.work
+  #         cache-dependency-path: "go.mod"
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: tracetest-dist
