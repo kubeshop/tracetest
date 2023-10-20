@@ -32,7 +32,7 @@ web/build: web/node_modules $(WEB_SRC_FILES)
 	cd web; npm run build
 
 dist/tracetest-docker-$(TAG).tar dist/tracetest-agent-docker-$(TAG).tar: $(CLI_SRC_FILES) $(SERVER_SRC_FILES) $(WEB_SRC_FILES) Dockerfile Dockerfile.agent agent/entrypoint.sh
-	goreleaser release --clean --skip-announce --snapshot -f .goreleaser.dev.yaml
+	goreleaser release --clean --skip=announce --snapshot -f .goreleaser.dev.yaml
 	docker save --output dist/tracetest-docker-$(TAG).tar "kubeshop/tracetest:$(TAG)"
 	docker save --output dist/tracetest-agent-docker-$(TAG).tar "kubeshop/tracetest-agent:$(TAG)"
 

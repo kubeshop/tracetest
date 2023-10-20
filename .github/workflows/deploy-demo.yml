@@ -80,7 +80,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: v1.21.2
-          args: release --clean --skip-announce -f .goreleaser.demo.yaml
+          args: release --clean --skip=announce -f .goreleaser.demo.yaml
         env:
           VERSION: ${{ github.ref_name}}-demo
           TRACETEST_ENV: demo
