@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli-e2etest/environment"
-	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
-	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
-	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/environment"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/helpers"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/testscenarios/types"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,7 +28,7 @@ func TestDeleteDemo(t *testing.T) {
 	// Then it should return an error and say that this resource does not exist
 	result := tracetestcli.Exec(t, "delete demo --id some-demo", tracetestcli.WithCLIConfig(cliConfig))
 	helpers.RequireExitCodeEqual(t, result, 1)
-	require.Contains(result.StdErr, "Resource demo with ID some-demo not found") 
+	require.Contains(result.StdErr, "Resource demo with ID some-demo not found")
 
 	// When I try to set up a new demo
 	// Then it should be applied with success

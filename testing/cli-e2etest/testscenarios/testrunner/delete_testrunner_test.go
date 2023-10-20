@@ -3,9 +3,9 @@ package testrunner
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli-e2etest/environment"
-	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
-	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/environment"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/helpers"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 )
 

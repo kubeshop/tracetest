@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/goccy/go-yaml"
-	"github.com/kubeshop/tracetest/cli-e2etest/command"
-	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/command"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/testscenarios/types"
 	"github.com/stretchr/testify/require"
 )
 
