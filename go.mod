@@ -33,11 +33,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/goware/urlx v0.3.2
-<<<<<<< HEAD:cli/go.mod
-	github.com/kubeshop/tracetest/agent v0.0.0-20230907210810-84198fc9f4ef
-	github.com/kubeshop/tracetest/server v0.0.0-20231013213457-a91e7a82c68b
-	github.com/pterm/pterm v0.12.55
-=======
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/j2gg0s/otsql v0.14.0
 	github.com/jackc/pgx/v5 v5.4.2
@@ -54,7 +49,6 @@ require (
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/pterm/pterm v0.12.69
 	github.com/segmentio/analytics-go/v3 v3.2.1
->>>>>>> c70865636 (use signle gomod):go.mod
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.15.0
