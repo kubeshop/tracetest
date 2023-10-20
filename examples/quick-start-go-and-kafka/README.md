@@ -6,6 +6,6 @@ This is a simple quick start on how to configure two Go lang apps that interacts
 
 If you want to run this example, just execute `docker compose up` on this folder.
 
-To execute a Trace-based test with Tracetest against this structure just run `tracetest run test -f test.yaml`.
+To execute a Trace-based test with Tracetest against this structure just run `tracetest run test -f test-producer.yaml` or `tracetest run test -f test-consumer.yaml`.
 
 Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!

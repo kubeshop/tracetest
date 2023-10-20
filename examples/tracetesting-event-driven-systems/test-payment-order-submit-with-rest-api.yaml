@@ -1,0 +1,35 @@
+type: Test
+spec:
+  id: payment-order-submit
+  name: Submit a payment order via Rest API and validate backgroud processes
+  trigger:
+    type: http
+    httpRequest:
+      url: http://payment-order-api:8080/payment
+      method: POST
+      body: |-
+        {
+          "originCustomerID": "bob",
+          "destinationCustomerID": "alice",
+          "value": 10000
+        }
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - name: It published a message to Kafka
+    selector: span[tracetest.span.type="messaging" name="paymentOrders publish" messaging.system="kafka" messaging.operation="publish"]
+    assertions:
+    - attr:messaging.operation  =  "publish"
+    - attr:messaging.destination.name  =  "paymentOrders"
+  - name: It processed a message from Kafka using Golang
+    selector: span[tracetest.span.type="messaging" name="paymentOrders receive" messaging.system="kafka" messaging.operation="receive"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:messaging.destination.name = "paymentOrders"
+  - name: It processed a message from Kafka using Java
+    selector: span[tracetest.span.type="messaging" name="paymentOrders process" messaging.system="kafka" messaging.operation="process"]
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+    - attr:messaging.destination.name = "paymentOrders"
+

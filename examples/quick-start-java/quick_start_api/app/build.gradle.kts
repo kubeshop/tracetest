@@ -24,17 +24,6 @@ dependencies {
   implementation("io.opentelemetry.instrumentation:opentelemetry-runtime-telemetry-java8")
   implementation("io.opentelemetry.instrumentation:opentelemetry-log4j-appender-2.17")
   implementation("io.opentelemetry.instrumentation:opentelemetry-spring-webmvc-6.0")
-
-  // implementation(platform("io.opentelemetry:opentelemetry-bom:1.31.0"))
-  // implementation("io.opentelemetry:opentelemetry-api:1.31.0")
-  // implementation("io.opentelemetry:opentelemetry-sdk:1.31.0")
-  // implementation("io.opentelemetry:opentelemetry-sdk-metrics:1.31.0")
-  // implementation("io.opentelemetry.semconv:opentelemetry-semconv:1.21.0-alpha")
-  // implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.31.0")
-  // implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.31.0")
-  // implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:1.31.0")
-
-  // implementation("io.opentelemetry.instrumentation:opentelemetry-spring-webmvc-6.0")
 }
 
 java {

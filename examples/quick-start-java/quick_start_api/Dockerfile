@@ -1,5 +1,3 @@
-#based on https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/adservice/Dockerfile
-
 FROM eclipse-temurin:17-jdk AS builder
 
 WORKDIR /usr/src/app/
