@@ -2,8 +2,6 @@ module github.com/kubeshop/tracetest/cli-e2etest
 
 go 1.21
 
-toolchain go1.21.3
-
 require (
 	atomicgo.dev/assert v0.0.2
 	github.com/goccy/go-yaml v1.11.2
