@@ -15,6 +15,6 @@ This examples' objective is to show how you can:
 4. Test if it works by running: `tracetest run test -f tests/test.yaml`. This would trigger a test that will send and retrieve spans from the Grafana Tempo instance that is running on your machine. View the test on `http://localhost:11633`.
 5. View traces in Grafana on `http://localhost:3000`. Use this TraceQL query:
 
-    ```yaml
-    { name="POST /pokemon/import" }
+    ```text
+    { name="Tracetest trigger" } || { name="POST /pokemon/import?" } || { name="POST /pokemon/import" }
     ```
