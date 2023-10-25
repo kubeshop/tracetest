@@ -181,10 +181,10 @@ jobs:
         with:
           name: tracetest-web
           path: web/build/
-      - uses: actions/download-artifact@v3
-        with:
-          name: architecture-graph
-          path: dist/architecture.png
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: architecture-graph
+      #     path: dist/architecture.png
 
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache.outputs.cache-hit != 'true'
