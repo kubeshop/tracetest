@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
+
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 
 	"github.com/spf13/cobra"
 )
@@ -27,6 +30,8 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 }
 
 func OnError(err error) {
+	errorMessage := handleErrorMessage(err)
+
 	fmt.Fprintf(os.Stderr, `
 Version
 %s
@@ -34,8 +39,19 @@ Version
 An error ocurred when executing the command
 
 %s
-`, versionText, err.Error())
+`, versionText, errorMessage)
 	ExitCLI(1)
+}
+
+func handleErrorMessage(err error) string {
+	var requestError resourcemanager.RequestError
+	hasRequestError := errors.As(err, &requestError)
+
+	if !hasRequestError || requestError.Code != 401 {
+		return err.Error()
+	}
+
+	return fmt.Sprintf("user is not authenticated on %s", cliConfig.Endpoint)
 }
 
 func WithParamsHandler(validators ...Validator) MiddlewareWrapper {

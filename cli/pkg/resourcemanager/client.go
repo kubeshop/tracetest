@@ -128,22 +128,27 @@ func (c Client) resourceType() string {
 	return caser.String(c.resourceName)
 }
 
-var ErrNotFound = requestError{
+var ErrNotFound = RequestError{
 	Code:    http.StatusNotFound,
 	Message: "Resource not found",
 }
 
-type requestError struct {
+type RequestError struct {
 	Code    int    `json:"code"`
 	Message string `json:"error"`
 }
 
-func (e requestError) Error() string {
+type alternateRequestError struct {
+	Status int    `json:"status"`
+	Detail string `json:"detail"`
+}
+
+func (e RequestError) Error() string {
 	return e.Message
 }
 
-func (e requestError) Is(target error) bool {
-	t, ok := target.(requestError)
+func (e RequestError) Is(target error) bool {
+	t, ok := target.(RequestError)
 	return ok && t.Code == e.Code
 }
 
@@ -159,16 +164,33 @@ func parseRequestError(resp *http.Response, format Format) error {
 	}
 
 	if len(body) == 0 {
-		return requestError{
+		return RequestError{
 			Code:    resp.StatusCode,
 			Message: resp.Status,
 		}
 	}
-	var reqErr requestError
+	var reqErr RequestError
 	err = format.Unmarshal(body, &reqErr)
 	if err != nil {
 		return fmt.Errorf("cannot parse response body: %w", err)
 	}
 
-	return reqErr
+	emptyRequestError := reqErr.Code == 0 && reqErr.Message == ""
+	if !emptyRequestError {
+		// Success, parsed error message
+		return reqErr
+	}
+
+	// Fallback, try to parse message in other format
+
+	var alternateReqError alternateRequestError
+	err = format.Unmarshal(body, &alternateReqError)
+	if err != nil {
+		return fmt.Errorf("cannot parse response body: %w", err)
+	}
+
+	return RequestError{
+		Code:    alternateReqError.Status,
+		Message: alternateReqError.Detail,
+	}
 }
