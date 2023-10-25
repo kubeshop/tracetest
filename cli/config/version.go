@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Masterminds/semver/v3"
@@ -32,33 +33,48 @@ Server: Not Configured`, false
 Server: Failed to get the server version - %s`, err.Error()), false
 	}
 
+	versionMatch := false
 	version := meta.GetVersion()
-	serverVersion, err := semver.NewVersion(version)
-	if err != nil {
-		return result + fmt.Sprintf(`
+	if !isSemver(version) || !isSemver(Version) {
+		// if either version is not semver, we can't compare them
+		// do a basic strict compare
+
+		versionMatch = version == Version
+	} else {
+
+		serverVersion, err := semver.NewVersion(version)
+		if err != nil {
+			return result + fmt.Sprintf(`
 Server: Failed to parse the server version - %s`, err.Error()), false
-	}
+		}
 
-	cliVersion, err := semver.NewVersion(Version)
-	if err != nil {
-		return result + fmt.Sprintf(`
+		cliVersion, err := semver.NewVersion(Version)
+		if err != nil {
+			return result + fmt.Sprintf(`
 Failed to parse the CLI version - %s`, err.Error()), false
-	}
+		}
 
-	versionConstrait, err := semver.NewConstraint(fmt.Sprintf(">=%d.%d", cliVersion.Major(), cliVersion.Minor()))
-	if err != nil {
-		return result + fmt.Sprintf(`
+		versionConstrait, err := semver.NewConstraint(fmt.Sprintf(">=%d.%d", cliVersion.Major(), cliVersion.Minor()))
+		if err != nil {
+			return result + fmt.Sprintf(`
 Failed to parse the CLI version constraint - %s`, err.Error()), false
+		}
+
+		versionMatch = versionConstrait.Check(serverVersion)
 	}
 
-	isVersionConstraintSatisfied := versionConstrait.Check(serverVersion)
-	if isVersionConstraintSatisfied {
+	if versionMatch {
 		version += `
 ✔️ Version match`
 	}
 
 	return result + fmt.Sprintf(`
-Server: %s`, version), isVersionConstraintSatisfied
+Server: %s`, version), versionMatch
+}
+
+func isSemver(version string) bool {
+	_, err := semver.NewVersion(version)
+	return !errors.Is(err, semver.ErrInvalidSemVer)
 }
 
 func getVersionMetadata(ctx context.Context, client *openapi.APIClient) (*openapi.Version, error) {
