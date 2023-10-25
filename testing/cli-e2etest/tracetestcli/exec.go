@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli-e2etest/command"
-	"github.com/kubeshop/tracetest/cli-e2etest/config"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/command"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/config"
 	"golang.org/x/exp/slices"
 
 	"github.com/kubeshop/tracetest/cli/cmd"

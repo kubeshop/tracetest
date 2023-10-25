@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"atomicgo.dev/assert"
-	"github.com/kubeshop/tracetest/cli-e2etest/environment"
-	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
-	"github.com/kubeshop/tracetest/cli-e2etest/testscenarios/types"
-	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/environment"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/helpers"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/testscenarios/types"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/tracetestcli"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -60,17 +60,17 @@ func TestGetTest(t *testing.T) {
 		helpers.RequireExitCodeEqual(t, result, 0)
 
 		listTest := helpers.UnmarshalYAML[types.TestResource](t, result.StdOut)
-		assert.Equal("Test", listTest.Type)
-		assert.Equal("fH_8AulVR", listTest.Spec.ID)
-		assert.Equal("Pokeshop - List", listTest.Spec.Name)
-		assert.Equal("List Pokemon", listTest.Spec.Description)
-		assert.Equal("http", listTest.Spec.Trigger.Type)
-		assert.Equal("http://demo-api:8081/pokemon?take=20&skip=0", listTest.Spec.Trigger.HTTPRequest.URL)
-		assert.Equal("GET", listTest.Spec.Trigger.HTTPRequest.Method)
-		assert.Equal("", listTest.Spec.Trigger.HTTPRequest.Body)
+		assert.Equal(t, "Test", listTest.Type)
+		assert.Equal(t, "fH_8AulVR", listTest.Spec.ID)
+		assert.Equal(t, "Pokeshop - List", listTest.Spec.Name)
+		assert.Equal(t, "List Pokemon", listTest.Spec.Description)
+		assert.Equal(t, "http", listTest.Spec.Trigger.Type)
+		assert.Equal(t, "http://demo-api:8081/pokemon?take=20&skip=0", listTest.Spec.Trigger.HTTPRequest.URL)
+		assert.Equal(t, "GET", listTest.Spec.Trigger.HTTPRequest.Method)
+		assert.Equal(t, "", listTest.Spec.Trigger.HTTPRequest.Body)
 		require.Len(listTest.Spec.Trigger.HTTPRequest.Headers, 1)
-		assert.Equal("Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
-		assert.Equal("application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
+		assert.Equal(t, "Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
+		assert.Equal(t, "application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
 	})
 
 	t.Run("get with JSON format", func(t *testing.T) {
@@ -84,17 +84,17 @@ func TestGetTest(t *testing.T) {
 		helpers.RequireExitCodeEqual(t, result, 0)
 
 		listTest := helpers.UnmarshalJSON[types.TestResource](t, result.StdOut)
-		assert.Equal("Test", listTest.Type)
-		assert.Equal("fH_8AulVR", listTest.Spec.ID)
-		assert.Equal("Pokeshop - List", listTest.Spec.Name)
-		assert.Equal("List Pokemon", listTest.Spec.Description)
-		assert.Equal("http", listTest.Spec.Trigger.Type)
-		assert.Equal("http://demo-api:8081/pokemon?take=20&skip=0", listTest.Spec.Trigger.HTTPRequest.URL)
-		assert.Equal("GET", listTest.Spec.Trigger.HTTPRequest.Method)
-		assert.Equal("", listTest.Spec.Trigger.HTTPRequest.Body)
+		assert.Equal(t, "Test", listTest.Type)
+		assert.Equal(t, "fH_8AulVR", listTest.Spec.ID)
+		assert.Equal(t, "Pokeshop - List", listTest.Spec.Name)
+		assert.Equal(t, "List Pokemon", listTest.Spec.Description)
+		assert.Equal(t, "http", listTest.Spec.Trigger.Type)
+		assert.Equal(t, "http://demo-api:8081/pokemon?take=20&skip=0", listTest.Spec.Trigger.HTTPRequest.URL)
+		assert.Equal(t, "GET", listTest.Spec.Trigger.HTTPRequest.Method)
+		assert.Equal(t, "", listTest.Spec.Trigger.HTTPRequest.Body)
 		require.Len(listTest.Spec.Trigger.HTTPRequest.Headers, 1)
-		assert.Equal("Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
-		assert.Equal("application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
+		assert.Equal(t, "Content-Type", listTest.Spec.Trigger.HTTPRequest.Headers[0].Key)
+		assert.Equal(t, "application/json", listTest.Spec.Trigger.HTTPRequest.Headers[0].Value)
 	})
 
 	t.Run("get with pretty format", func(t *testing.T) {

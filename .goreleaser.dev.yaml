@@ -10,10 +10,7 @@ release:
   disable: true
 before:
   hooks:
-    - dir: ./server
-      cmd: go mod tidy
-    - dir: ./cli
-      cmd: go mod tidy
+    - go mod tidy
 env:
   - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}dev{{ end }}
   # if TAG is defined, use it. Fallback to VERSION

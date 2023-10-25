@@ -68,9 +68,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.work'
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
 
       - uses: actions/download-artifact@v3
         with:

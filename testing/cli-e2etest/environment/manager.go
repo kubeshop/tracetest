@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeshop/tracetest/cli-e2etest/command"
-	"github.com/kubeshop/tracetest/cli-e2etest/config"
-	"github.com/kubeshop/tracetest/cli-e2etest/helpers"
-	"github.com/kubeshop/tracetest/cli-e2etest/tracetestcli"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/command"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/config"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/helpers"
+	"github.com/kubeshop/tracetest/testing/cli-e2etest/tracetestcli"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )

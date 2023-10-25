@@ -21,39 +21,39 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
 jobs:
-  backend-arch-graph:
-    name: Generate backend architecture graph
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup go
-        uses: actions/setup-go@v3
-        with:
-          go-version-file: "go.work"
-          cache: true
-          cache-dependency-path: go.work
-      - name: install graph tool
-        run: |
-          mkdir /tmp/go-arch
-          cd /tmp/go-arch
-          curl -SLO https://github.com/mathnogueira/golang-arch-viewer/archive/refs/heads/master.zip
-          unzip master.zip
-          cd golang-arch-viewer-master
-          make
-          mv dist/go-arch /tmp/go-arch/go-arch
-      - name: generate graph
-        run: |
-          cd server
-          mkdir -p ../dist/
-          /tmp/go-arch/go-arch -o ../dist/architecture.png
-      - name: Upload assets
-        uses: actions/upload-artifact@v3
-        with:
-          name: architecture-graph
-          path: dist/architecture.png
+  # backend-arch-graph:
+  #   name: Generate backend architecture graph
+  #   runs-on: ubuntu-latest
+  #   continue-on-error: true
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Setup go
+  #       uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: "go.mod"
+  #         cache: true
+  #         cache-dependency-path: go.mod
+  #     - name: install graph tool
+  #       run: |
+  #         mkdir /tmp/go-arch
+  #         cd /tmp/go-arch
+  #         curl -SLO https://github.com/mathnogueira/golang-arch-viewer/archive/refs/heads/master.zip
+  #         unzip master.zip
+  #         cd golang-arch-viewer-master
+  #         make
+  #         mv dist/go-arch /tmp/go-arch/go-arch
+  #     - name: generate graph
+  #       run: |
+  #         cd server
+  #         mkdir -p ../dist/
+  #         /tmp/go-arch/go-arch -o ../dist/architecture.png
+  #     - name: Upload assets
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: architecture-graph
+  #         path: dist/architecture.png
 
   unit-test-cli:
     name: CLI unit tests
@@ -67,9 +67,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd cli; make test
 
@@ -86,9 +86,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd server; make test -B
 
@@ -104,9 +104,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd agent; make test -B
 
@@ -201,9 +201,9 @@ jobs:
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         uses: actions/setup-go@v3
         with:
-          go-version-file: "go.work"
+          go-version-file: "go.mod"
           cache: true
-          cache-dependency-path: go.work
+          cache-dependency-path: "go.mod"
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         with:
@@ -345,6 +345,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+          cache: true
+          cache-dependency-path: "go.mod"
       - uses: actions/download-artifact@v3
         with:
           name: tracetest-dist
@@ -379,9 +385,9 @@ jobs:
   #     - name: Setup go
   #       uses: actions/setup-go@v3
   #       with:
-  #         go-version-file: "go.work"
+  #         go-version-file: "go.mod"
   #         cache: true
-  #         cache-dependency-path: go.work
+  #         cache-dependency-path: "go.mod"
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: tracetest-dist
