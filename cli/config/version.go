@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
 
@@ -32,14 +33,32 @@ Server: Failed to get the server version - %s`, err.Error()), false
 	}
 
 	version := meta.GetVersion()
-	isVersionMatch := version == Version
-	if isVersionMatch {
+	serverVersion, err := semver.NewVersion(version)
+	if err != nil {
+		return result + fmt.Sprintf(`
+Server: Failed to parse the server version - %s`, err.Error()), false
+	}
+
+	cliVersion, err := semver.NewVersion(Version)
+	if err != nil {
+		return result + fmt.Sprintf(`
+Failed to parse the CLI version - %s`, err.Error()), false
+	}
+
+	versionConstrait, err := semver.NewConstraint(fmt.Sprintf(">=%d.%d", cliVersion.Major(), cliVersion.Minor()))
+	if err != nil {
+		return result + fmt.Sprintf(`
+Failed to parse the CLI version constraint - %s`, err.Error()), false
+	}
+
+	isVersionConstraintSatisfied := versionConstrait.Check(serverVersion)
+	if isVersionConstraintSatisfied {
 		version += `
 ✔️ Version match`
 	}
 
 	return result + fmt.Sprintf(`
-Server: %s`, version), isVersionMatch
+Server: %s`, version), isVersionConstraintSatisfied
 }
 
 func getVersionMetadata(ctx context.Context, client *openapi.APIClient) (*openapi.Version, error) {

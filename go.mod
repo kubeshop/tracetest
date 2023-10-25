@@ -9,6 +9,7 @@ require (
 	github.com/Code-Hex/go-generics-cache v1.3.1
 	github.com/IBM/sarama v1.40.1
 	github.com/Jeffail/gabs/v2 v2.7.0
+	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/agnivade/levenshtein v1.0.1
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/alexeyco/simpletable v1.0.0
