@@ -29,7 +29,7 @@ const WelcomeGuides = [
   },
   {
     name: '⚙️ Configure trace data stores',
-    url: '../configuration/overview#supported-trace-data-stores',
+    url: '/configuration/overview#supported-trace-data-stores',
     description: (
       <Translate>
         Connect your existing trace data store or send traces to Tracetest directly!
@@ -39,7 +39,7 @@ const WelcomeGuides = [
   },
   {
     name: '🙄 New to Trace-based Testing?',
-    url: '../concepts/what-is-trace-based-testing',
+    url: '/concepts/what-is-trace-based-testing',
     description: (
       <Translate>
         Read about the concepts of trace-based testing to learn more!

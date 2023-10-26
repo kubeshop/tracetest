@@ -8,7 +8,7 @@ import Heading from '@theme/Heading';
 const GettingStartedGuides = [
   {
     name: 'Tracetest 🚀',
-    url: './installation',
+    url: '/getting-started/installation',
     description: (
       <Translate >
         Set up Tracetest and start trace-based testing your distributed system.
@@ -18,7 +18,7 @@ const GettingStartedGuides = [
   },
   {
     name: 'Tracetest Core 🪨 ',
-    url: '../core/getting-started/installation',
+    url: '/core/getting-started/installation',
     description: (
       <Translate>
         Use the open-source Tracetest Core in your own infrastructure.
