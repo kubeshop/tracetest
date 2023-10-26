@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"io"
@@ -324,12 +325,14 @@ func getCompleteProject(ui cliUI.UI, config configuration) *types.Project {
 		ui.Panic(err)
 	}
 
-	project, err := loader.Load(types.ConfigDetails{
+	project, err := loader.LoadWithContext(context.Background(), types.ConfigDetails{
 		WorkingDir:  workingDir,
 		ConfigFiles: configFiles,
 		Environment: map[string]string{
 			"TRACETEST_DEV": "",
 		},
+	}, func(o *loader.Options) {
+		o.SetProjectName("tracetest", true)
 	})
 	if err != nil {
 		ui.Exit(fmt.Errorf("cannot parse docker-compose file: %w", err).Error())
