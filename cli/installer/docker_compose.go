@@ -326,7 +326,7 @@ func getCompleteProject(ui cliUI.UI, config configuration) *types.Project {
 	}
 
 	project, err := loader.LoadWithContext(context.Background(), types.ConfigDetails{
-		WorkingDir:  workingDir,
+		WorkingDir:  fmt.Sprintf("%s/tracetest", workingDir),
 		ConfigFiles: configFiles,
 		Environment: map[string]string{
 			"TRACETEST_DEV": "",
