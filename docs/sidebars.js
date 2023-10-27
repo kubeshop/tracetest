@@ -463,6 +463,11 @@ const sidebars = {
           id: "getting-started/no-otel",
           label: "What if I don't have OpenTelemetry installed?",
         },
+        {
+          type: "doc",
+          id: "getting-started/try-live-demos",
+          label: "Try live demos!",
+        },
       ],
     },
     {
