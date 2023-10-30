@@ -40,12 +40,8 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 
 func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
 	c.flags = flags
-	var serverURL string
-	if flags.Endpoint != "" {
-		serverURL = flags.Endpoint
-	} else if prev.UIEndpoint != "" {
-		serverURL = prev.UIEndpoint
-	} else {
+	serverURL := getFirstValidString(flags.Endpoint, prev.UIEndpoint, DefaultCloudEndpoint)
+	if serverURL == "" {
 		path := ""
 		if prev.ServerPath != nil {
 			path = *prev.ServerPath
@@ -140,6 +136,16 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 	return oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
 		GetAuthJWT()
+}
+
+func getFirstValidString(values ...string) string {
+	for _, v := range values {
+		if v != "" {
+			return v
+		}
+	}
+
+	return ""
 }
 
 func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token, jwt string) {

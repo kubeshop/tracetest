@@ -11,9 +11,11 @@ import (
 )
 
 var (
-	start        = starter.NewStarter(configurator, resources)
-	defaultToken = os.Getenv("TRACETEST_TOKEN")
-	saveParams   = &saveParameters{}
+	start           = starter.NewStarter(configurator, resources)
+	defaultToken    = os.Getenv("TRACETEST_TOKEN")
+	defaultEndpoint = os.Getenv("TRACETEST_SERVER_URL")
+	defaultAPIKey   = os.Getenv("TRACETEST_API_KEY")
+	saveParams      = &saveParameters{}
 )
 
 var startCmd = &cobra.Command{
@@ -51,9 +53,9 @@ var startCmd = &cobra.Command{
 func init() {
 	startCmd.Flags().StringVarP(&saveParams.organizationID, "organization", "", "", "organization id")
 	startCmd.Flags().StringVarP(&saveParams.environmentID, "environment", "", "", "environment id")
-	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", "", "agent api key")
+	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", defaultAPIKey, "agent api key")
 	startCmd.Flags().StringVarP(&saveParams.token, "token", "", defaultToken, "token api key")
-	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", config.DefaultCloudEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
+	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	rootCmd.AddCommand(startCmd)
 }
 
