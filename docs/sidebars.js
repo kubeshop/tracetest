@@ -67,7 +67,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Pokemon API Demo",
+      label: "Pokeshop API Demo",
       items: [
         {
           type: "doc",
