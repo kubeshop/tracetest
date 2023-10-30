@@ -17,7 +17,7 @@ import (
 var ErrOtlpServerStart = errors.New("OTLP server start error")
 
 func NewClient(ctx context.Context, config config.Config, traceCache collector.TraceCache) (*client.Client, error) {
-	client, err := client.Connect(ctx, config.ServerURL,
+	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
 	)
@@ -25,44 +25,44 @@ func NewClient(ctx context.Context, config config.Config, traceCache collector.T
 		return nil, err
 	}
 
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(traceCache))
-	pollingWorker := workers.NewPollerWorker(client, workers.WithInMemoryDatastore(
+	triggerWorker := workers.NewTriggerWorker(controlPlaneClient, workers.WithTraceCache(traceCache))
+	pollingWorker := workers.NewPollerWorker(controlPlaneClient, workers.WithInMemoryDatastore(
 		poller.NewInMemoryDatastore(traceCache),
 	))
-	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(client)
+	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient)
 
-	client.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
-	client.OnTriggerRequest(triggerWorker.Trigger)
-	client.OnPollingRequest(pollingWorker.Poll)
-	client.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
+	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
+	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)
+	controlPlaneClient.OnPollingRequest(pollingWorker.Poll)
+	controlPlaneClient.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
 		fmt.Printf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason)
-		return client.Close()
+		return controlPlaneClient.Close()
 	})
 
-	return client, nil
+	return controlPlaneClient, nil
 }
 
 // Start the agent with given configuration
-func Start(ctx context.Context, config config.Config) (*Session, error) {
+func Start(ctx context.Context, cfg config.Config) (*Session, error) {
 	traceCache := collector.NewTraceCache()
-	client, err := NewClient(ctx, config, traceCache)
+	controlPlaneClient, err := NewClient(ctx, cfg, traceCache)
 	if err != nil {
 		return nil, err
 	}
 
-	err = client.Start(ctx)
+	err = controlPlaneClient.Start(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	err = StartCollector(ctx, config, traceCache)
+	err = StartCollector(ctx, cfg, traceCache)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Session{
-		client: client,
-		Token:  client.SessionConfiguration().AgentIdentification.Token,
+		client: controlPlaneClient,
+		Token:  controlPlaneClient.SessionConfiguration().AgentIdentification.Token,
 	}, nil
 }
 

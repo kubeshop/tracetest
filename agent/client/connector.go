@@ -26,6 +26,22 @@ func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, err
 	return client, nil
 }
 
+// See https://pkg.go.dev/google.golang.org/grpc/examples/features/retry#section-readme
+// these values were calculated to get a max retry of aprox 120s. This script can be used to play with values:
+// curl -SL https://gist.githubusercontent.com/schoren/5dd4dcadf133e4c56fa20c0b6a8d67ef/raw/1992d34d27368578d22e87b061ff00de6f7023be/calculate_max_time.sh | bash -s  -- 0.1 2.0 5.0 120
+var retryPolicy = `{
+	"methodConfig": [{
+			"name": [{}],
+			"retryPolicy": {
+				"maxAttempts": 29,
+				"initialBackoff": "0.1s",
+				"maxBackoff": "5s",
+				"backoffMultiplier": 1.5,
+				"retryableStatusCodes": ["UNAVAILABLE"]
+			}
+	}]
+}`
+
 func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -38,6 +54,7 @@ func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
 	conn, err := grpc.DialContext(
 		ctx, endpoint,
 		grpc.WithTransportCredentials(transportCredentials),
+		grpc.WithDefaultServiceConfig(retryPolicy),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to server: %w", err)
