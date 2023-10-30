@@ -17,7 +17,7 @@ import (
 var ErrOtlpServerStart = errors.New("OTLP server start error")
 
 func NewClient(ctx context.Context, config config.Config, traceCache collector.TraceCache) (*client.Client, error) {
-	c, err := client.Connect(ctx, config.ServerURL,
+	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
 	)
@@ -25,21 +25,21 @@ func NewClient(ctx context.Context, config config.Config, traceCache collector.T
 		return nil, err
 	}
 
-	triggerWorker := workers.NewTriggerWorker(c, workers.WithTraceCache(traceCache))
-	pollingWorker := workers.NewPollerWorker(c, workers.WithInMemoryDatastore(
+	triggerWorker := workers.NewTriggerWorker(controlPlaneClient, workers.WithTraceCache(traceCache))
+	pollingWorker := workers.NewPollerWorker(controlPlaneClient, workers.WithInMemoryDatastore(
 		poller.NewInMemoryDatastore(traceCache),
 	))
-	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(c)
+	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient)
 
-	c.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
-	c.OnTriggerRequest(triggerWorker.Trigger)
-	c.OnPollingRequest(pollingWorker.Poll)
-	c.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
+	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
+	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)
+	controlPlaneClient.OnPollingRequest(pollingWorker.Poll)
+	controlPlaneClient.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
 		fmt.Printf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason)
-		return c.Close()
+		return controlPlaneClient.Close()
 	})
 
-	return c, nil
+	return controlPlaneClient, nil
 }
 
 // Start the agent with given configuration
