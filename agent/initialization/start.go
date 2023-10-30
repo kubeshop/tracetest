@@ -45,12 +45,12 @@ func NewClient(ctx context.Context, config config.Config, traceCache collector.T
 // Start the agent with given configuration
 func Start(ctx context.Context, cfg config.Config) (*Session, error) {
 	traceCache := collector.NewTraceCache()
-	c, err := NewClient(ctx, cfg, traceCache)
+	controlPlaneClient, err := NewClient(ctx, cfg, traceCache)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.Start(ctx)
+	err = controlPlaneClient.Start(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +61,8 @@ func Start(ctx context.Context, cfg config.Config) (*Session, error) {
 	}
 
 	return &Session{
-		client: c,
-		Token:  c.SessionConfiguration().AgentIdentification.Token,
+		client: controlPlaneClient,
+		Token:  controlPlaneClient.SessionConfiguration().AgentIdentification.Token,
 	}, nil
 }
 
