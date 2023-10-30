@@ -26,6 +26,7 @@ func LoadConfig() (Config, error) {
 	vp := viper.NewWithOptions(
 		viper.EnvKeyReplacer(strings.NewReplacer(".", "_")),
 	)
+	vp.SetEnvPrefix("tracetest")
 
 	tracetestFolder := getTracetestFolder()
 
