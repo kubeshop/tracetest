@@ -1,4 +1,15 @@
-# AWS X-Ray
+---
+id: awsxray
+title: AWS X-Ray
+description: Use AWS X-Ray as the trace data store for Tracetest. You can use the native connection from Tracetest to pull telemetry data directly from any region.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 If you want to use [AWS X-Ray](https://aws.amazon.com/xray/) as the trace data store, you can use the native connection from Tracetest to pull telemetry data directly from any region.
 
@@ -13,7 +24,7 @@ Configure Tracetest to be aware that it has to fetch trace data from X-Ray.
 Tracetest uses the Golang [AWS-SDK](https://aws.amazon.com/sdk-for-go/) library to pull to fetch trace data.
 
 :::tip
-Need help configuring the OpenTelemetry Collector so send trace data from your application to AWS X-Ray? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
+Need help configuring the OpenTelemetry Collector so send trace data from your application to AWS X-Ray? Read more in [the reference page here](/configuration/opentelemetry-collector-configuration-file-reference).
 :::
 
 ## Connect Tracetest to X-Ray with the Web UI
@@ -49,5 +60,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-aws-x-ray.md).
+To learn more, [read the recipe on running a sample app with AWS X-Ray and Tracetest](/examples-tutorials/recipes/running-tracetest-with-aws-x-ray).
 :::

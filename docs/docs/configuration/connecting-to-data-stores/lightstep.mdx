@@ -1,4 +1,15 @@
-# Lightstep
+---
+id: lightstep
+title: Lightstep
+description: Use Lightstep as the trace data store for Tracetest. Configure the OpenTelemetry Collector to receive traces and forward them to both Tracetest and Lightstep.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 If you want to use [Lightstep](https://lightstep.com/) as the trace data store, you'll configure the OpenTelemetry Collector to receive traces from your system and then send them to both Tracetest and Lightstep. And, you don't have to change your existing pipelines to do so.
 
@@ -77,8 +88,6 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 
 ![Lightstep](../img/Lightstep-settings.png)
 
-<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643396/Blogposts/Docs/screely-1674643391899_w6k22s.png)-->
-
 ## Connect Tracetest to Lightstep with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
@@ -98,5 +107,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with Lightstep and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-lightstep.md).
+To learn more, [read the recipe on running a sample app with Lightstep and Tracetest](/examples-tutorials/recipes/running-tracetest-with-lightstep).
 :::

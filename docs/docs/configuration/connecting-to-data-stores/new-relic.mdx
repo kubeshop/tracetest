@@ -1,4 +1,15 @@
-# New Relic
+---
+id: new-relic
+title: New Relic
+description: Use New Relic as the trace data store for Tracetest. Configure the OpenTelemetry Collector to receive traces and forward them to both Tracetest and New Relic.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 If you want to use [New Relic](https://newrelic.com/) as the trace data store, you'll configure the OpenTelemetry Collector to receive traces from your system and then send them to both Tracetest and New Relic. And, you don't have to change your existing pipelines to do so.
 
@@ -79,8 +90,6 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 
 ![NewRelic](../img/New-Relic-settings.png)
 
-<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674643685/Blogposts/Docs/screely-1674643680615_de8fry.png)-->
-
 ## Connect Tracetest to New Relic with the CLI
 
 Or, if you prefer using the CLI, you can use this file config.
@@ -100,5 +109,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with New Relic and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-new-relic.md).
+To learn more, [read the recipe on running a sample app with New Relic and Tracetest](/examples-tutorials/recipes/running-tracetest-with-new-relic).
 :::

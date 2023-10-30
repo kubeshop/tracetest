@@ -1,4 +1,15 @@
-# Sampling Tracetest Spans
+---
+id: sampling-tracetest-spans
+title: Sampling Tracetest Spans
+description: When running Tracetest in production, your test spans could not be sampled by your probabilistic sampler. Here's how to avoid sampling out Tracetest test spans.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 Suppose you are considering Tracetest to run tests against a high-volume environment, such as production. In that case, you probably will hit some drawbacks, such as having
 your test spans not sampled by your probabilistic sampler. There are a couple of things that you can do to avoid those problems:

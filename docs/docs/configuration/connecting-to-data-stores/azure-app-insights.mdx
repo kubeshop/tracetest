@@ -1,4 +1,15 @@
-# Azure App Insights
+---
+id: azure-app-insights
+title: Azure App Insights
+description: Use Azure App Insights as the trace data store for Tracetest. You can use the native connection from Tracetest to pull telemetry data directly from any region.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 If you want to use [Azure App Insights](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) as the trace data store, you can use the native connection from Tracetest to pull telemetry data.
 
@@ -54,7 +65,7 @@ To learn more, [read the recipe on running a sample app with Azure App Insights 
 You can configure Tracetest to listen for incoming telemetry data from ports `4317` and `4318` for gRPC and REST accordingly, giving you the option to stream the information to both Azure App Insights and Tracetest at the same time.
 
 :::tip
-Need help configuring the [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) to send trace data from your application to Azure App Insights? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
+Need help configuring the [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib) to send trace data from your application to Azure App Insights? Read more in [the reference page here](/configuration/opentelemetry-collector-configuration-file-reference).
 :::
 
 ### Tracetest OpenTelemetry Collector connection to Azure App Insights with the Web UI

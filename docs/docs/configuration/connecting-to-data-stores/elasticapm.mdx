@@ -1,4 +1,15 @@
-# Elastic APM
+---
+id: elasticapm
+title: Elastic APM
+description: Use Elasticsearch as the trace data store for Tracetest. You can use the native connection from Tracetest to pull telemetry data directly from Elasticsearch.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 Tracetest fetches traces from [Elasticsearch's default port](https://discuss.elastic.co/t/what-are-ports-9200-and-9300-used-for/238578) `9200`.
 
@@ -28,7 +39,7 @@ To configure Elastic APM you will need to download the CA certificate from the D
 - Alternatively, you can skip CA certificate validation by setting the `Enable TLS but don't verify the certificate` option.
 
 :::tip
-Need help configuring the OpenTelemetry Collector so send trace data from your application to Elastic? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference).
+Need help configuring the OpenTelemetry Collector so send trace data from your application to Elastic? Read more in [the reference page here](/configuration/opentelemetry-collector-configuration-file-reference).
 :::
 
 ## Connect Tracetest to Elastic with the Web UI

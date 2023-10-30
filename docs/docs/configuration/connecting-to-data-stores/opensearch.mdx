@@ -1,4 +1,15 @@
-# OpenSearch
+---
+id: opensearch
+title: OpenSearch
+description: Use OpenSearch as the trace data store for Tracetest. You can use the native connection from Tracetest to pull telemetry data directly from OpenSearch.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 Tracetest fetches traces from [OpenSearch's default port](https://logz.io/blog/opensearch-tutorial-installation-configuration/#:~:text=This%20is%20because%20OpenSearch%20runs,use%20port%205601%20by%20default.) `9200`.
 
@@ -20,7 +31,7 @@ The defaults can be:
 - **Address**: `http://opensearch:9200`
 
 :::tip
-Need help configuring the OpenTelemetry Collector so send trace data from your application to OpenSearch? Read more in [the reference page here](../opentelemetry-collector-configuration-file-reference)).
+Need help configuring the OpenTelemetry Collector so send trace data from your application to OpenSearch? Read more in [the reference page here](/configuration/opentelemetry-collector-configuration-file-reference).
 :::
 
 ## Connect Tracetest to OpenSearch with the Web UI
@@ -32,8 +43,6 @@ http://opensearch:9200
 ```
 
 ![OpenSearch](../img/opensearch-settings.png)
-
-<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644099/Blogposts/Docs/screely-1674644094600_svcwp6.png)-->
 
 ## Connect Tracetest to OpenSearch with the CLI
 
@@ -58,5 +67,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with OpenSearch and Tracetest](../../examples-tutorials/recipes/running-tracetest-with-opensearch.md).
+To learn more, [read the recipe on running a sample app with OpenSearch and Tracetest](/examples-tutorials/recipes/running-tracetest-with-opensearch).
 :::

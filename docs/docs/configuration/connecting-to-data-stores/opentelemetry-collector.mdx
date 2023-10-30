@@ -1,4 +1,15 @@
-# OpenTelemetry Collector
+---
+id: opentelemetry-collector
+title: OpenTelemetry Collector
+description: Configure the OpenTelemetry Collector to receive traces and forward them to Tracetest.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 Tracetest receives trace data on port `4317`. Tracetest's trace receiver endpoint might look like:
 
@@ -66,7 +77,6 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 
 ![OpenTelemetry](../img/open-telemetry-settings.png)
 
-<!---![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1674644190/Blogposts/Docs/screely-1674644186486_pahrds.png) -->
 
 ## Connect Tracetest to OpenTelemetry Collector with the CLI
 
@@ -87,5 +97,5 @@ tracetest apply datastore -f my/data-store/file/location.yaml
 ```
 
 :::tip
-To learn more, [read the recipe on running a sample app with OpenTelemetry Collector and Tracetest](../../examples-tutorials/recipes/running-tracetest-without-a-trace-data-store.mdx).
+To learn more, [read the recipe on running a sample app with OpenTelemetry Collector and Tracetest](/examples-tutorials/recipes/running-tracetest-without-a-trace-data-store).
 :::
