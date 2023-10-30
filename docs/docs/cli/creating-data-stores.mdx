@@ -1,4 +1,15 @@
-# Defining Data Stores as Text Files
+---
+id: creating-data-stores
+title: Defining Data Stores as Text Files
+description: Configure Trace Data Stores in Tracetest by using a configuration file that can be applied to your Tracetest instance.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 You might have multiple Tracetest instances that need to be connected to the same data stores. An easy way of sharing the configuration is by using a configuration file that can be applied to your Tracetest instance.
 
@@ -151,11 +162,11 @@ spec:
   default: true
 ```
 
-> Consider reading about [how to use the OTEL collector](../configuration/connecting-to-data-stores/opentelemetry-collector.md) to send traces to your Tracetest instance.
+> Consider reading about [how to use the OTEL collector](/configuration/connecting-to-data-stores/opentelemetry-collector) to send traces to your Tracetest instance.
 
 ## Apply Configuration
 
-To apply the configuration, you need a [configured CLI](./configuring-your-cli.md) pointed to the instance you want to apply the data store. Then use the following command:
+To apply the configuration, you need a [configured CLI](/cli/configuring-your-cli) pointed to the instance you want to apply the data store. Then use the following command:
 
 ```
 tracetest apply datastore -f my/data-store/file/location.yaml

@@ -1,10 +1,21 @@
-# Defining Test Outputs in Text Files
+---
+id: creating-test-outputs
+title: Defining Test Outputs in Text Files
+description: Test outputs allow for exporting values from a test so they become available in Variable Sets of a Test Suite.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
-Outputs are really useful when running [Test Suites](../concepts/test-suites). They allow for exporting values from a test so they become available in the [Variable Sets](../concepts/variable-sets.md) of the current Test Suite.
+Outputs are really useful when running [Test Suites](/concepts/test-suites). They allow for exporting values from a test so they become available in the [Variable Sets](/concepts/variable-sets) of the current Test Suite.
 
 ## Outputs are Expression Results
 
-An output exports the result of an [Expression](../concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running Test Suite.
+An output exports the result of an [Expression](/concepts/expressions) and assigns it to a name, so it can be injected into the variable set of a running Test Suite.
 A `selector` is needed only if the provided expression refers to a/some span/s attribute or meta attributes.
 
 It can be defined using the following YAML definition:

@@ -1,9 +1,20 @@
-# Defining Test Suites as Text Files
+---
+id: creating-test-suites
+title: Defining Test Suites as Text Files
+description: Create and edit Test Suites with the CLI. Just like other structures of Tracetest, you can also manage your Test Suites using the CLI and definition files.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 This page showcases how to create and edit Test Suites with the CLI.
 
 :::tip
-[To read more about Test Suites check out Test Suites concepts page.](../concepts/test-suites.md)
+[To read more about Test Suites check out Test Suites concepts page.](/concepts/test-suites)
 :::
 
 Just like other structures of Tracetest, you can also manage your Test Suites using the CLI and definition files.
@@ -22,7 +33,7 @@ spec:
     - testID # you can also reference tests by their ids instead of referencing the definition file
 ```
 
-In order to apply this Test Suite to your Tracetest instance, make sure to have your [CLI configured](./configuring-your-cli.md) and run:
+In order to apply this Test Suite to your Tracetest instance, make sure to have your [CLI configured](/cli/configuring-your-cli) and run:
 
 ```sh
 tracetest apply testsuite -f <testsuite.yaml>
