@@ -1,13 +1,22 @@
-# Deployment
+---
+id: overview
+title:  Deployment
+description: Guides for deploying Tracetest Core. Tracetest Core allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 This section contains a general overview of deploying Tracetest in production. You can find platform-specific guides for:
 
-- [Docker](./docker)
-- [Kubernetes](./kubernetes)
+- [Docker](/core/deployment/docker)
+- [Kubernetes](/core/deployment/kubernetes)
 
 As shown in the diagram below, a typical production Tracetest deployment consists of Postgres, an OpenTelemetry Colletor and a [trace data store](/configuration/overview.mdx). But, if you do not want to use a trace data store, you can rely entirely on OpenTelemetry Collector.
-
-<!-- Add graph for Tracetest cluster -->
 
 ```mermaid
 flowchart TD
@@ -48,4 +57,4 @@ postgres:
 
 Read more in the [configuration docs](/configuration/overview.mdx).
 
-Or, continue reading to see how to run Tracetest in production with [Docker](./docker) or [Kubernetes](./kubernetes).
+Or, continue reading to see how to run Tracetest Core in production with [Docker](/core/deployment/docker) or [Kubernetes](/core/deployment/kubernetes).
