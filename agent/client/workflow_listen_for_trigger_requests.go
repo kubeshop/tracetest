@@ -31,7 +31,10 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 			}
 
 			// TODO: get context from request
-			c.triggerListener(context.Background(), &resp)
+			err = c.triggerListener(context.Background(), &resp)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		}
 	}()
 	return nil
