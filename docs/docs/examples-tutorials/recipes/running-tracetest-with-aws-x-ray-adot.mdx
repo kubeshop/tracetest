@@ -1,4 +1,16 @@
-# Running Tracetest with AWS X-Ray (AWS X-Ray Node.js SDK & AWS Distro for OpenTelemetry)
+---
+id: running-tracetest-with-aws-x-ray-adot
+title: Node.js with AWS X-Ray (Node.js SDK) and AWS Distro for OpenTelemetry
+description: Quick start on how to configure a Node.js app with OpenTelemetry traces, AWS X-Ray as a trace data store, including AWS Distro for OpenTelemetry, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray-adot)
@@ -10,7 +22,7 @@
 
 [AWS Distro for OpenTelemetry (ADOT)](https://aws-otel.github.io/docs/getting-started/collector) is a secure, production-ready, AWS-supported distribution of the OpenTelemetry project. Part of the Cloud Native Computing Foundation, OpenTelemetry provides open source APIs, libraries and agents to collect distributed traces and metrics for application monitoring.
 
-## Simple Node.js API with AWS X-Ray and Tracetest
+## Sample Node.js API with AWS X-Ray (Node.js SDK), AWS Distro for OpenTelemetry and Tracetest
 
 This is a simple quick start guide on how to configure a Node.js app to use instrumentation with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use AWS X-Ray as the trace data store, the ADOT as a middleware and a Node.js app to generate the telemetry data.
 
