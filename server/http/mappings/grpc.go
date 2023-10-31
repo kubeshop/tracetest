@@ -71,11 +71,6 @@ func (m Model) GRPCRequest(in openapi.GrpcRequest) *trigger.GRPCRequest {
 }
 
 func (m Model) GRPCResponse(in openapi.GrpcResponse) *trigger.GRPCResponse {
-	// ignore unset grcp responses
-	if in.StatusCode == 0 {
-		return nil
-	}
-
 	return &trigger.GRPCResponse{
 		StatusCode: int(in.StatusCode),
 		Metadata:   m.GRPCHeaders(in.Metadata),
