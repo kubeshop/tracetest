@@ -39,7 +39,7 @@ You can trigger this use case by calling the endpoint `GET /pokemon?take=20&skip
 
 ## Building a Test for This Scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /pokemon` and validate three properties:
+Using Tracetest, we can [create a test](/web-ui/creating-tests) that will execute an API call on `GET /pokemon` and validate three properties:
 - The API should return results with HTTP 200 OK.
 - The database should respond with low latency (< 200ms).
 - The database query should use the query string parameters `take` and `skip` correctly.
@@ -51,7 +51,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API response and the database responses:
+With this trace, we can build [assertions](/concepts/assertions) on Tracetest and validate the API response and the database responses:
 
 - **The API should return results with HTTP 200 OK:**
 ![](../images/list-pokemons-api-test-spec.png)

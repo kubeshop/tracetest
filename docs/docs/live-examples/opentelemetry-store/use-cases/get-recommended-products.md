@@ -32,7 +32,7 @@ You can trigger this use case by calling the endpoint `GET /api/recommendations?
 
 ## Building a Test for This Scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /api/recommendations?productIds=&sessionId={some-uuid}&currencyCode=` and validate the following properties:
+Using Tracetest, we can [create a test](/web-ui/creating-tests) that will execute an API call on `GET /api/recommendations?productIds=&sessionId={some-uuid}&currencyCode=` and validate the following properties:
 - It should have 4 products on this list.
 - The feature flagger should be called for one product.
 
@@ -43,7 +43,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the properties:
+With this trace, now we can build [assertions](/concepts/assertions) on Tracetest and validate the properties:
 
 - **It should have 4 products on this list.**
 ![](../images/get-recommended-products-get-product-test-spec.png)

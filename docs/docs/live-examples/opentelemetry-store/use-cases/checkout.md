@@ -57,7 +57,7 @@ If it is the first time that you are calling this endpoint, to see an item into 
 
 ## Building a Test for This Scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /api/cart` and validate the following properties:
+Using Tracetest, we can [create a test](/web-ui/creating-tests) that will execute an API call on `POST /api/cart` and validate the following properties:
 - An order was placed.
 - The user was charged.
 - The product was shipped.
@@ -70,7 +70,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the properties:
+With this trace, now we can build [assertions](/concepts/assertions) on Tracetest and validate the properties:
 
 - **An order was placed.**
 ![](../images/checkout-api-test-spec.png)

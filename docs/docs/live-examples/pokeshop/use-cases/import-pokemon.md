@@ -61,7 +61,7 @@ It should return the following payload:
 
 ## Building a Test for This Scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `POST /pokemon/import` and validate the following properties:
+Using Tracetest, we can [create a test](/web-ui/creating-tests) that will execute an API call on `POST /pokemon/import` and validate the following properties:
 - The API should enqueue an import task and return HTTP 200 OK.
 - The worker should dequeue the import task.
 - PokeAPI should return a valid response.
@@ -75,7 +75,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the API and Worker behaviors:
+With this trace, we can build [assertions](/concepts/assertions) on Tracetest and validate the API and Worker behaviors:
 
 - **The API should enqueue an import task and return HTTP 200 OK:**
 ![](../images/import-pokemon-message-enqueue-test-spec.png)

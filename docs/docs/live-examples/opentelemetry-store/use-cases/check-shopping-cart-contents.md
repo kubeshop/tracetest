@@ -40,7 +40,7 @@ If it is the first time that you are calling this endpoint, to see an item into 
 
 ## Building a Test for This Scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will execute an API call on `GET /api/cart?sessionId={some-uuid}&currecyCode=` and validate the following properties:
+Using Tracetest, we can [create a test](/web-ui/creating-tests) that will execute an API call on `GET /api/cart?sessionId={some-uuid}&currecyCode=` and validate the following properties:
 - The product ID `66VCHSJNUP`, previously added, exists in the cart.
 - The size of the shopping cart should be 1.
 
@@ -51,7 +51,7 @@ Running these tests for the first time will create an Observability trace like t
 
 ### Assertions
 
-With this trace, now we can build [assertions](../../../concepts/assertions.md) on Tracetest and validate the properties:
+With this trace, now we can build [assertions](/concepts/assertions) on Tracetest and validate the properties:
 
 - **The product ID `66VCHSJNUP`, previously added, exists in the cart.**
 ![](../images/check-shopping-cart-contents-product-catalog.png)

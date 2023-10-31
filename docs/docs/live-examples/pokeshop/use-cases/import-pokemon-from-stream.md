@@ -28,7 +28,7 @@ You can trigger this use case by sending a message to Kafka on the `pokemon` top
 
 ## Building a Test for This Scenario
 
-Using Tracetest, we can [create a test](../../../web-ui/creating-tests.md) that will produce a message to Kafka on `pokemon` topic and validate the following properties:
+Using Tracetest, we can [create a test](/web-ui/creating-tests) that will produce a message to Kafka on `pokemon` topic and validate the following properties:
 - The worker should read the import task.
 - PokeAPI should return a valid response.
 - The database should respond with low latency (< 200ms).
@@ -41,7 +41,7 @@ Running these tests for the first time will create a distributed trace like the 
 
 ### Assertions
 
-With this trace, we can build [assertions](../../../concepts/assertions.md) with Tracetest and validate the API and Worker behavior:
+With this trace, we can build [assertions](/concepts/assertions) with Tracetest and validate the API and Worker behavior:
 
 - **A message was received from Kafka stream:**
 ![](../images/import-pokemon-from-stream-message-received.png)
