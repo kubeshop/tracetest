@@ -32,7 +32,10 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 			}
 
 			// TODO: get context from request
-			c.shutdownListener(context.Background(), &resp)
+			err = c.shutdownListener(context.Background(), &resp)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		}
 	}()
 	return nil

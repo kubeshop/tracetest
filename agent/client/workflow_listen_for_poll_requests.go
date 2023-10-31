@@ -31,7 +31,10 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 			}
 
 			// TODO: Get ctx from request
-			c.pollListener(context.Background(), &resp)
+			err = c.pollListener(context.Background(), &resp)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		}
 	}()
 	return nil

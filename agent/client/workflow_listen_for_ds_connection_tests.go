@@ -31,7 +31,10 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 			}
 
 			// TODO: Get ctx from request
-			c.dataStoreConnectionListener(context.Background(), &req)
+			err = c.dataStoreConnectionListener(context.Background(), &req)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		}
 	}()
 	return nil
