@@ -5,13 +5,12 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/testconnection"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
 func buildDataStoreTestPipeline(
-	natsConn *nats.Conn,
+	driverFactory pipeline.DriverFactory[testconnection.Job],
 	dsTestListener *testconnection.Listener,
 	tracer trace.Tracer,
 	newTraceDBFn tracedb.FactoryFunc,
@@ -22,8 +21,8 @@ func buildDataStoreTestPipeline(
 	notifyWorker := testconnection.NewDsTestConnectionNotify(dsTestListener, tracer)
 
 	pipeline := pipeline.New(testconnection.NewConfigurer(meter),
-		pipeline.Step[testconnection.Job]{Processor: requestWorker, Driver: pipeline.NewNatsDriver[testconnection.Job](natsConn, "datastore_test_connection_request")},
-		pipeline.Step[testconnection.Job]{Processor: notifyWorker, Driver: pipeline.NewNatsDriver[testconnection.Job](natsConn, "datastore_test_connection_notify")},
+		pipeline.Step[testconnection.Job]{Processor: requestWorker, Driver: driverFactory.NewDriver("datastore_test_connection_request")},
+		pipeline.Step[testconnection.Job]{Processor: notifyWorker, Driver: driverFactory.NewDriver("datastore_test_connection_notify")},
 	)
 
 	return testconnection.NewDataStoreTestPipeline(pipeline, dsTestListener)

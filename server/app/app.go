@@ -30,6 +30,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -243,11 +244,12 @@ func (app *App) Start(opts ...appOption) error {
 
 	natsConn, err := nats.Connect(app.cfg.NATSEndpoint())
 	if err != nil {
-		return fmt.Errorf("could not connect to NATS: %w", err)
+		log.Printf("could not connect to NATS: %s. Defaulting to InMemory Queues", err)
 	}
 
+	executorDriverFactory := pipeline.NewDriverFactory[executor.Job](natsConn)
 	testPipeline := buildTestPipeline(
-		natsConn,
+		executorDriverFactory,
 		pool,
 		pollingProfileRepo,
 		dataStoreRepo,
@@ -281,9 +283,10 @@ func (app *App) Start(opts ...appOption) error {
 		testSuitePipeline.Stop()
 	})
 
+	testConnectionDriverFactory := pipeline.NewDriverFactory[testconnection.Job](natsConn)
 	dsTestListener := testconnection.NewListener()
 	dsTestPipeline := buildDataStoreTestPipeline(
-		natsConn,
+		testConnectionDriverFactory,
 		dsTestListener,
 		tracer,
 		tracedbFactory,

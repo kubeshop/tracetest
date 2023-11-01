@@ -15,13 +15,12 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/tracedb"
-	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
 func buildTestPipeline(
-	natsConn *nats.Conn,
+	driverFactory pipeline.DriverFactory[executor.Job],
 	pool *pgxpool.Pool,
 	ppRepo *pollingprofile.Repository,
 	dsRepo *datastore.Repository,
@@ -126,14 +125,14 @@ func buildTestPipeline(
 		WithMetricMeter(meter)
 
 	pipeline := pipeline.New(queueBuilder,
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trigger_resolver", triggerResolverWorker), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "trigger_resolve")},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trigger_executer", triggerExecuterWorker), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "trigger_execute")},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trigger_result_processor", triggerResultProcessorWorker), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "trigger_result")},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trace_poller_starter", tracePollerStarterWorker), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "tracePoller_start")},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trace_fetcher", traceFetcherWorker), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "tracePoller_fetch")},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trace_poller_evaluator", tracePollerEvaluatorWorker), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "tracePoller_evaluate"), InputQueueOffset: -1},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("linter_runner", linterRunner), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "linterRunner")},
-		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("assertion_runner", assertionRunner), Driver: pipeline.NewNatsDriver[executor.Job](natsConn, "assertionRunner")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trigger_resolver", triggerResolverWorker), Driver: driverFactory.NewDriver("trigger_resolve")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trigger_executer", triggerExecuterWorker), Driver: driverFactory.NewDriver("trigger_execute")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trigger_result_processor", triggerResultProcessorWorker), Driver: driverFactory.NewDriver("trigger_result")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trace_poller_starter", tracePollerStarterWorker), Driver: driverFactory.NewDriver("tracePoller_start")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trace_fetcher", traceFetcherWorker), Driver: driverFactory.NewDriver("tracePoller_fetch")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("trace_poller_evaluator", tracePollerEvaluatorWorker), Driver: driverFactory.NewDriver("tracePoller_evaluate"), InputQueueOffset: -1},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("linter_runner", linterRunner), Driver: driverFactory.NewDriver("linterRunner")},
+		pipeline.Step[executor.Job]{Processor: workerMetricMiddlewareBuilder.New("assertion_runner", assertionRunner), Driver: driverFactory.NewDriver("assertionRunner")},
 	)
 
 	const assertionRunnerStepIndex = 7
