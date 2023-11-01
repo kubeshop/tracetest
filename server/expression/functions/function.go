@@ -74,6 +74,8 @@ func DefaultRegistry() Registry {
 	registry.Add("fullName", generateFullName)
 	registry.Add("email", generateEmail)
 	registry.Add("phone", generatePhoneNumber)
+	registry.Add("date", generateDate, OptionalParam(types.TypeString))
+	registry.Add("dateTime", generateDateTime, OptionalParam(types.TypeString))
 	registry.Add("creditCard", generateCreditCard)
 	registry.Add("creditCardCvv", generateCreditCardCVV)
 	registry.Add("creditCardExpDate", generateCreditCardExpiration)
