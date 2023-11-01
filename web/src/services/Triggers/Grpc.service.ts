@@ -1,4 +1,4 @@
-import {parse, NamespaceBase, Service} from 'protobufjs';
+import {parse, Namespace, ReflectionObject, Service} from 'protobufjs';
 import {IRpcValues, ITriggerService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import GrpcRequest from 'models/GrpcRequest.model';
@@ -7,17 +7,28 @@ interface IRpcTriggerService extends ITriggerService {
   getMethodList(protoFile: string): string[];
 }
 
+function isService(ro: ReflectionObject): ro is Service {
+  return (ro as Service).methods !== undefined;
+}
+
 const RpcTriggerService = (): IRpcTriggerService => ({
   getMethodList(protoFile) {
     const parsedData = parse(protoFile);
 
-    const methodList = parsedData.root.nestedArray.flatMap(a => {
-      const namespace = a as NamespaceBase;
+    const methodList = parsedData.root.nestedArray.flatMap(aReflection => {
+      if (isService(aReflection)) {
+        return aReflection.methodsArray;
+      }
 
-      return namespace.nestedArray.flatMap(b => {
-        const service = b as Service;
-        return service.methods ? service.methodsArray : [];
-      });
+      return (
+        (aReflection as Namespace)?.nestedArray?.flatMap(bReflection => {
+          if (isService(bReflection)) {
+            return bReflection.methodsArray;
+          }
+
+          return [];
+        }) ?? []
+      );
     });
 
     return methodList.reduce<string[]>(
