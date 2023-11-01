@@ -18,11 +18,11 @@ So in this case, we need to trigger four tests in sequence to achieve test the e
 
 ## Building a Test Suite for This Scenario
 
-Using Tracetest, we can do that by [creating a test](../../../web-ui/creating-tests.md) for each step and later grouping these tests as [Test Suites](../../../web-ui/creating-test-suites.md) that have an [variable set](../../../concepts/variable-sets.md)].
- 
-We can do that by creating the tests and Test Suites through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the Test Suite with all tests needed. The [assertions](../../../concepts/assertions.md) that we will check are the same for every single test.
+Using Tracetest, we can do that by [creating a test](/web-ui/creating-tests) for each step and later grouping these tests as [Test Suites](/web-ui/creating-test-suites) that have an [variable set](/concepts/variable-sets).
 
-### Mapping Environment Variables 
+We can do that by creating the tests and Test Suites through the Web UI or using the CLI. In this example, we will use the CLI to create a Variable Set and then create the Test Suite with all tests needed. The [assertions](/concepts/assertions) that we will check are the same for every single test.
+
+### Mapping Environment Variables
 
 The first thing that we need to think about is to map the variables that are needed in this process. At first glance, we can identify the vars to the API address and the user ID:
 With these variables, we can create the following definition file as saving as `user-buying-products.env`:

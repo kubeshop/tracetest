@@ -151,12 +151,12 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-without-a-trace-data-store-with-manual-instrumentation",
-              label: "Node.js with Manual Instrumentation and OpenTelemetry Collector",
+              label: "Node.js and OpenTelemetry Manual Instrumentation",
             },
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-python-app-with-opentelemetry-collector-and-tracetest",
-              label: "Python with Manual Instrumentation and OpenTelemetry Collector",
+              label: "Python and OpenTelemetry Manual Instrumentation",
             },
           ],
         },
@@ -197,7 +197,7 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-signoz-pokeshop",
-              label: "SigNoz and Pokeshop API",
+              label: "Pokeshop API and SigNoz",
             },
           ],
         },
@@ -213,7 +213,7 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
-              label: "AWS Fargate and Terraform",
+              label: "Serverless Node.js and Jaeger with Terraform",
             },
           ],
         },
@@ -235,7 +235,7 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-tempo",
-              label: "Node.js and Tempo",
+              label: "Node.js and Grafana Tempo",
             },
           ],
         },
@@ -246,23 +246,23 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray",
-              label: "X-Ray (Node.js SDK)",
+              label: "Node.js and AWS X-Ray (Node.js SDK)",
             },
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-adot",
-              label: "X-Ray and AWS Distro for OpenTelemetry",
+              label: "Node.js with AWS X-Ray (Node.js SDK) and AWS Distro for OpenTelemetry",
             },
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-aws-x-ray-pokeshop",
-              label: "X-Ray, AWS Distro for OpenTelemetry and Pokeshop API",
+              label: "Pokeshop API with AWS X-Ray (Node.js SDK) and AWS Distro for OpenTelemetry",
             },
 
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-step-functions-terraform",
-              label: "AWS Step Functions, AWS X-Ray and Terraform",
+              label: ".NET Step Functions with AWS X-Ray, AWS Distro for OpenTelemetry, and Terraform",
             },
           ],
         },
@@ -273,17 +273,17 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights",
-              label: "Azure App Insights",
+              label: "Node.js and Azure Application Insights (Node.js SDK)",
             },
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-collector",
-              label: "Azure App Insights and The OpenTelemetry Collector",
+              label: "Node.js and Azure Application Insights with OpenTelemetry Collector",
             },
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop",
-              label: "Azure App Insights, The OpenTelemetry Collector and Pokeshop API",
+              label: "Pokeshop API and Azure Application Insights with OpenTelemetry Collector",
             },
           ],
         },
