@@ -169,17 +169,23 @@ Generator functions can be invoked as part of expressions. Therefore, you only n
 Available functions:
 
 | Function              | Description |
-| :-------------------- | ------------------------------------------------------------------------------------- |
-| `uuid()`              | Generates a random v4 uuid.                                                            |
-| `firstName()`         | Generates a random English first name.                                                 |
-| `lastName()`          | Generates a random English last name.                                                  |
-| `fullName()`          | Generates a random English first and last name.                                        |
-| `email()`             | Generates a random email address.                                                      |
-| `phone()`             | Generates a random phone number.                                                       |
-| `creditCard()`        | Generates a random credit card number (from 12 to 19 digits).                          |
-| `creditCardCvv()`     | Generates a random credit card cvv (3 digits).                                         |
-| `creditCardExpDate()` | Generates a random credit card expiration date (mm/yy).                                |
-| `randomInt(min, max)` | Generates a random integer contained in the closed interval defined by [`min`, `max`]. |
+| :-------------------- | --------------------------------------------------------------------------------------------- |
+| `uuid()`              | Generates a random v4 uuid.                                                                   |
+| `firstName()`         | Generates a random English first name.                                                        |
+| `lastName()`          | Generates a random English last name.                                                         |
+| `fullName()`          | Generates a random English first and last name.                                               |
+| `email()`             | Generates a random email address.                                                             |
+| `phone()`             | Generates a random phone number.                                                              |
+| `creditCard()`        | Generates a random credit card number (from 12 to 19 digits).                                 |
+| `creditCardCvv()`     | Generates a random credit card cvv (3 digits).                                                |
+| `creditCardExpDate()` | Generates a random credit card expiration date (mm/yy).                                       |
+| `randomInt(min, max)` | Generates a random integer contained in the closed interval defined by [`min`, `max`].        |
+| `date(format?)`       | Get the current date and formats it. Default is `YYYY-MM-DD` but you can specify other formats|
+| `dateTime(format?)`   | Get the current datetime and formats it. Default is RFC3339 but you can specify other formats |
+
+:::tip
+[Continue reading about date and datetime formats, here.](https://www.w3.org/TR/NOTE-datetime)
+:::
 
 :::tip
 [Continue reading about Test Specs, here.](/cli/creating-test-specifications)
