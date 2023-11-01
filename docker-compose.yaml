@@ -59,3 +59,9 @@ services:
       - ./local-config/collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - tracetest
+
+  nats:
+    image: nats:2.10-alpine
+    ports:
+        - "4222:4222" # connecting
+        - "8222:8222" # reporting server

@@ -42,6 +42,7 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/kubeshop/tracetest/server/version"
+	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -240,7 +241,13 @@ func (app *App) Start(opts ...appOption) error {
 		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
 	}
 
+	natsConn, err := nats.Connect(app.cfg.NATSEndpoint())
+	if err != nil {
+		return fmt.Errorf("could not connect to NATS: %w", err)
+	}
+
 	testPipeline := buildTestPipeline(
+		natsConn,
 		pool,
 		pollingProfileRepo,
 		dataStoreRepo,
@@ -276,7 +283,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	dsTestListener := testconnection.NewListener()
 	dsTestPipeline := buildDataStoreTestPipeline(
-		pool,
+		natsConn,
 		dsTestListener,
 		tracer,
 		tracedbFactory,
