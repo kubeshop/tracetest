@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 export const Paragraph = styled(Typography.Paragraph)`
   && {
-    margin-top: 10px;
+    margin: 0;
     font-weight: 600;
 
     span {

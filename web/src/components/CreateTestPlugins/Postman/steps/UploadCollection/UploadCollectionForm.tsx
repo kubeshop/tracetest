@@ -1,5 +1,5 @@
 import {Col, Form, Input, Row} from 'antd';
-import {BodyField} from 'components/CreateTestPlugins/Rest/steps/RequestDetails/BodyField/BodyField';
+import BodyField from 'components/CreateTestPlugins/Rest/steps/RequestDetails/BodyField/BodyField';
 import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
 import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
 import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';

@@ -7,13 +7,7 @@ interface IProps {
 }
 
 export const BearerFields = ({baseName}: IProps) => (
-  <Form.Item
-    data-cy="bearer-token"
-    name={[...baseName, 'bearer', 'token']}
-    label="Token"
-    rules={[{required: true}]}
-    style={{marginTop: '26px'}}
-  >
+  <Form.Item data-cy="bearer-token" name={[...baseName, 'bearer', 'token']} label="Token" rules={[{required: true}]}>
     <Editor type={SupportedEditors.Interpolation} />
   </Form.Item>
 );

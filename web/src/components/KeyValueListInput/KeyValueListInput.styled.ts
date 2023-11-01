@@ -2,7 +2,7 @@ import {DeleteOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 export const KeyValueContainer = styled.div`
-  align-items: center;
+  align-items: start;
   display: grid;
   justify-content: center;
   grid-template-columns: 40% 40% 19%;

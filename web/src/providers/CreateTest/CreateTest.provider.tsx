@@ -16,6 +16,7 @@ import TracetestAPI from 'redux/apis/Tracetest';
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import {Plugins} from 'constants/Plugins.constants';
+import {SupportedPlugins} from 'constants/Common.constants';
 import useTestCrud from '../Test/hooks/useTestCrud';
 
 const {useCreateTestMutation} = TracetestAPI.instance;
@@ -26,7 +27,7 @@ interface IContext extends ICreateTestState {
   plugin: IPlugin;
   onNext(draftTest?: TDraftTest): void;
   onPrev(): void;
-  onCreateTest(draftTest: TDraftTest): void;
+  onCreateTest(draftTest: TDraftTest, plugin: IPlugin): void;
   onUpdateDraftTest(draftTest: TDraftTest): void;
   onUpdatePlugin(plugin: IPlugin): void;
   onGoTo(stepId: string): void;
@@ -64,18 +65,19 @@ const CreateTestProvider = ({children}: IProps) => {
   const stepList = useAppSelector(CreateTestSelectors.selectStepList);
   const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
-  const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demos));
+  // const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demos));
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
   const isFormValid = useAppSelector(CreateTestSelectors.selectIsFormValid);
   const isFinalStep = stepNumber === stepList.length - 1;
 
   const onCreateTest = useCallback(
-    async (draft: TDraftTest) => {
+    async (draft: TDraftTest, plugin: IPlugin) => {
+      console.log('draft', draft);
       const rawTest = await TestService.getRequest(plugin, draft);
       const test = await createTest(rawTest).unwrap();
       runTest({test});
     },
-    [createTest, plugin, runTest]
+    [createTest, runTest]
   );
 
   const onUpdateDraftTest = useCallback(
@@ -87,12 +89,12 @@ const CreateTestProvider = ({children}: IProps) => {
 
   const onNext = useCallback(
     (draft: TDraftTest = {}) => {
-      if (isFinalStep)
+      /* if (isFinalStep)
         onCreateTest({
           ...draftTest,
           ...draft,
         });
-      else dispatch(setStepNumber({stepNumber: stepNumber + 1}));
+      else dispatch(setStepNumber({stepNumber: stepNumber + 1})); */
 
       onUpdateDraftTest(draft);
     },
@@ -138,8 +140,8 @@ const CreateTestProvider = ({children}: IProps) => {
       stepList,
       draftTest,
       stepNumber,
-      pluginName: plugin.name,
-      plugin,
+      pluginName: SupportedPlugins.REST,
+      plugin: Plugins.REST,
       activeStep,
       isLoading: isLoadingCreateTest || isEditLoading,
       isFormValid,
@@ -156,7 +158,7 @@ const CreateTestProvider = ({children}: IProps) => {
       stepList,
       draftTest,
       stepNumber,
-      plugin,
+      // plugin,
       activeStep,
       isLoadingCreateTest,
       isEditLoading,

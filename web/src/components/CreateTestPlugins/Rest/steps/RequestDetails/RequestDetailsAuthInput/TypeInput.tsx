@@ -26,7 +26,7 @@ interface IProps {
 
 const TypeInput = ({baseName}: IProps) => (
   <S.Row>
-    <Form.Item shouldUpdate style={{minWidth: '100%'}} label="Authorization Type" name={[...baseName, 'type']}>
+    <Form.Item shouldUpdate style={{minWidth: '100%'}} label="Authorization type" name={[...baseName, 'type']}>
       <Select
         className="select-auth-method"
         data-cy="auth-type-select"

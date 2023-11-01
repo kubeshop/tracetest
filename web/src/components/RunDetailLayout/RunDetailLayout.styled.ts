@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 import {Typography} from 'antd';
 import {LeftOutlined} from '@ant-design/icons';
 import Link from 'components/Link';
@@ -11,8 +11,8 @@ export const BackIcon = styled(LeftOutlined)`
 export const Container = styled.div`
   height: 100vh;
 
-  .ant-tabs,
-  .ant-tabs-content {
+  .run-tabs.ant-tabs,
+  .run-tabs.ant-tabs .ant-tabs-content {
     height: 100%;
   }
 `;
@@ -130,7 +130,7 @@ export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
   }
 `;
 
-export const TabLink = styled(Link)<{$isActive: boolean}>`
+export const TabLink = styled(Link)<{$isActive: boolean; $isDisabled?: boolean}>`
   && {
     color: ${({theme, $isActive}) => $isActive && theme.color.white};
     padding: 5px 16px;
@@ -140,5 +140,12 @@ export const TabLink = styled(Link)<{$isActive: boolean}>`
     &:focused {
       color: ${({theme, $isActive}) => $isActive && theme.color.white};
     }
+
+    ${({$isDisabled}) =>
+      $isDisabled &&
+      css`
+        opacity: 0.5;
+        pointer-events: none;
+      `}
   }
 `;

@@ -13,7 +13,7 @@ export const ApiKeyFieldsBase = ({baseName}: IProps) => (
     <R.FlexContainer>
       <Form.Item
         data-cy="apiKey-key"
-        style={{flexBasis: '50%', marginTop: '26px'}}
+        style={{flexBasis: '50%'}}
         name={[...baseName, 'apiKey', 'key']}
         label="Key"
         rules={[{required: true}]}
@@ -22,7 +22,7 @@ export const ApiKeyFieldsBase = ({baseName}: IProps) => (
       </Form.Item>
       <Form.Item
         data-cy="apiKey-value"
-        style={{flexBasis: '50%', marginTop: '26px'}}
+        style={{flexBasis: '50%'}}
         name={[...baseName, 'apiKey', 'value']}
         label="Value"
         rules={[{required: true}]}

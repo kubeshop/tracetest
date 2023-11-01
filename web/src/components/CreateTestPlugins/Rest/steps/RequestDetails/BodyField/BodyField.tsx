@@ -3,7 +3,7 @@ import {useState} from 'react';
 import Editor from 'components/Editor';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {BodyFieldContainer} from './BodyFieldContainer';
-import {SingleLabel} from './SingleLabel';
+import * as S from './BodyField.styled';
 import {useBodyMode} from './useBodyMode';
 import {useLanguageExtensionsMemo} from './useLanguageExtensionsMemo';
 
@@ -12,15 +12,16 @@ interface IProps {
   setBody: (body?: string) => void;
 }
 
-export const BodyField = ({body, setBody}: IProps): React.ReactElement => {
+const BodyField = ({body, setBody}: IProps) => {
   const [bodyMode, setBodyMode] = useBodyMode(body);
   const [buffer, setBuffer] = useState<undefined | string>(undefined);
   const extensions = useLanguageExtensionsMemo(bodyMode);
   const hasNoBody = bodyMode === 'none';
+
   return (
-    <>
-      <span>
-        <SingleLabel label="Request body">{buffer}</SingleLabel>
+    <S.Container>
+      <S.RadioContainer>
+        <S.SingleLabel label="Request body">{buffer}</S.SingleLabel>
         <Radio.Group
           value={bodyMode}
           onChange={e => {
@@ -47,7 +48,7 @@ export const BodyField = ({body, setBody}: IProps): React.ReactElement => {
             XML
           </Radio>
         </Radio.Group>
-      </span>
+      </S.RadioContainer>
       {hasNoBody && (
         <div>
           <h4>This request has no body {bodyMode}</h4>
@@ -63,6 +64,8 @@ export const BodyField = ({body, setBody}: IProps): React.ReactElement => {
           />
         </Form.Item>
       </BodyFieldContainer>
-    </>
+    </S.Container>
   );
 };
+
+export default BodyField;

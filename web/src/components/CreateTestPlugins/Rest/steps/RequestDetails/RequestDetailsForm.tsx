@@ -1,11 +1,9 @@
-import {Form} from 'antd';
-import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
+import {Form, Tabs} from 'antd';
 import {IHttpValues, TDraftTestForm} from 'types/Test.types';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
 import KeyValueListInput from 'components/KeyValueListInput';
-import {BodyField} from './BodyField/BodyField';
+import BodyField from './BodyField/BodyField';
 import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
-import RequestDetailsUrlInput from './RequestDetailsUrlInput';
 import SSLVerification from './SSLVerification';
 
 export const FORM_ID = 'create-test';
@@ -14,16 +12,25 @@ interface IProps {
   form: TDraftTestForm<IHttpValues>;
 }
 
-const RequestDetailsForm = ({form}: IProps) => {
-  return (
-    <S.InputContainer>
-      <RequestDetailsUrlInput />
-      <RequestDetailsAuthInput />
-      <KeyValueListInput name='headers' label='Header list' addButtonLabel='Add Header' keyPlaceholder='Header' valuePlaceholder='Value' initialValue={DEFAULT_HEADERS} />
+const RequestDetailsForm = ({form}: IProps) => (
+  <Tabs defaultActiveKey="general">
+    <Tabs.TabPane forceRender tab="General" key="general">
       <BodyField setBody={body => form.setFieldsValue({body})} body={Form.useWatch('body', form)} />
+      <RequestDetailsAuthInput />
       <SSLVerification />
-    </S.InputContainer>
-  );
-};
+    </Tabs.TabPane>
+
+    <Tabs.TabPane forceRender tab="Headers" key="headers">
+      <KeyValueListInput
+        name="headers"
+        label="Header list"
+        addButtonLabel="Add Header"
+        keyPlaceholder="Header"
+        valuePlaceholder="Value"
+        initialValue={DEFAULT_HEADERS}
+      />
+    </Tabs.TabPane>
+  </Tabs>
+);
 
 export default RequestDetailsForm;

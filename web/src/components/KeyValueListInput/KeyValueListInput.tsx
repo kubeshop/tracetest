@@ -9,10 +9,10 @@ interface IProps {
   name?: string;
   className?: string;
   label?: string;
-  addButtonLabel?: string
-  keyPlaceholder?: string
-  valuePlaceholder?: string
-  initialValue?: IKeyValue[]
+  addButtonLabel?: string;
+  keyPlaceholder?: string;
+  valuePlaceholder?: string;
+  initialValue?: IKeyValue[];
 }
 const KeyValueInputList = ({
   name = 'headers',
@@ -29,11 +29,11 @@ const KeyValueInputList = ({
         <>
           {fields.map((field, index) => (
             <S.KeyValueContainer key={field.name}>
-              <Form.Item name={[field.name, 'key']} style={{marginRight: '2px'}}>
+              <Form.Item name={[field.name, 'key']} style={{marginBottom: 0, marginRight: '2px'}}>
                 <Editor type={SupportedEditors.Interpolation} placeholder={`${keyPlaceholder} ${index + 1}`} />
               </Form.Item>
 
-              <Form.Item name={[field.name, 'value']} noStyle>
+              <Form.Item name={[field.name, 'value']} style={{marginBottom: 0}}>
                 <Editor type={SupportedEditors.Interpolation} placeholder={`${valuePlaceholder} ${index + 1}`} />
               </Form.Item>
 

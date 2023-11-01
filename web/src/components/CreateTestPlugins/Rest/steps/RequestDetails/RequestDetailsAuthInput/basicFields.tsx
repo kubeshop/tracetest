@@ -13,7 +13,7 @@ export const BasicFields = ({baseName}: IProps) => (
   <S.Row>
     <R.FlexContainer>
       <Form.Item
-        style={{flexBasis: '50%', marginTop: '26px'}}
+        style={{flexBasis: '50%'}}
         name={[...baseName, 'basic', 'username']}
         data-cy="basic-username"
         label="Username"
@@ -22,7 +22,7 @@ export const BasicFields = ({baseName}: IProps) => (
         <Editor type={SupportedEditors.Interpolation} />
       </Form.Item>
       <Form.Item
-        style={{flexBasis: '50%', marginTop: '26px'}}
+        style={{flexBasis: '50%'}}
         name={[...baseName, 'basic', 'password']}
         label="Password"
         data-cy="basic-password"
