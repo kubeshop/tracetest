@@ -10,6 +10,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestFunctionValidation(t *testing.T) {
+	registry := functions.DefaultRegistry()
+
+	emptyStringFn := func(args ...types.TypedValue) string { return "" }
+
+	assert.Panics(t, func() {
+		registry.Add("faulty", emptyStringFn,
+			functions.Param(types.TypeString),
+			functions.OptionalParam(types.TypeString),
+			functions.Param(types.TypeNumber),
+		)
+	})
+}
+
 func TestFunctionWithoutArgs(t *testing.T) {
 	registry := functions.DefaultRegistry()
 
@@ -55,7 +69,7 @@ func TestFunctionWithWrongArgNumber(t *testing.T) {
 
 	_, err = function.Invoke()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid number of arguments")
+	assert.Contains(t, err.Error(), "missing required parameters")
 }
 
 func TestFunctionWithWrongArgType(t *testing.T) {
