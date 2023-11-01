@@ -1,8 +1,8 @@
 import AllowButton, {Operation} from 'components/AllowButton';
 import CreateButton from 'components/CreateButton';
-import CreateTestModal from 'components/CreateTestModal/CreateTestModal';
 import Pagination from 'components/Pagination';
 import TestCard from 'components/ResourceCard/TestCard';
+import TriggerTypeModal from 'components/TriggerTypeModal';
 import {SortBy, SortDirection, sortOptions} from 'constants/Test.constants';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
@@ -98,7 +98,7 @@ const Tests = () => {
         </Pagination>
       </S.Wrapper>
 
-      <CreateTestModal isOpen={isCreateTestOpen} onClose={() => setIsCreateTestOpen(false)} />
+      <TriggerTypeModal isOpen={isCreateTestOpen} onClose={() => setIsCreateTestOpen(false)} />
     </>
   );
 };

@@ -22,6 +22,7 @@ const Router = () => (
     </Route>
 
     <Route element={<Layout />}>
+      <Route path="/test/create/:triggerType" element={<div />} />
       <Route path="/test/:testId" element={<Test />} />
       <Route path="/test/:testId/run/:runId" element={<RunDetail />} />
       <Route path="/test/:testId/run/:runId/:mode" element={<RunDetail />} />
