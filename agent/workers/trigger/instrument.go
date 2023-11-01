@@ -39,8 +39,11 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigg
 		return Response{}, fmt.Errorf("could not create tracestate: %w", err)
 	}
 
+	var tf trace.TraceFlags
 	spanContextConfig := trace.SpanContextConfig{
 		TraceState: tracestate,
+		Remote:     true,
+		TraceFlags: tf.WithSampled(true),
 	}
 
 	if opts != nil {
