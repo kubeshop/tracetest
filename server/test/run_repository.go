@@ -655,6 +655,11 @@ func readRunRow(row scanner) (Run, error) {
 		return Run{}, fmt.Errorf("cannot parse TriggerResult: %w", err)
 	}
 
+	err = json.Unmarshal(jsonResolvedTrigger, &r.ResolvedTrigger)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse ResolvedTrigger: %w", err)
+	}
+
 	err = json.Unmarshal(jsonTestResults, &r.Results)
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot parse Results: %w", err)
