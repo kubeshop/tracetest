@@ -735,6 +735,7 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 	// Prevents bad data in other fields to override correct data
 	existingRun.TriggerResult = run.TriggerResult
 	existingRun.Trace = traces.MergeTraces(existingRun.Trace, run.Trace)
+	existingRun.State = run.State
 
 	err = c.testRunRepository.UpdateRun(ctx, existingRun)
 	if err != nil {
