@@ -655,7 +655,7 @@ func (r *runRepository) GetTestSuiteRunSteps(ctx context.Context, id id.ID, runI
 WHERE test_suite_run_steps.test_suite_run_id = $1 AND test_suite_run_steps.test_suite_run_test_suite_id = $2
 `
 	query, params := sqlutil.TenantWithPrefix(ctx, query, "test_runs.", strconv.Itoa(runID), id)
-	query += ` ORDER BY test_runs.completed_at ASC`
+	query += ` ORDER BY test_runs.created_at ASC`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
