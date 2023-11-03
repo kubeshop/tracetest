@@ -157,6 +157,7 @@ message TriggerResult {
     GrpcResponse grpc = 3;
     TraceIdResponse traceID = 4;
     KafkaResponse kafka = 5;
+    Error error = 6;
 }
 
 message HttpResponse {
@@ -174,6 +175,10 @@ message GrpcResponse {
 
 message TraceIdResponse {
     string id = 1;
+}
+
+message Error {
+    string message = 1;
 }
 
 message DataStoreConnectionTestRequest {
@@ -302,6 +307,7 @@ message PollingResponse {
     string traceID = 5;
     repeated Span spans = 6;
     bool traceFound = 7;
+    Error error = 8;
 }
 
 message Span {
