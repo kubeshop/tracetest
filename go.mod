@@ -45,7 +45,6 @@ require (
 	github.com/ohler55/ojg v1.14.4
 	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/orlangure/gnomock v0.20.0
-	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/pterm/pterm v0.12.69
