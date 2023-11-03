@@ -1,4 +1,16 @@
-# Pokeshop API
+---
+id: overview
+title: Pokeshop API Demo
+description: As a testing ground, the Tracetest team has implemented a sample API instrumented with OpenTelemetry around the PokeAPI. The reason is to provide a microservice-based system that contains message queues, cache layers, databases, and CRUD operations.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 As a testing ground, the team at Tracetest has implemented a sample instrumented API around the [PokeAPI](https://pokeapi.co/).
 
@@ -20,11 +32,11 @@ Want to run tests against the Pokeshop Demo without installing it locally? Click
 
 We have three use cases that use each component of this structure and that can be observed via Open Telemetry and tested with Tracetest. Each one is triggered by an API call to their respective endpoint:
 
-- [Add Pokemon](./use-cases/add-pokemon.md): Add a new Pokemon only relying on user input into the database.
-- [Get Pokemon by ID](./use-cases/get-pokemon-by-id.md): Given a Pokemon ID, this endpoint returns the data of a Pokemon. If the same Pokemon was queried, the API will use its cache to return it.
-- [List Pokemon](./use-cases/list-pokemon.md): Lists all Pokemons registered into Pokeshop.
-- [Import Pokemon](./use-cases/import-pokemon.md): Given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
-- [Import Pokemon from Stream](./use-cases/import-pokemon-from-stream.md): Listening to a Stream, this use case also does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
+- [Add Pokemon](/live-examples/pokeshop/use-cases/add-pokemon): Add a new Pokemon only relying on user input into the database.
+- [Get Pokemon by ID](/live-examples/pokeshop/use-cases/get-pokemon-by-id): Given a Pokemon ID, this endpoint returns the data of a Pokemon. If the same Pokemon was queried, the API will use its cache to return it.
+- [List Pokemon](/live-examples/pokeshop/use-cases/list-pokemon): Lists all Pokemons registered into Pokeshop.
+- [Import Pokemon](/live-examples/pokeshop/use-cases/import-pokemon): Given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
+- [Import Pokemon from Stream](/live-examples/pokeshop/use-cases/import-pokemon-from-stream): Listening to a Stream, this use case also does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
 
 ## System Architecture
 

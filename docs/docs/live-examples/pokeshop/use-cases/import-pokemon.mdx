@@ -1,8 +1,21 @@
-# Pokeshop API - Import Pokemon
+---
+id: import-pokemon
+title: Pokeshop API - Import Pokemon
+description: As a testing ground, the Tracetest team has implemented a sample API instrumented with OpenTelemetry around the PokeAPI. This use case showcases a more complex scenario involving an async process.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously, for example, when triggering a user notification, generating reports or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
-Here the process is split into two phases: 
+Here the process is split into two phases:
+
 1. An API call that enqueues an import request to a queue.
 ```mermaid
 sequenceDiagram
