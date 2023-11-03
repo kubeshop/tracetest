@@ -205,3 +205,10 @@ func (c *AppConfig) AnalyticsFrontendKey() string {
 
 	return c.vp.GetString("analytics.frontendKey")
 }
+
+func (c *AppConfig) NATSEndpoint() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.vp.GetString("nats.endpoint")
+}

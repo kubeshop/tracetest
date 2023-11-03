@@ -37,11 +37,11 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/j2gg0s/otsql v0.14.0
 	github.com/jackc/pgx/v5 v5.4.2
-	github.com/jdvr/go-again v1.0.0
 	github.com/jhump/protoreflect v1.12.0
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20220423185008-bf980b35cac4
+	github.com/nats-io/nats.go v1.31.0
 	github.com/ohler55/ojg v1.14.4
 	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/orlangure/gnomock v0.20.0
@@ -148,6 +148,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mostynb/go-grpc-compression v1.2.1 // indirect
+	github.com/nats-io/nkeys v0.4.5 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.3-0.20211202183452-c5a74bcca799 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
