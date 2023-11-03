@@ -6,6 +6,12 @@ The idea is to have a microservice-divided system that behaves like a typical sc
 
 With this, users can get familiar with the Tracetest tool by focusing on creating assertions, visualizing the trace and identifying the different data that comes from the Collector ([Jaeger](https://www.jaegertracing.io/)). Users will learn about basic instrumentation practices: what tools to use, what data to send, when, and what suggested standards need to be followed.
 
+:::info
+Want to run tests against the Pokeshop Demo without installing it locally? Click the link below and we will add you to our `tracetest-demo` organization and give you access to the `pokeshop-demo` org as an engineer. You can run and create your own tests!
+
+[👉 **Access the shared demo, here.**](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept)
+:::
+
 - **Source Code**: https://github.com/kubeshop/pokeshop
 - **Running it locally**: [Instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-it-locally)
 - **Running on Kubernetes**: [Instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster)

@@ -67,7 +67,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Pokemon API Demo",
+      label: "Pokeshop API Demo",
       items: [
         {
           type: "doc",
@@ -462,6 +462,11 @@ const sidebars = {
           type: "doc",
           id: "getting-started/no-otel",
           label: "What if I don't have OpenTelemetry installed?",
+        },
+        {
+          type: "doc",
+          id: "getting-started/try-live-demos",
+          label: "Try live demos!",
         },
       ],
     },

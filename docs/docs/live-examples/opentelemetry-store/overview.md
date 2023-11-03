@@ -2,6 +2,12 @@
 
 The OpenTelemetry Demo is an example application published by the OpenTelemtry CNCF project. It implements an Astronomy shop in a set of microservices in different languages with OpenTelemetry enabled, intended to be used as an example of OpenTelemetry instrumentation and observability. The Tracetest team has made several key contributions to this project, including providing a full suite of end to end tests.
 
+:::info
+Want to run tests against the OpenTelemetry Astronomy Shop without installing it? Click the link below and we will add you to our `tracetest-demo` organization and give you access to the `opentelemetry-demo` org as an engineer. You can run and create your own tests!
+
+[👉 **Access the shared demo, here.**](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_646747b36e9ee487/accept)
+:::
+
 We will provide a full recipe below for running the full demo as well as running the associated Tracetests via Docker. Here are other references you may find useful:
 
 - **Source Code**: https://github.com/open-telemetry/opentelemetry-demo
