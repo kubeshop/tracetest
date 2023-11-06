@@ -460,13 +460,22 @@ func (m Model) Trigger(in openapi.Trigger) trigger.Trigger {
 
 func (m Model) TriggerResult(in openapi.TriggerResult) trigger.TriggerResult {
 
-	return trigger.TriggerResult{
-		Type:    trigger.TriggerType(in.Type),
-		HTTP:    m.HTTPResponse(in.TriggerResult.Http),
-		GRPC:    m.GRPCResponse(in.TriggerResult.Grpc),
-		TraceID: m.TraceIDResponse(in.TriggerResult.Traceid),
-		Error:   m.TriggerError(in.TriggerResult.Error),
+	tr := trigger.TriggerResult{
+		Type:  trigger.TriggerType(in.Type),
+		Error: m.TriggerError(in.TriggerResult.Error),
 	}
+	switch in.Type {
+	case "http":
+		tr.HTTP = m.HTTPResponse(in.TriggerResult.Http)
+	case "grpc":
+		tr.GRPC = m.GRPCResponse(in.TriggerResult.Grpc)
+	case "traceid":
+		tr.TraceID = m.TraceIDResponse(in.TriggerResult.Traceid)
+	case "kafka":
+		tr.Kafka = m.KafkaResponse(in.TriggerResult.Kafka)
+	}
+
+	return tr
 }
 
 func (m Model) TriggerError(in openapi.TriggerError) *trigger.TriggerError {
