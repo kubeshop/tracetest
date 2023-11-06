@@ -112,6 +112,15 @@ type encodedSpan struct {
 	Children   []encodedSpan
 }
 
+const nilSpanID = "0000000000000000"
+
+func (es encodedSpan) isValidID() bool {
+	if es.ID == nilSpanID || es.ID == "" {
+		return false
+	}
+	return true
+}
+
 func (s Span) IsZero() bool {
 	return !s.ID.IsValid()
 }
@@ -150,9 +159,13 @@ func (s *Span) UnmarshalJSON(data []byte) error {
 }
 
 func (s *Span) decodeSpan(aux encodedSpan) error {
-	sid, err := trace.SpanIDFromHex(aux.ID)
-	if err != nil {
-		return fmt.Errorf("unmarshal span: %w", err)
+	sid := trace.SpanID{}
+	if aux.isValidID() {
+		var err error
+		sid, err = trace.SpanIDFromHex(aux.ID)
+		if err != nil {
+			return fmt.Errorf("unmarshal span: %w", err)
+		}
 	}
 
 	children, err := decodeChildren(s, aux.Children, getCache())

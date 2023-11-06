@@ -571,7 +571,7 @@ func readRunRow(row scanner) (Run, error) {
 		return Run{}, fmt.Errorf("cannot parse Results: %w", err)
 	}
 
-	if jsonTrace != nil {
+	if jsonTrace != nil && string(jsonTrace) != "null" {
 		err = json.Unmarshal(jsonTrace, &r.Trace)
 		if err != nil {
 			return Run{}, fmt.Errorf("cannot parse Trace: %w", err)
