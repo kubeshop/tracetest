@@ -26,12 +26,11 @@ const sidebars = {
     {
       type: "category",
       label: "OpenTelemetry Store Demo",
+      link: {
+        type: "doc",
+        id: "live-examples/opentelemetry-store/overview"
+      },
       items: [
-        {
-          type: "doc",
-          id: "live-examples/opentelemetry-store/overview",
-          label: "Overview",
-        },
         {
           type: "category",
           label: "Use Cases",
@@ -68,12 +67,11 @@ const sidebars = {
     {
       type: "category",
       label: "Pokeshop API Demo",
+      link: {
+        type: "doc",
+        id: "live-examples/pokeshop/overview"
+      },
       items: [
-        {
-          type: "doc",
-          id: "live-examples/pokeshop/overview",
-          label: "Overview",
-        },
         {
           type: "category",
           label: "Use Cases",

@@ -1,8 +1,21 @@
-# Pokeshop API - Import Pokemon from Stream
+---
+id: import-pokemon-from-stream
+title: Pokeshop API - Import Pokemon from Stream
+description: As a testing ground, the Tracetest team has implemented a sample API instrumented with OpenTelemetry around the PokeAPI. This use case showcases a more complex scenario involving an async process.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 This use case showcases a more complex scenario involving an async process. Usually, when working with microservices, there are use cases where some of the processing needs to happen asynchronously. For example, when triggering a user notification, generating reports or processing a payment order. With this endpoint, we provide an example of how users can implement trace-based testing for such scenarios.
 
 Here the process listens to a stream, and whenever an event is read from it, the following process is triggered:
+
 ```mermaid
 sequenceDiagram
     participant Stream as Kafka
@@ -20,6 +33,7 @@ sequenceDiagram
 ```
 
 You can trigger this use case by sending a message to Kafka on the `pokemon` topic with the following message value:
+
 ```json
 {
   "id":  143
@@ -29,6 +43,7 @@ You can trigger this use case by sending a message to Kafka on the `pokemon` top
 ## Building a Test for This Scenario
 
 Using Tracetest, we can [create a test](/web-ui/creating-tests) that will produce a message to Kafka on `pokemon` topic and validate the following properties:
+
 - The worker should read the import task.
 - PokeAPI should return a valid response.
 - The database should respond with low latency (< 200ms).
