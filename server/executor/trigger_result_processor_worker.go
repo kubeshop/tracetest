@@ -85,15 +85,17 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 			Type:       "run_update",
 			Content:    RunResult{Run: job.Run, Err: err},
 		})
-	} else {
-		err := r.eventEmitter.Emit(ctx, events.TriggerExecutionSuccess(job.Run.TestID, job.Run.ID))
-		if err != nil {
-			r.handleDBError(job.Run, err)
-		}
+
+		r.handleDBError(job.Run, r.updater.Update(ctx, job.Run))
+		return
+	}
+
+	err := r.eventEmitter.Emit(ctx, events.TriggerExecutionSuccess(job.Run.TestID, job.Run.ID))
+	if err != nil {
+		r.handleDBError(job.Run, err)
 	}
 
 	job.Run.State = test.RunStateAwaitingTrace
-
 	r.handleDBError(job.Run, r.updater.Update(ctx, job.Run))
 
 	r.outputQueue.Enqueue(ctx, job)
