@@ -17,7 +17,15 @@ func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, err
 		PingPeriod: 30 * time.Second,
 	}
 
-	client := &Client{endpoint: endpoint, config: config}
+	client := &Client{
+		endpoint:                    endpoint,
+		config:                      config,
+		triggerListener:             triggerListener,
+		pollListener:                pollListener,
+		shutdownListener:            shutdownListener,
+		dataStoreConnectionListener: dataStoreConnectionListener,
+	}
+
 	for _, opt := range opts {
 		opt(client)
 	}

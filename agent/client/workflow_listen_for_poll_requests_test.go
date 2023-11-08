@@ -14,6 +14,7 @@ import (
 
 func TestPollWorkflow(t *testing.T) {
 	server := mocks.NewGrpcServer()
+	defer server.Stop()
 
 	client, err := client.Connect(context.Background(), server.Addr())
 	require.NoError(t, err)

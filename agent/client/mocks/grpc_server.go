@@ -175,6 +175,7 @@ func (s *GrpcServerMock) TerminateConnection(reason string) {
 func (s *GrpcServerMock) Restart() {
 	var wg sync.WaitGroup
 	wg.Add(1)
+	fmt.Println("restarting in port ", s.port)
 	go s.start(&wg, s.port)
 
 	wg.Wait()
