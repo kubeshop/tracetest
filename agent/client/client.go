@@ -57,25 +57,25 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
-	// err = c.startPollerListener(ctx)
-	// if err != nil {
-	// 	return err
-	// }
+	err = c.startPollerListener(ctx)
+	if err != nil {
+		return err
+	}
 
-	// err = c.startShutdownListener(ctx)
-	// if err != nil {
-	// 	return err
-	// }
+	err = c.startShutdownListener(ctx)
+	if err != nil {
+		return err
+	}
 
-	// err = c.startDataStoreConnectionTestListener(ctx)
-	// if err != nil {
-	// 	return err
-	// }
+	err = c.startDataStoreConnectionTestListener(ctx)
+	if err != nil {
+		return err
+	}
 
-	// err = c.startHearthBeat(ctx)
-	// if err != nil {
-	// 	return err
-	// }
+	err = c.startHearthBeat(ctx)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
