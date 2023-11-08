@@ -27,7 +27,12 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 			}
 
 			if err != nil {
-				log.Fatal("could not get message from polling stream: %w", err)
+				c.reconnect()
+			}
+
+			if c.pollListener == nil {
+				log.Println("warning: polling listener is nil")
+				continue
 			}
 
 			// TODO: Get ctx from request

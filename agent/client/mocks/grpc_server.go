@@ -21,6 +21,8 @@ type GrpcServerMock struct {
 
 	lastTriggerResponse *proto.TriggerResponse
 	lastPollingResponse *proto.PollingResponse
+
+	server *grpc.Server
 }
 
 func NewGrpcServer() *GrpcServerMock {
@@ -33,7 +35,8 @@ func NewGrpcServer() *GrpcServerMock {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	go server.start(&wg)
+	anyPort := 0
+	go server.start(&wg, anyPort)
 
 	wg.Wait()
 
@@ -44,8 +47,8 @@ func (s *GrpcServerMock) Addr() string {
 	return fmt.Sprintf("localhost:%d", s.port)
 }
 
-func (s *GrpcServerMock) start(wg *sync.WaitGroup) {
-	lis, err := net.Listen("tcp", ":0")
+func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -54,6 +57,8 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup) {
 
 	server := grpc.NewServer()
 	proto.RegisterOrchestratorServer(server, s)
+
+	s.server = server
 
 	wg.Done()
 	if err := server.Serve(lis); err != nil {
@@ -165,4 +170,16 @@ func (s *GrpcServerMock) TerminateConnection(reason string) {
 	s.terminationChannel <- &proto.ShutdownRequest{
 		Reason: reason,
 	}
+}
+
+func (s *GrpcServerMock) Restart() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go s.start(&wg, s.port)
+
+	wg.Wait()
+}
+
+func (s *GrpcServerMock) Stop() {
+	s.server.Stop()
 }

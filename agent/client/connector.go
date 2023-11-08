@@ -18,7 +18,11 @@ func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, err
 		return nil, err
 	}
 
-	client := &Client{conn: conn}
+	config := Config{
+		PingPeriod: 30 * time.Second,
+	}
+
+	client := &Client{endpoint: endpoint, conn: conn, config: config}
 	for _, opt := range opts {
 		opt(client)
 	}
@@ -55,6 +59,7 @@ func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
 		ctx, endpoint,
 		grpc.WithTransportCredentials(transportCredentials),
 		grpc.WithDefaultServiceConfig(retryPolicy),
+		grpc.WithIdleTimeout(0), // disable grpc idle timeout
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to server: %w", err)

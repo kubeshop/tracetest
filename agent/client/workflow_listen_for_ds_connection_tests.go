@@ -27,7 +27,12 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 			}
 
 			if err != nil {
-				log.Fatal("could not get message from ds connection stream: %w", err)
+				c.reconnect()
+			}
+
+			if c.dataStoreConnectionListener == nil {
+				log.Println("warning: datastore connection listener is nil")
+				continue
 			}
 
 			// TODO: Get ctx from request

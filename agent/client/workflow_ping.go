@@ -9,11 +9,15 @@ import (
 
 func (c *Client) startHearthBeat(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
-	ticker := time.NewTicker(2 * time.Minute)
+	ticker := time.NewTicker(c.config.PingPeriod)
 
 	go func() {
 		for range ticker.C {
-			client.Ping(ctx, c.sessionConfig.AgentIdentification)
+			_, err := client.Ping(ctx, c.sessionConfig.AgentIdentification)
+			if err != nil {
+				// Something is wrong with the connection
+				c.reconnect()
+			}
 		}
 	}()
 

@@ -27,7 +27,12 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 			}
 
 			if err != nil {
-				log.Fatal("could not get message from trigger stream: %w", err)
+				c.reconnect()
+			}
+
+			if c.triggerListener == nil {
+				log.Println("warning: trigger listener is nil")
+				continue
 			}
 
 			// TODO: get context from request

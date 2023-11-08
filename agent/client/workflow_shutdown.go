@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/kubeshop/tracetest/agent/proto"
 )
@@ -28,7 +27,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 			}
 
 			if err != nil {
-				log.Fatal("could not get shutdown listener: %w", err)
+				c.reconnect()
 			}
 
 			// TODO: get context from request

@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -12,8 +13,9 @@ import (
 )
 
 type Config struct {
-	APIKey    string
-	AgentName string
+	APIKey     string
+	AgentName  string
+	PingPeriod time.Duration
 }
 
 type SessionConfig struct {
@@ -22,6 +24,7 @@ type SessionConfig struct {
 }
 
 type Client struct {
+	endpoint      string
 	conn          *grpc.ClientConn
 	config        Config
 	sessionConfig *SessionConfig
@@ -54,22 +57,25 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
-	err = c.startPollerListener(ctx)
-	if err != nil {
-		return err
-	}
+	// err = c.startPollerListener(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = c.startShutdownListener(ctx)
-	if err != nil {
-		return err
-	}
+	// err = c.startShutdownListener(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = c.startDataStoreConnectionTestListener(ctx)
-	if err != nil {
-		return err
-	}
+	// err = c.startDataStoreConnectionTestListener(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
-	c.startHearthBeat(ctx)
+	// err = c.startHearthBeat(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -143,4 +149,15 @@ func (c *Client) getName() (string, error) {
 
 func isCancelledError(err error) bool {
 	return err != nil && strings.Contains(err.Error(), "context canceled")
+}
+
+func (c *Client) reconnect() error {
+	// connection is not working. We need to reconnect
+	newConn, err := connect(context.Background(), c.endpoint)
+	if err != nil {
+		log.Fatal(fmt.Errorf("could not reconnect to server: %w", err))
+	}
+
+	c.conn = newConn
+	return nil
 }
