@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -24,6 +25,7 @@ type SessionConfig struct {
 }
 
 type Client struct {
+	mutex         sync.Mutex
 	endpoint      string
 	conn          *grpc.ClientConn
 	config        Config
@@ -153,11 +155,10 @@ func isCancelledError(err error) bool {
 
 func (c *Client) reconnect() error {
 	// connection is not working. We need to reconnect
-	newConn, err := connect(context.Background(), c.endpoint)
+	err := c.connect(context.Background())
 	if err != nil {
 		log.Fatal(fmt.Errorf("could not reconnect to server: %w", err))
 	}
 
-	c.conn = newConn
 	return nil
 }

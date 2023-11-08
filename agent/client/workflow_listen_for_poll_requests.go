@@ -31,8 +31,7 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 			}
 
 			if c.pollListener == nil {
-				log.Println("warning: polling listener is nil")
-				continue
+				log.Fatal("warning: polling listener is nil")
 			}
 
 			// TODO: Get ctx from request

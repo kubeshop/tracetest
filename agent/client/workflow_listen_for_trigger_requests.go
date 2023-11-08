@@ -31,8 +31,7 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 			}
 
 			if c.triggerListener == nil {
-				log.Println("warning: trigger listener is nil")
-				continue
+				log.Fatal("warning: trigger listener is nil")
 			}
 
 			// TODO: get context from request

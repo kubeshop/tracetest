@@ -18,7 +18,13 @@ func TestClientReconnection(t *testing.T) {
 	client, err := client.Connect(context.Background(), server.Addr(), client.WithPingPeriod(time.Second))
 	require.NoError(t, err)
 
-	client.Start(context.Background())
+	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error { return nil })
+	client.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error { return nil })
+	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error { return nil })
+	client.OnDataStoreTestConnectionRequest(func(ctx context.Context, dsctr *proto.DataStoreConnectionTestRequest) error { return nil })
+
+	err = client.Start(context.Background())
+	require.NoError(t, err)
 
 	err = client.Start(context.Background())
 	require.NoError(t, err)

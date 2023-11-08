@@ -32,8 +32,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 			}
 
 			if c.shutdownListener == nil {
-				log.Println("warning: shutdown listener is nil")
-				continue
+				log.Fatal("warning: shutdown listener is nil")
 			}
 
 			// TODO: get context from request

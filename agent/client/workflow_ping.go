@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -15,7 +16,7 @@ func (c *Client) startHearthBeat(ctx context.Context) error {
 		for range ticker.C {
 			_, err := client.Ping(ctx, c.sessionConfig.AgentIdentification)
 			if err != nil {
-				// Something is wrong with the connection
+				log.Println(err)
 				c.reconnect()
 			}
 		}

@@ -31,8 +31,7 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 			}
 
 			if c.dataStoreConnectionListener == nil {
-				log.Println("warning: datastore connection listener is nil")
-				continue
+				log.Fatal("warning: datastore connection listener is nil")
 			}
 
 			// TODO: Get ctx from request
