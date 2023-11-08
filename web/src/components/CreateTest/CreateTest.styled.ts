@@ -11,8 +11,7 @@ export const Header = styled.div`
   align-items: flex-start;
   display: flex;
   gap: 20px;
-  height: 112px;
-  padding: 24px;
+  padding: 18px 24px 14px;
 `;
 
 export const HeaderLeft = styled.div`
@@ -32,7 +31,7 @@ export const Body = styled.div`
 
 export const Section = styled.div`
   flex: 1;
-  padding: 24px;
+  padding: 14px 24px;
 `;
 
 export const SectionLeft = styled(Section)`

@@ -1,7 +1,4 @@
 import {Tabs, TabsProps} from 'antd';
-// import {useMemo} from 'react';
-// import HeaderLeft from 'components/RunDetailLayout/HeaderLeft';
-// import HeaderRight from 'components/RunDetailLayout/HeaderRight';
 import CreateTest from 'components/CreateTest';
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import {TriggerTypes} from 'constants/Test.constants';
@@ -28,14 +25,6 @@ const renderTab = (title: string, triggerType: TriggerTypes, isDisabled: boolean
 const Content = ({triggerType}: IProps) => {
   useDocumentTitle(`Create - ${triggerType} test`);
 
-  /* const tabBarExtraContent = useMemo(
-    () => ({
-      left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} origin={runOriginPath} />,
-      right: <HeaderRight testId={id} />,
-    }),
-    [id, name, trigger.type, runOriginPath]
-  ); */
-
   return (
     <S.Container>
       <Tabs
@@ -46,7 +35,6 @@ const Content = ({triggerType}: IProps) => {
           TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
         }}
         renderTabBar={renderTabBar}
-        // tabBarExtraContent={tabBarExtraContent}
       >
         <Tabs.TabPane tab={renderTab('Trigger', triggerType, false, true)} key={RunDetailModes.TRIGGER}>
           <CreateTest triggerType={triggerType!} />

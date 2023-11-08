@@ -5,11 +5,9 @@ import {TriggerTypes} from 'constants/Test.constants';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {useState} from 'react';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
-import AllowButton, {Operation} from 'components/AllowButton';
-import CreateButton from 'components/CreateButton';
 import EditRequestDetails from 'components/EditTestForm/EditRequestDetails/EditRequestDetails';
 import * as S from './CreateTest.styled';
-import TriggerHeaderBar from './TriggerHeaderBar';
+import Header from './Header';
 
 export const FORM_ID = 'create-test';
 
@@ -18,7 +16,7 @@ interface IProps {
 }
 
 const CreateTest = ({triggerType}: IProps) => {
-  const {onCreateTest, isLoading} = useCreateTest();
+  const {onCreateTest} = useCreateTest();
   const plugin = TriggerTypeToPlugin[triggerType];
   const [isValid, setIsValid] = useState(false);
 
@@ -41,36 +39,15 @@ const CreateTest = ({triggerType}: IProps) => {
         onFinish={handleOnSubmit}
         onValuesChange={onValidate}
       >
-        <S.Header>
-          <S.HeaderLeft>
-            <TriggerHeaderBar form={form} type={triggerType} />
-          </S.HeaderLeft>
-
-          <S.HeaderRight>
-            <AllowButton
-              operation={Operation.Edit}
-              block
-              ButtonComponent={CreateButton}
-              data-cy="edit-test-submit"
-              disabled={!isValid}
-              loading={isLoading}
-              onClick={() => form.submit()}
-              type="primary"
-            >
-              Run
-            </AllowButton>
-          </S.HeaderRight>
-        </S.Header>
+        <Header triggerType={triggerType} isValid={isValid} />
 
         <S.Body>
           <S.SectionLeft>
-            <Typography.Title level={2}>Request Data</Typography.Title>
-
             <EditRequestDetails form={form} type={triggerType} />
           </S.SectionLeft>
 
           <S.SectionRight>
-            <Typography.Title level={2}>Response Data</Typography.Title>
+            <Typography.Title level={2}>Response</Typography.Title>
             <S.EmptyContainer>
               <Empty
                 description="Enter the trigger details and click run to get a response"

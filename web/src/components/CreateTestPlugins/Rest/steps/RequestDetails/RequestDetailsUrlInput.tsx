@@ -12,7 +12,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => (
   <div>
     <Row>
       {showMethodSelector && (
-        <Col span={4}>
+        <Col span={2}>
           <Form.Item name="method" initialValue={HTTP_METHOD.GET} valuePropName="value" style={{marginBottom: 0}}>
             <Select
               showSearch
@@ -33,7 +33,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => (
         </Col>
       )}
 
-      <Col span={showMethodSelector ? 20 : 24}>
+      <Col span={showMethodSelector ? 22 : 24}>
         <Form.Item
           data-cy="url"
           name="url"
@@ -45,7 +45,7 @@ const RequestDetailsUrlInput = ({showMethodSelector = true}: IProps) => (
       </Col>
     </Row>
 
-    <Form.Item name="url" style={{marginBottom: 0}}>
+    <Form.Item name="url" style={{marginBottom: 0}} noStyle>
       <UrlDockerTipInput />
     </Form.Item>
   </div>

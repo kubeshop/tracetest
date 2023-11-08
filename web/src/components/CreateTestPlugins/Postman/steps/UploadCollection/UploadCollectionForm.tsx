@@ -53,7 +53,7 @@ const UploadCollectionForm = ({form}: IProps) => (
     </Row>
     <Row gutter={12}>
       <Col span={18}>
-        <BodyField body={Form.useWatch('body', form)} setBody={body => form.setFieldsValue({body})} />
+        <BodyField />
       </Col>
     </Row>
   </S.FieldsContainer>

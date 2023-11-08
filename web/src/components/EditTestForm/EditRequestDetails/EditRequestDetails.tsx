@@ -14,13 +14,11 @@ const EditRequestDetailsMap = {
 
 export interface IFormProps {
   form: TDraftTestForm;
-  // request: TTriggerRequest;
 }
 
 interface IProps {
   type: TriggerTypes;
   form: TDraftTestForm;
-  // request: TTriggerRequest;
 }
 
 const EditRequestDetails = ({type, form}: IProps) => {
