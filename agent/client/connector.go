@@ -14,7 +14,7 @@ import (
 
 func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, error) {
 	config := Config{
-		PingPeriod: 30 * time.Second,
+		PingPeriod: defaultPingPeriod,
 	}
 
 	client := &Client{

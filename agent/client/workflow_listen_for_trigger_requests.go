@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
-	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
@@ -25,21 +25,14 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 				return
 			}
 
-			if err != nil && isConnectionError(err) {
-				err = retry.Do(func() error {
-					return c.reconnect()
-				})
-				if err == nil {
-					// everything was reconnect, so we can exist this goroutine
-					// as there's another one running in parallel
-					return
-				}
-
-				log.Fatal(err)
+			reconnected, err := c.handleDisconnectionError(err)
+			if reconnected {
+				return
 			}
 
 			if err != nil {
 				log.Println("could not get message from trigger stream: %w", err)
+				time.Sleep(1 * time.Second)
 				continue
 			}
 

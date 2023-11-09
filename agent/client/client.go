@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -13,6 +14,12 @@ import (
 	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"google.golang.org/grpc"
+)
+
+const (
+	reconnectRetryAttempts     = 6
+	reconnectRetryAttemptDelay = 1 * time.Second
+	defaultPingPeriod          = 30 * time.Second
 )
 
 type Config struct {
@@ -159,13 +166,30 @@ func (c *Client) reconnect() error {
 	// connection is not working. We need to reconnect
 	err := retry.Do(func() error {
 		return c.connect(context.Background())
-	}, retry.Attempts(3), retry.Delay(1*time.Second))
+	}, retry.Attempts(reconnectRetryAttempts), retry.Delay(reconnectRetryAttemptDelay))
 
 	if err != nil {
 		return fmt.Errorf("could not reconnect to server: %w", err)
 	}
 
 	return c.Start(context.Background())
+}
+
+func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
+	if !isConnectionError(inputErr) {
+		// if it's nil or any error other than the one we care about, return it and let the caller handle it
+		return false, inputErr
+	}
+
+	err := retry.Do(func() error {
+		return c.reconnect()
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return true, nil
 }
 
 func isConnectionError(err error) bool {

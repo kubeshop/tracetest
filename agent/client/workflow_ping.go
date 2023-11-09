@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
@@ -16,21 +15,18 @@ func (c *Client) startHearthBeat(ctx context.Context) error {
 	go func() {
 		for range ticker.C {
 			_, err := client.Ping(ctx, c.sessionConfig.AgentIdentification)
-			if err != nil && isConnectionError(err) {
-				err = retry.Do(func() error {
-					return c.reconnect()
-				})
-				if err == nil {
-					// everything was reconnect, so we can exist this goroutine
-					// as there's another one running in parallel
-					return
-				}
+			if isEndOfFileError(err) || isCancelledError(err) {
+				return
+			}
 
-				log.Fatal(err)
+			reconnected, err := c.handleDisconnectionError(err)
+			if reconnected {
+				return
 			}
 
 			if err != nil {
 				log.Println("could not get message from ping stream: %w", err)
+				time.Sleep(1 * time.Second)
 				continue
 			}
 		}

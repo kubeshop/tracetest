@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"sync"
-	"time"
 
 	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -39,7 +38,7 @@ func NewGrpcServer() *GrpcServerMock {
 
 	err := retry.Do(func() error {
 		return server.start(&wg, 0)
-	}, retry.Attempts(3), retry.Delay(time.Second))
+	}, retry.Attempts(reconnectRetryAttempts), retry.Delay(reconnectRetryAttemptDelay))
 	if err != nil {
 		log.Fatal(err)
 	}
