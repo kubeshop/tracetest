@@ -2,8 +2,9 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"strings"
 	"sync"
@@ -37,6 +38,7 @@ type Client struct {
 	pollListener                func(context.Context, *proto.PollingRequest) error
 	shutdownListener            func(context.Context, *proto.ShutdownRequest) error
 	dataStoreConnectionListener func(context.Context, *proto.DataStoreConnectionTestRequest) error
+	reconnectionListener        func()
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -117,6 +119,10 @@ func (c *Client) OnConnectionClosed(listener func(context.Context, *proto.Shutdo
 	c.shutdownListener = listener
 }
 
+func (c *Client) OnClientReconnection(listener func()) {
+	c.reconnectionListener = listener
+}
+
 func (c *Client) getConnectionRequest() (*proto.ConnectRequest, error) {
 	name, err := c.getName()
 	if err != nil {
@@ -161,8 +167,24 @@ func (c *Client) reconnect() error {
 	}, retry.Attempts(3), retry.Delay(1*time.Second))
 
 	if err != nil {
-		log.Fatal(fmt.Errorf("could not reconnect to server: %w", err))
+		return fmt.Errorf("could not reconnect to server: %w", err)
 	}
 
-	return nil
+	return c.Start(context.Background())
+}
+
+func isConnectionError(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "connection refused")
+}
+
+func isEndOfFileError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	if isEof := errors.Is(err, io.EOF); isEof {
+		return true
+	}
+
+	return strings.Contains(err.Error(), "EOF")
 }

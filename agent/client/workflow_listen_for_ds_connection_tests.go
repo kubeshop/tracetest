@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 
+	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
@@ -26,13 +27,22 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 				return
 			}
 
-			if err != nil && err != io.EOF {
-				c.reconnect()
-				continue
+			if err != nil && isConnectionError(err) {
+				err = retry.Do(func() error {
+					return c.reconnect()
+				})
+				if err == nil {
+					// everything was reconnect, so we can exist this goroutine
+					// as there's another one running in parallel
+					return
+				}
+
+				log.Fatal(err)
 			}
 
-			if c.dataStoreConnectionListener == nil {
-				log.Fatal("warning: datastore connection listener is nil")
+			if err != nil {
+				log.Println("could not get message from data store connection stream: %w", err)
+				continue
 			}
 
 			// TODO: Get ctx from request
