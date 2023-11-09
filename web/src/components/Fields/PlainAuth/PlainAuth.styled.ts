@@ -13,5 +13,8 @@ export const PlainFieldUsername = styled.div`
   margin-right: 2px;
 `;
 
-export const PlainFieldPassword = styled.div`
+export const PlainFieldPassword = styled.div``;
+
+export const Row = styled.div`
+  display: flex;
 `;

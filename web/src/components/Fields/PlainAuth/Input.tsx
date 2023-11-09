@@ -1,5 +1,5 @@
 import {Form, Select} from 'antd';
-import * as S from '../RequestDetails.styled';
+import * as S from '../../CreateTestPlugins/Kafka/steps/RequestDetails/RequestDetails.styled';
 
 const authMethodList = [
   {

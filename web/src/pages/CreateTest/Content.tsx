@@ -6,19 +6,18 @@ import {TriggerTypes} from 'constants/Test.constants';
 import {RunDetailModes} from 'constants/TestRun.constants';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {TDraftTest} from '../../types/Test.types';
-import useValidateTestDraft from '../../hooks/useValidateTestDraft';
-
-import {TriggerTypeToPlugin} from '../../constants/Plugins.constants';
-import {useCreateTest} from '../../providers/CreateTest/CreateTest.provider';
-import HeaderLeft from '../../components/RunDetailLayout/HeaderLeft';
+import {TDraftTest} from 'types/Test.types';
+import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
+import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import HeaderLeft from './HeaderLeft';
 
 interface IProps {
   triggerType: TriggerTypes;
 }
 
 const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
-  <S.ContainerHeader data-cy="run-detail-header">
+  <S.ContainerHeader data-cy="create-test-header">
     <DefaultTabBar {...props} className="site-custom-tab-bar" />
   </S.ContainerHeader>
 );
@@ -42,13 +41,13 @@ const Content = ({triggerType}: IProps) => {
   const [form] = Form.useForm<TDraftTest>();
 
   const handleOnSubmit = async (values: TDraftTest) => {
-    console.log(values);
     onCreateTest(values, plugin);
   };
 
   const tabBarExtraContent = useMemo(
     () => ({
-      left: <HeaderLeft name="Untitled Test" triggerType={triggerType} origin="/" />,
+      left: <HeaderLeft triggerType={triggerType} origin="/" />,
+      right: <S.Section $justifyContent="center" />,
     }),
     [triggerType]
   );
@@ -61,16 +60,15 @@ const Content = ({triggerType}: IProps) => {
         form={form}
         layout="vertical"
         name={FORM_ID}
+        initialValues={{name: 'Untitled Test'}}
         onFinish={handleOnSubmit}
         onValuesChange={onValidate}
       >
         <Tabs
           activeKey={RunDetailModes.TRIGGER}
           centered
-          className="run-tabs"
-          onChange={activeKey => {
-            TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
-          }}
+          className="create-test-tabs"
+          onChange={activeKey => TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes)}
           renderTabBar={renderTabBar}
           tabBarExtraContent={tabBarExtraContent}
         >

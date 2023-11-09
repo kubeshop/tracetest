@@ -3,7 +3,7 @@ import {Button, Form} from 'antd';
 import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {IKeyValue} from 'constants/Test.constants';
-import * as S from './KeyValueListInput.styled';
+import * as S from './KeyValueList.styled';
 
 interface IProps {
   name?: string;
@@ -14,7 +14,7 @@ interface IProps {
   valuePlaceholder?: string;
   initialValue?: IKeyValue[];
 }
-const KeyValueInputList = ({
+const KeyValueList = ({
   name = 'headers',
   className = '',
   label = '',
@@ -63,4 +63,4 @@ const KeyValueInputList = ({
   </Form.Item>
 );
 
-export default KeyValueInputList;
+export default KeyValueList;

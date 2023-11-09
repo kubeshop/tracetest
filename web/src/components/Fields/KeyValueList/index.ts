@@ -1,2 +1,2 @@
 // eslint-disable-next-line no-restricted-exports
-export {default} from './KeyValueListInput';
+export {default} from './KeyValueList';

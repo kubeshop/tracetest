@@ -4,7 +4,9 @@ import {Plugins} from 'constants/Plugins.constants';
 import {SupportedPlugins} from 'constants/Common.constants';
 
 export const initialState: ICreateTestState = {
-  draftTest: {},
+  draftTest: {
+    name: 'Untitled Test',
+  },
   stepList: Plugins.REST.stepList,
   stepNumber: 0,
   pluginName: SupportedPlugins.REST,

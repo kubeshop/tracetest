@@ -1,6 +1,6 @@
 import {Tabs} from 'antd';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
-import KeyValueListInput from 'components/KeyValueListInput';
+import KeyValueListInput from 'components/Fields/KeyValueList';
 import {Body} from 'components/Inputs';
 import {Auth, SSL} from 'components/Fields';
 

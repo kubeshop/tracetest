@@ -30,8 +30,12 @@ const RequestDetailsForm = ({form}: IProps) => {
   }, [protoFile]);
 
   return (
-    <Tabs defaultActiveKey="general">
-      <Tabs.TabPane forceRender tab="General" key="general">
+    <Tabs defaultActiveKey="auth">
+      <Tabs.TabPane forceRender tab="Auth" key="auth">
+        <Auth />
+      </Tabs.TabPane>
+
+      <Tabs.TabPane forceRender tab="Setup" key="setup">
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <FileUpload />
         </Form.Item>
@@ -45,8 +49,6 @@ const RequestDetailsForm = ({form}: IProps) => {
             ))}
           </Select>
         </Form.Item>
-
-        <Auth />
       </Tabs.TabPane>
 
       <Tabs.TabPane forceRender tab="Message" key="message">

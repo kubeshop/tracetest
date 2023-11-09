@@ -2,7 +2,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {Editor} from 'components/Inputs';
-import * as S from './RequestDetails.styled';
+import * as S from './MultiURL.styled';
 
 interface IProps {
   name?: string[];
@@ -12,27 +12,31 @@ function isFirstItem(index: number) {
   return index === 0;
 }
 
-const RequestDetailsUrlInput = ({
-  name = ['brokerUrls'],
-}: IProps) => (
-  <Form.Item className="input-url" label="Broker URLs" rules={[{required: true, min: 1, message: 'Please enter a Broker URL'}]} shouldUpdate>
-    <Form.List name={name.length === 1 ? name[0] : name}>
+const MultiURL = ({name = ['brokerUrls']}: IProps) => (
+  <Form.Item
+    className="input-url"
+    rules={[{required: true, min: 1, message: 'Please enter a Broker URL'}]}
+    shouldUpdate
+  >
+    <Form.List name={name.length === 1 ? name[0] : name} initialValue={['']}>
       {(fields, {add, remove}) => (
         <>
           {fields.map((field, index) => (
-            <S.BrokerURLInputContainer $firstItem={isFirstItem(index)} key={field.name}>
+            <S.BrokerURLInputContainer key={field.name}>
               <Form.Item name={[field.name]} noStyle>
                 <Editor type={SupportedEditors.Interpolation} placeholder={`Enter a broker URL (${index + 1})`} />
               </Form.Item>
 
-              {!isFirstItem(index) && <Form.Item noStyle>
-                <Button
-                  icon={<S.DeleteIcon />}
-                  onClick={() => remove(field.name)}
-                  style={{marginLeft: 12}}
-                  type="link"
-                />
-              </Form.Item>}
+              {(!isFirstItem(index) && (
+                <Form.Item noStyle>
+                  <Button
+                    icon={<S.DeleteIcon />}
+                    onClick={() => remove(field.name)}
+                    style={{marginLeft: 12}}
+                    type="link"
+                  />
+                </Form.Item>
+              )) || <div />}
             </S.BrokerURLInputContainer>
           ))}
 
@@ -51,4 +55,4 @@ const RequestDetailsUrlInput = ({
   </Form.Item>
 );
 
-export default RequestDetailsUrlInput;
+export default MultiURL;

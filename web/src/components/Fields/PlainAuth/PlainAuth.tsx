@@ -1,12 +1,12 @@
 import {Form} from 'antd';
-import {PlainUserPasswordFields} from './PlainUserPasswordFields';
-import TypeInput from './TypeInput';
+import Fields from './Fields';
+import TypeInput from './Input';
 
 interface IProps {
   name?: string[];
 }
 
-const RequestDetailsAuthInput = ({name = ['authentication']}: IProps) => (
+const PlainAuth = ({name = ['authentication']}: IProps) => (
   <div>
     <TypeInput baseName={name} />
     <Form.Item noStyle shouldUpdate style={{marginBottom: 0, width: '100%'}}>
@@ -14,7 +14,7 @@ const RequestDetailsAuthInput = ({name = ['authentication']}: IProps) => (
         const method = getFieldValue(name)?.type;
         switch (method) {
           case 'plain':
-            return <PlainUserPasswordFields baseName={name} />;
+            return <Fields baseName={name} />;
           default:
             return null;
         }
@@ -23,4 +23,4 @@ const RequestDetailsAuthInput = ({name = ['authentication']}: IProps) => (
   </div>
 );
 
-export default RequestDetailsAuthInput;
+export default PlainAuth;

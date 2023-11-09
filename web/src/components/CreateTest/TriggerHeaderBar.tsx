@@ -2,12 +2,13 @@ import {TriggerTypes} from 'constants/Test.constants';
 import TriggerHeaderBarGrpc from './Grpc';
 import TriggerHeaderBarHttp from './Http';
 import TriggerHeaderBarTraceID from './TraceID';
+import TriggerHeaderBarKafka from './Kafka';
 
 const TriggerHeaderMap = {
   [TriggerTypes.http]: TriggerHeaderBarHttp,
   [TriggerTypes.grpc]: TriggerHeaderBarGrpc,
   [TriggerTypes.traceid]: TriggerHeaderBarTraceID,
-  [TriggerTypes.kafka]: TriggerHeaderBarHttp,
+  [TriggerTypes.kafka]: TriggerHeaderBarKafka,
 };
 
 interface IProps {

@@ -11,11 +11,17 @@ export const Overlay = styled.div`
 
 export const SaveButton = styled(Button)``;
 
-export const InputContainer = styled.div`
-  display: grid;
-  grid-template-columns: 45% 64px;
-  align-items: center;
-  max-width: 80%;
+export const InputContainer = styled.label`
+  & > input {
+    min-width: max-content;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: 0px;
+
+    word-wrap: break-word;
+    word-break: break-all;
+  }
 `;
 
 export const EditIcon = styled(EditOutlined)`

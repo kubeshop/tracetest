@@ -52,7 +52,7 @@ const RouterMiddleware = () => ({
 
         const prevPathname = prevLocation?.pathname ?? '';
 
-        if (!prevPathname.match(runUrlRegex)) {
+        if (!prevPathname.match(runUrlRegex) && !prevPathname.includes('/create')) {
           const defaultPath = currLocation?.pathname?.includes('testsuite') ? '/testsuites' : '/';
           dispatch(runOriginPathAdded(prevLocation?.pathname ?? defaultPath));
         }

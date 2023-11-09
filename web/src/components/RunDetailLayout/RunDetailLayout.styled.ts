@@ -125,8 +125,10 @@ export const Text = styled(Typography.Text).attrs({
 
 export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
   && {
-    margin: 0;
-    max-width: calc((100vw / 2) - 200px - 54px);
+    && {
+      margin: 0;
+      max-width: calc((100vw / 2) - 200px - 54px);
+    }
   }
 `;
 
