@@ -13,14 +13,26 @@ import (
 )
 
 func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, error) {
-	conn, err := connect(ctx, endpoint)
-	if err != nil {
-		return nil, err
+	config := Config{
+		PingPeriod: defaultPingPeriod,
 	}
 
-	client := &Client{conn: conn}
+	client := &Client{
+		endpoint:                    endpoint,
+		config:                      config,
+		triggerListener:             triggerListener,
+		pollListener:                pollListener,
+		shutdownListener:            shutdownListener,
+		dataStoreConnectionListener: dataStoreConnectionListener,
+	}
+
 	for _, opt := range opts {
 		opt(client)
+	}
+
+	err := client.connect(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	return client, nil
@@ -42,25 +54,30 @@ var retryPolicy = `{
 	}]
 }`
 
-func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
+func (c *Client) connect(ctx context.Context) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	transportCredentials, err := getTransportCredentialsForEndpoint(endpoint)
+	transportCredentials, err := getTransportCredentialsForEndpoint(c.endpoint)
 	if err != nil {
-		return nil, fmt.Errorf("could not get transport credentials: %w", err)
+		return fmt.Errorf("could not get transport credentials: %w", err)
 	}
 
 	conn, err := grpc.DialContext(
-		ctx, endpoint,
+		ctx, c.endpoint,
 		grpc.WithTransportCredentials(transportCredentials),
 		grpc.WithDefaultServiceConfig(retryPolicy),
+		grpc.WithIdleTimeout(0), // disable grpc idle timeout
 	)
 	if err != nil {
-		return nil, fmt.Errorf("could not connect to server: %w", err)
+		return fmt.Errorf("could not connect to server: %w", err)
 	}
 
-	return conn, nil
+	c.conn = conn
+	return nil
 }
 
 func getTransportCredentialsForEndpoint(endpoint string) (credentials.TransportCredentials, error) {

@@ -2,10 +2,9 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io"
 	"log"
+	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
 )
@@ -22,12 +21,19 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 		for {
 			resp := proto.TriggerRequest{}
 			err := stream.RecvMsg(&resp)
-			if errors.Is(err, io.EOF) || isCancelledError(err) {
+			if isEndOfFileError(err) || isCancelledError(err) {
+				return
+			}
+
+			reconnected, err := c.handleDisconnectionError(err)
+			if reconnected {
 				return
 			}
 
 			if err != nil {
-				log.Fatal("could not get message from trigger stream: %w", err)
+				log.Println("could not get message from trigger stream: %w", err)
+				time.Sleep(1 * time.Second)
+				continue
 			}
 
 			// TODO: get context from request

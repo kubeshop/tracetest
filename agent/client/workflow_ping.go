@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -9,11 +10,25 @@ import (
 
 func (c *Client) startHearthBeat(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
-	ticker := time.NewTicker(2 * time.Minute)
+	ticker := time.NewTicker(c.config.PingPeriod)
 
 	go func() {
 		for range ticker.C {
-			client.Ping(ctx, c.sessionConfig.AgentIdentification)
+			_, err := client.Ping(ctx, c.sessionConfig.AgentIdentification)
+			if isEndOfFileError(err) || isCancelledError(err) {
+				return
+			}
+
+			reconnected, err := c.handleDisconnectionError(err)
+			if reconnected {
+				return
+			}
+
+			if err != nil {
+				log.Println("could not get message from ping stream: %w", err)
+				time.Sleep(1 * time.Second)
+				continue
+			}
 		}
 	}()
 
