@@ -3,10 +3,8 @@ import {useEffect, useState} from 'react';
 import GrpcService from 'services/Triggers/Grpc.service';
 import {IRpcValues, TDraftTestForm} from 'types/Test.types';
 import {SupportedEditors} from 'constants/Editor.constants';
-import Editor from 'components/Editor';
-import RequestDetailsFileInput from './RequestDetailsFileInput';
-import RequestDetailsMetadataInput from './RequestDetailsMetadataInput';
-import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
+import {Editor, FileUpload} from 'components/Inputs';
+import {Auth, Metadata} from 'components/Fields';
 
 interface IProps {
   form: TDraftTestForm<IRpcValues>;
@@ -35,7 +33,7 @@ const RequestDetailsForm = ({form}: IProps) => {
     <Tabs defaultActiveKey="general">
       <Tabs.TabPane forceRender tab="General" key="general">
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
-          <RequestDetailsFileInput />
+          <FileUpload />
         </Form.Item>
 
         <Form.Item data-cy="method" label="Select Method" name="method">
@@ -48,7 +46,7 @@ const RequestDetailsForm = ({form}: IProps) => {
           </Select>
         </Form.Item>
 
-        <RequestDetailsAuthInput />
+        <Auth />
       </Tabs.TabPane>
 
       <Tabs.TabPane forceRender tab="Message" key="message">
@@ -63,7 +61,7 @@ const RequestDetailsForm = ({form}: IProps) => {
       </Tabs.TabPane>
 
       <Tabs.TabPane forceRender tab="Metadata" key="metadata">
-        <RequestDetailsMetadataInput />
+        <Metadata />
       </Tabs.TabPane>
     </Tabs>
   );

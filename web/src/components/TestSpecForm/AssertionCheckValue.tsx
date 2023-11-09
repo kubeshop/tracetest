@@ -6,7 +6,7 @@ import {SupportedEditors} from 'constants/Editor.constants';
 import {delay} from 'lodash';
 import {useCallback} from 'react';
 import {TResolveExpressionContext} from 'types/Expression.types';
-import Editor from '../Editor';
+import {Editor} from 'components/Inputs';
 import {IValues} from './TestSpecForm';
 
 interface IProps {

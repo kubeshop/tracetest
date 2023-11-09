@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 
 const VariableNameForm = () => (

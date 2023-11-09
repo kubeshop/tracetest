@@ -1,5 +1,5 @@
-import RequestDetailsUrlInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsUrlInput';
+import {URL} from 'components/Fields';
 
-const Grpc = () => <RequestDetailsUrlInput showMethodSelector={false} />;
+const Grpc = () => <URL showMethodSelector={false} />;
 
 export default Grpc;

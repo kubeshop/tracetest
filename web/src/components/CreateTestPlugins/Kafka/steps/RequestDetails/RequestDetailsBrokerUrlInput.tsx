@@ -1,7 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
 import {SupportedEditors} from 'constants/Editor.constants';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import * as S from './RequestDetails.styled';
 
 interface IProps {

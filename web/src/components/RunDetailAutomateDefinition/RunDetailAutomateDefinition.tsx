@@ -2,7 +2,7 @@ import {DownloadOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
 import {useCallback, useEffect} from 'react';
 import {FramedCodeBlock} from 'components/CodeBlock';
-import InputOverlay from 'components/InputOverlay/InputOverlay';
+import {Overlay} from 'components/Inputs';
 import useDefinitionFile from 'hooks/useDefinitionFile';
 import {ResourceName, ResourceType} from 'types/Resource.type';
 import {downloadFile} from 'utils/Common';
@@ -31,7 +31,7 @@ const RunDetailAutomateDefinition = ({id, version, resourceType, fileName, onFil
     <S.Container>
       <S.Title>{ResourceName[resourceType]} Definition</S.Title>
       <S.FileName>
-        <InputOverlay value={fileName} onChange={onFileNameChange} />
+        <Overlay value={fileName} onChange={onFileNameChange} />
       </S.FileName>
       <FramedCodeBlock title="Preview your YAML file" value={definition} language="yaml" />
       <S.Footer>

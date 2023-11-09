@@ -1,10 +1,17 @@
-import {Tabs, TabsProps} from 'antd';
+import {Form, Tabs, TabsProps} from 'antd';
+import {useMemo, useState} from 'react';
 import CreateTest from 'components/CreateTest';
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import {TriggerTypes} from 'constants/Test.constants';
 import {RunDetailModes} from 'constants/TestRun.constants';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
+import {TDraftTest} from '../../types/Test.types';
+import useValidateTestDraft from '../../hooks/useValidateTestDraft';
+
+import {TriggerTypeToPlugin} from '../../constants/Plugins.constants';
+import {useCreateTest} from '../../providers/CreateTest/CreateTest.provider';
+import HeaderLeft from '../../components/RunDetailLayout/HeaderLeft';
 
 interface IProps {
   triggerType: TriggerTypes;
@@ -22,27 +29,59 @@ const renderTab = (title: string, triggerType: TriggerTypes, isDisabled: boolean
   </S.TabLink>
 );
 
+export const FORM_ID = 'create-test';
+
 const Content = ({triggerType}: IProps) => {
   useDocumentTitle(`Create - ${triggerType} test`);
 
+  const {onCreateTest} = useCreateTest();
+  const plugin = TriggerTypeToPlugin[triggerType];
+  const [isValid, setIsValid] = useState(false);
+
+  const onValidate = useValidateTestDraft({pluginName: plugin.name, setIsValid});
+  const [form] = Form.useForm<TDraftTest>();
+
+  const handleOnSubmit = async (values: TDraftTest) => {
+    console.log(values);
+    onCreateTest(values, plugin);
+  };
+
+  const tabBarExtraContent = useMemo(
+    () => ({
+      left: <HeaderLeft name="Untitled Test" triggerType={triggerType} origin="/" />,
+    }),
+    [triggerType]
+  );
+
   return (
     <S.Container>
-      <Tabs
-        activeKey={RunDetailModes.TRIGGER}
-        centered
-        className="run-tabs"
-        onChange={activeKey => {
-          TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
-        }}
-        renderTabBar={renderTabBar}
+      <Form<TDraftTest>
+        autoComplete="off"
+        data-cy="edit-test-modal"
+        form={form}
+        layout="vertical"
+        name={FORM_ID}
+        onFinish={handleOnSubmit}
+        onValuesChange={onValidate}
       >
-        <Tabs.TabPane tab={renderTab('Trigger', triggerType, false, true)} key={RunDetailModes.TRIGGER}>
-          <CreateTest triggerType={triggerType!} />
-        </Tabs.TabPane>
-        <Tabs.TabPane disabled tab={renderTab('Trace', triggerType, true)} key={RunDetailModes.TRACE} />
-        <Tabs.TabPane disabled tab={renderTab('Test', triggerType, true)} key={RunDetailModes.TEST} />
-        <Tabs.TabPane disabled tab={renderTab('Automate', triggerType, true)} key={RunDetailModes.AUTOMATE} />
-      </Tabs>
+        <Tabs
+          activeKey={RunDetailModes.TRIGGER}
+          centered
+          className="run-tabs"
+          onChange={activeKey => {
+            TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
+          }}
+          renderTabBar={renderTabBar}
+          tabBarExtraContent={tabBarExtraContent}
+        >
+          <Tabs.TabPane tab={renderTab('Trigger', triggerType, false, true)} key={RunDetailModes.TRIGGER}>
+            <CreateTest isValid={isValid} triggerType={triggerType!} />
+          </Tabs.TabPane>
+          <Tabs.TabPane disabled tab={renderTab('Trace', triggerType, true)} key={RunDetailModes.TRACE} />
+          <Tabs.TabPane disabled tab={renderTab('Test', triggerType, true)} key={RunDetailModes.TEST} />
+          <Tabs.TabPane disabled tab={renderTab('Automate', triggerType, true)} key={RunDetailModes.AUTOMATE} />
+        </Tabs>
+      </Form>
     </S.Container>
   );
 };

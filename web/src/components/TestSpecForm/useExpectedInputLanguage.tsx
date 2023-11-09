@@ -3,7 +3,7 @@ import {syntaxTree} from '@codemirror/language';
 
 import {Attributes} from 'constants/SpanAttribute.constants';
 import {useMemo} from 'react';
-import {selectorQL} from 'components/Editor/Selector/grammar';
+import {selectorQL} from 'components/Inputs/Editor/Selector/grammar';
 
 function isNumber(text?: string) {
   const matches = text?.toString().match(/^\d*(\.\d+)?$/);

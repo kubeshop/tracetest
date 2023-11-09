@@ -1,20 +1,19 @@
 import {Tabs} from 'antd';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
 import KeyValueListInput from 'components/KeyValueListInput';
-import BodyField from './BodyField/BodyField';
-import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
-import SSLVerification from './SSLVerification';
+import {Body} from 'components/Inputs';
+import {Auth, SSL} from 'components/Fields';
 
 export const FORM_ID = 'create-test';
 
 const RequestDetailsForm = () => (
   <Tabs defaultActiveKey="auth">
     <Tabs.TabPane forceRender tab="Auth" key="auth">
-      <RequestDetailsAuthInput />
+      <Auth />
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Body" key="body">
-      <BodyField />
+      <Body />
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Headers" key="headers">
@@ -29,7 +28,7 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Settings" key="settings">
-      <SSLVerification />
+      <SSL />
     </Tabs.TabPane>
   </Tabs>
 );

@@ -1,5 +1,5 @@
 import {Form} from 'antd';
-import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
+import {FileUpload} from 'components/Inputs';
 import React from 'react';
 import {IPostmanValues, TDraftTestForm} from '../../../../../../types/Test.types';
 import {useUploadCollectionCallback} from '../hooks/useUploadCollectionCallback';
@@ -14,6 +14,6 @@ export const CollectionFileField = ({form}: IProps): React.ReactElement => (
     name="collectionFile"
     label="Upload Postman Collection"
   >
-    <RequestDetailsFileInput data-cy="collectionFile" accept=".json" onChange={useUploadCollectionCallback(form)} />
+    <FileUpload data-cy="collectionFile" accept=".json" onChange={useUploadCollectionCallback(form)} />
   </Form.Item>
 );

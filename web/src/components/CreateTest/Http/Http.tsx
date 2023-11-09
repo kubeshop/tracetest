@@ -1,5 +1,5 @@
-import RequestDetailsUrlInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsUrlInput';
+import {URL} from 'components/Fields';
 
-const Http = () => <RequestDetailsUrlInput />;
+const Http = () => <URL />;
 
 export default Http;

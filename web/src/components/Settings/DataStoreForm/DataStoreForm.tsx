@@ -5,9 +5,9 @@ import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreConfig from 'models/DataStoreConfig.model';
+import {DataStoreSelection} from 'components/Inputs';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
-import DataStoreSelectionInput from './DataStoreSelectionInput';
 
 export const FORM_ID = 'data-store';
 
@@ -73,7 +73,7 @@ const DataStoreForm = ({
     >
       <S.FormContainer>
         <Form.Item name="dataStoreType">
-          <DataStoreSelectionInput />
+          <DataStoreSelection />
         </Form.Item>
         <S.FactoryContainer>
           <S.TopContainer>

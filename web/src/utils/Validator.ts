@@ -1,6 +1,6 @@
 import {XMLValidator} from 'fast-xml-parser';
 import isEmpty from 'lodash/isEmpty';
-import {BodyMode} from '../components/CreateTestPlugins/Rest/steps/RequestDetails/BodyField/useBodyMode';
+import {BodyMode} from '../components/Inputs/Body/useBodyMode';
 
 type Value = any;
 

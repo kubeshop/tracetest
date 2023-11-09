@@ -1,9 +1,7 @@
 import {Col, Form, Input, Row} from 'antd';
-import BodyField from 'components/CreateTestPlugins/Rest/steps/RequestDetails/BodyField/BodyField';
+import {Body} from 'components/Inputs';
 import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
-import RequestDetailsAuthInput from '../../../Rest/steps/RequestDetails/RequestDetailsAuthInput/RequestDetailsAuthInput';
-import RequestDetailsHeadersInput from '../../../Rest/steps/RequestDetails/RequestDetailsHeadersInput';
-import RequestDetailsUrlInput from '../../../Rest/steps/RequestDetails/RequestDetailsUrlInput';
+import {Auth, Headers, URL} from 'components/Fields';
 import {CollectionFileField} from './fields/CollectionFileField';
 import {EnvFileField} from './fields/EnvFileField';
 import {SelectTestFromCollection} from './fields/SelectTestFromCollection';
@@ -38,22 +36,24 @@ const UploadCollectionForm = ({form}: IProps) => (
     </Row>
     <Row gutter={12}>
       <Col span={18}>
-        <RequestDetailsUrlInput />
+        <URL />
       </Col>
     </Row>
     <Row gutter={12}>
       <Col span={18}>
-        <RequestDetailsHeadersInput />
+        <Headers />
       </Col>
     </Row>
     <Row gutter={12}>
       <Col span={18}>
-        <RequestDetailsAuthInput />
+        <Auth />
       </Col>
     </Row>
     <Row gutter={12}>
       <Col span={18}>
-        <BodyField />
+        <Form.Item name="body">
+          <Body />
+        </Form.Item>
       </Col>
     </Row>
   </S.FieldsContainer>

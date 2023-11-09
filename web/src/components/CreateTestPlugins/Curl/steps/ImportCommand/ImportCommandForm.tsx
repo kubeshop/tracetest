@@ -1,7 +1,7 @@
 import {Form} from 'antd';
 import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
 import CurlService from 'services/Triggers/Curl.service';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 
 export const FORM_ID = 'create-test';

@@ -1,7 +1,7 @@
 import {Tooltip} from 'antd';
 import {singularOrPlural} from 'utils/Common';
 import {SupportedEditors} from 'constants/Editor.constants';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import * as S from './TestSpec.styled';
 
 interface IProps {

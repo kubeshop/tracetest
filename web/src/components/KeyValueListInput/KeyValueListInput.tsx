@@ -1,6 +1,6 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {IKeyValue} from 'constants/Test.constants';
 import * as S from './KeyValueListInput.styled';

@@ -13,9 +13,9 @@ import {
   Tokens,
 } from 'constants/Editor.constants';
 import {TSpanFlatAttribute} from 'types/Span.types';
-import {expressionQLang} from 'components/Editor/Expression/grammar';
-import {interpolationQLang} from 'components/Editor/Interpolation/grammar';
-import {selectorQLang} from 'components/Editor/Selector/grammar';
+import {expressionQLang} from 'components/Inputs/Editor/Expression/grammar';
+import {interpolationQLang} from 'components/Inputs/Editor/Interpolation/grammar';
+import {selectorQLang} from 'components/Inputs/Editor/Selector/grammar';
 import {IKeyValue} from 'constants/Test.constants';
 import {noop} from 'lodash';
 import AssertionService from './Assertion.service';

@@ -1,6 +1,5 @@
 import {Form} from 'antd';
-import React from 'react';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from '../RequestDetails.styled';
 import * as R from './RequestDetailsAuthInput.styled';
