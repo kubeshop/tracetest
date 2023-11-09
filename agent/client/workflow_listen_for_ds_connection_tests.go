@@ -28,6 +28,7 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 
 			if err != nil {
 				c.reconnect()
+				continue
 			}
 
 			if c.dataStoreConnectionListener == nil {

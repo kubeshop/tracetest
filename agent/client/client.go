@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"google.golang.org/grpc"
 )
@@ -155,7 +156,10 @@ func isCancelledError(err error) bool {
 
 func (c *Client) reconnect() error {
 	// connection is not working. We need to reconnect
-	err := c.connect(context.Background())
+	err := retry.Do(func() error {
+		return c.connect(context.Background())
+	}, retry.Attempts(3), retry.Delay(1*time.Second))
+
 	if err != nil {
 		log.Fatal(fmt.Errorf("could not reconnect to server: %w", err))
 	}

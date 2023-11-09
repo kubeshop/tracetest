@@ -29,6 +29,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 
 			if err != nil {
 				c.reconnect()
+				continue
 			}
 
 			if c.shutdownListener == nil {

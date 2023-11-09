@@ -6,7 +6,9 @@ import (
 	"log"
 	"net"
 	"sync"
+	"time"
 
+	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"google.golang.org/grpc"
 )
@@ -35,8 +37,12 @@ func NewGrpcServer() *GrpcServerMock {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	anyPort := 0
-	go server.start(&wg, anyPort)
+	err := retry.Do(func() error {
+		return server.start(&wg, 0)
+	}, retry.Delay(time.Second))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	wg.Wait()
 
@@ -47,10 +53,10 @@ func (s *GrpcServerMock) Addr() string {
 	return fmt.Sprintf("localhost:%d", s.port)
 }
 
-func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) {
+func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) error {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return fmt.Errorf("failed to listen: %w", err)
 	}
 
 	s.port = lis.Addr().(*net.TCPAddr).Port
@@ -61,9 +67,14 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) {
 	s.server = server
 
 	wg.Done()
-	if err := server.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+
+	go func() {
+		if err := server.Serve(lis); err != nil {
+			log.Fatal("failed to serve: %w", err)
+		}
+	}()
+
+	return nil
 }
 
 func (s *GrpcServerMock) Connect(ctx context.Context, req *proto.ConnectRequest) (*proto.AgentConfiguration, error) {
@@ -170,15 +181,6 @@ func (s *GrpcServerMock) TerminateConnection(reason string) {
 	s.terminationChannel <- &proto.ShutdownRequest{
 		Reason: reason,
 	}
-}
-
-func (s *GrpcServerMock) Restart() {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	fmt.Println("restarting in port ", s.port)
-	go s.start(&wg, s.port)
-
-	wg.Wait()
 }
 
 func (s *GrpcServerMock) Stop() {

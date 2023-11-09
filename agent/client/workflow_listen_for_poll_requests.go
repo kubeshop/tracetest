@@ -28,6 +28,7 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 
 			if err != nil {
 				c.reconnect()
+				continue
 			}
 
 			if c.pollListener == nil {
