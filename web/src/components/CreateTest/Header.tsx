@@ -26,7 +26,7 @@ const Header = ({triggerType, isValid}: IProps) => {
           operation={Operation.Edit}
           block
           ButtonComponent={CreateButton}
-          data-cy="edit-test-submit"
+          data-cy="run-test-submit"
           disabled={!isValid}
           loading={isLoading}
           onClick={() => form.submit()}

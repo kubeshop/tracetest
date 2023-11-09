@@ -2,6 +2,7 @@ import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {POKEMON_HTTP_ENDPOINT, PokeshopDemo} from '../e2e/constants/Test';
 import {getTestId, getTestSuiteId} from '../e2e/utils/Common';
+import { SupportedPlugins } from '../../src/constants/Common.constants';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id$=-${number}]`;
@@ -48,7 +49,6 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
 
 Cypress.Commands.add('openTestCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
-  cy.get('[data-cy=create-test-steps-CreateTestFactory]').should('be.visible');
 });
 
 Cypress.Commands.add('interceptTracePageApiCalls', () => {
@@ -129,25 +129,21 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   }
 });
 
-Cypress.Commands.add('submitCreateForm', (mode = 'CreateTestFactory') => {
-  cy.get(`[data-cy=${mode}-create-create-button]`).last().click();
-  if (mode === 'CreateTestFactory') cy.wait('@testCreation');
-  if (mode === 'CreateTestSuiteFactory') cy.wait('@testSuiteCreation');
+Cypress.Commands.add('submitCreateForm', () => {
+  cy.get(`[data-cy="run-test-submit"]`).click();
+  cy.wait('@testCreation');
 });
 
-Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: string, mode = 'CreateTestFactory') => {
-  if (mode === 'CreateTestFactory') cy.get(`[data-cy=${mode}-create-next-button]`).click();
-  cy.get('[data-cy=create-test-name-input').type(name);
-  cy.get('[data-cy=create-test-description-input').type(description || name);
-  cy.get(`[data-cy=${mode}-create-next-button]`).last().click();
+Cypress.Commands.add('fillCreateFormBasicStep', (name: string) => {
+  cy.get('[data-cy=overlay-input-overlay]').should('be.visible').click();
+  cy.get('[data-cy="overlay-input"]').clear().type(name);
 });
 
 Cypress.Commands.add('createTestByName', (name: string) => {
   cy.openTestCreationModal();
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').click();
+  cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
   cy.submitCreateForm();
   cy.makeSureUserIsOnTracePage();
   cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);

@@ -1,4 +1,4 @@
-import {Tabs} from 'antd';
+import {Form, Tabs} from 'antd';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
 import KeyValueListInput from 'components/Fields/KeyValueList';
 import {Body} from 'components/Inputs';
@@ -13,7 +13,9 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Body" key="body">
-      <Body />
+      <Form.Item name="body" noStyle>
+        <Body />
+      </Form.Item>
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Headers" key="headers">

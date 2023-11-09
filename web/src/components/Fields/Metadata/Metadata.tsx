@@ -6,7 +6,7 @@ import * as S from './Metadata.styled';
 
 const Metadata = () => (
   <Form.Item label="Metadata">
-    <Form.List name="metadata">
+    <Form.List name="metadata" initialValue={[{key: '', value: ''}]}>
       {(fields, {add, remove}) => (
         <>
           {fields.map(field => (

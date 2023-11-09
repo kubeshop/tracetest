@@ -19,7 +19,7 @@ const Body = ({value = '', onChange = noop}: IProps) => {
   return (
     <S.Container>
       <S.RadioContainer>
-        <Select value={bodyMode} onChange={setBodyMode}>
+        <Select value={bodyMode} onChange={setBodyMode} data-cy="bodyMode">
           <Radio value="none" data-cy="bodyMode-none">
             none
           </Radio>
@@ -39,7 +39,7 @@ const Body = ({value = '', onChange = noop}: IProps) => {
           <h4>This request has no body {bodyMode}</h4>
         </div>
       )}
-      <S.BodyFieldContainer $isDisplaying={hasNoBody}>
+      <S.BodyFieldContainer $isDisplaying={hasNoBody} data-cy="body">
         <Editor
           value={value}
           onChange={onChange}

@@ -29,8 +29,8 @@ const BasicDetails = () => {
       <Step.FormContainer>
         <Step.Title $withSubtitle>Name your Test Suite</Step.Title>
         <Step.Subtitle>
-          Create a test suite which will run several tests in sequence. You can set outputs into variables and use
-          these variables later in the test suite in other tests.{' '}
+          Create a test suite which will run several tests in sequence. You can set outputs into variables and use these
+          variables later in the test suite in other tests.{' '}
         </Step.Subtitle>
         <Form<TDraftTestSuite>
           id={ComponentNames.BasicDetails}
@@ -41,7 +41,7 @@ const BasicDetails = () => {
           onFinish={handleSubmit}
           onValuesChange={onValidate}
         >
-          <BasicDetailsForm onSelectDemo={() => null} selectedDemo={undefined} demoList={[]} />
+          <BasicDetailsForm />
         </Form>
       </Step.FormContainer>
     </Step.Step>

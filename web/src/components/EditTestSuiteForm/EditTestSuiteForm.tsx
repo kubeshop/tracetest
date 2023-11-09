@@ -26,7 +26,7 @@ const EditTestSuiteForm = ({form, onSubmit, testSuite, onValidation}: IProps) =>
       initialValues={testSuite}
     >
       <S.FormContainer>
-        <BasicDetailsForm isEditing />
+        <BasicDetailsForm />
 
         <TestsSelectionForm />
       </S.FormContainer>

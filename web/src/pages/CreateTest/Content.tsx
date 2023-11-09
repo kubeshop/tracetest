@@ -1,5 +1,5 @@
 import {Form, Tabs, TabsProps} from 'antd';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import CreateTest from 'components/CreateTest';
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import {TriggerTypes} from 'constants/Test.constants';
@@ -11,6 +11,7 @@ import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import HeaderLeft from './HeaderLeft';
+import HeaderRight from './HeaderRight';
 
 interface IProps {
   triggerType: TriggerTypes;
@@ -31,23 +32,23 @@ const renderTab = (title: string, triggerType: TriggerTypes, isDisabled: boolean
 export const FORM_ID = 'create-test';
 
 const Content = ({triggerType}: IProps) => {
+  const {onCreateTest, onUpdatePlugin} = useCreateTest();
   useDocumentTitle(`Create - ${triggerType} test`);
 
-  const {onCreateTest} = useCreateTest();
+  useEffect(() => {
+    onUpdatePlugin(TriggerTypeToPlugin[triggerType]);
+  }, [onUpdatePlugin, triggerType]);
+
   const plugin = TriggerTypeToPlugin[triggerType];
   const [isValid, setIsValid] = useState(false);
 
   const onValidate = useValidateTestDraft({pluginName: plugin.name, setIsValid});
   const [form] = Form.useForm<TDraftTest>();
 
-  const handleOnSubmit = async (values: TDraftTest) => {
-    onCreateTest(values, plugin);
-  };
-
   const tabBarExtraContent = useMemo(
     () => ({
       left: <HeaderLeft triggerType={triggerType} origin="/" />,
-      right: <S.Section $justifyContent="center" />,
+      right: <HeaderRight />,
     }),
     [triggerType]
   );
@@ -61,7 +62,7 @@ const Content = ({triggerType}: IProps) => {
         layout="vertical"
         name={FORM_ID}
         initialValues={{name: 'Untitled Test'}}
-        onFinish={handleOnSubmit}
+        onFinish={values => onCreateTest(values, plugin)}
         onValuesChange={onValidate}
       >
         <Tabs

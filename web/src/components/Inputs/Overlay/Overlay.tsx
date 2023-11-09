@@ -19,6 +19,10 @@ const Overlay = ({onChange = noop, value = ''}: IProps) => {
   });
 
   useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  useEffect(() => {
     if (ref.current && isOpen) {
       const current = ref.current as HTMLInputElement;
       current.focus();
@@ -27,7 +31,12 @@ const Overlay = ({onChange = noop, value = ''}: IProps) => {
 
   return isOpen ? (
     <S.InputContainer ref={ref} htmlFor="overlay-input">
-      <Input id="overlay-input" onChange={event => setInputValue(event.target.value)} value={inputValue} />
+      <Input
+        data-cy="overlay-input"
+        id="overlay-input"
+        onChange={event => setInputValue(event.target.value)}
+        value={inputValue}
+      />
     </S.InputContainer>
   ) : (
     <S.Overlay
@@ -35,6 +44,7 @@ const Overlay = ({onChange = noop, value = ''}: IProps) => {
         e.stopPropagation();
         setIsOpen(true);
       }}
+      data-cy="overlay-input-overlay"
     >
       {inputValue} <S.EditIcon />
     </S.Overlay>

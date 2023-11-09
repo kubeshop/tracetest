@@ -16,7 +16,6 @@ import TracetestAPI from 'redux/apis/Tracetest';
 import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import {Plugins} from 'constants/Plugins.constants';
-import {SupportedPlugins} from 'constants/Common.constants';
 import useTestCrud from '../Test/hooks/useTestCrud';
 
 const {useCreateTestMutation} = TracetestAPI.instance;
@@ -65,15 +64,14 @@ const CreateTestProvider = ({children}: IProps) => {
   const stepList = useAppSelector(CreateTestSelectors.selectStepList);
   const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
   const stepNumber = useAppSelector(CreateTestSelectors.selectStepNumber);
-  // const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demos));
+  const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demos));
   const activeStep = useAppSelector(CreateTestSelectors.selectActiveStep);
   const isFormValid = useAppSelector(CreateTestSelectors.selectIsFormValid);
   const isFinalStep = stepNumber === stepList.length - 1;
 
   const onCreateTest = useCallback(
-    async (draft: TDraftTest, plugin: IPlugin) => {
-      console.log('draft', draft);
-      const rawTest = await TestService.getRequest(plugin, draft);
+    async (draft: TDraftTest, p: IPlugin) => {
+      const rawTest = await TestService.getRequest(p, draft);
       const test = await createTest(rawTest).unwrap();
       runTest({test});
     },
@@ -140,8 +138,8 @@ const CreateTestProvider = ({children}: IProps) => {
       stepList,
       draftTest,
       stepNumber,
-      pluginName: SupportedPlugins.REST,
-      plugin: Plugins.REST,
+      pluginName: plugin.name,
+      plugin,
       activeStep,
       isLoading: isLoadingCreateTest || isEditLoading,
       isFormValid,
@@ -158,7 +156,7 @@ const CreateTestProvider = ({children}: IProps) => {
       stepList,
       draftTest,
       stepNumber,
-      // plugin,
+      plugin,
       activeStep,
       isLoadingCreateTest,
       isEditLoading,

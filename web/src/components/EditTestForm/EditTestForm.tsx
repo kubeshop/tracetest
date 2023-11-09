@@ -39,7 +39,7 @@ const EditTestForm = ({
       initialValues={initialValues}
     >
       <S.FormContainer>
-        <BasicDetailsForm isEditing />
+        <BasicDetailsForm />
 
         <EditRequestDetails form={form} type={type} />
       </S.FormContainer>

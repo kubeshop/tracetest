@@ -4,6 +4,7 @@ import {TriggerTypes} from 'constants/Test.constants';
 import EditRequestDetails from 'components/EditTestForm/EditRequestDetails/EditRequestDetails';
 import * as S from './CreateTest.styled';
 import Header from './Header';
+import useShortcut from './hooks/useShortcut';
 
 export const FORM_ID = 'create-test';
 
@@ -14,6 +15,7 @@ interface IProps {
 
 const CreateTest = ({triggerType, isValid}: IProps) => {
   const form = Form.useFormInstance<TDraftTest>();
+  useShortcut();
 
   return (
     <S.Container>

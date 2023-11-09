@@ -1,27 +1,37 @@
 import {DownOutlined} from '@ant-design/icons';
-import {Dropdown, Menu, Typography} from 'antd';
+import {useCallback, useState} from 'react';
+import {Dropdown, Form, Menu} from 'antd';
 import {camelCase} from 'lodash';
-import {TDraftTest} from 'types/Test.types';
+import {IBasicValues, TDraftTest} from 'types/Test.types';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
-import * as S from './BasicDetails.styled';
+import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import * as S from './DemoSelector.styled';
 
-interface IProps {
-  onSelectDemo(demo: TDraftTest): void;
-  selectedDemo?: TDraftTest;
-  demoList?: TDraftTest[];
-}
+const BasicDetailsDemoHelper = () => {
+  const [selectedDemo, setSelectedDemo] = useState<TDraftTest>();
+  const form = Form.useFormInstance<IBasicValues>();
 
-const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo, demoList = []}: IProps) => {
-  const handleOnDemoClick = ({key}: {key: string}) => {
-    CreateTestAnalyticsService.onDemoTestClick();
-    const demo = demoList.find(({name}) => name === key)!;
-    onSelectDemo(demo);
-  };
+  const {
+    plugin: {demoList},
+    onIsFormValid,
+  } = useCreateTest();
+
+  const onSelectDemo = useCallback(
+    ({key}: {key: string}) => {
+      CreateTestAnalyticsService.onDemoTestClick();
+      const demo = demoList.find(({name}) => name === key)!;
+
+      form.setFieldsValue(demo);
+
+      onIsFormValid(true);
+      setSelectedDemo(demo);
+    },
+    [demoList, form, onIsFormValid]
+  );
 
   return (
     <S.DemoContainer>
-      <Typography.Text>Try these examples in our demo env: </Typography.Text>
       <Dropdown
         overlay={() => (
           <Menu
@@ -29,16 +39,16 @@ const BasicDetailsDemoHelper = ({selectedDemo, onSelectDemo, demoList = []}: IPr
               key: name,
               label: <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>,
             }))}
-            onClick={handleOnDemoClick}
+            onClick={onSelectDemo}
             style={{width: '190px'}}
           />
         )}
         placement="bottomLeft"
         trigger={['click']}
       >
-        <Typography.Link data-cy="example-button" onClick={e => e.preventDefault()} strong>
+        <S.Button data-cy="example-button" onClick={e => e.preventDefault()}>
           {selectedDemo?.name || 'Choose Example'} <DownOutlined />
-        </Typography.Link>
+        </S.Button>
       </Dropdown>
       <TooltipQuestion
         margin={8}
