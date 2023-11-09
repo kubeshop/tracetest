@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/avast/retry-go"
+	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"google.golang.org/grpc"
 )
@@ -38,7 +39,7 @@ func NewGrpcServer() *GrpcServerMock {
 
 	err := retry.Do(func() error {
 		return server.start(&wg, 0)
-	}, retry.Attempts(reconnectRetryAttempts), retry.Delay(reconnectRetryAttemptDelay))
+	}, retry.Attempts(client.ReconnectRetryAttempts), retry.Delay(client.ReconnectRetryAttemptDelay))
 	if err != nil {
 		log.Fatal(err)
 	}

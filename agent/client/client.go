@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	reconnectRetryAttempts     = 6
-	reconnectRetryAttemptDelay = 1 * time.Second
+	ReconnectRetryAttempts     = 6
+	ReconnectRetryAttemptDelay = 1 * time.Second
 	defaultPingPeriod          = 30 * time.Second
 )
 
@@ -166,7 +166,7 @@ func (c *Client) reconnect() error {
 	// connection is not working. We need to reconnect
 	err := retry.Do(func() error {
 		return c.connect(context.Background())
-	}, retry.Attempts(reconnectRetryAttempts), retry.Delay(reconnectRetryAttemptDelay))
+	}, retry.Attempts(ReconnectRetryAttempts), retry.Delay(ReconnectRetryAttemptDelay))
 
 	if err != nil {
 		return fmt.Errorf("could not reconnect to server: %w", err)
