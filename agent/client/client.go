@@ -38,7 +38,6 @@ type Client struct {
 	pollListener                func(context.Context, *proto.PollingRequest) error
 	shutdownListener            func(context.Context, *proto.ShutdownRequest) error
 	dataStoreConnectionListener func(context.Context, *proto.DataStoreConnectionTestRequest) error
-	reconnectionListener        func()
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -117,10 +116,6 @@ func (c *Client) OnPollingRequest(listener func(context.Context, *proto.PollingR
 
 func (c *Client) OnConnectionClosed(listener func(context.Context, *proto.ShutdownRequest) error) {
 	c.shutdownListener = listener
-}
-
-func (c *Client) OnClientReconnection(listener func()) {
-	c.reconnectionListener = listener
 }
 
 func (c *Client) getConnectionRequest() (*proto.ConnectRequest, error) {
