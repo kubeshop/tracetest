@@ -39,7 +39,7 @@ func NewGrpcServer() *GrpcServerMock {
 
 	err := retry.Do(func() error {
 		return server.start(&wg, 0)
-	}, retry.Delay(time.Second))
+	}, retry.Attempts(3), retry.Delay(time.Second))
 	if err != nil {
 		log.Fatal(err)
 	}
