@@ -14,8 +14,12 @@ const Overlay = ({onChange = noop, value = ''}: IProps) => {
   const [inputValue, setInputValue] = useState(value);
   const ref = useRef(null);
   useInputActions(ref, () => {
-    onChange(inputValue);
     setIsOpen(false);
+    if (inputValue) {
+      onChange(inputValue);
+    } else {
+      setInputValue(value);
+    }
   });
 
   useEffect(() => {
