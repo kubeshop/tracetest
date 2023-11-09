@@ -26,7 +26,7 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 				return
 			}
 
-			if err != nil {
+			if err != nil && err != io.EOF {
 				c.reconnect()
 				continue
 			}
