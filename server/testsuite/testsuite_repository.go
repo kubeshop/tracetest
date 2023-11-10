@@ -353,17 +353,15 @@ func (r *Repository) insertIntoTestSuites(ctx context.Context, suite TestSuite) 
 	}
 	defer stmt.Close()
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = stmt.ExecContext(
-		ctx,
+	params := sqlutil.TenantInsert(ctx,
 		suite.ID,
 		suite.GetVersion(),
 		suite.Name,
 		suite.Description,
 		suite.GetCreatedAt(),
-		tenantID,
 	)
+
+	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
 		return TestSuite{}, fmt.Errorf("sql exec: %w", err)
 	}

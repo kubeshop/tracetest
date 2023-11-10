@@ -124,12 +124,7 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 		return TestSuiteRun{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	var runID int
-	err = tx.QueryRowContext(
-		ctx,
-		replaceTestSuiteRunSequenceName(createTestSuiteRunQuery, tr.TestSuiteID),
+	params := sqlutil.TenantInsert(ctx,
 		tr.TestSuiteID,
 		tr.TestSuiteVersion,
 		tr.CreatedAt,
@@ -137,7 +132,13 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 		tr.CurrentTest,
 		jsonMetadata,
 		jsonVariableSet,
-		tenantID,
+	)
+
+	var runID int
+	err = tx.QueryRowContext(
+		ctx,
+		replaceTestSuiteRunSequenceName(createTestSuiteRunQuery, tr.TestSuiteID),
+		params...,
 	).Scan(&runID)
 	if err != nil {
 		tx.Rollback()

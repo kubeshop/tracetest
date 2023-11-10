@@ -259,17 +259,15 @@ func (r *Repository) insertIntoEnvironments(ctx context.Context, variableSet Var
 		return VariableSet{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = stmt.ExecContext(
-		ctx,
+	params := sqlutil.TenantInsert(ctx,
 		variableSet.ID,
 		variableSet.Name,
 		variableSet.Description,
 		variableSet.CreatedAt,
 		jsonValues,
-		tenantID,
 	)
+
+	_, err = stmt.ExecContext(ctx, params...)
 
 	if err != nil {
 		return VariableSet{}, fmt.Errorf("sql exec: %w", err)

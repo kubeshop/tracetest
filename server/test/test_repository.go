@@ -380,10 +380,7 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		return Test{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = stmt.ExecContext(
-		ctx,
+	params := sqlutil.TenantInsert(ctx,
 		test.ID,
 		test.Version,
 		test.Name,
@@ -392,8 +389,9 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		specsJson,
 		outputsJson,
 		test.CreatedAt,
-		tenantID,
 	)
+
+	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
 		return Test{}, fmt.Errorf("sql exec: %w", err)
 	}

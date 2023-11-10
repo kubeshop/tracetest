@@ -27,6 +27,8 @@ ALTER TABLE
   test_runs DROP CONSTRAINT test_runs_pkey CASCADE,
 ADD
   CONSTRAINT test_runs_pkey PRIMARY KEY (id, test_id),
+ADD
+  CONSTRAINT fk_test_runs_tests FOREIGN KEY (test_id, test_version) REFERENCES tests(id, version),
 ALTER COLUMN
   tenant_id DROP DEFAULT,
 ALTER COLUMN
@@ -71,6 +73,8 @@ ALTER TABLE
   test_suite_runs DROP CONSTRAINT transaction_run_pkey CASCADE,
 ADD
   CONSTRAINT transaction_run_pkey PRIMARY KEY (id, test_suite_id),
+ADD
+  CONSTRAINT transaction_run_transactions_fk FOREIGN KEY (test_suite_id, test_suite_version) REFERENCES test_suites(id, version),
 ALTER COLUMN
   tenant_id DROP DEFAULT,
 ALTER COLUMN
