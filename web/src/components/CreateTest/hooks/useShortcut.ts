@@ -6,7 +6,8 @@ const useShortcut = () => {
 
   const onKeydown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && e.metaKey) {
+      const modifierKey = e.metaKey || e.ctrlKey;
+      if (e.key === 'Enter' && modifierKey) {
         form.submit();
       }
     },
