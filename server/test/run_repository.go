@@ -172,12 +172,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		return Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	var runID int
-	err = tx.QueryRowContext(
-		ctx,
-		replaceRunSequenceName(createRunQuery, test.ID),
+	params := sqlutil.TenantInsert(ctx,
 		test.ID,
 		test.SafeVersion(),
 		run.CreatedAt,
@@ -194,8 +189,10 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		jsonVariableSet,
 		jsonlinter,
 		jsonGatesResult,
-		tenantID,
-	).Scan(&runID)
+	)
+
+	var runID int
+	err = tx.QueryRowContext(ctx, replaceRunSequenceName(createRunQuery, test.ID), params...).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
 		return Run{}, fmt.Errorf("sql exec: %w", err)
