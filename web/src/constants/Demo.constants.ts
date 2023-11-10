@@ -187,7 +187,7 @@ export function getOtelDemo(demoSettings: Demo) {
             state: 'CA',
             country: 'United States',
             city: 'Mountain View',
-            zipCode: 94043,
+            zipCode: '94043',
           },
           userCurrency: 'USD',
           creditCard: {
