@@ -1,5 +1,5 @@
-import BasicDetailsForm from 'components/CreateTestPlugins/Kafka/steps/RequestDetails/RequestDetailsForm';
+import RequestDetailsForm from 'components/CreateTestPlugins/Kafka/steps/RequestDetails/RequestDetailsForm';
 
-const EditRequestDetailsKafka = () => <BasicDetailsForm />;
+const EditRequestDetailsKafka = () => <RequestDetailsForm />;
 
 export default EditRequestDetailsKafka;

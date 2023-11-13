@@ -1,5 +1,5 @@
-import VariableNameForm from 'components/CreateTestPlugins/TraceID/steps/VariableName/VariableNameForm';
+import {VariableName} from 'components/Fields';
 
-const TraceID = () => <VariableNameForm />;
+const TraceID = () => <VariableName />;
 
 export default TraceID;

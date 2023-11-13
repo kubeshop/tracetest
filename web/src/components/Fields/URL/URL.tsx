@@ -36,10 +36,10 @@ const URL = ({showMethodSelector = true}: IProps) => (
         <Form.Item
           data-cy="url"
           name="url"
-          rules={[{required: true, message: 'Please enter a request url'}]}
+          rules={[{required: true, message: 'Please enter a valid URL'}]}
           style={{marginBottom: 0}}
         >
-          <Editor type={SupportedEditors.Interpolation} placeholder="Enter request url" />
+          <Editor type={SupportedEditors.Interpolation} placeholder="Enter URL" />
         </Form.Item>
       </Col>
     </Row>

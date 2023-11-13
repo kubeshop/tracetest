@@ -3,9 +3,7 @@ import styled from 'styled-components';
 
 export const KeyValueContainer = styled.div`
   align-items: start;
-  display: grid;
-  justify-content: center;
-  grid-template-columns: 40% 40% 19%;
+  display: flex;
   margin-bottom: 8px;
 `;
 
