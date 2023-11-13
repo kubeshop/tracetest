@@ -5,7 +5,7 @@ import {delay} from 'lodash';
 import {useEffect} from 'react';
 
 import AllowButton, {Operation} from 'components/AllowButton';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {EXPRESSIONS_DOCUMENTATION_URL, SELECTOR_LANGUAGE_CHEAT_SHEET_URL} from 'constants/Common.constants';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useAppSelector} from 'redux/hooks';

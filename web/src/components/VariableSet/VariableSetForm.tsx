@@ -1,6 +1,6 @@
 import {Form, FormInstance, Input} from 'antd';
 
-import RequestDetailsHeadersInput from 'components/CreateTestPlugins/Rest/steps/RequestDetails/RequestDetailsHeadersInput';
+import {Headers} from 'components/Fields';
 import {DEFAULT_VALUES} from 'components/VariableSetModal/VariableSetModal';
 import VariableSet from 'models/VariableSet.model';
 
@@ -36,7 +36,7 @@ const VariableSetForm = ({form, initialValues, onSubmit, onValidate}: IProps) =>
         <Input />
       </Form.Item>
 
-      <RequestDetailsHeadersInput
+      <Headers
         initialValue={form.getFieldValue('values') || DEFAULT_VALUES}
         label="Values"
         name={['values']}

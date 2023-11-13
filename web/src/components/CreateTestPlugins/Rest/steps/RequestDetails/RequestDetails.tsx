@@ -44,7 +44,7 @@ const RequestDetails = () => {
           onFinish={handleSubmit}
           onValuesChange={onValidate}
         >
-          <RequestDetailsForm form={form} />
+          <RequestDetailsForm />
         </Form>
       </Step.FormContainer>
     </Step.Step>

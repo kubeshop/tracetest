@@ -73,6 +73,7 @@ const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
       <Tabs
         activeKey={mode}
         centered
+        className="run-tabs"
         onChange={activeKey => {
           TestRunAnalyticsService.onChangeMode(activeKey as RunDetailModes);
         }}

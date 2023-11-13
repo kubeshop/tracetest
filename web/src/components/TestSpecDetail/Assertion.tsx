@@ -4,7 +4,7 @@ import OperatorService from 'services/Operator.service';
 import {ICheckResult} from 'types/Assertion.types';
 import {TCompareOperatorSymbol} from 'types/Operator.types';
 import {SupportedEditors} from 'constants/Editor.constants';
-import Editor from '../Editor';
+import {Editor} from 'components/Inputs';
 import * as S from './TestSpecDetail.styled';
 
 interface IProps {

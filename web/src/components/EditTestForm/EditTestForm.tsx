@@ -20,7 +20,7 @@ const EditTestForm = ({
   form,
   onSubmit,
   test: {
-    trigger: {request, type},
+    trigger: {type},
   },
   test,
   onValidation,
@@ -39,9 +39,9 @@ const EditTestForm = ({
       initialValues={initialValues}
     >
       <S.FormContainer>
-        <BasicDetailsForm isEditing />
+        <BasicDetailsForm />
 
-        <EditRequestDetails form={form} type={type} request={request} />
+        <EditRequestDetails form={form} type={type} />
       </S.FormContainer>
     </Form>
   );

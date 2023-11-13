@@ -1,29 +1,38 @@
-import {Form} from 'antd';
-import * as S from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetails.styled';
-import {IHttpValues, TDraftTestForm} from 'types/Test.types';
+import {Form, Tabs} from 'antd';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
-import KeyValueListInput from 'components/KeyValueListInput';
-import {BodyField} from './BodyField/BodyField';
-import RequestDetailsAuthInput from './RequestDetailsAuthInput/RequestDetailsAuthInput';
-import RequestDetailsUrlInput from './RequestDetailsUrlInput';
-import SSLVerification from './SSLVerification';
+import KeyValueListInput from 'components/Fields/KeyValueList';
+import {Body} from 'components/Inputs';
+import {Auth, SSL} from 'components/Fields';
 
 export const FORM_ID = 'create-test';
 
-interface IProps {
-  form: TDraftTestForm<IHttpValues>;
-}
+const RequestDetailsForm = () => (
+  <Tabs defaultActiveKey="auth">
+    <Tabs.TabPane forceRender tab="Auth" key="auth">
+      <Auth />
+    </Tabs.TabPane>
 
-const RequestDetailsForm = ({form}: IProps) => {
-  return (
-    <S.InputContainer>
-      <RequestDetailsUrlInput />
-      <RequestDetailsAuthInput />
-      <KeyValueListInput name='headers' label='Header list' addButtonLabel='Add Header' keyPlaceholder='Header' valuePlaceholder='Value' initialValue={DEFAULT_HEADERS} />
-      <BodyField setBody={body => form.setFieldsValue({body})} body={Form.useWatch('body', form)} />
-      <SSLVerification />
-    </S.InputContainer>
-  );
-};
+    <Tabs.TabPane forceRender tab="Body" key="body">
+      <Form.Item name="body" noStyle>
+        <Body />
+      </Form.Item>
+    </Tabs.TabPane>
+
+    <Tabs.TabPane forceRender tab="Headers" key="headers">
+      <KeyValueListInput
+        name="headers"
+        label=""
+        addButtonLabel="Add Header"
+        keyPlaceholder="Header"
+        valuePlaceholder="Value"
+        initialValue={DEFAULT_HEADERS}
+      />
+    </Tabs.TabPane>
+
+    <Tabs.TabPane forceRender tab="Settings" key="settings">
+      <SSL />
+    </Tabs.TabPane>
+  </Tabs>
+);
 
 export default RequestDetailsForm;

@@ -1,5 +1,3 @@
-import ValueForm from 'components/CreateTestPlugins/TraceID/steps/VariableName/VariableNameForm';
-
-const EditDetailsTraceId = () => <ValueForm />;
+const EditDetailsTraceId = () => null;
 
 export default EditDetailsTraceId;

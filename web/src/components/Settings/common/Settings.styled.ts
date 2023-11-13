@@ -27,22 +27,6 @@ export const Description = styled(Typography.Text)`
   }
 `;
 
-export const SwitchContainer = styled.div`
-  align-items: center;
-  display: flex;
-  gap: 8px;
-`;
-
-export const SwitchListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-export const SwitchLabel = styled.label`
-  margin-bottom: 24px;
-`;
-
 export const LinterPluginsContainer = styled.div`
   margin-top: 10px;
   padding: 24px 24px 0;
@@ -53,4 +37,16 @@ export const LinterPluginList = styled.ul`
   && {
     list-style-type: disc;
   }
+`;
+
+export const SwitchContainer = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+`;
+
+export const SwitchLabel = styled.label<{$disabled?: boolean}>`
+  color: ${({$disabled, theme}) => ($disabled ? theme.color.textLight : theme.color.text)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
 `;

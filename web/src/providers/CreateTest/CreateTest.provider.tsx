@@ -26,7 +26,7 @@ interface IContext extends ICreateTestState {
   plugin: IPlugin;
   onNext(draftTest?: TDraftTest): void;
   onPrev(): void;
-  onCreateTest(draftTest: TDraftTest): void;
+  onCreateTest(draftTest: TDraftTest, plugin: IPlugin): void;
   onUpdateDraftTest(draftTest: TDraftTest): void;
   onUpdatePlugin(plugin: IPlugin): void;
   onGoTo(stepId: string): void;
@@ -70,12 +70,12 @@ const CreateTestProvider = ({children}: IProps) => {
   const isFinalStep = stepNumber === stepList.length - 1;
 
   const onCreateTest = useCallback(
-    async (draft: TDraftTest) => {
-      const rawTest = await TestService.getRequest(plugin, draft);
+    async (draft: TDraftTest, p: IPlugin) => {
+      const rawTest = await TestService.getRequest(p, draft);
       const test = await createTest(rawTest).unwrap();
       runTest({test});
     },
-    [createTest, plugin, runTest]
+    [createTest, runTest]
   );
 
   const onUpdateDraftTest = useCallback(
@@ -87,12 +87,12 @@ const CreateTestProvider = ({children}: IProps) => {
 
   const onNext = useCallback(
     (draft: TDraftTest = {}) => {
-      if (isFinalStep)
+      /* if (isFinalStep)
         onCreateTest({
           ...draftTest,
           ...draft,
         });
-      else dispatch(setStepNumber({stepNumber: stepNumber + 1}));
+      else dispatch(setStepNumber({stepNumber: stepNumber + 1})); */
 
       onUpdateDraftTest(draft);
     },

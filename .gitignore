@@ -32,3 +32,4 @@ server/html
 docs/docs/cli/reference/
 
 __debug*
+web/cypress/downloads
