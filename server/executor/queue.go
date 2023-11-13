@@ -324,8 +324,8 @@ func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, 
 
 	ctx = context.WithValue(ctx, "LastInstanceID", job.Headers.Get("InstanceID"))
 
-	ctx, cancelCtx := context.WithCancel(ctx)
-	q.listenForStopRequests(context.Background(), cancelCtx, job)
+	ctx, cancelCtx := context.WithCancelCause(ctx)
+	q.listenForUserRequests(context.Background(), cancelCtx, job)
 
 	return ctx, Job{
 		Headers:        job.Headers,
@@ -336,34 +336,44 @@ func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, 
 		PollingProfile: q.resolvePollingProfile(ctx, job),
 		DataStore:      q.resolveDataStore(ctx, job),
 	}
-
 }
 
-type StopRequest struct {
+type UserRequestType string
+
+var (
+	UserRequestTypeStop            UserRequestType = "stop"
+	UserRequestSkipTraceCollection UserRequestType = "skip_trace_collection"
+)
+
+type UserRequest struct {
 	TestID id.ID
 	RunID  int
 }
 
-func (sr StopRequest) ResourceID() string {
+func (sr UserRequest) ResourceID(requestType UserRequestType) string {
 	runID := (test.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
-	return runID + "/stop"
+	return fmt.Sprintf("%s/%s", runID, requestType)
 }
 
-func (q Queue) listenForStopRequests(ctx context.Context, cancelCtx context.CancelFunc, job Job) {
+var (
+	ErrSkipTraceCollection = errors.New("skip trace collection")
+)
+
+func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.CancelCauseFunc, job Job) {
 	if q.subscriptor == nil {
 		return
 	}
 
 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		cancelCtx()
-		stopRequest, ok := m.Content.(StopRequest)
+		cancelCtx(nil)
+		request, ok := m.Content.(UserRequest)
 		if !ok {
 			return nil
 		}
 
-		run, err := q.runs.GetRun(ctx, stopRequest.TestID, stopRequest.RunID)
+		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
 		if err != nil {
-			return fmt.Errorf("failed to get run %d for test %s: %w", stopRequest.RunID, stopRequest.TestID, err)
+			return fmt.Errorf("failed to get run %d for test %s: %w", request.RunID, request.TestID, err)
 		}
 
 		if run.State == test.RunStateStopped {
@@ -371,10 +381,29 @@ func (q Queue) listenForStopRequests(ctx context.Context, cancelCtx context.Canc
 		}
 
 		return q.cancelRunHandlerFn(ctx, run)
-
 	})
 
-	q.subscriptor.Subscribe((StopRequest{job.Test.ID, job.Run.ID}).ResourceID(), sfn)
+	spfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		request, ok := m.Content.(UserRequest)
+		if !ok {
+			return nil
+		}
+
+		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
+		if err != nil {
+			return fmt.Errorf("failed to get run %d for test %s: %w", request.RunID, request.TestID, err)
+		}
+
+		if run.State == test.RunStateStopped || run.State.IsFinal() {
+			return nil
+		}
+
+		cancelCtx(ErrSkipTraceCollection)
+		return nil
+	})
+
+	q.subscriptor.Subscribe((UserRequest{job.Test.ID, job.Run.ID}).ResourceID(UserRequestTypeStop), sfn)
+	q.subscriptor.Subscribe((UserRequest{job.Test.ID, job.Run.ID}).ResourceID(UserRequestSkipTraceCollection), spfn)
 }
 
 func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuite {

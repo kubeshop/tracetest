@@ -27,6 +27,9 @@ type Test struct {
 
 	Trigger Trigger `json:"trigger,omitempty"`
 
+	// If true, the test will not collect a trace
+	SkipTraceCollection bool `json:"skipTraceCollection,omitempty"`
+
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`
 

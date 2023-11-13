@@ -2,6 +2,7 @@ package tracepollerworker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -52,11 +53,24 @@ func (w *tracePollerStarterWorker) ProcessItem(ctx context.Context, job executor
 	ctx, span := w.state.tracer.Start(ctx, "Start polling trace")
 	defer span.End()
 
+	if job.Run.SkipTraceCollection {
+		emitEvent(ctx, w.state, events.TracePollingSkipped(job.Test.ID, job.Run.ID))
+		w.outputQueue.Enqueue(ctx, job)
+		return
+	}
+
 	populateSpan(span, job, "", nil)
 
 	select {
 	default:
 	case <-ctx.Done():
+		err := context.Cause(ctx)
+		if errors.Is(err, executor.ErrSkipTraceCollection) {
+			ctx = context.Background()
+			emitEvent(ctx, w.state, events.TracePollingSkipped(job.Test.ID, job.Run.ID))
+			w.outputQueue.Enqueue(ctx, job)
+		}
+
 		return
 	}
 

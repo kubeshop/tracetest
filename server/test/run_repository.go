@@ -82,6 +82,8 @@ INSERT INTO test_runs (
 	-- required gates
 	"required_gates_result",
 
+	"skip_trace_collection",
+
 	"tenant_id"
 ) VALUES (
 	nextval('` + runSequenceName + `'), -- id
@@ -114,7 +116,8 @@ INSERT INTO test_runs (
 	$14, -- variable_set
 	$15, -- linter
 	$16,  -- required_gates_result
-	$17  -- tenant_id
+	$17, -- skip_trace_collection
+	$18  -- tenant_id
 )
 RETURNING "id"`
 
@@ -189,6 +192,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		jsonVariableSet,
 		jsonlinter,
 		jsonGatesResult,
+		run.SkipTraceCollection,
 	)
 
 	var runID int
@@ -391,7 +395,8 @@ const (
 	test_suite_run_steps.test_suite_run_id,
 	test_suite_run_steps.test_suite_run_test_suite_id,
 	"linter",
-	"required_gates_result"
+	"required_gates_result",
+	"skip_trace_collection"
 `
 
 	baseSql = `
@@ -547,6 +552,7 @@ func readRunRow(row scanner) (Run, error) {
 		&testSuiteID,
 		&jsonLinter,
 		&jsonGatesResult,
+		&r.SkipTraceCollection,
 	)
 
 	if err != nil {

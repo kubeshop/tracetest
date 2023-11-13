@@ -2,6 +2,7 @@ package tracepollerworker
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -64,6 +65,11 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 	ctx, span := w.state.tracer.Start(ctx, "Evaluating trace")
 	defer span.End()
 
+	if job.Run.SkipTraceCollection {
+		w.donePolling(ctx, "Trace Collection Skipped", job)
+		return
+	}
+
 	traceNotFound := job.Headers.GetBool("traceNotFound")
 
 	if traceNotFound && !tracePollerTimedOut(ctx, job) {
@@ -71,7 +77,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		populateSpan(span, job, "", nil)
 
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, 0, job.EnqueueCount(), false, "trace not found on data store"))
-		enqueueTraceFetchJob(ctx, job, w.state)
+		w.enqueueTraceFetchJob(ctx, job)
 		return
 	}
 
@@ -135,13 +141,17 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		emitEvent(ctx, w.state, events.TracePollingIterationInfo(job.Test.ID, job.Run.ID, totalSpans, job.EnqueueCount(), false, reason))
 
 		log.Printf("[TracePoller] Test %s Run %d: Not done polling. (%s)", job.Test.ID, job.Run.ID, reason)
-
-		enqueueTraceFetchJob(ctx, job, w.state)
+		w.enqueueTraceFetchJob(ctx, job)
 		return
 	}
-	log.Printf("[TracePoller] Test %s Run %d: Done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 
+	w.donePolling(ctx, reason, job)
+}
+
+func (w *tracePollerEvaluatorWorker) donePolling(ctx context.Context, reason string, job executor.Job) {
+	log.Printf("[TracePoller] Test %s Run %d: Done polling. (%s)", job.Test.ID, job.Run.ID, reason)
 	log.Printf("[TracePoller] Test %s Run %d: Start Sorting", job.Test.ID, job.Run.ID)
+
 	if job.Run.Trace == nil {
 		newTrace := traces.NewTrace(job.Run.TraceID.String(), []traces.Span{})
 		job.Run.Trace = &newTrace
@@ -183,7 +193,7 @@ func tracePollerTimedOut(ctx context.Context, job executor.Job) bool {
 	return timedOut
 }
 
-func enqueueTraceFetchJob(ctx context.Context, job executor.Job, state *workerState) {
+func (w *tracePollerEvaluatorWorker) enqueueTraceFetchJob(ctx context.Context, job executor.Job) {
 	go func() {
 		log.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.Run.ID, job.EnqueueCount())
 		time.Sleep(job.PollingProfile.Periodic.RetryDelayDuration())
@@ -194,10 +204,17 @@ func enqueueTraceFetchJob(ctx context.Context, job executor.Job, state *workerSt
 		select {
 		default:
 		case <-ctx.Done():
+			err := context.Cause(ctx)
+			if errors.Is(err, executor.ErrSkipTraceCollection) {
+				ctx = context.Background()
+				emitEvent(ctx, w.state, events.TracePollingSkipped(job.Test.ID, job.Run.ID))
+				w.donePolling(ctx, "Trace Collection Skipped", job)
+			}
+
 			return // user requested to stop the process
 		}
 
 		// inputQueue is set as the trace fetch queue by our pipeline engine
-		state.inputQueue.Enqueue(ctx, job)
+		w.state.inputQueue.Enqueue(ctx, job)
 	}()
 }
