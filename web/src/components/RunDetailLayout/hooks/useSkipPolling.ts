@@ -32,12 +32,13 @@ const useSkipPolling = () => {
     const newRun = await dispatch(
       TestSpecsActions.publish({test: {...test, skipTraceCollection: true}, testId: test.id, runId})
     ).unwrap();
-    navigate(`/test/${test.id}/run/${newRun.id}`);
     setIsLoading(false);
+    navigate(`/test/${test.id}/run/${newRun.id}`);
   }, [dispatch, navigate, runId, test]);
 
   useEffect(() => {
     if (isRunStateFinished(state) && shouldSave) editAndReRun();
+    else if (isRunStateFinished(state)) setIsLoading(false);
   }, [dispatch, editAndReRun, shouldSave, state, test]);
 
   return {onSkipPolling, isLoading};
