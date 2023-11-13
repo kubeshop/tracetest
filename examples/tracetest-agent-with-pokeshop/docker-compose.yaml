@@ -1,0 +1,206 @@
+name: tracetest
+services:
+    cache:
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            timeout: 3s
+            interval: 1s
+            retries: 60
+        image: redis:6
+        networks:
+            default: null
+        restart: unless-stopped
+    demo-api:
+        depends_on:
+            cache:
+                condition: service_healthy
+                required: true
+            postgres:
+                condition: service_healthy
+                required: true
+            queue:
+                condition: service_healthy
+                required: true
+        environment:
+            COLLECTOR_ENDPOINT: http://tracetest-agent:4317
+            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+            NPM_RUN_COMMAND: api
+            POKE_API_BASE_URL: https://pokeapi.co/api/v2
+            RABBITMQ_HOST: queue
+            REDIS_URL: cache
+        healthcheck:
+            test:
+                - CMD
+                - wget
+                - --spider
+                - localhost:8081
+            timeout: 3s
+            interval: 1s
+            retries: 60
+        image: kubeshop/demo-pokemon-api:latest
+        networks:
+            default: null
+        ports:
+            - mode: ingress
+              target: 8081
+              published: 8081
+              protocol: tcp
+        pull_policy: always
+        restart: unless-stopped
+    demo-rpc:
+        depends_on:
+            cache:
+                condition: service_healthy
+                required: true
+            postgres:
+                condition: service_healthy
+                required: true
+            queue:
+                condition: service_healthy
+                required: true
+        environment:
+            COLLECTOR_ENDPOINT: http://tracetest-agent:4317
+            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+            NPM_RUN_COMMAND: rpc
+            POKE_API_BASE_URL: https://pokeapi.co/api/v2
+            RABBITMQ_HOST: queue
+            REDIS_URL: cache
+        healthcheck:
+            test:
+                - CMD
+                - lsof
+                - -i
+                - "8082"
+            timeout: 3s
+            interval: 1s
+            retries: 60
+        image: kubeshop/demo-pokemon-api:latest
+        networks:
+            default: null
+        ports:
+            - mode: ingress
+              target: 8082
+              published: 8082
+              protocol: tcp
+        pull_policy: always
+        restart: unless-stopped
+    demo-streaming-worker:
+        depends_on:
+            cache:
+                condition: service_healthy
+                required: true
+            postgres:
+                condition: service_healthy
+                required: true
+            stream:
+                condition: service_healthy
+                required: true
+        environment:
+            COLLECTOR_ENDPOINT: http://tracetest-agent:4317
+            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+            KAFKA_BROKER: stream:9092
+            KAFKA_CLIENT_ID: streaming-worker
+            KAFKA_TOPIC: pokemon
+            NPM_RUN_COMMAND: stream-worker
+            POKE_API_BASE_URL: https://pokeapi.co/api/v2
+            REDIS_URL: cache
+            ZIPKIN_URL: http://localhost:9411
+        image: kubeshop/demo-pokemon-api:latest
+        networks:
+            default: null
+    demo-worker:
+        depends_on:
+            cache:
+                condition: service_healthy
+                required: true
+            postgres:
+                condition: service_healthy
+                required: true
+            queue:
+                condition: service_healthy
+                required: true
+        environment:
+            COLLECTOR_ENDPOINT: http://tracetest-agent:4317
+            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+            NPM_RUN_COMMAND: worker
+            POKE_API_BASE_URL: https://pokeapi.co/api/v2
+            RABBITMQ_HOST: queue
+            REDIS_URL: cache
+        image: kubeshop/demo-pokemon-api:latest
+        networks:
+            default: null
+        pull_policy: always
+        restart: unless-stopped
+    postgres:
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+        healthcheck:
+            test:
+                - CMD-SHELL
+                - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+            timeout: 5s
+            interval: 1s
+            retries: 60
+        image: postgres:14
+        networks:
+            default: null
+    queue:
+        healthcheck:
+            test:
+                - CMD-SHELL
+                - rabbitmq-diagnostics -q check_running
+            timeout: 5s
+            interval: 1s
+            retries: 60
+        image: rabbitmq:3.8-management
+        networks:
+            default: null
+        restart: unless-stopped
+    stream:
+        environment:
+            CLUSTER_ID: ckjPoprWQzOf0-FuNkGfFQ
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://stream:9092,PLAINTEXT_HOST://127.0.0.1:29092
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+            KAFKA_CONTROLLER_QUORUM_VOTERS: 1@0.0.0.0:9093
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+            KAFKA_HEAP_OPTS: -Xmx200m -Xms200m
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://:29092
+            KAFKA_METADATA_LOG_MAX_RECORD_BYTES_BETWEEN_SNAPSHOTS: "2800"
+            KAFKA_METADATA_LOG_SEGMENT_MS: "15000"
+            KAFKA_METADATA_MAX_RETENTION_MS: "60000"
+            KAFKA_NODE_ID: "1"
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+            KAFKA_PROCESS_ROLES: controller,broker
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+        healthcheck:
+            test:
+                - CMD-SHELL
+                - nc -z stream 9092
+            timeout: 10s
+            interval: 5s
+            retries: 10
+            start_period: 10s
+        image: confluentinc/cp-kafka:latest-ubi8
+        networks:
+            default: null
+        ports:
+            - mode: ingress
+              target: 29092
+              published: 29092
+              protocol: tcp
+    tracetest-agent:
+        environment:
+            TRACETEST_DEV: ${TRACETEST_DEV}
+            TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+        image: kubeshop/tracetest-agent:latest
+        networks:
+            default: null
+networks:
+    default:
+        name: tracetest_default
