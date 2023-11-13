@@ -50,7 +50,7 @@ const TriggerServiceByTypeMap = {
 
 const TestService = () => ({
   async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: Test): Promise<TRawTestResource> {
-    const {name, description} = draft;
+    const {name, description, skipTraceCollection = false} = draft;
     const triggerService = TriggerServiceMap[pluginName];
     const request = await triggerService.getRequest(draft);
 
@@ -66,6 +66,7 @@ const TestService = () => ({
         name,
         description,
         trigger,
+        skipTraceCollection,
         ...(original
           ? {
               outputs: toRawTestOutputs(original.outputs ?? []),
@@ -83,13 +84,14 @@ const TestService = () => ({
     return (isBasicDetails && basicDetailsValidation(draft)) || (isTriggerValid && authValidation(draft));
   },
 
-  getInitialValues({trigger: {request, type}, name, description}: Test) {
+  getInitialValues({trigger: {request, type}, name, description, skipTraceCollection}: Test) {
     const triggerService = TriggerServiceByTypeMap[type];
 
     return {
       name,
       description,
       type,
+      skipTraceCollection,
       ...triggerService.getInitialValues!(request),
     };
   },

@@ -68,6 +68,7 @@ export interface IBasicValues {
   name: string;
   description: string;
   testSuite: string;
+  skipTraceCollection: boolean;
 }
 
 export interface ITraceIDValues extends IHttpValues {

@@ -6,7 +6,7 @@ const SSL = () => (
   <S.SSLVerificationContainer>
     <label htmlFor="sslVerification">Enable SSL certificate verification</label>
     <Form.Item name="sslVerification" valuePropName="checked" style={{marginBottom: 0}}>
-      <Switch />
+      <Switch id="sslVerification" />
     </Form.Item>
     <TooltipQuestion title="Verify SSL certificates when sending the request. Verification failures will result in the request being aborted." />
   </S.SSLVerificationContainer>

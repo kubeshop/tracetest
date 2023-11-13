@@ -4,7 +4,7 @@ import GrpcService from 'services/Triggers/Grpc.service';
 import {IRpcValues, TDraftTestForm} from 'types/Test.types';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {Editor, FileUpload} from 'components/Inputs';
-import {Auth, Metadata} from 'components/Fields';
+import {Auth, Metadata, SkipTraceCollection} from 'components/Fields';
 
 interface IProps {
   form: TDraftTestForm<IRpcValues>;
@@ -64,6 +64,10 @@ const RequestDetailsForm = ({form}: IProps) => {
 
       <Tabs.TabPane forceRender tab="Metadata" key="metadata">
         <Metadata />
+      </Tabs.TabPane>
+
+      <Tabs.TabPane forceRender tab="Settings" key="settings">
+        <SkipTraceCollection />
       </Tabs.TabPane>
     </Tabs>
   );

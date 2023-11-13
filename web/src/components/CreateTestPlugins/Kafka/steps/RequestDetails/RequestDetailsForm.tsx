@@ -1,8 +1,9 @@
 import {Form, Tabs} from 'antd';
 import KeyValueListInput from 'components/Fields/KeyValueList';
-import {PlainAuth, SSL} from 'components/Fields';
+import {PlainAuth, SSL, SkipTraceCollection} from 'components/Fields';
 import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
+import * as S from './RequestDetails.styled';
 
 const RequestDetailsForm = () => {
   return (
@@ -47,7 +48,10 @@ const RequestDetailsForm = () => {
       </Tabs.TabPane>
 
       <Tabs.TabPane forceRender tab="Settings" key="settings">
-        <SSL />
+        <S.SettingsContainer>
+          <SSL />
+          <SkipTraceCollection />
+        </S.SettingsContainer>
       </Tabs.TabPane>
     </Tabs>
   );

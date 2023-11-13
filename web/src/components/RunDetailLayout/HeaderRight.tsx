@@ -1,11 +1,9 @@
-import {CloseCircleOutlined} from '@ant-design/icons';
-import {Button, Tooltip} from 'antd';
 import CreateButton from 'components/CreateButton';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
-import {isRunStateFinished, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
+import {isRunPollingState, isRunStateFinished, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
@@ -14,6 +12,8 @@ import * as S from './RunDetailLayout.styled';
 import EventLogPopover from '../EventLogPopover/EventLogPopover';
 import RunStatusIcon from '../RunStatusIcon/RunStatusIcon';
 import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
+import TracePollingActions from '../SkipPollingPopover/SkipPollingPopover';
+import useSkipPolling from './hooks/useSkipPolling';
 
 interface IProps {
   testId: string;
@@ -24,13 +24,13 @@ const HeaderRight = ({testId}: IProps) => {
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
   const {
-    isLoadingStop,
-    run: {state, requiredGatesResult},
+    run: {state, requiredGatesResult, createdAt},
     run,
-    stopRun,
     runEvents,
   } = useTestRun();
   const {onRun} = useTest();
+
+  const {onSkipPolling, isLoading} = useSkipPolling();
 
   return (
     <S.Section $justifyContent="flex-end">
@@ -39,18 +39,8 @@ const HeaderRight = ({testId}: IProps) => {
         <S.StateContainer data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
           <TestState testState={state} />
-          {state === TestStateEnum.AWAITING_TRACE && (
-            <S.StopContainer>
-              <Tooltip title="Stop test execution">
-                <Button
-                  disabled={isLoadingStop}
-                  icon={<CloseCircleOutlined />}
-                  onClick={stopRun}
-                  shape="circle"
-                  type="link"
-                />
-              </Tooltip>
-            </S.StopContainer>
+          {isRunPollingState(state) && (
+            <TracePollingActions startTime={createdAt} isLoading={isLoading} skipPolling={onSkipPolling} />
           )}
         </S.StateContainer>
       )}

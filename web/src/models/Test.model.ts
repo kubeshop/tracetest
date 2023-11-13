@@ -32,6 +32,7 @@ Test.FromRawTest = ({
   summary = {},
   outputs = [],
   createdAt = '',
+  skipTraceCollection = false,
 }: TRawTest): Test => {
   return {
     id,
@@ -39,6 +40,7 @@ Test.FromRawTest = ({
     version,
     description,
     createdAt,
+    skipTraceCollection,
     definition: TestSpecs({specs}),
     trigger: Trigger(rawTrigger || {}),
     summary: Summary(summary),

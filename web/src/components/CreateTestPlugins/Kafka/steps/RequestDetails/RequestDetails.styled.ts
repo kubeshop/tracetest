@@ -16,9 +16,8 @@ export const HeaderContainer = styled.div`
   grid-template-columns: 40% 40% 19%;
   margin-bottom: 8px;
 `;
-
-export const SSLVerificationContainer = styled.div`
-  align-items: center;
+export const SettingsContainer = styled.div`
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 14px;
 `;
