@@ -1,14 +1,14 @@
 ---
 id: server
 title: Configuring the Tracetest Server
-description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to get started with creating tests once you open Tracetest.
+description: Tracetest Core requires a minimal configuration to be launched. Connect to a PostgreSQL database which is installed as part of the "tracetest server install" command.
 keywords:
   - tracetest
   - trace-based testing
   - observability
   - distributed tracing
   - testing
-image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
 Tracetest requires a very minimal configuration to be launched, needing just the connection information to connect with the PostgreSQL database which is installed as part of the server install. There are a couple of ways to provide this database connection information.
@@ -60,4 +60,4 @@ You can also change the defaults for the Tracetest server, altering the port and
 - `TRACETEST_SERVER_HTTPPORT=11633`
 - `TRACETEST_SERVER_PATHPREFIX="/"`
 
-You can also initialize the server with a number of resources the first time it is launched by using [provisioning](./provisioning).
+You can also initialize the server with a number of resources the first time it is launched by using [provisioning](/core/configuration/provisioning).

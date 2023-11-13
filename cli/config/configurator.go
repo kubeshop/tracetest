@@ -117,8 +117,15 @@ func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags)
 			return err
 		}
 
-		flags.OrganizationID = claims["organization_id"].(string)
-		flags.EnvironmentID = claims["environment_id"].(string)
+		organizationId := claims["organization_id"].(string)
+		environmentId := claims["environment_id"].(string)
+
+		if organizationId != "" {
+			flags.OrganizationID = organizationId
+		}
+		if environmentId != "" {
+			flags.EnvironmentID = environmentId
+		}
 	}
 
 	if flags.AgentApiKey != "" {

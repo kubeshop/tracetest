@@ -51,6 +51,29 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 }
 
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
+	err := w.trigger(ctx, triggerRequest)
+	if err != nil {
+		sendErr := w.client.SendTriggerResponse(ctx, &proto.TriggerResponse{
+			RequestID:           triggerRequest.RequestID,
+			AgentIdentification: w.client.SessionConfiguration().AgentIdentification,
+			TestID:              triggerRequest.GetTestID(),
+			RunID:               triggerRequest.GetRunID(),
+			TriggerResult: &proto.TriggerResult{
+				Error: &proto.Error{
+					Message: err.Error(),
+				},
+			},
+		})
+
+		if sendErr != nil {
+			return fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
+		}
+	}
+
+	return err
+}
+
+func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
 	triggerConfig := convertProtoToTrigger(triggerRequest.Trigger)
 	triggerer, err := w.registry.Get(triggerConfig.Type)
 	if err != nil {

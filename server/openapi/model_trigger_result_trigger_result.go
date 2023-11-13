@@ -17,6 +17,8 @@ type TriggerResultTriggerResult struct {
 	Traceid TraceidResponse `json:"traceid,omitempty"`
 
 	Kafka KafkaResponse `json:"kafka,omitempty"`
+
+	Error TriggerError `json:"error,omitempty"`
 }
 
 // AssertTriggerResultTriggerResultRequired checks if the required fields are not zero-ed
@@ -31,6 +33,9 @@ func AssertTriggerResultTriggerResultRequired(obj TriggerResultTriggerResult) er
 		return err
 	}
 	if err := AssertKafkaResponseRequired(obj.Kafka); err != nil {
+		return err
+	}
+	if err := AssertTriggerErrorRequired(obj.Error); err != nil {
 		return err
 	}
 	return nil

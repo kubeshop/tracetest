@@ -17,7 +17,7 @@ func TestRunEvents(t *testing.T) {
 	defer rawDB.Close()
 
 	testRepo := test.NewRepository(rawDB)
-	testRunRepo := test.NewRunRepository(rawDB, test.NewCache("test"))
+	testRunRepo := test.NewRunRepository(rawDB)
 
 	test1 := createTestWithName(t, testRepo, "test 1")
 

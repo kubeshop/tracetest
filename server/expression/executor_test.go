@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -243,6 +244,26 @@ func TestFunctionExecution(t *testing.T) {
 			Name:       "should_generate_a_random_int_and_fail_comparison",
 			Query:      `randomInt(10,20) < 10`,
 			ShouldPass: false,
+		},
+		{
+			Name:       "should_generate_date_string",
+			Query:      fmt.Sprintf(`date() = "%s"`, time.Now().Format(time.DateOnly)),
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_generate_date_string",
+			Query:      fmt.Sprintf(`date("DD/MM/YYYY") = "%s"`, time.Now().Format("02/01/2006")),
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_generate_date_string",
+			Query:      fmt.Sprintf(`dateTime() = "%s"`, time.Now().Format(time.RFC3339)),
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_generate_date_string",
+			Query:      fmt.Sprintf(`dateTime("DD/MM/YYYY hh:mm") = "%s"`, time.Now().Format("02/01/2006 15:04")),
+			ShouldPass: true,
 		},
 	}
 

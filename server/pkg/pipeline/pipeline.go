@@ -20,7 +20,7 @@ type Pipeline[T any] struct {
 	queues []*Queue[T] // N + 1
 }
 
-type workerDriver[T any] interface {
+type WorkerDriver[T any] interface {
 	QueueDriver[T]
 	Start()
 	Stop()
@@ -40,7 +40,7 @@ type InputQueueSetter[T any] interface {
 }
 
 type Step[T any] struct {
-	Driver           workerDriver[T]
+	Driver           WorkerDriver[T]
 	Processor        StepProcessor[T]
 	InputQueueOffset int
 }

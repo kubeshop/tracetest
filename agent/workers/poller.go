@@ -50,6 +50,29 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
+	err := w.poll(ctx, request)
+	if err != nil {
+		sendErr := w.client.SendTrace(ctx, &proto.PollingResponse{
+			RequestID:           request.RequestID,
+			AgentIdentification: w.client.SessionConfiguration().AgentIdentification,
+			TestID:              request.GetTestID(),
+			RunID:               request.GetRunID(),
+			TraceID:             request.TraceID,
+			TraceFound:          false,
+			Error: &proto.Error{
+				Message: err.Error(),
+			},
+		})
+
+		if sendErr != nil {
+			return fmt.Errorf("could not report polling error back to the server: %w. Original error: %s", sendErr, err.Error())
+		}
+	}
+
+	return err
+}
+
+func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) error {
 	datastoreConfig, err := convertProtoToDataStore(request.Datastore)
 	if err != nil {
 		return err

@@ -1,28 +1,35 @@
-# Kubernetes Deployment
-
-<!-- Docusaurus imports start -->
+---
+id: kubernetes
+title:  Kubernetes Deployment
+description: Guides for deploying Tracetest Core in Kubernetes. Tracetest Core allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-<!-- Docusaurus imports end -->
-
-This guide walks you through deploying Tracetest with Kubernetes.
+This guide walks you through deploying Tracetest Core in Kubernetes.
 
 :::note
 This is an example of a production-ready deployment, but real-world deployments can vary significantly depending on desired performance and scale.
 This setup is ideal for CI/CD environments and QA teams working in shared environments. You can use a remote or local ([minikube](https://minikube.sigs.k8s.io/docs/start/), [kind](https://kind.sigs.k8s.io/), [k3d](https://k3d.io/), etc) cluster.
 :::
 
-You have two options to install Tracetest on Kubernetes:
+You have two options to install Tracetest Core in Kubernetes:
 
-- Using the [Tracetest CLI](../getting-started/installation) to guide your installation
+- Using the [Tracetest CLI](/core/getting-started/installation) to guide your installation
 - Using the official [Helm chart](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest)
 
 <Tabs groupId="kubernetes-installation">
   <TabItem value="cli" label="Tracetest CLI" default>
 
-First, install Tracetest CLI following the instructions on [Getting Started](../getting-started/installation#install-the-tracetest-cli).
+First, install Tracetest CLI following the instructions on [Getting Started](/core/getting-started/installation#install-the-tracetest-cli).
 
 After installing the CLI, run:
 
@@ -35,8 +42,6 @@ How do you want to run TraceTest? [type to search]:
   Using Docker Compose
 > Using Kubernetes
 ```
-
-<!-- ![Installer using docker compose](../img/installer/1_docker-compose_0.7.0.png) -->
 
 Select `Using Kubernetes` and follow the instructions.
 

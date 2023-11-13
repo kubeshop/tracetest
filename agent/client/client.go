@@ -2,18 +2,30 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
+	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"google.golang.org/grpc"
 )
 
+const (
+	ReconnectRetryAttempts     = 6
+	ReconnectRetryAttemptDelay = 1 * time.Second
+	defaultPingPeriod          = 30 * time.Second
+)
+
 type Config struct {
-	APIKey    string
-	AgentName string
+	APIKey     string
+	AgentName  string
+	PingPeriod time.Duration
 }
 
 type SessionConfig struct {
@@ -22,6 +34,8 @@ type SessionConfig struct {
 }
 
 type Client struct {
+	mutex         sync.Mutex
+	endpoint      string
 	conn          *grpc.ClientConn
 	config        Config
 	sessionConfig *SessionConfig
@@ -69,7 +83,10 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
-	c.startHearthBeat(ctx)
+	err = c.startHearthBeat(ctx)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -143,4 +160,50 @@ func (c *Client) getName() (string, error) {
 
 func isCancelledError(err error) bool {
 	return err != nil && strings.Contains(err.Error(), "context canceled")
+}
+
+func (c *Client) reconnect() error {
+	// connection is not working. We need to reconnect
+	err := retry.Do(func() error {
+		return c.connect(context.Background())
+	}, retry.Attempts(ReconnectRetryAttempts), retry.Delay(ReconnectRetryAttemptDelay))
+
+	if err != nil {
+		return fmt.Errorf("could not reconnect to server: %w", err)
+	}
+
+	return c.Start(context.Background())
+}
+
+func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
+	if !isConnectionError(inputErr) {
+		// if it's nil or any error other than the one we care about, return it and let the caller handle it
+		return false, inputErr
+	}
+
+	err := retry.Do(func() error {
+		return c.reconnect()
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return true, nil
+}
+
+func isConnectionError(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "connection refused")
+}
+
+func isEndOfFileError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	if isEof := errors.Is(err, io.EOF); isEof {
+		return true
+	}
+
+	return strings.Contains(err.Error(), "EOF")
 }

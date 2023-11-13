@@ -177,3 +177,44 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	assert.True(t, pollingResponse.TraceFound)
 	assert.Len(t, pollingResponse.Spans, 2)
 }
+
+func TestPollerWithInvalidDataStore(t *testing.T) {
+	ctx := context.Background()
+	controlPlane := mocks.NewGrpcServer()
+
+	client, err := client.Connect(ctx, controlPlane.Addr())
+	require.NoError(t, err)
+
+	pollerWorker := workers.NewPollerWorker(client)
+
+	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
+		return pollerWorker.Poll(ctx, pr)
+	})
+
+	err = client.Start(ctx)
+	require.NoError(t, err)
+
+	pollingRequest := proto.PollingRequest{
+		TestID:  "test",
+		RunID:   1,
+		TraceID: "42a2c381da1a5b3a32bc4988bf2431b0",
+		Datastore: &proto.DataStore{
+			Type: "tempo",
+			Tempo: &proto.TempoConfig{
+				Type: "http",
+				Http: &proto.HttpClientSettings{
+					Url: "http://localhost:16686", // invalid jaeger port, this should cause an error
+				},
+			},
+		},
+	}
+
+	controlPlane.SendPollingRequest(&pollingRequest)
+
+	time.Sleep(1 * time.Second)
+
+	pollingResponse := controlPlane.GetLastPollingResponse()
+	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
+	assert.NotNil(t, pollingResponse.Error)
+	assert.Contains(t, pollingResponse.Error.Message, "connection refused")
+}

@@ -33,3 +33,17 @@ components:
               $ref: "./traceid.yaml#/components/schemas/TRACEIDResponse"
             kafka:
               $ref: "./kafka.yaml#/components/schemas/KafkaResponse"
+            error:
+              $ref: "#/components/schemas/TriggerError"
+
+    TriggerError:
+      type: object
+      properties:
+        connectionError:
+          type: boolean
+        runningOnContainer:
+          type: boolean
+        targetsLocalhost:
+          type: boolean
+        message:
+          type: string

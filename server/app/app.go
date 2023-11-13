@@ -30,6 +30,7 @@ import (
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/provisioning"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -42,6 +43,7 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/kubeshop/tracetest/server/version"
+	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -226,7 +228,7 @@ func (app *App) Start(opts ...appOption) error {
 	variableSetRepo := variableset.NewRepository(db)
 	linterRepo := analyzer.NewRepository(db)
 	testRepo := test.NewRepository(db)
-	runRepo := test.NewRunRepository(db, test.NewCache(instanceID, test.WithMetricMeter(meter)))
+	runRepo := test.NewRunRepository(db)
 	testRunnerRepo := testrunner.NewRepository(db)
 	tracesRepo := traces.NewTraceRepository(db)
 
@@ -240,7 +242,14 @@ func (app *App) Start(opts ...appOption) error {
 		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
 	}
 
+	natsConn, err := nats.Connect(app.cfg.NATSEndpoint())
+	if err != nil {
+		log.Printf("could not connect to NATS: %s. Defaulting to InMemory Queues", err)
+	}
+
+	executorDriverFactory := pipeline.NewDriverFactory[executor.Job](natsConn)
 	testPipeline := buildTestPipeline(
+		executorDriverFactory,
 		pool,
 		pollingProfileRepo,
 		dataStoreRepo,
@@ -274,9 +283,10 @@ func (app *App) Start(opts ...appOption) error {
 		testSuitePipeline.Stop()
 	})
 
+	testConnectionDriverFactory := pipeline.NewDriverFactory[testconnection.Job](natsConn)
 	dsTestListener := testconnection.NewListener()
 	dsTestPipeline := buildDataStoreTestPipeline(
-		pool,
+		testConnectionDriverFactory,
 		dsTestListener,
 		tracer,
 		tracedbFactory,

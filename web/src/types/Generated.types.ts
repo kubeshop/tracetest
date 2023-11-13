@@ -2053,7 +2053,14 @@ export interface external {
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
             traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDResponse"];
             kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaResponse"];
+            error?: external["triggers.yaml"]["components"]["schemas"]["TriggerError"];
           };
+        };
+        TriggerError: {
+          connectionError?: boolean;
+          runningOnContainer?: boolean;
+          targetsLocalhost?: boolean;
+          message?: string;
         };
       };
     };
