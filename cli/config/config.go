@@ -31,14 +31,15 @@ type ConfigFlags struct {
 }
 
 type Config struct {
-	Scheme         string  `yaml:"scheme"`
-	Endpoint       string  `yaml:"endpoint"`
-	ServerPath     *string `yaml:"serverPath,omitempty"`
-	OrganizationID string  `yaml:"organizationID,omitempty"`
-	EnvironmentID  string  `yaml:"environmentID,omitempty"`
-	Token          string  `yaml:"token,omitempty"`
-	Jwt            string  `yaml:"jwt,omitempty"`
-	AgentApiKey    string  `yaml:"-"`
+	Scheme            string  `yaml:"scheme"`
+	Endpoint          string  `yaml:"endpoint"`
+	ServerPath        *string `yaml:"serverPath,omitempty"`
+	OrganizationID    string  `yaml:"organizationID,omitempty"`
+	EnvironmentID     string  `yaml:"environmentID,omitempty"`
+	Token             string  `yaml:"token,omitempty"`
+	Jwt               string  `yaml:"jwt,omitempty"`
+	AgentApiKey       string  `yaml:"-"`
+	EndpointOverriden bool    `yaml:"-"`
 
 	// cloud config
 	CloudAPIEndpoint string `yaml:"-"`
@@ -55,7 +56,7 @@ func (c Config) URL() string {
 }
 
 func (c Config) UI() string {
-	if c.UIEndpoint != "" {
+	if c.UIEndpoint != "" && !c.EndpointOverriden {
 		return fmt.Sprintf("%s/organizations/%s/environments/%s", strings.TrimSuffix(c.UIEndpoint, "/"), c.OrganizationID, c.EnvironmentID)
 	}
 

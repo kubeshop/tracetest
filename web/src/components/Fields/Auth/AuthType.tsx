@@ -1,5 +1,5 @@
 import {Form, Select} from 'antd';
-import * as S from '../../CreateTestPlugins/Rest/steps/RequestDetails/RequestDetails.styled';
+import * as S from '../../TestPlugins/Forms/Rest/Rest.styled';
 
 const authMethodList = [
   {

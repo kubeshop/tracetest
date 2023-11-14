@@ -193,7 +193,21 @@ func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
 }
 
 func isConnectionError(err error) bool {
-	return err != nil && strings.Contains(err.Error(), "connection refused")
+	if err == nil {
+		return false
+	}
+
+	possibleErrors := []string{
+		"connection refused",
+		"server closed",
+	}
+	for _, possibleErr := range possibleErrors {
+		if strings.Contains(err.Error(), possibleErr) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func isEndOfFileError(err error) bool {
