@@ -1,6 +1,6 @@
 import {Empty, Typography} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
-import useShortcut from 'components/TestPlugins/EntryPoint/hooks/useShortcut';
+import useShortcut from 'components/TestPlugins/hooks/useShortcut';
 import FormFactory from 'components/TestPlugins/FormFactory';
 import * as S from './CreateTest.styled';
 import Header from './Header';

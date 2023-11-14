@@ -32,7 +32,7 @@ const renderTab = (title: string, triggerType: TriggerTypes, isDisabled: boolean
 export const FORM_ID = 'create-test';
 
 const Content = ({triggerType}: IProps) => {
-  const {onCreateTest, onUpdatePlugin} = useCreateTest();
+  const {onCreateTest, onUpdatePlugin, draftTest} = useCreateTest();
   useDocumentTitle(`Create - ${triggerType} test`);
 
   useEffect(() => {
@@ -44,6 +44,10 @@ const Content = ({triggerType}: IProps) => {
 
   const onValidate = useValidateTestDraft({pluginName: plugin.name, setIsValid});
   const [form] = Form.useForm<TDraftTest>();
+
+  useEffect(() => {
+    onValidate({}, draftTest);
+  }, []);
 
   const tabBarExtraContent = useMemo(
     () => ({
@@ -61,7 +65,7 @@ const Content = ({triggerType}: IProps) => {
         form={form}
         layout="vertical"
         name={FORM_ID}
-        initialValues={{name: 'Untitled Test'}}
+        initialValues={draftTest}
         onFinish={values => onCreateTest(values, plugin)}
         onValuesChange={onValidate}
       >

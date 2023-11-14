@@ -1,23 +1,33 @@
 import parseCurl from 'parse-curl';
-import {ICurlValues, ITriggerService} from 'types/Test.types';
+import {ICurlValues, IImportService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import HttpRequest from 'models/HttpRequest.model';
+import {Plugins} from 'constants/Plugins.constants';
 
-interface ICurlTriggerService extends ITriggerService {
+interface ICurlTriggerService extends IImportService {
   getRequestFromCommand(command: string): ICurlValues;
   getIsValidCommand(command: string): boolean;
 }
 
 const CurlTriggerService = (): ICurlTriggerService => ({
-  async getRequest(draft) {
-    const {url, method, auth, headers, body} = draft as ICurlValues;
+  async getRequest(values) {
+    const {command} = values as ICurlValues;
+    const draft = this.getRequestFromCommand(command);
 
-    return HttpRequest({url, method, auth, headers, body});
+    return {
+      draft: {
+        ...draft,
+        name: draft.url,
+      },
+      plugin: Plugins.REST,
+    };
   },
 
   async validateDraft(draft) {
-    const {url, method} = draft as ICurlValues;
+    const {command} = draft as ICurlValues;
+    if (!this.getIsValidCommand(command)) return false;
+
+    const {url, method} = this.getRequestFromCommand(command);
     return Validator.required(url) && Validator.required(method);
   },
 

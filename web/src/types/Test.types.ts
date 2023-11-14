@@ -85,6 +85,16 @@ export interface ITriggerService {
   getInitialValues?(draft: TTriggerRequest): TDraftTest;
 }
 
+export interface IImportResult {
+  draft: TDraftTest;
+  plugin: IPlugin;
+}
+
+export interface IImportService {
+  getRequest(values: TDraftTest): Promise<IImportResult>;
+  validateDraft(draft: TDraftTest): Promise<boolean>;
+}
+
 export interface ICreateTestState {
   draftTest: TDraftTest;
   pluginName: SupportedPlugins;

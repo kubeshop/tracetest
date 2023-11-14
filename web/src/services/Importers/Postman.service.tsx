@@ -1,9 +1,9 @@
 import {Collection, Item, ItemGroup, Request, RequestAuthDefinition, VariableDefinition} from 'postman-collection';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {IPostmanValues, ITriggerService, TDraftTestForm, TRequestAuth} from 'types/Test.types';
+import {IImportService, IPostmanValues, TDraftTestForm, TRequestAuth} from 'types/Test.types';
 import Validator from 'utils/Validator';
-import HttpRequest from 'models/HttpRequest.model';
 import HttpService from '../Triggers/Http.service';
+import {Plugins} from '../../constants/Plugins.constants';
 
 export interface RequestDefinitionExtended extends Request {
   id: string;
@@ -12,7 +12,7 @@ export interface RequestDefinitionExtended extends Request {
 
 type AuthType = 'apiKey' | 'basic' | 'bearer';
 
-interface IPostmanTriggerService extends ITriggerService {
+interface IPostmanTriggerService extends IImportService {
   valuesFromRequest(
     requests: RequestDefinitionExtended[],
     variables: VariableDefinition[],
@@ -32,15 +32,22 @@ interface IPostmanTriggerService extends ITriggerService {
 }
 
 const Postman = (): IPostmanTriggerService => ({
-  async getRequest(draft) {
-    const {url, method, auth, headers, body} = draft as IPostmanValues;
+  async getRequest(values) {
+    const {collectionTest, variables, requests} = values as IPostmanValues;
+    const draft = (await this.valuesFromRequest(requests, variables, collectionTest || '')) || {};
 
-    return HttpRequest({url, method, auth, headers, body});
+    return {
+      draft: {...draft, name: draft.url},
+      plugin: Plugins.REST,
+    };
   },
-  async validateDraft(draft) {
-    const {collectionTest} = draft as IPostmanValues;
+  async validateDraft(values) {
+    const {collectionTest, variables, requests} = values as IPostmanValues;
 
-    return Validator.required(collectionTest) && HttpService.validateDraft(draft);
+    if (!Validator.required(collectionTest)) return false;
+
+    const draft = await this.valuesFromRequest(requests, variables, collectionTest || '');
+    return !!draft && HttpService.validateDraft(draft);
   },
   valuesFromRequest(requests, variables, identifier) {
     const request = requests.find(({id}) => identifier === id);
