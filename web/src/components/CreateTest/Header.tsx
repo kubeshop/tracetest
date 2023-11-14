@@ -1,18 +1,17 @@
-import CreateButton from 'components/CreateButton';
 import {Form} from 'antd';
+import AllowButton, {Operation} from 'components/AllowButton';
+import CreateButton from 'components/CreateButton';
 import {TriggerTypes} from 'constants/Test.constants';
-import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import EntryPointFactory from 'components/TestPlugins/EntryPointFactory';
-import AllowButton, {Operation} from '../AllowButton';
 import * as S from './CreateTest.styled';
 
 interface IProps {
-  triggerType: TriggerTypes;
+  isLoading: boolean;
   isValid: boolean;
+  triggerType: TriggerTypes;
 }
 
-const Header = ({triggerType, isValid}: IProps) => {
-  const {isLoading} = useCreateTest();
+const Header = ({isLoading, isValid, triggerType}: IProps) => {
   const form = Form.useFormInstance();
 
   return (
@@ -23,13 +22,13 @@ const Header = ({triggerType, isValid}: IProps) => {
 
       <S.HeaderRight>
         <AllowButton
-          operation={Operation.Edit}
           block
           ButtonComponent={CreateButton}
           data-cy="run-test-submit"
           disabled={!isValid}
           loading={isLoading}
           onClick={() => form.submit()}
+          operation={Operation.Edit}
           type="primary"
         >
           Run

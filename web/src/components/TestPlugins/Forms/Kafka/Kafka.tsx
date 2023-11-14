@@ -11,10 +11,6 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Message" key="message">
-      <Form.Item label="Topic" data-cy="topic" name="topic" rules={[{required: true, message: 'Please enter a topic'}]}>
-        <Editor type={SupportedEditors.Interpolation} placeholder="my-topic" />
-      </Form.Item>
-
       <Form.Item label="Key" data-cy="message-key" name="messageKey">
         <Editor type={SupportedEditors.Interpolation} placeholder="my-message-name" />
       </Form.Item>
@@ -29,13 +25,19 @@ const RequestDetailsForm = () => (
       </Form.Item>
     </Tabs.TabPane>
 
+    <Tabs.TabPane forceRender tab="Topic" key="topic">
+      <Form.Item data-cy="topic" name="topic" rules={[{required: true, message: 'Please enter a topic'}]}>
+        <Editor type={SupportedEditors.Interpolation} placeholder="my-topic" />
+      </Form.Item>
+    </Tabs.TabPane>
+
     <Tabs.TabPane forceRender tab="Headers" key="headers">
       <KeyValueList
         name="headers"
-        label="Message Headers"
+        label=""
         addButtonLabel="Add Header"
-        keyPlaceholder="Header Key"
-        valuePlaceholder="Header Value"
+        keyPlaceholder="Header"
+        valuePlaceholder="Value"
         initialValue={[{key: '', value: ''}]}
       />
     </Tabs.TabPane>
