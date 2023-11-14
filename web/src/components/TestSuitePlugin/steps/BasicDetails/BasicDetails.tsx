@@ -1,9 +1,9 @@
 import {Form} from 'antd';
 import {useCallback} from 'react';
-import * as Step from 'components/CreateTestPlugins/Step.styled';
+import * as Step from 'components/TestPlugins/Step.styled';
 import {useCreateTestSuite} from 'providers/CreateTestSuite';
 import {TDraftTestSuite} from 'types/TestSuite.types';
-import BasicDetailsForm from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
+import BasicDetailsForm from 'components/BasicDetailsForm/BasicDetailsForm';
 import {ComponentNames} from 'constants/Plugins.constants';
 
 const BasicDetails = () => {
