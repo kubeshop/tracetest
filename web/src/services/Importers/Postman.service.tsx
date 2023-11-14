@@ -37,7 +37,7 @@ const Postman = (): IPostmanTriggerService => ({
     const draft = (await this.valuesFromRequest(requests, variables, collectionTest || '')) || {};
 
     return {
-      draft: {...draft, name: draft.url},
+      draft,
       plugin: Plugins.REST,
     };
   },
@@ -60,6 +60,7 @@ const Postman = (): IPostmanTriggerService => ({
         })) || [];
 
       return {
+        name: request.name,
         url: this.substituteVariable(variables, url),
         method: request?.method as HTTP_METHOD,
         headers,
