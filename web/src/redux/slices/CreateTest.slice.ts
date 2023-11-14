@@ -1,14 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {ICreateTestState, TCreateTestSliceActions} from 'types/Test.types';
-import {Plugins} from 'constants/Plugins.constants';
 import {SupportedPlugins} from 'constants/Common.constants';
 
 export const initialState: ICreateTestState = {
   draftTest: {
     name: 'Untitled Test',
   },
-  stepList: Plugins.REST.stepList,
-  stepNumber: 0,
   pluginName: SupportedPlugins.REST,
   isFormValid: true,
 };
@@ -27,22 +24,12 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
       state,
       {
         payload: {
-          plugin: {name, stepList},
+          plugin: {name},
         },
       }
     ) {
       state.pluginName = name;
-      state.stepList = stepList;
       state.draftTest = {};
-    },
-    setStepNumber(state, {payload: {stepNumber, completeStep = true}}) {
-      const currentStep = state.stepList[state.stepNumber];
-      if (completeStep) currentStep.status = 'complete';
-      else if (currentStep.status !== 'complete') currentStep.status = 'pending';
-
-      const nextStep = state.stepList[stepNumber];
-      state.stepNumber = stepNumber;
-      if (nextStep && nextStep.status !== 'complete') state.stepList[stepNumber].status = 'selected';
     },
     setDraftTest(state, {payload: {draftTest}}) {
       state.draftTest = {
@@ -53,5 +40,5 @@ const createTestSlice = createSlice<ICreateTestState, TCreateTestSliceActions, '
   },
 });
 
-export const {setPlugin, setStepNumber, setDraftTest, reset, setIsFormValid} = createTestSlice.actions;
+export const {setPlugin, setDraftTest, reset, setIsFormValid} = createTestSlice.actions;
 export default createTestSlice.reducer;

@@ -3,8 +3,8 @@ import {useMemo} from 'react';
 import {TDraftTest, TDraftTestForm} from 'types/Test.types';
 import Test from 'models/Test.model';
 import TestService from 'services/Test.service';
-import BasicDetailsForm from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
-import EditRequestDetails from './EditRequestDetails/EditRequestDetails';
+import FormFactory from 'components/TestPlugins/FormFactory';
+import BasicDetailsForm from '../BasicDetailsForm/BasicDetailsForm';
 import * as S from './EditTestForm.styled';
 
 export const FORM_ID = 'edit-test';
@@ -41,7 +41,7 @@ const EditTestForm = ({
       <S.FormContainer>
         <BasicDetailsForm />
 
-        <EditRequestDetails form={form} type={type} />
+        <FormFactory type={type} />
       </S.FormContainer>
     </Form>
   );

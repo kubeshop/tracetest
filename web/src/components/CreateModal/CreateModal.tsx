@@ -1,6 +1,6 @@
 import {ICreateTestStep} from 'types/Plugins.types';
-import CreateTestSteps from '../CreateSteps';
-import CreateStepFooter from '../CreateSteps/CreateStepFooter';
+import CreateTestSteps from './CreateSteps';
+import CreateStepFooter from './CreateSteps/CreateStepFooter';
 import * as S from './CreateModal.styled';
 
 interface IProps {

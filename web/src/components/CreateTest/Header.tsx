@@ -2,9 +2,9 @@ import CreateButton from 'components/CreateButton';
 import {Form} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import EntryPointFactory from 'components/TestPlugins/EntryPointFactory';
 import AllowButton, {Operation} from '../AllowButton';
 import * as S from './CreateTest.styled';
-import TriggerHeaderBar from './TriggerHeaderBar';
 
 interface IProps {
   triggerType: TriggerTypes;
@@ -18,7 +18,7 @@ const Header = ({triggerType, isValid}: IProps) => {
   return (
     <S.Header>
       <S.HeaderLeft>
-        <TriggerHeaderBar type={triggerType} />
+        <EntryPointFactory type={triggerType} />
       </S.HeaderLeft>
 
       <S.HeaderRight>

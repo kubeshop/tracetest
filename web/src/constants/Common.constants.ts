@@ -62,10 +62,7 @@ export enum RouterSearchFields {
 
 export enum SupportedPlugins {
   REST = 'REST',
-  CURL = 'CURL',
   GRPC = 'GRPC',
-  Postman = 'Postman',
-  OpenAPI = 'OpenAPI',
   TraceID = 'TraceID',
   Kafka = 'Kafka',
 }
