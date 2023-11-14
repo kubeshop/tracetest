@@ -74,14 +74,14 @@ const (
 		t.specs,
 		t.outputs,
 		t.created_at,
-		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id) as total_runs,
+		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id AND tr.tenant_id = t.tenant_id) as total_runs,
 		last_test_run.created_at as last_test_run_time,
 		last_test_run.pass as last_test_run_pass,
 		last_test_run.fail as last_test_run_fail
 	FROM tests t
 	LEFT OUTER JOIN (
-		SELECT MAX(id) as id, test_id FROM test_runs GROUP BY test_id
-	) as ltr ON ltr.test_id = t.id
+		SELECT MAX(id) as id, test_id, tenant_id FROM test_runs GROUP BY test_id, tenant_id
+	) as ltr ON ltr.test_id = t.id AND ltr.tenant_id = t.tenant_id
 	LEFT OUTER JOIN
 		test_runs last_test_run
 	ON last_test_run.test_id = ltr.test_id AND last_test_run.id = ltr.id
@@ -89,8 +89,8 @@ const (
 
 	testMaxVersionQuery = `
 	INNER JOIN (
-		SELECT id as idx, max(version) as latest_version FROM tests GROUP BY idx
-		) as latest_tests ON latest_tests.idx = t.id AND t.version = latest_tests.latest_version
+		SELECT id as idx, tenant_id, max(version) as latest_version FROM tests GROUP BY idx, tenant_id
+		) as latest_tests ON latest_tests.idx = t.id AND t.version = latest_tests.latest_version AND t.tenant_id = latest_tests.tenant_id
 	`
 )
 
@@ -380,10 +380,7 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		return Test{}, fmt.Errorf("encoding error: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = stmt.ExecContext(
-		ctx,
+	params := sqlutil.TenantInsert(ctx,
 		test.ID,
 		test.Version,
 		test.Name,
@@ -392,8 +389,9 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		specsJson,
 		outputsJson,
 		test.CreatedAt,
-		tenantID,
 	)
+
+	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
 		return Test{}, fmt.Errorf("sql exec: %w", err)
 	}

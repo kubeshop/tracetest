@@ -1,0 +1,42 @@
+---
+id: creating-variable-sets
+title: Defining Variable Sets as Text Files
+description: Configure Variable Sets in Tracetest by using a configuration file that can be applied to your Tracetest instance.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+This page showcases how to create and edit variable sets with the CLI.
+
+:::tip
+[To read more about variable sets check out variable sets concepts.](/concepts/variable-sets)
+:::
+
+Just like Data Stores, you can also manage your variable sets using the CLI and definition files.
+
+A definition  file looks like the following:
+
+```yaml
+type: VariableSet
+spec:
+    name: Production
+    description: Production env variables
+    values:
+    - key: URL
+      value: https://app-production.company.com
+    - key: API_KEY
+      value: mysecret
+```
+
+In order to apply this configuration to your Tracetest instance, make sure to have your [CLI configured](/cli/configuring-your-cli) and run:
+
+```sh
+tracetest apply variableset -f <variableset.yaml>
+```
+
+> If the file contains the property `spec.id`, the operation will be considered a variable set update. If you try to apply a variable set and you get the error: `could not apply variableset: 404 Not Found`, it means the provided ID doesn't exist. Either update the ID to reference an existing variable set or remove the property from the file. Tracetest will create a new variable set and a new ID.

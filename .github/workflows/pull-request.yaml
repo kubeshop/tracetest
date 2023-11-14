@@ -304,9 +304,9 @@ jobs:
           TEST_ENV="${{ matrix.test_env }}" \
           ./run.bash || (cat /tmp/docker-log; exit 1)
 
-  trace-testing:
+  trace-testing-memory:
     needs: [build-docker]
-    name: Tracetesting API Server
+    name: Tracetesting API Server (InMemory)
     runs-on: ubuntu-latest
 
     steps:
@@ -332,6 +332,35 @@ jobs:
 
           ./scripts/wait-for-port.sh 11633
           ./run.sh tracetests || (cat /tmp/docker-log; exit 1)
+
+  trace-testing-nats:
+    needs: [build-docker]
+    name: Tracetesting API Server (NATS)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: tracetest-dist
+          path: dist/
+
+      - name: Import image
+        run: |
+          docker load --input dist/image.tar
+
+      - name: Start services
+        run: |
+          ./run.sh down up
+          ./run.sh tracetest-logs > /tmp/docker-log &
+      - name: Run tests
+        run: |
+          chmod +x ./dist/tracetest ./dist/tracetest-server
+
+          ./scripts/wait-for-port.sh 11633
+          NATS=true ./run.sh tracetests || (cat /tmp/docker-log; exit 1)
 
   e2e-cli:
     name: CLI e2e tests

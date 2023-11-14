@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -13,10 +12,6 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 	"github.com/kubeshop/tracetest/server/variableset"
-	"github.com/patrickmn/go-cache"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -33,94 +28,13 @@ type RunRepository interface {
 	GetTestSuiteRunSteps(_ context.Context, _ id.ID, runID int) ([]Run, error)
 }
 
-type Cache struct {
-	cache                 *cache.Cache
-	instanceID            string
-	cacheLatencyHistogram metric.Int64Histogram
-}
-
-type CacheConfig struct {
-	meter metric.Meter
-}
-
-type CacheOption func(*CacheConfig)
-
-func WithMetricMeter(meter metric.Meter) CacheOption {
-	return func(c *CacheConfig) {
-		c.meter = meter
-	}
-}
-
-func NewCache(instanceID string, opts ...CacheOption) *Cache {
-	cacheConfig := &CacheConfig{
-		meter: noop.NewMeterProvider().Meter("noop"),
-	}
-
-	for _, opt := range opts {
-		opt(cacheConfig)
-	}
-
-	cacheLatencyHistogram, _ := cacheConfig.meter.Int64Histogram("tracetest.cache.latency")
-
-	cache := &Cache{
-		cache:                 cache.New(5*time.Minute, 10*time.Minute),
-		instanceID:            instanceID,
-		cacheLatencyHistogram: cacheLatencyHistogram,
-	}
-
-	return cache
-}
-
-func (c *Cache) thisInstanceCacheKey(run Run) string {
-	return fmt.Sprintf("%s-%s-%d", c.instanceID, run.TestID, run.ID)
-}
-
-func (c *Cache) lastInstanceCacheKey(ctx context.Context, run Run) string {
-	instanceID := c.instanceID
-	if instanceID := ctx.Value("LastInstanceID"); instanceID != nil {
-		instanceID = instanceID.(string)
-	}
-
-	return fmt.Sprintf("%s-%s-%d", instanceID, run.TestID, run.ID)
-}
-
-func (c *Cache) Set(_ context.Context, run Run) error {
-	log.Printf("testRunCache Update %s %d", run.TestID, run.ID)
-	c.cache.Set(c.thisInstanceCacheKey(run), run, cache.DefaultExpiration)
-	return nil
-}
-
-func (c *Cache) Get(ctx context.Context, testID id.ID, runID int) (Run, bool) {
-	begin := time.Now()
-	key := c.lastInstanceCacheKey(ctx, Run{ID: runID, TestID: testID})
-	cached, found := c.cache.Get(key)
-
-	duration := time.Since(begin)
-
-	attributeSet := attribute.NewSet(
-		attribute.String("object_type", "test_run"),
-		attribute.String("key", key),
-		attribute.Bool("hit", found),
-	)
-
-	c.cacheLatencyHistogram.Record(ctx, duration.Milliseconds(), metric.WithAttributeSet(attributeSet))
-
-	if !found {
-		return Run{}, false
-	}
-
-	return cached.(Run), true
-}
-
 type runRepository struct {
-	db    *sql.DB
-	cache *Cache
+	db *sql.DB
 }
 
-func NewRunRepository(db *sql.DB, cache *Cache) RunRepository {
+func NewRunRepository(db *sql.DB) RunRepository {
 	return &runRepository{
-		db:    db,
-		cache: cache,
+		db: db,
 	}
 }
 
@@ -258,12 +172,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		return Run{}, fmt.Errorf("sql exec: %w", err)
 	}
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	var runID int
-	err = tx.QueryRowContext(
-		ctx,
-		replaceRunSequenceName(createRunQuery, test.ID),
+	params := sqlutil.TenantInsert(ctx,
 		test.ID,
 		test.SafeVersion(),
 		run.CreatedAt,
@@ -280,8 +189,10 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		jsonVariableSet,
 		jsonlinter,
 		jsonGatesResult,
-		tenantID,
-	).Scan(&runID)
+	)
+
+	var runID int
+	err = tx.QueryRowContext(ctx, replaceRunSequenceName(createRunQuery, test.ID), params...).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
 		return Run{}, fmt.Errorf("sql exec: %w", err)
@@ -417,8 +328,6 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		return fmt.Errorf("sql exec: %w", err)
 	}
 
-	r.cache.Set(ctx, run)
-
 	return nil
 }
 
@@ -501,11 +410,6 @@ var (
 )
 
 func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Run, error) {
-	cached, found := r.cache.Get(ctx, testID, runID)
-	if found {
-		return cached, nil
-	}
-
 	query, params := sqlutil.TenantWithPrefix(ctx, selectRunQuery+" WHERE id = $1 AND test_id = $2", "test_runs.", runID, testID)
 
 	run, err := readRunRow(r.db.QueryRowContext(ctx, query, params...))
@@ -513,7 +417,6 @@ func (r *runRepository) GetRun(ctx context.Context, testID id.ID, runID int) (Ru
 		return Run{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
-	r.cache.Set(ctx, run)
 	return run, nil
 }
 
@@ -655,12 +558,17 @@ func readRunRow(row scanner) (Run, error) {
 		return Run{}, fmt.Errorf("cannot parse TriggerResult: %w", err)
 	}
 
+	err = json.Unmarshal(jsonResolvedTrigger, &r.ResolvedTrigger)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse ResolvedTrigger: %w", err)
+	}
+
 	err = json.Unmarshal(jsonTestResults, &r.Results)
 	if err != nil {
 		return Run{}, fmt.Errorf("cannot parse Results: %w", err)
 	}
 
-	if jsonTrace != nil {
+	if jsonTrace != nil && string(jsonTrace) != "null" {
 		err = json.Unmarshal(jsonTrace, &r.Trace)
 		if err != nil {
 			return Run{}, fmt.Errorf("cannot parse Trace: %w", err)
@@ -744,7 +652,7 @@ func (r *runRepository) GetTestSuiteRunSteps(ctx context.Context, id id.ID, runI
 WHERE test_suite_run_steps.test_suite_run_id = $1 AND test_suite_run_steps.test_suite_run_test_suite_id = $2
 `
 	query, params := sqlutil.TenantWithPrefix(ctx, query, "test_runs.", strconv.Itoa(runID), id)
-	query += ` ORDER BY test_runs.completed_at ASC`
+	query += ` ORDER BY test_runs.created_at ASC`
 
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

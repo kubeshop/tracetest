@@ -1,10 +1,9 @@
-import {Empty, Form, Typography} from 'antd';
-import {TDraftTest} from 'types/Test.types';
+import {Empty, Typography} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
-import EditRequestDetails from 'components/EditTestForm/EditRequestDetails/EditRequestDetails';
+import useShortcut from 'components/TestPlugins/EntryPoint/hooks/useShortcut';
+import FormFactory from 'components/TestPlugins/FormFactory';
 import * as S from './CreateTest.styled';
 import Header from './Header';
-import useShortcut from './hooks/useShortcut';
 
 export const FORM_ID = 'create-test';
 
@@ -14,7 +13,6 @@ interface IProps {
 }
 
 const CreateTest = ({triggerType, isValid}: IProps) => {
-  const form = Form.useFormInstance<TDraftTest>();
   useShortcut();
 
   return (
@@ -23,7 +21,7 @@ const CreateTest = ({triggerType, isValid}: IProps) => {
 
       <S.Body>
         <S.SectionLeft>
-          <EditRequestDetails form={form} type={triggerType} />
+          <FormFactory type={triggerType} />
         </S.SectionLeft>
 
         <S.SectionRight>

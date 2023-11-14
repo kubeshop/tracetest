@@ -113,6 +113,51 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
 }
 
+func TestTriggerInexistentAPI(t *testing.T) {
+	cache := collector.NewTraceCache()
+	controlPlane := mocks.NewGrpcServer()
+
+	client, err := client.Connect(context.Background(), controlPlane.Addr())
+	require.NoError(t, err)
+
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache))
+
+	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
+		err := triggerWorker.Trigger(ctx, tr)
+		return err
+	})
+
+	client.Start(context.Background())
+
+	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
+
+	triggerRequest := &proto.TriggerRequest{
+		TestID:  "my test",
+		RunID:   1,
+		TraceID: traceID,
+		Trigger: &proto.Trigger{
+			Type: "http",
+			Http: &proto.HttpRequest{
+				Method: "GET",
+				Url:    "https://localhost:32148", // hopefully no one uses this port
+				Headers: []*proto.HttpHeader{
+					{Key: "Content-Type", Value: "application/json"},
+				},
+			},
+		},
+	}
+
+	// make the control plane send a trigger request to the agent
+	controlPlane.SendTriggerRequest(triggerRequest)
+	time.Sleep(1 * time.Second)
+
+	response := controlPlane.GetLastTriggerResponse()
+
+	require.NotNil(t, response)
+	assert.NotNil(t, response.TriggerResult.Error)
+	assert.Contains(t, response.TriggerResult.Error.Message, "connection refused")
+}
+
 func createHelloWorldApi() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"hello": "world"}`))

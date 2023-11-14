@@ -1,39 +1,39 @@
 ---
 id: overview
 title: Configuration
-description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to get started with creating tests once you open Tracetest.
+description: Tracetest Core configuration options include both Server and Provisioning on startup. This includes trace data stores as well.
 keywords:
   - tracetest
   - trace-based testing
   - observability
   - distributed tracing
   - testing
-image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1689693872/docs/Blog_Thumbnail_28_ugy2yy.png
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
 There are several configuration options with Tracetest Core:
 
-- [Server configuration](./server) to set database connection information needed to connect to required PostgreSQL instance.
-- [Provisioning configuration](./provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
+- [Server configuration](/core/configuration/server) to set database connection information needed to connect to required PostgreSQL instance.
+- [Provisioning configuration](/core/configuration/provisioning) to 'preload' the Tracetest server with resources when first running the Tracetest server.
 
 ## Supported Trace Data Stores
 
 Tracetest is designed to work with different trace data stores. To enable Tracetest to run end-to-end tests against trace data, you need to configure Tracetest to access trace data.
 
-Currently, Tracetest supports the [following data stores](../../configuration/overview).
+Currently, Tracetest supports the [following data stores](/configuration/overview).
 
 ## Configuring Tracetest Server
 
-Tracetest has a configuration file to contain the minimal information needed to start the Tracetest server. See more at [Tracetest Server Configuration](./server).
+Tracetest has a configuration file to contain the minimal information needed to start the Tracetest server. See more at [Tracetest Server Configuration](/core/configuration/server).
 
-You can also provision the server when it first starts, configuring most aspects of your Tracetest server environment. This is useful in a CI/CD environment to preload and configure the server. See more at [Provisioning a Tracetest Server](./provisioning).
+You can also provision the server when it first starts, configuring most aspects of your Tracetest server environment. This is useful in a CI/CD environment to preload and configure the server. See more at [Provisioning a Tracetest Server](/core/configuration/provisioning).
 
 Many of the server configuration settings can be set individually in the UI or via the CLI.
 
 See:
 
-- [Trace Polling](../../configuration/trace-polling.md)
-- [Test Runner](../../configuration/test-runner.md)
-- [Demo Applications](../../configuration/demo.md)
-- [Analytics](./analytics.mdx)
-- [Telemetry](./telemetry.mdx)
+- [Trace Polling](/configuration/trace-polling)
+- [Test Runner](/configuration/test-runner)
+- [Demo Applications](/configuration/demo)
+- [Analytics](/core/configuration/analytics)
+- [Telemetry](/core/configuration/telemetry)

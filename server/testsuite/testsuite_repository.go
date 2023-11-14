@@ -162,8 +162,8 @@ const getTestSuiteSQL = `
 		%s
 	FROM test_suites t
 	LEFT OUTER JOIN (
-		SELECT MAX(id) as id, test_suite_id FROM test_suite_runs GROUP BY test_suite_id
-	) as ltr ON ltr.test_suite_id = t.id
+		SELECT MAX(id) as id, tenant_id, test_suite_id FROM test_suite_runs GROUP BY test_suite_id, tenant_id
+	) as ltr ON ltr.test_suite_id = t.id AND ltr.tenant_id = t.tenant_id
 	LEFT OUTER JOIN
 		test_suite_runs last_test_suite_run
 	ON last_test_suite_run.test_suite_id = ltr.test_suite_id AND last_test_suite_run.id = ltr.id
@@ -171,8 +171,8 @@ const getTestSuiteSQL = `
 
 const testSuiteMaxVersionQuery = `
 	INNER JOIN (
-		SELECT id as idx, max(version) as latest_version FROM test_suites GROUP BY idx
-	) as latest_test_suites ON latest_test_suites.idx = t.id
+		SELECT id as idx, tenant_id, max(version) as latest_version FROM test_suites GROUP BY idx, tenant_id
+	) as latest_test_suites ON latest_test_suites.idx = t.id AND latest_test_suites.tenant_id = t.tenant_id
 
 	WHERE t.version = latest_test_suites.latest_version `
 
@@ -241,7 +241,7 @@ func querySelect() string {
 				HAVING ts.test_suite_id = t.id AND ts.test_suite_version = t.version
 			) as step_ids_query
 		) as step_ids,
-		(SELECT COUNT(*) FROM test_suite_runs tr WHERE tr.test_suite_id = t.id) as total_runs,
+		(SELECT COUNT(*) FROM test_suite_runs tr WHERE tr.test_suite_id = t.id AND tr.tenant_id = t.tenant_id) as total_runs,
 		last_test_suite_run.created_at as last_test_suite_run_time,
 		last_test_suite_run.pass as last_test_run_pass,
 		last_test_suite_run.fail as last_test_run_fail
@@ -353,17 +353,15 @@ func (r *Repository) insertIntoTestSuites(ctx context.Context, suite TestSuite) 
 	}
 	defer stmt.Close()
 
-	tenantID := sqlutil.TenantID(ctx)
-
-	_, err = stmt.ExecContext(
-		ctx,
+	params := sqlutil.TenantInsert(ctx,
 		suite.ID,
 		suite.GetVersion(),
 		suite.Name,
 		suite.Description,
 		suite.GetCreatedAt(),
-		tenantID,
 	)
+
+	_, err = stmt.ExecContext(ctx, params...)
 	if err != nil {
 		return TestSuite{}, fmt.Errorf("sql exec: %w", err)
 	}

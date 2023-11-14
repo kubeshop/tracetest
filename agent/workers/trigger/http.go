@@ -15,7 +15,6 @@ import (
 	"github.com/goware/urlx"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func HTTP() Triggerer {
@@ -38,22 +37,6 @@ func httpClient(sslVerification bool) http.Client {
 	}
 }
 
-func newSpanContext(ctx context.Context) trace.SpanContext {
-	spanCtx := trace.SpanContextFromContext(ctx)
-	tid := spanCtx.TraceID()
-	sid := spanCtx.SpanID()
-
-	tracestate, _ := trace.ParseTraceState("tracetest=true")
-	var tf trace.TraceFlags
-	return trace.NewSpanContext(trace.SpanContextConfig{
-		TraceID:    tid,
-		SpanID:     sid,
-		TraceFlags: tf.WithSampled(true),
-		TraceState: tracestate,
-		Remote:     true,
-	})
-}
-
 func (te *httpTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
 	response := Response{
 		Result: trigger.TriggerResult{
@@ -67,7 +50,6 @@ func (te *httpTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trig
 
 	client := httpClient(triggerConfig.HTTP.SSLVerification)
 
-	ctx = trace.ContextWithSpanContext(ctx, newSpanContext(ctx))
 	ctx, cncl := context.WithTimeout(ctx, 30*time.Second)
 	defer cncl()
 

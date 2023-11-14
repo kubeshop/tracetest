@@ -1,0 +1,67 @@
+version: "3.2"
+services:
+  tracetest:
+    restart: unless-stopped
+    image: kubeshop/tracetest:${TAG:-latest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build:
+      context: .
+    volumes:
+      - type: bind
+        source: ./local-config/tracetest.config.nats.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./local-config/tracetest.provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_TESTPIPELINES_TRIGGEREXECUTE_ENABLED: ${TRACETEST_TESTPIPELINES_TRIGGEREXECUTE_ENABLED}
+      TRACETEST_TESTPIPELINES_TRACEFETCH_ENABLED: ${TRACETEST_TESTPIPELINES_TRACEFETCH_ENABLED}
+      TRACETEST_DATASTOREPIPELINES_TESTCONNECTION_ENABLED: ${TRACETEST_DATASTOREPIPELINES_TESTCONNECTION_ENABLED}
+
+  postgres:
+    image: postgres:15.2
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.59.0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "55679:55679"
+      - "4317:4317"
+      - "8888:8888"
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./local-config/collector.config.yaml:/otel-local-config.yaml
+    depends_on:
+      - tracetest
+
+  nats:
+    image: nats:2.10-alpine
+    ports:
+        - "4222:4222" # connecting
+        - "8222:8222" # reporting server

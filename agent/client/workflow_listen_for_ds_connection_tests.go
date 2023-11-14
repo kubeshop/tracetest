@@ -2,10 +2,9 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io"
 	"log"
+	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
 )
@@ -22,12 +21,19 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 		for {
 			req := proto.DataStoreConnectionTestRequest{}
 			err := stream.RecvMsg(&req)
-			if errors.Is(err, io.EOF) || isCancelledError(err) {
+			if isEndOfFileError(err) || isCancelledError(err) {
+				return
+			}
+
+			reconnected, err := c.handleDisconnectionError(err)
+			if reconnected {
 				return
 			}
 
 			if err != nil {
-				log.Fatal("could not get message from ds connection stream: %w", err)
+				log.Println("could not get message from data store connection stream: %w", err)
+				time.Sleep(1 * time.Second)
+				continue
 			}
 
 			// TODO: Get ctx from request

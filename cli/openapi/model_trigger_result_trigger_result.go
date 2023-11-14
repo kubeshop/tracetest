@@ -23,6 +23,7 @@ type TriggerResultTriggerResult struct {
 	Grpc    *GRPCResponse    `json:"grpc,omitempty"`
 	Traceid *TRACEIDResponse `json:"traceid,omitempty"`
 	Kafka   *KafkaResponse   `json:"kafka,omitempty"`
+	Error   *TriggerError    `json:"error,omitempty"`
 }
 
 // NewTriggerResultTriggerResult instantiates a new TriggerResultTriggerResult object
@@ -170,6 +171,38 @@ func (o *TriggerResultTriggerResult) SetKafka(v KafkaResponse) {
 	o.Kafka = &v
 }
 
+// GetError returns the Error field value if set, zero value otherwise.
+func (o *TriggerResultTriggerResult) GetError() TriggerError {
+	if o == nil || isNil(o.Error) {
+		var ret TriggerError
+		return ret
+	}
+	return *o.Error
+}
+
+// GetErrorOk returns a tuple with the Error field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TriggerResultTriggerResult) GetErrorOk() (*TriggerError, bool) {
+	if o == nil || isNil(o.Error) {
+		return nil, false
+	}
+	return o.Error, true
+}
+
+// HasError returns a boolean if a field has been set.
+func (o *TriggerResultTriggerResult) HasError() bool {
+	if o != nil && !isNil(o.Error) {
+		return true
+	}
+
+	return false
+}
+
+// SetError gets a reference to the given TriggerError and assigns it to the Error field.
+func (o *TriggerResultTriggerResult) SetError(v TriggerError) {
+	o.Error = &v
+}
+
 func (o TriggerResultTriggerResult) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o TriggerResultTriggerResult) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Kafka) {
 		toSerialize["kafka"] = o.Kafka
+	}
+	if !isNil(o.Error) {
+		toSerialize["error"] = o.Error
 	}
 	return toSerialize, nil
 }

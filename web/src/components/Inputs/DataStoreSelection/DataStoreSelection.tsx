@@ -1,4 +1,5 @@
 import {Popover, Tabs} from 'antd';
+import {useCallback} from 'react';
 import {noop} from 'lodash';
 import {useTheme} from 'styled-components';
 import {ConfigMode, SupportedDataStores} from 'types/DataStore.types';
@@ -25,8 +26,17 @@ const DataStoreSelection = ({onChange = noop, value = SupportedDataStores.JAEGER
   const {dataStoreConfig} = useSettingsValues();
   const configuredDataStoreType = dataStoreConfig.defaultDataStore.type;
 
+  const handleChange = useCallback(
+    dataStore => {
+      const isDisabled = isLocalModeEnabled && dataStore !== SupportedDataStores.Agent;
+
+      if (!isDisabled) onChange(dataStore);
+    },
+    [isLocalModeEnabled, onChange]
+  );
+
   return (
-    <S.DataStoreListContainer tabPosition="left">
+    <S.DataStoreListContainer tabPosition="left" onChange={handleChange}>
       {supportedDataStoreList.map(dataStore => {
         if (dataStore === SupportedDataStores.Agent && !getFlag(Flag.IsAgentDataStoreEnabled)) {
           return null;
@@ -40,12 +50,7 @@ const DataStoreSelection = ({onChange = noop, value = SupportedDataStores.JAEGER
           <Tabs.TabPane
             key={dataStore}
             tab={
-              <S.DataStoreItemContainer
-                $isDisabled={isDisabled}
-                $isSelected={isSelected}
-                key={dataStore}
-                onClick={() => (isDisabled ? noop() : onChange(dataStore))}
-              >
+              <S.DataStoreItemContainer $isDisabled={isDisabled} $isSelected={isSelected} key={dataStore}>
                 <DataStoreIcon dataStoreType={dataStore} color={isSelected ? primary : text} width="22" height="22" />
 
                 {isDisabled ? (

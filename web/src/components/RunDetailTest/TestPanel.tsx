@@ -123,7 +123,7 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
           />
         </S.SectionLeft>
 
-        <S.SectionRight $shouldScroll={!selectedTestSpec}>
+        <S.SectionRight>
           {isTestSpecFormOpen && (
             <TestSpecForm
               onSubmit={values => {
@@ -202,19 +202,19 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
                   <TestOutputs outputs={outputs} />
                 </Tabs.TabPane>
               </Tabs>
-
-              <TestSpecDetail
-                isOpen={Boolean(selectedTestSpec)}
-                onClose={handleClose}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onRevert={handleRevert}
-                onSelectSpan={handleSelectSpan}
-                selectedSpan={selectedSpan?.id}
-                testSpec={selectedTestSpec}
-              />
             </S.TabsContainer>
           )}
+
+          <TestSpecDetail
+            isOpen={Boolean(selectedTestSpec)}
+            onClose={handleClose}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onRevert={handleRevert}
+            onSelectSpan={handleSelectSpan}
+            selectedSpan={selectedSpan?.id}
+            testSpec={selectedTestSpec}
+          />
         </S.SectionRight>
       </S.Container>
     </FillPanel>

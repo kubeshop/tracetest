@@ -1,0 +1,78 @@
+---
+id: overview
+title: Pokeshop API Demo
+description: As a testing ground, the Tracetest team has implemented a sample API instrumented with OpenTelemetry around the PokeAPI. The reason is to provide a microservice-based system that contains message queues, cache layers, databases, and CRUD operations.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+As a testing ground, the team at Tracetest has implemented a sample instrumented API around the [PokeAPI](https://pokeapi.co/).
+
+The idea is to have a microservice-divided system that behaves like a typical scenario by having async processes ([RabbitMQ](https://www.rabbitmq.com/) and [Kafka](https://kafka.apache.org/)), cache layers ([Redis](https://redis.io/)), database storage ([Postgres](https://www.postgresql.org/)) and simple CRUD interfaces for Pokemons.
+
+With this, users can get familiar with the Tracetest tool by focusing on creating assertions, visualizing the trace and identifying the different data that comes from the Collector ([Jaeger](https://www.jaegertracing.io/)). Users will learn about basic instrumentation practices: what tools to use, what data to send, when, and what suggested standards need to be followed.
+
+:::info
+Want to run tests against the Pokeshop Demo without installing it locally? Click the link below and we will add you to our `tracetest-demo` organization and give you access to the `pokeshop-demo` org as an engineer. You can run and create your own tests!
+
+[👉 **Access the shared demo, here.**](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept)
+:::
+
+- **Source Code**: https://github.com/kubeshop/pokeshop
+- **Running it locally**: [Instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-it-locally)
+- **Running on Kubernetes**: [Instructions](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster)
+
+## Use Cases
+
+We have three use cases that use each component of this structure and that can be observed via Open Telemetry and tested with Tracetest. Each one is triggered by an API call to their respective endpoint:
+
+- [Add Pokemon](/live-examples/pokeshop/use-cases/add-pokemon): Add a new Pokemon only relying on user input into the database.
+- [Get Pokemon by ID](/live-examples/pokeshop/use-cases/get-pokemon-by-id): Given a Pokemon ID, this endpoint returns the data of a Pokemon. If the same Pokemon was queried, the API will use its cache to return it.
+- [List Pokemon](/live-examples/pokeshop/use-cases/list-pokemon): Lists all Pokemons registered into Pokeshop.
+- [Import Pokemon](/live-examples/pokeshop/use-cases/import-pokemon): Given a Pokemon ID, this endpoint does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
+- [Import Pokemon from Stream](/live-examples/pokeshop/use-cases/import-pokemon-from-stream): Listening to a Stream, this use case also does an async process, going to PokeAPI to get Pokemon data and adding it to the database.
+
+## System Architecture
+
+The system is divided into two components:
+
+- an **API** that serves client requests,
+- a **Queue Worker** who deals with background processes, receiving data from the API
+- a **Stream Worker** who handles import events sent from a stream
+
+The communication between the API and Queue Worker is made using a `RabbitMQ` queue, and both services emit telemetry data to Jaeger and communicate with a Postgres database. Additionally, a Stream Worker listens to a `Kafka` stream to see if there is any import event sent on it to execute.
+
+A diagram of the system structure can be seen here:
+
+```mermaid
+flowchart TD
+    A[(Redis)]
+    B[(Postgres)]
+    C(Node.js API)
+    D(RabbitMQ)
+    E(Queue Worker)
+    F(Jaeger)
+    G(Kafka)
+    H(Stream Worker)
+
+    C --> A
+    C --> B
+    C --> D
+    D --> E
+    E --> B
+    C --> F
+    E --> F
+    G --> H
+    H --> B
+    H --> F
+```
+
+In our live tests, we are deploying into a single Kubernetes namespace, deployed via a [Helm chart](https://github.com/kubeshop/pokeshop/blob/master/docs/installing.md#run-on-a-kubernetes-cluster).
+
+The Pokeshop API is only accessible from within the Kubernetes cluster network as Tracetest needs to be able to reach it.

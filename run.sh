@@ -5,6 +5,10 @@ set -e
 export TAG=${TAG:-dev}
 
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
+# use nats version of docker-compose if NATS is set to true
+if [ "$NATS" == "true" ]; then
+  opts="-f docker-compose.nats.yaml -f examples/docker-compose.demo.yaml"
+fi
 
 help_message() {
   echo "usage: ./run.sh [cypress|tracetests|up|stop|build|down|tracetest-logs|logs|ps|restart]"
