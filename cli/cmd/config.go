@@ -93,6 +93,7 @@ func overrideConfig() {
 		}
 		cliConfig.Scheme = scheme
 		cliConfig.Endpoint = endpoint
+		cliConfig.EndpointOverriden = true
 	}
 }
 

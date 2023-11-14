@@ -8,7 +8,7 @@ import HttpRequest from 'models/HttpRequest.model';
 import TraceIDRequest from 'models/TraceIDRequest.model';
 import KafkaRequest from 'models/KafkaRequest.model';
 import {Model, TGrpcSchemas, THttpSchemas, TKafkaSchemas} from './Common.types';
-import {ICreateTestStep, IPlugin} from './Plugins.types';
+import {IPlugin} from './Plugins.types';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
@@ -88,8 +88,6 @@ export interface ITriggerService {
 
 export interface ICreateTestState {
   draftTest: TDraftTest;
-  stepList: ICreateTestStep[];
-  stepNumber: number;
   pluginName: SupportedPlugins;
   isFormValid: boolean;
 }
@@ -97,7 +95,6 @@ export interface ICreateTestState {
 export type TCreateTestSliceActions = {
   reset: CaseReducer<ICreateTestState>;
   setPlugin: CaseReducer<ICreateTestState, PayloadAction<{plugin: IPlugin}>>;
-  setStepNumber: CaseReducer<ICreateTestState, PayloadAction<{stepNumber: number; completeStep?: boolean}>>;
   setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
   setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
 };

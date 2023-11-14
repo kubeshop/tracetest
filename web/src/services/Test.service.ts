@@ -9,8 +9,6 @@ import Test, {TRawTestResource} from 'models/Test.model';
 import TestDefinitionService from './TestDefinition.service';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
-import PostmanService from './Triggers/Postman.service';
-import CurlService from './Triggers/Curl.service';
 import TraceIDService from './Triggers/TraceID.service';
 import KafkaService from './Triggers/Kafka.service';
 
@@ -35,9 +33,6 @@ const TriggerServiceMap = {
   [SupportedPlugins.GRPC]: GrpcService,
   [SupportedPlugins.REST]: HttpService,
   [SupportedPlugins.Kafka]: KafkaService,
-  [SupportedPlugins.OpenAPI]: HttpService,
-  [SupportedPlugins.Postman]: PostmanService,
-  [SupportedPlugins.CURL]: CurlService,
   [SupportedPlugins.TraceID]: TraceIDService,
 } as const;
 
