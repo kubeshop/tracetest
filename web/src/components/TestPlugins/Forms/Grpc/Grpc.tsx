@@ -31,7 +31,7 @@ const RequestDetailsForm = () => {
         <Auth />
       </Tabs.TabPane>
 
-      <Tabs.TabPane forceRender tab="Setup" key="setup">
+      <Tabs.TabPane forceRender tab="Service definition" key="service-definition">
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <FileUpload />
         </Form.Item>
