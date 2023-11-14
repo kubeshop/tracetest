@@ -5,18 +5,18 @@ import {Editor} from 'components/Inputs';
 import * as S from './Metadata.styled';
 
 const Metadata = () => (
-  <Form.Item label="Metadata">
+  <Form.Item>
     <Form.List name="metadata" initialValue={[{key: '', value: ''}]}>
       {(fields, {add, remove}) => (
         <>
-          {fields.map(field => (
+          {fields.map((field, index) => (
             <S.HeaderContainer key={field.name}>
               <Form.Item name={[field.name, 'key']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder="Key" />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`Key ${index + 1}`} />
               </Form.Item>
 
               <Form.Item name={[field.name, 'value']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder="Value" />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`Value ${index + 1}`} />
               </Form.Item>
 
               <Form.Item noStyle>

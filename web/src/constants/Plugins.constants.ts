@@ -14,8 +14,8 @@ export enum ComponentNames {
 
 const Rest: IPlugin = {
   name: SupportedPlugins.REST,
-  title: 'HTTP Request',
-  description: 'Create a basic HTTP request',
+  title: 'HTTP',
+  description: 'Test your HTTP service with an HTTP request',
   isActive: true,
   type: TriggerTypes.http,
   demoList: [],
@@ -23,8 +23,8 @@ const Rest: IPlugin = {
 
 const GRPC: IPlugin = {
   name: SupportedPlugins.GRPC,
-  title: 'GRPC Request',
-  description: 'Test and debug your GRPC request',
+  title: 'gRPC',
+  description: 'Test your gRPC service with a gRPC request',
   isActive: true,
   type: TriggerTypes.grpc,
   demoList: [],
@@ -33,7 +33,7 @@ const GRPC: IPlugin = {
 const Kafka: IPlugin = {
   name: SupportedPlugins.Kafka,
   title: 'Kafka',
-  description: 'Test consumers with Kafka messages',
+  description: 'Test Kafka based services with a Kafka request',
   isActive: true,
   demoList: [],
   type: TriggerTypes.kafka,
@@ -42,7 +42,7 @@ const Kafka: IPlugin = {
 const TraceID: IPlugin = {
   name: SupportedPlugins.TraceID,
   title: 'TraceID',
-  description: 'Define your test via a Trace ID',
+  description: 'Define your test via a TraceID',
   isActive: true,
   demoList: [],
   type: TriggerTypes.traceid,
@@ -51,13 +51,13 @@ const TraceID: IPlugin = {
 export const Plugins = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
-  [SupportedPlugins.TraceID]: TraceID,
   [SupportedPlugins.Kafka]: Kafka,
+  [SupportedPlugins.TraceID]: TraceID,
 } as const;
 
 export const TriggerTypeToPlugin = {
   [TriggerTypes.http]: Plugins.REST,
   [TriggerTypes.grpc]: Plugins.GRPC,
-  [TriggerTypes.traceid]: Plugins.TraceID,
   [TriggerTypes.kafka]: Plugins.Kafka,
+  [TriggerTypes.traceid]: Plugins.TraceID,
 } as const;

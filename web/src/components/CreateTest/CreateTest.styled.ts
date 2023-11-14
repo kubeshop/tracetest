@@ -9,6 +9,7 @@ export const Container = styled.div`
 
 export const Header = styled.div`
   align-items: flex-start;
+  background-color: ${({theme}) => theme.color.white};
   display: flex;
   gap: 20px;
   padding: 18px 24px 14px;
@@ -17,6 +18,13 @@ export const Header = styled.div`
 export const HeaderLeft = styled.div`
   flex: 1;
   overflow: hidden;
+
+  .ant-form-item-with-help .ant-form-item-explain {
+    display: none;
+    min-height: 0;
+    height: 0;
+    transition: none;
+  }
 `;
 
 export const HeaderRight = styled.div`
@@ -25,24 +33,25 @@ export const HeaderRight = styled.div`
 
 export const Body = styled.div`
   display: flex;
-  height: calc(100vh - 211px);
+  height: calc(100vh - 166px);
   width: 100%;
 `;
 
 export const Section = styled.div`
+  background-color: ${({theme}) => theme.color.white};
   flex: 1;
+  overflow-y: scroll;
   padding: 14px 24px;
 `;
 
 export const SectionLeft = styled(Section)`
-  background-color: ${({theme}) => theme.color.white};
-  overflow-y: scroll;
+  .ant-tabs-tab {
+    padding-top: 0;
+  }
 `;
 
 export const SectionRight = styled(Section)`
-  background-color: ${({theme}) => theme.color.white};
   border-left: 1px solid rgba(3, 24, 73, 0.1);
-  overflow-y: scroll;
 `;
 
 export const EmptyContainer = styled.div`

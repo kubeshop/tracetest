@@ -26,11 +26,7 @@ const RequestDetailsForm = () => {
   }, [protoFile]);
 
   return (
-    <Tabs defaultActiveKey="auth">
-      <Tabs.TabPane forceRender tab="Auth" key="auth">
-        <Auth />
-      </Tabs.TabPane>
-
+    <Tabs defaultActiveKey="service-definition">
       <Tabs.TabPane forceRender tab="Service definition" key="service-definition">
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <FileUpload />
@@ -47,8 +43,12 @@ const RequestDetailsForm = () => {
         </Form.Item>
       </Tabs.TabPane>
 
+      <Tabs.TabPane forceRender tab="Auth" key="auth">
+        <Auth />
+      </Tabs.TabPane>
+
       <Tabs.TabPane forceRender tab="Message" key="message">
-        <Form.Item data-cy="message" label="Message" name="message" style={{marginBottom: 0}}>
+        <Form.Item data-cy="message" name="message" style={{marginBottom: 0}}>
           <Editor
             type={SupportedEditors.Interpolation}
             placeholder="Enter message"
