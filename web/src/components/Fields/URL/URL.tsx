@@ -11,14 +11,12 @@ const URL = ({showMethodSelector = true}: IProps) => (
   <>
     <Row>
       {showMethodSelector && (
-        <Col span={2}>
+        <Col span={3}>
           <Form.Item name="method" initialValue={HTTP_METHOD.GET} valuePropName="value" style={{marginBottom: 0}}>
             <Select
-              showSearch
-              className="select-method"
               data-cy="method-select"
-              dropdownClassName="select-dropdown-method"
               filterOption={(input, option) => option?.key?.toLowerCase().includes(input.toLowerCase())}
+              showSearch
             >
               {Object.keys(HTTP_METHOD).map(method => {
                 return (
@@ -32,7 +30,7 @@ const URL = ({showMethodSelector = true}: IProps) => (
         </Col>
       )}
 
-      <Col span={showMethodSelector ? 22 : 24}>
+      <Col span={showMethodSelector ? 21 : 24}>
         <Form.Item
           data-cy="url"
           name="url"

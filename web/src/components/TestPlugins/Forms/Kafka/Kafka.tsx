@@ -1,6 +1,5 @@
 import {Form, Tabs} from 'antd';
-import KeyValueListInput from 'components/Fields/KeyValueList';
-import {PlainAuth, SSL} from 'components/Fields';
+import {KeyValueList, PlainAuth, SSL} from 'components/Fields';
 import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {FORM_ID} from 'pages/CreateTest/Content';
@@ -31,7 +30,7 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Headers" key="headers">
-      <KeyValueListInput
+      <KeyValueList
         name="headers"
         label="Message Headers"
         addButtonLabel="Add Header"

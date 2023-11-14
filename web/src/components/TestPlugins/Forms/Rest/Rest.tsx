@@ -1,8 +1,7 @@
 import {Form, Tabs} from 'antd';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
-import KeyValueListInput from 'components/Fields/KeyValueList';
 import {Body} from 'components/Inputs';
-import {Auth, SSL} from 'components/Fields';
+import {Auth, KeyValueList, SSL} from 'components/Fields';
 import {FORM_ID} from 'pages/CreateTest/Content';
 
 const RequestDetailsForm = () => (
@@ -18,7 +17,7 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Headers" key="headers">
-      <KeyValueListInput
+      <KeyValueList
         name="headers"
         label=""
         addButtonLabel="Add Header"
