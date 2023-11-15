@@ -1,23 +1,22 @@
 import {Empty, Typography} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
-import useShortcut from 'components/TestPlugins/EntryPoint/hooks/useShortcut';
+import useShortcut from 'components/TestPlugins/hooks/useShortcut';
 import FormFactory from 'components/TestPlugins/FormFactory';
 import * as S from './CreateTest.styled';
 import Header from './Header';
 
-export const FORM_ID = 'create-test';
-
 interface IProps {
-  triggerType: TriggerTypes;
+  isLoading: boolean;
   isValid: boolean;
+  triggerType: TriggerTypes;
 }
 
-const CreateTest = ({triggerType, isValid}: IProps) => {
+const CreateTest = ({isLoading, isValid, triggerType}: IProps) => {
   useShortcut();
 
   return (
     <S.Container>
-      <Header triggerType={triggerType} isValid={isValid} />
+      <Header isLoading={isLoading} isValid={isValid} triggerType={triggerType} />
 
       <S.Body>
         <S.SectionLeft>

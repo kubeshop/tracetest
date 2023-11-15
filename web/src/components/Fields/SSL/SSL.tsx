@@ -2,11 +2,15 @@ import {Form, Switch} from 'antd';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import * as S from './SSL.styled';
 
-const SSL = () => (
+interface IProps {
+  formID?: string;
+}
+
+const SSL = ({formID}: IProps) => (
   <S.SSLVerificationContainer>
-    <label htmlFor="sslVerification">Enable SSL certificate verification</label>
+    <label htmlFor={`${formID}_sslVerification`}>Enable SSL certificate verification</label>
     <Form.Item name="sslVerification" valuePropName="checked" style={{marginBottom: 0}}>
-      <Switch id="sslVerification" />
+      <Switch id={`${formID}_sslVerification`} />
     </Form.Item>
     <TooltipQuestion title="Verify SSL certificates when sending the request. Verification failures will result in the request being aborted." />
   </S.SSLVerificationContainer>

@@ -8,6 +8,7 @@ import RequiredGates from './RequiredGates/RequiredGates';
 import SwitchControl from './SwitchControl/SwitchControl';
 import TestSelection from './TestSelection/TestsSelection';
 import TestVariables from './TestVariables/TestVariables';
+import ImportSelector from './ImportSelector/ImportSelector';
 
 export {
   Body,
@@ -20,4 +21,5 @@ export {
   SwitchControl,
   TestSelection,
   TestVariables,
+  ImportSelector,
 };

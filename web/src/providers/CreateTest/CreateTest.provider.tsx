@@ -1,114 +1,67 @@
-import {createContext, useCallback, useContext, useMemo} from 'react';
+import {getDemoByPluginMap} from 'constants/Demo.constants';
 import {noop} from 'lodash';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
-import {IPlugin} from 'types/Plugins.types';
-import {initialState, setDraftTest, setPlugin, reset, setIsFormValid} from 'redux/slices/CreateTest.slice';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import CreateTestSelectors from 'selectors/CreateTest.selectors';
+import useTestCrud from 'providers/Test/hooks/useTestCrud';
+import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import TracetestAPI from 'redux/apis/Tracetest';
-import {ICreateTestState, TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
-import {Plugins} from 'constants/Plugins.constants';
-import useTestCrud from '../Test/hooks/useTestCrud';
+import {IPlugin} from 'types/Plugins.types';
+import {TDraftTest} from 'types/Test.types';
 
 const {useCreateTestMutation} = TracetestAPI.instance;
 
-interface IContext extends ICreateTestState {
+interface IContext {
+  demoList: TDraftTest[];
+  initialValues: TDraftTest;
   isLoading: boolean;
-  plugin: IPlugin;
   onCreateTest(draftTest: TDraftTest, plugin: IPlugin): void;
-  onUpdateDraftTest(draftTest: TDraftTest): void;
-  onUpdatePlugin(plugin: IPlugin): void;
-  onReset(): void;
-  onIsFormValid(isValid: boolean): void;
+  onInitialValues(draftTest: TDraftTest): void;
 }
 
 export const Context = createContext<IContext>({
-  ...initialState,
+  demoList: [],
+  initialValues: {},
   isLoading: false,
-  plugin: Plugins.REST,
   onCreateTest: noop,
-  onUpdateDraftTest: noop,
-  onUpdatePlugin: noop,
-  onReset: noop,
-  onIsFormValid: noop,
+  onInitialValues: noop,
 });
+
+export const useCreateTest = () => useContext(Context);
 
 interface IProps {
   children: React.ReactNode;
 }
 
-export const useCreateTest = () => useContext(Context);
-
 const CreateTestProvider = ({children}: IProps) => {
-  const dispatch = useAppDispatch();
+  const [initialValues, setInitialValues] = useState<TDraftTest>({name: 'Untitled'});
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
-  const {runTest, isEditLoading} = useTestCrud();
-  const {demos} = useSettingsValues();
+  const {runTest, isEditLoading: isLoadingEditTest} = useTestCrud();
 
-  const draftTest = useAppSelector(CreateTestSelectors.selectDraftTest);
-  const plugin = useAppSelector(state => CreateTestSelectors.selectPlugin(state, demos));
-  const isFormValid = useAppSelector(CreateTestSelectors.selectIsFormValid);
+  // TODO: this is a hack to get the demo list for REST plugin
+  const {demos} = useSettingsValues();
+  const demoByPluginMap = getDemoByPluginMap(demos);
+  const demoList = demoByPluginMap['REST'];
 
   const onCreateTest = useCallback(
-    async (draft: TDraftTest, p: IPlugin) => {
-      const rawTest = await TestService.getRequest(p, draft);
+    async (draft: TDraftTest, plugin: IPlugin) => {
+      const rawTest = await TestService.getRequest(plugin, draft);
       const test = await createTest(rawTest).unwrap();
       runTest({test});
     },
     [createTest, runTest]
   );
 
-  const onUpdateDraftTest = useCallback(
-    (update: TDraftTest) => {
-      dispatch(setDraftTest({draftTest: update}));
-    },
-    [dispatch]
-  );
-
-  const onUpdatePlugin = useCallback(
-    (newPlugin: IPlugin) => {
-      dispatch(setPlugin({plugin: newPlugin}));
-    },
-    [dispatch]
-  );
-
-  const onReset = useCallback(() => {
-    dispatch(reset());
-  }, [dispatch]);
-
-  const onIsFormValid = useCallback(
-    (isValid: boolean) => {
-      dispatch(setIsFormValid({isValid}));
-    },
-    [dispatch]
-  );
+  const onInitialValues = useCallback(values => setInitialValues(values), []);
 
   const value = useMemo<IContext>(
     () => ({
-      draftTest,
-      pluginName: plugin.name,
-      plugin,
-      isLoading: isLoadingCreateTest || isEditLoading,
-      isFormValid,
+      demoList,
+      initialValues,
+      isLoading: isLoadingCreateTest || isLoadingEditTest,
       onCreateTest,
-      onUpdateDraftTest,
-      onUpdatePlugin,
-      onReset,
-      onIsFormValid,
+      onInitialValues,
     }),
-    [
-      draftTest,
-      plugin,
-      isLoadingCreateTest,
-      isEditLoading,
-      isFormValid,
-      onCreateTest,
-      onUpdateDraftTest,
-      onUpdatePlugin,
-      onReset,
-      onIsFormValid,
-    ]
+    [demoList, initialValues, isLoadingCreateTest, isLoadingEditTest, onCreateTest, onInitialValues]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

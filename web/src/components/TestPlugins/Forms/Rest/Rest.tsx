@@ -1,13 +1,10 @@
 import {Form, Tabs} from 'antd';
 import {DEFAULT_HEADERS} from 'constants/Test.constants';
-import KeyValueListInput from 'components/Fields/KeyValueList';
 import {Body} from 'components/Inputs';
-import {Auth, SSL, SkipTraceCollection} from 'components/Fields';
-import * as S from './RequestDetails.styled';
+import {Auth, SSL, KeyValueList, SkipTraceCollection} from 'components/Fields';
+import * as S from './Rest.styled';
 
-export const FORM_ID = 'create-test';
-
-const RequestDetailsForm = () => (
+const Rest = () => (
   <Tabs defaultActiveKey="auth">
     <Tabs.TabPane forceRender tab="Auth" key="auth">
       <Auth />
@@ -20,7 +17,7 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Headers" key="headers">
-      <KeyValueListInput
+      <KeyValueList
         name="headers"
         label=""
         addButtonLabel="Add Header"
@@ -32,11 +29,11 @@ const RequestDetailsForm = () => (
 
     <Tabs.TabPane forceRender tab="Settings" key="settings">
       <S.SettingsContainer>
-        <SSL />
+        <SSL formID="rest" />
         <SkipTraceCollection />
       </S.SettingsContainer>
     </Tabs.TabPane>
   </Tabs>
 );
 
-export default RequestDetailsForm;
+export default Rest;
