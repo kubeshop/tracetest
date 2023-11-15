@@ -14,41 +14,37 @@ function isFirstItem(index: number) {
 
 const MultiURL = ({name = ['brokerUrls']}: IProps) => (
   <Form.Item
-    className="input-url"
-    rules={[{required: true, min: 1, message: 'Please enter a Broker URL'}]}
+    rules={[{required: true, min: 1, message: 'Please enter a valid URL'}]}
     shouldUpdate
+    style={{marginBottom: 0}}
   >
     <Form.List name={name.length === 1 ? name[0] : name} initialValue={['']}>
       {(fields, {add, remove}) => (
         <>
           {fields.map((field, index) => (
-            <S.BrokerURLInputContainer key={field.name}>
+            <S.URLContainer key={field.name}>
               <Form.Item name={[field.name]} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Enter a broker URL (${index + 1})`} />
+                <Editor type={SupportedEditors.Interpolation} placeholder={`Enter broker URL (${index + 1})`} />
               </Form.Item>
 
-              {(!isFirstItem(index) && (
+              {!isFirstItem(index) && (
                 <Form.Item noStyle>
-                  <Button
-                    icon={<S.DeleteIcon />}
-                    onClick={() => remove(field.name)}
-                    style={{marginLeft: 12}}
-                    type="link"
-                  />
+                  <Button icon={<S.DeleteIcon />} onClick={() => remove(field.name)} type="link" />
                 </Form.Item>
-              )) || <div />}
-            </S.BrokerURLInputContainer>
+              )}
+            </S.URLContainer>
           ))}
 
-          <Button
-            data-cy="add-broker-url"
-            icon={<PlusOutlined />}
-            onClick={() => add()}
-            style={{fontWeight: 600, height: 'auto', padding: 0}}
-            type="link"
-          >
-            Add URL
-          </Button>
+          <S.AddURLContainer>
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => add()}
+              style={{fontWeight: 600, height: 'auto', padding: 0}}
+              type="link"
+            >
+              New URL
+            </Button>
+          </S.AddURLContainer>
         </>
       )}
     </Form.List>

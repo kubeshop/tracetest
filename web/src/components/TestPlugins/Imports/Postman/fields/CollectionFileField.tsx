@@ -1,7 +1,7 @@
 import {Form} from 'antd';
 import {FileUpload} from 'components/Inputs';
 import React from 'react';
-import {IPostmanValues, TDraftTestForm} from '../../../../../types/Test.types';
+import {IPostmanValues, TDraftTestForm} from 'types/Test.types';
 import {useUploadCollectionCallback} from '../hooks/useUploadCollectionCallback';
 
 interface IProps {

@@ -1,4 +1,4 @@
-import {Radio, Select} from 'antd';
+import {Radio, Select, Typography} from 'antd';
 import {noop} from 'lodash';
 import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
@@ -36,7 +36,7 @@ const Body = ({value = '', onChange = noop}: IProps) => {
       </S.RadioContainer>
       {hasNoBody && (
         <div>
-          <h4>This request has no body {bodyMode}</h4>
+          <Typography.Text type="secondary">This request does not have a body</Typography.Text>
         </div>
       )}
       <S.BodyFieldContainer $isDisplaying={hasNoBody} data-cy="body">

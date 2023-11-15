@@ -16,15 +16,10 @@ interface IProps {
   baseName: string[];
 }
 
-const TypeInput = ({baseName}: IProps) => (
+const PlainAuthType = ({baseName}: IProps) => (
   <S.Row>
-    <Form.Item shouldUpdate style={{minWidth: '100%'}} label="Authentication Type" name={[...baseName, 'type']}>
-      <Select
-        className="select-auth-method"
-        data-cy="auth-type-select"
-        dropdownClassName="select-dropdown-auth-type"
-        placeholder="No Auth"
-      >
+    <Form.Item shouldUpdate style={{minWidth: '100%'}} name={[...baseName, 'type']}>
+      <Select data-cy="auth-type-select" defaultValue={null}>
         {authMethodList.map(({name, value}) => (
           <Select.Option data-cy={`auth-type-select-option-${value}`} key={value} value={value}>
             {name}
@@ -35,4 +30,4 @@ const TypeInput = ({baseName}: IProps) => (
   </S.Row>
 );
 
-export default TypeInput;
+export default PlainAuthType;
