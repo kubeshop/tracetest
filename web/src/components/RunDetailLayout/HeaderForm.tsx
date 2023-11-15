@@ -7,22 +7,20 @@ interface IProps {
   onSubmit(draft: TDraftTest): void;
 }
 
-const HeaderForm = ({name, onSubmit}: IProps) => {
-  return (
-    <Form<TDraftTest>
-      autoComplete="off"
-      initialValues={{name}}
-      name="edit-test-name"
-      onValuesChange={(changedValues: any, draft: TDraftTest) => {
-        if (draft.name === name) return;
-        onSubmit(draft);
-      }}
-    >
-      <Form.Item name="name" noStyle>
-        <Overlay />
-      </Form.Item>
-    </Form>
-  );
-};
+const HeaderForm = ({name, onSubmit}: IProps) => (
+  <Form<TDraftTest>
+    autoComplete="off"
+    initialValues={{name}}
+    name="edit-test-name"
+    onValuesChange={(changedValues: any, draft: TDraftTest) => {
+      if (draft.name === name) return;
+      onSubmit(draft);
+    }}
+  >
+    <Form.Item name="name" noStyle>
+      <Overlay />
+    </Form.Item>
+  </Form>
+);
 
 export default HeaderForm;

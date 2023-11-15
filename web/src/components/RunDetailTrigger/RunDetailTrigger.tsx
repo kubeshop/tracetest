@@ -46,7 +46,7 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
     <S.Container>
       <Form<TDraftTest>
         autoComplete="off"
-        data-cy="edit-test"
+        data-cy="edit-test-form"
         form={form}
         initialValues={initialValues}
         layout="vertical"

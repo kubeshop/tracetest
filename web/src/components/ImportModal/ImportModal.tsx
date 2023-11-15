@@ -49,7 +49,7 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
       footer={
         <>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="primary" disabled={!isValid} onClick={() => form.submit()}>
+          <Button data-cy="import-test-submit" type="primary" disabled={!isValid} onClick={() => form.submit()}>
             Import
           </Button>
         </>

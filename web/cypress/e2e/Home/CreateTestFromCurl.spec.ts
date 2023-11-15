@@ -1,4 +1,3 @@
-import {SupportedPlugins} from '../../../src/constants/Common.constants';
 import {POKEMON_HTTP_ENDPOINT} from '../constants/Test';
 
 describe('Create test from CURL Command', () => {
@@ -9,11 +8,8 @@ describe('Create test from CURL Command', () => {
 
   it('should create a basic GET test', () => {
     cy.interceptHomeApiCall();
-    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-    cy.openTestCreationModal();
-    cy.get(`[data-cy=${SupportedPlugins.CURL.toLowerCase()}-plugin]`).click();
-    cy.fillCreateFormBasicStep(name, 'Create from Curl Command');
-
+    cy.get('[data-cy=import-button]').click();
+    cy.get('[data-cy=curl-plugin]').click();
     cy.get('[data-cy=curl-command-editor] [contenteditable]')
       .first()
       .type(
@@ -23,12 +19,11 @@ describe('Create test from CURL Command', () => {
    `,
         {parseSpecialCharSequences: false}
       );
-    cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
-
+    cy.get(`[data-cy="import-test-submit"]`).click();
     cy.submitCreateForm();
     cy.matchTestRunPageUrl();
     cy.cancelOnBoarding();
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+    cy.get('[data-cy=overlay-input-overlay]').should('contain.text', POKEMON_HTTP_ENDPOINT);
     cy.deleteTest(true);
   });
 });
