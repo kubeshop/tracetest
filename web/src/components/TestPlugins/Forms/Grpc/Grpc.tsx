@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 import GrpcService from 'services/Triggers/Grpc.service';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {Editor, FileUpload} from 'components/Inputs';
-import {Auth, Metadata} from 'components/Fields';
+import {Auth, Metadata, SkipTraceCollection} from 'components/Fields';
 
 const RequestDetailsForm = () => {
   const [methodList, setMethodList] = useState<string[]>([]);
@@ -60,6 +60,10 @@ const RequestDetailsForm = () => {
 
       <Tabs.TabPane forceRender tab="Metadata" key="metadata">
         <Metadata />
+      </Tabs.TabPane>
+
+      <Tabs.TabPane forceRender tab="Settings" key="settings">
+        <SkipTraceCollection />
       </Tabs.TabPane>
     </Tabs>
   );

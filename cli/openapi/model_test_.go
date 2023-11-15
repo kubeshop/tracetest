@@ -27,6 +27,8 @@ type Test struct {
 	Version   *int32     `json:"version,omitempty"`
 	CreatedAt *time.Time `json:"createdAt,omitempty"`
 	Trigger   *Trigger   `json:"trigger,omitempty"`
+	// If true, the test will not collect a trace
+	SkipTraceCollection *bool `json:"skipTraceCollection,omitempty"`
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
@@ -243,6 +245,38 @@ func (o *Test) SetTrigger(v Trigger) {
 	o.Trigger = &v
 }
 
+// GetSkipTraceCollection returns the SkipTraceCollection field value if set, zero value otherwise.
+func (o *Test) GetSkipTraceCollection() bool {
+	if o == nil || isNil(o.SkipTraceCollection) {
+		var ret bool
+		return ret
+	}
+	return *o.SkipTraceCollection
+}
+
+// GetSkipTraceCollectionOk returns a tuple with the SkipTraceCollection field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetSkipTraceCollectionOk() (*bool, bool) {
+	if o == nil || isNil(o.SkipTraceCollection) {
+		return nil, false
+	}
+	return o.SkipTraceCollection, true
+}
+
+// HasSkipTraceCollection returns a boolean if a field has been set.
+func (o *Test) HasSkipTraceCollection() bool {
+	if o != nil && !isNil(o.SkipTraceCollection) {
+		return true
+	}
+
+	return false
+}
+
+// SetSkipTraceCollection gets a reference to the given bool and assigns it to the SkipTraceCollection field.
+func (o *Test) SetSkipTraceCollection(v bool) {
+	o.SkipTraceCollection = &v
+}
+
 // GetSpecs returns the Specs field value if set, zero value otherwise.
 func (o *Test) GetSpecs() []TestSpec {
 	if o == nil || isNil(o.Specs) {
@@ -364,6 +398,9 @@ func (o Test) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Trigger) {
 		toSerialize["trigger"] = o.Trigger
+	}
+	if !isNil(o.SkipTraceCollection) {
+		toSerialize["skipTraceCollection"] = o.SkipTraceCollection
 	}
 	if !isNil(o.Specs) {
 		toSerialize["specs"] = o.Specs

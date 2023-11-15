@@ -64,6 +64,7 @@ func (m OpenAPI) Test(in test.Test) openapi.Test {
 		Version:     int32(*in.Version),
 		CreatedAt:   *in.CreatedAt,
 		Outputs:     m.Outputs(in.Outputs),
+		SkipTraceCollection: in.SkipTraceCollection,
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),
 			LastRun: openapi.TestSummaryLastRun{

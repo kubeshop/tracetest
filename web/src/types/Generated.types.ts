@@ -110,6 +110,10 @@ export interface paths {
     /** stops the execution of a test run */
     post: operations["stopTestRun"];
   };
+  "/tests/{testId}/run/{runId}/skipPolling": {
+    /** skips the trace collection of a test run */
+    post: operations["skipTraceCollection"];
+  };
   "/tests/{testId}/run/{runId}/events": {
     /** get events from a test run */
     get: operations["getTestRunEvents"];
@@ -615,6 +619,16 @@ export interface operations {
   };
   /** stops the execution of a test run */
   stopTestRun: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: unknown;
+      /** could not stop execution, probably it's not running anymore */
+      422: unknown;
+    };
+  };
+  /** skips the trace collection of a test run */
+  skipTraceCollection: {
     parameters: {};
     responses: {
       /** successful operation */
@@ -1774,6 +1788,8 @@ export interface external {
           /** Format: date-time */
           createdAt?: string;
           trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
+          /** @description If true, the test will not collect a trace */
+          skipTraceCollection?: boolean;
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**

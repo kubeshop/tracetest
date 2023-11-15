@@ -8,3 +8,9 @@ export const Row = styled.div`
 export const Label = styled(Typography.Text).attrs({as: 'div'})`
   margin-bottom: 8px;
 `;
+
+export const SettingsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+`;

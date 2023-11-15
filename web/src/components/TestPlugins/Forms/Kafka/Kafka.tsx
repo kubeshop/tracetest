@@ -1,10 +1,10 @@
 import {Form, Tabs} from 'antd';
-import {KeyValueList, PlainAuth, SSL} from 'components/Fields';
+import {KeyValueList, PlainAuth, SSL, SkipTraceCollection} from 'components/Fields';
 import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
-import {FORM_ID} from 'pages/CreateTest/Content';
+import * as S from './Kafka.styled';
 
-const RequestDetailsForm = () => (
+const Kafka = () => (
   <Tabs defaultActiveKey="auth">
     <Tabs.TabPane forceRender tab="Auth" key="auth">
       <PlainAuth />
@@ -43,9 +43,12 @@ const RequestDetailsForm = () => (
     </Tabs.TabPane>
 
     <Tabs.TabPane forceRender tab="Settings" key="settings">
-      <SSL formID={FORM_ID} />
+      <S.SettingsContainer>
+        <SSL formID="kafka" />
+        <SkipTraceCollection />
+      </S.SettingsContainer>
     </Tabs.TabPane>
   </Tabs>
 );
 
-export default RequestDetailsForm;
+export default Kafka;
