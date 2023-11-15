@@ -5,9 +5,10 @@ import {TDraftTest} from 'types/Test.types';
 interface IProps {
   name: string;
   onSubmit(draft: TDraftTest): void;
+  isDisabled: boolean;
 }
 
-const HeaderForm = ({name, onSubmit}: IProps) => (
+const HeaderForm = ({name, onSubmit, isDisabled}: IProps) => (
   <Form<TDraftTest>
     autoComplete="off"
     initialValues={{name}}
@@ -18,7 +19,7 @@ const HeaderForm = ({name, onSubmit}: IProps) => (
     }}
   >
     <Form.Item name="name" noStyle>
-      <Overlay />
+      <Overlay isDisabled={isDisabled} />
     </Form.Item>
   </Form>
 );
