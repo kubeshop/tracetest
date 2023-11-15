@@ -9,12 +9,13 @@ interface IProps {
   id: string;
   disabled?: boolean;
   help?: string;
+  isLoading?: boolean;
   onChange?(value: boolean): void;
 }
 
-const SwitchControl = ({value = false, onChange = noop, text, id, disabled, help}: IProps) => (
+const SwitchControl = ({value = false, isLoading = false, onChange = noop, text, id, disabled, help}: IProps) => (
   <S.SwitchContainer>
-    <Switch onChange={onChange} checked={value} id={id} disabled={disabled} />
+    <Switch loading={isLoading} onChange={onChange} checked={value} id={id} disabled={disabled} />
     <S.SwitchLabel htmlFor={id} $disabled={disabled}>
       {text}
     </S.SwitchLabel>
