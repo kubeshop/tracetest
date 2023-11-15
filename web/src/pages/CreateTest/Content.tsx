@@ -1,15 +1,17 @@
 import {Form, Tabs, TabsProps} from 'antd';
-import {useMemo, useState} from 'react';
 import CreateTest from 'components/CreateTest';
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
+import {getDemoByPluginMap} from 'constants/Demo.constants';
+import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import {RunDetailModes} from 'constants/TestRun.constants';
 import useDocumentTitle from 'hooks/useDocumentTitle';
+import useValidateTestDraft from 'hooks/useValidateTestDraft';
+import {useCreateTest} from 'providers/CreateTest';
+import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
+import {useMemo, useState} from 'react';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {TDraftTest} from 'types/Test.types';
-import useValidateTestDraft from 'hooks/useValidateTestDraft';
-import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
-import {useCreateTest} from 'providers/CreateTest';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 
@@ -41,12 +43,19 @@ const Content = ({triggerType}: IProps) => {
   const [isValid, setIsValid] = useState(false);
   const onValidateTest = useValidateTestDraft({pluginName: plugin.name, setIsValid});
 
+  const {demos} = useSettingsValues();
+
+  const demosByTriggerType = useMemo(() => {
+    const demoByPluginMap = getDemoByPluginMap(demos);
+    return demoByPluginMap[plugin.name];
+  }, [demos, plugin.name]);
+
   const tabBarExtraContent = useMemo(
     () => ({
       left: <HeaderLeft triggerType={triggerType} origin="/" />,
-      right: <HeaderRight />,
+      right: <HeaderRight demos={demosByTriggerType} />,
     }),
-    [triggerType]
+    [demosByTriggerType, triggerType]
   );
 
   return (

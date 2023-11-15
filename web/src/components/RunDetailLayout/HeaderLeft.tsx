@@ -1,8 +1,10 @@
 import {LinkOutlined} from '@ant-design/icons';
-import {useMemo} from 'react';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useMemo} from 'react';
 import Date from 'utils/Date';
+import HeaderForm from './HeaderForm';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
 
@@ -13,15 +15,18 @@ interface IProps {
 }
 
 const HeaderLeft = ({name, triggerType, origin}: IProps) => {
-  const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {}, run} =
-    useTestRun();
+  const {
+    run: {id: runId, createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {},
+    run,
+  } = useTestRun();
+  const {onEditAndReRun} = useTest();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
 
   const description = useMemo(() => {
     return (
       <>
-        {triggerType} • Ran {createdTimeAgo}
+        v{testVersion} • {triggerType} • Ran {createdTimeAgo}
         {testSuiteId && testSuiteRunId && (
           <>
             {' '}
@@ -33,7 +38,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         )}
       </>
     );
-  }, [triggerType, createdTimeAgo, testSuiteId, testSuiteRunId]);
+  }, [triggerType, createdTimeAgo, testSuiteId, testSuiteRunId, testVersion]);
 
   return (
     <S.Section $justifyContent="flex-start">
@@ -42,9 +47,12 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
       </a>
       <S.InfoContainer>
         <S.Row>
-          <S.Title data-cy="test-details-name">
-            {name} (v{testVersion})
-          </S.Title>
+          <HeaderForm
+            name={name}
+            onSubmit={draft => {
+              onEditAndReRun(draft, runId ?? 1);
+            }}
+          />
           <Info
             date={createdAt ?? ''}
             executionTime={executionTime ?? 0}

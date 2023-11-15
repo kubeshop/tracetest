@@ -1,15 +1,15 @@
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import DemoSelector from 'components/DemoSelector';
-import {useCreateTest} from 'providers/CreateTest';
-import {useSettingsValues} from '../../providers/SettingsValues/SettingsValues.provider';
+import {TDraftTest} from 'types/Test.types';
 
-const HeaderRight = () => {
-  const {demoList} = useCreateTest();
-  const {demos} = useSettingsValues();
+interface IProps {
+  demos: TDraftTest[];
+}
 
-  return demoList.length && demos.length ? (
+const HeaderRight = ({demos}: IProps) => {
+  return demos.length ? (
     <S.Section $justifyContent="end">
-      <DemoSelector />
+      <DemoSelector demos={demos} />
     </S.Section>
   ) : (
     <S.Section $justifyContent="" />

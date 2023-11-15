@@ -123,15 +123,6 @@ export const Text = styled(Typography.Text).attrs({
   }
 `;
 
-export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
-  && {
-    && {
-      margin: 0;
-      max-width: calc((100vw / 2) - 200px - 54px);
-    }
-  }
-`;
-
 export const TabLink = styled(Link)<{$isActive: boolean; $isDisabled?: boolean}>`
   && {
     color: ${({theme, $isActive}) => $isActive && theme.color.white};

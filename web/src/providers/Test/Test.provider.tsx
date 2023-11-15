@@ -1,16 +1,20 @@
-import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import TracetestAPI from 'redux/apis/Tracetest';
-import {TDraftTest} from 'types/Test.types';
 import VersionMismatchModal from 'components/VersionMismatchModal';
-import TestService from 'services/Test.service';
+import {noop} from 'lodash';
 import Test from 'models/Test.model';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import TestSpecsActions from 'redux/actions/TestSpecs.actions';
+import TracetestAPI from 'redux/apis/Tracetest';
+import {useAppDispatch} from 'redux/hooks';
+import TestService from 'services/Test.service';
+import {TDraftTest} from 'types/Test.types';
 import useTestCrud, {TTestRunRequest} from './hooks/useTestCrud';
 
 const {useGetTestByIdQuery, useGetTestVersionByIdQuery} = TracetestAPI.instance;
 
 interface IContext {
   onEdit(values: TDraftTest): void;
+  onEditAndReRun(values: TDraftTest, runId: number): void;
   onRun(runRequest?: Partial<TTestRunRequest>): void;
   isLoading: boolean;
   isError: boolean;
@@ -22,6 +26,7 @@ interface IContext {
 
 export const Context = createContext<IContext>({
   onEdit: noop,
+  onEditAndReRun: noop,
   onRun: noop,
   test: {} as Test,
   latestTest: {} as Test,
@@ -40,6 +45,8 @@ interface IProps {
 export const useTest = () => useContext(Context);
 
 const TestProvider = ({children, testId, version = 0}: IProps) => {
+  const dispatch = useAppDispatch();
+  const {navigate} = useDashboard();
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [draft, setDraft] = useState<TDraftTest>({});
   const [action, setAction] = useState<'edit' | 'run'>();
@@ -72,6 +79,17 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
     [edit, isLatestVersion, test]
   );
 
+  const onEditAndReRun = useCallback(
+    async (values: TDraftTest, runId: number) => {
+      const newRun = await dispatch(
+        TestSpecsActions.publish({test: {...currentTest, ...values}, testId: currentTest.id, runId})
+      ).unwrap();
+
+      navigate(`/test/${currentTest.id}/run/${newRun.id}`);
+    },
+    [currentTest, dispatch, navigate]
+  );
+
   const onRun = useCallback(
     (request: Partial<TTestRunRequest> = {}) => {
       if (isLatestVersion)
@@ -100,6 +118,7 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
   const value = useMemo<IContext>(
     () => ({
       onEdit,
+      onEditAndReRun,
       onRun,
       isLoading,
       isError,
@@ -108,7 +127,7 @@ const TestProvider = ({children, testId, version = 0}: IProps) => {
       isLatestVersion,
       isEditLoading,
     }),
-    [onEdit, onRun, isLoading, isError, currentTest, latestTest, isLatestVersion, isEditLoading]
+    [onEdit, onEditAndReRun, onRun, isLoading, isError, currentTest, latestTest, isLatestVersion, isEditLoading]
   );
 
   return currentTest && latestTest ? (
