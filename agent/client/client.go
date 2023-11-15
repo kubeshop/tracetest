@@ -200,6 +200,7 @@ func isConnectionError(err error) bool {
 	possibleErrors := []string{
 		"connection refused",
 		"server closed",
+		"token is expired",
 	}
 	for _, possibleErr := range possibleErrors {
 		if strings.Contains(err.Error(), possibleErr) {
