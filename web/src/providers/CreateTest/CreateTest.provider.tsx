@@ -2,7 +2,7 @@ import {getDemoByPluginMap} from 'constants/Demo.constants';
 import {noop} from 'lodash';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
-import {createContext, useCallback, useContext, useMemo} from 'react';
+import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import TracetestAPI from 'redux/apis/Tracetest';
 import TestService from 'services/Test.service';
 import {IPlugin} from 'types/Plugins.types';
@@ -12,14 +12,18 @@ const {useCreateTestMutation} = TracetestAPI.instance;
 
 interface IContext {
   demoList: TDraftTest[];
+  initialValues: TDraftTest;
   isLoading: boolean;
   onCreateTest(draftTest: TDraftTest, plugin: IPlugin): void;
+  onInitialValues(draftTest: TDraftTest): void;
 }
 
 export const Context = createContext<IContext>({
   demoList: [],
+  initialValues: {},
   isLoading: false,
   onCreateTest: noop,
+  onInitialValues: noop,
 });
 
 export const useCreateTest = () => useContext(Context);
@@ -29,6 +33,7 @@ interface IProps {
 }
 
 const CreateTestProvider = ({children}: IProps) => {
+  const [initialValues, setInitialValues] = useState<TDraftTest>({name: 'Untitled'});
   const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
   const {runTest, isEditLoading: isLoadingEditTest} = useTestCrud();
 
@@ -46,13 +51,17 @@ const CreateTestProvider = ({children}: IProps) => {
     [createTest, runTest]
   );
 
+  const onInitialValues = useCallback(values => setInitialValues(values), []);
+
   const value = useMemo<IContext>(
     () => ({
       demoList,
+      initialValues,
       isLoading: isLoadingCreateTest || isLoadingEditTest,
       onCreateTest,
+      onInitialValues,
     }),
-    [demoList, isLoadingCreateTest, isLoadingEditTest, onCreateTest]
+    [demoList, initialValues, isLoadingCreateTest, isLoadingEditTest, onCreateTest, onInitialValues]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

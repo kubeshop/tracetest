@@ -1,5 +1,5 @@
 import {Form, Tabs, TabsProps} from 'antd';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import CreateTest from 'components/CreateTest';
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import {TriggerTypes} from 'constants/Test.constants';
@@ -32,14 +32,18 @@ const renderTab = (title: string, triggerType: TriggerTypes, isDisabled: boolean
 export const FORM_ID = 'create-test';
 
 const Content = ({triggerType}: IProps) => {
+  const {onCreateTest, isLoading, initialValues} = useCreateTest();
   useDocumentTitle(`Create ${triggerType} test`);
 
   const [form] = Form.useForm<TDraftTest>();
-  const {isLoading, onCreateTest} = useCreateTest();
 
   const plugin = TriggerTypeToPlugin[triggerType];
   const [isValid, setIsValid] = useState(false);
   const onValidateTest = useValidateTestDraft({pluginName: plugin.name, setIsValid});
+
+  useEffect(() => {
+    onValidateTest({}, initialValues);
+  }, []);
 
   const tabBarExtraContent = useMemo(
     () => ({
@@ -55,9 +59,9 @@ const Content = ({triggerType}: IProps) => {
         autoComplete="off"
         data-cy="create-test"
         form={form}
-        initialValues={{name: 'Untitled Test'}}
         layout="vertical"
         name={FORM_ID}
+        initialValues={initialValues}
         onFinish={values => onCreateTest(values, plugin)}
         onValuesChange={onValidateTest}
       >
