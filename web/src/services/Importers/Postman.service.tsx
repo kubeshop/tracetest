@@ -3,7 +3,6 @@ import {HTTP_METHOD} from 'constants/Common.constants';
 import {IImportService, IPostmanValues, TDraftTestForm, TRequestAuth} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import HttpService from '../Triggers/Http.service';
-import {Plugins} from '../../constants/Plugins.constants';
 
 export interface RequestDefinitionExtended extends Request {
   id: string;
@@ -36,10 +35,7 @@ const Postman = (): IPostmanTriggerService => ({
     const {collectionTest, variables, requests} = values as IPostmanValues;
     const draft = (await this.valuesFromRequest(requests, variables, collectionTest || '')) || {};
 
-    return {
-      draft,
-      plugin: Plugins.REST,
-    };
+    return draft;
   },
   async validateDraft(values) {
     const {collectionTest, variables, requests} = values as IPostmanValues;

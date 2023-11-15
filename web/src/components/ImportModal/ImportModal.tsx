@@ -4,6 +4,7 @@ import {TDraftTest} from 'types/Test.types';
 import {ImportTypes} from 'constants/Test.constants';
 import ImportService from 'services/Import.service';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {ImportTypeToPlugin} from 'constants/Plugins.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import * as S from './ImportModal.styled';
 import {ImportSelector} from '../Inputs';
@@ -19,8 +20,8 @@ const FORM_ID = 'import-test';
 
 const ImportModal = ({isOpen, onClose}: IProps) => {
   const [form] = Form.useForm<TDraftTest>();
-  const type = Form.useWatch('importType', form) || ImportTypes.curl;
-  const {onUpdateDraftTest, onUpdatePlugin} = useCreateTest();
+  const type = (Form.useWatch('importType', form) || ImportTypes.curl) as ImportTypes;
+  const {onInitialValues} = useCreateTest();
   const {navigate} = useDashboard();
 
   const [isValid, setIsValid] = useState(false);
@@ -34,13 +35,13 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
 
   const handleImport = useCallback(
     async (values: TDraftTest) => {
-      const {draft, plugin} = await ImportService.getRequest(type, values);
+      const draft = await ImportService.getRequest(type, values);
+      const plugin = ImportTypeToPlugin[type];
 
-      onUpdatePlugin(plugin);
-      onUpdateDraftTest(draft);
+      onInitialValues(draft);
       navigate(`/test/create/${plugin.type}`);
     },
-    [navigate, onUpdateDraftTest, onUpdatePlugin, type]
+    [navigate, onInitialValues, type]
   );
 
   return (

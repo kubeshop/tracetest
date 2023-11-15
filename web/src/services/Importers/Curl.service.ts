@@ -2,7 +2,6 @@ import parseCurl from 'parse-curl';
 import {ICurlValues, IImportService} from 'types/Test.types';
 import Validator from 'utils/Validator';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {Plugins} from 'constants/Plugins.constants';
 
 interface ICurlTriggerService extends IImportService {
   getRequestFromCommand(command: string): ICurlValues;
@@ -15,11 +14,8 @@ const CurlTriggerService = (): ICurlTriggerService => ({
     const draft = this.getRequestFromCommand(command);
 
     return {
-      draft: {
-        ...draft,
-        name: draft.url,
-      },
-      plugin: Plugins.REST,
+      ...draft,
+      name: draft.url,
     };
   },
 

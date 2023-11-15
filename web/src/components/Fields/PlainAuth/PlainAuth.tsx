@@ -1,14 +1,14 @@
 import {Form} from 'antd';
 import Fields from './Fields';
-import TypeInput from './Input';
+import PlainAuthType from './PlainAuthType';
 
 interface IProps {
   name?: string[];
 }
 
 const PlainAuth = ({name = ['authentication']}: IProps) => (
-  <div>
-    <TypeInput baseName={name} />
+  <>
+    <PlainAuthType baseName={name} />
     <Form.Item noStyle shouldUpdate style={{marginBottom: 0, width: '100%'}}>
       {({getFieldValue}) => {
         const method = getFieldValue(name)?.type;
@@ -20,7 +20,7 @@ const PlainAuth = ({name = ['authentication']}: IProps) => (
         }
       }}
     </Form.Item>
-  </div>
+  </>
 );
 
 export default PlainAuth;

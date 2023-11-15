@@ -1,5 +1,5 @@
 import {ImportTypes} from 'constants/Test.constants';
-import {TDraftTest, IImportResult} from 'types/Test.types';
+import {TDraftTest} from 'types/Test.types';
 import CurlService from './Importers/Curl.service';
 import PostmanService from './Importers/Postman.service';
 
@@ -9,7 +9,7 @@ const ImportServiceMap = {
 } as const;
 
 const ImportService = () => ({
-  async getRequest(type: ImportTypes, draft: TDraftTest): Promise<IImportResult> {
+  async getRequest(type: ImportTypes, draft: TDraftTest): Promise<TDraftTest> {
     return ImportServiceMap[type].getRequest(draft);
   },
 

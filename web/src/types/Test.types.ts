@@ -1,14 +1,12 @@
-import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {FormInstance} from 'antd';
 import {VariableDefinition, Request} from 'postman-collection';
 
-import {HTTP_METHOD, SupportedPlugins} from 'constants/Common.constants';
+import {HTTP_METHOD} from 'constants/Common.constants';
 import GRPCRequest from 'models/GrpcRequest.model';
 import HttpRequest from 'models/HttpRequest.model';
 import TraceIDRequest from 'models/TraceIDRequest.model';
 import KafkaRequest from 'models/KafkaRequest.model';
 import {Model, TGrpcSchemas, THttpSchemas, TKafkaSchemas} from './Common.types';
-import {IPlugin} from './Plugins.types';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
@@ -85,25 +83,7 @@ export interface ITriggerService {
   getInitialValues?(draft: TTriggerRequest): TDraftTest;
 }
 
-export interface IImportResult {
-  draft: TDraftTest;
-  plugin: IPlugin;
-}
-
 export interface IImportService {
-  getRequest(values: TDraftTest): Promise<IImportResult>;
+  getRequest(values: TDraftTest): Promise<TDraftTest>;
   validateDraft(draft: TDraftTest): Promise<boolean>;
 }
-
-export interface ICreateTestState {
-  draftTest: TDraftTest;
-  pluginName: SupportedPlugins;
-  isFormValid: boolean;
-}
-
-export type TCreateTestSliceActions = {
-  reset: CaseReducer<ICreateTestState>;
-  setPlugin: CaseReducer<ICreateTestState, PayloadAction<{plugin: IPlugin}>>;
-  setDraftTest: CaseReducer<ICreateTestState, PayloadAction<{draftTest: TDraftTest}>>;
-  setIsFormValid: CaseReducer<ICreateTestState, PayloadAction<{isValid: boolean}>>;
-};

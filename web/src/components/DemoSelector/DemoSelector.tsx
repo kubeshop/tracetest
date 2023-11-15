@@ -5,17 +5,14 @@ import {camelCase} from 'lodash';
 import {IBasicValues, TDraftTest} from 'types/Test.types';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
-import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {useCreateTest} from 'providers/CreateTest';
 import * as S from './DemoSelector.styled';
 
 const BasicDetailsDemoHelper = () => {
   const [selectedDemo, setSelectedDemo] = useState<TDraftTest>();
   const form = Form.useFormInstance<IBasicValues>();
 
-  const {
-    plugin: {demoList},
-    onIsFormValid,
-  } = useCreateTest();
+  const {demoList} = useCreateTest();
 
   const onSelectDemo = useCallback(
     ({key}: {key: string}) => {
@@ -24,10 +21,9 @@ const BasicDetailsDemoHelper = () => {
 
       form.setFieldsValue(demo);
 
-      onIsFormValid(true);
       setSelectedDemo(demo);
     },
-    [demoList, form, onIsFormValid]
+    [demoList, form]
   );
 
   return (

@@ -1,12 +1,10 @@
 import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import DemoSelector from 'components/DemoSelector';
-import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {useCreateTest} from 'providers/CreateTest';
 import {useSettingsValues} from '../../providers/SettingsValues/SettingsValues.provider';
 
 const HeaderRight = () => {
-  const {
-    plugin: {demoList},
-  } = useCreateTest();
+  const {demoList} = useCreateTest();
   const {demos} = useSettingsValues();
 
   return demoList.length && demos.length ? (
