@@ -18,7 +18,7 @@ describe('TestSuiteRuns', () => {
     const name = `TestSuite - #${String(Date.now()).slice(-4)}`;
     cy.openTestSuiteCreationModal();
     cy.interceptHomeApiCall();
-    cy.fillCreateFormBasicStep(name, name, 'CreateTestSuiteFactory');
+    cy.fillCreateFormBasicStep(name, 'CreateTestSuiteFactory');
 
     testSuitesUtils.testList.forEach(test => {
       cy.get('[data-cy=testsuite-test-selection]').click();
@@ -34,7 +34,7 @@ describe('TestSuiteRuns', () => {
     const name = `TestSuite - #${String(Date.now()).slice(-4)}`;
     cy.openTestSuiteCreationModal();
     cy.interceptHomeApiCall();
-    cy.fillCreateFormBasicStep(name, name, 'CreateTestSuiteFactory');
+    cy.fillCreateFormBasicStep(name, 'CreateTestSuiteFactory');
 
     testSuitesUtils.testList.forEach(test => {
       cy.get('[data-cy=testsuite-test-selection]').click();
@@ -53,7 +53,7 @@ describe('TestSuiteRuns', () => {
     const name = `TestSuite - #${String(Date.now()).slice(-4)}`;
     cy.openTestSuiteCreationModal();
     cy.interceptHomeApiCall();
-    cy.fillCreateFormBasicStep(name, name, 'CreateTestSuiteFactory');
+    cy.fillCreateFormBasicStep(name, 'CreateTestSuiteFactory');
 
     testSuitesUtils.testList.forEach(test => {
       cy.get('[data-cy=testsuite-test-selection]').click();

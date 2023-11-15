@@ -129,14 +129,25 @@ Cypress.Commands.add('cancelOnBoarding', () => {
   }
 });
 
-Cypress.Commands.add('submitCreateForm', () => {
-  cy.get(`[data-cy="run-test-submit"]`).click();
-  cy.wait('@testCreation');
+Cypress.Commands.add('submitCreateForm', (mode = 'CreateTestFactory') => {
+  if (mode === 'CreateTestFactory') {
+    cy.get(`[data-cy="run-test-submit"]`).click();
+    cy.wait('@testCreation');
+  } else {
+    cy.get(`[data-cy=${mode}-create-create-button]`).last().click();
+    cy.wait('@testSuiteCreation');
+  }
 });
 
-Cypress.Commands.add('fillCreateFormBasicStep', (name: string) => {
-  cy.get('[data-cy=overlay-input-overlay]').should('be.visible').click();
-  cy.get('[data-cy="overlay-input"]').clear().type(name);
+Cypress.Commands.add('fillCreateFormBasicStep', (name: string, mode = 'CreateTestFactory') => {
+  if (mode === 'CreateTestFactory') {
+    cy.get('[data-cy=overlay-input-overlay]').should('be.visible').click();
+    cy.get('[data-cy="overlay-input"]').clear().type(name);
+  } else {
+    cy.get('[data-cy=create-test-name-input').type(name);
+    cy.get('[data-cy=create-test-description-input').type(name);
+    cy.get(`[data-cy=${mode}-create-next-button]`).last().click();
+  }
 });
 
 Cypress.Commands.add('createTestByName', (name: string) => {

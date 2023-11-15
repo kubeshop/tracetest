@@ -1,3 +1,4 @@
+import {SupportedPlugins} from '../../../src/constants/Common.constants';
 import {POKEMON_HTTP_ENDPOINT} from '../constants/Test';
 
 interface IVariableSet {
@@ -111,19 +112,20 @@ describe('VariableSets', () => {
     cy.get('[data-cy=variableSet-selector]').click();
     cy.get('.variableSet-selector-items ul li').eq(1).click();
 
-    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.openTestCreationModal();
-    cy.fillCreateFormBasicStep(name);
+    cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
     // eslint-disable-next-line no-template-curly-in-string
     cy.setCreateFormUrl('GET', '${{}env:host}/pokemon');
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
 
-    cy.reload().get('[data-cy=run-detail-trigger-response]').within(() => {
-      cy.contains('Variable Set').click();
-      cy.contains(variableSet1.values[0].key);
-      cy.contains(variableSet1.values[0].value);
-    });
+    cy.reload()
+      .get('[data-cy=run-detail-trigger-response]')
+      .within(() => {
+        cy.contains('Variable Set').click();
+        cy.contains(variableSet1.values[0].key);
+        cy.contains(variableSet1.values[0].value);
+      });
 
     cy.deleteTest(true);
     deleteVariableSet();

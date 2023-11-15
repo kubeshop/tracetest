@@ -1,5 +1,6 @@
 import {Form} from 'antd';
 import Header from 'components/CreateTest/Header';
+import {StepsID} from 'components/GuidedTour/testRunSteps';
 import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse/RunDetailTriggerResponseFactory';
 import RunEvents from 'components/RunEvents';
 import FormFactory from 'components/TestPlugins/FormFactory';
@@ -57,7 +58,7 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
         <Header isLoading={isLoading || !stateIsFinished} isValid={isValid} triggerType={test.trigger.type} />
 
         <S.Body>
-          <S.SectionLeft>
+          <S.SectionLeft data-tour={StepsID.Trigger}>
             <FormFactory type={test.trigger.type} />
           </S.SectionLeft>
 
