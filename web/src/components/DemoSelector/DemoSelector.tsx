@@ -5,25 +5,24 @@ import {camelCase} from 'lodash';
 import {IBasicValues, TDraftTest} from 'types/Test.types';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
-import {useCreateTest} from 'providers/CreateTest';
 import * as S from './DemoSelector.styled';
 
-const BasicDetailsDemoHelper = () => {
+interface IProps {
+  demos: TDraftTest[];
+}
+
+const BasicDetailsDemoHelper = ({demos}: IProps) => {
   const [selectedDemo, setSelectedDemo] = useState<TDraftTest>();
   const form = Form.useFormInstance<IBasicValues>();
-
-  const {demoList} = useCreateTest();
 
   const onSelectDemo = useCallback(
     ({key}: {key: string}) => {
       CreateTestAnalyticsService.onDemoTestClick();
-      const demo = demoList.find(({name}) => name === key)!;
-
+      const demo = demos.find(({name}) => name === key)!;
       form.setFieldsValue(demo);
-
       setSelectedDemo(demo);
     },
-    [demoList, form]
+    [demos, form]
   );
 
   return (
@@ -31,7 +30,7 @@ const BasicDetailsDemoHelper = () => {
       <Dropdown
         overlay={() => (
           <Menu
-            items={demoList.map(({name = ''}) => ({
+            items={demos.map(({name = ''}) => ({
               key: name,
               label: <span data-cy={`demo-example-${camelCase(name)}`}>{name}</span>,
             }))}

@@ -1,6 +1,6 @@
-import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import {Overlay} from 'components/Inputs';
+import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
+import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {Form} from 'antd';
 
 interface IProps {
@@ -13,7 +13,7 @@ const HeaderLeft = ({triggerType, origin}: IProps) => {
 
   return (
     <S.Section $justifyContent="flex-start">
-      <a data-cy="create-test-header-back-button" onClick={() => navigate(origin)}>
+      <a onClick={() => navigate(origin)}>
         <S.BackIcon />
       </a>
       <S.InfoContainer>
