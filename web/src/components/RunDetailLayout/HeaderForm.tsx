@@ -14,6 +14,7 @@ const HeaderForm = ({name, onSubmit}: IProps) => {
       initialValues={{name}}
       name="edit-test-name"
       onValuesChange={(changedValues: any, draft: TDraftTest) => {
+        if (draft.name === name) return;
         onSubmit(draft);
       }}
     >
