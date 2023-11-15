@@ -236,6 +236,21 @@ func TracePollingSuccess(testID id.ID, runID int, reason string) model.TestRunEv
 	}
 }
 
+func TracePollingSkipped(testID id.ID, runID int) model.TestRunEvent {
+	return model.TestRunEvent{
+		TestID:              testID,
+		RunID:               runID,
+		Stage:               model.StageTrace,
+		Type:                "POLLING_SKIPPED",
+		Title:               "Trace polling has been skipped",
+		Description:         "The polling strategy has been skipped",
+		CreatedAt:           time.Now(),
+		DataStoreConnection: model.ConnectionResult{},
+		Polling:             model.PollingInfo{},
+		Outputs:             []model.OutputInfo{},
+	}
+}
+
 func TracePollingError(testID id.ID, runID int, reason string, err error) model.TestRunEvent {
 	return model.TestRunEvent{
 		TestID:              testID,

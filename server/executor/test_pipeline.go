@@ -66,6 +66,8 @@ func NewTestPipeline(
 	}
 }
 
+type key string
+
 func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, variableSet variableset.VariableSet, requiredGates *[]testrunner.RequiredGate) test.Run {
 	run := test.NewRun()
 	run.Metadata = metadata
@@ -77,6 +79,7 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 		requiredGates = &rg
 	}
 	run = run.ConfigureRequiredGates(*requiredGates)
+	run.SkipTraceCollection = testObj.SkipTraceCollection
 
 	run, err := p.runs.CreateRun(ctx, testObj, run)
 	p.handleDBError(run, err)
@@ -119,13 +122,25 @@ func (p *TestPipeline) Rerun(ctx context.Context, testObj test.Test, runID int) 
 }
 
 func (p *TestPipeline) StopTest(ctx context.Context, testID id.ID, runID int) {
-	sr := StopRequest{
+	sr := UserRequest{
 		TestID: testID,
 		RunID:  runID,
 	}
 
 	p.updatePublisher.PublishUpdate(subscription.Message{
-		ResourceID: sr.ResourceID(),
+		ResourceID: sr.ResourceID(UserRequestTypeStop),
+		Content:    sr,
+	})
+}
+
+func (p *TestPipeline) SkipTraceCollection(ctx context.Context, testID id.ID, runID int) {
+	sr := UserRequest{
+		TestID: testID,
+		RunID:  runID,
+	}
+
+	p.updatePublisher.PublishUpdate(subscription.Message{
+		ResourceID: sr.ResourceID(UserRequestSkipTraceCollection),
 		Content:    sr,
 	})
 }

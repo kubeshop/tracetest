@@ -74,6 +74,7 @@ type testSuiteRunRepository interface {
 
 type testRunner interface {
 	StopTest(_ context.Context, testID id.ID, runID int)
+	SkipTraceCollection(_ context.Context, testID id.ID, runID int)
 	Run(context.Context, test.Test, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) test.Run
 	Rerun(_ context.Context, _ test.Test, runID int) test.Run
 }
@@ -287,6 +288,12 @@ func (c *controller) RunTest(ctx context.Context, testID string, runInfo openapi
 
 func (c *controller) StopTestRun(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
 	c.testRunner.StopTest(ctx, id.ID(testID), int(runID))
+
+	return openapi.Response(http.StatusOK, map[string]string{"result": "success"}), nil
+}
+
+func (c *controller) SkipTraceCollection(ctx context.Context, testID string, runID int32) (openapi.ImplResponse, error) {
+	c.testRunner.SkipTraceCollection(ctx, id.ID(testID), int(runID))
 
 	return openapi.Response(http.StatusOK, map[string]string{"result": "success"}), nil
 }

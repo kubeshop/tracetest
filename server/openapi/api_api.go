@@ -177,6 +177,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTestSuite,
 		},
 		{
+			"SkipTraceCollection",
+			strings.ToUpper("Post"),
+			"/api/tests/{testId}/run/{runId}/skipPolling",
+			c.SkipTraceCollection,
+		},
+		{
 			"StopTestRun",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run/{runId}/stop",
@@ -679,6 +685,28 @@ func (c *ApiApiController) RunTestSuite(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	result, err := c.service.RunTestSuite(r.Context(), testSuiteIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// SkipTraceCollection - skips the trace collection of a test run
+func (c *ApiApiController) SkipTraceCollection(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.SkipTraceCollection(r.Context(), testIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
