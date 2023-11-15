@@ -1,9 +1,8 @@
 import {Form} from 'antd';
+import {FormInstance} from 'antd/es/form/Form';
 import {useCallback, useEffect} from 'react';
 
-const useShortcut = () => {
-  const form = Form.useFormInstance();
-
+export const useShortcutWithDefault = (form: FormInstance) => {
   const onKeydown = useCallback(
     (e: KeyboardEvent) => {
       const modifierKey = e.metaKey || e.ctrlKey;
@@ -20,6 +19,12 @@ const useShortcut = () => {
       window.removeEventListener('keydown', onKeydown);
     };
   }, [onKeydown]);
+};
+
+const useShortcut = () => {
+  const form = Form.useFormInstance();
+
+  useShortcutWithDefault(form);
 };
 
 export default useShortcut;

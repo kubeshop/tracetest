@@ -7,9 +7,10 @@ import * as S from './Overlay.styled';
 interface IProps {
   onChange?(value: string): void;
   value?: string;
+  isDisabled?: boolean;
 }
 
-const Overlay = ({onChange = noop, value = ''}: IProps) => {
+const Overlay = ({onChange = noop, value = '', isDisabled = false}: IProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const ref = useRef(null);
@@ -33,6 +34,10 @@ const Overlay = ({onChange = noop, value = ''}: IProps) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isDisabled) setIsOpen(false);
+  }, [isDisabled]);
+
   return isOpen ? (
     <S.InputContainer ref={ref} htmlFor="overlay-input">
       <Input
@@ -40,13 +45,16 @@ const Overlay = ({onChange = noop, value = ''}: IProps) => {
         id="overlay-input"
         onChange={event => setInputValue(event.target.value)}
         value={inputValue}
+        disabled={isDisabled}
       />
     </S.InputContainer>
   ) : (
     <S.Overlay
       onClick={e => {
-        e.stopPropagation();
-        setIsOpen(true);
+        if (!isDisabled) {
+          e.stopPropagation();
+          setIsOpen(true);
+        }
       }}
       data-cy="overlay-input-overlay"
     >

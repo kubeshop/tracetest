@@ -4,6 +4,7 @@ import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useMemo} from 'react';
 import Date from 'utils/Date';
+import {isRunStateFinished} from 'models/TestRun.model';
 import HeaderForm from './HeaderForm';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
@@ -19,9 +20,10 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
     run: {id: runId, createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {},
     run,
   } = useTestRun();
-  const {onEditAndReRun} = useTest();
+  const {onEditAndReRun, isEditLoading: isLoading} = useTest();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
+  const stateIsFinished = isRunStateFinished(run.state);
 
   const description = useMemo(() => {
     return (
@@ -49,9 +51,8 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         <S.Row>
           <HeaderForm
             name={name}
-            onSubmit={draft => {
-              onEditAndReRun(draft, runId ?? 1);
-            }}
+            onSubmit={draft => onEditAndReRun(draft, runId ?? 1)}
+            isDisabled={isLoading || !stateIsFinished}
           />
           <Info
             date={createdAt ?? ''}

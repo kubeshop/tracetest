@@ -1,4 +1,4 @@
-import {Form} from 'antd';
+import {Form, Input} from 'antd';
 import Header from 'components/CreateTest/Header';
 import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse/RunDetailTriggerResponseFactory';
 import RunEvents from 'components/RunEvents';
@@ -17,6 +17,7 @@ import {useMemo, useState} from 'react';
 import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
 import * as S from './RunDetailTrigger.styled';
+import {useShortcutWithDefault} from '../TestPlugins/hooks/useShortcut';
 
 export const FORM_ID = 'create-test';
 
@@ -41,6 +42,9 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
   const stateIsFinished = isRunStateFinished(run.state);
 
   const initialValues = useMemo(() => TestService.getInitialValues(test), [test]);
+  const isDisabled = isLoading || !stateIsFinished;
+
+  useShortcutWithDefault(form);
 
   return (
     <S.Container>
@@ -51,10 +55,13 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
         initialValues={initialValues}
         layout="vertical"
         name={FORM_ID}
-        onFinish={values => onEdit(values)}
+        onFinish={values => !isDisabled && onEdit(values)}
         onValuesChange={onValidateTest}
       >
-        <Header isLoading={isLoading || !stateIsFinished} isValid={isValid} triggerType={test.trigger.type} />
+        <Form.Item name="name" hidden>
+          <Input type="hidden" value={test.name} />
+        </Form.Item>
+        <Header isLoading={isDisabled} isValid={isValid} triggerType={test.trigger.type} />
 
         <S.Body>
           <S.SectionLeft>
