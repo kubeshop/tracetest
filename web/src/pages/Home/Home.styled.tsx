@@ -15,6 +15,12 @@ export const ActionsContainer = styled.div`
   width: 100%;
 `;
 
+export const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+`;
+
 export const TitleText = styled(Typography.Title).attrs({level: 1})`
   && {
     margin: 0;

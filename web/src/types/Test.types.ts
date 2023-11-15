@@ -82,3 +82,8 @@ export interface ITriggerService {
   validateDraft(draft: TDraftTest): Promise<boolean>;
   getInitialValues?(draft: TTriggerRequest): TDraftTest;
 }
+
+export interface IImportService {
+  getRequest(values: TDraftTest): Promise<TDraftTest>;
+  validateDraft(draft: TDraftTest): Promise<boolean>;
+}

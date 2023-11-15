@@ -9,7 +9,7 @@ import useDocumentTitle from 'hooks/useDocumentTitle';
 import useValidateTestDraft from 'hooks/useValidateTestDraft';
 import {useCreateTest} from 'providers/CreateTest';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {TDraftTest} from 'types/Test.types';
 import HeaderLeft from './HeaderLeft';
@@ -34,21 +34,24 @@ const renderTab = (title: string, triggerType: TriggerTypes, isDisabled: boolean
 export const FORM_ID = 'create-test';
 
 const Content = ({triggerType}: IProps) => {
+  const {onCreateTest, isLoading, initialValues} = useCreateTest();
   useDocumentTitle(`Create ${triggerType} test`);
 
   const [form] = Form.useForm<TDraftTest>();
-  const {isLoading, onCreateTest} = useCreateTest();
 
   const plugin = TriggerTypeToPlugin[triggerType];
   const [isValid, setIsValid] = useState(false);
   const onValidateTest = useValidateTestDraft({pluginName: plugin.name, setIsValid});
 
   const {demos} = useSettingsValues();
-
   const demosByTriggerType = useMemo(() => {
     const demoByPluginMap = getDemoByPluginMap(demos);
     return demoByPluginMap[plugin.name];
   }, [demos, plugin.name]);
+
+  useEffect(() => {
+    onValidateTest({}, initialValues);
+  }, []);
 
   const tabBarExtraContent = useMemo(
     () => ({
@@ -64,9 +67,9 @@ const Content = ({triggerType}: IProps) => {
         autoComplete="off"
         data-cy="create-test"
         form={form}
-        initialValues={{name: 'Untitled Test'}}
         layout="vertical"
         name={FORM_ID}
+        initialValues={initialValues}
         onFinish={values => onCreateTest(values, plugin)}
         onValuesChange={onValidateTest}
       >
