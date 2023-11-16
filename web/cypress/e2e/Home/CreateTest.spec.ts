@@ -18,7 +18,7 @@ describe('Create test', () => {
     cy.setCreateFormUrl('GET', `${POKEMON_HTTP_ENDPOINT}/pokemon`);
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+    cy.get('[data-cy=overlay-input-overlay]').should('contain.text', name);
   });
 
   it('should create a basic POST test from scratch', () => {
@@ -41,7 +41,7 @@ describe('Create test', () => {
       );
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+    cy.get('[data-cy=overlay-input-overlay]').should('contain.text', name);
   });
 
   it('should create a GET test from an example', () => {
