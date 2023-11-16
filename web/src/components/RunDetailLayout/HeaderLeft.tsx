@@ -5,6 +5,8 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useMemo} from 'react';
 import Date from 'utils/Date';
 import {isRunStateFinished} from 'models/TestRun.model';
+import { TDraftTest } from 'types/Test.types';
+import TestService from 'services/Test.service';
 import HeaderForm from './HeaderForm';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
@@ -16,14 +18,17 @@ interface IProps {
 }
 
 const HeaderLeft = ({name, triggerType, origin}: IProps) => {
-  const {
-    run: {id: runId, createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {},
-    run,
-  } = useTestRun();
-  const {onEditAndReRun, isEditLoading: isLoading} = useTest();
+  const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {}, run} =
+    useTestRun();
+  const {onEdit, isEditLoading: isLoading, test} = useTest();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
   const stateIsFinished = isRunStateFinished(run.state);
+
+  const handleOnEdit = (draft: TDraftTest) => {
+    const update = TestService.getInitialValues(test);
+    onEdit({...update, ...draft});
+  };
 
   const description = useMemo(() => {
     return (
@@ -51,7 +56,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         <S.Row>
           <HeaderForm
             name={name}
-            onSubmit={draft => onEditAndReRun(draft, runId ?? 1)}
+            onSubmit={handleOnEdit}
             isDisabled={isLoading || !stateIsFinished}
           />
           <Info

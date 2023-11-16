@@ -12,13 +12,15 @@ const Content = ({skipPolling, isLoading}: IProps) => {
 
   return (
     <>
-      <Typography.Paragraph>Skip the Trace Collection step to use current state to create tests</Typography.Paragraph>
+      <Typography.Paragraph>
+        You can skip the <b>awaiting trace</b> step and use the current state to create test specs.
+      </Typography.Paragraph>
       <S.Actions>
         <div>
           <Checkbox onChange={() => setShouldSave(prev => !prev)} value={shouldSave} /> Apply to all runs
         </div>
-        <Button loading={isLoading} type="primary" onClick={() => skipPolling(shouldSave)}>
-          Skip
+        <Button loading={isLoading} type="primary" ghost onClick={() => skipPolling(shouldSave)} size="small">
+          Skip awaiting trace
         </Button>
       </S.Actions>
     </>

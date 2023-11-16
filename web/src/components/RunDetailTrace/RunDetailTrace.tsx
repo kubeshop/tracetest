@@ -11,6 +11,7 @@ interface IProps {
   run: TestRun;
   runEvents: TestRunEvent[];
   testId: string;
+  skipTraceCollection: boolean;
 }
 
 export enum VisualizationType {
@@ -18,13 +19,13 @@ export enum VisualizationType {
   Timeline,
 }
 
-const RunDetailTrace = ({run, runEvents, testId}: IProps) => {
+const RunDetailTrace = ({run, runEvents, testId, skipTraceCollection}: IProps) => {
   return (
     <S.Container>
       <SetupAlert />
       <ResizablePanels>
         <SpanDetailsPanel run={run} testId={testId} />
-        <TracePanel run={run} runEvents={runEvents} testId={testId} />
+        <TracePanel run={run} runEvents={runEvents} testId={testId} skipTraceCollection={skipTraceCollection} />
         <AnalyzerPanel run={run} />
       </ResizablePanels>
     </S.Container>

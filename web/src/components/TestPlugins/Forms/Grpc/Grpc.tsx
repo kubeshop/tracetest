@@ -4,6 +4,7 @@ import GrpcService from 'services/Triggers/Grpc.service';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {Editor, FileUpload} from 'components/Inputs';
 import {Auth, Metadata, SkipTraceCollection} from 'components/Fields';
+import useQueryTabs from 'hooks/useQueryTabs';
 
 const RequestDetailsForm = () => {
   const [methodList, setMethodList] = useState<string[]>([]);
@@ -25,8 +26,10 @@ const RequestDetailsForm = () => {
     getMethodList();
   }, [protoFile]);
 
+  const [activeKey, setActiveKey] = useQueryTabs('service-definition');
+
   return (
-    <Tabs defaultActiveKey="service-definition">
+    <Tabs defaultActiveKey={activeKey} onChange={setActiveKey} activeKey={activeKey}>
       <Tabs.TabPane forceRender tab="Service definition" key="service-definition">
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <FileUpload />

@@ -36,7 +36,7 @@ const renderTab = (title: string, testId: string, runId: number, mode: string) =
   </S.TabLink>
 );
 
-const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
+const RunDetailLayout = ({test: {id, name, trigger, skipTraceCollection}, test}: IProps) => {
   const {mode = RunDetailModes.TRIGGER} = useParams();
   const {showNotification} = useNotification();
   const {isError, run, runEvents} = useTestRun();
@@ -84,7 +84,7 @@ const RunDetailLayout = ({test: {id, name, trigger}, test}: IProps) => {
           <RunDetailTrigger test={test} run={run} runEvents={runEvents} isError={isError} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Trace', id, run.id, mode)} key={RunDetailModes.TRACE}>
-          <RunDetailTrace run={run} runEvents={runEvents} testId={id} />
+          <RunDetailTrace run={run} runEvents={runEvents} testId={id} skipTraceCollection={skipTraceCollection} />
         </Tabs.TabPane>
         <Tabs.TabPane tab={renderTab('Test', id, run.id, mode)} key={RunDetailModes.TEST}>
           <RunDetailTest run={run} runEvents={runEvents} testId={id} />

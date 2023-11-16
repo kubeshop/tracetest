@@ -14,7 +14,7 @@ interface IProps {
 const TIMEOUT_TO_SHOW = 10; // seconds
 
 const SkipPollingPopover = ({isLoading, skipPolling, startTime}: IProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const diff = differenceInSeconds(new Date(), new Date(startTime));
 
   useEffect(() => {
@@ -31,13 +31,9 @@ const SkipPollingPopover = ({isLoading, skipPolling, startTime}: IProps) => {
         visible={isOpen}
         placement="bottomRight"
       >
-        <Button
-          loading={isLoading}
-          icon={<ForwardOutlined />}
-          onClick={() => skipPolling(false)}
-          shape="circle"
-          type="link"
-        />
+        <Button loading={isLoading} onClick={() => skipPolling(false)} type="link">
+          <ForwardOutlined />
+        </Button>
       </Popover>
     </S.StopContainer>
   );

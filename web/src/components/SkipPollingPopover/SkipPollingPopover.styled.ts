@@ -14,7 +14,7 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     .ant-popover-inner-content {
-      padding: 5px 14px;
+      padding: 14px;
       padding-top: 0;
     }
   }
