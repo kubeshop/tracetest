@@ -66,8 +66,6 @@ func NewTestPipeline(
 	}
 }
 
-type key string
-
 func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test.RunMetadata, variableSet variableset.VariableSet, requiredGates *[]testrunner.RequiredGate) test.Run {
 	run := test.NewRun()
 	run.Metadata = metadata

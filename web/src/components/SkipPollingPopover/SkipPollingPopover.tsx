@@ -14,7 +14,7 @@ interface IProps {
 const TIMEOUT_TO_SHOW = 10; // seconds
 
 const SkipPollingPopover = ({isLoading, skipPolling, startTime}: IProps) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const diff = differenceInSeconds(new Date(), new Date(startTime));
 
   useEffect(() => {
