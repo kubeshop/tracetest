@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -18,6 +19,7 @@ type grpcServer struct {
 
 	gServer *grpc.Server
 	tracer  trace.Tracer
+	logger  *zap.Logger
 }
 
 func NewGrpcServer(addr string, ingester Ingester, tracer trace.Tracer) *grpcServer {
@@ -25,7 +27,12 @@ func NewGrpcServer(addr string, ingester Ingester, tracer trace.Tracer) *grpcSer
 		addr:     addr,
 		ingester: ingester,
 		tracer:   tracer,
+		logger:   zap.NewNop(),
 	}
+}
+
+func (s *grpcServer) SetLogger(logger *zap.Logger) {
+	s.logger = logger
 }
 
 func (s *grpcServer) Start() error {
@@ -47,5 +54,11 @@ func (s grpcServer) Export(ctx context.Context, request *pb.ExportTraceServiceRe
 	ctx, span := s.tracer.Start(ctx, "Export trace")
 	defer span.End()
 
-	return s.ingester.Ingest(ctx, request, "gRPC")
+	s.logger.Debug("Received ExportTraceServiceRequest", zap.Any("request", request))
+
+	response, err := s.ingester.Ingest(ctx, request, RequestTypeGRPC)
+
+	s.logger.Debug("Sending ExportTraceServiceResponse", zap.Any("response", response), zap.Error(err))
+
+	return response, err
 }

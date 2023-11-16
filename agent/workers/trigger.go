@@ -88,7 +88,7 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 	if w.traceCache != nil {
 		// Set traceID to cache so the collector starts watching for incoming traces
 		// with same id
-		w.traceCache.Set(triggerRequest.TraceID, []*v1.Span{})
+		w.traceCache.Append(triggerRequest.TraceID, []*v1.Span{})
 	}
 
 	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{

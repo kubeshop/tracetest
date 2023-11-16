@@ -161,7 +161,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	span1ID := id.NewRandGenerator().SpanID()
 	span2ID := id.NewRandGenerator().SpanID()
 
-	cache.Set(traceID.String(), []*v1.Span{
+	cache.Append(traceID.String(), []*v1.Span{
 		{Name: "span 1", ParentSpanId: nil, SpanId: span1ID[:], TraceId: traceID[:]},
 		{Name: "span 2", ParentSpanId: span1ID[:], SpanId: span2ID[:], TraceId: traceID[:]},
 	})

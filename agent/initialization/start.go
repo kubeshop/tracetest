@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/collector"
@@ -12,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/kubeshop/tracetest/agent/workers/poller"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 var ErrOtlpServerStart = errors.New("OTLP server start error")
@@ -73,10 +75,32 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 		GRPCPort: config.OTLPServer.GRPCPort,
 	}
 
-	_, err := collector.Start(ctx, collectorConfig, noopTracer, collector.WithTraceCache(traceCache), collector.WithStartRemoteServer(false))
+	opts := []collector.CollectorOption{
+		collector.WithTraceCache(traceCache),
+		collector.WithStartRemoteServer(false),
+	}
+
+	if enableLogging() {
+		logger, err := zap.NewDevelopment()
+		if err != nil {
+			return fmt.Errorf("could not create logger: %w", err)
+		}
+		opts = append(opts, collector.WithLogger(logger))
+	}
+
+	_, err := collector.Start(
+		ctx,
+		collectorConfig,
+		noopTracer,
+		opts...,
+	)
 	if err != nil {
 		return ErrOtlpServerStart
 	}
 
 	return nil
+}
+
+func enableLogging() bool {
+	return os.Getenv("TRACETEST_DEV") == "true"
 }

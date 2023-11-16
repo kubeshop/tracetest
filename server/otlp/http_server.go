@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 
 	"go.opentelemetry.io/collector/pdata/ptrace/ptraceotlp"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -28,6 +29,7 @@ const (
 type httpServer struct {
 	addr     string
 	ingester Ingester
+	logger   *zap.Logger
 
 	hServer *http.Server
 }
@@ -36,23 +38,31 @@ func NewHttpServer(addr string, ingester Ingester) *httpServer {
 	return &httpServer{
 		addr:     addr,
 		ingester: ingester,
+		logger:   zap.NewNop(),
 	}
 }
 
+func (s *httpServer) SetLogger(logger *zap.Logger) {
+	s.logger = logger
+}
+
 func (s *httpServer) Start() error {
+	s.logger.Debug("Starting HTTP server", zap.String("addr", s.addr))
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/traces", s.Export).Methods("POST")
 
 	s.hServer = &http.Server{
 		Addr:    s.addr,
-		Handler: handlers.CompressHandler(decompressBodyHandler(handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType))),
+		Handler: handlers.CompressHandler(decompressBodyHandler(s.logger, handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType))),
 	}
 	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
+		s.logger.Error("cannot listen on address", zap.String("addr", s.addr), zap.Error(err))
 		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
 	}
 
 	go s.hServer.Serve(listener)
+	s.logger.Debug("HTTP server started", zap.String("addr", s.addr))
 	return nil
 }
 
@@ -64,19 +74,36 @@ func (s httpServer) Export(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("content-type")
 	response := newHttpResponse(w, contentType)
 
+	s.logger.Debug("Received ExportTraceServiceRequest", zap.String("content-type", contentType))
+
 	request, err := s.parseBody(r.Body, contentType)
 	if err != nil {
-		response.sendError(http.StatusUnprocessableEntity, status.Errorf(codes.InvalidArgument, "Could not parse request body %s", err.Error()))
+		s.logger.Error("Could not parse request body", zap.Error(err))
+		sendErr := response.sendError(http.StatusUnprocessableEntity, status.Errorf(codes.InvalidArgument, "Could not parse request body %s", err.Error()))
+		if sendErr != nil {
+			s.logger.Error("Could not send error response", zap.Error(sendErr))
+		}
 		return
 	}
+	s.logger.Debug("Parsed ExportTraceServiceRequest", zap.Any("request", request))
 
 	result, err := s.ingester.Ingest(r.Context(), request, "HTTP")
 	if err != nil {
-		response.sendError(http.StatusInternalServerError, status.Errorf(codes.InvalidArgument, "Error when ingesting spans %s", err.Error()))
+		s.logger.Error("Error when ingesting spans", zap.Error(err))
+		sendErr := response.sendError(http.StatusInternalServerError, status.Errorf(codes.InvalidArgument, "Error when ingesting spans %s", err.Error()))
+		if sendErr != nil {
+			s.logger.Error("Could not send error response", zap.Error(sendErr))
+		}
 		return
 	}
+	s.logger.Debug("Ingested spans", zap.Any("result", result))
 
-	response.send(http.StatusOK, result)
+	err = response.send(http.StatusOK, result)
+	if err != nil {
+		s.logger.Error("Error when sending response", zap.Error(err))
+	}
+
+	s.logger.Debug("Sent ExportTraceServiceResponse")
 }
 
 func (s httpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, error) {
@@ -84,7 +111,7 @@ func (s httpServer) parseProtoBuf(body []byte) (*pb.ExportTraceServiceRequest, e
 
 	err := proto.Unmarshal(body, &request)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot parse protobuf: %w", err)
 	}
 
 	return &request, nil
@@ -95,12 +122,12 @@ func (s httpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error
 
 	err := exportRequest.UnmarshalJSON(body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot parse json: %w", err)
 	}
 
 	protoBody, err := exportRequest.MarshalProto()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot marshalProto: %w", err)
 	}
 
 	return s.parseProtoBuf(protoBody)
@@ -109,7 +136,7 @@ func (s httpServer) parseJson(body []byte) (*pb.ExportTraceServiceRequest, error
 func (s httpServer) parseBody(reqBody io.ReadCloser, contentType string) (*pb.ExportTraceServiceRequest, error) {
 	body, err := io.ReadAll(reqBody)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read request body: %w", err)
 	}
 
 	if len(body) == 0 {
@@ -148,10 +175,10 @@ func (r httpResponse) send(statusCode int, message proto.Message) error {
 	return nil
 }
 
-func (r httpResponse) sendError(code int, err error) {
+func (r httpResponse) sendError(code int, err error) error {
 	rpcError, _ := status.FromError(err)
 
-	r.send(code, rpcError.Proto())
+	return r.send(code, rpcError.Proto())
 }
 
 func (r httpResponse) paseResponseBody(data proto.Message) ([]byte, error) {
@@ -162,13 +189,18 @@ func (r httpResponse) paseResponseBody(data proto.Message) ([]byte, error) {
 	return json.Marshal(data)
 }
 
-func decompressBodyHandler(h http.Handler) http.Handler {
+func decompressBodyHandler(logger *zap.Logger, h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.Header.Get("content-encoding"), "gzip") {
+			logger.Debug("Decompressing request body")
 			compressedBody, err := decompressBody(r.Body)
 			if err != nil {
+				logger.Error("Could not decompress request body", zap.Error(err))
 				response := newHttpResponse(w, r.Header.Get("content-type"))
-				response.sendError(http.StatusUnprocessableEntity, status.Errorf(codes.InvalidArgument, "Could not parse request body %s", err.Error()))
+				sendErr := response.sendError(http.StatusUnprocessableEntity, status.Errorf(codes.InvalidArgument, "Could not parse request body %s", err.Error()))
+				if sendErr != nil {
+					logger.Error("Could not send error response", zap.Error(sendErr))
+				}
 				return
 			}
 
