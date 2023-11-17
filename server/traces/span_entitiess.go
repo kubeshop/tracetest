@@ -74,7 +74,7 @@ func (a Attributes) MarshalJSON() ([]byte, error) {
 	return json.Marshal(a.values)
 }
 
-func (a *Attributes) UnmarshalBytes(in []byte) error {
+func (a *Attributes) UnmarshalJSON(in []byte) error {
 	a.mutex = &sync.Mutex{}
 	a.values = make(map[string]string, 0)
 
