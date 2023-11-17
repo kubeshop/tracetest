@@ -24,11 +24,19 @@ const (
 	TracetestMetadataFieldStatusDescription string = "tracetest.span.status_description"
 )
 
-func NewAttributes() Attributes {
-	return Attributes{
+func NewAttributes(inputs ...map[string]string) Attributes {
+	attr := Attributes{
 		mutex:  &sync.Mutex{},
 		values: make(map[string]string),
 	}
+
+	for _, input := range inputs {
+		for key, value := range input {
+			attr.values[key] = value
+		}
+	}
+
+	return attr
 }
 
 type Attributes struct {
@@ -48,7 +56,7 @@ func (a Attributes) Len() int {
 	return len(a.values)
 }
 
-func (a Attributes) lock() {
+func (a *Attributes) lock() {
 	if a.mutex == nil {
 		a.mutex = &sync.Mutex{}
 	}
@@ -56,8 +64,21 @@ func (a Attributes) lock() {
 	a.mutex.Lock()
 }
 
-func (a Attributes) unlock() {
-	a.mutex.Unlock()
+func (a *Attributes) unlock() {
+	if a.mutex != nil {
+		a.mutex.Unlock()
+	}
+}
+
+func (a Attributes) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a.values)
+}
+
+func (a *Attributes) UnmarshalBytes(in []byte) error {
+	a.mutex = &sync.Mutex{}
+	a.values = make(map[string]string, 0)
+
+	return json.Unmarshal(in, &a.values)
 }
 
 func (a Attributes) GetExists(key string) (string, bool) {
@@ -297,7 +318,7 @@ func decodeChildren(parent *Span, children []encodedSpan, cache spanCache) ([]*S
 
 func (span Span) setMetadataAttributes() Span {
 	if span.Attributes.values == nil {
-		span.Attributes = Attributes{}
+		span.Attributes = NewAttributes()
 	}
 
 	span.Attributes.Set(TracetestMetadataFieldName, span.Name)
