@@ -1,6 +1,12 @@
-import {SupportedDataStores} from '../types/DataStore.types';
+import {SupportedDataStores} from 'types/DataStore.types';
 
-export const Lightstep = `receivers:
+export const tracetest = `# OTLP for Tracetest
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true`;
+
+export const Lightstep = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       grpc:
@@ -13,11 +19,9 @@ processors:
 exporters:
   logging:
     logLevel: debug
-  # OTLP for Tracetest
-  otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-    tls:
-      insecure: true
+
+  ${traceTestBlock}
+  
   # OTLP for Lightstep
   otlp/lightstep:
     endpoint: ingest.lightstep.com:443
@@ -36,7 +40,7 @@ service:
       exporters: [logging, otlp/lightstep]
 `;
 
-export const OtelCollector = `receivers:
+export const OtelCollector = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       grpc:
@@ -47,10 +51,7 @@ processors:
     timeout: 100ms
 
 exporters:
-  otlp/1:
-    endpoint: tracetest:4317
-    tls:
-      insecure: true
+  ${traceTestBlock}
 
 service:
   pipelines:
@@ -60,7 +61,7 @@ service:
       exporters: [otlp/1]
 `;
 
-export const NewRelic = `receivers:
+export const NewRelic = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       grpc:
@@ -73,11 +74,9 @@ processors:
 exporters:
   logging:
     logLevel: debug
-  # OTLP for Tracetest
-  otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-    tls:
-      insecure: true
+
+  ${traceTestBlock}
+
   # OTLP for New Relic
   otlp/newrelic:
     endpoint: otlp.nr-data.net:443
@@ -98,7 +97,7 @@ service:
       exporters: [logging, otlp/newrelic]
 `;
 
-export const Datadog = `receivers:
+export const Datadog = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       http:
@@ -111,11 +110,8 @@ processors:
     timeout: 10s
 
 exporters:
-  # OTLP for Tracetest
-  otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-    tls:
-      insecure: true
+  ${traceTestBlock}
+
   # Datadog exporter
   datadog:
     api:
@@ -134,7 +130,7 @@ service:
       exporters: [datadog]
 `;
 
-export const Honeycomb = `receivers:
+export const Honeycomb = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       grpc:
@@ -147,11 +143,9 @@ processors:
 exporters:
   logging:
     logLevel: debug
-  # OTLP for Tracetest
-  otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-    tls:
-      insecure: true
+
+  ${traceTestBlock}
+
   # OTLP for Honeycomb
   otlp/honeycomb:
     endpoint: "api.honeycomb.io:443"
@@ -171,7 +165,7 @@ service:
       exporters: [logging, otlp/honeycomb]
 `;
 
-export const AzureAppInsights = `receivers:
+export const AzureAppInsights = (traceTestBlock: string) => `receivers:
 otlp:
   protocols:
     grpc:
@@ -183,10 +177,8 @@ processors:
 exporters:
   azuremonitor:
     instrumentation_key: <your-instrumentation-key>
-  otlp/tracetest:
-    endpoint: tracetest:4317
-    tls:
-      insecure: true
+
+  ${traceTestBlock}
 
 service:
   pipelines:
@@ -199,7 +191,7 @@ service:
       exporters: [azuremonitor]
 `;
 
-export const Signoz = `receivers:
+export const Signoz = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       grpc:
@@ -212,11 +204,9 @@ processors:
 exporters:
   logging:
     logLevel: debug
-  # OTLP for Tracetest
-  otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-    tls:
-      insecure: true
+  
+  ${traceTestBlock}
+
   # OTLP for Signoz
   otlp/signoz:
     endpoint: address-to-your-signoz-server:4317 # Send traces to Signoz. Read more in docs here: https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/#opentelemetry-collector-configuration
@@ -235,7 +225,7 @@ service:
       exporters: [logging, otlp/signoz]
 `;
 
-export const Dynatrace = `receivers:
+export const Dynatrace = (traceTestBlock: string) => `receivers:
   otlp:
     protocols:
       grpc:
@@ -247,12 +237,10 @@ processors:
 
 exporters:
   logging:
-    verbosity: detailed
-  # OTLP for Tracetest
-  otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
-    tls:
-      insecure: true
+    verbosity: detailed  
+  
+  ${traceTestBlock}
+
   # OTLP for Dynatrace
   otlphttp/dynatrace:
     endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp # Send traces to Dynatrace. Read more in docs here: https://www.dynatrace.com/support/help/extend-dynatrace/opentelemetry/collector#configuration
@@ -272,6 +260,18 @@ service:
 `;
 
 export const CollectorConfigMap = {
+  [SupportedDataStores.Datadog]: Datadog(tracetest),
+  [SupportedDataStores.Lightstep]: Lightstep(tracetest),
+  [SupportedDataStores.NewRelic]: NewRelic(tracetest),
+  [SupportedDataStores.OtelCollector]: OtelCollector(tracetest),
+  [SupportedDataStores.Honeycomb]: Honeycomb(tracetest),
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights(tracetest),
+  [SupportedDataStores.Signoz]: Signoz(tracetest),
+  [SupportedDataStores.Dynatrace]: Dynatrace(tracetest),
+  [SupportedDataStores.Agent]: OtelCollector(tracetest),
+} as const;
+
+export const CollectorConfigFunctionMap = {
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.NewRelic]: NewRelic,
@@ -280,4 +280,5 @@ export const CollectorConfigMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: Signoz,
   [SupportedDataStores.Dynatrace]: Dynatrace,
+  [SupportedDataStores.Agent]: OtelCollector,
 } as const;

@@ -2,6 +2,7 @@ import {Col, Form, Row} from 'antd';
 import {CollectorConfigMap} from 'constants/CollectorConfig.constants';
 import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
 import {FramedCodeBlock} from 'components/CodeBlock';
+import {withCustomization} from 'providers/Customization';
 import * as S from './OpenTelemetryCollector.styled';
 import DataStoreDocsBanner from '../../../DataStoreDocsBanner/DataStoreDocsBanner';
 
@@ -34,4 +35,4 @@ const Configuration = () => {
   );
 };
 
-export default Configuration;
+export default withCustomization(Configuration, 'collectorConfiguration');
