@@ -25,14 +25,14 @@ export enum SortDirection {
 
 export const sortOptions = [
   {
-    label: 'Recently Created',
-    value: 'created',
-    params: {sortDirection: SortDirection.Desc, sortBy: SortBy.Created},
-  },
-  {
     label: 'Last Run',
     value: 'last_run',
     params: {sortDirection: SortDirection.Desc, sortBy: SortBy.LastRun},
+  },
+  {
+    label: 'Recently Created',
+    value: 'created',
+    params: {sortDirection: SortDirection.Desc, sortBy: SortBy.Created},
   },
   {
     label: 'Name, A to Z',
