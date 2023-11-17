@@ -74,11 +74,19 @@ func (a *Attributes) unlock() {
 }
 
 func (a Attributes) MarshalJSON() ([]byte, error) {
+	a.lock()
+	defer a.unlock()
+
 	return json.Marshal(a.values)
 }
 
 func (a *Attributes) UnmarshalJSON(in []byte) error {
-	a.mutex = &sync.Mutex{}
+	if a.mutex == nil {
+		a.mutex = &sync.Mutex{}
+	}
+	a.lock()
+	defer a.unlock()
+
 	a.values = make(map[string]string, 0)
 
 	return json.Unmarshal(in, &a.values)
