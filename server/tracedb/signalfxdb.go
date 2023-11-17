@@ -169,18 +169,18 @@ func (db signalfxDB) getSegmentSpans(ctx context.Context, traceID string, timest
 }
 
 func convertSignalFXSpan(in signalFXSpan) traces.Span {
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 	for name, value := range in.Tags {
-		attributes[name] = value
+		attributes.Set(name, value)
 	}
 
 	for name, value := range in.ProcessTags {
-		attributes[name] = value
+		attributes.Set(name, value)
 	}
 
-	attributes[traces.TracetestMetadataFieldParentID] = in.ParentID
-	attributes[traces.TracetestMetadataFieldKind] = attributes["span.kind"]
-	delete(attributes, "span.kind")
+	attributes.Set(traces.TracetestMetadataFieldParentID, in.ParentID)
+	attributes.Set(traces.TracetestMetadataFieldKind, attributes.Get("span.kind"))
+	attributes.Delete("span.kind")
 
 	spanID, _ := trace.SpanIDFromHex(in.SpanID)
 	startTime, _ := time.Parse(time.RFC3339, in.StartTime)

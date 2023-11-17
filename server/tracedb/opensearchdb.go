@@ -152,7 +152,7 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
 	startTime, _ := time.Parse(time.RFC3339, input["startTime"].(string))
 	endTime, _ := time.Parse(time.RFC3339, input["endTime"].(string))
 
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 
 	for attrName, attrValue := range input {
 		if !strings.HasPrefix(attrName, "span.attributes.") && !strings.HasPrefix(attrName, "resource.attributes.") {
@@ -166,11 +166,11 @@ func convertOpensearchSpanIntoSpan(input map[string]interface{}) traces.Span {
 		// Opensearch's data-prepper replaces "." with "@". We have to revert it. Example:
 		// "service.name" becomes "service@name"
 		name = strings.ReplaceAll(name, "@", ".")
-		attributes[name] = fmt.Sprintf("%v", attrValue)
+		attributes.Set(name, fmt.Sprintf("%v", attrValue))
 	}
 
-	attributes[traces.TracetestMetadataFieldKind] = input["kind"].(string)
-	attributes[traces.TracetestMetadataFieldKind] = input["parentSpanId"].(string)
+	attributes.Set(traces.TracetestMetadataFieldKind, input["kind"].(string))
+	attributes.Set(traces.TracetestMetadataFieldKind, input["parentSpanId"].(string))
 
 	return traces.Span{
 		ID:         spanId,

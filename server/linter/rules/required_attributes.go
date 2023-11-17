@@ -63,7 +63,7 @@ func (r requiredAttributesRule) validateHttpSpan(span *traces.Span) analyzer.Res
 func (r requiredAttributesRule) getMissingAttrs(span *traces.Span, matchingAttrList []string, spanType string) []analyzer.Error {
 	missingAttributes := make([]analyzer.Error, 0)
 	for _, requiredAttribute := range matchingAttrList {
-		if _, attributeExists := span.Attributes[requiredAttribute]; !attributeExists {
+		if _, attributeExists := span.Attributes.GetExists(requiredAttribute); !attributeExists {
 			missingAttributes = append(missingAttributes, analyzer.Error{
 				Value:       requiredAttribute,
 				Description: fmt.Sprintf(`Attribute "%s" is missing from span of type "%s"`, requiredAttribute, spanType),

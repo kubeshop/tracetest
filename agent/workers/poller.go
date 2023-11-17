@@ -198,8 +198,8 @@ func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 func convertTraceInToProtoSpans(trace traces.Trace) []*proto.Span {
 	spans := make([]*proto.Span, 0, len(trace.Flat))
 	for _, span := range trace.Flat {
-		attributes := make([]*proto.KeyValuePair, 0, len(span.Attributes))
-		for name, value := range span.Attributes {
+		attributes := make([]*proto.KeyValuePair, 0, span.Attributes.Len())
+		for name, value := range span.Attributes.Values() {
 			attributes = append(attributes, &proto.KeyValuePair{
 				Key:   name,
 				Value: value,
