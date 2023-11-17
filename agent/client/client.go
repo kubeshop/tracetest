@@ -163,6 +163,10 @@ func isCancelledError(err error) bool {
 }
 
 func (c *Client) reconnect() error {
+	if c.conn != nil {
+		c.conn.Close()
+	}
+
 	// connection is not working. We need to reconnect
 	err := retry.Do(func() error {
 		return c.connect(context.Background())
