@@ -39,10 +39,10 @@ func TestAssertion(t *testing.T) {
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: traces.NewAttributes(map[string]string{
 						"service.name":            "Pokeshop",
 						"tracetest.span.duration": "2000",
-					},
+					}),
 				},
 			},
 			expectedAllPassed: true,
@@ -78,10 +78,10 @@ func TestAssertion(t *testing.T) {
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: traces.NewAttributes(map[string]string{
 						"service.name":            "Pokeshop",
 						"tracetest.span.duration": "2000",
-					},
+					}),
 				},
 			},
 			expectedAllPassed: true,
@@ -124,11 +124,11 @@ func TestAssertion(t *testing.T) {
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: traces.NewAttributes(map[string]string{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
 						"tracetest.span.duration": "21000000",
-					},
+					}),
 				},
 			},
 			expectedAllPassed: true,
@@ -169,11 +169,11 @@ func TestAssertion(t *testing.T) {
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: traces.NewAttributes(map[string]string{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
 						"tracetest.span.duration": "25187564", // 25ms
-					},
+					}),
 				},
 			},
 			expectedAllPassed: true,
@@ -204,11 +204,11 @@ func TestAssertion(t *testing.T) {
 			trace: traces.Trace{
 				RootSpan: traces.Span{
 					ID: spanID,
-					Attributes: traces.Attributes{
+					Attributes: traces.NewAttributes(map[string]string{
 						"service.name":            "Pokeshop",
 						"http.response.body":      `{"id":52}`,
 						"tracetest.span.duration": "35000000", // 35ms
-					},
+					}),
 				},
 			},
 			expectedAllPassed: false,

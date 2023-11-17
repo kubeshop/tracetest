@@ -22,38 +22,38 @@ var pokeshopTrace = traces.Trace{
 	ID: gen.TraceID(),
 	RootSpan: traces.Span{
 		ID: postImportSpanID,
-		Attributes: traces.Attributes{
+		Attributes: traces.NewAttributes(map[string]string{
 			"service.name":        "Pokeshop",
 			"tracetest.span.type": "http",
 			"http.status_code":    "201",
-		},
+		}),
 		Name: "POST /import",
 		Children: []*traces.Span{
 			{
 				ID: insertPokemonDatabaseSpanID,
-				Attributes: traces.Attributes{
+				Attributes: traces.NewAttributes(map[string]string{
 					"service.name":        "Pokeshop",
 					"tracetest.span.type": "db",
 					"db.statement":        "INSERT INTO pokemon (id) values (?)",
-				},
+				}),
 				Name: "Insert pokemon into database",
 			},
 			{
 				ID: getPokemonFromExternalAPISpanID,
-				Attributes: traces.Attributes{
+				Attributes: traces.NewAttributes(map[string]string{
 					"service.name":        "Pokeshop-worker",
 					"tracetest.span.type": "http",
 					"http.status_code":    "200",
-				},
+				}),
 				Name: "Get pokemon from external API",
 				Children: []*traces.Span{
 					{
 						ID: updatePokemonDatabaseSpanID,
-						Attributes: traces.Attributes{
+						Attributes: traces.NewAttributes(map[string]string{
 							"service.name":        "Pokeshop-worker",
 							"tracetest.span.type": "db",
 							"db.statement":        "UPDATE pokemon (name = ?) WHERE id = ?",
-						},
+						}),
 						Name: "Update pokemon on database",
 					},
 				},
